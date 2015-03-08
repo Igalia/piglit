@@ -25,6 +25,7 @@ def add_single_param_test_set(adder, name, *params):
     for param in params:
         adder([name, param], '{}-{}'.format(name, param), run_concurrent=False)
 
+
 def add_depthstencil_render_miplevels_tests(adder, test_types):
     # Note: the buffer sizes below have been chosen to exercise
     # many possible combinations of buffer alignments on i965.
@@ -32,6 +33,7 @@ def add_depthstencil_render_miplevels_tests(adder, test_types):
         for test_type in test_types:
             adder(['depthstencil-render-miplevels', texture_size, test_type],
                   run_concurrent=False)
+
 
 def add_fbo_stencil_tests(adder, format):
     g(['fbo-stencil', 'clear', format], 'fbo-stencil-{}-clear'.format(format))
@@ -42,6 +44,7 @@ def add_fbo_stencil_tests(adder, format):
     g(['fbo-stencil', 'copypixels', format],
       'fbo-stencil-{}-copypixels'.format(format))
     g(['fbo-stencil', 'blit', format], 'fbo-stencil-{}-blit'.format(format))
+
 
 def add_fbo_depthstencil_tests(group, format, num_samples):
     assert format, 'add_fbo_depthstencil_tests argument "format" cannot be empty'
@@ -62,49 +65,50 @@ def add_fbo_depthstencil_tests(group, format, num_samples):
 
     profile.test_list[grouptools.join(
         group, '{}depthstencil-{}-clear{}'.format(prefix, format, suffix))] = \
-            create_test(['fbo-depthstencil', 'clear', format, psamples])
+        create_test(['fbo-depthstencil', 'clear', format, psamples])
     profile.test_list[grouptools.join(
         group, '{}depthstencil-{}-readpixels-FLOAT-and-USHORT{}'.format(
             prefix, format, suffix))] = \
-                create_test(['fbo-depthstencil', 'readpixels', format,
-                             'FLOAT-and-USHORT', psamples])
+        create_test(['fbo-depthstencil', 'readpixels', format,
+                    'FLOAT-and-USHORT', psamples])
     profile.test_list[grouptools.join(
         group,
         '{}depthstencil-{}-readpixels-24_8{}'.format(
             prefix, format, suffix))] = \
-                create_test(['fbo-depthstencil', 'readpixels', format, '24_8',
-                             psamples])
+        create_test(['fbo-depthstencil', 'readpixels', format, '24_8',
+                    psamples])
     profile.test_list[grouptools.join(
         group,
         '{}depthstencil-{}-readpixels-32F_24_8_REV{}'.format(
             prefix, format, suffix))] = \
-                create_test(['fbo-depthstencil', 'readpixels', format,
-                             '32F_24_8_REV', psamples])
+        create_test(['fbo-depthstencil', 'readpixels', format,
+                    '32F_24_8_REV', psamples])
     profile.test_list[grouptools.join(
         group,
         '{}depthstencil-{}-drawpixels-FLOAT-and-USHORT{}'.format(
             prefix, format, suffix))] = \
-                create_test(['fbo-depthstencil', 'drawpixels', format,
-                             'FLOAT-and-USHORT', psamples])
+        create_test(['fbo-depthstencil', 'drawpixels', format,
+                     'FLOAT-and-USHORT', psamples])
     profile.test_list[grouptools.join(
         group,
         '{}depthstencil-{}-drawpixels-24_8{}'.format(
             prefix, format, suffix))] = \
-                create_test(['fbo-depthstencil', 'drawpixels', format, '24_8',
-                             psamples])
+        create_test(['fbo-depthstencil', 'drawpixels', format, '24_8',
+                    psamples])
     profile.test_list[grouptools.join(
         group,
         '{}depthstencil-{}-drawpixels-32F_24_8_REV{}'.format(
             prefix, format, suffix))] = \
-                create_test(['fbo-depthstencil', 'drawpixels', format,
-                             '32F_24_8_REV', psamples])
+        create_test(['fbo-depthstencil', 'drawpixels', format,
+                    '32F_24_8_REV', psamples])
     profile.test_list[grouptools.join(
         group,
         '{}depthstencil-{}-copypixels{}'.format(prefix, format, suffix))] = \
-            create_test(['fbo-depthstencil', 'copypixels', format, psamples])
+        create_test(['fbo-depthstencil', 'copypixels', format, psamples])
     profile.test_list[grouptools.join(
         group, '{}depthstencil-{}-blit{}'.format(prefix, format, suffix))] = \
-            create_test(['fbo-depthstencil', 'blit', format, psamples])
+        create_test(['fbo-depthstencil', 'blit', format, psamples])
+
 
 def add_msaa_visual_plain_tests(adder, args, **kwargs):
     assert isinstance(args, list)
@@ -114,6 +118,7 @@ def add_msaa_visual_plain_tests(adder, args, **kwargs):
         adder(args + ['-samples={}'.format(num_samples)],
               ' '.join(args + ['samples={}'.format(num_samples)]),
               **kwargs)
+
 
 def add_fbo_formats_tests(adder, extension, suffix=''):
     adder(['fbo-generatemipmap-formats', extension],
@@ -130,15 +135,18 @@ def add_fbo_formats_tests(adder, extension, suffix=''):
         adder(['fbo-colormask-formats', extension],
               'fbo-colormask-formats{}'.format(suffix))
 
+
 def add_msaa_formats_tests(adder, extension):
     for num_samples in MSAA_SAMPLE_COUNTS:
         adder(['ext_framebuffer_multisample-formats', str(num_samples), extension],
               'multisample-formats {} {}'.format(num_samples, extension))
 
+
 def add_vpfpgeneric(adder, name):
     adder(['vpfp-generic',
            os.path.join(TESTS_DIR, 'shaders', 'generic', name + '.vpfp')],
           name)
+
 
 def add_texwrap_target_tests(adder, target):
     adder(['texwrap', 'GL_RGBA8'], 'texwrap {}'.format(target))
@@ -148,6 +156,7 @@ def add_texwrap_target_tests(adder, target):
     adder(['texwrap', 'GL_RGBA8', 'proj', 'bordercolor'],
           'texwrap {} proj bordercolor'.format(target))
 
+
 def add_texwrap_format_tests(adder, ext='', suffix=''):
     args = [] if ext == '' else [ext]
     adder(['texwrap'] + args, 'texwrap formats{}'.format(suffix))
@@ -155,6 +164,7 @@ def add_texwrap_format_tests(adder, ext='', suffix=''):
           'texwrap formats{} bordercolor'.format(suffix))
     adder(['texwrap'] + args + ['bordercolor', 'swizzled'],
           'texwrap formats{} bordercolor-swizzled'.format(suffix))
+
 
 def add_fbo_depth_tests(adder, format):
     adder(['fbo-depth-tex1d', format], 'fbo-depth-{}-tex1d'.format(format))
@@ -166,6 +176,7 @@ def add_fbo_depth_tests(adder, format):
     adder(['fbo-depth', 'copypixels', format],
           'fbo-depth-{}-copypixels'.format(format))
     adder(['fbo-depth', 'blit', format], 'fbo-depth-{}-blit'.format(format))
+
 
 def power_set(s):
     """Generate all possible subsets of the given set, including the empty set.
@@ -700,7 +711,8 @@ with profile.group_manager(
     add_msaa_visual_plain_tests(g, ['glx-copy-sub-buffer'],
                                 run_concurrent=False)
 profile.test_list[os.path.join('glx', 'glx-buffer-age vblank_mode=0')] = \
-    PiglitGLTest(['glx-buffer-age'], require_platforms=['glx', 'mixed_glx_egl'],
+    PiglitGLTest(['glx-buffer-age'],
+                 require_platforms=['glx', 'mixed_glx_egl'],
                  run_concurrent=False)
 profile.test_list[os.path.join('glx', 'glx-buffer-age vblank_mode=0')].env['vblank_mode'] = '0'
 
@@ -792,7 +804,7 @@ oml_sync_control_nonzeros = [
     for period in ['1', '2']
 ]
 for args in oml_sync_control_nonzeros:
-    group = grouptools.join('glx','GLX_ARB_sync_control',
+    group = grouptools.join('glx', 'GLX_ARB_sync_control',
                             ' '.join(['timing'] + args))
     profile.test_list[group] = PiglitGLTest(
         ['glx-oml-sync-control-timing'] + args,
@@ -865,10 +877,14 @@ with profile.group_manager(
     g(['scissor-polygon'])
     g(['scissor-stencil-clear'], run_concurrent=False)
     g(['select', 'gl11'], 'GL_SELECT - no test function', run_concurrent=False)
-    g(['select', 'depth'], 'GL_SELECT - depth-test enabled', run_concurrent=False)
-    g(['select', 'stencil'], 'GL_SELECT - stencil-test enabled', run_concurrent=False)
-    g(['select', 'alpha'], 'GL_SELECT - alpha-test enabled', run_concurrent=False)
-    g(['select', 'scissor'], 'GL_SELECT - scissor-test enabled', run_concurrent=False)
+    g(['select', 'depth'], 'GL_SELECT - depth-test enabled',
+      run_concurrent=False)
+    g(['select', 'stencil'], 'GL_SELECT - stencil-test enabled',
+      run_concurrent=False)
+    g(['select', 'alpha'], 'GL_SELECT - alpha-test enabled',
+      run_concurrent=False)
+    g(['select', 'scissor'], 'GL_SELECT - scissor-test enabled',
+      run_concurrent=False)
     g(['stencil-drawpixels'], run_concurrent=False)
     g(['texgen'], run_concurrent=False)
     g(['two-sided-lighting'], run_concurrent=False)
@@ -881,8 +897,7 @@ with profile.group_manager(
     g(['getteximage-formats'], run_concurrent=False)
     g(['getteximage-luminance'], run_concurrent=False)
     g(['getteximage-simple'], run_concurrent=False)
-    g(['incomplete-texture', 'fixed'], 'incomplete-texture-fixed',
-    )
+    g(['incomplete-texture', 'fixed'], 'incomplete-texture-fixed')
     g(['max-texture-size'], run_concurrent=False)
     g(['max-texture-size-level'])
     g(['proxy-texture'])
@@ -933,7 +948,7 @@ with profile.group_manager(
     for format in color_formats:
         g(['teximage-colors', format], run_concurrent=False)
 
-    for num_samples in (0, ) +  MSAA_SAMPLE_COUNTS:
+    for num_samples in (0, ) + MSAA_SAMPLE_COUNTS:
         add_fbo_depthstencil_tests(
             grouptools.join('spec', '!opengl 1.1'), 'default_fb', num_samples)
 
@@ -1092,8 +1107,7 @@ with profile.group_manager(
     g(['bindfragdata-link-error'])
     g(['bindfragdata-nonexistent-variable'])
     g(['gl-3.0-bound-resource-limits'],
-      'bound-resource-limits',
-     )
+      'bound-resource-limits')
     g(['clearbuffer-depth'])
     g(['clearbuffer-depth-stencil'])
     g(['clearbuffer-display-lists'], run_concurrent=False)
@@ -1287,7 +1301,7 @@ with profile.group_manager(
         grouptools.join('spec', 'glsl-1.20')) as g:
     g(['glsl-1.20-getactiveuniform-constant'])
     g(['built-in-constants',
-       os.path.join(TESTS_DIR, 'spec', 'glsl-1.20','minimum-maximums.txt')],
+       os.path.join(TESTS_DIR, 'spec', 'glsl-1.20', 'minimum-maximums.txt')],
       'built-in constants')
 
 with profile.group_manager(
@@ -1435,7 +1449,7 @@ with profile.group_manager(
                   '2DShadow']:
         g(['tex-miplevel-selection', 'textureProjOffset(bias)', stage])
 
-    for stage in ['1D','2D','3D', '1DShadow', '2DShadow', '1DArray', '2DArray',
+    for stage in ['1D', '2D', '3D', '1DShadow', '2DShadow', '1DArray', '2DArray',
                   '1DArrayShadow']:
         g(['tex-miplevel-selection', 'textureLodOffset', stage])
 
@@ -1449,7 +1463,7 @@ with profile.group_manager(
                   '1DArrayShadow', '2DArrayShadow', 'CubeArray']:
         g(['tex-miplevel-selection', 'textureGrad', stage])
 
-    for stage in ['1D', '2D', '3D','2DRect', '2DRectShadow', '1DShadow',
+    for stage in ['1D', '2D', '3D', '2DRect', '2DRectShadow', '1DShadow',
                   '2DShadow', '1DArray', '2DArray', '1DArrayShadow',
                   '2DArrayShadow']:
         g(['tex-miplevel-selection', 'textureGradOffset', stage])
@@ -1712,7 +1726,7 @@ with profile.group_manager(
     samplers = ['2D', '2DArray', 'Cube', 'CubeArray']
     for stage, comp, type_, sampler in itertools.product(
             stages, comps, types, samplers):
-        for swiz in  ['red', 'green', 'blue', 'alpha'][:len(comp)] + ['', 'zero', 'one']:
+        for swiz in ['red', 'green', 'blue', 'alpha'][:len(comp)] + ['', 'zero', 'one']:
             for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
                 testname = grouptools.join(
                     func, '{}-{}-{}-{}-{}'.format(
@@ -1958,7 +1972,7 @@ with profile.group_manager(
     samplers = ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']
     for stage, type_, comp, sampler in itertools.product(
             stages, types, comps, samplers):
-        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets' ]:
+        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets']:
             for cs in xrange(len(comp)):
                 assert cs <= 3
                 address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
@@ -1981,7 +1995,7 @@ with profile.group_manager(
     # test shadow samplers
     samplers = ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']
     for stage, sampler in itertools.product(stages, samplers):
-        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets' ]:
+        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets']:
             testname = grouptools.join(func, '{}-r-none-shadow-{}'.format(
                 stage, sampler))
             cmd = ['textureGather', stage, 'shadow', 'r',
@@ -2065,12 +2079,9 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_sampler_objects')) as g:
-    g(['arb_sampler_objects-sampler-objects'], 'sampler-objects',
-    )
-    g(['arb_sampler_objects-sampler-incomplete'], 'sampler-incomplete',
-    )
-    g(['arb_sampler_objects-srgb-decode'], 'GL_EXT_texture_sRGB_decode',
-    )
+    g(['arb_sampler_objects-sampler-objects'], 'sampler-objects',)
+    g(['arb_sampler_objects-sampler-incomplete'], 'sampler-incomplete',)
+    g(['arb_sampler_objects-srgb-decode'], 'GL_EXT_texture_sRGB_decode',)
     g(['arb_sampler_objects-framebufferblit'], 'framebufferblit',
       run_concurrent=False)
 
@@ -2085,7 +2096,7 @@ with profile.group_manager(
           'builtin-gl-num-samples {0}'.format(num_samples),
           run_concurrent=False)
         g(['arb_sample_shading-builtin-gl-sample-id', str(num_samples)],
-          'builtin-gl-sample-id {}'.format(num_samples),run_concurrent=False)
+          'builtin-gl-sample-id {}'.format(num_samples), run_concurrent=False)
         g(['arb_sample_shading-builtin-gl-sample-mask', str(num_samples)],
           'builtin-gl-sample-mask {}'.format(num_samples),
           run_concurrent=False)
@@ -2354,7 +2365,6 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_color_buffer_float')) as g:
 
-
     def f(name, format, p1=None, p2=None):
         testname = '{}-{}{}{}'.format(
             format, name,
@@ -2362,7 +2372,6 @@ with profile.group_manager(
             '-{}'.format(p2) if p2 else '')
         cmd = ['arb_color_buffer_float-{}'.format(name), format, p1, p2]
         g([c for c in cmd if c is not None], testname)
-
 
     f('mrt', 'mixed')
     f('getteximage', 'GL_RGBA8')
@@ -2843,10 +2852,10 @@ with profile.group_manager(
     g(['ext_packed_depth_stencil-readpixels-24_8'], 'readpixels-24_8',
       run_concurrent=False)
     add_depthstencil_render_miplevels_tests(
-            g,
-            ['s=z24_s8', 'd=z24_s8', 'd=z24_s8_s=z24_s8', 'd=z24_s=z24_s8',
-             's=z24_s8_d=z24_s8', 's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
-             'ds=z24_s8'])
+        g,
+        ['s=z24_s8', 'd=z24_s8', 'd=z24_s8_s=z24_s8', 'd=z24_s=z24_s8',
+         's=z24_s8_d=z24_s8', 's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
+         'ds=z24_s8'])
     add_fbo_stencil_tests(g, 'GL_DEPTH24_STENCIL8')
     add_texwrap_format_tests(g, 'GL_EXT_packed_depth_stencil')
     add_fbo_depth_tests(g, 'GL_DEPTH24_STENCIL8')
@@ -2954,8 +2963,7 @@ with profile.group_manager(
     g(['compressedteximage', 'GL_COMPRESSED_RED_GREEN_RGTC2_EXT'])
     g(['compressedteximage', 'GL_COMPRESSED_SIGNED_RED_RGTC1_EXT'])
     g(['compressedteximage', 'GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT'])
-    g(['arb_texture_compression-invalid-formats', 'rgtc'], 'invalid formats',
-    )
+    g(['arb_texture_compression-invalid-formats', 'rgtc'], 'invalid formats')
     g(['rgtc-teximage-01'], run_concurrent=False)
     g(['rgtc-teximage-02'], run_concurrent=False)
     g(['fbo-generatemipmap-formats', 'GL_EXT_texture_compression_rgtc'],
@@ -3122,14 +3130,15 @@ with profile.group_manager(
     for mode in ['interleaved_ok_base', 'interleaved_ok_range',
                  'interleaved_ok_offset', 'interleaved_unbound',
                  'interleaved_no_varyings', 'separate_ok_1',
-                 'separate_unbound_0_1', 'separate_ok_2', 'separate_unbound_0_2',
-                 'separate_unbound_1_2', 'separate_no_varyings', 'no_prog_active',
-                 'begin_active', 'useprog_active', 'link_current_active',
-                 'link_other_active', 'bind_base_active', 'bind_range_active',
-                 'bind_offset_active', 'end_inactive', 'bind_base_max',
-                 'bind_range_max', 'bind_offset_max', 'bind_range_size_m4',
-                 'bind_range_size_0', 'bind_range_size_1', 'bind_range_size_2',
-                 'bind_range_size_3', 'bind_range_size_5', 'bind_range_offset_1',
+                 'separate_unbound_0_1', 'separate_ok_2',
+                 'separate_unbound_0_2', 'separate_unbound_1_2',
+                 'separate_no_varyings', 'no_prog_active', 'begin_active',
+                 'useprog_active', 'link_current_active', 'link_other_active',
+                 'bind_base_active', 'bind_range_active', 'bind_offset_active',
+                 'end_inactive', 'bind_base_max', 'bind_range_max',
+                 'bind_offset_max', 'bind_range_size_m4', 'bind_range_size_0',
+                 'bind_range_size_1', 'bind_range_size_2', 'bind_range_size_3',
+                 'bind_range_size_5', 'bind_range_offset_1',
                  'bind_range_offset_2', 'bind_range_offset_3',
                  'bind_range_offset_5', 'bind_offset_offset_1',
                  'bind_offset_offset_2', 'bind_offset_offset_3',
@@ -3174,7 +3183,8 @@ with profile.group_manager(
     for draw_mode in ['points', 'lines', 'line_loop', 'line_strip',
                       'triangles', 'triangle_strip', 'triangle_fan',
                       'quads', 'quad_strip', 'polygon']:
-        for shade_mode in ['monochrome', 'smooth', 'flat_first', 'flat_last', 'wireframe']:
+        for shade_mode in ['monochrome', 'smooth', 'flat_first', 'flat_last',
+                           'wireframe']:
             if (draw_mode in ['points', 'lines', 'line_loop', 'line_strip'] and
                     shade_mode == 'wireframe'):
                 continue
@@ -3186,9 +3196,9 @@ with profile.group_manager(
           'alignment {0}'.format(alignment))
 
     for output_type in ['float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat2x3',
-                        'mat2x4', 'mat3x2', 'mat3', 'mat3x4', 'mat4x2', 'mat4x3',
-                        'mat4', 'int', 'ivec2', 'ivec3', 'ivec4', 'uint', 'uvec2',
-                        'uvec3', 'uvec4']:
+                        'mat2x4', 'mat3x2', 'mat3', 'mat3x4', 'mat4x2',
+                        'mat4x3', 'mat4', 'int', 'ivec2', 'ivec3', 'ivec4',
+                        'uint', 'uvec2', 'uvec3', 'uvec4']:
         for suffix in ['', '[2]', '[2]-no-subscript']:
             g(['ext_transform_feedback-output-type', output_type, suffix],
               'output-type {0}{1}'.format(output_type, suffix))
@@ -3197,8 +3207,8 @@ with profile.group_manager(
         g(['ext_transform_feedback-generatemipmap', mode],
           'generatemipmap {0}'.format(mode))
 
-    for test_case in ['base-shrink', 'base-grow', 'offset-shrink', 'offset-grow',
-                      'range-shrink', 'range-grow']:
+    for test_case in ['base-shrink', 'base-grow', 'offset-shrink',
+                      'offset-grow', 'range-shrink', 'range-grow']:
         g(['ext_transform_feedback-change-size', test_case],
           'change-size {0}'.format(test_case))
 
@@ -3318,7 +3328,8 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_transform_feedback3')) as g:
     g(['arb_transform_feedback3-bind_buffer_invalid_index'],
-      'arb_transform_feedback3-bind_buffer_invalid_index', run_concurrent=False)
+      'arb_transform_feedback3-bind_buffer_invalid_index',
+      run_concurrent=False)
     g(['arb_transform_feedback3-query_with_invalid_index'],
       'arb_transform_feedback3-query_with_invalid_index', run_concurrent=False)
     g(['arb_transform_feedback3-end_query_with_name_zero'],
@@ -3342,8 +3353,9 @@ with profile.group_manager(
       run_concurrent=False)
 
     for param in ['gl_NextBuffer-1', 'gl_NextBuffer-2', 'gl_SkipComponents1-1',
-                  'gl_SkipComponents1-2', 'gl_SkipComponents1-3', 'gl_SkipComponents2',
-                  'gl_SkipComponents3', 'gl_SkipComponents4',
+                  'gl_SkipComponents1-2', 'gl_SkipComponents1-3',
+                  'gl_SkipComponents2', 'gl_SkipComponents3',
+                  'gl_SkipComponents4',
                   'gl_NextBuffer-gl_SkipComponents1-gl_NextBuffer',
                   'gl_NextBuffer-gl_NextBuffer', 'gl_SkipComponents1234']:
         g(['ext_transform_feedback-output-type', param], param)
@@ -3406,9 +3418,11 @@ with profile.group_manager(
         grouptools.join('spec', 'arb_uniform_buffer_object',
                         'maxuniformblocksize')) as g:
     g(['arb_uniform_buffer_object-maxuniformblocksize', 'vs'], 'vs')
-    g(['arb_uniform_buffer_object-maxuniformblocksize', 'vsexceed'], 'vsexceed')
+    g(['arb_uniform_buffer_object-maxuniformblocksize', 'vsexceed'],
+      'vsexceed')
     g(['arb_uniform_buffer_object-maxuniformblocksize', 'fs'], 'fs')
-    g(['arb_uniform_buffer_object-maxuniformblocksize', 'fsexceed'], 'fsexceed')
+    g(['arb_uniform_buffer_object-maxuniformblocksize', 'fsexceed'],
+      'fsexceed')
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ati_draw_buffers')) as g:
@@ -3428,7 +3442,8 @@ with profile.group_manager(
       run_concurrent=False)
     g(['arb_instanced_arrays-instanced_arrays'], run_concurrent=False)
     g(['arb_instanced_arrays-drawarrays'], run_concurrent=False)
-    add_single_param_test_set(g, 'arb_instanced_arrays-instanced_arrays', 'vbo')
+    add_single_param_test_set(g, 'arb_instanced_arrays-instanced_arrays',
+                              'vbo')
 
 with profile.group_manager(
         PiglitGLTest,
@@ -3443,16 +3458,16 @@ with profile.group_manager(
     g(['map_buffer_range_test'], run_concurrent=False)
     g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_RANGE_BIT', 'offset=0'],
       'MAP_INVALIDATE_RANGE_BIT offset=0')
-    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_RANGE_BIT', 'increment-offset'],
-      'MAP_INVALIDATE_RANGE_BIT increment-offset')
-    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_RANGE_BIT', 'decrement-offset'],
-      'MAP_INVALIDATE_RANGE_BIT decrement-offset')
+    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_RANGE_BIT',
+       'increment-offset'], 'MAP_INVALIDATE_RANGE_BIT increment-offset')
+    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_RANGE_BIT',
+       'decrement-offset'], 'MAP_INVALIDATE_RANGE_BIT decrement-offset')
     g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_BUFFER_BIT', 'offset=0'],
       'MAP_INVALIDATE_BUFFER_BIT offset=0')
-    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_BUFFER_BIT', 'increment-offset'],
-      'MAP_INVALIDATE_BUFFER_BIT increment-offset')
-    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_BUFFER_BIT', 'decrement-offset'],
-      'MAP_INVALIDATE_BUFFER_BIT decrement-offset')
+    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_BUFFER_BIT',
+       'increment-offset'], 'MAP_INVALIDATE_BUFFER_BIT increment-offset')
+    g(['map_buffer_range-invalidate', 'MAP_INVALIDATE_BUFFER_BIT',
+       'decrement-offset'], 'MAP_INVALIDATE_BUFFER_BIT decrement-offset')
     g(['map_buffer_range-invalidate', 'CopyBufferSubData', 'offset=0'],
       'CopyBufferSubData offset=0')
     g(['map_buffer_range-invalidate', 'CopyBufferSubData', 'increment-offset'],
@@ -3472,7 +3487,7 @@ with profile.group_manager(
     g(['arb_seamless_cubemap-three-faces-average'], run_concurrent=False)
 
 with profile.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'AMD_pinned_memory'))  as g:
+        PiglitGLTest, grouptools.join('spec', 'AMD_pinned_memory')) as g:
     g(['amd_pinned_memory', 'offset=0'], 'offset=0', run_concurrent=True)
     g(['amd_pinned_memory', 'increment-offset'], 'increment-offset',
       run_concurrent=True)
@@ -3926,7 +3941,8 @@ with profile.group_manager(
     g(['arb_geometry_shader4-vertices-in'])
 
     for draw in ['', 'indexed']:
-        for prim in ['GL_LINES_ADJACENCY', 'GL_LINE_STRIP_ADJACENCY', 'GL_TRIANGLES_ADJACENCY', 'GL_TRIANGLE_STRIP_ADJACENCY']:
+        for prim in ['GL_LINES_ADJACENCY', 'GL_LINE_STRIP_ADJACENCY',
+                     'GL_TRIANGLES_ADJACENCY', 'GL_TRIANGLE_STRIP_ADJACENCY']:
             g(['arb_geometry_shader4-ignore-adjacent-vertices', draw, prim])
 
     for mode in ['1', 'tf 1', 'max', 'tf max']:
@@ -4014,7 +4030,8 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_compressed_paletted_texture')) as g:
     g(['oes_compressed_paletted_texture-api'], 'basic API')
-    g(['arb_texture_compression-invalid-formats', 'paletted'], 'invalid formats')
+    g(['arb_texture_compression-invalid-formats', 'paletted'],
+      'invalid formats')
     g(['oes_compressed_paletted_texture-api'], 'basic API')
 
 with profile.group_manager(
@@ -4024,15 +4041,18 @@ with profile.group_manager(
     g(['egl-create-surface'], 'eglCreateSurface', run_concurrent=False)
     g(['egl-query-surface', '--bad-attr'], 'eglQuerySurface EGL_BAD_ATTRIBUTE',
       run_concurrent=False)
-    g(['egl-query-surface', '--bad-surface'], 'eglQuerySurface EGL_BAD_SURFACE',
+    g(['egl-query-surface', '--bad-surface'],
+      'eglQuerySurface EGL_BAD_SURFACE',
       run_concurrent=False)
     g(['egl-query-surface', '--attr=EGL_HEIGHT'], 'eglQuerySurface EGL_HEIGHT',
       run_concurrent=False)
     g(['egl-query-surface', '--attr=EGL_WIDTH'], 'eglQuerySurface EGL_WIDTH',
       run_concurrent=False)
-    g(['egl-terminate-then-unbind-context'], 'eglTerminate then unbind context',
+    g(['egl-terminate-then-unbind-context'],
+      'eglTerminate then unbind context',
       run_concurrent=False)
-    g(['egl-create-pbuffer-surface'], 'eglCreatePbufferSurface and then glClear',
+    g(['egl-create-pbuffer-surface'],
+      'eglCreatePbufferSurface and then glClear',
       run_concurrent=False)
 
 with profile.group_manager(
@@ -4142,7 +4162,8 @@ with profile.group_manager(
           run_concurrent=False)
 
     for tex_format in ['rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11',
-                       'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1']:
+                       'rgb8-punchthrough-alpha1',
+                       'srgb8-punchthrough-alpha1']:
         g(['oes_compressed_etc2_texture-miptree_gles3', tex_format])
 
 with profile.group_manager(
@@ -4151,7 +4172,8 @@ with profile.group_manager(
     g(['es3-drawarrays-primrestart-fixedindex'])
 
     for tex_format in ['rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11',
-                       'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1']:
+                       'rgb8-punchthrough-alpha1',
+                       'srgb8-punchthrough-alpha1']:
         for context in ['core', 'compat']:
             g(['oes_compressed_etc2_texture-miptree', tex_format, context])
 
