@@ -32,11 +32,11 @@ from framework.test import TEST_BIN_DIR, Test
 __all__ = ['profile']
 
 #############################################################################
-##### GTFTest: Execute a sub-test of the Khronos ES 3.0 Conformance suite.
-#####
-##### To use this, create a 'GTF3' symlink in piglit/bin which points to the
-##### Khronos 'GTF' executable.  Piglit will automatically add all .test
-##### files into the 'gtf' category.
+# GTFTest: Execute a sub-test of the Khronos ES 3.0 Conformance suite.
+#
+# To use this, create a 'GTF3' symlink in piglit/bin which points to the
+# Khronos 'GTF' executable.  Piglit will automatically add all .test
+# files into the 'gtf' category.
 #############################################################################
 
 if not path.exists(path.join(TEST_BIN_DIR, 'GTF3')):
@@ -47,8 +47,10 @@ profile = TestProfile()
 # Chase the piglit/bin/GTF symlink to find where the tests really live.
 gtfroot = path.dirname(path.realpath(path.join(TEST_BIN_DIR, 'GTF3')))
 
+
 class GTFTest(Test):
-    pass_re = re.compile(r'(Conformance|Regression) PASSED all (?P<passed>\d+) tests')
+    pass_re = re.compile(
+        r'(Conformance|Regression) PASSED all (?P<passed>\d+) tests')
 
     def __init__(self, testpath):
         super(GTFTest, self).__init__([path.join(TEST_BIN_DIR, 'GTF3'),
@@ -61,6 +63,7 @@ class GTFTest(Test):
             self.result['result'] = 'pass'
         else:
             self.result['result'] = 'fail'
+
 
 def populateTests(runfile):
     "Read a .run file, adding any .test files to the profile"
