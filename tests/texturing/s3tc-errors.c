@@ -267,7 +267,7 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 	pass = check_gl_error2(GL_INVALID_OPERATION, GL_INVALID_VALUE) && pass;
 
 	/* Try compressed subimage with invalid offset - should not work */
-	x = -3;
+	x = -4;
 	y = 8;
 	w = 4;
 	h = 4;
