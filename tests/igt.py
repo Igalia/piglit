@@ -79,8 +79,8 @@ else:
     assert os.path.exists(IGT_TEST_ROOT)
 
 # check for the test lists
-if not (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt'))
-        and os.path.exists(os.path.join(IGT_TEST_ROOT, 'multi-tests.txt'))):
+if not (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt')) and
+        os.path.exists(os.path.join(IGT_TEST_ROOT, 'multi-tests.txt'))):
     print("intel-gpu-tools test lists not found.")
     sys.exit(0)
 
@@ -113,7 +113,6 @@ class IGTTest(Test):
             self.result['result'] = 'timeout'
         else:
             self.result['result'] = 'fail'
-
 
 
 def list_tests(listname):
