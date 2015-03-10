@@ -39,14 +39,17 @@ if not os.path.exists(bin_oglconform):
 
 profile = TestProfile()
 
-#############################################################################
-##### OGLCTest: Execute a sub-test of the Intel oglconform test suite.
-#####
-##### To use this, create an 'oglconform' symlink in piglit/bin.  Piglit
-##### will obtain a list of tests from oglconform and add them all.
-#############################################################################
+
 class OGLCTest(Test):
-    skip_re = re.compile(r'Total Not run: 1|no test in schedule is compat|GLSL [13].[345]0 is not supported|wont be scheduled due to lack of compatible fbconfig')
+    """OGLCTest: Execute a sub-test of the Intel oglconform test suite.
+
+    To use this, create an 'oglconform' symlink in piglit/bin.  Piglit
+    will obtain a list of tests from oglconform and add them all.
+
+    """
+    skip_re = re.compile(r'Total Not run: 1|no test in schedule is '
+                         r'compat|GLSL [13].[345]0 is not supported|wont be '
+                         r'scheduled due to lack of compatible fbconfig')
 
     def __init__(self, category, subtest):
         super(OGLCTest, self).__init__([bin_oglconform, '-minFmt', '-v', '4',
@@ -65,13 +68,15 @@ class OGLCTest(Test):
 testlist_file = '/tmp/oglc.tests'
 
 with open(os.devnull, "w") as devnull:
-    subprocess.call([bin_oglconform, '-generateTestList', testlist_file], stdout=devnull.fileno(), stderr=devnull.fileno())
+    subprocess.call([bin_oglconform, '-generateTestList', testlist_file],
+                    stdout=devnull.fileno(), stderr=devnull.fileno())
 
 with open(testlist_file) as f:
     testlist = f.read().splitlines()
     for l in testlist:
         try:
             category, test = l.split()
-            profile.test_list[grouptools.join('oglconform', category, test)] = OGLCTest(category, test)
+            profile.test_list[grouptools.join('oglconform', category, test)] \
+                = OGLCTest(category, test)
         except:
             continue
