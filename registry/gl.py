@@ -74,46 +74,49 @@ def _repair_xml(xml_registry):
         remove_queue.append((parent, child))
 
     for enums in xml_registry.iterfind('./enums'):
-        if ('GL_ALL_ATTRIB_BITS' in fixes
-            and enums.get('group') == 'AttribMask'):
-                # The XML defines GL_ALL_ATTRIB_BITS incorrectly with all bits
-                # set (0xFFFFFFFF). From the GL_ARB_multisample spec, v5:
-                #
-                #     In order to avoid incompatibility with GL implementations
-                #     that do not support SGIS_multisample, ALL_ATTRIB_BITS
-                #     does not include MULTISAMPLE_BIT_ARB.
-                #
-                enum = enums.find("./enum[@name='GL_ALL_ATTRIB_BITS']")
-                enum.set('value', '0x000FFFFF')
+        if ('GL_ALL_ATTRIB_BITS' in fixes and
+                enums.get('group') == 'AttribMask'):
+            # The XML defines GL_ALL_ATTRIB_BITS incorrectly with all bits
+            # set (0xFFFFFFFF). From the GL_ARB_multisample spec, v5:
+            #
+            #     In order to avoid incompatibility with GL implementations
+            #     that do not support SGIS_multisample, ALL_ATTRIB_BITS
+            #     does not include MULTISAMPLE_BIT_ARB.
+            #
+            enum = enums.find("./enum[@name='GL_ALL_ATTRIB_BITS']")
+            enum.set('value', '0x000FFFFF')
 
-                fixes.remove('GL_ALL_ATTRIB_BITS')
-                continue
+            fixes.remove('GL_ALL_ATTRIB_BITS')
+            continue
 
-        if ('glOcclusionQueryEventMaskAMD' in fixes
-            and enums.get('namespace') == 'OcclusionQueryEventMaskAMD'):
-                # This tag's attributes are totally broken.
-                enums.set('namespace', 'GL')
-                enums.set('group', 'OcclusionQueryEventMaskAMD')
-                enums.set('type', 'bitmask')
+        if ('glOcclusionQueryEventMaskAMD' in fixes and
+                enums.get('namespace') == 'OcclusionQueryEventMaskAMD'):
+            # This tag's attributes are totally broken.
+            enums.set('namespace', 'GL')
+            enums.set('group', 'OcclusionQueryEventMaskAMD')
+            enums.set('type', 'bitmask')
 
-                fixes.remove('glOcclusionQueryEventMaskAMD')
-                continue
+            fixes.remove('glOcclusionQueryEventMaskAMD')
+            continue
 
-        if ('gles2_GL_ACTIVE_PROGRAM_EXT' in fixes
-            and enums.get('vendor') is not None and enums.get('vendor') == 'ARB'
-            and enums.get('start') is not None and enums.get('start') <= '0x8259'
-            and enums.get('end') is not None and enums.get('end') >= '0x8259'):
-                # GL_ACTIVE_PROGRAM_EXT has different numerical values in GL
-                # (0x8B8D) and in GLES (0x8259). Remove the GLES value to avoid
-                # redefinition collisions.
-                bad_enum = enums.find(("./enum"
-                                       "[@value='0x8259']"
-                                       "[@name='GL_ACTIVE_PROGRAM_EXT']"
-                                       "[@api='gles2']"))
-                defer_removal(enums, bad_enum)
+        if ('gles2_GL_ACTIVE_PROGRAM_EXT' in fixes and
+                enums.get('vendor') is not None and
+                enums.get('vendor') == 'ARB' and
+                enums.get('start') is not None and
+                enums.get('start') <= '0x8259' and
+                enums.get('end') is not None and
+                enums.get('end') >= '0x8259'):
+            # GL_ACTIVE_PROGRAM_EXT has different numerical values in GL
+            # (0x8B8D) and in GLES (0x8259). Remove the GLES value to avoid
+            # redefinition collisions.
+            bad_enum = enums.find(("./enum"
+                                   "[@value='0x8259']"
+                                   "[@name='GL_ACTIVE_PROGRAM_EXT']"
+                                   "[@api='gles2']"))
+            defer_removal(enums, bad_enum)
 
-                fixes.remove('gles2_GL_ACTIVE_PROGRAM_EXT')
-                continue
+            fixes.remove('gles2_GL_ACTIVE_PROGRAM_EXT')
+            continue
 
     for (parent, child) in remove_queue:
         parent.remove(child)
@@ -554,7 +557,8 @@ class Extension(object):
                 return True
             else:
                 return False
-        elif (other.vendor_namespace == 'EXT') != (self.vendor_namespace == 'EXT'):
+        elif (other.vendor_namespace == 'EXT') != \
+                (self.vendor_namespace == 'EXT'):
             # Sort EXT before others
             if self.vendor_namespace == 'EXT':
                 return True
@@ -677,9 +681,13 @@ class CommandParam(object):
         #
         #    <param>const <ptype>GLchar</ptype> *<name>name</name></param>
         #    <param len="1"><ptype>GLsizei</ptype> *<name>length</name></param>
-        #    <param len="bufSize"><ptype>GLint</ptype> *<name>values</name></param>
+        #    <param len="bufSize">
+        #        <ptype>GLint</ptype> *<name>values</name>
+        #    </param>
         #    <param><ptype>GLenum</ptype> <name>shadertype</name></param>
-        #    <param group="sync"><ptype>GLsync</ptype> <name>sync</name></param>
+        #    <param group="sync">
+        #        <ptype>GLsync</ptype> <name>sync</name>
+        #    </param>
         #    <param><ptype>GLuint</ptype> <name>baseAndCount</name>[2]</param>
 
         assert xml_param.tag == 'param'
@@ -691,11 +699,15 @@ class CommandParam(object):
 
         # Parse the C type.
         c_type_text = list(xml_param.itertext())
-        c_type_text_end = c_type_text.pop(-1)  # Could be <name> or <array_suffix>
-        if c_type_text_end.startswith('['): # We popped off <array_suffix>
+
+        # Could be <name> or <array_suffix>
+        c_type_text_end = c_type_text.pop(-1)
+
+        # We popped off <array_suffix>
+        if c_type_text_end.startswith('['):
             # This is an array variable.
             self.array_suffix = c_type_text_end
-            c_type_text.pop(-1) # Pop off the next one (<name>)
+            c_type_text.pop(-1)  # Pop off the next one (<name>)
         else:
             self.array_suffix = ''
         c_type_text = (t.strip() for t in c_type_text)
@@ -736,17 +748,32 @@ class Command(object):
         #
         #    <command>
         #        <proto>void <name>glTexSubImage2D</name></proto>
-        #        <param group="TextureTarget"><ptype>GLenum</ptype> <name>target</name></param>
-        #        <param group="CheckedInt32"><ptype>GLint</ptype> <name>level</name></param>
-        #        <param group="CheckedInt32"><ptype>GLint</ptype> <name>xoffset</name></param>
-        #        <param group="CheckedInt32"><ptype>GLint</ptype> <name>yoffset</name></param>
+        #        <param group="TextureTarget">
+        #            <ptype>GLenum</ptype> <name>target</name>
+        #        </param>
+        #        <param group="CheckedInt32">
+        #            <ptype>GLint</ptype> <name>level</name>
+        #        </param>
+        #        <param group="CheckedInt32">
+        #            <ptype>GLint</ptype> <name>xoffset</name>
+        #        </param>
+        #        <param group="CheckedInt32">
+        #            <ptype>GLint</ptype> <name>yoffset</name>
+        #        </param>
         #        <param><ptype>GLsizei</ptype> <name>width</name></param>
         #        <param><ptype>GLsizei</ptype> <name>height</name></param>
-        #        <param group="PixelFormat"><ptype>GLenum</ptype> <name>format</name></param>
-        #        <param group="PixelType"><ptype>GLenum</ptype> <name>type</name></param>
-        #        <param len="COMPSIZE(format,type,width,height)">const void *<name>pixels</name></param>
+        #        <param group="PixelFormat">
+        #            <ptype>GLenum</ptype> <name>format</name>
+        #        </param>
+        #        <param group="PixelType">
+        #            <ptype>GLenum</ptype> <name>type</name>
+        #        </param>
+        #        <param len="COMPSIZE(format,type,width,height)">const void *
+        #            <name>pixels</name>
+        #        </param>
         #        <glx type="render" opcode="4100"/>
-        #        <glx type="render" opcode="332" name="glTexSubImage2DPBO" comment="PBO protocol"/>
+        #        <glx type="render" opcode="332" name="glTexSubImage2DPBO"
+        #             comment="PBO protocol"/>
         #    </command>
         #
 
@@ -761,9 +788,12 @@ class Command(object):
         # Parse the return type from the <proto> element.
         #
         # Example of a difficult <proto> element:
-        #     <proto group="String">const <ptype>GLubyte</ptype> *<name>glGetStringi</name></proto>
+        #     <proto group="String">const <ptype>GLubyte</ptype> *
+        #         <name>glGetStringi</name>
+        #     </proto>
         c_return_type_text = list(xml_proto.itertext())
-        c_return_type_text.pop(-1)  # Pop off the text from the <name> subelement.
+        # Pop off the text from the <name> subelement.
+        c_return_type_text.pop(-1)
         c_return_type_text = (t.strip() for t in c_return_type_text)
         self.c_return_type = ' '.join(c_return_type_text).strip()
 
@@ -816,7 +846,8 @@ class Command(object):
     @property
     def c_prototype(self):
         """For example, "void glAccum(GLenum o, GLfloat value)"."""
-        return '{self.c_return_type} {self.name}({self.c_named_param_list})'.format(self=self)
+        return '{self.c_return_type} {self.name}({self.c_named_param_list})'\
+            .format(self=self)
 
     @property
     def c_funcptr_typedef(self):
@@ -827,7 +858,7 @@ class Command(object):
     def c_named_param_list(self):
         """For example, "GLenum op, GLfloat value" for glAccum."""
         return ', '.join(
-            '{param.c_type} {param.name}{param.array_suffix}'.format(param=param)
+            '{p.c_type} {p.name}{p.array_suffix}'.format(p=param)
             for param in self.param_list
         )
 
@@ -909,7 +940,8 @@ class CommandAliasMap(object):
     def __iter__(self):
         """A sorted iterator over the map's unique CommandAliasSet values."""
         if self.__sorted_unique_values is None:
-            self.__sorted_unique_values = sorted(set(six.itervalues(self.__map)))
+            self.__sorted_unique_values = \
+                sorted(set(six.itervalues(self.__map)))
 
         return iter(self.__sorted_unique_values)
 
@@ -918,9 +950,9 @@ class CommandAliasMap(object):
 
     def add(self, command):
         assert isinstance(command, Command)
-        _log_debug('adding command {0!r} to CommandAliasMap'.format(command.name))
-
         name = command.name
+        _log_debug('adding command {0!r} to CommandAliasMap'.format(name))
+
         name_set = self.get(name, None)
         assert self.__is_set_mapping_complete(name_set)
 
@@ -1013,13 +1045,16 @@ class EnumGroup(object):
         # Example of a bitmask group:
         #
         #     <enums namespace="GL" group="SyncObjectMask" type="bitmask">
-        #         <enum value="0x00000001" name="GL_SYNC_FLUSH_COMMANDS_BIT"/>
-        #         <enum value="0x00000001" name="GL_SYNC_FLUSH_COMMANDS_BIT_APPLE"/>
+        #         <enum value="0x00000001"
+        #               name="GL_SYNC_FLUSH_COMMANDS_BIT"/>
+        #         <enum value="0x00000001"
+        #               name="GL_SYNC_FLUSH_COMMANDS_BIT_APPLE"/>
         #     </enums>
         #
         # Example of a group that resides in OpenGL's default enum namespace:
         #
-        #     <enums namespace="GL" start="0x0000" end="0x7FFF" vendor="ARB" comment="...">
+        #     <enums namespace="GL" start="0x0000" end="0x7FFF" vendor="ARB"
+        #            comment="...">
         #         <enum value="0x0000" name="GL_POINTS"/>
         #         <enum value="0x0001" name="GL_LINES"/>
         #         <enum value="0x0002" name="GL_LINE_LOOP"/>
@@ -1131,13 +1166,14 @@ class Enum(object):
     def __eq__(self, other):
         if self.num_value != other.num_value:
             return False
-        elif (self.vendor_namespace is None) != (other.vendor_namespace is None):
+        elif (self.vendor_namespace is None) != \
+                (other.vendor_namespace is None):
             return False
         elif (self.vendor_namespace in Extension.RATIFIED_NAMESPACES) != \
-                 (other.vendor_namespace in Extension.RATIFIED_NAMESPACES):
+                (other.vendor_namespace in Extension.RATIFIED_NAMESPACES):
             return False
         elif (self.vendor_namespace == 'EXT') != \
-                 (other.vendor_namespace == 'EXT'):
+                (other.vendor_namespace == 'EXT'):
             return False
         elif self.name != other.name:
             return False
