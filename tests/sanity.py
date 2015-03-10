@@ -11,6 +11,6 @@ __all__ = ['profile']
 profile = TestProfile()
 
 with profile.group_manager(
-        PiglitGLTest, 
+        PiglitGLTest,
         grouptools.join('spec', '!OpenGL 1.0', 'gl-1.0-readpixsanity')) as g:
     g(['gl-1.0-readpixsanity'], run_concurrent=True)
