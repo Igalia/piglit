@@ -8,6 +8,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (arb_clear_texture-clear-max-level clear-max-level.c)
 piglit_add_executable (arb_clear_texture-simple simple.c)
 piglit_add_executable (arb_clear_texture-error error.c common.c)
 piglit_add_executable (arb_clear_texture-3d 3d.c)
