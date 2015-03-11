@@ -30,6 +30,7 @@ posix paths they may not start with a leading '/'.
 """
 
 import posixpath
+import os.path
 
 __all__ = [
     'join',
@@ -41,6 +42,22 @@ __all__ = [
     'splitname',
     'from_path'
 ]
+
+
+def _normalize(group):
+    """Helper to normalize group paths on Windows.
+
+    Although grouptools' heart is in the right place, the fact is that it fails
+    to spot when developers mistakedly use os.path.join for groups on Posix
+    systems.
+
+    So until this is improved somehow, make grouptools behavior on Windows
+    match Linux, ie, just silently ignore mixed use of grouptools and os.path.
+    """
+    if os.path.sep != '/':
+        group = group.replace(os.path.sep, '/')
+    return group
+
 
 def _assert_illegal(group):
     """Helper that checks for illegal characters in input."""
@@ -61,6 +78,7 @@ def testname(group):
     Analogous to os.path.basename
 
     """
+    group = _normalize(group)
     _assert_illegal(group)
 
     return posixpath.basename(group)
@@ -76,6 +94,7 @@ def groupname(group):
     Analogous to os.path.dirname
 
     """
+    group = _normalize(group)
     _assert_illegal(group)
 
     return posixpath.dirname(group)
@@ -83,6 +102,7 @@ def groupname(group):
 
 def splitname(group):
     """Split a group name, Returns tuple "(group, test)"."""
+    group = _normalize(group)
     _assert_illegal(group)
 
     return posixpath.split(group)
@@ -90,6 +110,7 @@ def splitname(group):
 
 def commonprefix(args):
     """Given a list of groups, returns the longest common leading component."""
+    args = [_normalize(group) for group in args]
     for group in args:
         _assert_illegal(group)
 
@@ -103,6 +124,7 @@ def join(*args):
     '\\' in them, as these are groups not paths.
 
     """
+    args = [_normalize(group) for group in args]
     for group in args:
         assert isinstance(group, (str, unicode)), \
             'Type must be string or unicode'
@@ -121,6 +143,8 @@ def relgroup(large, small):
     start is longer than the group then '' is returned.
 
     """
+    large = _normalize(large)
+    small = _normalize(small)
     for element in {large, small}:
         _assert_illegal(element)
 
@@ -138,6 +162,7 @@ def split(group):
     If input is '' return an empty list
 
     """
+    group = _normalize(group)
     _assert_illegal(group)
     if group == '':
         return []
