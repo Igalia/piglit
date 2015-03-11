@@ -60,9 +60,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
-	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -395,6 +393,9 @@ piglit_init(int argc, char **argv)
 		pass = false;
 	}
 
+	if (pass)
+		piglit_report_subtest_result(PIGLIT_PASS, "invalid program tests");
+
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
@@ -414,8 +415,9 @@ piglit_init(int argc, char **argv)
 	if (glGetError() == GL_NO_ERROR) {
 		piglit_report_subtest_result(PIGLIT_FAIL, "invalid enum test");
 		pass = false;
+	} else {
+		piglit_report_subtest_result(PIGLIT_PASS, "invalid enum test");
 	}
-
 	/* Test 3 illegal array cases referenced in the spec as 'bug 9254'. */
 	if (glGetProgramResourceLocation(prog, GL_UNIFORM, "array[+1]") != -1) {
 		piglit_report_subtest_result(PIGLIT_FAIL, "array case 1");
@@ -432,6 +434,9 @@ piglit_init(int argc, char **argv)
 		pass = false;
 	}
 
+	if (pass)
+		piglit_report_subtest_result(PIGLIT_PASS, "invalid array input");
+
 	/* Valid inputs. */
 	validate_location(prog, GL_UNIFORM,        "color",    9);
 	validate_location(prog, GL_PROGRAM_INPUT,  "input0",   3);
@@ -443,6 +448,9 @@ piglit_init(int argc, char **argv)
 	validate_location(prog, GL_UNIFORM,        "array",    1);
 	validate_location(prog, GL_UNIFORM,        "array[0]", 1);
 	validate_location(prog, GL_UNIFORM,        "array[1]", 2);
+
+	/* All valid inputs succeeded if we got this far. */
+	piglit_report_subtest_result(PIGLIT_PASS, "valid inputs");
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
