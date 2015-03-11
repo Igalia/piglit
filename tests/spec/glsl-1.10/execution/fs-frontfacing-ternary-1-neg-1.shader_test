@@ -1,0 +1,32 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform int front;
+uniform int back;
+
+const vec4 c = vec4(1.0, 0.0, 0.0, 0.0);
+void main()
+{
+	int f = gl_FrontFacing ? 1 : -1;
+	if (f == front) {
+		gl_FragColor = c.yxyx;
+	} else if (f == back) {
+		gl_FragColor = c.yyxx;
+	} else {
+		gl_FragColor = c.xyyx;
+	}
+}
+
+[test]
+uniform int front 1
+uniform int back -1
+
+draw rect -1 -1 2 1
+draw rect 1 0 -2 1
+relative probe rgba (0, 0) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (1, 0) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0, 1) (0.0, 0.0, 1.0, 1.0)
+relative probe rgba (1, 1) (0.0, 0.0, 1.0, 1.0)
