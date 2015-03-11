@@ -48,6 +48,8 @@ BACKEND_INITIAL_META = {
 
 JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'
 
+doc_formatter = utils.DocFormatter({'seperator': grouptools.SEPARATOR})
+
 
 def test_initialize_jsonbackend():
     """ Test that JSONBackend initializes
@@ -166,6 +168,30 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
     def test_xml_valid(self):
         """ JUnitBackend.write_test() (twice) produces valid xml """
         super(TestJUnitMultiTest, self).test_xml_valid()
+
+
+@doc_formatter
+def test_junit_replace():
+    """JUnitBackend.write_test: '{seperator}' is replaced with '.'"""
+    with utils.tempdir() as tdir:
+        test = backends.JUnitBackend(tdir)
+        test.initialize(BACKEND_INITIAL_META)
+        test.write_test(
+            grouptools.join('a', 'test', 'group', 'test1'),
+            results.TestResult({
+                'time': 1.2345,
+                'result': 'pass',
+                'out': 'this is stdout',
+                'err': 'this is stderr',
+                'command': 'foo',
+            })
+        )
+        test.finalize()
+
+        test_value = etree.parse(os.path.join(tdir, 'results.xml')).getroot()
+
+    nt.assert_equal(test_value.find('.//testcase').attrib['classname'],
+                    'piglit.a.test.group')
 
 
 def test_json_initialize_metadata():

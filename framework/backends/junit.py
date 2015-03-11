@@ -22,7 +22,6 @@
 
 from __future__ import print_function, absolute_import
 import os.path
-import re
 import shutil
 
 try:
@@ -46,7 +45,6 @@ class JUnitBackend(FileBackend):
     https://svn.jenkins-ci.org/trunk/hudson/dtkit/dtkit-format/dtkit-junit-model/src/main/resources/com/thalesgroup/dtkit/junit/model/xsd/junit-7.xsd
 
     """
-    _REPLACE = re.compile(r'[/\\]')
 
     def __init__(self, dest, junit_suffix='', **options):
         super(JUnitBackend, self).__init__(dest, **options)
@@ -159,7 +157,7 @@ class JUnitBackend(FileBackend):
         # replacing any '.' with '_' (so we don't get false groups).
         classname, testname = grouptools.splitname(name)
         classname = classname.replace('.', '_')
-        classname = JUnitBackend._REPLACE.sub('.', classname)
+        classname = classname.replace(grouptools.SEPARATOR, '.')
 
         # Add the test to the piglit group rather than directly to the root
         # group, this allows piglit junit to be used in conjunction with other

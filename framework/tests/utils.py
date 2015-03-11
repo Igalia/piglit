@@ -302,3 +302,41 @@ def no_error(func):
             raise TestFailure(e.message)
 
     return test_wrapper
+
+
+class DocFormatter(object):
+    """Decorator for formatting object docstrings.
+
+    This class is designed to be initialized once per test module, and then one
+    instance used as a decorator for all functions.
+
+    Works as follows:
+    >>> doc_formatter = DocFormatter({'format': 'foo', 'name': 'bar'})
+    >>>
+    >>> @doc_formatter
+    ... def foo():
+    ...     '''a docstring for {format} and {name}'''
+    ...     pass
+    ...
+    >>> foo.__doc__
+    'a docstring for foo and bar'
+
+    This allows tests that can be dynamically updated by changing a single
+    constant to have the test descriptions alos updated by the same constant.
+
+    Arguments:
+    table -- a dictionary of key value pairs to be converted
+
+    """
+    def __init__(self, table):
+        self.__table = table
+
+    def __call__(self, func):
+        try:
+            func.__doc__ = func.__doc__.format(**self.__table)
+        except KeyError as e:
+            # We want to catch this to ensure that a test that is looking for a
+            # KeyError doesn't pass when it shouldn't
+            raise UtilsError(e)
+
+        return func

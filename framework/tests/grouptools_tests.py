@@ -27,6 +27,10 @@ import nose.tools as nt
 import framework.grouptools as grouptools
 import framework.tests.utils as utils
 
+doc_formatter = utils.DocFormatter({  # pylint: disable=invalid-name
+    'seperator': grouptools.SEPARATOR,
+})
+
 
 @utils.nose_generator
 def generate_tests():
@@ -59,7 +63,15 @@ def generate_tests():
 def test_grouptools_join():
     """grouptools.join: works correctly."""
     # XXX: this hardcoded / needs to be fixed
-    nt.assert_equal(grouptools.join('g1', 'g2'), 'g1/g2')
+    nt.assert_equal(grouptools.join('g1', 'g2'),
+                    grouptools.SEPARATOR.join(['g1', 'g2']))
+
+
+@doc_formatter
+def test_grouptools_join_notrail():
+    """grouptools.join: doesn't add trailing {seperator} with empty element"""
+    test = grouptools.join('g1', 'g2', '')
+    nt.ok_(not test.endswith(grouptools.SEPARATOR), msg=test)
 
 
 def test_split_input_empty():
@@ -67,14 +79,19 @@ def test_split_input_empty():
     nt.assert_equal(grouptools.split(''), [])
 
 
+@doc_formatter
 def test_from_path_posix():
-    """grouptools.from_path: doesn't change posixpaths."""
+    """grouptools.from_path: converts / to {seperator} in posix paths."""
+    # Since we already have tests for grouptools.join we can trust it to do the
+    # right thing here. This also means that the test doesn't need to be
+    # updated if the separator is changed.
     nt.assert_equal(grouptools.from_path('foo/bar'),
                     grouptools.join('foo', 'bar'))
 
 
+@doc_formatter
 def test_from_path_nt():
-    """grouptools.from_path: converts \\ to / in nt paths."""
+    """grouptools.from_path: converts \\ to {seperator} in nt paths."""
     nt.assert_equal(grouptools.from_path('foo\\bar'),
                     grouptools.join('foo', 'bar'))
 

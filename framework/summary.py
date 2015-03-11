@@ -143,7 +143,7 @@ class HTMLIndex(list):
 
             # Split the group names and test names, then determine
             # which groups to close and which to open
-            openList = key.replace('\\', '/').split('/')
+            openList = key.split(grouptools.SEPARATOR)
             test = openList.pop()
             openList, closeList = returnList(openList, list(currentDir))
 
