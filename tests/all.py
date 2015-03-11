@@ -710,15 +710,15 @@ with profile.group_manager(
     g(['glx-string-sanity'], 'extension string sanity')
     add_msaa_visual_plain_tests(g, ['glx-copy-sub-buffer'],
                                 run_concurrent=False)
-profile.test_list[os.path.join('glx', 'glx-buffer-age vblank_mode=0')] = \
+profile.test_list[grouptools.join('glx', 'glx-buffer-age vblank_mode=0')] = \
     PiglitGLTest(['glx-buffer-age'],
                  require_platforms=['glx', 'mixed_glx_egl'],
                  run_concurrent=False)
-profile.test_list[os.path.join('glx', 'glx-buffer-age vblank_mode=0')].env['vblank_mode'] = '0'
+profile.test_list[grouptools.join('glx', 'glx-buffer-age vblank_mode=0')].env['vblank_mode'] = '0'
 
 with profile.group_manager(
         PiglitGLTest,
-        os.path.join('glx', 'glx_ext_import_context'),
+        grouptools.join('glx', 'glx_ext_import_context'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-free-context'], 'free context', run_concurrent=False)
     g(['glx-get-context-id'], 'get context ID', run_concurrent=False)
