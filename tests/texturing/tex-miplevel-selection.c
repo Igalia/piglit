@@ -1252,10 +1252,10 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		SET_VEC(c3, s0, t1, TEST_LAYER, z);
 		break;
 	case TEX_3D:
-		SET_VEC(c0, s0*p, t0*p, 0.5*p, p);
-		SET_VEC(c1, s1*p, t0*p, 0.5*p, p);
-		SET_VEC(c2, s1*p, t1*p, 0.5*p, p);
-		SET_VEC(c3, s0*p, t1*p, 0.5*p, p);
+		SET_VEC(c0, s0*p, t0*p, 0.51*p, p);
+		SET_VEC(c1, s1*p, t0*p, 0.51*p, p);
+		SET_VEC(c2, s1*p, t1*p, 0.51*p, p);
+		SET_VEC(c3, s0*p, t1*p, 0.51*p, p);
 		break;
 	case TEX_1D_ARRAY:
 		SET_VEC(c0, s0, TEST_LAYER, 0, 1);
