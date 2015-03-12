@@ -144,9 +144,6 @@ def generate_tests():
          grouptools.join('g1', 'g2', 't1'), True),
         ('split', grouptools.split, grouptools.join('g1', 'g2', 't1'),
          ['g1', 'g2', 't1']),
-        ('relgroup', grouptools.relgroup,
-         [grouptools.join('g1', 'g2', 'g3', 't1'), grouptools.join('g1', 'g2')],
-         grouptools.join('g3', 't1'), True)
     ]
 
     for args in tests:
@@ -154,16 +151,6 @@ def generate_tests():
         # In python3 we could use 'yield from'
         for wrapper, test in test_class:
             yield wrapper, test
-
-
-def test_relgroup_small_gt_large():
-    """grouptools.relgroup: if small > large return ''."""
-    nt.assert_equal(grouptools.relgroup('foo', 'foobar'), '')
-
-
-def test_relgroup_both_empty():
-    """grouptools.relgroup: if small == '' and large == '' return ''."""
-    nt.assert_equal(grouptools.relgroup('', ''), '')
 
 
 def test_split_input_empty():

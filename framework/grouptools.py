@@ -35,7 +35,6 @@ import os.path
 __all__ = [
     'join',
     'commonprefix',
-    'relgroup',
     'split',
     'groupname',
     'testname',
@@ -134,26 +133,6 @@ def join(*args):
         'Groups cannot start with /. ({})' .format(args[0])
 
     return posixpath.join(*args)
-
-
-def relgroup(large, small):
-    """Find the relationship between two groups.
-
-    This allows the comparison of two groups, and returns a string. If start
-    start is longer than the group then '' is returned.
-
-    """
-    large = _normalize(large)
-    small = _normalize(small)
-    for element in {large, small}:
-        _assert_illegal(element)
-
-    if len(small) > len(large):
-        return ''
-    elif small == '' and large == '':
-        return ''
-    else:
-        return posixpath.relpath(large, small)
 
 
 def split(group):
