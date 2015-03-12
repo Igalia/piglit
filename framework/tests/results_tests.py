@@ -27,11 +27,9 @@ import json
 
 import nose.tools as nt
 
-import framework.tests.utils as utils
-import framework.results as results
-import framework.status as status
-import framework.backends as backends
+from framework import results, status, backends, grouptools
 from framework.tests.backends_tests import BACKEND_INITIAL_META
+import framework.tests.utils as utils
 
 
 def check_initialize(target):
@@ -166,9 +164,9 @@ def test_resume_load():
     with utils.tempdir() as f:
         backend = backends.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
-        backend.write_test("group1/test1", {'result': 'fail'})
-        backend.write_test("group1/test2", {'result': 'pass'})
-        backend.write_test("group2/test3", {'result': 'fail'})
+        backend.write_test(grouptools.join("group1', 'test1"), {'result': 'fail'})
+        backend.write_test(grouptools.join("group1', 'test2"), {'result': 'pass'})
+        backend.write_test(grouptools.join("group2', 'test3"), {'result': 'fail'})
 
         try:
             results.TestrunResult.resume(f)
@@ -181,15 +179,17 @@ def test_resume_load_valid():
     with utils.tempdir() as f:
         backend = backends.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
-        backend.write_test("group1/test1", {'result': 'fail'})
-        backend.write_test("group1/test2", {'result': 'pass'})
-        backend.write_test("group2/test3", {'result': 'fail'})
+        backend.write_test(grouptools.join('group1', 'test1'), {'result': 'fail'})
+        backend.write_test(grouptools.join('group1', 'test2'), {'result': 'pass'})
+        backend.write_test(grouptools.join('group2', 'test3'), {'result': 'fail'})
 
         test = results.TestrunResult.resume(f)
 
         nt.assert_set_equal(
             set(test.tests.keys()),
-            set(['group1/test1', 'group1/test2', 'group2/test3']),
+            set([grouptools.join('group1', 'test1'),
+                 grouptools.join('group1', 'test2'),
+                 grouptools.join('group2', 'test3')]),
         )
 
 
@@ -198,9 +198,9 @@ def test_resume_load_invalid():
     with utils.tempdir() as f:
         backend = backends.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
-        backend.write_test("group1/test1", {'result': 'fail'})
-        backend.write_test("group1/test2", {'result': 'pass'})
-        backend.write_test("group2/test3", {'result': 'fail'})
+        backend.write_test(grouptools.join('group1', 'test1'), {'result': 'fail'})
+        backend.write_test(grouptools.join('group1', 'test2'), {'result': 'pass'})
+        backend.write_test(grouptools.join('group2', 'test3'), {'result': 'fail'})
         with open(os.path.join(f, 'tests', 'x.json'), 'w') as w:
             w.write('foo')
 
@@ -208,5 +208,7 @@ def test_resume_load_invalid():
 
         nt.assert_set_equal(
             set(test.tests.keys()),
-            set(['group1/test1', 'group1/test2', 'group2/test3']),
+            set([grouptools.join('group1', 'test1'),
+                 grouptools.join('group1', 'test2'),
+                 grouptools.join('group2', 'test3')]),
         )

@@ -90,12 +90,15 @@ def test_testprofile_set_dmesg_false():
 def test_testprofile_update_test_list():
     """ TestProfile.update() updates TestProfile.test_list """
     profile1 = profile.TestProfile()
-    profile1.test_list['group1/test1'] = utils.Test(['test1'])
+    group1 = grouptools.join('group1', 'test1')
+    group2 = grouptools.join('group1', 'test2')
+
+    profile1.test_list[group1] = utils.Test(['test1'])
 
 
     profile2 = profile.TestProfile()
-    profile2.test_list['group1/test1'] = utils.Test(['test3'])
-    profile2.test_list['group2/test2'] = utils.Test(['test2'])
+    profile2.test_list[group1] = utils.Test(['test3'])
+    profile2.test_list[group2] = utils.Test(['test2'])
 
     profile1.update(profile2)
 
@@ -106,10 +109,10 @@ class TestPrepareTestListMatches(object):
     """Create tests for TestProfile.prepare_test_list filtering"""
     def __init__(self):
         self.data = {
-            'group1/test1': 'thingy',
-            'group1/group3/test2': 'thing',
-            'group3/test5': 'other',
-            'group4/Test9': 'is_caps',
+            grouptools.join('group1', 'test1'): 'thingy',
+            grouptools.join('group1', 'group3', 'test2'): 'thing',
+            grouptools.join('group3', 'test5'): 'other',
+            grouptools.join('group4', 'Test9'): 'is_caps',
         }
 
     def test_matches_filter_mar_1(self):
@@ -138,21 +141,21 @@ class TestPrepareTestListMatches(object):
         profile_.test_list = self.data
         profile_._prepare_test_list(env)
 
-        baseline = {'group3/test5': 'other'}
+        baseline = {grouptools.join('group3', 'test5'): 'other'}
 
         nt.assert_dict_equal(profile_.test_list, baseline)
 
     def test_matches_env_exclude(self):
         """TestProfile.prepare_test_list: 'not path in env.exclude_tests"""
         env = core.Options()
-        env.exclude_tests.add('group3/test5')
+        env.exclude_tests.add(grouptools.join('group3', 'test5'))
 
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
         profile_._prepare_test_list(env)
 
         baseline = copy.deepcopy(self.data)
-        del baseline['group3/test5']
+        del baseline[grouptools.join('group3', 'test5')]
 
         nt.assert_dict_equal(profile_.test_list, baseline)
 
@@ -165,7 +168,7 @@ class TestPrepareTestListMatches(object):
         profile_._prepare_test_list(env)
 
         baseline = copy.deepcopy(self.data)
-        del baseline['group3/test5']
+        del baseline[grouptools.join('group3', 'test5')]
 
         nt.assert_dict_equal(profile_.test_list, baseline)
 
@@ -177,7 +180,7 @@ class TestPrepareTestListMatches(object):
         profile_.test_list = self.data
         profile_._prepare_test_list(env)
 
-        nt.assert_not_in('group4/Test9', profile_.test_list)
+        nt.assert_not_in(grouptools.join('group4', 'Test9'), profile_.test_list)
 
 
 @utils.no_error
@@ -251,4 +254,4 @@ def test_testprofile_groupmanager_name_str():
     with prof.group_manager(GleanTest, 'foo') as g:
         g('abc')
 
-    nt.ok_('foo/abc' in prof.test_list)
+    nt.ok_(grouptools.join('foo', 'abc') in prof.test_list)

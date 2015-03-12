@@ -130,17 +130,24 @@ def generate_tests():
     This cannot test all corners of the more complicated members.
 
     """
-    # pylint: disable=line-too-long
     tests = [
-        ('testname', grouptools.testname, 'g1/g2/t1', 't1'),
-        ('groupname', grouptools.groupname, 'g1/g2/t1', 'g1/g2'),
-        ('splitname', grouptools.splitname, 'g1/g2/t1', ('g1/g2', 't1')),
-        ('commonprefix', grouptools.commonprefix, ['g1/g2/1', 'g1/g2/2'], 'g1/g2/'),
-        ('join', grouptools.join, ['g1/g2', 't1'], 'g1/g2/t1', True),
-        ('split', grouptools.split, 'g1/g2/t1', ['g1', 'g2', 't1']),
-        ('relgroup', grouptools.relgroup, ['g1/g2/g3/t1', 'g1/g2'], 'g3/t1', True)
+        ('testname', grouptools.testname, grouptools.join('g1', 'g2', 't1'),
+         't1'),
+        ('groupname', grouptools.groupname, grouptools.join('g1', 'g2', 't1'),
+         grouptools.join('g1', 'g2')),
+        ('splitname', grouptools.splitname, grouptools.join('g1', 'g2', 't1'),
+         (grouptools.join('g1', 'g2'), 't1')),
+        ('commonprefix', grouptools.commonprefix,
+         [grouptools.join('g1', 'g2', '1'), grouptools.join('g1', 'g2', '2')],
+         grouptools.join('g1', 'g2', '')),
+        ('join', grouptools.join, [grouptools.join('g1', 'g2'), 't1'],
+         grouptools.join('g1', 'g2', 't1'), True),
+        ('split', grouptools.split, grouptools.join('g1', 'g2', 't1'),
+         ['g1', 'g2', 't1']),
+        ('relgroup', grouptools.relgroup,
+         [grouptools.join('g1', 'g2', 'g3', 't1'), grouptools.join('g1', 'g2')],
+         grouptools.join('g3', 't1'), True)
     ]
-    # pylint: enable=line-too-long
 
     for args in tests:
         test_class = _GroupToolsTest(*args)
@@ -166,12 +173,14 @@ def test_split_input_empty():
 
 def test_from_path_posix():
     """grouptools.from_path: doesn't change posixpaths."""
-    nt.assert_equal(grouptools.from_path('foo/bar'), 'foo/bar')
+    nt.assert_equal(grouptools.from_path('foo/bar'),
+                    grouptools.join('foo', 'bar'))
 
 
 def test_from_path_nt():
     """grouptools.from_path: converts \\ to / in nt paths."""
-    nt.assert_equal(grouptools.from_path('foo\\bar'), 'foo/bar')
+    nt.assert_equal(grouptools.from_path('foo\\bar'),
+                    grouptools.join('foo', 'bar'))
 
 
 def test_from_path_dot():

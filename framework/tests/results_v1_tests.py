@@ -31,6 +31,8 @@ import nose.tools as nt
 import framework.results as results
 import framework.tests.utils as utils
 
+# NOTE: do NOT use grouptools in this module, see v0 tests for explanation
+
 
 class TestV2Update(object):
     """Test V1 to V2 of results."""

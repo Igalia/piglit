@@ -31,6 +31,10 @@ import nose.tools as nt
 import framework.results as results
 import framework.tests.utils as utils
 
+# NOTE: It is very important to NOT use grouptools in this file.
+# The grouptools module changes and is updated from time to time, but this file
+# must remain static. It tests the update from one static version to another
+# static version.
 
 DATA = {}
 DATA['options'] = {

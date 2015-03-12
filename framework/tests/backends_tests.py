@@ -35,9 +35,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-import framework.core as core
-import framework.results as results
-import framework.backends as backends
+from framework import core, results, backends, grouptools
 import framework.tests.utils as utils
 
 
@@ -110,7 +108,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
         test = backends.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(
-            'a/test/group/test1',
+            grouptools.join('a', 'test', 'group', 'test1'),
             results.TestResult({
                 'time': 1.2345,
                 'result': 'pass',
@@ -140,7 +138,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
         test = backends.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(
-            'a/test/group/test1',
+            grouptools.join('a', 'test', 'group', 'test1'),
             results.TestResult({
                 'time': 1.2345,
                 'result': 'pass',
@@ -150,7 +148,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
             })
         )
         test.write_test(
-            'a/different/test/group/test2',
+            grouptools.join('a', 'different', 'test', 'group', 'test2'),
             results.TestResult({
                 'time': 1.2345,
                 'result': 'fail',
@@ -182,7 +180,7 @@ def test_json_initialize_metadata():
 class TestJSONTestMethod(utils.StaticDirectory):
     @classmethod
     def setup_class(cls):
-        cls.test_name = 'a/test/group/test1'
+        cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
         cls.result = results.TestResult({
             'time': 1.2345,
             'result': 'pass',
@@ -217,7 +215,7 @@ class TestJSONTestMethod(utils.StaticDirectory):
 class TestJSONTestFinalize(utils.StaticDirectory):
     @classmethod
     def setup_class(cls):
-        cls.test_name = 'a/test/group/test1'
+        cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
         cls.result = results.TestResult({
             'time': 1.2345,
             'result': 'pass',
@@ -257,7 +255,7 @@ def test_junit_skips_bad_tests():
         test = backends.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(
-            'a/test/group/test1',
+            grouptools.join('a', 'test', 'group', 'test1'),
             results.TestResult({
                 'time': 1.2345,
                 'result': 'pass',

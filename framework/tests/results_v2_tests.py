@@ -22,7 +22,6 @@
 
 from __future__ import print_function, absolute_import, division
 
-import os
 try:
     import simplejson as json
 except ImportError:
@@ -31,6 +30,8 @@ import nose.tools as nt
 
 import framework.results as results
 import framework.tests.utils as utils
+
+# NOTE: do NOT use grouptools in this module, see v0 tests for explanation
 
 DATA = {
     "results_version": 2,

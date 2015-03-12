@@ -33,6 +33,8 @@ import nose.tools as nt
 import framework.results as results
 import framework.tests.utils as utils
 
+# NOTE: do NOT use grouptools in this module, see v0 tests for explanation
+
 TEST_DATA = {
     'returncode': 0,
     'err': None,
