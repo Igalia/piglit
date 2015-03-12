@@ -41,7 +41,7 @@ __all__ = [
     'testname',
 ]
 
-SEPARATOR = '/'
+SEPARATOR = '@'
 
 
 def _normalize(group):

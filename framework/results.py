@@ -244,6 +244,7 @@ def update_results(results, filepath):
             1: _update_one_to_two,
             2: _update_two_to_three,
             3: _update_three_to_four,
+            4: _update_four_to_five,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -460,5 +461,18 @@ def _update_three_to_four(results):
             del results.tests[test]
 
     results.results_version = 4
+
+    return results
+
+
+def _update_four_to_five(results):
+    """Updates json results from version 4 to version 5."""
+    new_tests = {}
+
+    for name, test in results.tests.iteritems():
+        new_tests[name.replace('/', '@').replace('\\', '@')] = test
+
+    results.tests = new_tests
+    results.results_version = 5
 
     return results
