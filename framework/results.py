@@ -24,6 +24,7 @@
 from __future__ import print_function, absolute_import
 import os
 import sys
+import posixpath
 
 try:
     import simplejson as json
@@ -31,7 +32,6 @@ except ImportError:
     import json
 
 import framework.status as status
-from framework import grouptools
 from framework.backends import (CURRENT_JSON_VERSION, piglit_encoder,
                                 JSONBackend)
 
@@ -450,10 +450,12 @@ def _update_three_to_four(results):
             results.tests[new] = results.tests[original]
             del results.tests[original]
 
+    # This needs to use posixpath rather than grouptools because version 4 uses
+    # / as a separator, but grouptools isn't guaranteed to do so forever.
     for test, result in results.tests.items():
-        if grouptools.groupname(test) == 'glslparsertest':
-            group = grouptools.join('glslparsertest/shaders',
-                                    grouptools.testname(test))
+        if posixpath.dirname(test) == 'glslparsertest':
+            group = posixpath.join('glslparsertest/shaders',
+                                   posixpath.basename(test))
             results.tests[group] = result
             del results.tests[test]
 
