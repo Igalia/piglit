@@ -50,10 +50,10 @@ class OCLConform(Test):
             self.result['result'] = 'pass'
 
 def add_sub_test(profile, test_name, subtest_name, subtest):
-    profile.tests[grouptools.join('oclconform', test_name, subtest_name)] = subtest
+    profile.test_list[grouptools.join('oclconform', test_name, subtest_name)] = subtest
 
 def add_test(profile, test_name, test):
-    profile.tests[grouptools.join('oclconform', test_name)] = test
+    profile.test_list[grouptools.join('oclconform', test_name)] = test
 
 def add_oclconform_tests(profile):
     section_name = 'oclconform'
