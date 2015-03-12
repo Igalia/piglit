@@ -1144,6 +1144,7 @@ with profile.group_manager(
     g(['array-depth-roundtrip'], run_concurrent=False)
     g(['depth-cube-map'], run_concurrent=False)
     g(['sampler-cube-shadow'], run_concurrent=False)
+    g(['generatemipmap-cubemap'])
 
 with profile.group_manager(
         PiglitGLTest,
