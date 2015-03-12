@@ -47,7 +47,8 @@ def add_fbo_stencil_tests(adder, format):
 
 
 def add_fbo_depthstencil_tests(group, format, num_samples):
-    assert format, 'add_fbo_depthstencil_tests argument "format" cannot be empty'
+    assert format, \
+        'add_fbo_depthstencil_tests argument "format" cannot be empty'
 
     if format == 'default_fb':
         prefix = ''
@@ -138,7 +139,8 @@ def add_fbo_formats_tests(adder, extension, suffix=''):
 
 def add_msaa_formats_tests(adder, extension):
     for num_samples in MSAA_SAMPLE_COUNTS:
-        adder(['ext_framebuffer_multisample-formats', str(num_samples), extension],
+        adder(['ext_framebuffer_multisample-formats', str(num_samples),
+               extension],
               'multisample-formats {} {}'.format(num_samples, extension))
 
 
@@ -714,7 +716,8 @@ profile.test_list[grouptools.join('glx', 'glx-buffer-age vblank_mode=0')] = \
     PiglitGLTest(['glx-buffer-age'],
                  require_platforms=['glx', 'mixed_glx_egl'],
                  run_concurrent=False)
-profile.test_list[grouptools.join('glx', 'glx-buffer-age vblank_mode=0')].env['vblank_mode'] = '0'
+profile.test_list[grouptools.join(
+    'glx', 'glx-buffer-age vblank_mode=0')].env['vblank_mode'] = '0'
 
 with profile.group_manager(
         PiglitGLTest,
@@ -989,7 +992,8 @@ with profile.group_manager(
     g(['teximage-errors'], run_concurrent=False)
     g(['texture-packed-formats'], run_concurrent=False)
     g(['getteximage-targets', '3D'])
-    add_msaa_visual_plain_tests(g, ['copyteximage', '3D'], run_concurrent=False)
+    add_msaa_visual_plain_tests(g, ['copyteximage', '3D'],
+                                run_concurrent=False)
     add_texwrap_target_tests(g, '3D')
 
 with profile.group_manager(
@@ -1014,7 +1018,8 @@ with profile.group_manager(
     g(['triangle-rasterization', '-use_fbo'], 'triangle-rasterization-fbo',
       run_concurrent=False)
     g(['triangle-rasterization-overdraw'], run_concurrent=False)
-    g(['tex-miplevel-selection', '-nobias', '-nolod'], 'tex-miplevel-selection')
+    g(['tex-miplevel-selection', '-nobias', '-nolod'],
+      'tex-miplevel-selection')
     g(['tex-miplevel-selection', '-nobias'], 'tex-miplevel-selection-lod')
     g(['tex-miplevel-selection'], 'tex-miplevel-selection-lod-bias')
 
@@ -1216,7 +1221,8 @@ with profile.group_manager(
     for texture_type in ['3d', '2d_array', '2d_multisample_array', '1d_array',
                          'cube_map', 'cube_map_array']:
         for test_type in ['single_level', 'mipmapped']:
-            if texture_type == '2d_multisample_array' and test_type == 'mipmapped':
+            if texture_type == '2d_multisample_array' and \
+                            test_type == 'mipmapped':
                 continue
             g(['gl-3.2-layered-rendering-clear-color-all-types', texture_type,
                test_type],
@@ -1254,7 +1260,8 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-es-1.00')) as g:
     g(['built-in-constants_gles2',
-       os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00', 'minimum-maximums.txt')],
+       os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00',
+                    'minimum-maximums.txt')],
       'built-in constants')
 
 # Group spec/glsl-1.10
@@ -1358,7 +1365,11 @@ for stage in ['vs', 'gs', 'fs']:
             '{}-textureSize-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['textureSize', stage, sampler])
     # texelFetch():
-    for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray', 'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usampler1DArray', 'usampler2DArray']:
+    for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray',
+                    'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D',
+                    'isampler1DArray', 'isampler2DArray', 'usampler1D',
+                    'usampler2D', 'usampler3D', 'usampler1DArray',
+                    'usampler2DArray']:
         profile.test_list[grouptools.join(
             'spec', 'glsl-{}'.format(version), 'execution', 'texelFetch',
             '{}-texelFetch-{}'.format(stage, sampler))] = PiglitGLTest(
@@ -1371,8 +1382,9 @@ for stage in ['vs', 'gs', 'fs']:
     for type in ['i', 'u', '']:
         profile.test_list[grouptools.join(
             'spec', 'glsl-{}'.format(version), 'execution', 'texelFetch',
-            '{}-texelFetch-{}sampler2Darray-swizzle'.format(stage, type))] = PiglitGLTest(
-                ['texelFetch', stage, '{}sampler2DArray'.format(type), 'b0r1'])
+            '{}-texelFetch-{}sampler2Darray-swizzle'.format(stage, type))] = \
+            PiglitGLTest(['texelFetch', stage, '{}sampler2DArray'.format(type),
+                          'b0r1'])
 
 with profile.group_manager(
         PiglitGLTest,
@@ -1449,8 +1461,8 @@ with profile.group_manager(
                   '2DShadow']:
         g(['tex-miplevel-selection', 'textureProjOffset(bias)', stage])
 
-    for stage in ['1D', '2D', '3D', '1DShadow', '2DShadow', '1DArray', '2DArray',
-                  '1DArrayShadow']:
+    for stage in ['1D', '2D', '3D', '1DShadow', '2DShadow', '1DArray',
+                  '2DArray', '1DArrayShadow']:
         g(['tex-miplevel-selection', 'textureLodOffset', stage])
 
     for stage in ['1D', '2D', '3D', '1D_ProjVec4', '2D_ProjVec4', '1DShadow',
@@ -1476,7 +1488,8 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'linker', 'clipping')) as g:
-    g(['mixing-clip-distance-and-clip-vertex-disallowed'], run_concurrent=False)
+    g(['mixing-clip-distance-and-clip-vertex-disallowed'],
+      run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
@@ -1597,7 +1610,8 @@ with profile.group_manager(
           'primitive-types {0}'.format(prim_type))
 
         for restart_index in ['ffs', 'other']:
-            g(['glsl-1.50-geometry-primitive-id-restart', prim_type, restart_index],
+            g(['glsl-1.50-geometry-primitive-id-restart', prim_type,
+               restart_index],
               'primitive-id-restart {0} {1}'.format(prim_type, restart_index))
 
     for prim_type in ['GL_TRIANGLE_STRIP', 'GL_TRIANGLE_STRIP_ADJACENCY']:
@@ -1616,7 +1630,8 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'glsl-es-3.00')) as g:
     g(['built-in-constants_gles3',
-       os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00', 'minimum-maximums.txt')],
+       os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00',
+                    'minimum-maximums.txt')],
       'built-in constants')
 
 with profile.group_manager(
@@ -1709,7 +1724,8 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'ARB_texture_multisample', 'textureSize')) as g:
+        grouptools.join('spec', 'ARB_texture_multisample',
+                        'textureSize')) as g:
 
     stages = ['vs', 'gs', 'fs']
     for stage, sampler in itertools.product(stages, samplers_atm):
@@ -1809,8 +1825,10 @@ with profile.group_manager(
       run_concurrent=False)
     g(['arb_draw_elements_base_vertex-drawelements-instanced'],
       run_concurrent=False)
-    g(['arb_draw_elements_base_vertex-drawrangeelements'], run_concurrent=False)
-    g(['arb_draw_elements_base_vertex-multidrawelements'], run_concurrent=False)
+    g(['arb_draw_elements_base_vertex-drawrangeelements'],
+      run_concurrent=False)
+    g(['arb_draw_elements_base_vertex-multidrawelements'],
+      run_concurrent=False)
 
 # Group ARB_draw_instanced
 with profile.group_manager(
@@ -2026,7 +2044,8 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'ARB_gpu_shader_fp64', 'varying-packing')) as g:
+        grouptools.join('spec', 'ARB_gpu_shader_fp64',
+                        'varying-packing')) as g:
     for type in ['double', 'dvec2', 'dvec3', 'dvec4', 'dmat2', 'dmat3',
                  'dmat4', 'dmat2x3', 'dmat2x4', 'dmat3x2', 'dmat3x4',
                  'dmat4x2', 'dmat4x3']:
@@ -2105,7 +2124,8 @@ with profile.group_manager(
           run_concurrent=False)
 
     for num_samples in MSAA_SAMPLE_COUNTS:
-        g(['arb_sample_shading-interpolate-at-sample-position', str(num_samples)],
+        g(['arb_sample_shading-interpolate-at-sample-position',
+           str(num_samples)],
           'interpolate-at-sample-position {}'.format(num_samples),
           run_concurrent=False)
         g(['arb_sample_shading-ignore-centroid-qualifier', str(num_samples)],
@@ -2113,7 +2133,8 @@ with profile.group_manager(
           run_concurrent=False)
 
     for num_samples in [0, 2, 4, 6, 8]:
-        g(['arb_sample_shading-builtin-gl-sample-mask-simple', str(num_samples)],
+        g(['arb_sample_shading-builtin-gl-sample-mask-simple',
+           str(num_samples)],
           'builtin-gl-sample-mask-simple {}'.format(num_samples))
 
 # Group ARB_debug_output
@@ -2261,7 +2282,8 @@ with profile.group_manager(
     g(['arb_explicit_uniform_location-boundaries'], run_concurrent=False)
     g(['arb_explicit_uniform_location-array-elements'], run_concurrent=False)
     g(['arb_explicit_uniform_location-inactive-uniform'], run_concurrent=False)
-    g(['arb_explicit_uniform_location-use-of-unused-loc'], run_concurrent=False)
+    g(['arb_explicit_uniform_location-use-of-unused-loc'],
+      run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
@@ -2446,7 +2468,8 @@ with profile.group_manager(
         'GL_DEPTH32F_STENCIL8', 0)
 
 with profile.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'arb_texture_env_crossbar')) as g:
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_texture_env_crossbar')) as g:
     g(['crossbar'], run_concurrent=False)
 
 with profile.group_manager(
@@ -2616,12 +2639,14 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'ext_framebuffer_multisample_blit_scaled')) as g:
+        grouptools.join('spec',
+                        'ext_framebuffer_multisample_blit_scaled')) as g:
     g(['ext_framebuffer_multisample_blit_scaled-negative-blit-scaled'],
       'negative-blit-scaled')
 
     for num_samples in MSAA_SAMPLE_COUNTS:
-        g(['ext_framebuffer_multisample_blit_scaled-blit-scaled', str(num_samples)],
+        g(['ext_framebuffer_multisample_blit_scaled-blit-scaled',
+           str(num_samples)],
           'blit-scaled samples={}'.format(num_samples))
 
 with profile.group_manager(
@@ -2743,13 +2768,15 @@ with profile.group_manager(
                      'alpha-to-one-msaa-disabled',
                      'alpha-to-one-single-sample-buffer',
                      'bitmap', 'polygon-stipple']:
-            g(['ext_framebuffer_multisample-{}'.format(test), str(num_samples)],
+            g(['ext_framebuffer_multisample-{}'.format(test),
+               str(num_samples)],
               '{} {}'.format(test, num_samples))
 
         for blit_type in ('msaa', 'upsample', 'downsample', 'normal'):
             g(['ext_framebuffer_multisample-clip-and-scissor-blit',
                str(num_samples), blit_type],
-              'clip-and-scissor-blit {} {}'.format(str(num_samples), blit_type))
+              'clip-and-scissor-blit {} {}'.format(str(num_samples),
+                                                   blit_type))
 
         for flip_direction in ('x', 'y'):
             g(['ext_framebuffer_multisample-blit-flipped', str(num_samples),
@@ -2821,7 +2848,8 @@ with profile.group_manager(
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX16')
 
 with profile.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'ext_image_dma_buf_import')) as g:
+        PiglitGLTest, grouptools.join('spec', 'ext_image_dma_buf_import')) as \
+        g:
     g(['ext_image_dma_buf_import-invalid_hints'], run_concurrent=False)
     g(['ext_image_dma_buf_import-invalid_attributes'], run_concurrent=False)
     g(['ext_image_dma_buf_import-missing_attributes'], run_concurrent=False)
@@ -2890,8 +2918,9 @@ with profile.group_manager(
                                 run_concurrent=False)
     add_msaa_visual_plain_tests(g, ['copyteximage', '2D_ARRAY'],
                                 run_concurrent=False)
-    for test in ('depth-clear', 'depth-layered-clear', 'depth-draw', 'fs-writes-depth',
-                 'stencil-clear', 'stencil-layered-clear', 'stencil-draw', 'fs-writes-stencil'):
+    for test in ('depth-clear', 'depth-layered-clear', 'depth-draw',
+                 'fs-writes-depth', 'stencil-clear', 'stencil-layered-clear',
+                 'stencil-draw', 'fs-writes-stencil'):
         g(['fbo-depth-array', test])
     for test_mode in ['teximage', 'texsubimage']:
         test_name = 'compressed {0}'.format(test_mode, run_concurrent=False)
@@ -3064,7 +3093,8 @@ with profile.group_manager(
     g(['rg-teximage-02'], run_concurrent=False)
     g(['texture-rg'], run_concurrent=False)
     # TODO: unsupported for int yet
-    # g(['fbo-clear-formats', 'GL_ARB_texture_rg-int'], # 'fbo-clear-formats-int')
+    # g(['fbo-clear-formats', 'GL_ARB_texture_rg-int'],
+    #   'fbo-clear-formats-int')
     add_msaa_formats_tests(g, 'GL_ARB_texture_rg')
     add_msaa_formats_tests(g, 'GL_ARB_texture_rg-int')
     add_msaa_formats_tests(g, 'GL_ARB_texture_rg-float')
@@ -3108,8 +3138,10 @@ with profile.group_manager(
     g(['fbo-generatemipmap-formats', 'GL_EXT_texture_sRGB-s3tc'],
       'fbo-generatemipmap-formats-s3tc')
     # TODO: also use GL_ARB_framebuffer_sRGB:
-    # g(['fbo-blending-formats', 'GL_EXT_texture_sRGB'], # 'fbo-blending-formats')
-    g(['fbo-alphatest-formats', 'GL_EXT_texture_sRGB'], 'fbo-alphatest-formats')
+    # g(['fbo-blending-formats', 'GL_EXT_texture_sRGB'],
+    #   'fbo-blending-formats')
+    g(['fbo-alphatest-formats', 'GL_EXT_texture_sRGB'],
+      'fbo-alphatest-formats')
     add_msaa_formats_tests(g, 'GL_EXT_texture_sRGB')
     add_texwrap_format_tests(g, 'GL_EXT_texture_sRGB')
     add_texwrap_format_tests(g, 'GL_EXT_texture_sRGB-s3tc', '-s3tc')
