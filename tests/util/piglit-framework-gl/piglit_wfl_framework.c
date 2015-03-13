@@ -296,6 +296,11 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL;
 
+			if (test_config->supports_gl_compat_version >= 32) {
+				head_attrib_list[i++] = WAFFLE_CONTEXT_PROFILE;
+				head_attrib_list[i++] = WAFFLE_CONTEXT_COMPATIBILITY_PROFILE;
+			}
+
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
 			head_attrib_list[i++] = test_config->supports_gl_compat_version / 10;
 
