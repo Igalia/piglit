@@ -79,8 +79,12 @@ else:
     assert os.path.exists(IGT_TEST_ROOT)
 
 # check for the test lists
-if not (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt')) and
-        os.path.exists(os.path.join(IGT_TEST_ROOT, 'multi-tests.txt'))):
+if os.path.exists(os.path.join(IGT_TEST_ROOT, 'test-list.txt')):
+    TEST_LISTS = ['test-list.txt']
+elif (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt')) and
+      os.path.exists(os.path.join(IGT_TEST_ROOT, 'multi-tests.txt'))):
+    TEST_LISTS = ['single-tests.txt', 'multi-tests.txt']
+else:
     print("intel-gpu-tools test lists not found.")
     sys.exit(0)
 
@@ -117,7 +121,7 @@ class IGTTest(Test):
 
 def list_tests(listname):
     """Parse igt test list and return them as a list."""
-    with open(os.path.join(IGT_TEST_ROOT, listname + '.txt'), 'r') as f:
+    with open(os.path.join(IGT_TEST_ROOT, listname), 'r') as f:
         lines = (line.rstrip() for line in f.readlines())
 
     found_header = False
@@ -157,8 +161,9 @@ def add_subtest_cases(test):
 
 
 def populate_profile():
-    tests = list_tests("single-tests")
-    tests.extend(list_tests("multi-tests"))
+    tests = []
+    for test_list in TEST_LISTS:
+        tests.extend(list_tests(test_list))
 
     for test in tests:
         add_subtest_cases(test)
