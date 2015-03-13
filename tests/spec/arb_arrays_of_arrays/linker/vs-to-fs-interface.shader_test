@@ -10,10 +10,11 @@ GL_ARB_arrays_of_arrays
 out ArraysOfArraysBlock
 {
   vec4 a;
-} i[4][5];
+} i[2][5];
 
 void main()
 {
+  i[1][1].a = vec4(1.0);
   gl_Position = vec4(1.0);
 }
 
@@ -23,7 +24,7 @@ void main()
 in ArraysOfArraysBlock
 {
   vec4 a;
-} i[4][5];
+} i[2][5];
 
 void main()
 {
