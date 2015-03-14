@@ -73,7 +73,8 @@ def test_get_backend():
         'junit': backends.JUnitBackend,
     }
 
-    check = lambda n, i: nt.assert_is(backends.get_backend(n), i)
+    def check(n, i):
+        return nt.assert_is(backends.get_backend(n), i)
 
     for name, inst in backends_.iteritems():
         check.description = 'get_backend({0}) returns {0} backend'.format(name)
