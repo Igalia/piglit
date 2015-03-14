@@ -137,10 +137,15 @@ init_glut(void)
 	if (test_config->supports_gl_core_version) {
 		glutInitContextVersion(test_config->supports_gl_core_version / 10,
 				       test_config->supports_gl_core_version % 10);
-		glutInitContextFlags(GLUT_CORE_PROFILE);
+		if (test_config->supports_gl_core_version >= 32) {
+			glutInitContextProfile(GLUT_CORE_PROFILE);
+		}
 	} else {
 		glutInitContextVersion(test_config->supports_gl_compat_version / 10,
 				       test_config->supports_gl_compat_version % 10);
+		if (test_config->supports_gl_compat_version >= 32) {
+			glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
+		}
 	}
 #endif
 
