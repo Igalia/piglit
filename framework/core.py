@@ -42,6 +42,7 @@ __all__ = [
 PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl"]
 PIGLIT_CONFIG = ConfigParser.SafeConfigParser(allow_no_value=True)
 
+
 def get_config(arg=None):
     if arg:
         PIGLIT_CONFIG.readfp(arg)
@@ -112,8 +113,11 @@ class Options(object):
         # to change across runs, without sending them to os.environ which is
         # fickle and easy to break
         self.env = {
-            'PIGLIT_SOURCE_DIR': os.environ.get('PIGLIT_SOURCE_DIR',
-                 os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+            'PIGLIT_SOURCE_DIR':
+                os.environ.get(
+                    'PIGLIT_SOURCE_DIR',
+                    os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                 '..')))
         }
 
     def __iter__(self):
