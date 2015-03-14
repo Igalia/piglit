@@ -68,11 +68,11 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
 
         """
         assert isinstance(key, basestring), \
-               "Keys must be strings, but was {}".format(type(key))
+            "Keys must be strings, but was {}".format(type(key))
         # None is required to make empty assignment work:
         # foo = Tree['a']
         assert isinstance(value, (Test, types.NoneType)), \
-               "Values must be either a Test, but was {}".format(type(value))
+            "Values must be either a Test, but was {}".format(type(value))
 
         super(TestDict, self).__setitem__(key.lower(), value)
 
@@ -144,11 +144,13 @@ class TestProfile(object):
         # The extra argument is needed to match check_all's API
         def test_matches(path, test):
             """Filter for user-specified restrictions"""
-            return ((not opts.filter or matches_any_regexp(path, opts.filter))
-                    and not path in opts.exclude_tests and
+            return ((not opts.filter or
+                     matches_any_regexp(path, opts.filter)) and
+                    path not in opts.exclude_tests and
                     not matches_any_regexp(path, opts.exclude_filter))
 
         filters = self.filters + [test_matches]
+
         def check_all(item):
             """ Checks group and test name against all filters """
             path, test = item
@@ -343,8 +345,8 @@ class TestProfile(object):
 
             self.test_list[lgroup] = test_class(
                 args,
-                **{k:v for k, v in itertools.chain(default_args.iteritems(),
-                                                   kwargs.iteritems())})
+                **{k: v for k, v in itertools.chain(default_args.iteritems(),
+                                                    kwargs.iteritems())})
 
         yield adder
 
