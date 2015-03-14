@@ -147,6 +147,23 @@ init_glut(void)
 			glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
 		}
 	}
+
+	int context_flags = 0;
+	/* There are no 3.1 core profiles -- the closest is 3.1 context without
+	 * ARB_compatibility or a 3.2 core context --, and setting
+	 * forward-compatible flag should ensure we don't get a 3.1 context w/
+	 * ARB_compatibility.
+	 */
+	if (test_config->require_forward_compatible_context ||
+	    test_config->supports_gl_core_version == 31) {
+		context_flags |= GLUT_FORWARD_COMPATIBLE;
+	}
+	if (test_config->require_debug_context) {
+		context_flags |= GLUT_DEBUG;
+	}
+	if (context_flags) {
+		glutInitContextFlags(context_flags);
+	}
 #endif
 
 	glut_fw.window = glutCreateWindow("Piglit");

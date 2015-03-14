@@ -342,7 +342,14 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 			break;
 	}
 
-	if (test_config->require_forward_compatible_context) {
+	/* There are no 3.1 core profiles -- the closest is 3.1 context without
+	 * ARB_compatibility or a 3.2 core context --, and setting
+	 * forward-compatible flag should ensure we don't get a 3.1 context w/
+	 * ARB_compatibility.
+	 */
+	if (test_config->require_forward_compatible_context ||
+	    (flavor == CONTEXT_GL_CORE &&
+	     test_config->supports_gl_core_version == 31)) {
 		head_attrib_list[i++] = WAFFLE_CONTEXT_FORWARD_COMPATIBLE;
 		head_attrib_list[i++] = true;
 	}
