@@ -18,7 +18,7 @@
 # AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
- 
+
 from __future__ import print_function, absolute_import
 import os
 import os.path as path
@@ -315,7 +315,7 @@ class Summary:
             # If the new status is worse update it, or if the new status is
             # SKIP (which is equivalent to notrun) and the current is NOTRUN
             # update it
-            if (status[test] < result or 
+            if (status[test] < result or
                     (result == so.SKIP and status[test] == so.NOTRUN)):
                 status[test] = result
 
@@ -326,8 +326,10 @@ class Summary:
             # Create two dictionaries that have a default factory: they return
             # a default value instead of a key error.
             # This default key must be callable
-            self.fractions[results.name] = collections.defaultdict(lambda: (0, 0))
-            self.status[results.name] = collections.defaultdict(lambda: so.NOTRUN)
+            self.fractions[results.name] = \
+                collections.defaultdict(lambda: (0, 0))
+            self.status[results.name] = \
+                collections.defaultdict(lambda: so.NOTRUN)
 
             # short names
             fraction = self.fractions[results.name]
@@ -408,10 +410,12 @@ class Summary:
             for i in xrange(len(status) - 1):
                 first = status[i]
                 last = status[i + 1]
-                if first in [so.SKIP, so.NOTRUN] and last not in [so.SKIP, so.NOTRUN]:
+                if first in [so.SKIP, so.NOTRUN] and \
+                        last not in [so.SKIP, so.NOTRUN]:
                     self.tests['enabled'].add(test)
                     self.tests['changes'].add(test)
-                elif last in [so.SKIP, so.NOTRUN] and first not in [so.SKIP, so.NOTRUN]:
+                elif last in [so.SKIP, so.NOTRUN] and \
+                        first not in [so.SKIP, so.NOTRUN]:
                     self.tests['disabled'].add(test)
                     self.tests['changes'].add(test)
                 elif first < last:
@@ -450,12 +454,14 @@ class Summary:
                     path.join(destination, "result.css"))
 
         # Create the mako object for creating the test/index.html file
-        testindex = Template(filename=path.join(self.TEMPLATE_DIR, "testrun_info.mako"),
+        testindex = Template(filename=path.join(self.TEMPLATE_DIR,
+                                                "testrun_info.mako"),
                              output_encoding="utf-8",
                              module_directory=self.TEMP_DIR)
 
         # Create the mako object for the individual result files
-        testfile = Template(filename=path.join(self.TEMPLATE_DIR, "test_result.mako"),
+        testfile = Template(filename=path.join(self.TEMPLATE_DIR,
+                                               "test_result.mako"),
                             output_encoding="utf-8",
                             module_directory=self.TEMP_DIR)
 
@@ -485,7 +491,8 @@ class Summary:
 
             # Then build the individual test results
             for key, value in each.tests.iteritems():
-                html_path = path.join(destination, name, escape_filename(key + ".html"))
+                html_path = path.join(destination, name,
+                                      escape_filename(key + ".html"))
                 temp_path = path.dirname(html_path)
 
                 if value['result'] not in exclude:
@@ -510,7 +517,8 @@ class Summary:
                          output_encoding="utf-8",
                          module_directory=self.TEMP_DIR)
 
-        empty_status = Template(filename=path.join(self.TEMPLATE_DIR, "empty_status.mako"),
+        empty_status = Template(filename=path.join(self.TEMPLATE_DIR,
+                                                   "empty_status.mako"),
                                 output_encoding="utf-8",
                                 module_directory=self.TEMP_DIR)
 
@@ -530,7 +538,7 @@ class Summary:
         # Generate the rest of the pages
         for page in pages:
             with open(path.join(destination, page + '.html'), 'w') as out:
-            # If there is information to display display it
+                # If there is information to display display it
                 if self.tests[page]:
                     out.write(index.render(results=HTMLIndex(self,
                                                              self.tests[page]),
