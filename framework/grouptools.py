@@ -29,8 +29,6 @@ posix paths they may not start with a leading '/'.
 
 """
 
-import os.path
-
 __all__ = [
     'commonprefix',
     'from_path',
@@ -44,29 +42,6 @@ __all__ = [
 SEPARATOR = '@'
 
 
-def _normalize(group):
-    """Helper to normalize group paths on Windows.
-
-    Although grouptools' heart is in the right place, the fact is that it fails
-    to spot when developers mistakedly use os.path.join for groups on Posix
-    systems.
-
-    So until this is improved somehow, make grouptools behavior on Windows
-    match Linux, ie, just silently ignore mixed use of grouptools and os.path.
-    """
-    if os.path.sep != '/':
-        group = group.replace(os.path.sep, '/')
-    return group
-
-
-def _assert_illegal(group):
-    """Helper that checks for illegal characters in input."""
-    assert isinstance(group, (str, unicode)), \
-        'Type must be string or unicode but was {}'.format(type(group))
-    assert '\\' not in group, \
-        'Groups are not paths and cannot contain \\.  ({})'.format(group)
-
-
 def testname(group):
     """Return the last element of a group name.
 
@@ -77,9 +52,6 @@ def testname(group):
     Analogous to os.path.basename
 
     """
-    group = _normalize(group)
-    _assert_illegal(group)
-
     return splitname(group)[1]
 
 
@@ -93,17 +65,11 @@ def groupname(group):
     Analogous to os.path.dirname
 
     """
-    group = _normalize(group)
-    _assert_illegal(group)
-
     return splitname(group)[0]
 
 
 def splitname(group):
     """Split a group name, Returns tuple "(group, test)"."""
-    group = _normalize(group)
-    _assert_illegal(group)
-
     i = group.rfind(SEPARATOR) + 1
     head, tail = group[:i], group[i:]
     head = head.rstrip(SEPARATOR)
@@ -113,10 +79,6 @@ def splitname(group):
 
 def commonprefix(args):
     """Given a list of groups, returns the longest common leading component."""
-    args = [_normalize(group) for group in args]
-    for group in args:
-        _assert_illegal(group)
-
     if len(args) == 1:
         return args
 
@@ -134,10 +96,7 @@ def commonprefix(args):
 
 
 def join(first, *args):
-    """Join multiple groups together with some sanity checking.
-
-    Prevents groups from having '/' as the leading character or from having
-    '\\' in them, as these are groups not paths.
+    """Join multiple groups together.
 
     This function is implemented via string concatenation, while most
     pythonistas would use list joining, because it is accepted as better.  I
@@ -148,11 +107,7 @@ def join(first, *args):
     conincedently very similar to the way posixpath.join is implemented.
 
     """
-    args = [_normalize(group) for group in args]
-    first = _normalize(first)
-    _assert_illegal(first)
     for group in args:
-        _assert_illegal(group)
         # Only append things if the group is not empty, otherwise we'll get
         # extra SEPARATORs where we don't want them
         if group:
@@ -169,8 +124,6 @@ def split(group):
     If input is '' return an empty list
 
     """
-    group = _normalize(group)
-    _assert_illegal(group)
     if group == '':
         return []
     return group.split(SEPARATOR)
