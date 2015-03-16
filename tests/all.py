@@ -2051,7 +2051,7 @@ with profile.group_manager(
                  'dmat4x2', 'dmat4x3']:
         for arrayspec in ['array', 'separate']:
             g(['varying-packing-simple', type, arrayspec],
-              'simple {0} {1}'.format(type, arrayspec), run_concurrent=True)
+              'simple {0} {1}'.format(type, arrayspec))
 
 with profile.group_manager(
         PiglitGLTest,
@@ -3520,17 +3520,14 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'AMD_pinned_memory')) as g:
-    g(['amd_pinned_memory', 'offset=0'], 'offset=0', run_concurrent=True)
-    g(['amd_pinned_memory', 'increment-offset'], 'increment-offset',
-      run_concurrent=True)
-    g(['amd_pinned_memory', 'decrement-offset'], 'decrement-offset',
-      run_concurrent=True)
-    g(['amd_pinned_memory', 'offset=0', 'map-buffer'], 'map-buffer offset=0',
-      run_concurrent=True)
+    g(['amd_pinned_memory', 'offset=0'], 'offset=0')
+    g(['amd_pinned_memory', 'increment-offset'], 'increment-offset')
+    g(['amd_pinned_memory', 'decrement-offset'], 'decrement-offset')
+    g(['amd_pinned_memory', 'offset=0', 'map-buffer'], 'map-buffer offset=0')
     g(['amd_pinned_memory', 'increment-offset', 'map-buffer'],
-      'map-buffer increment-offset', run_concurrent=True)
+      'map-buffer increment-offset')
     g(['amd_pinned_memory', 'decrement-offset', 'map-buffer'],
-      'map-buffer decrement-offset', run_concurrent=True)
+      'map-buffer decrement-offset')
 
 with profile.group_manager(
         PiglitGLTest,
@@ -3964,7 +3961,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_map_buffer_alignment')) as g:
     g(['arb_map_buffer_alignment-sanity_test'], run_concurrent=False)
-    g(['arb_map_buffer_alignment-map-invalidate-range'], run_concurrent=True)
+    g(['arb_map_buffer_alignment-map-invalidate-range'])
 
 with profile.group_manager(
         PiglitGLTest,
@@ -4002,18 +3999,18 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_polygon_offset_clamp')) as g:
-    g(['ext_polygon_offset_clamp-draw'], run_concurrent=True)
-    g(['ext_polygon_offset_clamp-dlist'], run_concurrent=True)
+    g(['ext_polygon_offset_clamp-draw'])
+    g(['ext_polygon_offset_clamp-dlist'])
 
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_pipeline_statistics_query')) as g:
-    g(['arb_pipeline_statistics_query-vert'], run_concurrent=True)
-    g(['arb_pipeline_statistics_query-vert_adj'], run_concurrent=True)
-    g(['arb_pipeline_statistics_query-clip'], run_concurrent=True)
-    g(['arb_pipeline_statistics_query-geom'], run_concurrent=True)
-    g(['arb_pipeline_statistics_query-frag'], run_concurrent=True)
-    g(['arb_pipeline_statistics_query-comp'], run_concurrent=True)
+    g(['arb_pipeline_statistics_query-vert'])
+    g(['arb_pipeline_statistics_query-vert_adj'])
+    g(['arb_pipeline_statistics_query-clip'])
+    g(['arb_pipeline_statistics_query-geom'])
+    g(['arb_pipeline_statistics_query-frag'])
+    g(['arb_pipeline_statistics_query-comp'])
 
 with profile.group_manager(PiglitGLTest, 'hiz') as g:
     g(['hiz-depth-stencil-test-fbo-d0-s8'], run_concurrent=False)
@@ -4237,11 +4234,11 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_direct_state_access')) as g:
     g(['arb_direct_state_access-create-transformfeedbacks'],
-      'create-transformfeedbacks', run_concurrent=True)
+      'create-transformfeedbacks')
     g(['arb_direct_state_access-transformfeedback-bufferbase'],
-      'transformfeedback-bufferbase', run_concurrent=True)
+      'transformfeedback-bufferbase')
     g(['arb_direct_state_access-transformfeedback-bufferrange'],
-      'transformfeedback-bufferrange', run_concurrent=True)
+      'transformfeedback-bufferrange')
     g(['arb_direct_state_access-gettransformfeedback'], 'gettransformfeedback')
     g(['arb_direct_state_access-create-renderbuffers'], 'create-renderbuffers')
     g(['arb_direct_state_access-namedrenderbuffer'], 'namedrenderbuffer')
