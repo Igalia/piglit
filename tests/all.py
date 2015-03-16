@@ -3996,6 +3996,11 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'arb_shader_storage_buffer_object')) as g:
+    g(['arb_shader_storage_buffer_object-minmax'], 'minmax')
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_polygon_offset_clamp')) as g:
     g(['ext_polygon_offset_clamp-draw'], run_concurrent=True)
     g(['ext_polygon_offset_clamp-dlist'], run_concurrent=True)
