@@ -30,6 +30,7 @@ import datetime
 import re
 import getpass
 import sys
+import posixpath
 
 from mako.template import Template
 
@@ -262,7 +263,9 @@ class HTMLIndex(list):
             href = None
         else:
             css = text
-            href = grouptools.join(group, href + ".html")
+            # Use posixpath for this URL because it maintains portability
+            # between windows and *nix.
+            href = posixpath.join(group, href + ".html")
             href = normalize_href(href)
 
         self.append({'type': 'testResult',
