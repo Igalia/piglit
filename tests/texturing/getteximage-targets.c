@@ -104,8 +104,11 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 	int num_layers=1, num_faces=1, layer_size;
 	GLubyte data2[18][IMAGE_SIZE];
 	GLubyte *dataGet;
-	GLuint packPBO;
+	GLuint tex, packPBO;
 	bool pass = true;
+
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
 
 	switch (target) {
 	case GL_TEXTURE_1D:
@@ -218,6 +221,8 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 		glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 		glDeleteBuffers(1, &packPBO);
 	}
+
+	glDeleteTextures(1, &tex);
 	return pass;
 }
 
