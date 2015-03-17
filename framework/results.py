@@ -103,15 +103,6 @@ class TestResult(dict):
 
 class TestrunResult(object):
     def __init__(self):
-        self.serialized_keys = ['options',
-                                'name',
-                                'tests',
-                                'uname',
-                                'wglinfo',
-                                'glxinfo',
-                                'lspci',
-                                'results_version',
-                                'time_elapsed']
         self.name = None
         self.uname = None
         self.options = None
@@ -123,10 +114,10 @@ class TestrunResult(object):
         self.tests = {}
 
     def write(self, file_):
-        """ Write only values of the serialized_keys out to file """
+        """Write the result json."""
         with open(file_, 'w') as f:
-            json.dump(dict((k, v) for k, v in self.__dict__.iteritems()
-                           if k in self.serialized_keys),
+            json.dump({k: v for k, v in self.__dict__.iteritems() if not
+                       k.startswith('_')},
                       f, default=piglit_encoder, indent=JSONBackend.INDENT)
 
     @classmethod
