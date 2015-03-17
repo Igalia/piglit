@@ -118,7 +118,7 @@ class JUnitBackend(FileBackend):
             if lname in self._expected_failures:
                 expected_result = "failure"
                 # a test can either fail or crash, but not both
-                assert( lname not in self._expected_crashes )
+                assert lname not in self._expected_crashes
 
             if lname in self._expected_crashes:
                 expected_result = "error"
@@ -129,17 +129,20 @@ class JUnitBackend(FileBackend):
             if data['result'] == 'skip':
                 res = etree.SubElement(element, 'skipped')
 
-            elif data['result'] in ['warn', 'fail', 'dmesg-warn', 'dmesg-fail']:
+            elif data['result'] in ['warn', 'fail', 'dmesg-warn',
+                                    'dmesg-fail']:
                 if expected_result == "failure":
                     err.text += "\n\nWARN: passing test as an expected failure"
-                    res = etree.SubElement(element, 'skipped', message='expected failure')
+                    res = etree.SubElement(element, 'skipped',
+                                           message='expected failure')
                 else:
                     res = etree.SubElement(element, 'failure')
 
             elif data['result'] == 'crash':
                 if expected_result == "error":
                     err.text += "\n\nWARN: passing test as an expected crash"
-                    res = etree.SubElement(element, 'skipped', message='expected crash')
+                    res = etree.SubElement(element, 'skipped',
+                                           message='expected crash')
                 else:
                     res = etree.SubElement(element, 'error')
 
