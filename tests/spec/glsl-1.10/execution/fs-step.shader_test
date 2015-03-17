@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform float a;
+uniform float b;
+uniform vec4 color0;
+uniform vec4 color1;
+
+void main()
+{
+    /* This is a general step() test, but it is designed to tickle an
+     * optimization path in the GEN4 and GEN5 code generation in the i965
+     * driver.  This optimization tries to generate different code for
+     * expressions like 'float(expr cmp 0)'.
+     */
+    gl_FragColor = step(0.0, a * b) * color0 + color1;
+}
+
+[test]
+uniform float a -1
+uniform float b 1
+uniform vec4 color0 1.0 -1.0 0.0 0.0
+uniform vec4 color1 0.0 1.0 0.0 1.0
+draw rect -1 -1 1 2
+relative probe rgba (0.25, 0.5) (0.0, 1.0, 0.0, 1.0)
+
+uniform float a 1
+uniform float b 1
+uniform vec4 color0 -1.0 1.0 0.0 0.0
+uniform vec4 color1 1.0 0.0 0.0 1.0
+draw rect 0 -1 1 2
+relative probe rgba (0.75, 0.5) (0.0, 1.0, 0.0, 1.0)
