@@ -116,6 +116,7 @@ class TestrunResult(object):
         self.uname = None
         self.options = None
         self.glxinfo = None
+        self.wglinfo = None
         self.lspci = None
         self.time_elapsed = None
         self.results_version = CURRENT_JSON_VERSION
