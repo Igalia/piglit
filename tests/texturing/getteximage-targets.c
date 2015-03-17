@@ -221,58 +221,90 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 	return pass;
 }
 
+NORETURN void
+print_usage_and_exit(char *prog_name)
+{
+	printf("Usage: %s <target> <compression>\n"
+	       "  where <target> is one of:\n"
+	       "    1D\n"
+	       "    2D\n"
+	       "    3D\n"
+	       "    RECT\n"
+	       "    CUBE\n"
+	       "    1D_ARRAY\n"
+	       "    2D_ARRAY\n"
+	       "    CUBE_ARRAY\n"
+	       "  where <compression> is optional and can be one of:\n"
+	       "    S3TC: Valid only with 2D* and CUBE* targets\n",
+	       prog_name);
+	piglit_report_result(PIGLIT_FAIL);
+}
+
 void
 piglit_init(int argc, char **argv)
 {
-	int i;
-	GLenum target = GL_TEXTURE_2D;
+	GLenum target;
 	bool pass = true;
 	GLenum internalformat = GL_RGBA8;
 	GLubyte data[18][IMAGE_SIZE];
 	int tolerance = 0;
 
-	for (i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "1D") == 0) {
-			target = GL_TEXTURE_1D;
+	if (argc < 2 || argc > 3)
+		print_usage_and_exit(argv[0]);
+
+	if (strcmp(argv[1], "1D") == 0) {
+		target = GL_TEXTURE_1D;
+	}
+	else if (strcmp(argv[1], "2D") == 0) {
+		target = GL_TEXTURE_2D;
+	}
+	else if (strcmp(argv[1], "3D") == 0) {
+		target = GL_TEXTURE_3D;
+		piglit_require_gl_version(12);
+	}
+	else if (strcmp(argv[1], "RECT") == 0) {
+		target = GL_TEXTURE_RECTANGLE;
+		piglit_require_extension("GL_ARB_texture_rectangle");
+	}
+	else if (strcmp(argv[1], "CUBE") == 0) {
+		target = GL_TEXTURE_CUBE_MAP;
+		piglit_require_extension("GL_ARB_texture_cube_map");
+	}
+	else if (strcmp(argv[1], "1D_ARRAY") == 0) {
+		target = GL_TEXTURE_1D_ARRAY;
+		piglit_require_extension("GL_EXT_texture_array");
+	}
+	else if (strcmp(argv[1], "2D_ARRAY") == 0) {
+		target = GL_TEXTURE_2D_ARRAY;
+		piglit_require_extension("GL_EXT_texture_array");
+	}
+	else if (strcmp(argv[1], "CUBE_ARRAY") == 0) {
+		target = GL_TEXTURE_CUBE_MAP_ARRAY;
+		piglit_require_extension("GL_ARB_texture_cube_map_array");
+	}
+	else {
+		print_usage_and_exit(argv[0]);
+	}
+
+	if (argc == 3 && strcmp(argv[2], "S3TC") == 0 &&
+	    (target == GL_TEXTURE_2D ||
+	     target == GL_TEXTURE_2D_ARRAY ||
+	     target == GL_TEXTURE_CUBE_MAP ||
+	     target == GL_TEXTURE_CUBE_MAP_ARRAY)) {
+		internalformat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		tolerance = 8;
+		if (!piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")
+		    && !piglit_is_extension_supported("GL_ANGLE_texture_compression_dxt5")) {
+			fprintf(stderr,
+				"S3TC testing requires either "
+				"GL_EXT_texture_compression_s3tc or "
+				"GL_ANGLE_texture_compression_dxt5 "
+				"extension be supported.\n");
+			piglit_report_result(PIGLIT_SKIP);
 		}
-		if (strcmp(argv[i], "3D") == 0) {
-			target = GL_TEXTURE_3D;
-			piglit_require_gl_version(12);
-		}
-		if (strcmp(argv[i], "RECT") == 0) {
-			target = GL_TEXTURE_RECTANGLE;
-			piglit_require_extension("GL_ARB_texture_rectangle");
-		}
-		if (strcmp(argv[i], "CUBE") == 0) {
-			target = GL_TEXTURE_CUBE_MAP;
-			piglit_require_extension("GL_ARB_texture_cube_map");
-		}
-		if (strcmp(argv[i], "1D_ARRAY") == 0) {
-			target = GL_TEXTURE_1D_ARRAY;
-			piglit_require_extension("GL_EXT_texture_array");
-		}
-		if (strcmp(argv[i], "2D_ARRAY") == 0) {
-			target = GL_TEXTURE_2D_ARRAY;
-			piglit_require_extension("GL_EXT_texture_array");
-		}
-		if (strcmp(argv[i], "CUBE_ARRAY") == 0) {
-			target = GL_TEXTURE_CUBE_MAP_ARRAY;
-			piglit_require_extension("GL_ARB_texture_cube_map_array");
-		}
-		if (strcmp(argv[i], "S3TC") == 0) {
-			internalformat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-			tolerance = 8;
-			if (!piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")
-			    && !piglit_is_extension_supported("GL_ANGLE_texture_compression_dxt5")) {
-				fprintf(stderr,
-					"S3TC testing requires either "
-					"GL_EXT_texture_compression_s3tc or "
-					"GL_ANGLE_texture_compression_dxt5 "
-					"extension be supported.\n");
-				piglit_report_result(PIGLIT_SKIP);
-			}
-			puts("Testing S3TC.");
-		}
+		puts("Testing S3TC.");
+	} else if (argc == 3) {
+		print_usage_and_exit(argv[0]);
 	}
 
 	init_layer_data(data[0], 18);
