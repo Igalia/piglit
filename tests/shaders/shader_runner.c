@@ -935,6 +935,11 @@ process_test_script(const char *script_name)
 				if (test_start[0] != '\0')
 					test_start++;
 				return;
+			} else {
+				fprintf(stderr,
+					"Unknown section in test script.  "
+					"Perhaps missing closing ']'?\n");
+				piglit_report_result(PIGLIT_FAIL);
 			}
 		} else {
 			switch (state) {
