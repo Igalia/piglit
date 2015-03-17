@@ -67,7 +67,6 @@ with profile.group_manager(PiglitCLTest, 'api') as g:
     g(['cl-api-create-program-with-source'], 'clCreateProgramWithSource')
     g(['cl-api-build-program'], 'clBuildProgram')
     g(['cl-api-compile-program'], 'clCompileProgram')
-    g(['cl-api-create-kernels-in-program'], 'clCreateKernelsInProgram')
     g(['cl-api-get-program-info'], 'clGetProgramInfo')
     g(['cl-api-get-program-build-info'], 'clGetProgramBuildInfo')
     g(['cl-api-retain_release-program'],
