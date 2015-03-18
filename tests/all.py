@@ -2285,6 +2285,7 @@ with profile.group_manager(
     g(['arb_program_interface_query-resource-location'], run_concurrent=False)
     g(['arb_program_interface_query-resource-index'], run_concurrent=False)
     g(['arb_program_interface_query-resource-query'], run_concurrent=False)
+    g(['arb_program_interface_query-getprograminterfaceiv'], run_concurrent=False)
 
 # Group ARB_explicit_uniform_location
 with profile.group_manager(

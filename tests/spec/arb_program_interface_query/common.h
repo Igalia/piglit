@@ -42,27 +42,6 @@ static const char fs_empty[] =
 	"void main() {\n"
 	"}";
 
-static const char vs_array[] =
-	"#version 150\n"
-	"in vec4 vs_input[2];\n"
-	"struct vs_struct {\n"
-	"	vec4 hello;\n"
-	"	vec4 world[2];\n"
-	"};\n"
-	"uniform vs_struct sa[2];\n"
-	"void main() {\n"
-	"	gl_Position = vs_input[0] + sa[0].hello + sa[0].world[0];\n"
-	"}";
-
-static const char vs_aofa[] =
-	"#version 150\n"
-	"#extension GL_ARB_arrays_of_arrays : require\n"
-	"in vec4 vs_input2[2][2];\n"
-	"in vec4 vs_input3[2][2][2];\n"
-	"void main() {\n"
-	"	gl_Position = vs_input2[0][0] + vs_input3[0][0][0];\n"
-	"}";
-
 static const char vs_std[] =
 	"#version 150\n"
 	"struct vs_struct {\n"
