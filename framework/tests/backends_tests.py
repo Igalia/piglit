@@ -70,8 +70,8 @@ def test_get_backend():
     # We use a hand generated list here to ensure that we are getting what we
     # expect
     backends_ = {
-        'json': backends.JSONBackend,
-        'junit': backends.JUnitBackend,
+        'json': backends.json.JSONBackend,
+        'junit': backends.junit.JUnitBackend,
     }
 
     def check(n, i):
@@ -86,7 +86,7 @@ class TestJunitNoTests(utils.StaticDirectory):
     @classmethod
     def setup_class(cls):
         super(TestJunitNoTests, cls).setup_class()
-        test = backends.JUnitBackend(cls.tdir)
+        test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.finalize()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
@@ -109,7 +109,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
     def setup_class(cls):
         super(TestJUnitSingleTest, cls).setup_class()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
-        test = backends.JUnitBackend(cls.tdir)
+        test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(
             grouptools.join('a', 'test', 'group', 'test1'),
@@ -141,7 +141,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
     def setup_class(cls):
         super(TestJUnitMultiTest, cls).setup_class()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
-        test = backends.JUnitBackend(cls.tdir)
+        test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(
             grouptools.join('a', 'test', 'group', 'test1'),
@@ -178,7 +178,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
 def test_junit_replace():
     """JUnitBackend.write_test: '{seperator}' is replaced with '.'"""
     with utils.tempdir() as tdir:
-        test = backends.JUnitBackend(tdir)
+        test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(
             grouptools.join('a', 'test', 'group', 'test1'),
@@ -201,7 +201,7 @@ def test_junit_replace():
 def test_json_initialize_metadata():
     """ JSONBackend.initialize() produces a metadata.json file """
     with utils.tempdir() as f:
-        test = backends.JSONBackend(f)
+        test = backends.json.JSONBackend(f)
         test.initialize(BACKEND_INITIAL_META)
 
         nt.ok_(os.path.exists(os.path.join(f, 'metadata.json')))
@@ -218,7 +218,7 @@ class TestJSONTestMethod(utils.StaticDirectory):
             'err': 'this is stderr',
         })
         super(TestJSONTestMethod, cls).setup_class()
-        test = backends.JSONBackend(cls.tdir)
+        test = backends.json.JSONBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(cls.test_name, cls.result)
 
@@ -253,7 +253,7 @@ class TestJSONTestFinalize(utils.StaticDirectory):
             'err': 'this is stderr',
         })
         super(TestJSONTestFinalize, cls).setup_class()
-        test = backends.JSONBackend(cls.tdir)
+        test = backends.json.JSONBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(cls.test_name, cls.result)
         test.finalize()
@@ -282,7 +282,7 @@ class TestJSONTestFinalize(utils.StaticDirectory):
 def test_junit_skips_bad_tests():
     """ backends.JUnitBackend skips illformed tests """
     with utils.tempdir() as tdir:
-        test = backends.JUnitBackend(tdir)
+        test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
         test.write_test(
             grouptools.join('a', 'test', 'group', 'test1'),

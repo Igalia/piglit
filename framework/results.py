@@ -32,8 +32,8 @@ except ImportError:
     import json
 
 import framework.status as status
-from framework.backends import (CURRENT_JSON_VERSION, piglit_encoder,
-                                JSONBackend)
+from framework.backends.json import (CURRENT_JSON_VERSION, piglit_encoder,
+                                     JSONBackend)
 
 __all__ = [
     'ResultsLoadError',

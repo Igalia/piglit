@@ -325,7 +325,7 @@ def test_json_serialize_updated_result():
     test._new_messages = ['some', 'new', 'messages']
     result = test.update_result(result)
 
-    encoder = json.JSONEncoder(default=framework.backends.piglit_encoder)
+    encoder = json.JSONEncoder(default=framework.backends.json.piglit_encoder)
     encoder.encode(result)
 
 

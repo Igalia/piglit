@@ -20,10 +20,7 @@
 
 """ Import public backend classes into one place """
 
-# pylint: disable=wildcard-import
-from .json import *
-from .junit import *
-
+from . import json, junit
 
 # A list of available backends
 BACKENDS = ['json', 'junit']
@@ -32,8 +29,8 @@ BACKENDS = ['json', 'junit']
 def get_backend(backend):
     """ Returns a BackendInstance based on the string passed """
     backends = {
-        'json': JSONBackend,
-        'junit': JUnitBackend,
+        'json': json.JSONBackend,
+        'junit': junit.JUnitBackend,
     }
 
     # Be sure that we're exporting the same list of backends that we actually

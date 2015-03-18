@@ -162,7 +162,7 @@ def test_resume_non_folder():
 def test_resume_load():
     """ TestrunResult.resume loads with good results """
     with utils.tempdir() as f:
-        backend = backends.JSONBackend(f)
+        backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         backend.write_test(grouptools.join("group1', 'test1"), {'result': 'fail'})
         backend.write_test(grouptools.join("group1', 'test2"), {'result': 'pass'})
@@ -177,7 +177,7 @@ def test_resume_load():
 def test_resume_load_valid():
     """ TestrunResult.resume loads valid results """
     with utils.tempdir() as f:
-        backend = backends.JSONBackend(f)
+        backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         backend.write_test(grouptools.join('group1', 'test1'), {'result': 'fail'})
         backend.write_test(grouptools.join('group1', 'test2'), {'result': 'pass'})
@@ -196,7 +196,7 @@ def test_resume_load_valid():
 def test_resume_load_invalid():
     """ TestrunResult.resume ignores invalid results """
     with utils.tempdir() as f:
-        backend = backends.JSONBackend(f)
+        backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         backend.write_test(grouptools.join('group1', 'test1'), {'result': 'fail'})
         backend.write_test(grouptools.join('group1', 'test2'), {'result': 'pass'})
