@@ -31,13 +31,12 @@ except ImportError:
 
 import framework.status as status
 from .abstract import FileBackend
+from .register import Registry
 
 __all__ = [
-    'CURRENT_JSON_VERSION',
+    'REGISTRY',
     'JSONBackend',
-    'piglit_encoder',
 ]
-
 
 # The current version of the JSON results
 CURRENT_JSON_VERSION = 5
@@ -145,3 +144,9 @@ class JSONBackend(FileBackend):
         with open(t, 'w') as f:
             json.dump({name: data}, f, default=piglit_encoder)
             self._fsync(f)
+
+
+REGISTRY = Registry(
+    extensions=['', '.json'],
+    backend=JSONBackend,
+)

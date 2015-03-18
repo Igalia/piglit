@@ -32,8 +32,10 @@ except ImportError:
 import framework.grouptools as grouptools
 from framework.core import PIGLIT_CONFIG
 from .abstract import FileBackend
+from .register import Registry
 
 __all__ = [
+    'REGISTRY',
     'JUnitBackend',
 ]
 
@@ -203,3 +205,9 @@ class JUnitBackend(FileBackend):
         with open(t, 'w') as f:
             f.write(etree.tostring(element))
             self._fsync(f)
+
+
+REGISTRY = Registry(
+    extensions=['.xml'],
+    backend=JUnitBackend,
+)

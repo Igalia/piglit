@@ -78,9 +78,10 @@ def _default_backend():
     """
     try:
         backend = core.PIGLIT_CONFIG.get('core', 'backend')
-        if backend not in backends.BACKENDS:
+        if backend not in backends.BACKENDS.keys():
             print('Backend is not valid\n',
-                  'valid backends are: {}'.format(' '.join(backends.BACKENDS)),
+                  'valid backends are: {}'.format(
+                      ' '.join(backends.BACKENDS.keys())),
                   file=sys.stderr)
             sys.exit(1)
         return backend
@@ -127,7 +128,7 @@ def _run_parser(input_):
                              "(can be used more than once)")
     parser.add_argument('-b', '--backend',
                         default=_default_backend(),
-                        choices=backends.BACKENDS,
+                        choices=backends.BACKENDS.keys(),
                         help='select a results backend to use')
     conc_parser = parser.add_mutually_exclusive_group()
     conc_parser.add_argument('-c', '--all-concurrent',
