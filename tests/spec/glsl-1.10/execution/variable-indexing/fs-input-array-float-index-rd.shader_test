@@ -1,0 +1,77 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying float m1[4];
+varying float m2[4];
+
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+    m1[0] = 1.0;
+    m1[1] = 2.0;
+    m1[2] = 3.0;
+    m1[3] = 4.0;
+    m2[0] = 5.0;
+    m2[1] = 6.0;
+    m2[2] = 7.0;
+    m2[3] = 8.0;
+}
+
+[fragment shader]
+uniform int index;
+uniform float expect;
+varying float m1[4];
+varying float m2[4];
+
+void main()
+{
+    gl_FragColor = ((index >= 4 ? m2[index-4] : m1[index]) == expect)
+        ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+ortho
+
+uniform int index 0
+uniform float expect 1
+draw rect 5 5 10 10
+probe rgb 10 10 0.0 1.0 0.0
+
+uniform int index 1
+uniform float expect 2
+draw rect 30 5 10 10
+probe rgb 35 10 0.0 1.0 0.0
+
+uniform int index 2
+uniform float expect 3
+draw rect 55 5 10 10
+probe rgb 60 10 0.0 1.0 0.0
+
+uniform int index 3
+uniform float expect 4
+draw rect 80 5 10 10
+probe rgb 85 10 0.0 1.0 0.0
+
+uniform int index 4
+uniform float expect 5
+draw rect 105 5 10 10
+probe rgb 110 10 0.0 1.0 0.0
+
+uniform int index 5
+uniform float expect 6
+draw rect 130 5 10 10
+probe rgb 135 10 0.0 1.0 0.0
+
+uniform int index 6
+uniform float expect 7
+draw rect 155 5 10 10
+probe rgb 160 10 0.0 1.0 0.0
+
+uniform int index 7
+uniform float expect 8
+draw rect 180 5 10 10
+probe rgb 185 10 0.0 1.0 0.0
