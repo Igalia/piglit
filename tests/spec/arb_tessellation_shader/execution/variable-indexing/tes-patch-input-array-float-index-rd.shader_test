@@ -1,0 +1,223 @@
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader]
+#version 150
+
+in vec4 piglit_vertex;
+
+void main()
+{
+    gl_Position = piglit_vertex;
+}
+
+[tessellation control shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+layout(vertices = 4) out;
+
+patch out float m1[16];
+patch out float m2[14];
+
+void main()
+{
+    for (int i = 0; i < 16; i++)
+        m1[i] = 1.0 + float(i);
+
+    for (int i = 0; i < 14; i++)
+        m2[i] = 1.0 + float(16+i);
+
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
+    gl_TessLevelInner = float[2](1.0, 1.0);
+}
+
+[tessellation evaluation shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+layout(quads, equal_spacing) in;
+
+uniform int index;
+uniform vec4 expect;
+patch in float m1[16];
+patch in float m2[14];
+out vec4 color;
+
+#define INTERP_QUAD(INi, OUT) do { \
+    vec4 v[4]; \
+    for (int i = 0; i < 4; i++) v[i] = INi; \
+    OUT = mix(mix(v[0], v[1], gl_TessCoord[0]), mix(v[2], v[3], gl_TessCoord[0]), \
+              gl_TessCoord[1]); \
+} while(false)
+
+void main() {
+    color = (index >= 16 ? m2[index-16] : m1[index]) == expect.x ?
+        vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+
+    INTERP_QUAD(gl_in[i].gl_Position, gl_Position);
+}
+
+[fragment shader]
+#version 150
+in vec4 color;
+out vec4 outcolor;
+
+void main()
+{
+    outcolor = color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+
+uniform int index 0
+uniform vec4 expect 1 1.1 1.2 1.3
+draw rect patch -1 -1 0.09 0.09
+probe rgb 6 6 0.0 1.0 0.0
+
+uniform int index 1
+uniform vec4 expect 2 2.1 2.2 2.3
+draw rect patch -0.9 -1 0.09 0.09
+probe rgb 18 6 0.0 1.0 0.0
+
+uniform int index 2
+uniform vec4 expect 3 3.1 3.2 3.3
+draw rect patch -0.8 -1 0.09 0.09
+probe rgb 31 6 0.0 1.0 0.0
+
+uniform int index 3
+uniform vec4 expect 4 4.1 4.2 4.3
+draw rect patch -0.7 -1 0.09 0.09
+probe rgb 43 6 0.0 1.0 0.0
+
+uniform int index 4
+uniform vec4 expect 5 5.1 5.2 5.3
+draw rect patch -0.6 -1 0.09 0.09
+probe rgb 56 6 0.0 1.0 0.0
+
+uniform int index 5
+uniform vec4 expect 6 6.1 6.2 6.3
+draw rect patch -0.5 -1 0.09 0.09
+probe rgb 68 6 0.0 1.0 0.0
+
+uniform int index 6
+uniform vec4 expect 7 7.1 7.2 7.3
+draw rect patch -0.4 -1 0.09 0.09
+probe rgb 81 6 0.0 1.0 0.0
+
+uniform int index 7
+uniform vec4 expect 8 8.1 8.2 8.3
+draw rect patch -0.3 -1 0.09 0.09
+probe rgb 93 6 0.0 1.0 0.0
+
+uniform int index 8
+uniform vec4 expect 9 9.1 9.2 9.3
+draw rect patch -0.2 -1 0.09 0.09
+probe rgb 106 6 0.0 1.0 0.0
+
+uniform int index 9
+uniform vec4 expect 10 10.1 10.2 10.3
+draw rect patch -0.1 -1 0.09 0.09
+probe rgb 118 6 0.0 1.0 0.0
+
+uniform int index 10
+uniform vec4 expect 11 11.1 11.2 11.3
+draw rect patch 0 -1 0.09 0.09
+probe rgb 131 6 0.0 1.0 0.0
+
+uniform int index 11
+uniform vec4 expect 12 12.1 12.2 12.3
+draw rect patch 0.1 -1 0.09 0.09
+probe rgb 143 6 0.0 1.0 0.0
+
+uniform int index 12
+uniform vec4 expect 13 13.1 13.2 13.3
+draw rect patch 0.2 -1 0.09 0.09
+probe rgb 156 6 0.0 1.0 0.0
+
+uniform int index 13
+uniform vec4 expect 14 14.1 14.2 14.3
+draw rect patch 0.3 -1 0.09 0.09
+probe rgb 168 6 0.0 1.0 0.0
+
+uniform int index 14
+uniform vec4 expect 15 15.1 15.2 15.3
+draw rect patch 0.4 -1 0.09 0.09
+probe rgb 181 6 0.0 1.0 0.0
+
+uniform int index 15
+uniform vec4 expect 16 16.1 16.2 16.3
+draw rect patch 0.5 -1.0 0.09 0.09
+probe rgb 193 6 0.0 1.0 0.0
+
+uniform int index 16
+uniform vec4 expect 17 17.1 17.2 17.3
+draw rect patch -1 -0.9 0.09 0.09
+probe rgb 6 18 0.0 1.0 0.0
+
+uniform int index 17
+uniform vec4 expect 18 18.1 18.2 18.3
+draw rect patch -0.9 -0.9 0.09 0.09
+probe rgb 18 18 0.0 1.0 0.0
+
+uniform int index 18
+uniform vec4 expect 19 19.1 19.2 19.3
+draw rect patch -0.8 -0.9 0.09 0.09
+probe rgb 31 18 0.0 1.0 0.0
+
+uniform int index 19
+uniform vec4 expect 20 20.1 20.2 20.3
+draw rect patch -0.7 -0.9 0.09 0.09
+probe rgb 43 18 0.0 1.0 0.0
+
+uniform int index 20
+uniform vec4 expect 21 21.1 21.2 21.3
+draw rect patch -0.6 -0.9 0.09 0.09
+probe rgb 56 18 0.0 1.0 0.0
+
+uniform int index 21
+uniform vec4 expect 22 22.1 22.2 22.3
+draw rect patch -0.5 -0.9 0.09 0.09
+probe rgb 68 18 0.0 1.0 0.0
+
+uniform int index 22
+uniform vec4 expect 23 23.1 23.2 23.3
+draw rect patch -0.4 -0.9 0.09 0.09
+probe rgb 81 18 0.0 1.0 0.0
+
+uniform int index 23
+uniform vec4 expect 24 24.1 24.2 24.3
+draw rect patch -0.3 -0.9 0.09 0.09
+probe rgb 93 18 0.0 1.0 0.0
+
+uniform int index 24
+uniform vec4 expect 25 25.1 25.2 25.3
+draw rect patch -0.2 -0.9 0.09 0.09
+probe rgb 106 18 0.0 1.0 0.0
+
+uniform int index 25
+uniform vec4 expect 26 26.1 26.2 26.3
+draw rect patch -0.1 -0.9 0.09 0.09
+probe rgb 118 18 0.0 1.0 0.0
+
+uniform int index 26
+uniform vec4 expect 27 27.1 27.2 27.3
+draw rect patch 0 -0.9 0.09 0.09
+probe rgb 131 18 0.0 1.0 0.0
+
+uniform int index 27
+uniform vec4 expect 28 28.1 28.2 28.3
+draw rect patch 0.1 -0.9 0.09 0.09
+probe rgb 143 18 0.0 1.0 0.0
+
+uniform int index 28
+uniform vec4 expect 29 29.1 29.2 29.3
+draw rect patch 0.2 -0.9 0.09 0.09
+probe rgb 156 18 0.0 1.0 0.0
+
+uniform int index 29
+uniform vec4 expect 30 30.1 30.2 30.3
+draw rect patch 0.3 -0.9 0.09 0.09
+probe rgb 168 18 0.0 1.0 0.0
