@@ -1,0 +1,202 @@
+[require]
+GLSL >= 1.50
+GL_MAX_VERTEX_OUTPUT_COMPONENTS >= 128
+
+[vertex shader]
+#version 150
+
+uniform int index;
+in vec4 piglit_vertex;
+
+out block {
+  float m1[16];
+  float m2[15];
+} ins;
+
+void main()
+{
+    gl_Position = piglit_vertex;
+
+    for (int i = 0; i < ins.m1.length(); i++)
+        ins.m1[i] = 1.0 + float(i);
+
+    for (int i = 0; i < ins.m2.length(); i++)
+        ins.m2[i] = 1.0 + float(ins.m1.length()+i);
+
+    if (index >= ins.m1.length())
+        ins.m2[index-ins.m1.length()] = 0.0;
+    else
+        ins.m1[index] = 0.0;
+}
+
+[geometry shader]
+#version 150
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+uniform int index;
+in block {
+    float m1[16];
+    float m2[15];
+} ins[];
+out vec4 color;
+
+void main()
+{
+    for (int p = 0; p < 3; p++) {
+        bool pass = true;
+
+        for (int i = 0; i < ins[p].m1.length(); i++)
+            pass = pass && ins[p].m1[i] == (index == i ?
+                                            0.0 :
+                                            1.0 + float(i));
+
+        for (int i = 0; i < ins[p].m2.length(); i++)
+            pass = pass && ins[p].m2[i] == (index == ins[p].m1.length()+i ?
+                                            0.0 :
+                                            17.0 + float(i));
+
+        color = pass ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+
+        gl_Position = gl_in[p].gl_Position;
+        EmitVertex();
+    }
+}
+
+[fragment shader]
+#version 150
+in vec4 color;
+out vec4 outcolor;
+
+void main()
+{
+    outcolor = color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+
+uniform int index 0
+draw rect -1 -1 0.09 0.09
+probe rgb 6 6 0.0 1.0 0.0
+
+uniform int index 1
+draw rect -0.9 -1 0.09 0.09
+probe rgb 18 6 0.0 1.0 0.0
+
+uniform int index 2
+draw rect -0.8 -1 0.09 0.09
+probe rgb 31 6 0.0 1.0 0.0
+
+uniform int index 3
+draw rect -0.7 -1 0.09 0.09
+probe rgb 43 6 0.0 1.0 0.0
+
+uniform int index 4
+draw rect -0.6 -1 0.09 0.09
+probe rgb 56 6 0.0 1.0 0.0
+
+uniform int index 5
+draw rect -0.5 -1 0.09 0.09
+probe rgb 68 6 0.0 1.0 0.0
+
+uniform int index 6
+draw rect -0.4 -1 0.09 0.09
+probe rgb 81 6 0.0 1.0 0.0
+
+uniform int index 7
+draw rect -0.3 -1 0.09 0.09
+probe rgb 93 6 0.0 1.0 0.0
+
+uniform int index 8
+draw rect -0.2 -1 0.09 0.09
+probe rgb 106 6 0.0 1.0 0.0
+
+uniform int index 9
+draw rect -0.1 -1 0.09 0.09
+probe rgb 118 6 0.0 1.0 0.0
+
+uniform int index 10
+draw rect 0 -1 0.09 0.09
+probe rgb 131 6 0.0 1.0 0.0
+
+uniform int index 11
+draw rect 0.1 -1 0.09 0.09
+probe rgb 143 6 0.0 1.0 0.0
+
+uniform int index 12
+draw rect 0.2 -1 0.09 0.09
+probe rgb 156 6 0.0 1.0 0.0
+
+uniform int index 13
+draw rect 0.3 -1 0.09 0.09
+probe rgb 168 6 0.0 1.0 0.0
+
+uniform int index 14
+draw rect 0.4 -1 0.09 0.09
+probe rgb 181 6 0.0 1.0 0.0
+
+uniform int index 15
+draw rect 0.5 -1.0 0.09 0.09
+probe rgb 193 6 0.0 1.0 0.0
+
+uniform int index 16
+draw rect -1 -0.9 0.09 0.09
+probe rgb 6 18 0.0 1.0 0.0
+
+uniform int index 17
+draw rect -0.9 -0.9 0.09 0.09
+probe rgb 18 18 0.0 1.0 0.0
+
+uniform int index 18
+draw rect -0.8 -0.9 0.09 0.09
+probe rgb 31 18 0.0 1.0 0.0
+
+uniform int index 19
+draw rect -0.7 -0.9 0.09 0.09
+probe rgb 43 18 0.0 1.0 0.0
+
+uniform int index 20
+draw rect -0.6 -0.9 0.09 0.09
+probe rgb 56 18 0.0 1.0 0.0
+
+uniform int index 21
+draw rect -0.5 -0.9 0.09 0.09
+probe rgb 68 18 0.0 1.0 0.0
+
+uniform int index 22
+draw rect -0.4 -0.9 0.09 0.09
+probe rgb 81 18 0.0 1.0 0.0
+
+uniform int index 23
+draw rect -0.3 -0.9 0.09 0.09
+probe rgb 93 18 0.0 1.0 0.0
+
+uniform int index 24
+draw rect -0.2 -0.9 0.09 0.09
+probe rgb 106 18 0.0 1.0 0.0
+
+uniform int index 25
+draw rect -0.1 -0.9 0.09 0.09
+probe rgb 118 18 0.0 1.0 0.0
+
+uniform int index 26
+draw rect 0 -0.9 0.09 0.09
+probe rgb 131 18 0.0 1.0 0.0
+
+uniform int index 27
+draw rect 0.1 -0.9 0.09 0.09
+probe rgb 143 18 0.0 1.0 0.0
+
+uniform int index 28
+draw rect 0.2 -0.9 0.09 0.09
+probe rgb 156 18 0.0 1.0 0.0
+
+uniform int index 29
+draw rect 0.3 -0.9 0.09 0.09
+probe rgb 168 18 0.0 1.0 0.0
+
+uniform int index 30
+draw rect 0.4 -0.9 0.09 0.09
+probe rgb 181 18 0.0 1.0 0.0
