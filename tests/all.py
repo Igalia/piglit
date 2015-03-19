@@ -3412,7 +3412,7 @@ with profile.group_manager(
                   'gl_SkipComponents2', 'gl_SkipComponents3',
                   'gl_SkipComponents4',
                   'gl_NextBuffer-gl_SkipComponents1-gl_NextBuffer',
-                  'gl_NextBuffer-gl_NextBuffer', 'gl_SkipComponents1234']:
+                  'gl_NextBuffer-gl_NextBuffer', 'gl_SkipComponents1234', 'gl_SkipComponents1-gl_NextBuffer']:
         g(['ext_transform_feedback-output-type', param], param)
 
 with profile.group_manager(

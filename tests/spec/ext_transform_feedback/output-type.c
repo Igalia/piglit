@@ -1376,6 +1376,24 @@ struct test_desc {
 		true /* is transform_feedback3 */
 	},
 	{
+		"gl_SkipComponents1-gl_NextBuffer", /* name */
+
+		"#version 120\n" /* vs */
+		"varying float r[2];"
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = float[2](0.4, 0.5);"
+		"}",
+
+		4, /* num_varyings, varyings */
+		{"r[0]", "gl_SkipComponents1", "gl_NextBuffer", "r[1]"},
+
+		true, /* is_floating_point */
+		{2, 1}, /* num_elements, expected_float, expected_int */
+		{{0.4, DEFAULT_VALUE}, {0.5}}, {{0}},
+		true /* is transform_feedback3 */
+	},
+	{
 		"gl_NextBuffer-gl_SkipComponents1-gl_NextBuffer", /* name */
 
 		"#version 120\n" /* vs */
