@@ -32,14 +32,26 @@ except ImportError:
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 
-from framework import results, backends, grouptools
+from framework import results, backends, grouptools, status
 import framework.tests.utils as utils
 from .backends_tests import BACKEND_INITIAL_META
 
 
 JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'
 
-doc_formatter = utils.DocFormatter({'seperator': grouptools.SEPARATOR})
+doc_formatter = utils.DocFormatter({'separator': grouptools.SEPARATOR})
+
+_XML =  """\
+<?xml version='1.0' encoding='utf-8'?>
+  <testsuites>
+    <testsuite name="piglit" tests="1">
+      <testcase classname="piglit.foo.bar" name="a-test" status="pass" time="1.12345">
+        <system-out>this/is/a/command\nThis is stdout</system-out>
+        <system-err>this is stderr</system-err>
+      </testcase>
+    </testsuite>
+  </testsuites>
+"""
 
 
 class TestJunitNoTests(utils.StaticDirectory):
@@ -136,7 +148,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
 
 @doc_formatter
 def test_junit_replace():
-    """JUnitBackend.write_test: '{seperator}' is replaced with '.'"""
+    """JUnitBackend.write_test: '{separator}' is replaced with '.'"""
     with utils.tempdir() as tdir:
         test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
@@ -180,3 +192,125 @@ def test_junit_skips_bad_tests():
             test.finalize()
         except etree.ParseError as e:
             raise AssertionError(e)
+
+
+class TestJUnitLoad(utils.StaticDirectory):
+    """Methods that test loading JUnit results."""
+    __instance = None
+
+    @classmethod
+    def setup_class(cls):
+        super(TestJUnitLoad, cls).setup_class()
+        cls.xml_file = os.path.join(cls.tdir, 'results.xml')
+        
+        with open(cls.xml_file, 'w') as f:
+            f.write(_XML)
+
+        cls.testname = grouptools.join('foo', 'bar', 'a-test')
+
+    @classmethod
+    def xml(cls):
+        if cls.__instance is None:
+            cls.__instance =  backends.junit._load(cls.xml_file)
+        return cls.__instance
+
+    @utils.no_error
+    def test_no_errors(self):
+        """backends.junit._load: Raises no errors for valid junit."""
+        self.xml()
+
+    def test_return_testrunresult(self):
+        """backends.junit._load: returns a TestrunResult instance"""
+        nt.assert_is_instance(self.xml(), results.TestrunResult)
+
+    @doc_formatter
+    def test_replace_sep(self):
+        """backends.junit._load: replaces '.' with '{separator}'"""
+        nt.assert_in(self.testname, self.xml().tests)
+
+    def test_testresult_instance(self):
+        """backends.junit._load: replaces result with TestResult instance."""
+        nt.assert_is_instance(self.xml().tests[self.testname], results.TestResult)
+
+    def test_status_instance(self):
+        """backends.junit._load: a status is found and loaded."""
+        nt.assert_is_instance(self.xml().tests[self.testname]['result'],
+                              status.Status)
+
+    def test_time(self):
+        """backends.junit._load: Time is loaded correctly."""
+        time = self.xml().tests[self.testname]['time']
+        nt.assert_is_instance(time, float)
+        nt.assert_equal(time, 1.12345)
+
+    def test_command(self):
+        """backends.junit._load: command is loaded correctly."""
+        test = self.xml().tests[self.testname]['command']
+        nt.assert_equal(test, 'this/is/a/command')
+
+    def test_out(self):
+        """backends.junit._load: stdout is loaded correctly."""
+        test = self.xml().tests[self.testname]['out']
+        nt.assert_equal(test, 'This is stdout')
+
+    def test_err(self):
+        """backends.junit._load: stderr is loaded correctly."""
+        test = self.xml().tests[self.testname]['err']
+        nt.assert_equal(test, 'this is stderr')
+
+    @utils.no_error
+    def test_load_file(self):
+        """backends.junit.load: Loads a file directly."""
+        backends.junit.REGISTRY.load(self.xml_file)
+
+    @utils.no_error
+    def test_load_dir(self):
+        """backends.junit.load: Loads a directory."""
+        backends.junit.REGISTRY.load(self.tdir)
+
+
+def test_load_file_name():
+    """backend.junit._load: uses the filename for name if filename != 'results'
+    """
+    with utils.tempdir() as tdir:
+        filename = os.path.join(tdir, 'foobar.xml')
+        with open(filename, 'w') as f:
+            f.write(_XML)
+
+        test = backends.junit.REGISTRY.load(filename)
+    nt.assert_equal(test.name, 'foobar')
+
+
+def test_load_folder_name():
+    """backend.junit._load: uses the foldername if the result is 'results'
+    """
+    with utils.tempdir() as tdir:
+        os.mkdir(os.path.join(tdir, 'a cool test'))
+        filename = os.path.join(tdir, 'a cool test', 'results.xml')
+        with open(filename, 'w') as f:
+            f.write(_XML)
+
+        test = backends.junit.REGISTRY.load(filename)
+    nt.assert_equal(test.name, 'a cool test')
+
+
+def test_load_default_name():
+    """backend.junit._load: uses 'junit result' for name as fallback"""
+    curdir = os.getcwd()
+ 
+    # This try/finally ensures that no matter what the directory will be changed
+    # back, this is necessary to ensure that it doesn't spoil the environment
+    # for other tests.
+    try:
+        with utils.tempdir() as tdir:
+            os.chdir(tdir)
+
+            filename = 'results.xml'
+            with open(filename, 'w') as f:
+                f.write(_XML)
+
+            test = backends.junit.REGISTRY.load(filename)
+    finally:
+        os.chdir(curdir)
+
+    nt.assert_equal(test.name, 'junit result')

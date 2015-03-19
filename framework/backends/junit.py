@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2015 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ try:
 except ImportError:
     import xml.etree.cElementTree as etree
 
-import framework.grouptools as grouptools
+from framework import grouptools, results, status
 from framework.core import PIGLIT_CONFIG
 from .abstract import FileBackend
 from .register import Registry
@@ -207,9 +207,73 @@ class JUnitBackend(FileBackend):
             self._fsync(f)
 
 
+def _load(results_file):
+    """Load a junit results instance and return a TestrunResult.
+
+    It's worth noting that junit is not as descriptive as piglit's own json
+    format, so some data structures will be empty compared to json.
+
+    This tries to not make too many assumptions about the strucuter of the
+    JUnit document.
+
+    """
+    run_result = results.TestrunResult()
+
+    splitpath = os.path.splitext(results_file)[0].split(os.path.sep)
+    if splitpath[-1] != 'results':
+        run_result.name = splitpath[-1]
+    elif len(splitpath) > 1:
+        run_result.name = splitpath[-2]
+    else:
+        run_result.name = 'junit result'
+
+    tree = etree.parse(results_file).getroot().find('.//testsuite[@name="piglit"]')
+    for test in tree.iterfind('testcase'):
+        result = results.TestResult()
+        # Take the class name minus the 'piglit.' element, replace junit's '.'
+        # separator with piglit's separator, and join the group and test names
+        name = test.attrib['classname'].split('.', 1)[1]
+        name = name.replace('.', grouptools.SEPARATOR)
+        name = grouptools.join(name, test.attrib['name'])
+
+        # Remove the trailing _ if they were added (such as to api and search)
+        if name.endswith('_'):
+            name = name[:-1]
+
+        result['result'] = status.status_lookup(test.attrib['status'])
+        result['time'] = float(test.attrib['time'])
+        result['err'] = test.find('system-err').text
+
+        # The command is prepended to system-out, so we need to separate those
+        # into two separate elements
+        out = test.find('system-out').text.split('\n')
+        result['command'] = out[0]
+        result['out'] = '\n'.join(out[1:])
+
+        run_result.tests[name] = result
+    
+    return run_result
+
+
+def load(results_dir):
+    """Searches for a results file and returns a TestrunResult.
+
+    wraps _load and searches for the result file.
+
+    """
+    if not os.path.isdir(results_dir):
+        return _load(results_dir)
+    elif os.path.exists(os.path.join(results_dir, 'tests')):
+        raise NotImplementedError('resume support of junit not implemented')
+    elif os.path.exists(os.path.join(results_dir, 'results.xml')):
+        return _load(os.path.join(results_dir, 'results.xml'))
+    else:
+        raise Exception("No results found")
+
+
 REGISTRY = Registry(
     extensions=['.xml'],
     backend=JUnitBackend,
-    load=None,
+    load=load,
     meta=lambda x: x,  # The venerable no-op function
 )

@@ -25,6 +25,9 @@ in a single place.
 
 """
 
+# TODO: add a chdir decorator that gets the current dir, runs the test in a
+#       try and returns to the start dir in the finally
+
 from __future__ import print_function, absolute_import
 import os
 import sys
@@ -299,7 +302,7 @@ def no_error(func):
         try:
             func(*args, **kwargs)
         except Exception as e:
-            raise TestFailure(e.message)
+            raise TestFailure(*e.args)
 
     return test_wrapper
 
