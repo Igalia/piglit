@@ -1,0 +1,81 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform int index;
+varying vec2 m1[4];
+varying vec2 m2[4];
+
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+    m1[0] = vec2(1.0, 1.1);
+    m1[1] = vec2(2.0, 2.1);
+    m1[2] = vec2(3.0, 3.1);
+    m1[3] = vec2(4.0, 4.1);
+    m2[0] = vec2(5.0, 5.1);
+    m2[1] = vec2(6.0, 6.1);
+    m2[2] = vec2(7.0, 7.1);
+    m2[3] = vec2(8.0, 8.1);
+
+    if (index >= 4)
+        m2[index-4] = vec2(0.0, 0.1);
+    else
+        m1[index] = vec2(0.0, 0.1);
+}
+
+[fragment shader]
+uniform int index;
+varying vec2 m1[4];
+varying vec2 m2[4];
+
+void main()
+{
+    bool pass = true;
+
+    for (int i = 0; i < 4; i++)
+        pass = pass && m1[i] == (index == i ? vec2(0.0, 0.1) : vec2(1.0, 1.1) + vec2(i));
+
+    for (int i = 0; i < 4; i++)
+        pass = pass && m2[i] == (index == 4+i ? vec2(0.0, 0.1) : vec2(5.0, 5.1) + vec2(i));
+
+    gl_FragColor = pass ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+ortho
+
+uniform int index 0
+draw rect 5 5 10 10
+probe rgb 10 10 0.0 1.0 0.0
+
+uniform int index 1
+draw rect 30 5 10 10
+probe rgb 35 10 0.0 1.0 0.0
+
+uniform int index 2
+draw rect 55 5 10 10
+probe rgb 60 10 0.0 1.0 0.0
+
+uniform int index 3
+draw rect 80 5 10 10
+probe rgb 85 10 0.0 1.0 0.0
+
+uniform int index 4
+draw rect 105 5 10 10
+probe rgb 110 10 0.0 1.0 0.0
+
+uniform int index 5
+draw rect 130 5 10 10
+probe rgb 135 10 0.0 1.0 0.0
+
+uniform int index 6
+draw rect 155 5 10 10
+probe rgb 160 10 0.0 1.0 0.0
+
+uniform int index 7
+draw rect 180 5 10 10
+probe rgb 185 10 0.0 1.0 0.0
