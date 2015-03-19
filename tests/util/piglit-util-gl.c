@@ -656,7 +656,8 @@ required_gl_version_from_glsl_version(unsigned glsl_version)
  * if not NULL.
  */
 void
-piglit_draw_rect_from_arrays(const void *verts, const void *tex)
+piglit_draw_rect_from_arrays(const void *verts, const void *tex,
+			     bool use_patches)
 {
 	bool use_fixed_function_attributes;
 
@@ -754,7 +755,7 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 			glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
 		}
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(use_patches ? GL_PATCHES : GL_TRIANGLE_STRIP, 0, 4);
 
 		if (verts)
 			glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
@@ -775,7 +776,7 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex)
  * Convenience function to draw an axis-aligned rectangle.
  */
 GLvoid
-piglit_draw_rect(float x, float y, float w, float h)
+piglit_draw_rect_custom(float x, float y, float w, float h, bool use_patches)
 {
 	float verts[4][4];
 
@@ -796,7 +797,16 @@ piglit_draw_rect(float x, float y, float w, float h)
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
 
-	piglit_draw_rect_from_arrays(verts, NULL);
+	piglit_draw_rect_from_arrays(verts, NULL, use_patches);
+}
+
+/**
+ * Convenience function to draw an axis-aligned rectangle.
+ */
+GLvoid
+piglit_draw_rect(float x, float y, float w, float h)
+{
+	piglit_draw_rect_custom(x, y, w, h, false);
 }
 
 /**
@@ -824,7 +834,7 @@ piglit_draw_rect_z(float z, float x, float y, float w, float h)
 	verts[3][2] = z;
 	verts[3][3] = 1.0;
 
-	piglit_draw_rect_from_arrays(verts, NULL);
+	piglit_draw_rect_from_arrays(verts, NULL, false);
 }
 
 /**
@@ -863,7 +873,7 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
 	tex[3][0] = tx + tw;
 	tex[3][1] = ty + th;
 
-	piglit_draw_rect_from_arrays(verts, tex);
+	piglit_draw_rect_from_arrays(verts, tex, false);
 }
 
 unsigned

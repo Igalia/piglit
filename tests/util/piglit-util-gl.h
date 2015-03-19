@@ -175,12 +175,15 @@ GLvoid piglit_draw_triangle(float x1, float y1, float x2, float y2,
 			    float x3, float y3);
 GLvoid piglit_draw_triangle_z(float z, float x1, float y1, float x2, float y2,
 			      float x3, float y3);
+GLvoid piglit_draw_rect_custom(float x, float y, float w, float h,
+			       bool use_patches);
 GLvoid piglit_draw_rect(float x, float y, float w, float h);
 GLvoid piglit_draw_rect_z(float z, float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
                             float tx, float ty, float tw, float th);
 GLvoid piglit_draw_rect_back(float x, float y, float w, float h);
-void piglit_draw_rect_from_arrays(const void *verts, const void *tex);
+void piglit_draw_rect_from_arrays(const void *verts, const void *tex,
+				  bool use_patches);
 
 unsigned short piglit_half_from_float(float val);
 
