@@ -208,7 +208,6 @@ GLboolean
 draw_test(void)
 {
 	GLboolean pass = GL_TRUE;
-	GLenum origin, depth;
 	GLclampd near = 0, far = 1;
 
 	/* Now prepare the draw buffer */
