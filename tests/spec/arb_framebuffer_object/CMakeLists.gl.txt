@@ -12,6 +12,7 @@ link_libraries (
 
 piglit_add_executable(framebuffer-blit-levels framebuffer-blit-levels.c)
 piglit_add_executable(get-renderbuffer-internalformat get-renderbuffer-internalformat.c)
+piglit_add_executable(arb_framebuffer_object-mixed-buffer-sizes mixed-buffer-sizes.c)
 piglit_add_executable(arb_framebuffer_object-negative-readpixels-no-rb negative-readpixels-no-rb.c)
 piglit_add_executable(same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT.c)
 piglit_add_executable(same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT.c)
