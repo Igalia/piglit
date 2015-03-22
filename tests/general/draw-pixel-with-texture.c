@@ -39,8 +39,8 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLfloat tex_data[2 * 2 * 4] = {
-		1, 0, 0, 1, 	1, 0, 0, 1,
-		1, 0, 0, 1, 	1, 0, 0, 1,
+               1, 0, 0, 1,     0, 1, 1, 1,
+               0, 1, 0, 1,     0, 0, 1, 1,
 	};
 	GLfloat *pixels;
 	GLfloat expected[4] = {0.2, 0, 0, 1};
@@ -53,13 +53,13 @@ piglit_display(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	glTexCoord2f(0.5, 0.5);
+       glTexCoord2f(0.25, 0.25);
 	glEnable(GL_TEXTURE_2D);
 
 	for (i = 0; i < SCREEN_SIZE_IN_PIXELS; i += 4) {
 		pixels[i + 0] = 0.2;
 		pixels[i + 1] = 1;
-		pixels[i + 2] = 0;
+               pixels[i + 2] = 0.4;
 		pixels[i + 3] = 1;
 	}
 
