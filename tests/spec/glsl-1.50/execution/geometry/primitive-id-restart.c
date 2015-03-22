@@ -132,7 +132,7 @@ struct prim_type_info
 };
 
 
-static void
+NORETURN static void
 print_usage_and_exit(const char *prog_name)
 {
 	int i;
