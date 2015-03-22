@@ -796,7 +796,7 @@ piglit_ktx_load_texture(struct piglit_ktx *self,
 
 	/* Reset GL error state. */
 	while (glGetError())
-		;;
+		;
 
 	if (*tex_name == 0) {
 		glGenTextures(1, tex_name);
