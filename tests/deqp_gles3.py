@@ -24,7 +24,7 @@ import subprocess
 import xml.etree.cElementTree as ET
 
 # Piglit modules
-import framework
+from framework import core, grouptools
 from framework.profile import Test, TestProfile
 
 __all__ = ['profile']
@@ -66,8 +66,7 @@ def get_option(env_varname, config_option):
         return opt
 
     try:
-        opt = framework.core.PIGLIT_CONFIG.get(config_option[0],
-                                               config_option[1])
+        opt = core.PIGLIT_CONFIG.get(config_option[0], config_option[1])
     except ConfigParser.NoSectionError:
         pass
     except ConfigParser.NoOptionError:
@@ -167,7 +166,7 @@ def add_tests():
 
     for deqp_testname in iter_deqp_test_cases():
         # dEQP uses '.' as the testgroup separator.
-        piglit_testname = deqp_testname.replace('.', '/')
+        piglit_testname = deqp_testname.replace('.', grouptools.SEPARATOR)
 
         test = DEQPTest(deqp_testname)
         profile.test_list[piglit_testname] = test
