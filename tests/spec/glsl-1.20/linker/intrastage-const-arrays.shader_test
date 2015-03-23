@@ -1,0 +1,22 @@
+# Test linking two shaders which both have array of constants.
+# https://bugs.freedesktop.org/show_bug.cgi?id=89590
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+uniform int index;
+void main() {
+	const float zs[4] = float[4](0, 0, 0, 0);
+	gl_Position = vec4(zs[index]);
+}
+
+[fragment shader]
+uniform int index;
+void main()
+{
+	const vec4 colours[2] = vec4[2](vec4(1, 0, 0, 0), vec4(0, 1, 0, 0));
+	gl_FragColor = vec4(colours[index].x);
+}
+
+[test]
+link success
