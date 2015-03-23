@@ -156,7 +156,11 @@ def csv(input_):
                         help="JSON results file to be converted")
     args = parser.parse_args(input_)
 
-    testrun = framework.results.load_results(args.testResults)
+    try:
+        testrun = framework.results.load_results(args.testResults)
+    except framework.results.ResultsLoadError as e:
+        print('Error: {}'.format(e.message), file=sys.stderr)
+        sys.exit(1)
 
     def write_results(output):
         for name, result in testrun.tests.iteritems():
@@ -186,7 +190,11 @@ def aggregate(input_):
     assert os.path.isdir(args.results_folder)
 
     outfile = os.path.join(args.results_folder, args.output)
-    results = framework.results.load_results(args.results_folder)
+    try:
+        results = framework.results.load_results(args.results_folder)
+    except framework.results.ResultsLoadError as e:
+        print('Error: {}'.format(e.message), file=sys.stderr)
+        sys.exit(1)
 
     try:
         results.write(outfile)

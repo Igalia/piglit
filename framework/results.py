@@ -36,10 +36,15 @@ from framework.backends import (CURRENT_JSON_VERSION, piglit_encoder,
                                 JSONBackend)
 
 __all__ = [
+    'ResultsLoadError',
     'TestrunResult',
     'TestResult',
     'load_results',
 ]
+
+
+class ResultsLoadError(Exception):
+    pass
 
 
 class TestResult(dict):
@@ -214,7 +219,7 @@ def load_results(filename):
         elif os.path.exists(os.path.join(filename, 'main')):
             filepath = os.path.join(filename, 'main')
         else:
-            raise Exception("No results found")
+            raise ResultsLoadError('No results found in "{}"'.format(filename))
 
     with open(filepath, 'r') as f:
         testrun = TestrunResult.load(f)

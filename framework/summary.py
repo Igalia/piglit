@@ -301,7 +301,11 @@ class Summary:
 
         # Create a Result object for each piglit result and append it to the
         # results list
-        self.results = [framework.results.load_results(i) for i in resultfiles]
+        try:
+            self.results = [framework.results.load_results(i) for i in resultfiles]
+        except framework.results.ResultsLoadError as e:
+            print('Error: {}'.format(e.message), file=sys.stderr)
+            sys.exit(1)
 
         self.status = {}
         self.fractions = {}
