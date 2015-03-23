@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 c;
+attribute vec4 piglit_vertex;
+
+void main()
+{
+    c = vec4(2.0, 13.0, 1.0, 0.0);
+    gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+uniform vec4 a;
+uniform float b;
+
+varying vec4 c;
+
+void main()
+{
+    /* This tickles a bug in the i965 driver on GEN4 and GEN5 platforms.  An
+     * optimization tries to be clever doing a float cast of comparison with a
+     * constant value of zero.  However, the generated comparison was
+     * inverted, so everything went wrong.
+     */
+    gl_FragColor = vec4(equal(a * c, vec4(b, 13, 0, 0)));
+}
+
+[test]
+uniform vec4 a 1.0 1.0 1.0 1.0
+uniform float b 38.2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
