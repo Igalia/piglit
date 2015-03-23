@@ -20,14 +20,13 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import os
 import re
 import sys
-
 from os import path
-from glob import glob
+
 from framework.profile import TestProfile
 from framework.test import TEST_BIN_DIR, Test
+from framework import grouptools
 
 __all__ = ['profile']
 
@@ -79,7 +78,9 @@ def populateTests(runfile):
                 populateTests(newpath)
             else:
                 # Add the .test file
-                group = path.join('es3conform', path.relpath(newpath, gtfroot))
+                group = grouptools.join(
+                    'es3conform',
+                    grouptools.from_path(path.relpath(newpath, gtfroot)))
                 profile.test_list[group] = GTFTest(newpath)
 
 
