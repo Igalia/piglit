@@ -340,3 +340,24 @@ class DocFormatter(object):
             raise UtilsError(e)
 
         return func
+
+
+def test_in_tempdir(func):
+    """Decorator that moves to a new directory to run a test.
+
+    This decorator ensures that the test moves to a new directory, and then
+    returns to the original directory after the test completes.
+
+    """
+    original_dir = os.getcwd()
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        with tempdir() as tdir:
+            try:
+                os.chdir(tdir)
+                func(*args, **kwargs)
+            finally:
+                os.chdir(original_dir)
+
+    return wrapper

@@ -195,6 +195,11 @@ def load_results(filename):
     return _update_results(testrun, filepath)
 
 
+def set_meta(results):
+    """Set json specific metadata on a TestrunResult."""
+    results.results_version = CURRENT_JSON_VERSION
+
+
 def _load(results_file):
     """Load a json results instance and return a TestrunResult.
 
@@ -521,4 +526,6 @@ def _update_four_to_five(results):
 REGISTRY = Registry(
     extensions=['', '.json'],
     backend=JSONBackend,
+    load=load_results,
+    meta=set_meta,
 )

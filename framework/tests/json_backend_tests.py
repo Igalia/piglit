@@ -273,3 +273,16 @@ def test_load_results_file():
     """ Test that load_results takes a file """
     with utils.resultfile() as tfile:
         backends.json.load_results(tfile.name)
+
+
+def test_load_json():
+    """backends.load(): Loads .json files."""
+    with utils.tempdir() as tdir:
+        filename = os.path.join(tdir, 'results.json')
+        with open(filename, 'w') as f:
+            json.dump(utils.JSON_DATA, f)
+
+        result = backends.load(filename)
+
+    nt.assert_is_instance(result, results.TestrunResult)
+    nt.assert_in('sometest', result.tests)

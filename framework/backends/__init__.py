@@ -51,6 +51,8 @@ __all__ = [
     'BackendError',
     'BackendNotImplementedError',
     'get_backend',
+    'load',
+    'set_meta',
 ]
 
 
@@ -105,3 +107,69 @@ def get_backend(backend):
             'Backend for {} is not implemented'.format(backend))
 
     return inst
+
+
+def load(file_path):
+    """Wrapper for loading runs.
+
+    This function will attempt to determine how to load the file (based on file
+    extension), and then pass the file path into the appropriate loader, and
+    then return the TestrunResult instance.
+
+    """
+    extension = None
+
+    if os.path.isfile(file_path):
+        extension = os.path.splitext(file_path)[1]
+        if not extension:
+            extension = ''
+    else:
+        for file in os.listdir(file_path):
+            if file.startswith('result'):
+                extension = os.path.splitext(file)[1]
+                break
+            elif file == 'main':
+                extension = ''
+                break
+    tests = os.path.join(file_path, 'tests')
+    if extension is None:
+        if os.path.exists(tests):
+            extension = os.path.splitext(os.listdir(tests)[0])[1]
+        else:
+            # At this point we have failed to find any sort of backend, just except
+            # and die
+            raise BackendError("No backend found for any file in {}".format(
+                file_path))
+
+    for backend in BACKENDS.itervalues():
+        if extension in backend.extensions:
+            loader = backend.load
+            break
+    else:
+        raise BackendError(
+            'No module supports file extensions "{}"'.format(extension))
+
+    if loader is None:
+        raise BackendNotImplementedError(
+            'Loader for {} is not implemented'.format(extension))
+
+    return loader(file_path)
+
+
+def set_meta(backend, result):
+    """Wrapper around meta that gets the right meta function."""
+    try:
+        BACKENDS[backend].meta(result)
+    except KeyError:
+        raise BackendError('No backend {}'.format(backend))
+    except TypeError as e:
+        # Since we initialize non-implemented backends as None, and None isn't
+        # callable then we'll get a TypeError, and we're looking for NoneType
+        # in the message. If we get that we really want a
+        # BackendNotImplementedError
+        if e.message == "'NoneType' object is not callable":
+            raise BackendNotImplementedError(
+                'meta function for {} not implemented.'.format(backend))
+        else:
+            # Otherwise re-raise the error
+            raise

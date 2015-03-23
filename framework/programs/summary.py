@@ -154,7 +154,7 @@ def csv(input_):
     args = parser.parse_args(input_)
 
     try:
-        testrun = backends.json.load_results(args.testResults)
+        testrun = backends.load(args.testResults)
     except backends.errors.ResultsLoadError as e:
         print('Error: {}'.format(e.message), file=sys.stderr)
         sys.exit(1)
@@ -188,7 +188,7 @@ def aggregate(input_):
 
     outfile = os.path.join(args.results_folder, args.output)
     try:
-        results = backends.json.load_results(args.results_folder)
+        results = backends.load(args.results_folder)
     except backends.errors.ResultsLoadError as e:
         print('Error: {}'.format(e.message), file=sys.stderr)
         sys.exit(1)

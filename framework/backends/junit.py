@@ -210,4 +210,6 @@ class JUnitBackend(FileBackend):
 REGISTRY = Registry(
     extensions=['.xml'],
     backend=JUnitBackend,
+    load=None,
+    meta=lambda x: x,  # The venerable no-op function
 )

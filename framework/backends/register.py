@@ -22,4 +22,7 @@
 
 import collections
 
-Registry = collections.namedtuple('Registry', ['extensions', 'backend'])
+Registry = collections.namedtuple(
+    'Registry',
+    ['extensions', 'backend', 'load', 'meta']
+)

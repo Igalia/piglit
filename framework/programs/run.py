@@ -271,6 +271,7 @@ def run(input_):
     core.checkDir(args.results_path, False)
 
     results = framework.results.TestrunResult()
+    backends.set_meta(args.backend, results)
 
     # Set results.name
     if args.name is not None:
@@ -315,7 +316,7 @@ def resume(input_):
     args = parser.parse_args(input_)
     _disable_windows_exception_messages()
 
-    results = framework.results.TestrunResult.resume(args.results_path)
+    results = backends.load(args.results_path)
     opts = core.Options(concurrent=results.options['concurrent'],
                         exclude_filter=results.options['exclude_filter'],
                         include_filter=results.options['filter'],
