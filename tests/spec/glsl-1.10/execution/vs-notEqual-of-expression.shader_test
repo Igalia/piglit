@@ -1,0 +1,27 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 a;
+varying vec4 color;
+attribute vec4 piglit_vertex;
+
+void main()
+{
+    color = vec4(notEqual(piglit_vertex.w * a, vec4(0)));
+    gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+    gl_FragColor = color;
+}
+
+[test]
+uniform vec4 a 0.0 38.2 0.0 1.2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
