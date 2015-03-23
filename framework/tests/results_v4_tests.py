@@ -29,7 +29,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-import framework.results as results
+from framework import backends
 import framework.tests.utils as utils
 
 # NOTE: do NOT use grouptools in this module, see v0 tests for explanation
@@ -78,7 +78,7 @@ def make_result(data):
     with utils.with_tempfile(json.dumps(data)) as t:
         with open(t, 'r') as f:
             # pylint: disable=protected-access
-            return results._update_four_to_five(results.TestrunResult.load(f))
+            return backends.json._update_four_to_five(backends.json._load(f))
 
 
 class TestV5(object):
@@ -119,5 +119,5 @@ def test_load_results():
         with open(tempfile, 'w') as f:
             json.dump(DATA, f)
         with open(tempfile, 'r') as f:
-            result = results.load_results(tempfile)
+            result = backends.json.load_results(tempfile)
             nt.assert_equal(result.results_version, 5)

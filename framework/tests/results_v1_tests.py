@@ -28,7 +28,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-import framework.results as results
+from framework import backends
 import framework.tests.utils as utils
 
 # NOTE: do NOT use grouptools in this module, see v0 tests for explanation
@@ -75,8 +75,8 @@ class TestV2Update(object):
 
         with utils.with_tempfile(json.dumps(data)) as t:
             with open(t, 'r') as f:
-                cls.result = results._update_one_to_two(
-                    results.TestrunResult.load(f))
+                cls.result = backends.json._update_one_to_two(
+                    backends.json._load(f))
 
     def test_version_is_two(self):
         """update_results (v2): The result version is updated to 2."""
@@ -142,8 +142,8 @@ class TestV2NoUpdate(object):
 
         with utils.with_tempfile(json.dumps(data)) as t:
             with open(t, 'r') as f:
-                cls.result = results._update_one_to_two(
-                    results.TestrunResult.load(f))
+                cls.result = backends.json._update_one_to_two(
+                    backends.json._load(f))
 
     def test_version_is_two(self):
         """update_results (v2) no change: The result version is updated to 2.

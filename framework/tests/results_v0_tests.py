@@ -29,6 +29,7 @@ import tempfile
 import nose.tools as nt
 
 import framework.results as results
+from framework import backends
 import framework.tests.utils as utils
 
 # NOTE: It is very important to NOT use grouptools in this file.
@@ -123,7 +124,7 @@ DATA['tests'].update({
 
 with utils.with_tempfile(json.dumps(DATA)) as t:
     with open(t, 'r') as f:
-        RESULT = results._update_zero_to_one(results.TestrunResult.load(f))
+        RESULT = backends.json._update_zero_to_one(backends.json._load(f))
 
 
 def test_dmesg():
@@ -212,7 +213,7 @@ def test_info_split():
 
     with utils.with_tempfile(json.dumps(data)) as t:
         with open(t, 'r') as f:
-            results._update_zero_to_one(results.TestrunResult.load(f))
+            backends.json._update_zero_to_one(backends.json._load(f))
 
 
 def test_subtests_with_slash():
@@ -237,7 +238,7 @@ def _load_with_update(data):
     """
     try:
         with utils.with_tempfile(json.dumps(data)) as t:
-            result = results.load_results(t)
+            result = backends.json.load_results(t)
     except OSError as e:
         # There is the potential that the file will be renamed. In that event
         # remove the renamed files
@@ -251,7 +252,7 @@ def _load_with_update(data):
 
 
 def test_load_results_unversioned():
-    """results.load_results: Loads unversioned results and updates correctly.
+    """backends.json.load_results: Loads unversioned results and updates correctly.
 
     This is just a random change to show that the update path is being hit.
 
@@ -261,7 +262,7 @@ def test_load_results_unversioned():
 
 
 def test_load_results_v0():
-    """results.load_results: Loads results v0 and updates correctly.
+    """backends.json.load_results: Loads results v0 and updates correctly.
 
     This is just a random change to show that the update path is being hit.
 

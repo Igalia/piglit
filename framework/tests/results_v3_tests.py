@@ -22,7 +22,6 @@
 
 from __future__ import print_function, absolute_import, division
 
-import os
 import copy
 try:
     import simplejson as json
@@ -30,7 +29,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-import framework.results as results
+from framework import backends
 import framework.tests.utils as utils
 
 # NOTE: do NOT use grouptools in this module, see v0 tests for explanation
@@ -83,7 +82,7 @@ def make_result(data):
     with utils.with_tempfile(json.dumps(data)) as t:
         with open(t, 'r') as f:
             # pylint: disable=protected-access
-            return results._update_three_to_four(results.TestrunResult.load(f))
+            return backends.json._update_three_to_four(backends.json._load(f))
 
 
 class TestV4(object):

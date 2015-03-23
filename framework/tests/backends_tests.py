@@ -29,10 +29,6 @@ try:
     from lxml import etree
 except ImportError:
     import xml.etree.cElementTree as etree
-try:
-    import simplejson as json
-except ImportError:
-    import json
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 
@@ -50,18 +46,6 @@ BACKEND_INITIAL_META = {
 JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'
 
 doc_formatter = utils.DocFormatter({'seperator': grouptools.SEPARATOR})
-
-
-def test_initialize_jsonbackend():
-    """ Test that JSONBackend initializes
-
-    This needs to be handled separately from the others because it requires
-    arguments
-
-    """
-    with utils.tempdir() as tdir:
-        func = results.JSONBackend(tdir)
-        assert isinstance(func, results.JSONBackend)
 
 
 @utils.nose_generator
@@ -196,87 +180,6 @@ def test_junit_replace():
 
     nt.assert_equal(test_value.find('.//testcase').attrib['classname'],
                     'piglit.a.test.group')
-
-
-def test_json_initialize_metadata():
-    """ JSONBackend.initialize() produces a metadata.json file """
-    with utils.tempdir() as f:
-        test = backends.json.JSONBackend(f)
-        test.initialize(BACKEND_INITIAL_META)
-
-        nt.ok_(os.path.exists(os.path.join(f, 'metadata.json')))
-
-
-class TestJSONTestMethod(utils.StaticDirectory):
-    @classmethod
-    def setup_class(cls):
-        cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
-        cls.result = results.TestResult({
-            'time': 1.2345,
-            'result': 'pass',
-            'out': 'this is stdout',
-            'err': 'this is stderr',
-        })
-        super(TestJSONTestMethod, cls).setup_class()
-        test = backends.json.JSONBackend(cls.tdir)
-        test.initialize(BACKEND_INITIAL_META)
-        test.write_test(cls.test_name, cls.result)
-
-    def test_write_test(self):
-        """ JSONBackend.write_test() adds tests to a 'tests' directory """
-        assert os.path.exists(os.path.join(self.tdir, 'tests', '0.json'))
-
-    def test_json_is_valid(self):
-        """ JSONBackend.write_test() produces valid json """
-        with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
-            try:
-                json.load(f)
-            except Exception as e:
-                raise AssertionError(e)
-
-    def test_json_is_correct(self):
-        """ JSONBackend.write_test() produces correct json """
-        with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
-            test = json.load(f)
-
-        nt.assert_dict_equal({self.test_name: self.result}, test)
-
-
-class TestJSONTestFinalize(utils.StaticDirectory):
-    @classmethod
-    def setup_class(cls):
-        cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
-        cls.result = results.TestResult({
-            'time': 1.2345,
-            'result': 'pass',
-            'out': 'this is stdout',
-            'err': 'this is stderr',
-        })
-        super(TestJSONTestFinalize, cls).setup_class()
-        test = backends.json.JSONBackend(cls.tdir)
-        test.initialize(BACKEND_INITIAL_META)
-        test.write_test(cls.test_name, cls.result)
-        test.finalize()
-
-    def test_remove_metadata(self):
-        """ JSONBackend.finalize() removes metadata.json """
-        assert not os.path.exists(os.path.join(self.tdir, 'metadata.json'))
-
-    def test_remove_tests(self):
-        """ JSONBackend.finalize() removes tests directory """
-        assert not os.path.exists(os.path.join(self.tdir, 'tests'))
-
-    def test_create_results(self):
-        """ JSONBackend.finalize() creates a results.json file """
-        assert os.path.exists(os.path.join(self.tdir, 'results.json'))
-
-    def test_results_valid(self):
-        """ JSONBackend.finalize() results.json is valid """
-        with open(os.path.join(self.tdir, 'results.json'), 'r') as f:
-            try:
-                json.load(f)
-            except Exception as e:
-                raise AssertionError(e)
 
 
 def test_junit_skips_bad_tests():

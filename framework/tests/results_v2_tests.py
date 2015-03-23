@@ -28,7 +28,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-import framework.results as results
+from framework import backends
 import framework.tests.utils as utils
 
 # NOTE: do NOT use grouptools in this module, see v0 tests for explanation
@@ -80,7 +80,7 @@ DATA = {
 with utils.with_tempfile(json.dumps(DATA)) as t:
     with open(t, 'r') as f:
         # pylint: disable=protected-access
-        RESULT = results._update_two_to_three(results.TestrunResult.load(f))
+        RESULT = backends.json._update_two_to_three(backends.json._load(f))
 
 
 def test_unchanged():

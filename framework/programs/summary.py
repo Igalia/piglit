@@ -27,10 +27,7 @@ import os.path as path
 import sys
 import errno
 
-import framework.summary as summary
-import framework.status as status
-import framework.core as core
-import framework.results
+from framework import summary, status, core, backends
 
 __all__ = [
     'aggregate',
@@ -157,8 +154,8 @@ def csv(input_):
     args = parser.parse_args(input_)
 
     try:
-        testrun = framework.results.load_results(args.testResults)
-    except framework.results.ResultsLoadError as e:
+        testrun = backends.json.load_results(args.testResults)
+    except backends.errors.ResultsLoadError as e:
         print('Error: {}'.format(e.message), file=sys.stderr)
         sys.exit(1)
 
@@ -191,8 +188,8 @@ def aggregate(input_):
 
     outfile = os.path.join(args.results_folder, args.output)
     try:
-        results = framework.results.load_results(args.results_folder)
-    except framework.results.ResultsLoadError as e:
+        results = backends.json.load_results(args.results_folder)
+    except backends.errors.ResultsLoadError as e:
         print('Error: {}'.format(e.message), file=sys.stderr)
         sys.exit(1)
 

@@ -59,7 +59,7 @@ JSON_DATA = {
         "filter": [],
         "exclude_filter": []
     },
-    "results_version": framework.results.CURRENT_JSON_VERSION,
+    "results_version": framework.backends.json.CURRENT_JSON_VERSION,
     "name": "fake-tests",
     "lspci": "fake",
     "glxinfo": "fake",

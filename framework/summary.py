@@ -37,9 +37,7 @@ from mako.template import Template
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
 import framework.status as so
-import framework.results
-import framework.grouptools as grouptools
-
+from framework import grouptools, backends
 
 __all__ = [
     'Summary',
@@ -302,8 +300,8 @@ class Summary:
         # Create a Result object for each piglit result and append it to the
         # results list
         try:
-            self.results = [framework.results.load_results(i) for i in resultfiles]
-        except framework.results.ResultsLoadError as e:
+            self.results = [backends.json.load_results(i) for i in resultfiles]
+        except backends.errors.ResultsLoadError as e:
             print('Error: {}'.format(e.message), file=sys.stderr)
             sys.exit(1)
 
