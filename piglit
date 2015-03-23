@@ -135,6 +135,10 @@ def main():
                                     add_help=False,
                                     help='generate csv from results')
     csv.set_defaults(func=summary.csv)
+    aggregate = summary_parser.add_parser('aggregate',
+                                          add_help=False,
+                                          help="Aggregate incomplete piglit run.")
+    aggregate.set_defaults(func=summary.aggregate)
 
     # Parse the known arguments (piglit run or piglit summary html for
     # example), and then pass the arguments that this parser doesn't know about

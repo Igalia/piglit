@@ -19,19 +19,25 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+from __future__ import print_function, absolute_import
 import argparse
 import shutil
+import os
 import os.path as path
 import sys
+import errno
 
 import framework.summary as summary
 import framework.status as status
 import framework.core as core
 import framework.results
 
-__all__ = ['html',
-           'console',
-           'csv']
+__all__ = [
+    'aggregate',
+    'console',
+    'csv',
+    'html',
+]
 
 
 def html(input_):
@@ -163,3 +169,32 @@ def csv(input_):
             write_results(output)
     else:
         write_results(sys.stdout)
+
+
+def aggregate(input_):
+    """Combine files in a tests/ directory into a single results file."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('results_folder',
+                        type=path.realpath,
+                        metavar="<results path>",
+                        help="Path to a results folder")
+    parser.add_argument('-o', '--output',
+                        default="results.json",
+                        help="name of output file. Default: results.json")
+    args = parser.parse_args(input_)
+
+    assert os.path.isdir(args.results_folder)
+
+    outfile = os.path.join(args.results_folder, args.output)
+    results = framework.results.load_results(args.results_folder)
+
+    try:
+        results.write(outfile)
+    except IOError as e:
+        if e.errno == errno.EPERM:
+            print("Error: Unable to write aggregated file, permission denied.",
+                  file=sys.stderr)
+            sys.exit(1)
+        raise
+
+    print("Aggregated file written to: {}".format(outfile))
