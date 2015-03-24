@@ -29,6 +29,11 @@
 #include "piglit_glut_framework.h"
 #include "piglit-util-gl.h"
 
+/* Don't warn about using deprecated GLUT functions. */
+#ifdef __APPLE__
+#	pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 struct piglit_glut_framework {
 	struct piglit_gl_framework gl_fw;
 
