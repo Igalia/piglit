@@ -10,6 +10,11 @@ INCLUDE (CheckFunctionExists)
 INCLUDE (CheckIncludeFile)
 INCLUDE (FindPkgConfig)
 
+# http://www.cmake.org/cmake/help/v3.0/policy/CMP0042.html
+if (POLICY CMP0042)
+	cmake_policy (SET CMP0042 NEW)
+endif()
+
 project (piglit)
 
 # Require MSVC 2013 U4
