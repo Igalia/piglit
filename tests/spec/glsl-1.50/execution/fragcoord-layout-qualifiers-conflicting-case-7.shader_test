@@ -17,9 +17,7 @@
  *      the same set of qualifiers."
  *
  * Tests the case when one fragment shader redeclares gl_FragCoord without
- * any qualifiers and other one has missing redeclaration. Spec is not very
- * clear about this case but making this case fail to link would be wrong.
- * Test pases on NVIDIA's proprietary linux drivers (331.49).
+ * any qualifiers and other one has missing redeclaration.
  */
 [require]
 GLSL >= 1.50
@@ -48,4 +46,4 @@ void alpha()
 
 
 [test]
-link success
+link error
