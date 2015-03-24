@@ -127,12 +127,31 @@ init_glut(void)
 	else
 		flags |= GLUT_SINGLE;
 
+	/*
+	 * MacOSX GLUT.
+	 *
+	 * This will request a core profile.  It will always return the highest
+	 * version supported.
+	 *
+	 * See:
+	 * /System/Library/Frameworks/GLUT.framework/Headers/glut.h
+	 * https://developer.apple.com/opengl/capabilities/
+	 */
+#if GLUT_MACOSX_IMPLEMENTATION >= 4
+	if (test_config->supports_gl_core_version >= 31) {
+		flags |= GLUT_3_2_CORE_PROFILE;
+	}
+#endif
+
 	glutInit(&argc, argv);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(test_config->window_width,
 	                   test_config->window_height);
 	glutInitDisplayMode(flags);
 
+	/*
+	 * FreeGLUT
+	 */
 #ifdef PIGLIT_USE_GLUT_INIT_ERROR_FUNC
 	glutInitErrorFunc(error_func);
 #else
@@ -275,7 +294,8 @@ piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
 {
 	bool ok = true;
 
-#ifndef GLUT_CORE_PROFILE
+#if !defined(GLUT_CORE_PROFILE) && \
+    (!defined(GLUT_MACOSX_IMPLEMENTATION) || GLUT_MACOSX_IMPLEMENTATION < 4)
 	if (!test_config->supports_gl_compat_version) {
 		printf("GLUT can create only GL compatibility contexts, "
 			"which the test does not support running under.\n");
