@@ -39,6 +39,7 @@ CLC_VERSION_MIN = {
     'asinpi' : 10,
     'atan' : 10,
     'atan2' : 10,
+    'atan2pi' : 10,
     'atanh' : 10,
     'atanpi': 10,
     'cbrt' : 10,
@@ -148,6 +149,16 @@ tests = {
         'function_type': 'ttt',
         'values' : [
             [atan2(0.0, 0.0), atan2(1.2345, 10.0), atan2(35671470.0, 0.1)], # Result
+            [0.0,             1.2345,              35671470.0            ], # Arg0
+            [0.0,             10.0,                0.1                   ]  # Arg1
+        ],
+        'tolerance' : 6
+     },
+    'atan2pi' : {
+        'arg_types' : [F, F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [atan2(0.0, 0.0)/pi, atan2(1.2345, 10.0)/pi, atan2(35671470.0, 0.1)/pi], # Result
             [0.0,             1.2345,              35671470.0            ], # Arg0
             [0.0,             10.0,                0.1                   ]  # Arg1
         ],
