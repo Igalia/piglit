@@ -34,6 +34,7 @@ try:
 except ImportError:
     import json
 import nose.tools as nt
+from nose.plugins.skip import SkipTest
 
 from framework import core, results, backends, grouptools
 import framework.tests.utils as utils
@@ -128,6 +129,8 @@ class TestJUnitSingleTest(TestJunitNoTests):
 
     def test_xml_valid(self):
         """ JUnitBackend.write_test() (once) produces valid xml """
+        if etree.__name__ != 'lxml.etree':
+            raise SkipTest("Test requires lxml.")
         schema = etree.XMLSchema(file=JUNIT_SCHEMA)
         with open(self.test_file, 'r') as f:
             assert schema.validate(etree.parse(f)), 'xml is not valid'
