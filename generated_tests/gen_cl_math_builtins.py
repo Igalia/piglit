@@ -33,6 +33,7 @@ from math import fabs, fmod, log10, log1p, pi, pow, sin, sinh, sqrt, tan, tanh
 CLC_VERSION_MIN = {
     'acos' : 10,
     'acosh' : 10,
+    'acospi' : 10,
     'asin' : 10,
     'asinh' : 10,
     'atan' : 10,
@@ -95,6 +96,15 @@ tests = {
             [1.0,       1.12345,  float("nan"),       123456789.01234 ]  #Arg0
         ],
         'tolerance' : 4
+     },
+    'acospi' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [ 1,  1/2, 0.0, acos(0.12345) / pi, float("nan")], # Result
+            [-1.0, 0.0,  1.0,      0.12345,  float("nan")]  # Arg0
+        ],
+        'tolerance' : 5
      },
     'asin' : {
         'arg_types' : [F, F],
