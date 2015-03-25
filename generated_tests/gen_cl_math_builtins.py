@@ -36,6 +36,7 @@ CLC_VERSION_MIN = {
     'acospi' : 10,
     'asin' : 10,
     'asinh' : 10,
+    'asinpi' : 10,
     'atan' : 10,
     'atan2' : 10,
     'atanh' : 10,
@@ -123,6 +124,15 @@ tests = {
             [0.0, 1.0,              -1.12345,  float("nan"),       123456789.01234 ]  #Arg0
         ],
         'tolerance' : 4
+     },
+    'asinpi' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [-1/2, 0.0, 1/2, asin(0.12345)/pi, float("nan")], # Result
+            [-1.0,  0.0,  1.0,      0.12345,  float("nan")]  # Arg0
+        ],
+        'tolerance' : 5
      },
     'atan' : {
         'arg_types' : [F, F],
