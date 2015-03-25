@@ -36,15 +36,15 @@ td:first-child > div {
 	background-color: #c8c838
 }
 
-td.skip, td.warn, td.fail, td.pass, td.trap, td.abort, td.crash, td.dmesg-warn, td.dmesg-fail, td.timeout {
+td.skip, td.warn, td.fail, td.pass, td.trap, td.abort, td.crash, td.dmesg-warn, td.dmesg-fail, td.timeout, td.incomplete {
 	text-align: right;
 }
 
-td.trap, td.abort, td.crash {
+td.trap, td.abort, td.crash, td.incomplete {
 	color: #ffffff;
 }
 
-td.trap a, td.abort a, td.crash a {
+td.trap a, td.abort a, td.crash a, td.incomplete a {
 	color: #ffffff;
 }
 
@@ -76,3 +76,6 @@ tr:nth-child(odd)  td.abort { background-color: #111111; }
 tr:nth-child(even) td.abort { background-color: #000000; }
 tr:nth-child(odd)  td.crash { background-color: #111111; }
 tr:nth-child(even) td.crash { background-color: #000000; }
+
+tr:nth-child(odd)  td.incomplete { background-color: #853385; }
+tr:nth-child(even) td.incomplete { background-color: #351435; }

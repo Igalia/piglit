@@ -66,6 +66,7 @@ __all__ = ['NOTRUN',
            'DMESG_FAIL',
            'SKIP',
            'TIMEOUT',
+           'INCOMPLETE',
            'ALL']
 
 
@@ -77,15 +78,18 @@ def status_lookup(status):
     does not correspond to a key it will raise an exception
 
     """
-    status_dict = {'skip': SKIP,
-                   'pass': PASS,
-                   'warn': WARN,
-                   'fail': FAIL,
-                   'crash': CRASH,
-                   'dmesg-warn': DMESG_WARN,
-                   'dmesg-fail': DMESG_FAIL,
-                   'notrun': NOTRUN,
-                   'timeout': TIMEOUT}
+    status_dict = {
+        'skip': SKIP,
+        'pass': PASS,
+        'warn': WARN,
+        'fail': FAIL,
+        'crash': CRASH,
+        'dmesg-warn': DMESG_WARN,
+        'dmesg-fail': DMESG_FAIL,
+        'notrun': NOTRUN,
+        'timeout': TIMEOUT,
+        'incomplete': INCOMPLETE,
+    }
 
     try:
         return status_dict[status]
@@ -231,5 +235,8 @@ TIMEOUT = Status('timeout', 50)
 
 CRASH = Status('crash', 60)
 
+INCOMPLETE = Status('incomplete', 100)
+
 # A tuple (ordered, immutable) of all statuses in this module
-ALL = (PASS, WARN, DMESG_WARN, FAIL, DMESG_FAIL, TIMEOUT, CRASH, SKIP, NOTRUN)
+ALL = (PASS, WARN, DMESG_WARN, FAIL, DMESG_FAIL, TIMEOUT, CRASH, INCOMPLETE,
+       SKIP, NOTRUN)
