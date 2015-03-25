@@ -81,6 +81,8 @@ class JSONBackend(FileBackend):
     a file it just ignores it, making the result atomic.
 
     """
+    _file_extension = 'json'
+
     def initialize(self, metadata):
         """ Write boilerplate json code
 
@@ -148,13 +150,9 @@ class JSONBackend(FileBackend):
         os.unlink(os.path.join(self._dest, 'metadata.json'))
         shutil.rmtree(os.path.join(self._dest, 'tests'))
 
-    def write_test(self, name, data):
-        """ Write a test into the JSON tests dictionary """
-        t = os.path.join(self._dest, 'tests',
-                         '{}.json'.format(self._counter.next()))
-        with open(t, 'w') as f:
-            json.dump({name: data}, f, default=piglit_encoder)
-            self._fsync(f)
+    @staticmethod
+    def _write(f, name, data):
+        json.dump({name: data}, f, default=piglit_encoder)
 
 
 def load_results(filename):

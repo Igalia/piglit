@@ -276,8 +276,9 @@ class TestProfile(object):
 
             """
             name, test = pair
-            test.execute(name, log.get(), self.dmesg)
-            backend.write_test(name, test.result)
+            with backend.write_test(name) as w:
+                test.execute(name, log.get(), self.dmesg)
+                w(test.result)
 
         def run_threads(pool, testlist):
             """ Open a pool, close it, and join it """

@@ -57,6 +57,7 @@ class JUnitBackend(FileBackend):
     https://svn.jenkins-ci.org/trunk/hudson/dtkit/dtkit-format/dtkit-junit-model/src/main/resources/com/thalesgroup/dtkit/junit/model/xsd/junit-7.xsd
 
     """
+    _file_extension = 'xml'
 
     def __init__(self, dest, junit_suffix='', **options):
         super(JUnitBackend, self).__init__(dest, **options)
@@ -116,7 +117,7 @@ class JUnitBackend(FileBackend):
 
         shutil.rmtree(os.path.join(self._dest, 'tests'))
 
-    def write_test(self, name, data):
+    def _write(self, f, name, data):
 
         def calculate_result():
             """Set the result."""
@@ -195,27 +196,28 @@ class JUnitBackend(FileBackend):
         # Create the root element
         element = etree.Element('testcase', name=full_test_name,
                                 classname=classname,
-                                time=str(data['time']),
+                                # Incomplete will not have a time.
+                                time=str(data.get('time')),
                                 status=str(data['result']))
 
-        # Add stdout
-        out = etree.SubElement(element, 'system-out')
-        out.text = data['out']
+        # If this is an incomplete status then none of these values will be
+        # available, nor
+        if data['result'] != 'incomplete':
+            # Add stdout
+            out = etree.SubElement(element, 'system-out')
+            out.text = data['out']
 
-        # Prepend command line to stdout
-        out.text = data['command'] + '\n' + out.text
+            # Prepend command line to stdout
+            out.text = data['command'] + '\n' + out.text
 
-        # Add stderr
-        err = etree.SubElement(element, 'system-err')
-        err.text = data['err']
+            # Add stderr
+            err = etree.SubElement(element, 'system-err')
+            err.text = data['err']
+            calculate_result()
+        else:
+            etree.SubElement(element, 'failure', message='Incomplete run.')
 
-        calculate_result()
-
-        t = os.path.join(self._dest, 'tests',
-                         '{}.xml'.format(self._counter.next()))
-        with open(t, 'w') as f:
-            f.write(etree.tostring(element))
-            self._fsync(f)
+        f.write(etree.tostring(element))
 
 
 def _load(results_file):

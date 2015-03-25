@@ -339,8 +339,11 @@ def resume(input_):
         file_start_count=len(results.tests) + 1)
     # Specifically do not initialize again, everything initialize does is done.
 
-    for name in results.tests.iterkeys():
-        opts.exclude_tests.add(name)
+    # Don't re-run tests that have already completed, incomplete status tests
+    # have obviously not completed.
+    for name, result in results.tests.iteritems():
+        if result['result'] != 'incomplete':
+            opts.exclude_tests.add(name)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])
     profile.results_dir = args.results_path

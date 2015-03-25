@@ -70,7 +70,8 @@ class TestJSONTestMethod(utils.StaticDirectory):
         super(TestJSONTestMethod, cls).setup_class()
         test = backends.json.JSONBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
-        test.write_test(cls.test_name, cls.result)
+        with test.write_test(cls.test_name) as t:
+            t(cls.result)
 
     def test_write_test(self):
         """backends.json.JSONBackend.write_test(): adds tests to a 'tests' directory"""
@@ -103,7 +104,8 @@ class TestJSONTestFinalize(utils.StaticDirectory):
         super(TestJSONTestFinalize, cls).setup_class()
         test = backends.json.JSONBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
-        test.write_test(cls.test_name, cls.result)
+        with test.write_test(cls.test_name) as t:
+            t(cls.result)
         test.finalize()
 
     def test_remove_metadata(self):
@@ -182,9 +184,12 @@ def test_resume_load_valid():
     with utils.tempdir() as f:
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
-        backend.write_test("group1/test1", {'result': 'fail'})
-        backend.write_test("group1/test2", {'result': 'pass'})
-        backend.write_test("group2/test3", {'result': 'fail'})
+        with backend.write_test("group1/test1") as t:
+            t({'result': 'fail'})
+        with backend.write_test("group1/test2") as t:
+            t({'result': 'pass'})
+        with backend.write_test("group2/test3") as t:
+            t({'result': 'fail'})
 
         test = backends.json._resume(f)
 
@@ -199,9 +204,12 @@ def test_resume_load_invalid():
     with utils.tempdir() as f:
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
-        backend.write_test("group1/test1", {'result': 'fail'})
-        backend.write_test("group1/test2", {'result': 'pass'})
-        backend.write_test("group2/test3", {'result': 'fail'})
+        with backend.write_test("group1/test1") as t:
+            t({'result': 'fail'})
+        with backend.write_test("group1/test2") as t:
+            t({'result': 'pass'})
+        with backend.write_test("group2/test3") as t:
+            t({'result': 'fail'})
         with open(os.path.join(f, 'tests', 'x.json'), 'w') as w:
             w.write('foo')
 
@@ -210,6 +218,35 @@ def test_resume_load_invalid():
         nt.assert_set_equal(
             set(test.tests.keys()),
             set(['group1/test1', 'group1/test2', 'group2/test3']),
+        )
+
+
+def test_resume_load_incomplete():
+    """backends.json._resume: loads incomplete results.
+
+    Because resume, aggregate, and summary all use the function called _resume
+    we can't remove incomplete tests here. It's probably worth doing a refactor
+    to split some code out and allow this to be done in the resume path.
+    
+    """
+    with utils.tempdir() as f:
+        backend = backends.json.JSONBackend(f)
+        backend.initialize(BACKEND_INITIAL_META)
+        with backend.write_test("group1/test1") as t:
+            t({'result': 'fail'})
+        with backend.write_test("group1/test2") as t:
+            t({'result': 'pass'})
+        with backend.write_test("group2/test3") as t:
+            t({'result': 'crash'})
+        with backend.write_test("group2/test4") as t:
+            t({'result': 'incomplete'})
+
+        test = backends.json._resume(f)
+
+        nt.assert_set_equal(
+            set(test.tests.keys()),
+            set(['group1/test1', 'group1/test2', 'group2/test3',
+                 'group2/test4']),
         )
 
 

@@ -310,7 +310,7 @@ class Summary:
         self.totals = {}
         self.tests = {'all': set(), 'changes': set(), 'problems': set(),
                       'skipped': set(), 'regressions': set(), 'fixes': set(),
-                      'enabled': set(), 'disabled': set()}
+                      'enabled': set(), 'disabled': set(), 'incomplete': set()}
 
         def fgh(test, result):
             """ Helper for updating the fractions and status lists """
@@ -411,6 +411,9 @@ class Summary:
             if so.SKIP in status:
                 self.tests['skipped'].add(test)
 
+            if so.INCOMPLETE in status:
+                self.tests['incomplete'].add(test)
+
             # find fixes, regressions, and changes
             for i in xrange(len(status) - 1):
                 first = status[i]
@@ -437,7 +440,7 @@ class Summary:
         """
         self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0,
                        'timeout': 0, 'warn': 0, 'dmesg-warn': 0,
-                       'dmesg-fail': 0}
+                       'dmesg-fail': 0, 'incomplete': 0,}
 
         for test in results.tests.itervalues():
             self.totals[str(test['result'])] += 1
@@ -555,22 +558,30 @@ class Summary:
                 else:
                     out.write(empty_status.render(page=page, pages=pages))
 
-    def generate_text(self, diff, summary):
+    def generate_text(self, mode):
         """ Write summary information to the console """
+        assert mode in ['summary', 'diff', 'incomplete']
         self.__find_totals(self.results[-1])
 
         # Print the name of the test and the status from each test run
-        if not summary:
-            if diff:
-                for test in self.tests['changes']:
-                    print("%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                          ' '.join([str(i.tests.get(test, {'result': so.SKIP})
-                                    ['result']) for i in self.results])})
-            else:
-                for test in self.tests['all']:
-                    print("%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                          ' '.join([str(i.tests.get(test, {'result': so.SKIP})
-                                    ['result']) for i in self.results])})
+        if mode == 'diff':
+            for test in self.tests['changes']:
+                print("{test}: {statuses}".format(
+                    test=test,
+                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
+                                          ['result']) for i in self.results)))
+        elif mode == 'incomplete':
+            for test in self.tests['incomplete']:
+                print("{test}: {statuses}".format(
+                    test=test,
+                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
+                                          ['result']) for i in self.results)))
+        elif mode != 'summary':
+            for test in self.tests['all']:
+                print("{test}: {statuses}".format(
+                    test=test,
+                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
+                                          ['result']) for i in self.results)))
 
         # Print the summary
         print("summary:\n"
@@ -580,6 +591,7 @@ class Summary:
               "       skip: {skip}\n"
               "    timeout: {timeout}\n"
               "       warn: {warn}\n"
+              " incomplete: {incomplete}\n"
               " dmesg-warn: {dmesg-warn}\n"
               " dmesg-fail: {dmesg-fail}".format(**self.totals))
         if self.tests['changes']:

@@ -63,7 +63,8 @@ class TestJsonOutput(utils.StaticDirectory):
 
         backend = JSONBackend(cls.tdir, file_fsync=True)
         backend.initialize(_create_metadata(args, 'test', core.Options()))
-        backend.write_test('result', {'result': 'pass'})
+        with backend.write_test('result') as t:
+            t({'result': 'pass'})
         backend.finalize({'time_elapsed': 1.22})
         with open(os.path.join(cls.tdir, 'results.json'), 'r') as f:
             cls.json = json.load(f)

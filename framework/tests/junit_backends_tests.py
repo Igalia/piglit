@@ -81,9 +81,8 @@ class TestJUnitSingleTest(TestJunitNoTests):
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
         test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
-        test.write_test(
-            grouptools.join('a', 'test', 'group', 'test1'),
-            results.TestResult({
+        with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
+            t(results.TestResult({
                 'time': 1.2345,
                 'result': 'pass',
                 'out': 'this is stdout',
@@ -113,26 +112,22 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
         test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
-        test.write_test(
-            grouptools.join('a', 'test', 'group', 'test1'),
-            results.TestResult({
+        with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
+            t(results.TestResult({
                 'time': 1.2345,
                 'result': 'pass',
                 'out': 'this is stdout',
                 'err': 'this is stderr',
                 'command': 'foo',
-            })
-        )
-        test.write_test(
-            'a/different/test/group/test2',
-            results.TestResult({
+            }))
+        with test.write_test('a/different/test/group/test2') as t:
+            t(results.TestResult({
                 'time': 1.2345,
                 'result': 'fail',
                 'out': 'this is stdout',
                 'err': 'this is stderr',
                 'command': 'foo',
-            })
-        )
+            }))
         test.finalize()
 
     def test_xml_well_formed(self):
@@ -150,16 +145,14 @@ def test_junit_replace():
     with utils.tempdir() as tdir:
         test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
-        test.write_test(
-            grouptools.join('a', 'test', 'group', 'test1'),
-            results.TestResult({
+        with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
+            t(results.TestResult({
                 'time': 1.2345,
                 'result': 'pass',
                 'out': 'this is stdout',
                 'err': 'this is stderr',
                 'command': 'foo',
-            })
-        )
+            }))
         test.finalize()
 
         test_value = etree.parse(os.path.join(tdir, 'results.xml')).getroot()
@@ -174,9 +167,8 @@ def test_junit_skips_bad_tests():
     with utils.tempdir() as tdir:
         test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
-        test.write_test(
-            grouptools.join('a', 'test', 'group', 'test1'),
-            results.TestResult({
+        with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
+            t(results.TestResult({
                 'time': 1.2345,
                 'result': 'pass',
                 'out': 'this is stdout',

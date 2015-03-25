@@ -28,7 +28,12 @@ This module provides mixins and base classes for backend modules.
 from __future__ import print_function, absolute_import
 import os
 import abc
+import shutil
 import itertools
+import contextlib
+
+from framework.results import TestResult
+from framework.status import INCOMPLETE
 
 
 class Backend(object):
@@ -100,10 +105,15 @@ class Backend(object):
         """
 
     @abc.abstractmethod
-    def write_test(self, name, data):
+    def write_test(self, name):
         """ Write a test into the backend store
 
         This method writes an actual test into the backend store.
+
+        Should be a context manager, used with the with statement. It should
+        first write an incomplete status value, then yield and object that will
+        overwrite that value with the final value. That object needs to take a
+        'data' paramter whic is a result.TestResult object.
 
         Arguments:
         name -- the name of the test to be written
@@ -133,15 +143,55 @@ class FileBackend(Backend):
     """
     def __init__(self, dest, file_start_count=0, file_fsync=False, **kwargs):
         self._dest = dest
-        self._counter = itertools.count(file_start_count)
-        self._file_sync = file_fsync
+        self.__counter = itertools.count(file_start_count)
+        self.__file_sync = file_fsync
 
-    def _fsync(self, file_):
+    __INCOMPLETE = TestResult({'result': INCOMPLETE})
+
+    def __fsync(self, file_):
         """ Sync the file to disk
 
         If self._file_sync is truthy this will sync self._file to disk
 
         """
         file_.flush()
-        if self._file_sync:
+        if self.__file_sync:
             os.fsync(file_.fileno())
+
+    @abc.abstractmethod
+    def _write(self, f, name, data):
+        """Method that writes a TestResult into a result file."""
+
+    @abc.abstractproperty
+    def _file_extension(self):
+        """The file extension of the backend."""
+
+    @contextlib.contextmanager
+    def write_test(self, name):
+        """Write a test.
+
+        When this context manager is opened it will first write a placeholder
+        file with the status incomplete.
+
+        When it is called to write the finall result it will create a temporary
+        file, write to that file, then move that file over the original,
+        incomplete status file. This helps to make the operation atomic, as
+        long as the filesystem continues running and the result was valid in
+        the original file it will be valid at the end
+
+        """
+        def finish(val):
+            tfile = file_ + '.tmp'
+            with open(tfile, 'w') as f:
+                self._write(f, name, val)
+                self.__fsync(f)
+            shutil.move(tfile, file_)
+
+        file_ = os.path.join(self._dest, 'tests', '{}.{}'.format(
+            self.__counter.next(), self._file_extension))
+
+        with open(file_, 'w') as f:
+            self._write(f, name, self.__INCOMPLETE)
+            self.__fsync(f)
+
+        yield finish

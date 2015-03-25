@@ -108,13 +108,22 @@ def console(input_):
     # and then call for only summary
     excGroup1 = parser.add_mutually_exclusive_group()
     excGroup1.add_argument("-d", "--diff",
-                           action="store_true",
+                           action="store_const",
+                           const="diff",
+                           dest='mode',
                            help="Only display the differences between multiple "
                                 "result files")
     excGroup1.add_argument("-s", "--summary",
-                           action="store_true",
+                           action="store_const",
+                           const="summary",
+                           dest='mode',
                            help="Only display the summary, not the individual "
                                 "test results")
+    excGroup1.add_argument("-i", "--incomplete",
+                           action="store_const",
+                           const="incomplete",
+                           dest='mode',
+                           help="Only display tests that are incomplete.")
     parser.add_argument("-l", "--list",
                         action="store",
                         help="Use test results from a list file")
@@ -127,7 +136,7 @@ def console(input_):
 
     # Throw an error if -d/--diff is called, but only one results file is
     # provided
-    if args.diff and len(args.results) < 2:
+    if args.mode == 'diff' and len(args.results) < 2:
         parser.error('-d/--diff cannot be specified unless two or more '
                      'results files are specified')
 
@@ -137,7 +146,7 @@ def console(input_):
 
     # Generate the output
     output = summary.Summary(args.results)
-    output.generate_text(args.diff, args.summary)
+    output.generate_text(args.mode)
 
 
 def csv(input_):
