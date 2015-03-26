@@ -14,3 +14,4 @@ piglit_add_executable (arb_program_interface_query-resource-query resource-query
 piglit_add_executable (arb_program_interface_query-getprograminterfaceiv getprograminterfaceiv.c)
 piglit_add_executable (arb_program_interface_query-getprogramresourceindex getprogramresourceindex.c)
 piglit_add_executable (arb_program_interface_query-getprogramresourcename getprogramresourcename.c)
+piglit_add_executable (arb_program_interface_query-getprogramresourceiv getprogramresourceiv.c)
