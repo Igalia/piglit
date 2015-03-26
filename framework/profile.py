@@ -168,21 +168,25 @@ class TestProfile(object):
                   file=sys.stderr)
             sys.exit(1)
 
-    def _pre_run_hook(self):
+    def _pre_run_hook(self, opts):
         """ Hook executed at the start of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
         set this to do something, as be default it will no-op
 
+        Arguments:
+        opts -- a core.Options instance
         """
         pass
 
-    def _post_run_hook(self):
+    def _post_run_hook(self, opts):
         """ Hook executed at the end of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
         set this to do something, as be default it will no-op
 
+        Arguments:
+        opts -- a core.Options instance
         """
         pass
 
@@ -205,7 +209,7 @@ class TestProfile(object):
 
         """
 
-        self._pre_run_hook()
+        self._pre_run_hook(opts)
         Test.OPTS = opts
 
         chunksize = 1
@@ -250,7 +254,7 @@ class TestProfile(object):
 
         log.get().summary()
 
-        self._post_run_hook()
+        self._post_run_hook(opts)
 
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function
