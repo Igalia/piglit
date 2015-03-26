@@ -92,7 +92,7 @@ else:
 class IGTTestProfile(TestProfile):
     """Test profile for intel-gpu-tools tests."""
     def _pre_run_hook(self, opts):
-        if not check_environment():
+        if opts.execute and not check_environment():
             sys.exit(1)
 
 
