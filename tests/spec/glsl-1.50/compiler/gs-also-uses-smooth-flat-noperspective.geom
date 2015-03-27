@@ -1,7 +1,7 @@
 // [config]
 // expect_result: pass
 // glsl_version: 1.50
-// check_link: true
+// check_link: false
 // [end config]
 
 #version 150
