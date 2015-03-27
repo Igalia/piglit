@@ -141,13 +141,7 @@ void main()
        *     written."
        */
     % endif
-    ## TODO: Could probably simplify this with the use of params.row
-    % if params.expect_type == 'float':
-      color = (m${params.idx}[${params.col}][row] == expect) \
-    % else:
-      color = (m${params.idx}[${params.col}] == expect) \
-    % endif
-    ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    color = (m${params.idx}[${params.col}]${params.row} == expect) ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
   % endif
 }
 </%def>
