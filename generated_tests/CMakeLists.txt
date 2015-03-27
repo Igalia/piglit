@@ -120,6 +120,12 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	shader_image_load_store_tests.list
 	gen_shader_image_load_store_tests.py)
+piglit_make_generated_tests(
+	variable_index_read_tests.list
+	gen_variable_index_read_tests.py
+	templates/gen_variable_index_read_tests/vs.shader_test.mako
+	templates/gen_variable_index_read_tests/fs.shader_test.mako
+	templates/gen_variable_index_read_tests/helpers.mako)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -161,11 +167,12 @@ add_custom_target(gen-gl-tests
 			constant_array_size_tests_fp64.list
 			shader_precision_tests.list
 			shader_image_load_store_tests.list
+			variable_index_read_tests.list
 )
 
 # Create a custom target for generating OpenCL tests
 # This is not added to the default target, instead it is added
-# as a dependency of gen-etsts if OpenCL tests are enabled
+# as a dependency of gen-tests if OpenCL tests are enabled
 add_custom_target(gen-cl-tests
 	DEPENDS builtin_cl_int_tests.list
 			builtin_cl_math_tests.list

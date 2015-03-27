@@ -23,6 +23,7 @@
 from __future__ import print_function, absolute_import
 import os
 import errno
+import functools
 
 
 def safe_makedirs(dirs):
@@ -43,3 +44,24 @@ def safe_makedirs(dirs):
                 pass
             else:
                 raise
+
+
+class lazy_property(object):
+    """Decorator for lazy property loading.
+
+    A property decorated with this class will execute it's code the first time
+    it's run, but will store the value after that. This is useful for values
+    that are either 1) expensive to compute, or 2) need to be computed only
+    once and then read multiple times
+
+    """
+    def __init__(self, func):
+        functools.wraps(func)
+        self.__func = func
+
+    def __get__(self, obj, cls):
+        if not obj:
+            return self
+        value = self.__func(obj)
+        setattr(obj, self.__func.__name__, value)
+        return value
