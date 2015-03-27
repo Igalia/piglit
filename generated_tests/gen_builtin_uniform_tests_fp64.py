@@ -508,6 +508,8 @@ class ShaderTest(object):
         shader_test += '\n'
         shader_test += self.make_vbo_data()
         shader_test += '[test]\n'
+        shader_test += 'clear color 0.0 0.0 1.0 0.0\n'
+        shader_test += 'clear\n'
         shader_test += self.make_test()
         filename = self.filename()
         dirname = os.path.dirname(filename)
