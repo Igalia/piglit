@@ -24,8 +24,8 @@ ${helpers.license()}
 
 ${helpers.emit_header(params)}
 
-${helpers.emit_vs(params, 1)}
+${helpers.emit_vs(params, True)}
 
-${helpers.emit_fs(params, 0)}
+${helpers.emit_fs(params, False)}
 
 ${helpers.emit_test_vectors(params)}
