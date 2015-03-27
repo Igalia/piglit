@@ -1,8 +1,8 @@
-typedef TYPE type_t;
-
 #if TYPE == double
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 #endif
+
+typedef TYPE type_t;
 
 kernel void store_local(global type_t *out, global type_t *in) {
 	local type_t local_data[8];
