@@ -165,96 +165,46 @@ def main():
     array_dims = [0, 3]
     matrix_dims = [2, 3, 4]
     glsl_versions = [110, 120]
-    iter_ = itertools.product(modes, array_dims, matrix_dims, glsl_versions)
-    for mode, array_dim, matrix_dim, glsl_version in iter_:
-        if array_dim != 0:
-            arr = 'array-'
-            idx_text = 'index-'
-
-            # TODO: This can certainly be rolled up into a loop
-
-            make_fs(
-                'fs-{mode}-{arr}mat{matrix_dim}-col-row-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 'col', 'float',
-                           glsl_version))
-
-            make_fs(
-                'fs-{mode}-{arr}mat{matrix_dim}-row-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 1, 'float',
-                           glsl_version))
-
-            make_fs(
-                'fs-{mode}-{arr}mat{matrix_dim}-col-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 'col',
-                           'vec{}'.format(matrix_dim), glsl_version))
-
-            make_fs(
-                'fs-{mode}-{arr}mat{matrix_dim}-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 1,
-                           'vec{}'.format(matrix_dim), glsl_version))
-
-            make_vs(
-                'vs-{mode}-{arr}mat{matrix_dim}-col-row-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 'col', 'float',
-                           glsl_version))
-
-            make_vs(
-                'vs-{mode}-{arr}mat{matrix_dim}-row-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 1, 'float',
-                           glsl_version))
-
-            make_vs(
-                'vs-{mode}-{arr}mat{matrix_dim}-col-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 'col',
-                           'vec{}'.format(matrix_dim), glsl_version))
-
-            make_vs(
-                'vs-{mode}-{arr}mat{matrix_dim}-rd.shader_test'.format(**locals()),
-                TestParams(matrix_dim, array_dim, mode, 1, 1,
-                           'vec{}'.format(matrix_dim), glsl_version))
+    cols = [1, 'col']
+    stages = ['fs', 'vs']
+    iter_ = itertools.product(stages, modes, array_dims, matrix_dims,
+                              glsl_versions, cols)
+    for stage, mode, array_dim, matrix_dim, glsl_version, col in iter_:
+        if stage == 'vs':
+            func = make_vs
         else:
-            arr = ''
-            idx_text = ''
+            func = make_fs
 
-        make_fs(
-            'fs-{mode}-{arr}mat{matrix_dim}-{idx_text}col-row-rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 'col', 'float',
-                       glsl_version))
+        for expect in ['float', 'vec{}'.format(matrix_dim)]:
+            if array_dim != 0:
+                arr = 'array-'
+                idx_text = 'index-'
 
-        make_fs(
-            'fs-{mode}-{arr}mat{matrix_dim}-{idx_text}row-rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 1, 'float',
-                       glsl_version))
+                func(
+                    '{stage}-{mode}-{arr}mat{matrix_dim}-{col}{row}rd.shader_test'.format(
+                        stage=stage,
+                        mode=mode,
+                        arr=arr,
+                        matrix_dim=matrix_dim,
+                        col='col-' if col == 'col' else '',
+                        row='row-' if expect == 'float' else ''),
+                    TestParams(matrix_dim, array_dim, mode, 1, col, expect,
+                               glsl_version))
+            else:
+                arr = ''
+                idx_text = ''
 
-        make_fs(
-            'fs-{mode}-{arr}mat{matrix_dim}-{idx_text}col-rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 'col',
-                       'vec{}'.format(matrix_dim), glsl_version))
-
-        make_fs(
-            'fs-{mode}-{arr}mat{matrix_dim}-{idx_text}rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 1,
-                       'vec{}'.format(matrix_dim), glsl_version))
-
-        make_vs(
-            'vs-{mode}-{arr}mat{matrix_dim}-{idx_text}col-row-rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 'col', 'float',
-                       glsl_version))
-
-        make_vs(
-            'vs-{mode}-{arr}mat{matrix_dim}-{idx_text}row-rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 1, 'float',
-                       glsl_version))
-
-        make_vs(
-            'vs-{mode}-{arr}mat{matrix_dim}-{idx_text}col-rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 'col',
-                       'vec{}'.format(matrix_dim), glsl_version))
-
-        make_vs(
-            'vs-{mode}-{arr}mat{matrix_dim}-{idx_text}rd.shader_test'.format(**locals()),
-            TestParams(matrix_dim, array_dim, mode, 'index', 1,
-                       'vec{}'.format(matrix_dim), glsl_version))
+            func(
+                '{stage}-{mode}-{arr}mat{matrix_dim}-{idx_text}{col}{row}rd.shader_test'.format(
+                    stage=stage,
+                    mode=mode,
+                    arr=arr,
+                    matrix_dim=matrix_dim,
+                    idx_text=idx_text,
+                    col='col-' if col == 'col' else '',
+                    row='row-' if expect == 'float' else ''),
+                TestParams(matrix_dim, array_dim, mode, 'index', col, expect,
+                           glsl_version))
 
 
 if __name__ == '__main__':
