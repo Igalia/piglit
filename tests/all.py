@@ -4305,5 +4305,4 @@ with profile.group_manager(
     g(['arb_shader_image_load_store-unused'], 'unused')
 
 if platform.system() is 'Windows':
-    # FIXME: Is this correct?
-    profile.filter_tests(lambda p, _: p.startswith('glx'))
+    profile.filter_tests(lambda p, _: not p.startswith('glx'))
