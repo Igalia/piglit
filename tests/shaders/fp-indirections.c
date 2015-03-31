@@ -296,4 +296,17 @@ piglit_init(int argc, char **argv)
 	       get_program_i(GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB));
 	printf("Maximum native tex indirections: %d\n",
 	       get_program_i(GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB));
+
+	/* If the GL reports more than 10000 texture indirections, then we're probably
+	 * running on hardware with no limitations - the driver just picked some
+	 * arbitrary large number to report back.  The test isn't meaningful, and
+	 * the run time explodes with huge limits, so just skip it.
+	 *
+	 * For reference, Mesa and NVIDIA report 16384; AMD reports 2147483647.
+	 * Pineview hardware (where this test is relevant) has a limit of 4.
+	 */
+	if (get_program_i(GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB) > 10000) {
+		printf("Skipping; the hardware doesn't appear to have real limits.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 }
