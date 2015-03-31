@@ -169,6 +169,28 @@ static const char fs_atom[] =
 	"	atomicCounterIncrement(fs_counter);\n"
 	"}";
 
+static const char vs_loc[] =
+	"#version 150\n"
+	"#extension GL_ARB_explicit_attrib_location : require\n"
+	"layout (location = 3) in vec4 input0;\n"
+	"layout (location = 6) in vec4 input1;\n"
+	"void main() {\n"
+		"gl_Position = input0 * input1;\n"
+	"}";
+
+static const char fs_loc[] =
+	"#version 150\n"
+	"#extension GL_ARB_explicit_attrib_location  : require\n"
+	"#extension GL_ARB_explicit_uniform_location : require\n"
+	"layout (location = 9) uniform vec4 color;\n"
+	"layout (location = 1) uniform float array[4];\n"
+	"layout (location = 1) out vec4 output0;\n"
+	"layout (location = 0) out vec4 output1;\n"
+	"void main() {\n"
+		"output0 = color * array[2];\n"
+		"output1 = color * array[3];\n"
+	"}";
+
 static const char vs_tfv[] =
 	"#version 150\n"
 	"in vec4 vs_input0;\n"

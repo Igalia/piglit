@@ -57,6 +57,7 @@
  */
 
 #include "piglit-util-gl.h"
+#include "common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -85,29 +86,6 @@ static const GLenum valid_enums_sub_tes[] = {
 static const GLenum valid_enums_sub_com[] = {
 	GL_COMPUTE_SUBROUTINE_UNIFORM
 };
-
-
-static const char vs_text[] =
-	"#version 150\n"
-	"#extension GL_ARB_explicit_attrib_location : require\n"
-	"layout (location = 3) in vec4 input0;\n"
-	"layout (location = 6) in vec4 input1;\n"
-	"void main() {\n"
-		"gl_Position = input0 * input1;\n"
-	"}";
-
-static const char fs_text[] =
-	"#version 150\n"
-	"#extension GL_ARB_explicit_attrib_location  : require\n"
-	"#extension GL_ARB_explicit_uniform_location : require\n"
-	"layout (location = 9) uniform vec4 color;\n"
-	"layout (location = 1) uniform float array[4];\n"
-	"layout (location = 1) out vec4 output0;\n"
-	"layout (location = 0) out vec4 output1;\n"
-	"void main() {\n"
-		"output0 = color * array[2];\n"
-		"output1 = color * array[3];\n"
-	"}";
 
 static const char vs_subroutine_text[] =
 	"#version 150\n"
@@ -264,10 +242,10 @@ test_subroutine_stages_tcs_tes()
 	}
 
         prog = piglit_build_simple_program_multiple_shaders(
-                     GL_VERTEX_SHADER, vs_text,
+                     GL_VERTEX_SHADER, vs_loc,
                      GL_TESS_CONTROL_SHADER, tcs_subroutine_text,
                      GL_TESS_EVALUATION_SHADER, tes_subroutine_text,
-                     GL_FRAGMENT_SHADER, fs_text,
+                     GL_FRAGMENT_SHADER, fs_loc,
                      0);
 
 	glUseProgram(prog);
@@ -374,14 +352,14 @@ piglit_init(int argc, char **argv)
 	}
 
 	/* Test passing a shader, not program. */
-	shader = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
+	shader = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_loc);
 	glGetProgramResourceLocation(shader, GL_UNIFORM, "name");
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
 		piglit_report_subtest_result(PIGLIT_FAIL, "invalid program test 2");
 		pass = false;
 	}
 
-	prog = piglit_build_simple_program_unlinked(vs_text, fs_text);
+	prog = piglit_build_simple_program_unlinked(vs_loc, fs_loc);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
