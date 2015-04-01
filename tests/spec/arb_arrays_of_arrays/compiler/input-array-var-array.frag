@@ -7,9 +7,9 @@
 #version 150
 #extension GL_ARB_arrays_of_arrays: enable
 
-in vec4[3][1] an_array;
+in vec4[1] an_array[3];
 
 void main()
 {
-  gl_Position = an_array[0][0];
+  gl_FragColor = an_array[0][0];
 }
