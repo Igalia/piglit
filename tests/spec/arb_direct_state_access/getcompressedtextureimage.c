@@ -23,7 +23,7 @@
  */
 
 /**
- * @file getcompressedtextureimage-targets.c
+ * @file getcompressedtextureimage.c
  *
  * Adapted for testing glGetCompressedTextureImage in ARB_direct_state_access
  * by Laura Ekstrand <laura@jlekstrand.net>, November 2014.
