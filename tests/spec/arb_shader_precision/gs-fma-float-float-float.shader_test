@@ -1,0 +1,72 @@
+[require]
+GLSL >= 4.00
+
+[vertex shader]
+in vec4 piglit_vertex;
+flat out vec4 vertex_to_gs;
+void main()
+{
+     vertex_to_gs = piglit_vertex;
+}
+
+[geometry shader]
+#extension GL_ARB_shader_precision : require
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+flat in vec4 vertex_to_gs[3];
+flat out vec4 color;
+uniform float arg0;
+uniform float arg1;
+uniform float arg2;
+uniform float expected_a;
+uniform float expected_b;
+
+void main()
+{
+  vec4 tmp_color;
+  float result = fma(arg0, arg1, arg2);
+  tmp_color = result == expected_a || result == expected_b ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+  for (int i = 0; i < 3; i++) {
+    gl_Position = vertex_to_gs[i];
+    color = tmp_color;
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+flat in vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+uniform float arg0  0xbcf5c28f
+uniform float arg1  0xbf59999a
+uniform float arg2  0xbcd0e560
+uniform float expected_a  0x00000000
+uniform float expected_b  0x302b020c
+draw rect -1 -1 1 1
+relative probe rgba (0.0, 0.0) (0.0, 1.0, 0.0, 1.0)
+uniform float arg0  0x3fd5c28f
+uniform float arg1  0x3f28f5c3
+uniform float arg2  0x3f800003
+uniform float expected_a  0x40068a73
+uniform float expected_b  0x40068a74
+draw rect 0 -1 1 1
+relative probe rgba (1.0, 0.0) (0.0, 1.0, 0.0, 1.0)
+uniform float arg0  0xbcf5c28f
+uniform float arg1  0x3f28f5c3
+uniform float arg2  0x3fb5b22d
+uniform float expected_a  0x3fb3295f
+uniform float expected_b  0x3fb3295f
+draw rect -1 0 1 1
+relative probe rgba (0.0, 1.0) (0.0, 1.0, 0.0, 1.0)
+uniform float arg0  0x3fef5c29
+uniform float arg1  0xbcf5c28f
+uniform float arg2  0x3fc8ef34
+uniform float expected_a  0x3fc1c0eb
+uniform float expected_b  0x3fc1c0eb
+draw rect 0 0 1 1
+relative probe rgba (1.0, 1.0) (0.0, 1.0, 0.0, 1.0)
