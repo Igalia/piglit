@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_texture_stencil8-stencil-texture stencil-texture.c)
+piglit_add_executable (arb_texture_stencil8-draw draw.c)
 
 # vim: ft=cmake:
