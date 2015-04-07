@@ -261,8 +261,8 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [1.0, exp(0.95), exp(pi), exp(-pi), float("inf") ], # Result
-            [0.0, 0.95, pi, -pi, float("inf")]  # Arg0
+            [1.0, exp(0.95), exp(pi), exp(-pi), float("inf"), float.fromhex('0x1.66fe8ap+4')], # Result
+            [0.0, 0.95, pi, -pi, float("inf"), float.fromhex('0x1.8e2cp+1')]  # Arg0
         ],
         'tolerance' : 3
     },
