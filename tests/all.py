@@ -128,7 +128,7 @@ def add_fbo_formats_tests(adder, extension, suffix=''):
           'fbo-clear-formats{}'.format(suffix))
     adder(['get-renderbuffer-internalformat', extension],
           'get-renderbuffer-internalformat{}'.format(suffix))
-    if 'depth' not in extension:
+    if 'depth' not in extension and 'stencil' not in extension:
         adder(['fbo-blending-formats', extension],
               'fbo-blending-formats{}'.format(suffix))
         adder(['fbo-alphatest-formats', extension],
@@ -3643,6 +3643,7 @@ with profile.group_manager(
     g(['arb_clear_texture-rg'])
     g(['arb_clear_texture-depth-stencil'])
     g(['arb_clear_texture-srgb'])
+    g(['arb_clear_texture-stencil'])
 
 with profile.group_manager(
         PiglitGLTest,
@@ -4320,6 +4321,18 @@ with profile.group_manager(
     g(['arb_shader_image_load_store-shader-mem-barrier'], 'shader-mem-barrier')
     g(['arb_shader_image_load_store-state'], 'state')
     g(['arb_shader_image_load_store-unused'], 'unused')
+
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_texture_stencil8')) as g:
+    g(['arb_texture_stencil8-draw'], 'draw')
+    g(['arb_texture_stencil8-getteximage'], 'getteximage')
+    g(['arb_texture_stencil8-stencil-texture'], 'stencil-texture')
+    g(['arb_texture_stencil8-fbo-stencil8', 'clear', 'GL_STENCIL_INDEX8'], 'fbo-stencil-clear')
+    g(['arb_texture_stencil8-fbo-stencil8', 'blit', 'GL_STENCIL_INDEX8'], 'fbo-stencil-blit')
+    g(['arb_texture_stencil8-fbo-stencil8', 'readpixels', 'GL_STENCIL_INDEX8'], 'fbo-stencil-readpixels')
+    add_fbo_formats_tests(g, 'GL_ARB_texture_stencil8')
+    add_texwrap_format_tests(g, 'GL_ARB_texture_stencil8')
 
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
