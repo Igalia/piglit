@@ -349,6 +349,11 @@ static const struct format_desc arb_texture_rgb10_a2ui[] = {
 	{FORMAT(GL_RGB10_A2UI),           10, 10, 10, 2, 0, 0, 0, 0,  0, 0, UINT_TYPE},
 };
 
+static const struct format_desc arb_texture_stencil8[] = {
+	{FORMAT(GL_STENCIL_INDEX8),  0, 0, 0, 0, 0, 0, 0, 8, 0, 0,  UINT_TYPE},
+};
+
+
 static const struct test_desc test_sets[] = {
 	{
 		core,
@@ -485,6 +490,12 @@ static const struct test_desc test_sets[] = {
 		ARRAY_SIZE(arb_es2_compatibility),
 		"GL_ARB_ES2_compatibility",
 		{"GL_ARB_ES2_compatibility"}
+	},
+	{
+		arb_texture_stencil8,
+		ARRAY_SIZE(arb_texture_stencil8),
+		"GL_ARB_texture_stencil8",
+		{"GL_ARB_texture_stencil8"}
 	},
 
 	{NULL}
@@ -1486,6 +1497,7 @@ static void init_texture(const struct format_desc *format, GLboolean npot)
 {
 	int x, y, z;
 	GLenum baseformat = format->depth ? (format->stencil ? GL_DEPTH_STENCIL : GL_DEPTH_COMPONENT) :
+			    format->stencil ? GL_STENCIL_INDEX :
 			    format->type == FLOAT_TYPE ? GL_RGBA : GL_RGBA_INTEGER;
 	GLenum type = format->internalformat == GL_DEPTH24_STENCIL8 ? GL_UNSIGNED_INT_24_8 :
 		      format->internalformat == GL_DEPTH32F_STENCIL8 ? GL_FLOAT_32_UNSIGNED_INT_24_8_REV :
@@ -1516,7 +1528,7 @@ static void init_texture(const struct format_desc *format, GLboolean npot)
 	}
 
 	/* Convert to one-channel texture. Not nice, but easy. */
-	if (format->depth) {
+	if (format->depth || format->stencil) {
 		for (x = 1; x < size_z*size_y*size_x; x++) {
 			image[x] = image[x*4];
 		}
