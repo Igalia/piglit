@@ -21,5 +21,6 @@ piglit_add_executable (arb_clear_texture-float float.c common.c)
 piglit_add_executable (arb_clear_texture-rg rg.c rg.c common.c)
 piglit_add_executable (arb_clear_texture-depth-stencil depth-stencil.c common.c)
 piglit_add_executable (arb_clear_texture-srgb srgb.c common.c)
+piglit_add_executable (arb_clear_texture-stencil stencil.c common.c)
 
 # vim: ft=cmake:
