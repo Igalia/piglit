@@ -142,7 +142,7 @@ tests = {
             [atan(0.0), atan(0.12345), atan(3567147.0)], # Result
             [0.0,       0.12345,       3567147.0]# Arg0
         ],
-        'tolerance' : 2
+        'tolerance' : 5
      },
     'atan2' : {
         'arg_types' : [F, F, F],
@@ -171,17 +171,17 @@ tests = {
             [0.0, float("inf"), float("-inf"), float("nan"), atanh(0.123456789)], #Result
             [0.0, 1.0,              -1.0,      float("nan"),       0.123456789 ]  #Arg0
         ],
-        'tolerance' : 4
+        'tolerance' : 5
      },
     'atanpi' : {
-    'arg_types' : [F, F],
-    'function_type': 'ttt',
-    'values' : [
-        [0.0, -0.0, atan(1.02345)/pi, atan(-1.02345)/pi, float("nan"), 0.5,          -0.5          ],
-        [0.0, -0.0, 1.02345,          -1.02345,          float("nan"), float("inf"), float("-inf") ]
-    ],
-    'tolerance' : 5
- },
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [0.0, -0.0, atan(1.02345)/pi, atan(-1.02345)/pi, float("nan"), 0.5,          -0.5          ],
+            [0.0, -0.0, 1.02345,          -1.02345,          float("nan"), float("inf"), float("-inf") ]
+        ],
+        'tolerance' : 5
+    },
     'cbrt' : {
         'arg_types': [F, F],
         'function_type': 'ttt',
@@ -215,7 +215,7 @@ tests = {
             [1.0, 0.0,    -1.0, 0.0,        1.0,    cos(1.12345), cos(7), cos(8), cos(pow(2,20)), cos(pow(2,24)), cos(pow(2,120)), float("nan")], # Result
             [0.0, pi / 2, pi,   3 * pi / 2, 2 * pi, 1.12345, 7, 8, pow(2,20), pow(2,24), pow(2,120), float("nan")] # Arg0
         ],
-        'tolerance' : 2
+        'tolerance' : 4
     },
     'cosh' : {
         'arg_types' : [F, F],
@@ -360,7 +360,7 @@ tests = {
             [0.0, 1.0,   0.0, -1.0,       0.0,    sin(2.234567), sin(7), sin(8), sin(pow(2,20)), sin(pow(2,24)), sin(pow(2,120)), float("nan")], # Result
             [0.0, pi / 2, pi, 3 * pi / 2, 2 * pi, 2.234567, 7, 8, pow(2,20), pow(2,24), pow(2,120), float("nan")] # Arg0
         ],
-        'tolerance': 2
+        'tolerance': 4
     },
     'sinh' : {
         'arg_types' : [F, F],
