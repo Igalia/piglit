@@ -455,6 +455,7 @@ supported_format_set(const struct test_desc *set)
 
 	if (set->format == ext_texture_integer ||
 		 set->format == ext_packed_depth_stencil ||
+		 set->format == arb_texture_stencil8 ||
 		 set->format == arb_texture_rg_int ||
 		 set->format == arb_depth_texture ||
 		 set->format == arb_depth_buffer_float) {

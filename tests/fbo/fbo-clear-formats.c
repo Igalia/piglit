@@ -273,7 +273,7 @@ create_tex(GLenum internalformat, GLenum baseformat)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
 
-		if (clear_stencil) {
+		if (clear_stencil || baseformat == GL_STENCIL_INDEX) {
 			if (!do_stencil_clear(format, tex, level, dim)) {
 				glDeleteTextures(1, &tex);
 				return 0;
@@ -522,7 +522,11 @@ test_format(const struct format_desc *format)
 
 	printf("Testing %s", format->name);
 
-	if (clear_stencil && format->base_internal_format != GL_DEPTH_STENCIL) {
+	if (format->base_internal_format == GL_STENCIL_INDEX)
+		clear_stencil = true;
+
+	if (clear_stencil && format->base_internal_format != GL_DEPTH_STENCIL &&
+	    format->base_internal_format != GL_STENCIL_INDEX) {
 		printf(" - no stencil.\n");
 		return PIGLIT_SKIP;
 	}

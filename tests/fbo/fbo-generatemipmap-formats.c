@@ -488,7 +488,8 @@ piglit_display(void)
 			/* Skip testing textures with depth-stencil internal
 			 * formats as they are not allowed in glGenerateMipmap.
 			 */
-			if (format.base_internal_format == GL_DEPTH_STENCIL)
+			if (format.base_internal_format == GL_DEPTH_STENCIL ||
+			    format.base_internal_format == GL_STENCIL_INDEX)
 				continue;
 
 			pass = test_format(&format,
@@ -498,7 +499,8 @@ piglit_display(void)
 			set_npot(GL_TRUE);
 			for (i = 0; i < test_sets[test_index].num_formats; i++) {
 				format = test_sets[test_index].format[i];
-				if (format.base_internal_format == GL_DEPTH_STENCIL)
+				if (format.base_internal_format == GL_DEPTH_STENCIL ||
+				    format.base_internal_format == GL_STENCIL_INDEX)
 					continue;
 
 				pass = test_format(&format,
@@ -508,7 +510,8 @@ piglit_display(void)
 		}
 	} else {
 		format = test_sets[test_index].format[format_index];
-		if (format.base_internal_format != GL_DEPTH_STENCIL)
+		if (format.base_internal_format != GL_DEPTH_STENCIL &&
+		    format.base_internal_format != GL_STENCIL_INDEX)
 			pass = test_format(&format,
 					   test_sets[test_index].basetype);
 	}

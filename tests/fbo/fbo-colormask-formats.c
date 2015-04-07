@@ -59,7 +59,8 @@ static enum piglit_result test_format(const struct format_desc *format)
 	float defaults[] = {-1, -1, -1, -1};
 
 	if (format->base_internal_format == GL_DEPTH_COMPONENT ||
-	    format->base_internal_format == GL_DEPTH_STENCIL)
+	    format->base_internal_format == GL_DEPTH_STENCIL ||
+	    format->base_internal_format == GL_STENCIL_INDEX)
 		return PIGLIT_SKIP;
 
 	glGenFramebuffersEXT(1, &fb);

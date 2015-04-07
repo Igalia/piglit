@@ -310,6 +310,10 @@ static const struct format_desc arb_es2_compatibility[] = {
 	FORMAT(GL_RGB565, GL_RGB)
 };
 
+static const struct format_desc arb_texture_stencil8[] = {
+	FORMAT(GL_STENCIL_INDEX8, GL_STENCIL_INDEX)
+};
+
 struct test_desc {
 	const struct format_desc *format;
 	unsigned num_formats;
@@ -498,6 +502,13 @@ static const struct test_desc test_sets[] = {
 		"GL_ARB_texture_compression_bptc-float",
 		GL_FLOAT,
 		{"GL_ARB_texture_compression_bptc"}
+	},
+	{
+		arb_texture_stencil8,
+		ARRAY_SIZE(arb_texture_stencil8),
+		"GL_ARB_texture_stencil8",
+		GL_UNSIGNED_BYTE,
+		{"GL_ARB_texture_stencil8"}
 	},
 };
 

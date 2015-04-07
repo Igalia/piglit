@@ -76,6 +76,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 
         if (format->base_internal_format == GL_DEPTH_COMPONENT ||
             format->base_internal_format == GL_DEPTH_STENCIL ||
+            format->base_internal_format == GL_STENCIL_INDEX ||
 	    format->base_internal_format == GL_ALPHA)
 		return PIGLIT_SKIP;
 
