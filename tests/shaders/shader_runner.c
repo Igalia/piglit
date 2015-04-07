@@ -114,6 +114,9 @@ GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
 GLint geometry_layout_vertices_out = 0;
 GLuint atomics_bo = 0;
 
+#define SHADER_TYPES 6
+static GLuint *subuniform_locations[SHADER_TYPES];
+static int num_subuniform_locations[SHADER_TYPES];
 char *shader_string;
 GLint shader_string_size;
 const char *vertex_data_start = NULL;
@@ -1284,6 +1287,17 @@ check_double_support(void)
 }
 
 /**
+ * Check that the GL implementation supports shader subroutines
+ * If not, terminate the test with a SKIP.
+ */
+void
+check_shader_subroutine_support(void)
+{
+	if (gl_version.num < 40 && !piglit_is_extension_supported("GL_ARB_shader_subroutine"))
+		piglit_report_result(PIGLIT_SKIP);
+}
+
+/**
  * Handles uploads of UBO uniforms by mapping the buffer and storing
  * the data.  If the uniform is not in a uniform block, returns false.
  */
@@ -1682,6 +1696,140 @@ set_uniform(const char *line, int ubo_array_index)
 	printf("unknown uniform type \"%s\"\n", name);
 	piglit_report_result(PIGLIT_FAIL);
 
+	return;
+}
+
+static GLenum lookup_shader_type(GLuint idx)
+{
+	switch (idx) {
+	case 0:
+		return GL_VERTEX_SHADER;
+	case 1:
+		return GL_FRAGMENT_SHADER;
+	case 2:
+		return GL_GEOMETRY_SHADER;
+	case 3:
+		return GL_TESS_CONTROL_SHADER;
+	case 4:
+		return GL_TESS_EVALUATION_SHADER;
+	case 5:
+		return GL_COMPUTE_SHADER;
+	default:
+		return 0;
+	}
+}
+
+static GLenum get_shader_from_string(const char *name, int *idx)
+{
+	if (string_match("GL_VERTEX_SHADER", name)) {
+		*idx = 0;
+		return GL_VERTEX_SHADER;
+	}
+	if (string_match("GL_FRAGMENT_SHADER", name)) {
+		*idx = 1;
+		return GL_FRAGMENT_SHADER;
+	}
+	if (string_match("GL_GEOMETRY_SHADER", name)) {
+		*idx = 2;
+		return GL_GEOMETRY_SHADER;
+	}
+	if (string_match("GL_TESS_CONTROL_SHADER", name)) {
+		*idx = 3;
+		return GL_TESS_CONTROL_SHADER;
+	}
+	if (string_match("GL_TESS_EVALUATION_SHADER", name)) {
+		*idx = 4;
+		return GL_TESS_EVALUATION_SHADER;
+	}
+	if (string_match("GL_COMPUTE_SHADER", name)) {
+		*idx = 5;
+		return GL_COMPUTE_SHADER;
+	}
+	return 0;
+}
+
+void
+free_subroutine_uniforms(void)
+{
+	int sidx;
+	for (sidx = 0; sidx < 4; sidx++)
+	    free(subuniform_locations[sidx]);
+}
+
+void
+program_subroutine_uniforms(void)
+{
+	int sidx;
+	int stype;
+
+	for (sidx = 0; sidx < 4; sidx++) {
+
+		if (num_subuniform_locations[sidx] == 0)
+			continue;
+
+		stype = lookup_shader_type(sidx);
+		if (!stype)
+			continue;
+
+		glUniformSubroutinesuiv(stype, num_subuniform_locations[sidx], subuniform_locations[sidx]);
+	}
+}
+
+void
+set_subroutine_uniform(const char *line)
+{
+	GLuint prog;
+	char name[512];
+	char subname[512];
+	const char *type;
+	GLint loc;
+	GLuint idx;
+	GLenum ptype = 0;
+	int sidx = 0;
+
+	type = eat_whitespace(line);
+	line = eat_text(type);
+
+	line = strcpy_to_space(name, eat_whitespace(line));
+	line = strcpy_to_space(subname, eat_whitespace(line));
+
+	ptype = get_shader_from_string(type, &sidx);
+	if (ptype == 0) {
+		printf("illegal type in subroutine uniform\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
+
+	if (num_subuniform_locations[sidx] == 0) {
+		glGetProgramStageiv(prog, ptype, GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS,
+				    &num_subuniform_locations[sidx]);
+
+		if (num_subuniform_locations[sidx] == 0) {
+			printf("illegal subroutine uniform specified\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		subuniform_locations[sidx] = calloc(num_subuniform_locations[sidx], sizeof(GLuint));
+		if (!subuniform_locations[sidx])
+			piglit_report_result(PIGLIT_FAIL);
+	}
+
+	loc = glGetSubroutineUniformLocation(prog, ptype, name);
+	if (loc < 0) {
+		printf("cannot get location of subroutine uniform \"%s\"\n",
+		       name);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	idx = glGetSubroutineIndex(prog, ptype, subname);
+	if (idx == GL_INVALID_INDEX) {
+		printf("cannot get index of subroutine uniform \"%s\"\n",
+		       subname);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	subuniform_locations[sidx][loc] = idx;
 	return;
 }
 
@@ -2343,11 +2491,13 @@ piglit_display(void)
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		} else if (string_match("draw rect tex", line)) {
 			program_must_be_in_use();
+			program_subroutine_uniforms();
 			get_floats(line + 13, c, 8);
 			piglit_draw_rect_tex(c[0], c[1], c[2], c[3],
 					     c[4], c[5], c[6], c[7]);
 		} else if (string_match("draw rect ortho", line)) {
 			program_must_be_in_use();
+			program_subroutine_uniforms();
 			get_floats(line + 15, c, 4);
 
 			piglit_draw_rect(-1.0 + 2.0 * (c[0] / piglit_width),
@@ -2360,6 +2510,7 @@ piglit_display(void)
 			piglit_draw_rect_custom(c[0], c[1], c[2], c[3], true);
 		} else if (string_match("draw rect", line)) {
 			program_must_be_in_use();
+			program_subroutine_uniforms();
 			get_floats(line + 9, c, 4);
 			piglit_draw_rect(c[0], c[1], c[2], c[3]);
 		} else if (string_match("draw instanced rect", line)) {
@@ -2680,6 +2831,10 @@ piglit_display(void)
 		} else if (string_match("uniform", line)) {
 			program_must_be_in_use();
 			set_uniform(line + 7, ubo_array_index);
+		} else if (string_match("subuniform", line)) {
+			program_must_be_in_use();
+			check_shader_subroutine_support();
+			set_subroutine_uniform(line + 10);
 		} else if (string_match("parameter ", line)) {
 			set_parameter(line + strlen("parameter "));
 		} else if (string_match("patch parameter ", line)) {
@@ -2716,6 +2871,7 @@ piglit_display(void)
 	piglit_present_results();
 
 	if (piglit_automatic) {
+	        free_subroutine_uniforms();
 		/* Free our resources, useful for valgrinding. */
 		glDeleteProgram(prog);
 		glUseProgram(0);
