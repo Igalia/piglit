@@ -1951,7 +1951,7 @@ with profile.group_manager(
     g(['fbo-scissor-blit', 'window'], 'fbo-scissor-blit window',
       run_concurrent=False)
     g(['fbo-tex-rgbx'], 'fbo-tex-rgbx')
-    g(['arb_framebuffer_object-mixed-buffer-sizes'],
+    g(['arb_framebuffer_object-mixed-buffer-sizes'], 'mixed-buffer-sizes')
     g(['arb_framebuffer_object-negative-readpixels-no-rb'],
       'negative-readpixels-no-rb')
     g(['fbo-drawbuffers-none', 'glClear'])
