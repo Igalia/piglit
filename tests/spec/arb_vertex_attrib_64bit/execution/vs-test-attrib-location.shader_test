@@ -1,0 +1,44 @@
+# this tests that using explicit attributes
+# that each dvec3/4 only takes up one location
+#
+[require]
+GLSL >= 3.30
+GL_ARB_gpu_shader_fp64
+GL_ARB_vertex_attrib_64bit
+
+[vertex shader]
+#version 330
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_vertex_attrib_64bit : require
+layout(location = 0) in dvec3 vertex;
+layout(location = 1) in dvec3 incolor;
+flat out dvec4 fscolor;
+void main()
+{
+        gl_Position = vec4(vertex, 1.0);
+	fscolor = dvec4(incolor, 1.0lf);
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+flat in dvec4 fscolor;
+out vec4 color;
+void main()
+{
+  color = vec4(fscolor);
+}
+
+[vertex data]
+vertex/double/3 incolor/double/3
+-1.0 -1.0 0.0   0.0 1.0 0.0
+ 1.0 -1.0 0.0   0.0 1.0 0.0
+ 1.0  1.0 0.0   0.0 1.0 0.0
+-1.0  1.0 0.0   0.0 1.0 0.0
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
