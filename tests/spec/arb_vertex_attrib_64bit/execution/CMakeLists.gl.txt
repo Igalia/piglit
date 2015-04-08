@@ -10,3 +10,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_vertex_attrib_64bit-double_attribs double_attribs.c)
+piglit_add_executable (arb_vertex_attrib_64bit-check-explicit-location check-explicit-location.c)
