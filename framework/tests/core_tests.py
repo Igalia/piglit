@@ -207,19 +207,16 @@ def test_config_home_fallback():
 
 
 @nt.with_setup(*GetConfigFixture.make())
+@utils.test_in_tempdir
 def test_local():
     """ get_config() finds ./piglit.conf """
     with utils.tempdir() as tdir:
-        try:
-            return_dir = os.getcwd()
-            os.chdir(tdir)
+        os.chdir(tdir)
 
-            with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
-                f.write(_CONF_FILE)
+        with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
+            f.write(_CONF_FILE)
 
-            core.get_config()
-        finally:
-            os.chdir(return_dir)
+        core.get_config()
 
     nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
            msg='./piglit.conf not found')

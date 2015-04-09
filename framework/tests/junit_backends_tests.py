@@ -294,23 +294,16 @@ def test_load_folder_name():
     nt.assert_equal(test.name, 'a cool test')
 
 
+@utils.test_in_tempdir
 def test_load_default_name():
     """backend.junit._load: uses 'junit result' for name as fallback"""
-    curdir = os.getcwd()
- 
-    # This try/finally ensures that no matter what the directory will be changed
-    # back, this is necessary to ensure that it doesn't spoil the environment
-    # for other tests.
-    try:
-        with utils.tempdir() as tdir:
-            os.chdir(tdir)
+    with utils.tempdir() as tdir:
+        os.chdir(tdir)
 
-            filename = 'results.xml'
-            with open(filename, 'w') as f:
-                f.write(_XML)
+        filename = 'results.xml'
+        with open(filename, 'w') as f:
+            f.write(_XML)
 
-            test = backends.junit.REGISTRY.load(filename)
-    finally:
-        os.chdir(curdir)
+        test = backends.junit.REGISTRY.load(filename)
 
     nt.assert_equal(test.name, 'junit result')
