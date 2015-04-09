@@ -2831,6 +2831,7 @@ with profile.group_manager(
     g(['fbo-bind-renderbuffer'])
     g(['fbo-clearmipmap'])
     g(['fbo-clear-formats'])
+    g(['fbo-colormask-formats'])
     g(['fbo-copyteximage'])
     g(['fbo-copyteximage-simple'])
     g(['fbo-cubemap'])
