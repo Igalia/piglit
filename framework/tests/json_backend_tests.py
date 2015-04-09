@@ -286,3 +286,10 @@ def test_load_json():
 
     nt.assert_is_instance(result, results.TestrunResult)
     nt.assert_in('sometest', result.tests)
+
+
+def test_piglit_decoder():
+    """backends.json.piglit_decoder: Works correctly"""
+    test = json.loads('{"foo": {"result": "pass"}}',
+                      object_hook=backends.json.piglit_decoder)
+    nt.assert_is_instance(test['foo'], results.TestResult)

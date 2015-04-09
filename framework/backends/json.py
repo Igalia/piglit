@@ -61,6 +61,13 @@ def piglit_encoder(obj):
     return obj
 
 
+def piglit_decoder(obj):
+    """Json decoder for piglit that can load TestResult objects."""
+    if isinstance(obj, dict) and 'result' in obj:
+        return results.TestResult.load(obj)
+    return obj
+
+
 class JSONBackend(FileBackend):
     """ Piglit's native JSON backend
 
@@ -208,10 +215,7 @@ def _load(results_file):
     """
     result = results.TestrunResult()
     result.results_vesrion = 0  # This should get overwritten
-    result.__dict__.update(json.load(results_file))
-
-    for key, value in result.tests.viewitems():
-        result.tests[key] = results.TestResult.load(value)
+    result.__dict__.update(json.load(results_file, object_hook=piglit_decoder))
 
     return result
 
@@ -240,15 +244,9 @@ def _resume(results_dir):
     for file_ in os.listdir(os.path.join(results_dir, 'tests')):
         with open(os.path.join(results_dir, 'tests', file_), 'r') as f:
             try:
-                test = json.load(f)
+                testrun.tests.update(json.load(f, object_hook=piglit_decoder))
             except ValueError:
                 continue
-
-        # XXX: There has to be a better way to get a single key: value out
-        # of a dict even when the key name isn't known
-        # XXX: Yes, using a piglit_decoder function
-        for key, value in test.iteritems():
-            testrun.tests[key] = results.TestResult.load(value)
 
     return testrun
 
