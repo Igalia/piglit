@@ -24,13 +24,16 @@
 #include "image_common.h"
 
 /**
- * @file intel_external_sampler_only.c
+ * @file
  *
- * Intel driver does not allow imported dma-buffers to be rendered but to be
- * read only. In addition the driver allows the buffers to be sampled only using
- * the image external extension.
- * This test creates an egl image based on a dma buffer and tries to use the
- * image as target for a 2D texture and for a render buffer.
+ * The Intel driver supports glEGLImageTargetRenderbufferStorageOES and
+ * glEGLImageTargetTexture2DOES(GL_TEXTURE_2D) for EGLImages imported with
+ * EGL_EXT_image_dma_buf_import, as long as the image has a single plane and
+ * a non-exotic format. This test verifies that the two calls succeed with
+ * an RGBA dma_buf.
+ *
+ * This is only an API test. It doesn't actually render to or texture from the
+ * EGLImage.
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -71,7 +74,7 @@ try_as_texture_2d(EGLImageKHR img)
 
 	/* Set the image as level zero */
 	glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, (GLeglImageOES)img);
-	res = piglit_check_gl_error(GL_INVALID_OPERATION);
+	res = piglit_check_gl_error(GL_NO_ERROR);
 
 	glDeleteTextures(1, &tex);
 
@@ -88,7 +91,7 @@ try_as_render_buffer(EGLImageKHR img)
 	piglit_glBindRenderbufferOES(GL_RENDERBUFFER_OES, rbo);
 
 	glEGLImageTargetRenderbufferStorageOES(GL_RENDERBUFFER_OES, img);
-	res = piglit_check_gl_error(GL_INVALID_OPERATION);
+	res = piglit_check_gl_error(GL_NO_ERROR);
 
 	piglit_glDeleteRenderbuffersOES(1, &rbo);
 
