@@ -194,7 +194,10 @@ def aggregate(input_):
         sys.exit(1)
 
     try:
-        results.write(outfile)
+        # FIXME: This works, it fixes the problem, but it only works because
+        # only the json backend has the ability to agregate results at the
+        # moment.
+        backends.json._write(results, outfile)
     except IOError as e:
         if e.errno == errno.EPERM:
             print("Error: Unable to write aggregated file, permission denied.",
