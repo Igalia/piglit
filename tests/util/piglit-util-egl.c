@@ -100,7 +100,7 @@ piglit_egl_get_default_display(EGLenum platform)
 		has_wayland = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_wayland");
 		has_gbm = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_gbm");
 
-		peglGetPlatformDisplayEXT = (void*) eglGetProcAddress("eglGetPlaformDisplayEXT");
+		peglGetPlatformDisplayEXT = (void*) eglGetProcAddress("eglGetPlatformDisplayEXT");
 	}
 
 	if (!has_base) {
