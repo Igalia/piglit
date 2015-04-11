@@ -1,0 +1,50 @@
+# Use 4 uniforms and gl_FragCoord (which adds a mesa state parameter) and see
+# if the uniform storage is updated after reallocating the parameter list.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+#version 110
+
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+#version 110
+
+uniform float zero0, zero1, zero2;
+uniform float u;
+
+void main()
+{
+    gl_FragColor = u + zero0 * gl_FragCoord + zero1 + zero2;
+}
+
+[test]
+uniform float zero0 0
+uniform float zero1 0
+uniform float zero2 0
+uniform float u 0.3
+
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+
+draw rect 0 0 50 50
+
+uniform float u 0.4
+draw rect 50 0 50 50
+
+uniform float u 0.5
+draw rect 100 0 50 50
+
+uniform float u 0.6
+draw rect 150 0 50 50
+
+probe rgb 25 25 0.3 0.3 0.3
+probe rgb 75 25 0.4 0.4 0.4
+probe rgb 125 25 0.5 0.5 0.5
+probe rgb 175 25 0.6 0.6 0.6
