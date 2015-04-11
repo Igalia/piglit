@@ -123,5 +123,8 @@ add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
                                   'relational'))
+add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
+                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
+                                  'common'))
 add_program_test_dir(grouptools.join('program', 'execute', 'store'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'store'))

@@ -57,10 +57,8 @@ CLC_VERSION_MIN = {
     'ldexp' : 10,
     'log10' : 10,
     'log1p' : 10,
-    'mix' : 10,
     'nextafter' : 10,
     'round' : 10,
-    'sign' : 10,
     'sin' : 10,
     'sinh' : 10,
     'sinpi' : 10,
@@ -317,16 +315,6 @@ tests = {
         ],
         'tolerance' : 2
     },
-    'mix' : { #x + (y - x) * a
-        'arg_types': [F, F, F, F],
-        'function_type': 'tts',
-        'values': [
-            [float("nan"), float("nan"), 1.0, 3.0, 10.0  ], # Result
-            [1.0         , 1.0,          1.0, 4.0, 15.0 ], # Arg0
-            [2.0         , float("nan"), 2.0, 2.0, 10.0 ], # Arg1
-            [float("nan"), 0.0,          0.0, 0.5, 1.0  ], # Arg2
-        ]
-    },
     'nextafter' : {
         'arg_types': [F, F, F],
         'function_type': 'ttt',
@@ -342,15 +330,6 @@ tests = {
         'values': [
             [1.0, -1.0, 0.0, -0.0, float("nan"), -4.0,  2.0, 0.0, 1.0],
             [0.5, -0.5, 0.0, -0.0, float("nan"), -3.99, 1.5, 0.4, 0.6]
-        ]
-    },
-    'sign' : { # This is really a Common function but it uses the same types
-               # as a lot of the math functions.
-        'arg_types': [F, F],
-        'function_type': 'ttt',
-        'values': [
-            [1.0, -1.0, 0.0, -0.0, 0.0],
-            [0.5, -0.5, 0.0, -0.0, float("nan")]
         ]
     },
     'sin' : {
