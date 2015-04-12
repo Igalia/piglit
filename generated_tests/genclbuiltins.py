@@ -302,22 +302,20 @@ def isFloatType(t):
     return t not in U
 
 # Print a test with all-vector inputs/outputs and/or mixed vector/scalar args
-def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, tss):
+def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, fntype):
     # If the test allows mixed vector/scalar arguments, handle the case with
     # only vector arguments through a recursive call.
-    if (tss):
+    if (fntype is 'tss' or fntype is 'tts'):
         print_test(f, fnName, argType, functionDef, tests, numTests, vecSize,
-                   False)
+                   'ttt')
 
     # The tss && vecSize==1 case is handled in the non-tss case.
-    if (tss and vecSize == 1):
+    if ((not fntype is 'ttt') and vecSize == 1):
         return
 
     # If we're handling mixed vector/scalar input widths, the kernels have
     # different names than when the vector widths match
-    tssStr = 'tss_'
-    if (not tss):
-        tssStr = ''
+    tssStr = fntype + '_' if (not fntype is 'ttt') else ''
 
     argTypes = getArgTypes(argType, functionDef['arg_types'])
     argCount = len(argTypes)
@@ -342,7 +340,7 @@ def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, tss):
         # The output argument and first tss argument are vectors, any that
         # follow are scalar. If !tss, then everything has a matching vector
         # width
-        if (arg < 2 or not tss):
+        if (fntype is 'ttt' or (arg < 2 and fntype is 'tss') or (arg < 3 and fntype is 'tts')):
             f.write(argInOut + str(arg) + ' buffer ' + argTypes[arg] +
                     '[' + str(numTests * vecSize) + '] ' +
                     ''.join(map(lambda x: (x + ' ') * vecSize, argVal.split()))
@@ -421,7 +419,7 @@ def gen(types, minVersions, functions, testDefs, dirName):
             sizes.insert(0, 1)  # Add 1-wide scalar to the vector widths
             for vecSize in sizes:
                 print_test(f, fnName, dataType, functionDef, tests,
-                           numTests, vecSize, (fnType is 'tss'))
+                           numTests, vecSize, fnType)
 
             # Terminate the header section
             f.write('!*/\n\n')
