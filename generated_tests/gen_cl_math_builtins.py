@@ -53,6 +53,8 @@ CLC_VERSION_MIN = {
     'exp' : 10,
     'fabs' : 10,
     'floor' : 10,
+    'fmax' : 10,
+    'fmin' : 10,
     'fmod' : 10,
     'ldexp' : 10,
     'log10' : 10,
@@ -275,6 +277,24 @@ tests = {
         'values': [
             [0.0, -1.0, 0.0, -0.0, float("nan"), -4.0,  1.0],
             [0.5, -0.5, 0.0, -0.0, float("nan"), -3.99, 1.5]
+        ]
+    },
+    'fmax' : {
+        'arg_types': [F, F, F],
+        'function_type': 'tss',
+        'values': [
+            [1.0,  0.0, 0.0,  0.0, 1.0, 1.0,          float("nan")], #Result
+            [1.0, -0.5, 0.0,  0.0, 1.0, float("nan"), float("nan")], #Arg0
+            [0.0,  0.0, 0.0, -0.5, float("nan"), 1.0, float("nan")] #Arg1
+        ]
+    },
+    'fmin' : {
+        'arg_types': [F, F, F],
+        'function_type': 'tss',
+        'values': [
+            [0.0, -0.5, 0.0, -0.5, 1.0, 1.0,          float("nan")], #Result
+            [1.0, -0.5, 0.0,  0.0, 1.0, float("nan"), float("nan")], #Arg0
+            [0.0,  0.0, 0.0, -0.5, float("nan"), 1.0, float("nan")] #Arg1
         ]
     },
     'fmod' : {
