@@ -44,8 +44,7 @@ except ImportError:
 from nose.plugins.skip import SkipTest
 import nose.tools as nt
 
-import framework.results
-import framework.test
+from framework import test, backends
 
 
 __all__ = [
@@ -62,7 +61,7 @@ JSON_DATA = {
         "filter": [],
         "exclude_filter": []
     },
-    "results_version": framework.backends.json.CURRENT_JSON_VERSION,
+    "results_version": backends.json.CURRENT_JSON_VERSION,
     "name": "fake-tests",
     "lspci": "fake",
     "glxinfo": "fake",
@@ -232,7 +231,7 @@ def platform_check(plat):
         raise SkipTest('Platform {} is not supported'.format(sys.platform))
 
 
-class Test(framework.test.Test):
+class Test(test.Test):
     """A basic dmmmy Test class that can be used in places a test is required.
 
     This provides dummy version of abstract methods in
