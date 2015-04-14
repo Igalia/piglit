@@ -8,10 +8,10 @@ GL_ARB_vertex_attrib_64bit
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
 #extension GL_ARB_vertex_attrib_64bit : require
-in dvec4 vertex;
+in dvec2 vertex;
 void main()
 {
-        gl_Position = vec4(vertex);
+        gl_Position = vec4(vertex, 0.0, 1.0);
 }
 
 [fragment shader]
