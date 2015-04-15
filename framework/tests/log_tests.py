@@ -40,15 +40,15 @@ def test_initialize():
 
     for name, class_ in [('QuiteLog', log.QuietLog),
                          ('VerboseLog', log.VerboseLog)]:
-        check_initialize.description = "{} initializes".format(name)
+        check_initialize.description = "log.{}: class initializes".format(name)
         yield check_initialize, class_, TEST_STATE
 
-    check_initialize.description = "LogManager initializes"
+    check_initialize.description = "log.LogManager: class initializes"
     yield check_initialize, log.LogManager, 'quiet', 100
 
 
 def test_log_factory_returns_log():
-    """ LogManager.get() returns a BaseLog derived instance """
+    """log.LogManager.get() returns a BaseLog derived instance"""
     logger = log.LogManager('quiet', 100)
     log_inst = logger.get()
     assert isinstance(log_inst, log.BaseLog)
@@ -56,7 +56,7 @@ def test_log_factory_returns_log():
 
 @utils.nose_generator
 def test_quietlog_log_state_update():
-    """ QuiteLog.log() updates shared state managed by LogManager """
+    """log.QuiteLog.log() updates shared state managed by LogManager"""
     logger = log.LogManager('quiet', 100)
     log_inst = logger.get()
     log_inst.log('pass')
@@ -66,8 +66,7 @@ def test_quietlog_log_state_update():
     for name, value in [('total', 100), ('summary', {'pass': 1}),
                         ('complete', 1)]:
         check.description = \
-            'State value {0} is incremented by QuiteLog.log()'.format(
-                name, value)
+            'log.QuiteLog(): increments state value {0}'.format(name)
         yield check, logger._state[name], value
 
 
@@ -121,7 +120,7 @@ def test_print_when_expected():
     printing.append(('VerboseLog.summary', verbose.summary, []))
 
     for name, func, args in printing:
-        check_for_output.description = "{} produces output".format(name)
+        check_for_output.description = "log.{}: produces output".format(name)
         yield check_for_output, func, args
 
 
@@ -164,5 +163,5 @@ def test_noprint_when_expected():
     printing.append(('DummyLog.summary', dummy.summary, []))
 
     for name, func, args in printing:
-        check_no_output.description = "{} produces no output".format(name)
+        check_no_output.description = "log.{}: produces no output".format(name)
         yield check_no_output, func, args
