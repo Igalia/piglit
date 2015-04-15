@@ -22,10 +22,11 @@
 
 from __future__ import print_function, absolute_import
 
+from framework.tests import utils
 from framework.test import OpenCVTest
 
 
+@utils.no_error
 def test_initialize_opencvtest():
-    """ Test that opencvtest initializes correctly """
-    test = OpenCVTest('test_prog', 'testname')
-    assert test
+    """test.opencv.OpenCVTest: Class initializes"""
+    OpenCVTest('test_prog', 'testname')
