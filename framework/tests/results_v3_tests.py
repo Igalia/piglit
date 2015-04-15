@@ -101,23 +101,23 @@ class TestV4(object):
         cls.result = make_result(DATA)
 
     def test_old_removed(self):
-        """Version 3: All old test names are removed."""
+        """backends.json.update_results (3 -> 4): All old test names are removed"""
         for old in self.old:
             nt.assert_not_in(old, self.result.tests)
 
     def test_new_added(self):
-        """Version 3: All new test names are added."""
+        """backends.json.update_results (3 -> 4): All new test names are added"""
         for new in self.new:
             nt.assert_in(new, self.result.tests)
 
     def test_new_has_data(self):
-        """Version 3: All new tests have expected data."""
+        """backends.json.update_results (3 -> 4): All new tests have expected data"""
         for new in self.new:
             nt.assert_dict_equal(self.result.tests[new], TEST_DATA)
 
 
 def test_missing():
-    """Version 3: updates successfully when tests to rename are not present."""
+    """backends.json.update_results (3 -> 4): updates successfully when tests to rename are not present"""
     data = copy.copy(DATA)
     del data['tests']['spec/arb_draw_instanced/instance-array-dereference']
 
