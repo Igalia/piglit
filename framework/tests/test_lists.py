@@ -38,20 +38,16 @@ import framework.tests.utils as utils
 @utils.nose_generator
 def gen_test_import():
     """ Generates a bunch of tests to import the various test modules """
+    def check_import(module):
+        """ Test that a module can be imported """
+        if not path.exists('bin'):
+            raise SkipTest(
+                "Piglit has not been compiled, this test will not work")
+
+        importlib.import_module(module)
+
     # Test the various OpenGL modules
-    for module in ['all', 'quick', 'gpu', 'sanity', 'cpu', 'llvmpipe']:
+    for module in ['all', 'quick', 'gpu', 'sanity', 'cpu', 'llvmpipe', 'cl',
+                   'quick_cl']:
         check_import.description = "Test import of tests.{}".format(module)
         yield check_import, "tests." + module
-
-    # Test the various OpenCL modules
-    for module in ['cl', 'quick_cl']:
-        check_import.description = "Test import of tests.{}".format(module)
-        yield check_import, "tests." + module
-
-
-def check_import(module):
-    """ Test that a module can be imported """
-    if not path.exists('bin'):
-        raise SkipTest("Piglit has not been compiled, this test will not work")
-
-    importlib.import_module(module)
