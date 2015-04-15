@@ -271,6 +271,20 @@ def test_update_result_replace():
             "dmesg.Dmesg.update_result: subtest '{0}' replaced correctly".format(res)
         yield check_update_result, new_result['subtest']['test'], res
 
+
+@utils.nose_generator
+def test_update_result_no_match_regex():
+    """ Generates tests for update_result """
+
+    def create_test_result(res):
+        result = framework.results.TestResult()
+        result['result'] = res
+        result['subtest'] = {}
+        result['subtest']['test'] = res
+        return result
+
+    dmesg = TestDmesg()
+    for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
         # check that the status is not updated when Dmesg.regex is set and does
         # not match the dmesg output
         dmesg.regex = re.compile("(?!)")
@@ -281,6 +295,20 @@ def test_update_result_replace():
             "dmesg.Dmesg.update_result: with non-matching regex '{0}'".format(res)
         yield check_equal_result, new_result['result'], res
 
+
+@utils.nose_generator
+def test_update_result_match_regex():
+    """ Generates tests for update_result """
+
+    def create_test_result(res):
+        result = framework.results.TestResult()
+        result['result'] = res
+        result['subtest'] = {}
+        result['subtest']['test'] = res
+        return result
+
+    dmesg = TestDmesg()
+    for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
         # check that the status is updated when Dmesg.regex is set and matches
         # the dmesg output
         dmesg.regex = re.compile("piglit.*test")
