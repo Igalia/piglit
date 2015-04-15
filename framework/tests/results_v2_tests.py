@@ -84,10 +84,15 @@ with utils.with_tempfile(json.dumps(DATA)) as t:
 
 
 def test_unchanged():
-    """Version 2: results with no caps are not mangled."""
+    """backends.json.update_results (2 -> 3): results with no caps are not mangled"""
     nt.ok_('test/is/a/test' in RESULT.tests)
 
 
 def test_lower():
-    """Version 2: results with aps are lowered."""
+    """backends.json.update_results (2 -> 3): results with caps are lowered"""
     nt.ok_('test/is/some/other1/test' in RESULT.tests)
+
+
+def test_removed():
+    """backends.json.update_results (2 -> 3): results with caps are removed"""
+    nt.ok_('Test/Is/SomE/Other1/Test' not in RESULT.tests)
