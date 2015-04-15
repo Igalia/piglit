@@ -100,7 +100,7 @@ def test_options_init():
 
 
 def test_parse_listfile_return():
-    """ Test that parse_listfile returns a container
+    """core.parse_listfile(): returns a list-like object
 
     Given a file with a newline seperated list of results, parse_listfile
     should return a list of files with no whitespace
@@ -123,23 +123,23 @@ class Test_parse_listfile_TrailingWhitespace(object):
             cls.results = core.parse_listfile(tfile)
 
     def test_newlines(self):
-        """core.parse_listfile: Remove trailing newlines"""
+        """core.parse_listfile(): Remove trailing newlines"""
         nt.assert_equal(self.results[0], "/tmp/foo",
                         msg="Trailing newline not removed!")
 
     def test_spaces(self):
-        """core.parse_listfile: Remove trailing spaces"""
+        """core.parse_listfile(): Remove trailing spaces"""
         nt.assert_equal(self.results[1], "/tmp/foo",
                         msg="Trailing spaces not removed!")
 
     def test_tabs(self):
-        """core.parse_listfile: Remove trailing tabs"""
+        """core.parse_listfile(): Remove trailing tabs"""
         nt.assert_equal(self.results[2], "/tmp/foo",
                         msg="Trailing tabs not removed!")
 
 
 def test_parse_listfile_tilde():
-    """ Test that parse_listfile properly expands tildes
+    """core.parse_listfile(): tildes (~) are properly expanded.
 
     According to the python docs for python 2.7
     (http://docs.python.org/2/library/os.path.html#module-os.path), both
@@ -157,7 +157,7 @@ def test_parse_listfile_tilde():
 
 @_save_core_config
 def test_xdg_config_home():
-    """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
+    """core.get_config() finds $XDG_CONFIG_HOME/piglit.conf"""
     with utils.tempdir() as tdir:
         os.environ['XDG_CONFIG_HOME'] = tdir
         with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
@@ -170,7 +170,7 @@ def test_xdg_config_home():
 
 @_save_core_config
 def test_config_home_fallback():
-    """ get_config() finds $HOME/.config/piglit.conf """
+    """core.get_config() finds $HOME/.config/piglit.conf"""
     with utils.tempdir() as tdir:
         os.environ['HOME'] = tdir
         os.mkdir(os.path.join(tdir, '.config'))
@@ -185,7 +185,7 @@ def test_config_home_fallback():
 @_save_core_config
 @utils.test_in_tempdir
 def test_local():
-    """ get_config() finds ./piglit.conf """
+    """core.get_config() finds ./piglit.conf"""
     with utils.tempdir() as tdir:
         os.chdir(tdir)
 
@@ -200,7 +200,7 @@ def test_local():
 
 @_save_core_config
 def test_piglit_root():
-    """ get_config() finds "piglit root"/piglit.conf """
+    """core.get_config() finds "piglit root"/piglit.conf"""
     with open('piglit.conf', 'w') as f:
         f.write(_CONF_FILE)
     return_dir = os.getcwd()
