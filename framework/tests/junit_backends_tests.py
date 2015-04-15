@@ -64,7 +64,7 @@ class TestJunitNoTests(utils.StaticDirectory):
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
 
     def test_xml_well_formed(self):
-        """ JUnitBackend.__init__ and finalize produce well formed xml
+        """backends.junit.JUnitBackend: initialize and finalize produce well formed xml
 
         While it will produce valid XML, it cannot produc valid JUnit, since
         JUnit requires at least one test to be valid
@@ -96,11 +96,11 @@ class TestJUnitSingleTest(TestJunitNoTests):
         test.finalize()
 
     def test_xml_well_formed(self):
-        """ JUnitBackend.write_test() (once) produces well formed xml """
+        """backends.junit.JUnitBackend.write_test(): (once) produces well formed xml"""
         super(TestJUnitSingleTest, self).test_xml_well_formed()
 
     def test_xml_valid(self):
-        """ JUnitBackend.write_test() (once) produces valid xml """
+        """backends.junit.JUnitBackend.write_test(): (once) produces valid xml"""
         if etree.__name__ != 'lxml.etree':
             raise SkipTest('Test requires lxml features')
         schema = etree.XMLSchema(file=JUNIT_SCHEMA)
@@ -138,17 +138,17 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
         test.finalize()
 
     def test_xml_well_formed(self):
-        """ JUnitBackend.write_test() (twice) produces well formed xml """
+        """backends.junit.JUnitBackend.write_test(): (twice) produces well formed xml"""
         super(TestJUnitMultiTest, self).test_xml_well_formed()
 
     def test_xml_valid(self):
-        """ JUnitBackend.write_test() (twice) produces valid xml """
+        """backends.junit.JUnitBackend.write_test(): (twice) produces valid xml"""
         super(TestJUnitMultiTest, self).test_xml_valid()
 
 
 @doc_formatter
 def test_junit_replace():
-    """JUnitBackend.write_test: '{separator}' is replaced with '.'"""
+    """backends.junit.JUnitBackend.write_test(): '{separator}' is replaced with '.'"""
     with utils.tempdir() as tdir:
         test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
@@ -171,7 +171,7 @@ def test_junit_replace():
 
 
 def test_junit_skips_bad_tests():
-    """ backends.JUnitBackend skips illformed tests """
+    """backends.junit.JUnitBackend: skips illformed tests"""
     with utils.tempdir() as tdir:
         test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
@@ -270,7 +270,7 @@ class TestJUnitLoad(utils.StaticDirectory):
 
 
 def test_load_file_name():
-    """backend.junit._load: uses the filename for name if filename != 'results'
+    """backends.junit._load: uses the filename for name if filename != 'results'
     """
     with utils.tempdir() as tdir:
         filename = os.path.join(tdir, 'foobar.xml')
@@ -282,7 +282,7 @@ def test_load_file_name():
 
 
 def test_load_folder_name():
-    """backend.junit._load: uses the foldername if the result is 'results'
+    """backends.junit._load: uses the foldername if the result is 'results'
     """
     with utils.tempdir() as tdir:
         os.mkdir(os.path.join(tdir, 'a cool test'))
@@ -296,7 +296,7 @@ def test_load_folder_name():
 
 @utils.test_in_tempdir
 def test_load_default_name():
-    """backend.junit._load: uses 'junit result' for name as fallback"""
+    """backends.junit._load: uses 'junit result' for name as fallback"""
     with utils.tempdir() as tdir:
         os.chdir(tdir)
 
