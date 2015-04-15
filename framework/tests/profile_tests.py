@@ -23,10 +23,8 @@
 from __future__ import print_function, absolute_import
 import sys
 import copy
-import platform
 
 import nose.tools as nt
-from nose.plugins.skip import SkipTest
 
 import framework.core as core
 import framework.dmesg as dmesg
@@ -39,6 +37,7 @@ from framework.test import GleanTest
 sys.stderr = sys.stdout
 
 
+@utils.no_error
 def test_initialize_testprofile():
     """ TestProfile initializes """
     profile.TestProfile()
@@ -70,8 +69,7 @@ def test_testprofile_default_dmesg():
 
 def test_testprofile_set_dmesg_true():
     """ Dmesg returns an apropriate dmesg is ste to True """
-    if not platform.platform().startswith('Linux'):
-        raise SkipTest('No dmesg support on this platform')
+    utils.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
     assert isinstance(profile_.dmesg, dmesg.LinuxDmesg)
@@ -79,8 +77,7 @@ def test_testprofile_set_dmesg_true():
 
 def test_testprofile_set_dmesg_false():
     """ Dmesg returns a DummyDmesg if set to False """
-    if not platform.platform().startswith('Linux'):
-        raise SkipTest('No dmesg support on this platform')
+    utils.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
     profile_.dmesg = False
