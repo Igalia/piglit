@@ -188,10 +188,8 @@ def privileged_test(func):
     excluding tests with privileged execution requirements
 
     """
-    def sudo_test_wrapper(*args, **kwargs):
-        func(*args, **kwargs)
-
-    return sudo_test_wrapper
+    func.__name__ = 'sudo_{}'.format(func.__name__)
+    return func
 
 
 class StaticDirectory(object):

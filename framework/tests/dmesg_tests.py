@@ -80,9 +80,12 @@ def privileged_generator(func):
     exclude them
     
     """
+
     def sudo_test_wrapper(*args, **kwargs):
         for x in func(*args, **kwargs):
-            yield x
+            x = list(x)
+            x[0] = utils.privileged_test(utils.GeneratedTestWrapper(x[0]))
+            yield tuple(x)
 
     return sudo_test_wrapper
 
@@ -118,18 +121,20 @@ class TestDmesg(dmesg.BaseDmesg):
 
 
 # Tests
+@utils.no_error
 def test_linux_initialization():
-    """ Test that LinuxDmesg initializes """
+    """dmesg.LinuxDmesg: class initializes"""
     dmesg.LinuxDmesg()
 
 
+@utils.no_error
 def test_dummy_initialization():
-    """ Test that DummyDmesg initializes """
+    """dmesg.DummyDmesg: class initializes"""
     dmesg.DummyDmesg()
 
 
 def test_get_dmesg_dummy():
-    """ Test that get_dmesg function returns a Dummy when asked """
+    """dmesg.get_dmesg: Returns a DummyDmesg when not_dummy is False"""
     dummy = dmesg.get_dmesg(not_dummy=False)
     nt.assert_is(type(dummy), dmesg.DummyDmesg,
                  msg=("Error: get_dmesg should have returned DummyDmesg, "
@@ -137,17 +142,18 @@ def test_get_dmesg_dummy():
 
 
 def test_get_dmesg_linux():
-    """ Test that get_dmesg() returns a LinuxDmesg instance when asked """
-    if not sys.platform.startswith('linux'):
-        raise SkipTest("Cannot test a LinuxDmesg on a non linux system")
+    """dmesg.get_dmesg: Returns a LinuxDmesg when not_dummy is True and the OS is Linux
+    """
+    utils.platform_check('linux')
     posix = _get_dmesg()
     nt.assert_is(type(posix), dmesg.LinuxDmesg,
                  msg=("Error: get_dmesg should have returned LinuxDmesg, "
                       "but it actually returned {}".format(type(posix))))
 
 
-def sudo_test_update_dmesg_with_updates():
-    """ update_dmesg() updates results when there is a new entry in dmesg
+@utils.privileged_test
+def test_update_dmesg_with_updates():
+    """dmesg.Dmesg.update_dmesg(): updates results when there is a new entry in dmesg
 
     This will skip on non-Posix systems, since there is no way to actually test
     it.
@@ -167,8 +173,9 @@ def sudo_test_update_dmesg_with_updates():
                              "has been updated.".format(test.__class__)))
 
 
-def sudo_test_update_dmesg_without_updates():
-    """ update_dmesg() does not update results when there is no change in dmesg
+@utils.privileged_test
+def test_update_dmesg_without_updates():
+    """dmesg.Dmesg.update_dmesg(): does not update results when there is no change in dmesg
 
     This will skip on non-Posix systems, since there is no way to actually test
     it.
@@ -187,7 +194,7 @@ def sudo_test_update_dmesg_without_updates():
 
 
 def test_dmesg_wrap_partial():
-    """ Test that dmesg still works after dmesg wraps partially
+    """dmesg.Dmesg.update_dmesg(): still works after partial wrap of dmesg
 
     We can overwrite the DMESG_COMMAND class variable to emluate dmesg being
     filled up and overflowing. What this test does is starts with a string that
@@ -215,9 +222,9 @@ def test_dmesg_wrap_partial():
 
 
 def test_dmesg_wrap_complete():
-    """ Test that dmesg still works after dmesg wraps completely
+    """dmesg.Dmesg.update_dmesg(): still works acter complete wrap of dmesg
 
-    just like the partial version, but with nothingin common.
+    just like the partial version, but with nothing in common.
 
     """
     # We don't want weird side effects of changing DMESG_COMMAND globally, so
@@ -256,11 +263,12 @@ def test_update_result_replace():
         dmesg._new_messages = ['add', 'some', 'stuff']
         new_result = dmesg.update_result(create_test_result(res))
 
-        check_update_result.description = "Test update_result: {0}".format(res)
+        check_update_result.description = \
+            "dmesg.Dmesg.update_result: '{0}' replaced correctly".format(res)
         yield check_update_result, new_result['result'], res
 
         check_update_result.description = \
-            "Test update_result subtest: {0}".format(res)
+            "dmesg.Dmesg.update_result: subtest '{0}' replaced correctly".format(res)
         yield check_update_result, new_result['subtest']['test'], res
 
         # check that the status is not updated when Dmesg.regex is set and does
@@ -270,7 +278,7 @@ def test_update_result_replace():
         new_result = dmesg.update_result(create_test_result(res))
 
         check_equal_result.description = \
-            "Test update_result with non-matching regex: {0}".format(res)
+            "dmesg.Dmesg.update_result: with non-matching regex '{0}'".format(res)
         yield check_equal_result, new_result['result'], res
 
         # check that the status is updated when Dmesg.regex is set and matches
@@ -280,7 +288,7 @@ def test_update_result_replace():
         new_result = dmesg.update_result(create_test_result(res))
 
         check_update_result.description = \
-            "Test update_result with matching regex: {0} ".format(res)
+            "dmesg.Dmesg.update_result: with matching regex '{0}'".format(res)
         yield check_update_result, new_result['result'], res
 
 
@@ -319,7 +327,7 @@ def check_update_result(result, status):
 
 
 def test_update_result_add_dmesg():
-    """ Tests update_result's addition of dmesg attribute """
+    """dmesg.Dmesgupdate_result: sets the dmesg attribute"""
     test = TestDmesg()
 
     result = framework.results.TestResult()
@@ -333,7 +341,7 @@ def test_update_result_add_dmesg():
 
 
 def test_json_serialize_updated_result():
-    """ Test that a TestResult that has been updated is json serializable """
+    """dmesg.Dmesg.update_result: The TestResult is still json serializable"""
     test = TestDmesg()
 
     result = framework.results.TestResult()
@@ -359,7 +367,8 @@ def test_testclasses_dmesg():
               'tests/glslparsertest/shaders/main1.vert', 'GLSLParserTest')]
 
     for tclass, tfile, desc in lists:
-        check_classes_dmesg.description = "Test dmesg in {}".format(desc)
+        check_classes_dmesg.description = \
+            "dmesg.Dmesg: works with test class '{}'".format(desc)
         yield check_classes_dmesg, tclass, tfile
 
 
