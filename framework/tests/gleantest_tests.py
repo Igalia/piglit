@@ -22,17 +22,21 @@
 
 from __future__ import print_function, absolute_import
 
+import nose.tools as nt
+
 from framework.test import GleanTest
+from framework.tests import utils
 
 
+@utils.no_error
 def test_initialize_gleantest():
-    """ Test that GleanTest initilizes """
-    test = GleanTest('name')
-    assert test
+    """test.gleantest.GleanTest: class initializes correctly"""
+    GleanTest('name')
 
 
 def test_GLOBAL_PARAMS_assignment():
-    """ Test to ensure that GleanTest.GLOBAL_PARAMS are correctly assigned
+    """test.gleantest.GleanTest: GLOBAL_PARAMS apply to instances created
+    after GLABL_PARAMS is set
 
     Specifically this tests for a bug where GLOBAL_PARAMS only affected
     instances of GleanTest created after GLOBAL_PARAMS were set, so changing the
@@ -47,11 +51,11 @@ def test_GLOBAL_PARAMS_assignment():
     test1 = GleanTest('basic')
     GleanTest.GLOBAL_PARAMS = ['--quick']
     test2 = GleanTest('basic')
-    assert test1.command == test2.command
+    nt.assert_list_equal(test1.command, test2.command)
 
 
 def test_bad_returncode():
-    """ Result is 'Fail' when returncode is not 0
+    """test.gleantest.GleanTest: If returncode is 0 the result is 'fail'
 
     Currently clean returns 127 if piglit can't find it's libs (LD_LIBRARY_PATH
     isn't set properly), and then marks such tests as pass, when they obviously
@@ -61,4 +65,5 @@ def test_bad_returncode():
     test = GleanTest('basic')
     test.result['returncode'] = 1
     test.interpret_result()
-    assert test.result['result'] == 'fail', "Result should have been fail"
+    nt.assert_equal(test.result['result'], 'fail',
+                    msg="Result should have been fail")
