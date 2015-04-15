@@ -33,6 +33,8 @@ import nose.tools as nt
 import framework.status as status
 import framework.tests.utils as utils
 
+# pylint: disable=expression-not-assigned,invalid-name,line-too-long
+
 # Statuses from worst to last. NotRun is intentionally not in this list and
 # tested separately because of upcoming features for it
 STATUSES = ["pass", "warn", "dmesg-warn", "fail", "dmesg-fail", "timeout",
@@ -54,19 +56,14 @@ NO_OPS = ('skip', 'notrun')
 
 @utils.no_error
 def initialize_status():
-    """ status.Status inializes """
+    """status.Status: class inializes"""
     status.Status('test', 1)
 
 
 @utils.no_error
 def initialize_nochangestatus():
-    """ NoChangeStatus initializes """
+    """status.NoChangeStatus: class initializes"""
     status.NoChangeStatus('test')
-
-
-def compare_status_nochangestatus():
-    """ Status and NoChangeStatus can be compared with < """
-    status.CRASH < status.PASS
 
 
 @utils.nose_generator
@@ -77,18 +74,19 @@ def test_gen_lookup():
         status.status_lookup(status_)
 
     for stat in STATUSES + ['skip', 'notrun']:
-        test.description = "Lookup: {}".format(stat)
+        test.description = \
+            "status.status_lookup: can lookup '{}' as expected".format(stat)
         yield test, stat
 
 
 @nt.raises(status.StatusException)
 def test_bad_lookup():
-    """ A bad status raises a StatusException """
+    """status.status_lookup: An unexepcted value raises a StatusException"""
     status.status_lookup('foobar')
 
 
 def test_status_in():
-    """ A status can be compared to a str with `x in container` syntax """
+    """status.Status: A status can be looked up with 'x in y' synatx"""
     stat = status.PASS
     slist = ['pass']
 
@@ -103,8 +101,9 @@ def test_is_regression():
         assert status.status_lookup(new) < status.status_lookup(old)
 
     for new, old in REGRESSIONS:
-        is_regression.description = ("Test that {0} -> {1} is a "
-                                     "regression".format(old, new))
+        is_regression.description = \
+            "status.Status: '{}' -> '{}' is a regression as expected".format(
+                old, new)
         yield is_regression, new, old
 
 
@@ -116,8 +115,9 @@ def test_is_fix():
         assert status.status_lookup(new) > status.status_lookup(old)
 
     for new, old in FIXES:
-        is_fix.description = ("Test that {0} -> {1} is a "
-                              "fix".format(new, old))
+        is_fix.description = \
+            "status.Status: '{}' -> '{}' is a fix as expected".format(
+                new, old)
         yield is_fix, new, old
 
 
@@ -129,8 +129,9 @@ def test_is_change():
         assert status.status_lookup(new) != status.status_lookup(old)
 
     for new, old in itertools.permutations(STATUSES, 2):
-        is_not_equivalent.description = ("Test that {0} -> {1} is a "
-                                         "change".format(new, old))
+        is_not_equivalent.description = \
+            "status.Status: '{}' -> '{}' is a change as expected".format(
+                new, old)
         yield is_not_equivalent, new, old
 
 
@@ -138,7 +139,7 @@ def test_is_change():
 def test_not_change():
     """ Skip and NotRun should not count as changes """
     def check_not_change(new, old):
-        """ Check that a status doesn't count as a change 
+        """ Check that a status doesn't count as a change
 
         This checks that new < old and old < new do not return true. This is meant
         for checking skip and notrun, which we don't want to show up as regressions
@@ -154,7 +155,7 @@ def test_not_change():
 
     for nochange, stat in itertools.permutations(NO_OPS, 2):
         check_not_change.description = \
-            "{0} -> {1} should not be a change".format(nochange, stat)
+            "status.Status: {0} -> {1} is not a change".format(nochange, stat)
         yield (check_not_change, status.status_lookup(nochange),
                status.status_lookup(stat))
 
@@ -178,11 +179,11 @@ def test_max_statuses():
         nochange = status.status_lookup(nochange)
         stat = status.status_lookup(stat)
         _max_nochange_stat.description = \
-            "max({nochange}, {stat}) = {stat}".format(**locals())
+            "status.Status: max({nochange}, {stat}) = {stat}".format(**locals())
         yield _max_nochange_stat, nochange, stat
 
         _max_stat_nochange.description = \
-            "max({stat}, {nochange}) = {stat}".format(**locals())
+            "status.Status: max({stat}, {nochange}) = {stat}".format(**locals())
         yield _max_stat_nochange, nochange, stat
 
 
@@ -234,14 +235,12 @@ def test_nochangestatus_magic():
                         (u'Test', 'unicode'),
                         ('Test', 'str')]:
         check_operator_equal.description = (
-            'Operator eq works with type: {0} on class '
-            'status.NoChangeStatus'.format(type_)
+            'Status.NoChangeStatus: Operator eq works with type: {}'.format(type_)
         )
         yield check_operator_equal, obj, comp, lambda x, y: x.__eq__(y), True
 
         check_operator_not_equal.description = (
-            'Operator ne works with type: {0} on class '
-            'status.NoChangeStatus'.format(type_)
+            'status.NoChangeStatus: Operator ne works with type: {}'.format(type_)
         )
         yield check_operator_not_equal, obj, comp, lambda x, y: x.__ne__(y), True
 
@@ -257,8 +256,8 @@ def test_status_magic():
             (unicode, 'unicode', u'foo'),
             (repr, 'repr', 'foo'),
             (int, 'int', 0)]:
-        check_operator.description = 'Operator {0} works on class {1}'.format(
-            str(func), 'status.Status')
+        check_operator.description = \
+            'status.Status: Operator {} works'.format(name)
         yield check_operator, obj, func, result
 
     for func, name in [
@@ -266,8 +265,7 @@ def test_status_magic():
             (lambda x, y: y.__gt__(x), 'gt')]:
 
         check_operator_equal.description = \
-            'Operator {0} works on class {1} when True'.format(
-                name, 'status.Status')
+            'status.Status: Operator {0} works when True'.format(name)
         yield check_operator_equal, obj, comparitor, func, True
 
     for func, name in [
@@ -279,24 +277,23 @@ def test_status_magic():
             (lambda x, y: x.__ne__(y), 'ne'),
             (lambda x, y: x.__eq__(x), 'eq')]:
         check_operator_not_equal.description = \
-            'Operator {0} works on class {1} when False'.format(
-                name, 'status.Status')
+            'status.Status: Operator {0} works when False'.format(name)
         yield check_operator_not_equal, obj, comparitor, func, False
 
 
 @nt.raises(TypeError)
 def test_status_eq_raises():
-    """ Comparing Status and an unlike object with eq raises a TypeError """
+    """status.Status: eq comparison to uncomparable object results in TypeError"""
     status.PASS == dict()
 
 
 @nt.raises(TypeError)
 def test_nochangestatus_eq_raises():
-    """ NoChangeStatus == !(str, unicode, Status) raises TypeError """
+    """status.NoChangeStatus: eq comparison to uncomparable type results in TypeError"""
     status.NOTRUN == dict()
 
 
 @nt.raises(TypeError)
 def test_nochangestatus_ne_raises():
-    """ NoChangeStatus != (str, unicode, Status) raises TypeError """
+    """status.NoChangeStatus: ne comparison to uncomparable type results in TypeError"""
     status.NOTRUN != dict()
