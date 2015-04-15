@@ -26,7 +26,6 @@ from __future__ import print_function, absolute_import
 import os
 
 import nose.tools as nt
-from nose.plugins.skip import SkipTest
 
 from framework import core, backends
 import framework.tests.utils as utils
@@ -79,7 +78,8 @@ def test_get_backend():
         return nt.assert_is(backends.get_backend(n), i)
 
     for name, inst in backends_.iteritems():
-        check.description = 'get_backend({0}) returns {0} backend'.format(name)
+        check.description = \
+            'backends.get_backend({0}): returns {0} backend'.format(name)
         yield check, name, inst
 
 
