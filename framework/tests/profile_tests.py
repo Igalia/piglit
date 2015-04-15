@@ -39,13 +39,13 @@ sys.stderr = sys.stdout
 
 @utils.no_error
 def test_initialize_testprofile():
-    """ TestProfile initializes """
+    """profile.TestProfile: class initializes"""
     profile.TestProfile()
 
 
 @nt.raises(SystemExit)
 def test_load_test_profile_no_profile():
-    """ Loading a module with no profile name exits
+    """profile.load_test_profile: Loading a module with no profile name exits
 
     Beacuse load_test_profile uses test.{} to load a module we need a module in
     tests that doesn't have a profile attribute. The only module that currently
@@ -56,19 +56,19 @@ def test_load_test_profile_no_profile():
 
 
 def test_load_test_profile_returns():
-    """ load_test_profile returns a TestProfile instance """
+    """profile.load_test_profile: returns a TestProfile instance"""
     profile_ = profile.load_test_profile('sanity')
     assert isinstance(profile_, profile.TestProfile)
 
 
 def test_testprofile_default_dmesg():
-    """ Dmesg initializes false """
+    """profile.TestProfile: Dmesg initializes False"""
     profile_ = profile.TestProfile()
     assert isinstance(profile_.dmesg, dmesg.DummyDmesg)
 
 
 def test_testprofile_set_dmesg_true():
-    """ Dmesg returns an apropriate dmesg is ste to True """
+    """profile.TestProfile: Dmesg returns an apropriate dmesg is ste to True"""
     utils.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
@@ -76,7 +76,7 @@ def test_testprofile_set_dmesg_true():
 
 
 def test_testprofile_set_dmesg_false():
-    """ Dmesg returns a DummyDmesg if set to False """
+    """profile.TestProfile: Dmesg returns a DummyDmesg if set to False"""
     utils.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
@@ -85,7 +85,7 @@ def test_testprofile_set_dmesg_false():
 
 
 def test_testprofile_update_test_list():
-    """ TestProfile.update() updates TestProfile.test_list """
+    """profile.TestProfile.update(): updates TestProfile.test_list"""
     profile1 = profile.TestProfile()
     group1 = grouptools.join('group1', 'test1')
     group2 = grouptools.join('group1', 'test2')
@@ -113,8 +113,7 @@ class TestPrepareTestListMatches(object):
         }
 
     def test_matches_filter_mar_1(self):
-        """TestProfile.prepare_test_list: 'not env.filter or
-        matches_any_regex() env.filter is False
+        """profile.TestProfile.prepare_test_list: 'not env.filter or matches_any_regex()' env.filter is False
 
         Nothing should be filtered.
 
@@ -128,10 +127,7 @@ class TestPrepareTestListMatches(object):
         nt.assert_dict_equal(profile_.test_list, self.data)
 
     def test_matches_filter_mar_2(self):
-        """TestProfile.prepare_test_list: 'not env.filter or matches_any_regex()
-        mar is False
-
-        """
+        """profile.TestProfile.prepare_test_list: 'not env.filter or matches_any_regex()' mar is False"""
         env = core.Options(include_filter=['test5'])
 
         profile_ = profile.TestProfile()
@@ -143,7 +139,7 @@ class TestPrepareTestListMatches(object):
         nt.assert_dict_equal(profile_.test_list, baseline)
 
     def test_matches_env_exclude(self):
-        """TestProfile.prepare_test_list: 'not path in env.exclude_tests"""
+        """profile.TestProfile.prepare_test_list: 'not path in env.exclude_tests'"""
         env = core.Options()
         env.exclude_tests.add(grouptools.join('group3', 'test5'))
 
@@ -157,7 +153,7 @@ class TestPrepareTestListMatches(object):
         nt.assert_dict_equal(profile_.test_list, baseline)
 
     def test_matches_exclude_mar(self):
-        """TestProfile.prepare_test_list: 'not matches_any_regexp()"""
+        """profile.TestProfile.prepare_test_list: 'not matches_any_regexp()'"""
         env = core.Options(exclude_filter=['test5'])
 
         profile_ = profile.TestProfile()
@@ -170,7 +166,7 @@ class TestPrepareTestListMatches(object):
         nt.assert_dict_equal(profile_.test_list, baseline)
 
     def test_matches_include_caps(self):
-        """TestProfile.prepare_test_list: matches capitalized tests."""
+        """profile.TestProfile.prepare_test_list: matches capitalized tests"""
         env = core.Options(exclude_filter=['test9'])
 
         profile_ = profile.TestProfile()
@@ -182,14 +178,14 @@ class TestPrepareTestListMatches(object):
 
 @utils.no_error
 def test_testprofile_group_manager_no_name_args_eq_one():
-    """TestProfile.group_manager: no name and len(args) == 1 is valid"""
+    """profile.TestProfile.group_manager: no name and len(args) == 1 is valid"""
     prof = profile.TestProfile()
     with prof.group_manager(utils.Test, 'foo') as g:
         g(['a'])
 
 
 def test_testprofile_group_manager_no_name_args_gt_one():
-    """TestProfile.group_manager: no name and len(args) > 1 is valid"""
+    """profile.TestProfile.group_manager: no name and len(args) > 1 is valid"""
     prof = profile.TestProfile()
     with prof.group_manager(utils.Test, 'foo') as g:
         g(['a', 'b'])
@@ -199,14 +195,14 @@ def test_testprofile_group_manager_no_name_args_gt_one():
 
 @utils.no_error
 def test_testprofile_group_manager_name():
-    """TestProfile.group_manager: name plus len(args) > 1 is valid"""
+    """profile.TestProfile.group_manager: name plus len(args) > 1 is valid"""
     prof = profile.TestProfile()
     with prof.group_manager(utils.Test, 'foo') as g:
         g(['a', 'b'], 'a')
 
 
 def test_testprofile_group_manager_is_added():
-    """TestProfile.group_manager: Tests are added to the profile"""
+    """profile.TestProfile.group_manager: Tests are added to the profile"""
     prof = profile.TestProfile()
     with prof.group_manager(utils.Test, 'foo') as g:
         g(['a', 'b'], 'a')
@@ -215,7 +211,7 @@ def test_testprofile_group_manager_is_added():
 
 
 def test_testprofile_groupmanager_kwargs():
-    """TestProfile.group_manager: Extra kwargs are passed to the Test."""
+    """profile.TestProfile.group_manager: Extra kwargs are passed to the Test"""
     prof = profile.TestProfile()
     with prof.group_manager(utils.Test, 'foo') as g:
         g(['a'], run_concurrent=True)
@@ -225,7 +221,7 @@ def test_testprofile_groupmanager_kwargs():
 
 
 def test_testprofile_groupmanager_default_args():
-    """TestProfile.group_manager: group_manater kwargs are passed to the Test."""
+    """profile.TestProfile.group_manager: group_manater kwargs are passed to the Test"""
     prof = profile.TestProfile()
     with prof.group_manager(utils.Test, 'foo', run_concurrent=True) as g:
         g(['a'])
@@ -235,7 +231,7 @@ def test_testprofile_groupmanager_default_args():
 
 
 def test_testprofile_groupmanager_kwargs_overwrite():
-    """TestProfile.group_manager: default_args are overwritten by kwargs."""
+    """profile.TestProfile.group_manager: default_args are overwritten by kwargs"""
     prof = profile.TestProfile()
     with prof.group_manager(utils.Test, 'foo', run_concurrent=True) as g:
         g(['a'], run_concurrent=False)
@@ -245,7 +241,7 @@ def test_testprofile_groupmanager_kwargs_overwrite():
 
 
 def test_testprofile_groupmanager_name_str():
-    """TestProfile.group_manager: if args is a string it is not joined."""
+    """profile.TestProfile.group_manager: if args is a string it is not joined"""
     prof = profile.TestProfile()
     # Yes, this is really about supporting gleantest anyway.
     with prof.group_manager(GleanTest, 'foo') as g:
@@ -256,7 +252,7 @@ def test_testprofile_groupmanager_name_str():
 
 @nt.raises(profile.TestDictError)
 def test_testdict_key_not_string():
-    """TestDict: If key value isn't a string an exception is raised.
+    """profile.TestDict: If key value isn't a string an exception is raised.
 
     This throws a few different things at the key value and expects an error to
     be raised. It isn't a perfect test, but it was the best I could come up
@@ -271,7 +267,7 @@ def test_testdict_key_not_string():
 
 @nt.raises(profile.TestDictError)
 def test_testdict_value_not_valid():
-    """TestDict: If the value isn't a Tree, Test, or None an exception is raised.
+    """profile.TestDict: If the value isn't a Test an exception is raised.
 
     Like the key test this isn't perfect, but it does try the common mistakes.
 
@@ -284,7 +280,7 @@ def test_testdict_value_not_valid():
 
 @nt.raises(profile.TestDictError)
 def test_testdict_reassignment():
-    """TestDict: reassigning a key raises an exception."""
+    """profile.TestDict: reassigning a key raises an exception"""
     test = profile.TestDict()
     test['foo'] = utils.Test(['foo'])
     test['foo'] = utils.Test(['foo', 'bar'])
@@ -292,14 +288,14 @@ def test_testdict_reassignment():
 
 @nt.raises(profile.TestDictError)
 def test_testdict_reassignment_lower():
-    """TestDict: reassigning a key raises an exception (capitalization is ignored)."""
+    """profile.TestDict: reassigning a key raises an exception (capitalization is ignored)"""
     test = profile.TestDict()
     test['foo'] = utils.Test(['foo'])
     test['Foo'] = utils.Test(['foo', 'bar'])
 
 
 def test_testdict_allow_reassignment():
-    """TestDict: allow_reassignment works."""
+    """profile.TestDict: allow_reassignment works"""
     test = profile.TestDict()
     test['a'] = utils.Test(['foo'])
     with test.allow_reassignment:
@@ -309,7 +305,7 @@ def test_testdict_allow_reassignment():
 
 
 def test_testprofile_allow_reassignment():
-    """TestProfile: allow_reassignment wrapper works."""
+    """profile.TestProfile: allow_reassignment wrapper works"""
     prof = profile.TestProfile()
     prof.test_list['a'] = utils.Test(['foo'])
     with prof.allow_reassignment:
@@ -319,7 +315,7 @@ def test_testprofile_allow_reassignment():
 
 
 def test_testprofile_allow_reassignment_with_groupmanager():
-    """TestProfile: allow_reassignment wrapper works with groupmanager."""
+    """profile.TestProfile: allow_reassignment wrapper works with groupmanager"""
     testname = grouptools.join('a', 'b')
     prof = profile.TestProfile()
     prof.test_list[testname] = utils.Test(['foo'])
@@ -330,9 +326,8 @@ def test_testprofile_allow_reassignment_with_groupmanager():
     nt.ok_(prof.test_list[testname].command == ['bar'])
 
 
-@utils.no_error
 def test_testprofile_allow_reassignemnt_stacked():
-    """profile.TestDict.allow_reassignment: check stacking cornercase.
+    """profile.profile.TestDict.allow_reassignment: check stacking cornercase
 
     There is an odd corner case in the original (obvious) implmentation of this
     function, If one opens two context managers and then returns from the inner
