@@ -37,7 +37,7 @@ from .backends_tests import BACKEND_INITIAL_META
 
 
 def test_initialize_jsonbackend():
-    """ Test that JSONBackend initializes
+    """backends.json.JSONBackend: Class initializes
 
     This needs to be handled separately from the others because it requires
     arguments
@@ -48,25 +48,8 @@ def test_initialize_jsonbackend():
         assert isinstance(func, backends.json.JSONBackend)
 
 
-@utils.nose_generator
-def test_get_backend():
-    """ Generate tests to get various backends """
-    # We use a hand generated list here to ensure that we are getting what we
-    # expect
-    backends_ = {
-        'json': backends.json.JSONBackend,
-        'junit': backends.junit.JUnitBackend,
-    }
-
-    check = lambda n, i: nt.assert_is(backends.get_backend(n), i)
-
-    for name, inst in backends_.iteritems():
-        check.description = 'get_backend({0}) returns {0} backend'.format(name)
-        yield check, name, inst
-
-
 def test_json_initialize_metadata():
-    """ JSONBackend.initialize() produces a metadata.json file """
+    """backends.json.JSONBackend.initialize(): produces a metadata.json file"""
     with utils.tempdir() as f:
         test = backends.json.JSONBackend(f)
         test.initialize(BACKEND_INITIAL_META)
@@ -90,11 +73,11 @@ class TestJSONTestMethod(utils.StaticDirectory):
         test.write_test(cls.test_name, cls.result)
 
     def test_write_test(self):
-        """ JSONBackend.write_test() adds tests to a 'tests' directory """
+        """backends.json.JSONBackend.write_test(): adds tests to a 'tests' directory"""
         assert os.path.exists(os.path.join(self.tdir, 'tests', '0.json'))
 
     def test_json_is_valid(self):
-        """ JSONBackend.write_test() produces valid json """
+        """backends.json.JSONBackend.write_test(): produces valid json"""
         with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
             try:
                 json.load(f)
@@ -102,7 +85,7 @@ class TestJSONTestMethod(utils.StaticDirectory):
                 raise AssertionError(e)
 
     def test_json_is_correct(self):
-        """ JSONBackend.write_test() produces correct json """
+        """backends.json.JSONBackend.write_test(): produces correct json"""
         with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
             test = json.load(f)
 
@@ -126,19 +109,19 @@ class TestJSONTestFinalize(utils.StaticDirectory):
         test.finalize()
 
     def test_remove_metadata(self):
-        """ JSONBackend.finalize() removes metadata.json """
+        """backends.json.JSONBackend.finalize(): removes metadata.json"""
         assert not os.path.exists(os.path.join(self.tdir, 'metadata.json'))
 
     def test_remove_tests(self):
-        """ JSONBackend.finalize() removes tests directory """
+        """backends.json.JSONBackend.finalize(): removes tests directory"""
         assert not os.path.exists(os.path.join(self.tdir, 'tests'))
 
     def test_create_results(self):
-        """ JSONBackend.finalize() creates a results.json file """
+        """backends.json.JSONBackend.finalize(): creates a results.json file"""
         assert os.path.exists(os.path.join(self.tdir, 'results.json'))
 
     def test_results_valid(self):
-        """ JSONBackend.finalize() results.json is valid """
+        """backends.json.JSONBackend.finalize(): results.json is valid"""
         with open(os.path.join(self.tdir, 'results.json'), 'r') as f:
             try:
                 json.load(f)
@@ -147,7 +130,7 @@ class TestJSONTestFinalize(utils.StaticDirectory):
 
 
 def test_update_results_current():
-    """ update_results() returns early when the results_version is current """
+    """backends.json.update_results(): returns early when the results_version is current"""
     data = utils.JSON_DATA.copy()
     data['results_version'] = backends.json.CURRENT_JSON_VERSION
 
@@ -164,7 +147,7 @@ def test_update_results_current():
 
 
 def test_update_results_old():
-    """ update_results() updates results
+    """backends.json.update_results(): updates results
 
     Because of the design of the our updates (namely that they silently
     incrementally update from x to y) it's impossible to konw exactly what
@@ -191,29 +174,15 @@ def test_update_results_old():
     nt.assert_equal(res.results_version, backends.json.CURRENT_JSON_VERSION)
 
 
-@utils.no_error
+@nt.raises(AssertionError)
 def test_json_resume_non_folder():
-    """ TestrunResult.resume doesn't accept a file """
+    """backends.json._resume: doesn't accept a file"""
     with utils.with_tempfile('') as f:
-        with nt.assert_raises(AssertionError):
-            backends.json._resume(f)
-
-
-@utils.no_error
-def test_resume_load():
-    """ TestrunResult.resume loads with good results """
-    with utils.tempdir() as f:
-        backend = backends.json.JSONBackend(f)
-        backend.initialize(BACKEND_INITIAL_META)
-        backend.write_test("group1/test1", {'result': 'fail'})
-        backend.write_test("group1/test2", {'result': 'pass'})
-        backend.write_test("group2/test3", {'result': 'fail'})
-
         backends.json._resume(f)
 
 
 def test_resume_load_valid():
-    """ TestrunResult.resume loads valid results """
+    """backends.json._resume: loads valid results"""
     with utils.tempdir() as f:
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
@@ -230,7 +199,7 @@ def test_resume_load_valid():
 
 
 def test_resume_load_invalid():
-    """ TestrunResult.resume ignores invalid results """
+    """backends.json._resume: ignores invalid results"""
     with utils.tempdir() as f:
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
@@ -250,7 +219,7 @@ def test_resume_load_invalid():
 
 @utils.no_error
 def test_load_results_folder_as_main():
-    """ Test that load_results takes a folder with a file named main in it """
+    """backends.json.load_results: takes a folder with a file named main in it"""
     with utils.tempdir() as tdir:
         with open(os.path.join(tdir, 'main'), 'w') as tfile:
             tfile.write(json.dumps(utils.JSON_DATA))
@@ -260,7 +229,7 @@ def test_load_results_folder_as_main():
 
 @utils.no_error
 def test_load_results_folder():
-    """ Test that load_results takes a folder with a file named results.json """
+    """backends.json.load_results: takes a folder with a file named results.json"""
     with utils.tempdir() as tdir:
         with open(os.path.join(tdir, 'results.json'), 'w') as tfile:
             tfile.write(json.dumps(utils.JSON_DATA))
@@ -270,7 +239,7 @@ def test_load_results_folder():
 
 @utils.no_error
 def test_load_results_file():
-    """ Test that load_results takes a file """
+    """backends.json.load_results: Loads a file passed by name"""
     with utils.resultfile() as tfile:
         backends.json.load_results(tfile.name)
 
