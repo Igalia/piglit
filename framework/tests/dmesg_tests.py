@@ -30,8 +30,11 @@ import os
 import sys
 import subprocess
 import re
-import json
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 
@@ -68,6 +71,20 @@ def _write_dev_kmesg():
                            'echo "piglit dmesg test" > /dev/kmsg'])
     if err != 0:
         raise SkipTest("Writing to the ringbuffer failed")
+
+
+def privileged_generator(func):
+    """Like utils.nose_generator, but for privileged tests.
+
+    This makes the tests yielded privlileged, which means using '-e sudo' will
+    exclude them
+    
+    """
+    def sudo_test_wrapper(*args, **kwargs):
+        for x in func(*args, **kwargs):
+            yield x
+
+    return sudo_test_wrapper
 
 
 class DummyJsonWriter(object):
@@ -329,12 +346,12 @@ def test_json_serialize_updated_result():
     encoder.encode(result)
 
 
-@utils.privileged_test
-@utils.nose_generator
+@privileged_generator
 def test_testclasses_dmesg():
     """ Generator that creates tests for """
-    lists = [(framework.test.PiglitTest,
-              ['attribs', '-auto', '-fbo'], 'PiglitTest'),
+    lists = [(framework.test.PiglitGLTest, ['attribs'], 'PiglitGLTest'),
+             (framework.test.PiglitCLTest,
+              ['cl-api-build-program'], 'PiglitCLTest'),
              (framework.test.GleanTest, 'basic', "GleanTest"),
              (framework.test.ShaderTest,
               'tests/shaders/loopfunc.shader_test', 'ShaderTest'),
