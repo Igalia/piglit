@@ -42,14 +42,13 @@ def test_generate_initialize():
         target()
 
     for target in [results.TestrunResult, results.TestResult]:
-        check.description = "Test that {} initializes".format(
-            target.__name__)
+        check.description = \
+            "results.{}: class initializes".format(target.__name__)
         yield check, target
 
 
 def test_testresult_load_to_status():
-    """ TestResult initialized with result key converts the value to a Status
-    """
+    """results.TestResult: an initial status value is converted to a Status object"""
     result = results.TestResult.load({'result': 'pass'})
     assert isinstance(result['result'], status.Status), \
         "Result key not converted to a status object"
