@@ -94,26 +94,26 @@ class TestV5(object):
         cls.result = make_result(DATA)
 
     def test_posix_removed(self):
-        """Version 4: / is replaced with @"""
+        """backends.json.update_results (4 -> 5): / is replaced with @"""
         nt.assert_not_in('a/test/of/great/length', self.result.tests)
 
     def test_win_removed(self):
-        """Version 4: / is replaced with @"""
+        """backends.json.update_results (4 -> 5): \\ is replaced with @"""
         nt.assert_not_in('has\\windows', self.result.tests)
 
     def test_new_added(self):
-        """Version 4: All new test names are added."""
+        """backends.json.update_results (4 -> 5): All new test names are added."""
         for new in self.new:
             nt.assert_in(new, self.result.tests)
 
     def test_new_has_data(self):
-        """Version 4: All new tests have expected data."""
+        """backends.json.update_results (4 -> 5): All new tests have expected data."""
         for new in self.new:
             nt.assert_dict_equal(self.result.tests[new], TEST_DATA)
 
 
 def test_load_results():
-    """Version 4: load_results properly updates."""
+    """backends.json.update_results (4 -> 5): load_results properly updates."""
     with utils.tempdir() as d:
         tempfile = os.path.join(d, 'results.json')
         with open(tempfile, 'w') as f:
