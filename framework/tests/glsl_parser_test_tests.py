@@ -43,7 +43,8 @@ def _check_config(content):
 
 
 def test_no_config_start():
-    """ GLSLParserTest requires [config] """
+    """test.glsl_parser_test.GLSLParserTest: exception is raised if [config] section is missing
+    """
     content = ('// expect_result: pass\n'
                '// glsl_version: 1.00\n'
                '// [end config]\n')
@@ -56,7 +57,8 @@ def test_no_config_start():
 
 
 def test_find_config_start():
-    """ GLSLParserTest finds [config] """
+    """test.glsl_parser_test.GLSLParserTest: successfully finds [config] section
+    """
     content = ('// [config]\n'
                '// glsl_version: 1.00\n'
                '//\n')
@@ -69,7 +71,8 @@ def test_find_config_start():
 
 
 def test_no_config_end():
-    """ GLSLParserTest requires [end config] """
+    """test.glsl_parser_test.GLSLParserTest: exception is raised if [end config] section is missing
+    """
     with utils.with_tempfile('// [config]\n') as tfile:
         with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
@@ -79,7 +82,8 @@ def test_no_config_end():
 
 
 def test_no_expect_result():
-    """ expect_result section is required """
+    """test.glsl_parser_test.GLSLParserTest: exception is raised if "expect_result" key is missing
+    """
     content = ('// [config]\n'
                '// glsl_version: 1.00\n'
                '//\n')
@@ -93,7 +97,8 @@ def test_no_expect_result():
 
 
 def test_no_glsl_version():
-    """ glsl_version section is required """
+    """test.glsl_parser_test.GLSLParserTest: exception is raised if "glsl_version" key is missing
+    """
     content = ('// [config]\n'
                '// expect_result: pass\n'
                '// [end config]\n')
@@ -107,7 +112,8 @@ def test_no_glsl_version():
 
 
 def test_cpp_comments():
-    """ Parses C++ style comments """
+    """test.glsl_parser_test.GLSLParserTest: parses C++ style comments ('//')
+    """
     content = ('// [config]\n'
                '// expect_result: pass\n'
                '// glsl_version: 1.00\n'
@@ -120,7 +126,8 @@ def test_cpp_comments():
 
 
 def test_c_comments():
-    """ Parses C style comments """
+    """test.glsl_parser_test.GLSLParserTest: parses C++ style comments ('/* */')
+    """
     content = ('/*\n'
                ' * [config]\n'
                ' * expect_result: pass\n'
@@ -135,7 +142,8 @@ def test_c_comments():
 
 
 def test_blank_in_config():
-    """ C++ style comments can have uncommented newlines """
+    """test.glsl_parser_test.GLSLParserTest: C++ style comments can have uncommented newlines
+    """
     content = ('// [config]\n'
                '\n'
                '// expect_result: pass\n'
@@ -151,7 +159,8 @@ def test_blank_in_config():
 
 
 def test_empty_in_config():
-    """ C++ sytle comments can have blank commented lines """
+    """test.glsl_parser_test.GLSLParserTest: C style comments can have blank newlines
+    """
     content = ('// [config]\n'
                '//\n'
                '// expect_result: pass\n'
@@ -167,7 +176,9 @@ def test_empty_in_config():
 
 
 def test_glslparser_initializer():
-    """ GLSLParserTest initializes """
+    """test.glsl_parser_test.GLSLParserTest: clas initializes correctly"""
+    # TODO: use a tempfile and write a temporary test rather than rely on a
+    # real one
     glsl.GLSLParserTest('tests/spec/glsl-es-1.00/compiler/version-macro.frag')
 
 
@@ -201,13 +212,14 @@ def test_config_to_command():
     ]
 
     for config, result, desc in content:
-        check_config_to_command.description = \
-            'Command correctly generated for {}'.format(desc)
+        check_config_to_command.description = (
+            'test.glsl_parser_test.GLSLParserTest.command: '
+            'correctly generated for {}'.format(desc))
         yield check_config_to_command, config, result
 
 
 def test_bad_section_name():
-    """ A section name not in the _CONFIG_KEYS name raises an error """
+    """test.glsl_parser_test.GLSLParserTest: A section name not in the _CONFIG_KEYS name raises an error"""
     content = ('// [config]\n'
                '// expect_result: pass\n'
                '// glsl_version: 1.00\n'
@@ -224,7 +236,7 @@ def test_bad_section_name():
 
 
 def test_good_section_names():
-    """ A section name in the _CONFIG_KEYS does not raise an error """
+    """test.glsl_parser_test.GLSLParserTest: A section name in the _CONFIG_KEYS does not raise an error"""
     content = ('// [config]\n'
                '// expect_result: pass\n'
                '// glsl_version: 1.00\n'
@@ -259,8 +271,9 @@ def test_duplicate_entries():
     ]
 
     for name, value in content:
-        check_no_duplicates.description = \
-            "duplicate values of {0} raise an exception".format(name)
+        check_no_duplicates.description = (
+            "test.glsl_parser_test.GLSLParserTest: duplicate values of "
+            "{0} raise an exception".format(name))
         test = '// [config]\n{0}{1}// [end config]'.format(
             ''.join(x[1] for x in content), value)
 
@@ -303,7 +316,8 @@ def glslparser_exetensions_seperators():
         test = content.format(value)
         with utils.with_tempfile(test) as tfile:
             check_bad_character.description = (
-                'require_extensions: {0} should raise an error'.format(name))
+                'test.glsl_parser_test.GLSLParserTest: require_extensions {0} '
+                'should raise an error'.format(name))
             yield check_bad_character, tfile
 
 
@@ -333,8 +347,9 @@ def test_good_extensions():
 
     for x in options:
         test = content.format(x)
-        check_good_extension.description = \
-            'require_extension {} is valid'.format(x)
+        check_good_extension.description = (
+            'test.glsl_parser_test.GLSLParserTest: '
+            'require_extension {} is valid'.format(x))
 
         with utils.with_tempfile(test) as tfile:
             yield check_good_extension, tfile, x
