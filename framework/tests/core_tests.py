@@ -134,32 +134,28 @@ def test_parse_listfile_return():
     assert isinstance(results, collections.Container)
 
 
-def check_whitespace(actual, base, message):
-    """ check that the string has not trailing whitespace """
-    assert base == actual, message
+class Test_parse_listfile_TrailingWhitespace(object):
+    """Test that parse_listfile removes whitespace"""
+    @classmethod
+    def setup_class(cls):
+        contents = "/tmp/foo\n/tmp/foo  \n/tmp/foo\t\n"
+        with utils.with_tempfile(contents) as tfile:
+            cls.results = core.parse_listfile(tfile)
 
+    def test_newlines(self):
+        """core.parse_listfile: Remove trailing newlines"""
+        nt.assert_equal(self.results[0], "/tmp/foo",
+                        msg="Trailing newline not removed!")
 
-def test_parse_listfile_whitespace():
-    """ Test that parse_listfile remove whitespace """
-    contents = "/tmp/foo\n/tmp/foo  \n/tmp/foo\t\n"
+    def test_spaces(self):
+        """core.parse_listfile: Remove trailing spaces"""
+        nt.assert_equal(self.results[1], "/tmp/foo",
+                        msg="Trailing spaces not removed!")
 
-    with utils.with_tempfile(contents) as tfile:
-        results = core.parse_listfile(tfile)
-
-    yld = check_whitespace
-
-    # Test for newlines
-    yld.description = ("Test that trailing newlines are removed by "
-                       "parse_listfile")
-    yield yld, results[0], "/tmp/foo", "Trailing newline not removed!"
-
-    # test for normal spaces
-    yld.description = "Test that trailing spaces are removed by parse_listfile"
-    yield yld, results[1], "/tmp/foo", "Trailing spaces not removed!"
-
-    # test for tabs
-    yld.description = "Test that trailing tabs are removed by parse_listfile"
-    yield yld, results[2], "/tmp/foo", "Trailing tab not removed!"
+    def test_tabs(self):
+        """core.parse_listfile: Remove trailing tabs"""
+        nt.assert_equal(self.results[2], "/tmp/foo",
+                        msg="Trailing tabs not removed!")
 
 
 def test_parse_listfile_tilde():
