@@ -44,7 +44,8 @@ class TestTest(Test):
 
 # Tests
 def test_run_return_early():
-    """ Test.run() exits early when Test._run_command() has exception """
+    """test.base.Test.run(): exits early when Test._run_command() has exception
+    """
     def helper():
         raise AssertionError("The test didn't return early")
 
@@ -56,7 +57,7 @@ def test_run_return_early():
 
 
 def test_timeout():
-    """ Test that Test.timeout works correctly """
+    """test.base.Test.run(): kills tests that exceed timeout when set"""
     utils.binary_check('sleep')
 
     def helper():
@@ -71,7 +72,8 @@ def test_timeout():
 
 
 def test_timeout_pass():
-    """ Test that the correct result is returned if a test does not timeout """
+    """test.base.Test.run(): Result is returned when timeout is set but not exceeded
+    """
     utils.binary_check('true')
 
     def helper():
@@ -86,10 +88,9 @@ def test_timeout_pass():
 
 
 def test_WindowResizeMixin_rerun():
-    """base.WindowResizeMixin runs multiple when spurious resize detected."""
-
-    # Because of Python's inheritance strucutre we need the mixin here.
-
+    """test.base.WindowResizeMixin: runs multiple when spurious resize detected
+    """
+    # Because of Python's inheritance order we need the mixin here.
     class Mixin(object):
         def __init__(self, *args, **kwargs):
             super(Mixin, self).__init__(*args, **kwargs)
@@ -98,6 +99,8 @@ def test_WindowResizeMixin_rerun():
         def _run_command(self):
             self.result['returncode'] = None
 
+            # IF this is run only once we'll have "got spurious window resize"
+            # in result['out'], if it runs multiple times we'll get 'all good'
             if self.__return_spurious:
                 self.result['out'] = "Got spurious window resize"
                 self.__return_spurious = False
@@ -114,8 +117,8 @@ def test_WindowResizeMixin_rerun():
 
 
 def test_run_command_early():
-    """Test.run() returns early if there is an error in _run_command()."""
-
+    """test.base.Test.run(): returns early if there is an error in _run_command()
+    """
     class Test_(Test):
         def interpret_result(self):
             raise AssertionError('Test.run() did not return early')
@@ -129,11 +132,12 @@ def test_run_command_early():
 
 @nt.raises(AssertionError)
 def test_no_string():
+    """test.base.Test.__init__: Asserts if it is passed a string instead of a list"""
     TestTest('foo')
 
 
 def test_mutation():
-    """Test.command does not mutate the value it was provided
+    """test.base.Test.command: does not mutate the value it was provided
 
     There is a very subtle bug in all.py that causes the key values to be
     changed before they are assigned in some cases. This is because the right
