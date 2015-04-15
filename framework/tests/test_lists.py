@@ -48,7 +48,7 @@ def gen_test_import():
 
     # Test the various OpenGL modules
     for module in ['all', 'quick', 'gpu', 'sanity', 'cpu', 'llvmpipe', 'cl',
-                   'quick_cl']:
+                   'quick_cl', 'shader', 'glslparser']:
         check_import.description = \
             "tests.{}: Can be successfully imported".format(module)
         yield check_import, "tests." + module
