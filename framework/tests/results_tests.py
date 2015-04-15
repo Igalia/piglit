@@ -27,15 +27,6 @@ from framework import results, status
 import framework.tests.utils as utils
 
 
-@utils.no_error
-def check_initialize(target):
-    """ Check that a class initializes without error """
-    func = target()
-    # Asserting that func exists will fail for Group and TestrunResult which
-    # are dict subclasses
-    assert isinstance(func, target)
-
-
 @utils.nose_generator
 def test_generate_initialize():
     """ Generator that creates tests to initialize all of the classes in core
@@ -46,12 +37,14 @@ def test_generate_initialize():
     even work?
 
     """
-    yieldable = check_initialize
+    @utils.no_error
+    def check(target):
+        target()
 
     for target in [results.TestrunResult, results.TestResult]:
-        yieldable.description = "Test that {} initializes".format(
+        check.description = "Test that {} initializes".format(
             target.__name__)
-        yield yieldable, target
+        yield check, target
 
 
 def test_testresult_load_to_status():
