@@ -2291,6 +2291,11 @@ with profile.group_manager(
     g(['arb_program_interface_query-getprogramresourcename'], run_concurrent=False)
     g(['arb_program_interface_query-getprogramresourceiv'], run_concurrent=False)
 
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_framebuffer_no_attachments')) as g:
+    g(['arb_framebuffer_no_attachments-minmax'], run_concurrent=False)
+
 # Group ARB_explicit_uniform_location
 with profile.group_manager(
         PiglitGLTest,
