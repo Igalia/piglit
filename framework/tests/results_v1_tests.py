@@ -79,32 +79,32 @@ class TestV2Update(object):
                     backends.json._load(f))
 
     def test_version_is_two(self):
-        """update_results (v2): The result version is updated to 2."""
+        """backends.json.update_results (1 -> 2): The result version is updated to 2"""
         nt.assert_equal(self.result.results_version, 2)
 
     def test_no_env(self):
-        """update_results (v2): Removes options['env']."""
+        """backends.json.update_results (1 -> 2): Removes options['env']"""
         nt.ok_('env' not in self.result.options)
 
     def test_glxinfo(self):
-        """update_results (v2): puts glxinfo in the root."""
+        """backends.json.update_results (1 -> 2): puts glxinfo in the root"""
         nt.assert_equal(self.result.glxinfo, 'and stuff')
 
     def test_lspci(self):
-        """update_results (v2): puts lspci in the root."""
+        """backends.json.update_results (1 -> 2): puts lspci in the root"""
         nt.assert_equal(self.result.lspci, 'stuff')
 
     def test_uname(self):
-        """update_results (v2): puts uname in the root."""
+        """backends.json.update_results (1 -> 2): puts uname in the root"""
         nt.assert_equal(self.result.uname, 'more stuff')
 
     def test_wglinfo(self):
-        """update_results (v2): puts wglinfo in the root."""
+        """backends.json.update_results (1 -> 2): puts wglinfo in the root"""
         nt.assert_equal(self.result.wglinfo, 'stuff')
 
 
 class TestV2NoUpdate(object):
-    """Test a version 1 to 2 update when version 1 was correct."""
+    """Test a version 1 to 2 update when version 1 was correct"""
     @classmethod
     def setup_class(cls):
         data = {
@@ -146,22 +146,21 @@ class TestV2NoUpdate(object):
                     backends.json._load(f))
 
     def test_version_is_two(self):
-        """update_results (v2) no change: The result version is updated to 2.
-        """
+        """backends.json.update_results (1 -> 2) no change: The result version is updated to 2"""
         nt.assert_equal(self.result.results_version, 2)
 
     def test_glxinfo(self):
-        """update_results (v2) no change: doesn't clobber glxinfo."""
+        """backends.json.update_results (1 -> 2) no change: doesn't clobber glxinfo"""
         nt.assert_equal(self.result.glxinfo, 'and stuff')
 
     def test_lspci(self):
-        """update_results (v2) no change: doesn't clobber lspci."""
+        """backends.json.update_results (1 -> 2) no change: doesn't clobber lspci"""
         nt.assert_equal(self.result.lspci, 'stuff')
 
     def test_uname(self):
-        """update_results (v2) no change: doesn't clobber uname."""
+        """backends.json.update_results (1 -> 2) no change: doesn't clobber uname"""
         nt.assert_equal(self.result.uname, 'more stuff')
 
     def test_wglinfo(self):
-        """update_results (v2) no change: doesn't clobber wglinfo."""
+        """backends.json.update_results (1 -> 2) no change: doesn't clobber wglinfo"""
         nt.assert_equal(self.result.wglinfo, 'stuff')
