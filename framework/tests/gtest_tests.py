@@ -22,10 +22,11 @@
 
 from __future__ import print_function, absolute_import
 
+from framework.tests import utils
 from framework.test import GTest
 
 
+@utils.no_error
 def test_initialize_gtest():
-    """ Test that GTest successfully initializes correctly """
-    test = GTest(['/bin/true'])
-    assert test
+    """test.gtest.GTest: Class initializes"""
+    GTest(['/bin/true'])
