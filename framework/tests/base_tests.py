@@ -25,7 +25,7 @@ from __future__ import print_function, absolute_import
 import nose.tools as nt
 
 import framework.tests.utils as utils
-from framework.test.base import Test, WindowResizeMixin
+from framework.test.base import Test, WindowResizeMixin, TestRunError
 
 
 # Helpers
@@ -43,6 +43,18 @@ class TestTest(Test):
 
 
 # Tests
+def test_run_return_early():
+    """ Test.run() exits early when Test._run_command() has exception """
+    def helper():
+        raise utils.TestFailure("The test didn't return early")
+
+    # Of course, this won't work if you actually have a foobarcommand in your
+    # path...
+    test = TestTest(['foobaroinkboink_zing'])
+    test.test_interpret_result = helper
+    test.run()
+
+
 def test_timeout():
     """test.base.Test.run(): kills tests that exceed timeout when set"""
     utils.binary_check('sleep')
@@ -111,7 +123,7 @@ def test_run_command_early():
             raise utils.TestFailure("The test didn't return early")
 
         def _run_command(self):
-            return True
+            raise TestRunError('an error', 'skip')
 
     # Of course, if there is an executable 'foobarboinkoink' in your path this
     # test will fail. It seems pretty unlikely that you would

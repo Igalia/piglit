@@ -52,6 +52,13 @@ class TestIsSkip(exceptions.PiglitException):
     pass
 
 
+class TestRunError(exceptions.PiglitException):
+    """Exception raised if the test fails to run."""
+    def __init__(self, message, status):
+        super(TestRunError, self).__init__(message)
+        self.status = status
+
+
 class ProcessTimeout(threading.Thread):
     """ Timeout class for test processes
 
@@ -208,15 +215,18 @@ class Test(object):
             self.is_skip()
         except TestIsSkip as e:
             self.result['result'] = 'skip'
-            self.result['out'] = e.message
-            self.result['err'] = ""
+            self.result['out'] = unicode(e.message)
+            self.result['err'] = u""
             self.result['returncode'] = None
             return
 
-        run_error = self._run_command()
-        if run_error:
-            # If there was an error self.result should already have been set,
-            # return early
+        try:
+            self._run_command()
+        except TestRunError as e:
+            self.result['result'] = unicode(e.status)
+            self.result['out'] = unicode(e.message)
+            self.result['err'] = u""
+            self.result['returncode'] = None
             return
 
         self.interpret_result()
@@ -262,11 +272,6 @@ class Test(object):
         executable isn't found it sets the result to skip.
 
         """
-        # if there is an error in run command this will be set to True, if this
-        # is True then the run test method will return early. If this is set to
-        # True then self.result should be properly filled out
-        error = False
-
         # Setup the environment for the test. Environment variables are taken
         # from the following sources, listed in order of increasing precedence:
         #
@@ -317,11 +322,7 @@ class Test(object):
             # Piglit should not report that test as having
             # failed.
             if e.errno == errno.ENOENT:
-                self.result['result'] = 'skip'
-                out = "Test executable not found.\n"
-                err = ""
-                returncode = None
-                error = True
+                raise TestRunError("Test executable not found.\n", 'skip')
             else:
                 raise e
 
@@ -342,8 +343,6 @@ class Test(object):
         self.result['out'] = out.decode('utf-8', 'replace')
         self.result['err'] = err.decode('utf-8', 'replace')
         self.result['returncode'] = returncode
-
-        return error
 
     def __eq__(self, other):
         return self.command == other.command
@@ -373,18 +372,10 @@ class WindowResizeMixin(object):
 
         """
         for _ in xrange(5):
-            err = super(WindowResizeMixin, self)._run_command()
-            if err:
-                return err
-            elif "Got spurious window resize" not in self.result['out']:
-                return False
+            super(WindowResizeMixin, self)._run_command()
+            if "Got spurious window resize" not in self.result['out']:
+                return
 
         # If we reach this point then there has been no error, but spurious
-        # resize was detected more than 5 times. Set the result to fail, and
-        # add a message about why, and return True so that the test will exit
-        # early
-        self.result['result'] = 'fail'
-        self.result['err'] = unicode()
-        self.result['out'] = unicode('Got spurious resize more than 5 times')
-        self.result['returncode'] = None
-        return True
+        # resize was detected more than 5 times. Set the result to fail
+        raise TestRunError('Got spurious resize more than 5 times', 'fail')
