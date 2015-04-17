@@ -289,50 +289,6 @@ piglit_report_subtest_result(enum piglit_result result, const char *format, ...)
 	va_end(ap);
 }
 
-#ifdef _WIN32
-
-#ifndef DBG_PRINTEXCEPTION_C
-#define DBG_PRINTEXCEPTION_C 0x40010006
-#endif
-
-static LONG WINAPI
-exception_handler(PEXCEPTION_POINTERS pExceptionInfo)
-{
-	PEXCEPTION_RECORD pExceptionRecord = pExceptionInfo->ExceptionRecord;
-
-	/* Ignore OutputDebugStringA exceptions. */
-	if (pExceptionRecord->ExceptionCode == DBG_PRINTEXCEPTION_C) {
-		return EXCEPTION_CONTINUE_SEARCH;
-	}
-
-	/* Ignore C++ exceptions
-	 * http://support.microsoft.com/kb/185294
-	 * http://blogs.msdn.com/b/oldnewthing/archive/2010/07/30/10044061.aspx
-	 */
-	if (pExceptionRecord->ExceptionCode == 0xe06d7363) {
-		return EXCEPTION_CONTINUE_SEARCH;
-	}
-
-	/* Ignore thread naming exception.
-	 * http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
-	 */
-	if (pExceptionRecord->ExceptionCode == 0x406d1388) {
-		return EXCEPTION_CONTINUE_SEARCH;
-	}
-
-	fflush(stdout);
-	fprintf(stderr, "error: uncaught exception 0x%08lx\n",
-		pExceptionRecord->ExceptionCode);
-	fflush(stderr);
-
-	TerminateProcess(GetCurrentProcess(),
-			 pExceptionRecord->ExceptionCode);
-
-	return EXCEPTION_CONTINUE_SEARCH;
-}
-
-#endif /* _WIN32 */
-
 
 void
 piglit_disable_error_message_boxes(void)
@@ -367,26 +323,6 @@ piglit_disable_error_message_boxes(void)
 		_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 #endif
 	}
-
-	/* Catch any exceptions and abort immediately.
-	 *
-	 * At least with certain implementations of GLUT (namely
-	 * freeglut-2.8.1), the glutDisplayFunc()'s callback called inside a
-	 * WindowProc callback function.
-	 *
-	 * And on certain cases (depending on the Windows version and 32 vs 64
-	 * bits processes) uncaught exceptions inside WindowProc callbacks are
-	 * silently ignored!  (See Remarks section of
-	 * http://msdn.microsoft.com/en-us/library/windows/desktop/ms633573.aspx
-	 * page.)   The end result is that automatic tests end up blocking
-	 * waiting for user input when an uncaught exceptionhappens, as control
-	 * flow is interrupted before it reaches piglit_report_result(), and
-	 * the process never aborts.
-	 *
-	 * By installing our own exception handler we can ensure that uncaught
-	 * exceptions will never be silently ignored.
-	 */
-	AddVectoredExceptionHandler(0, exception_handler);
 #endif /* _WIN32 */
 }
 

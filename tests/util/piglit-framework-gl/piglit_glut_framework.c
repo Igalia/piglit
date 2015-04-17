@@ -56,13 +56,92 @@ destroy(struct piglit_gl_framework *gl_fw)
 	glut_fw.window = 0;
 }
 
+
+#ifdef _WIN32
+
+/* Catch any exceptions and abort immediately.
+ *
+ * At least with certain implementations of GLUT (namely
+ * freeglut-2.8.1), the glutDisplayFunc()'s callback called inside a
+ * WindowProc callback function.
+ *
+ * And on certain cases (depending on the Windows version and 32 vs 64
+ * bits processes) uncaught exceptions inside WindowProc callbacks are
+ * silently ignored!  (See Remarks section of
+ * http://msdn.microsoft.com/en-us/library/windows/desktop/ms633573.aspx
+ * page.)   The end result is that automatic tests end up blocking
+ * waiting for user input when an uncaught exceptionhappens, as control
+ * flow is interrupted before it reaches piglit_report_result(), and
+ * the process never aborts.
+ *
+ * By installing our own exception handler we can ensure that uncaught
+ * exceptions will never be silently ignored.
+ *
+ * NOTE: SetUnhandledExceptionFilter does not work here, as some Windows
+ * versions never call the unhandled exception filter.  We must use MSVC
+ * __try/__except statements, or in MinGW, the __try1/__except1 macros.
+ */
+static LONG WINAPI
+exception_filter(PEXCEPTION_POINTERS pExceptionInfo)
+{
+	PEXCEPTION_RECORD pExceptionRecord = pExceptionInfo->ExceptionRecord;
+
+	fflush(stdout);
+	fprintf(stderr, "error: caught unhandled exception 0x%08lx\n", pExceptionRecord->ExceptionCode);
+	fflush(stderr);
+
+	_exit(pExceptionRecord->ExceptionCode);
+}
+
+#  ifdef __MINGW32__
+
+// http://www.programmingunlimited.net/siteexec/content.cgi?page=mingw-seh
+// http://www.microsoft.com/msj/0197/exception/exception.aspx
+EXCEPTION_DISPOSITION
+exception_handler(struct _EXCEPTION_RECORD *ExceptionRecord, void *EstablisherFrame, struct _CONTEXT *ContextRecord, void *DispatcherContext)
+{
+	EXCEPTION_POINTERS ExceptionInfo = {ExceptionRecord, ContextRecord};
+	switch (exception_filter(&ExceptionInfo)) {
+	case EXCEPTION_EXECUTE_HANDLER:
+		return ExceptionExecuteHandler;
+	case EXCEPTION_CONTINUE_SEARCH:
+		return ExceptionContinueSearch;
+	case EXCEPTION_CONTINUE_EXECUTION:
+		return ExceptionContinueExecution;
+	default:
+		return ExceptionContinueSearch;
+	}
+}
+
+#  define TRY __try1(exception_handler);
+#  define CATCH_ALL __except1;
+
+#  else
+
+#    define TRY __try {
+#    define CATCH_ALL } __except(exception_filter(GetExceptionInformation())) {}
+
+#  endif
+
+#else
+
+#  define TRY
+#  define CATCH_ALL
+
+#endif
+
+
 static void
 display(void)
 {
 	const struct piglit_gl_test_config *test_config = glut_fw.gl_fw.test_config;
 
+	TRY
+
 	if (test_config->display)
 		glut_fw.result = test_config->display();
+
+	CATCH_ALL
 
 	if (piglit_automatic) {
 		glutDestroyWindow(glut_fw.window);
