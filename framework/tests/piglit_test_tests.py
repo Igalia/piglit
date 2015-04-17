@@ -25,6 +25,7 @@ from __future__ import print_function, absolute_import
 import nose.tools as nt
 
 from framework.tests import utils
+from framework.test.base import TestIsSkip
 from framework.test.piglit_test import (PiglitBaseTest, PiglitGLTest,
                                         PiglitCLTest)
 
@@ -93,29 +94,33 @@ def test_PiglitGLTest_include_and_exclude():
                      exclude_platforms=['gbm'])
 
 
+@utils.not_raises(TestIsSkip)
 def test_PiglitGLTest_platform_in_require():
     """test.piglit_test.PiglitGLTest.is_skip(): does not skip if platform is in require_platforms"""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
     test = PiglitGLTest(['foo'], require_platforms=['glx'])
-    nt.assert_false(test.is_skip())
+    test.is_skip()
 
 
+@nt.raises(TestIsSkip)
 def test_PiglitGLTest_platform_not_in_require():
     """test.piglit_test.PiglitGLTest.is_skip(): skips if platform is not in require_platforms"""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
     test = PiglitGLTest(['foo'], require_platforms=['glx'])
-    nt.assert_true(test.is_skip())
+    test.is_skip()
 
 
+@nt.raises(TestIsSkip)
 def test_PiglitGLTest_platform_in_exclude():
     """test.piglit_test.PiglitGLTest.is_skip(): skips if platform is in exclude_platforms"""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
     test = PiglitGLTest(['foo'], exclude_platforms=['glx'])
-    nt.assert_true(test.is_skip())
+    test.is_skip()
 
 
+@utils.not_raises(TestIsSkip)
 def test_PiglitGLTest_platform_not_in_exclude():
     """test.piglit_test.PiglitGLTest.is_skip(): does not skip if platform is in exclude_platforms"""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
     test = PiglitGLTest(['foo'], exclude_platforms=['glx'])
-    nt.assert_false(test.is_skip())
+    test.is_skip()

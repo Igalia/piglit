@@ -24,7 +24,7 @@
 
 from __future__ import print_function, absolute_import
 import os
-from .base import Test
+from .base import Test, TestIsSkip
 from .piglit_test import TEST_BIN_DIR
 
 __all__ = [
@@ -61,5 +61,8 @@ class GleanTest(Test):
     def is_skip(self):
         # Glean tests require glx
         if self.OPTS.env['PIGLIT_PLATFORM'] not in ['glx', 'mixed_glx_egl']:
-            return True
-        return super(GleanTest, self).is_skip()
+            raise TestIsSkip(
+                'Glean tests require platform to support glx, '
+                'but the platform is "{}"'.format(
+                    self.OPTS.env['PIGLIT_PLATFORM']))
+        super(GleanTest, self).is_skip()

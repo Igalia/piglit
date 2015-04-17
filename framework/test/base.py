@@ -36,6 +36,7 @@ import itertools
 import abc
 import copy
 
+from framework import exceptions
 from framework.core import Options
 from framework.results import TestResult
 
@@ -44,6 +45,11 @@ __all__ = [
     'Test',
     'WindowResizeMixin',
 ]
+
+
+class TestIsSkip(exceptions.PiglitException):
+    """Exception raised in is_skip() if the test is a skip."""
+    pass
 
 
 class ProcessTimeout(threading.Thread):
@@ -198,9 +204,11 @@ class Test(object):
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
                 self.OPTS.env.iteritems(), self.env.iteritems()))
 
-        if self.is_skip():
+        try:
+            self.is_skip()
+        except TestIsSkip as e:
             self.result['result'] = 'skip'
-            self.result['out'] = "skipped by self.is_skip()"
+            self.result['out'] = e.message
             self.result['err'] = ""
             self.result['returncode'] = None
             return
@@ -241,7 +249,7 @@ class Test(object):
         skipped. The base version will always return False
 
         """
-        return False
+        pass
 
     def __set_process_group(self):
         if hasattr(os, 'setpgrp'):

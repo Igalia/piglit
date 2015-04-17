@@ -360,3 +360,19 @@ def capture_stderr(func):
             sys.stderr = restore
 
     return _inner
+
+
+def not_raises(exception):
+    """Decorator for tests that should not raise one of the follow exceptions.
+    """
+    def _decorator(function):
+        @functools.wraps(function)
+        def _inner(*args, **kwargs):
+            try:
+                function(*args, **kwargs)
+            except exception as e:
+                raise TestFailure(e)
+
+        return _inner
+
+    return _decorator

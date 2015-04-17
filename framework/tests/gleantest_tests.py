@@ -26,6 +26,7 @@ import nose.tools as nt
 
 from framework.test import GleanTest
 from framework.tests import utils
+from framework.test.base import TestIsSkip
 
 
 @utils.no_error
@@ -67,3 +68,28 @@ def test_bad_returncode():
     test.interpret_result()
     nt.assert_equal(test.result['result'], 'fail',
                     msg="Result should have been fail")
+
+
+@nt.raises(TestIsSkip)
+def test_is_skip_not_glx():
+    """test.gleantest.GleanTest.is_skip: Skips when platform isn't glx"""
+    GleanTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
+    test = GleanTest('foo')
+    test.is_skip()
+
+
+@utils.not_raises(TestIsSkip)
+def test_is_skip_glx():
+    """test.gleantest.GleanTest.is_skip: Does not skip when platform is glx"""
+    GleanTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
+    test = GleanTest('foo')
+    test.is_skip()
+
+
+@utils.not_raises(TestIsSkip)
+def test_is_skip_glx_egl():
+    """test.gleantest.GleanTest.is_skip: Does not skip when platform is mixed_glx_egl
+    """
+    GleanTest.OPTS.env['PIGLIT_PLATFORM'] = 'mixed_glx_egl'
+    test = GleanTest('foo')
+    test.is_skip()
