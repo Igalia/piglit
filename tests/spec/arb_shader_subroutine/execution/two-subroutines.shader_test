@@ -1,0 +1,63 @@
+# shader subroutine test using two
+# shader subroutines with two functions
+# in each.
+
+[require]
+GLSL >= 1.50
+GL_ARB_shader_subroutine
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shader_subroutine: enable
+
+out vec4 color;
+
+subroutine float getchan1();
+subroutine uniform getchan1 GetChan1;
+
+subroutine float getchan2();
+subroutine uniform getchan2 GetChan2;
+
+subroutine(getchan1)
+float chan1_full()
+{
+	return 1.0;
+}
+
+subroutine(getchan1)
+float chan1_empty()
+{
+	return 0.0;
+}
+
+subroutine(getchan2)
+float chan2_full()
+{
+	return 1.0;
+}
+
+subroutine(getchan2)
+float chan2_empty()
+{
+	return 0.0;
+}
+
+void main()
+{
+	color = vec4(GetChan1(), GetChan2(), 0.0, 1.0);
+}
+
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+subuniform GL_FRAGMENT_SHADER GetChan1 chan1_full
+subuniform GL_FRAGMENT_SHADER GetChan2 chan2_empty
+draw rect -1 -1 2 2
+probe all rgba 1.0 0.0 0.0 1.0
+subuniform GL_FRAGMENT_SHADER GetChan1 chan1_empty
+subuniform GL_FRAGMENT_SHADER GetChan2 chan2_full
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

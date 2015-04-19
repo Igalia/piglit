@@ -1,0 +1,47 @@
+# test calling subroutine uniforms in an array
+# with a constant value works.
+[require]
+GLSL >= 1.50
+GL_ARB_shader_subroutine
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shader_subroutine: enable
+
+out vec4 color;
+
+subroutine float getchan1();
+
+subroutine uniform getchan1 GetChan1[2];
+
+subroutine(getchan1)
+float chan_full()
+{
+	return 1.0;
+}
+
+subroutine(getchan1)
+float chan_empty()
+{
+	return 0.0;
+}
+
+void main()
+{
+	color = vec4(GetChan1[0](), GetChan1[1](), 0.0, 1.0);
+}
+
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+subuniform GL_FRAGMENT_SHADER GetChan1[0] chan_full
+subuniform GL_FRAGMENT_SHADER GetChan1[1] chan_empty
+draw rect -1 -1 2 2
+probe all rgba 1.0 0.0 0.0 1.0
+subuniform GL_FRAGMENT_SHADER GetChan1[0] chan_empty
+subuniform GL_FRAGMENT_SHADER GetChan1[1] chan_full
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
