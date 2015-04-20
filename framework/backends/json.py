@@ -31,10 +31,9 @@ try:
 except ImportError:
     import json
 
-from framework import status, results
+from framework import status, results, exceptions
 from .abstract import FileBackend
 from .register import Registry
-from . import errors
 
 __all__ = [
     'REGISTRY',
@@ -191,8 +190,8 @@ def load_results(filename):
         elif os.path.exists(os.path.join(filename, 'main')):
             filepath = os.path.join(filename, 'main')
         else:
-            raise errors.ResultsLoadError('No results found in "{}"'.format(
-                filename))
+            raise exceptions.PiglitFatalError(
+                'No results found in "{}"'.format(filename))
 
     with open(filepath, 'r') as f:
         testrun = _load(f)

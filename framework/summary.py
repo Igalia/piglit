@@ -299,11 +299,7 @@ class Summary:
 
         # Create a Result object for each piglit result and append it to the
         # results list
-        try:
-            self.results = [backends.load(i) for i in resultfiles]
-        except backends.errors.ResultsLoadError as e:
-            print('Error: {}'.format(e.message), file=sys.stderr)
-            sys.exit(1)
+        self.results = [backends.load(i) for i in resultfiles]
 
         self.status = {}
         self.fractions = {}
