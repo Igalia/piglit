@@ -23,19 +23,18 @@
 
 import os
 import re
-import sys
 import subprocess
 
-import framework.grouptools as grouptools
-import framework.core
+from framework import grouptools, exceptions, core
 from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
 
-bin_oglconform = framework.core.PIGLIT_CONFIG.get('oglconform', 'path')
+bin_oglconform = core.PIGLIT_CONFIG.required_get('oglconform', 'path')
 
 if not os.path.exists(bin_oglconform):
-    sys.exit(0)
+    raise exceptions.PiglitFatalError(
+        'Cannot find binary {}'.format(bin_oglconform))
 
 profile = TestProfile()
 

@@ -32,7 +32,7 @@ import ConfigParser
 
 from nose.plugins.skip import SkipTest
 
-from framework import core
+from framework import core, exceptions
 
 
 def setup_module():
@@ -50,9 +50,14 @@ def _import(name):
     """
     try:
         return importlib.import_module(name)
+    except exceptions.PiglitFatalError:
+        raise SkipTest('The module experienced a fatal error. '
+                       'This may be expected.')
     except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        # FIXME: This is a legacy path
         raise SkipTest('No config section for {}'.format(name))
     except SystemExit as e:
+        # FIXME: This is a legacy path
         if e.code == 0:
             # This means that it's a normal operation, but not that it's a pass
             raise SkipTest('Profile exited normally.')
