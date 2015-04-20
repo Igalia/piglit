@@ -29,7 +29,7 @@ try:
 except ImportError:
     import xml.etree.cElementTree as etree
 
-from framework import grouptools, results, status
+from framework import grouptools, results, status, exceptions
 from framework.core import PIGLIT_CONFIG
 from .abstract import FileBackend
 from .register import Registry
@@ -281,7 +281,7 @@ def load(results_dir):
     elif os.path.exists(os.path.join(results_dir, 'results.xml')):
         return _load(os.path.join(results_dir, 'results.xml'))
     else:
-        raise Exception("No results found")
+        raise exceptions.PiglitFatalError("No results found")
 
 
 REGISTRY = Registry(
