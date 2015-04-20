@@ -10,3 +10,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_framebuffer_no_attachments-minmax minmax.c)
+piglit_add_executable (arb_framebuffer_no_attachments-params params.c)
