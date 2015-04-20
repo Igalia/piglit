@@ -26,11 +26,11 @@
 from __future__ import print_function, absolute_import
 import re
 
+from framework import exceptions
 from .piglit_test import PiglitBaseTest
 
 __all__ = [
     'ShaderTest',
-    'ShaderTestParserException',
 ]
 
 
@@ -41,14 +41,14 @@ class ShaderTest(PiglitBaseTest):
     GLES3 test, and then returns a PiglitTest setup properly.
 
     """
-    def __init__(self, arguments):
+    def __init__(self, filename):
         is_gl = re.compile(r'GL (<|<=|=|>=|>) \d\.\d')
         # Iterate over the lines in shader file looking for the config section.
         # By using a generator this can be split into two for loops at minimal
         # cost. The first one looks for the start of the config block or raises
         # an exception. The second looks for the GL version or raises an
         # exception
-        with open(arguments, 'r') as shader_file:
+        with open(filename, 'r') as shader_file:
             lines = (l for l in shader_file)
 
             # Find the config section
@@ -60,7 +60,8 @@ class ShaderTest(PiglitBaseTest):
                 if line.lstrip().startswith('[require]'):
                     break
             else:
-                raise ShaderTestParserException("Config block not found")
+                raise exceptions.PiglitFatalError(
+                    "In file {}: Config block not found".format(filename))
 
             # Find the OpenGL API to use
             for line in lines:
@@ -73,7 +74,8 @@ class ShaderTest(PiglitBaseTest):
                     # If we don't set gles2 or gles3 continue the loop,
                     # probably htting the exception in the for/else
                     else:
-                        raise ShaderTestParserException("No GL ES version set")
+                        raise exceptions.PiglitFatalError(
+                            "In File {}: No GL ES version set".format(filename))
                     break
                 elif line.startswith('[') or is_gl.match(line):
                     # In the event that we reach the end of the config black
@@ -82,16 +84,12 @@ class ShaderTest(PiglitBaseTest):
                     prog = 'shader_runner'
                     break
             else:
-                raise ShaderTestParserException("No GL version set")
+                raise exceptions.PiglitFatalError(
+                    "In file {}: No GL version set".format(filename))
 
-        super(ShaderTest, self).__init__([prog, arguments], run_concurrent=True)
+        super(ShaderTest, self).__init__([prog, filename], run_concurrent=True)
 
     @PiglitBaseTest.command.getter
     def command(self):
         """ Add -auto to the test command """
         return self._command + ['-auto']
-
-
-class ShaderTestParserException(Exception):
-    """ An excpetion to be raised for errors in the ShaderTest parser """
-    pass

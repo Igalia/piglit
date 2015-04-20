@@ -25,6 +25,7 @@ import os
 
 import nose.tools as nt
 
+from framework import exceptions
 import framework.test as testm
 import framework.tests.utils as utils
 
@@ -39,7 +40,7 @@ def test_parse_gl_test_no_decimal():
     data = ('[require]\n'
             'GL = 2\n')
     with utils.tempfile(data) as temp:
-        with nt.assert_raises(testm.ShaderTestParserException) as exc:
+        with nt.assert_raises(exceptions.PiglitFatalError) as exc:
             testm.ShaderTest(temp)
             nt.assert_equal(exc.exception, "No GL version set",
                             msg="A GL version was passed without a decimal, "
