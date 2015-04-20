@@ -26,11 +26,8 @@ import copy
 
 import nose.tools as nt
 
-import framework.core as core
-import framework.dmesg as dmesg
-import framework.profile as profile
 from framework.tests import utils
-from framework import grouptools
+from framework import grouptools, core, dmesg, profile, exceptions
 from framework.test import GleanTest
 
 # Don't print sys.stderr to the console
@@ -43,7 +40,7 @@ def test_initialize_testprofile():
     profile.TestProfile()
 
 
-@nt.raises(SystemExit)
+@nt.raises(exceptions.PiglitFatalError)
 def test_load_test_profile_no_profile():
     """profile.load_test_profile: Loading a module with no profile name exits
 
@@ -250,7 +247,7 @@ def test_testprofile_groupmanager_name_str():
     nt.ok_(grouptools.join('foo', 'abc') in prof.test_list)
 
 
-@nt.raises(profile.TestDictError)
+@nt.raises(exceptions.PiglitFatalError)
 def test_testdict_key_not_string():
     """profile.TestDict: If key value isn't a string an exception is raised.
 
@@ -265,7 +262,7 @@ def test_testdict_key_not_string():
         test[x] = utils.Test(['foo'])
 
 
-@nt.raises(profile.TestDictError)
+@nt.raises(exceptions.PiglitFatalError)
 def test_testdict_value_not_valid():
     """profile.TestDict: If the value isn't a Test an exception is raised.
 
@@ -278,7 +275,7 @@ def test_testdict_value_not_valid():
         test['foo'] = x
 
 
-@nt.raises(profile.TestDictError)
+@nt.raises(exceptions.PiglitFatalError)
 def test_testdict_reassignment():
     """profile.TestDict: reassigning a key raises an exception"""
     test = profile.TestDict()
@@ -286,7 +283,7 @@ def test_testdict_reassignment():
     test['foo'] = utils.Test(['foo', 'bar'])
 
 
-@nt.raises(profile.TestDictError)
+@nt.raises(exceptions.PiglitFatalError)
 def test_testdict_reassignment_lower():
     """profile.TestDict: reassigning a key raises an exception (capitalization is ignored)"""
     test = profile.TestDict()

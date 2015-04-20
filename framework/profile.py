@@ -28,27 +28,22 @@ are represented by a TestProfile or a TestProfile derived object.
 
 from __future__ import print_function, absolute_import
 import os
-import sys
 import multiprocessing
 import multiprocessing.dummy
 import importlib
 import contextlib
 import itertools
 
+from framework import grouptools, exceptions
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
 from framework.test.base import Test
-import framework.grouptools as grouptools
 
 __all__ = [
     'TestProfile',
     'load_test_profile',
     'merge_test_profiles'
 ]
-
-
-class TestDictError(Exception):
-    pass
 
 
 class TestDict(dict):  # pylint: disable=too-few-public-methods
@@ -79,13 +74,14 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
         """
         # keys should be strings
         if not isinstance(key, basestring):
-            raise TestDictError("Keys must be strings, but was {}".format(
-                type(key)))
+            raise exceptions.PiglitFatalError(
+                "TestDict keys must be strings, but was {}".format(type(key)))
 
         # Values should either be more Tests
         if not isinstance(value, Test):
-            raise TestDictError(
-                "Values must be a Test, but was a {}".format(type(value)))
+            raise exceptions.PiglitFatalError(
+                "TestDict values must be a Test, but was a {}".format(
+                    type(value)))
 
         # This must be lowered before the following test, or the test can pass
         # in error if the key has capitals in it.
@@ -103,7 +99,7 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
             else:
                 error = "and both tests are the same."
 
-            raise TestDictError(
+            raise exceptions.PiglitFatalError(
                 "A test has already been asigned the name: {}\n{}".format(
                     key, error))
 
@@ -216,9 +212,8 @@ class TestProfile(object):
                               if check_all(item))
 
         if not self.test_list:
-            print('Error: There are no tests scheduled to run. Aborting run.',
-                  file=sys.stderr)
-            sys.exit(1)
+            raise exceptions.PiglitFatalError(
+                'There are no tests scheduled to run. Aborting run.')
 
     def _pre_run_hook(self, opts):
         """ Hook executed at the start of TestProfile.run
@@ -435,13 +430,9 @@ def load_test_profile(filename):
             os.path.splitext(os.path.basename(filename))[0]))
         return mod.profile
     except AttributeError:
-        print("Error: There is not profile attribute in module {0}."
-              "Did you specify the right file?".format(filename),
-              file=sys.stderr)
-        sys.exit(2)
-    except TestDictError as e:
-        print("Error: {}".format(e.message), file=sys.stderr)
-        sys.exit(1)
+        raise exceptions.PiglitFatalError(
+            'There is not profile attribute in module {}.\n'
+            'Did you specify the right file?'.format(filename))
 
 
 def merge_test_profiles(profiles):
