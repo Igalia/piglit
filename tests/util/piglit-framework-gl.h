@@ -267,13 +267,6 @@ piglit_gl_test_run(int argc, char *argv[],
                 config.init = piglit_init;                                   \
                 config.display = piglit_display;                             \
                                                                              \
-                /* Default window size.  Note: Win8's min window width */    \
-                /* seems to be 160 pixels.  When the window size is */       \
-                /* unexpectedly resized, tests are marked as "WARN". */      \
-                /* Let's use a larger default to avoid that. */              \
-                config.window_width = 160;                                   \
-                config.window_height = 160;                                  \
-                                                                             \
                 /* Open a new scope so that tests can declare locals */      \
                 /* between here and PIGLIT_GL_TEST_CONFIG_END. */            \
                 {
