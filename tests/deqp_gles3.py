@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import ConfigParser
 import os
 import subprocess
 import xml.etree.cElementTree as ET
@@ -65,12 +64,7 @@ def get_option(env_varname, config_option):
     if opt is not None:
         return opt
 
-    try:
-        opt = core.PIGLIT_CONFIG.get(config_option[0], config_option[1])
-    except ConfigParser.NoSectionError:
-        pass
-    except ConfigParser.NoOptionError:
-        pass
+    opt = core.PIGLIT_CONFIG.safe_get(config_option[0], config_option[1])
 
     return opt
 
