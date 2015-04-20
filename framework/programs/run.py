@@ -29,10 +29,9 @@ import time
 import ConfigParser
 import ctypes
 
-import framework.core as core
+from framework import core, backends, exceptions
 import framework.results
 import framework.profile
-import framework.backends as backends
 
 __all__ = ['run',
            'resume']
@@ -232,6 +231,7 @@ def _disable_windows_exception_messages():
         ctypes.windll.kernel32.SetErrorMode(uMode)
 
 
+@exceptions.handler
 def run(input_):
     """ Function for piglit run command
 
@@ -302,6 +302,7 @@ def run(input_):
           'Results have been written to ' + args.results_path)
 
 
+@exceptions.handler
 def resume(input_):
     parser = argparse.ArgumentParser()
     parser.add_argument("results_path",

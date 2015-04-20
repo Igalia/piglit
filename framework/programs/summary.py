@@ -27,7 +27,7 @@ import os.path as path
 import sys
 import errno
 
-from framework import summary, status, core, backends
+from framework import summary, status, core, backends, exceptions
 
 __all__ = [
     'aggregate',
@@ -37,6 +37,7 @@ __all__ = [
 ]
 
 
+@exceptions.handler
 def html(input_):
     # Make a copy of the status text list and add all. This is used as the
     # argument list for -e/--exclude
@@ -101,6 +102,7 @@ def html(input_):
     output.generate_html(args.summaryDir, args.exclude_details)
 
 
+@exceptions.handler
 def console(input_):
     parser = argparse.ArgumentParser()
 
@@ -149,6 +151,7 @@ def console(input_):
     output.generate_text(args.mode or 'all')
 
 
+@exceptions.handler
 def csv(input_):
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output",
@@ -181,6 +184,7 @@ def csv(input_):
         write_results(sys.stdout)
 
 
+@exceptions.handler
 def aggregate(input_):
     """Combine files in a tests/ directory into a single results file."""
     parser = argparse.ArgumentParser()

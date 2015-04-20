@@ -341,3 +341,22 @@ def no_error(func):
 
     """
     return not_raises(Exception)(func)
+
+
+def capture_stderr(func):
+    """Redirect stderr to stdout for nose capture.
+
+    It would probably be better to implement a full stderr handler as a
+    plugin...
+
+    """
+    @functools.wraps(func)
+    def _inner(*args, **kwargs):
+        restore = sys.stderr
+        sys.stderr = sys.stdout
+        try:
+            func(*args, **kwargs)
+        finally:
+            sys.stderr = restore
+
+    return _inner
