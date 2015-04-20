@@ -35,11 +35,9 @@ drm. Even if you have rendernode support enabled.
 from __future__ import print_function, division, absolute_import
 import os
 import re
-import sys
 import subprocess
 
-import framework.grouptools as grouptools
-import framework.core
+from framework import grouptools, exceptions, core
 from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
@@ -53,30 +51,30 @@ def check_environment():
     """
     debugfs_path = "/sys/kernel/debug/dri"
     if os.getuid() != 0:
-        print("Test Environment check: not root!")
-        return False
+        raise exceptions.PiglitInternalError(
+            "Test Environment check: not root!")
     if not os.path.isdir(debugfs_path):
-        print("Test Environment check: debugfs not mounted properly!")
-        return False
+        raise exceptions.PiglitInternalError(
+            "Test Environment check: debugfs not mounted properly!")
     for subdir in os.listdir(debugfs_path):
         if not os.path.isdir(os.path.join(debugfs_path, subdir)):
             continue
         clients = open(os.path.join(debugfs_path, subdir, "clients"), 'r')
         lines = clients.readlines()
         if len(lines) > 2:
-            print("Test Environment check: other drm clients running!")
-            return False
-
-    print("Test Environment check: Succeeded.")
-    return True
+            raise exceptions.PiglitInternalError(
+                "Test Environment check: other drm clients running!")
 
 
 if 'IGT_TEST_ROOT' in os.environ:
     IGT_TEST_ROOT = os.environ['IGT_TEST_ROOT']
 else:
     IGT_TEST_ROOT = os.path.join(
-        framework.core.PIGLIT_CONFIG.get('igt', 'path'), 'tests')
-    assert os.path.exists(IGT_TEST_ROOT)
+        core.PIGLIT_CONFIG.required_get('igt', 'path'), 'tests')
+
+if not os.path.exists(IGT_TEST_ROOT):
+    raise exceptions.PiglitFatalError(
+        'IGT directory does not exist. Missing: {}'.format(IGT_TEST_ROOT))
 
 # check for the test lists
 if os.path.exists(os.path.join(IGT_TEST_ROOT, 'test-list.txt')):
@@ -85,15 +83,17 @@ elif (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt')) and
       os.path.exists(os.path.join(IGT_TEST_ROOT, 'multi-tests.txt'))):
     TEST_LISTS = ['single-tests.txt', 'multi-tests.txt']
 else:
-    print("intel-gpu-tools test lists not found.")
-    sys.exit(0)
+    raise exceptions.PiglitFatalError("intel-gpu-tools test lists not found.")
 
 
 class IGTTestProfile(TestProfile):
     """Test profile for intel-gpu-tools tests."""
     def _pre_run_hook(self, opts):
-        if opts.execute and not check_environment():
-            sys.exit(1)
+        if opts.execute:
+            try:
+                check_environment()
+            except exceptions.PiglitInternalError as e:
+                raise exceptions.PiglitFatalError(e.message)
 
 
 profile = IGTTestProfile()  # pylint: disable=invalid-name
