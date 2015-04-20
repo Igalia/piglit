@@ -24,26 +24,21 @@
 from __future__ import print_function, absolute_import
 import os
 import re
-import sys
 
+from framework import exceptions
 from .piglit_test import PiglitBaseTest
 
 __all__ = [
     'GLSLParserTest',
-    'GLSLParserError',
     'GLSLParserNoConfigError',
 ]
 
 
-class GLSLParserError(Exception):
+class GLSLParserNoConfigError(exceptions.PiglitInternalError):
     pass
 
 
-class GLSLParserNoConfigError(GLSLParserError):
-    pass
-
-
-class GLSLParserInternalError(GLSLParserError):
+class GLSLParserInternalError(exceptions.PiglitInternalError):
     pass
 
 
@@ -76,8 +71,8 @@ class GLSLParserTest(PiglitBaseTest):
                 command = self.__get_command(self.__parser(testfile, filepath),
                                              filepath)
             except GLSLParserInternalError as e:
-                print(e.message, file=sys.stderr)
-                sys.exit(1)
+                raise exceptions.PiglitFatalError(
+                    'In file "{}":\n{}'.format(filepath, e.message))
 
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
 
@@ -155,25 +150,25 @@ class GLSLParserTest(PiglitBaseTest):
             if match:
                 if match.group('key') not in GLSLParserTest._CONFIG_KEYS:
                     raise GLSLParserInternalError(
-                        "Key {0} in file {1} is not a valid key for a "
+                        "Key {} is not a valid key for a "
                         "glslparser test config block".format(
-                            match.group('key'), filepath))
+                            match.group('key')))
                 elif match.group('key') in self.__found_keys:
                     # If this key has already been encountered throw an error,
                     # there are no duplicate keys allows
                     raise GLSLParserInternalError(
-                        'Duplicate entry for key {0} in file {1}'.format(
-                            match.group('key'), filepath))
+                        'Duplicate entry for key {}'.format(
+                            match.group('key')))
                 else:
                     bad = bad_values.search(match.group('value'))
                     # XXX: this always seems to return a match object, even
                     # when the match is ''
                     if bad.group():
                         raise GLSLParserInternalError(
-                            'Bad character "{0}" in file: "{1}", '
-                            'line: "{2}". Only alphanumerics, _, and space '
+                            'Bad character "{}" at line: "{}". '
+                            'Only alphanumerics, _, and space '
                             'are allowed'.format(
-                                bad.group()[0], filepath, line))
+                                bad.group()[0], line))
 
                     # Otherwise add the key to the set of found keys, and add
                     # it to the dictionary that will be returned
