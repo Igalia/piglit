@@ -26,17 +26,15 @@
 from __future__ import print_function, division, absolute_import
 import os
 import re
-import sys
 import subprocess
 import itertools
 
-import framework.grouptools as grouptools
-import framework.core
+from framework import grouptools, exceptions, core
 from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
 
-X_TEST_SUITE = framework.core.PIGLIT_CONFIG.get('xts', 'path')
+X_TEST_SUITE = core.PIGLIT_CONFIG.required_get('xts', 'path')
 
 
 class XTSProfile(TestProfile):  # pylint: disable=too-few-public-methods
@@ -198,7 +196,6 @@ def _populate_profile():
 
 
 if not os.path.exists(X_TEST_SUITE):
-    print("Error: xtest not found.", file=sys.stderr)
-    sys.exit(1)
+    raise exceptions.PiglitFatalError('XTest suite not found.')
 
 profile = _populate_profile()  # pylint: disable=invalid-name

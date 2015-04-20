@@ -32,13 +32,12 @@ import ConfigParser
 
 from nose.plugins.skip import SkipTest
 
-import framework.core
+from framework import core
 
 
 def setup_module():
-    framework.core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser(
-        allow_no_value=True)
-    framework.core.get_config()
+    core.PIGLIT_CONFIG = core.PiglitConfig(allow_no_value=True)
+    core.get_config()
 
 
 def _import(name):
