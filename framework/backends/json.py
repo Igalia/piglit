@@ -294,10 +294,9 @@ def _update_results(results, filepath):
     results = loop_updates(results)
 
     # Move the old results, and write the current results
-    filedir = os.path.dirname(filepath)
     try:
-        os.rename(filepath, os.path.join(filedir, 'results.json.old'))
-        _write(results, os.path.join(filedir, 'results.json'))
+        os.rename(filepath, filepath + '.old')
+        _write(results, filepath)
     except OSError:
         print("WARNING: Could not write updated results {}".format(filepath),
               file=sys.stderr)
