@@ -28,7 +28,6 @@ errors and to ensure that the API hasn't changed without fixing these modules
 
 from __future__ import print_function, absolute_import
 import importlib
-import ConfigParser
 
 from nose.plugins.skip import SkipTest
 
@@ -53,16 +52,6 @@ def _import(name):
     except exceptions.PiglitFatalError:
         raise SkipTest('The module experienced a fatal error. '
                        'This may be expected.')
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        # FIXME: This is a legacy path
-        raise SkipTest('No config section for {}'.format(name))
-    except SystemExit as e:
-        # FIXME: This is a legacy path
-        if e.code == 0:
-            # This means that it's a normal operation, but not that it's a pass
-            raise SkipTest('Profile exited normally.')
-        else:
-            raise Exception('Profile exited. code: {}.'.format(e.code))
 
 
 def test_xts_import():

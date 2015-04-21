@@ -21,12 +21,11 @@
 # DEALINGS IN THE SOFTWARE.
 
 import re
-import sys
 from os import path
 
 from framework.profile import TestProfile
 from framework.test import TEST_BIN_DIR, Test
-from framework import grouptools
+from framework import grouptools, exceptions
 
 __all__ = ['profile']
 
@@ -39,7 +38,8 @@ __all__ = ['profile']
 #############################################################################
 
 if not path.exists(path.join(TEST_BIN_DIR, 'GTF3')):
-    sys.exit(0)
+    raise exceptions.PiglitFatalError(
+        'Missing GTF3 symlink. Unable to run es3conform tests.')
 
 profile = TestProfile()
 
