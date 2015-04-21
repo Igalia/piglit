@@ -59,10 +59,9 @@ def _default_platform():
         try:
             plat = core.PIGLIT_CONFIG.get('core', 'platform')
             if plat not in core.PLATFORMS:
-                print('Platform is not valid\n'
-                      'valid platforms are: {}'.format(core.PLATFORMS),
-                      file=sys.stderr)
-                sys.exit(1)
+                raise exceptions.PiglitFatalError(
+                    'Platform is not valid\nvalid platforms are: {}'.format(
+                        core.PLATFORMS))
             return plat
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
             return 'mixed_glx_egl'
@@ -78,11 +77,9 @@ def _default_backend():
     try:
         backend = core.PIGLIT_CONFIG.get('core', 'backend')
         if backend not in backends.BACKENDS.keys():
-            print('Backend is not valid\n',
-                  'valid backends are: {}'.format(
-                      ' '.join(backends.BACKENDS.keys())),
-                  file=sys.stderr)
-            sys.exit(1)
+            raise exceptions.PiglitFatalError(
+                'Backend is not valid\nvalid backends are: {}'.format(
+                      ' '.join(backends.BACKENDS.keys())))
         return backend
     except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
         return 'json'
