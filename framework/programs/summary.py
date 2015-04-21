@@ -205,9 +205,8 @@ def aggregate(input_):
         backends.json._write(results, outfile)
     except IOError as e:
         if e.errno == errno.EPERM:
-            print("Error: Unable to write aggregated file, permission denied.",
-                  file=sys.stderr)
-            sys.exit(1)
+            raise exceptions.PiglitFatalError(
+                "Unable to write aggregated file, permission denied.")
         raise
 
     print("Aggregated file written to: {}".format(outfile))
