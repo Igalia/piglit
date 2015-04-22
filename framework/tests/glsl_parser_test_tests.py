@@ -38,7 +38,7 @@ sys.stderr = sys.stdout
 
 def _check_config(content):
     """ This is the test that actually checks the glsl config section """
-    with utils.with_tempfile(content) as tfile:
+    with utils.tempfile(content) as tfile:
         return glsl.GLSLParserTest(tfile), tfile
 
 
@@ -48,7 +48,7 @@ def test_no_config_start():
     content = ('// expect_result: pass\n'
                '// glsl_version: 1.00\n'
                '// [end config]\n')
-    with utils.with_tempfile(content) as tfile:
+    with utils.tempfile(content) as tfile:
         with nt.assert_raises(glsl.GLSLParserNoConfigError) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
@@ -62,7 +62,7 @@ def test_find_config_start():
     content = ('// [config]\n'
                '// glsl_version: 1.00\n'
                '//\n')
-    with utils.with_tempfile(content) as tfile:
+    with utils.tempfile(content) as tfile:
         with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_not_equal(
@@ -73,7 +73,7 @@ def test_find_config_start():
 def test_no_config_end():
     """test.glsl_parser_test.GLSLParserTest: exception is raised if [end config] section is missing
     """
-    with utils.with_tempfile('// [config]\n') as tfile:
+    with utils.tempfile('// [config]\n') as tfile:
         with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
@@ -87,7 +87,7 @@ def test_no_expect_result():
     content = ('// [config]\n'
                '// glsl_version: 1.00\n'
                '//\n')
-    with utils.with_tempfile(content) as tfile:
+    with utils.tempfile(content) as tfile:
         with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
@@ -102,7 +102,7 @@ def test_no_glsl_version():
     content = ('// [config]\n'
                '// expect_result: pass\n'
                '// [end config]\n')
-    with utils.with_tempfile(content) as tfile:
+    with utils.tempfile(content) as tfile:
         with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
@@ -226,7 +226,7 @@ def test_bad_section_name():
                '// new_awesome_key: foo\n'
                '// [end config]\n')
 
-    with utils.with_tempfile(content) as tfile:
+    with utils.tempfile(content) as tfile:
         with nt.assert_raises(SystemExit) as e:
             glsl.GLSLParserTest(tfile)
 
@@ -252,7 +252,7 @@ def test_good_section_names():
 
 def check_no_duplicates(content, dup):
     """ Ensure that duplicate entries raise an error """
-    with utils.with_tempfile(content) as tfile:
+    with utils.tempfile(content) as tfile:
         with nt.assert_raises(SystemExit) as e:
             glsl.GLSLParserTest(tfile)
 
@@ -314,7 +314,7 @@ def glslparser_exetensions_seperators():
 
     for name, value in problems:
         test = content.format(value)
-        with utils.with_tempfile(test) as tfile:
+        with utils.tempfile(test) as tfile:
             check_bad_character.description = (
                 'test.glsl_parser_test.GLSLParserTest: require_extensions {0} '
                 'should raise an error'.format(name))
@@ -351,5 +351,5 @@ def test_good_extensions():
             'test.glsl_parser_test.GLSLParserTest: '
             'require_extension {} is valid'.format(x))
 
-        with utils.with_tempfile(test) as tfile:
+        with utils.tempfile(test) as tfile:
             yield check_good_extension, tfile, x

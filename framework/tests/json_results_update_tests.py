@@ -133,7 +133,7 @@ class TestV0toV1(object):
             },
         })
 
-        with utils.with_tempfile(json.dumps(cls.DATA)) as t:
+        with utils.tempfile(json.dumps(cls.DATA)) as t:
             with open(t, 'r') as f:
                 cls.RESULT = backends.json._update_zero_to_one(backends.json._load(f))
 
@@ -226,7 +226,7 @@ class TestV0toV1(object):
             data = self.DATA
 
         try:
-            with utils.with_tempfile(json.dumps(data)) as t:
+            with utils.tempfile(json.dumps(data)) as t:
                 result = backends.json.load_results(t)
         except OSError as e:
             # There is the potential that the file will be renamed. In that event
@@ -266,7 +266,7 @@ class TestV0toV1(object):
         data['tests']['sometest']['info'] = \
             'Returncode: 1\n\nErrors:stderr\n\nOutput: stdout\n\nmore\n\nstuff'
 
-        with utils.with_tempfile(json.dumps(data)) as t:
+        with utils.tempfile(json.dumps(data)) as t:
             with open(t, 'r') as f:
                 backends.json._update_zero_to_one(backends.json._load(f))
 
@@ -310,7 +310,7 @@ class TestV2Update(object):
             }
         }
 
-        with utils.with_tempfile(json.dumps(data)) as t:
+        with utils.tempfile(json.dumps(data)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_one_to_two(
                     backends.json._load(f))
@@ -377,7 +377,7 @@ class TestV2NoUpdate(object):
             }
         }
 
-        with utils.with_tempfile(json.dumps(data)) as t:
+        with utils.tempfile(json.dumps(data)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_one_to_two(
                     backends.json._load(f))
@@ -453,7 +453,7 @@ class TestV2toV3(object):
             }
         }
 
-        with utils.with_tempfile(json.dumps(data)) as t:
+        with utils.tempfile(json.dumps(data)) as t:
             with open(t, 'r') as f:
                 # pylint: disable=protected-access
                 cls.RESULT = backends.json._update_two_to_three(backends.json._load(f))
@@ -518,7 +518,7 @@ class TestV3toV4(object):
     @staticmethod
     def _make_result(data):
         """Write data to a file and return a result.TestrunResult object."""
-        with utils.with_tempfile(json.dumps(data)) as t:
+        with utils.tempfile(json.dumps(data)) as t:
             with open(t, 'r') as f:
                 # pylint: disable=protected-access
                 return backends.json._update_three_to_four(backends.json._load(f))
@@ -607,7 +607,7 @@ class TestV4toV5(object):
             "has@windows",
         ]
 
-        with utils.with_tempfile(json.dumps(cls.DATA)) as t:
+        with utils.tempfile(json.dumps(cls.DATA)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_four_to_five(backends.json._load(f))
 

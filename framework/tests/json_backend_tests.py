@@ -177,7 +177,7 @@ def test_update_results_old():
 @nt.raises(AssertionError)
 def test_json_resume_non_folder():
     """backends.json._resume: doesn't accept a file"""
-    with utils.with_tempfile('') as f:
+    with utils.tempfile('') as f:
         backends.json._resume(f)
 
 

@@ -38,7 +38,7 @@ def test_parse_gl_test_no_decimal():
     """test.shader_test.ShaderTest: raises if version lacks decminal"""
     data = ('[require]\n'
             'GL = 2\n')
-    with utils.with_tempfile(data) as temp:
+    with utils.tempfile(data) as temp:
         with nt.assert_raises(testm.ShaderTestParserException) as exc:
             testm.ShaderTest(temp)
             nt.assert_equal(exc.exception, "No GL version set",
@@ -52,7 +52,7 @@ def test_parse_gles2_test():
     data = ('[require]\n'
             'GL ES >= 2.0\n'
             'GLSL ES >= 1.00\n')
-    with utils.with_tempfile(data) as temp:
+    with utils.tempfile(data) as temp:
         test = testm.ShaderTest(temp)
 
     nt.assert_equal(
@@ -66,7 +66,7 @@ def test_parse_gles3_test():
     data = ('[require]\n'
             'GL ES >= 3.0\n'
             'GLSL ES >= 3.00\n')
-    with utils.with_tempfile(data) as temp:
+    with utils.tempfile(data) as temp:
         test = testm.ShaderTest(temp)
 
     nt.assert_equal(

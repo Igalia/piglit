@@ -74,8 +74,8 @@ def check_sets(old, ostat, new, nstat, set_):
     old['tests']['sometest']['result'] = ostat
     new['tests']['sometest']['result'] = nstat
 
-    with utils.with_tempfile(json.dumps(old)) as ofile:
-        with utils.with_tempfile(json.dumps(new)) as nfile:
+    with utils.tempfile(json.dumps(old)) as ofile:
+        with utils.tempfile(json.dumps(new)) as nfile:
             summ = summary.Summary([ofile, nfile])
 
             print(summ.tests)
@@ -95,7 +95,7 @@ class TestSubtestHandling(object):
         data['tests']['with_subtests']['subtest']['subtest3'] = 'crash'
         data['tests']['is_skip']['result'] = 'skip'
 
-        with utils.with_tempfile(json.dumps(data)) as sumfile:
+        with utils.tempfile(json.dumps(data)) as sumfile:
             cls.summ = summary.Summary([sumfile])
 
     def test_subtests_are_tests(self):

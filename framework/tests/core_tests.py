@@ -108,7 +108,7 @@ def test_parse_listfile_return():
     """
     contents = "/tmp/foo\n/tmp/bar\n"
 
-    with utils.with_tempfile(contents) as tfile:
+    with utils.tempfile(contents) as tfile:
         results = core.parse_listfile(tfile)
 
     assert isinstance(results, collections.Container)
@@ -119,7 +119,7 @@ class Test_parse_listfile_TrailingWhitespace(object):
     @classmethod
     def setup_class(cls):
         contents = "/tmp/foo\n/tmp/foo  \n/tmp/foo\t\n"
-        with utils.with_tempfile(contents) as tfile:
+        with utils.tempfile(contents) as tfile:
             cls.results = core.parse_listfile(tfile)
 
     def test_newlines(self):
@@ -149,7 +149,7 @@ def test_parse_listfile_tilde():
     """
     contents = "~/foo\n"
 
-    with utils.with_tempfile(contents) as tfile:
+    with utils.tempfile(contents) as tfile:
         results = core.parse_listfile(tfile)
 
     assert results[0] == os.path.expandvars("$HOME/foo")

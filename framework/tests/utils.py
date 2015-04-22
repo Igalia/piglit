@@ -29,7 +29,7 @@ from __future__ import print_function, absolute_import
 import os
 import sys
 import shutil
-import tempfile
+import tempfile as tempfile_
 import functools
 import subprocess
 from contextlib import contextmanager
@@ -44,7 +44,7 @@ from framework import test, backends, results
 
 
 __all__ = [
-    'with_tempfile',
+    'tempfile',
     'resultfile',
     'tempdir',
     'JSON_DATA'
@@ -103,7 +103,7 @@ class StaticDirectory(object):
     def setup_class(cls):
         """ Create a temperary directory that will be removed in teardown_class
         """
-        cls.tdir = tempfile.mkdtemp()
+        cls.tdir = tempfile_.mkdtemp()
 
     @classmethod
     def teardown_class(cls):
@@ -206,7 +206,7 @@ class GeneratedTestWrapper(object):
 @contextmanager
 def resultfile():
     """ Create a stringio with some json in it and pass that as results """
-    with tempfile.NamedTemporaryFile(delete=False) as output:
+    with tempfile_.NamedTemporaryFile(delete=False) as output:
         json.dump(JSON_DATA, output)
 
     yield output
@@ -215,7 +215,7 @@ def resultfile():
 
 
 @contextmanager
-def with_tempfile(contents):
+def tempfile(contents):
     """ Provides a context manager for a named tempfile
 
     This contextmanager creates a named tempfile, writes data into that
@@ -228,7 +228,7 @@ def with_tempfile(contents):
 
     """
     # Do not delete the tempfile as soon as it is closed
-    temp = tempfile.NamedTemporaryFile(delete=False)
+    temp = tempfile_.NamedTemporaryFile(delete=False)
     temp.write(contents)
     temp.close()
 
@@ -240,7 +240,7 @@ def with_tempfile(contents):
 @contextmanager
 def tempdir():
     """ Creates a temporary directory, returns it, and then deletes it """
-    tdir = tempfile.mkdtemp()
+    tdir = tempfile_.mkdtemp()
     yield tdir
     shutil.rmtree(tdir)
 
