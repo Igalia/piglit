@@ -63,6 +63,7 @@ class TestJunitNoTests(utils.StaticDirectory):
         test.finalize()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
 
+    @utils.no_error
     def test_xml_well_formed(self):
         """backends.junit.JUnitBackend: initialize and finalize produce well formed xml
 
@@ -70,10 +71,7 @@ class TestJunitNoTests(utils.StaticDirectory):
         JUnit requires at least one test to be valid
 
         """
-        try:
-            etree.parse(self.test_file)
-        except Exception as e:
-            raise AssertionError(e)
+        etree.parse(self.test_file)
 
 
 class TestJUnitSingleTest(TestJunitNoTests):
@@ -170,6 +168,7 @@ def test_junit_replace():
                     'piglit.a.test.group')
 
 
+@utils.not_raises(etree.ParseError)
 def test_junit_skips_bad_tests():
     """backends.junit.JUnitBackend: skips illformed tests"""
     with utils.tempdir() as tdir:
@@ -188,10 +187,7 @@ def test_junit_skips_bad_tests():
         with open(os.path.join(tdir, 'tests', '1.xml'), 'w') as f:
             f.write('bad data')
 
-        try:
-            test.finalize()
-        except etree.ParseError as e:
-            raise AssertionError(e)
+        test.finalize()
 
 
 class TestJUnitLoad(utils.StaticDirectory):
