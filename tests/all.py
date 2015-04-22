@@ -2296,6 +2296,7 @@ with profile.group_manager(
         grouptools.join('spec', 'ARB_framebuffer_no_attachments')) as g:
     g(['arb_framebuffer_no_attachments-minmax'], run_concurrent=False)
     g(['arb_framebuffer_no_attachments-params'])
+    g(['arb_framebuffer_no_attachments-atomic'])
 
 # Group ARB_explicit_uniform_location
 with profile.group_manager(
