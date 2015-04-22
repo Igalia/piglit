@@ -44,7 +44,7 @@ except ImportError:
 from nose.plugins.skip import SkipTest
 import nose.tools as nt
 
-from framework import test, backends
+from framework import test, backends, results
 
 
 __all__ = [
@@ -53,6 +53,16 @@ __all__ = [
     'tempdir',
     'JSON_DATA'
 ]
+
+
+class _Tree(dict):
+    """Private helper to make JSON_DATA easier to work with."""
+    def __getitem__(self, key):
+        try:
+            return super(_Tree, self).__getitem__(key)
+        except KeyError:
+            ret = self[key] = _Tree()
+            return ret
 
 
 JSON_DATA = {
@@ -65,12 +75,12 @@ JSON_DATA = {
     "name": "fake-tests",
     "lspci": "fake",
     "glxinfo": "fake",
-    "tests": {
-        "sometest": {
+    "tests": _Tree({
+        "sometest": results.TestResult({
             "result": "pass",
             "time": 0.01
-        }
-    }
+        })
+    })
 }
 
 
