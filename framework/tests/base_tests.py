@@ -108,12 +108,14 @@ def test_run_command_early():
     """
     class Test_(Test):
         def interpret_result(self):
-            raise AssertionError('Test.run() did not return early')
+            raise utils.TestFailure("The test didn't return early")
 
         def _run_command(self):
             return True
 
-    test = Test_(['foo'])
+    # Of course, if there is an executable 'foobarboinkoink' in your path this
+    # test will fail. It seems pretty unlikely that you would
+    test = Test_(['foobarboinkoink'])
     test.run()
 
 
