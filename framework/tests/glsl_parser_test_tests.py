@@ -235,6 +235,7 @@ def test_bad_section_name():
                    'glslparser test config block'.format(tfile))
 
 
+@utils.not_raises(glsl.GLSLParserError)
 def test_good_section_names():
     """test.glsl_parser_test.GLSLParserTest: A section name in the _CONFIG_KEYS does not raise an error"""
     content = ('// [config]\n'
@@ -244,10 +245,7 @@ def test_good_section_names():
                '// check_link: True\n'
                '// [end config]\n')
 
-    try:
-        _check_config(content)
-    except glsl.GLSLParserException as e:
-        raise AssertionError(e)
+    _check_config(content)
 
 
 def check_no_duplicates(content, dup):
@@ -287,7 +285,7 @@ def check_bad_character(tfile):
 
         # Obviously this isn't a perfect check, but it should be close enough
         if not e.exception.message.startswith('Bad character "'):
-            raise AssertionError(e.exception)
+            raise utils.TestFailure(e.exception)
 
 
 @utils.nose_generator
