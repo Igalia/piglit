@@ -43,19 +43,6 @@ class TestTest(Test):
 
 
 # Tests
-def test_run_return_early():
-    """test.base.Test.run(): exits early when Test._run_command() has exception
-    """
-    def helper():
-        raise AssertionError("The test didn't return early")
-
-    # Of course, this won't work if you actually have a foobarcommand in your
-    # path...
-    test = TestTest(['foobarcommand'])
-    test.test_interpret_result = helper
-    test.run()
-
-
 def test_timeout():
     """test.base.Test.run(): kills tests that exceed timeout when set"""
     utils.binary_check('sleep')
