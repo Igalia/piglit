@@ -25,9 +25,6 @@ in a single place.
 
 """
 
-# TODO: add a chdir decorator that gets the current dir, runs the test in a
-#       try and returns to the start dir in the finally
-
 from __future__ import print_function, absolute_import
 import os
 import sys
@@ -42,7 +39,6 @@ try:
 except ImportError:
     import json
 from nose.plugins.skip import SkipTest
-import nose.tools as nt
 
 from framework import test, backends, results
 
@@ -93,6 +89,120 @@ class UtilsError(Exception):
     pass
 
 
+class StaticDirectory(object):
+    """ Helper class providing shared files creation and cleanup
+
+    One should override the setup_class method in a child class, call super(),
+    and then add files to cls.dir.
+
+    Tests in this class should NOT modify the contents of tidr, if you want
+    that functionality you want a different class
+
+    """
+    @classmethod
+    def setup_class(cls):
+        """ Create a temperary directory that will be removed in teardown_class
+        """
+        cls.tdir = tempfile.mkdtemp()
+
+    @classmethod
+    def teardown_class(cls):
+        """ Remove the temporary directory """
+        shutil.rmtree(cls.tdir)
+
+
+class DocFormatter(object):
+    """Decorator for formatting object docstrings.
+
+    This class is designed to be initialized once per test module, and then one
+    instance used as a decorator for all functions.
+
+    Works as follows:
+    >>> doc_formatter = DocFormatter({'format': 'foo', 'name': 'bar'})
+    >>>
+    >>> @doc_formatter
+    ... def foo():
+    ...     '''a docstring for {format} and {name}'''
+    ...     pass
+    ...
+    >>> foo.__doc__
+    'a docstring for foo and bar'
+
+    This allows tests that can be dynamically updated by changing a single
+    constant to have the test descriptions alos updated by the same constant.
+
+    Arguments:
+    table -- a dictionary of key value pairs to be converted
+
+    """
+    def __init__(self, table):
+        self.__table = table
+
+    def __call__(self, func):
+        try:
+            func.__doc__ = func.__doc__.format(**self.__table)
+        except KeyError as e:
+            # We want to catch this to ensure that a test that is looking for a
+            # KeyError doesn't pass when it shouldn't
+            raise UtilsError(e)
+
+        return func
+
+
+class Test(test.Test):
+    """A basic dmmmy Test class that can be used in places a test is required.
+
+    This provides dummy version of abstract methods in
+    framework.test.base.Test, which allows it to be initialized and run, but is
+    unlikely to be useful for running.
+
+    This is mainly intended for testing where a Test class is required, but
+    doesn't need to be run.
+
+    """
+    def interpret_result(self):
+        pass
+
+
+class GeneratedTestWrapper(object):
+    """ An object proxy for nose test instances
+
+    Nose uses python generators to create test generators, the drawback of this
+    is that unless the generator is very specifically engineered it yeilds the
+    same instance multiple times. Since nose uses an instance attribute to
+    display the name of the test on a failure, and it prints the failure
+    dialogue after the run is complete all failing tests from a single
+    generator will end up with the name of the last test generated. This
+    generator is used in conjunction with the nose_generator() decorator to
+    create multiple objects each with a unique description attribute, working
+    around the bug.
+    Upstream bug: https://code.google.com/p/python-nose/issues/detail?id=244
+
+    This uses functoos.update_wrapper to proxy the underlying object, and
+    provides a __call__ method (which allows it to be called like a function)
+    that calls the underling function.
+
+    This class can also be used to wrap a class, but that class needs to
+    provide a __call__ method, and use that to return results.
+
+    Arguments:
+    wrapped -- A function or function-like-class
+
+    """
+    def __init__(self, wrapped):
+        self._wrapped = wrapped
+        functools.update_wrapper(self, self._wrapped)
+
+    def __call__(self, *args, **kwargs):
+        """ calls the wrapped function
+
+        Arguments:
+        *args -- arguments to be passed to the wrapped function
+        **kwargs -- keyword arguments to be passed to the wrapped function
+        """
+        return self._wrapped(*args, **kwargs)
+
+
 @contextmanager
 def resultfile():
     """ Create a stringio with some json in it and pass that as results """
@@ -135,46 +245,6 @@ def tempdir():
     shutil.rmtree(tdir)
 
 
-@nt.nottest
-class GeneratedTestWrapper(object):
-    """ An object proxy for nose test instances
-
-    Nose uses python generators to create test generators, the drawback of this
-    is that unless the generator is very specifically engineered it yeilds the
-    same instance multiple times. Since nose uses an instance attribute to
-    display the name of the test on a failure, and it prints the failure
-    dialogue after the run is complete all failing tests from a single
-    generator will end up with the name of the last test generated. This
-    generator is used in conjunction with the nose_generator() decorator to
-    create multiple objects each with a unique description attribute, working
-    around the bug.
-    Upstream bug: https://code.google.com/p/python-nose/issues/detail?id=244
-
-    This uses functoos.update_wrapper to proxy the underlying object, and
-    provides a __call__ method (which allows it to be called like a function)
-    that calls the underling function.
-
-    This class can also be used to wrap a class, but that class needs to
-    provide a __call__ method, and use that to return results.
-
-    Arguments:
-    wrapped -- A function or function-like-class
-
-    """
-    def __init__(self, wrapped):
-        self._wrapped = wrapped
-        functools.update_wrapper(self, self._wrapped)
-
-    def __call__(self, *args, **kwargs):
-        """ calls the wrapped function
-
-        Arguments:
-        *args -- arguments to be passed to the wrapped function
-        **kwargs -- keyword arguments to be passed to the wrapped function
-        """
-        return self._wrapped(*args, **kwargs)
-
-
 def nose_generator(func):
     """ Decorator for nose test generators to us GeneratedTestWrapper
 
@@ -202,28 +272,6 @@ def privileged_test(func):
     return func
 
 
-class StaticDirectory(object):
-    """ Helper class providing shared files creation and cleanup
-
-    One should override the setup_class method in a child class, call super(),
-    and then add files to cls.dir.
-
-    Tests in this class should NOT modify the contents of tidr, if you want
-    that functionality you want a different class
-
-    """
-    @classmethod
-    def setup_class(cls):
-        """ Create a temperary directory that will be removed in teardown_class
-        """
-        cls.tdir = tempfile.mkdtemp()
-
-    @classmethod
-    def teardown_class(cls):
-        """ Remove the temporary directory """
-        shutil.rmtree(cls.tdir)
-
-
 def binary_check(bin_):
     """Check for the existance of a binary or raise SkipTest."""
     with open(os.devnull, 'w') as null:
@@ -237,21 +285,6 @@ def platform_check(plat):
     """If the platform is not in the list specified skip the test."""
     if not sys.platform.startswith(plat):
         raise SkipTest('Platform {} is not supported'.format(sys.platform))
-
-
-class Test(test.Test):
-    """A basic dmmmy Test class that can be used in places a test is required.
-
-    This provides dummy version of abstract methods in
-    framework.test.base.Test, which allows it to be initialized and run, but is
-    unlikely to be useful for running.
-
-    This is mainly intended for testing where a Test class is required, but
-    doesn't need to be run.
-
-    """
-    def interpret_result(self):
-        pass
 
 
 def fail_if(function, values, exceptions, except_error=False):
@@ -312,44 +345,6 @@ def no_error(func):
             raise TestFailure(*e.args)
 
     return test_wrapper
-
-
-class DocFormatter(object):
-    """Decorator for formatting object docstrings.
-
-    This class is designed to be initialized once per test module, and then one
-    instance used as a decorator for all functions.
-
-    Works as follows:
-    >>> doc_formatter = DocFormatter({'format': 'foo', 'name': 'bar'})
-    >>>
-    >>> @doc_formatter
-    ... def foo():
-    ...     '''a docstring for {format} and {name}'''
-    ...     pass
-    ...
-    >>> foo.__doc__
-    'a docstring for foo and bar'
-
-    This allows tests that can be dynamically updated by changing a single
-    constant to have the test descriptions alos updated by the same constant.
-
-    Arguments:
-    table -- a dictionary of key value pairs to be converted
-
-    """
-    def __init__(self, table):
-        self.__table = table
-
-    def __call__(self, func):
-        try:
-            func.__doc__ = func.__doc__.format(**self.__table)
-        except KeyError as e:
-            # We want to catch this to ensure that a test that is looking for a
-            # KeyError doesn't pass when it shouldn't
-            raise UtilsError(e)
-
-        return func
 
 
 def test_in_tempdir(func):
