@@ -30,12 +30,12 @@ import framework.tests.utils as utils
 
 
 def test_initialize_shader_test():
-    """ Test that ShaderTest initializes """
+    """test.shader_test.ShaderTest: class initializes"""
     testm.ShaderTest('tests/spec/glsl-es-1.00/execution/sanity.shader_test')
 
 
 def test_parse_gl_test_no_decimal():
-    """ The GL Parser raises an exception if GL version lacks decimal """
+    """test.shader_test.ShaderTest: raises if version lacks decminal"""
     data = ('[require]\n'
             'GL = 2\n')
     with utils.with_tempfile(data) as temp:
@@ -48,7 +48,7 @@ def test_parse_gl_test_no_decimal():
 
 
 def test_parse_gles2_test():
-    """ Tests the parser for GLES2 tests """
+    """test.shader_test.ShaderTest: Identifies GLES2 tests successfully"""
     data = ('[require]\n'
             'GL ES >= 2.0\n'
             'GLSL ES >= 1.00\n')
@@ -62,7 +62,7 @@ def test_parse_gles2_test():
 
 
 def test_parse_gles3_test():
-    """ Tests the parser for GLES3 tests """
+    """test.shader_test.ShaderTest: Identifies GLES3 tests successfully"""
     data = ('[require]\n'
             'GL ES >= 3.0\n'
             'GLSL ES >= 3.00\n')
@@ -75,7 +75,7 @@ def test_parse_gles3_test():
             "but instead ran with " + os.path.basename(test.command[0]))
 
 
-def test_add_fbo():
-    """ ShaderTest.command adds -auto """
+def test_add_auto():
+    """test.shader_test.ShaderTest: -auto is added to the command"""
     test = testm.ShaderTest('tests/spec/glsl-es-1.00/execution/sanity.shader_test')
     nt.assert_in('-auto', test.command)
