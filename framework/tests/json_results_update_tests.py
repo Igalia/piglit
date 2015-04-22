@@ -551,12 +551,12 @@ class TestV3toV4(object):
         for new in self.new:
             nt.assert_dict_equal(self.result.tests[new], self.TEST_DATA)
 
+    @utils.not_raises(KeyError)
     def test_missing(self):
         """backends.json.update_results (3 -> 4): updates successfully when tests to rename are not present"""
         data = copy.copy(self.DATA)
         del data['tests']['spec/arb_draw_instanced/instance-array-dereference']
-
-        utils.fail_if(self._make_result, [data], KeyError)
+        self._make_result(data)
 
 
 class TestV4toV5(object):

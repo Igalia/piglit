@@ -264,11 +264,12 @@ def nose_generator(func):
 def privileged_test(func):
     """ Wrapper to name the tests as sudo
 
-    This makes the name of the function contain sudo, which is useful for
-    excluding tests with privileged execution requirements
+    This makes the name of the function contain begin with sudo, which is
+    useful for excluding tests with privileged execution requirements
 
     """
-    func.__name__ = 'sudo_{}'.format(func.__name__)
+    func.__name__ = 'sudo_' + func.__name__
+
     return func
 
 
@@ -285,66 +286,6 @@ def platform_check(plat):
     """If the platform is not in the list specified skip the test."""
     if not sys.platform.startswith(plat):
         raise SkipTest('Platform {} is not supported'.format(sys.platform))
-
-
-def fail_if(function, values, exceptions, except_error=False):
-    """function fails if any of the exceptions are raised.
-
-    Arguments:
-    function -- a callable to test. If it raises an exception caught by the
-                values of exceptions it will cause the test to fail.
-    values -- arguments to pass to function as an explodable collection (a
-              list-like object). The will be exploded.
-    exceptions -- any value that can be passed to the except keyword such that
-                  any exception that causes the test to fail will be caught.
-
-    Keyword Arguments:
-    except_error -- If false any other exception will cause the test to raise
-                    an error, if set to true any errors other than those of
-                    exceptions will cause be passed. Default: False
-
-    Tests can be catch a single exception:
-    >>> a = {}
-    >>> fail_if(lambda x: a[x], ['foo'], KeyError)
-    Traceback (most recent call last):
-    TestFailure
-
-    They can also catch multiple exceptions:
-    >>> a = {}
-    >>> fail_if(lambda x: a[x], ['foo'], (KeyError, ValueError))
-    Traceback (most recent call last):
-    TestFailure
-
-    If except_error is True and an error is raised that isn't caught by
-    exceptions the test will pass:
-    >>> a = {}
-    >>> fail_if(lambda x: a[x], ['foo'], AssertionError, except_error=True)
-
-    """
-    try:
-        return function(*values)
-    except exceptions:
-        raise TestFailure
-    except Exception:  # pylint: disable=broad-except
-        if not except_error:
-            raise
-        return None
-
-
-def no_error(func):
-    """Decorator for tests that should not raise an error.
-
-    If any error is raised then it will be converted into a TestFailure.
-
-    """
-    @functools.wraps(func)
-    def test_wrapper(*args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except Exception as e:
-            raise TestFailure(*e.args)
-
-    return test_wrapper
 
 
 def test_in_tempdir(func):
@@ -366,3 +307,37 @@ def test_in_tempdir(func):
                 os.chdir(original_dir)
 
     return wrapper
+
+
+def not_raises(exceptions):
+    """Decorator that causes a test to fail if it raises an exception.
+
+    Without arguments this will raise a TestFailure if Exception is raised.
+    arguments are passed those will be handed directly to the except keyword,
+    and a TestFailure will be raised only for those exceptions.
+
+    Uncaught exceptions will still be handled by nose and return an error.
+
+    """
+
+    def _wrapper(func):
+        """wrapper that wraps the actual functiion definition."""
+
+        @functools.wraps(func)
+        def _inner(*args, **kwargs):
+            """Wrapper for the function call."""
+            try:
+                func(*args, **kwargs)
+            except exceptions as e:
+                raise TestFailure(e.message)
+
+        return _inner
+
+    return _wrapper
+
+
+def no_error(func):
+    """Convenience wrapper around not_raises when any error is an exception
+
+    """
+    return not_raises(Exception)(func)
