@@ -86,6 +86,7 @@ extern float piglit_tolerance[4];
 static struct component_version gl_version;
 static struct component_version glsl_version;
 static struct component_version glsl_req_version;
+static int gl_max_vertex_output_components;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
 static int gl_max_varying_components;
@@ -558,6 +559,11 @@ process_requirement(const char *line)
 		int *val;
 		const char *desc;
 	} getint_limits[] = {
+		{
+			"GL_MAX_VERTEX_OUTPUT_COMPONENTS",
+			&gl_max_vertex_output_components,
+			"vertex output components",
+		},
 		{
 			"GL_MAX_FRAGMENT_UNIFORM_COMPONENTS",
 			&gl_max_fragment_uniform_components,
@@ -2698,6 +2704,9 @@ piglit_init(int argc, char **argv)
 	             (major * 100) + minor);
 
 #ifdef PIGLIT_USE_OPENGL
+	if (piglit_get_gl_version() >= 32)
+		glGetIntegerv(GL_MAX_VERTEX_OUTPUT_COMPONENTS,
+			      &gl_max_vertex_output_components);
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
 		      &gl_max_fragment_uniform_components);
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
