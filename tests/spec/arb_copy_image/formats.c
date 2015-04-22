@@ -138,6 +138,7 @@ struct texture_format formats[] = {
 
 	FORMAT(GL_DEPTH_STENCIL, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, false, 4, 1, 1),
 
+	FORMAT(GL_STENCIL_INDEX8, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, false, 1, 1, 1),
 #ifdef GL_EXT_texture_compression_s3tc
 	FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RED, GL_BYTE, true, 8, 4, 4),
 	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_RED, GL_BYTE, true, 8, 4, 4),
@@ -253,6 +254,8 @@ is_format_supported(struct texture_format *format)
 	case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT:
 		return piglit_is_extension_supported("GL_ARB_texture_compression_bptc");
 #endif
+	case GL_STENCIL_INDEX8:
+		return piglit_is_extension_supported("GL_ARB_texture_stencil8");
 	}
 
 	return true;
@@ -522,6 +525,7 @@ load_compare_program(struct texture_format *format)
 	case GL_RGB_INTEGER:
 	case GL_RGBA_INTEGER:
 	case GL_BGRA_INTEGER:
+	case GL_STENCIL_INDEX:
 		switch (format->data_type) {
 		case GL_BYTE:
 		case GL_SHORT:
