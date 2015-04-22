@@ -76,13 +76,11 @@ class TestJSONTestMethod(utils.StaticDirectory):
         """backends.json.JSONBackend.write_test(): adds tests to a 'tests' directory"""
         assert os.path.exists(os.path.join(self.tdir, 'tests', '0.json'))
 
+    @utils.no_error
     def test_json_is_valid(self):
         """backends.json.JSONBackend.write_test(): produces valid json"""
         with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
-            try:
-                json.load(f)
-            except Exception as e:
-                raise AssertionError(e)
+            json.load(f)
 
     def test_json_is_correct(self):
         """backends.json.JSONBackend.write_test(): produces correct json"""
@@ -120,13 +118,11 @@ class TestJSONTestFinalize(utils.StaticDirectory):
         """backends.json.JSONBackend.finalize(): creates a results.json file"""
         assert os.path.exists(os.path.join(self.tdir, 'results.json'))
 
+    @utils.no_error
     def test_results_valid(self):
         """backends.json.JSONBackend.finalize(): results.json is valid"""
         with open(os.path.join(self.tdir, 'results.json'), 'r') as f:
-            try:
-                json.load(f)
-            except Exception as e:
-                raise AssertionError(e)
+            json.load(f)
 
 
 def test_update_results_current():
