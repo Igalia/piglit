@@ -214,7 +214,7 @@ def _load(results_file):
     
     """
     result = results.TestrunResult()
-    result.results_vesrion = 0  # This should get overwritten
+    result.results_version = 0  # This should get overwritten
     result.__dict__.update(json.load(results_file, object_hook=piglit_decoder))
 
     return result
