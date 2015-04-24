@@ -4210,6 +4210,12 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'egl_khr_wait_sync'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_khr_fence_sync', 'wait_sync'], 'conformance')
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'egl_chromium_sync_control'),
         exclude_platforms=['glx']) as g:
     g(['egl_chromium_sync_control'], 'conformance')

@@ -63,6 +63,7 @@
 EGLSyncKHR (*peglCreateSyncKHR)(EGLDisplay dpy, EGLenum type, const EGLint *attrib_list);
 EGLBoolean (*peglDestroySyncKHR)(EGLDisplay dpy, EGLSyncKHR sync);
 EGLint (*peglClientWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout);
+EGLint (*peglWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
 EGLBoolean (*peglGetSyncAttribKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint attribute, EGLint *value);
 
 static const char *prog_name;
@@ -1250,7 +1251,7 @@ test_eglDestroySyncKHR_invalid_sync(void *test_data)
 	return result;
 }
 
-static const struct piglit_subtest subtests[] = {
+static const struct piglit_subtest fence_sync_subtests[] = {
 	{
 		"eglCreateSyncKHR_default_attributes",
 		"eglCreateSyncKHR_default_attributes",
@@ -1331,17 +1332,63 @@ static const struct piglit_subtest subtests[] = {
 	{0},
 };
 
+/**
+ * Verify that eglWaitSyncKHR() emits correct error when given an invalid
+ * sync object.
+ */
+static enum piglit_result
+test_eglWaitSyncKHR_invalid_sync(void *test_data)
+{
+	enum piglit_result result = PIGLIT_PASS;
+	EGLint wait_status = 0;
+	EGLSyncKHR invalid_sync = (EGLSyncKHR) &canary;
+
+	result = test_setup();
+	if (result != PIGLIT_PASS) {
+		return result;
+	}
+
+	piglit_require_egl_extension(g_dpy, "EGL_KHR_wait_sync");
+
+	wait_status = peglWaitSyncKHR(g_dpy, invalid_sync, 0);
+	if (wait_status != EGL_FALSE) {
+		piglit_loge("Given an invalid sync object, eglWaitSyncKHR() "
+			  "should return EGL_FALSE, but returned 0x%x",
+			  wait_status);
+		result = PIGLIT_FAIL;
+	}
+	if (!piglit_check_egl_error(EGL_BAD_PARAMETER)) {
+		piglit_loge("Given an invalid sync object, eglWaitSyncKHR() "
+			  "did not emit EGL_BAD_PARAMETER");
+		result = PIGLIT_FAIL;
+	}
+
+	test_cleanup(EGL_NO_SYNC_KHR, &result);
+	return result;
+}
+
+static const struct piglit_subtest wait_sync_subtests[] = {
+	{
+		"eglWaitSyncKHR_invalid_sync",
+		"eglWaitSyncKHR_invalid_sync",
+		test_eglWaitSyncKHR_invalid_sync,
+	},
+	{0},
+};
+
 static void
 init_egl_extension_funcs(void)
 {
 	peglCreateSyncKHR = (void*) eglGetProcAddress("eglCreateSyncKHR");
 	peglDestroySyncKHR = (void*) eglGetProcAddress("eglDestroySyncKHR");
 	peglClientWaitSyncKHR = (void*) eglGetProcAddress("eglClientWaitSyncKHR");
+	peglWaitSyncKHR = (void*) eglGetProcAddress("eglWaitSyncKHR");
 	peglGetSyncAttribKHR = (void*) eglGetProcAddress("eglGetSyncAttribKHR");
 }
 
 static void
 parse_args(int *argc, char **argv,
+	   const struct piglit_subtest *subtests,
 	   const char ***selected_subtests,
 	   size_t *num_selected_subtests)
 {
@@ -1363,7 +1410,7 @@ parse_args(int *argc, char **argv,
 	piglit_strip_arg(argc, argv, "-auto");
 
 	piglit_parse_subtest_args(argc, argv, subtests, selected_subtests,
-			          num_selected_subtests);
+				  num_selected_subtests);
 
 	if (*argc > 1) {
 		piglit_loge("unrecognized option: %s", argv[1]);
@@ -1377,8 +1424,14 @@ main(int argc, char **argv)
 	enum piglit_result result = PIGLIT_SKIP;
 	const char **selected_subtests = NULL;
 	size_t num_selected_subtests = 0;
+	const struct piglit_subtest *subtests;
 
-	parse_args(&argc, argv, &selected_subtests, &num_selected_subtests);
+	if (piglit_strip_arg(&argc, argv, "wait_sync"))
+		subtests = wait_sync_subtests;
+	else
+		subtests = fence_sync_subtests;
+
+	parse_args(&argc, argv, subtests, &selected_subtests, &num_selected_subtests);
 	init_egl_extension_funcs();
 	result = piglit_run_selected_subtests(subtests, selected_subtests,
 					      num_selected_subtests, result);
