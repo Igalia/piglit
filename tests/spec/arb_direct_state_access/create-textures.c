@@ -65,12 +65,6 @@ piglit_display(void)
 	glCreateTextures(GL_TEXTURE_2D, -1, &name);
 	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-	/* name is not a valid pointer */
-	glCreateTextures(GL_TEXTURE_2D, 1, 0);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
-	glCreateTextures(GL_TEXTURE_2D, 1, NULL);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
-
 	/* Trivial, but should work. */
 	glCreateTextures(GL_TEXTURE_2D, 1, &name);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
