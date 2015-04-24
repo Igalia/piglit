@@ -4343,6 +4343,11 @@ with profile.group_manager(
     g(['arb_shader_image_load_store-unused'], 'unused')
 
 with profile.group_manager(
+    PiglitGLTest,
+    grouptools.join('spec', 'arb_shader_image_size')) as g:
+    g(['arb_shader_image_size-builtin'], 'builtin')
+
+with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_stencil8')) as g:
     g(['arb_texture_stencil8-draw'], 'draw')

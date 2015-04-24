@@ -24,5 +24,12 @@ with profile.group_manager(
         g(['arb_shader_image_load_store-shader-mem-barrier', '--quick'],
           'shader-mem-barrier')
 
+# Set the --quick flag on the image_size test
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_shader_image_size')) as g:
+    with profile.allow_reassignment:
+        g(['arb_shader_image_size-builtin', '--quick'], 'builtin')
+
 # These take too long
 profile.filter_tests(lambda n, _: '-explosion' not in n)

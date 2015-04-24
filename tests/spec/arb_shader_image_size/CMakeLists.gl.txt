@@ -1,0 +1,16 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+)
+
+piglit_add_executable (arb_shader_image_size-builtin builtin.c
+					../arb_shader_image_load_store/image.c
+					../arb_shader_image_load_store/grid.c
+					../arb_shader_image_load_store/common.c)
+# vim: ft=cmake:
