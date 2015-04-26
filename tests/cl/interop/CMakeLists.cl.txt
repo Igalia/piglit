@@ -1,0 +1,15 @@
+IF(EGL_FOUND)
+	include_directories(
+		${GLEXT_INCLUDE_DIR}
+		${OPENGL_INCLUDE_PATH}
+	)
+
+	link_libraries (
+		piglitutil_gles2
+		${EGL_LDFLAGS}
+		${OPENGL_gl_LIBRARY}
+		${OPENGL_glu_LIBRARY}
+	)
+
+	piglit_cl_add_interop_test (egl_khr_cl_event2 egl_khr_cl_event2.c)
+ENDIF(EGL_FOUND)
