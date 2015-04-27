@@ -40,6 +40,16 @@ __all__ = [
 ]
 
 
+_JUNIT_SPECIAL_NAMES = ('api', 'search')
+
+
+def junit_escape(name):
+    name = name.replace('.', '_')
+    if name in _JUNIT_SPECIAL_NAMES:
+        name += '_'
+    return name
+
+
 class JUnitBackend(FileBackend):
     """ Backend that produces ANT JUnit XML
 
@@ -161,8 +171,9 @@ class JUnitBackend(FileBackend):
         # classname), and replace piglits '/' separated groups with '.', after
         # replacing any '.' with '_' (so we don't get false groups).
         classname, testname = grouptools.splitname(name)
-        classname = classname.replace('.', '_')
-        classname = classname.replace(grouptools.SEPARATOR, '.')
+        classname = classname.split(grouptools.SEPARATOR)
+        classname = [junit_escape(e) for e in classname]
+        classname = '.'.join(classname)
 
         # Add the test to the piglit group rather than directly to the root
         # group, this allows piglit junit to be used in conjunction with other
@@ -177,7 +188,7 @@ class JUnitBackend(FileBackend):
         # The testname variable is used in the calculate_result
         # closure, and must not have the suffix appended.
         full_test_name = testname + self._test_suffix
-        if full_test_name in ('api', 'search'):
+        if full_test_name in _JUNIT_SPECIAL_NAMES:
             testname += '_'
             full_test_name = testname + self._test_suffix
 
