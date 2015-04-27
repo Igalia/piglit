@@ -39,7 +39,7 @@ probe all rgba 0.0 1.0 0.0 1.0
 
 uniform ivec4 x -1 2 -131072 -131073
 uniform ivec4 y 1 -2 131072 131073
-uniform ivec4 expected_msb -1 -1 4294967292 4294967291
-uniform ivec4 expected_lsb -1 -4 0 4294705151
+uniform ivec4 expected_msb -1 -1 -4 -5
+uniform ivec4 expected_lsb -1 -4 0 -262145
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
