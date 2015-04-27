@@ -2294,7 +2294,7 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_framebuffer_no_attachments')) as g:
-    g(['arb_framebuffer_no_attachments-minmax'], run_concurrent=False)
+    g(['arb_framebuffer_no_attachments-minmax'])
     g(['arb_framebuffer_no_attachments-params'])
     g(['arb_framebuffer_no_attachments-atomic'])
 
