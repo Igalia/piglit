@@ -35,13 +35,14 @@ from nose.plugins.skip import SkipTest
 from framework import results, backends, grouptools, status
 import framework.tests.utils as utils
 from .backends_tests import BACKEND_INITIAL_META
+from framework.backends import compression
 
 
 JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'
 
 doc_formatter = utils.DocFormatter({'separator': grouptools.SEPARATOR})
 
-_XML =  """\
+_XML = """\
 <?xml version='1.0' encoding='utf-8'?>
   <testsuites>
     <testsuite name="piglit" tests="1">
@@ -52,6 +53,22 @@ _XML =  """\
     </testsuite>
   </testsuites>
 """
+
+_SAVED_COMPRESSION = compression.MODE
+
+
+def setup_module():
+    # Set the compression mode to a controlled value (no compression), to
+    # ensure that we're not getting unexpected file extensions. This means that
+    # the default can be changed, or environment variables set without
+    # affecting unit tests
+    compression.MODE = 'none'
+    compression.COMPRESSOR = compression.COMPRESSORS['none']
+
+
+def teardown_module():
+    compression.MODE = _SAVED_COMPRESSION
+    compression.COMPRESSOR = compression.COMPRESSORS[_SAVED_COMPRESSION]
 
 
 class TestJunitNoTests(utils.StaticDirectory):
@@ -199,7 +216,7 @@ class TestJUnitLoad(utils.StaticDirectory):
     @classmethod
     def xml(cls):
         if cls.__instance is None:
-            cls.__instance =  backends.junit._load(cls.xml_file)
+            cls.__instance = backends.junit._load(cls.xml_file)
         return cls.__instance
 
     @utils.no_error
@@ -248,13 +265,13 @@ class TestJUnitLoad(utils.StaticDirectory):
 
     @utils.no_error
     def test_load_file(self):
-        """backends.junit.load: Loads a file directly."""
-        backends.junit.REGISTRY.load(self.xml_file)
+        """backends.junit.load: Loads a file directly"""
+        backends.junit.REGISTRY.load(self.xml_file, 'none')
 
     @utils.no_error
     def test_load_dir(self):
-        """backends.junit.load: Loads a directory."""
-        backends.junit.REGISTRY.load(self.tdir)
+        """backends.junit.load: Loads a directory"""
+        backends.junit.REGISTRY.load(self.tdir, 'none')
 
 
 def test_load_file_name():
@@ -265,20 +282,19 @@ def test_load_file_name():
         with open(filename, 'w') as f:
             f.write(_XML)
 
-        test = backends.junit.REGISTRY.load(filename)
+        test = backends.junit.REGISTRY.load(filename, 'none')
     nt.assert_equal(test.name, 'foobar')
 
 
 def test_load_folder_name():
-    """backends.junit._load: uses the foldername if the result is 'results'
-    """
+    """backends.junit._load: uses the folder name if the result is 'results'"""
     with utils.tempdir() as tdir:
         os.mkdir(os.path.join(tdir, 'a cool test'))
         filename = os.path.join(tdir, 'a cool test', 'results.xml')
         with open(filename, 'w') as f:
             f.write(_XML)
 
-        test = backends.junit.REGISTRY.load(filename)
+        test = backends.junit.REGISTRY.load(filename, 'none')
     nt.assert_equal(test.name, 'a cool test')
 
 
@@ -292,6 +308,6 @@ def test_load_default_name():
         with open(filename, 'w') as f:
             f.write(_XML)
 
-        test = backends.junit.REGISTRY.load(filename)
+        test = backends.junit.REGISTRY.load(filename, 'none')
 
     nt.assert_equal(test.name, 'junit result')

@@ -31,9 +31,26 @@ except ImportError:
     import json
 import nose.tools as nt
 
-from framework import results, backends, exceptions
+from framework import results, backends, exceptions, grouptools
+from framework.backends import compression
 import framework.tests.utils as utils
 from .backends_tests import BACKEND_INITIAL_META
+
+_SAVED_COMPRESSION = compression.MODE
+
+
+def setup_module():
+    # Set the compression mode to a controlled value (no compression), to
+    # ensure that we're not getting unexpected file extensions. This means that
+    # the default can be changed, or environment variables set without
+    # affecting unit tests
+    compression.MODE = 'none'
+    compression.COMPRESSOR = compression.COMPRESSORS['none']
+
+
+def teardown_module():
+    compression.MODE = _SAVED_COMPRESSION
+    compression.COMPRESSOR = compression.COMPRESSORS[_SAVED_COMPRESSION]
 
 
 def test_initialize_jsonbackend():
@@ -91,10 +108,12 @@ class TestJSONTestMethod(utils.StaticDirectory):
         nt.assert_dict_equal({self.test_name: self.result}, test)
 
 
+
 class TestJSONTestFinalize(utils.StaticDirectory):
+    # We're explictely setting none here since the default can change from none
     @classmethod
     def setup_class(cls):
-        cls.test_name = 'a/test/group/test1'
+        cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
         cls.result = results.TestResult({
             'time': 1.2345,
             'result': 'pass',
@@ -117,7 +136,8 @@ class TestJSONTestFinalize(utils.StaticDirectory):
         assert not os.path.exists(os.path.join(self.tdir, 'tests'))
 
     def test_create_results(self):
-        """backends.json.JSONBackend.finalize(): creates a results.json file"""
+        """backends.json.JSONBackend.finalize(): creates a results.json file
+        """
         assert os.path.exists(os.path.join(self.tdir, 'results.json'))
 
     @utils.no_error
@@ -227,7 +247,7 @@ def test_resume_load_incomplete():
     Because resume, aggregate, and summary all use the function called _resume
     we can't remove incomplete tests here. It's probably worth doing a refactor
     to split some code out and allow this to be done in the resume path.
-    
+
     """
     with utils.tempdir() as f:
         backend = backends.json.JSONBackend(f)
@@ -252,12 +272,13 @@ def test_resume_load_incomplete():
 
 @utils.no_error
 def test_load_results_folder_as_main():
-    """backends.json.load_results: takes a folder with a file named main in it"""
+    """backends.json.load_results: takes a folder with a file named main in it
+    """
     with utils.tempdir() as tdir:
         with open(os.path.join(tdir, 'main'), 'w') as tfile:
             tfile.write(json.dumps(utils.JSON_DATA))
 
-        backends.json.load_results(tdir)
+        backends.json.load_results(tdir, 'none')
 
 
 @utils.no_error
@@ -267,14 +288,14 @@ def test_load_results_folder():
         with open(os.path.join(tdir, 'results.json'), 'w') as tfile:
             tfile.write(json.dumps(utils.JSON_DATA))
 
-        backends.json.load_results(tdir)
+        backends.json.load_results(tdir, 'none')
 
 
 @utils.no_error
 def test_load_results_file():
     """backends.json.load_results: Loads a file passed by name"""
     with utils.resultfile() as tfile:
-        backends.json.load_results(tfile.name)
+        backends.json.load_results(tfile.name, 'none')
 
 
 def test_load_json():

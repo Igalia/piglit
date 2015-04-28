@@ -26,14 +26,32 @@ This module provides mixins and base classes for backend modules.
 """
 
 from __future__ import print_function, absolute_import
-import os
 import abc
-import shutil
-import itertools
 import contextlib
+import itertools
+import os
+import shutil
 
+from . import compression
 from framework.results import TestResult
 from framework.status import INCOMPLETE
+
+
+@contextlib.contextmanager
+def write_compressed(filename):
+    """Write a the final result using desired compression.
+
+    This helper function reads the piglit.conf to decide whether to use
+    compression, and what type of compression to use.
+
+    Currently it implements no compression
+
+    """
+    if compression.MODE != 'none':
+        filename = '{}.{}'.format(filename, compression.MODE)
+
+    with compression.COMPRESSOR(filename) as f:
+        yield f
 
 
 class Backend(object):
@@ -143,8 +161,9 @@ class FileBackend(Backend):
     """
     def __init__(self, dest, file_start_count=0, file_fsync=False, **kwargs):
         self._dest = dest
-        self.__counter = itertools.count(file_start_count)
-        self.__file_sync = file_fsync
+        self._counter = itertools.count(file_start_count)
+        self._file_sync = file_fsync
+        self._write_final = write_compressed
 
     __INCOMPLETE = TestResult({'result': INCOMPLETE})
 
@@ -155,7 +174,7 @@ class FileBackend(Backend):
 
         """
         file_.flush()
-        if self.__file_sync:
+        if self._file_sync:
             os.fsync(file_.fileno())
 
     @abc.abstractmethod
@@ -188,7 +207,7 @@ class FileBackend(Backend):
             shutil.move(tfile, file_)
 
         file_ = os.path.join(self._dest, 'tests', '{}.{}'.format(
-            next(self.__counter), self._file_extension))
+            next(self._counter), self._file_extension))
 
         with open(file_, 'w') as f:
             self._write(f, name, self.__INCOMPLETE)

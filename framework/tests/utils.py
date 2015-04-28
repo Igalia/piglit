@@ -452,5 +452,4 @@ def set_piglit_conf(*values):
                     core.PIGLIT_CONFIG.remove_option(section, key)
 
         return _inner
-
     return _decorator

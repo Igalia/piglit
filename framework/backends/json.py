@@ -32,8 +32,9 @@ except ImportError:
     import json
 
 from framework import status, results, exceptions
-from .abstract import FileBackend
+from .abstract import FileBackend, write_compressed
 from .register import Registry
+from . import compression
 
 __all__ = [
     'REGISTRY',
@@ -140,10 +141,10 @@ class JSONBackend(FileBackend):
                     pass
         assert data['tests']
 
-        # write out the combined file.
-        with open(os.path.join(self._dest, 'results.json'), 'w') as f:
-            json.dump(data, f, default=piglit_encoder,
-                      indent=INDENT)
+        # write out the combined file. Use the compression writer from the
+        # FileBackend
+        with self._write_final(os.path.join(self._dest, 'results.json')) as f:
+            json.dump(data, f, default=piglit_encoder, indent=INDENT)
 
         # Delete the temporary files
         os.unlink(os.path.join(self._dest, 'metadata.json'))
@@ -154,7 +155,7 @@ class JSONBackend(FileBackend):
         json.dump({name: data}, f, default=piglit_encoder)
 
 
-def load_results(filename):
+def load_results(filename, compression_):
     """ Loader function for TestrunResult class
 
     This function takes a single argument of a results file.
@@ -182,18 +183,23 @@ def load_results(filename):
         #      this?
         return _resume(filename)
     else:
-        # If there are both old and new results in a directory pick the new
-        # ones first
-        if os.path.exists(os.path.join(filename, 'results.json')):
-            filepath = os.path.join(filename, 'results.json')
-        # Version 0 results are called 'main'
-        elif os.path.exists(os.path.join(filename, 'main')):
-            filepath = os.path.join(filename, 'main')
+        # Look for a compressed result first, then a bare result, finally for
+        # an old main file
+        for name in ['results.json.{}'.format(compression_),
+                     'results.json', 
+                     'main']:
+            if os.path.exists(os.path.join(filename, name)):
+                filepath = os.path.join(filename, name)
+                break
         else:
             raise exceptions.PiglitFatalError(
-                'No results found in "{}"'.format(filename))
+                'No results found in "{}" (compression: {})'.format(
+                    filename, compression_))
 
-    with open(filepath, 'r') as f:
+    assert compression_ in compression.COMPRESSORS, \
+        'unsupported compression type'
+
+    with compression.DECOMPRESSORS[compression_](filepath) as f:
         testrun = _load(f)
 
     return _update_results(testrun, filepath)
@@ -310,7 +316,7 @@ def _update_results(results, filepath):
 
 def _write(results, file_):
     """WRite the values of the results out to a file."""
-    with open(file_, 'w') as f:
+    with write_compressed(file_) as f:
         json.dump({k:v for k, v in results.__dict__.iteritems()},
                   f,
                   default=piglit_encoder,

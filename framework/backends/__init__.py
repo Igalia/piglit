@@ -45,6 +45,7 @@ import os
 import importlib
 
 from .register import Registry
+from .compression import COMPRESSION_SUFFIXES
 
 __all__ = [
     'BACKENDS',
@@ -69,7 +70,7 @@ def _register():
 
     Walk through the list of backends and register them to a name in a
     dictionary, so that they can be referenced from helper functions.
-    
+
     """
     registry = {}
 
@@ -95,7 +96,7 @@ def get_backend(backend):
     If the backend module exists, but there is not active implementation then a
     BackendNotImplementedError will be raised, it is also the responsiblity of
     the caller to handle this error.
-    
+
     """
     try:
         inst = BACKENDS[backend].backend
@@ -117,45 +118,57 @@ def load(file_path):
     then return the TestrunResult instance.
 
     """
-    extension = None
+    def get_extension(file_path):
+        """Get the extension name to use when searching for a loader.
 
-    # This should be 'not isdir', since an fd does not evaluate to True using
-    # 'os.path.isfile'
-    if not os.path.isdir(file_path):
-        extension = os.path.splitext(file_path)[1]
-        if not extension:
-            extension = ''
-    else:
-        for file in os.listdir(file_path):
-            if file.startswith('result'):
-                extension = os.path.splitext(file)[1]
-                break
-            elif file == 'main':
-                extension = ''
-                break
-    tests = os.path.join(file_path, 'tests')
-    if extension is None:
-        if os.path.exists(tests):
-            extension = os.path.splitext(os.listdir(tests)[0])[1]
+        This function correctly handles compression suffixes, as long as they
+        are valid.
+
+        """
+        def _extension(file_path):
+            """Helper function to get the extension string."""
+            compression = 'none'
+            name, extension = os.path.splitext(file_path)
+
+            # If we hit a compressed suffix, get an additional suffix to test
+            # with.
+            # i.e: Use .json.gz rather that .gz
+            if extension in COMPRESSION_SUFFIXES:
+                compression = extension[1:]  # Drop the leading '.'
+                extension = os.path.splitext(name)[1]
+
+            return extension, compression
+
+        if not os.path.isdir(file_path):
+            return _extension(file_path)
         else:
-            # At this point we have failed to find any sort of backend, just except
-            # and die
+            for file_ in os.listdir(file_path):
+                if file_.startswith('result'):
+                    return _extension(file_)
+
+        tests = os.path.join(file_path, 'tests')
+        if os.path.exists(tests):
+            return _extension(os.listdir(tests)[0])
+        else:
+            # At this point we have failed to find any sort of backend, just
+            # except and die
             raise BackendError("No backend found for any file in {}".format(
                 file_path))
+
+    extension, compression = get_extension(file_path)
 
     for backend in BACKENDS.itervalues():
         if extension in backend.extensions:
             loader = backend.load
-            break
-    else:
-        raise BackendError(
-            'No module supports file extensions "{}"'.format(extension))
 
-    if loader is None:
-        raise BackendNotImplementedError(
-            'Loader for {} is not implemented'.format(extension))
+            if loader is None:
+                raise BackendNotImplementedError(
+                    'Loader for {} is not implemented'.format(extension))
 
-    return loader(file_path)
+            return loader(file_path, compression)
+
+    raise BackendError(
+        'No module supports file extensions "{}"'.format(extension))
 
 
 def set_meta(backend, result):

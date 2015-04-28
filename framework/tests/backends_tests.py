@@ -114,7 +114,7 @@ def test_load():
     backends.BACKENDS['test_backend'] = backends.register.Registry(
         extensions=['.test_extension'],
         backend=None,
-        load=lambda x: [x],
+        load=lambda x, y: [x],  # y is for a compression value
         meta=None,
     )
 
@@ -146,7 +146,7 @@ def test_load_resume():
     backends.BACKENDS['test_backend'] = backends.register.Registry(
         extensions=['.test_backend'],
         backend=None,
-        load=lambda x: x,
+        load=lambda x, y: x,
         meta=None,
     )
     os.mkdir('tests')

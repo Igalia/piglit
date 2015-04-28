@@ -33,10 +33,27 @@ import nose.tools as nt
 
 import framework.tests.utils as utils
 from framework import backends, results
+from framework.backends import compression
 
 # Disable some errors that cannot be fixed either because tests need to probe
 # protected members, or because of nose requirements, like long lines
 # pylint: disable=protected-access,invalid-name,line-too-long
+
+_SAVED_COMPRESSION = compression.MODE
+
+
+def setup_module():
+    # Set the compression mode to a controlled value (no compression), to
+    # ensure that we're not getting unexpected file extensions. This means that
+    # the default can be changed, or environment variables set without
+    # affecting unit tests
+    compression.MODE = 'none'
+    compression.COMPRESSOR = compression.COMPRESSORS['none']
+
+
+def teardown_module():
+    compression.MODE = _SAVED_COMPRESSION
+    compression.COMPRESSOR = compression.COMPRESSORS[_SAVED_COMPRESSION]
 
 
 class TestV0toV1(object):
@@ -227,7 +244,7 @@ class TestV0toV1(object):
 
         try:
             with utils.tempfile(json.dumps(data)) as t:
-                result = backends.json.load_results(t)
+                result = backends.json.load_results(t, 'none')
         except OSError as e:
             # There is the potential that the file will be renamed. In that event
             # remove the renamed files
@@ -636,5 +653,5 @@ class TestV4toV5(object):
             with open(tempfile, 'w') as f:
                 json.dump(self.DATA, f)
             with open(tempfile, 'r') as f:
-                result = backends.json.load_results(tempfile)
+                result = backends.json.load_results(tempfile, 'none')
                 nt.assert_equal(result.results_version, 5)

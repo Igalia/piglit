@@ -267,7 +267,7 @@ def _load(results_file):
     return run_result
 
 
-def load(results_dir):
+def load(results_dir, compression):  # pylint: disable=unused-argument
     """Searches for a results file and returns a TestrunResult.
 
     wraps _load and searches for the result file.

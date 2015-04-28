@@ -37,8 +37,26 @@ except ImportError:
 
 import framework.core as core
 import framework.tests.utils as utils
+from framework.backends import compression
 from framework.backends.json import JSONBackend
 from framework.programs.run import _create_metadata
+
+# pylint: disable=invalid-name
+_SAVED_COMPRESSION = compression.MODE
+
+
+def setup_module():
+    # Set the compression mode to a controlled value (no compression), to
+    # ensure that we're not getting unexpected file extensions. This means that
+    # the default can be changed, or environment variables set without
+    # affecting unit tests
+    compression.MODE = 'none'
+    compression.COMPRESSOR = compression.COMPRESSORS['none']
+
+
+def teardown_module():
+    compression.MODE = _SAVED_COMPRESSION
+    compression.COMPRESSOR = compression.COMPRESSORS[_SAVED_COMPRESSION]
 
 
 # Helpers
