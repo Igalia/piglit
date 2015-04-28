@@ -1,0 +1,27 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying float xval;
+varying float yval;
+void main()
+{
+	gl_Position = gl_Vertex;
+	xval = gl_Vertex.x;
+	yval = gl_Vertex.y;
+}
+
+[fragment shader]
+uniform vec4 arg0;
+varying float xval;
+varying float yval;
+void main()
+{
+	gl_FragColor = vec4(dFdx(xval) * 20.0,
+                            dFdy(yval) * 10.0,
+                            0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgba  16  16 0.16 0.08 0.00 1.00

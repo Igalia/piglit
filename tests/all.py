@@ -542,7 +542,6 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-vs-statechange-1'])
     g(['vp-combined-image-units'])
     g(['glsl-derivs'])
-    g(['glsl-deriv-varyings'])
     g(['glsl-fwidth'])
     g(['glsl-lod-bias'])
     g(['vp-ignore-input'])

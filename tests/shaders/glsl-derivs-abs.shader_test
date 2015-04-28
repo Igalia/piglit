@@ -1,0 +1,55 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying float xval;
+varying float yval;
+void main()
+{
+	gl_Position = gl_Vertex;
+	xval = gl_Vertex.x;
+	yval = gl_Vertex.y;
+}
+
+[fragment shader]
+uniform vec4 arg0;
+varying float xval;
+varying float yval;
+void main()
+{
+        float xval_sign = sign(xval) == -1.0 ? -1.0 : 1.0;
+        float yval_sign = sign(yval) == -1.0 ? -1.0 : 1.0;
+	gl_FragColor = vec4(dFdx(abs(xval)) * xval_sign * 20.0,
+                            dFdy(abs(yval)) * yval_sign * 10.0,
+                            0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+
+probe rgba  16  16 0.16 0.08 0.00 1.00
+probe rgba  16 167 0.16 0.08 0.00 1.00
+probe rgba 167  16 0.16 0.08 0.00 1.00
+probe rgba 167 167 0.16 0.08 0.00 1.00
+
+probe rgba   0   0 0.16 0.08 0.00 1.00
+probe rgba   0 249 0.16 0.08 0.00 1.00
+probe rgba 249   0 0.16 0.08 0.00 1.00
+probe rgba 249 249 0.16 0.08 0.00 1.00
+
+probe rgba 123 123 0.16 0.08 0.00 1.00
+probe rgba 124 123 0.00 0.08 0.00 1.00
+probe rgba 125 123 0.00 0.08 0.00 1.00
+probe rgba 126 123 0.16 0.08 0.00 1.00
+probe rgba 123 124 0.16 0.00 0.00 1.00
+probe rgba 124 124 0.00 0.00 0.00 1.00
+probe rgba 125 124 0.00 0.00 0.00 1.00
+probe rgba 126 124 0.16 0.00 0.00 1.00
+probe rgba 123 125 0.16 0.00 0.00 1.00
+probe rgba 124 125 0.00 0.00 0.00 1.00
+probe rgba 125 125 0.00 0.00 0.00 1.00
+probe rgba 126 125 0.16 0.00 0.00 1.00
+probe rgba 123 126 0.16 0.08 0.00 1.00
+probe rgba 124 126 0.00 0.08 0.00 1.00
+probe rgba 125 126 0.00 0.08 0.00 1.00
+probe rgba 126 126 0.16 0.08 0.00 1.00
