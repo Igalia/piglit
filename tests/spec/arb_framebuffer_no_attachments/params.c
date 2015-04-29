@@ -179,7 +179,7 @@ dsa_subtest(GLuint fbo)
 	GLint value;
 	bool pass = true;
 
-	if (!piglit_is_extension_supported("GL_ARB_direct_state_access")) {
+	if (!piglit_is_extension_supported("GL_EXT_direct_state_access")) {
 		piglit_report_subtest_result(PIGLIT_SKIP, "dsa");
 		return pass;
 	}
@@ -195,7 +195,7 @@ dsa_subtest(GLuint fbo)
 		pass = pass && test_values(&tests[i], GL_FRAMEBUFFER, fbo);
 	}
 
-	/* Test INVALID_VALUE error when fbo given does not exist. */
+	/* Test using fbo name that was not returned by glGenFramebuffers. */
 	if (!set_value(GL_FRAMEBUFFER_DEFAULT_WIDTH, 42, GL_FRAMEBUFFER,
 		GL_INVALID_VALUE, 666))
 		pass = false;
