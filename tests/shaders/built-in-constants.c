@@ -115,6 +115,17 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		config.supports_gl_compat_version = 10;
 		config.supports_gl_es_version = 30;
 		break;
+	case 310:
+		/* It seems impossible that a desktop OpenGL implementation
+		 * would support GL_ARB_ES3_1_compatibility and not support at
+		 * least OpenGL 3.2.  Realistically, the compute shader
+		 * requirement means that nearly all
+		 * GL_ARB_ES3_1_compatibility implementations will be OpenGL
+		 * 4.2 or later.
+		 */
+		config.supports_gl_core_version = 32;
+		config.supports_gl_es_version = 31;
+		break;
 	default: {
 		const unsigned int gl_version
 			= required_gl_version_from_glsl_version(required_glsl_version);
@@ -413,6 +424,10 @@ piglit_init(int argc, char **argv)
 			break;
 		case 300:
 			if (!piglit_is_extension_supported("GL_ARB_ES3_compatibility"))
+			    piglit_report_result(PIGLIT_SKIP);
+			break;
+		case 310:
+			if (!piglit_is_extension_supported("GL_ARB_ES3_1_compatibility"))
 			    piglit_report_result(PIGLIT_SKIP);
 			break;
 		default:
