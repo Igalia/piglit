@@ -1,4 +1,4 @@
-3.00
+300 es
 gl_MaxVertexAttribs 16
 gl_MaxVertexUniformVectors 256
 gl_MaxVertexOutputVectors 16

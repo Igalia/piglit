@@ -1,4 +1,4 @@
-1.30
+130
 GL_ARB_shading_language_420pack
 gl_MinProgramTexelOffset -8
 gl_MaxProgramTexelOffset 7

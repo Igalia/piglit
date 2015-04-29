@@ -1,4 +1,4 @@
-1.50
+150
 gl_MaxVertexAttribs 16
 gl_MaxVertexUniformComponents 1024
 gl_MaxVaryingFloats 60

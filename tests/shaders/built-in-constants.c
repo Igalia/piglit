@@ -37,7 +37,8 @@ struct test_vector tests[500];
 unsigned num_tests = 0;
 
 int required_glsl_version = 0;
-char *required_glsl_version_string = NULL;
+char required_glsl_version_string[128];
+bool es_shader = false;
 GLenum shader_type = 0;
 
 /**
@@ -185,11 +186,9 @@ parse_file(const char *filename)
 	unsigned text_size;
 	char *text = piglit_load_text_file(filename, &text_size);
 	char *line = text;
-	int count;
-	int major;
-	int minor;
 	char *end_of_line;
 	ptrdiff_t len;
+	char *endptr;
 
 	if (line == NULL) {
 		fprintf(stderr, "could not read file \"%s\"\n", filename);
@@ -198,7 +197,7 @@ parse_file(const char *filename)
 
 	/* The format of the test file is:
 	 *
-	 * major.minor
+	 * version [es|core]
 	 * GL_VERTEX_SHADER|GL_GEOMETRY_SHADER|GL_FRAGMENT_SHADER|GL_COMPUTE_SHADER
 	 * GL_ARB_some_extension
 	 * gl_MaxFoo 8
@@ -208,13 +207,28 @@ parse_file(const char *filename)
 
 	/* Process the version requirement.
 	 */
-	count = sscanf(line, "%d.%d", &major, &minor);
-	if (count != 2) {
-		fprintf(stderr, "Parse error in version line.\n");
+	end_of_line = strchrnul(line, '\n');
+	len = end_of_line - line;
+
+	if (len + 1 >= ARRAY_SIZE(required_glsl_version_string)) {
+		fprintf(stderr, "Version line too long.\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	required_glsl_version = major * 100 + minor;
+	memcpy(required_glsl_version_string, line, len);
+	required_glsl_version_string[len] = '\0';
+
+	required_glsl_version = strtol(line, &endptr, 10);
+	line = (char *) eat_whitespace(endptr);
+	es_shader = strncmp("es\n", line, 3) == 0;
+
+	if (required_glsl_version <= 0 ||
+	    (line != end_of_line &&
+	     strncmp("es\n", line, 3) != 0 &&
+	     strncmp("core\n", line, 5) != 0)) {
+		fprintf(stderr, "Parse error in version line.\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	/* Skip to the next line.
 	 */
@@ -264,8 +278,6 @@ parse_file(const char *filename)
 	}
 
 	while (line[0] != '\0') {
-		char *endptr;
-
 		line = (char *) eat_whitespace(line);
 
 		if (string_match("gl_Max", line) != 0
@@ -392,7 +404,29 @@ piglit_init(int argc, char **argv)
 
 	piglit_get_glsl_version(&is_es, &major, &minor);
 	glsl_version = major * 100 + minor;
-	if (glsl_version < required_glsl_version)
+
+	if ((es_shader || required_glsl_version == 100) && !is_es) {
+		switch (required_glsl_version) {
+		case 100:
+			if (!piglit_is_extension_supported("GL_ARB_ES2_compatibility"))
+			    piglit_report_result(PIGLIT_SKIP);
+			break;
+		case 300:
+			if (!piglit_is_extension_supported("GL_ARB_ES3_compatibility"))
+			    piglit_report_result(PIGLIT_SKIP);
+			break;
+		default:
+			printf("Unknown GLSL ES version.\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	} else if ((!es_shader && required_glsl_version != 100) && is_es) {
+		/* It should actually be impossible to get here because
+		 * supports_gl_es_version won't get set, and that is required
+		 * in the ES builds.
+		 */
+		printf("Desktop OpenGL shaders are not valid in OpenGL ES.\n");
+		piglit_report_result(PIGLIT_FAIL);
+	} else if (glsl_version < required_glsl_version)
 		piglit_report_result(PIGLIT_SKIP);
 
 	/* Process the list of required extensions.  While doing this,
@@ -434,22 +468,20 @@ piglit_init(int argc, char **argv)
 	 * shaders in the test run.
 	 */
 	asprintf(&version_string,
-		 "#version %d %s\n"
+		 "#version %s\n"
 		 "%s"
 		 "#ifdef GL_ES\n"
 		 "precision mediump float;\n"
 		 "#endif\n",
-		 required_glsl_version,
-		 required_glsl_version == 300 ? "es" : "",
+		 required_glsl_version_string,
 		 extension_enables);
 
 	asprintf(&passthrough_version_string,
-		 "#version %d %s\n"
+		 "#version %s\n"
 		 "#ifdef GL_ES\n"
 		 "precision mediump float;\n"
 		 "#endif\n",
-		 required_glsl_version,
-		 required_glsl_version == 300 ? "es" : "");
+		 required_glsl_version_string);
 
 
 	/* Create the shaders that will be used for the real part of the test.

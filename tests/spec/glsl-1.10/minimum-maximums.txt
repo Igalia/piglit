@@ -1,4 +1,4 @@
-1.10
+110
 gl_MaxClipPlanes 6
 gl_MaxCombinedTextureImageUnits 2
 gl_MaxDrawBuffers 1

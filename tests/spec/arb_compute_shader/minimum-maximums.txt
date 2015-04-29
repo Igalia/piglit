@@ -1,4 +1,4 @@
-3.30
+330
 GL_COMPUTE_SHADER
 GL_ARB_compute_shader
 gl_MaxComputeWorkGroupCount.x 65535

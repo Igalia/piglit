@@ -1,4 +1,4 @@
-1.30
+130
 gl_MaxClipDistances 8
 gl_MaxClipPlanes 8
 gl_MaxCombinedTextureImageUnits 16
