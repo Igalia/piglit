@@ -644,6 +644,16 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     for subtest in ('interstage', 'intrastage', 'vs-gs'):
         g(['version-mixing', subtest])
 
+    for subtest in ('texture2D',
+                    'bias',
+                    'textureGrad',
+                    'texelFetch',
+                    'textureLod',
+                    'textureSize',
+                    'textureQueryLOD',
+                    'textureGather'):
+        g(['zero-tex-coord', subtest])
+
 with profile.group_manager(
         PiglitGLTest, 'glx',
         require_platforms=['glx', 'mixed_glx_egl']) as g:
