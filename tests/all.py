@@ -1651,6 +1651,13 @@ with profile.group_manager(
         grouptools.join('spec', 'glsl-es-3.00', 'execution')) as g:
     g(['varying-struct-centroid_gles3'])
 
+with profile.group_manager(
+        PiglitGLTest, grouptools.join('spec', 'glsl-es-3.10')) as g:
+    g(['built-in-constants_gles3',
+       os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.10',
+                    'minimum-maximums.txt')],
+      'built-in constants')
+
 # AMD_performance_monitor
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'AMD_performance_monitor')) as g:
