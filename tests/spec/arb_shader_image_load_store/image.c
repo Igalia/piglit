@@ -599,9 +599,9 @@ image_target_mipmapping_dimensions(const struct image_target_info *target)
 }
 
 const struct image_stage_info *
-image_stages(void)
+known_image_stages(void)
 {
-        const struct image_stage_info known[] = {
+        static const struct image_stage_info known[] = {
                 { "Vertex", GL_VERTEX_SHADER, GL_VERTEX_SHADER_BIT },
                 { "Tessellation control", GL_TESS_CONTROL_SHADER,
                   GL_TESS_CONTROL_SHADER_BIT },
@@ -610,15 +610,25 @@ image_stages(void)
                 { "Geometry", GL_GEOMETRY_SHADER, GL_GEOMETRY_SHADER_BIT },
                 { "Fragment", GL_FRAGMENT_SHADER, GL_FRAGMENT_SHADER_BIT },
                 { "Compute", GL_COMPUTE_SHADER, GL_COMPUTE_SHADER_BIT },
+                { 0 }
         };
-        static struct image_stage_info supported[ARRAY_SIZE(known) + 1];
+        return known;
+}
+
+const struct image_stage_info *
+image_stages(void)
+{
+        static struct image_stage_info supported[7];
 
         if (!supported[0].name) {
-                int i, n = 0;
+                const struct image_stage_info *stage;
+                int n = 0;
 
-                for (i = 0; i < ARRAY_SIZE(known); ++i) {
-                        if (image_stage_max_images(&known[i]))
-                                supported[n++] = known[i];
+                for (stage = known_image_stages(); stage->stage; ++stage) {
+                        if (image_stage_max_images(stage)) {
+                                assert(n < ARRAY_SIZE(supported) - 1);
+                                supported[n++] = *stage;
+                        }
                 }
         }
 

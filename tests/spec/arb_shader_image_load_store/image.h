@@ -264,6 +264,13 @@ struct image_stage_info {
 };
 
 /**
+ * Get all shader stages in pipeline order regardless of whether they
+ * support image access.
+ */
+const struct image_stage_info *
+known_image_stages(void);
+
+/**
  * Get all shader stages that support image access in pipeline order.
  */
 const struct image_stage_info *
