@@ -4038,6 +4038,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_shader_storage_buffer_object')) as g:
     g(['arb_shader_storage_buffer_object-minmax'], 'minmax')
+    g(['arb_shader_storage_buffer_object-rendering'], 'rendering')
 
 with profile.group_manager(
         PiglitGLTest,
