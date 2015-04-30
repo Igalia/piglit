@@ -4040,6 +4040,7 @@ with profile.group_manager(
     g(['arb_shader_storage_buffer_object-minmax'], 'minmax')
     g(['arb_shader_storage_buffer_object-rendering'], 'rendering')
     g(['arb_shader_storage_buffer_object-getintegeri_v'], 'getintegeri_v')
+    g(['arb_shader_storage_buffer_object-deletebuffers'], 'deletebuffers')
 
 with profile.group_manager(
         PiglitGLTest,
