@@ -270,7 +270,8 @@ const struct image_stage_info *
 image_stages(void);
 
 /**
- * Get information for the specified stage.
+ * Get information for the specified stage, or NULL if the specified
+ * stage doesn't support images.
  */
 const struct image_stage_info *
 get_image_stage(GLenum s);
