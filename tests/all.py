@@ -4035,6 +4035,18 @@ with profile.group_manager(
         grouptools.join('spec', 'arb_shader_storage_buffer_object')) as g:
     g(['arb_shader_storage_buffer_object-minmax'], 'minmax')
     g(['arb_shader_storage_buffer_object-rendering'], 'rendering')
+    g(['arb_shader_storage_buffer_object-maxshaderstorageblocksize '], 'maxshaderstorageblocksize')
+
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_shader_storage_buffer_object',
+                        'maxshaderstorageblocksize')) as g:
+    g(['arb_shader_storage_buffer_object-maxshaderstorageblocksize', 'vs'], 'vs')
+    g(['arb_shader_storage_buffer_object-maxshaderstorageblocksize', 'vsexceed'],
+      'vsexceed')
+    g(['arb_shader_storage_buffer_object-maxshaderstorageblocksize', 'fs'], 'fs')
+    g(['arb_shader_storage_buffer_object-maxshaderstorageblocksize', 'fsexceed'],
+      'fsexceed')
 
 with profile.group_manager(
         PiglitGLTest,
