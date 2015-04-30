@@ -9,5 +9,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_shader_storage_buffer_object-minmax minmax.c)
+piglit_add_executable (arb_shader_storage_buffer_object-rendering rendering.c)
 
 # vim: ft=cmake:
