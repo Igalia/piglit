@@ -97,8 +97,9 @@ class GLSLParserTest(PiglitBaseTest):
                                               "from config".format(opt))
 
         # Create the command and pass it into a PiglitTest()
+        glsl = config['glsl_version']
         command = [
-            'glslparsertest',
+            'glslparsertest_gles2' if glsl in ['1.00', '3.00'] else 'glslparsertest',
             filepath,
             config['expect_result'],
             config['glsl_version']
