@@ -4042,6 +4042,17 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'arb_shader_storage_buffer_object',
+                        'max-ssbo-size')) as g:
+    g(['arb_shader_storage_buffer_object-max-ssbo-size', 'vs'], 'vs')
+    g(['arb_shader_storage_buffer_object-max-ssbo-size', 'vsexceed'],
+      'vsexceed')
+    g(['arb_shader_storage_buffer_object-max-ssbo-size', 'fs'], 'fs')
+    g(['arb_shader_storage_buffer_object-max-ssbo-size', 'fsexceed'],
+      'fsexceed')
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_polygon_offset_clamp')) as g:
     g(['ext_polygon_offset_clamp-draw'])
     g(['ext_polygon_offset_clamp-dlist'])
