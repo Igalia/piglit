@@ -11,5 +11,6 @@ link_libraries (
 piglit_add_executable (arb_shader_storage_buffer_object-minmax minmax.c)
 piglit_add_executable (arb_shader_storage_buffer_object-rendering rendering.c)
 piglit_add_executable (arb_shader_storage_buffer_object-max-ssbo-size max-ssbo-size.c)
+piglit_add_executable (arb_shader_storage_buffer_object-getintegeri_v getintegeri_v.c)
 
 # vim: ft=cmake:
