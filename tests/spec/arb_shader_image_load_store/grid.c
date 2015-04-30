@@ -243,7 +243,7 @@ generate_stage_source(const struct grid_info grid,
 static inline unsigned
 get_stage_idx(const struct image_stage_info *stage)
 {
-        return stage - image_stages();
+        return ffs(stage->bit) - 1;
 }
 
 /**
@@ -270,7 +270,7 @@ generate_program_v(const struct grid_info grid, const char **sources)
         GLuint prog = glCreateProgram();
         const struct image_stage_info *stage;
 
-        for (stage = image_stages(); stage->stage; ++stage) {
+        for (stage = known_image_stages(); stage->stage; ++stage) {
                 if (stages & stage->bit) {
                         char *source = generate_stage_source(
                                 grid, stage->stage,
