@@ -22,6 +22,7 @@
 
 from __future__ import print_function, absolute_import
 import os
+import textwrap
 
 import nose.tools as nt
 
@@ -160,9 +161,17 @@ def test_empty_in_config():
 
 def test_glslparser_initializer():
     """test.glsl_parser_test.GLSLParserTest: clas initializes correctly"""
-    # TODO: use a tempfile and write a temporary test rather than rely on a
-    # real one
-    glsl.GLSLParserTest('tests/spec/glsl-es-1.00/compiler/version-macro.frag')
+    content = textwrap.dedent("""\
+        /*
+         * [config]
+         * expect_result: pass
+         * glsl_version: 1.10
+         * [end config]
+         */
+        """)
+
+    with utils.tempfile(content) as f:
+        glsl.GLSLParserTest(f)
 
 
 def check_config_to_command(config, result):
