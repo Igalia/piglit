@@ -327,3 +327,30 @@ def test_good_extensions():
 
         with utils.tempfile(test) as tfile:
             yield check_good_extension, tfile
+
+
+@utils.nose_generator
+def test_get_glslparsertest_gles2():
+    """GLSLParserTest: gets gles2 binary if glsl is 1.00 or 3.00"""
+
+    @utils.no_error
+    def test(content):
+        with utils.tempfile(content) as f:
+            t = glsl.GLSLParserTest(f)
+            nt.eq_(os.path.basename(t.command[0]), 'glslparsertest_gles2')
+
+    content = textwrap.dedent("""\
+        /*
+         * [config]
+         * expect_result: pass
+         * glsl_version: {}
+         * [end config]
+         */
+        """)
+
+    description = ("test.glsl_parser_test.GLSLParserTest: "
+                   "gets gles2 binary if glsl is {}")
+
+    for version in ['1.00', '3.00']:
+        test.description = description.format(version)
+        yield test, content.format(version)
