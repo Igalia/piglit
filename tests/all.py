@@ -4042,6 +4042,7 @@ with profile.group_manager(
     g(['arb_shader_storage_buffer_object-getintegeri_v'], 'getintegeri_v')
     g(['arb_shader_storage_buffer_object-deletebuffers'], 'deletebuffers')
     g(['arb_shader_storage_buffer_object-maxblocks'], 'maxblocks')
+    g(['arb_shader_storage_buffer_object-ssbo-binding'], 'ssbo-binding')
 
 with profile.group_manager(
         PiglitGLTest,
