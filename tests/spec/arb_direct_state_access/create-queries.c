@@ -102,6 +102,12 @@ piglit_display(void)
 	piglit_check_gl_error(GL_NO_ERROR);
 	SUBTESTCONDITION(param == 0, pass, "default RESULT(%d) == 0", param);
 
+	/* test the target */
+	glGetQueryObjectiv(ids[2], GL_QUERY_TARGET, &param);
+	piglit_check_gl_error(GL_NO_ERROR);
+	SUBTESTCONDITION(param == GL_SAMPLES_PASSED, pass, "TARGET(%s) == "
+			 "GL_SAMPLES_PASSED", piglit_get_gl_enum_name(param));
+
 	/* clean up */
 	glDeleteQueries(10, ids);
 
