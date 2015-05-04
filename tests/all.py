@@ -4038,6 +4038,7 @@ with profile.group_manager(
     g(['arb_shader_storage_buffer_object-maxshaderstorageblocksize '], 'maxshaderstorageblocksize')
     g(['arb_shader_storage_buffer_object-getintegeri_v'], 'getintegeri_v')
     g(['arb_shader_storage_buffer_object-deletebuffers'], 'deletebuffers')
+    g(['arb_shader_storage_buffer_object-maxblocks'], 'maxblocks')
 
 with profile.group_manager(
         PiglitGLTest,
