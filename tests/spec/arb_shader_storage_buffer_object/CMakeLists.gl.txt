@@ -17,5 +17,6 @@ piglit_add_executable (arb_shader_storage_buffer_object-maxblocks maxblocks.c)
 piglit_add_executable (arb_shader_storage_buffer_object-ssbo-binding ssbo-binding.c)
 piglit_add_executable (arb_shader_storage_buffer_object-array-ssbo-binding array-ssbo-binding.c)
 piglit_add_executable (arb_shader_storage_buffer_object-layout-std430-write-shader layout-std430-write-shader.c)
+piglit_add_executable (arb_shader_storage_buffer_object-layout-std140-write-shader layout-std140-write-shader.c)
 
 # vim: ft=cmake:

@@ -4045,6 +4045,7 @@ with profile.group_manager(
     g(['arb_shader_storage_buffer_object-ssbo-binding'], 'ssbo-binding')
     g(['arb_shader_storage_buffer_object-array-ssbo-binding'], 'array-ssbo-binding')
     g(['arb_shader_storage_buffer_object-layout-std430-write-shader'], 'layout-std430-write-shader')
+    g(['arb_shader_storage_buffer_object-layout-std140-write-shader'], 'layout-std140-write-shader')
 
 with profile.group_manager(
         PiglitGLTest,
