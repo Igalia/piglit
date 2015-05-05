@@ -1,0 +1,41 @@
+# From the GL_ARB_shader_storage_buffer_object spec:
+#
+#  "When a named shader storage block is declared by multiple shaders in a
+#   program, it must be declared identically in each shader. The buffer
+#   variables within the block must be declared with the same names, types,
+#   qualification, and declaration order.  If a program contains multiple
+#   shaders with different declarations for the same named shader storage
+#   block, the program will fail to link.
+
+[require]
+GLSL >= 1.50
+GL_ARB_shader_storage_buffer_object
+
+[vertex shader]
+
+#version 150
+#extension GL_ARB_shader_storage_buffer_object: require
+
+buffer a {
+	vec4 s;
+} b[2];
+
+void main(void) {
+
+}
+
+[fragment shader]
+
+#version 150
+#extension GL_ARB_shader_storage_buffer_object: require
+
+buffer a {
+	vec4 s;
+} b[3];
+
+void main(void) {
+
+}
+
+[test]
+link error
