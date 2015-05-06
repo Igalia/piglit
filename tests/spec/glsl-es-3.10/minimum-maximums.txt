@@ -34,4 +34,4 @@ gl_MaxVertexAtomicCounterBuffers 0
 gl_MaxFragmentAtomicCounterBuffers 0
 gl_MaxVertexAtomicCounterBuffers 0
 gl_MaxCombinedAtomicCounterBuffers 1
-gl_MaxAtomicCounterBufferSize 3
+gl_MaxAtomicCounterBufferSize 32
