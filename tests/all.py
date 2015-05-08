@@ -484,6 +484,7 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-getattriblocation'])
     g(['getuniform-01'])
     g(['getuniform-02'])
+    g(['getuniform-03'])
     g(['glsl-invalid-asm-01'])
     g(['glsl-invalid-asm-02'])
     g(['glsl-novertexdata'])

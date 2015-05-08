@@ -59,6 +59,7 @@ piglit_add_executable (glsl-getactiveuniform-count glsl-getactiveuniform-count.c
 piglit_add_executable (glsl-getactiveuniform-length glsl-getactiveuniform-length.c)
 piglit_add_executable (getuniform-01 getuniform-01.c)
 piglit_add_executable (getuniform-02 getuniform-02.c)
+piglit_add_executable (getuniform-03 getuniform-03.c)
 piglit_add_executable (glsl-invalid-asm-01 glsl-invalid-asm-01.c)
 piglit_add_executable (glsl-invalid-asm-02 glsl-invalid-asm-02.c)
 piglit_add_executable (glsl-novertexdata glsl-novertexdata.c)
