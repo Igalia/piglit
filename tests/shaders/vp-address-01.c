@@ -48,7 +48,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = (((BOX_SIZE+1)*TEST_COLS)+1);
 	config.window_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
