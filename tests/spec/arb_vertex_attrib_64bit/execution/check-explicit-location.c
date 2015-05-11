@@ -31,7 +31,7 @@
  * \author Ian Romanick + Dave Airlie
  */
 
-
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
