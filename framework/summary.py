@@ -574,29 +574,35 @@ class Summary:
                     statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
                                           ['result']) for i in self.results)))
 
+        def print_summary():
+            """print a summary."""
+            print("summary:\n"
+                  "       pass: {pass}\n"
+                  "       fail: {fail}\n"
+                  "      crash: {crash}\n"
+                  "       skip: {skip}\n"
+                  "    timeout: {timeout}\n"
+                  "       warn: {warn}\n"
+                  " incomplete: {incomplete}\n"
+                  " dmesg-warn: {dmesg-warn}\n"
+                  " dmesg-fail: {dmesg-fail}".format(**self.totals))
+            if self.tests['changes']:
+                print("    changes: {changes}\n"
+                      "      fixes: {fixes}\n"
+                      "regressions: {regressions}".format(
+                          **{k: len(v) for k, v in self.tests.iteritems()}))
+
+            print("      total: {}".format(sum(self.totals.itervalues())))
+
         # Print the name of the test and the status from each test run
         if mode == 'all':
             printer(self.tests['all'])
+            print_summary()
         elif mode == 'diff':
             printer(self.tests['changes'])
+            print_summary()
         elif mode == 'incomplete':
             printer(self.tests['incomplete'])
+        elif mode == 'summary':
+            print_summary()
 
-        # Print the summary
-        print("summary:\n"
-              "       pass: {pass}\n"
-              "       fail: {fail}\n"
-              "      crash: {crash}\n"
-              "       skip: {skip}\n"
-              "    timeout: {timeout}\n"
-              "       warn: {warn}\n"
-              " incomplete: {incomplete}\n"
-              " dmesg-warn: {dmesg-warn}\n"
-              " dmesg-fail: {dmesg-fail}".format(**self.totals))
-        if self.tests['changes']:
-            print("    changes: {changes}\n"
-                  "      fixes: {fixes}\n"
-                  "regressions: {regressions}".format(
-                      **dict((k, len(v)) for k, v in self.tests.iteritems())))
-
-        print("      total: {}".format(sum(self.totals.itervalues())))
