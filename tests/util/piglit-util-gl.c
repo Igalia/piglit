@@ -755,7 +755,16 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex,
 			glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
 		}
 
-		glDrawArrays(use_patches ? GL_PATCHES : GL_TRIANGLE_STRIP, 0, 4);
+		if (use_patches) {
+			GLint old_patch_vertices;
+
+			glGetIntegerv(GL_PATCH_VERTICES, &old_patch_vertices);
+			glPatchParameteri(GL_PATCH_VERTICES, 4);
+			glDrawArrays(GL_PATCHES, 0, 4);
+			glPatchParameteri(GL_PATCH_VERTICES, old_patch_vertices);
+		}
+		else
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		if (verts)
 			glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
