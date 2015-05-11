@@ -570,7 +570,7 @@ class Summary:
             """
             for test in list_:
                 print("{test}: {statuses}".format(
-                    test=test,
+                    test='/'.join(test.split(grouptools.SEPARATOR)),
                     statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
                                           ['result']) for i in self.results)))
 
@@ -605,4 +605,3 @@ class Summary:
             printer(self.tests['incomplete'])
         elif mode == 'summary':
             print_summary()
-
