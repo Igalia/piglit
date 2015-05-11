@@ -809,7 +809,7 @@ ManifestStencil::compile()
 		{  1, -1 },
 		{  1,  1 }
 	};
-	glGenVertexArrays(1, &vertex_buf);
+	glGenBuffers(1, &vertex_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data,
 		     GL_STATIC_DRAW);
@@ -900,7 +900,7 @@ ManifestDepth::compile()
 		{  1, -1 },
 		{  1,  1 }
 	};
-	glGenVertexArrays(1, &vertex_buf);
+	glGenBuffers(1, &vertex_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data,
 		     GL_STATIC_DRAW);
