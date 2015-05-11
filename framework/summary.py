@@ -563,25 +563,24 @@ class Summary:
         assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
         self.__find_totals(self.results[-1])
 
+        def printer(list_):
+            """Takes a list of test names to print and prints the name and
+            result.
+
+            """
+            for test in list_:
+                print("{test}: {statuses}".format(
+                    test=test,
+                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
+                                          ['result']) for i in self.results)))
+
         # Print the name of the test and the status from each test run
         if mode == 'all':
-            for test in self.tests['all']:
-                print("{test}: {statuses}".format(
-                    test=test,
-                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
-                                          ['result']) for i in self.results)))
+            printer(self.tests['all'])
         elif mode == 'diff':
-            for test in self.tests['changes']:
-                print("{test}: {statuses}".format(
-                    test=test,
-                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
-                                          ['result']) for i in self.results)))
+            printer(self.tests['changes'])
         elif mode == 'incomplete':
-            for test in self.tests['incomplete']:
-                print("{test}: {statuses}".format(
-                    test=test,
-                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
-                                          ['result']) for i in self.results)))
+            printer(self.tests['incomplete'])
 
         # Print the summary
         print("summary:\n"
