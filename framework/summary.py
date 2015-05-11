@@ -560,11 +560,17 @@ class Summary:
 
     def generate_text(self, mode):
         """ Write summary information to the console """
-        assert mode in ['summary', 'diff', 'incomplete']
+        assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
         self.__find_totals(self.results[-1])
 
         # Print the name of the test and the status from each test run
-        if mode == 'diff':
+        if mode == 'all':
+            for test in self.tests['all']:
+                print("{test}: {statuses}".format(
+                    test=test,
+                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
+                                          ['result']) for i in self.results)))
+        elif mode == 'diff':
             for test in self.tests['changes']:
                 print("{test}: {statuses}".format(
                     test=test,
@@ -572,12 +578,6 @@ class Summary:
                                           ['result']) for i in self.results)))
         elif mode == 'incomplete':
             for test in self.tests['incomplete']:
-                print("{test}: {statuses}".format(
-                    test=test,
-                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
-                                          ['result']) for i in self.results)))
-        elif mode != 'summary':
-            for test in self.tests['all']:
                 print("{test}: {statuses}".format(
                     test=test,
                     statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})

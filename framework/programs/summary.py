@@ -146,7 +146,7 @@ def console(input_):
 
     # Generate the output
     output = summary.Summary(args.results)
-    output.generate_text(args.mode)
+    output.generate_text(args.mode or 'all')
 
 
 def csv(input_):
