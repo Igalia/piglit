@@ -1,5 +1,6 @@
 add_subdirectory (egl-1.4)
 add_subdirectory (egl_ext_client_extensions)
 add_subdirectory (egl_khr_create_context)
+add_subdirectory (egl_khr_get_all_proc_addresses)
 add_subdirectory (egl_khr_fence_sync)
 add_subdirectory (egl_chromium_sync_control)

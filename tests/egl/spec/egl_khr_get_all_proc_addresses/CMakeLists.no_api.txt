@@ -1,0 +1,7 @@
+link_libraries(
+	piglitutil
+)
+
+piglit_add_executable(egl_khr_get_all_proc_addresses egl_khr_get_all_proc_addresses.c)
+
+# vim: ft=cmake:
