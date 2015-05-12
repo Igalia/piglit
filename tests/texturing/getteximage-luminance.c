@@ -192,7 +192,9 @@ test_fbo_readpixels_lum_as_rgba(void)
 {
 	static const GLfloat lumImage[2*2] = { 0.25, 0.25, 0.25, 0.25 };
 	static const GLfloat rgbaImage[4] = { 0.25, 0.0, 0.0, 1.0 };
-	GLuint tex, fbo;
+	GLuint tex, fbo, pbo;
+	GLfloat  *test_pbo = NULL;
+	bool pass = true;
 	GLfloat test[2*2*4];
 	GLenum status;
 
@@ -230,10 +232,36 @@ test_fbo_readpixels_lum_as_rgba(void)
 		printf("  Expected %g, %g, %g, %g  Found %g, %g, %g, %g\n",
 		       rgbaImage[0], rgbaImage[1], rgbaImage[2], rgbaImage[3],
 		       test[0], test[1], test[2], test[3]);
-		return false;
+		pass = false;
 	}
 
-	return true;
+	/* Test reading in to a PBO. */
+	if (!piglit_is_extension_supported("GL_ARB_pixel_buffer_object"))
+		return pass;
+
+	glGenBuffersARB(1, &pbo);
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
+	glBufferDataARB(GL_PIXEL_PACK_BUFFER, 2*2*4, NULL, GL_STREAM_DRAW_ARB);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	/* get rgba image in a pbo (only red should have the lum value) */
+	glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, NULL);
+
+	test_pbo = glMapBufferARB(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY_ARB);
+
+	if (test_pbo && !rgba_equal(rgbaImage, test_pbo)) {
+		printf("%s: glReadPixels(GL_LUMINANCE as GL_RGBA) in pbo failed\n",
+		       TestName);
+		printf("  Expected %g, %g, %g, %g  Found %g, %g, %g, %g\n",
+		       rgbaImage[0], rgbaImage[1], rgbaImage[2], rgbaImage[3],
+		       test_pbo[0], test_pbo[1], test_pbo[2], test_pbo[3]);
+		pass = false;
+	}
+
+	glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER, 0);
+	glDeleteBuffersARB(1, &pbo);
+	return pass;
 }
 
 
@@ -245,7 +273,9 @@ test_fbo_readpixels_rgba_as_lum(void)
 {
 	static const GLfloat rgbaImage[4] = { 0.5, 0.25, 0.125, 1.0 };
 	static const GLfloat lumImage[1] = { 0.5 + 0.25 + 0.125 };
-	GLuint tex, fbo;
+	GLuint tex, fbo, pbo;
+	GLfloat *test_pbo = NULL;
+	bool pass = true;
 	GLfloat test[1];
 	GLenum status;
 
@@ -277,14 +307,39 @@ test_fbo_readpixels_rgba_as_lum(void)
 
 	/* get luminance image, should be sum of RGB values */
 	glReadPixels(0, 0, 1, 1, GL_LUMINANCE, GL_FLOAT, test);
+
 	if (!lum_equal(lumImage, test)) {
 		printf("%s: glReadPixels(GL_RGBA as GL_LUMINANCE) failed\n",
 		       TestName);
 		printf("  Expected %g  Found %g\n", lumImage[0], test[0]);
-		return false;
+		pass = false;
 	}
 
-	return true;
+	/* Test reading in to a PBO. */
+	if (!piglit_is_extension_supported("GL_ARB_pixel_buffer_object"))
+		return pass;
+
+	glGenBuffersARB(1, &pbo);
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
+	glBufferDataARB(GL_PIXEL_PACK_BUFFER, 4, NULL, GL_STREAM_DRAW_ARB);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	/* get luminance image in to pbo, should be sum of RGB values */
+	glReadPixels(0, 0, 1, 1, GL_LUMINANCE, GL_FLOAT, NULL);
+
+	test_pbo = glMapBufferARB(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY_ARB);
+
+	if (test_pbo && !lum_equal(lumImage, test_pbo)) {
+		printf("%s: glReadPixels(GL_RGBA as GL_LUMINANCE) in pbo failed\n",
+		       TestName);
+		printf("  Expected %g  Found %g\n", lumImage[0], test_pbo[0]);
+		pass = false;
+	}
+
+	glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
+	glBindBufferARB(GL_PIXEL_PACK_BUFFER, 0);
+	glDeleteBuffersARB(1, &pbo);
+	return pass;
 }
 
 
