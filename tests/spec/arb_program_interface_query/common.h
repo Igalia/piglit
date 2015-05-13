@@ -102,13 +102,19 @@ static const char fs_std[] =
 	"uniform fs_uniform_block {"
 	"	vec4 fs_color;\n"
 	"	float fs_array[4];\n"
-	"};"
+	"};\n"
+	"uniform fs_array_uniform_block {\n"
+	"	vec4 fs_color;\n"
+	"	float fs_array[4];\n"
+	"} faub[4];\n"
 	"in vec4 fs_input1;\n"
 	"out vec4 fs_output0;\n"
 	"out vec4 fs_output1;\n"
 	"void main() {\n"
-		"fs_output0 = fs_color * fs_input1 * fs_array[2];\n"
-		"fs_output1 = fs_color * fs_input1 * fs_array[3];\n"
+		"fs_output0 = fs_color * fs_input1 * fs_array[2] * \n"
+		"	      faub[0].fs_array[2] * faub[2].fs_array[2];\n"
+		"fs_output1 = fs_color * fs_input1 * fs_array[3] * \n"
+		"             faub[1].fs_array[3] * faub[3].fs_array[3];\n"
 	"}";
 
 static const char vs_stor[] =

@@ -189,13 +189,21 @@ PIGLIT_GL_TEST_CONFIG_END
  * white space anywhere in the string.
  */
 static const char *st_r_uniform[] = {"vs_test", "gs_test", "fs_color",
-				     "fs_array[0]", "sa[0].a[0]", "sa[1].a[0]",
+				     "fs_array[0]",
+				     "fs_array_uniform_block.fs_color",
+				     "fs_array_uniform_block.fs_array[0]",
+				     "sa[0].a[0]", "sa[1].a[0]",
 				     NULL};
 static const char *st_r_tess_uniform[] = {"tcs_test", "tes_test", NULL};
 static const char *st_r_cs_uniform[] = {"cs_test", "tex", NULL};
 static const char *st_r_uniform_block[] = {"vs_uniform_block",
 					   "gs_uniform_block",
-					   "fs_uniform_block", NULL};
+					   "fs_uniform_block",
+					   "fs_array_uniform_block[0]",
+					   "fs_array_uniform_block[1]",
+					   "fs_array_uniform_block[2]",
+					   "fs_array_uniform_block[3]",
+					   NULL};
 static const char *st_r_tess_uniform_block[] = {"tcs_uniform_block",
 						"tes_uniform_block", NULL};
 static const char *st_r_cs_uniform_block[] = {"cs_uniform_block", NULL};
@@ -346,10 +354,10 @@ struct subtest_t {
 }
 
 static const struct subtest_t subtests[] = {
- ST( 6, 12, -1, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_UNIFORM, "(vs,gs,fs)", st_r_uniform),
+ ST( 8, 35, -1, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_UNIFORM, "(vs,gs,fs)", st_r_uniform),
  ST( 2,  9, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_UNIFORM, "(tes,tcs)", st_r_tess_uniform),
  ST( 2,  8, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_UNIFORM, "(cs)", st_r_cs_uniform),
- ST( 3, 17,  2, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_UNIFORM_BLOCK, "(vs,gs,fs)", st_r_uniform_block),
+ ST( 7, 26,  2, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_UNIFORM_BLOCK, "(vs,gs,fs)", st_r_uniform_block),
  ST( 2, 18, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_UNIFORM_BLOCK, "(tcs,tes)", st_r_tess_uniform_block),
  ST( 1, 17, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_UNIFORM_BLOCK, "(cs)", st_r_cs_uniform_block),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs)", st_r_in_vs),
