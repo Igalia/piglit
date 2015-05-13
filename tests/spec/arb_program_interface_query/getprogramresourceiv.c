@@ -454,6 +454,25 @@ static const struct subtest_t subtests[] = {
 	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
 	{ 0, 0, { 0 } }}
  },
+ { &prog_std, GL_UNIFORM, "fs_array_uniform_block.fs_array", "fs_array_uniform_block[0]", {
+	{ GL_NAME_LENGTH, 1, { 35 } },
+	{ GL_TYPE, 1, { GL_FLOAT } },
+	{ GL_ARRAY_SIZE, 1, { 4 } },
+	{ GL_OFFSET, 1, { 0 } }, /* valid index == anything but -1 */
+	{ GL_BLOCK_INDEX, 1, { 2 } }, /* compared to fs_array_uniform_block[0]'s idx */
+	{ GL_ARRAY_STRIDE, 1, { 0 } }, /* valid index == anything but -1 */
+	{ GL_MATRIX_STRIDE, 1, { 0 } },
+	{ GL_IS_ROW_MAJOR, 1, { 0 } },
+	{ GL_ATOMIC_COUNTER_BUFFER_INDEX, 1, { -1 } }, /* valid index == anything but -1 */
+	{ GL_REFERENCED_BY_VERTEX_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_CONTROL_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 1 } },
+	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
+	{ GL_LOCATION, 1, { -1 } }, /* valid index == anything but -1 */
+	{ 0, 0, { 0 } }}
+ },
  { &prog_stor, GL_BUFFER_VARIABLE, "gs_buf_var", "gs_buffer_block", {
 	{ GL_NAME_LENGTH, 1, { 11 } },
 	{ GL_TYPE, 1, { GL_FLOAT_VEC4 } },
