@@ -79,7 +79,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	test_range(__LINE__, 0, 0, -1, -1);
+	test_range(__LINE__, 0, 0, 0, 0);
 
 	glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment);
 
@@ -117,7 +117,7 @@ piglit_init(int argc, char **argv)
 	 * of the GL API, including glBindBuffer(), to allow it
 	 */
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
-	test_range(__LINE__, 0, 0, -1, -1);
+	test_range(__LINE__, 0, 0, 0, 0);
 
 	/* Test the error condition. */
 	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_bindings);
