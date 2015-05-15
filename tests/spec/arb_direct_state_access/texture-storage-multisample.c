@@ -107,14 +107,6 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	static GLuint prog = 0;
 	static GLint tex_loc, tex_depth_loc, z_loc;
 	static GLuint fbo, array_tex;
-	static const float verts[] = { /* Two triangles for the texture */
-		0.0, 0.0,
-		0.0, 1.0,
-		1.0, 1.0,
-		1.0, 1.0,
-		1.0, 0.0,
-		0.0, 0.0
-	};
 	unsigned z;
 
 	struct {
@@ -185,8 +177,6 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	glUniform1i(tex_loc, backup.active_tex - GL_TEXTURE0);
 	glUniform1i(tex_depth_loc, depth);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
 
 	/* When we call draw arrays, the data (in array_tex) will get drawn
 	 * into our texture (in tex) because it's attached to
@@ -201,7 +191,7 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 		    GL_FRAMEBUFFER_COMPLETE)
 			return;
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		piglit_draw_rect(0.0, 0.0, 2.0, 2.0);
 	} else {
 		for (z = 0; z < depth; ++z) {
 			glUniform1i(z_loc, z);
@@ -212,11 +202,9 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 			    GL_FRAMEBUFFER_COMPLETE)
 				return;
 
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+			piglit_draw_rect(0.0, 0.0, 2.0, 2.0);
 		}
 	}
-
-	glDisableVertexAttribArray(0);
 
 	/* Restore values for the client */
 	if (!backup.arb_sample_shading)
