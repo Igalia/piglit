@@ -26,11 +26,6 @@
 /**
  * Note: only the glTextureStorage2D() function is tested with actual 
  * rendering.
- * 
- * Original author:  Brian Paul
- * Adapted for testing ARB_direct_state_access by
- * Laura Ekstrand
- * November 2014
  */
 
 #include "piglit-util-gl.h"
@@ -78,11 +73,9 @@ test_one_level_errors(GLenum target)
 
 	if (target == GL_TEXTURE_1D) {
 		glTextureStorage1D(tex, 1, GL_RGBA8, width);
-	}
-	else if (target == GL_TEXTURE_2D) {
+	} else if (target == GL_TEXTURE_2D) {
 		glTextureStorage2D(tex, 1, GL_RGBA8, width, height);
-	}
-	else if (target == GL_TEXTURE_3D) {
+	} else if (target == GL_TEXTURE_3D) {
 		glTextureStorage3D(tex, 1, GL_RGBA8, width, height, depth);
 	}
 
@@ -174,12 +167,10 @@ test_mipmap_errors(GLenum target)
 	if (target == GL_TEXTURE_1D) {
 		glTextureStorage1D(tex, levels, GL_RGBA8, width);
 		targetString = "GL_TEXTURE_1D";
-	}
-	else if (target == GL_TEXTURE_2D) {
+	} else if (target == GL_TEXTURE_2D) {
 		glTextureStorage2D(tex, levels, GL_RGBA8, width, height);
 		targetString = "GL_TEXTURE_2D";
-	}
-	else if (target == GL_TEXTURE_3D) {
+	} else if (target == GL_TEXTURE_3D) {
 		glTextureStorage3D(tex, levels, GL_RGBA8, width, 
 			height, depth);
 		targetString = "GL_TEXTURE_3D";

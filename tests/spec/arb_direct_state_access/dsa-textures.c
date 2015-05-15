@@ -31,8 +31,6 @@
 
 #include <stdlib.h>
 
-static const char* glversion;
-
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 13;
@@ -61,12 +59,10 @@ piglit_init(int argc, char **argv)
 
 	srand(0);
 
-	glversion = (const char*) glGetString(GL_VERSION);
-	printf("Using driver %s.\n", glversion);
+	printf("Using driver %s.\n", (const char *) glGetString(GL_VERSION));
 
 	dsa_init_program();
-
-} /* piglit_init */
+}
 
 enum piglit_result
 piglit_display(void)
@@ -74,7 +70,7 @@ piglit_display(void)
 	bool pass = true;
 	GLfloat* data = random_image_data();
 	GLuint name;
-	int texunit = 3;
+	const GLuint texunit = 3;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &name);
 	glTextureStorage2D(name, 1, GL_RGBA32F, piglit_width, piglit_height);
@@ -88,16 +84,16 @@ piglit_display(void)
 	dsa_texture_with_unit(texunit);
 	glEnable(GL_TEXTURE_2D);
 	glBindTextureUnit(texunit, name);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height, 0, 0, 1, 1);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Check to make sure the image was drawn correctly */
-	pass &= piglit_probe_image_rgba(0, 0, piglit_width, piglit_height,
-		data);
+	pass = piglit_probe_image_rgba(0, 0, piglit_width, piglit_height, data)
+		&& pass;
 
 	if (!piglit_automatic)
 		piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
-} /* piglit_display */
+}

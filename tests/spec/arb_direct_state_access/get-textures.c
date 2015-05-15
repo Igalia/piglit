@@ -58,19 +58,19 @@ piglit_display(void)
 
 	/* Non-gen-ed name */
 	glGetTextureImage(3, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0, data);
-	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	/* Unsupported target. */
 	glGenTextures(1, &name);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X, name);
 	glGetTextureImage(name, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0, data);
-	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 	glDeleteTextures(1, &name);
 
 	/* Unsupported dsa target for non-dsa version. */
 	glGetTexImage(GL_TEXTURE_CUBE_MAP, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 		     data);
-	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
 	/* No Storage
 	 *
@@ -79,7 +79,7 @@ piglit_display(void)
 	 */
 	glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &name);
 	glGetTextureImage(name, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0, data);
-	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 	glDeleteTextures(1, &name);
 
 	/* Insufficient storage
@@ -101,7 +101,7 @@ piglit_display(void)
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0,
 		     GL_RGBA8, 50, 50, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	glGetTextureImage(name, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0, data);
-	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 	glDeleteTextures(1, &name);
 
 	/* Trivial, but should work. */
@@ -109,7 +109,7 @@ piglit_display(void)
 	glTextureStorage2D(name, 1, GL_RGBA8, 50, 50);
 	glGetTextureImage(name, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 			  50 * 50 * 6 * 4, data);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

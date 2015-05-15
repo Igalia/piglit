@@ -76,7 +76,7 @@ piglit_display(void)
 	/* f case */
 	glTextureParameterf(name, GL_TEXTURE_MIN_LOD, scalarf);
 	glGetTextureParameterfv(name, GL_TEXTURE_MIN_LOD, &paramf);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	if (paramf != scalarf) {
 		printf("glTextureParameterf did not correctly set "
 		       "GL_TEXTURE_MIN_LOD.\n\tValue returned by "
@@ -88,7 +88,7 @@ piglit_display(void)
 	/* fv case */
 	glTextureParameterfv(name, GL_TEXTURE_BORDER_COLOR, colorfv);
 	glGetTextureParameterfv(name, GL_TEXTURE_BORDER_COLOR, &paramfv[0]);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	for (i = 0; i < 4; ++i) {
 		if (paramfv[i] != colorfv[i]) {
 			printf("glTextureParameterfv did not correctly set "
@@ -104,7 +104,7 @@ piglit_display(void)
 	/* i case */
 	glTextureParameteri(name, GL_TEXTURE_MAX_LEVEL, scalari);
 	glGetTextureParameteriv(name, GL_TEXTURE_MAX_LEVEL, &parami);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	if (parami != scalari) {
 		printf("glTextureParameteri did not correctly set "
 		       "GL_TEXTURE_MAX_LEVEL.\n\tValue returned by "
@@ -117,7 +117,7 @@ piglit_display(void)
 	/* i (enum) case */
 	glTextureParameteri(name, GL_TEXTURE_MIN_FILTER, scalare);
 	glGetTextureParameterIuiv(name, GL_TEXTURE_MIN_FILTER, &parame);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	if (parame != scalare) {
 		printf("glTextureParameteri did not correctly set "
 		       "GL_TEXTURE_MIN_FILTER.\n\tValue returned by "
@@ -134,7 +134,7 @@ piglit_display(void)
 	}
 	glTextureParameteriv(name, GL_TEXTURE_BORDER_COLOR, coloriv);
 	glGetTextureParameterfv(name, GL_TEXTURE_BORDER_COLOR, &paramfv[0]);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	for (i = 0; i < 4; ++i) {
 		if (fabs(paramfv[i] - colorfv[i]) >= piglit_tolerance[i]) {
 			printf("glTextureParameteriv did not correctly set "
@@ -150,7 +150,7 @@ piglit_display(void)
 	/* Iiv case */
 	glTextureParameterIiv(name, GL_TEXTURE_BORDER_COLOR, colorIiv);
 	glGetTextureParameterIiv(name, GL_TEXTURE_BORDER_COLOR, &paramIiv[0]);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	for (i = 0; i < 4; ++i) {
 		if (paramIiv[i] != colorIiv[i]) {
 			printf("glTextureParameterIiv did not correctly set "
@@ -167,7 +167,7 @@ piglit_display(void)
 	glTextureParameterIuiv(name, GL_TEXTURE_BORDER_COLOR, colorIuiv);
 	glGetTextureParameterIuiv(name, GL_TEXTURE_BORDER_COLOR, 
 				  &paramIuiv[0]);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	for (i = 0; i < 4; ++i) {
 		if (paramIuiv[i] != colorIuiv[i]) {
 			printf("glTextureParameterIuiv did not correctly set "
@@ -183,7 +183,7 @@ piglit_display(void)
 	/* Iuiv (enum) case */
 	glTextureParameterIuiv(name, GL_TEXTURE_SWIZZLE_RGBA, swizzle);
 	glGetTextureParameterIuiv(name, GL_TEXTURE_SWIZZLE_RGBA, &paramse[0]);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	for (i = 0; i < 4; ++i) {
 		if (paramse[i] != swizzle[i]) {
 			printf("glTextureParameterIuiv did not correctly set "

@@ -24,11 +24,7 @@
 
 /**
  * @file getcompressedtextureimage.c
- *
- * Adapted for testing glGetCompressedTextureImage in ARB_direct_state_access
- * by Laura Ekstrand <laura@jlekstrand.net>, November 2014.
  */
-
 #include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -148,12 +144,10 @@ getTexImage(bool doPBO, GLenum target, GLubyte *data,
 	GLint compressed;
 	GLint comp_size;
 
-	/* Upload the data. */
+	/* Upload the data.  These are all targets that can be compressed
+	 * according to _mesa_target_can_be_compressed.
+	 */
 	switch (target) {
-
-	/* These are all targets that can be compressed according to
-	 * _mesa_target_can_be_compressed */
-
 	case GL_TEXTURE_2D:
 		glCreateTextures(target, 1, &name);
 		glTextureStorage2D(name, 1, internalformat, IMAGE_WIDTH,
@@ -195,7 +189,6 @@ getTexImage(bool doPBO, GLenum target, GLubyte *data,
 	default:
 		puts("Invalid texture target.");
 		return PIGLIT_FAIL;
-
 	}
 
 	/* Make sure the driver has compressed the image. */
@@ -207,12 +200,13 @@ getTexImage(bool doPBO, GLenum target, GLubyte *data,
 	glGetTextureLevelParameteriv(name, 0,
 				     GL_TEXTURE_COMPRESSED_IMAGE_SIZE,
 				     &comp_size);
-	/*  The OpenGL 4.5 core spec
-	 *  (30.10.2014) Section 8.11 Texture Queries says:
-	 *       "For GetTextureLevelParameter* only, texture may also be a
-	 *       cube map texture object.  In this case the query is always
-	 *       performed for face zero (the TEXTURE_CUBE_MAP_POSITIVE_X
-	 *       face), since there is no way to specify another face."
+	/* Section 8.11 (Texture Queries) of the OpenGL 4.5 Core Profile spec
+	 * says:
+	 *
+	 *     "For GetTextureLevelParameter* only, texture may also be a cube
+	 *     map texture object.  In this case the query is always performed
+	 *     for face zero (the TEXTURE_CUBE_MAP_POSITIVE_X face), since
+	 *     there is no way to specify another face."
 	 */
 	if (target == GL_TEXTURE_CUBE_MAP)
 		comp_size *= num_faces;
@@ -223,7 +217,8 @@ getTexImage(bool doPBO, GLenum target, GLubyte *data,
 
 
 	/* Setup the PBO or data array to read into from
-	 * glGetCompressedTextureImage */
+	 * glGetCompressedTextureImage
+	 */
 	if (doPBO) {
 		glGenBuffers(1, &packPBO);
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, packPBO);
@@ -359,9 +354,8 @@ piglit_init(int argc, char **argv)
 
 	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map"))
 		clear_target_mask(GL_TEXTURE_CUBE_MAP);
-	if (!piglit_is_extension_supported("GL_EXT_texture_array")) {
+	if (!piglit_is_extension_supported("GL_EXT_texture_array"))
 		clear_target_mask(GL_TEXTURE_2D_ARRAY);
-	}
 	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map_array"))
 		clear_target_mask(GL_TEXTURE_CUBE_MAP_ARRAY);
 
@@ -415,8 +409,9 @@ piglit_display(void)
 			result = PIGLIT_FAIL;
 	}
 
-	/* 1D targets can't be compressed in Mesa right now,
-	 * but here is a trivial test for the entry point. */
+	/* 1D targets can't be compressed in Mesa right now, but here is a
+	 * trivial test for the entry point.
+	 */
 	glCompressedTextureSubImage1D(250, 0, 0, 60,
 				      internalformat, 60*4*8,
 				      NULL);
@@ -434,4 +429,3 @@ piglit_display(void)
 
 	return result;
 }
-

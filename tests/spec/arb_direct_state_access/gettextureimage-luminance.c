@@ -25,11 +25,6 @@
 
 /*
  * Test glGetTexImage for luminance formats.
- * Brian Paul
- * 8 Mar 2012
- *
- * Adapted for testing glGetTextureImage in ARB_direct_state_access by
- * Laura Ekstrand <laura@jlekstrand.net>, November 2014.
  */
 
 #include "piglit-util-gl.h"

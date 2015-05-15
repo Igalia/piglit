@@ -26,13 +26,6 @@
 
 /**
  * @file gettextureimage-formats.c
- *
- * Test glGetTexImage with a variety of formats.
- * Brian Paul
- * Sep 2011
- *
- * Adapted for testing glGetTextureImage in ARB_direct_state_access by
- * Laura Ekstrand <laura@jlekstrand.net>, November 2014.
  */
 
 
@@ -116,8 +109,7 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffers(1, &fb);
 		glViewport(0, 0, piglit_width, piglit_height);
-	}
-	else {
+	} else {
 		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 		glTexImage2D(GL_TEXTURE_2D, 0, intFormat, TEX_SIZE, TEX_SIZE, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, tex);
@@ -133,8 +125,7 @@ ubyte_to_float(GLubyte b, GLint bits)
 		GLint b2 = b >> (8 - bits);
 		GLint max = 255 >> (8 - bits);
 		return b2 / (float) max;
-	}
-	else {
+	} else {
 		return b / 255.0;
 	}
 }
@@ -147,17 +138,14 @@ bits_to_tolerance(GLint bits, GLboolean compressed)
 
 	if (bits == 0) {
 		return 0.25;
-	}
-	else if (bits == 1) {
+	} else if (bits == 1) {
 		return 0.5;
-	}
-	else if (bits > 8) {
+	} else if (bits > 8) {
 		/* The original texture was specified as GLubyte and we
 		 * assume that the window/surface is 8-bits/channel.
 		 */
 		t = 4.0 / 255;
-	}
-	else {
+	} else {
 		t = 4.0 / (1 << (bits - 1));
 	}
 
@@ -194,8 +182,7 @@ compute_expected_color(const struct format_desc *fmt,
 		texel[2] = ubyte_to_float(upperRightTexel[2], bits[2]);
 		texel[3] = 1.0;
 		compressed = GL_FALSE;
-	}
-	else {
+	} else {
 		GLint r, g, b, a, l, i;
 		GLenum baseFormat = 0;
 
@@ -220,8 +207,7 @@ compute_expected_color(const struct format_desc *fmt,
 			texel[1] = 0.0;
 			texel[2] = 0.0;
 			texel[3] = ubyte_to_float(upperRightTexel[0], bits[3]);
-		}
-		else if (a > 0) {
+		} else if (a > 0) {
 			if (l > 0) {
 				baseFormat = GL_LUMINANCE_ALPHA;
 				bits[0] = l;
@@ -232,8 +218,7 @@ compute_expected_color(const struct format_desc *fmt,
 				texel[1] = 0.0;
 				texel[2] = 0.0;
 				texel[3] = ubyte_to_float(upperRightTexel[3], bits[3]);
-			}
-			else if (r > 0 && g > 0 && b > 0) {
+			} else if (r > 0 && g > 0 && b > 0) {
 				baseFormat = GL_RGBA;
 				bits[0] = r;
 				bits[1] = g;
@@ -243,8 +228,7 @@ compute_expected_color(const struct format_desc *fmt,
 				texel[1] = ubyte_to_float(upperRightTexel[1], bits[1]);
 				texel[2] = ubyte_to_float(upperRightTexel[2], bits[2]);
 				texel[3] = ubyte_to_float(upperRightTexel[3], bits[3]);
-			}
-			else if (r == 0 && g == 0 && b == 0) {
+			} else if (r == 0 && g == 0 && b == 0) {
 				baseFormat = GL_ALPHA;
 				bits[0] = 0;
 				bits[1] = 0;
@@ -254,16 +238,14 @@ compute_expected_color(const struct format_desc *fmt,
 				texel[1] = 0.0;
 				texel[2] = 0.0;
 				texel[3] = ubyte_to_float(upperRightTexel[3], bits[3]);
-			}
-			else {
+			} else {
 				baseFormat = 0;  /* ??? */
 				texel[0] = 0.0;
 				texel[1] = 0.0;
 				texel[2] = 0.0;
 				texel[3] = 0.0;
 			}
-		}
-		else if (l > 0) {
+		} else if (l > 0) {
 			baseFormat = GL_LUMINANCE;
 			bits[0] = l;
 			bits[1] = 0;
@@ -273,8 +255,7 @@ compute_expected_color(const struct format_desc *fmt,
 			texel[1] = 0.0;
 			texel[2] = 0.0;
 			texel[3] = 1.0;
-		}
-		else if (r > 0) {
+		} else if (r > 0) {
 			if (g > 0) {
 				if (b > 0) {
 					baseFormat = GL_RGB;
@@ -286,8 +267,7 @@ compute_expected_color(const struct format_desc *fmt,
 					texel[1] = ubyte_to_float(upperRightTexel[1], bits[1]);
 					texel[2] = ubyte_to_float(upperRightTexel[2], bits[2]);
 					texel[3] = 1.0;
-				}
-				else {
+				} else {
 					baseFormat = GL_RG;
 					bits[0] = r;
 					bits[1] = g;
@@ -298,8 +278,7 @@ compute_expected_color(const struct format_desc *fmt,
 					texel[2] = 0.0;
 					texel[3] = 1.0;
 				}
-			}
-			else {
+			} else {
 				baseFormat = GL_RED;
 				bits[0] = r;
 				bits[1] = 0;
@@ -460,12 +439,11 @@ supported_format_set(const struct test_desc *set)
 		return GL_FALSE;
 
 	if (set->format == ext_texture_integer ||
-		 set->format == ext_packed_depth_stencil ||
-		 set->format == arb_texture_rg_int ||
-		 set->format == arb_depth_texture ||
-		 set->format == arb_depth_buffer_float) {
-		/*
-		 * texture_integer requires a fragment shader, different
+	    set->format == ext_packed_depth_stencil ||
+	    set->format == arb_texture_rg_int ||
+	    set->format == arb_depth_texture ||
+	    set->format == arb_depth_buffer_float) {
+		/* texture_integer requires a fragment shader, different
 		 * glTexImage calls.  Depth/stencil formats not implemented.
 		 */
 		return GL_FALSE;
@@ -505,13 +483,11 @@ piglit_display(void)
 
 	if (piglit_automatic) {
 		pass = test_all_formats();
-	}
-	else {
+	} else {
 		const struct test_desc *set = &test_sets[test_index];
 		if (supported_format_set(set)) {
 			pass = test_format(set, &set->format[format_index]);
-		}
-		else {
+		} else {
 			/* unsupported format - not a failure */
 			pass = GL_TRUE;
 			glClear(GL_COLOR_BUFFER_BIT);

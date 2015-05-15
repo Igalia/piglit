@@ -25,8 +25,6 @@
  *
  * Contains some common functionality for writing arb_direct_state_access
  * Piglit tests.
- *
- * @author Laura Ekstrand (laura@jlekstrand.net)
  */
 
 #include "dsa-utils.h"

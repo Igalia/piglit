@@ -55,19 +55,19 @@ piglit_display(void)
 
 	/* Invalid (not a target) */
 	glCreateTextures(GL_INVALID_ENUM, 1, &name);
-	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
 	/* Invalid (not supported) target */
 	glCreateTextures(GL_PROXY_TEXTURE_2D, 1, &name);
-	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
 	/* n is negative */
 	glCreateTextures(GL_TEXTURE_2D, -1, &name);
-	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
 	/* Trivial, but should work. */
 	glCreateTextures(GL_TEXTURE_2D, 1, &name);
-	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

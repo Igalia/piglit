@@ -21,13 +21,11 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-
 /**
  * @file
  * Test texture unit state with respect to the different number of
  * texture coord units, image units, combined units, etc.
  */
-
 #include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -153,8 +151,7 @@ test_rasterpos(void)
          if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
             return GL_FALSE;
          }
-      }
-      else {
+      } else {
          /* INVALID_OPERATION is expected */
          glGetFloatv(GL_CURRENT_RASTER_TEXTURE_COORDS, v);
          if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
@@ -193,9 +190,8 @@ test_texture_matrix(void)
    }
 
    /* there should be no errors at this point */
-   if (!piglit_check_gl_error(GL_NO_ERROR)) {
+   if (!piglit_check_gl_error(GL_NO_ERROR))
       return GL_FALSE;
-   }
 
    /* this should generate an error */
    {
@@ -203,16 +199,14 @@ test_texture_matrix(void)
       glActiveTexture(GL_TEXTURE0 + MaxTextureCoordUnits);
       if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
          /* INVALID_ENUM is expected */
-         if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+         if (!piglit_check_gl_error(GL_INVALID_ENUM))
             return GL_FALSE;
-         }
-      }
-      else {
+
+      } else {
          /* INVALID_OPERATION is expected */
          glGetFloatv(GL_TEXTURE_MATRIX, m);
-         if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
+         if (!piglit_check_gl_error(GL_INVALID_OPERATION))
             return GL_FALSE;
-         }
       }
    }
 
@@ -281,9 +275,8 @@ test_texture_env(void)
    for (i = 0; i < MaxTextureCombinedUnits; i++) {
       glActiveTexture(GL_TEXTURE0 + i);
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[i]);
-      if (!piglit_check_gl_error(GL_NO_ERROR)) {
+      if (!piglit_check_gl_error(GL_NO_ERROR))
          return GL_FALSE;
-      }
    }
 
    /* check per-unit state */
@@ -299,9 +292,8 @@ test_texture_env(void)
    }
 
    /* there should be no errors at this point */
-   if (!piglit_check_gl_error(GL_NO_ERROR)) {
+   if (!piglit_check_gl_error(GL_NO_ERROR))
       return GL_FALSE;
-   }
 
    return GL_TRUE;
 }
@@ -332,23 +324,24 @@ piglit_display(void)
 }
 
 
-static void
-init(void)
+void
+piglit_init(int argc, char *argv[])
 {
+   piglit_require_gl_version(13);
+   piglit_require_extension("GL_ARB_direct_state_access");
+
    if (piglit_is_extension_supported("GL_ARB_vertex_shader")) {
       glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
       glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
       glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &MaxTextureVertexUnits);
       glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxTextureCombinedUnits);
-   }
-   else if (piglit_is_extension_supported("GL_ARB_fragment_shader") ||
-            piglit_is_extension_supported("GL_ARB_fragment_program")) {
+   } else if (piglit_is_extension_supported("GL_ARB_fragment_shader") ||
+	      piglit_is_extension_supported("GL_ARB_fragment_program")) {
       glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
       glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
       MaxTextureVertexUnits = 0;
       MaxTextureCombinedUnits = MaxTextureImageUnits;
-   }
-   else {
+   } else {
       glGetIntegerv(GL_MAX_TEXTURE_UNITS, &MaxTextureCoordUnits);
       MaxTextureImageUnits =
       MaxTextureCombinedUnits = MaxTextureCoordUnits;
@@ -370,14 +363,3 @@ init(void)
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
 }
-
-
-void
-piglit_init(int argc, char *argv[])
-{
-   piglit_require_gl_version(13);
-   piglit_require_extension("GL_ARB_direct_state_access");
-
-   init();
-}
-

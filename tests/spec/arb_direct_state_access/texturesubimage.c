@@ -23,24 +23,13 @@
  *
  */
 
-
 /**
  * Test glTextureSubImage*D. This is pretty trivial, since it only uses
  * glTextureSubImage*D with offsets of 0 and the width, height, and depth of
  * the full image. Moreover, it doesn't test varying depths for the 3D case.
  * But since DSA functions share backends with the non-DSA ones, we really
  * only need to test entry points here.
- *
- * Laura Ekstrand
- * October 2014
- *
- * Based on texsubimage.c by
- * Brian Paul
- * October 2011
- *
  */
-
-
 #include "piglit-util-gl.h"
 #include <stdlib.h>
 #include <string.h>
@@ -82,14 +71,12 @@ subtest(GLenum target)
 		glTextureStorage1D(tex, 1, GL_RGBA8, piglit_width);
 		glTextureSubImage1D(tex, 0, 0, piglit_width, GL_RGBA,
 			GL_UNSIGNED_BYTE, refImg);
-	}
-	else if (target == GL_TEXTURE_2D) {
+	} else if (target == GL_TEXTURE_2D) {
 		glTextureStorage2D(tex, 1, GL_RGBA8, piglit_width,
 				   piglit_height);
 		glTextureSubImage2D(tex, 0, 0, 0, piglit_width, piglit_height,
 				    GL_RGBA, GL_UNSIGNED_BYTE, refImg);
-	}
-	else if (target == GL_TEXTURE_3D) {
+	} else if (target == GL_TEXTURE_3D) {
 		glTextureStorage3D(tex, 1, GL_RGBA8, piglit_width,
 				   piglit_height, depth);
 		glTextureSubImage3D(tex, 0, 0, 0, 0,
@@ -103,13 +90,14 @@ subtest(GLenum target)
 	glClear(GL_COLOR_BUFFER_BIT);
 	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height, 0, 0, 1, 1);
 	if (target == GL_TEXTURE_1D) {
-		pass &= piglit_probe_image_ubyte(0, 0, piglit_width, 1,
-						 GL_RGBA, refImg);
-	}
-	else {
-		pass &= piglit_probe_image_ubyte(0, 0, piglit_width,
+		pass = piglit_probe_image_ubyte(0, 0, piglit_width, 1,
+						 GL_RGBA, refImg)
+			&& pass;
+	} else {
+		pass = piglit_probe_image_ubyte(0, 0, piglit_width,
 						 piglit_height,
-						 GL_RGBA, refImg);
+						 GL_RGBA, refImg)
+			&& pass;
 	}
 
 	if (!piglit_automatic)

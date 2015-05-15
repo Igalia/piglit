@@ -24,9 +24,6 @@
 
 /**
  * @file gettextureimage-targets.c
- *
- * Adapted for testing glGetTextureImage in ARB_direct_state_access by
- * Laura Ekstrand <laura@jlekstrand.net>, November 2014.
  */
 
 #include "piglit-util-gl.h"
@@ -135,7 +132,7 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 		/* This is invalid. You must use 2D storage call for cube. */
 		glTextureStorage3D(name, 1, internalformat,
 				   IMAGE_WIDTH, IMAGE_HEIGHT, num_faces);
-		pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 		glTextureStorage2D(name, 1, internalformat,
 				   IMAGE_WIDTH, IMAGE_HEIGHT);
 		/* This is legal. */
@@ -195,8 +192,7 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 	if (doPBO) {
 		glGetTextureImage(name, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 			layer_size * num_faces * num_layers, NULL);
-	}
-	else {
+	} else {
 		glGetTextureImage(name, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 			layer_size * num_faces * num_layers, data2);
 	}
@@ -291,15 +287,17 @@ piglit_display(void)
 
 		printf("Testing %s into PBO\n", 
 			piglit_get_gl_enum_name(targets[i].target));
-		pass &= getTexImage(true, targets[i].target, data,
-				    internalformat, tolerance);
+		pass = getTexImage(true, targets[i].target, data,
+				    internalformat, tolerance)
+			&& pass;
 
 		printf("Testing %s into client array\n",
 			piglit_get_gl_enum_name(targets[i].target));
-		pass &= getTexImage(false, targets[i].target, data, 
-				    internalformat, tolerance);
+		pass = getTexImage(false, targets[i].target, data,
+				    internalformat, tolerance)
+			&& pass;
 
-		pass &= piglit_check_gl_error(GL_NO_ERROR);
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;

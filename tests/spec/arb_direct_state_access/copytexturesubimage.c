@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008 Intel Corporation
+ * Copyright © 2008, 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -19,12 +19,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- *
- * Authors:
- *    Eric Anholt <eric@anholt.net>
- *
- *    Laura Ekstrand <laura@jlekstrand.net> adapted this for testing
- *    CopyTextureSubImage* from ARB_direct_state_access.
  */
 
 #include "piglit-util-gl.h"
@@ -218,9 +212,9 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 	glDeleteTextures(1, &texname);
 
 	printf("Checking %s, rect 1:\n", piglit_get_gl_enum_name(target));
-	pass &= check_results(dstx, dsty, srcw, srch);
+	pass = check_results(dstx, dsty, srcw, srch) && pass;
 	printf("Checking %s, rect 2:\n", piglit_get_gl_enum_name(target));
-	pass &= check_results(dstx2, dsty2, srcw, srch);
+	pass = check_results(dstx2, dsty2, srcw, srch) && pass;
 
 	return pass;
 }
@@ -245,9 +239,9 @@ piglit_display(void)
 	/* Test non-power-of-two 2D textures.
 	 */
 	if (have_NPOT) {
-		pass &= do_row(srcy, 31, 13, GL_TEXTURE_2D);
+		pass = do_row(srcy, 31, 13, GL_TEXTURE_2D) && pass;
 		srcy += 15;
-		pass &= do_row(srcy, 11, 34, GL_TEXTURE_2D);
+		pass = do_row(srcy, 11, 34, GL_TEXTURE_2D) && pass;
 		srcy += 35 + 5;
 	}
 
@@ -255,9 +249,9 @@ piglit_display(void)
 	/* Test non-power-of-two 2D textures.
 	 */
 	if (have_rect) {
-		pass &= do_row(srcy, 31, 13, GL_TEXTURE_RECTANGLE_ARB);
+		pass = do_row(srcy, 31, 13, GL_TEXTURE_RECTANGLE_ARB) && pass;
 		srcy += 14;
-		pass &= do_row(srcy, 11, 34, GL_TEXTURE_RECTANGLE_ARB);
+		pass = do_row(srcy, 11, 34, GL_TEXTURE_RECTANGLE_ARB) && pass;
 		srcy += 35 + 5;
 	}
 

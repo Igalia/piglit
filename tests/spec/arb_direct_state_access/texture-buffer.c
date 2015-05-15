@@ -62,10 +62,10 @@ piglit_display(void)
 	bool pass = true;
 	GLuint tex, bo;
 	GLuint prog;
-	float green[] = {0, 1, 0, 0};
-	float blue[] =  {0, 0, 1, 0};
-	uint8_t g_rgba8[] = {0x00, 0xff, 0x00, 0x00};
-	uint8_t b_rgba8[] = {0x00, 0x00, 0xff, 0x00};
+	static const float green[] = {0, 1, 0, 0};
+	static const float blue[] =  {0, 0, 1, 0};
+	static const uint8_t g_rgba8[] = {0x00, 0xff, 0x00, 0x00};
+	static const uint8_t b_rgba8[] = {0x00, 0x00, 0xff, 0x00};
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
@@ -84,12 +84,14 @@ piglit_display(void)
 		     GL_STREAM_DRAW);
 	piglit_draw_rect(0, -1, 1, 2);
 
-	pass = pass && piglit_probe_rect_rgba(0, 0,
-					      piglit_width / 2, piglit_height,
-					      green);
-	pass = pass && piglit_probe_rect_rgba(piglit_width / 2, 0,
-					      piglit_width / 2, piglit_height,
-					      blue);
+	pass = piglit_probe_rect_rgba(0, 0,
+				      piglit_width / 2, piglit_height,
+				      green)
+		&& pass;
+	pass = piglit_probe_rect_rgba(piglit_width / 2, 0,
+				      piglit_width / 2, piglit_height,
+				      blue)
+		&& pass;
 
 	piglit_present_results();
 
