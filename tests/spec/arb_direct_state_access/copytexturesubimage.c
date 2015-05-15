@@ -39,15 +39,6 @@ int have_rect = 0;
 /** Should non-power-of-two textures be tested? */
 int have_NPOT = 0;
 
-static void rect(int x1, int y1, int x2, int y2)
-{
-	glBegin(GL_POLYGON);
-	glVertex2f(x1, y1);
-	glVertex2f(x1, y2);
-	glVertex2f(x2, y2);
-	glVertex2f(x2, y1);
-	glEnd();
-}
 static bool inrect(int x, int y, int x1, int y1, int x2, int y2)
 {
 	if (x >= x1 && x < x2 && y >= y1 && y < y2)
@@ -128,11 +119,11 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 
 	/* Draw the object we're going to copy */
 	glColor3f(1.0, 0.0, 0.0);
-	rect(srcx, srcy, srcx + srcw, srcy + srch);
+	piglit_draw_rect(srcx, srcy, srcw, srch);
 	glColor3f(0.0, 1.0, 0.0);
-	rect(srcx + 5, srcy + 5, srcx + srcw - 5, srcy + srch/2);
+	piglit_draw_rect(srcx + 5, srcy + 5, srcw - 10, srch/2 - 5);
 	glColor3f(0.0, 0.0, 1.0);
-	rect(srcx + 5, srcy + srch/2, srcx + srcw - 5, srcy + srch - 5);
+	piglit_draw_rect(srcx + 5, srcy + srch/2, srcw - 10, srch - 5 - srch/2);
 
 	/* Create a texture image and copy it in */
 	glGenTextures(1, &texname);
@@ -157,19 +148,8 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 				srcw, srch);
 
 	/* Draw the texture image out */
-	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 0.0);
-	glVertex2f(dstx, dsty);
-
-	glTexCoord2f(0.0, tex_t_max);
-	glVertex2f(dstx, dsty + srch);
-
-	glTexCoord2f(tex_s_max, tex_t_max);
-	glVertex2f(dstx + srcw, dsty + srch);
-
-	glTexCoord2f(tex_s_max, 0.0);
-	glVertex2f(dstx + srcw, dsty);
-	glEnd();
+	piglit_draw_rect_tex(dstx, dsty, srcw, srch,
+			     0.0, 0.0, tex_s_max, tex_t_max);
 
 	glTexImage2D(target, 0, GL_RGBA8, srcw, srch, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -194,19 +174,8 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 				remain_width, remain_height);
 
 	/* Draw the texture image out */
-	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 0.0);
-	glVertex2f(dstx2, dsty2);
-
-	glTexCoord2f(0.0, tex_t_max);
-	glVertex2f(dstx2, dsty2 + srch);
-
-	glTexCoord2f(tex_s_max, tex_t_max);
-	glVertex2f(dstx2 + srcw, dsty2 + srch);
-
-	glTexCoord2f(tex_s_max, 0.0);
-	glVertex2f(dstx2 + srcw, dsty2);
-	glEnd();
+	piglit_draw_rect_tex(dstx2, dsty2, srcw, srch,
+			     0.0, 0.0, tex_s_max, tex_t_max);
 
 	glDisable(target);
 	glDeleteTextures(1, &texname);
