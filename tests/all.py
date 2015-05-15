@@ -4360,8 +4360,6 @@ with profile.group_manager(
       'gettextureimage-formats init-by-rendering')
     g(['arb_direct_state_access-gettextureimage-luminance'],
       'gettextureimage-luminance')
-    g(['arb_direct_state_access-gettextureimage-simple'],
-      'gettextureimage-simple')
     g(['arb_direct_state_access-gettextureimage-targets'],
       'gettextureimage-targets')
     g(['arb_direct_state_access-compressedtextureimage',
