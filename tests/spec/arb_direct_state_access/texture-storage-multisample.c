@@ -34,7 +34,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 13;
+	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 			       PIGLIT_GL_VISUAL_DOUBLE;
@@ -43,7 +43,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 /* This has the modelview matrix built in. */
 static const char multisample_texture_vs_source[] =
-	"#version 130\n"
+	"#version 140\n"
 	"in vec2 piglit_vertex;\n"
 	"out vec2 tex_coords;\n"
 	"void main()\n"
@@ -55,7 +55,7 @@ static const char multisample_texture_vs_source[] =
 	;
 
 static const char multisample_texture_fs_source[] =
-	"#version 130\n"
+	"#version 140\n"
 	"#extension GL_ARB_sample_shading : enable\n"
 	"in vec2 tex_coords;\n"
 	"uniform sampler2DArray tex;\n"
@@ -149,7 +149,6 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &backup.active_tex);
 	glGetIntegerv(GL_CURRENT_PROGRAM, &backup.prog);
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &backup.draw_fbo);
-	glGetIntegerv(GL_CLAMP_FRAGMENT_COLOR, &backup.clamp_fragment_color);
 	glGetIntegerv(GL_VIEWPORT, backup.viewport);
 	glGetBooleanv(GL_SAMPLE_SHADING_ARB, &backup.arb_sample_shading);
 	glGetFloatv(GL_MIN_SAMPLE_SHADING_VALUE_ARB, &backup.min_sample_shading);
@@ -170,8 +169,6 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	/* Bind the special FBO and attach our texture to it. */
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	glViewport(0, 0, width, height);
-
-	glClampColor(GL_CLAMP_FRAGMENT_COLOR, GL_FALSE);
 
 	glUseProgram(prog);
 	glUniform1i(tex_loc, backup.active_tex - GL_TEXTURE0);
@@ -216,7 +213,6 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	glViewport(backup.viewport[0], backup.viewport[1],
 		   backup.viewport[2], backup.viewport[3]);
 	glBindTexture(target, tex);
-	glClampColor(GL_CLAMP_FRAGMENT_COLOR, backup.clamp_fragment_color);
 }
 
 static bool
@@ -363,7 +359,6 @@ draw_multisampled(void)
 	/* Draw the image. Can't use piglit_draw_rect_tex because the OpenGL
 	 * 1.0 pipeline doesn't handle multisample textures.
 	 */
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
