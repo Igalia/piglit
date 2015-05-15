@@ -33,7 +33,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 13;
+	config.supports_gl_core_version = 31;
+	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE;
@@ -83,7 +84,6 @@ piglit_display(void)
 
 	/* Draw the image */
 	dsa_texture_with_unit(prog, texunit);
-	glEnable(GL_TEXTURE_2D);
 	glUseProgram(prog);
 	glBindTextureUnit(texunit, name);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
