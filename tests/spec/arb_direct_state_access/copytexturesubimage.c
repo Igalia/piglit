@@ -22,10 +22,12 @@
  */
 
 #include "piglit-util-gl.h"
+#include "dsa-utils.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
+	config.supports_gl_compat_version = 20;
 
 	config.window_width = 200;
 	config.window_height = 200;
@@ -33,11 +35,39 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-/** Should GL_TEXTURE_RECTANGLE_ARB be tested? */
-int have_rect = 0;
+static const char vs_template[] =
+	"#version %s\n"
+	"#if __VERSION__ < 130\n"
+	"attribute vec4 piglit_vertex;\n"
+	"#else\n"
+	"in vec4 piglit_vertex;\n"
+	"#endif\n"
+	"uniform mat3 xform;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"        gl_Position = vec4((xform * piglit_vertex.xyw).xy, 0, 1);\n"
+	"}\n"
+	;
 
-/** Should non-power-of-two textures be tested? */
-int have_NPOT = 0;
+static const char fs_template[] =
+	"#version %s\n"
+	"#if __VERSION__ < 130\n"
+	"#define piglit_color gl_FragColor\n"
+	"#else\n"
+	"out vec4 piglit_color;\n"
+	"#endif\n"
+	"uniform vec3 color;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"        piglit_color = vec4(color, 1);\n"
+	"}\n"
+	;
+
+static GLuint builder_prog = 0;
+static GLuint texture2D_prog = 0;
+static GLuint texture_rect_prog = 0;
 
 static bool inrect(int x, int y, int x1, int y1, int x2, int y2)
 {
@@ -106,6 +136,8 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 	int remain_height;
 	GLuint texname;
 	bool pass = true;
+	GLint color_loc;
+	GLuint prog;
 
 	/* Rectangle textures use coordinates on the range [0..w]x[0..h],
 	 * where as all other textures use coordinates on the range
@@ -118,11 +150,15 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 
 
 	/* Draw the object we're going to copy */
-	glColor3f(1.0, 0.0, 0.0);
+	glUseProgram(builder_prog);
+	color_loc = glGetUniformLocation(builder_prog, "color");
+	dsa_set_xform(builder_prog, piglit_width, piglit_height);
+
+	glUniform3f(color_loc, 1.0, 0.0, 0.0);
 	piglit_draw_rect(srcx, srcy, srcw, srch);
-	glColor3f(0.0, 1.0, 0.0);
+	glUniform3f(color_loc, 0.0, 1.0, 0.0);
 	piglit_draw_rect(srcx + 5, srcy + 5, srcw - 10, srch/2 - 5);
-	glColor3f(0.0, 0.0, 1.0);
+	glUniform3f(color_loc, 0.0, 0.0, 1.0);
 	piglit_draw_rect(srcx + 5, srcy + srch/2, srcw - 10, srch - 5 - srch/2);
 
 	/* Create a texture image and copy it in */
@@ -137,9 +173,6 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glEnable(target);
-
 	glTexImage2D(target, 0, GL_RGBA8, srcw, srch, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glCopyTextureSubImage2D(texname, 0,
@@ -148,6 +181,21 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 				srcw, srch);
 
 	/* Draw the texture image out */
+	switch (target) {
+	case GL_TEXTURE_2D:
+		prog = texture2D_prog;
+		break;
+	case GL_TEXTURE_RECTANGLE_ARB:
+		prog = texture_rect_prog;
+		break;
+	default:
+		fprintf(stderr, "Invalid texture target.\n");
+		return false;
+	}
+
+	glUseProgram(prog);
+	dsa_set_xform(prog, piglit_width, piglit_height);
+
 	piglit_draw_rect_tex(dstx, dsty, srcw, srch,
 			     0.0, 0.0, tex_s_max, tex_t_max);
 
@@ -177,7 +225,6 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 	piglit_draw_rect_tex(dstx2, dsty2, srcw, srch,
 			     0.0, 0.0, tex_s_max, tex_t_max);
 
-	glDisable(target);
 	glDeleteTextures(1, &texname);
 
 	printf("Checking %s, rect 1:\n", piglit_get_gl_enum_name(target));
@@ -207,17 +254,15 @@ piglit_display(void)
 
 	/* Test non-power-of-two 2D textures.
 	 */
-	if (have_NPOT) {
-		pass = do_row(srcy, 31, 13, GL_TEXTURE_2D) && pass;
-		srcy += 15;
-		pass = do_row(srcy, 11, 34, GL_TEXTURE_2D) && pass;
-		srcy += 35 + 5;
-	}
+	pass = do_row(srcy, 31, 13, GL_TEXTURE_2D) && pass;
+	srcy += 15;
+	pass = do_row(srcy, 11, 34, GL_TEXTURE_2D) && pass;
+	srcy += 35 + 5;
 
 
 	/* Test non-power-of-two 2D textures.
 	 */
-	if (have_rect) {
+	if (texture_rect_prog != 0) {
 		pass = do_row(srcy, 31, 13, GL_TEXTURE_RECTANGLE_ARB) && pass;
 		srcy += 14;
 		pass = do_row(srcy, 11, 34, GL_TEXTURE_RECTANGLE_ARB) && pass;
@@ -232,25 +277,31 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	char *vs_source;
+	char *fs_source;
+	bool es;
+	int major;
+	int minor;
+	const char * ver;
+
+
 	piglit_require_extension("GL_ARB_direct_state_access");
-
-	glDisable(GL_DITHER);
-
-	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho( 0, piglit_width, 0, piglit_height, -1, 1 );
-
-	glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
-	glLoadIdentity();
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 
-	have_NPOT = (piglit_get_gl_version() >= 20
-		|| (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")));
+	piglit_get_glsl_version(&es, &major, &minor);
+	ver = ((major * 100 + minor) >= 140) ? "140" : "110";
 
-	have_rect = ((piglit_is_extension_supported("GL_ARB_texture_rectangle"))
-		|| (piglit_is_extension_supported("GL_EXT_texture_rectangle"))
-		|| (piglit_is_extension_supported("GL_NV_texture_rectangle")));
+	asprintf(&vs_source, vs_template, ver);
+	asprintf(&fs_source, fs_template, ver);
+
+	builder_prog = piglit_build_simple_program(vs_source, fs_source);
+
+	free(vs_source);
+	free(fs_source);
+
+	texture2D_prog = dsa_create_program(GL_TEXTURE_2D);
+
+	if (piglit_is_extension_supported("GL_ARB_texture_rectangle"))
+		texture_rect_prog = dsa_create_program(GL_TEXTURE_RECTANGLE_ARB);
 }
