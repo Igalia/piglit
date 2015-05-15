@@ -23,6 +23,7 @@
 
 #include <unistd.h>
 
+#include "image_common.h"
 #include "sample_common.h"
 
 static const char fs_src[] =
