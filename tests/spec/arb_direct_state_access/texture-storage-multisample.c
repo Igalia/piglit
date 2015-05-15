@@ -44,12 +44,12 @@ PIGLIT_GL_TEST_CONFIG_END
 /* This has the modelview matrix built in. */
 static const char multisample_texture_vs_source[] =
 	"#version 130\n"
-	"in vec2 vertex;\n"
+	"in vec2 piglit_vertex;\n"
 	"out vec2 tex_coords;\n"
 	"void main()\n"
 	"{\n"
-	"	tex_coords = vertex;\n"
-	"	vec2 pos = (vertex.xy * 2) - vec2(1, 1);\n"
+	"	tex_coords = piglit_vertex;\n"
+	"	vec2 pos = (piglit_vertex.xy * 2) - vec2(1, 1);\n"
 	"	gl_Position = vec4(pos, 0, 1);\n"
 	"}\n"
 	;
@@ -141,15 +141,9 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 
 	if (prog == 0) {
 		/* First-run setup */
-		prog = piglit_build_simple_program_unlinked(
+		prog = piglit_build_simple_program(
 			multisample_texture_vs_source,
 			multisample_texture_fs_source);
-		glBindAttribLocation(prog, 0, "vertex");
-		glLinkProgram(prog);
-		if (!piglit_link_check_status(prog)) {
-			prog = 0;
-			return;
-		}
 
 		tex_loc = glGetUniformLocation(prog, "tex");
 		tex_depth_loc = glGetUniformLocation(prog, "tex_depth");
