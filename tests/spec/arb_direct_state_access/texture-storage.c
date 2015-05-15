@@ -32,7 +32,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 12;
+	config.supports_gl_core_version = 31;
+	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -317,6 +318,7 @@ test_2d_mipmap_rendering(void)
 	GLint width = 128, height = 64, levels = 8;
 	GLint v, l;
 	GLfloat vfloat;
+	GLuint prog;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &tex);
 	glBindTextureUnit(0, tex);
@@ -397,10 +399,12 @@ test_2d_mipmap_rendering(void)
 	}
 
 	/* now do a rendering test */
-	glEnable(GL_TEXTURE_2D);
 	glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER,
 			GL_NEAREST_MIPMAP_NEAREST);
 	glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	prog = dsa_create_program(GL_TEXTURE_2D);
+	glUseProgram(prog);
 
 	/* draw a quad using each texture mipmap level */
 	for (l = 0; l < levels; l++) {
@@ -432,7 +436,8 @@ test_2d_mipmap_rendering(void)
 		}
 	}
 
-	glDisable(GL_TEXTURE_2D);
+	glUseProgram(0);
+	glDeleteProgram(prog);
 
 	glDeleteTextures(1, &tex);
 
@@ -589,13 +594,7 @@ piglit_display(void)
 	X(test_2d_mipmap_rendering(), "2D mipmap rendering");
 	X(test_internal_formats(), "internal formats");
 	X(test_immutablity(GL_TEXTURE_2D), "immutability");
-
-	if (piglit_get_gl_version() >= 13
-	    || piglit_is_extension_supported("GL_ARB_texture_cube_map"))
-		X(test_cube_texture(), "cube texture");
-	else
-		piglit_report_subtest_result(PIGLIT_SKIP,
-					     "cube texture");
+	X(test_cube_texture(), "cube texture");
 
 	if (piglit_is_extension_supported("GL_ARB_texture_cube_map_array"))
 		X(test_cube_array_texture(), "cube array texture");
