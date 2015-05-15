@@ -33,10 +33,12 @@
 #include "piglit-util-gl.h"
 #include <stdlib.h>
 #include <string.h>
+#include "dsa-utils.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
+	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 			       PIGLIT_GL_VISUAL_DOUBLE;
@@ -62,6 +64,9 @@ subtest(GLenum target)
 {
 	bool pass = true;
 	GLuint tex;
+	GLuint prog;
+
+	prog = dsa_create_program(target);
 
 	/* Draw the reference image. */
 	glCreateTextures(target, 1, &tex);
@@ -85,10 +90,10 @@ subtest(GLenum target)
 				    refImg);
 	}
 
+	glUseProgram(prog);
 	glBindTextureUnit(0, tex);
-	glEnable(target);
 	glClear(GL_COLOR_BUFFER_BIT);
-	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height, 0, 0, 1, 1);
+	piglit_draw_rect_tex(-1.0, -1.0, 2.0, 2.0, 0.0, 0.0, 1.0, 1.0);
 	if (target == GL_TEXTURE_1D) {
 		pass = piglit_probe_image_ubyte(0, 0, piglit_width, 1,
 						 GL_RGBA, refImg)
@@ -99,6 +104,9 @@ subtest(GLenum target)
 						 GL_RGBA, refImg)
 			&& pass;
 	}
+
+	glUseProgram(0);
+	glDeleteProgram(prog);
 
 	if (!piglit_automatic)
 		piglit_present_results();
@@ -138,8 +146,6 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_texture_storage");
 
 	srand(0);
-
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	/* Make the image data for testing. */
 	refImg = random_image_data(piglit_width, piglit_height, depth);
