@@ -55,9 +55,11 @@ do { \
 	                             __VA_ARGS__); \
 } while (0)
 
-void dsa_init_program(void);
+GLuint dsa_create_program(GLenum target);
 
-void dsa_texture_with_unit(GLuint);
+void dsa_texture_with_unit(GLuint prog, GLuint unit);
+
+void dsa_set_xform(GLuint prog, int width, int height);
 
 #ifdef __cplusplus
 } /* end extern "C" */

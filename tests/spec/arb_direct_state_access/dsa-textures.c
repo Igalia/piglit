@@ -40,6 +40,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static GLuint prog;
+
 GLfloat*
 random_image_data(void)
 {
@@ -61,7 +63,7 @@ piglit_init(int argc, char **argv)
 
 	printf("Using driver %s.\n", (const char *) glGetString(GL_VERSION));
 
-	dsa_init_program();
+	prog = dsa_create_program(GL_TEXTURE_2D);
 }
 
 enum piglit_result
@@ -80,12 +82,12 @@ piglit_display(void)
 	glTextureParameteri(name, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	/* Draw the image */
-	piglit_ortho_projection(piglit_width, piglit_height, false);
-	dsa_texture_with_unit(texunit);
+	dsa_texture_with_unit(prog, texunit);
 	glEnable(GL_TEXTURE_2D);
+	glUseProgram(prog);
 	glBindTextureUnit(texunit, name);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height, 0, 0, 1, 1);
+	piglit_draw_rect_tex(-1.0, -1.0, 2.0, 2.0, 0.0, 0.0, 1.0, 1.0);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Check to make sure the image was drawn correctly */
