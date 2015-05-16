@@ -30,7 +30,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
+	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -153,26 +154,12 @@ piglit_display(void)
 void
 piglit_init(int argc, char *argv[])
 {
-   piglit_require_gl_version(13);
    piglit_require_extension("GL_ARB_direct_state_access");
 
-   if (piglit_is_extension_supported("GL_ARB_vertex_shader")) {
-      glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
-      glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
-      glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &MaxTextureVertexUnits);
-      glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxTextureCombinedUnits);
-   } else if (piglit_is_extension_supported("GL_ARB_fragment_shader") ||
-	      piglit_is_extension_supported("GL_ARB_fragment_program")) {
-      glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
-      glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
-      MaxTextureVertexUnits = 0;
-      MaxTextureCombinedUnits = MaxTextureImageUnits;
-   } else {
-      glGetIntegerv(GL_MAX_TEXTURE_UNITS, &MaxTextureCoordUnits);
-      MaxTextureImageUnits =
-      MaxTextureCombinedUnits = MaxTextureCoordUnits;
-      MaxTextureVertexUnits = 0;
-   }
+   glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
+   glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
+   glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &MaxTextureVertexUnits);
+   glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxTextureCombinedUnits);
 
    report_info();
 
