@@ -91,20 +91,12 @@ report4v(const GLfloat exp[4], const GLfloat act[4])
 }
 
 
-static void
-clear_errors()
-{
-   while (glGetError())
-      ;
-}
-
-
 static bool
 test_rasterpos(void)
 {
    int i;
 
-   clear_errors();
+   piglit_reset_gl_error();
 
    /* set current texcoords */
    for (i = 0; i < MaxTextureCoordUnits; i++) {
@@ -169,7 +161,7 @@ test_texture_matrix(void)
 {
    int i;
 
-   clear_errors();
+   piglit_reset_gl_error();
 
    /* set tex matrices */
    for (i = 0; i < MaxTextureCoordUnits; i++) {
@@ -221,7 +213,7 @@ test_texture_params(void)
    int i;
    int maxUnit;
 
-   clear_errors();
+   piglit_reset_gl_error();
 
    glCreateTextures(GL_TEXTURE_2D, MaxTextureCombinedUnits, tex);
 
@@ -269,7 +261,7 @@ test_texture_env(void)
    /* Texture Environment state is fixed-function; not used by shaders */
    int i;
 
-   clear_errors();
+   piglit_reset_gl_error();
 
    /* set per-unit state */
    for (i = 0; i < MaxTextureCombinedUnits; i++) {
