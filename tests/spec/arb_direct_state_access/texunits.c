@@ -92,71 +92,6 @@ report4v(const GLfloat exp[4], const GLfloat act[4])
 
 
 static bool
-test_rasterpos(void)
-{
-   int i;
-
-   piglit_reset_gl_error();
-
-   /* set current texcoords */
-   for (i = 0; i < MaxTextureCoordUnits; i++) {
-      glMultiTexCoord4fv(GL_TEXTURE0 + i, Random[i]);
-   }
-
-   /* query current texcoords */
-   for (i = 0; i < MaxTextureCoordUnits; i++) {
-      GLfloat v[4];
-      glActiveTexture(GL_TEXTURE0 + i);
-      glGetFloatv(GL_CURRENT_TEXTURE_COORDS, v);
-      if (!equal4v(Random[i], v)) {
-         printf("Get GL_CURRENT_TEXTURE_COORDS, unit %d failed\n", i);
-         report4v(Random[i], v);
-         return false;
-      }
-   }
-
-   /* set raster pos to update raster tex coords */
-   glRasterPos2i(0, 0);
-
-   for (i = 0; i < MaxTextureCoordUnits; i++) {
-      GLfloat v[4];
-      glActiveTexture(GL_TEXTURE0 + i);
-      glGetFloatv(GL_CURRENT_RASTER_TEXTURE_COORDS, v);
-      if (!equal4v(Random[i], v)) {
-         printf("Get GL_CURRENT_RASTER_TEXTURE_COORDS, unit %d failed\n", i);
-         report4v(Random[i], v);
-         return false;
-      }
-   }
-
-   /* there should be no errors at this point */
-   if (!piglit_check_gl_error(GL_NO_ERROR)) {
-      return false;
-   }
-
-   /* this should generate an error */
-   {
-      GLfloat v[4];
-      glActiveTexture(GL_TEXTURE0 + MaxTextureCoordUnits);
-      if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
-         /* INVALID_ENUM is expected */
-         if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-            return false;
-         }
-      } else {
-         /* INVALID_OPERATION is expected */
-         glGetFloatv(GL_CURRENT_RASTER_TEXTURE_COORDS, v);
-         if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
-            return false;
-         }
-      }
-   }
-
-   return true;
-}
-
-
-static bool
 test_texture_matrix(void)
 {
    int i;
@@ -271,7 +206,6 @@ piglit_display(void)
 {
 	bool pass = true;
 
-	pass = test_rasterpos() && pass;
 	pass = test_texture_matrix() && pass;
 	pass = test_texture_params() && pass;
 
