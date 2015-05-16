@@ -255,42 +255,6 @@ test_texture_params(void)
 }
 
 
-static bool
-test_texture_env(void)
-{
-   /* Texture Environment state is fixed-function; not used by shaders */
-   int i;
-
-   piglit_reset_gl_error();
-
-   /* set per-unit state */
-   for (i = 0; i < MaxTextureCombinedUnits; i++) {
-      glActiveTexture(GL_TEXTURE0 + i);
-      glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[i]);
-      if (!piglit_check_gl_error(GL_NO_ERROR))
-         return false;
-   }
-
-   /* check per-unit state */
-   for (i = 0; i < MaxTextureCombinedUnits; i++) {
-      GLfloat v[4];
-      glActiveTexture(GL_TEXTURE0 + i);
-      glGetTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, v);
-      if (!equal4v(v, Random[i])) {
-         printf("Setting per-unit env state failed for unit %d\n", i);
-         report4v(Random[i], v);
-         return false;
-      }
-   }
-
-   /* there should be no errors at this point */
-   if (!piglit_check_gl_error(GL_NO_ERROR))
-      return false;
-
-   return true;
-}
-
-
 static void
 report_info(void)
 {
@@ -310,7 +274,6 @@ piglit_display(void)
 	pass = test_rasterpos() && pass;
 	pass = test_texture_matrix() && pass;
 	pass = test_texture_params() && pass;
-	pass = test_texture_env() && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
