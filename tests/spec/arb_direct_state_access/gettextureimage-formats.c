@@ -47,7 +47,7 @@ static const char *TestName = "gettextureimage-formats";
 
 static const GLfloat clearColor[4] = { 0.4, 0.4, 0.4, 0.0 };
 static GLuint texture_id;
-static GLboolean init_by_rendering;
+static bool init_by_rendering;
 
 #define TEX_SIZE 128
 
@@ -58,9 +58,9 @@ static GLboolean init_by_rendering;
  * Make a simple texture image where red increases from left to right,
  * green increases from bottom to top, blue stays constant (50%) and
  * the alpha channel is a checkerboard pattern.
- * \return GL_TRUE for success, GL_FALSE if unsupported format
+ * \return true for success, false if unsupported format
  */
-static GLboolean
+static bool
 make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 {
 	GLubyte tex[TEX_SIZE][TEX_SIZE][4];
@@ -97,7 +97,7 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 			glDeleteFramebuffers(1, &fb);
-			return GL_FALSE;
+			return false;
 		}
 
 		glViewport(0, 0, TEX_SIZE, TEX_SIZE);
@@ -132,7 +132,7 @@ ubyte_to_float(GLubyte b, GLint bits)
 
 
 static GLfloat
-bits_to_tolerance(GLint bits, GLboolean compressed)
+bits_to_tolerance(GLint bits, bool compressed)
 {
 	GLfloat t;
 
@@ -322,7 +322,7 @@ compute_expected_color(const struct format_desc *fmt,
 }
 
 
-static GLboolean
+static bool
 colors_equal(const GLfloat expected[4], const GLfloat pix[4],
 	     GLfloat tolerance[4])
 {
@@ -330,13 +330,13 @@ colors_equal(const GLfloat expected[4], const GLfloat pix[4],
 		 fabsf(expected[1] - pix[1]) > tolerance[1] ||
 		 fabsf(expected[2] - pix[2]) > tolerance[2] ||
 		 fabsf(expected[3] - pix[3]) > tolerance[3]) {
-		return GL_FALSE;
+		return false;
 	}
-	return GL_TRUE;
+	return true;
 }
 
 
-static GLboolean
+static bool
 test_format(const struct test_desc *test,
 	    const struct format_desc *fmt)
 {
@@ -346,7 +346,7 @@ test_format(const struct test_desc *test,
 	GLubyte upperRightTexel[4];
 	int level;
 	GLfloat expected[4], pix[4], tolerance[4];
-	GLboolean pass = GL_TRUE;
+	bool pass = true;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -358,7 +358,7 @@ test_format(const struct test_desc *test,
 	    fmt->internalformat != GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) {
 		/* init texture image */
 		if (!make_texture_image(fmt->internalformat, upperRightTexel))
-			return GL_TRUE; /* unsupported = OK */
+			return true; /* unsupported = OK */
 
 		x = 10;
 		y = 40;
@@ -409,7 +409,7 @@ test_format(const struct test_desc *test,
 							 pix[0], pix[1], pix[2], pix[3]);
 					printf("Tolerance (%f, %f, %f, %f)\n",
 							 tolerance[0], tolerance[1], tolerance[2], tolerance[3]);
-					pass = GL_FALSE;
+					pass = false;
 				}
 			}
 
@@ -432,11 +432,11 @@ test_format(const struct test_desc *test,
  * This checks if required extensions are present and if this piglit test
  * can actually grok the formats.
  */
-static GLboolean
+static bool
 supported_format_set(const struct test_desc *set)
 {
 	if (!supported(set))
-		return GL_FALSE;
+		return false;
 
 	if (set->format == ext_texture_integer ||
 	    set->format == ext_packed_depth_stencil ||
@@ -446,17 +446,17 @@ supported_format_set(const struct test_desc *set)
 		/* texture_integer requires a fragment shader, different
 		 * glTexImage calls.  Depth/stencil formats not implemented.
 		 */
-		return GL_FALSE;
+		return false;
 	}
 
-	return GL_TRUE;
+	return true;
 }
 
 
-static GLboolean
+static bool
 test_all_formats(void)
 {
-	GLboolean pass = GL_TRUE;
+	bool pass = true;
 	int i, j;
 
 	for (i = 0; i < ARRAY_SIZE(test_sets); i++) {
@@ -464,7 +464,7 @@ test_all_formats(void)
 		if (supported_format_set(set)) {
 			for (j = 0; j < set->num_formats; j++) {
 				if (!test_format(set, &set->format[j])) {
-					pass = GL_FALSE;
+					pass = false;
 				}
 			}
 		}
@@ -477,9 +477,9 @@ test_all_formats(void)
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass;
+	bool pass;
 
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, false);
 
 	if (piglit_automatic) {
 		pass = test_all_formats();
@@ -489,7 +489,7 @@ piglit_display(void)
 			pass = test_format(set, &set->format[format_index]);
 		} else {
 			/* unsupported format - not a failure */
-			pass = GL_TRUE;
+			pass = true;
 			glClear(GL_COLOR_BUFFER_BIT);
 			piglit_present_results();
 		}
@@ -515,7 +515,7 @@ piglit_init(int argc, char **argv)
 
 	for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "init-by-rendering") == 0) {
-			init_by_rendering = GL_TRUE;
+			init_by_rendering = true;
 			puts("The textures will be initialized by rendering "
 			     "to them using glDrawPixels.");
 			break;

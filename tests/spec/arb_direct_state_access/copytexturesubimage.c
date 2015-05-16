@@ -48,19 +48,19 @@ static void rect(int x1, int y1, int x2, int y2)
 	glVertex2f(x2, y1);
 	glEnd();
 }
-static GLboolean inrect(int x, int y, int x1, int y1, int x2, int y2)
+static bool inrect(int x, int y, int x1, int y1, int x2, int y2)
 {
 	if (x >= x1 && x < x2 && y >= y1 && y < y2)
-		return GL_TRUE;
+		return true;
 	else
-		return GL_FALSE;
+		return false;
 }
 
-static GLboolean
+static bool
 check_results(int dstx, int dsty, int w, int h)
 {
 	GLfloat *results;
-	GLboolean pass = GL_TRUE;
+	bool pass = true;
 	int x, y;
 
 	results = malloc(w * h * 4 * sizeof(GLfloat));
@@ -96,7 +96,7 @@ check_results(int dstx, int dsty, int w, int h)
 				       results[(y * w + x) * 4 + 0],
 				       results[(y * w + x) * 4 + 1],
 				       results[(y * w + x) * 4 + 2]);
-				pass = GL_FALSE;
+				pass = false;
 			}
 		}
 	}
@@ -105,7 +105,7 @@ check_results(int dstx, int dsty, int w, int h)
 	return pass;
 }
 
-static GLboolean
+static bool
 do_row(int srcy, int srcw, int srch, GLenum target)
 {
 	int srcx = 20;
@@ -114,7 +114,7 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 	int remain_width;
 	int remain_height;
 	GLuint texname;
-	GLboolean pass = GL_TRUE;
+	bool pass = true;
 
 	/* Rectangle textures use coordinates on the range [0..w]x[0..h],
 	 * where as all other textures use coordinates on the range
@@ -223,7 +223,7 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass;
+	bool pass;
 	int srcy = 5;
 
 

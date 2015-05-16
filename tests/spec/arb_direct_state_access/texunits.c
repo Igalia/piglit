@@ -60,7 +60,7 @@ generate_random_numbers(void)
 }
 
 
-static GLboolean
+static bool
 equal4v(const GLfloat v1[4], const GLfloat v2[4])
 {
    return (v1[0] == v2[0] &&
@@ -70,15 +70,15 @@ equal4v(const GLfloat v1[4], const GLfloat v2[4])
 }
 
 
-static GLboolean
+static bool
 equal16v(const GLfloat v1[16], const GLfloat v2[16])
 {
    int i;
    for (i = 0; i < 16; i++) {
       if (v1[i] != v2[i])
-         return GL_FALSE;
+         return false;
    }
-   return GL_TRUE;
+   return true;
 }
 
 
@@ -99,7 +99,7 @@ clear_errors()
 }
 
 
-static GLboolean
+static bool
 test_rasterpos(void)
 {
    int i;
@@ -119,7 +119,7 @@ test_rasterpos(void)
       if (!equal4v(Random[i], v)) {
          printf("Get GL_CURRENT_TEXTURE_COORDS, unit %d failed\n", i);
          report4v(Random[i], v);
-         return GL_FALSE;
+         return false;
       }
    }
 
@@ -133,13 +133,13 @@ test_rasterpos(void)
       if (!equal4v(Random[i], v)) {
          printf("Get GL_CURRENT_RASTER_TEXTURE_COORDS, unit %d failed\n", i);
          report4v(Random[i], v);
-         return GL_FALSE;
+         return false;
       }
    }
 
    /* there should be no errors at this point */
    if (!piglit_check_gl_error(GL_NO_ERROR)) {
-      return GL_FALSE;
+      return false;
    }
 
    /* this should generate an error */
@@ -149,22 +149,22 @@ test_rasterpos(void)
       if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
          /* INVALID_ENUM is expected */
          if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-            return GL_FALSE;
+            return false;
          }
       } else {
          /* INVALID_OPERATION is expected */
          glGetFloatv(GL_CURRENT_RASTER_TEXTURE_COORDS, v);
          if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
-            return GL_FALSE;
+            return false;
          }
       }
    }
 
-   return GL_TRUE;
+   return true;
 }
 
 
-static GLboolean
+static bool
 test_texture_matrix(void)
 {
    int i;
@@ -185,13 +185,13 @@ test_texture_matrix(void)
       glGetFloatv(GL_TEXTURE_MATRIX, m);
       if (!equal16v((GLfloat *) Random + (i * 4) % 124, m)) {
          printf("Get texture matrix unit %d failed\n", i);
-         return GL_FALSE;
+         return false;
       }
    }
 
    /* there should be no errors at this point */
    if (!piglit_check_gl_error(GL_NO_ERROR))
-      return GL_FALSE;
+      return false;
 
    /* this should generate an error */
    {
@@ -200,21 +200,21 @@ test_texture_matrix(void)
       if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
          /* INVALID_ENUM is expected */
          if (!piglit_check_gl_error(GL_INVALID_ENUM))
-            return GL_FALSE;
+            return false;
 
       } else {
          /* INVALID_OPERATION is expected */
          glGetFloatv(GL_TEXTURE_MATRIX, m);
          if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-            return GL_FALSE;
+            return false;
       }
    }
 
-   return GL_TRUE;
+   return true;
 }
 
 
-static GLboolean
+static bool
 test_texture_params(void)
 {
    GLuint tex[MAX_UNITS];
@@ -240,13 +240,13 @@ test_texture_params(void)
       if (!equal4v(v, Random[i])) {
          printf("Setting per-unit param state failed for unit %d\n", i);
          report4v(Random[i], v);
-         return GL_FALSE;
+         return false;
       }
    }
 
    /* there should be no errors at this point */
    if (!piglit_check_gl_error(GL_NO_ERROR)) {
-      return GL_FALSE;
+      return false;
    }
 
    maxUnit = MAX2(MaxTextureCombinedUnits, MaxTextureCoordUnits);
@@ -256,14 +256,14 @@ test_texture_params(void)
    /* INVALID_OPERATION is expected */
    /* (see the GL 4.4 spec for glBindTextures) */
    if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
-      return GL_FALSE;
+      return false;
    }
 
-   return GL_TRUE;
+   return true;
 }
 
 
-static GLboolean
+static bool
 test_texture_env(void)
 {
    /* Texture Environment state is fixed-function; not used by shaders */
@@ -276,7 +276,7 @@ test_texture_env(void)
       glActiveTexture(GL_TEXTURE0 + i);
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[i]);
       if (!piglit_check_gl_error(GL_NO_ERROR))
-         return GL_FALSE;
+         return false;
    }
 
    /* check per-unit state */
@@ -287,15 +287,15 @@ test_texture_env(void)
       if (!equal4v(v, Random[i])) {
          printf("Setting per-unit env state failed for unit %d\n", i);
          report4v(Random[i], v);
-         return GL_FALSE;
+         return false;
       }
    }
 
    /* there should be no errors at this point */
    if (!piglit_check_gl_error(GL_NO_ERROR))
-      return GL_FALSE;
+      return false;
 
-   return GL_TRUE;
+   return true;
 }
 
 
@@ -313,7 +313,7 @@ report_info(void)
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass = GL_TRUE;
+	bool pass = true;
 
 	pass = test_rasterpos() && pass;
 	pass = test_texture_matrix() && pass;

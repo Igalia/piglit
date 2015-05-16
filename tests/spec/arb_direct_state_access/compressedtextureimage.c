@@ -131,10 +131,10 @@ display_mipmaps(int x, int y)
 	}
 }
 
-static GLboolean
+static bool
 check_resulting_mipmaps(int x, int y)
 {
-	GLboolean pass = GL_TRUE;
+	bool pass = true;
 	int size;
 	float red[4] =   {1.0, 0.0, 0.0, 1.0};
 	float green[4] = {0.0, 1.0, 0.0, 1.0};
@@ -198,7 +198,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	tex_src = piglit_rgbw_texture(format->token, SIZE, SIZE,
-				      GL_TRUE, GL_FALSE,
+				      true, false,
 				      GL_UNSIGNED_NORMALIZED);
 	glCreateTextures(GL_TEXTURE_2D, 1, &tex);
 
@@ -266,7 +266,7 @@ piglit_init(int argc, char **argv)
 	int i;
 	piglit_require_extension("GL_ARB_direct_state_access");
 
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, false);
 
 	if (argc != 2)
 		usage(argc, argv);

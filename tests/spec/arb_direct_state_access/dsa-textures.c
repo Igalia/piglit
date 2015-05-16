@@ -80,7 +80,7 @@ piglit_display(void)
 	glTextureParameteri(name, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	/* Draw the image */
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, false);
 	dsa_texture_with_unit(texunit);
 	glEnable(GL_TEXTURE_2D);
 	glBindTextureUnit(texunit, name);
