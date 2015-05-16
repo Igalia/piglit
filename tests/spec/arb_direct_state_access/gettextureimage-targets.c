@@ -30,7 +30,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 20;
 	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
@@ -256,12 +256,8 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_direct_state_access");
 	piglit_require_extension("GL_ARB_texture_storage");
 
-	if (piglit_get_gl_version() < 12)
-		clear_target_mask(GL_TEXTURE_3D);
 	if (!piglit_is_extension_supported("GL_ARB_texture_rectangle"))
 		clear_target_mask(GL_TEXTURE_RECTANGLE);
-	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map"))
-		clear_target_mask(GL_TEXTURE_CUBE_MAP);
 	if (!piglit_is_extension_supported("GL_EXT_texture_array")) {
 		clear_target_mask(GL_TEXTURE_1D_ARRAY);
 		clear_target_mask(GL_TEXTURE_2D_ARRAY);
