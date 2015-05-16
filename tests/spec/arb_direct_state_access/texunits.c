@@ -348,10 +348,4 @@ piglit_init(int argc, char *argv[])
    }
 
    generate_random_numbers();
-
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
 }
