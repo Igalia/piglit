@@ -26,11 +26,12 @@
  * @file getcompressedtextureimage.c
  */
 #include "piglit-util-gl.h"
+#include "dsa-utils.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 216;
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 20;
 	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
@@ -49,15 +50,19 @@ show_image(GLubyte *data, int num_layers, const char *title)
 	GLuint name;
 	int i;
 	char junk[50];
+	GLuint prog = 0;
 
 	if (!piglit_automatic) {
+		prog = dsa_create_program(GL_TEXTURE_2D);
+		glUseProgram(prog);
+		dsa_set_xform(prog, piglit_width, piglit_height);
+
 		/* Create the texture handle. */
 		glCreateTextures(GL_TEXTURE_2D, 1, &name);
 		glTextureStorage2D(name, 1, GL_RGBA8, IMAGE_WIDTH,
 			IMAGE_HEIGHT);
 		glTextureParameteri(name, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(name, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glEnable(GL_TEXTURE_2D);
 		glBindTextureUnit(0, name);
 
 		/* Draw the layers, separated by some space */
@@ -84,6 +89,8 @@ show_image(GLubyte *data, int num_layers, const char *title)
 		printf("\n");
 
 		glDeleteTextures(1, &name);
+		glUseProgram(0);
+		glDeleteProgram(prog);
 	}
 }
 
@@ -352,15 +359,12 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_direct_state_access");
 	piglit_require_extension("GL_ARB_texture_storage");
 
-	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map"))
-		clear_target_mask(GL_TEXTURE_CUBE_MAP);
 	if (!piglit_is_extension_supported("GL_EXT_texture_array"))
 		clear_target_mask(GL_TEXTURE_2D_ARRAY);
 	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map_array"))
 		clear_target_mask(GL_TEXTURE_CUBE_MAP_ARRAY);
 
 	glClearColor(0.5, 0.5, 0.5, 1);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
 
 enum piglit_result
