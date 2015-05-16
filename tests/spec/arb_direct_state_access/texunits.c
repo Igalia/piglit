@@ -70,74 +70,12 @@ equal4v(const GLfloat v1[4], const GLfloat v2[4])
 }
 
 
-static bool
-equal16v(const GLfloat v1[16], const GLfloat v2[16])
-{
-   int i;
-   for (i = 0; i < 16; i++) {
-      if (v1[i] != v2[i])
-         return false;
-   }
-   return true;
-}
-
-
 static void
 report4v(const GLfloat exp[4], const GLfloat act[4])
 {
    printf("Expected (%g, %g, %g, %g) but found (%g, %g, %g, %g)\n",
           exp[0], exp[1], exp[2], exp[3],
           act[0], act[1], act[2], act[3]);
-}
-
-
-static bool
-test_texture_matrix(void)
-{
-   int i;
-
-   piglit_reset_gl_error();
-
-   /* set tex matrices */
-   for (i = 0; i < MaxTextureCoordUnits; i++) {
-      glActiveTexture(GL_TEXTURE0 + i);
-      glMatrixMode(GL_TEXTURE);
-      glLoadMatrixf((GLfloat *) Random + (i * 4) % 124);
-   }
-
-   /* query matrices */
-   for (i = 0; i < MaxTextureCoordUnits; i++) {
-      GLfloat m[16];
-      glActiveTexture(GL_TEXTURE0 + i);
-      glGetFloatv(GL_TEXTURE_MATRIX, m);
-      if (!equal16v((GLfloat *) Random + (i * 4) % 124, m)) {
-         printf("Get texture matrix unit %d failed\n", i);
-         return false;
-      }
-   }
-
-   /* there should be no errors at this point */
-   if (!piglit_check_gl_error(GL_NO_ERROR))
-      return false;
-
-   /* this should generate an error */
-   {
-      GLfloat m[16];
-      glActiveTexture(GL_TEXTURE0 + MaxTextureCoordUnits);
-      if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
-         /* INVALID_ENUM is expected */
-         if (!piglit_check_gl_error(GL_INVALID_ENUM))
-            return false;
-
-      } else {
-         /* INVALID_OPERATION is expected */
-         glGetFloatv(GL_TEXTURE_MATRIX, m);
-         if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-            return false;
-      }
-   }
-
-   return true;
 }
 
 
@@ -206,7 +144,6 @@ piglit_display(void)
 {
 	bool pass = true;
 
-	pass = test_texture_matrix() && pass;
 	pass = test_texture_params() && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
