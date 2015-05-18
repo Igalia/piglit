@@ -31,10 +31,11 @@
 
 #include "piglit-util-gl.h"
 #include "../fbo/fbo-formats.h"
+#include "dsa-utils.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 20;
 	config.supports_gl_core_version = 31;
 
 	config.window_width = 600;
@@ -47,6 +48,7 @@ static const char *TestName = "gettextureimage-formats";
 
 static const GLfloat clearColor[4] = { 0.4, 0.4, 0.4, 0.0 };
 static GLuint texture_id;
+static GLuint prog;
 static bool init_by_rendering;
 
 #define TEX_SIZE 128
@@ -366,12 +368,13 @@ test_format(const struct test_desc *test,
 		compute_expected_color(fmt, upperRightTexel, expected, tolerance);
 
 		/* Draw with the texture */
-		glEnable(GL_TEXTURE_2D);
+		glUseProgram(prog);
+		dsa_set_xform(prog, piglit_width, piglit_height);
 #if DO_BLEND
 		glEnable(GL_BLEND);
 #endif
 		piglit_draw_rect_tex(x, y, w, h,  0.0, 0.0, 1.0, 1.0);
-		glDisable(GL_TEXTURE_2D);
+		glUseProgram(0);
 		glDisable(GL_BLEND);
 
 		x += TEX_SIZE + 20;
@@ -379,22 +382,17 @@ test_format(const struct test_desc *test,
 		level = 0;
 		while (w > 0) {
 			/* Get the texture image */
-			assert(!glIsEnabled(GL_TEXTURE_2D));
 			glGetTextureImage(texture_id, level, GL_RGBA,
 					  GL_FLOAT, sizeof(readback),
 					  readback);
 
-			assert(!glIsEnabled(GL_TEXTURE_2D));
 			/* Draw the texture image */
 			glWindowPos2iARB(x, y);
 #if DO_BLEND
 			glEnable(GL_BLEND);
 #endif
-			assert(!glIsEnabled(GL_TEXTURE_2D));
 			glDrawPixels(w, h, GL_RGBA, GL_FLOAT, readback);
 			glDisable(GL_BLEND);
-
-			assert(!glIsEnabled(GL_TEXTURE_2D));
 
 			if (level <= 2) {
 				GLint rx = x + w-1;
@@ -505,11 +503,6 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_direct_state_access");
 
-	if ((piglit_get_gl_version() < 14) && !piglit_is_extension_supported("GL_ARB_window_pos")) {
-		printf("Requires GL 1.4 or GL_ARB_window_pos");
-		piglit_report_result(PIGLIT_SKIP);
-	}
-
 	fbo_formats_init(1, argv, !piglit_automatic);
 	(void) fbo_formats_display;
 
@@ -527,9 +520,9 @@ piglit_init(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+
+	prog = dsa_create_program(GL_TEXTURE_2D);
 }
