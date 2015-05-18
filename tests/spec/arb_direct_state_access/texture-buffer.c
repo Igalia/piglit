@@ -40,45 +40,40 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 			       PIGLIT_GL_VISUAL_RGBA;
 PIGLIT_GL_TEST_CONFIG_END
 
+static const char vs_source[] =
+	"#version 140\n"
+	"in vec4 piglit_vertex;\n"
+	"void main()\n"
+	"{\n"
+	"	gl_Position = piglit_vertex;\n"
+	"}\n"
+	;
+
+static const char fs_source[] =
+	"#version 140\n"
+	"uniform samplerBuffer s;\n"
+	"void main()\n"
+	"{\n"
+	"	gl_FragColor = texelFetch(s, 0);\n"
+	"}\n"
+	;
+
+static GLuint prog;
+static GLuint tex;
+static GLuint bo;
+
 enum piglit_result
 piglit_display(void)
 {
-	static const char *vs_source =
-		"#version 140\n"
-		"in vec4 piglit_vertex;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_Position = piglit_vertex;\n"
-		"}\n";
-
-	static const char *fs_source =
-		"#version 140\n"
-		"uniform samplerBuffer s;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor = texelFetch(s, 0);\n"
-		"}\n";
 
 	bool pass = true;
-	GLuint tex, bo;
-	GLuint prog;
 	static const float green[] = {0, 1, 0, 0};
 	static const float blue[] =  {0, 0, 1, 0};
 	static const uint8_t g_rgba8[] = {0x00, 0xff, 0x00, 0x00};
 	static const uint8_t b_rgba8[] = {0x00, 0x00, 0xff, 0x00};
 
-	prog = piglit_build_simple_program(vs_source, fs_source);
-	glUseProgram(prog);
-
-	glGenBuffers(1, &bo);
-	glBindBuffer(GL_TEXTURE_BUFFER, bo);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(g_rgba8), g_rgba8,
 		     GL_STREAM_DRAW);
-
-	glCreateTextures(GL_TEXTURE_BUFFER, 1, &tex);
-	glTextureBuffer(tex, GL_RGBA8, bo);
-	glBindTextureUnit(0, tex);
-
 	piglit_draw_rect(-1, -1, 1, 2);
 	glBufferData(GL_TEXTURE_BUFFER, sizeof(b_rgba8), b_rgba8,
 		     GL_STREAM_DRAW);
@@ -105,4 +100,14 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL_version(140);
 	if (piglit_get_gl_version() < 31)
 		piglit_require_extension("GL_ARB_texture_buffer_object");
+
+	prog = piglit_build_simple_program(vs_source, fs_source);
+	glUseProgram(prog);
+
+	glGenBuffers(1, &bo);
+	glBindBuffer(GL_TEXTURE_BUFFER, bo);
+
+	glCreateTextures(GL_TEXTURE_BUFFER, 1, &tex);
+	glTextureBuffer(tex, GL_RGBA8, bo);
+	glBindTextureUnit(0, tex);
 }
