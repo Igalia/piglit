@@ -40,7 +40,7 @@ except ImportError:
     import json
 from nose.plugins.skip import SkipTest
 
-from framework import test, backends, results
+from framework import test, backends, results, core
 
 
 __all__ = [
@@ -49,6 +49,8 @@ __all__ = [
     'tempdir',
     'JSON_DATA'
 ]
+
+core.get_config()
 
 
 class _Tree(dict):
@@ -362,16 +364,92 @@ def capture_stderr(func):
     return _inner
 
 
-def not_raises(exception):
-    """Decorator for tests that should not raise one of the follow exceptions.
+def set_env(**envargs):
+    """Decorator that sets environment variables and then unsets them.
+
+    If an value is set to None that key will be deleted from os.environ
+
     """
-    def _decorator(function):
-        @functools.wraps(function)
+
+    def _decorator(func):
+        """The actual decorator."""
+
+        @functools.wraps(func)
         def _inner(*args, **kwargs):
+            """The returned function."""
+            backup = {}
+            for key, value in envargs.iteritems():
+                backup[key] = os.environ.get(key, "__DONOTRESTORE__")
+                if value is not None:
+                    os.environ[key] = value
+                elif key in os.environ:
+                    del os.environ[key]
+
             try:
-                function(*args, **kwargs)
-            except exception as e:
-                raise TestFailure(e)
+                func(*args, **kwargs)
+            finally:
+                for key, value in backup.iteritems():
+                    if value == "__DONOTRESTORE__" and key in os.environ:
+                        del os.environ[key]
+                    else:
+                        os.environ[key] = value
+
+        return _inner
+
+    return _decorator
+
+
+def set_piglit_conf(*values):
+    """Decorator that sets and then usets values from core.PIGLIT_CONF.
+
+    This decorator takes arguments for sections and options to overwrite in
+    piglit.conf. It will first backup any options to be overwritten, and store
+    any options that don't exist. Then it will set those options, run the test,
+    and finally restore any options overwritten, and delete any new options
+    added. If value is set to NoneType the option will be removed.
+
+    Arguments:
+    Values -- tuples containing a section, option, and value in the form:
+    (<section>, <option>, <value>)
+
+    """
+    def _decorator(func):
+        """The actual decorator."""
+
+        @functools.wraps(func)
+        def _inner(*args, **kwargs):
+            """The function returned by the decorator."""
+            backup = set()
+            remove = set()
+
+            for section, key, value in values:
+                get = core.PIGLIT_CONFIG.safe_get(section, key)
+                # If there is a value, save that value to restore it, if there
+                # is not a value AND if there is a value to set (IE: we're not
+                # clearing a value if it exsists), the add it to remove
+                if get is not None:
+                    backup.add((section, key, get))
+                elif value is not None:
+                    remove.add((section, key))
+
+                # set any new values, and remove any values that are set to
+                # None
+                if value is not None:
+                    if not core.PIGLIT_CONFIG.has_section(section):
+                        core.PIGLIT_CONFIG.add_section(section)
+                    core.PIGLIT_CONFIG.set(section, key, value)
+                elif (core.PIGLIT_CONFIG.has_section(section) and
+                      core.PIGLIT_CONFIG.has_option(section, key)):
+                    core.PIGLIT_CONFIG.remove_option(section, key)
+
+            try:
+                func(*args, **kwargs)
+            finally:
+                # Restore all values
+                for section, key, value in backup:
+                    core.PIGLIT_CONFIG.set(section, key, value)
+                for section, key in remove:
+                    core.PIGLIT_CONFIG.remove_option(section, key)
 
         return _inner
 
