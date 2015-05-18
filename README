@@ -337,6 +337,9 @@ igt.py
 deqp_gles3.py
 	Support for running deQP's gles3 profile with piglit.
 
+deqp_gles31.py
+	Support for running deQP's gles3.1 profile with piglit.
+
 
 5. How to write tests
 ---------------------
