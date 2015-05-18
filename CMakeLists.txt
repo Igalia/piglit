@@ -33,9 +33,9 @@ endif()
 
 
 option(PIGLIT_BUILD_GL_TESTS "Build tests for OpenGL" ON)
-option(PIGLIT_BUILD_GLES1_TESTS "Build tests for OpenGL ES1" OFF)
-option(PIGLIT_BUILD_GLES2_TESTS "Build tests for OpenGL ES2" OFF)
-option(PIGLIT_BUILD_GLES3_TESTS "Build tests for OpenGL ES3" OFF)
+option(PIGLIT_BUILD_GLES1_TESTS "Build tests for OpenGL ES1" ON)
+option(PIGLIT_BUILD_GLES2_TESTS "Build tests for OpenGL ES2" ON)
+option(PIGLIT_BUILD_GLES3_TESTS "Build tests for OpenGL ES3" ON)
 option(PIGLIT_BUILD_CL_TESTS "Build tests for OpenCL" OFF)
 
 if(PIGLIT_BUILD_GL_TESTS)
