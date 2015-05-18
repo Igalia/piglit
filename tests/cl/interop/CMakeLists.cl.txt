@@ -1,4 +1,4 @@
-IF(EGL_FOUND)
+IF(EGL_FOUND AND PIGLIT_BUILD_GLES2_TESTS)
 	include_directories(
 		${GLEXT_INCLUDE_DIR}
 		${OPENGL_INCLUDE_PATH}
@@ -12,4 +12,4 @@ IF(EGL_FOUND)
 	)
 
 	piglit_cl_add_interop_test (egl_khr_cl_event2 egl_khr_cl_event2.c)
-ENDIF(EGL_FOUND)
+ENDIF(EGL_FOUND AND PIGLIT_BUILD_GLES2_TESTS)
