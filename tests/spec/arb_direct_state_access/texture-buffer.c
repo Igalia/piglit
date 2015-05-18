@@ -33,7 +33,6 @@
 #include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_compat_version = 10;
 	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE |
@@ -97,9 +96,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_ARB_direct_state_access");
-	piglit_require_GLSL_version(140);
-	if (piglit_get_gl_version() < 31)
-		piglit_require_extension("GL_ARB_texture_buffer_object");
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
