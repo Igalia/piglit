@@ -33,6 +33,16 @@ bindir=/home/usr/oclconform
 testA
 testB
 
+[deqp-gles2]
+; Path to the deqp-gles2 executable
+; Can be overwritten by PIGLIT_DEQP_GLES2_BIN environment variable
+;bin=/home/knuth/deqp/modules/gles2/deqp-gles2
+
+; Space-separated list of extra command line arguments for deqp-gles31. The
+; option is not required. The environment variable PIGLIT_DEQP_GLES31_EXTRA_ARGS
+; overrides the value set here.
+;extra_args=--deqp-visibility hidden
+
 ;[deqp-gles3]
 ;
 ; Path to the deqp-gles3 executable. You can also set this with the environment
