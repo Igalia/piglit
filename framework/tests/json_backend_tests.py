@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring,protected-access
 
 """ Tests for the backend package """
 
@@ -31,7 +31,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-from framework import results, backends
+from framework import results, backends, exceptions
 import framework.tests.utils as utils
 from .backends_tests import BACKEND_INITIAL_META
 
@@ -295,3 +295,11 @@ def test_piglit_decoder():
     test = json.loads('{"foo": {"result": "pass"}}',
                       object_hook=backends.json.piglit_decoder)
     nt.assert_is_instance(test['foo'], results.TestResult)
+
+
+@nt.raises(exceptions.PiglitFatalError)
+def test_load_bad_json():
+    """backends.json._load: Raises fatal error if json is corrupt"""
+    with utils.tempfile('{"bad json": }') as f:
+        with open(f, 'r') as tfile:
+            backends.json._load(tfile)

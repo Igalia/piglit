@@ -212,7 +212,14 @@ def _load(results_file):
     """
     result = results.TestrunResult()
     result.results_version = 0  # This should get overwritten
-    result.__dict__.update(json.load(results_file, object_hook=piglit_decoder))
+    try:
+        result.__dict__.update(
+            json.load(results_file, object_hook=piglit_decoder))
+    except ValueError as e:
+        raise exceptions.PiglitFatalError(
+            'While loading json results file: "{}",\n'
+            'the following error occured:\n{}'.format(results_file.name,
+                                                      e.message))
 
     return result
 
