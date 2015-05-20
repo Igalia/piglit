@@ -311,6 +311,10 @@ def resume(input_):
                         type=argparse.FileType("r"),
                         help="Optionally specify a piglit config file to use. "
                              "Default is piglit.conf")
+    parser.add_argument("-n", "--no-retry",
+                        dest="no_retry",
+                        action="store_true",
+                        help="Do not retry incomplete tests")
     args = parser.parse_args(input_)
     _disable_windows_exception_messages()
 
@@ -340,7 +344,7 @@ def resume(input_):
     # Don't re-run tests that have already completed, incomplete status tests
     # have obviously not completed.
     for name, result in results.tests.iteritems():
-        if result['result'] != 'incomplete':
+        if args.no_retry or result['result'] != 'incomplete':
             opts.exclude_tests.add(name)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])
