@@ -1,0 +1,39 @@
+# Use one gl_CullDistance values to _not_ "cull" away a vertex with a positive
+# value supplied to gl_CullDistance.
+#
+# The gl_CullDistance variable provides a mechanism for controlling user
+# culling. The element gl_CullDistance[i] specifies a cull distance for each
+# plane i. A distance of 0.0 means that the vertex is on the plane, a positive
+# distance means that the vertex is insider the cull volume, and a negative
+# distance means that the point is outside the cull volume. Primitives whose
+# vertices all have a negative clip distance for plane i will be discarded.
+
+[require]
+GLSL >= 1.30
+GL_ARB_cull_distance
+
+[vertex shader]
+#version 130
+#extension GL_ARB_cull_distance: enable
+
+out float gl_CullDistance[1];
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_CullDistance[0] = 1;
+}
+
+[fragment shader]
+#version 130
+
+void main(void)
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
