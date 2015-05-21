@@ -46,6 +46,7 @@ def test_piglittest_interpret_result():
     """test.piglit_test.PiglitBaseTest.interpret_result(): works no subtests"""
     test = PiglitBaseTest(['foo'])
     test.result['out'] = 'PIGLIT: {"result": "pass"}\n'
+    test.result['returncode'] = 0
     test.interpret_result()
     assert test.result['result'] == 'pass'
 
@@ -55,6 +56,7 @@ def test_piglittest_interpret_result_subtest():
     test = PiglitBaseTest(['foo'])
     test.result['out'] = ('PIGLIT: {"result": "pass"}\n'
                           'PIGLIT: {"subtest": {"subtest": "pass"}}\n')
+    test.result['returncode'] = 0
     test.interpret_result()
     assert test.result['subtest']['subtest'] == 'pass'
 
@@ -67,6 +69,7 @@ def test_piglitest_no_clobber():
         'PIGLIT: {"subtest": {"test1": "pass"}}\n'
         'PIGLIT: {"subtest": {"test2": "pass"}}\n'
     )
+    test.result['returncode'] = 0
     test.interpret_result()
 
     nt.assert_dict_equal(test.result['subtest'],

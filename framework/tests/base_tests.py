@@ -59,12 +59,11 @@ def test_timeout():
     """test.base.Test.run(): kills tests that exceed timeout when set"""
     utils.binary_check('sleep', 1)
 
-    def helper():
-        if (test.result['returncode'] == 0):
-            test.result['result'] = "pass"
+    class _Test(Test):
+        def interpret_result(self):
+            super(_Test, self).interpret_result()
 
-    test = TestTest(['sleep', '60'])
-    test.test_interpret_result = helper
+    test = _Test(['sleep', '60'])
     test.timeout = 1
     test.run()
     assert test.result['result'] == 'timeout'

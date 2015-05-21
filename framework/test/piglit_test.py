@@ -82,6 +82,8 @@ class PiglitBaseTest(Test):
         self.result['out'] = '\n'.join(
             s for s in outlines if not s.startswith('PIGLIT:'))
 
+        super(PiglitBaseTest, self).interpret_result()
+
 
 class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
     """ OpenGL specific Piglit test class

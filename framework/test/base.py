@@ -199,8 +199,16 @@ class Test(object):
 
     @abc.abstractmethod
     def interpret_result(self):
-        """ Convert the raw output of the test into a form piglit understands
+        """Convert the raw output of the test into a form piglit understands.
         """
+        if _is_crash_returncode(self.result['returncode']):
+            # check if the process was terminated by the timeout
+            if self.timeout > 0 and self.__proc_timeout.join() > 0:
+                self.result['result'] = 'timeout'
+            else:
+                self.result['result'] = 'crash'
+        elif self.result['returncode'] != 0 and self.result['result'] == 'pass':
+            self.result['result'] = 'warn'
 
     def run(self):
         """
@@ -236,15 +244,6 @@ class Test(object):
             return
 
         self.interpret_result()
-
-        if _is_crash_returncode(self.result['returncode']):
-            # check if the process was terminated by the timeout
-            if self.timeout > 0 and self.__proc_timeout.join() > 0:
-                self.result['result'] = 'timeout'
-            else:
-                self.result['result'] = 'crash'
-        elif self.result['returncode'] != 0 and self.result['result'] == 'pass':
-            self.result['result'] = 'warn'
 
         if self.OPTS.valgrind:
             # If the underlying test failed, simply report
