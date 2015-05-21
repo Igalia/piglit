@@ -186,9 +186,6 @@ class Test(object):
     @property
     def command(self):
         assert self._command
-        if self.OPTS.valgrind:
-            return ['valgrind', '--quiet', '--error-exitcode=1',
-                    '--tool=memcheck'] + self._command
         return self._command
 
     @abc.abstractmethod

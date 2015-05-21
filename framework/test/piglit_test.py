@@ -65,6 +65,14 @@ class PiglitBaseTest(Test):
         # Prepend TEST_BIN_DIR to the path.
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
 
+    @Test.command.getter
+    def command(self):
+        command = super(PiglitBaseTest, self).command
+        if self.OPTS.valgrind:
+            return ['valgrind', '--quiet', '--error-exitcode=1',
+                    '--tool=memcheck'] + command
+        return command
+
     def interpret_result(self):
         outlines = self.result['out'].split('\n')
         outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
