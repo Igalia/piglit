@@ -25,8 +25,12 @@ from __future__ import print_function, absolute_import
 import nose.tools as nt
 
 import framework.tests.utils as utils
-from framework.test.base import Test, WindowResizeMixin, TestRunError
+from framework.test.base import (
+    Test, WindowResizeMixin, ValgrindMixin, TestRunError
+)
+from framework.tests.status_tests import PROBLEMS, STATUSES
 
+# pylint: disable=invalid-name
 
 # Helpers
 class TestTest(Test):
@@ -159,3 +163,82 @@ def test_mutation():
     _Test(args)
 
     nt.assert_list_equal(args, ['a', 'b'])
+
+
+def test_ValgrindMixin_command():
+    """test.base.ValgrindMixin.command: overrides self.command"""
+    class _Test(ValgrindMixin, utils.Test):
+        pass
+
+    test = _Test(['foo'])
+    test.OPTS.valgrind = True
+    nt.eq_(test.command, ['valgrind', '--quiet', '--error-exitcode=1',
+                          '--tool=memcheck', 'foo'])
+    test.OPTS.valgrind = False
+
+
+class TestValgrindMixinRun(object):
+    @classmethod
+    def setup_class(cls):
+        class _NoRunTest(utils.Test):
+            def run(self):
+                self.interpret_result()
+
+        class _Test(ValgrindMixin, _NoRunTest):
+            pass
+
+        cls.test = _Test
+
+    @utils.nose_generator
+    def test_bad_valgrind_true(self):
+        """Test non-pass status when OPTS.valgrind is True."""
+        def test(status, expected):
+            test = self.test(['foo'])
+            test.OPTS.valgrind = True
+            test.result['result'] = status
+            test.run()
+            nt.eq_(test.result['result'], expected)
+
+        desc = ('test.base.ValgrindMixin.run: '
+                'when status is "{}" it is changed to "{}"')
+
+        for status in PROBLEMS:
+            test.description = desc.format(status, 'skip')
+            yield test, status, 'skip'
+
+    @utils.nose_generator
+    def test_valgrind_false(self):
+        """Test non-pass status when OPTS.valgrind is False."""
+        def test(status):
+            test = self.test(['foo'])
+            test.OPTS.valgrind = False
+            test.result['result'] = status
+            test.run()
+            nt.eq_(test.result['result'], status)
+
+        desc = ('test.base.ValgrindMixin.run: when status is "{}" '
+                'it is not changed when not running valgrind.')
+
+        for status in STATUSES:
+            test.description = desc.format(status)
+            yield test, status
+
+    def test_pass(self):
+        """test.base.ValgrindMixin.run: when test is 'pass' and returncode is '0' result is pass
+        """
+        test = self.test(['foo'])
+        test.OPTS.valgrind = True
+        test.result['result'] = 'pass'
+        test.result['returncode'] = 0
+        test.run()
+        nt.eq_(test.result['result'], 'pass')
+
+    def test_fallthrough(self):
+        """test.base.ValgrindMixin.run: when a test is 'pass' but returncode is not 0 it's 'fail'
+        """
+        test = self.test(['foo'])
+        test.OPTS.valgrind = True
+        test.result['result'] = 'pass'
+        test.result['returncode'] = 1
+        test.run()
+        nt.eq_(test.result['result'], 'fail')

@@ -31,7 +31,7 @@ try:
 except ImportError:
     import json
 
-from .base import Test, WindowResizeMixin, TestIsSkip
+from .base import Test, WindowResizeMixin, ValgrindMixin, TestIsSkip
 import framework.core as core
 
 
@@ -52,7 +52,7 @@ CL_CONCURRENT = (not sys.platform.startswith('linux') or
                  glob.glob('/dev/dri/render*'))
 
 
-class PiglitBaseTest(Test):
+class PiglitBaseTest(ValgrindMixin, Test):
     """
     PiglitTest: Run a "native" piglit test executable
 
@@ -64,14 +64,6 @@ class PiglitBaseTest(Test):
 
         # Prepend TEST_BIN_DIR to the path.
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
-
-    @Test.command.getter
-    def command(self):
-        command = super(PiglitBaseTest, self).command
-        if self.OPTS.valgrind:
-            return ['valgrind', '--quiet', '--error-exitcode=1',
-                    '--tool=memcheck'] + command
-        return command
 
     def interpret_result(self):
         outlines = self.result['out'].split('\n')

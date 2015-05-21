@@ -256,6 +256,8 @@ def nose_generator(func):
     GeneratedTestWrapper reverse-proxy object
 
     """
+
+    @functools.wraps(func)
     def test_wrapper(*args, **kwargs):
         for x in func(*args, **kwargs):
             x = list(x)

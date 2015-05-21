@@ -43,6 +43,9 @@ from framework.results import TestResult
 
 __all__ = [
     'Test',
+    'TestIsSkip',
+    'TestRunError',
+    'ValgrindMixin',
     'WindowResizeMixin',
 ]
 
@@ -245,18 +248,6 @@ class Test(object):
 
         self.interpret_result()
 
-        if self.OPTS.valgrind:
-            # If the underlying test failed, simply report
-            # 'skip' for this valgrind test.
-            if self.result['result'] != 'pass':
-                self.result['result'] = 'skip'
-            elif self.result['returncode'] == 0:
-                # Test passes and is valgrind clean.
-                self.result['result'] = 'pass'
-            else:
-                # Test passed but has valgrind errors.
-                self.result['result'] = 'fail'
-
     def is_skip(self):
         """ Application specific check for skip
 
@@ -321,11 +312,9 @@ class Test(object):
             out, err = proc.communicate()
             returncode = proc.returncode
         except OSError as e:
-            # Different sets of tests get built under
-            # different build configurations.  If
-            # a developer chooses to not build a test,
-            # Piglit should not report that test as having
-            # failed.
+            # Different sets of tests get built under different build
+            # configurations.  If a developer chooses to not build a test,
+            # Piglit should not report that test as having failed.
             if e.errno == errno.ENOENT:
                 raise TestRunError("Test executable not found.\n", 'skip')
             else:
@@ -384,3 +373,42 @@ class WindowResizeMixin(object):
         # If we reach this point then there has been no error, but spurious
         # resize was detected more than 5 times. Set the result to fail
         raise TestRunError('Got spurious resize more than 5 times', 'fail')
+
+
+class ValgrindMixin(object):
+    """Mixin class that adds support for running tests through valgrind.
+
+    This mixin allows a class to run with the --valgrind option.
+
+    """
+    @Test.command.getter
+    def command(self):
+        command = super(ValgrindMixin, self).command
+        if self.OPTS.valgrind:
+            return ['valgrind', '--quiet', '--error-exitcode=1',
+                    '--tool=memcheck'] + command
+        else:
+            return command
+
+    def interpret_result(self):
+        """Set the status to the valgrind status.
+
+        It is important that the valgrind interpret_results code is run last,
+        since it depends on the statuses already set and passed to it,
+        including the Test.interpret_result() method. To this end it executes
+        super().interpret_result(), then calls it's own result.
+
+        """
+        super(ValgrindMixin, self).interpret_result()
+
+        if self.OPTS.valgrind:
+            # If the underlying test failed, simply report
+            # 'skip' for this valgrind test.
+            if self.result['result'] != 'pass':
+                self.result['result'] = 'skip'
+            elif self.result['returncode'] == 0:
+                # Test passes and is valgrind clean.
+                self.result['result'] = 'pass'
+            else:
+                # Test passed but has valgrind errors.
+                self.result['result'] = 'fail'
