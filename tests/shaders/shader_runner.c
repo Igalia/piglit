@@ -2723,11 +2723,25 @@ piglit_display(void)
 			glShadeModel(GL_SMOOTH);
 		} else if (string_match("shade model flat", line)) {
 			glShadeModel(GL_FLAT);
-		} else if (sscanf(line,
-				  "texture rgbw %d ( %d , %d )",
-				  &tex, &w, &h) == 3) {
+		} else if (sscanf(line, "texture rgbw %d ( %d", &tex, &w) == 2) {
+			GLenum int_fmt = GL_RGBA;
+			int num_scanned =
+				sscanf(line,
+				       "texture rgbw %d ( %d , %d ) %31s",
+				       &tex, &w, &h, s);
+			if (num_scanned < 3) {
+				fprintf(stderr,
+					"invalid texture rgbw command!\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			if (num_scanned >= 4) {
+				int_fmt = piglit_get_gl_enum_from_name(s);
+			}
+
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_rgbw_texture(GL_RGBA, w, h, GL_FALSE, GL_FALSE, GL_UNSIGNED_NORMALIZED);
+			piglit_rgbw_texture(int_fmt, w, h, GL_FALSE, GL_FALSE,
+					    GL_UNSIGNED_NORMALIZED);
 			if (!piglit_is_core_profile)
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line, "texture miptree %d", &tex) == 1) {
