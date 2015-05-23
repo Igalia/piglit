@@ -2442,7 +2442,7 @@ probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
 enum piglit_result
 piglit_display(void)
 {
-	const char *line;
+	const char *line, *next_line;
 	bool pass = true;
 	GLbitfield clear_bits = 0;
 	bool link_error_expected = false;
@@ -2451,16 +2451,27 @@ piglit_display(void)
 	if (test_start == NULL)
 		return PIGLIT_PASS;
 
-	line = test_start;
-	while (line[0] != '\0') {
+	next_line = test_start;
+	while (next_line[0] != '\0') {
 		float c[32];
 		double d[4];
 		int x, y, z, w, h, l, tex, level;
 		char s[32];
 
-		line = eat_whitespace(line);
 
-		if (sscanf(line, "atomic counters %d", &x) == 1) {
+		line = eat_whitespace(next_line);
+
+		next_line = strchrnul(next_line, '\n');
+
+		/* Duplicate the line to make it null terminated */
+		line = strndup(line, next_line - line);
+
+		/* If strchrnul found a newline, then skip it */
+		if (next_line[0] != '\0')
+			next_line++;
+
+		if (line[0] == '\0') {
+		} else if (sscanf(line, "atomic counters %d", &x) == 1) {
 			GLuint *atomics_buf = calloc(x, sizeof(GLuint));
 			glGenBuffers(1, &atomics_bo);
 			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
@@ -2859,9 +2870,7 @@ piglit_display(void)
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
-		line = strchrnul(line, '\n');
-		if (line[0] != '\0')
-			line++;
+		free((void*) line);
 	}
 
 	if (!link_ok && !link_error_expected) {
