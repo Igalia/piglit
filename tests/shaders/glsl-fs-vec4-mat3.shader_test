@@ -1,0 +1,20 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main()
+{
+	mat3 matrix3 = mat3(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9);
+
+	gl_FragColor = vec4(matrix3);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.1 0.2 0.3 0.4
