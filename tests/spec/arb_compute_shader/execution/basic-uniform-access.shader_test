@@ -24,7 +24,7 @@ void main()
 
 [test]
 uniform int tex 0
-texture rgbw 0 (16, 16)
+texture rgbw 0 (16, 16) GL_RGBA8
 image texture 0
 fb tex 2d 0
 

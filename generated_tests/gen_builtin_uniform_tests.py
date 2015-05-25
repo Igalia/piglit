@@ -705,7 +705,7 @@ class ComputeShaderTest(ShaderTest):
 
     def make_test_init(self):
         return '''uniform int tex 0
-texture rgbw 0 ({0}, 1)
+texture rgbw 0 ({0}, 1) GL_RGBA8
 image texture 0
 fb tex 2d 0
 '''.format(len(self._test_vectors))

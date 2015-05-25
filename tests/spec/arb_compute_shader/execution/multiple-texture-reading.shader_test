@@ -33,7 +33,7 @@ void main()
 
 [test]
 # Setup src0 image
-texture rgbw 0 (16, 16)
+texture rgbw 0 (16, 16) GL_RGBA8
 uniform int src0 0
 image texture 0
 fb tex 2d 0
@@ -41,7 +41,7 @@ clear color 1.0 0.0 1.0 0.0
 clear
 
 # Setup src1 image
-texture rgbw 1 (16, 16)
+texture rgbw 1 (16, 16) GL_RGBA8
 uniform int src1 1
 image texture 1
 fb tex 2d 1
@@ -49,7 +49,7 @@ clear color 0.0 1.0 0.0 1.0
 clear
 
 # Setup dst image
-texture rgbw 2 (16, 16)
+texture rgbw 2 (16, 16) GL_RGBA8
 uniform int dst 2
 image texture 2
 fb tex 2d 2
