@@ -50,7 +50,6 @@ run_test(struct piglit_gl_framework *gl_fw,
 		gl_fw->test_config->init(argc, argv);
 	if (gl_fw->test_config->display)
 		result = gl_fw->test_config->display();
-	gl_fw->destroy(gl_fw);
 	piglit_report_result(result);
 }
 

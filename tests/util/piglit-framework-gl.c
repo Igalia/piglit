@@ -174,6 +174,13 @@ piglit_gl_process_args(int *argc, char *argv[],
 
 }
 
+static void
+destroy(void)
+{
+	if (gl_fw->destroy)
+		gl_fw->destroy(gl_fw);
+}
+
 void
 piglit_gl_test_run(int argc, char *argv[],
 		   const struct piglit_gl_test_config *config)
@@ -188,6 +195,7 @@ piglit_gl_test_run(int argc, char *argv[],
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	atexit(destroy);
 	gl_fw->run_test(gl_fw, argc, argv);
 	assert(false);
 }
