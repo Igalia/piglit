@@ -31,11 +31,11 @@ void main()
 [test]
 # Texture 0 is the imageStore output.
 uniform int tex 0
-texture rgbw 0 (16, 16)
+texture rgbw 0 (16, 16) GL_RGBA8
 image texture 0
 
 # Texture 1 is the rendering output. We don't care about this.
-texture rgbw 1 (16, 16)
+texture rgbw 1 (16, 16) GL_RGBA8
 
 # Store red using imageStore
 uniform vec4 color 1.0 0.0 0.0 1.0
