@@ -1702,6 +1702,12 @@ with profile.group_manager(
     g(['amd_performance_monitor_api'], 'api', run_concurrent=False)
     g(['amd_performance_monitor_measure'], 'measure', run_concurrent=False)
 
+# Group ARB_arrays_of_arrays
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_arrays_of_arrays')) as g:
+    g(['arb_arrays_of_arrays-max-binding'], run_concurrent=False)
+
 # Group ARB_point_sprite
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_point_sprite')) as g:

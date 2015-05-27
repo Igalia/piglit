@@ -1,5 +1,6 @@
 add_subdirectory (amd_performance_monitor)
 add_subdirectory (amd_pinned_memory)
+add_subdirectory (arb_arrays_of_arrays)
 add_subdirectory (arb_base_instance)
 add_subdirectory (arb_buffer_storage)
 add_subdirectory (arb_clear_buffer_object)
