@@ -97,7 +97,7 @@ ${base_type}(${matrix_data(c * matrix_dim**2 + 1, matrix_dim)})\
     uniform int index;
   % endif
 
-  % if params.col == 'col':
+  % if params.col == '[col]':
     uniform int col;
   % endif
 
@@ -141,7 +141,7 @@ void main()
        *     written."
        */
     % endif
-    color = (m${params.idx}[${params.col}]${params.row} == expect) ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    color = (m${params.idx}${params.col}${params.row} == expect) ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
   % endif
 }
 </%def>
@@ -164,7 +164,7 @@ void main()
     % if params.mode == 'temp':
       ${emit_set_matrix(params)}
     % endif
-    gl_FragColor = (m${params.idx}[${params.col}]${params.row} == expect) \
+    gl_FragColor = (m${params.idx}${params.col}${params.row} == expect) \
     % if not do_compare:
       ? color : vec4(1.0, 0.0, 0.0, 1.0);
     % else:
@@ -201,7 +201,7 @@ void main()
     <% x_base = ((size - 1) * (15 * params.matrix_dim + 10)) %>
     % for column in params.test_columns:
       <%block filter="newlines">
-      % if params.col == 'col':
+      % if params.col == '[col]':
         uniform int col ${column - 1}
       % endif
       </%block>

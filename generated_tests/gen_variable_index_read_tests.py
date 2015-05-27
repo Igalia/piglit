@@ -49,7 +49,7 @@ class TestParams(object):
         self.array_dim = array_dim
         self.mode = mode
         self.index_value = index_value
-        self.col = col
+        self.__col = col
         self.expect_type = expect_type
 
         assert glsl_version in [110, 120]
@@ -97,6 +97,10 @@ class TestParams(object):
             return ''
 
     @lazy_property
+    def col(self):
+        return '[{}]'.format(self.__col)
+
+    @lazy_property
     def test_sizes(self):
         if self.array_dim == 0:
             return [1]
@@ -107,7 +111,7 @@ class TestParams(object):
 
     @lazy_property
     def test_columns(self):
-        if self.col == 'col':
+        if self.col == '[col]':
             return list(range(1, 1 + self.matrix_dim))
         else:
             return [2]
