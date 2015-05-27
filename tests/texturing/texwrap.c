@@ -568,6 +568,7 @@ static GLuint texture_id;
 static GLenum texture_target;
 static GLboolean texture_npot;
 static GLboolean texture_proj;
+static GLboolean texture_offset;
 static GLboolean test_border_color;
 static GLboolean texture_swizzle;
 static GLboolean has_texture_swizzle;
@@ -575,8 +576,8 @@ static GLboolean has_npot;
 static const struct test_desc *test;
 static const struct format_desc *init_format;
 static int size_x = 1, size_y = 1, size_z = 1;
-static GLuint prog_int, prog_uint;
-static GLint int_scale_loc, uint_scale_loc;
+static GLuint prog_int, prog_uint, prog_offset;
+static GLint int_scale_loc, uint_scale_loc, use_offset_loc, int_use_offset_loc, uint_use_offset_loc;
 
 /* Image data. */
 static const int swizzle[4] = {2, 0, 1, 3};
@@ -636,6 +637,11 @@ static void sample_nearest(int x, int y, int z,
 		coords[2] = 0;
 	}
 
+	if (texture_offset) {
+		coords[0] -= 3;
+		if (texture_target != GL_TEXTURE_1D)
+			coords[1] += 3;
+	}
 	/* Handle clamp mirroring. */
 	switch (wrap_mode) {
 	case GL_MIRROR_CLAMP_EXT:
@@ -862,6 +868,7 @@ static void draw(const struct format_desc *format,
 		scale[0] = scale[1] = scale[2] = scale[3] = 1.0/((1ull << (bits-1))-1);
 		glUseProgram(prog_int);
 		glUniform4fv(int_scale_loc, 1, scale);
+		glUniform1i(int_use_offset_loc, texture_offset);
 		break;
 	case UINT_TYPE:
 		scale[0] = scale[1] = scale[2] = scale[3] = 1.0/((1ull << bits)-1);
@@ -870,8 +877,13 @@ static void draw(const struct format_desc *format,
 		}
 		glUseProgram(prog_uint);
 		glUniform4fv(uint_scale_loc, 1, scale);
+		glUniform1i(uint_use_offset_loc, texture_offset);
 		break;
 	default:;
+		if (texture_offset) {
+			glUseProgram(prog_offset);
+			glUniform1f(use_offset_loc, 1.0);
+		}
 	}
 
 	/* Loop over min/mag filters. */
@@ -965,6 +977,8 @@ static void draw(const struct format_desc *format,
 		glUseProgram(0);
 		break;
 	default:;
+		if (texture_offset)
+			glUseProgram(0);
 	}
 
 	glDisable(texture_target);
@@ -1660,18 +1674,41 @@ static const char *fp_int =
 	"#version 130 \n"
 	"uniform isampler2D tex; \n"
 	"uniform vec4 scale; \n"
+	"uniform bool use_offset; \n"
 	"void main() \n"
 	"{ \n"
+	"   if (use_offset) { \n"
+	"   gl_FragColor = vec4(textureOffset(tex, gl_TexCoord[0].xy, ivec2(-3, 3))) * scale; \n"
+	"   } else { \n"
 	"   gl_FragColor = vec4(texture(tex, gl_TexCoord[0].xy)) * scale; \n"
+	"   } \n"
 	"} \n";
 
 static const char *fp_uint =
 	"#version 130 \n"
 	"uniform usampler2D tex; \n"
 	"uniform vec4 scale; \n"
+	"uniform bool use_offset; \n"
 	"void main() \n"
 	"{ \n"
+	"   if (use_offset) { \n"
+	"   gl_FragColor = vec4(textureOffset(tex, gl_TexCoord[0].xy, ivec2(-3, 3)) * scale; \n"
+	"   } else { \n"
 	"   gl_FragColor = vec4(texture(tex, gl_TexCoord[0].xy)) * scale; \n"
+	"   } \n"
+	"} \n";
+
+static const char *fp_offset =
+	"#version 130 \n"
+	"uniform sampler2D tex; \n"
+	"uniform bool use_offset; \n"
+	"void main() \n"
+	"{ \n"
+	"   if (use_offset) { \n"
+	"   gl_FragColor = textureOffset(tex, gl_TexCoord[0].xy, ivec2(-3, 3)); \n"
+	"   } else { \n"
+	"   gl_FragColor = texture(tex, gl_TexCoord[0].xy); \n"
+	"   } \n"
 	"} \n";
 
 void piglit_init(int argc, char **argv)
@@ -1719,6 +1756,11 @@ void piglit_init(int argc, char **argv)
 		if (strcmp(argv[p], "proj") == 0) {
 			texture_proj = 1;
 			printf("Using projective mapping.\n");
+			continue;
+		}
+		if (strcmp(argv[p], "offset") == 0) {
+			texture_offset = 1;
+			printf("Using texture offsets.\n");
 			continue;
 		}
 		if (strcmp(argv[p], "bordercolor") == 0) {
@@ -1796,6 +1838,16 @@ outer_continue:;
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB,   GL_REPLACE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
 
+	if (texture_offset) {
+		piglit_require_GLSL_version(130);
+		fp = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fp_offset);
+		assert(fp);
+		prog_offset = piglit_link_simple_program(0, fp);
+		assert(prog_offset);
+		use_offset_loc = glGetUniformLocation(prog_offset, "use_offset");
+		assert(use_offset_loc != -1);
+	}
+
 	switch (test->format[0].type) {
 	case INT_TYPE:
 	case UINT_TYPE:
@@ -1806,6 +1858,8 @@ outer_continue:;
 		assert(prog_int);
 		int_scale_loc = glGetUniformLocation(prog_int, "scale");
 		assert(int_scale_loc != -1);
+		int_use_offset_loc = glGetUniformLocation(prog_int, "use_offset");
+		assert(int_use_offset_loc != -1);
 
 		fp = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fp_uint);
 		assert(fp);
@@ -1813,6 +1867,8 @@ outer_continue:;
 		assert(prog_uint);
 		uint_scale_loc = glGetUniformLocation(prog_uint, "scale");
 		assert(uint_scale_loc != -1);
+		uint_use_offset_loc = glGetUniformLocation(prog_uint, "use_offset");
+		assert(uint_use_offset_loc != -1);
 		break;
 	default:;
 	}
