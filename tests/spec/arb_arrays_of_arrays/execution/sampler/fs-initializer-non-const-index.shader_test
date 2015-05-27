@@ -1,0 +1,79 @@
+# Normally, uniform array variables are initialized by array literals.
+#
+# However, samplers are different. Consider a declaration such as:
+#
+#   layout(binding = 5) uniform sampler2D[3];
+#
+# The initializer value is a single integer (5), while the storage has 3
+# array elements. The proper behavior is to increment one for each
+# element; they should be initialized to 5, 6, and 7.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+GL_ARB_arrays_of_arrays
+GL_ARB_shading_language_420pack
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shading_language_420pack : enable
+#extension GL_ARB_gpu_shader5: require
+#extension GL_ARB_arrays_of_arrays: enable
+
+layout(binding = 0) uniform sampler2D tex[2][2];
+
+uniform int n;
+uniform int m;
+
+out vec4 color;
+
+void main()
+{
+	color = texture(tex[n][m], vec2(0.75, 0.25));
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+texture checkerboard 0 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 1 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 2 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.0, 0.0, 1.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 3 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (1.0, 1.0, 1.0, 1.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+uniform int n 0
+uniform int m 0
+draw rect -1 -1 1 1
+
+relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (1.0, 0.0, 0.0)
+
+uniform int n 0
+uniform int m 1
+draw rect 0 -1 1 1
+
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.0, 1.0, 0.0)
+
+uniform int n 1
+uniform int m 0
+draw rect -1 0 1 1
+
+relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 0.0, 1.0)
+
+uniform int n 1
+uniform int m 1
+draw rect 0 0 1 1
+
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (1.0, 1.0, 1.0)

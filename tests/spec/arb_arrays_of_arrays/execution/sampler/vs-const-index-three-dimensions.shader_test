@@ -1,0 +1,32 @@
+[require]
+GLSL >= 1.20
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#extension GL_ARB_arrays_of_arrays: enable
+uniform sampler2D tex[2][2][2];
+varying vec4 colour;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	colour = texture2D(tex[1][0][1], gl_Vertex.xy);
+}
+
+[fragment shader]
+#extension GL_ARB_arrays_of_arrays: enable
+varying vec4 colour;
+
+void main()
+{
+	gl_FragColor = colour;
+}
+
+[test]
+uniform int tex[1][0][1] 1
+texture rgbw 1 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0)
+relative probe rgb (1.0, 0.0) (0.0, 1.0, 0.0)
+relative probe rgb (0.0, 1.0) (0.0, 0.0, 1.0)
+relative probe rgb (1.0, 1.0) (1.0, 1.0, 1.0)

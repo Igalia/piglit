@@ -1,0 +1,47 @@
+# Normally, uniform array variables are initialized by array literals.
+#
+# However, samplers are different. Consider a declaration such as:
+#
+#   layout(binding = 5) uniform sampler2D[3];
+#
+# The initializer value is a single integer (5), while the storage has 3
+# array elements. The proper behavior is to increment one for each
+# element; they should be initialized to 5, 6, and 7.
+
+[require]
+GLSL >= 1.40
+GL_ARB_arrays_of_arrays
+GL_ARB_shading_language_420pack
+
+[vertex shader]
+#extension GL_ARB_arrays_of_arrays: enable
+in vec4 piglit_vertex;
+out vec4 texcoords;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	texcoords = (piglit_vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+#extension GL_ARB_arrays_of_arrays: enable
+#extension GL_ARB_shading_language_420pack: enable
+
+layout(binding = 0) uniform sampler2D tex[2][2][2];
+
+in vec4 texcoords;
+out vec4 color;
+
+void main()
+{
+	color = texture2D(tex[0][1][1], texcoords.xy);
+}
+
+[test]
+texture rgbw 3 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.25, 0.25) (1.0, 0.0, 0.0)
+relative probe rgb (0.75, 0.25) (0.0, 1.0, 0.0)
+relative probe rgb (0.25, 0.75) (0.0, 0.0, 1.0)
+relative probe rgb (0.75, 0.75) (1.0, 1.0, 1.0)
