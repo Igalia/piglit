@@ -19,7 +19,7 @@ out vec4 color;
 
 void main()
 {
-	color = texture(s[n], vec2(0.5, 0.5));
+	color = texture(s[n], vec2(0.75, 0.25));
 }
 
 [test]
@@ -31,19 +31,19 @@ uniform int s[1] 2
 uniform int s[2] 3
 uniform int s[3] 4
 
-texture checkerboard 1 0 (32, 32) (1.0, 0.0, 0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+texture checkerboard 1 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
 texparameter 2D min nearest
 texparameter 2D mag nearest
 
-texture checkerboard 2 0 (32, 32) (0.0, 1.0, 0.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+texture checkerboard 2 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.0, 1.0, 0.0, 0.0)
 texparameter 2D min nearest
 texparameter 2D mag nearest
 
-texture checkerboard 3 0 (32, 32) (0.0, 0.0, 1.0, 0.0) (0.0, 0.0, 1.0, 0.0)
+texture checkerboard 3 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.0, 0.0, 1.0, 0.0)
 texparameter 2D min nearest
 texparameter 2D mag nearest
 
-texture checkerboard 4 0 (32, 32) (1.0, 1.0, 1.0, 1.0) (1.0, 1.0, 1.0, 1.0)
+texture checkerboard 4 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (1.0, 1.0, 1.0, 1.0)
 texparameter 2D min nearest
 texparameter 2D mag nearest
 
