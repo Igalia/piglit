@@ -1692,7 +1692,7 @@ static const char *fp_uint =
 	"void main() \n"
 	"{ \n"
 	"   if (use_offset) { \n"
-	"   gl_FragColor = vec4(textureOffset(tex, gl_TexCoord[0].xy, ivec2(-3, 3)) * scale; \n"
+	"   gl_FragColor = vec4(textureOffset(tex, gl_TexCoord[0].xy, ivec2(-3, 3))) * scale; \n"
 	"   } else { \n"
 	"   gl_FragColor = vec4(texture(tex, gl_TexCoord[0].xy)) * scale; \n"
 	"   } \n"
