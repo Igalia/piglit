@@ -86,6 +86,9 @@ bool check_platform_extensions(cl_platform_id platform_id, char* extensions)
 {
 	char* pch;
 
+	if (!extensions)
+		return true;
+
 	pch = strtok(extensions, " ");
 	while(pch != NULL) {
 		if(   strlen(pch) > 0
@@ -107,6 +110,9 @@ bool check_platform_extensions(cl_platform_id platform_id, char* extensions)
 bool check_device_extensions(cl_device_id device_id, char* extensions)
 {
 	char* pch;
+
+	if (!extensions)
+		return true;
 
 	pch = strtok(extensions, " ");
 	while(pch != NULL) {
