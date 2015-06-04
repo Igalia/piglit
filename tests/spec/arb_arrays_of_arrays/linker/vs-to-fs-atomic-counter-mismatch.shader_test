@@ -1,0 +1,59 @@
+# Test for linking error between vertex and fragment shaders
+# with mismatching AoA atomic counter declorations
+
+[require]
+GLSL >= 1.40
+GL_ARB_shader_atomic_counters
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#version 140
+#extension GL_ARB_arrays_of_arrays: enable
+#extension GL_ARB_shader_atomic_counters: enable
+
+layout(binding = 0) uniform atomic_uint a1[3][2][2];
+
+in vec4 piglit_vertex;
+out vec4 vcolor;
+
+void main()
+{
+  uint v[2];
+  v[0] = atomicCounter(a1[2][0][1]);
+  atomicCounterIncrement(a1[0][0][0]);
+  v[1] = atomicCounter(a1[0][0][0]);
+
+  if (v[1] > v[0])
+    vcolor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    vcolor = vec4(1.0, 0.0, 0.0, 1.0);
+
+  gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 140
+#extension GL_ARB_arrays_of_arrays: enable
+#extension GL_ARB_shader_atomic_counters: enable
+
+layout(binding = 0) uniform atomic_uint a1[2][2][2];
+
+in vec4 vcolor;
+out vec4 fcolor;
+
+void main()
+{
+
+  uint v[2];
+  v[0] = atomicCounter(a1[1][0][1]);
+  atomicCounterIncrement(a1[0][0][0]);
+  v[1] = atomicCounter(a1[0][0][0]);
+
+  if (v[1] > v[0])
+    fcolor = vec4(0.0, 1.0, 0.0, 1.0) + vcolor;
+  else
+    fcolor = vec4(1.0, 0.0, 0.0, 1.0) + vcolor;
+}
+
+[test]
+link error
