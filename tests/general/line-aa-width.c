@@ -136,7 +136,7 @@ piglit_display(void)
 	 * coverage in each column
 	 */
 	for (x1 = 2; x1 < piglit_width; x1 += seg_width) {
-		int x2 = x1 + seg_width - 4;
+		int x2 = x1 + seg_width - 5;
 		int sample_x;
 		float y1, y2;
 		float avg = 0.0;
@@ -144,8 +144,8 @@ piglit_display(void)
 		float max = -100.0;
 		char *err = NULL;
 
-		if (x2 > piglit_width - 4)
-			x2 = piglit_width - 4;
+		if (x2 > piglit_width - 5)
+			x2 = piglit_width - 5;
 
 		/* If we don't have a couple of pixels to sample because we've
 		 * hit the edge of the window, we're done.
