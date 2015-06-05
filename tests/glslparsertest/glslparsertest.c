@@ -161,6 +161,13 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 			"#version %d %s\n"
 			"void main() { gl_Position = vec4(0.0); }";
 		break;
+	case GL_TESS_EVALUATION_SHADER:
+		shader_template =
+			"#version %d %s\n"
+			"#extension GL_ARB_tessellation_shader : require\n"
+			"layout(quads, equal_spacing) in;\n"
+			"void main() { gl_Position = vec4(0.0); }";
+		break;
 	case GL_FRAGMENT_SHADER:
 		shader_template =
 			"#version %d %s\n"
@@ -302,6 +309,8 @@ test(void)
 		    type == GL_TESS_CONTROL_SHADER ||
 		    type == GL_TESS_EVALUATION_SHADER)
 			attach_dummy_shader(shader_prog, GL_VERTEX_SHADER);
+		if (type == GL_TESS_CONTROL_SHADER)
+			attach_dummy_shader(shader_prog, GL_TESS_EVALUATION_SHADER);
 		if (test_requires_geometry_shader4) {
 			/* The default value of
 			 * GL_GEOMETRY_VERTICES_OUT_ARB is zero, which
