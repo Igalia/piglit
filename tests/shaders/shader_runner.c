@@ -2672,6 +2672,9 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
+		} else if (sscanf(line, "texcoord %d ( %f , %f , %f , %f )",
+		                  &x, c + 0, c + 1, c + 2, c + 3) == 5) {
+			glMultiTexCoord4fv(GL_TEXTURE0 + x, c);
 		} else if (string_match("texparameter ", line)) {
 			handle_texparameter(line + strlen("texparameter "));
 		} else if (string_match("uniform", line)) {
