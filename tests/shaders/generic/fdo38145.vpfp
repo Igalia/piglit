@@ -1,7 +1,8 @@
 ; test for a regression in the R600 SPI setup that affected doom3 rendering.
 ; Author: Vadim Girlin
 
-!!ARBvp1.0 OPTION ARB_position_invariant;
+!!ARBvp1.0
+OPTION ARB_position_invariant;
 MOV	result.texcoord[0],0;
 MOV	result.texcoord[1],1;
 END
