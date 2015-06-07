@@ -144,12 +144,6 @@ def add_msaa_formats_tests(adder, extension):
               'multisample-formats {} {}'.format(num_samples, extension))
 
 
-def add_vpfpgeneric(adder, name):
-    adder(['vpfp-generic',
-           os.path.join(TESTS_DIR, 'shaders', 'generic', name + '.vpfp')],
-          name)
-
-
 def add_texwrap_target_tests(adder, target):
     adder(['texwrap', target, 'GL_RGBA8'],
           'texwrap {}'.format(target))
