@@ -2652,15 +2652,6 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'nv_vertex_program')) as g:
-    add_vpfpgeneric(g, 'nv-mov')
-    add_vpfpgeneric(g, 'nv-add')
-    add_vpfpgeneric(g, 'nv-arl')
-    add_vpfpgeneric(g, 'nv-init-zero-reg')
-    add_vpfpgeneric(g, 'nv-init-zero-addr')
-
-with profile.group_manager(
-        PiglitGLTest,
         grouptools.join('spec', 'nv_vertex_program2_option')) as g:
     g(['vp-address-03'], run_concurrent=False)
     g(['vp-address-05'], run_concurrent=False)
