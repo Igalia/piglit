@@ -300,6 +300,14 @@ if (WIN32)
 	add_definitions (-D_USE_MATH_DEFINES)
 endif (WIN32)
 
+if (APPLE)
+	# Don't warn about using deprecated OpenGL/GLU/GLUT functions.
+	# TODO: It would be nice to silence just the deprecation macros from
+	# OpenGLAvailability.h as opposed to all deprecated functions.
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+endif ()
+
 if (OPENGL_FOUND)
 	if (APPLE)
 		find_path(GLEXT_INCLUDE_DIR
