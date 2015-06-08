@@ -21,7 +21,6 @@
  * IN THE SOFTWARE.
  */
 
-#define _GNU_SOURCE
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
