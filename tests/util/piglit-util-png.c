@@ -26,10 +26,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <GL/gl.h>
 #ifdef PIGLIT_HAS_PNG
 #include <png.h>
 #endif
+
+#include <piglit/gl_wrap.h>
 
 #define aborts(s) _abortf("piglit_write_png: %s", s)
 #define abortf(s, ...) _abortf("piglit_write_png" s, __VA_ARGS__)
