@@ -118,6 +118,35 @@ int asprintf(char **strp, const char *fmt, ...)
 
 #endif /* HAVE_ASPRINTF */
 
+#ifdef _MSC_VER
+
+char *
+basename(char *path)
+{
+	char *res;
+
+	// Skip drive letter
+	if (path[0] != '\0' && path[1] == ':') {
+		path += 2;
+	}
+
+	// Return pointer to the char after the last directory separator
+	res = path;
+	while (true) {
+		char c = *path++;
+		switch (c) {
+		case '\0':
+			return res;
+		case '\\':
+		case '/':
+			res = ++path;
+			break;
+		}
+	}
+}
+
+#endif /* _MSC_VER */
+
 /**
  * \brief Split \a string into an array of strings.
  *

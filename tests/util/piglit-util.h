@@ -82,6 +82,8 @@ extern "C" {
 
 #define usleep(__usec) Sleep(((__usec) + 999)/1000)
 
+char *basename(char *path);
+
 #endif /* defined(_MSC_VER) */
 
 #if (__GNUC__ >= 3)
