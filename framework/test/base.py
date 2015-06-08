@@ -212,7 +212,7 @@ class Test(object):
             self.is_skip()
         except TestIsSkip as e:
             self.result['result'] = 'skip'
-            self.result['out'] = unicode(e.message)
+            self.result['out'] = unicode(e)
             self.result['err'] = u""
             self.result['returncode'] = None
             return
@@ -221,7 +221,7 @@ class Test(object):
             self._run_command()
         except TestRunError as e:
             self.result['result'] = unicode(e.status)
-            self.result['out'] = unicode(e.message)
+            self.result['out'] = unicode(e)
             self.result['err'] = u""
             self.result['returncode'] = None
             return

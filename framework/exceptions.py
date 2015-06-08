@@ -49,12 +49,12 @@ def handler(func):
         try:
             func(*args, **kwargs)
         except PiglitFatalError as e:
-            print('Fatal Error: {}'.format(e.message), file=sys.stderr)
+            print('Fatal Error: {}'.format(str(e)), file=sys.stderr)
             sys.exit(1)
         except (PiglitInternalError, PiglitException) as e:
             print('Warning: An internal exception that should have '
                   'been handled was not. This is bug and should be reported.\n'
-                  'BUG: {}'.format(e.message),
+                  'BUG: {}'.format(str(e)),
                   file=sys.stderr)
             if _DEBUG:
                 raise e
@@ -62,7 +62,7 @@ def handler(func):
         except Exception as e:  # pylint: disable=broad-except
             print('Warning: A python exception that should have '
                   'been handled was not. This is bug and should be reported.\n'
-                  'BUG: {}'.format(e.message),
+                  'BUG: {}'.format(str(e)),
                   file=sys.stderr)
             if _DEBUG:
                 raise e

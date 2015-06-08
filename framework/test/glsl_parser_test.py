@@ -72,7 +72,7 @@ class GLSLParserTest(PiglitBaseTest):
                                              filepath)
             except GLSLParserInternalError as e:
                 raise exceptions.PiglitFatalError(
-                    'In file "{}":\n{}'.format(filepath, e.message))
+                    'In file "{}":\n{}'.format(filepath, str(e)))
 
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
 

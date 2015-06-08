@@ -93,7 +93,7 @@ class IGTTestProfile(TestProfile):
             try:
                 check_environment()
             except exceptions.PiglitInternalError as e:
-                raise exceptions.PiglitFatalError(e.message)
+                raise exceptions.PiglitFatalError(str(e))
 
 
 profile = IGTTestProfile()  # pylint: disable=invalid-name

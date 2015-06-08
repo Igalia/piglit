@@ -331,7 +331,7 @@ def not_raises(exceptions):
             try:
                 func(*args, **kwargs)
             except exceptions as e:
-                raise TestFailure(e.message)
+                raise TestFailure(str(e))
 
         return _inner
 

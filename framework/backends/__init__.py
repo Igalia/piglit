@@ -167,7 +167,7 @@ def set_meta(backend, result):
         # callable then we'll get a TypeError, and we're looking for NoneType
         # in the message. If we get that we really want a
         # BackendNotImplementedError
-        if e.message == "'NoneType' object is not callable":
+        if str(e) == "'NoneType' object is not callable":
             raise BackendNotImplementedError(
                 'meta function for {} not implemented.'.format(backend))
         else:

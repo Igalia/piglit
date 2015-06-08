@@ -219,7 +219,7 @@ def _load(results_file):
         raise exceptions.PiglitFatalError(
             'While loading json results file: "{}",\n'
             'the following error occured:\n{}'.format(results_file.name,
-                                                      e.message))
+                                                      str(e)))
 
     return result
 
