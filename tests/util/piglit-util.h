@@ -51,6 +51,10 @@ extern "C" {
 #include <math.h>
 #include <float.h>
 
+#if defined(__APPLE__) || defined(__MINGW32__)
+#  include "libgen.h" // for basename
+#endif
+
 #include "piglit-log.h"
 
 #ifndef __has_attribute
