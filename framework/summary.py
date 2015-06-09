@@ -31,13 +31,14 @@ import re
 import getpass
 import sys
 import posixpath
+import errno
 
 from mako.template import Template
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
 import framework.status as so
-from framework import grouptools, backends
+from framework import grouptools, backends, exceptions
 
 __all__ = [
     'Summary',
@@ -475,7 +476,17 @@ class Summary:
         # Iterate across the tests creating the various test specific files
         for each in self.results:
             name = escape_pathname(each.name)
-            os.mkdir(path.join(destination, name))
+            try:
+                os.mkdir(path.join(destination, name))
+            except OSError as e:
+                if e.errno == errno.EEXIST:
+                    raise exceptions.PiglitFatalError(
+                        'Two or more of your results have the same "name" '
+                        'attribute. Try changing one or more of the "name" '
+                        'values in your json files.\n'
+                        'Duplicate value: {}'.format(name))
+                else:
+                    raise e
 
             if each.time_elapsed is not None:
                 time = datetime.timedelta(0, each.time_elapsed)
