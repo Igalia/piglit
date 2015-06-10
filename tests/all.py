@@ -4195,6 +4195,13 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'egl_khr_gl_colorspace'),
+        exclude_platforms=['glx']) as g:
+    g(['egl-gl-colorspace'], 'linear')
+    g(['egl-gl-colorspace', 'srgb'], 'srgb')
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'egl_khr_wait_sync'),
         exclude_platforms=['glx']) as g:
     g(['egl_khr_fence_sync', 'wait_sync'], 'conformance')

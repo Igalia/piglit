@@ -30,6 +30,7 @@ struct egl_state {
 
 struct egl_test {
 	const EGLint *config_attribs;
+	const EGLint *surface_attribs;
 	const char **extensions;
 	enum piglit_result (*draw)(struct egl_state *state);
 	EGLint window_width;

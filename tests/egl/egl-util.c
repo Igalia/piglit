@@ -75,6 +75,7 @@ egl_init_test(struct egl_test *test)
 	static const char *no_extensions[] = { NULL };
 
 	test->config_attribs = egl_default_attribs;
+	test->surface_attribs = NULL;
 	test->draw = NULL;
 	test->extensions = no_extensions;
 	test->window_width = egl_default_window_width;
@@ -283,7 +284,8 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		goto fail;
 
 	state.surf = eglCreateWindowSurface(state.egl_dpy,
-					    state.cfg, state.win, NULL);
+					    state.cfg, state.win,
+					    test->surface_attribs);
 	if (state.surf == EGL_NO_SURFACE) {
 		fprintf(stderr, "eglCreateWindowSurface() failed\n");
 		result = PIGLIT_FAIL;
