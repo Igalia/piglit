@@ -83,6 +83,20 @@ piglit_cl_test(const int argc,
 
 	/*** Normal usage ***/
 	for(i = 0; i < num_kernel_work_group_infos; i++) {
+		cl_int success_code = CL_SUCCESS;
+
+#if defined(CL_VERSION_1_2)
+		/* CL_KERNEL_GLOBAL_WORK_SIZE query
+		 * is valid for custom device or build-in kernel
+		 */
+		if (kernel_work_group_infos[i] == CL_KERNEL_GLOBAL_WORK_SIZE) {
+			cl_device_type* dev_type_ptr =
+			   piglit_cl_get_device_info(env->device_id, CL_DEVICE_TYPE);
+			if (*dev_type_ptr != CL_DEVICE_TYPE_CUSTOM)
+				success_code = CL_INVALID_VALUE;
+		}
+#endif
+
 		printf("%s ", piglit_cl_get_enum_name(kernel_work_group_infos[i]));
 
 		errNo = clGetKernelWorkGroupInfo(kernel,
@@ -91,7 +105,7 @@ piglit_cl_test(const int argc,
 		                                 0,
 		                                 NULL,
 		                                 &param_value_size);
-		if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		if(!piglit_cl_check_error(errNo, success_code)) {
 			fprintf(stderr,
 			        "Failed (error code: %s): Get size of %s.\n",
 			        piglit_cl_get_error_name(errNo),
@@ -107,7 +121,7 @@ piglit_cl_test(const int argc,
 		                                 param_value_size,
 		                                 param_value,
 		                                 NULL);
-		if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		if(!piglit_cl_check_error(errNo, success_code)) {
 			fprintf(stderr,
 			        "Failed (error code: %s): Get value of %s.\n",
 			        piglit_cl_get_error_name(errNo),
