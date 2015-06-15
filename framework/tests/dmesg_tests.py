@@ -402,6 +402,10 @@ def test_testclasses_dmesg():
 
 def check_classes_dmesg(test_class, test_args):
     """ Do the actual check on the provided test class for dmesg """
+    # There is so much magic in this test that pylint freaks out needlessly,
+    # please ignore all of those errors
+    # pylint: disable=no-init,too-few-public-methods,super-on-old-class
+    # pylint: disable=no-member
     if not os.path.exists('bin'):
         raise SkipTest("This tests requires a working, built version of "
                        "piglit")
@@ -409,8 +413,12 @@ def check_classes_dmesg(test_class, test_args):
     test = _get_dmesg()
 
     # Create the test and then write to dmesg to ensure that it actually works
-    test = test_class(test_args)
-    test._test_hook_execute_run = _write_dev_kmesg
+    class _localclass(test_class):
+        def run(self):
+            _write_dev_kmesg()
+            super(_localclass, self).run()
+
+    test = _localclass(test_args)
 
     json = DummyJsonWriter()
 

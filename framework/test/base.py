@@ -145,7 +145,7 @@ class Test(object):
     OPTS = Options()
     __metaclass__ = abc.ABCMeta
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
-                 '_test_hook_execute_run', '__proc_timeout']
+                 '__proc_timeout']
     timeout = 0
 
     def __init__(self, command, run_concurrent=False):
@@ -157,10 +157,6 @@ class Test(object):
         self.result = TestResult({'result': 'fail'})
         self.cwd = None
         self.__proc_timeout = None
-
-        # This is a hook for doing some testing on execute right before
-        # self.run is called.
-        self._test_hook_execute_run = lambda: None
 
     def execute(self, path, log, dmesg):
         """ Run a test
@@ -180,7 +176,6 @@ class Test(object):
             try:
                 time_start = time.time()
                 dmesg.update_dmesg()
-                self._test_hook_execute_run()
                 self.run()
                 self.result['time'] = time.time() - time_start
                 self.result = dmesg.update_result(self.result)
