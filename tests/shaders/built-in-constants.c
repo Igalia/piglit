@@ -444,6 +444,14 @@ piglit_init(int argc, char **argv)
 	} else if (glsl_version < required_glsl_version)
 		piglit_report_result(PIGLIT_SKIP);
 
+	/* Tessellation shaders must use the #extension directive. */
+	if (piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
+		assert(num_required_extensions < ARRAY_SIZE(required_extensions));
+		required_extensions[num_required_extensions] =
+			strdup("GL_ARB_tessellation_shader");
+		num_required_extensions++;
+	}
+
 	/* Process the list of required extensions.  While doing this,
 	 * generate the GLSL code that will enable those extensions in the
 	 * shaders.
