@@ -646,7 +646,8 @@ check_extensions(const struct subtest_t st)
 	     st.programInterface == GL_TESS_CONTROL_SUBROUTINE_UNIFORM ||
 	     st.programInterface == GL_TESS_EVALUATION_SUBROUTINE_UNIFORM ||
 	     st.tcs_text || st.tes_text) &&
-	     !piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
+	    (!piglit_is_extension_supported("GL_ARB_shader_subroutine") ||
+	     !piglit_is_extension_supported("GL_ARB_tessellation_shader"))) {
 		 return false;
 	 }
 
