@@ -32,6 +32,7 @@
 /* Chunks of code in this file are taken from egl-util.c */
 
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include "piglit-util-gl.h"
 #include "piglit-util-egl.h"
