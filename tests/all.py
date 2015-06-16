@@ -1078,6 +1078,7 @@ with profile.group_manager(
     g(['gl-2.0-large-point-fs'])
     g(['gl-2.0-vertexattribpointer'])
     g(['gl-2.0-vertex-const-attr'])
+    g(['gl-2.0-reuse_fragment_shader'])
     g(['attrib-assignments'], run_concurrent=False)
     g(['getattriblocation-conventional'], run_concurrent=False)
     g(['clip-flag-behavior'], run_concurrent=False)
