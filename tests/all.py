@@ -2100,6 +2100,8 @@ with profile.group_manager(
       'ProgramUniform coverage')
     g(['arb_separate_shader_object-rendezvous_by_location', '-fbo'],
       'Rendezvous by location', run_concurrent=False)
+    g(['arb_separate_shader_object-rendezvous_by_location-5-stages'],
+      'Rendezvous by location (5 stages)')
     g(['arb_separate_shader_object-ValidateProgramPipeline'],
       'ValidateProgramPipeline')
     g(['arb_separate_shader_object-400-combinations', '-fbo', '--by-location'],
