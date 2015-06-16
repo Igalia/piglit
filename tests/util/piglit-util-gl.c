@@ -672,6 +672,17 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex,
 
 		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
 
+		if (!prog &&
+		    piglit_is_extension_supported("GL_ARB_separate_shader_objects")) {
+			GLuint pipeline;
+
+			glGetIntegerv(GL_PROGRAM_PIPELINE_BINDING,
+				      (GLint*)&pipeline);
+			if (pipeline)
+				glGetProgramPipelineiv(pipeline, GL_VERTEX_SHADER,
+						       (GLint*)&prog);
+		}
+
 		/* If there is a current program and that program has an
 		 * active attribute named piglit_vertex, don't use the fixed
 		 * function inputs.
