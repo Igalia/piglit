@@ -3287,10 +3287,15 @@ with profile.group_manager(
 
     for api_suffix, possible_options in [('', [[], ['interface']]),
                                          ('_gles3', [[]])]:
-        for subtest in ['basic-struct', 'struct-whole-array',
-                        'struct-array-elem', 'array-struct',
-                        'array-struct-whole-array', 'array-struct-array-elem',
-                        'struct-struct', 'array-struct-array-struct']:
+        if api_suffix == '_gles3':
+            subtest_list = ['basic-struct']
+        else:
+            subtest_list = ['basic-struct', 'struct-whole-array',
+                            'struct-array-elem', 'array-struct',
+                            'array-struct-whole-array',
+                            'array-struct-array-elem', 'struct-struct',
+                            'array-struct-array-struct']
+        for subtest in subtest_list:
             for mode in ['error', 'get', 'run', 'run-no-fs']:
                 for options in possible_options:
                     g(['ext_transform_feedback-structs{0}'.format(api_suffix),
