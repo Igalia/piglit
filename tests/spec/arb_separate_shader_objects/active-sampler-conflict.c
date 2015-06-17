@@ -81,56 +81,108 @@ static const char *fs_code =
 	"}\n"
 	;
 
+static const char *fs_arrays_code =
+	"#version 130\n"
+	"#extension GL_ARB_separate_shader_objects: require\n"
+	"\n"
+	"out vec4 out_color;\n"
+	"\n"
+	"uniform sampler2D s2[2];\n"
+	"uniform sampler3D s3[2];\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"    out_color = texture(s2[1], vec2(0)) + texture(s3[1], vec3(0));\n"
+	"}\n"
+	;
+
+static const char *fs_arrays_of_arrays_code =
+	"#version 130\n"
+	"#extension GL_ARB_separate_shader_objects: require\n"
+	"#extension GL_ARB_arrays_of_arrays: require\n"
+	"\n"
+	"out vec4 out_color;\n"
+	"\n"
+	"uniform sampler2D s2[2][2];\n"
+	"uniform sampler3D s3[2][2];\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"    out_color = texture(s2[1][1], vec2(0)) + texture(s3[1][1], vec3(0));\n"
+	"}\n"
+	;
+
 static const float vert[2] = {
 	0.0, 0.0
 };
 
-void piglit_init(int argc, char **argv)
+static bool
+setup_program(GLuint *prog, GLuint *pipe, GLuint *vao,
+	      GLuint *bo, const char **fs_code)
 {
-	GLuint prog;
-	GLint s2_loc;
-	GLint s3_loc;
-	GLuint pipe;
-	GLuint vao;
-	GLuint bo;
 	bool pass = true;
 
-	piglit_require_extension("GL_ARB_separate_shader_objects");
+	*prog = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
+				      (const GLchar *const *) fs_code);
+	piglit_link_check_status(*prog);
 
-	prog = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
-					 (const GLchar *const *) &fs_code);
-	piglit_link_check_status(prog);
-
-	s2_loc = glGetUniformLocation(prog, "s2");
-	if (s2_loc == -1) {
-		fprintf(stderr, "Failed to get uniform location for s2.\n");
-		pass = false;
-	}
-
-	s3_loc = glGetUniformLocation(prog, "s3");
-	if (s3_loc == -1) {
-		fprintf(stderr, "Failed to get uniform location for s3.\n");
-		pass = false;
-	}
-
-	glGenProgramPipelines(1, &pipe);
-	glUseProgramStages(pipe,
+	glGenProgramPipelines(1, pipe);
+	glUseProgramStages(*pipe,
 			   GL_FRAGMENT_SHADER_BIT,
-			   prog);
-	glActiveShaderProgram(pipe, prog);
-	glBindProgramPipeline(pipe);
+			   *prog);
+	glActiveShaderProgram(*pipe, *prog);
+	glBindProgramPipeline(*pipe);
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	glGenVertexArrays(1, vao);
+	glBindVertexArray(*vao);
 
 	/* Configure a vertex array object and buffer object that will
 	 * be used for drawing later.
 	 */
-	glGenBuffers(1, &bo);
-	glBindBuffer(GL_ARRAY_BUFFER, bo);
+	glGenBuffers(1, bo);
+	glBindBuffer(GL_ARRAY_BUFFER, *bo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
 
-	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+
+static void
+cleanup(GLuint prog, GLuint *pipe, GLuint *vao, GLuint *bo)
+{
+	glBindProgramPipeline(0);
+	glDeleteProgram(prog);
+	glDeleteProgramPipelines(1, pipe);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	glDeleteBuffers(1, bo);
+	glDeleteVertexArrays(1, vao);
+}
+
+static bool
+get_uniform_location(GLuint prog, GLint *loc, char *uni_name)
+{
+	bool pass = true;
+	*loc = glGetUniformLocation(prog, uni_name);
+	if (*loc == -1) {
+		fprintf(stderr, "Failed to get uniform location for %s.\n",
+                        uni_name);
+		pass = false;
+	}
+	return pass;
+}
+
+static bool
+test_sampler_conflict(GLuint prog, GLuint pipe,
+		      char *s2_uni_name, char *s3_uni_name)
+{
+	GLint s2_loc;
+	GLint s3_loc;
+	bool pass = true;
+
+	pass = get_uniform_location(prog, &s2_loc, s2_uni_name);
+	pass = get_uniform_location(prog, &s3_loc, s3_uni_name);
 
 	/* First, try an invalid configuration.
 	 */
@@ -187,17 +239,44 @@ void piglit_init(int argc, char **argv)
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	/* Clean up.
-	 */
-	glBindProgramPipeline(0);
-	glDeleteProgram(prog);
-	glDeleteProgramPipelines(1, &pipe);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	return pass;
+}
 
-	glDeleteBuffers(1, &bo);
-	glDeleteVertexArrays(1, &vao);
+void piglit_init(int argc, char **argv)
+{
+	GLuint prog;
+	GLuint pipe;
+	GLuint vao;
+	GLuint bo;
+	GLint s_loc;
+	char *s2_uni_name = "s2";
+	char *s3_uni_name = "s3";
+	char *s2_uni_array_name = "s2[1]";
+	char *s3_uni_array_name = "s3[1]";
+	bool pass;
+
+	piglit_require_extension("GL_ARB_separate_shader_objects");
+
+	pass = setup_program(&prog, &pipe, &vao, &bo, &fs_code);
+	pass = test_sampler_conflict(prog, pipe,
+				     s2_uni_name, s3_uni_name) && pass;
+	cleanup(prog, &pipe, &vao, &bo);
+
+	pass = setup_program(&prog, &pipe, &vao, &bo, &fs_arrays_code);
+	pass = test_sampler_conflict(prog, pipe, s2_uni_array_name,
+				     s3_uni_array_name) && pass;
+	cleanup(prog, &pipe, &vao, &bo);
+
+	if (piglit_is_extension_supported("GL_ARB_arrays_of_arrays")) {
+		char *s2_uni_aoa_name = "s2[1][1]";
+		char *s3_uni_aoa_name = "s3[1][1]";
+
+		pass = setup_program(&prog, &pipe, &vao, &bo,
+				     &fs_arrays_of_arrays_code);
+		pass = test_sampler_conflict(prog, pipe, s2_uni_aoa_name,
+					     s3_uni_aoa_name) && pass;
+		cleanup(prog, &pipe, &vao, &bo);
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
