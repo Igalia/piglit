@@ -46,10 +46,10 @@ def make_profile(test_list, test_class):
     return profile
 
 
-def get_option(env_varname, config_option):
+def get_option(env_varname, config_option, default=None):
     """Query the given environment variable and then piglit.conf for the option.
 
-    Return None if the option is unset.
+    Return the value of the default argument if opt is None.
 
     """
     opt = os.environ.get(env_varname, None)
@@ -58,7 +58,7 @@ def get_option(env_varname, config_option):
 
     opt = core.PIGLIT_CONFIG.safe_get(config_option[0], config_option[1])
 
-    return opt
+    return opt or default
 
 
 def gen_caselist_txt(bin_, caselist):

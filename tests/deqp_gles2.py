@@ -33,7 +33,8 @@ _DEQP_GLES2_BIN = deqp.get_option('PIGLIT_DEQP_GLES2_BIN',
 class DEQPGLES2Test(deqp.DEQPBaseTest):
     deqp_bin = _DEQP_GLES2_BIN
     extra_args = deqp.get_option('PIGLIT_DEQP_GLES2_EXTRA_ARGS',
-                                 ('deqp-gles2', 'extra_args')).split() or []
+                                 ('deqp-gles2', 'extra_args'),
+                                 default='').split()
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name

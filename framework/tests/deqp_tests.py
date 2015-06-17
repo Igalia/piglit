@@ -59,6 +59,15 @@ def test_get_option_conf():
 
 
 @utils.set_env(_PIGLIT_TEST_ENV=None)
+def test_get_option_default():
+    """deqp.get_option: default value is returned when env and conf are unset
+    """
+    nt.eq_(deqp.get_option('_PIGLIT_TEST_ENV', ('deqp_test', 'test_env'),
+                           'foobar'),
+           'foobar')
+
+
+@utils.set_env(_PIGLIT_TEST_ENV=None)
 def test_get_option_conf_no_section():
     """deqp.get_option: if a no_section error is raised and env is unset None is return
     """

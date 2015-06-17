@@ -74,7 +74,9 @@ def filter_mustpass(caselist_path):
 class DEQPGLES3Test(deqp.DEQPBaseTest):
     deqp_bin = _DEQP_GLES3_EXE
     extra_args = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
-                                 ('deqp-gles3', 'extra_args')).split() or []
+                                 ('deqp-gles3', 'extra_args'),
+                                 default='').split()
+
 
     def __init__(self, *args, **kwargs):
         super(DEQPGLES3Test, self).__init__(*args, **kwargs)
