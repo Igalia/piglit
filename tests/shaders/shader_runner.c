@@ -2476,7 +2476,7 @@ piglit_display(void)
 			glClear(clear_bits);
 		} else if (sscanf(line,
 				  "clip plane %d %lf %lf %lf %lf",
-				  &x, &d[0], &d[1], &d[2], &d[3])) {
+				  &x, &d[0], &d[1], &d[2], &d[3]) == 5) {
 			if (x < 0 || x >= gl_max_clip_planes) {
 				printf("clip plane id %d out of range\n", x);
 				piglit_report_result(PIGLIT_FAIL);
@@ -2521,7 +2521,7 @@ piglit_display(void)
 			       &primcount,
 			       c + 0, c + 1, c + 2, c + 3);
 			draw_instanced_rect(primcount, c[0], c[1], c[2], c[3]);
-		} else if (sscanf(line, "draw arrays %31s %d %d", s, &x, &y)) {
+		} else if (sscanf(line, "draw arrays %31s %d %d", s, &x, &y) == 3) {
 			GLenum mode = decode_drawing_mode(s);
 			int first = x;
 			size_t count = (size_t) y;
