@@ -1049,6 +1049,7 @@ with profile.group_manager(
       'normal3b3s-invariance-byte', run_concurrent=False)
     g(['gl-1.5-normal3b3s-invariance', 'GL_SHORT'],
       'normal3b3s-invariance-short', run_concurrent=False)
+    g(['gl-1.5-vertex-buffer-offsets'], 'vertex-buffer-offsets')
 
 with profile.group_manager(
         PiglitGLTest,
