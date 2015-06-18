@@ -151,13 +151,15 @@ def add_vpfpgeneric(adder, name):
 
 
 def add_texwrap_target_tests(adder, target):
-    adder(['texwrap', 'GL_RGBA8'], 'texwrap {}'.format(target))
-    adder(['texwrap', 'GL_RGBA8', 'offset'],
+    adder(['texwrap', target, 'GL_RGBA8'],
+          'texwrap {}'.format(target))
+    adder(['texwrap', target, 'GL_RGBA8', 'offset'],
           'texwrap {} offset'.format(target))
-    adder(['texwrap', 'GL_RGBA8', 'bordercolor'],
+    adder(['texwrap', target, 'GL_RGBA8', 'bordercolor'],
           'texwrap {} bordercolor'.format(target))
-    adder(['texwrap', 'GL_RGBA8', 'proj'], 'texwrap {} proj'.format(target))
-    adder(['texwrap', 'GL_RGBA8', 'proj', 'bordercolor'],
+    adder(['texwrap', target, 'GL_RGBA8', 'proj'],
+          'texwrap {} proj'.format(target))
+    adder(['texwrap', target, 'GL_RGBA8', 'proj', 'bordercolor'],
           'texwrap {} proj bordercolor'.format(target))
 
 
