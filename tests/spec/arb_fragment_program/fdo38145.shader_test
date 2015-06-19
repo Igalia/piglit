@@ -1,0 +1,29 @@
+# test for a regression in the R600 SPI setup that affected doom3 rendering.
+# Author: Vadim Girlin
+
+[require]
+GL >= 1.3
+ARB_vertex_program
+ARB_fragment_program
+
+[vertex program]
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+MOV	result.texcoord[0],0;
+MOV	result.texcoord[1],1;
+END
+
+[fragment program]
+!!ARBfp1.0
+TEMP	R0;
+MOV	R0, fragment.position;
+MOV	result.color,fragment.texcoord[1];
+END
+
+[test]
+ortho 0 1 0 1
+clear color 0.0 0.0 0.0 0.0
+clear
+draw rect 0 0 1 1
+probe all rgba 1.0 1.0 1.0 1.0
+
