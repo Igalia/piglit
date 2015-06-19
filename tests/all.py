@@ -2608,7 +2608,6 @@ with profile.group_manager(
     g(['vp-address-04'], run_concurrent=False)
     g(['vp-bad-program'], run_concurrent=False)
     g(['vp-max-array'], run_concurrent=False)
-    add_vpfpgeneric(g, 'arl')
     add_vpfpgeneric(g, 'big-param')
     add_vpfpgeneric(g, 'dataflow-bug')
     add_vpfpgeneric(g, 'fogcoord-dp3')
