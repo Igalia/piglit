@@ -2597,7 +2597,6 @@ with profile.group_manager(
     add_vpfpgeneric(g, 'vp-arl-constant-array')
     add_vpfpgeneric(g, 'vp-arl-constant-array-huge')
     add_vpfpgeneric(g, 'vp-arl-constant-array-huge-varying')
-    add_vpfpgeneric(g, 'vp-arl-constant-array-huge-relative-offset')
     add_vpfpgeneric(g, 'vp-arl-constant-array-varying')
     add_vpfpgeneric(g, 'vp-arl-env-array')
     add_vpfpgeneric(g, 'vp-arl-local-array')
