@@ -2605,7 +2605,6 @@ with profile.group_manager(
     g(['vp-address-04'], run_concurrent=False)
     g(['vp-bad-program'], run_concurrent=False)
     g(['vp-max-array'], run_concurrent=False)
-    add_vpfpgeneric(g, 'fogcoord-dp3')
     add_vpfpgeneric(g, 'fogcoord-dph')
     add_vpfpgeneric(g, 'fogcoord-dp4')
     add_vpfpgeneric(g, 'vp-arl-constant-array')
