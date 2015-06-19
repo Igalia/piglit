@@ -1,0 +1,32 @@
+# Detects whether or not the implementation correctly handles aliasing
+# of src/dst in EXP.
+
+[require]
+GL >= 1.3
+ARB_vertex_program
+ARB_fragment_program
+
+[vertex program]
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+
+TEMP temp1, temp2;
+
+MOV temp1, {0.0,  0.25, 2.0, -1.0};
+MOV temp2, {0.25, 0.0, -1.0, 2.0};
+MAX temp1, temp1, temp2;
+ADD result.color, temp1, {0.0, 0.0, -1.75, -1.75};
+END
+
+[fragment program]
+!!ARBfp1.0
+MOV result.color, fragment.color;
+END
+
+[test]
+ortho 0 1 0 1
+clear color 1.0 1.0 1.0 1.0
+clear
+draw rect 0 0 1 1
+probe all rgba 0.25 0.25 0.25 0.25
+
