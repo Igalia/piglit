@@ -1905,7 +1905,6 @@ with profile.group_manager(
     g(['trinity-fp1'], run_concurrent=False)
     g(['arb_fragment_program-sparse-samplers'], 'sparse-samplers')
     g(['incomplete-texture', 'arb_fp'], 'incomplete-texture-arb_fp')
-    add_vpfpgeneric(g, 'fp-dst-aliasing-1')
     add_vpfpgeneric(g, 'fp-dst-aliasing-2')
     add_vpfpgeneric(g, 'fp-ex2-sat')
     add_vpfpgeneric(g, 'fp-two-constants')
