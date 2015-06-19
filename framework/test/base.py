@@ -109,6 +109,20 @@ class ProcessTimeout(threading.Thread):
         return self.status
 
 
+def _is_crash_returncode(returncode):
+    """Determine whether the given process return code correspond to a
+    crash.
+    """
+    if sys.platform == 'win32':
+        # On Windows:
+        # - For uncaught exceptions the process terminates with the exception
+        # code, which is usually negative
+        # - MSVCRT's abort() terminates process with exit code 3
+        return returncode < 0 or returncode == 3
+    else:
+        return returncode < 0
+
+
 class Test(object):
     """ Abstract base class for Test classes
 
@@ -228,7 +242,7 @@ class Test(object):
 
         self.interpret_result()
 
-        if self.result['returncode'] < 0:
+        if _is_crash_returncode(self.result['returncode']):
             # check if the process was terminated by the timeout
             if self.timeout > 0 and self.__proc_timeout.join() > 0:
                 self.result['result'] = 'timeout'
