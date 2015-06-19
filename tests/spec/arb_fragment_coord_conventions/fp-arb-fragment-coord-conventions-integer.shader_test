@@ -1,0 +1,28 @@
+# Tests that integer pixel center choice with ARB_fragment_coord_conventions
+# means no fractional component.
+
+[require]
+GL >= 1.3
+ARB_vertex_program
+ARB_fragment_program
+
+[vertex program]
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+END
+
+[fragment program]
+!!ARBfp1.0
+OPTION ARB_fragment_coord_pixel_center_integer;
+
+MOV result.color, {0.0, 0.0, 0.0, 0.0};
+FRC result.color.xy, fragment.position;
+END
+
+[test]
+ortho 0 1 0 1
+clear color 1.0 1.0 1.0 1.0
+clear
+draw rect 0 0 1 1
+probe all rgba 0.0 0.0 0.0 0.0
+

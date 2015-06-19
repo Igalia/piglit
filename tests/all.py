@@ -1924,7 +1924,6 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_fragment_coord_conventions')) as g:
     add_vpfpgeneric(g, 'fp-arb-fragment-coord-conventions-none')
-    add_vpfpgeneric(g, 'fp-arb-fragment-coord-conventions-integer')
 
 with profile.group_manager(
         PiglitGLTest,
