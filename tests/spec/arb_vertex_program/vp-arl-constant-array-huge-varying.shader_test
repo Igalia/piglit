@@ -1,5 +1,11 @@
-; Tests loading of a per-vertex variable entry from a constant array.
+# Tests loading of a per-vertex variable entry from a constant array.
 
+[require]
+GL >= 1.3
+ARB_vertex_program
+ARB_fragment_program
+
+[vertex program]
 !!ARBvp1.0
 OPTION ARB_position_invariant;
 PARAM vals[] =	{
@@ -150,9 +156,15 @@ ARL A0.x, temp.x;
 ADD result.color, vals[A0.x], vertex.position.xyzz;
 END
 
+[fragment program]
 !!ARBfp1.0
 MOV result.color, fragment.color;
 END
 
-!!test
-expected          0.75     0.25      0.0      0.0
+[test]
+ortho 0 1 0 1
+clear color 0.0 1.0 1.0 1.0
+clear
+draw rect 0 0 1 1
+probe all rgba 0.75 0.25 0.0 0.0
+
