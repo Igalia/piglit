@@ -1,0 +1,47 @@
+# Test against a dataflow analysis bug that appeared in the R300 program
+# compiler.
+#
+# Note the redundant MOV before the first MAD. This is intended, and part
+# of what triggered the (admittedly somewhat subtle) bug.
+
+[require]
+GL >= 1.3
+ARB_vertex_program
+ARB_fragment_program
+
+[vertex program]
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+
+TEMP tx, ty, tz, t;
+TEMP tweight;
+
+MOV tweight, vertex.texcoord[0];
+MUL tx, tweight.x, program.local[0];
+MUL ty, tweight.x, program.local[1];
+
+MOV t, program.local[2];
+MAD tx, tweight.y, program.local[2], tx;
+MOV t, program.local[3];
+MAD ty, tweight.y, t, ty;
+
+ADD result.color, tx, ty;
+END
+
+[fragment program]
+!!ARBfp1.0
+MOV result.color, fragment.color;
+END
+
+[test]
+ortho 0 1 0 1
+texcoord 0 (-1, 2, 0, 0)
+parameter local_vp 0 (0, 0.5, -1.3, 0.1)
+parameter local_vp 1 (-0.3, 0, 0.4, -0.5)
+parameter local_vp 2 (0.2, 0.3, 0, 0.2)
+parameter local_vp 3 (-0.1, 0.1, -0.1, 0)
+clear color 1.0 1.0 0.0 0.0
+clear
+draw rect 0 0 1 1
+probe all rgba 0.5 0.3 0.7 0.8
+
