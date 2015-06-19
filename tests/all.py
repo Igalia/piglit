@@ -2594,7 +2594,6 @@ with profile.group_manager(
     g(['vp-address-04'], run_concurrent=False)
     g(['vp-bad-program'], run_concurrent=False)
     g(['vp-max-array'], run_concurrent=False)
-    add_vpfpgeneric(g, 'vp-arl-local-array')
     add_vpfpgeneric(g, 'vp-arl-neg-array')
     add_vpfpgeneric(g, 'vp-arl-neg-array-2')
     add_vpfpgeneric(g, 'vp-constant-array')
