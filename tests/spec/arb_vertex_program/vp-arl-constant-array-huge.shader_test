@@ -1,7 +1,13 @@
-; Tests loading of an entry in a large constant array.  Caught failure in the
-; 965 driver where only the first entry of the constant array was necessarily
-; correct, and the state containing the transformation matrix wasn't set up.
+# Tests loading of an entry in a large constant array.  Caught failure in the
+# 965 driver where only the first entry of the constant array was necessarily
+# correct, and the state containing the transformation matrix wasn't set up.
 
+[require]
+GL >= 1.3
+ARB_vertex_program
+ARB_fragment_program
+
+[vertex program]
 !!ARBvp1.0
 OPTION ARB_position_invariant;
 PARAM vals[] =	{
@@ -130,20 +136,31 @@ ARL A0.x, program.local[0].x;
 MOV result.color, vals[A0.x+0];
 END
 
+[fragment program]
 !!ARBfp1.0
 MOV result.color, fragment.color;
 END
 
-!!test
-vertex.local[0]   0.0     0.0      0.0      0.0
-expected          0.5     1.0      1.0      0.0
-!!test
-vertex.local[0]   1.0     0.0      0.0      0.0
-expected          1.0     0.0      0.8      0.0
-!!test
-vertex.local[0]   2.0     0.0      0.0      0.0
-expected          1.0     0.0      0.5      0.0
-!!test
-vertex.local[0]   3.0     0.0      0.0      0.0
-expected          0.8     1.0      0.0      0.0
+[test]
+ortho 0 1 0 1
+parameter local_vp 0 (0.0, 0.0, 0.0, 0.0)
+clear color 1.0 0.0 0.0 1.0
+clear
+draw rect 0 0 1 1
+probe all rgba 0.5 1.0 1.0 0.0
+parameter local_vp 0 (1.0, 0.0, 0.0, 0.0)
+clear color 0.0 1.0 0.0 1.0
+clear
+draw rect 0 0 1 1
+probe all rgba 1.0 0.0 0.8 0.0
+parameter local_vp 0 (2.0, 0.0, 0.0, 0.0)
+clear color 0.0 1.0 1.0 1.0
+clear
+draw rect 0 0 1 1
+probe all rgba 1.0 0.0 0.5 0.0
+parameter local_vp 0 (3.0, 0.0, 0.0, 0.0)
+clear color 0.0 0.0 1.0 1.0
+clear
+draw rect 0 0 1 1
+probe all rgba 0.8 1.0 0.0 0.0
 
