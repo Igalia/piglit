@@ -2595,7 +2595,6 @@ with profile.group_manager(
     g(['vp-bad-program'], run_concurrent=False)
     g(['vp-max-array'], run_concurrent=False)
     add_vpfpgeneric(g, 'vp-constant-array')
-    add_vpfpgeneric(g, 'vp-constant-array-huge')
     add_vpfpgeneric(g, 'vp-constant-negate')
     add_vpfpgeneric(g, 'vp-exp-alias')
     add_vpfpgeneric(g, 'vp-max')
