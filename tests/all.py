@@ -1922,11 +1922,6 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'arb_fragment_coord_conventions')) as g:
-    add_vpfpgeneric(g, 'fp-arb-fragment-coord-conventions-none')
-
-with profile.group_manager(
-        PiglitGLTest,
         grouptools.join('spec', 'ATI_fragment_shader')) as g:
     g(['ati-fs-bad-delete'])
 
