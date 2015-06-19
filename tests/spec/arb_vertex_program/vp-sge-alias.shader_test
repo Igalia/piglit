@@ -1,0 +1,29 @@
+# Detects whether or not the implementation correctly handles aliasing
+# of src/dest registers of SGE.  This caught a bug in the 965 driver.
+
+[require]
+GL >= 1.3
+ARB_vertex_program
+ARB_fragment_program
+
+[vertex program]
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+TEMP temp;
+MOV temp, {3, 0, 1, 0};
+SGE temp, temp, {2, 1, 0, -1};
+MOV result.color, temp;
+END
+
+[fragment program]
+!!ARBfp1.0
+MOV result.color, fragment.color;
+END
+
+[test]
+ortho 0 1 0 1
+clear color 0.0 1.0 0.0 0.0
+clear
+draw rect 0 0 1 1
+probe all rgba 1 0 1 1
+
