@@ -100,6 +100,8 @@
 static void
 parse_args(int argc, char *argv[], struct piglit_gl_test_config *config);
 
+static const int outer_dim_size = 2;
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
@@ -116,6 +118,13 @@ enum base_type
 	BASE_TYPE_UINT,
 	BASE_TYPE_INT,
 	BASE_TYPE_DOUBLE,
+};
+
+enum test_array_type
+{
+	SEPARATE,
+	ARRAY,
+	ARRAYS_OF_ARRAYS,
 };
 
 static const char *
@@ -219,7 +228,8 @@ const struct type_desc *all_types[] = {
 struct varying_desc
 {
 	const struct type_desc *type;
-	unsigned array_elems;
+	unsigned one_dim_array_elems;
+	unsigned two_dim_array_elems;
 };
 
 /**
@@ -228,12 +238,12 @@ struct varying_desc
  */
 static GLint
 get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
-	   struct varying_desc *varyings)
+	   struct varying_desc *varyings, enum test_array_type array_type)
 {
 	GLuint shader;
 	char *full_text = malloc(1000 * 100 + num_varyings);
 	char *text = full_text;
-	unsigned i, j, k, l;
+	unsigned i, j, k, l, m;
 	const char *varying_keyword;
 	unsigned offset = 0;
 	GLenum shader_type = is_vs ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
@@ -249,6 +259,8 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 	}
 
 	text += sprintf(text, "#version %u\n", glsl_version);
+	if (array_type == ARRAYS_OF_ARRAYS)
+		text += sprintf(text, "#extension GL_ARB_arrays_of_arrays: enable\n");
 	for (i = 0; i < num_varyings; ++i) {
 		const char *opt_flat_keyword = "";
 		if (!fp64 && varyings[i].type->base == BASE_TYPE_DOUBLE) {
@@ -257,11 +269,17 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 		}
 		if (varyings[i].type->base != BASE_TYPE_FLOAT)
 			opt_flat_keyword = "flat ";
-		if (varyings[i].array_elems != 0) {
+		if (varyings[i].two_dim_array_elems != 0) {
+			text += sprintf(text, "%s%s %s var%03u[%u][%u];\n",
+					opt_flat_keyword, varying_keyword,
+					varyings[i].type->name, i,
+					outer_dim_size,
+					varyings[i].two_dim_array_elems);
+		} else if (varyings[i].one_dim_array_elems != 0) {
 			text += sprintf(text, "%s%s %s var%03u[%u];\n",
 					opt_flat_keyword, varying_keyword,
 					varyings[i].type->name, i,
-					varyings[i].array_elems);
+					varyings[i].one_dim_array_elems);
 		} else {
 			text += sprintf(text, "%s%s %s var%03u;\n",
 					opt_flat_keyword, varying_keyword,
@@ -282,31 +300,42 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 	else
 		text += sprintf(text, "  bool failed = false;\n");
 	for (i = 0; i < num_varyings; ++i) {
-		unsigned array_loop_bound = varyings[i].array_elems;
+		unsigned array_loop_bound;
+		unsigned outer_array_loop_bound = 1;
 		const char *base_type_name
 			= get_base_type_name(varyings[i].type->base);
+		if (varyings[i].two_dim_array_elems != 0) {
+			outer_array_loop_bound = outer_dim_size;
+			array_loop_bound = varyings[i].two_dim_array_elems;
+		} else {
+			array_loop_bound = varyings[i].one_dim_array_elems;
+		}
 		if (array_loop_bound == 0)
 			array_loop_bound = 1;
-		for (j = 0; j < array_loop_bound; ++j) {
-			for (k = 0; k < varyings[i].type->num_cols; ++k) {
-				for (l = 0; l < varyings[i].type->num_rows; ++l) {
-					text += sprintf(text, "  ");
-					if (!is_vs)
-						text += sprintf(text, "failed = failed || ");
-					text += sprintf(text, "var%03u", i);
-					if (varyings[i].array_elems)
-						text += sprintf(text, "[%u]", j);
-					if (varyings[i].type->num_cols > 1)
-						text += sprintf(text, "[%u]", k);
-					if (varyings[i].type->num_rows > 1)
-						text += sprintf(text, "[%u]", l);
-					if (is_vs)
-						text += sprintf(text, " = ");
-					else
-						text += sprintf(text, " != ");
-					text += sprintf(text, "%s(i + %u);\n",
-							base_type_name,
-							offset++);
+		for (j = 0; j < outer_array_loop_bound; ++j) {
+			for (k = 0; k < array_loop_bound; ++k) {
+				for (l = 0; l < varyings[i].type->num_cols; ++l) {
+					for (m = 0; m < varyings[i].type->num_rows; ++m) {
+						text += sprintf(text, "  ");
+						if (!is_vs)
+							text += sprintf(text, "failed = failed || ");
+						text += sprintf(text, "var%03u", i);
+						if (varyings[i].two_dim_array_elems)
+							text += sprintf(text, "[%u]", j);
+						if (varyings[i].one_dim_array_elems || varyings[i].two_dim_array_elems)
+							text += sprintf(text, "[%u]", k);
+						if (varyings[i].type->num_cols > 1)
+							text += sprintf(text, "[%u]", l);
+						if (varyings[i].type->num_rows > 1)
+							text += sprintf(text, "[%u]", m);
+						if (is_vs)
+							text += sprintf(text, " = ");
+						else
+							text += sprintf(text, " != ");
+						text += sprintf(text, "%s(i + %u);\n",
+								base_type_name,
+								offset++);
+					}
 				}
 			}
 		}
@@ -334,7 +363,8 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
  */
 static unsigned
 choose_varyings(struct varying_desc *varyings,
-		const struct type_desc *test_type, GLboolean test_array,
+		const struct type_desc *test_type,
+		enum test_array_type array_type,
 		unsigned max_varying_floats)
 {
 	unsigned num_varyings = 0;
@@ -343,24 +373,43 @@ choose_varyings(struct varying_desc *varyings,
 		= test_type->num_cols * test_type->num_rows * element_size;
 	unsigned num_test_varyings
 		= max_varying_floats / components_in_test_type;
+	unsigned num_two_dim_test_varyings
+		 = num_test_varyings / outer_dim_size;
+	unsigned num_extra_arrays = 0;
 	unsigned num_extra_varyings
 		= max_varying_floats
 		- num_test_varyings * components_in_test_type;
 	unsigned i;
-	if (test_array) {
+	if (array_type == ARRAYS_OF_ARRAYS) {
 		varyings[num_varyings].type = test_type;
-		varyings[num_varyings].array_elems = num_test_varyings;
+		varyings[num_varyings].two_dim_array_elems = num_two_dim_test_varyings;
+		varyings[num_varyings].one_dim_array_elems = 0;
+		num_extra_arrays
+			= num_test_varyings - (num_two_dim_test_varyings * outer_dim_size);
+		++num_varyings;
+		if (num_extra_arrays > 0) {
+			varyings[num_varyings].type = test_type;
+			varyings[num_varyings].two_dim_array_elems = 0;
+			varyings[num_varyings].one_dim_array_elems = num_extra_arrays;
+			++num_varyings;
+		}
+	} else if (array_type == ARRAY) {
+		varyings[num_varyings].type = test_type;
+		varyings[num_varyings].two_dim_array_elems = 0;
+		varyings[num_varyings].one_dim_array_elems = num_test_varyings;
 		++num_varyings;
 	} else {
 		for (i = 0; i < num_test_varyings; ++i) {
 			varyings[num_varyings].type = test_type;
-			varyings[num_varyings].array_elems = 0;
+			varyings[num_varyings].two_dim_array_elems = 0;
+			varyings[num_varyings].one_dim_array_elems = 0;
 			++num_varyings;
 		}
 	}
 	for (i = 0; i < num_extra_varyings; ++i) {
 		varyings[num_varyings].type = &float_type;
-		varyings[num_varyings].array_elems = 0;
+		varyings[num_varyings].two_dim_array_elems = 0;
+		varyings[num_varyings].one_dim_array_elems = 0;
 		++num_varyings;
 	}
 
@@ -377,6 +426,8 @@ NORETURN print_usage_and_exit(const char *prog_name)
 		printf("    %s\n", all_types[i]->name);
 	printf("  and <arrayspec> is one of:\n"
 	       "    array: test using an array of the above type\n"
+	       "    arrays_of_arrays: test using a multidimensional array"
+	       " of the above type\n"
 	       "    separate: test using separately declared varyings\n");
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -414,36 +465,44 @@ parse_args(int argc, char *argv[], struct piglit_gl_test_config *config)
 void
 piglit_init(int argc, char **argv)
 {
-	GLboolean test_array;
+	enum test_array_type array_type;
 	GLint max_varying_floats;
 	struct varying_desc *varyings;
 	unsigned num_varyings;
+	unsigned glsl_version;
 	GLuint vs, fs;
 
 	if (argc != 3)
 		print_usage_and_exit(argv[0]);
 
+	glsl_version = test_type->glsl_version_required;
+
 	if (strcmp(argv[2], "array") == 0)
-		test_array = GL_TRUE;
+		array_type = ARRAY;
 	else if (strcmp(argv[2], "separate") == 0)
-		test_array = GL_FALSE;
-	else
+		array_type = SEPARATE;
+	else if (strcmp(argv[2], "arrays_of_arrays") == 0) {
+		array_type = ARRAYS_OF_ARRAYS;
+		piglit_require_extension("GL_ARB_arrays_of_arrays");
+		if (glsl_version < 120)
+			glsl_version = 120;
+	} else
 		print_usage_and_exit(argv[0]);
 
 	piglit_require_gl_version(20);
-	piglit_require_GLSL_version(test_type->glsl_version_required);
+	piglit_require_GLSL_version(glsl_version);
 	if (test_type->base == BASE_TYPE_DOUBLE)
 		piglit_require_extension("GL_ARB_gpu_shader_fp64");
 	glGetIntegerv(GL_MAX_VARYING_FLOATS, &max_varying_floats);
 
 	varyings = malloc(sizeof(*varyings) * max_varying_floats);
 	num_varyings = choose_varyings(varyings, test_type,
-				       test_array, max_varying_floats);
+				       array_type, max_varying_floats);
 
 	vs = get_shader(true, test_type->glsl_version_required,
-			num_varyings, varyings);
+			num_varyings, varyings, array_type);
 	fs = get_shader(false, test_type->glsl_version_required,
-			num_varyings, varyings);
+			num_varyings, varyings, array_type);
 	prog = piglit_link_simple_program(vs, fs);
 	i_location = glGetUniformLocation(prog, "i");
 	free(varyings);

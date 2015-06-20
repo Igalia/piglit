@@ -1311,7 +1311,7 @@ with profile.group_manager(
                   'ivec3', 'ivec4', 'uvec2', 'uvec3', 'uvec4', 'mat2', 'mat3',
                   'mat4', 'mat2x3', 'mat2x4', 'mat3x2', 'mat3x4', 'mat4x2',
                   'mat4x3']:
-        for arrayspec in ['array', 'separate']:
+        for arrayspec in ['array', 'separate', 'arrays_of_arrays']:
             g(['varying-packing-simple', type_, arrayspec],
               'simple {} {}'.format(type_, arrayspec))
 
@@ -2097,7 +2097,7 @@ with profile.group_manager(
     for type in ['double', 'dvec2', 'dvec3', 'dvec4', 'dmat2', 'dmat3',
                  'dmat4', 'dmat2x3', 'dmat2x4', 'dmat3x2', 'dmat3x4',
                  'dmat4x2', 'dmat4x3']:
-        for arrayspec in ['array', 'separate']:
+        for arrayspec in ['array', 'separate', 'arrays_of_arrays']:
             g(['varying-packing-simple', type, arrayspec],
               'simple {0} {1}'.format(type, arrayspec))
 
