@@ -24,20 +24,22 @@ from framework.test import deqp
 
 __all__ = ['profile']
 
-
 # Path to the deqp-gles3 executable.
 _DEQP_GLES31_BIN = deqp.get_option('PIGLIT_DEQP_GLES31_BIN',
                                    ('deqp-gles31', 'bin'))
 
+_EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES31_EXTRA_ARGS',
+                              ('deqp-gles31', 'extra_args'),
+                              default='').split()
+
 
 class DEQPGLES31Test(deqp.DEQPBaseTest):
     deqp_bin = _DEQP_GLES31_BIN
-    extra_args = deqp.get_option('PIGLIT_DEQP_GLES31_EXTRA_ARGS',
-                                 ('deqp-gles31', 'extra_args'),
-                                 default='').split()
+    extra_args = [x for x in _EXTRA_ARGS if not x.startsiwth('--deqp-case')]
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     deqp.iter_deqp_test_cases(
-        deqp.gen_caselist_txt(_DEQP_GLES31_BIN, 'dEQP-GLES31-cases.txt')),
+        deqp.gen_caselist_txt(_DEQP_GLES31_BIN, 'dEQP-GLES31-cases.txt',
+                              _EXTRA_ARGS)),
     DEQPGLES31Test)

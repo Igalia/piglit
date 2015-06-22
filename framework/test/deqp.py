@@ -61,8 +61,12 @@ def get_option(env_varname, config_option, default=None):
     return opt or default
 
 
-def gen_caselist_txt(bin_, caselist):
-    """Generate a caselist.txt and return its path."""
+def gen_caselist_txt(bin_, caselist, extra_args):
+    """Generate a caselist.txt and return its path.
+
+    Extra args should be a list of extra arguments to pass to deqp.
+
+    """
     # dEQP is stupid (2014-12-07):
     #   1. To generate the caselist file, dEQP requires that the process's
     #      current directory must be that same as that of the executable.
@@ -76,9 +80,10 @@ def gen_caselist_txt(bin_, caselist):
     #      we must *dynamically* generate it during the testrun.
     basedir = os.path.dirname(bin_)
     caselist_path = os.path.join(basedir, caselist)
+
     # TODO: need to catch some exceptions here...
     subprocess.check_call(
-        [bin_, '--deqp-runmode=txt-caselist'], cwd=basedir)
+        [bin_, '--deqp-runmode=txt-caselist'] + extra_args, cwd=basedir)
     assert os.path.exists(caselist_path)
     return caselist_path
 

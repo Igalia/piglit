@@ -35,6 +35,10 @@ _DEQP_GLES3_EXE = deqp.get_option('PIGLIT_DEQP_GLES3_EXE',
 _DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP_MUSTPASS',
                                  ('deqp-gles3', 'mustpasslist'))
 
+_EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
+                              ('deqp-gles3', 'extra_args'),
+                              default='').split()
+
 
 def _get_test_case(root, root_group, outputfile):
     """Parser the test case list of Google Android CTS,
@@ -73,9 +77,7 @@ def filter_mustpass(caselist_path):
 
 class DEQPGLES3Test(deqp.DEQPBaseTest):
     deqp_bin = _DEQP_GLES3_EXE
-    extra_args = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
-                                 ('deqp-gles3', 'extra_args'),
-                                 default='').split()
+    extra_args = [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
 
     def __init__(self, *args, **kwargs):
@@ -84,5 +86,6 @@ class DEQPGLES3Test(deqp.DEQPBaseTest):
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     deqp.iter_deqp_test_cases(filter_mustpass(
-        deqp.gen_caselist_txt(_DEQP_GLES3_EXE, 'dEQP-GLES3-cases.txt'))),
+        deqp.gen_caselist_txt(_DEQP_GLES3_EXE, 'dEQP-GLES3-cases.txt',
+                              _EXTRA_ARGS))),
     DEQPGLES3Test)
