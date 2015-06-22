@@ -411,7 +411,7 @@ class TestProfile(object):
 
 
 def load_test_profile(filename):
-    """ Load a python module and return it's profile attribute
+    """Load a python module and return it's profile attribute.
 
     All of the python test files provide a profile attribute which is a
     TestProfile instance. This loads that module and returns it or raises an
@@ -419,7 +419,10 @@ def load_test_profile(filename):
 
     This method doesn't care about file extensions as a way to be backwards
     compatible with script wrapping piglit. 'tests/quick', 'tests/quick.tests',
-    and 'tests/quick.py' are all equally valid for filename
+    and 'tests/quick.py' are all equally valid for filename.
+
+    This will raise a FatalError if the module doesn't exist, or if the module
+    doesn't have a profile attribute.
 
     Arguments:
     filename -- the name of a python module to get a 'profile' from
@@ -433,6 +436,10 @@ def load_test_profile(filename):
         raise exceptions.PiglitFatalError(
             'There is not profile attribute in module {}.\n'
             'Did you specify the right file?'.format(filename))
+    except ImportError:
+        raise exceptions.PiglitFatalError(
+            'There is no test profile called "{}".\n'
+            'Check your spelling?'.format(filename))
 
 
 def merge_test_profiles(profiles):

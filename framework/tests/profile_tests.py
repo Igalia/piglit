@@ -52,6 +52,12 @@ def test_load_test_profile_no_profile():
     profile.load_test_profile('__init__')
 
 
+@nt.raises(exceptions.PiglitFatalError)
+def test_load_test_profile_no_module():
+    """profile.load_test_profile: Trying to load a non-existant module exits"""
+    profile.load_test_profile('this_module_will_never_ever_exist')
+
+
 def test_load_test_profile_returns():
     """profile.load_test_profile: returns a TestProfile instance"""
     profile_ = profile.load_test_profile('sanity')
