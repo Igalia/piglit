@@ -2900,6 +2900,9 @@ with profile.group_manager(
       'ext_image_dma_buf_import-sample_argb8888', run_concurrent=False)
     g(['ext_image_dma_buf_import-sample_rgb', '-fmt=XR24', '-alpha-one'],
       'ext_image_dma_buf_import-sample_xrgb8888', run_concurrent=False)
+    g(['ext_image_dma_buf_import-transcode-nv12-as-r8-gr88'],
+      'ext_image_dma_buf_import-transcode-nv12-as-r8-gr88',
+      run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
