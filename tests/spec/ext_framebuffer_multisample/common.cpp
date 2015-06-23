@@ -126,13 +126,13 @@ DownsampleProg::compile(int supersample_factor)
 		"  texCoordVarying = texCoord;\n"
 		"}\n";
 
-	static const char *frag =
+	static const char *frag_template =
 		"#version 120\n"
 		"uniform sampler2DRect samp;\n"
-		"uniform int supersample_factor;\n"
 		"varying vec2 texCoordVarying;\n"
 		"void main()\n"
 		"{\n"
+		"  int supersample_factor = %d;\n"
 		"  vec4 sum = vec4(0.0);\n"
 		"  vec2 pixel = floor(texCoordVarying);\n"
 		"  for (int i = 0; i < supersample_factor; ++i) {\n"
@@ -143,9 +143,14 @@ DownsampleProg::compile(int supersample_factor)
 		"  }\n"
 		"  gl_FragColor = sum / (supersample_factor * supersample_factor);\n"
 		"}\n";
+	char *frag;
+
+	if (asprintf(&frag, frag_template, supersample_factor) == -1)
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Compile program */
 	prog = piglit_build_simple_program_unlinked(vert, frag);
+	free(frag);
 	glBindAttribLocation(prog, 0, "pos");
 	glBindAttribLocation(prog, 1, "texCoord");
 	glLinkProgram(prog);
@@ -155,8 +160,6 @@ DownsampleProg::compile(int supersample_factor)
 
 	/* Set up uniforms */
 	glUseProgram(prog);
-	glUniform1i(glGetUniformLocation(prog, "supersample_factor"),
-		    supersample_factor);
 	glUniform1i(glGetUniformLocation(prog, "samp"), 0);
 
 	/* Set up vertex array object */
