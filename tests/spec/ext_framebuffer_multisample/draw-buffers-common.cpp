@@ -124,6 +124,7 @@ static const char *vert_template =
  */
 static const char *frag_template =
 	"#version %s\n"
+	"#define NUM_ATTACHMENTS %d\n"
 	"#define DUAL_SRC_BLEND %d\n"
 	"#define ALPHA_TO_COVERAGE %d\n"
 	"#define OUT_TYPE %s\n"
@@ -133,14 +134,17 @@ static const char *frag_template =
 	"out vec4 frag_out_2;\n"
 	"#else\n"
 	"#define frag_out_0 gl_FragData[0]\n"
+	"#if NUM_ATTACHMENTS > 1\n"
 	"#define frag_out_1 gl_FragData[1]\n"
 	"#define frag_out_2 gl_FragData[2]\n"
+	"#endif\n"
 	"#endif\n"
 	"uniform OUT_TYPE frag_0_color;\n"
 	"uniform vec4 color;\n"
 	"void main()\n"
 	"{\n"
 	"  frag_out_0 = frag_0_color;\n"
+	"#if NUM_ATTACHMENTS > 1\n"
 	"  #if DUAL_SRC_BLEND\n"
 	"    frag_out_1 = vec4(color.rgb, 1.0 - color.a / 2.0);\n"
 	"  #elif ALPHA_TO_COVERAGE\n"
@@ -149,6 +153,7 @@ static const char *frag_template =
 	"  #else\n"
 	"    frag_out_1 = frag_out_2 = color;\n"
 	"  #endif\n"
+	" #endif\n"
 	"}\n";
 
 const char *
@@ -183,6 +188,7 @@ shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend)
 				  strlen(out_type_glsl) + 4;
 	char *frag = (char *) malloc(frag_alloc_len);
 	sprintf(frag, frag_template, need_glsl130 ? "130" : "120",
+		num_draw_buffers,
 		is_dual_src_blending,
 		sample_alpha_to_coverage, out_type_glsl);
 
