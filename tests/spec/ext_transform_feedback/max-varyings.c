@@ -241,7 +241,8 @@ coord_from_index(int index)
 }
 
 static GLboolean
-check_xfb_output(int max_varyings, int num_xfb_varyings, int offset)
+check_xfb_output(int max_varyings, int num_xfb_varyings,
+                 int offset, const char **xfb_varyings)
 {
 	GLboolean pass = GL_TRUE;
 	int vertex, varying, i;
@@ -262,8 +263,8 @@ check_xfb_output(int max_varyings, int num_xfb_varyings, int offset)
 				printf("Out of a total of %i\n", max_varyings);
 				printf("With an offset of %i\n", offset);
 				printf("Got incorrect transform feedback data "
-				       "for vertex %i, varying %i\n", vertex,
-				       varying);
+				       "for vertex %i, varying %s\n",
+				       vertex, *(xfb_varyings + offset));
 				printf("Expected (%f, %f, %f, %f)\n",
 				       expected[0], expected[1], expected[2],
 				       expected[3]);
@@ -319,8 +320,8 @@ draw(GLuint vs, GLuint fs, int num_xfb_varyings,
 				 10);
 
 		glEndTransformFeedback();
-		pass = check_xfb_output(max_varyings, num_xfb_varyings, offset)
-			&& pass;
+		pass = check_xfb_output(max_varyings, num_xfb_varyings,
+			  offset, xfb_varyings) && pass;
 
 		glDeleteProgram(prog);
 	}
