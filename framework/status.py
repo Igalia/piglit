@@ -36,12 +36,13 @@ A tuple representing :
 Status ordering from best to worst:
 
 pass
-dmesg-warn
 warn
-dmesg-fail
+dmesg-warn
 fail
+dmesg-fail
 timeout
 crash
+incomplete
 
 SKIP and NOTRUN are not factored into regressions and fixes, they are counted
 seperately. They also derive from a sublcass of Status, which always returns
