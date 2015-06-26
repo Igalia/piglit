@@ -264,6 +264,9 @@ else ()
 endif ()
 
 if (MINGW)
+	# Match MSVC default stack size
+	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,1048576")
+
 	# Avoid depending on MinGW runtime DLLs
 	check_cxx_compiler_flag (-static-libgcc HAVE_STATIC_LIBGCC_FLAG)
 	if (HAVE_STATIC_LIBGCC_FLAG)
