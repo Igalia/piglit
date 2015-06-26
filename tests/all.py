@@ -4355,5 +4355,10 @@ with profile.group_manager(
     g(['arb_vertex_attrib_64bit-double_attribs'], 'double_attribs')
     g(['arb_vertex_attrib_64bit-check-explicit-location'], 'check-explicit-location')
 
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ext_framebuffer_blit')) as g:
+    g(['ext_framebuffer_blit-blit-early'], 'blit-early')
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
