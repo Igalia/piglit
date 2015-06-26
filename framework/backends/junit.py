@@ -142,8 +142,7 @@ class JUnitBackend(FileBackend):
             if data['result'] == 'skip':
                 res = etree.SubElement(element, 'skipped')
 
-            elif data['result'] in ['warn', 'fail', 'dmesg-warn',
-                                    'dmesg-fail']:
+            elif data['result'] in ['fail', 'dmesg-warn', 'dmesg-fail']:
                 if expected_result == "failure":
                     err.text += "\n\nWARN: passing test as an expected failure"
                     res = etree.SubElement(element, 'skipped',
