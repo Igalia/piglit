@@ -201,3 +201,20 @@ def test_decompress_gz():
 def test_gz_output():
     """framework.backends: when using gz compression a gz file is created"""
     nt.eq_(_test_extension(), '.gz')
+
+
+@utils.no_error
+def test_compress_bz2():
+    """framework.backends.compression: can compress to 'bz2'"""
+    _test_compressor('bz2')
+
+
+def test_decompress_bz2():
+    """framework.backends.compression: can decompress from 'bz2'"""
+    _test_decompressor('bz2')
+
+
+@_set_compression_mode('bz2')
+def test_bz2_output():
+    """framework.backends: when using bz2 compression a bz2 file is created"""
+    nt.eq_(_test_extension(), '.bz2')

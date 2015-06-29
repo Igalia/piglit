@@ -42,6 +42,7 @@ they're passing unicode and not bytes.
 """
 
 from __future__ import print_function, absolute_import, division
+import bz2
 import functools
 import gzip
 import os
@@ -49,16 +50,20 @@ import os
 from framework import exceptions
 from framework.core import PIGLIT_CONFIG
 
-COMPRESSION_SUFFIXES = ['.gz']
+# TODO: in python3 the bz2 module has an open function
 
-DEFAULT = 'gz'
+COMPRESSION_SUFFIXES = ['.gz', '.bz2']
+
+DEFAULT = 'bz2'
 
 COMPRESSORS = {
+    'bz2': functools.partial(bz2.BZ2File, mode='w'),
     'gz': functools.partial(gzip.open, mode='w'),
     'none': functools.partial(open, mode='w'),
 }
 
 DECOMPRESSORS = {
+    'bz2': functools.partial(bz2.BZ2File, mode='r'),
     'gz': functools.partial(gzip.open, mode='r'),
     'none': functools.partial(open, mode='r'),
 }
