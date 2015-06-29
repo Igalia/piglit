@@ -43,21 +43,24 @@ they're passing unicode and not bytes.
 
 from __future__ import print_function, absolute_import, division
 import functools
+import gzip
 import os
 
 from framework import exceptions
 from framework.core import PIGLIT_CONFIG
 
-COMPRESSION_SUFFIXES = []
+COMPRESSION_SUFFIXES = ['.gz']
 
-DEFAULT = 'none'
+DEFAULT = 'gz'
 
 COMPRESSORS = {
+    'gz': functools.partial(gzip.open, mode='w'),
     'none': functools.partial(open, mode='w'),
 }
 
 DECOMPRESSORS = {
-    'none': functools.partial(open, mode='r')
+    'gz': functools.partial(gzip.open, mode='r'),
+    'none': functools.partial(open, mode='r'),
 }
 
 

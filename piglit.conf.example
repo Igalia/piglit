@@ -111,9 +111,9 @@ run_test=./%(test_name)s
 ;backend=json
 
 ; Set the default compression method to use,
-; May be one of: 'none'
-; Default: none (Note that this may change in the future)
-;compression=none
+; May be one of: 'none', 'gz'
+; Default: 'gz'
+;compression=gz
 
 [expected-failures]
 ; Provide a list of test names that are expected to fail.  These tests

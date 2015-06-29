@@ -32,9 +32,30 @@ import functools
 import nose.tools as nt
 
 from framework.tests import utils
-from framework.backends import compression
+from framework.backends import compression, abstract
 
 # pylint: disable=line-too-long,protected-access
+
+# Helpers
+
+
+class _TestBackend(abstract.FileBackend):
+    """A class for testing backend compression."""
+    _file_extension = 'test_extension'
+
+    def initialize(self, *args, **kwargs):  # pylint: disable=unused-argument
+        os.mkdir(os.path.join(self._dest, 'tests'))
+
+    def finalize(self, *args, **kwargs): # pylint: disable=unused-argument
+        tests = os.path.join(self._dest, 'tests')
+        with self._write_final(os.path.join(self._dest, 'results.txt')) as f:
+            for file_ in os.listdir(tests):
+                with open(os.path.join(tests, file_), 'r') as t:
+                    f.write(t.read())
+
+    @staticmethod
+    def _write(f, name, data):  # pylint: disable=arguments-differ
+        f.write('{}: {}'.format(name, data))
 
 
 def _add_compression(value):
@@ -54,6 +75,31 @@ def _add_compression(value):
             finally:
                 del compression.COMPRESSORS[value]
                 del compression.DECOMPRESSORS[value]
+
+        return _inner
+
+    return _wrapper
+
+
+def _set_compression_mode(mode):
+    """Change the compression mode for one test."""
+
+    def _wrapper(func):
+        """The actual decorator."""
+
+        @functools.wraps(func)
+        @utils.set_env(PIGLIT_COMPRESSION=mode)
+        def _inner(*args, **kwargs):
+            """The called function."""
+            restore = compression.MODE
+            compression.MODE = compression._set_mode()
+            compression.COMPRESSOR = compression.COMPRESSORS[compression.MODE]
+
+            try:
+                func(*args, **kwargs)
+            finally:
+                compression.MODE = restore
+                compression.COMPRESSOR = compression.COMPRESSORS[compression.MODE]
 
         return _inner
 
@@ -83,6 +129,29 @@ def _test_decompressor(mode):
             nt.eq_(f.read(), 'foo')
 
 
+def _test_extension():
+    """Create an final file and return the extension."""
+    with utils.tempdir() as d:
+        obj = _TestBackend(d)
+        obj.initialize()
+        with obj.write_test('foo') as t:
+            t({'result': 'foo'})
+
+        obj.finalize()
+
+        for each in os.listdir(d):
+            if each.startswith('results.txt'):
+                ext = os.path.splitext(each)[1]
+                break
+        else:
+            raise utils.TestFailure('No results file generated')
+
+    return ext
+
+
+# Tests
+
+
 @utils.no_error
 def test_compress_none():
     """framework.backends.compression: can compress to 'none'"""
@@ -92,6 +161,7 @@ def test_compress_none():
 def test_decompress_none():
     """framework.backends.compression: can decompress from 'none'"""
     _test_decompressor('none')
+
 
 
 @_add_compression('foobar')
@@ -114,3 +184,20 @@ def test_set_mode_piglit_conf():
 def test_set_mode_default():
     """framework.backends.compression._set_mode: uses DEFAULT if env and piglit.conf are unset"""
     nt.eq_(compression._set_mode(), compression.DEFAULT)
+
+
+@utils.no_error
+def test_compress_gz():
+    """framework.backends.compression: can compress to 'gz'"""
+    _test_compressor('gz')
+
+
+def test_decompress_gz():
+    """framework.backends.compression: can decompress from 'gz'"""
+    _test_decompressor('gz')
+
+
+@_set_compression_mode('gz')
+def test_gz_output():
+    """framework.backends: when using gz compression a gz file is created"""
+    nt.eq_(_test_extension(), '.gz')
