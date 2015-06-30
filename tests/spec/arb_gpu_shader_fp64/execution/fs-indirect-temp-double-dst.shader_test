@@ -1,0 +1,43 @@
+# test indirect access to an array of doubles as a dst.
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+in vec4 vertex;
+void main()
+{
+        gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : require
+uniform double arg0;
+uniform double arg1;
+uniform double tolerance;
+uniform double expected;
+uniform int pick;
+void main()
+{
+  double result[5];
+
+  result[pick] = (arg0 + arg1);
+  gl_FragColor = distance(result[pick], expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+uniform double arg0 0.5
+uniform double arg1 0.25
+uniform double expected 0.75
+uniform double tolerance 0.0
+uniform int pick 3
+draw arrays GL_TRIANGLE_FAN 0 4
