@@ -111,7 +111,9 @@ run_test=./%(test_name)s
 ;backend=json
 
 ; Set the default compression method to use for results
-; May be one of: 'none', 'gz', 'bz2'
+; May be one of: 'none', 'gz', 'bz2', 'xz'
+; note: xz requires either the backports.lzma python module or an xz binary
+;
 ; Default: 'bz2'
 ;compression=bz2
 

@@ -218,3 +218,20 @@ def test_decompress_bz2():
 def test_bz2_output():
     """framework.backends: when using bz2 compression a bz2 file is created"""
     nt.eq_(_test_extension(), '.bz2')
+
+
+@utils.no_error
+def test_compress_xz():
+    """framework.backends.compression: can compress to 'xz'"""
+    _test_compressor('xz')
+
+
+def test_decompress_xz():
+    """framework.backends.compression: can decompress from 'xz'"""
+    _test_decompressor('xz')
+
+
+@_set_compression_mode('xz')
+def test_xz_output():
+    """framework.backends: when using xz compression a xz file is created"""
+    nt.eq_(_test_extension(), '.xz')
