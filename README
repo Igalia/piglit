@@ -45,6 +45,9 @@ Optionally, you can install the following:
   - lxml. An accelerated python xml library using libxml2 (http://lxml.de/)
   - simplejson. A fast C based implementation of the python json library.
     (https://simplejson.readthedocs.org/en/latest/)
+  - backports.lzma. A packport of python3's lzma module to python2,
+    this enables fast native xz (de)compression in piglit for results files
+    (https://github.com/peterjc/backports.lzma)
 
 Now configure the build system:
 
