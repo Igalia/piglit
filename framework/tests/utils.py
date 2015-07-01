@@ -391,7 +391,7 @@ def set_env(**envargs):
                 for key, value in backup.iteritems():
                     if value == "__DONOTRESTORE__" and key in os.environ:
                         del os.environ[key]
-                    else:
+                    elif value != '__DONOTRESTORE__':
                         os.environ[key] = value
 
         return _inner
