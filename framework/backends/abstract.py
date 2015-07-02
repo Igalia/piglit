@@ -188,7 +188,7 @@ class FileBackend(Backend):
             shutil.move(tfile, file_)
 
         file_ = os.path.join(self._dest, 'tests', '{}.{}'.format(
-            self.__counter.next(), self._file_extension))
+            next(self.__counter), self._file_extension))
 
         with open(file_, 'w') as f:
             self._write(f, name, self.__INCOMPLETE)
