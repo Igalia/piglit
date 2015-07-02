@@ -496,13 +496,14 @@ class Summary:
             self.__find_totals(each)
 
             with open(path.join(destination, name, "index.html"), 'w') as out:
-                out.write(testindex.render(name=each.name,
-                                           totals=self.totals,
-                                           time=time,
-                                           options=each.options,
-                                           uname=each.uname,
-                                           glxinfo=each.glxinfo,
-                                           lspci=each.lspci))
+                out.write(testindex.render_unicode(
+                    name=each.name,
+                    totals=self.totals,
+                    time=time,
+                    options=each.options,
+                    uname=each.uname,
+                    glxinfo=each.glxinfo,
+                    lspci=each.lspci))
 
             # Then build the individual test results
             for key, value in each.tests.iteritems():
@@ -521,7 +522,7 @@ class Summary:
                         value['time'] = datetime.timedelta(0, value['time'])
 
                     with open(html_path, 'w') as out:
-                        out.write(testfile.render(
+                        out.write(testfile.render_unicode(
                             testname=key,
                             value=value,
                             css=path.relpath(result_css, temp_path),
@@ -544,26 +545,28 @@ class Summary:
         # alltests, where the other pages all use the same name. ie,
         # changes.html, self.changes, and page=changes.
         with open(path.join(destination, "index.html"), 'w') as out:
-            out.write(index.render(results=HTMLIndex(self, self.tests['all']),
-                                   page='all',
-                                   pages=pages,
-                                   colnum=len(self.results),
-                                   exclude=exclude))
+            out.write(index.render_unicode(
+                results=HTMLIndex(self, self.tests['all']),
+                page='all',
+                pages=pages,
+                colnum=len(self.results),
+                exclude=exclude))
 
         # Generate the rest of the pages
         for page in pages:
             with open(path.join(destination, page + '.html'), 'w') as out:
                 # If there is information to display display it
                 if self.tests[page]:
-                    out.write(index.render(results=HTMLIndex(self,
-                                                             self.tests[page]),
-                                           pages=pages,
-                                           page=page,
-                                           colnum=len(self.results),
-                                           exclude=exclude))
+                    out.write(index.render_unicode(
+                        results=HTMLIndex(self, self.tests[page]),
+                        pages=pages,
+                        page=page,
+                        colnum=len(self.results),
+                        exclude=exclude))
                 # otherwise provide an empty page
                 else:
-                    out.write(empty_status.render(page=page, pages=pages))
+                    out.write(empty_status.render_unicode(page=page,
+                                                          pages=pages))
 
     def generate_text(self, mode):
         """ Write summary information to the console """
