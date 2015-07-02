@@ -196,6 +196,9 @@ class Status(object):
     def __int__(self):
         return self.value
 
+    def __hash__(self):
+        return hash(self.name)
+
 
 class NoChangeStatus(Status):
     """ Special sublcass of status that overides rich comparison methods
