@@ -279,7 +279,7 @@ run_index_subtest(const struct subtest_index_t st, bool *pass)
 		local_pass = false;
 	} else if (st.expected_error == GL_NO_ERROR) {
 		if (index >=0 && st.expect_value != 0) {
-			printf("Invalid index for '%s': expected INVALID_INDEX"
+			printf("Invalid index for '%s': expected INVALID_INDEX "
 			       "but got %i\n", st.name, index);
 			local_pass = false;
 		} else if (index == GL_INVALID_INDEX && st.expect_value != -1) {
