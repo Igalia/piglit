@@ -1,0 +1,36 @@
+# Test for linking error between vertex and fragment shaders
+# when interface fields are unmatching unsized arrays
+
+[require]
+GLSL >= 1.50
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#version 150
+#extension GL_ARB_arrays_of_arrays: enable
+out ArraysOfArraysBlock
+{
+  vec4 a[][3];
+} i;
+
+void main()
+{
+  i.a[2][2] = vec4(1.0);
+  gl_Position = vec4(1.0);
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_arrays_of_arrays: enable
+in ArraysOfArraysBlock
+{
+  vec4 a[][3];
+} i;
+
+void main()
+{
+  gl_FragColor = i.a[1][2];
+}
+
+[test]
+link error
