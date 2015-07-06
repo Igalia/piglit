@@ -24,7 +24,6 @@ from __future__ import print_function, absolute_import
 import sys
 import os
 import shutil
-import ConfigParser
 
 import nose.tools as nt
 
@@ -108,7 +107,7 @@ class _Helpers(TestWithEnvClean):
 
     def setup(self):
         # Set core.PIGLIT_CONFIG back to pristine between tests
-        core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
+        core.PIGLIT_CONFIG = core.PiglitConfig(allow_no_value=True)
 
 
 class TestBackend(_Helpers):

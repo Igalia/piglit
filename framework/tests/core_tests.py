@@ -26,7 +26,6 @@ import collections
 import shutil
 import textwrap
 import functools
-import ConfigParser
 
 import nose.tools as nt
 
@@ -66,8 +65,7 @@ def _save_core_config(func):
             if os.path.exists('piglit.conf'):
                 shutil.move('piglit.conf', 'piglit.conf.restore')
                 restore_piglitconf = True
-            core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser(
-                allow_no_value=True)
+            core.PIGLIT_CONFIG = core.PiglitConfig(allow_no_value=True)
         except Exception as e:
             raise utils.UtilsError(e)
 
