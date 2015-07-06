@@ -88,11 +88,6 @@ def _save_core_config(func):
     return inner
 
 
-def _reset_piglit_config():
-    """ Set core.PIGLIT_CONFIG back to pristine """
-    core.PIGLIT_CONFIG = core.PiglitConfig(allow_no_value=True)
-
-
 @utils.nose_generator
 def test_generate_initialize():
     """ Generator that creates tests to initialize all of the classes in core
