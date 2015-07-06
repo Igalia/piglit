@@ -57,7 +57,7 @@ def handler(func):
                   'BUG: {}'.format(str(e)),
                   file=sys.stderr)
             if _DEBUG:
-                raise e
+                raise
             sys.exit(1)
         except Exception as e:  # pylint: disable=broad-except
             print('Warning: A python exception that should have '
@@ -65,7 +65,7 @@ def handler(func):
                   'BUG: {}'.format(str(e)),
                   file=sys.stderr)
             if _DEBUG:
-                raise e
+                raise
             sys.exit(1)
 
     return _inner
