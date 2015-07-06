@@ -1242,6 +1242,41 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 }
 
 int
+piglit_probe_rects_equal(int x1, int y1, int x2, int y2,
+			int w, int h, GLenum format)
+{
+	int retval;
+	GLfloat *pixels;
+	int ncomponents, rect_size;
+
+	/* Allocate buffer large enough for two rectangles */
+	ncomponents = piglit_num_components(format);
+	rect_size = w * h * ncomponents;
+	pixels = malloc(2 * rect_size * sizeof(GLfloat));
+
+	/* Load the pixels into the buffer and compare */
+	/* We only need to do one glReadPixels if the images are adjacent */
+	if ((x1 + w) == x2 && y1 == y2) {
+		piglit_read_pixels_float(x1, y1, 2*w, h, format, pixels);
+		retval = piglit_compare_image_halves_color(2*w, h,
+						       ncomponents,
+						       piglit_tolerance,
+						       pixels);
+	} else {
+		piglit_read_pixels_float(x1, y1, w, h, format, pixels);
+		piglit_read_pixels_float(x2, y2, w, h, format,
+					pixels + rect_size);
+		retval = piglit_compare_images_color(0, 0, w, h,
+					       ncomponents,
+					       piglit_tolerance,
+					       pixels, pixels + rect_size);
+	}
+
+	free(pixels);
+	return retval;
+}
+
+int
 piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 {
 	int i, j, p;
@@ -1376,6 +1411,52 @@ piglit_compute_probe_tolerance(GLenum format, float *tolerance)
 			tolerance[component] = piglit_tolerance[component];
 		break;
 	}
+}
+
+int
+piglit_compare_pixels(int x, int y, const float *expected, const float *probe,
+			 const float *tolerance, int num_components)
+{
+	int p;
+
+	for (p = 0; p < num_components; ++p) {
+		if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+			printf("Probe at (%i,%i)\n", x, y);
+			printf("  Expected:");
+			print_pixel_float(expected, num_components);
+			printf("\n  Observed:");
+			print_pixel_float(probe, num_components);
+			printf("\n");
+
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+int
+piglit_compare_image_halves_color(int w, int h, int num_components,
+			    const float *tolerance,
+			    const float *image)
+{
+	int i, j, half_width;
+
+	half_width = w/2;
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < half_width; i++) {
+			const float *probe =
+				&image[(j*w+i)*num_components];
+			const float *expected =
+				&image[(j*w+half_width+i)*num_components];
+			if (!piglit_compare_pixels(i, j, expected, probe,
+						tolerance,
+						num_components))
+				return 0;
+		}
+	}
+
+	return 1;
 }
 
 /**

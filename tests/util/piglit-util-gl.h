@@ -142,6 +142,27 @@ int piglit_probe_rect_rgba(int x, int y, int w, int h, const float* expected);
 int piglit_probe_rect_rgba_int(int x, int y, int w, int h, const int* expected);
 int piglit_probe_rect_rgba_uint(int x, int y, int w, int h, const unsigned int* expected);
 void piglit_compute_probe_tolerance(GLenum format, float *tolerance);
+
+/**
+ * Compare two pixels.
+ * \param x the x coordinate of the pixel being probed
+ * \param y the y coordinate of the pixel being probed
+ */
+int piglit_compare_pixels(int x, int y, const float *expected, const float *probe,
+			 const float *tolerance, int num_components);
+
+/**
+ * Compare two adjacent in-memory floating-point images.
+ * Adjacent means: y1 == y2 && x1 == x2 - w;
+ *
+ * \param w the width of the rectangle containing both images
+ * \param h the height of the rectangle containing both images
+ * \param images : the start of the buffer containing the observed image on
+ *		the left and the expected image on the right
+ */
+int piglit_compare_image_halves_color(int w, int h, int num_components,
+			    const float *tolerance,
+			    const float *expected_observed_image);
 int piglit_compare_images_color(int x, int y, int w, int h, int num_components,
 				const float *tolerance,
 				const float *expected_image,
@@ -170,6 +191,16 @@ int piglit_probe_rect_depth(int x, int y, int w, int h, float expected);
 int piglit_probe_pixel_stencil(int x, int y, unsigned expected);
 int piglit_probe_rect_stencil(int x, int y, int w, int h, unsigned expected);
 int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h);
+
+/**
+ * \brief Check if two rectangles are equivalent
+ *
+ * Given the coordinates of two rectangles, check that the two are equal.
+ * The first rectangle is what's observed, whereas the second rectangle is
+ * what's expected.
+ */
+int piglit_probe_rects_equal(int x1, int y1, int x2, int y2,
+			int w, int h, GLenum format);
 
 bool piglit_probe_buffer(GLuint buf, GLenum target, const char *label,
 			 unsigned n, unsigned num_components,
