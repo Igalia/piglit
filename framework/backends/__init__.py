@@ -119,7 +119,9 @@ def load(file_path):
     """
     extension = None
 
-    if os.path.isfile(file_path):
+    # This should be 'not isdir', since an fd does not evaluate to True using
+    # 'os.path.isfile'
+    if not os.path.isdir(file_path):
         extension = os.path.splitext(file_path)[1]
         if not extension:
             extension = ''
