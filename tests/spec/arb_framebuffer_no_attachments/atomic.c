@@ -81,7 +81,7 @@ compare_counter(uint32_t value, const char *subtest)
 			__func__, subtest, value, *ptr);
 	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 	piglit_report_subtest_result(result ? PIGLIT_PASS : PIGLIT_FAIL,
-		subtest);
+		"%s", subtest);
 	return result;
 }
 
