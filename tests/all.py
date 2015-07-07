@@ -1057,6 +1057,7 @@ with profile.group_manager(
     g(['attribs'])
     g(['gl-2.0-edgeflag'])
     g(['gl-2.0-edgeflag-immediate'])
+    g(['gl-2.0-large-point-fs'])
     g(['gl-2.0-vertexattribpointer'])
     g(['gl-2.0-vertex-const-attr'])
     g(['attrib-assignments'], run_concurrent=False)
