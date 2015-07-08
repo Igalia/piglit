@@ -24,6 +24,8 @@
  *
  */
 
+#define CL_USE_DEPRECATED_OPENCL_1_1_APIS
+
 #include "piglit-framework-cl-api.h"
 
 PIGLIT_CL_API_TEST_CONFIG_BEGIN
