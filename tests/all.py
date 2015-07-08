@@ -2164,6 +2164,8 @@ with profile.group_manager(
            str(num_samples)],
           'builtin-gl-sample-mask-simple {}'.format(num_samples))
 
+    g(['arb_sample_shading-builtin-gl-sample-mask-mrt-alpha'])
+
 # Group ARB_debug_output
 with profile.group_manager(
         PiglitGLTest,
