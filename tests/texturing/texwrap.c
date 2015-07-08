@@ -1839,6 +1839,10 @@ outer_continue:;
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
 
 	if (texture_offset) {
+		if (texture_target != GL_TEXTURE_2D) {
+			printf("Offset tests only work with 2D textures.\n");
+			piglit_report_result(PIGLIT_SKIP);
+		}
 		piglit_require_GLSL_version(130);
 		fp = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fp_offset);
 		assert(fp);
@@ -1851,6 +1855,10 @@ outer_continue:;
 	switch (test->format[0].type) {
 	case INT_TYPE:
 	case UINT_TYPE:
+		if (texture_target != GL_TEXTURE_2D) {
+			printf("Integer tests only work with 2D textures.\n");
+			piglit_report_result(PIGLIT_SKIP);
+		}
 		piglit_require_GLSL_version(130);
 		fp = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fp_int);
 		assert(fp);
