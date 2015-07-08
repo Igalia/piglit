@@ -43,7 +43,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 GLuint prog, fbo;
 
-float green[] = {0,1,0,0};
+float green[] = {0,1,0};
 
 enum piglit_result
 piglit_display(void)
@@ -61,11 +61,11 @@ piglit_display(void)
 
 	glEnable(GL_DEPTH_TEST);
 
-	glBegin(GL_QUADS);
+	glBegin(GL_TRIANGLE_STRIP);
 		glVertex3f(-1.0f, -1.0f,  1.0f);
 		glVertex3f( 1.0f, -1.0f, -1.0f);
-		glVertex3f( 1.0f,  1.0f,  1.0f);
 		glVertex3f(-1.0f,  1.0f, -1.0f);
+		glVertex3f( 1.0f,  1.0f,  1.0f);
 	glEnd();
 
 	glDisable(GL_DEPTH_TEST);
@@ -81,7 +81,7 @@ piglit_display(void)
 
 	piglit_draw_rect(-1, -1, 2, 2);
 
-	pass = piglit_probe_rect_rgba(0, 0, TEX_WIDTH, TEX_HEIGHT, green) && pass;
+	pass = piglit_probe_rect_rgb(0, 0, TEX_WIDTH, TEX_HEIGHT, green) && pass;
 
 	piglit_present_results();
 
