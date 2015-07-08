@@ -80,11 +80,11 @@ main(int argc, char *argv[])
 	struct egl_test test;
 	const char *extensions[] = {"EGL_KHR_gl_colorspace", NULL};
 	const EGLint surface_linear[] = {
-		EGL_GL_COLORSPACE, EGL_GL_COLORSPACE_LINEAR,
+		EGL_GL_COLORSPACE_KHR, EGL_GL_COLORSPACE_LINEAR_KHR,
 		EGL_NONE
 	};
 	const EGLint surface_srgb[] = {
-		EGL_GL_COLORSPACE, EGL_GL_COLORSPACE_SRGB,
+		EGL_GL_COLORSPACE_KHR, EGL_GL_COLORSPACE_SRGB_KHR,
 		EGL_NONE
 	};
 	const EGLint test_attribs[] = {
