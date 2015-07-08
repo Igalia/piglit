@@ -26,6 +26,10 @@ __all__ = ['profile']
 
 
 def xts_render_filter(path, test):
+    # Keep any tests that aren't from xts.
+    if 'xts5' not in path:
+        return True
+
     # All of Xlib9 is for rendering.
     return 'xlib9' in path
 

@@ -161,10 +161,21 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
         self.result['images'] = self._process_log_for_images(log)
 
 
-def _populate_profile():
-    """ Populate the profile attribute """
-    # Add all tests to the profile
-    profile = XTSProfile()  # pylint: disable=redefined-outer-name
+class RendercheckTest(Test):
+    def __init__(self, args):
+        super(RendercheckTest, self).__init__(['rendercheck'] + args)
+        self.testname = "rendercheck " + " ".join(args)
+
+    def interpret_result(self):
+        if self.result['returncode'] == 0:
+            self.result['result'] = 'pass'
+        elif self.result['returncode'] == 77:
+            self.result['result'] = 'skip'
+        else:
+            self.result['result'] = 'fail'
+
+
+def _populate_profile_xts(profile):
     fpath = os.path.join(X_TEST_SUITE, 'xts5')
     for dirpath, _, filenames in os.walk(fpath):
         for fname in filenames:
@@ -192,6 +203,47 @@ def _populate_profile():
                             os.path.join(dirpath, testname),
                             testname,
                             num)
+
+
+def _add_rendercheck_test(profile, path, args):
+    test = RendercheckTest(args.split(' '))
+    group_path = 'rendercheck/' + path
+    group = grouptools.join(*(group_path.split('/')))
+    profile.test_list[group] = test
+
+
+def _populate_profile_rendercheck(profile):
+    _add_rendercheck_test(profile, 'blend/All/a8r8g8b8', '-t blend -f a8r8g8b8')
+    _add_rendercheck_test(profile, 'blend/All/x8r8g8b8', '-t blend -f a8r8g8b8,x8r8g8b8')
+    _add_rendercheck_test(profile, 'blend/All/a2r10g10b10', '-t blend -f a8r8g8b8,a2r10g10b10')
+    _add_rendercheck_test(profile, 'blend/Clear', '-t blend -o clear')
+    _add_rendercheck_test(profile, 'blend/Src', '-t blend -o src')
+    _add_rendercheck_test(profile, 'blend/Over', '-t blend -o over')
+    _add_rendercheck_test(profile, 'composite/All/a8r8g8b8', '-t composite -f a8r8g8b8')
+    _add_rendercheck_test(profile, 'composite/All/x8r8g8b8', '-t composite -f a8r8g8b8,x8r8g8b8')
+    _add_rendercheck_test(profile, 'composite/All/a2r10g10b10', '-t composite -f a8r8g8b8,a2r10g10b10')
+    _add_rendercheck_test(profile, 'ca composite/All/a8r8g8b8', '-t cacomposite -f a8r8g8b8')
+    _add_rendercheck_test(profile, 'ca composite/All/x8r8g8b8', '-t cacomposite -f a8r8g8b8,x8r8g8b8')
+    _add_rendercheck_test(profile, 'ca composite/All/a2r10g10b10', '-t cacomposite -f a8r8g8b8,a2r10g10b10')
+    _add_rendercheck_test(profile, 'fill', '-t fill')
+    _add_rendercheck_test(profile, 'bug7366', '-t bug7366')
+    _add_rendercheck_test(profile, 'destination coordinates', '-t dcoords')
+    _add_rendercheck_test(profile, 'source coordinates', '-t scoords')
+    _add_rendercheck_test(profile, 'mask coordinates', '-t mcoords')
+    _add_rendercheck_test(profile, 'translated source coordinates', '-t tscoords')
+    _add_rendercheck_test(profile, 'translated mask coordinates', '-t tmcoords')
+    _add_rendercheck_test(profile, 'triangles', '-t triangles')
+    _add_rendercheck_test(profile, 'LibreOffice xRGB', '-t libreoffice_xrgb')
+    _add_rendercheck_test(profile, 'GTK ARGB vs xBGR', '-t gtk_argb_xbgr')
+    _add_rendercheck_test(profile, 'large blend source', '-t large_blend_src')
+
+
+def _populate_profile():
+    """ Populate the profile attribute """
+    # Add all tests to the profile
+    profile = XTSProfile()  # pylint: disable=redefined-outer-name
+    _populate_profile_xts(profile)
+    _populate_profile_rendercheck(profile)
     return profile
 
 
