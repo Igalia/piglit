@@ -90,8 +90,18 @@ def html(input_):
     if path.exists(args.summaryDir) and args.overwrite:
         shutil.rmtree(args.summaryDir)
 
-    # If the requested directory doesn't exist, create it or throw an error
-    core.checkDir(args.summaryDir, not args.overwrite)
+    # If the directory exists and overwrite is specified, delete it so it can
+    # be recreated shortly after, if it is empty follow this path too. If the
+    # directory exists and is not empty, and args.overwite is Falsy, raise an
+    # exception and exit. Finally create the new directory
+    if os.path.exists(args.summaryDir):
+        if args.overwrite or not os.listdir(args.summaryDir):
+            shutil.rmtree(args.summaryDir)
+        else:
+            raise exceptions.PiglitFatalError(
+                'Results directory already exists and is not empty.\n'
+                'use -o/--overwrite to force.')
+    os.mkdir(args.summaryDir)
 
     # Merge args.list and args.resultsFiles
     if args.list:

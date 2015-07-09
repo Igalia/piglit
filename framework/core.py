@@ -23,11 +23,9 @@
 # Piglit core
 
 from __future__ import print_function, absolute_import
-import errno
 import os
 import re
 import subprocess
-import sys
 import ConfigParser
 
 from framework import exceptions
@@ -112,27 +110,6 @@ def get_config(arg=None):
                 break
             except IOError:
                 pass
-
-
-# Ensure the given directory exists
-def checkDir(dirname, failifexists):
-    exists = True
-    try:
-        os.stat(dirname)
-    except OSError as e:
-        if e.errno == errno.ENOENT or e.errno == errno.ENOTDIR:
-            exists = False
-
-    if exists and failifexists:
-        print("%(dirname)s exists already.\nUse --overwrite if "
-              "you want to overwrite it.\n" % locals(), file=sys.stderr)
-        exit(1)
-
-    try:
-        os.makedirs(dirname)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
 
 
 class Options(object):
