@@ -284,6 +284,9 @@ piglit_display(void)
 	glGetIntegerv(GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS, &max_combined);
 	glGetIntegerv(GL_MAX_COMBINED_SHADER_OUTPUT_RESOURCES, &max_combined_out);
 
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+	  return PIGLIT_FAIL;
+
 	printf("Max VS shader storage blocks: %d\n", max_vs);
 	printf("Max FS shader storage blocks: %d\n", max_fs);
 	printf("Max combined shader storage blocks: %d\n", max_combined);
