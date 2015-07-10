@@ -119,6 +119,10 @@ piglit_display(void)
 		width = height = depth = 0;
 		find_max_tex3d_size(maxsize, &width, &height, &depth);
 
+		printf("Max 3D texture size: %d x %d x %d\n",
+		       width, height, depth);
+		fflush(stdout);
+
 		glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, width, height, depth, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		err = glGetError();
