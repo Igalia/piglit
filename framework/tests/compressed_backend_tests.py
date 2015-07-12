@@ -235,3 +235,16 @@ def test_decompress_xz():
 def test_xz_output():
     """framework.backends: when using xz compression a xz file is created"""
     nt.eq_(_test_extension(), '.xz')
+
+
+@_add_compression('foobar')
+@utils.set_env(PIGLIT_COMPRESSION=None)
+@utils.set_piglit_conf(('core', 'compression', 'foobar'))
+def test_update_piglit_conf():
+    """framework.backends.compression: The compression mode honors updates to piglit.conf.
+
+    the values in piglit.conf are subject to change. And the default
+    compression mode needs to be changed with them.
+
+    """
+    nt.eq_(compression.MODE, 'foobar')
