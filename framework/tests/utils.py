@@ -42,7 +42,6 @@ from nose.plugins.skip import SkipTest
 
 from framework import test, backends, results, core
 
-
 __all__ = [
     'tempfile',
     'resultfile',
@@ -80,6 +79,8 @@ JSON_DATA = {
         })
     })
 }
+
+_SAVED_COMPRESSION = os.environ.get('PIGLIT_COMPRESSION')
 
 
 class TestFailure(AssertionError):
@@ -453,3 +454,27 @@ def set_piglit_conf(*values):
 
         return _inner
     return _decorator
+
+
+def set_compression(mode):
+    """lock piglit compression mode to specifed value.
+
+    Meant to be called from setup_module function.
+
+    """
+    # The implimentation details of this is that the environment value is the
+    # first value looked at for setting compression, so if it's set all other
+    # values will be ignored.
+    os.environ['PIGLIT_COMPRESSION'] = mode
+
+
+def unset_compression():
+    """Restore compression to the origonal value.
+
+    Counterpart to set_compression. Should be called from teardown_module.
+
+    """
+    if _SAVED_COMPRESSION is not None:
+        os.environ['PIGLIT_COMPRESSION'] = _SAVED_COMPRESSION
+    else:
+        del os.environ['PIGLIT_COMPRESSION']
