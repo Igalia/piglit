@@ -33,13 +33,12 @@ import nose.tools as nt
 
 import framework.tests.utils as utils
 from framework import backends, results
-from framework.backends import compression
 
 # Disable some errors that cannot be fixed either because tests need to probe
 # protected members, or because of nose requirements, like long lines
 # pylint: disable=protected-access,invalid-name,line-too-long
 
-_SAVED_COMPRESSION = compression.MODE
+_SAVED_COMPRESSION = os.environ.get('PIGLIT_COMPRESSON')
 
 
 def setup_module():
@@ -47,13 +46,16 @@ def setup_module():
     # ensure that we're not getting unexpected file extensions. This means that
     # the default can be changed, or environment variables set without
     # affecting unit tests
-    compression.MODE = 'none'
-    compression.COMPRESSOR = compression.COMPRESSORS['none']
+    # We set PIGLIT_COMPRESSION because it is the first value to checked when
+    # setting a compressor
+    os.environ['PIGLIT_COMPRESSION'] = 'none'
 
 
 def teardown_module():
-    compression.MODE = _SAVED_COMPRESSION
-    compression.COMPRESSOR = compression.COMPRESSORS[_SAVED_COMPRESSION]
+    if _SAVED_COMPRESSION is not None:
+        os.environ['PIGLIT_COMPRESSION'] = _SAVED_COMPRESSION
+    else:
+        del os.environ['PIGLIT_COMPRESSION']
 
 
 class TestV0toV1(object):

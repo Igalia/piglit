@@ -35,7 +35,6 @@ from nose.plugins.skip import SkipTest
 from framework import results, backends, grouptools, status
 import framework.tests.utils as utils
 from .backends_tests import BACKEND_INITIAL_META
-from framework.backends import compression
 
 
 JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'
@@ -54,7 +53,7 @@ _XML = """\
   </testsuites>
 """
 
-_SAVED_COMPRESSION = compression.MODE
+_SAVED_COMPRESSION = os.environ.get('PIGLIT_COMPRESSON')
 
 
 def setup_module():
@@ -62,13 +61,16 @@ def setup_module():
     # ensure that we're not getting unexpected file extensions. This means that
     # the default can be changed, or environment variables set without
     # affecting unit tests
-    compression.MODE = 'none'
-    compression.COMPRESSOR = compression.COMPRESSORS['none']
+    # We set PIGLIT_COMPRESSION because it is the first value to checked when
+    # setting a compressor
+    os.environ['PIGLIT_COMPRESSION'] = 'none'
 
 
 def teardown_module():
-    compression.MODE = _SAVED_COMPRESSION
-    compression.COMPRESSOR = compression.COMPRESSORS[_SAVED_COMPRESSION]
+    if _SAVED_COMPRESSION is not None:
+        os.environ['PIGLIT_COMPRESSION'] = _SAVED_COMPRESSION
+    else:
+        del os.environ['PIGLIT_COMPRESSION']
 
 
 class TestJunitNoTests(utils.StaticDirectory):

@@ -81,31 +81,6 @@ def _add_compression(value):
     return _wrapper
 
 
-def _set_compression_mode(mode):
-    """Change the compression mode for one test."""
-
-    def _wrapper(func):
-        """The actual decorator."""
-
-        @functools.wraps(func)
-        @utils.set_env(PIGLIT_COMPRESSION=mode)
-        def _inner(*args, **kwargs):
-            """The called function."""
-            restore = compression.MODE
-            compression.MODE = compression._set_mode()
-            compression.COMPRESSOR = compression.COMPRESSORS[compression.MODE]
-
-            try:
-                func(*args, **kwargs)
-            finally:
-                compression.MODE = restore
-                compression.COMPRESSOR = compression.COMPRESSORS[compression.MODE]
-
-        return _inner
-
-    return _wrapper
-
-
 def _test_compressor(mode):
     """Helper to simplify testing compressors."""
     func = compression.COMPRESSORS[mode]
@@ -166,24 +141,24 @@ def test_decompress_none():
 
 @_add_compression('foobar')
 @utils.set_env(PIGLIT_COMPRESSION='foobar')
-def test_set_mode_env():
-    """framework.backends.compression._set_mode: uses PIGlIT_COMPRESSION environment variable"""
-    nt.eq_(compression._set_mode(), 'foobar')
+def testget_mode_env():
+    """framework.backends.compression.get_mode: uses PIGlIT_COMPRESSION environment variable"""
+    nt.eq_(compression.get_mode(), 'foobar')
 
 
 @_add_compression('foobar')
 @utils.set_env(PIGLIT_COMPRESSION=None)
 @utils.set_piglit_conf(('core', 'compression', 'foobar'))
-def test_set_mode_piglit_conf():
-    """framework.backends.compression._set_mode: uses piglit.conf [core]:compression value if env is unset"""
-    nt.eq_(compression._set_mode(), 'foobar')
+def testget_mode_piglit_conf():
+    """framework.backends.compression.get_mode: uses piglit.conf [core]:compression value if env is unset"""
+    nt.eq_(compression.get_mode(), 'foobar')
 
 
 @utils.set_env(PIGLIT_COMPRESSION=None)
 @utils.set_piglit_conf(('core', 'compression', None))
-def test_set_mode_default():
-    """framework.backends.compression._set_mode: uses DEFAULT if env and piglit.conf are unset"""
-    nt.eq_(compression._set_mode(), compression.DEFAULT)
+def testget_mode_default():
+    """framework.backends.compression.get_mode: uses DEFAULT if env and piglit.conf are unset"""
+    nt.eq_(compression.get_mode(), compression.DEFAULT)
 
 
 @utils.no_error
@@ -197,7 +172,7 @@ def test_decompress_gz():
     _test_decompressor('gz')
 
 
-@_set_compression_mode('gz')
+@utils.set_env(PIGLIT_COMPRESSION='gz')
 def test_gz_output():
     """framework.backends: when using gz compression a gz file is created"""
     nt.eq_(_test_extension(), '.gz')
@@ -214,7 +189,7 @@ def test_decompress_bz2():
     _test_decompressor('bz2')
 
 
-@_set_compression_mode('bz2')
+@utils.set_env(PIGLIT_COMPRESSION='bz2')
 def test_bz2_output():
     """framework.backends: when using bz2 compression a bz2 file is created"""
     nt.eq_(_test_extension(), '.bz2')
@@ -231,7 +206,7 @@ def test_decompress_xz():
     _test_decompressor('xz')
 
 
-@_set_compression_mode('xz')
+@utils.set_env(PIGLIT_COMPRESSION='xz')
 def test_xz_output():
     """framework.backends: when using xz compression a xz file is created"""
     nt.eq_(_test_extension(), '.xz')
@@ -247,4 +222,4 @@ def test_update_piglit_conf():
     compression mode needs to be changed with them.
 
     """
-    nt.eq_(compression.MODE, 'foobar')
+    nt.eq_(compression.get_mode(), 'foobar')

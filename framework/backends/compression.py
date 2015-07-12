@@ -22,22 +22,18 @@
 
 This includes both compression and decompression support.
 
-The primary way to interact with this module should be through the use of the
-COMPRESSORS and DECOMPRESSORS constants.
-
-These constants provide a dictionary
-mapping text representations of the compression methods to functions that
-should be called as context managers using the filename as the only argument.
-
-For example:
-with COMPRESSORS['none'] as f:
-    f.write('foobar')
-
-COMPRESSOR provides a convenience method for getting the default compressor,
-although COMPRESSORS is available, for more advanced uses.
+This provides a low level interface of dictionaries, COMPRESSORS and
+DECOMPRESSORS, which use compression modes ('bz2', 'gz', 'xz', 'none') to
+provide open-like functions with correct mode settings for writing or reading,
+respectively.
 
 They should always take unicode objects. It is up to the caller to ensure that
 they're passing unicode and not bytes.
+
+A helper, get_mode(), is provided to return the user selected mode (it will try
+the PIGLIT_COMPRESSION environment variable, then the piglit.conf
+[core]:compression key, and finally the value of compression.DEFAULT). This is
+the best way to get a compressor.
 
 """
 
@@ -51,6 +47,22 @@ import subprocess
 
 from framework import exceptions
 from framework.core import PIGLIT_CONFIG
+
+__all__ = [
+    'UnsupportedCompressor',
+    'COMPRESSORS',
+    'DECOMPRESSORS',
+    'get_mode',
+]
+
+
+class UnsupportedCompressor(exceptions.PiglitInternalError):
+    def __init__(self, method, *args, **kwargs):
+        super(UnsupportedCompressor, self).__init__(*args, **kwargs)
+        self.__method = method
+
+    def __str__(self):
+        return 'unsupported compression method {}'.format(self.__method)
 
 
 # TODO: in python3 the bz2 module has an open function
@@ -159,28 +171,26 @@ except ImportError:
         pass
 
 
-def _set_mode():
-    """Set the compression mode.
+def get_mode():
+    """Return the key value of the correct compressor to use.
 
     Try the environment variable PIGLIT_COMPRESSION; then check the
     PIGLIT_CONFIG section 'core', option 'compression'; finally fall back to
     DEFAULT.
 
+    This will raise an UnsupportedCompressionError if there isn't a compressor
+    for that mode. It is the job of the caller to handle this exceptions
+
     """
+    # This is provided as a function rather than a constant because as a
+    # function it can honor changes to the PIGLIT_CONFIG instance, or the
+    # PIGLIT_COMPRESSION environment variable.
+
     method = (os.environ.get('PIGLIT_COMPRESSION') or
               PIGLIT_CONFIG.safe_get('core', 'compression') or
               DEFAULT)
 
     if method not in COMPRESSORS:
-        raise exceptions.PiglitFatalError(
-            'unsupported compression method {}'.format(method))
-    if method not in DECOMPRESSORS:
-        raise exceptions.PiglitFatalError(
-            'unsupported decompression method {}'.format(method))
+        raise UnsupportedCompressor(method)
 
     return method
-
-
-MODE = _set_mode()
-
-COMPRESSOR = COMPRESSORS[MODE]

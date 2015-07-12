@@ -47,10 +47,11 @@ def write_compressed(filename):
     Currently it implements no compression
 
     """
-    if compression.MODE != 'none':
-        filename = '{}.{}'.format(filename, compression.MODE)
+    mode = compression.get_mode()
+    if mode != 'none':
+        filename = '{}.{}'.format(filename, mode)
 
-    with compression.COMPRESSOR(filename) as f:
+    with compression.COMPRESSORS[mode](filename) as f:
         yield f
 
 
