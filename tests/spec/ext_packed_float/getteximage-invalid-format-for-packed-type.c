@@ -80,6 +80,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#define TEXSIZE 4
+
+
 /* For simplicity, we are only testing the following types: */
 static const GLenum testedTypes[] = {
 	GL_UNSIGNED_BYTE_3_3_2,
@@ -110,7 +113,7 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 subtest(GLenum format, GLenum type)
 {
-	GLfloat pxBuffer[4];
+	GLfloat pxBuffer[TEXSIZE * TEXSIZE * 4];
 	enum piglit_result result;
 
 	glGetTexImage(GL_TEXTURE_2D, 0, format, type, pxBuffer);
@@ -140,6 +143,16 @@ piglit_display(void)
 	int i, j;
 	enum piglit_result result = PIGLIT_PASS;
 	enum piglit_result subtest_result;
+	GLuint tex;
+	GLfloat texData[TEXSIZE][TEXSIZE][3];
+
+	memset(texData, 0, sizeof(texData));
+
+	/* Setup a packed float texture (contents not significant) */
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F_EXT,
+		     TEXSIZE, TEXSIZE, 0, GL_RGB, GL_FLOAT, texData);
 
 	for (j = 0; j < ARRAY_SIZE(testedTypes); j++) {
 		for (i = 0; i < ARRAY_SIZE(formatTypes); i++) {
