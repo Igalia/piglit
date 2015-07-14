@@ -2515,6 +2515,13 @@ with profile.group_manager(
         'GL_DEPTH32F_STENCIL8', 0)
 
 with profile.group_manager(
+        PiglitGLTest, grouptools.join('spec', 'arb_get_texture_sub_image')) as g:
+    g(['arb_get_texture_sub_image-cubemap'])
+    g(['arb_get_texture_sub_image-errors'])
+    g(['arb_get_texture_sub_image-get'])
+    g(['arb_get_texture_sub_image-getcompressed'])
+
+with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_env_crossbar')) as g:
     g(['crossbar'], run_concurrent=False)
