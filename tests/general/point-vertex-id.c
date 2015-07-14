@@ -31,9 +31,10 @@
  *
  * Specify gl_VertexID or gl_InstanceID as an argument to specify
  * which to test. Alternatively you can specify both in order to test
- * a combination of both.
+ * a combination of both. Additionally ‘divisor’ can be specified to
+ * make it use an instanced array.
  *
- * See bug #84677
+ * See bug #84677 and #91292
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -54,6 +55,10 @@ vertex_shader[] =
 	"in vec2 pos;\n"
 	"#endif"
 	"\n"
+	"#ifdef USE_DIVISOR\n"
+	"in vec2 triangle_offset;\n"
+	"#endif\n"
+	"\n"
 	"void\n"
 	"main()\n"
 	"{\n"
@@ -62,7 +67,14 @@ vertex_shader[] =
 	"#endif\n"
 	"        gl_Position = vec4(pos, 0.0, 1.0);\n"
 	"#ifdef USE_INSTANCE_ID\n"
-	"        gl_Position.t += float(gl_InstanceID) * 20.0;\n"
+	"        float instance_offset = 20.0;\n"
+	"#ifdef USE_DIVISOR\n"
+	"        instance_offset = 10.0;\n"
+	"#endif\n"
+	"        gl_Position.t += float(gl_InstanceID) * instance_offset;\n"
+	"#endif\n"
+	"#ifdef USE_DIVISOR\n"
+	"        gl_Position.st += triangle_offset;\n"
 	"#endif\n"
 	"        gl_Position.st = ((gl_Position.st + 0.5) * 2.0 /\n"
 	"                          viewport_size - 1.0);\n"
@@ -77,6 +89,7 @@ struct vertex {
 enum test_mode_flags {
 	TEST_MODE_VERTEX_ID = (1 << 0),
 	TEST_MODE_INSTANCE_ID = (1 << 1),
+	TEST_MODE_DIVISOR = (1 << 2),
 };
 
 static enum test_mode_flags test_modes;
@@ -93,7 +106,7 @@ vertices[] = {
 	{ 30, 20, GL_FALSE },
 	/* Copy of the above two triangles but shifted up by 20. If
 	 * instanced rendering is used these will be generated based
-	 * on the gl_InstanceID instead.
+	 * on the gl_InstanceID or an instanced array instead.
 	 */
 	{ 10, 30, GL_TRUE },
 	{ 20, 30, GL_TRUE },
@@ -101,6 +114,25 @@ vertices[] = {
 	{ 30, 30, GL_FALSE },
 	{ 40, 30, GL_FALSE },
 	{ 30, 40, GL_FALSE },
+};
+
+/* If a divisor is set then each pair of triangles will be drawn as an
+ * instance and these offsets will be added to each instance.
+ */
+static const struct vertex
+triangle_offsets[] = {
+	{ 0, 0 },
+	{ 0, 20 },
+};
+
+/* If both the divisor and the instance id is used then these offsets
+ * will be used instead. The remainder of the offset will be added by
+ * the instance ID.
+ */
+static const struct vertex
+triangle_offsets_with_instance_id[] = {
+	{ 0, 0 },
+	{ 0, 10 },
 };
 
 enum piglit_result
@@ -119,6 +151,8 @@ piglit_display(void)
 		       "#extension GL_ARB_draw_instanced : require\n"
 		       "#define USE_INSTANCE_ID\n");
 	}
+	if (test_modes & TEST_MODE_DIVISOR)
+		strcat(shader_buf, "#define USE_DIVISOR\n");
 	if (test_modes & TEST_MODE_VERTEX_ID)
 		strcat(shader_buf, "#define USE_VERTEX_ID\n");
 	strcat(shader_buf, vertex_shader);
@@ -161,9 +195,25 @@ piglit_display(void)
 				      &vertices[0].x);
 	}
 
+	if (test_modes & TEST_MODE_DIVISOR) {
+		pos_location = glGetAttribLocation(program, "triangle_offset");
+		if (pos_location == -1)
+			piglit_report_result(PIGLIT_FAIL);
+		glEnableVertexAttribArray(pos_location);
+		glVertexAttribDivisor(pos_location, 1);
+		glVertexAttribPointer(pos_location,
+				      2, /* size */
+				      GL_INT,
+				      GL_FALSE, /* normalized */
+				      sizeof (struct vertex),
+				      (test_modes & TEST_MODE_INSTANCE_ID) ?
+				      &triangle_offsets_with_instance_id[0].x :
+				      &triangle_offsets[0].x);
+	}
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
-	if ((test_modes & TEST_MODE_INSTANCE_ID)) {
+	if (test_modes & (TEST_MODE_INSTANCE_ID | TEST_MODE_DIVISOR)) {
 		glDrawArraysInstanced(GL_TRIANGLES,
 				      0, /* first */
 				      ARRAY_SIZE(vertices) / 2,
@@ -173,9 +223,6 @@ piglit_display(void)
 			     0, /* first */
 			     ARRAY_SIZE(vertices));
 	}
-
-	if (!(test_modes & TEST_MODE_VERTEX_ID))
-		glDisableVertexAttribArray(pos_location);
 
 	ref_image = malloc(piglit_width * piglit_height * 3 *
 			   sizeof (float));
@@ -211,6 +258,8 @@ piglit_init(int argc, char **argv)
 			test_modes |= TEST_MODE_VERTEX_ID;
 		} else if (!strcmp(argv[i], "gl_InstanceID")) {
 			test_modes |= TEST_MODE_INSTANCE_ID;
+		} else if (!strcmp(argv[i], "divisor")) {
+			test_modes |= TEST_MODE_DIVISOR;
 		} else {
 			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
 			piglit_report_result(PIGLIT_FAIL);
@@ -219,14 +268,16 @@ piglit_init(int argc, char **argv)
 
 	if (test_modes == 0) {
 		fprintf(stderr,
-			"usage: point-vertex-id [gl_VertexID] [gl_InstanceID]\n"
-			"Either one or both of the arguments must be "
-			"specified\n");
+			"usage: point-vertex-id [gl_VertexID] [gl_InstanceID] "
+			"[divisor]\n"
+			"At least one of the arguments must be specified\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	if ((test_modes & TEST_MODE_INSTANCE_ID))
+	if (test_modes & (TEST_MODE_INSTANCE_ID | TEST_MODE_DIVISOR))
 		piglit_require_extension("GL_ARB_draw_instanced");
+	if (test_modes & TEST_MODE_DIVISOR)
+		piglit_require_extension("GL_ARB_instanced_arrays");
 
 	piglit_require_GLSL_version(130);
 }
