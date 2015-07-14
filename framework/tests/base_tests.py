@@ -57,7 +57,7 @@ def test_run_return_early():
 
 def test_timeout():
     """test.base.Test.run(): kills tests that exceed timeout when set"""
-    utils.binary_check('sleep')
+    utils.binary_check('sleep', 1)
 
     def helper():
         if (test.result['returncode'] == 0):

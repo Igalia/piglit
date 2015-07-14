@@ -32,6 +32,7 @@ import shutil
 import tempfile as tempfile_
 import functools
 import subprocess
+import errno
 from contextlib import contextmanager
 
 try:
@@ -276,13 +277,26 @@ def privileged_test(func):
     return func
 
 
-def binary_check(bin_):
-    """Check for the existance of a binary or raise SkipTest."""
+def binary_check(bin_, errno_=None):
+    """Check for the existance of a binary or raise SkipTest.
+
+    If an errno_ is provided then a skip test will be raised unless the error
+    number provided is raised, or no error is raised.
+
+    """
     with open(os.devnull, 'w') as null:
         try:
-            subprocess.check_call(['which', bin_], stdout=null, stderr=null)
-        except subprocess.CalledProcessError:
-            raise SkipTest('Binary {} not available'.format(bin_))
+            subprocess.check_call([bin_], stdout=null, stderr=null)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                raise SkipTest('Binary {} not available'.format(bin_))
+        except subprocess.CalledProcessError as e:
+            if errno_ is not None and e.returncode == errno_:
+                pass
+            else:
+                raise SkipTest(
+                    'Binary provided bad returncode of {} (wanted {})'.format(
+                        e.returncode, errno_))
 
 
 def platform_check(plat):
