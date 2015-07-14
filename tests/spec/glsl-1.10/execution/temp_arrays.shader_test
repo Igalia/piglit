@@ -1,0 +1,57 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+
+/**
+ * This test exercises arrays indexed with a variable.
+ * We test with two arrays to be sure at least one is positioned
+ * above TEMP[0].
+ */
+
+uniform float one;
+uniform int writeIndex;
+uniform int readIndex;
+varying vec4 color;
+void main()
+{
+	// Setup two arrays
+	vec4 a1[5], a2[5];
+
+	a1[0] = vec4(0.0, 0.0, 0.0, 0.0);
+	a1[1] = vec4(0.0, 0.0, 0.0, 0.0);
+	a1[2] = vec4(0.0, 0.0, 0.0, 0.0);
+	a1[3] = vec4(0.0, 0.0, 0.0, 0.0);
+	a1[4] = vec4(0.0, 0.0, 0.0, 0.0);
+
+	a2[0] = vec4(0.0, 0.0, 0.0, 0.0);
+	a2[1] = vec4(0.0, 0.0, 0.0, 0.0);
+	a2[2] = vec4(0.0, 0.0, 0.0, 0.0);
+	a2[3] = vec4(0.0, 0.0, 0.0, 0.0);
+	a2[4] = vec4(0.0, 0.0, 0.25, 0.0);
+
+	gl_Position = gl_Vertex;
+
+	// write to the arrays
+	a1[writeIndex] = vec4(1.0, 0.25, 0.0, 1.0);
+	a2[writeIndex] = vec4(1.0, 0.25, 0.75, 1.0);
+
+	// add array elements
+	color = a1[readIndex] + a2[readIndex] + a2[4];
+}
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform int readIndex 1
+uniform int writeIndex 1
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.5, 1.0, 1.0)
+relative probe rgb (1.0, 0.0) (1.0, 0.5, 1.0, 1.0)
+relative probe rgb (0.0, 1.0) (1.0, 0.5, 1.0, 1.0)
+relative probe rgb (1.0, 1.0) (1.0, 0.5, 1.0, 1.0)
