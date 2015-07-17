@@ -17,5 +17,6 @@ piglit_add_executable (arb_gpu_shader5-interpolateAtCentroid-centroid interpolat
 piglit_add_executable (arb_gpu_shader5-interpolateAtCentroid-noperspective interpolateAtCentroid-noperspective.c)
 piglit_add_executable (arb_gpu_shader5-interpolateAtSample interpolateAtSample.c)
 piglit_add_executable (arb_gpu_shader5-interpolateAtSample-nonconst interpolateAtSample-nonconst.c)
+piglit_add_executable (arb_gpu_shader5-interpolateAtSample-different interpolateAtSample-different.c)
 piglit_add_executable (arb_gpu_shader5-interpolateAtOffset interpolateAtOffset.c)
 piglit_add_executable (arb_gpu_shader5-interpolateAtOffset-nonconst interpolateAtOffset-nonconst.c)
