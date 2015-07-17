@@ -28,7 +28,6 @@ import os.path as path
 import time
 import ConfigParser
 import ctypes
-import shutil
 
 from framework import core, backends, exceptions
 import framework.results
@@ -266,9 +265,7 @@ def run(input_):
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
-    if os.path.exists(args.results_path):
-        shutil.rmtree(args.results_path)
-    os.mkdir(args.results_path)
+    core.checkDir(args.results_path, False)
 
     results = framework.results.TestrunResult()
     backends.set_meta(args.backend, results)
