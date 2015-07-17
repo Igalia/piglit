@@ -186,7 +186,7 @@ def load_results(filename, compression_):
         # Look for a compressed result first, then a bare result, finally for
         # an old main file
         for name in ['results.json.{}'.format(compression_),
-                     'results.json', 
+                     'results.json',
                      'main']:
             if os.path.exists(os.path.join(filename, name)):
                 filepath = os.path.join(filename, name)
@@ -214,7 +214,7 @@ def _load(results_file):
     """Load a json results instance and return a TestrunResult.
 
     This function converts an existing, fully completed json run.
-    
+
     """
     result = results.TestrunResult()
     result.results_version = 0  # This should get overwritten
@@ -317,7 +317,7 @@ def _update_results(results, filepath):
 def _write(results, file_):
     """WRite the values of the results out to a file."""
     with write_compressed(file_) as f:
-        json.dump({k:v for k, v in results.__dict__.iteritems()},
+        json.dump({k: v for k, v in results.__dict__.iteritems()},
                   f,
                   default=piglit_encoder,
                   indent=INDENT)
@@ -355,8 +355,8 @@ def _update_zero_to_one(results):
         #
         # This expects that the order of info is rougly returncode, errors,
         # output, *extra it can handle having extra information in the middle,
-        if (None in [test.get('out'), test.get('err'), test.get('returncode')]
-                and test.get('info')):
+        if (None in [test.get('out'), test.get('err'),
+                     test.get('returncode')] and test.get('info')):
 
             # This attempts to split everything before Errors: as a returncode,
             # and everything before Output: as Errors, and everything else as
@@ -517,7 +517,7 @@ def _update_three_to_four(results):
     return results
 
 
-def _update_four_to_five(results):                                                                                                    
+def _update_four_to_five(results):
     """Updates json results from version 4 to version 5."""
     new_tests = {}
 
