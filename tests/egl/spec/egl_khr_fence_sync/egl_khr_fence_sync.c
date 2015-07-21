@@ -67,7 +67,6 @@ EGLint (*peglWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
 EGLBoolean (*peglGetSyncAttribKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint attribute, EGLint *value);
 
 static const char *prog_name;
-static const struct piglit_subtest subtests[];
 
 static const EGLint canary = 0x31415926;
 static EGLDisplay g_dpy = 0;
