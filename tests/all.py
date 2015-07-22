@@ -2076,6 +2076,7 @@ with profile.group_manager(
     g(['arb_gpu_shader5-interpolateAtSample-nonconst'])
     g(['arb_gpu_shader5-interpolateAtSample-different'])
     g(['arb_gpu_shader5-interpolateAtSample-different', 'uniform'])
+    g(['arb_gpu_shader5-interpolateAtSample-dynamically-nonuniform'])
     g(['arb_gpu_shader5-interpolateAtOffset'])
     g(['arb_gpu_shader5-interpolateAtOffset-nonconst'])
 
