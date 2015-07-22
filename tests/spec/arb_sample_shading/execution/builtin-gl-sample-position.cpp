@@ -69,7 +69,7 @@ compile_shader(void)
 		"#version 130\n"
 		"#extension GL_ARB_sample_shading : enable\n"
 		"uniform int samples;\n"
-		"uniform vec2 expected_pos["MAX_NUM_SAMPLES_STR"];\n"
+		"uniform vec2 expected_pos[" MAX_NUM_SAMPLES_STR "];\n"
 		"out vec4 out_color;\n"
 		"void main()\n"
 		"{\n"
