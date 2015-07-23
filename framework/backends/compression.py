@@ -125,7 +125,10 @@ except ImportError:
                     yield f
 
                 try:
-                    subprocess.check_call(['xz', '--compress', '-9', filename])
+                    with open(os.devnull, 'w') as null:
+                        subprocess.check_call(
+                            ['xz', '--compress', '-9', filename],
+                            stderr=null)
                 except OSError as e:
                     if e.errno == errno.ENOENT:
                         raise exceptions.PiglitFatalError(
@@ -146,8 +149,10 @@ except ImportError:
                     filename = '{}.xz'.format(filename)
 
                 try:
-                    string = subprocess.check_output(
-                        ['xz', '--decompress', '--stdout', filename])
+                    with open(os.devnull, 'w') as null:
+                        string = subprocess.check_output(
+                            ['xz', '--decompress', '--stdout', filename],
+                            stderr=null)
                 except OSError as e:
                     if e.errno == errno.ENOENT:
                         raise exceptions.PiglitFatalError(
