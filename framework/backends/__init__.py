@@ -135,7 +135,9 @@ def load(file_path):
             # i.e: Use .json.gz rather that .gz
             if extension in COMPRESSION_SUFFIXES:
                 compression = extension[1:]  # Drop the leading '.'
-                extension = os.path.splitext(name)[1]
+                # Remove any trailing '.', this fixes a bug where the filename
+                # is 'foo.json..xz, or similar
+                extension = os.path.splitext(name.rstrip('.'))[1]
 
             return extension, compression
 

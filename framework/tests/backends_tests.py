@@ -197,3 +197,18 @@ def test_set_meta_notimplemented():
     """backends.load(): An error is raised if a set_meta isn't properly implmented.
     """
     backends.set_meta('test_backend', {})
+
+
+@nt.with_setup(_notimplemented_setup, _registry_teardown)
+@nt.raises(backends.BackendNotImplementedError)
+@utils.not_raises(backends.BackendError)
+def test_load_trailing_dot():
+    """framework.backends.load: handles the result name ending in '.'
+
+    Basically if this reaches a BackendNotImplementedError, then the '.' was
+    handled correctly, otherwise if it's '.' then we should reach the
+    BackendError, which is incorrect.
+    
+    """
+    backends.load('foo.test_backend..gz')
+
