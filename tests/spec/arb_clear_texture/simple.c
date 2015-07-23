@@ -126,7 +126,6 @@ piglit_display(void)
 	piglit_draw_rect_tex(64, 0, 64, 64, 0, 0, 1, 1);
 
 	glDisable(GL_TEXTURE_2D);
-	glDeleteTextures(2, texture);
 
 	/* Check for the 3 separate regions */
 	pass &= piglit_probe_rect_rgb(0, 0, 64, 64, green);
