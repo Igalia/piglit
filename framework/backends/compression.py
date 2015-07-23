@@ -119,7 +119,7 @@ except ImportError:
 
                 """
                 if filename.endswith('.xz'):
-                    filename = filename[:-2]
+                    filename = filename[:-3]
 
                 with open(filename, 'w') as f:
                     yield f

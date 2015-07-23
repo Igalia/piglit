@@ -117,7 +117,10 @@ def _test_extension():
 
         for each in os.listdir(d):
             if each.startswith('results.txt'):
-                ext = os.path.splitext(each)[1]
+                name, ext = os.path.splitext(each)
+                if name.endswith('.'):
+                    raise utils.TestFailure(
+                        'extra trailing "." in name "{}"'.format(name))
                 break
         else:
             raise utils.TestFailure('No results file generated')
