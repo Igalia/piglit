@@ -80,7 +80,6 @@ static const GLenum valid_enums_sub[] = {
 static const GLenum valid_enums_sub_tes[] = {
 	GL_TESS_CONTROL_SUBROUTINE_UNIFORM,
 	GL_TESS_EVALUATION_SUBROUTINE_UNIFORM,
-	GL_COMPUTE_SUBROUTINE_UNIFORM
 };
 
 static const GLenum valid_enums_sub_com[] = {
