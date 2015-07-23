@@ -43,18 +43,6 @@ PIGLIT_GL_TEST_CONFIG_END
 static const char *Prog = "sampler-objects";
 
 
-static GLboolean
-check_error(int line)
-{
-   GLenum err = glGetError();
-   if (err != GL_NO_ERROR) {
-      fprintf(stderr, "%s: unexpected error 0x%x at line %d\n", Prog, err, line);
-      return GL_TRUE;
-   }
-   return GL_FALSE;
-}
-
-
 /**
  * Test the sampler object gen/bind/delete functions.
  */
@@ -64,7 +52,7 @@ test_objects(void)
    GLuint samplers[4], i;
 
    glGenSamplers(4, samplers);
-   if (check_error(__LINE__))
+   if (!piglit_check_gl_error(GL_NO_ERROR))
       return PIGLIT_FAIL;
 
    for (i = 0; i < 4; i++) {
@@ -78,12 +66,12 @@ test_objects(void)
 
    for (i = 0; i < 4; i++) {
       glBindSampler(i, samplers[i]);
-      if (check_error(__LINE__))
+      if (!piglit_check_gl_error(GL_NO_ERROR))
          return PIGLIT_FAIL;
    }
 
    glDeleteSamplers(4, samplers);
-   if (check_error(__LINE__))
+   if (!piglit_check_gl_error(GL_NO_ERROR))
       return PIGLIT_FAIL;
 
    for (i = 0; i < 4; i++) {
@@ -159,7 +147,7 @@ test_samplers(void)
    GLuint samplers[NUM_SAMPLERS], i;
 
    glGenSamplers(NUM_SAMPLERS, samplers);
-   if (check_error(__LINE__))
+   if (!piglit_check_gl_error(GL_NO_ERROR))
       return PIGLIT_FAIL;
 
    /* Create samplers which clamp lod to a particular mipmap level) */
