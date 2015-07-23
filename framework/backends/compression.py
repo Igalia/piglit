@@ -127,7 +127,7 @@ except ImportError:
                 try:
                     with open(os.devnull, 'w') as null:
                         subprocess.check_call(
-                            ['xz', '--compress', '-9', filename],
+                            ['xz', '--compress', '-9', '--force', filename],
                             stderr=null)
                 except OSError as e:
                     if e.errno == errno.ENOENT:

@@ -30,6 +30,7 @@ import os
 import functools
 
 import nose.tools as nt
+from nose.plugins.skip import SkipTest
 
 from framework.tests import utils
 from framework.backends import compression, abstract
@@ -223,3 +224,23 @@ def test_update_piglit_conf():
 
     """
     nt.eq_(compression.get_mode(), 'foobar')
+
+
+@utils.set_env(PIGLIT_COMPRESSION='xz')
+@utils.test_in_tempdir
+def test_xz_shell_override():
+    """framework.backends.compression: the xz shell utility path can overwrite"""
+    # TODO: this test will not be required by python3, where the builtin lzma
+    # module replaces all of this.
+    try:
+        import backports.lzma  # pylint: disable=unused-variable
+    except ImportError:
+        pass
+    else:
+        raise SkipTest('Test requires shell path, not backports.lzma path.')
+
+    with open('foo.json.xz', 'w') as f:
+        f.write('foo')
+
+    with compression.COMPRESSORS['xz']('foo.json') as f:
+        f.write('foobar')
