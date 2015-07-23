@@ -211,12 +211,14 @@ static const char vs_sub[] =
 	"#version 150\n"
 	"#extension GL_ARB_shader_subroutine : require\n"
 	"in vec4 vs_input0;\n"
+	"out vec4 vs_output1;\n"
 	"subroutine vec4 vs_offset();\n"
 	"subroutine uniform vs_offset VERTEX;\n"
 	"subroutine (vs_offset) vec4 vss() { return vec4(1, 0, 0, 0); }\n"
 	"subroutine (vs_offset) vec4 vss2() { return vec4(1, 0, 0, 0); }\n"
 	"void main() {\n"
 	"	gl_Position = vs_input0 + VERTEX();\n"
+        "       vs_output1 = vs_input0;\n"
 	"}";
 
 static const char gs_sub[] =
