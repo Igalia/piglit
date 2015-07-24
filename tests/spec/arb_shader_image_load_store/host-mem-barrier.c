@@ -250,6 +250,14 @@ run_test_element_array_raw(const struct image_barrier_info *bar, unsigned l)
 }
 
 static bool
+can_test_ubo_raw(void)
+{
+   int size = 0;
+   glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &size);
+   return size >= 16 * N;
+}
+
+static bool
 run_test_ubo_raw(const struct image_barrier_info *bar, unsigned l)
 {
         const struct grid_info grid =
@@ -995,7 +1003,8 @@ piglit_init(int argc, char **argv)
                         barrier_subtest(&status, true, run_test_element_array_raw,
                                         "Element array/RaW", bar, l);
 
-                        barrier_subtest(&status, true, run_test_ubo_raw,
+                        barrier_subtest(&status, can_test_ubo_raw(),
+                                        run_test_ubo_raw,
                                         "Uniform buffer/RaW", bar, l);
 
                         barrier_subtest(&status, true, run_test_tex_fetch_raw,
