@@ -276,6 +276,65 @@ test_cubemap_faces(void)
 }
 
 
+static bool
+test_zero_size_image(void)
+{
+	GLubyte image[8*8*4];
+	GLuint tex;
+	bool pass = true;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glTexImage2D(GL_TEXTURE_2D,
+		     0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+	/* getting 0x0 image from 8x8 source should work */
+	glGetTextureSubImage(tex, 0,
+			     0, 0, 0,
+			     0, 0, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE,
+			     sizeof(image), image);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		pass = false;
+
+	/* replace image with 0x0 image (deallocates old one) */
+	glTexImage2D(GL_TEXTURE_2D,
+		     0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+	/* getting 0x0 image from 0x0 source should work */
+	glGetTextureSubImage(tex, 0,
+			     0, 0, 0,
+			     0, 0, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE,
+			     sizeof(image), image);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		pass = false;
+
+	/* getting 0x0 image at an offset from 0x0 source should error */
+	glGetTextureSubImage(tex, 0,
+			     1, 2, 0,  /* offset */
+			     0, 0, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE,
+			     sizeof(image), image);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		pass = false;
+
+	/* getting 2x2 image from 0x0 source should generate error */
+	glGetTextureSubImage(tex, 0,
+			     0, 0, 0,
+			     2, 2, 1,
+			     GL_RGBA, GL_UNSIGNED_BYTE,
+			     sizeof(image), image);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		pass = false;
+
+	glDeleteTextures(1, &tex);
+
+	return pass;
+}
+
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -288,6 +347,7 @@ piglit_init(int argc, char **argv)
 	pass = test_buffer_size() && pass;
 	pass = test_invalid_values() && pass;
 	pass = test_cubemap_faces() && pass;
+	pass = test_zero_size_image() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
