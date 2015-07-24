@@ -33,8 +33,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 20;
-
+	config.supports_gl_compat_version = 32;
+	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -58,10 +58,12 @@ enum piglit_result
 piglit_display(void)
 {
 	const char *vs_ssbo_template =
+		"#version 130\n"
 		"#extension GL_ARB_shader_storage_buffer_object : enable\n"
 		"#extension GL_ARB_uniform_buffer_object : enable\n"
 		"\n"
 		"varying vec4 vary;"
+		"in vec4 piglit_vertex;\n"
 		"\n"
 		"layout(std140) buffer ssbo {\n"
 		"	vec4 v[%d];\n"
@@ -69,7 +71,7 @@ piglit_display(void)
 		"uniform int i;\n"
 		"\n"
 		"void main() {\n"
-		"	gl_Position = gl_Vertex;\n"
+		"	gl_Position = piglit_vertex;\n"
 		"	vary = v[i];\n"
 		"}\n";
 
@@ -83,10 +85,12 @@ piglit_display(void)
 		"}\n";
 
 	const char *vs_template =
+		"#version 130\n"
 		"#extension GL_ARB_shader_storage_buffer_object : enable\n"
+		"in vec4 piglit_vertex;\n"
 		"\n"
 		"void main() {\n"
-		"	gl_Position = gl_Vertex;\n"
+		"	gl_Position = piglit_vertex;\n"
 		"}\n";
 
 	const char *fs_ssbo_template =

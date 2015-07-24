@@ -40,8 +40,8 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = 100;
 	config.window_height = 100;
-	config.supports_gl_compat_version = 10;
-	config.supports_gl_core_version = 31;
+	config.supports_gl_compat_version = 32;
+	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
 PIGLIT_GL_TEST_CONFIG_END

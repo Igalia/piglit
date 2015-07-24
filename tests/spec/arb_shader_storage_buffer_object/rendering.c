@@ -33,16 +33,19 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 32;
+	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char vert_shader_text[] =
+	"#version 130\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"
 	"\n"
 	"buffer ssbo_pos_size { vec2 pos; float size; };\n"
 	"buffer ssbo_rot {float rotation; };\n"
+	"in vec4 piglit_vertex;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -50,7 +53,7 @@ static const char vert_shader_text[] =
 	"   m[0][0] = m[1][1] = cos(rotation); \n"
 	"   m[0][1] = sin(rotation); \n"
 	"   m[1][0] = -m[0][1]; \n"
-	"   gl_Position.xy = m * gl_Vertex.xy * vec2(size) + pos;\n"
+	"   gl_Position.xy = m * piglit_vertex.xy * vec2(size) + pos;\n"
 	"   gl_Position.zw = vec2(0, 1);\n"
 	"}\n";
 

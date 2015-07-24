@@ -48,7 +48,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 800;
 	config.window_height = 200;
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 32;
+	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -58,15 +59,17 @@ get_shader(GLenum target, const char *block_prefix, int blocks)
 {
 	char *shader = NULL;
 	const char *vs_source =
+		"#version 130\n"
 		"#extension GL_ARB_shader_storage_buffer_object : enable\n"
 		"#extension GL_ARB_uniform_buffer_object : enable\n"
 		"\n"
-		"varying vec4 v;"
+		"varying vec4 v;\n"
+		"in vec4 piglit_vertex;\n"
 		"\n"
 		"%s"
 		"\n"
 		"void main() {\n"
-		"	gl_Position = gl_Vertex;\n"
+		"	gl_Position = piglit_vertex;\n"
 		"	v = vec4(0)%s;\n"
 		"}\n";
 	const char *fs_source =
