@@ -77,7 +77,7 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	int i;
-	unsigned int vao, tcs_prog, tes_prog, normal_prog;
+	unsigned int vao, tess_prog, normal_prog;
 	static const GLenum primitive[] = {
 		GL_POINTS,
 		GL_LINES,
@@ -97,13 +97,9 @@ piglit_init(int argc, char **argv)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	tcs_prog = piglit_build_simple_program_multiple_shaders(
+	tess_prog = piglit_build_simple_program_multiple_shaders(
 			GL_VERTEX_SHADER, vs_source,
 			GL_TESS_CONTROL_SHADER, tcs_source,
-			GL_FRAGMENT_SHADER, fs_source,
-			0);
-	tes_prog = piglit_build_simple_program_multiple_shaders(
-			GL_VERTEX_SHADER, vs_source,
 			GL_TESS_EVALUATION_SHADER, tes_source,
 			GL_FRAGMENT_SHADER, fs_source,
 			0);
@@ -113,14 +109,7 @@ piglit_init(int argc, char **argv)
 			0);
 
 	for (i = 0; i < ARRAY_SIZE(primitive); ++i) {
-		glUseProgram(tcs_prog);
-		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-		glDrawArrays(primitive[i], 0, 12);
-		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
-	}
-
-	for (i = 0; i < ARRAY_SIZE(primitive); ++i) {
-		glUseProgram(tes_prog);
+		glUseProgram(tess_prog);
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 		glDrawArrays(primitive[i], 0, 12);
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
@@ -137,8 +126,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	glUseProgram(0);
-	glDeleteProgram(tcs_prog);
-	glDeleteProgram(tes_prog);
+	glDeleteProgram(tess_prog);
 	glDeleteProgram(normal_prog);
 	glBindVertexArray(0);
 	glDeleteVertexArrays(1, &vao);
