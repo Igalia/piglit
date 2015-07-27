@@ -57,6 +57,14 @@ static const char *const tcs_source_template =
 static char *tcs_source;
 
 
+static const char *const tes_source =
+"#version 150\n"
+"#extension GL_ARB_tessellation_shader: require\n"
+"layout(triangles) in;\n"
+"void main() { gl_Position = vec4(0.0); }\n";
+static char *tcs_source;
+
+
 static bool
 test_tcs_params(const int vertices)
 {
@@ -66,6 +74,7 @@ test_tcs_params(const int vertices)
 	prog = piglit_build_simple_program_multiple_shaders(
 			GL_VERTEX_SHADER, vs_source,
 			GL_TESS_CONTROL_SHADER, tcs_source,
+			GL_TESS_EVALUATION_SHADER, tes_source,
 			0);
 
 	glGetProgramiv(prog, GL_TESS_CONTROL_OUTPUT_VERTICES, &v);
