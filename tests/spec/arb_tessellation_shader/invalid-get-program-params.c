@@ -80,14 +80,13 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_tessellation_shader");
 
-	tcs_prog = piglit_build_simple_program_multiple_shaders(
-			GL_VERTEX_SHADER, vs_source,
-			GL_TESS_CONTROL_SHADER, tcs_source,
-			0);
-	tes_prog = piglit_build_simple_program_multiple_shaders(
-			GL_VERTEX_SHADER, vs_source,
-			GL_TESS_EVALUATION_SHADER, tes_source,
-			0);
+	tcs_prog = glCreateShaderProgramv(GL_TESS_CONTROL_SHADER, 1,
+					  (const GLchar *const*)&tcs_source);
+	piglit_link_check_status(tcs_prog);
+
+	tes_prog = glCreateShaderProgramv(GL_TESS_EVALUATION_SHADER, 1,
+					  (const GLchar *const*)&tes_source);
+	piglit_link_check_status(tes_prog);
 
 	for (i = 0; i < ARRAY_SIZE(tes_params); ++i ) {
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
