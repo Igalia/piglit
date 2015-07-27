@@ -267,49 +267,6 @@ equal_images(GLenum target,
 }
 
 /**
- * Get block size for compressed format.
- * \return GL_TRUE if format is compressed, GL_FALSE otherwise
- * XXX this could be a piglit util function if useful elsewhere.
- */
-static GLboolean
-get_format_block_size(GLenum format, GLuint *bw, GLuint *bh)
-{
-	switch (format) {
-	case GL_COMPRESSED_RGB_FXT1_3DFX:
-	case GL_COMPRESSED_RGBA_FXT1_3DFX:
-		*bw = 8;
-		*bh = 4;
-		return GL_TRUE;
-	case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-	case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-	case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
-	case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-	case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
-	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
-	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
-	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
-		*bw = 4;
-		*bh = 4;
-		return GL_TRUE;
-	case GL_COMPRESSED_RED:
-	case GL_COMPRESSED_RED_RGTC1_EXT:
-	case GL_COMPRESSED_RG:
-	case GL_COMPRESSED_RED_GREEN_RGTC2_EXT:
-		*bw = 4;
-		*bh = 4;
-		return GL_TRUE;
-	case GL_COMPRESSED_LUMINANCE_LATC1_EXT:
-	case GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT:
-		*bw = 4;
-		*bh = 4;
-		return GL_TRUE;
-	default:
-		*bw = *bh = 1;
-		return GL_FALSE;
-	}
-}
-
-/**
  * Draw each image of the texture to the framebuffer and then save the
  * entire thing to a buffer with glReadPixels().
  */
@@ -402,9 +359,9 @@ test_format(GLenum target, GLenum intFormat)
 	GLubyte *updated_img, *updated_ref;
 	GLubyte *testImg;
 	GLboolean pass = GL_TRUE;
-	GLuint bw, bh, wMask, hMask, dMask;
+	GLuint bw, bh, bb, wMask, hMask, dMask;
 	GLuint pbo = 0;
-	get_format_block_size(intFormat, &bw, &bh);
+	piglit_get_compressed_block_size(intFormat, &bw, &bh, &bb);
 	wMask = ~(bw-1);
 	hMask = ~(bh-1);
 	dMask = ~0;
