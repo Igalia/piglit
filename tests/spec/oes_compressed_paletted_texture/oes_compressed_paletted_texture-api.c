@@ -71,7 +71,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_OES_compressed_paletted_texture");
 
 	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
 
 	/* The OES_compressed_paletted_texture spec says:
 	 *
