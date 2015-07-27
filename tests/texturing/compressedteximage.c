@@ -34,7 +34,7 @@
 
 #include "piglit-util-gl.h"
 
-#define SIZE 128
+#define SIZE 256
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -282,4 +282,7 @@ piglit_init(int argc, char **argv)
 
 	for (i = 0; format->extension[i]; i++)
 		piglit_require_extension(format->extension[i]);
+
+	if (format->token == GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT)
+		piglit_set_tolerance_for_bits(7, 7, 7, 7);
 }
