@@ -153,8 +153,9 @@ def add_vpfpgeneric(adder, name):
 def add_texwrap_target_tests(adder, target):
     adder(['texwrap', target, 'GL_RGBA8'],
           'texwrap {}'.format(target))
-    adder(['texwrap', target, 'GL_RGBA8', 'offset'],
-          'texwrap {} offset'.format(target))
+    if target == '2D':
+        adder(['texwrap', target, 'GL_RGBA8', 'offset'],
+              'texwrap {} offset'.format(target))
     adder(['texwrap', target, 'GL_RGBA8', 'bordercolor'],
           'texwrap {} bordercolor'.format(target))
     adder(['texwrap', target, 'GL_RGBA8', 'proj'],
@@ -166,8 +167,9 @@ def add_texwrap_target_tests(adder, target):
 def add_texwrap_format_tests(adder, ext='', suffix=''):
     args = [] if ext == '' else [ext]
     adder(['texwrap'] + args, 'texwrap formats{}'.format(suffix))
-    adder(['texwrap'] + args + ['offset'],
-          'texwrap formats{} offset'.format(suffix))
+    if 'compression' not in ext and 's3tc' not in ext:
+        adder(['texwrap'] + args + ['offset'],
+              'texwrap formats{} offset'.format(suffix))
     adder(['texwrap'] + args + ['bordercolor'],
           'texwrap formats{} bordercolor'.format(suffix))
     adder(['texwrap'] + args + ['bordercolor', 'swizzled'],
