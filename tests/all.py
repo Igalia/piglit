@@ -4168,6 +4168,11 @@ with profile.group_manager(
     g(['oes_compressed_etc1_rgb8_texture-miptree'], 'miptree')
 
 with profile.group_manager(
+         PiglitGLTest,
+         grouptools.join('spec', 'khr_texture_compression_astc')) as g:
+    g(['arb_texture_compression-invalid-formats', 'astc'], 'invalid formats')
+
+with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_compressed_paletted_texture')) as g:
     g(['oes_compressed_paletted_texture-api'], 'basic API')

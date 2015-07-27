@@ -76,7 +76,7 @@ struct format_list {
 	/**
 	 * Formats that are part of the extension but should not be exposed.
 	 */
-	struct format_tuple bad[5];
+	struct format_tuple bad[29];
 };
 
 /**
@@ -267,6 +267,46 @@ static const struct format_list etc2_formats = {
 };
 
 /**
+ * Formats belonging to GL_KHR_texture_compression_astc_ldr
+ */
+static const struct format_list astc_formats = {
+	{
+		{ NULL, 0 },
+	},
+	{
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_4x4_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_5x4_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_5x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_6x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_6x6_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_8x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_8x6_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_8x8_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x6_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x8_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x10_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_12x10_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_12x12_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR) },
+		{ NULL, 0 },
+	}
+};
+
+/**
  * List of all known compression methods to test
  *
  * The dummy first element is because this list is used by \c main to replace
@@ -284,6 +324,7 @@ const char *all_formats[] = {
 	"paletted",
 	"etc1",
 	"etc2",
+	"astc",
 };
 
 enum piglit_result
@@ -519,6 +560,14 @@ piglit_init(int argc, char **argv)
 					   check_errors,
 					   piglit_is_extension_supported("GL_ARB_ES3_compatibility"),
 					   true)
+				&& pass;
+		} else if (strcmp(argv[i], "astc") == 0) {
+			pass = try_formats(&astc_formats,
+					   compressed_formats,
+					   num_compressed_formats,
+					   check_errors,
+					   piglit_is_extension_supported("GL_KHR_texture_compression_astc_ldr"),
+					   false)
 				&& pass;
 		} else {
 			fprintf(stderr,
