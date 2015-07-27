@@ -1,4 +1,5 @@
 link_libraries(piglitutil_${piglit_target_api})
 piglit_add_executable(khr_compressed_astc-miptree_${piglit_target_api} khr_compressed_astc-miptree.c)
+piglit_add_executable(khr_compressed_astc-basic_${piglit_target_api} khr_compressed_astc-basic.c)
 
 # vim: ft=cmake:

@@ -4171,6 +4171,8 @@ with profile.group_manager(
          PiglitGLTest,
          grouptools.join('spec', 'khr_texture_compression_astc')) as g:
     g(['arb_texture_compression-invalid-formats', 'astc'], 'invalid formats')
+    g(['khr_compressed_astc-basic_gl'], 'basic-gl')
+    g(['khr_compressed_astc-basic_gles2'], 'basic-gles')
     g(['khr_compressed_astc-miptree_gl'], 'miptree-gl')
     g(['khr_compressed_astc-miptree_gles2'], 'miptree-gles')
 
