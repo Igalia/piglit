@@ -5,7 +5,7 @@
 GLSL >= 1.40
 GL_ARB_shader_atomic_counters
 GL_ARB_arrays_of_arrays
-INT GL_MAX_VERTEX_ATOMIC_COUNTER_BUFFERS >= 2
+INT GL_MAX_VERTEX_ATOMIC_COUNTER_BUFFERS >= 1
 
 [vertex shader]
 #version 140
@@ -52,6 +52,12 @@ void main()
 	   v1[6] <= v0[6] || v1[7] != v0[7])
 		passed = false;
 
+	/* Skip one decrement since it may be the 0 => 0xffffffff
+	 * transition.
+	 */
+	atomicCounterDecrement(a1[0][1][1]);
+	atomicCounterDecrement(a1[2][0][1]);
+
 	/* Get all initail values of a1 */
 	v0[0] = atomicCounter(a1[0][0][0]);
 	v0[1] = atomicCounter(a1[0][0][1]);
@@ -65,11 +71,6 @@ void main()
 	v0[9] = atomicCounter(a1[2][0][1]);
 	v0[10] = atomicCounter(a1[2][1][0]);
 	v0[11] = atomicCounter(a1[2][1][1]);
-
-	/* Skip one decrement since it may be the 0 => 0xffffffff
-	 * transition.
-	 */
-	atomicCounterDecrement(a1[2][0][1]);
 
 	/* Test that a decrement of an atomic
 	 * counter results in a smaller value.
@@ -113,7 +114,7 @@ void main()
 }
 
 [test]
-atomic counters 2
+atomic counters 20
 
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
