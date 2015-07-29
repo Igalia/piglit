@@ -86,7 +86,7 @@ test_clear(GLint maxLevel)
 		if (!piglit_check_gl_error(GL_NO_ERROR))
 			return false;
 		for (i = 0; i < 4 * w * h; i++) {
-			if (texData[i] != expected) {
+			if (fabsf(texData[i] - expected) > 0.01) {
 				printf("Failure:\n");
 				printf("\tmipmap level %d, pixel %d\n",
 				       l, i / 4);
