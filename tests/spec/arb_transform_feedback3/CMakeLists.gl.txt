@@ -15,5 +15,5 @@ piglit_add_executable (arb_transform_feedback3-draw_using_invalid_stream_index d
 piglit_add_executable (arb_transform_feedback3-set_varyings_with_invalid_args set_varyings_with_invalid_args.c)
 piglit_add_executable (arb_transform_feedback3-set_invalid_varyings set_invalid_varyings.c)
 piglit_add_executable (arb_transform_feedback3-ext_interleaved_two_bufs ext_interleaved_two_bufs.c)
-
+piglit_add_executable (arb_transform_feedback3-begin_end begin_end.c)
 # vim: ft=cmake:
