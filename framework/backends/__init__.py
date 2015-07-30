@@ -145,7 +145,7 @@ def load(file_path):
             return _extension(file_path)
         else:
             for file_ in os.listdir(file_path):
-                if file_.startswith('result'):
+                if file_.startswith('result') and not file_.endswith('.old'):
                     return _extension(file_)
 
         tests = os.path.join(file_path, 'tests')

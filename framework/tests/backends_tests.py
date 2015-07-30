@@ -212,3 +212,20 @@ def test_load_trailing_dot():
     """
     backends.load('foo.test_backend..gz')
 
+
+@nt.with_setup(_notimplemented_setup, _registry_teardown)
+@utils.test_in_tempdir
+@nt.raises(backends.BackendError)
+def test_load_old():
+    """backends.load(): Ignores files ending in '.old'
+
+    If this raises a BackendError it means it didn't find a backend to use,
+    thus it skipped the file ending in '.old'.
+    
+    """
+    os.mkdir('test')
+    file_path = os.path.join('test', 'results.test_backend.old')
+    with open(file_path, 'w') as f:
+        f.write('foo')
+
+    backends.load('test')
