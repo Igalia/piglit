@@ -38,26 +38,10 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const char gs_text[] =
-        "#version 150\n"
-        "#extension GL_ARB_gpu_shader5 : enable\n"
-        "layout(points, max_vertices = 1, stream = 0) out;\n"
-        "\n"
-        "void main() {\n"
-        "    gl_Position = gl_in[0].gl_Position;\n"
-        "    EmitStreamVertex(0);\n"
-        "}\n";
-
 void
 piglit_init(int argc, char **argv)
 {
-        static const float verts[] = {
-                -1.0f, -1.0f,
-                 1.0f, -1.0f,
-                -1.0f,  1.0f,
-                 1.0f,  1.0f,
-        };
-	GLuint vao, buf, tfb;
+	GLuint tfb;
 	GLint max_stream;
 	bool pass;
 
@@ -69,20 +53,6 @@ piglit_init(int argc, char **argv)
 		printf("failed to resolve the maximum number of streams\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
-
-	piglit_build_simple_program_multiple_shaders(
-			GL_VERTEX_SHADER, vs_pass_thru_text,
-			GL_GEOMETRY_SHADER, gs_text, 0);
-
-	/* Test is run under desktop OpenGL 3.2 -> use of VAOs is required */
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-        glGenBuffers(1, &buf);
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
 
 	glGenTransformFeedbacks(1, &tfb);
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, tfb);
