@@ -95,85 +95,84 @@ try:
 except ImportError:
     try:
         with open(os.devnull, 'w') as d:
-            subprocess.check_call(['xz'], stderr=d)
-    except subprocess.CalledProcessError as e:
-        if e.returncode == 1:
-            import contextlib
-            try:
-                import cStringIO as StringIO
-            except ImportError:
-                import StringIO
-
-            @contextlib.contextmanager
-            def _compress_xz(filename):
-                """Emulates an open function in write mode for xz.
-
-                Python 2.x doesn't support xz, but it's dang useful. This
-                function calls out to the shell and tries to use xz from the
-                environment to get xz compression.
-
-                This obviously won't work without a working xz binary.
-
-                This function tries to emulate the default values of the lzma
-                module in python3 as much as possible
-
-                """
-                if filename.endswith('.xz'):
-                    filename = filename[:-3]
-
-                with open(filename, 'w') as f:
-                    yield f
-
-                try:
-                    with open(os.devnull, 'w') as null:
-                        subprocess.check_call(
-                            ['xz', '--compress', '-9', '--force', filename],
-                            stderr=null)
-                except OSError as e:
-                    if e.errno == errno.ENOENT:
-                        raise exceptions.PiglitFatalError(
-                            'No xz binary available')
-                    raise
-
-            @contextlib.contextmanager
-            def _decompress_xz(filename):
-                """Eumlates an option function in read mode for xz.
-
-                See the comment in _compress_xz for more information.
-
-                This function tries to emulate the lzma module as much as
-                possible
-
-                """
-                if not filename.endswith('.xz'):
-                    filename = '{}.xz'.format(filename)
-
-                try:
-                    with open(os.devnull, 'w') as null:
-                        string = subprocess.check_output(
-                            ['xz', '--decompress', '--stdout', filename],
-                            stderr=null)
-                except OSError as e:
-                    if e.errno == errno.ENOENT:
-                        raise exceptions.PiglitFatalError(
-                            'No xz binary available')
-                    raise
-
-                # We need a file-like object, so the contents must be placed in
-                # a StringIO object.
-                io = StringIO.StringIO()
-                io.write(string)
-                io.seek(0)
-
-                yield io
-
-                io.close()
-
-            COMPRESSORS['xz'] = _compress_xz
-            DECOMPRESSORS['xz'] = _decompress_xz
-            COMPRESSION_SUFFIXES += ['.xz']
+            subprocess.check_call(['xz', '--help'], stdout=d, stderr=d)
     except OSError:
         pass
+    else:
+        import contextlib
+        try:
+            import cStringIO as StringIO
+        except ImportError:
+            import StringIO
+
+        @contextlib.contextmanager
+        def _compress_xz(filename):
+            """Emulates an open function in write mode for xz.
+
+            Python 2.x doesn't support xz, but it's dang useful. This
+            function calls out to the shell and tries to use xz from the
+            environment to get xz compression.
+
+            This obviously won't work without a working xz binary.
+
+            This function tries to emulate the default values of the lzma
+            module in python3 as much as possible
+
+            """
+            if filename.endswith('.xz'):
+                filename = filename[:-3]
+
+            with open(filename, 'w') as f:
+                yield f
+
+            try:
+                with open(os.devnull, 'w') as null:
+                    subprocess.check_call(
+                        ['xz', '--compress', '-9', '--force', filename],
+                        stderr=null)
+            except OSError as e:
+                if e.errno == errno.ENOENT:
+                    raise exceptions.PiglitFatalError(
+                        'No xz binary available')
+                raise
+
+        @contextlib.contextmanager
+        def _decompress_xz(filename):
+            """Eumlates an option function in read mode for xz.
+
+            See the comment in _compress_xz for more information.
+
+            This function tries to emulate the lzma module as much as
+            possible
+
+            """
+            if not filename.endswith('.xz'):
+                filename = '{}.xz'.format(filename)
+
+            try:
+                with open(os.devnull, 'w') as null:
+                    string = subprocess.check_output(
+                        ['xz', '--decompress', '--stdout', filename],
+                        stderr=null)
+            except OSError as e:
+                if e.errno == errno.ENOENT:
+                    raise exceptions.PiglitFatalError(
+                        'No xz binary available')
+                raise
+
+            # We need a file-like object, so the contents must be placed in
+            # a StringIO object.
+            io = StringIO.StringIO()
+            io.write(string)
+            io.seek(0)
+
+            yield io
+
+            io.close()
+
+        COMPRESSORS['xz'] = _compress_xz
+        DECOMPRESSORS['xz'] = _decompress_xz
+        COMPRESSION_SUFFIXES += ['.xz']
 
 
 def get_mode():
