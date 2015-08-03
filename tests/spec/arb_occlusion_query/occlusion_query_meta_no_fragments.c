@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
-	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -96,7 +96,44 @@ piglit_display(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	glEndQuery(GL_SAMPLES_PASSED);
-	test_pass &= verify_no_fragments(query, "glClear");
+	test_pass &= verify_no_fragments(query, "glClear(simple)");
+
+	/* No fragments for scissored glClear
+	 */
+	glScissor(0, 0, piglit_width / 2, piglit_height / 2);
+	glEnable(GL_SCISSOR_TEST);
+	glBeginQuery(GL_SAMPLES_PASSED, query);
+	{
+		glClearColor(0.0, 1.0, 0.0, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	glEndQuery(GL_SAMPLES_PASSED);
+	glDisable(GL_SCISSOR_TEST);
+	test_pass &= verify_no_fragments(query, "glClear(scissored)");
+
+	/* No fragments for glColorMask + glClear
+	 */
+	glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glBeginQuery(GL_SAMPLES_PASSED, query);
+	{
+		glClearColor(0.0, 1.0, 0.0, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	glEndQuery(GL_SAMPLES_PASSED);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	test_pass &= verify_no_fragments(query, "glClear(color masked)");
+
+	/* No fragments for 1-bit stencil clear
+	 */
+	glStencilMask(1);
+	glBeginQuery(GL_SAMPLES_PASSED, query);
+	{
+		glClearColor(0.0, 1.0, 0.0, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	}
+	glEndQuery(GL_SAMPLES_PASSED);
+	glStencilMask(~0);
+	test_pass &= verify_no_fragments(query, "glClear(1-bit stencil)");
 
 	/* No fragments for glGenerateMipmap
 	 *
