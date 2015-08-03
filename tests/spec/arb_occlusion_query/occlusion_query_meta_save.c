@@ -41,8 +41,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-enum piglit_result
-piglit_display(void)
+
+static bool
+run_test(bool scissor_clear)
 {
 	GLuint query;
 	GLint result = -1;
@@ -61,7 +62,14 @@ piglit_display(void)
 
 	/* Clear the framebuffer. This shouldn't affect the query */
 	glClearColor(0.0, 0.0, 1.0, 0.0);
+	if (scissor_clear) {
+		glScissor(0, 0, piglit_width / 2, piglit_height / 2);
+		glEnable(GL_SCISSOR_TEST);
+	}
 	glClear(GL_COLOR_BUFFER_BIT);
+	if (scissor_clear) {
+		glDisable(GL_SCISSOR_TEST);
+	}
 
 	/* Render another 64 pixels. This should continue adding to
 	 * the query */
@@ -76,13 +84,24 @@ piglit_display(void)
 	piglit_present_results();
 
 	if (result != 128) {
-		printf("Occlusion query resulted in %d samples "
+		printf("Failure: \n");
+		printf("  Occlusion query resulted in %d samples "
 		       "(expected 128)\n",
 		       result);
-		return PIGLIT_FAIL;
+		printf("  Scissor enabled? %s\n", scissor_clear ? "yes" : "no");
+		return false;
 	} else {
-		return PIGLIT_PASS;
+		return true;
 	}
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	bool pass = run_test(false);
+	pass = run_test(true) && pass;
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
