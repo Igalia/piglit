@@ -132,15 +132,14 @@ class BaseDmesg(object):
                 else:
                     return result
 
-            result['result'] = replace(result['result'])
+            result.result = replace(result.result)
 
             # Replace the results of any subtests
-            if 'subtest' in result:
-                for key, value in result['subtest'].iteritems():
-                    result['subtest'][key] = replace(value)
+            for key, value in result.subtests.iteritems():
+                result.subtests[key] = replace(value)
 
             # Add the dmesg values to the result
-            result['dmesg'] = "\n".join(self._new_messages)
+            result.dmesg = "\n".join(self._new_messages)
 
         return result
 

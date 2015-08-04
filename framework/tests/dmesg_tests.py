@@ -27,7 +27,6 @@ don't want to run them use '-e sudo' with nosetests
 
 from __future__ import print_function, absolute_import
 import os
-import sys
 import subprocess
 import re
 
@@ -38,7 +37,7 @@ except ImportError:
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 
-import framework.dmesg as dmesg
+from framework import dmesg, status
 import framework.core
 import framework.test
 import framework.backends
@@ -251,25 +250,24 @@ def test_update_result_replace():
 
     def create_test_result(res):
         result = framework.results.TestResult()
-        result['result'] = res
-        result['subtest'] = {}
-        result['subtest']['test'] = res
+        result.result = res
+        result.subtests['test'] = res
         return result
 
     dmesg = TestDmesg()
-
-    for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
+    for res in [status.status_lookup(x) for x in
+                ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']]:
         dmesg.regex = None
         dmesg._new_messages = ['add', 'some', 'stuff']
         new_result = dmesg.update_result(create_test_result(res))
 
         check_update_result.description = \
             "dmesg.Dmesg.update_result: '{0}' replaced correctly".format(res)
-        yield check_update_result, new_result['result'], res
+        yield check_update_result, new_result.result, res
 
         check_update_result.description = \
             "dmesg.Dmesg.update_result: subtest '{0}' replaced correctly".format(res)
-        yield check_update_result, new_result['subtest']['test'], res
+        yield check_update_result, new_result.subtests['test'], res
 
 
 @utils.nose_generator
@@ -278,13 +276,13 @@ def test_update_result_no_match_regex():
 
     def create_test_result(res):
         result = framework.results.TestResult()
-        result['result'] = res
-        result['subtest'] = {}
-        result['subtest']['test'] = res
+        result.result = res
+        result.subtests['test'] = res
         return result
 
     dmesg = TestDmesg()
-    for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
+    for res in [status.status_lookup(x) for x in
+                ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']]:
         # check that the status is not updated when Dmesg.regex is set and does
         # not match the dmesg output
         dmesg.regex = re.compile("(?!)")
@@ -293,7 +291,7 @@ def test_update_result_no_match_regex():
 
         check_equal_result.description = \
             "dmesg.Dmesg.update_result: with non-matching regex '{0}'".format(res)
-        yield check_equal_result, new_result['result'], res
+        yield check_equal_result, new_result.result, res
 
 
 @utils.nose_generator
@@ -302,13 +300,13 @@ def test_update_result_match_regex():
 
     def create_test_result(res):
         result = framework.results.TestResult()
-        result['result'] = res
-        result['subtest'] = {}
-        result['subtest']['test'] = res
+        result.result = res
+        result.subtests['test'] = res
         return result
 
     dmesg = TestDmesg()
-    for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
+    for res in [status.status_lookup(x) for x in
+                ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']]:
         # check that the status is updated when Dmesg.regex is set and matches
         # the dmesg output
         dmesg.regex = re.compile("piglit.*test")
@@ -317,7 +315,7 @@ def test_update_result_match_regex():
 
         check_update_result.description = \
             "dmesg.Dmesg.update_result: with matching regex '{0}'".format(res)
-        yield check_update_result, new_result['result'], res
+        yield check_update_result, new_result.result, res
 
 
 def check_equal_result(result, status):
@@ -355,17 +353,18 @@ def check_update_result(result, status):
 
 
 def test_update_result_add_dmesg():
-    """dmesg.Dmesgupdate_result: sets the dmesg attribute"""
+    """dmesg.Dmesg.update_result: sets the dmesg attribute"""
     test = TestDmesg()
 
     result = framework.results.TestResult()
-    result['result'] = 'pass'
+    result.result = 'pass'
+    messages = ['some', 'new', 'messages']
 
-    test._new_messages = ['some', 'new', 'messages']
+    test._new_messages = messages
     result = test.update_result(result)
 
-    nt.assert_in('dmesg', result,
-                 msg="result does not have dmesg member but should")
+    nt.eq_(result.dmesg, '\n'.join(messages),
+           msg="result does not have dmesg member but should")
 
 
 def test_json_serialize_updated_result():
@@ -373,7 +372,7 @@ def test_json_serialize_updated_result():
     test = TestDmesg()
 
     result = framework.results.TestResult()
-    result['result'] = 'pass'
+    result.result = 'pass'
 
     test._new_messages = ['some', 'new', 'messages']
     result = test.update_result(result)
@@ -424,5 +423,5 @@ def check_classes_dmesg(test_class, test_args):
 
     test.execute(None, DummyLog(), json, test)
 
-    nt.assert_in(json.result['result'], ['dmesg-warn', 'dmesg-fail'],
+    nt.assert_in(json.result.result, ['dmesg-warn', 'dmesg-fail'],
                  msg="{0} did not update status with dmesg".format(type(test)))

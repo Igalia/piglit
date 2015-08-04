@@ -109,14 +109,14 @@ class IGTTest(Test):
         self.timeout = 600
 
     def interpret_result(self):
-        if self.result['returncode'] == 0:
-            self.result['result'] = 'pass'
-        elif self.result['returncode'] == 77:
-            self.result['result'] = 'skip'
-        elif self.result['returncode'] == 78:
-            self.result['result'] = 'timeout'
+        if self.result.returncode == 0:
+            self.result.result = 'pass'
+        elif self.result.returncode == 77:
+            self.result.result = 'skip'
+        elif self.result.returncode == 78:
+            self.result.result = 'timeout'
         else:
-            self.result['result'] = 'fail'
+            self.result.result = 'fail'
 
 
 def list_tests(listname):

@@ -11,7 +11,7 @@
     <h1>Results for ${testname}</h1>
     <h2>Overview</h2>
     <div>
-      <p><b>Result:</b> ${value.get('status', 'None')}</p>
+      <p><b>Result:</b> ${value.result}</p>
     </div>
     <p><a href="${index}">Back to summary</a></p>
     <h2>Details</h2>
@@ -22,13 +22,13 @@
       </tr>
       <tr>
         <td>Returncode</td>
-        <td>${value.get('returncode', 'None')}</td>
+        <td>${value.returncode}</td>
       </tr>
       <tr>
         <td>Time</td>
-        <td>${value.get('time', 'None')}</b>
+        <td>${value.time}</b>
       </tr>
-    % if value.get('images', None):
+    % if value.images:
       <tr>
         <td>Images</td>
         <td>
@@ -52,41 +52,41 @@
       <tr>
         <td>Stdout</td>
         <td>
-          <pre>${value.get('out', 'None') | h}</pre>
+          <pre>${value.out | h}</pre>
         </td>
       </tr>
       <tr>
         <td>Stderr</td>
         <td>
-          <pre>${value.get('err', 'None') | h}</pre>
+          <pre>${value.err | h}</pre>
         </td>
       </tr>
-    % if value.get('environment') is not None:
+    % if value.environment:
       <tr>
         <td>Environment</td>
         <td>
-          <pre>${value.get('environment') | h}</pre>
+          <pre>${value.environment | h}</pre>
         </td>
       </tr>
     % endif
       <tr>
         <td>Command</td>
         <td>
-          </pre>${value.get('command', 'None')}</pre>
+          </pre>${value.command}</pre>
         </td>
       </tr>
-    % if value.get('traceback') is not None:
+    % if value.traceback:
       <tr>
         <td>Traceback</td>
         <td>
-          <pre>${value.get('traceback') | h}</pre>
+          <pre>${value.traceback | h}</pre>
         </td>
       </tr>
     % endif
       <tr>
         <td>dmesg</td>
         <td>
-          <pre>${value.get('dmesg', 'None') | h}</pre>
+          <pre>${value.dmesg | h}</pre>
         </td>
       </tr>
     </table>

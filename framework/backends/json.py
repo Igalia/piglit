@@ -42,7 +42,7 @@ __all__ = [
 ]
 
 # The current version of the JSON results
-CURRENT_JSON_VERSION = 5
+CURRENT_JSON_VERSION = 6
 
 # The level to indent a final file
 INDENT = 4
@@ -58,13 +58,18 @@ def piglit_encoder(obj):
         return str(obj)
     elif isinstance(obj, set):
         return list(obj)
+    elif hasattr(obj, 'to_json'):
+        return obj.to_json()
     return obj
 
 
 def piglit_decoder(obj):
     """Json decoder for piglit that can load TestResult objects."""
-    if isinstance(obj, dict) and 'result' in obj:
-        return results.TestResult.load(obj)
+    if isinstance(obj, dict):
+        if obj.get('__type__', '') == 'TestResult':
+            return results.TestResult.from_dict(obj)
+        elif obj.get('__type__', '') == 'Subtests':
+            return results.Subtests.from_dict(obj)
     return obj
 
 
@@ -287,6 +292,7 @@ def _update_results(results, filepath):
             2: _update_two_to_three,
             3: _update_three_to_four,
             4: _update_four_to_five,
+            5: _update_five_to_six,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -326,7 +332,7 @@ def _write(results, file_):
                   indent=INDENT)
 
 
-def _update_zero_to_one(results):
+def _update_zero_to_one(result):
     """ Update version zero results to version 1 results
 
     Changes from version 0 to version 1
@@ -347,7 +353,10 @@ def _update_zero_to_one(results):
     updated_results = {}
     remove = set()
 
-    for name, test in results.tests.iteritems():
+    for name, test in result.tests.iteritems():
+        assert not isinstance(test, results.TestResult), \
+            'Test was erroniaously turned into a TestResult'
+
         # fix dmesg errors if any
         if isinstance(test.get('dmesg'), list):
             test['dmesg'] = '\n'.join(test['dmesg'])
@@ -429,13 +438,13 @@ def _update_zero_to_one(results):
                 updated_results[testname] = test
 
     for name in remove:
-        del results.tests[name]
-    results.tests.update(updated_results)
+        del result.tests[name]
+    result.tests.update(updated_results)
 
     # set the results version
-    results.results_version = 1
+    result.results_version = 1
 
-    return results
+    return result
 
 
 def _update_one_to_two(results):
@@ -531,6 +540,24 @@ def _update_four_to_five(results):
     results.results_version = 5
 
     return results
+
+
+def _update_five_to_six(result):
+    """Updates json results from version 5 to 6.
+
+    This uses a special field to for marking TestResult instances, rather than
+    just checking for fields we expect.
+
+    """
+    new_tests = {}
+
+    for name, test in result.tests.iteritems():
+        new_tests[name] = results.TestResult.from_dict(test)
+
+    result.tests = new_tests
+    result.results_version = 6
+
+    return result
 
 
 REGISTRY = Registry(

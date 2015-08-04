@@ -181,9 +181,9 @@ def csv(input_):
 
     def write_results(output):
         for name, result in testrun.tests.iteritems():
-            output.write("{},{},{},{}\n".format(name, result.get('time', ""),
-                                                result.get('returncode', ""),
-                                                result['result']))
+            output.write("{},{},{},{}\n".format(name, result.time,
+                                                result.returncode,
+                                                result.result))
 
     if args.output != "stdout":
         with open(args.output, 'w') as output:

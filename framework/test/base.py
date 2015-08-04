@@ -157,7 +157,7 @@ class Test(object):
         self.run_concurrent = run_concurrent
         self._command = copy.copy(command)
         self.env = {}
-        self.result = TestResult({'result': 'fail'})
+        self.result = TestResult()
         self.cwd = None
         self.__proc_timeout = None
 
@@ -180,18 +180,18 @@ class Test(object):
                 time_start = time.time()
                 dmesg.update_dmesg()
                 self.run()
-                self.result['time'] = time.time() - time_start
+                self.result.time = time.time() - time_start
                 self.result = dmesg.update_result(self.result)
             # This is a rare case where a bare exception is okay, since we're
             # using it to log exceptions
             except:
                 exception = sys.exc_info()
-                self.result['result'] = 'fail'
-                self.result['exception'] = "{}{}".format(*exception[:2])
-                self.result['traceback'] = "".join(
+                self.result.result = 'fail'
+                self.result.exception = "{}{}".format(*exception[:2])
+                self.result.traceback = "".join(
                     traceback.format_tb(exception[2]))
 
-            log.log(self.result['result'])
+            log.log(self.result.result)
         else:
             log.log('dry-run')
 
@@ -204,14 +204,14 @@ class Test(object):
     def interpret_result(self):
         """Convert the raw output of the test into a form piglit understands.
         """
-        if _is_crash_returncode(self.result['returncode']):
+        if _is_crash_returncode(self.result.returncode):
             # check if the process was terminated by the timeout
             if self.timeout > 0 and self.__proc_timeout.join() > 0:
-                self.result['result'] = 'timeout'
+                self.result.result = 'timeout'
             else:
-                self.result['result'] = 'crash'
-        elif self.result['returncode'] != 0 and self.result['result'] == 'pass':
-            self.result['result'] = 'warn'
+                self.result.result = 'crash'
+        elif self.result.returncode != 0 and self.result.result == 'pass':
+            self.result.result = 'warn'
 
     def run(self):
         """
@@ -223,27 +223,25 @@ class Test(object):
         * For 'returncode', the value will be the numeric exit code/value.
         * For 'command', the value will be command line program and arguments.
         """
-        self.result['command'] = ' '.join(self.command)
-        self.result['environment'] = " ".join(
+        self.result.command = ' '.join(self.command)
+        self.result.environment = " ".join(
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
                 self.OPTS.env.iteritems(), self.env.iteritems()))
 
         try:
             self.is_skip()
         except TestIsSkip as e:
-            self.result['result'] = 'skip'
-            self.result['out'] = unicode(e)
-            self.result['err'] = u""
-            self.result['returncode'] = None
+            self.result.result = 'skip'
+            self.result.out = unicode(e)
+            self.result.returncode = None
             return
 
         try:
             self._run_command()
         except TestRunError as e:
-            self.result['result'] = unicode(e.status)
-            self.result['out'] = unicode(e)
-            self.result['err'] = u""
-            self.result['returncode'] = None
+            self.result.result = unicode(e.status)
+            self.result.out = unicode(e)
+            self.result.returncode = None
             return
 
         self.interpret_result()
@@ -334,9 +332,9 @@ class Test(object):
         # replaces erroneous charcters with the Unicode
         # "replacement character" (a white question mark inside
         # a black diamond).
-        self.result['out'] = out.decode('utf-8', 'replace')
-        self.result['err'] = err.decode('utf-8', 'replace')
-        self.result['returncode'] = returncode
+        self.result.out = out.decode('utf-8', 'replace')
+        self.result.err = err.decode('utf-8', 'replace')
+        self.result.returncode = returncode
 
     def __eq__(self, other):
         return self.command == other.command
@@ -367,7 +365,7 @@ class WindowResizeMixin(object):
         """
         for _ in xrange(5):
             super(WindowResizeMixin, self)._run_command()
-            if "Got spurious window resize" not in self.result['out']:
+            if "Got spurious window resize" not in self.result.out:
                 return
 
         # If we reach this point then there has been no error, but spurious
@@ -404,11 +402,11 @@ class ValgrindMixin(object):
         if self.OPTS.valgrind:
             # If the underlying test failed, simply report
             # 'skip' for this valgrind test.
-            if self.result['result'] != 'pass':
-                self.result['result'] = 'skip'
-            elif self.result['returncode'] == 0:
+            if self.result.result != 'pass':
+                self.result.result = 'skip'
+            elif self.result.returncode == 0:
                 # Test passes and is valgrind clean.
-                self.result['result'] = 'pass'
+                self.result.result = 'pass'
             else:
                 # Test passed but has valgrind errors.
-                self.result['result'] = 'fail'
+                self.result.result = 'fail'

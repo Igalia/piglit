@@ -140,16 +140,16 @@ class DEQPBaseTest(Test):
         return command + self.extra_args
 
     def interpret_result(self):
-        if self.result['returncode'] != 0:
-            self.result['result'] = 'fail'
+        if self.result.returncode != 0:
+            self.result.result = 'fail'
             return
 
-        for line in self.result['out'].split('\n'):
+        for line in self.result.out.split('\n'):
             line = line.lstrip()
             for k, v in self.__RESULT_MAP.iteritems():
                 if line.startswith(k):
-                    self.result['result'] = v
+                    self.result.result = v
                     return
 
         # We failed to parse the test output. Fallback to 'fail'.
-        self.result['result'] = 'fail'
+        self.result.result = 'fail'

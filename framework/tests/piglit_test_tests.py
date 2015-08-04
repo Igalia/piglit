@@ -43,36 +43,36 @@ def test_initialize_piglitcltest():
 
 
 def test_piglittest_interpret_result():
-    """test.piglit_test.PiglitBaseTest.interpret_result(): works no subtests"""
+    """test.piglit_test.PiglitBaseTest.interpret_result(): works with no subtests"""
     test = PiglitBaseTest(['foo'])
-    test.result['out'] = 'PIGLIT: {"result": "pass"}\n'
-    test.result['returncode'] = 0
+    test.result.out = 'PIGLIT: {"result": "pass"}\n'
+    test.result.returncode = 0
     test.interpret_result()
-    nt.eq_(test.result['result'], 'pass')
+    nt.eq_(test.result.result, 'pass')
 
 
 def test_piglittest_interpret_result_subtest():
     """test.piglit_test.PiglitBaseTest.interpret_result(): works with subtests"""
     test = PiglitBaseTest(['foo'])
-    test.result['out'] = ('PIGLIT: {"result": "pass"}\n'
+    test.result.out = ('PIGLIT: {"result": "pass"}\n'
                           'PIGLIT: {"subtest": {"subtest": "pass"}}\n')
-    test.result['returncode'] = 0
+    test.result.returncode = 0
     test.interpret_result()
-    nt.eq_(test.result['subtest']['subtest'], 'pass')
+    nt.eq_(test.result.subtests['subtest'], 'pass')
 
 
 def test_piglitest_no_clobber():
     """test.piglit_test.PiglitBaseTest.interpret_result(): does not clobber subtest entires"""
     test = PiglitBaseTest(['a', 'command'])
-    test.result['out'] = (
+    test.result.out = (
         'PIGLIT: {"result": "pass"}\n'
         'PIGLIT: {"subtest": {"test1": "pass"}}\n'
         'PIGLIT: {"subtest": {"test2": "pass"}}\n'
     )
-    test.result['returncode'] = 0
+    test.result.returncode = 0
     test.interpret_result()
 
-    nt.assert_dict_equal(test.result['subtest'],
+    nt.assert_dict_equal(test.result.subtests,
                          {'test1': 'pass', 'test2': 'pass'})
 
 

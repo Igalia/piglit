@@ -70,7 +70,7 @@ def test_timeout():
     test = _Test(['sleep', '60'])
     test.timeout = 1
     test.run()
-    nt.eq_(test.result['result'], 'timeout')
+    nt.eq_(test.result.result, 'timeout')
 
 
 def test_timeout_pass():
@@ -79,14 +79,14 @@ def test_timeout_pass():
     utils.binary_check('true')
 
     def helper():
-        if (test.result['returncode'] == 0):
-            test.result['result'] = "pass"
+        if (test.result.returncode == 0):
+            test.result.result = "pass"
 
     test = TestTest(['true'])
     test.test_interpret_result = helper
     test.timeout = 1
     test.run()
-    nt.eq_(test.result['result'], 'pass')
+    nt.eq_(test.result.result, 'pass')
 
 
 def test_WindowResizeMixin_rerun():
@@ -99,15 +99,15 @@ def test_WindowResizeMixin_rerun():
             self.__return_spurious = True
 
         def _run_command(self):
-            self.result['returncode'] = None
+            self.result.returncode = None
 
             # IF this is run only once we'll have "got spurious window resize"
-            # in result['out'], if it runs multiple times we'll get 'all good'
+            # in result.out, if it runs multiple times we'll get 'all good'
             if self.__return_spurious:
-                self.result['out'] = "Got spurious window resize"
+                self.result.out = "Got spurious window resize"
                 self.__return_spurious = False
             else:
-                self.result['out'] = 'all good'
+                self.result.out = 'all good'
 
     class Test_(WindowResizeMixin, Mixin, Test):
         def interpret_result(self):
@@ -115,7 +115,7 @@ def test_WindowResizeMixin_rerun():
 
     test = Test_(['foo'])
     test.run()
-    nt.assert_equal(test.result['out'], 'all good')
+    nt.assert_equal(test.result.out, 'all good')
 
 
 def test_run_command_early():
@@ -195,9 +195,9 @@ class TestValgrindMixinRun(object):
         def test(status, expected):
             test = self.test(['foo'])
             test.OPTS.valgrind = True
-            test.result['result'] = status
+            test.result.result = status
             test.run()
-            nt.eq_(test.result['result'], expected)
+            nt.eq_(test.result.result, expected)
 
         desc = ('test.base.ValgrindMixin.run: '
                 'when status is "{}" it is changed to "{}"')
@@ -212,9 +212,9 @@ class TestValgrindMixinRun(object):
         def test(status):
             test = self.test(['foo'])
             test.OPTS.valgrind = False
-            test.result['result'] = status
+            test.result.result = status
             test.run()
-            nt.eq_(test.result['result'], status)
+            nt.eq_(test.result.result, status)
 
         desc = ('test.base.ValgrindMixin.run: when status is "{}" '
                 'it is not changed when not running valgrind.')
@@ -228,17 +228,17 @@ class TestValgrindMixinRun(object):
         """
         test = self.test(['foo'])
         test.OPTS.valgrind = True
-        test.result['result'] = 'pass'
-        test.result['returncode'] = 0
+        test.result.result = 'pass'
+        test.result.returncode = 0
         test.run()
-        nt.eq_(test.result['result'], 'pass')
+        nt.eq_(test.result.result, 'pass')
 
     def test_fallthrough(self):
         """test.base.ValgrindMixin.run: when a test is 'pass' but returncode is not 0 it's 'fail'
         """
         test = self.test(['foo'])
         test.OPTS.valgrind = True
-        test.result['result'] = 'pass'
-        test.result['returncode'] = 1
+        test.result.result = 'pass'
+        test.result.returncode = 1
         test.run()
-        nt.eq_(test.result['result'], 'fail')
+        nt.eq_(test.result.result, 'fail')

@@ -139,10 +139,10 @@ class JUnitBackend(FileBackend):
             res = None
             # Add relevant result value, if the result is pass then it doesn't
             # need one of these statuses
-            if data['result'] == 'skip':
+            if data.result == 'skip':
                 res = etree.SubElement(element, 'skipped')
 
-            elif data['result'] in ['fail', 'dmesg-warn', 'dmesg-fail']:
+            elif data.result in ['fail', 'dmesg-warn', 'dmesg-fail']:
                 if expected_result == "failure":
                     err.text += "\n\nWARN: passing test as an expected failure"
                     res = etree.SubElement(element, 'skipped',
@@ -150,7 +150,7 @@ class JUnitBackend(FileBackend):
                 else:
                     res = etree.SubElement(element, 'failure')
 
-            elif data['result'] == 'crash':
+            elif data.result == 'crash':
                 if expected_result == "error":
                     err.text += "\n\nWARN: passing test as an expected crash"
                     res = etree.SubElement(element, 'skipped',
@@ -165,7 +165,7 @@ class JUnitBackend(FileBackend):
 
             # Add the piglit type to the failure result
             if res is not None:
-                res.attrib['type'] = str(data['result'])
+                res.attrib['type'] = str(data.result)
 
         # Split the name of the test and the group (what junit refers to as
         # classname), and replace piglits '/' separated groups with '.', after
@@ -196,22 +196,22 @@ class JUnitBackend(FileBackend):
         element = etree.Element('testcase', name=full_test_name,
                                 classname=classname,
                                 # Incomplete will not have a time.
-                                time=str(data.get('time')),
-                                status=str(data['result']))
+                                time=str(data.time),
+                                status=str(data.result))
 
         # If this is an incomplete status then none of these values will be
         # available, nor
-        if data['result'] != 'incomplete':
+        if data.result != 'incomplete':
             # Add stdout
             out = etree.SubElement(element, 'system-out')
-            out.text = data['out']
+            out.text = data.out
 
             # Prepend command line to stdout
-            out.text = data['command'] + '\n' + out.text
+            out.text = data.command + '\n' + out.text
 
             # Add stderr
             err = etree.SubElement(element, 'system-err')
-            err.text = data['err']
+            err.text = data.err
             calculate_result()
         else:
             etree.SubElement(element, 'failure', message='Incomplete run.')
@@ -252,15 +252,15 @@ def _load(results_file):
         if name.endswith('_'):
             name = name[:-1]
 
-        result['result'] = status.status_lookup(test.attrib['status'])
-        result['time'] = float(test.attrib['time'])
-        result['err'] = test.find('system-err').text
+        result.result = test.attrib['status']
+        result.time = float(test.attrib['time'])
+        result.err = test.find('system-err').text
 
         # The command is prepended to system-out, so we need to separate those
         # into two separate elements
         out = test.find('system-out').text.split('\n')
-        result['command'] = out[0]
-        result['out'] = '\n'.join(out[1:])
+        result.command = out[0]
+        result.out = '\n'.join(out[1:])
 
         run_result.tests[name] = result
     

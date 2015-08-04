@@ -32,6 +32,7 @@ import nose.tools as nt
 
 import framework.summary as summary
 import framework.tests.utils as utils
+from framework.backends.json import piglit_encoder
 
 
 @utils.no_error
@@ -72,10 +73,12 @@ def test_summary_add_to_set():
 def check_sets(old, ostat, new, nstat, set_):
     """ Check that the statuses are added to the correct set """
     old['tests']['sometest']['result'] = ostat
+    old['tests']['sometest']['__type__'] = 'TestResult'
     new['tests']['sometest']['result'] = nstat
+    new['tests']['sometest']['__type__'] = 'TestResult'
 
-    with utils.tempfile(json.dumps(old)) as ofile:
-        with utils.tempfile(json.dumps(new)) as nfile:
+    with utils.tempfile(json.dumps(old, default=piglit_encoder)) as ofile:
+        with utils.tempfile(json.dumps(new, default=piglit_encoder)) as nfile:
             summ = summary.Summary([ofile, nfile])
 
             print(summ.tests)
@@ -88,22 +91,22 @@ class TestSubtestHandling(object):
     @classmethod
     def setup_class(cls):
         data = copy.deepcopy(utils.JSON_DATA)
+        data['tests']['sometest']['__type__'] = 'TestResult'
         data['tests']['with_subtests']['result'] = 'pass'
+        data['tests']['with_subtests']['__type__'] = 'TestResult'
 
-        data['tests']['with_subtests']['subtest']['subtest1'] = 'fail'
-        data['tests']['with_subtests']['subtest']['subtest2'] = 'warn'
-        data['tests']['with_subtests']['subtest']['subtest3'] = 'crash'
+        data['tests']['with_subtests']['subtests']['subtest1'] = 'fail'
+        data['tests']['with_subtests']['subtests']['subtest2'] = 'warn'
+        data['tests']['with_subtests']['subtests']['subtest3'] = 'crash'
         data['tests']['is_skip']['result'] = 'skip'
+        data['tests']['is_skip']['__type__'] = 'TestResult'
 
-        with utils.tempfile(json.dumps(data)) as sumfile:
+        with utils.tempfile(json.dumps(data, default=piglit_encoder)) as sumfile:
             cls.summ = summary.Summary([sumfile])
 
     def test_subtests_are_tests(self):
         """summary.Summary: Subtests should be treated as full tests"""
-        nt.assert_equal(
-            self.summ.fractions['fake-tests']['with_subtests'], (0, 3),
-            msg="Summary.fraction['fake-tests']['with_subtests'] should "
-                "be (0, 3), but isn't")
+        nt.eq_(self.summ.fractions['fake-tests']['with_subtests'], (0, 3))
 
     def test_tests_w_subtests_are_groups(self):
         """summary.Summary: Tests with subtests should be a group
@@ -112,21 +115,13 @@ class TestSubtestHandling(object):
         will be 'crash' if it has. (since we set the data that way)
 
         """
-        nt.assert_equal(
-            self.summ.status['fake-tests']['with_subtests'], 'crash',
-            msg="Summary.status['fake-tests']['with_subtests'] should "
-                "be crash, but isn't")
+        nt.eq_(self.summ.status['fake-tests']['with_subtests'], 'crash')
 
     def test_removed_from_all(self):
         """summary.Summary: Tests with subtests should not be in the all results
         """
-        nt.assert_not_in(
-            'with_subtests', self.summ.tests['all'],
-            msg="Test with subtests should have been removed from "
-                "self.tests['all'], but wasn't")
+        nt.assert_not_in('with_subtests', self.summ.tests['all'])
 
     def subtest_not_skip_notrun(self):
         """summary.Summary: skips are not changed to notruns"""
-        nt.eq_(
-            self.summ.status['fake-tests']['is_skip'], 'skip',
-            msg="Status should be skip but was changed")
+        nt.eq_(self.summ.status['fake-tests']['is_skip'], 'skip')

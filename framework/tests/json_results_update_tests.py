@@ -159,9 +159,8 @@ class TestV0toV1(object):
         nt.ok_(self.RESULT.tests.get('group1/groupA/test'))
 
     def test_subtests_test_is_testresult(self):
-        """backends.json.update_results (0 -> 1): The result of the new test is a TestResult Instance"""
-        nt.ok_(isinstance(self.RESULT.tests['group1/groupA/test'],
-                          results.TestResult))
+        """backends.json.update_results (0 -> 1): The result of the new test is a dict Instance"""
+        nt.ok_(isinstance(self.RESULT.tests['group1/groupA/test'], dict))
 
     def test_info_delete(self):
         """backends.json.update_results (0 -> 1): Remove the info name from results"""
@@ -233,7 +232,8 @@ class TestV0toV1(object):
             data = self.DATA
 
         try:
-            with utils.tempfile(json.dumps(data)) as t:
+            with utils.tempfile(
+                    json.dumps(data, default=backends.json.piglit_encoder)) as t:
                 result = backends.json.load_results(t, 'none')
         except OSError as e:
             # There is the potential that the file will be renamed. In that event
@@ -253,7 +253,7 @@ class TestV0toV1(object):
 
         """
         result = self._load_with_update()
-        nt.assert_equal(result.tests['sometest']['dmesg'], 'this\nis\ndmesg')
+        nt.assert_equal(result.tests['sometest'].dmesg, 'this\nis\ndmesg')
 
     def test_load_results_v0(self):
         """backends.json.load_results: Loads results v0 and updates correctly.
@@ -265,7 +265,7 @@ class TestV0toV1(object):
         data['results_version'] = 0
 
         result = self._load_with_update(data)
-        nt.assert_equal(result.tests['sometest']['dmesg'], 'this\nis\ndmesg')
+        nt.assert_equal(result.tests['sometest'].dmesg, 'this\nis\ndmesg')
 
     def test_info_split(self):
         """backends.json.update_results (0 -> 1): info can split into any number of elements"""
@@ -273,7 +273,8 @@ class TestV0toV1(object):
         data['tests']['sometest']['info'] = \
             'Returncode: 1\n\nErrors:stderr\n\nOutput: stdout\n\nmore\n\nstuff'
 
-        with utils.tempfile(json.dumps(data)) as t:
+        with utils.tempfile(
+                json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 backends.json._update_zero_to_one(backends.json._load(f))
 
@@ -317,7 +318,8 @@ class TestV2Update(object):
             }
         }
 
-        with utils.tempfile(json.dumps(data)) as t:
+        with utils.tempfile(
+                json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_one_to_two(
                     backends.json._load(f))
@@ -384,7 +386,8 @@ class TestV2NoUpdate(object):
             }
         }
 
-        with utils.tempfile(json.dumps(data)) as t:
+        with utils.tempfile(
+                json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_one_to_two(
                     backends.json._load(f))
@@ -460,7 +463,8 @@ class TestV2toV3(object):
             }
         }
 
-        with utils.tempfile(json.dumps(data)) as t:
+        with utils.tempfile(
+                json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 # pylint: disable=protected-access
                 cls.RESULT = backends.json._update_two_to_three(backends.json._load(f))
@@ -525,7 +529,8 @@ class TestV3toV4(object):
     @staticmethod
     def _make_result(data):
         """Write data to a file and return a result.TestrunResult object."""
-        with utils.tempfile(json.dumps(data)) as t:
+        with utils.tempfile(
+                json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 # pylint: disable=protected-access
                 return backends.json._update_three_to_four(backends.json._load(f))
@@ -614,7 +619,8 @@ class TestV4toV5(object):
             "has@windows",
         ]
 
-        with utils.tempfile(json.dumps(cls.DATA)) as t:
+        with utils.tempfile(
+                json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_four_to_five(backends.json._load(f))
 
@@ -636,12 +642,63 @@ class TestV4toV5(object):
         for new in self.new:
             nt.assert_dict_equal(self.result.tests[new], self.TEST_DATA)
 
+
+class TestV5toV6(object):
+    TEST_DATA = {
+        'returncode': 0,
+        'err': None,
+        'environment': None,
+        'command': 'foo',
+        'result': 'skip',
+        'time': 0.123,
+        'out': None,
+    }
+
+    DATA = {
+        "results_version": 4,
+        "name": "test",
+        "options": {
+            "profile": ['quick'],
+            "dmesg": False,
+            "verbose": False,
+            "platform": "gbm",
+            "sync": False,
+            "valgrind": False,
+            "filter": [],
+            "concurrent": "all",
+            "test_count": 0,
+            "exclude_tests": [],
+            "exclude_filter": [],
+            "env": {
+                "lspci": "stuff",
+                "uname": "more stuff",
+                "glxinfo": "and stuff",
+                "wglinfo": "stuff"
+            }
+        },
+        "tests": {
+            'a@test': TEST_DATA,
+        }
+    }
+
+    @classmethod
+    def setup_class(cls):
+        """Class setup. Create a TestrunResult with v4 data."""
+        with utils.tempfile(
+                json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
+            with open(t, 'r') as f:
+                cls.result = backends.json._update_five_to_six(backends.json._load(f))
+
+    def test_result_is_TestResult(self):
+        """backends.json.update_results (5 -> 6): A test result is converted to a TestResult instance"""
+        nt.ok_(isinstance(self.result.tests['a@test'], results.TestResult))
+
     def test_load_results(self):
-        """backends.json.update_results (4 -> 5): load_results properly updates."""
+        """backends.json.update_results (5 -> 6): load_results properly updates."""
         with utils.tempdir() as d:
             tempfile = os.path.join(d, 'results.json')
             with open(tempfile, 'w') as f:
-                json.dump(self.DATA, f)
+                json.dump(self.DATA, f, default=backends.json.piglit_encoder)
             with open(tempfile, 'r') as f:
                 result = backends.json.load_results(tempfile, 'none')
-                nt.assert_equal(result.results_version, 5)
+                nt.assert_equal(result.results_version, 6)

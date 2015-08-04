@@ -171,7 +171,7 @@ class FileBackend(Backend):
         self._file_sync = file_fsync
         self._write_final = write_compressed
 
-    __INCOMPLETE = TestResult({'result': INCOMPLETE})
+    __INCOMPLETE = TestResult(result=INCOMPLETE)
 
     def __fsync(self, file_):
         """ Sync the file to disk

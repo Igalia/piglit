@@ -35,8 +35,8 @@ try:
 except ImportError:
     import json
 
-import framework.core as core
 import framework.tests.utils as utils
+from framework import core, results
 from framework.backends.json import JSONBackend
 from framework.programs.run import _create_metadata
 
@@ -74,7 +74,7 @@ class TestJsonOutput(utils.StaticDirectory):
         backend = JSONBackend(cls.tdir, file_fsync=True)
         backend.initialize(_create_metadata(args, 'test', core.Options()))
         with backend.write_test('result') as t:
-            t({'result': 'pass'})
+            t(results.TestResult('pass'))
         backend.finalize({'time_elapsed': 1.22})
         with open(os.path.join(cls.tdir, 'results.json'), 'r') as f:
             cls.json = json.load(f)

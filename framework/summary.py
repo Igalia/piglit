@@ -38,6 +38,7 @@ from mako.template import Template
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
 import framework.status as so
+import framework.results
 from framework import grouptools, backends, exceptions
 
 __all__ = [
@@ -188,7 +189,7 @@ class HTMLIndex(list):
                 # If the "group" at the top of the key heirachy contains
                 # 'subtest' then it is really not a group, link to that page
                 try:
-                    if each.tests[grouptools.groupname(key)]['subtest']:
+                    if each.tests[grouptools.groupname(key)].subtests:
                         href = grouptools.groupname(key)
                 except KeyError:
                     href = key
@@ -342,24 +343,18 @@ class Summary:
             temp_results = {}
 
             for key, value in results.tests.iteritems():
-                # if the first character of key is a / then our while loop will
-                # become an infinite loop. Beyond that / should never be the
-                # leading character, if it is then there is a bug in one of the
-                # test profiles.
-                assert key[0] != '/'
-
                 # Treat a test with subtests as if it is a group, assign the
                 # subtests' statuses and fractions down to the test, and then
                 # proceed like normal.
-                if 'subtest' in value:
-                    for (subt, subv) in value['subtest'].iteritems():
+                if value.subtests:
+                    for (subt, subv) in value.subtests.iteritems():
                         subt = grouptools.join(key, subt)
                         subv = so.status_lookup(subv)
 
                         # Add the subtest to the fractions and status lists
                         fraction[subt] = subv.fraction
                         status[subt] = subv
-                        temp_results.update({subt: {'result': subv}})
+                        temp_results.update({subt: framework.results.TestResult(subv)})
 
                         self.tests['all'].add(subt)
                         while subt != '':
@@ -377,11 +372,11 @@ class Summary:
                     # if the status of the previous level was worse, but is not
                     # skip
                     while key != '':
-                        fgh(key, value['result'])
+                        fgh(key, value.result)
                         key = grouptools.groupname(key)
 
                     # when we hit the root update the 'all' group and stop
-                    fgh('all', value['result'])
+                    fgh('all', value.result)
 
             # Update the the results.tests dictionary with the subtests so that
             # they are entered into the appropriate pages other than all.
@@ -395,7 +390,7 @@ class Summary:
             status = []
             for each in self.results:
                 try:
-                    status.append(each.tests[test]['result'])
+                    status.append(each.tests[test].result)
                 except KeyError:
                     status.append(so.NOTRUN)
 
@@ -440,7 +435,7 @@ class Summary:
                        'dmesg-fail': 0, 'incomplete': 0,}
 
         for test in results.tests.itervalues():
-            self.totals[str(test['result'])] += 1
+            self.totals[str(test.result)] += 1
 
     def generate_html(self, destination, exclude):
         """
@@ -513,15 +508,15 @@ class Summary:
                                       escape_filename(key + ".html"))
                 temp_path = path.dirname(html_path)
 
-                if value['result'] not in exclude:
+                if value.result not in exclude:
                     # os.makedirs is very annoying, it throws an OSError if
                     # the path requested already exists, so do this check to
                     # ensure that it doesn't
                     if not path.exists(temp_path):
                         os.makedirs(temp_path)
 
-                    if value.get('time') is not None:
-                        value['time'] = datetime.timedelta(0, value['time'])
+                    if value.time:
+                        value.time = datetime.timedelta(0, value.time)
 
                     with open(html_path, 'w') as out:
                         out.write(testfile.render(
@@ -581,11 +576,19 @@ class Summary:
             result.
 
             """
+            def make_status(test):
+                elems = []
+                for res in self.results:
+                    try:
+                        elems.append(str(res.tests[test].result))
+                    except KeyError:
+                        elems.append(str(so.NOTRUN))
+                return ' '.join(elems)
+
             for test in list_:
                 print("{test}: {statuses}".format(
                     test='/'.join(test.split(grouptools.SEPARATOR)),
-                    statuses=' '.join(str(i.tests.get(test, {'result': so.SKIP})
-                                          ['result']) for i in self.results)))
+                    statuses=make_status(test)))
 
         def print_summary():
             """print a summary."""

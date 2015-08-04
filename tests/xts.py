@@ -136,29 +136,29 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
         try:
             with open(self.test_results_file, 'r') as rfile:
                 log = rfile.read()
-                self.result['out'] = log
+                self.result.out = log
                 os.remove(self.test_results_file)
         except IOError:
-            self.result['err'] = "No results file found"
+            self.result.err = "No results file found"
 
-        if self.result['returncode'] == 0:
-            if re.search('FAIL', self.result['out']) is not None:
-                self.result['result'] = 'fail'
-            elif re.search('PASS', self.result['out']) is not None:
-                self.result['result'] = 'pass'
+        if self.result.returncode == 0:
+            if re.search('FAIL', self.result.out) is not None:
+                self.result.result = 'fail'
+            elif re.search('PASS', self.result.out) is not None:
+                self.result.result = 'pass'
             else:
-                self.result['result'] = 'fail'
-        elif self.result['returncode'] == 77:
-            self.result['result'] = 'skip'
-        elif self.result['returncode'] == 1:
+                self.result.result = 'fail'
+        elif self.result.returncode == 77:
+            self.result.result = 'skip'
+        elif self.result.returncode == 1:
             if re.search('Could not open all VSW5 fonts', log):
-                self.result['result'] = 'warn'
+                self.result.result = 'warn'
             else:
-                self.result['result'] = 'fail'
+                self.result.result = 'fail'
         else:
-            self.result['result'] = 'fail'
+            self.result.result = 'fail'
 
-        self.result['images'] = self._process_log_for_images(log)
+        self.result.images = self._process_log_for_images(log)
 
 
 class RendercheckTest(Test):
@@ -167,12 +167,12 @@ class RendercheckTest(Test):
         self.testname = "rendercheck " + " ".join(args)
 
     def interpret_result(self):
-        if self.result['returncode'] == 0:
-            self.result['result'] = 'pass'
-        elif self.result['returncode'] == 77:
-            self.result['result'] = 'skip'
+        if self.result.returncode == 0:
+            self.result.result = 'pass'
+        elif self.result.returncode == 77:
+            self.result.result = 'skip'
         else:
-            self.result['result'] = 'fail'
+            self.result.result = 'fail'
 
 
 def _populate_profile_xts(profile):

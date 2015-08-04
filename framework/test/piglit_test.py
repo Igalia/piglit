@@ -66,12 +66,13 @@ class PiglitBaseTest(ValgrindMixin, Test):
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
 
     def interpret_result(self):
-        outlines = self.result['out'].split('\n')
+        outlines = self.result.out.split('\n')
         outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
 
+        # FIXME: handle this properly. It needs a method in TestResult probably
         for piglit in outpiglit:
-            self.result.recursive_update(json.loads(piglit))
-        self.result['out'] = '\n'.join(
+            self.result.update(json.loads(piglit))
+        self.result.out = '\n'.join(
             s for s in outlines if not s.startswith('PIGLIT:'))
 
         super(PiglitBaseTest, self).interpret_result()

@@ -32,6 +32,7 @@ import functools
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 
+from framework import results
 from framework.tests import utils
 from framework.backends import compression, abstract
 
@@ -111,7 +112,7 @@ def _test_extension():
         obj = _TestBackend(d)
         obj.initialize()
         with obj.write_test('foo') as t:
-            t({'result': 'foo'})
+            t(results.TestResult('pass'))
 
         obj.finalize()
 

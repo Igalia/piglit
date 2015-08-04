@@ -25,7 +25,7 @@ from __future__ import print_function, absolute_import
 
 import nose.tools as nt
 
-from framework import results, status
+from framework import results, status, exceptions
 import framework.tests.utils as utils
 
 
@@ -49,8 +49,235 @@ def test_generate_initialize():
         yield check, target
 
 
-def test_testresult_load_to_status():
-    """results.TestResult: an initial status value is converted to a Status object"""
-    result = results.TestResult.load({'result': 'pass'})
-    nt.ok_(isinstance(result['result'], status.Status),
-           msg="Result key not converted to a status object")
+def test_Subtests_convert():
+    """results.Subtests.__setitem__: converts strings to statues"""
+    test = results.Subtests()
+    test['foo'] = 'pass'
+    nt.assert_is(test['foo'], status.PASS)
+
+
+def test_Subtests_to_json():
+    """results.Subtests.to_json: sets values properly"""
+    baseline = {
+        'foo': status.PASS,
+        'bar': status.CRASH,
+        '__type__': 'Subtests',
+    }
+
+    test = results.Subtests()
+    test['foo'] = status.PASS
+    test['bar'] = status.CRASH
+
+    nt.assert_dict_equal(baseline, test.to_json())
+
+
+def test_Subtests_from_dict():
+    """results.Subtests.from_dict: restores values properly"""
+    baseline = results.Subtests()
+    baseline['foo'] = status.PASS
+    baseline['bar'] = status.CRASH
+
+    test = results.Subtests.from_dict(baseline.to_json())
+
+    nt.assert_dict_equal(baseline, test)
+
+
+def test_Subtests_from_dict_instance():
+    """results.Subtests.from_dict: restores values properly"""
+    baseline = results.Subtests()
+    baseline['foo'] = status.PASS
+
+    test = results.Subtests.from_dict(baseline.to_json())
+
+    nt.assert_is(test['foo'], status.PASS)
+
+
+def test_TestResult_from_dict_inst():
+    """results.TestResult.from_dict: returns a TestResult"""
+    test = results.TestResult.from_dict({'result': 'pass'})
+    nt.ok_(isinstance(test, results.TestResult))
+
+
+class TestTestResultFromDictAttributes(object):
+    """A series of tests to show that each attribute is sucessfully populated.
+    """
+    @classmethod
+    def setup_class(cls):
+        dict_ = {
+            'returncode': 10,
+            'err': 'stderr',
+            'out': 'stdout',
+            'time': 1.2345,
+            'command': 'this is a command',
+            'environment': 'environment variables',
+            'result': 'pass',
+            'dmesg': 'this is some dmesg',
+        }
+
+        cls.test = results.TestResult.from_dict(dict_)
+
+    def test_returncode(self):
+        """results.TestResult.from_dict: sets returncode correctly"""
+        nt.eq_(self.test.returncode, 10)
+
+    def test_err(self):
+        """results.TestResult.from_dict: sets err correctly"""
+        nt.eq_(self.test.err, 'stderr')
+
+    def test_out(self):
+        """results.TestResult.from_dict: sets out correctly"""
+        nt.eq_(self.test.out, 'stdout')
+
+    def test_time(self):
+        """results.TestResult.from_dict: sets time correctly"""
+        nt.eq_(self.test.time, 1.2345)
+
+    def test_command(self):
+        """results.TestResult.from_dict: sets command correctly"""
+        nt.eq_(self.test.command, 'this is a command')
+
+    def test_environment(self):
+        """results.TestResult.from_dict: sets environment correctly"""
+        nt.eq_(self.test.environment, 'environment variables')
+
+    def test_result(self):
+        """results.TestResult.from_dict: sets result correctly"""
+        nt.eq_(self.test.result, 'pass')
+
+    def test_dmesg(self):
+        """dmesgs.TestResult.from_dict: sets dmesg correctly"""
+        nt.eq_(self.test.dmesg, 'this is some dmesg')
+
+
+def test_TestResult_result_getter():
+    """results.TestResult.result: Getter returns the result when there are no subtests"""
+    test = results.TestResult('pass')
+    nt.eq_(test.result, 'pass')
+
+
+def test_TestResult_result_setter():
+    """results.TestResult.result: setter makes the result a status"""
+    test = results.TestResult('pass')
+    test.result = 'fail'
+    nt.ok_(isinstance(test.result, status.Status))
+    nt.eq_(test.result, 'fail')
+
+
+@nt.raises(exceptions.PiglitFatalError)
+def test_TestResult_result_setter_invalid():
+    """results.TestResult.result: setter raises PiglitFatalError for invalid values"""
+    test = results.TestResult('pass')
+    test.result = 'poop'
+
+
+class TestTestResult_to_json(object):
+    """Tests for the attributes of the to_json method."""
+    @classmethod
+    def setup_class(cls):
+        cls.dict = {
+            'returncode': 100,
+            'err': 'this is an err',
+            'out': 'this is some text',
+            'time': 0.5,
+            'environment': 'some env stuff',
+            'subtests': {
+                'a': 'pass',
+                'b': 'fail',
+            },
+            'result': 'crash',
+        }
+
+        test = results.TestResult.from_dict(cls.dict)
+
+        cls.json = test.to_json()
+
+    def test_returncode(self):
+        """results.TestResult.to_json: sets the returncode correctly"""
+        nt.eq_(self.dict['returncode'], self.json['returncode'])
+
+    def test_err(self):
+        """results.TestResult.to_json: sets the err correctly"""
+        nt.eq_(self.dict['err'], self.json['err'])
+
+    def test_out(self):
+        """results.TestResult.to_json: sets the out correctly"""
+        nt.eq_(self.dict['out'], self.json['out'])
+
+    def test_time(self):
+        """results.TestResult.to_json: sets the time correctly"""
+        nt.eq_(self.dict['time'], self.json['time'])
+
+    def test_environment(self):
+        """results.TestResult.to_json: sets the environment correctly"""
+        nt.eq_(self.dict['environment'], self.json['environment'])
+
+    def test_subtests(self):
+        """results.TestResult.to_json: sets the subtests correctly"""
+        nt.eq_(self.dict['subtests'], self.json['subtests'])
+
+    def test_type(self):
+        """results.TestResult.to_json: adds the __type__ hint"""
+        nt.eq_(self.json['__type__'], 'TestResult')
+
+
+class TestTestResult_from_dict(object):
+    """Tests for the from_dict method."""
+    @classmethod
+    def setup_class(cls):
+        cls.dict = {
+            'returncode': 100,
+            'err': 'this is an err',
+            'out': 'this is some text',
+            'time': 0.5,
+            'environment': 'some env stuff',
+            'subtests': {
+                'a': 'pass',
+                'b': 'fail',
+            },
+            'result': 'crash',
+        }
+
+        cls.test = results.TestResult.from_dict(cls.dict)
+
+    def test_returncode(self):
+        """results.TestResult.from_dict: sets returncode properly"""
+        nt.eq_(self.test.returncode, self.dict['returncode'])
+
+    def test_err(self):
+        """results.TestResult.from_dict: sets err properly"""
+        nt.eq_(self.test.err, self.dict['err'])
+
+    def test_out(self):
+        """results.TestResult.from_dict: sets out properly"""
+        nt.eq_(self.test.out, self.dict['out'])
+
+    def test_time(self):
+        """results.TestResult.from_dict: sets time properly"""
+        nt.eq_(self.test.time, self.dict['time'])
+
+    def test_environment(self):
+        """results.TestResult.from_dict: sets environment properly"""
+        nt.eq_(self.test.environment, self.dict['environment'])
+
+    def test_subtests(self):
+        """results.TestResult.from_dict: sets subtests properly"""
+        nt.eq_(self.test.subtests, self.dict['subtests'])
+
+    def test_subtests_type(self):
+        """results.TestResult.from_dict: subtests are Status instances"""
+        nt.assert_is(self.test.subtests['a'], status.PASS)
+        nt.assert_is(self.test.subtests['b'], status.FAIL)
+
+
+def test_TestResult_update():
+    """results.TestResult.update: result is updated"""
+    test = results.TestResult('pass')
+    test.update({'result': 'incomplete'})
+    nt.eq_(test.result, 'incomplete')
+
+
+def test_TestResult_update_subtests():
+    """results.TestResult.update: subests are updated"""
+    test = results.TestResult('pass')
+    test.update({'subtest': {'result': 'incomplete'}})
+    nt.eq_(test.subtests['result'], 'incomplete')

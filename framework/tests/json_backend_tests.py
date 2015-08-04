@@ -68,13 +68,13 @@ def test_json_initialize_metadata():
 class TestJSONTestMethod(utils.StaticDirectory):
     @classmethod
     def setup_class(cls):
-        cls.test_name = 'a/test/group/test1'
-        cls.result = results.TestResult({
-            'time': 1.2345,
-            'result': 'pass',
-            'out': 'this is stdout',
-            'err': 'this is stderr',
-        })
+        cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
+        cls.result = results.TestResult()
+        cls.time = 1.2345
+        cls.result = 'pass'
+        cls.out = 'this is stdout'
+        cls.err = 'this is stderr'
+
         super(TestJSONTestMethod, cls).setup_class()
         test = backends.json.JSONBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
@@ -104,12 +104,8 @@ class TestJSONTestFinalize(utils.StaticDirectory):
     @classmethod
     def setup_class(cls):
         cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
-        cls.result = results.TestResult({
-            'time': 1.2345,
-            'result': 'pass',
-            'out': 'this is stdout',
-            'err': 'this is stderr',
-        })
+        cls.result = results.TestResult('pass')
+
         super(TestJSONTestFinalize, cls).setup_class()
         test = backends.json.JSONBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
@@ -144,7 +140,7 @@ def test_update_results_current():
 
     with utils.tempdir() as d:
         with open(os.path.join(d, 'main'), 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f, default=backends.json.piglit_encoder)
 
         with open(os.path.join(d, 'main'), 'r') as f:
             base = backends.json._load(f)
@@ -195,11 +191,11 @@ def test_resume_load_valid():
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         with backend.write_test("group1/test1") as t:
-            t({'result': 'fail'})
+            t(results.TestResult('fail'))
         with backend.write_test("group1/test2") as t:
-            t({'result': 'pass'})
+            t(results.TestResult('pass'))
         with backend.write_test("group2/test3") as t:
-            t({'result': 'fail'})
+            t(results.TestResult('fail'))
 
         test = backends.json._resume(f)
 
@@ -215,11 +211,11 @@ def test_resume_load_invalid():
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         with backend.write_test("group1/test1") as t:
-            t({'result': 'fail'})
+            t(results.TestResult('fail'))
         with backend.write_test("group1/test2") as t:
-            t({'result': 'pass'})
+            t(results.TestResult('pass'))
         with backend.write_test("group2/test3") as t:
-            t({'result': 'fail'})
+            t(results.TestResult('fail'))
         with open(os.path.join(f, 'tests', 'x.json'), 'w') as w:
             w.write('foo')
 
@@ -243,13 +239,13 @@ def test_resume_load_incomplete():
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         with backend.write_test("group1/test1") as t:
-            t({'result': 'fail'})
+            t(results.TestResult('fail'))
         with backend.write_test("group1/test2") as t:
-            t({'result': 'pass'})
+            t(results.TestResult('pass'))
         with backend.write_test("group2/test3") as t:
-            t({'result': 'crash'})
+            t(results.TestResult('crash'))
         with backend.write_test("group2/test4") as t:
-            t({'result': 'incomplete'})
+            t(results.TestResult('incomplete'))
 
         test = backends.json._resume(f)
 
@@ -266,7 +262,8 @@ def test_load_results_folder_as_main():
     """
     with utils.tempdir() as tdir:
         with open(os.path.join(tdir, 'main'), 'w') as tfile:
-            tfile.write(json.dumps(utils.JSON_DATA))
+            tfile.write(json.dumps(utils.JSON_DATA,
+                                   default=backends.json.piglit_encoder))
 
         backends.json.load_results(tdir, 'none')
 
@@ -276,7 +273,8 @@ def test_load_results_folder():
     """backends.json.load_results: takes a folder with a file named results.json"""
     with utils.tempdir() as tdir:
         with open(os.path.join(tdir, 'results.json'), 'w') as tfile:
-            tfile.write(json.dumps(utils.JSON_DATA))
+            tfile.write(json.dumps(utils.JSON_DATA,
+                                   default=backends.json.piglit_encoder))
 
         backends.json.load_results(tdir, 'none')
 
@@ -293,7 +291,7 @@ def test_load_json():
     with utils.tempdir() as tdir:
         filename = os.path.join(tdir, 'results.json')
         with open(filename, 'w') as f:
-            json.dump(utils.JSON_DATA, f)
+            json.dump(utils.JSON_DATA, f, default=backends.json.piglit_encoder)
 
         result = backends.load(filename)
 
@@ -301,11 +299,19 @@ def test_load_json():
     nt.assert_in('sometest', result.tests)
 
 
-def test_piglit_decoder():
-    """backends.json.piglit_decoder: Works correctly"""
-    test = json.loads('{"foo": {"result": "pass"}}',
+def test_piglit_decoder_result():
+    """backends.json.piglit_decoder: turns results into TestResults"""
+    test = json.loads('{"foo": {"result": "pass", "__type__": "TestResult"}}',
                       object_hook=backends.json.piglit_decoder)
     nt.assert_is_instance(test['foo'], results.TestResult)
+
+
+def test_piglit_decoder_old_result():
+    """backends.json.piglit_decoder: does not turn old results into TestResults
+    """
+    test = json.loads('{"foo": {"result": "pass"}}',
+                      object_hook=backends.json.piglit_decoder)
+    nt.assert_is_instance(test['foo'], dict)
 
 
 @nt.raises(exceptions.PiglitFatalError)

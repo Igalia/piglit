@@ -22,7 +22,8 @@
 """ Module for results generation """
 
 from __future__ import print_function, absolute_import
-import framework.status as status
+
+from framework import status, exceptions
 
 __all__ = [
     'TestrunResult',
@@ -30,58 +31,112 @@ __all__ = [
 ]
 
 
-class TestResult(dict):
-    def recursive_update(self, dictionary):
-        """ Recursively update the TestResult
+class Subtests(dict):
+    def __setitem__(self, name, value):
+        super(Subtests, self).__setitem__(name, status.status_lookup(value))
 
-        The problem with using self.update() is this:
-        >>> t = TestResult()
-        >>> t.update({'subtest': {'test1': 'pass'}})
-        >>> t.update({'subtest': {'test2': 'pass'}})
-        >>> t['subtest']
-        {'test2': 'pass'}
-
-        This function is different, because it recursively updates self, it
-        doesn't clobber existing entires in the same way
-        >>> t = TestResult()
-        >>> t.recursive_update({'subtest': {'test1': 'pass'}})
-        >>> t.recursive_update({'subtest': {'test2': 'pass'}})
-        >>> t['subtest']
-        {'test1': 'pass', 'test2': 'pass'}
-
-        Arguments:
-        dictionary -- a dictionary instance to update the TestResult with
-
-        """
-        def update(d, u, check):
-            for k, v in u.iteritems():
-                if isinstance(v, dict):
-                    d[k] = update(d.get(k, {}), v, True)
-                else:
-                    if check and k in d:
-                        print("Warning: duplicate subtest: {} value: {} old value: {}".format(k, v, d[k]))
-                    d[k] = v
-            return d
-
-        update(self, dictionary, False)
+    def to_json(self):
+        res = dict(self)
+        res['__type__'] = 'Subtests'
+        return res
 
     @classmethod
-    def load(cls, res):
-        """Load an already generated result.
+    def from_dict(cls, dict_):
+        res = cls(dict_)
+
+        if '__type__' in res:
+            del res['__type__']
+
+        return res
+
+
+class TestResult(object):
+    """An object represting the result of a single test."""
+    __slots__ = ['returncode', 'err', 'out', 'time', 'command', 'environment',
+                 'subtests', 'dmesg', '__result', 'images', 'traceback']
+
+    def __init__(self, result=None):
+        self.returncode = None
+        self.err = str()
+        self.out = str()
+        self.time = float()
+        self.command = str()
+        self.environment = str()
+        self.subtests = Subtests()
+        self.dmesg = str()
+        self.images = None
+        self.traceback = None
+        if result:
+            self.result = result
+        else:
+            self.__result = status.NOTRUN
+
+    @property
+    def result(self):
+        """Return the result of the test.
+
+        If there are subtests return the "worst" value of those subtests. If
+        there are not return the stored value of the test.
+
+        """
+        return self.__result
+
+    @result.setter
+    def result(self, new):
+        try:
+            self.__result = status.status_lookup(new)
+        except exceptions.PiglitInternalError as e:
+            raise exceptions.PiglitFatalError(str(e))
+
+    def to_json(self):
+        """Return the TestResult as a json serializable object."""
+        obj = {
+            '__type__': 'TestResult',
+            'returncode': self.returncode,
+            'err': self.err,
+            'out': self.out,
+            'time': self.time,
+            'environment': self.environment,
+            'subtests': self.subtests,
+            'result': self.result,
+        }
+        return obj
+
+    @classmethod
+    def from_dict(cls, dict_):
+        """Load an already generated result in dictionary form.
 
         This is used as an alternate constructor which converts an existing
         dictionary into a TestResult object. It converts a key 'result' into a
         status.Status object
 
         """
-        result = cls(res)
+        inst = cls()
 
-        # Replace the result with a status object. 'result' is a required key
-        # for results, so don't do any checking. This should fail if it doesn't
-        # exist.
-        result['result'] = status.status_lookup(result['result'])
+        # TODO: There's probably a more clever way to do this
+        for each in ['returncode', 'err', 'out', 'time', 'command',
+                     'environment', 'result', 'dmesg']:
+            if each in dict_:
+                setattr(inst, each, dict_[each])
 
-        return result
+        if 'subtests' in dict_:
+            for name, value in dict_['subtests'].iteritems():
+                inst.subtests[name] = value
+
+        return inst
+
+    def update(self, dict_):
+        """Update the results and subtests fields from a piglit test.
+
+        Native piglit tests output their data as valid json, and piglit uses
+        the json module to parse this data. This method consumes that raw
+        dictionary data and updates itself.
+
+        """
+        if 'result' in dict_:
+            self.result = dict_['result']
+        elif 'subtest' in dict_:
+            self.subtests.update(dict_['subtest'])
 
 
 class TestrunResult(object):

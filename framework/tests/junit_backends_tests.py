@@ -87,17 +87,18 @@ class TestJUnitSingleTest(TestJunitNoTests):
     def setup_class(cls):
         super(TestJUnitSingleTest, cls).setup_class()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
+
+        result = results.TestResult()
+        result.time = 1.2345
+        result.result = 'pass'
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+
         test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
         with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
-            t(results.TestResult({
-                'time': 1.2345,
-                'result': 'pass',
-                'out': 'this is stdout',
-                'err': 'this is stderr',
-                'command': 'foo',
-            })
-        )
+            t(result)
         test.finalize()
 
     def test_xml_well_formed(self):
@@ -117,27 +118,24 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
     @classmethod
     def setup_class(cls):
         super(TestJUnitMultiTest, cls).setup_class()
+
+        result = results.TestResult()
+        result.time = 1.2345
+        result.result = 'pass'
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
         test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
+        with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
+            t(result)
+
+        result.result = 'fail'
         with test.write_test(
-            grouptools.join('a', 'test', 'group', 'test1')) as t:
-                t(results.TestResult({
-                    'time': 1.2345,
-                    'result': 'pass',
-                    'out': 'this is stdout',
-                    'err': 'this is stderr',
-                    'command': 'foo',
-                }))
-        with test.write_test(
-            grouptools.join('a', 'different', 'test', 'group', 'test2')) as t:
-                t(results.TestResult({
-                    'time': 1.2345,
-                    'result': 'fail',
-                    'out': 'this is stdout',
-                    'err': 'this is stderr',
-                    'command': 'foo',
-                }))
+                grouptools.join('a', 'different', 'test', 'group', 'test2')) as t:
+            t(result)
         test.finalize()
 
     def test_xml_well_formed(self):
@@ -153,16 +151,17 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
 def test_junit_replace():
     """backends.junit.JUnitBackend.write_test(): '{separator}' is replaced with '.'"""
     with utils.tempdir() as tdir:
+        result = results.TestResult()
+        result.time = 1.2345
+        result.result = 'pass'
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+
         test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
         with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
-            t(results.TestResult({
-                'time': 1.2345,
-                'result': 'pass',
-                'out': 'this is stdout',
-                'err': 'this is stderr',
-                'command': 'foo',
-            }))
+            t(result)
         test.finalize()
 
         test_value = etree.parse(os.path.join(tdir, 'results.xml')).getroot()
@@ -175,17 +174,17 @@ def test_junit_replace():
 def test_junit_skips_bad_tests():
     """backends.junit.JUnitBackend: skips illformed tests"""
     with utils.tempdir() as tdir:
+        result = results.TestResult()
+        result.time = 1.2345
+        result.result = 'pass'
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+
         test = backends.junit.JUnitBackend(tdir)
         test.initialize(BACKEND_INITIAL_META)
         with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
-            t(results.TestResult({
-                'time': 1.2345,
-                'result': 'pass',
-                'out': 'this is stdout',
-                'err': 'this is stderr',
-                'command': 'foo',
-            })
-        )
+            t(result)
         with open(os.path.join(tdir, 'tests', '1.xml'), 'w') as f:
             f.write('bad data')
 
@@ -232,28 +231,28 @@ class TestJUnitLoad(utils.StaticDirectory):
 
     def test_status_instance(self):
         """backends.junit._load: a status is found and loaded."""
-        nt.assert_is_instance(self.xml().tests[self.testname]['result'],
+        nt.assert_is_instance(self.xml().tests[self.testname].result,
                               status.Status)
 
     def test_time(self):
         """backends.junit._load: Time is loaded correctly."""
-        time = self.xml().tests[self.testname]['time']
+        time = self.xml().tests[self.testname].time
         nt.assert_is_instance(time, float)
         nt.assert_equal(time, 1.12345)
 
     def test_command(self):
         """backends.junit._load: command is loaded correctly."""
-        test = self.xml().tests[self.testname]['command']
+        test = self.xml().tests[self.testname].command
         nt.assert_equal(test, 'this/is/a/command')
 
     def test_out(self):
         """backends.junit._load: stdout is loaded correctly."""
-        test = self.xml().tests[self.testname]['out']
+        test = self.xml().tests[self.testname].out
         nt.assert_equal(test, 'This is stdout')
 
     def test_err(self):
         """backends.junit._load: stderr is loaded correctly."""
-        test = self.xml().tests[self.testname]['err']
+        test = self.xml().tests[self.testname].err
         nt.assert_equal(test, 'this is stderr')
 
     @utils.no_error

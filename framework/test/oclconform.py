@@ -44,10 +44,10 @@ def get_test_section_name(test):
 class OCLConform(Test):
 
     def interpret_result(self):
-        if self.result['returncode'] != 0 or 'FAIL' in self.result['out']:
-            self.result['result'] = 'fail'
+        if self.result.returncode != 0 or 'FAIL' in self.result.out:
+            self.result.result = 'fail'
         else:
-            self.result['result'] = 'pass'
+            self.result.result = 'pass'
 
 def add_sub_test(profile, test_name, subtest_name, subtest):
     profile.test_list[grouptools.join('oclconform', test_name, subtest_name)] = subtest

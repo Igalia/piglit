@@ -141,21 +141,21 @@ def test_DEQPBaseTest_interpret_result_returncode():
     """deqp.DEQPBaseTest.interpret_result: if returncode is not 0 result is fail
     """
     test = _DEQPTestTest('a.deqp.test')
-    test.result['returncode'] = 1
+    test.result.returncode = 1
     test.interpret_result()
 
-    nt.eq_(test.result['result'], 'fail')
+    nt.eq_(test.result.result, 'fail')
 
 
 def test_DEQPBaseTest_interpret_result_fallthrough():
     """deqp.DEQPBaseTest.interpret_result: if no case is hit set to fail
     """
     test = _DEQPTestTest('a.deqp.test')
-    test.result['returncode'] = 0
-    test.result['out'] = ''
+    test.result.returncode = 0
+    test.result.out = ''
     test.interpret_result()
 
-    nt.eq_(test.result['result'], 'fail')
+    nt.eq_(test.result.result, 'fail')
 
 
 @utils.nose_generator
@@ -163,10 +163,10 @@ def test_DEQPBaseTest_interpret_result_status():
     """generate tests for each status possiblility."""
     def test(status, expected):
         inst = _DEQPTestTest('a.deqp.test')
-        inst.result['returncode'] = 0
-        inst.result['out'] = status
+        inst.result.returncode = 0
+        inst.result.out = status
         inst.interpret_result()
-        nt.eq_(inst.result['result'], expected)
+        nt.eq_(inst.result.result, expected)
 
     desc = ('deqp.DEQPBaseTest.interpret_result: '
             'when "{}" in stdout status is set to "{}"')

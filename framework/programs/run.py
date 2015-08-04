@@ -328,7 +328,7 @@ def resume(input_):
     # Don't re-run tests that have already completed, incomplete status tests
     # have obviously not completed.
     for name, result in results.tests.iteritems():
-        if args.no_retry or result['result'] != 'incomplete':
+        if args.no_retry or result.result != 'incomplete':
             opts.exclude_tests.add(name)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])

@@ -28,6 +28,7 @@ in a single place.
 from __future__ import print_function, absolute_import
 import os
 import sys
+import copy
 import shutil
 import tempfile as tempfile_
 import functools
@@ -41,7 +42,7 @@ except ImportError:
     import json
 from nose.plugins.skip import SkipTest
 
-from framework import test, backends, results, core
+from framework import test, backends, core, results
 
 __all__ = [
     'tempfile',
@@ -74,10 +75,10 @@ JSON_DATA = {
     "lspci": "fake",
     "glxinfo": "fake",
     "tests": _Tree({
-        "sometest": results.TestResult({
-            "result": "pass",
-            "time": 0.01
-        })
+        "sometest": {
+            'result': 'pass',
+            'time': 1.2,
+        }
     })
 }
 
@@ -230,12 +231,15 @@ class GeneratedTestWrapper(object):
 @contextmanager
 def resultfile():
     """ Create a stringio with some json in it and pass that as results """
-    with tempfile_.NamedTemporaryFile(delete=False) as output:
-        json.dump(JSON_DATA, output)
+    data = copy.deepcopy(JSON_DATA)
+    data['tests']['sometest'] = results.TestResult('pass')
+    data['tests']['sometest'].time = 1.2
+    with tempfile_.NamedTemporaryFile(delete=False) as f:
+        json.dump(data, f, default=backends.json.piglit_encoder)
 
-    yield output
+    yield f
 
-    os.remove(output.name)
+    os.remove(f.name)
 
 
 @contextmanager
