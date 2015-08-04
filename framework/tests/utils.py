@@ -85,7 +85,27 @@ _SAVED_COMPRESSION = os.environ.get('PIGLIT_COMPRESSION')
 
 
 class TestFailure(AssertionError):
-    pass
+    """An exception to be raised when a test fails.
+
+    Nose expects an AssertionError for test failures, so this is a sublcass of
+    AssertionError.
+
+    It provides the benefit of being able to take either a text message to
+    print, or an exception instance. When passed text it will print the message
+    exactly, when passed an exception it will print the exception type and the
+    str() value of that exception.
+
+    """
+    def __init__(self, arg):
+        super(TestFailure, self).__init__(self)
+        self.__arg = arg
+
+    def __str__(self):
+        if isinstance(self.__arg, Exception):
+            return 'exception type "{}" with message "{}" raised.'.format(
+                type(self.__arg), str(self.__arg))
+        else:
+            return self.__arg
 
 
 class UtilsError(Exception):
@@ -348,7 +368,7 @@ def not_raises(exceptions):
             try:
                 func(*args, **kwargs)
             except exceptions as e:
-                raise TestFailure(str(e))
+                raise TestFailure(e)
 
         return _inner
 
