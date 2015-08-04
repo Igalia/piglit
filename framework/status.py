@@ -57,6 +57,7 @@ The formula for determining fixes is:
 """
 
 from __future__ import print_function, absolute_import
+from framework import exceptions
 
 __all__ = ['NOTRUN',
            'PASS',
@@ -96,10 +97,10 @@ def status_lookup(status):
         return status_dict[status]
     except KeyError:
         # Raise a StatusException rather than a key error
-        raise StatusException
+        raise StatusException(status)
 
 
-class StatusException(LookupError):
+class StatusException(exceptions.PiglitInternalError):
     """ Raise this exception when a string is passed to status_lookup that
     doesn't exists
 
@@ -109,7 +110,12 @@ class StatusException(LookupError):
     Error class here allows for more fine-grained control.
 
     """
-    pass
+    def __init__(self, status):
+        self.__status = status
+        super(StatusException, self).__init__(self)
+
+    def __str__(self):
+        return 'Unknown status "{}"'.format(self.__status)
 
 
 class Status(object):
