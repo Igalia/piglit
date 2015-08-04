@@ -204,8 +204,9 @@ def collect_system_info():
                                                    stderr=subprocess.STDOUT)
         except OSError as e:
             # If we get the 'no file or directory' error then pass, that means
-            # that the binary isn't installed or isn't relavent to the system
-            if e.errno != 2:
+            # that the binary isn't installed or isn't relavent to the system.
+            # If it's any other OSError, then raise
+            if e.errno != errno.ENOENT:
                 raise
         except subprocess.CalledProcessError:
             # If the binary is installed by doesn't work on the window system
