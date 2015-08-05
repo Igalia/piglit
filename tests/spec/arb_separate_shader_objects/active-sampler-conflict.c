@@ -248,7 +248,6 @@ void piglit_init(int argc, char **argv)
 	GLuint pipe;
 	GLuint vao;
 	GLuint bo;
-	GLint s_loc;
 	char *s2_uni_name = "s2";
 	char *s3_uni_name = "s3";
 	char *s2_uni_array_name = "s2[1]";
