@@ -245,6 +245,8 @@ piglit_display(void)
 
 	piglit_present_results();
 
+	free(ref_image);
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
