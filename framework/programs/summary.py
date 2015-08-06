@@ -213,4 +213,5 @@ def aggregate(input_):
                 "Unable to write aggregated file, permission denied.")
         raise
 
-    print("Aggregated file written to: {}".format(outfile))
+    print("Aggregated file written to: {}.{}".format(
+        outfile, backends.compression.get_mode()))
