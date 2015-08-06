@@ -90,7 +90,8 @@ def _run_parser(input_):
     """ Parser for piglit run command """
     unparsed = parsers.parse_config(input_)[1]
 
-    parser = argparse.ArgumentParser()
+    # Set the parent of the config to add the -f/--config message
+    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument("-n", "--name",
                         metavar="<test name>",
                         default=None,
@@ -146,12 +147,6 @@ def _run_parser(input_):
                         type=str,
                         default="",
                         help="suffix string to append to each test name in junit")
-    # -f/--config is a duplicate that cannot be hit, but is needed for help
-    # generation
-    parser.add_argument("-f", "--config",
-                        metavar="config_file",
-                        dest="__unused",
-                        help="override piglit.conf search path")
     log_parser = parser.add_mutually_exclusive_group()
     log_parser.add_argument('-v', '--verbose',
                             action='store_const',
