@@ -80,6 +80,11 @@ def status_lookup(status):
     does not correspond to a key it will raise an exception
 
     """
+    # Don't go through this if what we've been passed already is a status, it's
+    # very expensive
+    if isinstance(status, Status):
+        return status
+
     status_dict = {
         'skip': SKIP,
         'pass': PASS,
