@@ -32,6 +32,7 @@ import ctypes
 from framework import core, backends, exceptions
 import framework.results
 import framework.profile
+from . import parsers
 
 __all__ = ['run',
            'resume']
@@ -87,19 +88,7 @@ def _default_backend():
 
 def _run_parser(input_):
     """ Parser for piglit run command """
-    # Parse the config file before any other options, this allows the config
-    # file to be used to sete default values for the parser.
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("-f", "--config",
-                        dest="config_file",
-                        type=argparse.FileType("r"),
-                        help="override piglit.conf search path")
-    known, unparsed = parser.parse_known_args(input_)
-
-    # Read the config file
-    # We want to read this before we finish parsing since some default options
-    # are set in the config file.
-    core.get_config(known.config_file)
+    unparsed = parsers.parse_config(input_)[1]
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--name",
