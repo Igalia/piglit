@@ -44,10 +44,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 
-static const char *const vs_source =
-"#version 150\n"
-"void main() { gl_Position = vec4(0.0); }\n";
-
 static const char *const tcs_source =
 "#version 150\n"
 "#extension GL_ARB_tessellation_shader: require\n"
