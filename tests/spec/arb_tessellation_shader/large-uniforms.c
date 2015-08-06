@@ -155,12 +155,14 @@ test_uniform_array(const GLenum shader, const int n, const bool expect_fail)
 		fprintf(stderr, "Program with %d uniform components in %s "
 			"linked succesfully\n", n,
 			piglit_get_gl_enum_name(shader));
+		free(source_uniforms);
 		return false;
 	}
 	if (!link_status && !expect_fail) {
 		fprintf(stderr, "Program with %d uniform components in %s "
 			"failed to link\n", n,
 			piglit_get_gl_enum_name(shader));
+		free(source_uniforms);
 		return false;
 	}
 	glDeleteProgram(prog);
@@ -227,12 +229,14 @@ test_uniform_block(const GLenum shader, const int num_blocks, const int size,
 		fprintf(stderr, "Program with %d uniform blocks of size %d (vec4s)"
 			"in %s linked successfully\n", num_blocks, size,
 			piglit_get_gl_enum_name(shader));
+		free(source_uniforms);
 		return false;
 	}
 	if (!link_status && !expect_fail) {
 		fprintf(stderr, "Program with %d uniform blocks of size %d (vec4s)"
 			"in %s failed to link\n", num_blocks, size,
 			piglit_get_gl_enum_name(shader));
+		free(source_uniforms);
 		return false;
 	}
 	glDeleteProgram(prog);
