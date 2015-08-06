@@ -28,6 +28,7 @@ import sys
 import errno
 
 from framework import summary, status, core, backends, exceptions
+from . import parsers
 
 __all__ = [
     'aggregate',
@@ -183,7 +184,10 @@ def csv(input_):
 @exceptions.handler
 def aggregate(input_):
     """Combine files in a tests/ directory into a single results file."""
-    parser = argparse.ArgumentParser()
+    unparsed = parsers.parse_config(input_)[1]
+
+    # Adding the parent is necissary to get the help options
+    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument('results_folder',
                         type=path.realpath,
                         metavar="<results path>",
@@ -191,7 +195,7 @@ def aggregate(input_):
     parser.add_argument('-o', '--output',
                         default="results.json",
                         help="name of output file. Default: results.json")
-    args = parser.parse_args(input_)
+    args = parser.parse_args(unparsed)
 
     assert os.path.isdir(args.results_folder)
 
