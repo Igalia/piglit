@@ -35,22 +35,22 @@ void main()
 [test]
 # Texture 0 is the imageStore output.
 uniform int tex[0][0] 0
-texture rgbw 0 (16, 16)
+texture rgbw 0 (16, 16) GL_RGBA8
 image texture 0
 
 # Texture 1 is the imageStore output.
 uniform int tex[0][1] 1
-texture rgbw 1 (16, 16)
+texture rgbw 1 (16, 16) GL_RGBA8
 image texture 1
 
 # Texture 2 is the imageStore output.
 uniform int tex[1][0] 2
-texture rgbw 2 (16, 16)
+texture rgbw 2 (16, 16) GL_RGBA8
 image texture 2
 
 # Texture 3 is the imageStore output.
 uniform int tex[1][1] 3
-texture rgbw 3 (16, 16)
+texture rgbw 3 (16, 16) GL_RGBA8
 image texture 3
 
 # Texture 4 is the rendering output. We don't care about this.
