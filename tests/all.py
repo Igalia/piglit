@@ -1854,6 +1854,10 @@ with profile.group_manager(
       'PROGRAM_BINARY_RETRIEVABLE_HINT')
 
 with profile.group_manager(
+        PiglitGLTest, grouptools.join('spec', 'EXT_depth_bounds_test')) as g:
+    g(['depth_bounds'])
+
+with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_depth_clamp')) as g:
     g(['depth_clamp'], run_concurrent=False)
     g(['depth-clamp-range'], run_concurrent=False)
