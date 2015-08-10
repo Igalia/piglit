@@ -118,21 +118,132 @@
                     REGEX_TYPE_INT "|" REGEX_TYPE_UINT "|" REGEX_TYPE_LONG "|" \
                     REGEX_TYPE_ULONG "|" REGEX_TYPE_FLOAT "|" REGEX_TYPE_DOUBLE
 
+/* Image types */
+/* TODO: add OpenCL 1.2+ types */
+#define REGEX_IMGT_2D        "2D|2d"
+#define REGEX_IMGT_3D        "3D|3d"
+#define REGEX_IMAGE_TYPE     REGEX_IMGT_2D "|" REGEX_IMGT_3D
+
+/* Image formats */
+/* TODO: add OpenCL 2.0 formats */
+#define REGEX_CHO_R          "R|r"
+#define REGEX_CHO_RX         "RX|Rx|rx"
+#define REGEX_CHO_A          "A|a"
+#define REGEX_CHO_INTENSITY  "INTENSITY|intensity"
+#define REGEX_CHO_LUMINANCE  "LUMINANCE|luminance"
+#define REGEX_CHO_RG         "RG|rg"
+#define REGEX_CHO_RGX        "RGX|RGx|rgx"
+#define REGEX_CHO_RA         "RA|ra"
+#define REGEX_CHO_RGB        "RGB|rgb"
+#define REGEX_CHO_RGBX       "RGBX|rgbx"
+#define REGEX_CHO_RGBA       "RGBA|rgba"
+#define REGEX_CHO_ARGB       "ARGB|argb"
+#define REGEX_CHO_BGRA       "BGRA|bgra"
+#define REGEX_CHANNEL_ORDER  REGEX_CHO_R "|" REGEX_CHO_RX "|" REGEX_CHO_A "|" \
+                             REGEX_CHO_INTENSITY "|" REGEX_CHO_LUMINANCE "|" \
+                             REGEX_CHO_RG "|" REGEX_CHO_RGX "|" \
+                             REGEX_CHO_RA "|" REGEX_CHO_RGB "|" \
+                             REGEX_CHO_RGBX "|" REGEX_CHO_RGBA "|" \
+                             REGEX_CHO_ARGB "|" REGEX_CHO_BGRA
+
+#define REGEX_CHT_SNORM_INT8         "SNORM_INT8|snorm_int8"
+#define REGEX_CHT_SNORM_INT16        "SNORM_INT16|snorm_int16"
+#define REGEX_CHT_UNORM_INT8         "UNORM_INT8|unorm_int8"
+#define REGEX_CHT_UNORM_INT16        "UNORM_INT16|unorm_int16"
+#define REGEX_CHT_UNORM_SHORT_565    "UNORM_SHORT_565|unorm_short_565"
+#define REGEX_CHT_UNORM_SHORT_555    "UNORM_SHORT_555|unorm_short_555"
+#define REGEX_CHT_UNORM_INT_101010   "UNORM_INT_101010|unorm_int_101010"
+#define REGEX_CHT_SIGNED_INT8        "SIGNED_INT8|signed_int8"
+#define REGEX_CHT_SIGNED_INT16       "SIGNED_INT16|signed_int16"
+#define REGEX_CHT_SIGNED_INT32       "SIGNED_INT32|signed_int32"
+#define REGEX_CHT_UNSIGNED_INT8      "UNSIGNED_INT8|unsigned_int8"
+#define REGEX_CHT_UNSIGNED_INT16     "UNSIGNED_INT16|unsigned_int16"
+#define REGEX_CHT_UNSIGNED_INT32     "UNSIGNED_INT32|unsigned_int32"
+#define REGEX_CHT_HALF_FLOAT         "HALF_FLOAT|half_float"
+#define REGEX_CHT_FLOAT              "FLOAT|float"
+#define REGEX_CHANNEL_DATA_TYPE  REGEX_CHT_SNORM_INT8 "|" \
+                                 REGEX_CHT_SNORM_INT16 "|" \
+                                 REGEX_CHT_UNORM_INT8 "|" \
+                                 REGEX_CHT_UNORM_INT16 "|" \
+                                 REGEX_CHT_UNORM_SHORT_565 "|" \
+                                 REGEX_CHT_UNORM_SHORT_555 "|" \
+                                 REGEX_CHT_UNORM_INT_101010 "|" \
+                                 REGEX_CHT_SIGNED_INT8 "|" \
+                                 REGEX_CHT_SIGNED_INT16 "|" \
+                                 REGEX_CHT_SIGNED_INT32 "|" \
+                                 REGEX_CHT_UNSIGNED_INT8 "|" \
+                                 REGEX_CHT_UNSIGNED_INT16 "|" \
+                                 REGEX_CHT_UNSIGNED_INT32 "|" \
+                                 REGEX_CHT_HALF_FLOAT "|" \
+                                 REGEX_CHT_FLOAT
+
+/* Sampler */
+#define REGEX_SAMP_ADDR_NONE               "NONE|none"
+#define REGEX_SAMP_ADDR_CLAMP_TO_EDGE      "CLAMP_TO_EDGE|clamp_to_edge"
+#define REGEX_SAMP_ADDR_CLAMP              "CLAMP|clamp"
+#define REGEX_SAMP_ADDR_REPEAT             "REPEAT|repeat"
+#define REGEX_SAMP_ADDR_MIRRORED_REPEAT    "MIRRORED_REPEAT|mirrored_repeat"
+#define REGEX_SAMPLER_ADDRESSING_MODE  REGEX_SAMP_ADDR_NONE "|"\
+                                       REGEX_SAMP_ADDR_CLAMP_TO_EDGE "|" \
+                                       REGEX_SAMP_ADDR_CLAMP "|" \
+                                       REGEX_SAMP_ADDR_REPEAT "|" \
+                                       REGEX_SAMP_ADDR_MIRRORED_REPEAT
+
+#define REGEX_SAMP_FILT_NEAREST  "NEAREST|nearest"
+#define REGEX_SAMP_FILT_LINEAR   "LINEAR|linear"
+#define REGEX_SAMPLER_FILTER_MODE  REGEX_SAMP_FILT_NEAREST "|" \
+                                   REGEX_SAMP_FILT_LINEAR
+
 /*
  * Value argument:
  *   index<whitespace>type<whitespace>value
  * Buffer argument:
  *   index<whitespace>buffer<whitespace>type[size]<whitespace>(value|random|repeat value)<whitespace>tolerance<whitespace>value
+ * Image argument:
+ *   index<whitespace>image<whitespace>type<whitespace>
+ *                    (value|random|repeat value)<whitespace>
+ *                    image_type<whitespace>(2d|3d)<whitespace>i
+ *                    image_width<whitespace>value<whitespace>
+ *                    image_height<whitespace>value<whitespace>
+ *                    image_channel_order<whitespace>value<whitespace>
+ *                    image_channel_data_type<whitespace>value<whitespace>
+ *                    tolerance<whitespace>value
+ * Sampler argument:
+ *   index<whitespace>sampler<whitespace>
+ *                    normalized_coords<whitespace>bool<whitespace>
+ *                    addressing_mode<whitespace>(none|clamp_to_edge|repeat|mirrored_repeat)<whitespace>
+ *                    filter_mode<whitespace>(nearest|linear)<whitespace>
  */
 #define REGEX_DEFINE_ARG(type, value)  "([[:digit:]]+)[[:space:]]+" type \
                                        "[[:space:]]+(" value ")"
 #define REGEX_ARG_TOLERANCE            "tolerance[[:space:]]+(" REGEX_VALUE ")"
 #define REGEX_ARG_TOLERANCE_ULP        REGEX_ARG_TOLERANCE "[[:space:]]+ulp"
+#define REGEX_ARG_IMAGE_TYPE                "image_type[[:space:]]+(" REGEX_IMAGE_TYPE ")"
+#define REGEX_ARG_IMAGE_WIDTH               "image_width[[:space:]]+(" REGEX_UINT ")"
+#define REGEX_ARG_IMAGE_HEIGHT              "image_height[[:space:]]+(" REGEX_UINT ")"
+#define REGEX_ARG_IMAGE_CHANNEL_ORDER       "image_channel_order[[:space:]]+(" REGEX_CHANNEL_ORDER ")"
+#define REGEX_ARG_IMAGE_CHANNEL_DATA_TYPE   "image_channel_data_type[[:space:]]+(" REGEX_CHANNEL_DATA_TYPE ")"
+#define REGEX_ARG_SAMPLER_NORMALIZED_COORDS "normalized_coords[[:space:]]+" REGEX_BOOL
+#define REGEX_ARG_SAMPLER_ADDERSSING_MODE   "addressing_mode[[:space:]]+(" REGEX_SAMPLER_ADDRESSING_MODE ")"
+#define REGEX_ARG_SAMPLER_FILTER_MODE       "filter_mode[[:space:]]+(" REGEX_SAMPLER_FILTER_MODE ")"
 #define REGEX_ARG_VALUE   REGEX_DEFINE_ARG( "(" REGEX_TYPE ")", REGEX_ARRAY )
 #define REGEX_ARG_BUFFER  REGEX_DEFINE_ARG( "buffer[[:space:]]+(" REGEX_TYPE ")\\[([[:digit:]]+)\\]", \
                                             REGEX_ARRAY "|" REGEX_RANDOM "|" REGEX_REPEAT )           \
                           "([[:space:]]+" "("REGEX_ARG_TOLERANCE "|" REGEX_ARG_TOLERANCE_ULP")" ")?"
-#define REGEX_ARG         "(" REGEX_ARG_VALUE "|" REGEX_ARG_BUFFER ")"
+#define REGEX_ARG_IMAGE   REGEX_DEFINE_ARG( "image[[:space:]]+(" REGEX_TYPE ")",             \
+                                            REGEX_ARRAY "|" REGEX_RANDOM "|" REGEX_REPEAT )  \
+                          "[[:space:]]+"REGEX_ARG_IMAGE_TYPE                                 \
+                          "[[:space:]]+"REGEX_ARG_IMAGE_WIDTH                                \
+                          "[[:space:]]+"REGEX_ARG_IMAGE_HEIGHT                               \
+                          "[[:space:]]+"REGEX_ARG_IMAGE_CHANNEL_ORDER                        \
+                          "[[:space:]]+"REGEX_ARG_IMAGE_CHANNEL_DATA_TYPE                    \
+                          "([[:space:]]+" "("REGEX_ARG_TOLERANCE "|" REGEX_ARG_TOLERANCE_ULP")" ")?"
+#define REGEX_ARG_SAMPLER "([[:digit:]]+)[[:space:]]+sampler"                 \
+                          "[[:space:]]+"REGEX_ARG_SAMPLER_NORMALIZED_COORDS \
+                          "[[:space:]]+"REGEX_ARG_SAMPLER_ADDERSSING_MODE   \
+                          "[[:space:]]+"REGEX_ARG_SAMPLER_FILTER_MODE
+#define REGEX_ARG         "(" REGEX_ARG_VALUE "|" REGEX_ARG_BUFFER "|" \
+                              REGEX_ARG_IMAGE "|" REGEX_ARG_SAMPLER ")"
 
 /* Match whole line */
 #define REGEX_FULL_MATCH(content) "^"content"$"
@@ -198,6 +309,8 @@ add_dynamic_array(void** array,
 enum test_arg_type {
 	TEST_ARG_VALUE,
 	TEST_ARG_BUFFER,
+	TEST_ARG_IMAGE,
+	TEST_ARG_SAMPLER
 };
 
 enum cl_type {
@@ -230,6 +343,15 @@ struct test_arg {
 	int64_t toli;
 	uint64_t tolu;
 	uint64_t ulp;
+
+	/* image data */
+	cl_image_desc   image_desc;
+	cl_image_format image_format;
+
+	/* sampler data */
+	cl_bool            sampler_normalized_coords;
+	cl_addressing_mode sampler_addressing_mode;
+	cl_filter_mode     sampler_filter_mode;
 };
 
 struct test_arg create_test_arg()
@@ -967,6 +1089,7 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 	char* type = NULL;
 	char* value = NULL;
 	struct test_arg test_arg = create_test_arg();
+	bool has_type = true;
 
 	/* Get matches */
 	if(regex_get_matches(src, REGEX_FULL_MATCH(REGEX_ARG_VALUE),
@@ -975,6 +1098,12 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 	} else if(regex_get_matches(src, REGEX_FULL_MATCH(REGEX_ARG_BUFFER),
 	                            pmatch, 5, REG_NEWLINE)) { // buffer
 		// do nothing
+	} else if(regex_get_matches(src, REGEX_FULL_MATCH(REGEX_ARG_IMAGE),
+	                            pmatch, 5, REG_NEWLINE)) { // image
+		// do nothing
+	} else if(regex_get_matches(src, REGEX_FULL_MATCH(REGEX_ARG_SAMPLER),
+	                            pmatch, 5, REG_NEWLINE)) { // sampler
+		has_type = false;
 	} else {
 		fprintf(stderr,
 		        "Invalid configuration, invalid test argument: %s\n",
@@ -987,42 +1116,44 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 	test_arg.index = get_int(index_str);
 	free(index_str);
 
-	/* Set type, cl_size, cl_mem_size and size (partially for buffers) */
-	regex_get_match_str(&type, src, pmatch, 2);
-	if(regex_match(type, "[[:digit:]]+")) {
-		char* type_size_str;
-		regex_get_str(&type_size_str, type, "[[:digit:]]+", 0, REG_NEWLINE);
-		test_arg.cl_size = get_int(type_size_str);
-		test_arg.cl_mem_size = test_arg.cl_size != 3 ? test_arg.cl_size : 4; // test if we have type3
-		free(type_size_str);
-	} else {
-		test_arg.cl_size = 1;
-		test_arg.cl_mem_size = 1;
-	}
+	if(has_type) {
+		/* Set type, cl_size, cl_mem_size and size (partially for buffers) */
+		regex_get_match_str(&type, src, pmatch, 2);
+		if(regex_match(type, "[[:digit:]]+")) {
+			char* type_size_str;
+			regex_get_str(&type_size_str, type, "[[:digit:]]+", 0, REG_NEWLINE);
+			test_arg.cl_size = get_int(type_size_str);
+			test_arg.cl_mem_size = test_arg.cl_size != 3 ? test_arg.cl_size : 4; // test if we have type3
+			free(type_size_str);
+		} else {
+			test_arg.cl_size = 1;
+			test_arg.cl_mem_size = 1;
+		}
 
 #define IF(regex_type, enum_type, main_type)                       \
-	if(regex_match(type, REGEX_FULL_MATCH(regex_type))) {          \
-		test_arg.cl_type = enum_type;                              \
-		test_arg.size = sizeof(main_type) * test_arg.cl_mem_size;  \
-	}
+		if(regex_match(type, REGEX_FULL_MATCH(regex_type))) {          \
+			test_arg.cl_type = enum_type;                              \
+			test_arg.size = sizeof(main_type) * test_arg.cl_mem_size;  \
+		}
 #define ELSEIF(regex_type, enum_type, main_type) \
-	else IF(regex_type, enum_type, main_type)
+		else IF(regex_type, enum_type, main_type)
 
-	IF    (REGEX_TYPE_CHAR,   TYPE_CHAR,   cl_char)
-	ELSEIF(REGEX_TYPE_UCHAR,  TYPE_UCHAR,  cl_uchar)
-	ELSEIF(REGEX_TYPE_SHORT,  TYPE_SHORT,  cl_short)
-	ELSEIF(REGEX_TYPE_USHORT, TYPE_USHORT, cl_ushort)
-	ELSEIF(REGEX_TYPE_INT,    TYPE_INT,    cl_int)
-	ELSEIF(REGEX_TYPE_UINT,   TYPE_UINT,   cl_uint)
-	ELSEIF(REGEX_TYPE_LONG,   TYPE_LONG,   cl_long)
-	ELSEIF(REGEX_TYPE_ULONG,  TYPE_ULONG,  cl_ulong)
-	ELSEIF(REGEX_TYPE_FLOAT,  TYPE_FLOAT,  cl_float)
-	ELSEIF(REGEX_TYPE_DOUBLE,  TYPE_DOUBLE,  cl_double)
+		IF    (REGEX_TYPE_CHAR,   TYPE_CHAR,   cl_char)
+		ELSEIF(REGEX_TYPE_UCHAR,  TYPE_UCHAR,  cl_uchar)
+		ELSEIF(REGEX_TYPE_SHORT,  TYPE_SHORT,  cl_short)
+		ELSEIF(REGEX_TYPE_USHORT, TYPE_USHORT, cl_ushort)
+		ELSEIF(REGEX_TYPE_INT,    TYPE_INT,    cl_int)
+		ELSEIF(REGEX_TYPE_UINT,   TYPE_UINT,   cl_uint)
+		ELSEIF(REGEX_TYPE_LONG,   TYPE_LONG,   cl_long)
+		ELSEIF(REGEX_TYPE_ULONG,  TYPE_ULONG,  cl_ulong)
+		ELSEIF(REGEX_TYPE_FLOAT,  TYPE_FLOAT,  cl_float)
+		ELSEIF(REGEX_TYPE_DOUBLE,  TYPE_DOUBLE,  cl_double)
 
 #undef IF
 #undef ELSEIF
 
-	free(type);
+		free(type);
+	}
 
 	/* Get arg type, size and value */
 	if(regex_match(src, REGEX_FULL_MATCH(REGEX_ARG_VALUE))) { // value
@@ -1113,6 +1244,245 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 			}
 		}
 		free(value);
+	} else if(regex_match(src, REGEX_FULL_MATCH(REGEX_ARG_IMAGE))) { // image
+		char* str = NULL;
+		const char* properties_str = src + pmatch[3].rm_eo;
+		const char* tolerance_str = NULL;
+		size_t image_elems = 0;
+		cl_channel_order cho;
+		cl_channel_type cht;
+		regmatch_t pmatch_prop[2];
+
+		/* Set arg type */
+		test_arg.type = TEST_ARG_IMAGE;
+
+		/* Image type */
+		regex_get_matches(properties_str, REGEX_ARG_IMAGE_TYPE,
+		                  pmatch_prop, 2, REG_NEWLINE);
+		regex_get_match_str(&str, properties_str, pmatch_prop, 1);
+		properties_str += pmatch_prop[1].rm_eo;
+		if(regex_match(str, REGEX_FULL_MATCH("("REGEX_IMGT_2D")"))) {
+			test_arg.image_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
+		} else {
+			/* TODO: Implement other image types */
+			fprintf(stderr, "Image type not supported: %s\n", str);
+			exit_report_result(PIGLIT_WARN);
+		}
+		free(str);
+
+		/* Image width */
+		regex_get_matches(properties_str, REGEX_ARG_IMAGE_WIDTH,
+		                  pmatch_prop, 2, REG_NEWLINE);
+		regex_get_match_str(&str, properties_str, pmatch_prop, 1);
+		properties_str += pmatch_prop[1].rm_eo;
+		test_arg.image_desc.image_width = get_int(str);
+		free(str);
+
+		/* Image height */
+		regex_get_matches(properties_str, REGEX_ARG_IMAGE_HEIGHT,
+		                  pmatch_prop, 2, REG_NEWLINE);
+		regex_get_match_str(&str, properties_str, pmatch_prop, 1);
+		properties_str += pmatch_prop[1].rm_eo;
+		test_arg.image_desc.image_height = get_int(str);
+		free(str);
+
+		/* Image descriptor defaults */
+		test_arg.image_desc.image_depth = 1;
+		test_arg.image_desc.image_array_size = 1;
+		test_arg.image_desc.image_row_pitch = 0;
+		test_arg.image_desc.image_slice_pitch = 0;
+		test_arg.image_desc.num_mip_levels = 0;
+		test_arg.image_desc.num_samples = 0;
+		test_arg.image_desc.buffer = NULL;
+
+		/* Image channel order */
+		regex_get_matches(properties_str, REGEX_ARG_IMAGE_CHANNEL_ORDER,
+		                  pmatch_prop, 2, REG_NEWLINE);
+		regex_get_match_str(&str, properties_str, pmatch_prop, 1);
+		properties_str += pmatch_prop[1].rm_eo;
+		if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_R")"))) {
+			cho = CL_R;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_RX")"))) {
+			cho = CL_Rx;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_A")"))) {
+			cho = CL_A;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_INTENSITY")"))) {
+			cho = CL_INTENSITY;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_LUMINANCE")"))) {
+			cho = CL_LUMINANCE;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_RG")"))) {
+			cho = CL_RG;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_RGX")"))) {
+			cho = CL_RGx;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_RA")"))) {
+			cho = CL_RA;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_RGB")"))) {
+			cho = CL_RGB;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_RGBX")"))) {
+			cho = CL_RGBx;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_RGBA")"))) {
+			cho = CL_RGBA;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_ARGB")"))) {
+			cho = CL_ARGB;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHO_BGRA")"))) {
+			cho = CL_BGRA;
+		} else {
+			fprintf(stderr, "Image channel order not supported: %s\n", str);
+			exit_report_result(PIGLIT_WARN);
+		}
+		free(str);
+		test_arg.image_format.image_channel_order = cho;
+
+		/* Image channel data type */
+		regex_get_matches(properties_str, REGEX_ARG_IMAGE_CHANNEL_DATA_TYPE,
+		                  pmatch_prop, 2, REG_NEWLINE);
+		regex_get_match_str(&str, properties_str, pmatch_prop, 1);
+		properties_str += pmatch_prop[1].rm_eo;
+		if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_SNORM_INT8")"))) {
+			cht = CL_SNORM_INT8;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_SNORM_INT16")"))) {
+			cht = CL_SNORM_INT16;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNORM_INT8")"))) {
+			cht = CL_UNORM_INT8;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNORM_INT16")"))) {
+			cht = CL_UNORM_INT16;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNORM_SHORT_565")"))) {
+			cht = CL_UNORM_SHORT_565;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNORM_SHORT_555")"))) {
+			cht = CL_UNORM_SHORT_555;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNORM_INT_101010")"))) {
+			cht = CL_UNORM_INT_101010;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_SIGNED_INT8")"))) {
+			cht = CL_SIGNED_INT8;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_SIGNED_INT16")"))) {
+			cht = CL_SIGNED_INT16;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_SIGNED_INT32")"))) {
+			cht = CL_SIGNED_INT32;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNSIGNED_INT8")"))) {
+			cht = CL_UNSIGNED_INT8;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNSIGNED_INT16")"))) {
+			cht = CL_UNSIGNED_INT16;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_UNSIGNED_INT32")"))) {
+			cht = CL_UNSIGNED_INT32;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_HALF_FLOAT")"))) {
+			cht = CL_HALF_FLOAT;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_CHT_FLOAT")"))) {
+			cht = CL_FLOAT;
+		} else {
+			fprintf(stderr, "Image channel data type not supported: %s\n", str);
+			exit_report_result(PIGLIT_WARN);
+		}
+		free(str);
+		test_arg.image_format.image_channel_data_type = cht;
+
+		/* Set size */
+		image_elems = test_arg.image_desc.image_width *
+		              test_arg.image_desc.image_height *
+		              test_arg.image_desc.image_depth *
+		              test_arg.image_desc.image_array_size;
+		test_arg.length = image_elems;
+		test_arg.size *= image_elems;
+
+		/* Set tolerance */
+		tolerance_str = properties_str;
+		if(regex_match(tolerance_str, REGEX_ARG_TOLERANCE)) {
+			if(arg_in) {
+				fprintf(stderr,
+				        "Invalid configuration, in argument buffer can't have tolerance: %s\n",
+				        src);
+				exit_report_result(PIGLIT_WARN);
+			}
+			get_test_arg_tolerance(&test_arg, tolerance_str);
+		}
+
+		/* Get value */
+		regex_get_match_str(&value, src, pmatch, 3);
+		if(regex_match(value, REGEX_FULL_MATCH(REGEX_NULL))) {
+			test_arg.value = NULL;
+			if(!arg_in) {
+				fprintf(stderr,
+				        "Invalid configuration, out argument buffer value can not be NULL: %s\n",
+				        src);
+				exit_report_result(PIGLIT_WARN);
+			}
+		} else {
+			if(regex_match(value, REGEX_FULL_MATCH(REGEX_RANDOM))) {
+				test_arg.value = malloc(test_arg.size);
+				if(!arg_in) {
+					fprintf(stderr,
+					        "Invalid configuration, out argument buffer can not be random: %s\n",
+					        src);
+					exit_report_result(PIGLIT_WARN);
+				}
+			} else if(regex_match(value, REGEX_FULL_MATCH(REGEX_REPEAT))) {
+				regmatch_t rmatch[3];
+				char* repeat_value_str;
+
+				regex_get_matches(value, REGEX_REPEAT, rmatch, 3, 0);
+				regex_get_match_str(&repeat_value_str, value, rmatch, 2);
+
+				get_test_arg_value(&test_arg,
+				                   repeat_value_str,
+				                   get_array_length(repeat_value_str));
+
+				free(repeat_value_str);
+			} else if(regex_match(value, REGEX_ARRAY)) {
+				get_test_arg_value(&test_arg, value,
+				                   image_elems * test_arg.cl_size);
+			}
+		}
+		free(value);
+
+	} else if(regex_match(src, REGEX_FULL_MATCH(REGEX_ARG_SAMPLER))) { // sampler
+		char* str = NULL;
+
+		/* Samplers are only allowed for in arguments */
+		if(!arg_in) {
+			fprintf(stderr,
+			        "Invalid configuration, only arg_in samplers are allowed: %s\n",
+			        src);
+			exit_report_result(PIGLIT_WARN);
+		}
+
+		test_arg.size = sizeof(cl_sampler);
+
+		/* Set arg type */
+		test_arg.type = TEST_ARG_SAMPLER;
+
+		/* Normalized coords */
+		regex_get_match_str(&str, src, pmatch, 2);
+		test_arg.sampler_normalized_coords = get_bool(str);
+		free(str);
+
+		/* Addressing mode */
+		regex_get_match_str(&str, src, pmatch, 3);
+		if(regex_match(str, REGEX_FULL_MATCH("("REGEX_SAMP_ADDR_NONE")"))) {
+			test_arg.sampler_addressing_mode = CL_ADDRESS_NONE;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_SAMP_ADDR_CLAMP_TO_EDGE")"))) {
+			test_arg.sampler_addressing_mode = CL_ADDRESS_CLAMP_TO_EDGE;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_SAMP_ADDR_CLAMP")"))) {
+			test_arg.sampler_addressing_mode = CL_ADDRESS_CLAMP;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_SAMP_ADDR_REPEAT))) {
+			test_arg.sampler_addressing_mode = CL_ADDRESS_REPEAT;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_SAMP_ADDR_MIRRORED_REPEAT))) {
+			test_arg.sampler_addressing_mode = CL_ADDRESS_MIRRORED_REPEAT;
+		} else {
+			fprintf(stderr, "Sampler addressing mode not supported: %s\n", str);
+			exit_report_result(PIGLIT_WARN);
+		}
+		free(str);
+
+		/* Filter mode */
+		regex_get_match_str(&str, src, pmatch, 4);
+		if(regex_match(str, REGEX_FULL_MATCH("("REGEX_SAMP_FILT_NEAREST")"))) {
+			test_arg.sampler_filter_mode = CL_FILTER_NEAREST;
+		} else if(regex_match(str, REGEX_FULL_MATCH("("REGEX_SAMP_FILT_LINEAR")"))) {
+			test_arg.sampler_filter_mode = CL_FILTER_LINEAR;
+		} else {
+			fprintf(stderr, "Sampler filter mode not supported: %s\n", str);
+			exit_report_result(PIGLIT_WARN);
+		}
+		free(str);
 	}
 
 	if(arg_in) {
@@ -1638,6 +2008,19 @@ free_mem_args(struct mem_arg** mem_args, unsigned int* num_mem_args)
 	*num_mem_args = 0;
 }
 
+void
+free_sampler_args(cl_sampler** sampler_args, unsigned int* num_sampler_args)
+{
+	unsigned i;
+
+	for(i = 0; i < *num_sampler_args; i++) {
+		clReleaseSampler((*sampler_args)[i]);
+	}
+
+	free(*sampler_args); *sampler_args = NULL;
+	*num_sampler_args = 0;
+}
+
 bool
 check_test_arg_value(struct test_arg test_arg,
                      void* value)
@@ -1730,6 +2113,9 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	struct mem_arg* mem_args = NULL;
 	unsigned int  num_mem_args = 0;
 
+	cl_sampler *sampler_args = NULL;
+	unsigned int num_sampler_args = 0;
+
 	/* Check if this device supports the local work size. */
 	if (!piglit_cl_framework_check_local_work_size(env->device_id,
 						test.local_work_size)) {
@@ -1808,6 +2194,64 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 				                  &mem_arg);
 			}
 			break;
+		}
+		case TEST_ARG_IMAGE: {
+			struct mem_arg mem_arg;
+			mem_arg.index = test_arg.index;
+
+			if(!test_arg.value) {
+				printf("Image argument cannot be null.\n");
+				arg_set = false;
+				break;
+			}
+
+			mem_arg.mem = piglit_cl_create_image(env->context,
+			                                     CL_MEM_READ_ONLY,
+			                                     &test_arg.image_format,
+			                                     &test_arg.image_desc);
+			if(   mem_arg.mem != NULL
+			   && piglit_cl_write_whole_image(env->context->command_queues[0],
+			                                  mem_arg.mem,
+			                                  test_arg.value)
+			   && piglit_cl_set_kernel_arg(kernel,
+			                               mem_arg.index,
+			                               sizeof(cl_mem),
+			                               &mem_arg.mem)) {
+				arg_set = true;
+			}
+
+			if(arg_set) {
+				add_dynamic_array((void**)&mem_args,
+				                  &num_mem_args,
+				                  sizeof(struct mem_arg),
+				                  &mem_arg);
+			}
+			break;
+		}
+		case TEST_ARG_SAMPLER: {
+			cl_sampler sampler = piglit_cl_create_sampler(
+				env->context,
+				test_arg.sampler_normalized_coords,
+				test_arg.sampler_addressing_mode,
+				test_arg.sampler_filter_mode);
+
+			if(!sampler) {
+				arg_set = false;
+				break;
+			}
+
+			arg_set = piglit_cl_set_kernel_arg(kernel,
+			                                   test_arg.index,
+			                                   test_arg.size,
+			                                   &sampler);
+
+			if(arg_set) {
+				add_dynamic_array((void**)&sampler_args,
+				                  &num_sampler_args,
+				                  sizeof(cl_sampler),
+				                  &sampler);
+			}
+			break;
 		}}
 
 		if(!arg_set) {
@@ -1815,6 +2259,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			       test_arg.index);
 			clReleaseKernel(kernel);
 			free_mem_args(&mem_args, &num_mem_args);
+			free_sampler_args(&sampler_args, &num_sampler_args);
 			return PIGLIT_FAIL;
 		}
 	}
@@ -1867,13 +2312,64 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 				                  &mem_arg);
 			}
 			break;
-		}}
+		}
+		case TEST_ARG_IMAGE: {
+			unsigned k;
+			bool fail = false;
+			struct mem_arg mem_arg;
+			mem_arg.index = test_arg.index;
+			mem_arg.type = test_arg.image_desc.image_type;
+
+			for(k = 0; k < num_mem_args; k++) {
+				if(mem_args[k].index == mem_arg.index) {
+					printf("Argument %d: images cannot be in-out arguments.",
+					       mem_arg.index);
+					arg_set = false;
+					fail = true;
+					break;
+				}
+			}
+			if(fail) {
+				break;
+			}
+
+			if(!test_arg.value) {
+				printf("Image argument cannot be null.\n");
+				arg_set = false;
+				break;
+			}
+
+			mem_arg.mem = piglit_cl_create_image(env->context,
+			                                     CL_MEM_WRITE_ONLY,
+			                                     &test_arg.image_format,
+			                                     &test_arg.image_desc);
+			if(   mem_arg.mem != NULL
+			   && piglit_cl_set_kernel_arg(kernel,
+			                               mem_arg.index,
+			                               sizeof(cl_mem),
+			                               &mem_arg.mem)) {
+				arg_set = true;
+			}
+
+			if(arg_set) {
+				add_dynamic_array((void**)&mem_args,
+				                  &num_mem_args,
+				                  sizeof(struct mem_arg),
+				                  &mem_arg);
+			}
+			break;
+		}
+		case TEST_ARG_SAMPLER:
+			// not accepted by parser
+			break;
+		}
 
 		if(!arg_set) {
 			printf("Failed to set kernel argument with index %u\n",
 			       test_arg.index);
 			clReleaseKernel(kernel);
 			free_mem_args(&mem_args, &num_mem_args);
+			free_sampler_args(&sampler_args, &num_sampler_args);
 			return PIGLIT_FAIL;
 		}
 	}
@@ -1889,6 +2385,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 		printf("Failed to enqueue the kernel\n");
 		clReleaseKernel(kernel);
 		free_mem_args(&mem_args, &num_mem_args);
+		free_sampler_args(&sampler_args, &num_sampler_args);
 		return PIGLIT_FAIL;
 	}
 
@@ -1944,13 +2441,57 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			}
 
 			break;
-		}}
+		}
+		case TEST_ARG_IMAGE: {
+			struct mem_arg mem_arg;
+
+			/* Find the right buffer */
+			for(k = 0; k < num_mem_args; k++) {
+				if(mem_args[k].index == test_arg.index) {
+					mem_arg = mem_args[k];
+				}
+			}
+
+			if(test_arg.value != NULL) {
+				void* read_value = malloc(test_arg.size);
+
+				if(piglit_cl_read_whole_image(env->context->command_queues[0],
+					                          mem_arg.mem,
+					                          read_value)) {
+					arg_valid = true;
+					if(check_test_arg_value(test_arg, read_value)) {
+						printf(" Argument %u: PASS%s\n",
+						                     test_arg.index,
+						                     !test.expect_test_fail ? "" : " (not expected)");
+						if(test.expect_test_fail) {
+							piglit_merge_result(&result, PIGLIT_FAIL);
+						}
+					} else {
+						printf(" Argument %u: FAIL%s\n",
+						                     test_arg.index,
+						                     !test.expect_test_fail ? "" : " (expected)");
+						if(!test.expect_test_fail) {
+							piglit_merge_result(&result, PIGLIT_FAIL);
+						}
+					}
+				}
+
+				free(read_value);
+			}
+
+			break;
+		}
+		case TEST_ARG_SAMPLER:
+			// Not accepted by parser
+			break;
+		}
 
 		if(!arg_valid) {
 			printf("Failed to validate kernel argument with index %u\n",
 			       test_arg.index);
 			clReleaseKernel(kernel);
 			free_mem_args(&mem_args, &num_mem_args);
+			free_sampler_args(&sampler_args, &num_sampler_args);
 			return PIGLIT_FAIL;
 		}
 	}
@@ -1958,6 +2499,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	/* Clean memory used by test */
 	clReleaseKernel(kernel);
 	free_mem_args(&mem_args, &num_mem_args);
+	free_sampler_args(&sampler_args, &num_sampler_args);
 	return result;
 }
 
