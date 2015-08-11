@@ -37,7 +37,10 @@ This script outputs, to stdout, the name of each file it generates.
 
 """
 
-import os, sys, random
+from __future__ import print_function, division, absolute_import
+import os
+import sys
+import random
 
 
 class Test(object):
