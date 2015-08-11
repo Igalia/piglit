@@ -77,6 +77,7 @@ with profile.group_manager(PiglitCLTest, 'api') as g:
     # Kernel
     g(['cl-api-create-kernel'], 'clCreateKernel')
     g(['cl-api-create-kernels-in-program'], 'clCreateKernelsInProgram')
+    g(['cl-api-get-kernel-arg-info'], 'clGetKernelArgInfo')
     g(['cl-api-get-kernel-info'], 'clGetKernelInfo')
     g(['cl-api-get-kernel-work-group-info'], 'clGetKernelWorkGroupInfo')
     g(['cl-api-retain_release-kernel'], 'clRetainKernel and clReleaseKernel')

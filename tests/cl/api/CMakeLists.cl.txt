@@ -42,6 +42,7 @@ piglit_cl_add_api_test (create-kernels-in-program create-kernels-in-program.c)
 piglit_cl_add_api_test (set-kernel-arg set-kernel-arg.c)
 piglit_cl_add_api_test (retain_release-kernel retain_release-kernel.c)
 piglit_cl_add_api_test (get-kernel-info get-kernel-info.c)
+piglit_cl_add_api_test (get-kernel-arg-info get-kernel-arg-info.c)
 piglit_cl_add_api_test (get-kernel-work-group-info get-kernel-work-group-info.c)
 
 # Events

@@ -81,6 +81,9 @@ PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_program_info);
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_program_build_info);
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_mem_info);
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_kernel_info);
+#ifdef CL_VERSION_1_2
+PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_kernel_arg_info);
+#endif
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_kernel_work_group_info);
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_event_info);
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_image_info);
