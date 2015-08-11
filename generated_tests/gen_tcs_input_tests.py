@@ -42,6 +42,8 @@ import os
 import sys
 import random
 
+from six.moves import range
+
 
 class Test(object):
     def __init__(self, type_name, array, name):
@@ -99,12 +101,12 @@ class Test(object):
         data = self.test_data()
         uniforms = ''
         if self.var_array:
-            for i in xrange(12):
-                for j in xrange(self.var_array):
+            for i in range(12):
+                for j in range(self.var_array):
                     uniforms += 'uniform {0} reference[{1}].v[{2}] {3}\n'.format(
                         self.var_type, i, j, data[i*j])
         else:
-            for i in xrange(12):
+            for i in range(12):
                 uniforms += 'uniform {0} reference[{1}].v {2}\n'.format(
                     self.var_type,
                     i,
@@ -155,8 +157,8 @@ class Test(object):
         c = self.components()
 
         ret = []
-        for i in xrange(n):
-            ret.append(" ".join(str(rand()) for _ in xrange(c)))
+        for i in range(n):
+            ret.append(" ".join(str(rand()) for _ in range(c)))
 
         return ret
 
