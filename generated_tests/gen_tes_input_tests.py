@@ -186,7 +186,7 @@ class Test(object):
         c = self.components()
 
         ret = []
-        for i in range(n):
+        for _ in range(n):
             ret.append(" ".join(str(rand()) for _ in range(c)))
 
         return ret
