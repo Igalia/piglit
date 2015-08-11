@@ -47,7 +47,7 @@ class Test(object):
         name -- name of the variable to test
 
         """
-        self.var_name = name or 'var';
+        self.var_name = name or 'var'
 
         if self.var_name == 'gl_Position':
             self.var_type = 'vec4'
@@ -288,7 +288,7 @@ def all_tests():
         for array in [None, 2]:
             yield Test(type_name=type_name, array=array, name=None)
     for var in ['gl_Position', 'gl_PointSize', 'gl_ClipDistance']:
-        yield Test(type_name=None, array=None, name=var);
+        yield Test(type_name=None, array=None, name=var)
 
 def main():
     for test in all_tests():
