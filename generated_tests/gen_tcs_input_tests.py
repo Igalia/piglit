@@ -22,18 +22,20 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-## Test passing variables from the vertex shader to the tessellation control
-# shader.
-#
-# For every varying type create one tests that passes a scalar of that type
-# and one test that passes a two element array.
-# Copy a uniform value to the varying in the vertex shader and compare the
-# varying to the same uniform in the tessellation control shader.
-# If the values are equal draw the screen green, red otherwise.
-#
-# Draw for tessellated quads. Each should cover one quarter of the screen.
-#
-# This script outputs, to stdout, the name of each file it generates.
+"""Test passing variables from the vertex shader to the tessellation control
+shader.
+
+For every varying type create one tests that passes a scalar of that type
+and one test that passes a two element array.
+Copy a uniform value to the varying in the vertex shader and compare the
+varying to the same uniform in the tessellation control shader.
+If the values are equal draw the screen green, red otherwise.
+
+Draw for tessellated quads. Each should cover one quarter of the screen.
+
+This script outputs, to stdout, the name of each file it generates.
+
+"""
 
 import os, sys, random
 
