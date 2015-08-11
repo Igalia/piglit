@@ -49,7 +49,6 @@ BLACKLIST = set([os.path.abspath(os.path.join(os.path.dirname(__file__), _p))
 # True or False (True if it is expected to fail. This allows us to have
 # condtional failures, like when we expect python3 to fail.
 EXPECTED_FAILS = {
-    'gen_tes_input_tests.py': sys.version.startswith('3'),
     'gen_tcs_input_tests.py': sys.version.startswith('3'),
 }
 
