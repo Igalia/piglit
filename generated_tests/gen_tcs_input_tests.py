@@ -102,13 +102,13 @@ class Test(object):
             for i in xrange(12):
                 for j in xrange(self.var_array):
                     uniforms += 'uniform {0} reference[{1}].v[{2}] {3}\n'.format(
-                            self.var_type, i, j, data[i*j])
+                        self.var_type, i, j, data[i*j])
         else:
             for i in xrange(12):
                 uniforms += 'uniform {0} reference[{1}].v {2}\n'.format(
-                        self.var_type,
-                        i,
-                        data[i])
+                    self.var_type,
+                    i,
+                    data[i])
 
         #strip last newline
         return uniforms[:-1]
@@ -144,13 +144,13 @@ class Test(object):
             n = 12
 
         if self.var_type.startswith('i'):
-            rand = lambda : random.randint(-0x80000000, 0x7fffffff)
+            rand = lambda: random.randint(-0x80000000, 0x7fffffff)
         elif self.var_type.startswith('u'):
-            rand = lambda : random.randint(0, 0xffffffff)
+            rand = lambda: random.randint(0, 0xffffffff)
         else:
-            rand = lambda : ((-1 + 2 * random.randint(0, 1)) *
-                             random.randint(0, 2**23-1) *
-                             2.0**(random.randint(-126, 127)))
+            rand = lambda: ((-1 + 2 * random.randint(0, 1)) *
+                            random.randint(0, 2**23-1) *
+                            2.0**(random.randint(-126, 127)))
 
         c = self.components()
 
@@ -272,8 +272,7 @@ relative probe rgb (0.25, 0.75) (0.0, 1.0, 0.0)
 relative probe rgb (0.75, 0.75) (0.0, 1.0, 0.0)
 """
 
-        test = test.format(self = self,
-            generator_command = " ".join(sys.argv))
+        test = test.format(self=self, generator_command=" ".join(sys.argv))
 
         filename = self.filename()
         dirname = os.path.dirname(filename)
@@ -284,7 +283,7 @@ relative probe rgb (0.75, 0.75) (0.0, 1.0, 0.0)
 
 
 def all_tests():
-    for type_name in ['float', 'vec2',  'vec3',  'vec4',
+    for type_name in ['float', 'vec2', 'vec3', 'vec4',
                       'mat2', 'mat3', 'mat4',
                       'mat2x3', 'mat2x4', 'mat3x2',
                       'mat3x4', 'mat4x2', 'mat4x3',
@@ -294,6 +293,7 @@ def all_tests():
             yield Test(type_name=type_name, array=array, name=None)
     for var in ['gl_Position', 'gl_PointSize', 'gl_ClipDistance']:
         yield Test(type_name=None, array=None, name=var)
+
 
 def main():
     for test in all_tests():
