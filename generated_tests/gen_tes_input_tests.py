@@ -53,7 +53,7 @@ class Test(object):
         name -- name of the variable to test
 
         """
-        self.var_name = name or 'var';
+        self.var_name = name or 'var'
         self.use_block = 0 if patch_in else 1
 
         if self.var_name == 'gl_Position':
@@ -320,7 +320,7 @@ def all_tests():
             for patch_in in [True, False]:
                     yield Test(type_name, array, patch_in, name=None)
     for var in ['gl_Position', 'gl_PointSize', 'gl_ClipDistance']:
-        yield Test(type_name=None, array=None, patch_in=False, name=var);
+        yield Test(type_name=None, array=None, patch_in=False, name=var)
 
 def main():
     for test in all_tests():
