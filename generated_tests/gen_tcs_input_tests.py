@@ -181,16 +181,16 @@ GL_ARB_tessellation_shader
 
 [vertex shader]
 uniform struct S0 {{
-	{self.var_type_full} v;
+        {self.var_type_full} v;
 }} reference[12];
 
 out {self.interface_name} {{
-	{self.var_type_full} {self.var_name};
+        {self.var_type_full} {self.var_name};
 }} {self.interface_vs_instance};
 
 void main()
 {{
-	{self.interface_vs_instance}{self.vs_var_ref} = reference[gl_VertexID].v;
+        {self.interface_vs_instance}{self.vs_var_ref} = reference[gl_VertexID].v;
 }}
 
 [tessellation control shader]
@@ -198,27 +198,27 @@ void main()
 layout(vertices = 3) out;
 
 uniform struct S0 {{
-	{self.var_type_full} v;
+        {self.var_type_full} v;
 }} reference[12];
 
 in {self.interface_name} {{
-	{self.var_type_full} {self.var_name};
+        {self.var_type_full} {self.var_name};
 }} {self.interface_tcs_instance}[];
 
 out int pass[];
 
 void main()
 {{
-	const int vertices_in = 3;
-	int local_pass = 1;
-	for (int i = 0; i < vertices_in; ++i) {{
-		int vertex_ID = gl_PrimitiveID * vertices_in + i;
-		if ({self.interface_tcs_instance}[i]{self.tcs_var_ref} != reference[vertex_ID].v)
-			local_pass = 0;
-	}}
-	pass[gl_InvocationID] = local_pass;
-	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
-	gl_TessLevelInner = float[2](1.0, 1.0);
+        const int vertices_in = 3;
+        int local_pass = 1;
+        for (int i = 0; i < vertices_in; ++i) {{
+                int vertex_ID = gl_PrimitiveID * vertices_in + i;
+                if ({self.interface_tcs_instance}[i]{self.tcs_var_ref} != reference[vertex_ID].v)
+                        local_pass = 0;
+        }}
+        pass[gl_InvocationID] = local_pass;
+        gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
+        gl_TessLevelInner = float[2](1.0, 1.0);
 }}
 
 [tessellation evaluation shader]
@@ -231,20 +231,20 @@ out vec4 vert_color;
 
 void main()
 {{
-	const vec4 red = vec4(1, 0, 0, 1);
-	const vec4 green = vec4(0, 1, 0, 1);
-	vec2[3] position = vec2[3](
-		vec2(float(gl_PrimitiveID / 2) - 1.0, float(gl_PrimitiveID % 2) - 1.0),
-		vec2(float(gl_PrimitiveID / 2) - 0.0, float(gl_PrimitiveID % 2) - 1.0),
-		vec2(float(gl_PrimitiveID / 2) - 1.0, float(gl_PrimitiveID % 2) - 0.0)
-	);
-	gl_Position = vec4(position[0]
-	            + (position[1] - position[0]) * gl_TessCoord[0]
-	            + (position[2] - position[0]) * gl_TessCoord[1], 0.0, 1.0);
-	vert_color = green;
-	if (pass[0] == 0 || pass[1] == 0 || pass[2] == 0) {{
-		vert_color = red;
-	}}
+        const vec4 red = vec4(1, 0, 0, 1);
+        const vec4 green = vec4(0, 1, 0, 1);
+        vec2[3] position = vec2[3](
+                vec2(float(gl_PrimitiveID / 2) - 1.0, float(gl_PrimitiveID % 2) - 1.0),
+                vec2(float(gl_PrimitiveID / 2) - 0.0, float(gl_PrimitiveID % 2) - 1.0),
+                vec2(float(gl_PrimitiveID / 2) - 1.0, float(gl_PrimitiveID % 2) - 0.0)
+        );
+        gl_Position = vec4(position[0]
+                    + (position[1] - position[0]) * gl_TessCoord[0]
+                    + (position[2] - position[0]) * gl_TessCoord[1], 0.0, 1.0);
+        vert_color = green;
+        if (pass[0] == 0 || pass[1] == 0 || pass[2] == 0) {{
+                vert_color = red;
+        }}
 }}
 
 [fragment shader]
@@ -255,7 +255,7 @@ out vec4 frag_color;
 
 void main()
 {{
-	frag_color = vert_color;
+        frag_color = vert_color;
 }}
 
 [test]
