@@ -1004,6 +1004,155 @@ piglit_cl_read_whole_buffer(cl_command_queue command_queue, cl_mem buffer,
 	return success;
 }
 
+cl_mem
+piglit_cl_create_image(piglit_cl_context context, cl_mem_flags flags,
+                       const cl_image_format *format, const cl_image_desc *desc)
+{
+	cl_int errNo;
+	cl_mem image = NULL;
+
+	if (piglit_cl_get_platform_version(context->platform_id) >= 12) {
+		image = clCreateImage(context->cl_ctx, flags, format, desc, NULL, &errNo);
+	} else if (desc->image_type == CL_MEM_OBJECT_IMAGE2D) {
+		image = clCreateImage2D(context->cl_ctx, flags, format,
+		                        desc->image_width, desc->image_height, 0,
+		                        NULL, &errNo);
+	} else if (desc->image_type == CL_MEM_OBJECT_IMAGE3D) {
+		image = clCreateImage3D(context->cl_ctx, flags, format,
+		                        desc->image_width, desc->image_height,
+		                        desc->image_depth, 0, 0,
+		                        NULL, &errNo);
+	} else {
+		fprintf(stderr,
+		        "Invalid image mem object type: %s\n",
+		        piglit_cl_get_enum_name(desc->image_type));
+	}
+	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		fprintf(stderr,
+		        "Could not create image: %s\n",
+		        piglit_cl_get_error_name(errNo));
+	}
+
+	return image;
+}
+
+bool
+piglit_cl_write_image(cl_command_queue command_queue, cl_mem image,
+                      const size_t *origin, const size_t *region,
+                      const void *ptr)
+{
+	cl_int errNo;
+
+	errNo = clEnqueueWriteImage(command_queue, image, CL_TRUE, origin, region,
+	                            0, 0, ptr, 0, NULL, NULL);
+	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		fprintf(stderr,
+		        "Could not enqueue image write: %s\n",
+		        piglit_cl_get_error_name(errNo));
+		return false;
+	}
+
+	return true;
+}
+
+static void
+piglit_get_image_region(cl_mem image, size_t *region)
+{
+	size_t *p = NULL;
+	cl_mem_object_type *type;
+
+	type = piglit_cl_get_mem_object_info(image, CL_MEM_TYPE);
+
+	p = piglit_cl_get_image_info(image, CL_IMAGE_WIDTH);
+	region[0] = *p;
+	free(p);
+
+	switch (*type) {
+		case CL_MEM_OBJECT_IMAGE1D:
+		case CL_MEM_OBJECT_IMAGE1D_BUFFER:
+			region[1] = 1;
+			region[2] = 1;
+			break;
+		case CL_MEM_OBJECT_IMAGE2D:
+			p = piglit_cl_get_image_info(image, CL_IMAGE_HEIGHT);
+			region[1] = *p;
+			free(p);
+			region[2] = 1;
+			break;
+		case CL_MEM_OBJECT_IMAGE3D:
+			p = piglit_cl_get_image_info(image, CL_IMAGE_HEIGHT);
+			region[1] = *p;
+			free(p);
+			p = piglit_cl_get_image_info(image, CL_IMAGE_DEPTH);
+			region[2] = *p;
+			free(p);
+			break;
+		case CL_MEM_OBJECT_IMAGE1D_ARRAY:
+			p = piglit_cl_get_image_info(image, CL_IMAGE_ARRAY_SIZE);
+			region[1] = *p;
+			free(p);
+			region[2] = 1;
+			break;
+		case CL_MEM_OBJECT_IMAGE2D_ARRAY:
+			p = piglit_cl_get_image_info(image, CL_IMAGE_HEIGHT);
+			region[1] = *p;
+			free(p);
+			p = piglit_cl_get_image_info(image, CL_IMAGE_ARRAY_SIZE);
+			region[2] = *p;
+			free(p);
+			break;
+	}
+
+	free(type);
+}
+
+bool
+piglit_cl_write_whole_image(cl_command_queue command_queue, cl_mem image,
+                            const void *ptr)
+{
+	bool success;
+	size_t origin[3], region[3];
+
+	memset(origin, 0, sizeof(origin));
+	piglit_get_image_region(image, region);
+	success = piglit_cl_write_image(command_queue, image, origin, region, ptr);
+
+	return success;
+}
+
+bool
+piglit_cl_read_image(cl_command_queue command_queue, cl_mem image,
+                     const size_t *origin, const size_t *region,
+                     void *ptr)
+{
+	cl_int errNo;
+
+	errNo = clEnqueueReadImage(command_queue, image, CL_TRUE, origin, region,
+	                           0, 0, ptr, 0, NULL, NULL);
+	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		fprintf(stderr,
+		        "Could not enqueue image read: %s\n",
+		        piglit_cl_get_error_name(errNo));
+		return false;
+	}
+
+	return true;
+}
+
+bool
+piglit_cl_read_whole_image(cl_command_queue command_queue, cl_mem image,
+                           void *ptr)
+{
+	bool success;
+	size_t origin[3], region[3];
+
+	memset(origin, 0, sizeof(origin));
+	piglit_get_image_region(image, region);
+	success = piglit_cl_read_image(command_queue, image, origin, region, ptr);
+
+	return success;
+}
+
 cl_kernel
 piglit_cl_create_kernel(cl_program program, const char* kernel_name)
 {
@@ -1019,6 +1168,26 @@ piglit_cl_create_kernel(cl_program program, const char* kernel_name)
 	}
 
 	return kernel;
+}
+
+cl_sampler
+piglit_cl_create_sampler(piglit_cl_context context,
+                         cl_bool normalized_coords,
+                         cl_addressing_mode addressing_mode,
+                         cl_filter_mode filter_mode)
+{
+	cl_int errNo;
+	cl_sampler sampler;
+
+	sampler = clCreateSampler(context->cl_ctx, normalized_coords,
+	                          addressing_mode, filter_mode, &errNo);
+	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		fprintf(stderr,
+		        "Could not create sampler: %s\n",
+		        piglit_cl_get_error_name(errNo));
+	}
+
+	return sampler;
 }
 
 bool

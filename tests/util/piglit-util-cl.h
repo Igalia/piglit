@@ -529,6 +529,102 @@ piglit_cl_read_whole_buffer(cl_command_queue command_queue,
                             void *ptr);
 
 /**
+ * \brief Create an image.
+ *
+ * @param context      Context on which to create image.
+ * @param flags        Memory flags.
+ * @param format       Image format.
+ * @param desc         Image descriptor.
+ * @return             Created image or NULL on fail.
+ */
+cl_mem
+piglit_cl_create_image(piglit_cl_context context,
+                       cl_mem_flags flags,
+                       const cl_image_format *format,
+                       const cl_image_desc *desc);
+
+/**
+ * \brief Blocking write to an image.
+ *
+ * @param command_queue  Command queue to enqueue operation on.
+ * @param image          Image to write to.
+ * @param origin         (x, y, z) offset in pixels.
+ * @param region         (width, height, depht) size in pixels.
+ * @param ptr            Pointer to data to be written to image.
+ * @return               \c true on succes, \c false otherwise.
+ */
+bool
+piglit_cl_write_image(cl_command_queue command_queue,
+                      cl_mem image,
+                      const size_t *origin,
+                      const size_t *region,
+                      const void *ptr);
+
+/**
+ * \brief Blocking write to the entire area of an image.
+ *
+ * \warning \c ptr must point to memory space which is equal or larger
+ * in size than \c image.
+ *
+ * @param command_queue  Command queue to enqueue operation on.
+ * @param image          Image to write to.
+ * @param ptr            Pointer to data to be written to image.
+ * @return               \c true on succes, \c false otherwise.
+ */
+bool
+piglit_cl_write_whole_image(cl_command_queue command_queue,
+                            cl_mem image,
+                            const void *ptr);
+
+/**
+ * \brief Blocking read from an image.
+ *
+ * @param command_queue  Command queue to enqueue operation on.
+ * @param image          Image to read from.
+ * @param origin         (x, y, z) offset in pixels.
+ * @param region         (width, height, depht) size in pixels.
+ * @param ptr            Pointer to data read from image.
+ * @return               \c true on succes, \c false otherwise.
+ */
+bool
+piglit_cl_read_image(cl_command_queue command_queue,
+                     cl_mem image,
+                     const size_t *origin,
+                     const size_t *region,
+                     void *ptr);
+
+/**
+ * \brief Blocking read of the full contents of an image.
+ *
+ * \warning \c ptr must point to memory space which is equal or larger
+ * in size than \c image.
+ *
+ * @param command_queue  Command queue to enqueue operation on.
+ * @param image          Image to read from.
+ * @param ptr            Pointer to data read from image.
+ * @return               \c true on succes, \c false otherwise.
+ */
+bool
+piglit_cl_read_whole_image(cl_command_queue command_queue,
+                           cl_mem image,
+                           void *ptr);
+
+/**
+ * \brief Create a sampler.
+ *
+ * @param context            Context on which to create image.
+ * @param normalized_coords  Use normalized coords if true.
+ * @param addressing_mode    Addressing mode.
+ * @param filter_mode        Filter mode.
+ * @return                   Created sampler or NULL on fail.
+ */
+cl_sampler
+piglit_cl_create_sampler(piglit_cl_context context,
+                         cl_bool normalized_coords,
+                         cl_addressing_mode addressing_mode,
+                         cl_filter_mode filter_mode);
+
+/**
  * \brief Create a kernel.
  *
  * @param context      Program on which to create a kernel.
