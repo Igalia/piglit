@@ -1993,6 +1993,7 @@ init(const int argc,
 struct mem_arg {
 	cl_uint index;
 	cl_mem mem;
+	cl_mem_object_type type;
 };
 
 void
@@ -2162,6 +2163,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 		case TEST_ARG_BUFFER: {
 			struct mem_arg mem_arg;
 			mem_arg.index = test_arg.index;
+			mem_arg.type = CL_MEM_OBJECT_BUFFER;
 
 			if(test_arg.value != NULL) {
 				mem_arg.mem = piglit_cl_create_buffer(env->context,
@@ -2198,6 +2200,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 		case TEST_ARG_IMAGE: {
 			struct mem_arg mem_arg;
 			mem_arg.index = test_arg.index;
+			mem_arg.type = test_arg.image_desc.image_type;
 
 			if(!test_arg.value) {
 				printf("Image argument cannot be null.\n");
@@ -2274,15 +2277,28 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			break;
 		case TEST_ARG_BUFFER: {
 			unsigned k;
+			bool fail = false;
 			struct mem_arg mem_arg;
 			mem_arg.index = test_arg.index;
+			mem_arg.type = CL_MEM_OBJECT_BUFFER;
 
 			for(k = 0; k < num_mem_args; k++) {
-				if(mem_args[k].index == mem_arg.index) {
-					arg_set = true;
+				if(mem_args[k].index != mem_arg.index)
+					continue;
+
+				if(mem_args[k].type != mem_arg.type) {
+					printf("Inconsistent types specified for in-out"
+					       "argument %d: arg_in: %s, arg_out: %s.\n",
+					       mem_arg.index,
+					       piglit_cl_get_enum_name(mem_args[k].type),
+					       piglit_cl_get_enum_name(mem_arg.type));
+					arg_set = false;
+					fail = true;
+					break;
 				}
+				arg_set = true;
 			}
-			if(arg_set) {
+			if(arg_set || fail) {
 				break;
 			}
 
