@@ -1618,24 +1618,24 @@ init(const int argc,
 	config->run_per_device = true;
 }
 
-/* Buffer functions */
+/* Memory object functions */
 
-struct buffer_arg {
+struct mem_arg {
 	cl_uint index;
-	cl_mem buffer;
+	cl_mem mem;
 };
 
 void
-free_buffer_args(struct buffer_arg** buffer_args, unsigned int* num_buffer_args)
+free_mem_args(struct mem_arg** mem_args, unsigned int* num_mem_args)
 {
 	unsigned i;
 
-	for(i = 0; i < *num_buffer_args; i++) {
-		clReleaseMemObject((*buffer_args)[i].buffer);
+	for(i = 0; i < *num_mem_args; i++) {
+		clReleaseMemObject((*mem_args)[i].mem);
 	}
 
-	free(*buffer_args); *buffer_args = NULL;
-	*num_buffer_args = 0;
+	free(*mem_args); *mem_args = NULL;
+	*num_mem_args = 0;
 }
 
 bool
@@ -1727,8 +1727,8 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	cl_kernel kernel;
 
 	// setting/validating arguments
-	struct buffer_arg* buffer_args = NULL;
-	unsigned int  num_buffer_args = 0;
+	struct mem_arg* mem_args = NULL;
+	unsigned int  num_mem_args = 0;
 
 	/* Check if this device supports the local work size. */
 	if (!piglit_cl_framework_check_local_work_size(env->device_id,
@@ -1774,38 +1774,38 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			                                   test_arg.value);
 			break;
 		case TEST_ARG_BUFFER: {
-			struct buffer_arg buffer_arg;
-			buffer_arg.index = test_arg.index;
+			struct mem_arg mem_arg;
+			mem_arg.index = test_arg.index;
 
 			if(test_arg.value != NULL) {
-				buffer_arg.buffer = piglit_cl_create_buffer(env->context,
+				mem_arg.mem = piglit_cl_create_buffer(env->context,
 				                                            CL_MEM_READ_WRITE,
 				                                            test_arg.size);
-				if(   buffer_arg.buffer != NULL
+				if(   mem_arg.mem != NULL
 				   && piglit_cl_write_buffer(env->context->command_queues[0],
-				                             buffer_arg.buffer,
+				                             mem_arg.mem,
 				                             0,
 				                             test_arg.size,
 				                             test_arg.value)
 				   && piglit_cl_set_kernel_arg(kernel,
-				                               buffer_arg.index,
+				                               mem_arg.index,
 				                               sizeof(cl_mem),
-				                               &buffer_arg.buffer)) {
+				                               &mem_arg.mem)) {
 					arg_set = true;
 				}
 			} else {
-				buffer_arg.buffer = NULL;
+				mem_arg.mem = NULL;
 				arg_set = piglit_cl_set_kernel_arg(kernel,
-				                                   buffer_arg.index,
+				                                   mem_arg.index,
 				                                   sizeof(cl_mem),
 				                                   NULL);
 			}
 
 			if(arg_set) {
-				add_dynamic_array((void**)&buffer_args,
-				                  &num_buffer_args,
-				                  sizeof(struct buffer_arg),
-				                  &buffer_arg);
+				add_dynamic_array((void**)&mem_args,
+				                  &num_mem_args,
+				                  sizeof(struct mem_arg),
+				                  &mem_arg);
 			}
 			break;
 		}}
@@ -1814,7 +1814,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			printf("Failed to set kernel argument with index %u\n",
 			       test_arg.index);
 			clReleaseKernel(kernel);
-			free_buffer_args(&buffer_args, &num_buffer_args);
+			free_mem_args(&mem_args, &num_mem_args);
 			return PIGLIT_FAIL;
 		}
 	}
@@ -1829,11 +1829,11 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			break;
 		case TEST_ARG_BUFFER: {
 			unsigned k;
-			struct buffer_arg buffer_arg;
-			buffer_arg.index = test_arg.index;
+			struct mem_arg mem_arg;
+			mem_arg.index = test_arg.index;
 
-			for(k = 0; k < num_buffer_args; k++) {
-				if(buffer_args[k].index == buffer_arg.index) {
+			for(k = 0; k < num_mem_args; k++) {
+				if(mem_args[k].index == mem_arg.index) {
 					arg_set = true;
 				}
 			}
@@ -1842,29 +1842,29 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			}
 
 			if(test_arg.value != NULL) {
-				buffer_arg.buffer = piglit_cl_create_buffer(env->context,
+				mem_arg.mem = piglit_cl_create_buffer(env->context,
 				                                            CL_MEM_READ_WRITE,
 				                                            test_arg.size);
-				if(   buffer_arg.buffer != NULL
+				if(   mem_arg.mem != NULL
 				   && piglit_cl_set_kernel_arg(kernel,
-				                               buffer_arg.index,
+				                               mem_arg.index,
 				                               sizeof(cl_mem),
-				                               &buffer_arg.buffer)) {
+				                               &mem_arg.mem)) {
 					arg_set = true;
 				}
 			} else {
-				buffer_arg.buffer = NULL;
+				mem_arg.mem = NULL;
 				arg_set = piglit_cl_set_kernel_arg(kernel,
-				                                   buffer_arg.index,
+				                                   mem_arg.index,
 				                                   sizeof(cl_mem),
 				                                   NULL);
 			}
 
 			if(arg_set) {
-				add_dynamic_array((void**)&buffer_args,
-				                  &num_buffer_args,
-				                  sizeof(struct buffer_arg),
-				                  &buffer_arg);
+				add_dynamic_array((void**)&mem_args,
+				                  &num_mem_args,
+				                  sizeof(struct mem_arg),
+				                  &mem_arg);
 			}
 			break;
 		}}
@@ -1873,7 +1873,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			printf("Failed to set kernel argument with index %u\n",
 			       test_arg.index);
 			clReleaseKernel(kernel);
-			free_buffer_args(&buffer_args, &num_buffer_args);
+			free_mem_args(&mem_args, &num_mem_args);
 			return PIGLIT_FAIL;
 		}
 	}
@@ -1888,7 +1888,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	                                      test.local_work_size_null ? NULL : test.local_work_size)) {
 		printf("Failed to enqueue the kernel\n");
 		clReleaseKernel(kernel);
-		free_buffer_args(&buffer_args, &num_buffer_args);
+		free_mem_args(&mem_args, &num_mem_args);
 		return PIGLIT_FAIL;
 	}
 
@@ -1905,12 +1905,12 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			// Not accepted by parser
 			break;
 		case TEST_ARG_BUFFER: {
-			struct buffer_arg buffer_arg;
+			struct mem_arg mem_arg;
 
 			/* Find the right buffer */
-			for(k = 0; k < num_buffer_args; k++) {
-				if(buffer_args[k].index == test_arg.index) {
-					buffer_arg = buffer_args[k];
+			for(k = 0; k < num_mem_args; k++) {
+				if(mem_args[k].index == test_arg.index) {
+					mem_arg = mem_args[k];
 				}
 			}
 
@@ -1918,7 +1918,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 				void* read_value = malloc(test_arg.size);
 
 				if(piglit_cl_read_buffer(env->context->command_queues[0],
-					                     buffer_arg.buffer,
+					                     mem_arg.mem,
 					                     0,
 					                     test_arg.size,
 					                     read_value)) {
@@ -1950,14 +1950,14 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			printf("Failed to validate kernel argument with index %u\n",
 			       test_arg.index);
 			clReleaseKernel(kernel);
-			free_buffer_args(&buffer_args, &num_buffer_args);
+			free_mem_args(&mem_args, &num_mem_args);
 			return PIGLIT_FAIL;
 		}
 	}
 
 	/* Clean memory used by test */
 	clReleaseKernel(kernel);
-	free_buffer_args(&buffer_args, &num_buffer_args);
+	free_mem_args(&mem_args, &num_mem_args);
 	return result;
 }
 
