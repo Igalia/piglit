@@ -1160,7 +1160,7 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 		/* Values are only allowed for in arguments */
 		if(!arg_in) {
 			fprintf(stderr,
-			        "Invalid configuration, out arguments can only be buffers: %s\n",
+			        "Invalid configuration, only arg_in values are allowed: %s\n",
 			        src);
 			exit_report_result(PIGLIT_WARN);
 		}
