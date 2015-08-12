@@ -13,3 +13,4 @@ link_libraries (
 piglit_add_executable (textureSize textureSize.c common.c)
 piglit_add_executable (texelFetch texelFetch.c common.c)
 piglit_add_executable (textureGather textureGather.c)
+piglit_add_executable (textureSamples textureSamples.c common.c)

@@ -1420,6 +1420,16 @@ for stage in ['vs', 'gs', 'fs']:
             PiglitGLTest(['texelFetch', stage, '{}sampler2DArray'.format(type),
                           'b0r1'])
 
+    for type in ('i', 'u', ''):
+        for sampler in ('sampler2DMS', 'sampler2DMSArray'):
+            for samples in ('2', '4', '8'):
+                stype = '{}{}'.format(type, sampler)
+                profile.test_list[grouptools.join(
+                    'spec', 'arb_shader_texture_image_samples',
+                    'textureSamples', '{}-{}-{}'.format(stage, stype, samples))
+                ] = PiglitGLTest([
+                    'textureSamples', stage, stype, samples])
+
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30')) as g:
