@@ -571,16 +571,15 @@ check_extensions_prop(GLenum prop)
 	}
 
 	if ((prop == GL_REFERENCED_BY_TESS_CONTROL_SHADER ||
-	     prop == GL_REFERENCED_BY_TESS_EVALUATION_SHADER) &&
+	     prop == GL_REFERENCED_BY_TESS_EVALUATION_SHADER ||
+             prop == GL_IS_PER_PATCH) &&
 	     !piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
 		 return false;
 	}
 
 	if ((prop == GL_REFERENCED_BY_COMPUTE_SHADER ||
-	     prop == GL_COMPUTE_SUBROUTINE_UNIFORM ||
-	     prop == GL_IS_PER_PATCH) &&
-	     !piglit_is_extension_supported("GL_ARB_compute_shader") &&
-	     !piglit_is_extension_supported("GL_ARB_shader_image_load_store")) {
+	     prop == GL_COMPUTE_SUBROUTINE_UNIFORM) &&
+	     !piglit_is_extension_supported("GL_ARB_compute_shader")) {
 		 return false;
 	}
 
