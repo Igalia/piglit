@@ -104,6 +104,15 @@ check(const struct grid_info grid, struct image_info img_src)
 		 */
 		ret &= check_pixels(img, pixels, img_src.size.x, img_src.size.y,
 			     img_src.size.z / 6.0, img_src.size.w);
+	} else if (img_src.target->target == GL_TEXTURE_CUBE_MAP) {
+		/* Unlike image-load-store's size (exported by the framework
+		 * used for this test), image-size reports only the size of one
+		 * face, not including the number of faces. From the
+		 * ARB_shader_image_size extension:
+		 * "Cube images return the dimensions of one face."
+		 */
+		ret &= check_pixels(img, pixels, img_src.size.x, img_src.size.y,
+			     1.0, 1.0);
 	} else if (image_target_samples(img_src.target) > 1) {
 		/* Unlike image-load-store's size (exported by the framework
 		 * used for this test), image-size does not report the sample
