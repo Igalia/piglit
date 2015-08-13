@@ -646,12 +646,12 @@ class TestV4toV5(object):
 class TestV5toV6(object):
     TEST_DATA = {
         'returncode': 0,
-        'err': None,
+        'err': '',
         'environment': None,
         'command': 'foo',
         'result': 'skip',
         'time': 0.123,
-        'out': None,
+        'out': '',
     }
 
     DATA = {

@@ -50,15 +50,43 @@ class Subtests(dict):
         return res
 
 
+class StringDescriptor(object):  # pylint: disable=too-few-public-methods
+    """A Shared data descriptor class for TestResult.
+
+    This provides a property that can be passed a str or unicode, but always
+    returns a unicode object.
+
+    """
+    def __init__(self, name, default=unicode()):
+        assert isinstance(default, unicode)
+        self.__name = name
+        self.__default = default
+
+    def __get__(self, instance, cls):
+        return getattr(instance, self.__name, self.__default)
+
+    def __set__(self, instance, value):
+        if isinstance(value, str):
+            setattr(instance, self.__name, value.decode('utf-8', 'replace'))
+        elif isinstance(value, unicode):
+            setattr(instance, self.__name, value)
+        else:
+            raise TypeError('{} attribute must be a str or unicode instance, '
+                            'but was {}.'.format(self.__name, type(value)))
+
+    def __delete__(self, instance):
+        raise NotImplementedError
+
+
 class TestResult(object):
     """An object represting the result of a single test."""
-    __slots__ = ['returncode', 'err', 'out', 'time', 'command', 'environment',
-                 'subtests', 'dmesg', '__result', 'images', 'traceback']
+    __slots__ = ['returncode', '_err', '_out', 'time', 'command', 'traceback',
+                 'environment', 'subtests', 'dmesg', '__result', 'images']
+    err = StringDescriptor('_err')
+    out = StringDescriptor('_out')
 
     def __init__(self, result=None):
         self.returncode = None
-        self.err = str()
-        self.out = str()
         self.time = float()
         self.command = str()
         self.environment = str()
@@ -113,10 +141,14 @@ class TestResult(object):
         status.Status object
 
         """
+        # pylint will say that assining to inst.out or inst.err is a non-slot
+        # because self.err and self.out are descriptors, methods that act like
+        # variables. Just silence pylint
+        # pylint: disable=assigning-non-slot
         inst = cls()
 
         # TODO: There's probably a more clever way to do this
-        for each in ['returncode', 'err', 'out', 'time', 'command',
+        for each in ['returncode', 'time', 'command',
                      'environment', 'result', 'dmesg']:
             if each in dict_:
                 setattr(inst, each, dict_[each])
@@ -124,6 +156,13 @@ class TestResult(object):
         if 'subtests' in dict_:
             for name, value in dict_['subtests'].iteritems():
                 inst.subtests[name] = value
+
+        # out and err must be set manually to avoid replacing the setter
+        if 'out' in dict_:
+            inst.out = dict_['out']
+
+        if 'err' in dict_:
+            inst.err = dict_['err']
 
         return inst
 

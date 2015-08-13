@@ -290,3 +290,59 @@ def test_TestResult_update_subtests():
     test = results.TestResult('pass')
     test.update({'subtest': {'result': 'incomplete'}})
     nt.eq_(test.subtests['result'], 'incomplete')
+
+
+class TestStringDescriptor(object):
+    """Test class for StringDescriptor."""
+    @classmethod
+    def setup_class(cls):
+        class Test(object):  # pylint: disable=too-few-public-methods
+            val = results.StringDescriptor('test')
+
+        cls.class_ = Test
+
+    def setup(self):
+        self.test = self.class_()
+
+    def test_get_default(self):
+        """results.StringDescriptor.__get__: returns default when unset"""
+        nt.eq_(self.test.val, u'')
+
+    def test_set_no_replace(self):
+        """results.StringDescriptor.__set__: instance is not replaced
+
+        This test might not make sense if you don't understand the difference
+        between 'is' and '==' in python. '==' is an equavalency test, while
+        'is' returns true only if the instances are the same.
+
+        What this test does is makes sure that self.test.val is not *replaced*
+        by inst, and instead the value is passed into the __set__ method.
+
+        """
+        inst = 'foo'
+        self.test.val = inst
+        nt.ok_(self.test.val is not inst)
+
+    def test_set_unicode(self):
+        """results.StringDescriptor.__set__: unicode is stored directly"""
+        inst = u'foo'
+        self.test.val = inst
+        nt.eq_(self.test.val, inst)
+
+    def test_set_str(self):
+        """results.StringDescriptor.__set__: converts strs to unicode"""
+        inst = 'foo'
+        self.test.val = inst
+        nt.eq_(self.test.val, unicode(inst))
+
+    @utils.no_error
+    def test_set_str_unicode_literals(self):
+        """results.StringDescriptor.__set__: handles unicode litterals in strs
+        """
+        inst = r'\ufffd'
+        self.test.val = inst
+
+    @nt.raises(NotImplementedError)
+    def test_delete(self):
+        """results.StringDescriptor.__delete__: raises NotImplementedError"""
+        del self.test.val
