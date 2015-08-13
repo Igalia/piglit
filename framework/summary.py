@@ -462,12 +462,14 @@ class Summary:
         testindex = Template(filename=path.join(self.TEMPLATE_DIR,
                                                 "testrun_info.mako"),
                              output_encoding="utf-8",
+                             encoding_errors='replace',
                              module_directory=self.TEMP_DIR)
 
         # Create the mako object for the individual result files
         testfile = Template(filename=path.join(self.TEMPLATE_DIR,
                                                "test_result.mako"),
                             output_encoding="utf-8",
+                            encoding_errors='replace',
                             module_directory=self.TEMP_DIR)
 
         result_css = path.join(destination, "result.css")
@@ -496,7 +498,7 @@ class Summary:
             self.__find_totals(each)
 
             with open(path.join(destination, name, "index.html"), 'w') as out:
-                out.write(testindex.render_unicode(
+                out.write(testindex.render(
                     name=each.name,
                     totals=self.totals,
                     time=time,
@@ -522,7 +524,7 @@ class Summary:
                         value['time'] = datetime.timedelta(0, value['time'])
 
                     with open(html_path, 'w') as out:
-                        out.write(testfile.render_unicode(
+                        out.write(testfile.render(
                             testname=key,
                             value=value,
                             css=path.relpath(result_css, temp_path),
@@ -531,11 +533,13 @@ class Summary:
         # Finally build the root html files: index, regressions, etc
         index = Template(filename=path.join(self.TEMPLATE_DIR, "index.mako"),
                          output_encoding="utf-8",
+                         encoding_errors='replace',
                          module_directory=self.TEMP_DIR)
 
         empty_status = Template(filename=path.join(self.TEMPLATE_DIR,
                                                    "empty_status.mako"),
                                 output_encoding="utf-8",
+                                encoding_errors='replace',
                                 module_directory=self.TEMP_DIR)
 
         pages = frozenset(['changes', 'problems', 'skipped', 'fixes',
@@ -545,7 +549,7 @@ class Summary:
         # alltests, where the other pages all use the same name. ie,
         # changes.html, self.changes, and page=changes.
         with open(path.join(destination, "index.html"), 'w') as out:
-            out.write(index.render_unicode(
+            out.write(index.render(
                 results=HTMLIndex(self, self.tests['all']),
                 page='all',
                 pages=pages,
@@ -557,7 +561,7 @@ class Summary:
             with open(path.join(destination, page + '.html'), 'w') as out:
                 # If there is information to display display it
                 if self.tests[page]:
-                    out.write(index.render_unicode(
+                    out.write(index.render(
                         results=HTMLIndex(self, self.tests[page]),
                         pages=pages,
                         page=page,
@@ -565,8 +569,7 @@ class Summary:
                         exclude=exclude))
                 # otherwise provide an empty page
                 else:
-                    out.write(empty_status.render_unicode(page=page,
-                                                          pages=pages))
+                    out.write(empty_status.render(page=page, pages=pages))
 
     def generate_text(self, mode):
         """ Write summary information to the console """
