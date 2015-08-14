@@ -139,7 +139,7 @@ piglit_cl_test(const int argc,
 	bool found_invalid_platform = false;
 	cl_platform_id* platform_ids;
 	unsigned int num_platform_ids;
-	cl_platform_id invalid_platform_id;
+	cl_platform_id invalid_platform_id = NULL;
 
 	//TODO: test also CL_CONTEXT_INTEROP_USER_SYNC
 	cl_context_properties context_properties[] = {
@@ -160,20 +160,6 @@ piglit_cl_test(const int argc,
 		0
 	};
 
-	/* Find invalid platform_id */
-	invalid_platform_id = 0;
-	num_platform_ids = piglit_cl_get_platform_ids(&platform_ids);
-	while(!found_invalid_platform) {
-		found_invalid_platform = true;
-		invalid_platform_id = (cl_platform_id)1;
-		for(i = 0; i < num_platform_ids; i++) {
-			if(invalid_platform_id == platform_ids[i]) {
-				found_invalid_platform = false;
-				break;
-			}
-		}
-	}
-	free(platform_ids);
 	invalid_platform_context_properties[1] =
 		(cl_context_properties)invalid_platform_id;
 
