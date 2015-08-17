@@ -41,13 +41,14 @@ piglit_init(int argc, char **argv)
 {
     /* test some new error cases */
 
-    GLuint fbo, tex;
+    GLuint fbo;
+    GLuint tex[2];
     glGenFramebuffers(1, &fbo);
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, tex);
+    glGenTextures(2, tex);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, tex[0]);
     glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
             4, GL_RGBA, 64, 64, 2, GL_TRUE);
 
@@ -57,10 +58,21 @@ piglit_init(int argc, char **argv)
     }
 
     /* binding a negative layer should fail */
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex, 0, -1);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex[0], 0, -1);
 
     if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
         printf("glFramebufferTextureLayer w/ negative layer must "
+                "emit GL_INVALID_VALUE but did not\n");
+        piglit_report_result(PIGLIT_FAIL);
+    }
+
+    /* An INVALID_VALUE error is generated if samples is zero. */
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, tex[1]);
+    glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+            0, GL_RGBA, 64, 64, 2, GL_TRUE);
+
+    if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+        printf("glFramebufferTextureLayer w/ sampler == 0 must "
                 "emit GL_INVALID_VALUE but did not\n");
         piglit_report_result(PIGLIT_FAIL);
     }
