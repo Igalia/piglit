@@ -137,10 +137,10 @@ create_bind_texture(GLenum textureType) {
 		}
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE:
-		glTexImage2DMultisample(textureType, 0, GL_RGB, 6, 6, GL_FALSE);
+		glTexImage2DMultisample(textureType, 1, GL_RGBA, 6, 6, GL_FALSE);
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
-		glTexImage3DMultisample(textureType, 0, GL_RGB,
+		glTexImage3DMultisample(textureType, 1, GL_RGBA,
 					6, 6, 6, GL_FALSE);
 		break;
 	}
