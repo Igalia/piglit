@@ -94,6 +94,7 @@ piglit_cl_test(const int argc,
 			   piglit_cl_get_device_info(env->device_id, CL_DEVICE_TYPE);
 			if (*dev_type_ptr != CL_DEVICE_TYPE_CUSTOM)
 				success_code = CL_INVALID_VALUE;
+			free(dev_type_ptr);
 		}
 #endif
 
