@@ -274,6 +274,15 @@ The summary shows the 'status' of a test:
 There are also dmesg-* statuses. These have the same meaning as above, but are
 triggered by dmesg related messages.
 
+3.1 Note
+--------
+
+The way 'piglit run' and 'piglit summary' count tests are different, 'piglit
+run' counts the number of Test derived instance in the profile(s) selected,
+while 'piglit summary' counts the number of subtests a result contains, or it's
+result if there are no subtests. This means that the number shown by 'piglit
+run' will be less than or equal to the number calculated by 'piglit summary'.
+
 
 4. Available test sets
 ----------------------
