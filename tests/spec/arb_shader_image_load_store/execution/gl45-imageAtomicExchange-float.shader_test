@@ -1,0 +1,44 @@
+# Test the overload of imageAtomicExchange() with floating point
+# argument, which wasn't defined by the original
+# ARB_shader_image_load_store extension or by unextended desktop GL
+# until version 4.5.
+#
+[require]
+GL >= 4.5
+GLSL >= 4.5
+
+[vertex shader]
+#version 450
+in vec4 piglit_vertex;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 450
+
+layout(r32f, binding=0) uniform image2D img;
+uniform float v;
+out vec4 color;
+
+void main()
+{
+	color = vec4(imageAtomicExchange(img, ivec2(gl_FragCoord.xy), v));
+}
+
+[test]
+texture rgbw 0 (250, 250) GL_R32F
+image texture 0 GL_R32F
+
+uniform float v 0.5
+draw rect -1 -1 2 2
+
+relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (1.0, 1.0, 1.0)
+relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 0.0, 0.0)
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.0, 0.0, 0.0)
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (1.0, 1.0, 1.0)
+
+fb tex 2d 0
+probe all rgb 0.5 0.0 0.0
