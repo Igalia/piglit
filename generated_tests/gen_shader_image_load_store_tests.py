@@ -708,8 +708,6 @@ gen('builtin-constants', """\
                 gl_MaxCombinedImageUnitsAndFragmentOutputs +
                 gl_MaxImageSamples +
                 gl_MaxVertexImageUniforms +
-                gl_MaxTessControlImageUniforms +
-                gl_MaxTessEvaluationImageUniforms +
                 gl_MaxGeometryImageUniforms +
                 gl_MaxFragmentImageUniforms +
                 gl_MaxCombinedImageUniforms;
