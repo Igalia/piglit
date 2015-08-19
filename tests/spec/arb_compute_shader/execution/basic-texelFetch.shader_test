@@ -51,7 +51,7 @@ void main()
 # Setup tex image
 texture rgbw 0 (64, 64)
 uniform int tex 0
-image texture 0
+image texture 0 GL_RGBA8
 
 atomic counters 4
 

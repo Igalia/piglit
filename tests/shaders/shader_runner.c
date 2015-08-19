@@ -2633,13 +2633,15 @@ piglit_display(void)
 		} else if (string_match("hint", line)) {
 			do_hint(line + 4);
 		} else if (sscanf(line,
-				  "image texture %d",
-				  &tex) == 1) {
+				  "image texture %d %31s",
+				  &tex, s) == 2) {
+			const GLenum img_fmt = piglit_get_gl_enum_from_name(s);
 			GLint tex_num;
 
 			glActiveTexture(GL_TEXTURE0 + tex);
 			glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex_num);
-			glBindImageTexture(tex, tex_num, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+			glBindImageTexture(tex, tex_num, 0, GL_FALSE, 0,
+					   GL_READ_WRITE, img_fmt);
 		} else if (sscanf(line, "ortho %f %f %f %f",
 				  c + 0, c + 1, c + 2, c + 3) == 4) {
 			piglit_gen_ortho_projection(c[0], c[1], c[2], c[3],

@@ -49,7 +49,7 @@ void main()
 [test]
 uniform int tex 0
 texture rgbw 0 (16, 16) GL_RGBA8
-image texture 0
+image texture 0 GL_RGBA8
 fb tex 2d 0
 
 compute 2 2 1
