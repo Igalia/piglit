@@ -255,7 +255,8 @@ test_max_dimensions(const struct image_format_info *format,
 					get_test_extent(target, d);
 
 			subtest(status,
-				is_test_reasonable(quick, size) &&
+				!quick &&
+				is_test_reasonable(!slow, size) &&
 				is_format_interesting(format, slow) &&
 				is_stage_interesting(stage, slow),
 				run_test(format, target, size),
@@ -264,6 +265,26 @@ test_max_dimensions(const struct image_format_info *format,
 				size.x, size.y, size.z,	size.w);
 		}
 	}
+}
+
+static void
+test_small_dimensions(const struct image_format_info *format,
+		      const struct image_target_info *target,
+		      const struct image_stage_info *stage,
+		      enum piglit_result *status,
+		      bool slow)
+{
+	const struct image_extent size =
+			image_extent_for_target(target,
+						16, 96);
+
+	subtest(status,
+		is_format_interesting(format, slow) &&
+		is_stage_interesting(stage, slow),
+		run_test(format, target, size),
+		"%s/%s/image%s size test/%dx%dx%dx%d",
+		format->name, stage->name, target->name,
+		size.x, size.y, size.z,	size.w);
 }
 
 void
@@ -285,6 +306,10 @@ piglit_init(int argc, char **argv)
 	for (format = image_formats_load_store; format->format; ++format) {
 		for (stage = image_stages(); stage->stage; ++stage) {
 			for (target = image_targets(); target->name; ++target) {
+				test_small_dimensions(format, target,
+						     stage, &status,
+						     slow);
+
 				test_max_dimensions(format, target,
 						    stage, &status,
 						    quick, slow);
