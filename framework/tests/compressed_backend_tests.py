@@ -247,3 +247,36 @@ def test_xz_shell_override():
 
     with compression.COMPRESSORS['xz']('foo.json') as f:
         f.write('foobar')
+
+
+@utils.set_piglit_conf(('core', 'compression', 'bz2'))
+def test_write_compressed_one_suffix_bz2():
+    """backends.abstract.write_compressed: bz2 Does not duplicate compression suffixes
+    """
+    with utils.tempdir() as d:
+        with abstract.write_compressed(os.path.join(d, 'results.txt.bz2')) as f:
+            f.write('foo')
+
+        nt.eq_(os.listdir(d)[0], 'results.txt.bz2')
+
+
+@utils.set_piglit_conf(('core', 'compression', 'gz'))
+def test_write_compressed_one_suffix_gz():
+    """backends.abstract.write_compressed: gz Does not duplicate compression suffixes
+    """
+    with utils.tempdir() as d:
+        with abstract.write_compressed(os.path.join(d, 'results.txt.gz')) as f:
+            f.write('foo')
+
+        nt.eq_(os.listdir(d)[0], 'results.txt.gz')
+
+
+@utils.set_piglit_conf(('core', 'compression', 'gz'))
+def test_write_compressed_one_suffix_mixed():
+    """backends.abstract.write_compressed: does not generate two different compression suffixes
+    """
+    with utils.tempdir() as d:
+        with abstract.write_compressed(os.path.join(d, 'results.txt.bz2')) as f:
+            f.write('foo')
+
+        nt.eq_(os.listdir(d)[0], 'results.txt.gz')
