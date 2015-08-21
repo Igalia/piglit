@@ -2406,6 +2406,8 @@ with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_texture_storage')) as g:
     g(['arb_texture_storage-texture-storage'], 'texture-storage',
       run_concurrent=False)
+    g(['arb_texture_storage-texture-storage-attach-before'], 'attach-before',
+      run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,

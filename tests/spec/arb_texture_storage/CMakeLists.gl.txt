@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_texture_storage-texture-storage texture-storage.c)
+piglit_add_executable (arb_texture_storage-texture-storage-attach-before attach-before-storage.c)
 
 # vim: ft=cmake:
