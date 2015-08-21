@@ -23,6 +23,8 @@
 
 from __future__ import print_function, absolute_import
 
+import nose.tools as nt
+
 from framework import results, status
 import framework.tests.utils as utils
 

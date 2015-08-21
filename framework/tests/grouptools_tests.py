@@ -71,7 +71,7 @@ def test_grouptools_join():
 def test_grouptools_join_notrail():
     """grouptools.join: doesn't add trailing {seperator} with empty element"""
     test = grouptools.join('g1', 'g2', '')
-    nt.ok_(not test.endswith(grouptools.SEPARATOR), msg=test)
+    nt.ok_(not test.endswith(grouptools.SEPARATOR))
 
 
 def test_split_input_empty():

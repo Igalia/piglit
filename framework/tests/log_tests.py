@@ -51,7 +51,7 @@ def test_log_factory_returns_log():
     """log.LogManager.get() returns a BaseLog derived instance"""
     logger = log.LogManager('quiet', 100)
     log_inst = logger.get()
-    nt.ok(isinstance(log_inst, log.BaseLog))
+    nt.ok_(isinstance(log_inst, log.BaseLog))
 
 
 @utils.nose_generator

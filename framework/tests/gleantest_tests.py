@@ -66,8 +66,7 @@ def test_bad_returncode():
     test = GleanTest('basic')
     test.result['returncode'] = 1
     test.interpret_result()
-    nt.assert_equal(test.result['result'], 'fail',
-                    msg="Result should have been fail")
+    nt.assert_equal(test.result['result'], 'fail')
 
 
 @nt.raises(TestIsSkip)

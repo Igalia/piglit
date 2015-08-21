@@ -51,7 +51,7 @@ def test_no_config_start():
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
                 exc.exception, 'No [config] section found!',
-                msg="No config section found, no exception raised")
+                msg="No config section was found and no exception raised")
 
 
 @nt.raises(exceptions.PiglitFatalError)
@@ -122,7 +122,7 @@ def test_c_comments():
 
     nt.assert_equal(test.command, [os.path.join(TEST_BIN_DIR, 'glslparsertest'),
                                    name, 'pass', '1.10'],
-                    msg="C style comments were not properly parsed")
+                    msg="C style (/* */) comments were not properly parsed")
 
 
 def test_blank_in_config():
@@ -138,8 +138,8 @@ def test_blank_in_config():
 
     nt.assert_equal(test.command, [os.path.join(TEST_BIN_DIR, 'glslparsertest'),
                                    name, 'pass', '1.10'],
-                    msg="A newline in a C++ style comment was not properly "
-                        "parsed.")
+                    msg="A newline in a C++ style comment (//) was not "
+                        "properly parsed.")
 
 
 def test_empty_in_config():

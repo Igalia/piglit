@@ -350,8 +350,8 @@ def check_update_result(result, status):
                             status))
     else:
         nt.assert_equal(result, status,
-                        msg="{} should not have changed, but it did.".format(
-                            result))
+                        msg="{} should not have changed, but was {}.".format(
+                            result, status))
 
 
 def test_update_result_add_dmesg():
