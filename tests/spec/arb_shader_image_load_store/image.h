@@ -156,6 +156,12 @@ const char *
 image_type_name(const struct image_format_info *format);
 
 /**
+ * Get the size in bits of one pixel in the specified format.
+ */
+unsigned int
+image_pixel_size(const struct image_format_info *format);
+
+/**
  * Get a compatible unsigned integer format of the same size.
  */
 GLenum

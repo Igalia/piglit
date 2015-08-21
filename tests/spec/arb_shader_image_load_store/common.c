@@ -215,7 +215,7 @@ upload_image_levels(const struct image_info img, unsigned num_levels,
                 glGenBuffers(1, &buffers[unit]);
                 glBindBuffer(GL_PIXEL_PACK_BUFFER, buffers[unit]);
                 glBufferData(GL_PIXEL_PACK_BUFFER,
-                             m * img.size.x * sizeof(uint32_t),
+                             img.size.x * image_pixel_size(img.format) / 8,
                              NULL, GL_STATIC_DRAW);
 
                 glGenTextures(1, &packed_tex);

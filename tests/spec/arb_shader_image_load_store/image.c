@@ -207,11 +207,17 @@ image_type_name(const struct image_format_info *format)
         return get_image_type(format)->image_type_name;
 }
 
+unsigned int
+image_pixel_size(const struct image_format_info *format)
+{
+        return format->bits[0] + format->bits[1] +
+               format->bits[2] + format->bits[3];
+}
+
 GLenum
 image_compat_format(const struct image_format_info *format)
 {
-        const unsigned bits = (format->bits[0] + format->bits[1] +
-                               format->bits[2] + format->bits[3]);
+        const unsigned bits = image_pixel_size(format);
 
         switch (bits) {
         case 128:
