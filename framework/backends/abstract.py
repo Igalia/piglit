@@ -49,7 +49,12 @@ def write_compressed(filename):
     """
     mode = compression.get_mode()
     if mode != 'none':
-        filename = '{}.{}'.format(filename, mode)
+        # if the suffix (final .xxx) is a knwon compression suffix 
+        suffix = os.path.splitext(filename)[1]
+        if suffix in compression.COMPRESSION_SUFFIXES:
+            filename = '{}.{}'.format(os.path.splitext(filename)[0], mode)
+        else:
+            filename = '{}.{}'.format(filename, mode)
 
     with compression.COMPRESSORS[mode](filename) as f:
         yield f
