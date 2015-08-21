@@ -131,13 +131,14 @@ check(const struct grid_info grid, struct image_info img_src)
 }
 
 static bool
-run_test(const struct image_target_info *target,
+run_test(const struct image_format_info *format,
+	 const struct image_target_info *target,
 	 const struct image_extent size)
 {
 	const struct grid_info grid = grid_info(GL_FRAGMENT_SHADER, GL_RGBA32I,
 						16, 16);
 	const struct image_info img = {
-		target, grid.format, size,
+		target, format, size,
 		image_format_epsilon(grid.format)
 	};
 	GLuint prog = generate_program(
@@ -208,14 +209,72 @@ is_test_reasonable(bool quick, const struct image_extent size)
 	return product(size) < (quick ? 4 : 64) * 1024 * 1024;
 }
 
+static bool
+is_format_interesting(const struct image_format_info *format, bool override)
+{
+	switch(format->format)
+	{
+	case GL_RGBA32F:
+	case GL_RGBA16F:
+	case GL_RGBA32I:
+	case GL_RGBA16I:
+	case GL_RGBA8I:
+	case GL_RGBA32UI:
+	case GL_RGBA16UI:
+	case GL_RGBA8UI:
+		return true;
+	default:
+		return override;
+	}
+}
+
+static bool
+is_stage_interesting(const struct image_stage_info *stage, bool override)
+{
+	switch(stage->stage)
+	{
+	case GL_FRAGMENT_SHADER:
+	case GL_COMPUTE_SHADER:
+		return true;
+	default:
+		return override;
+	}
+}
+
+static void
+test_max_dimensions(const struct image_format_info *format,
+		    const struct image_target_info *target,
+		    const struct image_stage_info *stage,
+		    enum piglit_result *status,
+		    bool quick, bool slow)
+{
+	int d;
+	for (d = 0; d < 4; ++d) {
+		if (should_test_dimension(target, d)) {
+			const struct image_extent size =
+					get_test_extent(target, d);
+
+			subtest(status,
+				is_test_reasonable(quick, size) &&
+				is_format_interesting(format, slow) &&
+				is_stage_interesting(stage, slow),
+				run_test(format, target, size),
+				"%s/%s/image%s max size test/%dx%dx%dx%d",
+				format->name, stage->name, target->name,
+				size.x, size.y, size.z,	size.w);
+		}
+	}
+}
+
 void
 piglit_init(int argc, char **argv)
 {
 	const bool quick = (argc >= 2 && !strcmp(argv[1], "--quick"));
+	const bool slow = (argc >= 2 && !strcmp(argv[1], "--slow"));
 	enum piglit_result status = PIGLIT_PASS;
+	const struct image_format_info *format;
 	const struct image_target_info *target;
 	const struct image_stage_info *stage;
-	int d;
 
 	/* The spec of the extension says we should require GL 4.2 but let's
 	 * just request GL_ARB_shader_image_size which will in turn require
@@ -223,22 +282,12 @@ piglit_init(int argc, char **argv)
 	 */
 	piglit_require_extension("GL_ARB_shader_image_size");
 
-
-	for (stage = image_stages(); stage->stage; ++stage) {
-		for (target = image_targets(); target->name; ++target) {
-			for (d = 0; d < 4; ++d) {
-				if (should_test_dimension(target, d)) {
-					const struct image_extent size =
-						get_test_extent(target, d);
-
-					subtest(&status,
-						is_test_reasonable(quick, size),
-						run_test(target, size),
-						"%s/image%s max size test/"
-						"%dx%dx%dx%d", stage->name,
-						target->name,
-						size.x, size.y, size.z, size.w);
-				}
+	for (format = image_formats_load_store; format->format; ++format) {
+		for (stage = image_stages(); stage->stage; ++stage) {
+			for (target = image_targets(); target->name; ++target) {
+				test_max_dimensions(format, target,
+						    stage, &status,
+						    quick, slow);
 			}
 		}
 	}
