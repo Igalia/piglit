@@ -50,5 +50,5 @@ def test_generate_initialize():
 def test_testresult_load_to_status():
     """results.TestResult: an initial status value is converted to a Status object"""
     result = results.TestResult.load({'result': 'pass'})
-    assert isinstance(result['result'], status.Status), \
-        "Result key not converted to a status object"
+    nt.ok_(isinstance(result['result'], status.Status),
+           msg="Result key not converted to a status object")

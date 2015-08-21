@@ -48,7 +48,7 @@ def test_piglittest_interpret_result():
     test.result['out'] = 'PIGLIT: {"result": "pass"}\n'
     test.result['returncode'] = 0
     test.interpret_result()
-    assert test.result['result'] == 'pass'
+    nt.eq_(test.result['result'], 'pass')
 
 
 def test_piglittest_interpret_result_subtest():
@@ -58,7 +58,7 @@ def test_piglittest_interpret_result_subtest():
                           'PIGLIT: {"subtest": {"subtest": "pass"}}\n')
     test.result['returncode'] = 0
     test.interpret_result()
-    assert test.result['subtest']['subtest'] == 'pass'
+    nt.eq_(test.result['subtest']['subtest'], 'pass')
 
 
 def test_piglitest_no_clobber():

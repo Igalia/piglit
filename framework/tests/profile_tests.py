@@ -61,13 +61,13 @@ def test_load_test_profile_no_module():
 def test_load_test_profile_returns():
     """profile.load_test_profile: returns a TestProfile instance"""
     profile_ = profile.load_test_profile('sanity')
-    assert isinstance(profile_, profile.TestProfile)
+    nt.ok_(isinstance(profile_, profile.TestProfile))
 
 
 def test_testprofile_default_dmesg():
     """profile.TestProfile: Dmesg initializes False"""
     profile_ = profile.TestProfile()
-    assert isinstance(profile_.dmesg, dmesg.DummyDmesg)
+    nt.ok_(isinstance(profile_.dmesg, dmesg.DummyDmesg))
 
 
 def test_testprofile_set_dmesg_true():
@@ -75,7 +75,7 @@ def test_testprofile_set_dmesg_true():
     utils.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
-    assert isinstance(profile_.dmesg, dmesg.LinuxDmesg)
+    nt.ok_(isinstance(profile_.dmesg, dmesg.LinuxDmesg))
 
 
 def test_testprofile_set_dmesg_false():
@@ -84,7 +84,7 @@ def test_testprofile_set_dmesg_false():
     profile_ = profile.TestProfile()
     profile_.dmesg = True
     profile_.dmesg = False
-    assert isinstance(profile_.dmesg, dmesg.DummyDmesg)
+    nt.ok_(isinstance(profile_.dmesg, dmesg.DummyDmesg))
 
 
 def test_testprofile_update_test_list():

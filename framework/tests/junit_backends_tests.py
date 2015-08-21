@@ -110,7 +110,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
             raise SkipTest('Test requires lxml features')
         schema = etree.XMLSchema(file=JUNIT_SCHEMA)
         with open(self.test_file, 'r') as f:
-            assert schema.validate(etree.parse(f)), 'xml is not valid'
+            nt.ok_(schema.validate(etree.parse(f)), msg='xml is not valid')
 
 
 class TestJUnitMultiTest(TestJUnitSingleTest):

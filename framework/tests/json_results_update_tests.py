@@ -147,31 +147,30 @@ class TestV0toV1(object):
 
     def test_dmesg(self):
         """backends.json.update_results (0 -> 1): dmesg is converted from a list to a string"""
-        assert self.RESULT.tests['sometest']['dmesg'] == 'this\nis\ndmesg'
+        nt.eq_(self.RESULT.tests['sometest']['dmesg'], 'this\nis\ndmesg')
 
     def test_subtests_remove_duplicates(self):
         """backends.json.update_results (0 -> 1): Removes duplicate entries"""
-        assert 'group1/groupA/test/subtest 1' not in self.RESULT.tests
-        assert 'group1/groupA/test/subtest 2' not in self.RESULT.tests
+        nt.ok_('group1/groupA/test/subtest 1' not in self.RESULT.tests)
+        nt.ok_('group1/groupA/test/subtest 2' not in self.RESULT.tests)
 
     def test_subtests_add_test(self):
         """backends.json.update_results (0 -> 1): Add an entry for the actual test"""
-        assert self.RESULT.tests.get('group1/groupA/test')
+        nt.ok_(self.RESULT.tests.get('group1/groupA/test'))
 
     def test_subtests_test_is_testresult(self):
         """backends.json.update_results (0 -> 1): The result of the new test is a TestResult Instance"""
-        assert isinstance(
-            self.RESULT.tests['group1/groupA/test'],
-            results.TestResult)
+        nt.ok_(isinstance(self.RESULT.tests['group1/groupA/test'],
+                          results.TestResult))
 
     def test_info_delete(self):
         """backends.json.update_results (0 -> 1): Remove the info name from results"""
         for value in self.RESULT.tests.itervalues():
-            assert 'info' not in value
+            nt.ok_('info' not in value)
 
     def test_returncode_from_info(self):
         """backends.json.update_results (0 -> 1): Use the returncode from info if there is no returncode"""
-        assert self.RESULT.tests['sometest']['returncode'] == 1
+        nt.eq_(self.RESULT.tests['sometest']['returncode'], 1)
 
     def test_returncode_no_override(self):
         """backends.json.update_results (0 -> 1): Do not clobber returncode with info
@@ -181,19 +180,19 @@ class TestV0toV1(object):
         there is a value in returncode already
 
         """
-        assert self.RESULT.tests['group1/groupA/test']['returncode'] != 1
+        nt.ok_(self.RESULT.tests['group1/groupA/test']['returncode'] != 1)
 
     def test_err_from_info(self):
         """backends.json.update_results (0 -> 1): add an err attribute from info"""
-        assert self.RESULT.tests['group1/groupA/test']['err'] == 'stderr'
+        nt.eq_(self.RESULT.tests['group1/groupA/test']['err'], 'stderr')
 
     def test_out_from_info(self):
         """backends.json.update_results (0 -> 1): add an out attribute from info"""
-        assert self.RESULT.tests['group1/groupA/test']['out'] == 'stdout'
+        nt.eq_(self.RESULT.tests['group1/groupA/test']['out'], 'stdout')
 
     def test_set_version(self):
         """backends.json.update_results (0 -> 1): Set the version to 1"""
-        assert self.RESULT.results_version == 1
+        nt.eq_(self.RESULT.results_version, 1)
 
     def test_dont_break_single_subtest(self):
         """backends.json.update_results (0 -> 1): Don't break single subtest entries
@@ -210,7 +209,7 @@ class TestV0toV1(object):
         should remain test/foo/bar since bar is the name of the test not a subtest
 
         """
-        assert self.RESULT.tests['single/test/thing']
+        nt.ok_(self.RESULT.tests['single/test/thing'])
 
     def test_subtests_with_slash(self):
         """backends.json.update_results (0 -> 1): Subtest names with /'s are handled correctly"""
@@ -222,7 +221,7 @@ class TestV0toV1(object):
 
     def test_handle_fixed_subtests(self):
         """backends.json.update_results (0 -> 1): Correctly handle new single entry subtests correctly"""
-        assert 'group3/groupA/test' in self.RESULT.tests.iterkeys()
+        nt.ok_('group3/groupA/test' in self.RESULT.tests.iterkeys())
 
     def _load_with_update(self, data=None):
         """If the file is not results.json, it will be renamed.

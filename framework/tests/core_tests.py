@@ -101,9 +101,10 @@ def test_generate_initialize():
     def check_initialize(target):
         """ Check that a class initializes without error """
         func = target()
+
         # Asserting that func exists will fail for Group and TestrunResult which
         # are dict subclasses
-        assert isinstance(func, target)
+        nt.ok_(isinstance(func, target))
 
 
     for target in [core.Options, core.PiglitConfig]:
@@ -124,7 +125,7 @@ def test_parse_listfile_return():
     with utils.tempfile(contents) as tfile:
         results = core.parse_listfile(tfile)
 
-    assert isinstance(results, collections.Container)
+    nt.ok_(isinstance(results, collections.Container))
 
 
 class Test_parse_listfile_TrailingWhitespace(object):
@@ -165,7 +166,7 @@ def test_parse_listfile_tilde():
     with utils.tempfile(contents) as tfile:
         results = core.parse_listfile(tfile)
 
-    assert results[0] == os.path.expandvars("$HOME/foo")
+    nt.ok_(results[0] == os.path.expandvars("$HOME/foo"))
 
 
 @_save_core_config

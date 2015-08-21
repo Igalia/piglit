@@ -28,7 +28,6 @@ tests
 import nose.tools as nt
 
 from framework import profile, grouptools, exceptions
-from framework.core import PIGLIT_CONFIG
 from framework.test import deqp
 from framework.tests import utils
 
@@ -71,7 +70,6 @@ def test_get_option_default():
 def test_get_option_conf_no_section():
     """deqp.get_option: if a no_section error is raised and env is unset None is return
     """
-    assert not PIGLIT_CONFIG.has_section('deqp_test')
     nt.eq_(deqp.get_option('_PIGLIT_TEST_ENV', ('deqp_test', 'test_env')), None)
 
 

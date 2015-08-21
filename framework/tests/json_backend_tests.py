@@ -53,7 +53,7 @@ def test_initialize_jsonbackend():
     """
     with utils.tempdir() as tdir:
         func = backends.json.JSONBackend(tdir)
-        assert isinstance(func, backends.json.JSONBackend)
+        nt.ok_(isinstance(func, backends.json.JSONBackend))
 
 
 def test_json_initialize_metadata():
@@ -83,7 +83,7 @@ class TestJSONTestMethod(utils.StaticDirectory):
 
     def test_write_test(self):
         """backends.json.JSONBackend.write_test(): adds tests to a 'tests' directory"""
-        assert os.path.exists(os.path.join(self.tdir, 'tests', '0.json'))
+        nt.ok_(os.path.exists(os.path.join(self.tdir, 'tests', '0.json')))
 
     @utils.no_error
     def test_json_is_valid(self):
@@ -119,16 +119,16 @@ class TestJSONTestFinalize(utils.StaticDirectory):
 
     def test_remove_metadata(self):
         """backends.json.JSONBackend.finalize(): removes metadata.json"""
-        assert not os.path.exists(os.path.join(self.tdir, 'metadata.json'))
+        nt.ok_(not os.path.exists(os.path.join(self.tdir, 'metadata.json')))
 
     def test_remove_tests(self):
         """backends.json.JSONBackend.finalize(): removes tests directory"""
-        assert not os.path.exists(os.path.join(self.tdir, 'tests'))
+        nt.ok_(not os.path.exists(os.path.join(self.tdir, 'tests')))
 
     def test_create_results(self):
         """backends.json.JSONBackend.finalize(): creates a results.json file
         """
-        assert os.path.exists(os.path.join(self.tdir, 'results.json'))
+        nt.ok_(os.path.exists(os.path.join(self.tdir, 'results.json')))
 
     @utils.no_error
     def test_results_valid(self):

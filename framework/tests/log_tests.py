@@ -51,7 +51,7 @@ def test_log_factory_returns_log():
     """log.LogManager.get() returns a BaseLog derived instance"""
     logger = log.LogManager('quiet', 100)
     log_inst = logger.get()
-    assert isinstance(log_inst, log.BaseLog)
+    nt.ok(isinstance(log_inst, log.BaseLog))
 
 
 @utils.nose_generator
@@ -88,7 +88,7 @@ def check_for_output(func, args, file_=sys.stdout):
     func(*args)
     # In nose sys.stdout and sys.stderr is a StringIO object, it returns a
     # string of everything after the tell.
-    assert file_.read() == ''
+    nt.eq_(file_.read(), '')
 
 
 @utils.nose_generator
@@ -137,7 +137,8 @@ def check_no_output(func, args, file_=sys.stdout):
 
     func(*args)
     file_.seek(-1)
-    assert file_.tell() == 0, 'file.tell() is at {}'.format(file_.tell())
+    nt.eq_(file_.tell(), 0,
+           msg='file.tell() is at {}, but should be at 0'.format(file_.tell()))
 
 
 @utils.nose_generator

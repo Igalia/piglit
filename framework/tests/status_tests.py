@@ -90,7 +90,7 @@ def test_status_in():
     stat = status.PASS
     slist = ['pass']
 
-    assert stat in slist
+    nt.ok_(stat in slist)
 
 
 @utils.nose_generator
@@ -98,7 +98,7 @@ def test_is_regression():
     """ Generate all tests for regressions """
     def is_regression(new, old):
         """ Test that old -> new is a regression """
-        assert status.status_lookup(new) < status.status_lookup(old)
+        nt.ok_(status.status_lookup(new) < status.status_lookup(old))
 
     for new, old in REGRESSIONS:
         is_regression.description = \
@@ -112,7 +112,7 @@ def test_is_fix():
     """ Generates all tests for fixes """
     def is_fix(new, old):
         """ Test that new -> old is a fix """
-        assert status.status_lookup(new) > status.status_lookup(old)
+        nt.ok_(status.status_lookup(new) > status.status_lookup(old))
 
     for new, old in FIXES:
         is_fix.description = \
@@ -126,7 +126,7 @@ def test_is_change():
     """ Test that status -> !status is a change """
     def is_not_equivalent(new, old):
         """ Test that new != old """
-        assert status.status_lookup(new) != status.status_lookup(old)
+        nt.ok_(status.status_lookup(new) != status.status_lookup(old))
 
     for new, old in itertools.permutations(STATUSES, 2):
         is_not_equivalent.description = \

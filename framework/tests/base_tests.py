@@ -70,7 +70,7 @@ def test_timeout():
     test = _Test(['sleep', '60'])
     test.timeout = 1
     test.run()
-    assert test.result['result'] == 'timeout'
+    nt.eq_(test.result['result'], 'timeout')
 
 
 def test_timeout_pass():
@@ -86,7 +86,7 @@ def test_timeout_pass():
     test.test_interpret_result = helper
     test.timeout = 1
     test.run()
-    assert test.result['result'] == 'pass'
+    nt.eq_(test.result['result'], 'pass')
 
 
 def test_WindowResizeMixin_rerun():
