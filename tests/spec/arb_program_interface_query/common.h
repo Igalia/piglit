@@ -256,7 +256,7 @@ static const char tcs_sub[] =
 	"uniform tcs_uniform_block {\n"
 	"	vec4 tcs_test;\n"
 	"};\n"
-	"out vec4 tcs_output[gl_MaxPatchVertices];\n"
+	"out vec4 tcs_output[3];\n"
 	"in vec4 tcs_input[gl_MaxPatchVertices];\n"
 	"patch out vec4 tcs_patch;\n"
 	"subroutine vec4 tcs_offset();\n"
