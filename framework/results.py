@@ -79,6 +79,8 @@ class TestResult(object):
         there are not return the stored value of the test.
 
         """
+        if self.subtests:
+            return max(self.subtests.itervalues())
         return self.__result
 
     @result.setter

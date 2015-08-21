@@ -155,6 +155,15 @@ def test_TestResult_result_getter():
     nt.eq_(test.result, 'pass')
 
 
+def test_TestResult_result_getter_subtests():
+    """results.TestResult.result: Getter returns worst subtest when subtests are present"""
+    test = results.TestResult('pass')
+    test.subtests['a'] = 'fail'
+    test.subtests['a'] = 'crash'
+    test.subtests['a'] = 'incomplete'
+    nt.eq_(test.result, 'incomplete')
+
+
 def test_TestResult_result_setter():
     """results.TestResult.result: setter makes the result a status"""
     test = results.TestResult('pass')
