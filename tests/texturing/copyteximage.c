@@ -575,6 +575,7 @@ create_texture(GLenum target)
 enum piglit_result
 piglit_display(void)
 {
+	GLint format;
 	GLuint tex;
 	GLboolean pass = GL_TRUE;
 	const GLfloat *expected;
@@ -611,6 +612,56 @@ piglit_display(void)
 						    test_vectors[i].format,
 						    expected)) {
 				pass = GL_FALSE;
+			}
+		}
+
+		/* Test that internalformats 1, 2, 3 and 4 are not accepted
+		 * as OpenGL 1.0 backwards-compatible aliases.
+		 *
+		 * The OpenGL 1.1 spec, section 3.8 ('Texturing') says the
+		 * the following about glCopyTexImage2D (and similar for
+		 * glCopyTexImage1D):
+		 *
+		 * Parameters level, internalformat, and border are specified
+		 * using the same values, with the same meanings, as the
+		 * equivalent arguments of TexImage2D, except that
+		 * internalformat may not be specified as 1, 2, 3, or 4.
+		 */
+		for (format = 1; format <= 4; ++format) {
+			switch (target[j].target) {
+			case GL_TEXTURE_1D:
+			case GL_TEXTURE_1D_ARRAY:
+				glCopyTexImage1D(target[j].target, 0,
+						 format,
+						 0, 0, IMAGE_SIZE, 0);
+				pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+				break;
+
+			case GL_TEXTURE_2D:
+			case GL_TEXTURE_2D_ARRAY:
+			case GL_TEXTURE_RECTANGLE:
+				glCopyTexImage2D(target[j].target, 0, format,
+						 0, 0, IMAGE_SIZE, IMAGE_SIZE,
+						 0);
+				pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+				break;
+
+			case GL_TEXTURE_CUBE_MAP:
+				for (i = 0; i < 6; i++) {
+					glCopyTexImage2D(cube_face_targets[i],
+							 0, format, 0, 0,
+							 IMAGE_SIZE,
+							 IMAGE_SIZE, 0);
+					pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+				}
+				break;
+
+			case GL_TEXTURE_3D:
+				/* There is no glCopyTexImage3D, and
+				 * glCopyTexSubImage3D does not take an
+				 * internalformat argument
+                                 */
+				continue;
 			}
 		}
 
