@@ -234,6 +234,7 @@ def resultfile():
     data = copy.deepcopy(JSON_DATA)
     data['tests']['sometest'] = results.TestResult('pass')
     data['tests']['sometest'].time = 1.2
+    data = results.TestrunResult.from_dict(data)
     with tempfile_.NamedTemporaryFile(delete=False) as f:
         json.dump(data, f, default=backends.json.piglit_encoder)
 

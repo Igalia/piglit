@@ -498,3 +498,70 @@ class TestTestrunResultToJson(object):
     def test_type(self):
         """results.TestrunResult.to_json: __type__ is added"""
         nt.eq_(self.test['__type__'], 'TestrunResult')
+
+
+class TestTestrunResultFromDict(object):
+    """Tests for TestrunResult.from_dict."""
+    @classmethod
+    def setup_class(cls):
+        subtest = results.TestResult('fail')
+        subtest.subtests['foo'] = 'pass'
+
+        test = results.TestrunResult()
+        test.name = 'name'
+        test.uname = 'this is uname'
+        test.options = {'some': 'option'}
+        test.glxinfo = 'glxinfo'
+        test.wglinfo = 'wglinfo'
+        test.lspci = 'this is lspci'
+        test.time_elapsed = 1.23
+        test.tests = {
+            'a test': results.TestResult('pass'),
+            'subtest': subtest,
+        }
+        test.results_version = 100000  # This will never be less than current
+
+        cls.baseline = test
+        cls.test = results.TestrunResult.from_dict(test.to_json())
+
+    @utils.nose_generator
+    def test_basic(self):
+        """Generate tests for basic attributes"""
+
+        def test(baseline, test):
+            nt.eq_(baseline, test)
+
+        for attrib in ['name', 'uname', 'glxinfo', 'wglinfo', 'lspci',
+                       'time_elapsed', 'results_version']:
+            test.description = ('results.TestrunResult.from_dict: '
+                                '{} is restored correctly'.format(attrib))
+            yield (test,
+                   getattr(self.baseline, attrib),
+                   getattr(self.test, attrib))
+
+    def test_tests(self):
+        """results.TestrunResult.from_dict: tests is restored correctly"""
+        nt.eq_(self.test.tests['a test'].result,
+               self.baseline.tests['a test'].result)
+
+    def test_test_type(self):
+        """results.TestrunResult.from_dict: tests is restored correctly"""
+        nt.ok_(isinstance(self.test.tests['a test'].result, status.Status),
+               msg='Tests should be type Status, but was "{}"'.format(
+                   type(self.test.tests['a test'].result)))
+
+    def test_totals(self):
+        """results.TestrunResult.from_dict: totals is restored correctly"""
+        nt.assert_dict_equal(self.baseline.totals, self.test.totals)
+
+    def test_subtests(self):
+        """results.TestrunResult.from_dict: subtests are restored correctly"""
+        nt.eq_(self.test.tests['subtest'].subtests['foo'],
+               self.baseline.tests['subtest'].subtests['foo'])
+
+    def test_subtest_type(self):
+        """results.TestrunResult.from_dict: subtests are Status instances"""
+        nt.ok_(isinstance(self.test.tests['subtest'].subtests['foo'],
+                          status.Status),
+               msg='Subtests should be type Status, but was "{}"'.format(
+                   type(self.test.tests['subtest'].subtests['foo'])))

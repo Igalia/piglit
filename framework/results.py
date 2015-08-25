@@ -204,6 +204,11 @@ class Totals(dict):
         result['__type__'] = 'Totals'
         return result
 
+    @classmethod
+    def from_dict(cls, dict_):
+        """Convert a dictionary into a Totals object."""
+        return cls(dict_)
+
 
 class TestrunResult(object):
     """The result of a single piglit run."""
@@ -246,3 +251,30 @@ class TestrunResult(object):
         rep = copy.copy(self.__dict__)
         rep['__type__'] = 'TestrunResult'
         return rep
+
+    @classmethod
+    def from_dict(cls, dict_, _no_totals=False):
+        """Convert a dictionary into a TestrunResult.
+
+        This method is meant to be used for loading results from json or
+        similar formats
+
+        _no_totals is not meant to be used externally, it allows us to control
+        the generation of totals when loading old results formats.
+
+        """
+        res = cls()
+        for name in ['name', 'uname', 'options', 'glxinfo', 'wglinfo', 'lspci',
+                     'tests', 'totals', 'results_version']:
+            value = dict_.get(name)
+            if value:
+                setattr(res, name, value)
+
+        # This could be replaced with a getter/setter property
+        time = dict_.get('time_elapsed')
+        res.time_elapsed = None if time is None else float(time)
+
+        if not res.totals and not _no_totals:
+            res.calculate_group_totals()
+
+        return res

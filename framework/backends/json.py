@@ -47,6 +47,13 @@ CURRENT_JSON_VERSION = 6
 # The level to indent a final file
 INDENT = 4
 
+_DECODER_TABLE = {
+    'Subtests': results.Subtests,
+    'TestResult': results.TestResult,
+    'TestrunResult': results.TestrunResult,
+    'Totals': results.Totals,
+}
+
 
 def piglit_encoder(obj):
     """ Encoder for piglit that can transform additional classes into json
@@ -66,10 +73,10 @@ def piglit_encoder(obj):
 def piglit_decoder(obj):
     """Json decoder for piglit that can load TestResult objects."""
     if isinstance(obj, dict):
-        if obj.get('__type__', '') == 'TestResult':
-            return results.TestResult.from_dict(obj)
-        elif obj.get('__type__', '') == 'Subtests':
-            return results.Subtests.from_dict(obj)
+        try:
+            return _DECODER_TABLE[obj['__type__']].from_dict(obj)
+        except KeyError:
+            pass
     return obj
 
 
@@ -141,10 +148,12 @@ class JSONBackend(FileBackend):
                 # writing worked and is valid or it didn't work.
                 try:
                     with open(test, 'r') as f:
-                        data['tests'].update(json.load(f))
+                        data['tests'].update(json.load(f, object_hook=piglit_decoder))
                 except ValueError:
                     pass
         assert data['tests']
+
+        data = results.TestrunResult.from_dict(data)
 
         # write out the combined file. Use the compression writer from the
         # FileBackend
@@ -221,18 +230,17 @@ def _load(results_file):
     This function converts an existing, fully completed json run.
 
     """
-    result = results.TestrunResult()
-    result.results_version = 0  # This should get overwritten
     try:
-        result.__dict__.update(
-            json.load(results_file, object_hook=piglit_decoder))
+        result = json.load(results_file, object_hook=piglit_decoder)
     except ValueError as e:
         raise exceptions.PiglitFatalError(
             'While loading json results file: "{}",\n'
             'the following error occured:\n{}'.format(results_file.name,
                                                       str(e)))
 
-    return result
+    if isinstance(result, results.TestrunResult):
+        return result
+    return results.TestrunResult.from_dict(result, _no_totals=True)
 
 
 def _resume(results_dir):
