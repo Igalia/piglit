@@ -23,7 +23,9 @@
 
 from __future__ import print_function, absolute_import
 
-from framework import status, exceptions
+import collections
+
+from framework import status, exceptions, grouptools
 
 __all__ = [
     'TestrunResult',
@@ -180,7 +182,24 @@ class TestResult(object):
             self.subtests.update(dict_['subtest'])
 
 
+class Totals(dict):
+    def __init__(self, *args, **kwargs):
+        super(Totals, self).__init__(*args, **kwargs)
+        for each in status.ALL:
+            self[str(each)] = 0
+
+    def __nonzero__(self):
+        # Since totals are prepopulated, calling 'if not <Totals instance>'
+        # will always result in True, this will cause it to return True only if
+        # one of the values is not zero
+        for each in self.itervalues():
+            if each != 0:
+                return True
+        return False
+
+
 class TestrunResult(object):
+    """The result of a single piglit run."""
     def __init__(self):
         self.name = None
         self.uname = None
@@ -190,3 +209,27 @@ class TestrunResult(object):
         self.lspci = None
         self.time_elapsed = None
         self.tests = {}
+        self.totals = collections.defaultdict(Totals)
+
+    def calculate_group_totals(self):
+        """Calculate the number of pases, fails, etc at each level."""
+        for name, result in self.tests.iteritems():
+            # If there are subtests treat the test as if it is a group instead
+            # of a test.
+            if result.subtests:
+                for res in result.subtests.itervalues():
+                    res = str(res)
+                    temp = name
+
+                    self.totals[temp][res] += 1
+                    while temp:
+                        temp = grouptools.groupname(temp)
+                        self.totals[temp][res] += 1
+                    self.totals['root'][res] += 1
+            else:
+                res = str(result.result)
+                while name:
+                    name = grouptools.groupname(name)
+                    self.totals[name][res] += 1
+                self.totals['root'][res] += 1
+
