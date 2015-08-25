@@ -24,6 +24,7 @@
 from __future__ import print_function, absolute_import
 
 import collections
+import copy
 
 from framework import status, exceptions, grouptools
 
@@ -197,6 +198,12 @@ class Totals(dict):
                 return True
         return False
 
+    def to_json(self):
+        """Convert totals to a json object."""
+        result = copy.copy(self)
+        result['__type__'] = 'Totals'
+        return result
+
 
 class TestrunResult(object):
     """The result of a single piglit run."""
@@ -233,3 +240,9 @@ class TestrunResult(object):
                     self.totals[name][res] += 1
                 self.totals['root'][res] += 1
 
+    def to_json(self):
+        if not self.totals:
+            self.calculate_group_totals()
+        rep = copy.copy(self.__dict__)
+        rep['__type__'] = 'TestrunResult'
+        return rep

@@ -326,10 +326,7 @@ def _update_results(results, filepath):
 def _write(results, file_):
     """WRite the values of the results out to a file."""
     with write_compressed(file_) as f:
-        json.dump({k: v for k, v in results.__dict__.iteritems()},
-                  f,
-                  default=piglit_encoder,
-                  indent=INDENT)
+        json.dump(results, f, default=piglit_encoder, indent=INDENT)
 
 
 def _update_zero_to_one(result):

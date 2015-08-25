@@ -445,3 +445,56 @@ def test_totals_true():
         test = results.Totals()
         test[key] += 1
         nt.ok_(bool(test), msg='Returns false with status {}'.format(key))
+
+
+class TestTestrunResultToJson(object):
+    """results.TestrunResult.to_json: returns expected values"""
+    @classmethod
+    def setup_class(cls):
+        test = results.TestrunResult()
+        test.name = 'name'
+        test.uname = 'this is uname'
+        test.options = {'some': 'option'}
+        test.glxinfo = 'glxinfo'
+        test.wglinfo = 'wglinfo'
+        test.lspci = 'this is lspci'
+        test.time_elapsed = 1.23
+        test.tests = {'a test': results.TestResult('pass')}
+
+        cls.test = test.to_json()
+
+    def test_name(self):
+        """results.TestrunResult.to_json: name is properly encoded"""
+        nt.eq_(self.test['name'], 'name')
+
+    def test_uname(self):
+        """results.TestrunResult.to_json: uname is properly encoded"""
+        nt.eq_(self.test['uname'], 'this is uname')
+
+    def test_options(self):
+        """results.TestrunResult.to_json: options is properly encoded"""
+        nt.assert_dict_equal(self.test['options'], {'some': 'option'})
+
+    def test_glxinfo(self):
+        """results.TestrunResult.to_json: glxinfo is properly encoded"""
+        nt.eq_(self.test['glxinfo'], 'glxinfo')
+
+    def test_wglinfo(self):
+        """results.TestrunResult.to_json: wglinfo is properly encoded"""
+        nt.eq_(self.test['wglinfo'], 'wglinfo')
+
+    def test_lspci(self):
+        """results.TestrunResult.to_json: lspci is properly encoded"""
+        nt.eq_(self.test['lspci'], 'this is lspci')
+
+    def test_time(self):
+        """results.TestrunResult.to_json: time_elapsed is properly encoded"""
+        nt.eq_(self.test['time_elapsed'], 1.23)
+
+    def test_tests(self):
+        """results.TestrunResult.to_json: tests is properly encoded"""
+        nt.eq_(self.test['tests']['a test'].result, 'pass')
+
+    def test_type(self):
+        """results.TestrunResult.to_json: __type__ is added"""
+        nt.eq_(self.test['__type__'], 'TestrunResult')
