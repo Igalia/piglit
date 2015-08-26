@@ -305,7 +305,6 @@ class Summary:
 
         self.status = {}
         self.fractions = {}
-        self.totals = {}
         self.tests = {'all': set(), 'changes': set(), 'problems': set(),
                       'skipped': set(), 'regressions': set(), 'fixes': set(),
                       'enabled': set(), 'disabled': set(), 'incomplete': set()}
@@ -425,18 +424,6 @@ class Summary:
                     self.tests['fixes'].add(test)
                     self.tests['changes'].add(test)
 
-    def __find_totals(self, results):
-        """
-        Private: Find the total number of pass, fail, crash, skip, and warn in
-        the specified results.
-        """
-        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0,
-                       'timeout': 0, 'warn': 0, 'dmesg-warn': 0,
-                       'dmesg-fail': 0, 'incomplete': 0,}
-
-        for test in results.tests.itervalues():
-            self.totals[str(test.result)] += 1
-
     def generate_html(self, destination, exclude):
         """
         Produce HTML summaries.
@@ -490,12 +477,10 @@ class Summary:
             else:
                 time = None
 
-            self.__find_totals(each)
-
             with open(path.join(destination, name, "index.html"), 'w') as out:
                 out.write(testindex.render(
                     name=each.name,
-                    totals=self.totals,
+                    totals=each.totals['root'],
                     time=time,
                     options=each.options,
                     uname=each.uname,
@@ -569,7 +554,7 @@ class Summary:
     def generate_text(self, mode):
         """ Write summary information to the console """
         assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
-        self.__find_totals(self.results[-1])
+        totals = self.results[-1].totals['root']
 
         def printer(list_):
             """Takes a list of test names to print and prints the name and
@@ -601,14 +586,14 @@ class Summary:
                   "       warn: {warn}\n"
                   " incomplete: {incomplete}\n"
                   " dmesg-warn: {dmesg-warn}\n"
-                  " dmesg-fail: {dmesg-fail}".format(**self.totals))
+                  " dmesg-fail: {dmesg-fail}".format(**totals))
             if self.tests['changes']:
                 print("    changes: {changes}\n"
                       "      fixes: {fixes}\n"
                       "regressions: {regressions}".format(
                           **{k: len(v) for k, v in self.tests.iteritems()}))
 
-            print("      total: {}".format(sum(self.totals.itervalues())))
+            print("      total: {}".format(sum(totals.itervalues())))
 
         # Print the name of the test and the status from each test run
         if mode == 'all':
