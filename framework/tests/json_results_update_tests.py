@@ -693,12 +693,59 @@ class TestV5toV6(object):
         """backends.json.update_results (5 -> 6): A test result is converted to a TestResult instance"""
         nt.ok_(isinstance(self.result.tests['a@test'], results.TestResult))
 
+
+class TestV6toV7(object):
+    DATA = {
+        "results_version": 6,
+        "name": "test",
+        "options": {
+            "profile": ['quick'],
+            "dmesg": False,
+            "verbose": False,
+            "platform": "gbm",
+            "sync": False,
+            "valgrind": False,
+            "filter": [],
+            "concurrent": "all",
+            "test_count": 0,
+            "exclude_tests": [],
+            "exclude_filter": [],
+            "env": {
+                "lspci": "stuff",
+                "uname": "more stuff",
+                "glxinfo": "and stuff",
+                "wglinfo": "stuff"
+            }
+        },
+        "tests": {
+            'a@test': results.TestResult('pass'),
+            'a@nother@test': results.TestResult('fail'),
+            'a@nother@thing': results.TestResult('crash'),
+        }
+    }
+
+    @classmethod
+    def setup_class(cls):
+        """Class setup. Create a TestrunResult with v4 data."""
+        with utils.tempfile(
+                json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
+            with open(t, 'r') as f:
+                cls.result = backends.json._update_six_to_seven(backends.json._load(f))
+
+    def test_is_TestrunResult(self):
+        """backends.json.update_results (6 -> 7): makes TestrunResult"""
+        nt.ok_(isinstance(self.result, results.TestrunResult))
+
+    def test_totals(self):
+        """backends.json.update_results (6 -> 7): Totals are populated"""
+        nt.ok_(self.result.totals != {})
+
     def test_load_results(self):
-        """backends.json.update_results (5 -> 6): load_results properly updates."""
+        """backends.json.update_results (6 -> 7): load_results properly updates."""
         with utils.tempdir() as d:
             tempfile = os.path.join(d, 'results.json')
             with open(tempfile, 'w') as f:
                 json.dump(self.DATA, f, default=backends.json.piglit_encoder)
             with open(tempfile, 'r') as f:
                 result = backends.json.load_results(tempfile, 'none')
-                nt.assert_equal(result.results_version, 6)
+                nt.eq_(result.results_version, 7)

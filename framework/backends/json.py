@@ -42,7 +42,7 @@ __all__ = [
 ]
 
 # The current version of the JSON results
-CURRENT_JSON_VERSION = 6
+CURRENT_JSON_VERSION = 7
 
 # The level to indent a final file
 INDENT = 4
@@ -274,6 +274,8 @@ def _resume(results_dir):
             except ValueError:
                 continue
 
+    testrun.calculate_group_totals()
+
     return testrun
 
 
@@ -301,6 +303,7 @@ def _update_results(results, filepath):
             3: _update_three_to_four,
             4: _update_four_to_five,
             5: _update_five_to_six,
+            6: _update_six_to_seven,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -561,6 +564,19 @@ def _update_five_to_six(result):
 
     result.tests = new_tests
     result.results_version = 6
+
+    return result
+
+
+def _update_six_to_seven(result):
+    """Update json results from version 6 to 7.
+
+    Version 7 results always contain the totals member.
+
+    """
+    if not result.totals:
+        result.calculate_group_totals()
+    result.results_version = 7
 
     return result
 
