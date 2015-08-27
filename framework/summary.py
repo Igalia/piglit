@@ -32,6 +32,8 @@ import getpass
 import sys
 import posixpath
 import errno
+import textwrap
+import operator
 
 from mako.template import Template
 
@@ -554,7 +556,6 @@ class Summary:
     def generate_text(self, mode):
         """ Write summary information to the console """
         assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
-        totals = self.results[-1].totals['root']
 
         def printer(list_):
             """Takes a list of test names to print and prints the name and
@@ -577,23 +578,61 @@ class Summary:
 
         def print_summary():
             """print a summary."""
-            print("summary:\n"
-                  "       pass: {pass}\n"
-                  "       fail: {fail}\n"
-                  "      crash: {crash}\n"
-                  "       skip: {skip}\n"
-                  "    timeout: {timeout}\n"
-                  "       warn: {warn}\n"
-                  " incomplete: {incomplete}\n"
-                  " dmesg-warn: {dmesg-warn}\n"
-                  " dmesg-fail: {dmesg-fail}".format(**totals))
-            if self.tests['changes']:
-                print("    changes: {changes}\n"
-                      "      fixes: {fixes}\n"
-                      "regressions: {regressions}".format(
-                          **{k: len(v) for k, v in self.tests.iteritems()}))
+            template = textwrap.dedent("""\
+                summary:
+                       name: {names}
+                       ----  {divider}
+                       pass: {pass_}
+                       fail: {fail}
+                      crash: {crash}
+                       skip: {skip}
+                    timeout: {timeout}
+                       warn: {warn}
+                 incomplete: {incomplete}
+                 dmesg-warn: {dmesg_warn}
+                 dmesg-fail: {dmesg_fail}
+                    changes: {changes}
+                      fixes: {fixes}
+                regressions: {regressions}
+                      total: {total}""")
 
-            print("      total: {}".format(sum(totals.itervalues())))
+            print_template = ' '.join(
+                '{: >20}' for x in xrange(len(self.results)))
+
+            def status_printer(stat):
+                return print_template.format(
+                    *[x.totals['root'][stat] for x in self.results])
+
+            def change_printer(func):
+                counts = ['']  # There can't be changes from nil -> 0
+                for prev, cur in itertools.izip(self.results[:-1], self.results[1:]):
+                    count = 0
+                    for name in self.tests['all']:
+                        try:
+                            if func(prev.tests[name].result, cur.tests[name].result):
+                                count += 1
+                        except KeyError:
+                            pass
+                    counts.append(count)
+                return print_template.format(*counts)
+
+            print(template.format(
+                names=print_template.format(*[r.name for r in self.results]),
+                divider=print_template.format(*['-'*20 for _ in self.results]),
+                pass_=status_printer('pass'),
+                crash=status_printer('crash'),
+                fail=status_printer('fail'),
+                skip=status_printer('skip'),
+                timeout=status_printer('timeout'),
+                warn=status_printer('warn'),
+                incomplete=status_printer('incomplete'),
+                dmesg_warn=status_printer('dmesg-warn'),
+                dmesg_fail=status_printer('dmesg-fail'),
+                changes=change_printer(operator.ne),
+                fixes=change_printer(operator.gt),
+                regressions=change_printer(operator.lt),
+                total=print_template.format(*[
+                    sum(x.totals['root'].itervalues()) for x in self.results])))
 
         # Print the name of the test and the status from each test run
         if mode == 'all':
