@@ -46,6 +46,7 @@ from framework import grouptools, backends, exceptions
 
 __all__ = [
     'Summary',
+    'console'
 ]
 
 
@@ -554,102 +555,6 @@ class Summary:
                 else:
                     out.write(empty_status.render(page=page, pages=pages))
 
-    def generate_text(self, mode):
-        """ Write summary information to the console """
-        assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
-
-        def printer(list_):
-            """Takes a list of test names to print and prints the name and
-            result.
-
-            """
-            def make_status(test):
-                elems = []
-                for res in self.results:
-                    try:
-                        elems.append(str(res.tests[test].result))
-                    except KeyError:
-                        elems.append(str(so.NOTRUN))
-                return ' '.join(elems)
-
-            for test in list_:
-                print("{test}: {statuses}".format(
-                    test='/'.join(test.split(grouptools.SEPARATOR)),
-                    statuses=make_status(test)))
-
-        def print_summary():
-            """print a summary."""
-            template = textwrap.dedent("""\
-                summary:
-                       name: {names}
-                       ----  {divider}
-                       pass: {pass_}
-                       fail: {fail}
-                      crash: {crash}
-                       skip: {skip}
-                    timeout: {timeout}
-                       warn: {warn}
-                 incomplete: {incomplete}
-                 dmesg-warn: {dmesg_warn}
-                 dmesg-fail: {dmesg_fail}
-                    changes: {changes}
-                      fixes: {fixes}
-                regressions: {regressions}
-                      total: {total}""")
-
-            def make(value):
-                # This convaluted little function makes a formatter string that
-                # looks like this: {: >x.x}, which prints a string that is x
-                # characters wide and truncated at x, and right aligned, using
-                # spaces to pad any remaining space on the left
-                return '{: >' + '{0}.{0}'.format(value) + '}'
-
-            lens = [max(min(len(x.name), 20), 6) for x in self.results]
-            print_template = ' '.join(make(y) for y in lens)
-
-            def status_printer(stat):
-                totals = [str(x.totals['root'][stat]) for x in self.results]
-                return print_template.format(*totals)
-
-            def change_printer(func):
-                counts = ['']
-                counts.extend([str(len(e)) for e in find_diffs(
-                    self.results,
-                    self.tests['all'],
-                    func)])
-                return print_template.format(*counts)
-
-            print(template.format(
-                names=print_template.format(*[r.name for r in self.results]),
-                divider=print_template.format(*['-'*l for l in lens]),
-                pass_=status_printer('pass'),
-                crash=status_printer('crash'),
-                fail=status_printer('fail'),
-                skip=status_printer('skip'),
-                timeout=status_printer('timeout'),
-                warn=status_printer('warn'),
-                incomplete=status_printer('incomplete'),
-                dmesg_warn=status_printer('dmesg-warn'),
-                dmesg_fail=status_printer('dmesg-fail'),
-                changes=change_printer(operator.ne),
-                fixes=change_printer(operator.gt),
-                regressions=change_printer(operator.lt),
-                total=print_template.format(*[
-                    str(sum(x.totals['root'].itervalues()))
-                    for x in self.results])))
-
-        # Print the name of the test and the status from each test run
-        if mode == 'all':
-            printer(self.tests['all'])
-            print_summary()
-        elif mode == 'diff':
-            printer(self.tests['changes'])
-            print_summary()
-        elif mode == 'incomplete':
-            printer(self.tests['incomplete'])
-        elif mode == 'summary':
-            print_summary()
-
 
 def find_diffs(results, tests, comparator, handler=lambda *a: None):
     """Generate diffs between two or more sets of results.
@@ -712,7 +617,8 @@ class Results(object):  # pylint: disable=too-few-public-methods
     def get_result(self, name):
         """Get all results for a single test.
 
-        replace any missing vaules with status.NOTRUN
+        Replace any missing vaules with status.NOTRUN, correclty handles
+        subtests.
 
         """
         results = []
@@ -721,6 +627,16 @@ class Results(object):  # pylint: disable=too-few-public-methods
                 results.append(res.tests[name].result)
             except KeyError:
                 results.append(so.NOTRUN)
+        if all(x == so.NOTRUN for x in results):
+            # this is likely a subtest, see if that's the case
+            name, test = grouptools.splitname(name)
+
+            results = []
+            for res in self.results:
+                try:
+                    results.append(res.tests[name].subtests[test])
+                except KeyError:
+                    results.append(so.NOTRUN)
         return results
 
 
@@ -903,3 +819,81 @@ class Counts(object):
     @lazy_property
     def incomplete(self):
         return [len(x) for x in self.__names.incomplete]
+
+
+def console(results, mode):
+    """ Write summary information to the console """
+    assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
+    results = Results([backends.load(r) for r in results])
+
+    def printer(list_):
+        """Takes a list of test names to print and prints the name and
+        result.
+
+        """
+        for test in list_:
+            print("{test}: {statuses}".format(
+                test='/'.join(test.split(grouptools.SEPARATOR)),
+                statuses=' '.join(str(r) for r in results.get_result(test))))
+
+    def print_summary():
+        """print a summary."""
+        template = textwrap.dedent("""\
+            summary:
+                   name: {names}
+                   ----  {divider}
+                   pass: {pass_}
+                   fail: {fail}
+                  crash: {crash}
+                   skip: {skip}
+                timeout: {timeout}
+                   warn: {warn}
+             incomplete: {incomplete}
+             dmesg-warn: {dmesg_warn}
+             dmesg-fail: {dmesg_fail}
+                changes: {changes}
+                  fixes: {fixes}
+            regressions: {regressions}
+                  total: {total}""")
+
+        lens = [max(min(len(x.name), 20), 6) for x in results.results]
+        print_template = ' '.join(
+            (lambda x: '{: >' + '{0}.{0}'.format(x) + '}')(y) for y in lens)
+
+        def status_printer(stat):
+            totals = [str(x.totals['root'][stat]) for x in results.results]
+            return print_template.format(*totals)
+
+        print(template.format(
+            names=print_template.format(*[r.name for r in results.results]),
+            divider=print_template.format(*['-'*l for l in lens]),
+            pass_=status_printer('pass'),
+            crash=status_printer('crash'),
+            fail=status_printer('fail'),
+            skip=status_printer('skip'),
+            timeout=status_printer('timeout'),
+            warn=status_printer('warn'),
+            incomplete=status_printer('incomplete'),
+            dmesg_warn=status_printer('dmesg-warn'),
+            dmesg_fail=status_printer('dmesg-fail'),
+            changes=print_template.format(
+                *[str(s) for s in results.counts.changes]),
+            fixes=print_template.format(
+                *[str(s) for s in results.counts.fixes]),
+            regressions=print_template.format(
+                *[str(s) for s in results.counts.regressions]),
+            total=print_template.format(*[
+                str(sum(x.totals['root'].itervalues()))
+                for x in results.results])))
+
+    # Print the name of the test and the status from each test run
+    if mode == 'all':
+        printer(results.names.all)
+        print_summary()
+    elif mode == 'diff':
+        printer(results.names.all_changes)
+        print_summary()
+    elif mode == 'incomplete':
+        printer(results.names.all_incomplete)
+    elif mode == 'summary':
+        print_summary()

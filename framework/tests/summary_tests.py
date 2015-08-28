@@ -386,3 +386,34 @@ def test_Results_get_results_missing():
     res = summary.Results([res1, res2])
 
     nt.eq_(res.get_result('foo'), [status.PASS, status.NOTRUN])
+
+
+def test_Results_get_results_subtest():
+    """summary.Results.get_results (subtest): returns list of statuses"""
+    res1 = results.TestrunResult()
+    res1.tests['foo'] = results.TestResult('notrun')
+    res1.tests['foo'].subtests['1'] = 'pass'
+
+    res2 = results.TestrunResult()
+    res2.tests['foo'] = results.TestResult('notrun')
+    res2.tests['foo'].subtests['1'] = 'fail'
+
+    res = summary.Results([res1, res2])
+
+    nt.eq_(res.get_result(grouptools.join('foo', '1')),
+           [status.PASS, status.FAIL])
+
+
+def test_Results_get_results_missing_subtest():
+    """summary.Results.get_results (subtest): handles KeyErrors"""
+    res1 = results.TestrunResult()
+    res1.tests['foo'] = results.TestResult('pass')
+    res1.tests['foo'].subtests['1'] = 'pass'
+
+    res2 = results.TestrunResult()
+    res2.tests['bar'] = results.TestResult('fail')
+
+    res = summary.Results([res1, res2])
+
+    nt.eq_(res.get_result(grouptools.join('foo', '1')),
+           [status.PASS, status.NOTRUN])

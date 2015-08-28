@@ -156,8 +156,7 @@ def console(input_):
         args.results.extend(core.parse_listfile(args.list))
 
     # Generate the output
-    output = summary.Summary(args.results)
-    output.generate_text(args.mode or 'all')
+    summary.console(args.results, args.mode or 'all')
 
 
 @exceptions.handler
