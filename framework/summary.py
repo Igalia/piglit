@@ -41,6 +41,7 @@ from mako.template import Template
 # the module
 import framework.status as so
 import framework.results
+from framework.core import lazy_property
 from framework import grouptools, backends, exceptions
 
 __all__ = [
@@ -611,9 +612,11 @@ class Summary:
                 return print_template.format(*totals)
 
             def change_printer(func):
-                counts = ['']  # There can't be changes from nil -> 0
+                counts = ['']
                 counts.extend([str(len(e)) for e in find_diffs(
-                    self.results, self.tests['all'], func)])
+                    self.results,
+                    self.tests['all'],
+                    func)])
                 return print_template.format(*counts)
 
             print(template.format(
@@ -648,9 +651,26 @@ class Summary:
             print_summary()
 
 
-def find_diffs(results, tests, comparator):
-    """Generate diffs between two or more sets of results."""
-    diffs = []
+def find_diffs(results, tests, comparator, handler=lambda *a: None):
+    """Generate diffs between two or more sets of results.
+
+    Arguments:
+    results -- a list of results.TestrunResult instances
+    tests -- an iterable of test names. Must be iterable more than once
+    comparator -- a function with the signautre f(x, y), that returns True when
+                  the test should be added to the set of diffs
+
+    Keyword Arguemnts:
+    handler -- a function with the signature f(names, name, prev, cur). in the
+               event of a KeyError while comparing the results with comparator,
+               handler will be passed the (<the set of names>, <the current
+               test name>, <the previous result>, <the current result>). This
+               can be used to add name even when a KeyError is expected (ie,
+               enabled tests).
+               Default: pass
+
+    """
+    diffs = [] # There can't be changes from nil -> 0
     for prev, cur in itertools.izip(results[:-1], results[1:]):
         names = set()
         for name in tests:
@@ -658,6 +678,228 @@ def find_diffs(results, tests, comparator):
                 if comparator(prev.tests[name].result, cur.tests[name].result):
                     names.add(name)
             except KeyError:
-                pass
+                handler(names, name, prev, cur)
         diffs.append(names)
     return diffs
+
+
+def find_single(results, tests, func):
+    """Find statuses in a single run."""
+    statuses = []
+    for res in results:
+        names = set()
+        for name in tests:
+            try:
+                if func(res.tests[name].result):
+                    names.add(name)
+            except KeyError:
+                pass
+        statuses.append(names)
+    return statuses
+
+
+class Results(object):  # pylint: disable=too-few-public-methods
+    """Container object for results.
+
+    Has the results, the names of status, and the counts of statuses.
+
+    """
+    def __init__(self, results):
+        self.results = results
+        self.names = Names(self)
+        self.counts = Counts(self)
+
+    def get_result(self, name):
+        """Get all results for a single test.
+
+        replace any missing vaules with status.NOTRUN
+
+        """
+        results = []
+        for res in self.results:
+            try:
+                results.append(res.tests[name].result)
+            except KeyError:
+                results.append(so.NOTRUN)
+        return results
+
+
+class Names(object):
+    """Class containing names of tests for various statuses.
+
+    Members contain lists of sets of names that have a status.
+
+    Each status is lazily evaluated and cached.
+
+    """
+    def __init__(self, tests):
+        self.__results = tests.results
+
+    def __diff(self, comparator, handler=None):
+        """Helper for simplifying comparators using find_diffs."""
+        ret = ['']
+        if handler is None:
+            ret.extend(find_diffs(self.__results, self.all, comparator))
+        else:
+            ret.extend(find_diffs(self.__results, self.all, comparator,
+                                  handler=handler))
+        return ret
+
+    def __single(self, comparator):
+        """Helper for simplifying comparators using find_single."""
+        return find_single(self.__results, self.all, comparator)
+
+    @lazy_property
+    def all(self):
+        """A set of all tests in all runs."""
+        all_ = set()
+        for res in self.__results:
+            for key, value in res.tests.iteritems():
+                if not value.subtests:
+                    all_.add(key)
+                else:
+                    for subt in value.subtests.iterkeys():
+                        all_.add(grouptools.join(key, subt))
+        return all_
+
+    @lazy_property
+    def changes(self):
+        return self.__diff(operator.ne)
+
+    @lazy_property
+    def problems(self):
+        return self.__single(lambda x: x > so.PASS)
+
+    @lazy_property
+    def skips(self):
+        # It is critical to use is not == here, otherwise so.NOTRUN will also
+        # be added to this list
+        return self.__single(lambda x: x is so.SKIP)
+
+    @lazy_property
+    def regressions(self):
+        return self.__diff(operator.lt)
+
+    @lazy_property
+    def fixes(self):
+        return self.__diff(operator.gt)
+
+    @lazy_property
+    def enabled(self):
+        def handler(names, name, prev, cur):
+            if name not in prev.tests and name in cur.tests:
+                names.add(name)
+        return self.__diff(
+            lambda x, y: x is so.NOTRUN and y is not so.NOTRUN,
+            handler=handler)
+
+    @lazy_property
+    def disabled(self):
+        def handler(names, name, prev, cur):
+            if name in prev.tests and name not in cur.tests:
+                names.add(name)
+        return self.__diff(
+            lambda x, y: x is not so.NOTRUN and y is so.NOTRUN,
+            handler=handler)
+
+    @lazy_property
+    def incomplete(self):
+        return self.__single(lambda x: x is so.INCOMPLETE)
+
+    @lazy_property
+    def all_changes(self):
+        if len(self.changes) > 1:
+            return set.union(*self.changes[1:])
+        else:
+            return set()
+
+    @lazy_property
+    def all_disabled(self):
+        if len(self.disabled) > 1:
+            return set.union(*self.disabled[1:])
+        else:
+            return set()
+
+    @lazy_property
+    def all_enabled(self):
+        if len(self.enabled) > 1:
+            return set.union(*self.enabled[1:])
+        else:
+            return set()
+
+    @lazy_property
+    def all_fixes(self):
+        if len(self.fixes) > 1:
+            return set.union(*self.fixes[1:])
+        else:
+            return set()
+
+    @lazy_property
+    def all_regressions(self):
+        if len(self.regressions) > 1:
+            return set.union(*self.regressions[1:])
+        else:
+            return set()
+
+    @lazy_property
+    def all_incomplete(self):
+        if len(self.incomplete) > 1:
+            return set.union(*self.incomplete)
+        else:
+            return self.incomplete[0]
+
+    @lazy_property
+    def all_problems(self):
+        if len(self.problems) > 1:
+            return set.union(*self.problems)
+        else:
+            return self.problems[0]
+
+    @lazy_property
+    def all_skips(self):
+        if len(self.skips) > 1:
+            return set.union(*self.skips)
+        else:
+            return self.skips[0]
+
+
+class Counts(object):
+    """Number of tests in each catagory."""
+    def __init__(self, tests):
+        self.__names = tests.names
+
+    @lazy_property
+    def all(self):
+        return len(self.__names.all)
+
+    @lazy_property
+    def changes(self):
+        return [len(x) for x in self.__names.changes]
+
+    @lazy_property
+    def problems(self):
+        return [len(x) for x in self.__names.problems]
+
+    @lazy_property
+    def skips(self):
+        return [len(x) for x in self.__names.skips]
+
+    @lazy_property
+    def regressions(self):
+        return [len(x) for x in self.__names.regressions]
+
+    @lazy_property
+    def fixes(self):
+        return [len(x) for x in self.__names.fixes]
+
+    @lazy_property
+    def enabled(self):
+        return [len(x) for x in self.__names.enabled]
+
+    @lazy_property
+    def disabled(self):
+        return [len(x) for x in self.__names.disabled]
+
+    @lazy_property
+    def incomplete(self):
+        return [len(x) for x in self.__names.incomplete]

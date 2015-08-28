@@ -232,3 +232,24 @@ def parse_listfile(filename):
     """
     with open(filename, 'r') as file:
         return [os.path.expanduser(i.strip()) for i in file.readlines()]
+
+
+class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-methods
+    """Descriptor that replaces the function it wraps with the value generated.
+
+    This makes a property that is truely lazy, it is calculated once on demand,
+    and stored. This makes this very useful for values that you might want to
+    calculate and reuse, but they cannot change.
+
+    This works by very cleverly shadowing itself with the calculated value. It
+    adds the value to the instance, which pushes itself up the MRO and will
+    never be quired again.
+
+    """
+    def __init__(self, func):
+        self.__func = func
+
+    def __get__(self, instance, cls):
+        value = self.__func(instance)
+        setattr(instance, self.__func.__name__, value)
+        return value

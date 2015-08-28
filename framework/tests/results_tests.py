@@ -398,7 +398,7 @@ class TestTestrunResultTotalsSubtests(object):
     """results.TestrunResult.totals: Tests with subtests are handled correctly"""
     @classmethod
     def setup_class(cls):
-        tr = results.TestResult('incomplete')
+        tr = results.TestResult('crash')
         tr.subtests['foo'] = status.PASS
         tr.subtests['bar'] = status.CRASH
         tr.subtests['oink'] = status.FAIL
