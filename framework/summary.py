@@ -612,15 +612,8 @@ class Summary:
 
             def change_printer(func):
                 counts = ['']  # There can't be changes from nil -> 0
-                for prev, cur in itertools.izip(self.results[:-1], self.results[1:]):
-                    count = 0
-                    for name in self.tests['all']:
-                        try:
-                            if func(prev.tests[name].result, cur.tests[name].result):
-                                count += 1
-                        except KeyError:
-                            pass
-                    counts.append(str(count))
+                counts.extend([str(len(e)) for e in find_diffs(
+                    self.results, self.tests['all'], func)])
                 return print_template.format(*counts)
 
             print(template.format(
@@ -653,3 +646,18 @@ class Summary:
             printer(self.tests['incomplete'])
         elif mode == 'summary':
             print_summary()
+
+
+def find_diffs(results, tests, comparator):
+    """Generate diffs between two or more sets of results."""
+    diffs = []
+    for prev, cur in itertools.izip(results[:-1], results[1:]):
+        names = set()
+        for name in tests:
+            try:
+                if comparator(prev.tests[name].result, cur.tests[name].result):
+                    names.add(name)
+            except KeyError:
+                pass
+        diffs.append(names)
+    return diffs

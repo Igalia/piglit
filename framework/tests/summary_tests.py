@@ -30,7 +30,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-import framework.summary as summary
+from framework import summary, results
 import framework.tests.utils as utils
 from framework.backends.json import piglit_encoder
 
@@ -125,3 +125,22 @@ class TestSubtestHandling(object):
     def subtest_not_skip_notrun(self):
         """summary.Summary: skips are not changed to notruns"""
         nt.eq_(self.summ.status['fake-tests']['is_skip'], 'skip')
+
+
+def test_find_diffs_():
+    """summary.find_diffs: calculates correct set of diffs"""
+    res1 = results.TestrunResult()
+    res1.tests['foo'] = results.TestResult('pass')
+    res1.tests['bar'] = results.TestResult('fail')
+    res1.tests['oink'] = results.TestResult('crash')
+    res1.tests['bonk'] = results.TestResult('warn')
+
+    res2 = results.TestrunResult()
+    res2.tests['foo'] = results.TestResult('fail')
+    res2.tests['bar'] = results.TestResult('pass')
+    res2.tests['oink'] = results.TestResult('crash')
+
+    diffs = summary.find_diffs([res1, res2],
+                               {'foo', 'bar', 'oink', 'bonk'},
+                               lambda x, y: x != y)
+    nt.eq_(diffs, [{'foo', 'bar'}])
