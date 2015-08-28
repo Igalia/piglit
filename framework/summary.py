@@ -831,7 +831,7 @@ def console(results, mode):
         result.
 
         """
-        for test in list_:
+        for test in sorted(list_):
             print("{test}: {statuses}".format(
                 test='/'.join(test.split(grouptools.SEPARATOR)),
                 statuses=' '.join(str(r) for r in results.get_result(test))))
