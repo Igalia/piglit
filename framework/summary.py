@@ -596,12 +596,19 @@ class Summary:
                 regressions: {regressions}
                       total: {total}""")
 
-            print_template = ' '.join(
-                '{: >20}' for x in xrange(len(self.results)))
+            def make(value):
+                # This convaluted little function makes a formatter string that
+                # looks like this: {: >x.x}, which prints a string that is x
+                # characters wide and truncated at x, and right aligned, using
+                # spaces to pad any remaining space on the left
+                return '{: >' + '{0}.{0}'.format(value) + '}'
+
+            lens = [max(min(len(x.name), 20), 6) for x in self.results]
+            print_template = ' '.join(make(y) for y in lens)
 
             def status_printer(stat):
-                return print_template.format(
-                    *[x.totals['root'][stat] for x in self.results])
+                totals = [str(x.totals['root'][stat]) for x in self.results]
+                return print_template.format(*totals)
 
             def change_printer(func):
                 counts = ['']  # There can't be changes from nil -> 0
@@ -613,12 +620,12 @@ class Summary:
                                 count += 1
                         except KeyError:
                             pass
-                    counts.append(count)
+                    counts.append(str(count))
                 return print_template.format(*counts)
 
             print(template.format(
                 names=print_template.format(*[r.name for r in self.results]),
-                divider=print_template.format(*['-'*20 for _ in self.results]),
+                divider=print_template.format(*['-'*l for l in lens]),
                 pass_=status_printer('pass'),
                 crash=status_printer('crash'),
                 fail=status_printer('fail'),
@@ -632,7 +639,8 @@ class Summary:
                 fixes=change_printer(operator.gt),
                 regressions=change_printer(operator.lt),
                 total=print_template.format(*[
-                    sum(x.totals['root'].itervalues()) for x in self.results])))
+                    str(sum(x.totals['root'].itervalues()))
+                    for x in self.results])))
 
         # Print the name of the test and the status from each test run
         if mode == 'all':
