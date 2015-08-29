@@ -227,7 +227,7 @@ class NoChangeStatus(Status):
         raise TypeError("Cannot compare type: {}".format(type(other)))
 
 
-NOTRUN = NoChangeStatus('Not Run')
+NOTRUN = NoChangeStatus('notrun')
 
 SKIP = NoChangeStatus('skip')
 
