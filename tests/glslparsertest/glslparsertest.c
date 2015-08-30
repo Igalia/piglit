@@ -152,7 +152,7 @@ static void
 attach_dummy_shader(GLuint shader_prog, GLenum type)
 {
 	const char *shader_template;
-	char shader_text[128];
+	char shader_text[4096];
 	GLint shader;
 
 	switch (type) {
@@ -180,10 +180,10 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 		break;
 	}
 
-	sprintf(shader_text,
-		shader_template,
-		requested_version,
-		(requested_version == 300) ? "es" : "");
+	snprintf(shader_text, sizeof(shader_text),
+		 shader_template,
+		 requested_version,
+		 (requested_version == 300) ? "es" : "");
 	shader = piglit_compile_shader_text(type, shader_text);
 	glAttachShader(shader_prog, shader);
 }
