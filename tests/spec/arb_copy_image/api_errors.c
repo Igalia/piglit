@@ -78,22 +78,16 @@ image_storage(GLenum target, GLuint name, GLenum internal_format,
 	}
 }
 
-GLenum targets[] = {
+/* only testing legal targets below */
+static const GLenum targets[] = {
 	GL_TEXTURE_1D,
 	GL_TEXTURE_1D_ARRAY,
 	GL_TEXTURE_2D,
 	GL_TEXTURE_RECTANGLE,
-	GL_TEXTURE_BUFFER,
 	GL_TEXTURE_2D_ARRAY,
 	GL_TEXTURE_2D_MULTISAMPLE,
 	GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
 	GL_TEXTURE_CUBE_MAP,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
 	GL_TEXTURE_CUBE_MAP_ARRAY,
 	GL_TEXTURE_3D
 };
@@ -132,29 +126,45 @@ test_simple_errors(GLenum src_target, GLenum dst_target)
 	/* This is no longer needed */
 	image_delete(src_target, src2);
 
+	/* Section 18.3.2 (Copying Between Images) of the OpenGL 4.5 Core
+	 * Profile spec says:
+	 *
+	 *     "An INVALID_VALUE error is generated if either name does not
+	 *     correspond to a valid renderbuffer or texture object according
+	 *     to the corresponding target parameter."
+	 */
 	if (src_target != GL_RENDERBUFFER_EXT) {
 		for (i = 0; i < ARRAY_LENGTH(targets); ++i) {
 			if (targets[i] == src_target)
 				continue;
 
+			/* here, targets[i] doesn't match src object's target */
 			glCopyImageSubData(src, targets[i], 0, 0, 0, 0,
 					   dst, dst_target, 0, 0, 0, 0,
 					   0, 0, 0);
-			pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+			pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 			if (!pass)
 				return false;
 		}
 	}
 
+	/* Section 18.3.2 (Copying Between Images) of the OpenGL 4.5 Core
+	 * Profile spec says:
+	 *
+	 *     "An INVALID_VALUE error is generated if either name does not
+	 *     correspond to a valid renderbuffer or texture object according
+	 *     to the corresponding target parameter."
+	 */
 	if (dst_target != GL_RENDERBUFFER_EXT) {
 		for (i = 0; i < ARRAY_LENGTH(targets); ++i) {
 			if (targets[i] == dst_target)
 				continue;
 
+			/* here, targets[i] doesn't match dst object's target */
 			glCopyImageSubData(src, src_target, 0, 0, 0, 0,
 					   dst, targets[i], 0, 0, 0, 0,
 					   0, 0, 0);
-			pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+			pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 			if (!pass)
 				return false;
 		}
@@ -230,19 +240,38 @@ test_compressed_alignment_errors()
 			   tex[1], GL_TEXTURE_2D, 0, 0, 0, 0, 20, 24, 1);
 	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-	/* Check for compressed with wrong block size */
+	/* Section 18.3.2 (Copying Between Images) of the OpenGL 4.5 Core
+	 * Profile spec says:
+	 *
+	 *     "An INVALID_OPERATION error is generated if the texel size of
+	 *     the uncompressed image is not equal to the block size of the
+	 *     compressed image."
+	 */
 	glBindTexture(GL_TEXTURE_2D, tex[2]);
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16UI, 32, 32);
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 0, 0, 0,
 			   tex[2], GL_TEXTURE_2D, 0, 0, 0, 0, 20, 20, 1);
-	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
+	/* Section 18.3.2 (Copying Between Images) of the OpenGL 4.5 Core
+	 * Profile spec says:
+	 *
+	 *     "An INVALID_OPERATION error is generated if the formats are
+	 *     not compatible."
+	 *
+	 * The definition of compatible refers back to table 8.22 "Compatible
+	 * internal formats for TextureView."  This table does not contain
+	 * S3TC formats because they are from an older extension.  Given the
+	 * different encodings of DXT1 and DXT3 textures, it is reasonable to
+	 * assume they would not be compatible for texture views, and this
+	 * matches at least NVIDIA's implementation.
+	 */
 	glBindTexture(GL_TEXTURE_2D, tex[3]);
 	glTexStorage2D(GL_TEXTURE_2D, 1,
 		       GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 32, 32);
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 0, 0, 0,
 			   tex[3], GL_TEXTURE_2D, 0, 0, 0, 0, 20, 20, 1);
-	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
 	glDeleteTextures(4, tex);
 
@@ -258,7 +287,9 @@ piglit_display(void)
 	pass &= test_simple_errors(GL_RENDERBUFFER, GL_TEXTURE_2D);
 	pass &= test_simple_errors(GL_TEXTURE_2D, GL_RENDERBUFFER);
 	pass &= test_simple_errors(GL_RENDERBUFFER, GL_RENDERBUFFER);
-	pass &= test_compressed_alignment_errors();
+	if (piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")) {
+		pass &= test_compressed_alignment_errors();
+	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
