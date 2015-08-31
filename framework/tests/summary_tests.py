@@ -22,18 +22,11 @@
 """ Module providing tests for the summary module """
 
 from __future__ import print_function, absolute_import
-import copy
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 import nose.tools as nt
 
 from framework import summary, results, status, grouptools
 from framework.tests import utils
-from framework.backends.json import piglit_encoder
 
 
 @utils.no_error
@@ -41,69 +34,6 @@ def test_initialize_summary():
     """summary.Summary: class initializes"""
     with utils.resultfile() as tfile:
         summary.Summary([tfile.name])
-
-
-@utils.nose_generator
-def test_summary_add_to_set():
-    """ Generate tests for testing Summary.test sets """
-    old = copy.deepcopy(utils.JSON_DATA)
-    new = copy.deepcopy(utils.JSON_DATA)
-
-    for ostat, nstat, set_ in [('fail', 'pass', 'fixes'),
-                               ('pass', 'warn', 'regressions'),
-                               ('dmesg-fail', 'warn', 'changes'),
-                               ('dmesg-warn', 'crash', 'problems'),
-                               ('notrun', 'pass', 'enabled'),
-                               ('skip', 'dmesg-warn', 'enabled'),
-                               ('fail', 'notrun', 'disabled'),
-                               ('crash', 'skip', 'disabled'),
-                               ('skip', 'skip', 'skipped'),
-                               ('notrun', 'fail', 'problems'),
-                               ('fail', 'notrun', 'problems'),
-                               ('pass', 'fail', 'problems'),
-                               ('timeout', 'pass', 'fixes'),
-                               ('pass', 'timeout', 'regressions'),
-                               ('pass', 'timeout', 'problems')]:
-        check_sets.description = \
-                "summary.Summary: {0} -> {1} should be added to {2}".format(
-                        ostat, nstat, set_)
-
-        yield check_sets, old, ostat, new, nstat, set_
-
-
-def check_sets(old, ostat, new, nstat, set_):
-    """ Check that the statuses are added to the correct set """
-    old['tests']['sometest']['result'] = ostat
-    old['tests']['sometest']['__type__'] = 'TestResult'
-    new['tests']['sometest']['result'] = nstat
-    new['tests']['sometest']['__type__'] = 'TestResult'
-
-    with utils.tempfile(json.dumps(old, default=piglit_encoder)) as ofile:
-        with utils.tempfile(json.dumps(new, default=piglit_encoder)) as nfile:
-            summ = summary.Summary([ofile, nfile])
-
-            print(summ.tests)
-            nt.assert_equal(1, len(summ.tests[set_]),
-                    msg="{0} was not appended".format(set_))
-
-
-            class TestSubtestHandling(object):
-                """Test Summary subtest handling."""
-    @classmethod
-    def setup_class(cls):
-        data = copy.deepcopy(utils.JSON_DATA)
-        data['tests']['sometest']['__type__'] = 'TestResult'
-        data['tests']['with_subtests']['result'] = 'pass'
-        data['tests']['with_subtests']['__type__'] = 'TestResult'
-
-        data['tests']['with_subtests']['subtests']['subtest1'] = 'fail'
-        data['tests']['with_subtests']['subtests']['subtest2'] = 'warn'
-        data['tests']['with_subtests']['subtests']['subtest3'] = 'crash'
-        data['tests']['is_skip']['result'] = 'skip'
-        data['tests']['is_skip']['__type__'] = 'TestResult'
-
-        with utils.tempfile(json.dumps(data, default=piglit_encoder)) as sumfile:
-            cls.summ = summary.Summary([sumfile])
 
 
 def test_find_diffs():

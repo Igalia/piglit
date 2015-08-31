@@ -24,7 +24,6 @@ import os
 import os.path as path
 import itertools
 import shutil
-import collections
 import tempfile
 import datetime
 import re
@@ -40,7 +39,6 @@ from mako.template import Template
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
 import framework.status as so
-import framework.results
 from framework.core import lazy_property
 from framework import grouptools, backends, exceptions
 
@@ -73,7 +71,7 @@ class HTMLIndex(list):
     html strings that will be printed by the mako template.
     """
 
-    def __init__(self, summary, page):
+    def __init__(self, results, page):
         """
         Steps through the list of groups and tests from all of the results and
         generates a list of dicts that are passed to mako and turned into HTML
@@ -114,6 +112,29 @@ class HTMLIndex(list):
                     else:
                         common.append(i)
 
+        def group_result(result, group):
+            """Get the worst status in a group."""
+            if group not in result.totals:
+                return so.NOTRUN
+
+            return max([so.status_lookup(s) for s, v in
+                        result.totals[group].iteritems() if v > 0])
+
+        def group_fraction(result, group):
+            """Get the fraction value for a group."""
+            if group not in result.totals:
+                return (0, 0)
+
+            num = 0
+            den = 0
+            for k, v in result.totals[group].iteritems():
+                if v > 0:
+                    s = so.status_lookup(k)
+                    num += s.fraction[0] * v
+                    den += s.fraction[1] * v
+
+            return (num, den)
+
         # set a starting depth of 1, 0 is used for 'all' so 1 is the
         # next available group
         depth = 1
@@ -125,7 +146,7 @@ class HTMLIndex(list):
         # Add a new 'tab' for each result
         self._newRow()
         self.append({'type': 'other', 'text': '<td />'})
-        for each in summary.results:
+        for each in results.results:
             href = normalize_href(os.path.join(
                 escape_pathname(each.name), "index.html"))
             self.append({'type': 'other',
@@ -138,9 +159,9 @@ class HTMLIndex(list):
         # Add the toplevel 'all' group
         self._newRow()
         self._groupRow("head", 0, 'all')
-        for each in summary.results:
-            self._groupResult(summary.fractions[each.name]['all'],
-                              summary.status[each.name]['all'])
+        for each in results.results:
+            self._groupResult(group_fraction(each, 'root'),
+                              group_result(each, 'root'))
         self._endRow()
 
         # Add the groups and tests to the out list
@@ -170,11 +191,11 @@ class HTMLIndex(list):
                 # there is a KeyError (the group doesn't exist), use (0, 0)
                 # which will get skip. This sets the group coloring correctly
                 currentDir.append(localGroup)
-                for each in summary.results:
+                for each in results.results:
                     # Decide which fields need to be updated
                     self._groupResult(
-                        summary.fractions[each.name][grouptools.join(*currentDir)],
-                        summary.status[each.name][grouptools.join(*currentDir)])
+                        group_fraction(each, grouptools.join(*currentDir)),
+                        group_result(each, grouptools.join(*currentDir)))
 
                 # After each group increase the depth by one
                 depth += 1
@@ -189,7 +210,7 @@ class HTMLIndex(list):
             # Add the result from each test result to the HTML summary If there
             # is a KeyError (a result doesn't contain a particular test),
             # return Not Run, with clas skip for highlighting
-            for each in summary.results:
+            for each in results.results:
                 # If the "group" at the top of the key heirachy contains
                 # 'subtest' then it is really not a group, link to that page
                 try:
@@ -202,7 +223,7 @@ class HTMLIndex(list):
 
                 try:
                     self._testResult(escape_pathname(each.name), href,
-                                     summary.status[each.name][key])
+                                     each.tests[key].result)
                 except KeyError:
                     self.append({'type': 'other',
                                  'text': '<td class="skip">Not Run</td>'})
@@ -305,128 +326,7 @@ class Summary:
 
         # Create a Result object for each piglit result and append it to the
         # results list
-        self.results = [backends.load(i) for i in resultfiles]
-
-        self.status = {}
-        self.fractions = {}
-        self.tests = {'all': set(), 'changes': set(), 'problems': set(),
-                      'skipped': set(), 'regressions': set(), 'fixes': set(),
-                      'enabled': set(), 'disabled': set(), 'incomplete': set()}
-
-        def fgh(test, result):
-            """ Helper for updating the fractions and status lists """
-            fraction[test] = tuple(
-                [sum(i) for i in zip(fraction[test], result.fraction)])
-
-            # If the new status is worse update it, or if the new status is
-            # SKIP (which is equivalent to notrun) and the current is NOTRUN
-            # update it
-            if (status[test] < result or
-                    (result == so.SKIP and status[test] == so.NOTRUN)):
-                status[test] = result
-
-        for results in self.results:
-            # Create a set of all of the tset names across all of the runs
-            self.tests['all'] = set(self.tests['all'] | set(results.tests))
-
-            # Create two dictionaries that have a default factory: they return
-            # a default value instead of a key error.
-            # This default key must be callable
-            self.fractions[results.name] = \
-                collections.defaultdict(lambda: (0, 0))
-            self.status[results.name] = \
-                collections.defaultdict(lambda: so.NOTRUN)
-
-            # short names
-            fraction = self.fractions[results.name]
-            status = self.status[results.name]
-
-            # store the results to be appeneded to results. Adding them in the
-            # loop will cause a RuntimeError
-            temp_results = {}
-
-            for key, value in results.tests.iteritems():
-                # Treat a test with subtests as if it is a group, assign the
-                # subtests' statuses and fractions down to the test, and then
-                # proceed like normal.
-                if value.subtests:
-                    for (subt, subv) in value.subtests.iteritems():
-                        subt = grouptools.join(key, subt)
-                        subv = so.status_lookup(subv)
-
-                        # Add the subtest to the fractions and status lists
-                        fraction[subt] = subv.fraction
-                        status[subt] = subv
-                        temp_results.update({subt: framework.results.TestResult(subv)})
-
-                        self.tests['all'].add(subt)
-                        while subt != '':
-                            fgh(subt, subv)
-                            subt = grouptools.groupname(subt)
-                        fgh('all', subv)
-
-                    # remove the test from the 'all' list, this will cause to
-                    # be treated as a group
-                    self.tests['all'].discard(key)
-                else:
-                    # Walk the test name as if it was a path, at each level
-                    # update the tests passed over the total number of tests
-                    # (fractions), and update the status of the current level
-                    # if the status of the previous level was worse, but is not
-                    # skip
-                    while key != '':
-                        fgh(key, value.result)
-                        key = grouptools.groupname(key)
-
-                    # when we hit the root update the 'all' group and stop
-                    fgh('all', value.result)
-
-            # Update the the results.tests dictionary with the subtests so that
-            # they are entered into the appropriate pages other than all.
-            # Updating it in the loop will raise a RuntimeError
-            for key, value in temp_results.iteritems():
-                results.tests[key] = value
-
-        # Create the lists of statuses like problems, regressions, fixes,
-        # changes and skips
-        for test in self.tests['all']:
-            status = []
-            for each in self.results:
-                try:
-                    status.append(each.tests[test].result)
-                except KeyError:
-                    status.append(so.NOTRUN)
-
-            # Problems include: warn, dmesg-warn, fail, dmesg-fail, and crash.
-            # Skip does not go on this page, it has the 'skipped' page
-            if max(status) > so.PASS:
-                self.tests['problems'].add(test)
-
-            # Find all tests with a status of skip
-            if so.SKIP in status:
-                self.tests['skipped'].add(test)
-
-            if so.INCOMPLETE in status:
-                self.tests['incomplete'].add(test)
-
-            # find fixes, regressions, and changes
-            for i in xrange(len(status) - 1):
-                first = status[i]
-                last = status[i + 1]
-                if first in [so.SKIP, so.NOTRUN] and \
-                        last not in [so.SKIP, so.NOTRUN]:
-                    self.tests['enabled'].add(test)
-                    self.tests['changes'].add(test)
-                elif last in [so.SKIP, so.NOTRUN] and \
-                        first not in [so.SKIP, so.NOTRUN]:
-                    self.tests['disabled'].add(test)
-                    self.tests['changes'].add(test)
-                elif first < last:
-                    self.tests['regressions'].add(test)
-                    self.tests['changes'].add(test)
-                elif first > last:
-                    self.tests['fixes'].add(test)
-                    self.tests['changes'].add(test)
+        self.results = Results([backends.load(i) for i in resultfiles])
 
     def generate_html(self, destination, exclude):
         """
@@ -462,7 +362,7 @@ class Summary:
         index = path.join(destination, "index.html")
 
         # Iterate across the tests creating the various test specific files
-        for each in self.results:
+        for each in self.results.results:
             name = escape_pathname(each.name)
             try:
                 os.mkdir(path.join(destination, name))
@@ -526,7 +426,7 @@ class Summary:
                                 encoding_errors='replace',
                                 module_directory=self.TEMP_DIR)
 
-        pages = frozenset(['changes', 'problems', 'skipped', 'fixes',
+        pages = frozenset(['changes', 'problems', 'skips', 'fixes',
                            'regressions', 'enabled', 'disabled'])
 
         # Index.html is a bit of a special case since there is index, all, and
@@ -534,22 +434,24 @@ class Summary:
         # changes.html, self.changes, and page=changes.
         with open(path.join(destination, "index.html"), 'w') as out:
             out.write(index.render(
-                results=HTMLIndex(self, self.tests['all']),
+                results=HTMLIndex(self.results, self.results.names.all),
                 page='all',
                 pages=pages,
-                colnum=len(self.results),
+                colnum=len(self.results.results),
                 exclude=exclude))
 
         # Generate the rest of the pages
         for page in pages:
             with open(path.join(destination, page + '.html'), 'w') as out:
                 # If there is information to display display it
-                if self.tests[page]:
+                if sum(getattr(self.results.counts, page)) > 0:
                     out.write(index.render(
-                        results=HTMLIndex(self, self.tests[page]),
+                        results=HTMLIndex(
+                            self.results,
+                            getattr(self.results.names, 'all_' + page)),
                         pages=pages,
                         page=page,
-                        colnum=len(self.results),
+                        colnum=len(self.results.results),
                         exclude=exclude))
                 # otherwise provide an empty page
                 else:
