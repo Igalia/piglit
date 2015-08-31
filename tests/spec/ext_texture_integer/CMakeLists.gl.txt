@@ -12,6 +12,7 @@ link_libraries (
 
 piglit_add_executable (ext_texture_integer-fbo-blending fbo-blending.c)
 piglit_add_executable (ext_texture_integer-fbo_integer_precision_clear fbo-integer-precision-clear.c)
+piglit_add_executable (ext_texture_integer-texformats texformats.c)
 piglit_add_executable (ext_texture_integer-fbo_integer_readpixels_sint_uint fbo-integer-readpixels-sint-uint.c)
 piglit_add_executable (ext_texture_integer-getteximage-clamping getteximage-clamping.c)
 piglit_add_executable (ext_texture_integer-texture_integer_glsl130 texture-integer-glsl130.c)

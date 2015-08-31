@@ -3122,6 +3122,7 @@ with profile.group_manager(
     g(['ext_texture_integer-getteximage-clamping'], 'getteximage-clamping')
     g(['ext_texture_integer-getteximage-clamping', 'GL_ARB_texture_rg'],
       'getteximage-clamping GL_ARB_texture_rg')
+    g(['ext_texture_integer-texformats']),
     g(['ext_texture_integer-texture_integer_glsl130'],
       'texture_integer_glsl130')
     g(['fbo-integer'], run_concurrent=False)
