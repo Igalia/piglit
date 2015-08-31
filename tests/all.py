@@ -3892,6 +3892,7 @@ with profile.group_manager(
     g(['arb_copy_image-formats', '--samples=2'])
     g(['arb_copy_image-formats', '--samples=4'])
     g(['arb_copy_image-formats', '--samples=8'])
+    g(['arb_copy_image-format-swizzle'])
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_cull_distance')) as g:
