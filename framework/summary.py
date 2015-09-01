@@ -34,7 +34,7 @@ import errno
 import textwrap
 import operator
 
-from mako.template import Template
+from mako.lookup import TemplateLookup
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
@@ -310,8 +310,12 @@ class Summary:
                          "piglit-{}".format(getpass.getuser()),
                          'version-{}'.format(sys.version.split()[0]),
                          "html-summary")
-    TEMPLATE_DIR = path.abspath(
-        path.join(path.dirname(__file__), '..', 'templates'))
+    TEMPLATE_DIR = path.join(path.dirname(__file__), '..', 'templates')
+    TEMPLATES = TemplateLookup(
+        TEMPLATE_DIR,
+        output_encoding="utf-8",
+        encoding_errors='replace',
+        module_directory=TEMP_DIR)
 
     def __init__(self, resultfiles):
         """
@@ -344,20 +348,6 @@ class Summary:
         shutil.copy(path.join(self.TEMPLATE_DIR, "result.css"),
                     path.join(destination, "result.css"))
 
-        # Create the mako object for creating the test/index.html file
-        testindex = Template(filename=path.join(self.TEMPLATE_DIR,
-                                                "testrun_info.mako"),
-                             output_encoding="utf-8",
-                             encoding_errors='replace',
-                             module_directory=self.TEMP_DIR)
-
-        # Create the mako object for the individual result files
-        testfile = Template(filename=path.join(self.TEMPLATE_DIR,
-                                               "test_result.mako"),
-                            output_encoding="utf-8",
-                            encoding_errors='replace',
-                            module_directory=self.TEMP_DIR)
-
         result_css = path.join(destination, "result.css")
         index = path.join(destination, "index.html")
 
@@ -382,7 +372,7 @@ class Summary:
                 time = None
 
             with open(path.join(destination, name, "index.html"), 'w') as out:
-                out.write(testindex.render(
+                out.write(self.TEMPLATES.get_template('testrun_info.mako').render(
                     name=each.name,
                     totals=each.totals['root'],
                     time=time,
@@ -408,24 +398,14 @@ class Summary:
                         value.time = datetime.timedelta(0, value.time)
 
                     with open(html_path, 'w') as out:
-                        out.write(testfile.render(
-                            testname=key,
-                            value=value,
-                            css=path.relpath(result_css, temp_path),
-                            index=path.relpath(index, temp_path)))
+                        out.write(self.TEMPLATES.get_template(
+                            'test_result.mako').render(
+                                testname=key,
+                                value=value,
+                                css=path.relpath(result_css, temp_path),
+                                index=path.relpath(index, temp_path)))
 
         # Finally build the root html files: index, regressions, etc
-        index = Template(filename=path.join(self.TEMPLATE_DIR, "index.mako"),
-                         output_encoding="utf-8",
-                         encoding_errors='replace',
-                         module_directory=self.TEMP_DIR)
-
-        empty_status = Template(filename=path.join(self.TEMPLATE_DIR,
-                                                   "empty_status.mako"),
-                                output_encoding="utf-8",
-                                encoding_errors='replace',
-                                module_directory=self.TEMP_DIR)
-
         pages = frozenset(['changes', 'problems', 'skips', 'fixes',
                            'regressions', 'enabled', 'disabled'])
 
@@ -433,7 +413,7 @@ class Summary:
         # alltests, where the other pages all use the same name. ie,
         # changes.html, self.changes, and page=changes.
         with open(path.join(destination, "index.html"), 'w') as out:
-            out.write(index.render(
+            out.write(self.TEMPLATES.get_template('index.mako').render(
                 results=HTMLIndex(self.results, self.results.names.all),
                 page='all',
                 pages=pages,
@@ -445,7 +425,7 @@ class Summary:
             with open(path.join(destination, page + '.html'), 'w') as out:
                 # If there is information to display display it
                 if sum(getattr(self.results.counts, page)) > 0:
-                    out.write(index.render(
+                    out.write(self.TEMPLATES.get_template('index.mako').render(
                         results=HTMLIndex(
                             self.results,
                             getattr(self.results.names, 'all_' + page)),
@@ -455,7 +435,9 @@ class Summary:
                         exclude=exclude))
                 # otherwise provide an empty page
                 else:
-                    out.write(empty_status.render(page=page, pages=pages))
+                    out.write(
+                        self.TEMPLATES.get_template('empty_status.mako').render(
+                            page=page, pages=pages))
 
 
 def find_diffs(results, tests, comparator, handler=lambda *a: None):
