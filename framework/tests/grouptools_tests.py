@@ -107,3 +107,10 @@ def test_commonprefix_empty():
     value = grouptools.commonprefix((grouptools.join('foo', 'bar'), ''))
 
     nt.eq_(expected, value)
+
+
+def test_join_empty():
+    """grouptools.join: empty values are not joined"""
+    expected = 'spec'
+    test = grouptools.join('', 'spec')
+    nt.eq_(expected, test)

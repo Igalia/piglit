@@ -109,6 +109,15 @@ def join(first, *args):
     conincedently very similar to the way posixpath.join is implemented.
 
     """
+    # If first happens to be a non-existant value, walk through args until we
+    # find a real value and use that.
+    args = (a for a in args)
+    if not first:
+        for group in args:
+            if group:
+                first = group
+                break
+
     for group in args:
         # Only append things if the group is not empty, otherwise we'll get
         # extra SEPARATORs where we don't want them
