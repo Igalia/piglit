@@ -2099,6 +2099,7 @@ with profile.group_manager(
      g(['arb_gpu_shader_fp64-tf-interleaved'])
      g(['arb_gpu_shader_fp64-tf-interleaved-aligned'])
      g(['arb_gpu_shader_fp64-getuniformdv'])
+     g(['arb_gpu_shader_fp64-wrong-type-setter'])
 
 with profile.group_manager(
         PiglitGLTest,
