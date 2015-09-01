@@ -29,13 +29,6 @@ from framework import summary, results, status, grouptools
 from framework.tests import utils
 
 
-@utils.no_error
-def test_initialize_summary():
-    """summary.Summary: class initializes"""
-    with utils.resultfile() as tfile:
-        summary.Summary([tfile.name])
-
-
 def test_find_diffs():
     """summary.find_diffs: calculates correct set of diffs"""
     res1 = results.TestrunResult()

@@ -103,8 +103,7 @@ def html(input_):
         args.resultsFiles.extend(core.parse_listfile(args.list))
 
     # Create the HTML output
-    output = summary.Summary(args.resultsFiles)
-    output.generate_html(args.summaryDir, args.exclude_details)
+    summary.html(args.resultsFiles, args.summaryDir, args.exclude_details)
 
 
 @exceptions.handler
