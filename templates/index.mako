@@ -1,3 +1,58 @@
+<%!
+  import os
+  import posixpath  # this must be posixpath, since we want /'s not \'s
+  import re
+  from framework import grouptools, status
+
+  def group_changes(test, current):
+      group = grouptools.groupname(test)
+      common = grouptools.commonprefix((current, group))
+
+      common = grouptools.split(common)
+      open = grouptools.split(group)[len(common):]
+      close = grouptools.split(current)[len(common):]
+
+      return open, close
+
+  def group_result(result, group):
+      """Get the worst status in a group."""
+      if group not in result.totals:
+          return status.NOTRUN
+
+      return max([status.status_lookup(s) for s, v in
+                  result.totals[group].iteritems() if v > 0])
+
+  def group_fraction(result, group):
+      """Get the fraction value for a group."""
+      if group not in result.totals:
+          return '0/0'
+
+      num = 0
+      den = 0
+      for k, v in result.totals[group].iteritems():
+          if v > 0:
+              s = status.status_lookup(k)
+              num += s.fraction[0] * v
+              den += s.fraction[1] * v
+
+      return '{}/{}'.format(num, den)
+
+
+  def escape_filename(key):
+      """Avoid reserved characters in filenames."""
+      return re.sub(r'[<>:"|?*#]', '_', key)
+
+
+  def escape_pathname(key):
+      """ Remove / and \\ from names """
+      return re.sub(r'[/\\]', '_', key)
+
+
+  def normalize_href(href):
+      """Force backward slashes in URLs."""
+      return href.replace('\\', '/')
+%>
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -31,50 +86,100 @@
 
         ## Status columns
         ## Create an additional column for each summary
-        % for _ in xrange(colnum):
+        % for _ in xrange(len(results.results)):
         <col />
         % endfor
       </colgroup>
-      % for line in results:
-        % if line['type'] == "newRow":
+      <tr>
+        <th/>
+        % for res in results.results:
+          <th class="head"><b>${res.name}</b><br />\
+          (<a href="${normalize_href(os.path.join(escape_pathname(res.name), 'index.html'))}">info</a>)</th>
+        % endfor
+      </tr>
+      <tr>
+        <td class="head"><b>all</b></td>
+        % for res in results.results:
+          <td class="${group_result(res, 'root')}">
+            <b>${group_fraction(res, 'root')}</b>
+          </td>
+        % endfor
+      </tr>
+      <%
+        depth = 1
+        group = ''
+      %>
+      % for test in sorted(getattr(results.names, page if page == 'all' else 'all_' + page)):
+        <%
+          open, close = group_changes(test, group)
+          depth -= len(close)  # lower the indent for the groups we're not using
+          if close:
+            # remove the groups we're not using from current
+            group = grouptools.split(group)[:-len(close)]
+            if group:
+              group = grouptools.join(*group)
+            else:
+              group = ''
+        %>
         <tr>
-        % elif line['type'] == "endRow":
-        </tr>
-        % elif line['type'] == "groupRow":
-          <td>
-            <div class="${line['class']}" style="margin-left: ${line['indent']}em">
-              <b>${line['text']}</b>
-            </div>
-          </td>
-        % elif line['type'] == "testRow":
-          <td>
-            <div class="${line['class']}" style="margin-left: ${line['indent']}em">
-              ${line['text']}
-            </div>
-          </td>
-        % elif line['type'] == "groupResult":
-          <td class="${line['class']}">
-            <b>${line['text']}</b>
-          </td>
-        % elif line['type'] == "testResult":
-          <td class="${line['class']}">
-          ## If the result is in the excluded results page list from
-          ## argparse, just print the text, otherwise add the link
-          % if line['class'] not in exclude and line['href'] is not None:
-            <a href="${line['href']}">
-              ${line['text']}
+        % if open:
+          % for elem in open:
+            <% group = grouptools.join(group, elem) %>
+            ## Add the left most column, the name of the group
+            <td>
+              <div class="head" style="margin-left: ${depth * 1.75}em">
+                <b>${elem}</b>
+              </div>
+            </td>
+            ## add each group's totals
+            % for res in results.results:
+              <td class="${group_result(res, group)}">
+                <b>${group_fraction(res, group)}</b>
+              </td>
+            % endfor
+            <% depth += 1 %>
+            </tr><tr>
+          % endfor
+        % endif
+        
+        <td>
+          <div class="group" style="margin-left: ${depth * 1.75}em">
+            ${grouptools.testname(test)}
+          </div>
+        </td>
+        % for res in results.results:
+          <%
+            # Get the raw result, if it's none check to see if it's a subtest, if that's still None
+            # then declare it not run
+            # This very intentionally uses posix path, we're generating urls, and while
+            # some windows based browsers support \\ as a url separator, *nix systems do not,
+            # which would make a result generated on windows non-portable
+            raw = res.tests.get(test)
+            if raw is not None:
+              result = raw.result
+              href = normalize_href(posixpath.join(escape_pathname(res.name),
+                                                   escape_filename(test)))
+            else:
+              raw = res.tests.get(grouptools.groupname(test))
+              if raw is not None:
+                result = raw.subtests[grouptools.testname(test)]
+                href = normalize_href(posixpath.join(escape_pathname(res.name),
+                                                     escape_filename(grouptools.groupname(test))))
+              else:
+                result = status.NOTRUN
+            del raw  # we dont need this, so don't let it leak
+          %>
+          <td class="${str(result)}">
+          % if str(result) not in exclude and result is not status.NOTRUN:
+            <a href="${href}.html">
+              ${str(result)}
             </a>
           % else:
-            ${line['text']}
+            ${str(result)}
           % endif
           </td>
-        % elif line['type'] == "subtestResult":
-          <td class="${line['class']}">
-            ${line['text']}
-          </td>
-        % elif line['type'] == "other":
-          ${line['text']}
-        % endif
+        % endfor
+        </tr>
       % endfor
     </table>
   </body>
