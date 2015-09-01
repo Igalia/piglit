@@ -22,6 +22,7 @@
 """ Module providing tests for the summary module """
 
 from __future__ import print_function, absolute_import
+import datetime
 
 import nose.tools as nt
 
@@ -340,3 +341,16 @@ def test_Results_get_results_missing_subtest():
 
     nt.eq_(res.get_result(grouptools.join('foo', '1')),
            [status.PASS, status.NOTRUN])
+
+
+def test_time_as_delta():
+    """summary.time_as_delta: converts a time into a delta"""
+    input_ = 1.2
+    expected = datetime.timedelta(0, input_)
+
+    nt.eq_(expected, summary.time_as_delta(input_))
+
+
+def test_time_as_delta_none():
+    """summary.time_as_delta: returns None when input is None"""
+    nt.eq_(None, summary.time_as_delta(None))

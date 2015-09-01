@@ -74,6 +74,13 @@ def normalize_href(href):
     return href.replace('\\', '/')
 
 
+def time_as_delta(time):
+    """Convert time to a time delta, or return None."""
+    if time is not None:
+        return datetime.timedelta(0, time)
+    return None
+
+
 class HTMLIndex(list):
     """
     Builds HTML output to be passed to the index mako template, which will be
@@ -346,16 +353,11 @@ def html(results, destination, exclude):
             else:
                 raise e
 
-        if each.time_elapsed is not None:
-            time = datetime.timedelta(0, each.time_elapsed)
-        else:
-            time = None
-
         with open(path.join(destination, name, "index.html"), 'w') as out:
             out.write(_TEMPLATES.get_template('testrun_info.mako').render(
                 name=each.name,
                 totals=each.totals['root'],
-                time=time,
+                time=time_as_delta(each.time_elapsed),
                 options=each.options,
                 uname=each.uname,
                 glxinfo=each.glxinfo,
@@ -375,7 +377,7 @@ def html(results, destination, exclude):
                     os.makedirs(temp_path)
 
                 if value.time:
-                    value.time = datetime.timedelta(0, value.time)
+                    value.time = time_as_delta(value.time)
 
                 with open(html_path, 'w') as out:
                     out.write(_TEMPLATES.get_template(
