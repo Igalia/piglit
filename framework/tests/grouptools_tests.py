@@ -99,3 +99,11 @@ def test_from_path_nt():
 def test_from_path_dot():
     """grouptools.from_path: should convert '.' into ''."""
     nt.assert_equal(grouptools.from_path('.'), '')
+
+
+def test_commonprefix_empty():
+    """grouptools.commonprefix: handles an empty value"""
+    expected = ''
+    value = grouptools.commonprefix((grouptools.join('foo', 'bar'), ''))
+
+    nt.eq_(expected, value)

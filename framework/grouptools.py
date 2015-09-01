@@ -81,6 +81,8 @@ def commonprefix(args):
     """Given a list of groups, returns the longest common leading component."""
     if len(args) == 1:
         return args
+    elif any(e == '' for e in args):
+        return ''
 
     common = []
 
