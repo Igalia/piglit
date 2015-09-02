@@ -2025,6 +2025,7 @@ with profile.group_manager(
                           framebuffer_srgb_setting))
     g(['framebuffer-srgb'], run_concurrent=False)
     g(['arb_framebuffer_srgb-clear'])
+    g(['arb_framebuffer_srgb-pushpop'])
 
 with profile.group_manager(
         PiglitGLTest,
