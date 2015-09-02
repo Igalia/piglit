@@ -1,0 +1,28 @@
+# test to check a bug in r600 sb backend
+# it miscompiles this due to the 1.0
+# at the end wierdly.
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform int count;
+uniform vec4 init_val;
+
+void main()
+{
+	vec4 out_val = init_val;
+	int i = 0;
+	while (i++ < count) {
+		out_val = out_val.yzwx;
+	}
+	gl_FragColor = vec4(out_val.xyz, 1.0);
+}
+
+[test]
+uniform int count 3
+uniform vec4 init_val 0.25 0.5 0.75 1.0
+
+draw rect -1 -1 2 2
+probe all rgba 1.0 0.25 0.5 1.0
