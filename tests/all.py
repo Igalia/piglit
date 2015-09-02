@@ -3936,6 +3936,7 @@ with profile.group_manager(
         grouptools.join('spec', 'arb_draw_buffers')) as g:
     g(['arb_draw_buffers-state_change'], run_concurrent=False)
     g(['fbo-mrt-alphatest'], run_concurrent=False)
+    g(['fbo-mrt-new-bind'], run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
