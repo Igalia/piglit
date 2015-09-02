@@ -2980,8 +2980,8 @@ with profile.group_manager(
                  'stencil-draw', 'fs-writes-stencil'):
         g(['fbo-depth-array', test])
     for test_mode in ['teximage', 'texsubimage']:
-        test_name = 'compressed {0}'.format(test_mode, run_concurrent=False)
-        g(['ext_texture_array-{}'.format(test_name), '-fbo'], test_name,
+        g(['ext_texture_array-compressed', test_mode, '-fbo'],
+          'compressed {0}'.format(test_mode),
           run_concurrent=False)
 
 with profile.group_manager(
