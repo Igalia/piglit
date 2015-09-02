@@ -120,22 +120,24 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
         test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
-        with test.write_test(grouptools.join('a', 'test', 'group', 'test1')) as t:
-            t(results.TestResult({
-                'time': 1.2345,
-                'result': 'pass',
-                'out': 'this is stdout',
-                'err': 'this is stderr',
-                'command': 'foo',
-            }))
-        with test.write_test('a/different/test/group/test2') as t:
-            t(results.TestResult({
-                'time': 1.2345,
-                'result': 'fail',
-                'out': 'this is stdout',
-                'err': 'this is stderr',
-                'command': 'foo',
-            }))
+        with test.write_test(
+            grouptools.join('a', 'test', 'group', 'test1')) as t:
+                t(results.TestResult({
+                    'time': 1.2345,
+                    'result': 'pass',
+                    'out': 'this is stdout',
+                    'err': 'this is stderr',
+                    'command': 'foo',
+                }))
+        with test.write_test(
+            grouptools.join('a', 'different', 'test', 'group', 'test2')) as t:
+                t(results.TestResult({
+                    'time': 1.2345,
+                    'result': 'fail',
+                    'out': 'this is stdout',
+                    'err': 'this is stderr',
+                    'command': 'foo',
+                }))
         test.finalize()
 
     def test_xml_well_formed(self):
