@@ -2382,6 +2382,7 @@ with profile.group_manager(
       'negative-unsupported')
     g(['arb_texture_buffer_object-subdata-sync'], 'subdata-sync')
     g(['arb_texture_buffer_object-unused-name'], 'unused-name')
+    g(['arb_texture_buffer_object-render-no-bo'], 'render-no-bo')
 
 with profile.group_manager(
         PiglitGLTest,
