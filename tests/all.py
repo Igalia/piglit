@@ -3707,6 +3707,7 @@ with profile.group_manager(
     g(['arb_copy_image-simple', '--rb-to-tex'])
     g(['arb_copy_image-simple', '--rb-to-rb'])
     g(['arb_copy_image-srgb-copy'])
+    g(['arb_copy_image-api_errors'])
     g(['arb_copy_image-targets', 'GL_TEXTURE_1D', '32', '1', '1',
        'GL_TEXTURE_1D', '32', '1', '1', '11', '0', '0', '5', '0', '0', '14',
        '1', '1'])
