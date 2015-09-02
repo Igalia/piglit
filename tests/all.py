@@ -4132,6 +4132,7 @@ with profile.group_manager(PiglitGLTest, 'hiz') as g:
 with profile.group_manager(PiglitGLTest, 'fast_color_clear') as g:
     g(['fcc-blit-between-clears'])
     g(['fcc-read-to-pbo-after-clear'], run_concurrent=False)
+    g(['fcc-front-buffer-distraction'], run_concurrent=False)
 
     for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
         for buffer_type in ('rb', 'tex'):
