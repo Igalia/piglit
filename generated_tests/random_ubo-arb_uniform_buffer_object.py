@@ -25,7 +25,7 @@ import errno
 import random_ubo
 
 def do_test(requirements, packing):
-    path = os.path.join("spec", "arb_uniform_buffer_object", "execution")
+    path = os.path.join("spec", "arb_shader_buffer_object", "execution")
 
     try:
         os.makedirs(path)
@@ -64,11 +64,12 @@ def do_test(requirements, packing):
         blocks,
         packing,
         130,
-        ["GL_ARB_uniform_buffer_object"]))
+        ["GL_ARB_shader_storage_buffer_object"]))
 
     file.close()
 
 all_packing = [random_ubo.std140_packing_rules(),
+               random_ubo.std430_packing_rules(),
                random_ubo.shared_packing_rules()]
 
 all_requirements = []

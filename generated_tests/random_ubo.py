@@ -1193,13 +1193,13 @@ def emit_shader_test(blocks, packing, glsl_version, extensions):
 
     % for (block_name, instance_name, global_layout, block_layout, fields, field_layouts) in uniform_blocks:
     % if global_layout:
-    layout(${global_layout}) uniform;
+    layout(${global_layout}) buffer;
 
     % endif
     % if block_layout:
     layout(${block_layout})
     % endif
-    uniform ${block_name} {
+    buffer ${block_name} {
                               // base   base  align  padded  row-   array   matrix
                               // align  off.  off.   size    major  stride  stride
     % for m in iterate_all_block_members(fields, field_layouts, block_name, instance_name, packing, block_row_major_default(global_layout, block_layout)):
@@ -1615,7 +1615,7 @@ class std430_packing_rules(std140_packing_rules):
             # arrays of scalars and vectors in rule 4 and of structures in rule
             # 9 are not rounded up a multiple of the base alignment of a vec4
             return max(self.base_alignment(base_type, row_major),
-                       self.size(base_type, row_major)))
+                       self.size(base_type, row_major))
         else:
             # (9) If the member is a structure, the base alignment of the
             #     structure is <N>, where <N> is the largest base alignment
