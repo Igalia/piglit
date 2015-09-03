@@ -19,6 +19,13 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+"""Module with tools for generating summaries from a set of results.
+
+Currently supported in this module are a console based text summary and a html
+based summary.
+
+"""
+
 from __future__ import print_function, absolute_import
 import os
 import os.path as path
