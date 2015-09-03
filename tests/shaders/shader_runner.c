@@ -2046,6 +2046,170 @@ active_uniform(const char *line)
 	return;
 }
 
+/**
+ * Query an active resource using ARB_program_interface_query functions
+ *
+ * Format of the command:
+ *
+ *  verify program_interface_query GL_INTERFACE_TYPE_ENUM name GL_PNAME_ENUM integer
+ *
+ * or
+ *
+ *  verify program_interface_query GL_INTERFACE_TYPE_ENUM name GL_PNAME_ENUM GL_TYPE_ENUM
+ */
+void
+active_program_interface(const char *line)
+{
+	static const struct string_to_enum all_props[] = {
+		ENUM_STRING(GL_TYPE),
+		ENUM_STRING(GL_ARRAY_SIZE),
+		ENUM_STRING(GL_NAME_LENGTH),
+		ENUM_STRING(GL_BLOCK_INDEX),
+		ENUM_STRING(GL_OFFSET),
+		ENUM_STRING(GL_ARRAY_STRIDE),
+		ENUM_STRING(GL_MATRIX_STRIDE),
+		ENUM_STRING(GL_IS_ROW_MAJOR),
+		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER_INDEX),
+		ENUM_STRING(GL_BUFFER_BINDING),
+		ENUM_STRING(GL_BUFFER_DATA_SIZE),
+		ENUM_STRING(GL_NUM_ACTIVE_VARIABLES),
+		ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_GEOMETRY_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_FRAGMENT_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_COMPUTE_SHADER),
+		ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
+		ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
+		ENUM_STRING(GL_LOCATION),
+		ENUM_STRING(GL_LOCATION_INDEX),
+		ENUM_STRING(GL_IS_PER_PATCH),
+		ENUM_STRING(GL_NUM_COMPATIBLE_SUBROUTINES),
+		ENUM_STRING(GL_COMPATIBLE_SUBROUTINES),
+		{ NULL, 0 }
+	};
+
+	static const struct string_to_enum all_program_interface[] = {
+		ENUM_STRING(GL_UNIFORM),
+		ENUM_STRING(GL_UNIFORM_BLOCK),
+		ENUM_STRING(GL_PROGRAM_INPUT),
+		ENUM_STRING(GL_PROGRAM_OUTPUT),
+		ENUM_STRING(GL_BUFFER_VARIABLE),
+		ENUM_STRING(GL_SHADER_STORAGE_BUFFER),
+		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING),
+		{ NULL, 0 }
+	};
+
+	char name[512];
+	char name_buf[512];
+	char prop_string[512];
+	char interface_type_string[512];
+	GLenum prop, interface_type;
+	GLint expected;
+	int i;
+	int num_active_buffers;
+
+	if (!piglit_is_extension_supported("GL_ARB_program_interface_query") &&
+	    piglit_get_gl_version() < 43) {
+		fprintf(stderr,
+			"GL_ARB_program_interface_query not supported or "
+			"OpenGL version < 4.3\n");
+		return;
+	}
+
+	strcpy_to_space(interface_type_string, eat_whitespace(line));
+	interface_type = lookup_enum_string(all_program_interface, &line,
+					    "glGetProgramResourceiv "
+					    "programInterface");
+	line = strcpy_to_space(name, eat_whitespace(line));
+
+	strcpy_to_space(prop_string, eat_whitespace(line));
+	prop = lookup_enum_string(all_props, &line,
+				  "glGetProgramResourceiv pname");
+
+	line = eat_whitespace(line);
+	if (isdigit(line[0])) {
+		expected = strtol(line, NULL, 0);
+	} else {
+		expected = lookup_enum_string(all_types, &line, "type enum");
+	}
+
+	glGetProgramInterfaceiv(prog, interface_type,
+				GL_ACTIVE_RESOURCES, &num_active_buffers);
+	for (i = 0; i < num_active_buffers; i++) {
+		GLint got;
+		GLint length;
+		GLsizei name_len;
+		bool pass = true;
+
+		glGetProgramResourceName(prog, interface_type,
+					 i, 512, &name_len, name_buf);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetProgramResourceName error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (strcmp(name, name_buf) != 0)
+			continue;
+
+		if (prop == GL_NAME_LENGTH && name_len != expected) {
+			fprintf(stderr,
+				"glGetProgramResourceName(%s, %s): "
+				"expected %d (0x%04x), got %d (0x%04x)\n",
+				name, prop_string,
+				expected, expected, got, got);
+			pass = false;
+		}
+
+		/* Set 'got' to some value in case glGetActiveUniformsiv
+		 * doesn't write to it.  That should only be able to occur
+		 * when the function raises a GL error, but "should" is kind
+		 * of a funny word.
+		 */
+		got = ~expected;
+		glGetProgramResourceiv(prog, interface_type,
+				       i, 1, &prop, 1,
+				       &length, &got);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetProgramResourceiv error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (got != expected) {
+			fprintf(stderr,
+				"glGetProgramResourceiv(%s, %s): "
+				"expected %d, got %d\n",
+				name, prop_string,
+				expected, got);
+			pass = false;
+		}
+
+		if (!pass)
+			piglit_report_result(PIGLIT_FAIL);
+
+		return;
+	}
+
+	fprintf(stderr, "No active resource named \"%s\"\n", name);
+	piglit_report_result(PIGLIT_FAIL);
+	return;
+}
+
 void
 set_parameter(const char *line)
 {
@@ -2889,6 +3053,8 @@ piglit_display(void)
 			get_ints(line + strlen("ubo array index "), &ubo_array_index, 1);
 		} else if (string_match("active uniform ", line)) {
 			active_uniform(line + strlen("active uniform "));
+		} else if (string_match("verify program_interface_query ", line)) {
+			active_program_interface(line + strlen("verify program_interface_query "));
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
