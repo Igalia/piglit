@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Intel Corporation
+# Copyright (c) 2013, 2015 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -85,21 +85,8 @@ def status_lookup(status):
     if isinstance(status, Status):
         return status
 
-    status_dict = {
-        'skip': SKIP,
-        'pass': PASS,
-        'warn': WARN,
-        'fail': FAIL,
-        'crash': CRASH,
-        'dmesg-warn': DMESG_WARN,
-        'dmesg-fail': DMESG_FAIL,
-        'notrun': NOTRUN,
-        'timeout': TIMEOUT,
-        'incomplete': INCOMPLETE,
-    }
-
     try:
-        return status_dict[status]
+        return _STATUS_MAP[status]
     except KeyError:
         # Raise a StatusException rather than a key error
         raise StatusException(status)
@@ -251,6 +238,19 @@ TIMEOUT = Status('timeout', 50)
 CRASH = Status('crash', 60)
 
 INCOMPLETE = Status('incomplete', 100)
+
+_STATUS_MAP = {
+    'skip': SKIP,
+    'pass': PASS,
+    'warn': WARN,
+    'fail': FAIL,
+    'crash': CRASH,
+    'dmesg-warn': DMESG_WARN,
+    'dmesg-fail': DMESG_FAIL,
+    'notrun': NOTRUN,
+    'timeout': TIMEOUT,
+    'incomplete': INCOMPLETE,
+}
 
 # A tuple (ordered, immutable) of all statuses in this module
 ALL = (PASS, WARN, DMESG_WARN, FAIL, DMESG_FAIL, TIMEOUT, CRASH, INCOMPLETE,
