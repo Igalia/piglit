@@ -1516,6 +1516,125 @@ class std140_packing_rules(packing_rules):
             return align(self.size(base_type, row_major),
                          self.base_alignment(base_type, row_major))
 
+class std430_packing_rules(std140_packing_rules):
+    def layout_string(self):
+        return "std430"
+
+    def fixed_offsets(self):
+        return True
+
+    def base_alignment(self, type, row_major):
+        # Shader storage blocks (see section 7.8) also support the std140
+        # layout qualifier, as well as a std430 qualifier not supported
+        # for uniform blocks. When using the std430 storage layout,
+        # shader storage blocks will be laid out in buffer storage
+        # identically to uniform and shader storage blocks using the
+        # std140 layout, except that the base alignment and stride of
+        # arrays of scalars and vectors in rule 4 and of structures in rule
+        # 9 are not rounded up a multiple of the base alignment of a vec4
+        if isarray(type):
+            return self.base_alignment(array_base_type(type), row_major)
+
+        # (1) If the member is a scalar consuming <N> basic machine units, the
+        #     base alignment is <N>.
+
+        if isscalar(type):
+            return basic_machine_units(type)
+
+        if isvector(type):
+            # (2) If the member is a two- or four-component vector with
+            #     components consuming <N> basic machine units, the base
+            #     alignment is 2<N> or 4<N>, respectively.
+            #
+            # (3) If the member is a three-component vector with components
+            #     consuming <N> basic machine units, the base alignment is
+            #     4<N>.
+
+            components = vector_size(type)
+            if components == 2 or components == 4:
+                return components * basic_machine_units(vector_base_type(type))
+            elif components == 3:
+                return 4 * basic_machine_units(vector_base_type(type))
+
+            raise Exception("Invalid vector size {} for type {}".format(
+                components,
+                type))
+        elif ismatrix(type):
+            return self.matrix_stride(type, row_major)
+
+        if type not in struct_types:
+            raise Exception("Unknown type {}".format(type))
+
+        a = 0
+        fields = struct_types[type]
+        for (field_type, field_name) in fields:
+            a = max(a, self.base_alignment(field_type, row_major))
+
+        return a
+
+    def matrix_stride(self, type, row_major):
+        c, r = matrix_dimensions(type)
+        if not row_major:
+            # (4) If the member is an array of scalars or vectors, the base
+            #     alignment and array stride are set to match the base
+            #     alignment of a single array element, according to rules (1),
+            #     (2), and (3), and rounded up to the base alignment of a
+            #     vec4. The array may have padding at the end; the base offset
+            #     of the member following the array is rounded up to the next
+            #     multiple of the base alignment.
+            #
+            # (5) If the member is a column-major matrix with <C> columns and
+            #     <R> rows, the matrix is stored identically to an array of
+            #     <C> column vectors with <R> components each, according to
+            #     rule (4).
+
+            if type[0] == 'd':
+                return self.base_alignment("dvec{}".format(r), False)
+            else:
+                return self.base_alignment("vec{}".format(r), False)
+        else:
+            # (7) If the member is a row-major matrix with <C> columns and <R>
+            #     rows, the matrix is stored identically to an array of <R>
+            #     row vectors with <C> components each, according to rule (4).
+
+            if type[0] == 'd':
+                return max(16, self.base_alignment("dvec{}".format(c), False))
+            else:
+                return max(16, self.base_alignment("vec{}".format(c), False))
+
+    def array_stride(self, type, row_major):
+        base_type = array_base_type(type)
+
+        if not isstructure(base_type):
+            # Shader storage blocks (see section 7.8) also support the std140
+            # layout qualifier, as well as a std430 qualifier not supported
+            # for uniform blocks. When using the std430 storage layout,
+            # shader storage blocks will be laid out in buffer storage
+            # identically to uniform and shader storage blocks using the
+            # std140 layout, except that the base alignment and stride of
+            # arrays of scalars and vectors in rule 4 and of structures in rule
+            # 9 are not rounded up a multiple of the base alignment of a vec4
+            return max(self.base_alignment(base_type, row_major),
+                       self.size(base_type, row_major)))
+        else:
+            # (9) If the member is a structure, the base alignment of the
+            #     structure is <N>, where <N> is the largest base alignment
+            #     value of any of its members, and rounded up to the base
+            #     alignment of a vec4. The individual members of this
+            #     sub-structure are then assigned offsets by applying this set
+            #     of rules recursively, where the base offset of the first
+            #     member of the sub-structure is equal to the aligned offset
+            #     of the structure. The structure may have padding at the end;
+            #     the base offset of the member following the sub-structure is
+            #     rounded up to the next multiple of the base alignment of the
+            #     structure.
+            #
+            # (10) If the member is an array of <S> structures, the <S> elements
+            #     of the array are laid out in order, according to rule (9).
+
+            return align(self.size(base_type, row_major),
+                         self.base_alignment(base_type, row_major))
+
 
 class shared_packing_rules(std140_packing_rules):
     def layout_string(self):
@@ -1747,6 +1866,9 @@ if __name__ == "__main__":
     if glsl_version >= 430 and "GL_ARB_arrays_of_arrays" in extensions:
         extensions.remove("GL_ARB_arrays_of_arrays")
 
+    if glsl_version >= 430 and "GL_ARB_shader_storage_buffer_object" in extensions:
+        extensions.remove("GL_ARB_shader_storage_buffer_object")
+
     # Pick a random subset of the remaining extensions.
     num_ext = len(extensions)
     if num_ext > 0:
@@ -1765,8 +1887,7 @@ if __name__ == "__main__":
         types.extend(DOUBLE_TYPES)
 
     # Based on the GLSL version, pick a set of packing rules
-    # FINISHME: Add support for std430_packing_rules() soon.
-    packing = random.choice([std140_packing_rules(), shared_packing_rules()])
+    packing = random.choice([std140_packing_rules(), std430_packing_rules(), shared_packing_rules()])
 
     # Based on the GLSL version and the set of available extensions, pick
     # some required combinations of data structures to include in the UBO.
@@ -1804,6 +1925,10 @@ if __name__ == "__main__":
 
     if glsl_version < 140:
         extensions.append("GL_ARB_uniform_buffer_object")
+
+    if glsl_version < 430:
+        extensions.append("GL_ARB_shader_storage_buffer_object")
+
 
     # Generate the test!
     fields, required_layouts = generate_ubo(requirements, types)
