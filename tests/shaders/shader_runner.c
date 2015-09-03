@@ -1855,6 +1855,190 @@ active_uniform(const char *line)
 	return;
 }
 
+/**
+ * Query a uniform using glGetActiveUniformsiv
+ *
+ * Format of the command:
+ *
+ *     active uniform uniform_name GL_PNAME_ENUM integer
+ *
+ * or
+ *
+ *     active uniform uniform_name GL_PNAME_ENUM GL_TYPE_ENUM
+ */
+void
+program_interface(const char *line)
+{
+	static const struct string_to_enum all_props[] = {
+		ENUM_STRING(GL_TYPE),
+		ENUM_STRING(GL_ARRAY_SIZE),
+		ENUM_STRING(GL_NAME_LENGTH),
+		ENUM_STRING(GL_BLOCK_INDEX),
+		ENUM_STRING(GL_OFFSET),
+		ENUM_STRING(GL_ARRAY_STRIDE),
+		ENUM_STRING(GL_MATRIX_STRIDE),
+		ENUM_STRING(GL_IS_ROW_MAJOR),
+		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER_INDEX),
+		ENUM_STRING(GL_BUFFER_BINDING),
+		ENUM_STRING(GL_BUFFER_DATA_SIZE),
+		ENUM_STRING(GL_NUM_ACTIVE_VARIABLES),
+		ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_GEOMETRY_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_FRAGMENT_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_COMPUTE_SHADER),
+		ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
+		ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
+		ENUM_STRING(GL_LOCATION),
+		ENUM_STRING(GL_LOCATION_INDEX),
+		ENUM_STRING(GL_IS_PER_PATCH),
+		ENUM_STRING(GL_NUM_COMPATIBLE_SUBROUTINES),
+		ENUM_STRING(GL_COMPATIBLE_SUBROUTINES),
+		{ NULL, 0 }
+	};
+
+	static const struct string_to_enum all_types[] = {
+		ENUM_STRING(GL_UNIFORM),
+		ENUM_STRING(GL_UNIFORM_BLOCK),
+		ENUM_STRING(GL_PROGRAM_INPUT),
+		ENUM_STRING(GL_PROGRAM_OUTPUT),
+		ENUM_STRING(GL_BUFFER_VARIABLE),
+		ENUM_STRING(GL_SHADER_STORAGE_BUFFER),
+		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING),
+		{ NULL, 0 }
+	};
+
+	static const struct string_to_enum all_pname[] = {
+		ENUM_STRING(GL_ACTIVE_RESOURCES),
+		ENUM_STRING(GL_MAX_NAME_LENGTH),
+		ENUM_STRING(GL_MAX_NUM_ACTIVE_VARIABLES),
+		ENUM_STRING(GL_MAX_NUM_COMPATIBLE_SUBROUTINES),
+		{ NULL, 0 }
+	};
+
+	char name[512];
+	char name_buf[512];
+	char pname_string[512];
+	GLenum pname;
+	GLint expected;
+	int i;
+	int num_active_uniforms;
+
+	line = strcpy_to_space(name, eat_whitespace(line));
+
+	strcpy_to_space(pname_string, eat_whitespace(line));
+	pname = lookup_enum_string(all_pnames, &line, "glGetUniformsiv pname");
+
+	line = eat_whitespace(line);
+	if (isdigit(line[0])) {
+		expected = strtol(line, NULL, 0);
+	} else {
+		expected = lookup_enum_string(all_types, &line, "type enum");
+	}
+
+	glGetProgramiv(prog, GL_ACTIVE_RESOURCES, &num_active_uniforms);
+	for (i = 0; i < num_active_uniforms; i++) {
+		GLint got;
+		GLint size;
+		GLenum type;
+		GLsizei name_len;
+		bool pass = true;
+
+		glGetActiveUniform(prog, i, sizeof(name_buf), &name_len,
+				   &size, &type, name_buf);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetActiveUniform error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (strcmp(name, name_buf) != 0)
+			continue;
+
+		/* If the requested pname is one of the values that
+		 * glGetActiveUniform happens to return, check the value
+		 * returned by that function too.
+		 */
+		switch (pname) {
+		case GL_TYPE:
+			got = (GLint) type;
+			break;
+
+		case GL_ARRAY_SIZE:
+			got = size;
+			break;
+
+		case GL_NAME_LENGTH:
+			got = name_len;
+			break;
+
+		default:
+			/* This ensures the check below will pass when the
+			 * requested enum is not one of the values already
+			 * returned by glGetActiveUniform.
+			 */
+			got = expected;
+			break;
+		}
+
+		if (got != expected) {
+			fprintf(stderr,
+				"glGetActiveUniform(%s, %s): "
+				"expected %d (0x%04x), got %d (0x%04x)\n",
+				name, pname_string,
+				expected, expected, got, got);
+			pass = false;
+		}
+
+		/* Set 'got' to some value in case glGetActiveUniformsiv
+		 * doesn't write to it.  That should only be able to occur
+		 * when the function raises a GL error, but "should" is kind
+		 * of a funny word.
+		 */
+		got = ~expected;
+		glGetActiveUniformsiv(prog, 1, (GLuint *) &i, pname, &got);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetActiveUniformsiv error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (got != expected) {
+			fprintf(stderr,
+				"glGetActiveUniformsiv(%s, %s): "
+				"expected %d, got %d\n",
+				name, pname_string,
+				expected, got);
+			pass = false;
+		}
+
+		if (!pass)
+			piglit_report_result(PIGLIT_FAIL);
+
+		return;
+	}
+
+
+	fprintf(stderr, "No active uniform named \"%s\"\n", name);
+	piglit_report_result(PIGLIT_FAIL);
+	return;
+}
+
+
 void
 set_parameter(const char *line)
 {
