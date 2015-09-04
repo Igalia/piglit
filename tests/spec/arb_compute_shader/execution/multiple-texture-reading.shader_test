@@ -67,7 +67,7 @@ probe all rgba 0.0 0.0 0.0 0.0
 # Use src0 image only
 uniform int select_textures 1
 compute 1 1 1
-#probe all rgba 1.0 0.0 1.0 0.0
+probe all rgba 1.0 0.0 1.0 0.0
 
 # Use src1 image only
 uniform int select_textures 2
