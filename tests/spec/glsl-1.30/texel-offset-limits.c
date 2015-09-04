@@ -25,7 +25,7 @@
 /**
  * @file texel-offset-limits.c
  *
- * Tests that GLSL 1.30 exposes the GL_MIN/MAX_PROGRAM_OFFSET_LIMITS.
+ * Tests that GLSL 1.30 exposes the GL_MIN/MAX_PROGRAM_TEXEL_OFFSET limits.
  */
 
 #include "piglit-util-gl.h"
