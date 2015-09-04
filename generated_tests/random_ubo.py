@@ -1255,14 +1255,14 @@ def emit_shader_test(blocks, packing, glsl_version, extensions):
     link success
     % for (name, type, size, offset, astride, mstride, row_major) in test_vectors:
 
-    active uniform ${name} GL_UNIFORM_TYPE ${type}
-    active uniform ${name} GL_UNIFORM_SIZE ${size}
+    active buffer_variable ${name} GL_TYPE ${type}
+    active buffer_variable ${name} GL_SIZE ${size}
         % if packing.fixed_offsets():
-    active uniform ${name} GL_UNIFORM_OFFSET ${offset}
-    active uniform ${name} GL_UNIFORM_ARRAY_STRIDE ${astride}
-    active uniform ${name} GL_UNIFORM_MATRIX_STRIDE ${mstride}
+    active buffer_variable ${name} GL_OFFSET ${offset}
+    active buffer_variable ${name} GL_ARRAY_STRIDE ${astride}
+    active buffer_variable ${name} GL_MATRIX_STRIDE ${mstride}
         % endif
-    active uniform ${name} GL_UNIFORM_IS_ROW_MAJOR ${row_major}
+    active buffer_variable ${name} GL_IS_ROW_MAJOR ${row_major}
     % endfor
 
     % for (type, name, data) in setters:
