@@ -1758,7 +1758,7 @@ active_uniform(const char *line)
 	line = strcpy_to_space(name, eat_whitespace(line));
 
 	strcpy_to_space(pname_string, eat_whitespace(line));
-	pname = lookup_enum_string(all_pnames, &line, "glGetUniformsiv pname");
+	pname = lookup_enum_string(all_pnames, &line, "glGetUniform pname");
 
 	line = eat_whitespace(line);
 	if (isdigit(line[0])) {
@@ -1860,15 +1860,94 @@ active_uniform(const char *line)
  *
  * Format of the command:
  *
- *     active uniform uniform_name GL_PNAME_ENUM integer
+ *     active buffer_variable buffer_var_name GL_PNAME_ENUM integer
  *
  * or
  *
- *     active uniform uniform_name GL_PNAME_ENUM GL_TYPE_ENUM
+ *     active buffer_variable buffer_var_name GL_PNAME_ENUM GL_TYPE_ENUM
  */
 void
-program_interface(const char *line)
+active_buffer_variable(const char *line)
 {
+  /* FIXME: I need to refactor this to reuse it for active_uniform() too */
+	static const struct string_to_enum all_types[] = {
+		ENUM_STRING(GL_FLOAT),
+		ENUM_STRING(GL_FLOAT_VEC2),
+		ENUM_STRING(GL_FLOAT_VEC3),
+		ENUM_STRING(GL_FLOAT_VEC4),
+		ENUM_STRING(GL_DOUBLE),
+		ENUM_STRING(GL_DOUBLE_VEC2),
+		ENUM_STRING(GL_DOUBLE_VEC3),
+		ENUM_STRING(GL_DOUBLE_VEC4),
+		ENUM_STRING(GL_INT),
+		ENUM_STRING(GL_INT_VEC2),
+		ENUM_STRING(GL_INT_VEC3),
+		ENUM_STRING(GL_INT_VEC4),
+		ENUM_STRING(GL_UNSIGNED_INT),
+		ENUM_STRING(GL_UNSIGNED_INT_VEC2),
+		ENUM_STRING(GL_UNSIGNED_INT_VEC3),
+		ENUM_STRING(GL_UNSIGNED_INT_VEC4),
+		ENUM_STRING(GL_BOOL),
+		ENUM_STRING(GL_BOOL_VEC2),
+		ENUM_STRING(GL_BOOL_VEC3),
+		ENUM_STRING(GL_BOOL_VEC4),
+		ENUM_STRING(GL_FLOAT_MAT2),
+		ENUM_STRING(GL_FLOAT_MAT3),
+		ENUM_STRING(GL_FLOAT_MAT4),
+		ENUM_STRING(GL_FLOAT_MAT2x3),
+		ENUM_STRING(GL_FLOAT_MAT2x4),
+		ENUM_STRING(GL_FLOAT_MAT3x2),
+		ENUM_STRING(GL_FLOAT_MAT3x4),
+		ENUM_STRING(GL_FLOAT_MAT4x2),
+		ENUM_STRING(GL_FLOAT_MAT4x3),
+		ENUM_STRING(GL_DOUBLE_MAT2),
+		ENUM_STRING(GL_DOUBLE_MAT3),
+		ENUM_STRING(GL_DOUBLE_MAT4),
+		ENUM_STRING(GL_DOUBLE_MAT2x3),
+		ENUM_STRING(GL_DOUBLE_MAT2x4),
+		ENUM_STRING(GL_DOUBLE_MAT3x2),
+		ENUM_STRING(GL_DOUBLE_MAT3x4),
+		ENUM_STRING(GL_DOUBLE_MAT4x2),
+		ENUM_STRING(GL_DOUBLE_MAT4x3),
+		ENUM_STRING(GL_SAMPLER_1D),
+		ENUM_STRING(GL_SAMPLER_2D),
+		ENUM_STRING(GL_SAMPLER_3D),
+		ENUM_STRING(GL_SAMPLER_CUBE),
+		ENUM_STRING(GL_SAMPLER_1D_SHADOW),
+		ENUM_STRING(GL_SAMPLER_2D_SHADOW),
+		ENUM_STRING(GL_SAMPLER_1D_ARRAY),
+		ENUM_STRING(GL_SAMPLER_2D_ARRAY),
+		ENUM_STRING(GL_SAMPLER_1D_ARRAY_SHADOW),
+		ENUM_STRING(GL_SAMPLER_2D_ARRAY_SHADOW),
+		ENUM_STRING(GL_SAMPLER_2D_MULTISAMPLE),
+		ENUM_STRING(GL_SAMPLER_2D_MULTISAMPLE_ARRAY),
+		ENUM_STRING(GL_SAMPLER_CUBE_SHADOW),
+		ENUM_STRING(GL_SAMPLER_BUFFER),
+		ENUM_STRING(GL_SAMPLER_2D_RECT),
+		ENUM_STRING(GL_SAMPLER_2D_RECT_SHADOW),
+		ENUM_STRING(GL_INT_SAMPLER_1D),
+		ENUM_STRING(GL_INT_SAMPLER_2D),
+		ENUM_STRING(GL_INT_SAMPLER_3D),
+		ENUM_STRING(GL_INT_SAMPLER_CUBE),
+		ENUM_STRING(GL_INT_SAMPLER_1D_ARRAY),
+		ENUM_STRING(GL_INT_SAMPLER_2D_ARRAY),
+		ENUM_STRING(GL_INT_SAMPLER_2D_MULTISAMPLE),
+		ENUM_STRING(GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY),
+		ENUM_STRING(GL_INT_SAMPLER_BUFFER),
+		ENUM_STRING(GL_INT_SAMPLER_2D_RECT),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_1D),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_3D),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_CUBE),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_1D_ARRAY),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_ARRAY),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_BUFFER),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_RECT),
+		{ NULL, 0 }
+	};
+
 	static const struct string_to_enum all_props[] = {
 		ENUM_STRING(GL_TYPE),
 		ENUM_STRING(GL_ARRAY_SIZE),
@@ -1898,50 +1977,51 @@ program_interface(const char *line)
 		{ NULL, 0 }
 	};
 
-	static const struct string_to_enum all_types[] = {
-		ENUM_STRING(GL_UNIFORM),
-		ENUM_STRING(GL_UNIFORM_BLOCK),
-		ENUM_STRING(GL_PROGRAM_INPUT),
-		ENUM_STRING(GL_PROGRAM_OUTPUT),
-		ENUM_STRING(GL_BUFFER_VARIABLE),
-		ENUM_STRING(GL_SHADER_STORAGE_BUFFER),
-		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER),
-		ENUM_STRING(GL_VERTEX_SUBROUTINE),
-		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE),
-		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE),
-		ENUM_STRING(GL_GEOMETRY_SUBROUTINE),
-		ENUM_STRING(GL_FRAGMENT_SUBROUTINE),
-		ENUM_STRING(GL_COMPUTE_SUBROUTINE),
-		ENUM_STRING(GL_VERTEX_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_GEOMETRY_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_FRAGMENT_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_COMPUTE_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING),
-		{ NULL, 0 }
-	};
+	/* FIXME: This is not in use, I directly set GL_BUFFER_VARIABLE */
+	/* static const struct string_to_enum all_program_interface[] = { */
+	/* 	ENUM_STRING(GL_UNIFORM), */
+	/* 	ENUM_STRING(GL_UNIFORM_BLOCK), */
+	/* 	ENUM_STRING(GL_PROGRAM_INPUT), */
+	/* 	ENUM_STRING(GL_PROGRAM_OUTPUT), */
+	/* 	ENUM_STRING(GL_BUFFER_VARIABLE), */
+	/* 	ENUM_STRING(GL_SHADER_STORAGE_BUFFER), */
+	/* 	ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER), */
+	/* 	ENUM_STRING(GL_VERTEX_SUBROUTINE), */
+	/* 	ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE), */
+	/* 	ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE), */
+	/* 	ENUM_STRING(GL_GEOMETRY_SUBROUTINE), */
+	/* 	ENUM_STRING(GL_FRAGMENT_SUBROUTINE), */
+	/* 	ENUM_STRING(GL_COMPUTE_SUBROUTINE), */
+	/* 	ENUM_STRING(GL_VERTEX_SUBROUTINE_UNIFORM), */
+	/* 	ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM), */
+	/* 	ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM), */
+	/* 	ENUM_STRING(GL_GEOMETRY_SUBROUTINE_UNIFORM), */
+	/* 	ENUM_STRING(GL_FRAGMENT_SUBROUTINE_UNIFORM), */
+	/* 	ENUM_STRING(GL_COMPUTE_SUBROUTINE_UNIFORM), */
+	/* 	ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING), */
+	/* 	{ NULL, 0 } */
+	/* }; */
 
-	static const struct string_to_enum all_pname[] = {
-		ENUM_STRING(GL_ACTIVE_RESOURCES),
-		ENUM_STRING(GL_MAX_NAME_LENGTH),
-		ENUM_STRING(GL_MAX_NUM_ACTIVE_VARIABLES),
-		ENUM_STRING(GL_MAX_NUM_COMPATIBLE_SUBROUTINES),
-		{ NULL, 0 }
-	};
+	/* static const struct string_to_enum all_pname[] = { */
+	/* 	ENUM_STRING(GL_ACTIVE_RESOURCES), */
+	/* 	ENUM_STRING(GL_MAX_NAME_LENGTH), */
+	/* 	ENUM_STRING(GL_MAX_NUM_ACTIVE_VARIABLES), */
+	/* 	ENUM_STRING(GL_MAX_NUM_COMPATIBLE_SUBROUTINES), */
+	/* 	{ NULL, 0 } */
+	/* }; */
 
 	char name[512];
 	char name_buf[512];
-	char pname_string[512];
-	GLenum pname;
+	char prop_string[512];
+	GLenum prop;
 	GLint expected;
 	int i;
-	int num_active_uniforms;
+	int num_active_buffers;
 
 	line = strcpy_to_space(name, eat_whitespace(line));
 
-	strcpy_to_space(pname_string, eat_whitespace(line));
-	pname = lookup_enum_string(all_pnames, &line, "glGetUniformsiv pname");
+	strcpy_to_space(prop_string, eat_whitespace(line));
+	prop = lookup_enum_string(all_props, &line, "glGetProgramResourceiv pname");
 
 	line = eat_whitespace(line);
 	if (isdigit(line[0])) {
@@ -1950,16 +2030,16 @@ program_interface(const char *line)
 		expected = lookup_enum_string(all_types, &line, "type enum");
 	}
 
-	glGetProgramiv(prog, GL_ACTIVE_RESOURCES, &num_active_uniforms);
-	for (i = 0; i < num_active_uniforms; i++) {
+	glGetProgramInterfaceiv(prog, GL_BUFFER_VARIABLE,
+                                GL_ACTIVE_RESOURCES, &num_active_buffers);
+	for (i = 0; i < num_active_buffers; i++) {
 		GLint got;
-		GLint size;
-		GLenum type;
+		GLint length;
 		GLsizei name_len;
 		bool pass = true;
 
-		glGetActiveUniform(prog, i, sizeof(name_buf), &name_len,
-				   &size, &type, name_buf);
+		glGetProgramResourceName(prog, GL_BUFFER_VARIABLE,
+					 i, 512, &name_len, name_buf);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
 			fprintf(stderr, "glGetActiveUniform error\n");
@@ -1969,39 +2049,13 @@ program_interface(const char *line)
 		if (strcmp(name, name_buf) != 0)
 			continue;
 
-		/* If the requested pname is one of the values that
-		 * glGetActiveUniform happens to return, check the value
-		 * returned by that function too.
-		 */
-		switch (pname) {
-		case GL_TYPE:
-			got = (GLint) type;
-			break;
-
-		case GL_ARRAY_SIZE:
-			got = size;
-			break;
-
-		case GL_NAME_LENGTH:
-			got = name_len;
-			break;
-
-		default:
-			/* This ensures the check below will pass when the
-			 * requested enum is not one of the values already
-			 * returned by glGetActiveUniform.
-			 */
-			got = expected;
-			break;
-		}
-
-		if (got != expected) {
-			fprintf(stderr,
-				"glGetActiveUniform(%s, %s): "
-				"expected %d (0x%04x), got %d (0x%04x)\n",
-				name, pname_string,
-				expected, expected, got, got);
-			pass = false;
+		if (prop == GL_NAME_LENGTH && name_len != expected) {
+		  fprintf(stderr,
+			  "glGetProgramResourceName(%s, %s): "
+			  "expected %d (0x%04x), got %d (0x%04x)\n",
+			  name, prop_string,
+			  expected, expected, got, got);
+		  pass = false;
 		}
 
 		/* Set 'got' to some value in case glGetActiveUniformsiv
@@ -2010,18 +2064,21 @@ program_interface(const char *line)
 		 * of a funny word.
 		 */
 		got = ~expected;
-		glGetActiveUniformsiv(prog, 1, (GLuint *) &i, pname, &got);
+
+		glGetProgramResourceiv(prog, GL_BUFFER_VARIABLE,
+				       i, 1, &prop, 1,
+				       &length, &got);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			fprintf(stderr, "glGetActiveUniformsiv error\n");
+			fprintf(stderr, "glGetProgramResourceiv() error\n");
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
 		if (got != expected) {
 			fprintf(stderr,
-				"glGetActiveUniformsiv(%s, %s): "
+				"glGetProgramResourceiv(%s, %s): "
 				"expected %d, got %d\n",
-				name, pname_string,
+				name, prop_string,
 				expected, got);
 			pass = false;
 		}
@@ -2033,7 +2090,7 @@ program_interface(const char *line)
 	}
 
 
-	fprintf(stderr, "No active uniform named \"%s\"\n", name);
+	fprintf(stderr, "No active buffer variable named \"%s\"\n", name);
 	piglit_report_result(PIGLIT_FAIL);
 	return;
 }
@@ -2801,6 +2858,8 @@ piglit_display(void)
 			get_ints(line + strlen("ubo array index "), &ubo_array_index, 1);
 		} else if (string_match("active uniform ", line)) {
 			active_uniform(line + strlen("active uniform "));
+		} else if (string_match("active buffer_variable ", line)) {
+			active_buffer_variable(line + strlen("active buffer_variable "));
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
