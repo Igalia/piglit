@@ -2042,7 +2042,7 @@ active_buffer_variable(const char *line)
 					 i, 512, &name_len, name_buf);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			fprintf(stderr, "glGetActiveUniform error\n");
+			fprintf(stderr, "glGetProgramResourceName error\n");
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
@@ -2935,7 +2935,7 @@ piglit_init(int argc, char **argv)
 						   vertex_data_end);
 		vbo_present = true;
 	}
-	setup_ubos();
+	//setup_ubos();
 
 	render_width = piglit_width;
 	render_height = piglit_height;
