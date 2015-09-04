@@ -654,8 +654,8 @@ check_extensions(const struct subtest_t st)
 	if ((st.programInterface == GL_COMPUTE_SUBROUTINE ||
 	     st.programInterface == GL_COMPUTE_SUBROUTINE_UNIFORM ||
 	     st.cs_text) &&
-	     !piglit_is_extension_supported("GL_ARB_compute_shader") &&
-	     !piglit_is_extension_supported("GL_ARB_shader_image_load_store")) {
+	     (!piglit_is_extension_supported("GL_ARB_compute_shader") ||
+	     !piglit_is_extension_supported("GL_ARB_shader_image_load_store"))) {
 		 return false;
 	 }
 
