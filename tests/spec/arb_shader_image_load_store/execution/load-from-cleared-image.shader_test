@@ -1,0 +1,77 @@
+# Tests loading from an image just after clearing the image texture
+#
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_image_load_store
+
+[vertex shader]
+#version 130
+in vec4 piglit_vertex;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 330
+#extension GL_ARB_shader_image_load_store: enable
+
+uniform vec4 color;
+layout(rgba8) readonly uniform image2D src;
+out vec4 outcolor;
+
+void main()
+{
+	ivec2 coord = ivec2(gl_FragCoord);
+	if (imageLoad(src, coord) == color)
+		outcolor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		outcolor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+# Setup src image
+texture rgbw 0 (16, 16) GL_RGBA8
+uniform int src 0
+image texture 0 GL_RGBA8
+
+# Texture 1 is the rendering output
+texture rgbw 1 (16, 16) GL_RGBA8
+
+
+# Clear the src image that we will be loading from
+uniform vec4 color 0.0 0.0 0.0 0.0
+clear color 0.0 0.0 0.0 0.0
+fb tex 2d 0
+clear
+
+# Test using image loads of the cleared texture
+fb tex 2d 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+
+# Clear the src image that we will be loading from
+uniform vec4 color 1.0 0.0 1.0 0.0
+clear color 1.0 0.0 1.0 0.0
+fb tex 2d 0
+clear
+
+# Test using image loads of the cleared texture
+fb tex 2d 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+
+# Clear the src image that we will be loading from
+uniform vec4 color 0.0 1.0 0.0 1.0
+clear color 0.0 1.0 0.0 1.0
+fb tex 2d 0
+clear
+
+# Test using image loads of the cleared texture
+fb tex 2d 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
