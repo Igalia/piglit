@@ -1256,7 +1256,7 @@ def emit_shader_test(blocks, packing, glsl_version, extensions):
     % for (name, type, size, offset, astride, mstride, row_major) in test_vectors:
 
     active buffer_variable ${name} GL_TYPE ${type}
-    active buffer_variable ${name} GL_SIZE ${size}
+    active buffer_variable ${name} GL_ARRAY_SIZE ${size}
         % if packing.fixed_offsets():
     active buffer_variable ${name} GL_OFFSET ${offset}
     active buffer_variable ${name} GL_ARRAY_STRIDE ${astride}
@@ -1265,12 +1265,13 @@ def emit_shader_test(blocks, packing, glsl_version, extensions):
     active buffer_variable ${name} GL_IS_ROW_MAJOR ${row_major}
     % endfor
 
-    % for (type, name, data) in setters:
-    uniform ${type} ${name} ${data}
-    % endfor
+    """))
+    # % for (type, name, data) in setters:
+    # uniform ${type} ${name} ${data}
+    # % endfor
 
-    draw rect -1 -1 2 2
-    probe all rgba 0.0 1.0 0.0 1.0"""))
+    # draw rect -1 -1 2 2
+    # probe all rgba 0.0 1.0 0.0 1.0"""))
 
     return t.render(glsl_version=glsl_version,
                     extensions=extensions,
