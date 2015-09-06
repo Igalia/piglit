@@ -864,6 +864,7 @@ with profile.group_manager(
     g(['draw-copypixels-sync'], run_concurrent=False)
     g(['draw-pixel-with-texture'])
     g(['drawpix-z'])
+    g(['draw-sync'])
     g(['fog-modes'], run_concurrent=False)
     g(['fragment-center'], run_concurrent=False)
     g(['geterror-invalid-enum'], run_concurrent=False)
