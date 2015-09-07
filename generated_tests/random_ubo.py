@@ -1331,6 +1331,14 @@ class packing_rules(object):
         If the type is not an array type, zero is returned.
         """
 
+    def padded_size(self, type, row_major):
+        if type in ["vec3", "bvec3", "ivec3", "uvec3"]:
+            return 4 * 4
+
+        if type == "dvec3":
+            return 4 * 8
+        return self.size(type, row_major);
+
     def size(self, type, row_major):
         """Determine the size, in bytes, of the specified type.
 
@@ -1599,9 +1607,9 @@ class std430_packing_rules(std140_packing_rules):
             #     row vectors with <C> components each, according to rule (4).
 
             if type[0] == 'd':
-                return max(16, self.base_alignment("dvec{}".format(c), False))
+                return self.base_alignment("dvec{}".format(c), False)
             else:
-                return max(16, self.base_alignment("vec{}".format(c), False))
+                return self.base_alignment("vec{}".format(c), False)
 
     def array_stride(self, type, row_major):
         base_type = array_base_type(type)
@@ -1888,7 +1896,7 @@ if __name__ == "__main__":
         types.extend(DOUBLE_TYPES)
 
     # Based on the GLSL version, pick a set of packing rules
-    packing = random.choice([std140_packing_rules(), std430_packing_rules(), shared_packing_rules()])
+    packing = random.choice([std430_packing_rules()])
 
     # Based on the GLSL version and the set of available extensions, pick
     # some required combinations of data structures to include in the UBO.

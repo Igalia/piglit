@@ -68,9 +68,7 @@ def do_test(requirements, packing):
 
     file.close()
 
-all_packing = [random_ubo.std140_packing_rules(),
-               random_ubo.std430_packing_rules(),
-               random_ubo.shared_packing_rules()]
+all_packing = [random_ubo.std430_packing_rules()]
 
 all_requirements = []
 
