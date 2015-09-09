@@ -4381,6 +4381,7 @@ with profile.group_manager(
     g(['arb_direct_state_access-create-programpipelines'],
       'create-programpipelines')
     g(['arb_direct_state_access-create-queries'], 'create-queries')
+    g(['arb_direct_state_access-generatetexturemipmap'], 'generatetexturemipmap')
 
 with profile.group_manager(
         PiglitGLTest,
