@@ -45,7 +45,11 @@ def html(input_):
     statuses = set(str(s) for s in status.ALL)
     statuses.add('all')
 
-    parser = argparse.ArgumentParser()
+    """Combine files in a tests/ directory into a single results file."""
+    unparsed = parsers.parse_config(input_)[1]
+
+    # Adding the parent is necissary to get the help options
+    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument("-o", "--overwrite",
                         action="store_true",
                         help="Overwrite existing directories")
@@ -70,7 +74,7 @@ def html(input_):
                         metavar="<Results Files>",
                         nargs="*",
                         help="Results files to include in HTML")
-    args = parser.parse_args(input_)
+    args = parser.parse_args(unparsed)
 
     # If args.list and args.resultsFiles are empty, then raise an error
     if not args.list and not args.resultsFiles:
@@ -105,7 +109,11 @@ def html(input_):
 
 @exceptions.handler
 def console(input_):
-    parser = argparse.ArgumentParser()
+    """Combine files in a tests/ directory into a single results file."""
+    unparsed = parsers.parse_config(input_)[1]
+
+    # Adding the parent is necissary to get the help options
+    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
 
     # Set the -d and -s options as exclusive, since it's silly to call for diff
     # and then call for only summary
@@ -135,7 +143,7 @@ def console(input_):
                         nargs="+",
                         help="Space seperated paths to at least one results "
                              "file")
-    args = parser.parse_args(input_)
+    args = parser.parse_args(unparsed)
 
     # Throw an error if -d/--diff is called, but only one results file is
     # provided
@@ -154,7 +162,10 @@ def console(input_):
 
 @exceptions.handler
 def csv(input_):
-    parser = argparse.ArgumentParser()
+    unparsed = parsers.parse_config(input_)[1]
+
+    # Adding the parent is necissary to get the help options
+    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument("-o", "--output",
                         metavar="<Output File>",
                         action="store",
@@ -164,7 +175,7 @@ def csv(input_):
     parser.add_argument("testResults",
                         metavar="<Input Files>",
                         help="JSON results file to be converted")
-    args = parser.parse_args(input_)
+    args = parser.parse_args(unparsed)
 
     testrun = backends.load(args.testResults)
 
