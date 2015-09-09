@@ -87,29 +87,27 @@ def _print_summary(results):
             for x in results.results])))
 
 
+def _print_result(results, list_):
+    """Takes a list of test names to print and prints the name and result."""
+    for test in sorted(list_):
+        print("{test}: {statuses}".format(
+            test='/'.join(test.split(grouptools.SEPARATOR)),
+            statuses=' '.join(str(r) for r in results.get_result(test))))
+
+
 def console(results, mode):
     """ Write summary information to the console """
     assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
     results = Results([backends.load(r) for r in results])
 
-    def printer(list_):
-        """Takes a list of test names to print and prints the name and
-        result.
-
-        """
-        for test in sorted(list_):
-            print("{test}: {statuses}".format(
-                test='/'.join(test.split(grouptools.SEPARATOR)),
-                statuses=' '.join(str(r) for r in results.get_result(test))))
-
     # Print the name of the test and the status from each test run
     if mode == 'all':
-        printer(results.names.all)
+        _print_result(results, results.names.all)
         _print_summary(results)
     elif mode == 'diff':
-        printer(results.names.all_changes)
+        _print_result(results, results.names.all_changes)
         _print_summary(results)
     elif mode == 'incomplete':
-        printer(results.names.all_incomplete)
+        _print_result(results, results.names.all_incomplete)
     elif mode == 'summary':
         _print_summary(results)

@@ -25,7 +25,7 @@ generator.
 
 """
 
-# pylint: disable=protected-access
+# pylint: disable=protected-access,invalid-name
 
 from __future__ import absolute_import, division, print_function
 import sys
@@ -38,7 +38,18 @@ from framework import results, grouptools
 from framework.summary import console_, common
 
 
-class TestConsoleOutput(object):
+def get_stdout(callable_):
+    """Capture stdout from a import callable"""
+    capture = StringIO()
+    temp = sys.stdout
+    sys.stdout = capture
+    callable_()
+    sys.stdout = temp
+
+    return capture.getvalue()
+
+
+class Test_print_summary(object):
     """Tests for the console output."""
     _ENUMS = {
         'names': 1,
@@ -105,14 +116,8 @@ class TestConsoleOutput(object):
 
         reses = common.Results([res1, res2])
 
-        # Redirect sys.stdout to a StringIO, which we can get the values out.
-        capture = StringIO()
-        temp = sys.stdout
-        sys.stdout = capture
-        console_._print_summary(reses)
-        sys.stdout = temp
-
-        cls.actual = capture.getvalue().split('\n')
+        cls.actual = get_stdout(
+            lambda: console_._print_summary(reses)).split('\n')
 
     @utils.nose_generator
     def test_values(self):
@@ -129,3 +134,32 @@ class TestConsoleOutput(object):
         for key, value in self._ENUMS.iteritems():
             test.description = description.format(key)
             yield test, value
+
+
+def test_print_result():
+    """summary.console_._print_result: prints expected values"""
+    res1 = results.TestrunResult()
+    res1.tests['foo'] = results.TestResult('pass')
+
+    res2 = results.TestrunResult()
+    res2.tests['foo'] = results.TestResult('fail')
+
+    reses = common.Results([res1, res2])
+
+    expected = 'foo: pass fail\n'
+    actual = get_stdout(lambda: console_._print_result(reses, reses.names.all))
+
+    nt.eq_(expected, actual)
+
+
+def test_print_result_replaces():
+    """summary.console_._print_result: Replaces separtaor with /"""
+    res1 = results.TestrunResult()
+    res1.tests[grouptools.join('foo', 'bar')] = results.TestResult('pass')
+
+    reses = common.Results([res1])
+
+    expected = 'foo/bar: pass\n'
+    actual = get_stdout(lambda: console_._print_result(reses, reses.names.all))
+
+    nt.eq_(expected, actual)
