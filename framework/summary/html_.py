@@ -1,0 +1,160 @@
+# Copyright 2013-2015 Intel Corporation
+# Copyright 2013, 2014 Advanced Micro Devices
+# Copyright 2014 VMWare
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+"""Genrate html summaries."""
+
+from __future__ import absolute_import, division, print_function
+import os
+import shutil
+import tempfile
+import getpass
+import sys
+import errno
+
+from mako.lookup import TemplateLookup
+
+# a local variable status exists, prevent accidental overloading by renaming
+# the module
+from framework import backends, exceptions
+
+from .common import Results, escape_filename, escape_pathname, time_as_delta
+
+__all__ = [
+    'html',
+]
+
+_TEMP_DIR = os.path.join(
+    tempfile.gettempdir(),
+    "piglit-{}".format(getpass.getuser()),
+    'version-{}'.format(sys.version.split()[0]))
+_TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), '../..', 'templates')
+_TEMPLATES = TemplateLookup(
+    _TEMPLATE_DIR,
+    output_encoding="utf-8",
+    encoding_errors='replace',
+    module_directory=os.path.join(_TEMP_DIR, "html-summary"))
+
+
+def html(results, destination, exclude):
+    """
+    Produce HTML summaries.
+
+    Basically all this does is takes the information provided by the
+    constructor, and passes it to mako templates to generate HTML files.
+    The beauty of this approach is that mako is leveraged to do the
+    heavy lifting, this method just passes it a bunch of dicts and lists
+    of dicts, which mako turns into pretty HTML.
+    """
+    results = Results([backends.load(i) for i in results])
+
+    # Copy static files
+    shutil.copy(os.path.join(_TEMPLATE_DIR, "index.css"),
+                os.path.join(destination, "index.css"))
+    shutil.copy(os.path.join(_TEMPLATE_DIR, "result.css"),
+                os.path.join(destination, "result.css"))
+
+    result_css = os.path.join(destination, "result.css")
+    index = os.path.join(destination, "index.html")
+
+    # Iterate across the tests creating the various test specific files
+    for each in results.results:
+        name = escape_pathname(each.name)
+        try:
+            os.mkdir(os.path.join(destination, name))
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                raise exceptions.PiglitFatalError(
+                    'Two or more of your results have the same "name" '
+                    'attribute. Try changing one or more of the "name" '
+                    'values in your json files.\n'
+                    'Duplicate value: {}'.format(name))
+            else:
+                raise e
+
+        with open(os.path.join(destination, name, "index.html"), 'w') as out:
+            out.write(_TEMPLATES.get_template('testrun_info.mako').render(
+                name=each.name,
+                totals=each.totals['root'],
+                time=time_as_delta(each.time_elapsed),
+                options=each.options,
+                uname=each.uname,
+                glxinfo=each.glxinfo,
+                lspci=each.lspci))
+
+        # Then build the individual test results
+        for key, value in each.tests.iteritems():
+            html_path = os.path.join(destination, name,
+                                     escape_filename(key + ".html"))
+            temp_path = os.path.dirname(html_path)
+
+            if value.result not in exclude:
+                # os.makedirs is very annoying, it throws an OSError if
+                # the path requested already exists, so do this check to
+                # ensure that it doesn't
+                if not os.path.exists(temp_path):
+                    os.makedirs(temp_path)
+
+                if value.time:
+                    value.time = time_as_delta(value.time)
+
+                with open(html_path, 'w') as out:
+                    out.write(_TEMPLATES.get_template(
+                        'test_result.mako').render(
+                            testname=key,
+                            value=value,
+                            css=os.path.relpath(result_css, temp_path),
+                            index=os.path.relpath(index, temp_path)))
+
+    # Finally build the root html files: index, regressions, etc
+    pages = frozenset(['changes', 'problems', 'skips', 'fixes',
+                       'regressions', 'enabled', 'disabled'])
+
+    # Index.html is a bit of a special case since there is index, all, and
+    # alltests, where the other pages all use the same name. ie,
+    # changes.html, changes, and page=changes.
+    try:
+        with open(os.path.join(destination, "index.html"), 'w') as out:
+            out.write(_TEMPLATES.get_template('index.mako').render(
+                results=results,
+                page='all',
+                pages=pages,
+                exclude=exclude))
+
+        # Generate the rest of the pages
+        for page in pages:
+            with open(os.path.join(destination, page + '.html'), 'w') as out:
+                # If there is information to display display it
+                if sum(getattr(results.counts, page)) > 0:
+                    out.write(_TEMPLATES.get_template('index.mako').render(
+                        results=results,
+                        pages=pages,
+                        page=page,
+                        exclude=exclude))
+                # otherwise provide an empty page
+                else:
+                    out.write(
+                        _TEMPLATES.get_template('empty_status.mako').render(
+                            page=page, pages=pages))
+    except:
+        from mako.exceptions import text_error_template
+        print(text_error_template().render())
+        exit(1)

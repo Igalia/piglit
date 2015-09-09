@@ -26,7 +26,8 @@ import datetime
 
 import nose.tools as nt
 
-from framework import summary, results, status, grouptools
+from framework import results, status, grouptools
+from framework.summary import common as summary
 from framework.tests import utils
 
 
