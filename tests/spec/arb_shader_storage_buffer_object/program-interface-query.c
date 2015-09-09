@@ -110,7 +110,7 @@ piglit_init(int argc, char **argv)
 	const int expected_std140[NUM_QUERIES] =
 		{ 0, 112, GL_FLOAT_MAT2, 3, 0, 16, 32, 16, 1, 1, 0 };
 	const int expected_std430[NUM_QUERIES] =
-		{ 2, 64, GL_FLOAT_MAT2, 3, 2, 16, 16, 8, 0, 0, 1 };
+		{ 2, 56, GL_FLOAT_MAT2, 3, 2, 16, 16, 8, 0, 0, 1 };
 	int i;
 
 	piglit_require_extension("GL_ARB_shader_storage_buffer_object");
