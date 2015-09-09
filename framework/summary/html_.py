@@ -54,28 +54,19 @@ _TEMPLATES = TemplateLookup(
     module_directory=os.path.join(_TEMP_DIR, "html-summary"))
 
 
-def html(results, destination, exclude):
-    """
-    Produce HTML summaries.
-
-    Basically all this does is takes the information provided by the
-    constructor, and passes it to mako templates to generate HTML files.
-    The beauty of this approach is that mako is leveraged to do the
-    heavy lifting, this method just passes it a bunch of dicts and lists
-    of dicts, which mako turns into pretty HTML.
-    """
-    results = Results([backends.load(i) for i in results])
-
-    # Copy static files
+def _copy_static_files(destination):
+    """Copy static files into the results directory."""
     shutil.copy(os.path.join(_TEMPLATE_DIR, "index.css"),
                 os.path.join(destination, "index.css"))
     shutil.copy(os.path.join(_TEMPLATE_DIR, "result.css"),
                 os.path.join(destination, "result.css"))
 
+
+def _make_testrun_info(results, destination, exclude):
+    """Create the pages for each results file."""
     result_css = os.path.join(destination, "result.css")
     index = os.path.join(destination, "index.html")
 
-    # Iterate across the tests creating the various test specific files
     for each in results.results:
         name = escape_pathname(each.name)
         try:
@@ -124,37 +115,51 @@ def html(results, destination, exclude):
                             css=os.path.relpath(result_css, temp_path),
                             index=os.path.relpath(index, temp_path)))
 
-    # Finally build the root html files: index, regressions, etc
+
+def _make_comparison_pages(results, destination, exclude):
+    """Create the pages of comparisons."""
     pages = frozenset(['changes', 'problems', 'skips', 'fixes',
                        'regressions', 'enabled', 'disabled'])
 
     # Index.html is a bit of a special case since there is index, all, and
     # alltests, where the other pages all use the same name. ie,
     # changes.html, changes, and page=changes.
-    try:
-        with open(os.path.join(destination, "index.html"), 'w') as out:
-            out.write(_TEMPLATES.get_template('index.mako').render(
-                results=results,
-                page='all',
-                pages=pages,
-                exclude=exclude))
+    with open(os.path.join(destination, "index.html"), 'w') as out:
+        out.write(_TEMPLATES.get_template('index.mako').render(
+            results=results,
+            page='all',
+            pages=pages,
+            exclude=exclude))
 
-        # Generate the rest of the pages
-        for page in pages:
-            with open(os.path.join(destination, page + '.html'), 'w') as out:
-                # If there is information to display display it
-                if sum(getattr(results.counts, page)) > 0:
-                    out.write(_TEMPLATES.get_template('index.mako').render(
-                        results=results,
-                        pages=pages,
-                        page=page,
-                        exclude=exclude))
-                # otherwise provide an empty page
-                else:
-                    out.write(
-                        _TEMPLATES.get_template('empty_status.mako').render(
-                            page=page, pages=pages))
-    except:
-        from mako.exceptions import text_error_template
-        print(text_error_template().render())
-        exit(1)
+    # Generate the rest of the pages
+    for page in pages:
+        with open(os.path.join(destination, page + '.html'), 'w') as out:
+            # If there is information to display display it
+            if sum(getattr(results.counts, page)) > 0:
+                out.write(_TEMPLATES.get_template('index.mako').render(
+                    results=results,
+                    pages=pages,
+                    page=page,
+                    exclude=exclude))
+            # otherwise provide an empty page
+            else:
+                out.write(
+                    _TEMPLATES.get_template('empty_status.mako').render(
+                        page=page, pages=pages))
+
+
+def html(results, destination, exclude):
+    """
+    Produce HTML summaries.
+
+    Basically all this does is takes the information provided by the
+    constructor, and passes it to mako templates to generate HTML files.
+    The beauty of this approach is that mako is leveraged to do the
+    heavy lifting, this method just passes it a bunch of dicts and lists
+    of dicts, which mako turns into pretty HTML.
+    """
+    results = Results([backends.load(i) for i in results])
+
+    _copy_static_files(destination)
+    _make_testrun_info(results, destination, exclude)
+    _make_comparison_pages(results, destination, exclude)
