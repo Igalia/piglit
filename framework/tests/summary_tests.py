@@ -354,3 +354,19 @@ def test_time_as_delta():
 def test_time_as_delta_none():
     """summary.time_as_delta: returns None when input is None"""
     nt.eq_(None, summary.time_as_delta(None))
+
+
+def test_escape_filename():
+    """summary.escape_filename: replaces invalid characters with '_'"""
+    invalid = r'<>:"|?*#'
+    expected = '_' * len(invalid)
+
+    nt.eq_(expected, summary.escape_filename(invalid))
+
+
+def test_escape_pathname():
+    """summary.escape_pathname: replaces '/' and '\\' with '_'"""
+    invalid = 'foo/bar\\boink'
+    expected = 'foo_bar_boink'
+
+    nt.eq_(expected, summary.escape_pathname(invalid))
