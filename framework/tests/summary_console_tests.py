@@ -1,0 +1,131 @@
+# Copyright (c) 2015 Intel Corporation
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+"""Tests for framework.summary.console_
+
+Some of these tests are fickle, since we're testing the output of a summary
+generator.
+
+"""
+
+# pylint: disable=protected-access
+
+from __future__ import absolute_import, division, print_function
+import sys
+from cStringIO import StringIO
+
+import nose.tools as nt
+
+from . import utils
+from framework import results, grouptools
+from framework.summary import console_, common
+
+
+class TestConsoleOutput(object):
+    """Tests for the console output."""
+    _ENUMS = {
+        'names': 1,
+        'dividier': 2,
+        'pass': 3,
+        'fail': 4,
+        'crash': 5,
+        'skip': 6,
+        'timeout': 7,
+        'warn': 8,
+        'incomplete': 9,
+        'dmesg-warn': 10,
+        'dmesg-fail': 11,
+        'changes': 12,
+        'fixes': 13,
+        'regressions': 14,
+        'total': 15,
+    }
+
+    @classmethod
+    def setup_class(cls):
+        """Create both an expected value and an actual value.
+
+        The expected value makes use of the template, this helps to minimize
+        the number of changes that need to be made if the output is altered.
+
+        """
+        names = [grouptools.join('foo', 'bar', 'oink', 'foobar', 'boink'),
+                 'foo', 'bar']
+        template = '{: >20.20} {: >6.6}'
+
+        cls.expected = console_._SUMMARY_TEMPLATE.format(
+            names=' '.join(['this is a really rea', 'a name']),
+            divider=' '.join(['--------------------', '------']),
+            pass_=template.format('1', '2'),
+            fail=template.format('2', '0'),
+            crash=template.format('0', '0'),
+            skip=template.format('0', '1'),
+            timeout=template.format('0', '0'),
+            warn=template.format('0', '0'),
+            incomplete=template.format('0', '0'),
+            dmesg_warn=template.format('0', '0'),
+            dmesg_fail=template.format('0', '0'),
+            changes=template.format('0', '1'),
+            fixes=template.format('0', '1'),
+            regressions=template.format('0', '0'),
+            total=template.format('3', '3')).split('\n')
+
+        res1 = results.TestrunResult()
+        res1.name = 'this is a really really really really long name'
+        res1.tests[names[0]] = results.TestResult('pass')
+        res1.tests[names[1]] = results.TestResult('fail')
+        res1.tests[names[2]] = results.TestResult('notrun')
+        res1.tests[names[2]].subtests['1'] = 'fail'
+        res1.calculate_group_totals()
+
+        res2 = results.TestrunResult()
+        res2.name = 'a name'
+        res2.tests[names[0]] = results.TestResult('pass')
+        res2.tests[names[1]] = results.TestResult('pass')
+        res2.tests[names[2]] = results.TestResult('notrun')
+        res2.tests[names[2]].subtests['1'] = 'skip'
+        res2.calculate_group_totals()
+
+        reses = common.Results([res1, res2])
+
+        # Redirect sys.stdout to a StringIO, which we can get the values out.
+        capture = StringIO()
+        temp = sys.stdout
+        sys.stdout = capture
+        console_._print_summary(reses)
+        sys.stdout = temp
+
+        cls.actual = capture.getvalue().split('\n')
+
+    @utils.nose_generator
+    def test_values(self):
+        """Generate a bunch of tests."""
+        def test(value):
+            nt.eq_(self.actual[value], self.expected[value],
+                   msg='Values do not match\n'
+                       'expected "{}"\n'
+                       'actual   "{}"'.format(
+                           self.expected[value], self.actual[value]))
+
+        description = "summary.console_._print_summary: calculates {} correctly"
+
+        for key, value in self._ENUMS.iteritems():
+            test.description = description.format(key)
+            yield test, value

@@ -34,6 +34,58 @@ __all__ = [
     'console',
 ]
 
+_SUMMARY_TEMPLATE = textwrap.dedent("""\
+    summary:
+           name: {names}
+           ----  {divider}
+           pass: {pass_}
+           fail: {fail}
+          crash: {crash}
+           skip: {skip}
+        timeout: {timeout}
+           warn: {warn}
+     incomplete: {incomplete}
+     dmesg-warn: {dmesg_warn}
+     dmesg-fail: {dmesg_fail}
+        changes: {changes}
+          fixes: {fixes}
+    regressions: {regressions}
+          total: {total}""")
+
+
+def _print_summary(results):
+    """print a summary."""
+
+    lens = [max(min(len(x.name), 20), 6) for x in results.results]
+    print_template = ' '.join(
+        (lambda x: '{: >' + '{0}.{0}'.format(x) + '}')(y) for y in lens)
+
+    def status_printer(stat):
+        totals = [str(x.totals['root'][stat]) for x in results.results]
+        return print_template.format(*totals)
+
+    print(_SUMMARY_TEMPLATE.format(
+        names=print_template.format(*[r.name for r in results.results]),
+        divider=print_template.format(*['-'*l for l in lens]),
+        pass_=status_printer('pass'),
+        crash=status_printer('crash'),
+        fail=status_printer('fail'),
+        skip=status_printer('skip'),
+        timeout=status_printer('timeout'),
+        warn=status_printer('warn'),
+        incomplete=status_printer('incomplete'),
+        dmesg_warn=status_printer('dmesg-warn'),
+        dmesg_fail=status_printer('dmesg-fail'),
+        changes=print_template.format(
+            *[str(s) for s in results.counts.changes]),
+        fixes=print_template.format(
+            *[str(s) for s in results.counts.fixes]),
+        regressions=print_template.format(
+            *[str(s) for s in results.counts.regressions]),
+        total=print_template.format(*[
+            str(sum(x.totals['root'].itervalues()))
+            for x in results.results])))
+
 
 def console(results, mode):
     """ Write summary information to the console """
@@ -50,64 +102,14 @@ def console(results, mode):
                 test='/'.join(test.split(grouptools.SEPARATOR)),
                 statuses=' '.join(str(r) for r in results.get_result(test))))
 
-    def print_summary():
-        """print a summary."""
-        template = textwrap.dedent("""\
-            summary:
-                   name: {names}
-                   ----  {divider}
-                   pass: {pass_}
-                   fail: {fail}
-                  crash: {crash}
-                   skip: {skip}
-                timeout: {timeout}
-                   warn: {warn}
-             incomplete: {incomplete}
-             dmesg-warn: {dmesg_warn}
-             dmesg-fail: {dmesg_fail}
-                changes: {changes}
-                  fixes: {fixes}
-            regressions: {regressions}
-                  total: {total}""")
-
-        lens = [max(min(len(x.name), 20), 6) for x in results.results]
-        print_template = ' '.join(
-            (lambda x: '{: >' + '{0}.{0}'.format(x) + '}')(y) for y in lens)
-
-        def status_printer(stat):
-            totals = [str(x.totals['root'][stat]) for x in results.results]
-            return print_template.format(*totals)
-
-        print(template.format(
-            names=print_template.format(*[r.name for r in results.results]),
-            divider=print_template.format(*['-'*l for l in lens]),
-            pass_=status_printer('pass'),
-            crash=status_printer('crash'),
-            fail=status_printer('fail'),
-            skip=status_printer('skip'),
-            timeout=status_printer('timeout'),
-            warn=status_printer('warn'),
-            incomplete=status_printer('incomplete'),
-            dmesg_warn=status_printer('dmesg-warn'),
-            dmesg_fail=status_printer('dmesg-fail'),
-            changes=print_template.format(
-                *[str(s) for s in results.counts.changes]),
-            fixes=print_template.format(
-                *[str(s) for s in results.counts.fixes]),
-            regressions=print_template.format(
-                *[str(s) for s in results.counts.regressions]),
-            total=print_template.format(*[
-                str(sum(x.totals['root'].itervalues()))
-                for x in results.results])))
-
     # Print the name of the test and the status from each test run
     if mode == 'all':
         printer(results.names.all)
-        print_summary()
+        _print_summary(results)
     elif mode == 'diff':
         printer(results.names.all_changes)
-        print_summary()
+        _print_summary(results)
     elif mode == 'incomplete':
         printer(results.names.all_incomplete)
     elif mode == 'summary':
-        print_summary()
+        _print_summary(results)
