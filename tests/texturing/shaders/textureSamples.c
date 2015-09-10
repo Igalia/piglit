@@ -65,47 +65,21 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static int vertex_location;
-
 enum piglit_result
 piglit_display()
 {
 	bool pass = true;
-	static const float verts[] = {
-		-1, -1,
-		-1,  1,
-		 1,  1,
-		 1, -1,
-	};
-	GLuint vbo;
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	/* For GL core, we need to have a vertex array object bound.
-	 * Otherwise, we don't particularly have to.  Always use a
-	 * vertex buffer object, though.
-	 */
-	if (piglit_get_gl_version() >= 31) {
-		GLuint vao;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-	}
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
-
-	glVertexAttribPointer(vertex_location, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(vertex_location);
-
 	float expected_color[4] = {0, 1, 0};
 	glViewport(0, 0, piglit_width, piglit_height);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	piglit_draw_rect(-1, -1, 2, 2);
 
 	pass &= piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height,
 				      expected_color);
 
-	glDisableVertexAttribArray(vertex_location);
 	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
@@ -155,33 +129,23 @@ generate_GLSL(enum shader_target test_stage)
 			 "#extension GL_ARB_texture_multisample: enable\n"
 			 "#extension GL_ARB_shader_texture_image_samples: enable\n"
 			 "uniform %s tex;\n"
-			 "in vec4 vertex;\n"
+			 "in vec4 piglit_vertex;\n"
 			 "flat out int samples;\n"
 			 "void main()\n"
 			 "{\n"
 			 "    samples = textureSamples(tex);\n"
-			 "    gl_Position = vertex;\n"
+			 "    gl_Position = piglit_vertex;\n"
 			 "}\n",
 			 shader_version, sampler.name);
-		asprintf(&fs_code,
-			 "#version %d\n"
-			 "flat in int samples;\n"
-			 "out vec4 color;\n"
-			 "void main()\n"
-			 "{\n"
-			 "  if (samples == %d) color = vec4(0,1,0,1);\n"
-			 "  else color = vec4(1,0,0,1);\n"
-			 "}\n",
-			 shader_version, sample_count);
 		break;
 	case GS:
 		asprintf(&vs_code,
 			 "#version %d\n"
-			 "in vec4 vertex;\n"
+			 "in vec4 piglit_vertex;\n"
 			 "out vec4 pos_to_gs;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    pos_to_gs = vertex;\n"
+			 "    pos_to_gs = piglit_vertex;\n"
 			 "}\n",
 			 shader_version);
 		asprintf(&gs_code,
@@ -202,24 +166,14 @@ generate_GLSL(enum shader_target test_stage)
 			 "    }\n"
 			 "}\n",
 			 shader_version, sampler.name);
-		asprintf(&fs_code,
-			 "#version %d\n"
-			 "flat in int samples;\n"
-			 "out vec4 color;\n"
-			 "void main()\n"
-			 "{\n"
-			 "  if (samples == %d) color = vec4(0,1,0,1);\n"
-			 "  else color = vec4(1,0,0,1);\n"
-			 "}\n",
-			 shader_version, sample_count);
 		break;
 	case FS:
 		asprintf(&vs_code,
 			 "#version %d\n"
-			 "in vec4 vertex;\n"
+			 "in vec4 piglit_vertex;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    gl_Position = vertex;\n"
+			 "    gl_Position = piglit_vertex;\n"
 			 "}\n",
 			 shader_version);
 		asprintf(&fs_code,
@@ -237,6 +191,24 @@ generate_GLSL(enum shader_target test_stage)
 		break;
 	default:
 		assert(!"Should not get here.");
+		break;
+	}
+
+	switch (test_stage) {
+	case VS:
+	case GS:
+		asprintf(&fs_code,
+			 "#version %d\n"
+			 "flat in int samples;\n"
+			 "out vec4 color;\n"
+			 "void main()\n"
+			 "{\n"
+			 "  if (samples == %d) color = vec4(0,1,0,1);\n"
+			 "  else color = vec4(1,0,0,1);\n"
+			 "}\n",
+			 shader_version, sample_count);
+		break;
+	default:
 		break;
 	}
 
@@ -315,7 +287,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	int prog;
-	int tex_location;
 
 	piglit_require_extension("GL_ARB_shader_texture_image_samples");
 	require_GL_features(test_stage);
@@ -350,10 +321,7 @@ piglit_init(int argc, char **argv)
 	if (!prog)
 		piglit_report_result(PIGLIT_FAIL);
 
-	tex_location = glGetUniformLocation(prog, "tex");
-	vertex_location = glGetAttribLocation(prog, "vertex");
 	glUseProgram(prog);
-	glUniform1i(tex_location, 0);
 
 	generate_texture();
 }
