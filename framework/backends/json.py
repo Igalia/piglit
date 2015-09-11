@@ -232,6 +232,7 @@ def _load(results_file):
 
 def _resume(results_dir):
     """Loads a partially completed json results directory."""
+    # TODO: could probably use TestrunResult.from_dict here
     # Pylint can't infer that the json being loaded is a dict
     # pylint: disable=maybe-no-member
     assert os.path.isdir(results_dir), \
@@ -249,6 +250,8 @@ def _resume(results_dir):
     testrun.uname = meta.get('uname')
     testrun.glxinfo = meta.get('glxinfo')
     testrun.lspci = meta.get('lspci')
+
+    set_meta(testrun)
 
     # Load all of the test names and added them to the test list
     for file_ in os.listdir(os.path.join(results_dir, 'tests')):
