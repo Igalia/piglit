@@ -94,7 +94,11 @@ def commonprefix(args):
         else:
             break
 
-    return join(*common)
+    # Join needs at least one element to join
+    if common:
+        return join(*common)
+    else:
+        return ''
 
 
 def join(first, *args):

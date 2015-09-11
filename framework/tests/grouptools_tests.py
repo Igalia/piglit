@@ -114,3 +114,8 @@ def test_join_empty():
     expected = 'spec'
     test = grouptools.join('', 'spec')
     nt.eq_(expected, test)
+
+
+def test_commonprefix_none():
+    """grouptools.commonprefix: returns '' when no values are the same"""
+    nt.eq_('', grouptools.commonprefix(['foo', 'bar']))
