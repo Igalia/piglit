@@ -51,6 +51,24 @@ namespace piglit_util_fbo {
 		int height;
 
 		/**
+		 * If non-zero, GL_TEXTURE_2D_MULTISAMPLE_ARRAY is used with
+		 * the specified number of layers instead of
+		 * GL_TEXTURE_2D_MULTISAMPLE.
+		 *
+		 * Default value is zero.
+		 */
+		unsigned layers;
+
+		/**
+		 * Specifies the layer of the texture that should be attached
+		 * to the framebuffer.  This must be less than the value of
+		 * ::layers (unless ::layers is zero).
+		 *
+		 * Default value is zero.
+		 */
+		unsigned attachment_layer;
+
+		/**
 		 * True if a single renderbuffer should be used as the backing
 		 * store for both the depth and stencil attachment points.
 		 * Defaults to true.

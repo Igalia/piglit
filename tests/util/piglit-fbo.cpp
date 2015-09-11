@@ -37,6 +37,8 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 	  num_tex_attachments(0),
 	  width(width),
 	  height(height),
+	  layers(0),
+	  attachment_layer(0),
 	  combine_depth_stencil(true),
 	  color_format(GL_RGBA),
 	  color_internalformat(GL_RGBA),
@@ -116,19 +118,34 @@ Fbo::attach_color_texture(const FboConfig &config, int index)
 void
 Fbo::attach_multisample_color_texture(const FboConfig &config, int index)
 {
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, color_tex[index]);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-				config.num_samples,
-				config.color_internalformat,
-				config.width,
-				config.height,
-				GL_TRUE /* fixed sample locations */);
-
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
-			       config.tex_attachment[index],
-			       GL_TEXTURE_2D_MULTISAMPLE,
-			       color_tex[index],
-			       0 /* level */);
+	if (config.layers == 0) {
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, color_tex[index]);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+					config.num_samples,
+					config.color_internalformat,
+					config.width,
+					config.height,
+					GL_TRUE /* fixed sample locations */);
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
+				       config.tex_attachment[index],
+				       GL_TEXTURE_2D_MULTISAMPLE,
+				       color_tex[index],
+				       0 /* level */);
+	} else {
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, color_tex[index]);
+		glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+					config.num_samples,
+					config.color_internalformat,
+					config.width,
+					config.height,
+					config.layers,
+					GL_TRUE /* fixed sample locations */);
+		glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER,
+					  config.tex_attachment[index],
+					  color_tex[index],
+					  0 /* level */,
+					  config.attachment_layer);
+	}
 }
 
 void
