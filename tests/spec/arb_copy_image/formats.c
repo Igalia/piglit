@@ -172,6 +172,10 @@ struct texture_format formats[] = {
 	FORMAT(GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, GL_RGB, GL_BYTE, true, 16, 4, 4),
 #endif
 
+#ifdef GL_ARB_depth_buffer_float
+        FORMAT(GL_DEPTH32F_STENCIL8, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, false, 8, 1, 1),
+#endif
+
 #undef FORMAT
 };
 
@@ -256,6 +260,8 @@ is_format_supported(struct texture_format *format)
 #endif
 	case GL_STENCIL_INDEX8:
 		return piglit_is_extension_supported("GL_ARB_texture_stencil8");
+	case GL_DEPTH32F_STENCIL8:
+		return piglit_is_extension_supported("GL_ARB_depth_buffer_float");
 	}
 
 	return true;
@@ -409,6 +415,24 @@ setup_test_data(struct texture_format *src_format,
 		rand_int = (int *)(rand_data + data_size);
 		for (i = 0; i < data_size / sizeof(float); ++i)
 			dst_float[i] = rand_int[i] / (float)INT16_MAX;
+	}
+	else if (src_format->data_type == GL_FLOAT_32_UNSIGNED_INT_24_8_REV ||
+		 dst_format->data_type == GL_FLOAT_32_UNSIGNED_INT_24_8_REV) {
+		/* Use float values in [0,1].  The stencil values will
+		 * be the least significant 8 bits in the dwords at odd
+		 * offsets. */
+		float *src_float = (float *)src_data;
+		float *dst_float = (float *)dst_data;
+		rand_int = (int *)rand_data;
+		for (i = 0; i < data_size / sizeof(float); ++i) {
+			src_float[i] = (rand_int[i] & 0xffff) / 65535.0f;
+			assert(src_float[i] <= 1.0f);
+		}
+		rand_int = (int *)(rand_data + data_size);
+		for (i = 0; i < data_size / sizeof(float); ++i) {
+			dst_float[i] = (rand_int[i] & 0xffff) / 65535.0f;
+			assert(dst_float[i] <= 1.0f);
+		}
 	} else {
 		memcpy(src_data, rand_data, data_size);
 		memcpy(dst_data, rand_data + data_size, data_size);
@@ -708,6 +732,32 @@ run_multisample_test(struct texture_format *src_format,
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+
+/** test if two pixels are equal, according to the format */
+static bool
+pixels_equal(const void *p1, const void *p2,
+	     const struct texture_format *format)
+{
+	if (format->data_type == GL_FLOAT_32_UNSIGNED_INT_24_8_REV) {
+		/* don't compare the 3 unused bytes which pad the
+		 * stencil value.
+		 */
+		const float *f1 = (const float *) p1;
+		const float *f2 = (const float *) p2;
+		const GLuint *b1 = (const GLuint *) p1;
+		const GLuint *b2 = (const GLuint *) p2;
+		if (f1[0] != f2[0])
+			return false;
+		if ((b1[1] & 0xff) != (b2[1] & 0xff))
+			return false;
+		return true;
+	}
+	else {
+		return memcmp(p1, p2, format->bytes) == 0;
+	}
+}
+
+
 static bool
 check_texture(GLuint texture, unsigned level,
 	      const struct texture_format *format, const unsigned char *data)
@@ -729,17 +779,16 @@ check_texture(GLuint texture, unsigned level,
 
 	for (j = 0; j < TEX_SIZE; ++j) {
 	        for (i = 0; i < TEX_SIZE; ++i) {
-			if (memcmp(tex_data + ((j * TEX_SIZE) + i) * format->bytes,
-				   data + ((j * TEX_SIZE) + i) * format->bytes,
-				   format->bytes) != 0) {
+			int pos = ((j * TEX_SIZE) + i) * format->bytes;
+			if (!pixels_equal(tex_data + pos, data + pos, format)) {
 				fprintf(stdout, "texel mismatch at (%d, %d); expected 0x",
 					i, j);
 				for (k = format->bytes - 1; k >= 0; --k)
-					fprintf(stdout, "%02x", data[((j * TEX_SIZE) + i) * format->bytes + k]);
+					fprintf(stdout, "%02x", data[pos + k]);
 
 				fprintf(stdout, ", received 0x");
 				for (k = format->bytes - 1; k >= 0; --k)
-					fprintf(stdout, "%02x", tex_data[((j * TEX_SIZE) + i) * format->bytes + k]);
+					fprintf(stdout, "%02x", tex_data[pos + k]);
 				fprintf(stdout, ".\n");
 
 				pass = false;
