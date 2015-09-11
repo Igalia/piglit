@@ -251,26 +251,17 @@ def _resume(results_dir):
     assert meta['results_version'] == CURRENT_JSON_VERSION, \
         "Old results version, resume impossible"
 
-    testrun = results.TestrunResult()
-    testrun.name = meta['name']
-    testrun.options = meta['options']
-    testrun.uname = meta.get('uname')
-    testrun.glxinfo = meta.get('glxinfo')
-    testrun.lspci = meta.get('lspci')
-
-    set_meta(testrun)
+    meta['tests'] = {}
 
     # Load all of the test names and added them to the test list
     for file_ in os.listdir(os.path.join(results_dir, 'tests')):
         with open(os.path.join(results_dir, 'tests', file_), 'r') as f:
             try:
-                testrun.tests.update(json.load(f, object_hook=piglit_decoder))
+                meta['tests'].update(json.load(f, object_hook=piglit_decoder))
             except ValueError:
                 continue
 
-    testrun.calculate_group_totals()
-
-    return testrun
+    return results.TestrunResult.from_dict(meta)
 
 
 def _update_results(results, filepath):
