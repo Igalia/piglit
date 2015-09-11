@@ -715,7 +715,6 @@ check_texture(GLuint texture, unsigned level,
 	int i, j, k;
 	bool pass = true;
 	unsigned char *tex_data;
-	float passrate;
 
 	tex_data = malloc(TEX_SIZE * TEX_SIZE * format->bytes);
 
@@ -728,14 +727,11 @@ check_texture(GLuint texture, unsigned level,
 			      format->data_type, tex_data);
 	}
 
-	passrate = 0;
 	for (j = 0; j < TEX_SIZE; ++j) {
 	        for (i = 0; i < TEX_SIZE; ++i) {
 			if (memcmp(tex_data + ((j * TEX_SIZE) + i) * format->bytes,
 				   data + ((j * TEX_SIZE) + i) * format->bytes,
-				   format->bytes) == 0) {
-				passrate += 1;
-			} else {
+				   format->bytes) != 0) {
 				fprintf(stdout, "texel mismatch at (%d, %d); expected 0x",
 					i, j);
 				for (k = format->bytes - 1; k >= 0; --k)
@@ -747,11 +743,10 @@ check_texture(GLuint texture, unsigned level,
 				fprintf(stdout, ".\n");
 
 				pass = false;
+				i = j = TEX_SIZE; /* exit loops upon error */
 			}
 		}
 	}
-	passrate /= TEX_SIZE * TEX_SIZE;
-	printf("%0.1f%% of pixels match\n", passrate * 100);
 
 	free(tex_data);
 
@@ -803,7 +798,9 @@ run_test(struct texture_format *src_format, struct texture_format *dst_format)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
-	if (!pass) goto cleanup;
+	if (!pass)
+		goto cleanup;
+
 	warn |= !check_texture(texture[0], src_level, src_format, src_data);
 
 	dst_width = TEX_SIZE * dst_format->block_width;
@@ -839,7 +836,9 @@ run_test(struct texture_format *src_format, struct texture_format *dst_format)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
-	if (!pass) goto cleanup;
+	if (!pass)
+		goto cleanup;
+
 	warn |= !check_texture(texture[1], dst_level, dst_format, dst_data);
 
 	glCopyImageSubData(texture[0], GL_TEXTURE_2D, src_level,
