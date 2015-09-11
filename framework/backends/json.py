@@ -183,18 +183,12 @@ def load_results(filename, compression_):
     # file descriptors
     if not os.path.isdir(filename):
         filepath = filename
-    elif os.path.exists(os.path.join(filename, 'metadata.json')):
-        # If the test is still running we need to use the resume code, since
-        # there will not be a results.json file.
-        # We want to return here since the results are known current (there's
-        # an assert in TestrunResult.load), and there is no filepath
-        # to pass to update_results
-        # XXX: This needs to be run before searching for a results.json file so
-        #      that if the new run is overwriting an old one we load the
-        #      partial and not the original. It might be better to just delete
-        #      the contents of the folder if there is anything in it.
-        # XXX: What happens if the tests folder gets deleted in the middle of
-        #      this?
+    elif (os.path.exists(os.path.join(filename, 'metadata.json')) and
+          not os.path.exists(os.path.join(
+              filename, 'results.json.' + compression_))):
+        # We want to hit this path only if there isn't a
+        # results.json.<compressions>, since otherwise we'll continually
+        # regenerate values that we don't need to.
         return _resume(filename)
     else:
         # Look for a compressed result first, then a bare result, finally for
