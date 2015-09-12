@@ -59,6 +59,7 @@ with profile.group_manager(PiglitCLTest, 'api') as g:
     g(['cl-api-enqueue-read_write-buffer'],
       'clEnqueueReadBuffer and clEnqueueWriteBuffer')
     g(['cl-api-enqueue-fill-buffer'], 'clEnqueueFillBuffer')
+    g(['cl-api-enqueue-fill-image'], 'clEnqueueFillImage')
     g(['cl-api-enqueue-migrate-mem-objects'], 'clEnqueueMigrateMemObjects')
     g(['cl-api-get-mem-object-info'], 'clGetMemObjectInfo')
     g(['cl-api-get-image-info'], 'clGetImageInfo')
