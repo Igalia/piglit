@@ -101,8 +101,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define MAX_LOD_OR_SAMPLES  10.0
-
 /** Vertex shader attribute locations */
 const int pos_loc = 0;
 const int texcoord_loc = 1;
@@ -139,7 +137,7 @@ compute_divisors(int lod, float *divisors)
 	divisors[0] = max2(level_size[lod][0] - 1, 1);
 	divisors[1] = max2(level_size[lod][1] - 1, 1);
 	divisors[2] = max2(level_size[lod][2] - 1, 1);
-	divisors[3] = MAX_LOD_OR_SAMPLES;
+	divisors[3] = miplevels;
 
 	if (sampler.data_type != GL_UNSIGNED_INT)
 		divisors[0] = -divisors[0];
