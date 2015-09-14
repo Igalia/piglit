@@ -323,6 +323,7 @@ piglit_init(int argc, char **argv)
 
 	/* Create the pipeline */
 	glGenProgramPipelines(1, &pipe);
+	glBindProgramPipeline(pipe);
 
 	build_and_validate_pipe(pipe, true, 
 				"VS/FS program, single glUseProgramStages "
