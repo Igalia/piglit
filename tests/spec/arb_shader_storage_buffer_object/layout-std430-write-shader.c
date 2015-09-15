@@ -46,7 +46,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define SSBO_SIZE 48
+#define SSBO_SIZE 64
 
 static const char vs_pass_thru_text[] =
 	"#version 130\n"
@@ -65,6 +65,8 @@ static const char vs_pass_thru_text[] =
 	"       float f;\n"
 	"       A s;\n"
 	"       mat3x4 m;\n"
+	"       vec2 v2a[3];\n"
+	"       vec3 v3a[2];\n"
 	"       float unsized_array[];\n"
 	"};\n"
 	"in vec4 piglit_vertex;\n"
@@ -78,6 +80,10 @@ static const char vs_pass_thru_text[] =
 	"       s.sb[0].b1[0] = 18.0;\n"
 	"       s.sb[0].b1[1] = 19.0;\n"
 	"       m[1] = vec4(25.0, 26.0, 27.0, 28.0);\n"
+	"       v2a[0].yx = vec2(34.0, 33.0);\n"
+	"       v2a[1].y = 36.0;\n"
+	"       v3a[0].xz = vec2(39.0, 41.0);\n"
+	"       v3a[1].y = 43.0;\n"
 	"       int index = int(v.x); // index should be zero\n"
 	"       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
 	"}\n";
@@ -99,6 +105,8 @@ static const char fs_source[] =
 	"       float f;\n"
 	"       A s;\n"
 	"       mat3x4 m;\n"
+	"       vec2 v2a[3];\n"
+	"       vec3 v3a[2];\n"
 	"       float unsized_array[];\n"
 	"};\n"
 	"out vec4 color;\n"
@@ -112,6 +120,10 @@ static const char fs_source[] =
 	"       s.sb[1].b1[2] = 20.0;\n"
 	"       m[0] = vec4(21.0, 22.0, 23.0, 24.0);\n"
 	"       m[2] = vec4(29.0, 30.0, 31.0, 32.0);\n"
+	"       v2a[1].x = 35.0;\n"
+	"       v2a[2].xy = vec2(37.0, 38.0);\n"
+	"       v3a[0].y = 40.0;\n"
+	"       v3a[1].xz = vec2(42.0, 44.0);\n"
 	"       int index = int(v.z + gl_FragCoord.x);\n"
 	"       unsized_array[index] = unsized_array.length() * 2.0;\n"
 	"}\n";
@@ -129,6 +141,10 @@ float expected[SSBO_SIZE] = { 0.0,  1.0,  2.0,  3.0, // vec4 v
 			     21.0, 22.0, 23.0, 24.0, // mat3x4 m[0]
 			     25.0, 26.0, 27.0, 28.0, // mat3x4 m[1]
 			     29.0, 30.0, 31.0, 32.0, // mat3x4 m[2]
+			     33.0, 34.0, 35.0, 36.0, // vec2 v2a[3]
+			     37.0, 38.0,  0.0,  0.0, //
+			     39.0, 40.0, 41.0,  0.0, // vec3 v3a[2]
+			     42.0, 43.0, 44.0,  0.0, //
 			      4.0,  4.0,  8.0,  8.0  // float unsized_array[0]
 };
 
