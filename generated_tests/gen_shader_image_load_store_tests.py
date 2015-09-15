@@ -819,3 +819,11 @@ gen('builtin-qualifier-mismatch-writeonly', """\
     }
 """, product(image_load_builtin + image_atomic_builtins,
              image_types[:1], shader_stages))
+
+gen('builtin-memory-barrier', """\
+    ${header('pass')}
+    void main()
+    {
+        memoryBarrier();
+    }
+""", shader_stages)
