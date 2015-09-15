@@ -2382,6 +2382,7 @@ with profile.group_manager(
     g(['arb_texture_buffer_object-get'], 'get')
     g(['arb_texture_buffer_object-fetch-outside-bounds'],
       'fetch-outside-bounds')
+    g(['arb_texture_buffer_object-max-size'], 'max-size')
     g(['arb_texture_buffer_object-minmax'], 'minmax')
     g(['arb_texture_buffer_object-negative-bad-bo'], 'negative-bad-bo')
     g(['arb_texture_buffer_object-negative-bad-format'], 'negative-bad-format')
