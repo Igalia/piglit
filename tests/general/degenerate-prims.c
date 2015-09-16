@@ -78,7 +78,7 @@ piglit_display(void)
 		verts2[2][2] = { {-1, -1}, {1, 1} },
 		verts3[3][2] = { {-1, -1}, {1, -1}, {0, 1} },
 		verts4[4][2] = { {-1, -1}, {1, -1}, {1, 1}, {-1, 1} };
-	static bool pass = true;
+	bool pass = true;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
