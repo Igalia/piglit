@@ -994,6 +994,7 @@ with profile.group_manager(
     g(['gl-1.0-ortho-pos'])
     g(['gl-1.0-readpixsanity'])
     g(['gl-1.0-logicop'])
+    g(['gl-1.0-no-op-paths'])
 
 with profile.group_manager(
         PiglitGLTest,
