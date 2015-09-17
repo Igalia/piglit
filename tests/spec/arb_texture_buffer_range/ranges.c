@@ -52,7 +52,7 @@ GLint vertex_location;
 #define WIN_HEIGHT (TBO_WIDTH / WIN_WIDTH)
 
 enum piglit_result
-test_range(GLint offset, GLint size)
+test_range(GLuint offset, GLuint size)
 {
 	const float green[4] = { 0, 1, 0, 0 };
 
@@ -62,8 +62,8 @@ test_range(GLint offset, GLint size)
 	glTexBufferRange(GL_TEXTURE_BUFFER, GL_R8UI, tbo, offset, size);
 
 	glUniform1i(glGetUniformLocation(prog, "buf"), 0);
-	glUniform1i(glGetUniformLocation(prog, "offset"), offset);
-	glUniform1i(glGetUniformLocation(prog, "size"), size);
+	glUniform1ui(glGetUniformLocation(prog, "offset"), offset);
+	glUniform1ui(glGetUniformLocation(prog, "size"), size);
 
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
@@ -135,18 +135,18 @@ static char *vs_source =
 
 static char *fs_source =
 	"#version 140\n"
-	"#define WIN_WIDTH 32\n"
-	"uniform isamplerBuffer buf;\n"
-	"uniform int offset;\n"
-	"uniform int size;\n"
+	"#define WIN_WIDTH 32u\n"
+	"uniform usamplerBuffer buf;\n"
+	"uniform uint offset;\n"
+	"uniform uint size;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"  int pos = int(gl_FragCoord.x) + int(gl_FragCoord.y) * WIN_WIDTH;\n"
-	"  int expected = ((pos + offset) | 1) & 0xff;\n"
+	"  uint pos = uint(gl_FragCoord.x) + uint(gl_FragCoord.y) * WIN_WIDTH;\n"
+	"  uint expected = ((pos + offset) | 1u) & 0xffu;\n"
 	"  if (pos >= size)\n"
-	"    expected = 0;\n"
-	"  float ok = float(texelFetch(buf, pos).r == expected);\n"
+	"    expected = 0u;\n"
+	"  float ok = float(texelFetch(buf, int(pos)).r == expected);\n"
 	"  gl_FragColor = vec4(1.0 - ok, ok, 0.0, 0.0);\n"
 	"}\n";
 
