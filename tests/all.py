@@ -2371,6 +2371,7 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_buffer_object')) as g:
+    g(['arb_texture_buffer_object-bufferstorage'], 'bufferstorage')
     g(['arb_texture_buffer_object-data-sync'], 'data-sync')
     g(['arb_texture_buffer_object-dlist'], 'dlist')
     g(['arb_texture_buffer_object-formats', 'fs', 'core'],
