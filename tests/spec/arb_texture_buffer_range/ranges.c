@@ -144,9 +144,9 @@ static char *fs_source =
 	"{\n"
 	"  uint pos = uint(gl_FragCoord.x) + uint(gl_FragCoord.y) * WIN_WIDTH;\n"
 	"  uint expected = ((pos + offset) | 1u) & 0xffu;\n"
-	"  if (pos >= size)\n"
-	"    expected = 0u;\n"
-	"  float ok = float(texelFetch(buf, int(pos)).r == expected);\n"
+	"  float ok = 1.0;\n"
+	"  if (pos < size)\n"
+	"    ok = float(texelFetch(buf, int(pos)).r == expected);\n"
 	"  gl_FragColor = vec4(1.0 - ok, ok, 0.0, 0.0);\n"
 	"}\n";
 
