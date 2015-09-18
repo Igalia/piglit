@@ -252,7 +252,6 @@ with profile.group_manager(GleanTest, 'glean') as g:
     g('fbo')
     g('getString')
     g('occluQry')
-    g('paths')
     g('pixelFormats')
     g('pointAtten')
     g('pointSprite')
