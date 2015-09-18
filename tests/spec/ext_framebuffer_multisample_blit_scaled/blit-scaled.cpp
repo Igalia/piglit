@@ -179,7 +179,7 @@ compile_shader(void)
 	break;
 	case 8:
 		sample_map = "  const int sample_map[8] = int[8](5 , 2, 4, 6, 0, 3, 7, 1);\n";
-		sample_number =  "sample_map[int(2 * fract(coord.x) + 8 * fract(coord.y))]";
+		sample_number = "sample_map[int(2 * fract(coord.x) + 8 * fract(coord.y))]";
 		break;
 	default:
 		printf("Unsupported sample count %d\n", samples);
@@ -321,9 +321,10 @@ bool test_ms_blit_scaled(const Fbo& ms_fbo)
 	glClear(GL_COLOR_BUFFER_BIT);
 	test_pattern->draw(TestPattern::no_projection);
 
-	if(ms_fbo.config.num_tex_attachments == 0) {
+	if (ms_fbo.config.num_tex_attachments == 0) {
 		/* Blit the framebuffer with multisample texture attachment
-		 * into the framebuffer with multisample renderbuffer attachment.
+		 * into the framebuffer with multisample renderbuffer
+		 * attachment.
 		 */
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampled_tex.handle);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_fbo.handle);
@@ -337,7 +338,7 @@ bool test_ms_blit_scaled(const Fbo& ms_fbo)
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 
-        for(scale = 0.1; scale < 2.5f; scale += 0.1) {
+	for (scale = 0.1; scale < 2.5f; scale += 0.1) {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glClear(GL_COLOR_BUFFER_BIT);
 
