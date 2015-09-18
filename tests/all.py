@@ -251,7 +251,6 @@ with profile.group_manager(GleanTest, 'glean') as g:
     g('depthStencil')
     g('fbo')
     g('getString')
-    g('occluQry')
     g('pixelFormats')
     g('pointAtten')
     g('pointSprite')
