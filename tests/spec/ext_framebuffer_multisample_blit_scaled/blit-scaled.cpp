@@ -61,7 +61,7 @@ const float srcX1 = pattern_width / 2, srcY1 = pattern_height / 2;
 static Fbo multisampled_tex, multisampled_fbo, singlesampled_fbo;
 
 static void
-print_usage_and_exit(char *prog_name)
+print_usage_and_exit(const char *prog_name)
 {
 	printf("Usage: %s <num_samples>\n", prog_name);
 	piglit_report_result(PIGLIT_FAIL);
