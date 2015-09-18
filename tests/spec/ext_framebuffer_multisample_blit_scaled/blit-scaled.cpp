@@ -72,13 +72,13 @@ compile_shader(void)
 {
 	static const char *vert =
 		"#version 130\n"
-		"in vec2 pos;\n"
-		"in vec2 texCoord;\n"
+		"in vec2 piglit_vertex;\n"
+		"in vec2 piglit_texcoord;\n"
 		"out vec2 textureCoord;\n"
 		"void main()\n"
 		"{\n"
-		"  gl_Position = vec4(pos, 0.0, 1.0);\n"
-		"  textureCoord = texCoord;\n"
+		"  gl_Position = vec4(piglit_vertex, 0.0, 1.0);\n"
+		"  textureCoord = piglit_texcoord;\n"
 		"}\n";
 	/* Bilinear filtering of samples using shader program */
 	static const char *frag_template =
@@ -194,18 +194,7 @@ compile_shader(void)
 		 1.0f / samples, texel_fetch_macro);
 
 	/* Compile program */
-	prog = glCreateProgram();
-	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	glAttachShader(prog, vs);
-	piglit_check_gl_error(GL_NO_ERROR);
-	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	glAttachShader(prog, fs);
-	glBindAttribLocation(prog, 0, "pos");
-	glBindAttribLocation(prog, 1, "texCoord");
-	glLinkProgram(prog);
-	if (!piglit_link_check_status(prog)) {
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(vert, frag);
 
 	/* Set up vertex array object */
 	glGenVertexArrays(1, &vao);
