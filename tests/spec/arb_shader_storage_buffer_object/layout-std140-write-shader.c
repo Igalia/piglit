@@ -38,7 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define SSBO_SIZE 44
+#define SSBO_SIZE 72
 
 static const char vs_pass_thru_text[] =
 	"#version 130\n"
@@ -49,6 +49,9 @@ static const char vs_pass_thru_text[] =
 	"       float a1;\n"
 	"       vec2 a2[2];\n"
 	"       mat2 a4;\n"
+	"       mat3x2 ma;\n"
+	"       mat2x3 mb;\n"
+	"       mat2   mc;\n"
 	"};\n"
 	"layout(std140, row_major, binding=2) buffer ssbo {\n"
 	"       vec4 v;\n"
@@ -74,6 +77,9 @@ static const char fs_source[] =
 	"       float a1;\n"
 	"       vec2 a2[2];\n"
 	"       mat2 a4;\n"
+	"       mat3x2 ma;\n"
+	"       mat2x3 mb;\n"
+	"       mat2   mc;\n"
 	"};\n"
 	"layout(std140, row_major, binding=2) buffer ssbo {\n"
 	"       vec4 v;\n"
@@ -84,6 +90,9 @@ static const char fs_source[] =
 	"out vec4 color;\n"
 	"\n"
 	"void main() {\n"
+	"       s.ma = mat3x2(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);\n"
+	"       s.mb = mat2x3(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);\n"
+	"       s.mc = s.ma * s.mb;\n"
 	"       color = vec4(0,1,0,1);\n"
 	"       v = vec4(0.0, 1.0, 2.0, 3.0);\n"
 	"       s.a1 = 5.0;\n"
@@ -102,6 +111,13 @@ float expected[SSBO_SIZE] = { 0.0,  1.0,  2.0,  3.0, // vec4 v
 			      8.0,  9.0,  0.0,  0.0, // vec2 s.a2[1]
 			     10.0, 12.0,  0.0,  0.0, // mat2 a4
 			     11.0, 13.0,  0.0,  0.0, // mat2 a4
+			      1.0,  3.0,  5.0,  0.0, // mat3x2 ma
+			      2.0,  4.0,  6.0,  0.0, // mat3x2 ma
+			      1.0,  4.0,  0.0,  0.0, // mat2x3 mb,
+			      2.0,  5.0,  0.0,  0.0, // mat2x3 mb,
+			      3.0,  6.0,  0.0,  0.0, // mat2x3 mb,
+			     22.0, 49.0,  0.0,  0.0, // mat2 mc,
+			     28.0, 64.0,  0.0,  0.0, // mat2 mc,
 			      4.0,  0.0,  0.0,  0.0, // float unsized_array[0]
 			      4.0,  0.0,  0.0,  0.0, // float unsized_array[1]
 			      8.0,  0.0,  0.0,  0.0, // float unsized_array[2]
