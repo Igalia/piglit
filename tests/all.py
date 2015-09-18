@@ -2122,6 +2122,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_occlusion_query')) as g:
     g(['occlusion_query'])
+    g(['occlusion_query_conformance'])
     g(['occlusion_query_lifetime'])
     g(['occlusion_query_meta_fragments'])
     g(['occlusion_query_meta_no_fragments'])
