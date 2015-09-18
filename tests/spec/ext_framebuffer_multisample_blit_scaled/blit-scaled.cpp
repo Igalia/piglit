@@ -63,12 +63,14 @@ static Fbo multisampled_tex, multisampled_fbo, singlesampled_fbo;
 static void
 print_usage_and_exit(const char *prog_name)
 {
-	printf("Usage: %s <num_samples>\n", prog_name);
+	printf("Usage: %s <num_samples> [array]\n"
+	       "    array: Use GL_TEXTURE_2D_MULTISAMPLE_ARRAY instead of GL_TEXTURE_2D_MULTISAMPLE\n",
+	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
 void
-compile_shader(void)
+compile_shader(GLenum target)
 {
 	static const char *vert =
 		"#version 130\n"
@@ -85,7 +87,7 @@ compile_shader(void)
 		"#version 130\n"
 		"#extension GL_ARB_texture_multisample : require\n"
 		"in vec2 textureCoord;\n"
-		"uniform sampler2DMS texSampler;\n"
+		"uniform %s texSampler;\n"
 		"uniform float src_width;\n"
 		"uniform float src_height;\n"
 		"out vec4 out_color;\n"
@@ -186,11 +188,24 @@ compile_shader(void)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	asprintf(&texel_fetch_macro,
-		 "#define TEXEL_FETCH(coord) texelFetch(texSampler, ivec2(coord), %s);\n",
-		 sample_number);
+	char const*target_string;
+	if (target == GL_TEXTURE_2D_MULTISAMPLE) {
+		asprintf(&texel_fetch_macro,
+			 "#define TEXEL_FETCH(coord) texelFetch(texSampler, "
+			 "ivec2(coord), %s);\n",
+			 sample_number);
+		target_string = "sampler2DMS";
+	} else {
+		/* The layer for the array texture is hardcoded to 1. */
+		asprintf(&texel_fetch_macro,
+			 "#define TEXEL_FETCH(coord) texelFetch(texSampler, "
+			 "ivec3(coord, 1), %s);\n",
+			 sample_number);
+		target_string = "sampler2DMSArray";
+	}
 
-	asprintf(&frag, frag_template, sample_map, y_scale, 1.0f / y_scale,
+	asprintf(&frag, frag_template, target_string, sample_map,
+		 y_scale, 1.0f / y_scale,
 		 1.0f / samples, texel_fetch_macro);
 
 	/* Compile program */
@@ -230,8 +245,11 @@ ms_blit_scaled_glsl(const Fbo *src_fbo)
 		{  1,  1, srcX1, srcY1 },
 		{  1, -1, srcX1, srcY0 }};
 
+	const GLenum target = src_fbo->config.layers == 0
+		? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
+
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, src_fbo->color_tex[0]);
+	glBindTexture(target, src_fbo->color_tex[0]);
 	glUseProgram(prog);
 	glBindVertexArray(vao);
 
@@ -252,7 +270,7 @@ ms_blit_scaled_glsl(const Fbo *src_fbo)
 void
 piglit_init(int argc, char **argv)
 {
-	if (argc != 2)
+	if (argc < 2 || argc > 3)
 		print_usage_and_exit(argv[0]);
 
 	/* 1st arg: num_samples */
@@ -260,6 +278,14 @@ piglit_init(int argc, char **argv)
 	int num_samples = strtol(argv[1], &endptr, 0);
 	if (endptr != argv[1] + strlen(argv[1]))
 		print_usage_and_exit(argv[0]);
+
+        GLenum texture_target = GL_TEXTURE_2D_MULTISAMPLE;
+	if (argc > 2) {
+		if (strcmp(argv[2], "array") == 0)
+			texture_target = GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
+		else
+			print_usage_and_exit(argv[0]);
+	}
 
 	piglit_require_extension("GL_ARB_vertex_array_object");
 	piglit_require_extension("GL_EXT_framebuffer_multisample_blit_scaled");
@@ -280,6 +306,10 @@ piglit_init(int argc, char **argv)
 	multisampled_fbo.setup(msConfig);
 	msConfig.num_tex_attachments = 1;
 	msConfig.num_rb_attachments = 0; /* default value is 1 */
+	if (texture_target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
+		msConfig.layers = 2;
+		msConfig.attachment_layer = 1;
+	}
 	multisampled_tex.setup(msConfig);
 
 	/* Implementation might not create a buffer with requested sample
@@ -291,7 +321,7 @@ piglit_init(int argc, char **argv)
 	test_pattern = new Triangles();
 	test_pattern->compile();
 
-	compile_shader();
+	compile_shader(texture_target);
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
@@ -385,9 +415,14 @@ piglit_display()
 	bool pass = true;
 	printf("Left Image: multisample scaled blit using extension.\n"
 	       "Right Image: multisample scaled blit using shader program.\n");
-	pass = test_ms_blit_scaled(multisampled_tex)
-               && pass;
-	pass = test_ms_blit_scaled(multisampled_fbo)
-               && pass;
+	pass = test_ms_blit_scaled(multisampled_tex) && pass;
+
+	/* In a full piglit run, the FBO test does not need to be done for
+	 * both the array and non-array version of the test.  Just do it for
+	 * the non-array run to match the old behavior.
+	 */
+	if (multisampled_tex.config.layers == 0)
+		pass = test_ms_blit_scaled(multisampled_fbo) && pass;
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

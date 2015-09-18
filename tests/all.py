@@ -2704,6 +2704,11 @@ with profile.group_manager(
            str(num_samples)],
           'blit-scaled samples={}'.format(num_samples))
 
+    for num_samples in MSAA_SAMPLE_COUNTS:
+        g(['ext_framebuffer_multisample_blit_scaled-blit-scaled',
+           str(num_samples), 'array'],
+          'blit-scaled samples={} with GL_TEXTURE_2D_MULTISAMPLE_ARRAY'.format(num_samples))
+
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_framebuffer_multisample')) as g:
