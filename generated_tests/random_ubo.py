@@ -739,7 +739,7 @@ def generate_test_vectors(fields,
     return test_vectors
 
 
-def scalar_derp(type, name, offset, data):
+def scalar_derp(type, name, data):
     """Return a GLSL code string to compare a scalar with its expected value."""
     if type == "bool":
         if int(data) == 0:
@@ -771,7 +771,7 @@ def scalar_derp(type, name, offset, data):
         raise Exception("Unknown scalar type {}".format(type))
 
 
-def vector_derp(type, name, offset, data):
+def vector_derp(type, name, data):
     """Return a list of GLSL code strings that compare each field of a vector
     its expected value.
     """
@@ -780,12 +780,11 @@ def vector_derp(type, name, offset, data):
 
     return [scalar_derp(scalar,
                  "{}.{}".format(name, "xyzw"[i]),
-                 offset,
                  data[i])
             for i in xrange(vector_size(type))]
 
 
-def matrix_derp(type, name, offset, data):
+def matrix_derp(type, name, data):
     """Return a list of GLSL code strings that compare each field of a matrix
     its expected value.
     """
@@ -802,7 +801,6 @@ def matrix_derp(type, name, offset, data):
         data_pairs.extend(vector_derp(
                 column_type,
                 "{}[{}]".format(name, i),
-                offset,
                 data[(i * r):(i * r) + r]))
 
     return data_pairs
@@ -913,17 +911,14 @@ def generate_data_pairs(uniform_blocks, packing):
                         if isscalar(base_type):
                             checkers.append(scalar_derp(base_type,
                                                         name,
-                                                        offset,
                                                         data[0]))
                         elif isvector(base_type):
                             checkers.extend(vector_derp(base_type,
                                                         name,
-                                                        offset,
                                                         data))
                         elif ismatrix(base_type):
                             checkers.extend(matrix_derp(base_type,
                                                         name,
-                                                        offset,
                                                         data))
                 else:
                     raw_data = random_data(m.GLSL_type, m.GLSL_name, m.offset)
@@ -936,17 +931,14 @@ def generate_data_pairs(uniform_blocks, packing):
                     if isscalar(m.GLSL_type):
                         checkers.append(scalar_derp(m.GLSL_type,
                                                     m.GLSL_name,
-                                                    m.offset,
                                                     data[0]))
                     elif isvector(m.GLSL_type):
                         checkers.extend(vector_derp(m.GLSL_type,
                                                     m.GLSL_name,
-                                                    m.offset,
                                                     data))
                     elif ismatrix(m.GLSL_type):
                         checkers.extend(matrix_derp(m.GLSL_type,
                                                     m.GLSL_name,
-                                                    m.offset,
                                                     data))
 
     return checkers, setters
