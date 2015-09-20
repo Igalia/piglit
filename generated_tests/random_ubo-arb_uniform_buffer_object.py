@@ -64,7 +64,7 @@ def do_test(requirements, packing):
         blocks,
         packing,
         130,
-        ["GL_ARB_uniform_buffer_object"]))
+        ["GL_ARB_uniform_buffer_object","GL_ARB_arrays_of_arrays"]))
 
     file.close()
 
@@ -114,6 +114,11 @@ all_requirements.append([["struct", "struct", "struct"]])
 all_requirements.append([["struct", "array", "struct"]])
 all_requirements.append([["array", "struct", "struct"]])
 all_requirements.append([["array", "struct", "array", "struct"]])
+
+all_requirements.append([["struct", "array", "array", "struct"]])
+all_requirements.append([["struct", "array", "array", "array", "struct"]])
+all_requirements.append([["array", "array", "struct", "array"]])
+all_requirements.append([["struct", "array", "array", "array"]])
 
 for p in all_packing:
     for r in all_requirements:

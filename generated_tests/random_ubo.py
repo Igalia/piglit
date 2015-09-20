@@ -141,7 +141,6 @@ def array_elements(type):
     # Is there a better way to do this?
     return int(type.split("[")[1].split("]")[0])
 
-
 def basic_machine_units(type):
     """Return the size in 'basic machine units' of a scalar type."""
     if type in ["float", "bool", "int", "uint"]:
@@ -158,9 +157,27 @@ def array_base_type(type):
     if not isarray(type):
         raise Exception("Non-array type {}".format(type))
 
-    # XXX This will need changes for arrays-of-arrays.
+    return type[:type.index("[")] + type[type.index("]")+1:]
+
+def without_array(type):
+    """Return the type of an element with all arrays removed."""
+    if not isarray(type):
+        raise Exception("Non-array type {}".format(type))
+
     return type.split("[")[0]
 
+def arrays_of_arrays_size(type):
+    """Return the total number of elements in an array of arrays."""
+    if not isarray(type):
+        raise Exception("Non-array type {}".format(type))
+
+    size = 1
+    base_type = type
+    while (isarray(base_type)):
+        size = size * array_elements(base_type)
+        base_type = array_base_type(base_type)
+
+    return size
 
 def vector_base_type(type):
     """Return the type of an element from a vector."""
@@ -188,7 +205,7 @@ def iterate_structures(fields, types_seen=[], types_yielded=[]):
     """
     for (type, name) in fields:
         if isarray(type):
-            type = array_base_type(type)
+            type = without_array(type)
 
         if not isstructure(type):
             continue
@@ -351,7 +368,7 @@ def generate_layouts(fields, required_layouts, allow_row_major_structure):
     layouts = []
     for ((type, name), lay) in zip(fields, required_layouts):
         if isarray(type):
-            type = array_base_type(type)
+            type = without_array(type)
 
         if lay:
             layouts.append(lay)
@@ -407,6 +424,60 @@ def fields_to_glsl_struct(type):
 
     return structure_template.render(struct_name=type, fields=struct_types[type])
 
+def iterate_struct_array_recursive(field_type,
+                                   name_from_API,
+                                   name_from_shader,
+                                   packing,
+                                   offset,
+                                   row_major,
+                                   field_row_major,
+                                   explicit_layout):
+
+    astride = packing.array_stride(field_type, field_row_major)
+    array_member_align = packing.base_alignment(field_type, field_row_major)
+
+    element_t = array_base_type(field_type)
+
+    for i in xrange(array_elements(field_type)):
+        name_from_API_with_index = "{}[{}]".format(name_from_API, i)
+        name_from_shader_with_index = "{}[{}]".format(name_from_shader, i)
+
+        if isarray(element_t):
+            inner_aoa_size = arrays_of_arrays_size(element_t)
+            o = align(offset, array_member_align) + (astride * i * inner_aoa_size)
+
+            for x in iterate_struct_array_recursive(element_t,
+                                                    name_from_API_with_index,
+                                                    name_from_shader_with_index,
+                                                    packing,
+                                                    o,
+                                                    row_major,
+                                                    field_row_major,
+                                                    explicit_layout):
+                yield x
+
+                a = packing.base_alignment(x.GLSL_type, row_major)
+                o = align(o, a) + packing.size(x.GLSL_type, row_major)
+        else:
+            o = align(offset, array_member_align) + (astride * i)
+            yield block_member(
+                name_from_shader_with_index,
+                name_from_API_with_index,
+                element_t,
+                explicit_layout,
+                o,
+                field_row_major)
+            for x in iterate_all_recursive(struct_types[element_t],
+                                           None,
+                                           name_from_API_with_index,
+                                           name_from_shader_with_index,
+                                           packing,
+                                           o,
+                                           field_row_major):
+                yield x
+
+                a = packing.base_alignment(x.GLSL_type, row_major)
+                o = align(o, a) + packing.size(x.GLSL_type, row_major)
 
 def iterate_all_recursive(fields,
                           field_layouts,
@@ -483,7 +554,7 @@ def iterate_all_recursive(fields,
             field_row_major = row_major
 
         if isarray(field_type):
-            base_type = array_base_type(field_type)
+            base_type = without_array(field_type)
 
             if isstructure(base_type):
                 yield block_member(
@@ -494,40 +565,15 @@ def iterate_all_recursive(fields,
                     offset,
                     field_row_major)
 
-                astride = packing.array_stride(field_type, field_row_major)
-                array_member_align = packing.base_alignment(
-                    field_type,
-                    field_row_major)
-
-                for i in xrange(array_elements(field_type)):
-                    name_from_API_with_index = "{}[{}]".format(
-                        name_from_API,
-                        i)
-                    name_from_shader_with_index = "{}[{}]".format(
-                        name_from_shader,
-                        i)
-
-                    o = align(offset, array_member_align) + (astride * i)
-
-                    yield block_member(
-                        name_from_shader_with_index,
-                        name_from_API_with_index,
-                        base_type,
-                        explicit_layout,
-                        o,
-                        field_row_major)
-
-                    for x in iterate_all_recursive(struct_types[base_type],
-                                                   None,
-                                                   name_from_API_with_index,
-                                                   name_from_shader_with_index,
-                                                   packing,
-                                                   o,
-                                                   field_row_major):
-                        yield x
-
-                        a = packing.base_alignment(x.GLSL_type, row_major)
-                        o = align(o, a) + packing.size(x.GLSL_type, row_major)
+                for x in iterate_struct_array_recursive(field_type,
+                                           name_from_API,
+                                           name_from_shader,
+                                           packing,
+                                           offset,
+                                           row_major,
+                                           field_row_major,
+                                           explicit_layout):
+                    yield x
 
             elif ismatrix(base_type):
                 yield block_member(
@@ -709,19 +755,25 @@ def generate_test_vectors(fields,
         a = packing.base_alignment(m.GLSL_type, m.row_major)
 
         if isarray(m.GLSL_type):
+            size = array_elements(m.GLSL_type)
             base_type = array_base_type(m.GLSL_type)
             astride = packing.array_stride(m.GLSL_type, m.row_major)
             name = m.API_name + "[0]"
+            while(isarray(base_type)):
+                size = array_elements(base_type)
+                base_type = array_base_type(base_type)
+                name = name + "[0]"
         else:
             base_type = m.GLSL_type
             astride = 0
             name = m.API_name
+            size = m.size
 
         if ismatrix(base_type):
             test_vectors.append((
                     name,
                     m.API_type,
-                    m.size,
+                    size,
                     align(m.offset, a),
                     astride,
                     packing.matrix_stride(base_type, m.row_major),
@@ -730,7 +782,7 @@ def generate_test_vectors(fields,
             test_vectors.append((
                     name,
                     m.API_type,
-                    m.size,
+                    size,
                     align(m.offset, a),
                     astride,
                     0,
@@ -860,6 +912,41 @@ def bit_exact_data(raw_data, type):
     else:
         return raw_data
 
+def generate_array_data_pairs(name, api_name, element_type, row_major, offset, packing, setters, checkers):
+    base_type = array_base_type(element_type)
+
+    astride = packing.array_stride(element_type, row_major)
+
+    for i in xrange(array_elements(element_type)):
+
+        name_with_index = "{}[{}]".format(name, i)
+        api_name_with_index = "{}[{}]".format(api_name, i)
+
+        if isarray(base_type):
+            offset = offset + (i * arrays_of_arrays_size(base_type) * astride)
+            generate_array_data_pairs(name_with_index, api_name_with_index, base_type, row_major, offset, packing, setters, checkers)
+        else:
+            offset = offset + (i * astride)
+            raw_data = random_data(base_type, name_with_index, offset)
+            setters.append(
+                (fudge_type_for_setter(base_type),
+                api_name_with_index,
+                bit_exact_data(raw_data, base_type)))
+
+            data = raw_data.split(" ")
+
+            if isscalar(base_type):
+                checkers.append(scalar_derp(base_type,
+                                            name_with_index,
+                                            data[0]))
+            elif isvector(base_type):
+                checkers.extend(vector_derp(base_type,
+                                            name_with_index,
+                                            data))
+            elif ismatrix(base_type):
+                checkers.extend(matrix_derp(base_type,
+                                            name_with_index,
+                                            data))
 
 def generate_data_pairs(uniform_blocks, packing):
     """Return GLSL code to test values and shader_runner code to set them.
@@ -891,35 +978,7 @@ def generate_data_pairs(uniform_blocks, packing):
 
             if m.API_type:
                 if isarray(m.GLSL_type):
-                    base_type = array_base_type(m.GLSL_type)
-
-                    astride = packing.array_stride(m.GLSL_type, m.row_major)
-
-                    for i in xrange(array_elements(m.GLSL_type)):
-
-                        name = "{}[{}]".format(m.GLSL_name, i)
-                        offset = m.offset + (i * astride)
-
-                        raw_data = random_data(base_type, m.GLSL_name, offset)
-                        setters.append(
-                            (fudge_type_for_setter(base_type),
-                             "{}[{}]".format(m.API_name, i),
-                             bit_exact_data(raw_data, base_type)))
-
-                        data = raw_data.split(" ")
-
-                        if isscalar(base_type):
-                            checkers.append(scalar_derp(base_type,
-                                                        name,
-                                                        data[0]))
-                        elif isvector(base_type):
-                            checkers.extend(vector_derp(base_type,
-                                                        name,
-                                                        data))
-                        elif ismatrix(base_type):
-                            checkers.extend(matrix_derp(base_type,
-                                                        name,
-                                                        data))
+                    generate_array_data_pairs(m.GLSL_name, m.API_name, m.GLSL_type, m.row_major, m.offset, packing, setters, checkers)
                 else:
                     raw_data = random_data(m.GLSL_type, m.GLSL_name, m.offset)
                     setters.append((fudge_type_for_setter(m.GLSL_type),
@@ -961,7 +1020,7 @@ def pretty_format_type_data(packing, type, offset, row_major):
     if isarray(type):
         astride = packing.array_stride(type, row_major)
 
-        base_type = array_base_type(type)
+        base_type = without_array(type)
         if ismatrix(base_type) and row_major:
             if row_major:
                 row_major_str = "yes"
@@ -1001,13 +1060,12 @@ def pretty_format_member(m, packing):
     # If the name ends in an array subscript, emit a special line to note that
     # the following fields are the contents of an element of an array of
     # structures.
-
     if m.GLSL_name[-1] == "]":
         n = m.struct_nesting() + 1
         indent = "//  " + ("  " * n)
 
-        return "{indent}[{index}".format(indent=indent,
-                                         index=m.GLSL_name.split("[")[-1])
+        return "{indent}{index}".format(indent=indent,
+                                         index=m.GLSL_name[m.GLSL_name.index("["):])
 
     # Strip off everything before the last period.
     name = m.GLSL_name.split(".")[-1]
@@ -1329,8 +1387,8 @@ class packing_rules(object):
         size, in bytes, of the entire data type.  This will include padded
         after the data element as required by the GLSL specification.
         """
-        if "[" in type:
-            return self.array_stride(type, row_major) * array_elements(type)
+        if isarray(type):
+            return self.array_stride(type, row_major) * arrays_of_arrays_size(type)
 
         if type in ["float", "bool", "int", "uint"]:
             return 4
@@ -1476,7 +1534,7 @@ class std140_packing_rules(packing_rules):
                 return max(16, self.base_alignment("vec{}".format(c), False))
 
     def array_stride(self, type, row_major):
-        base_type = array_base_type(type)
+        base_type = without_array(type)
 
         if not isstructure(base_type):
             # (4) If the member is an array of scalars or vectors, the base
@@ -1539,7 +1597,7 @@ class unique_name_dict:
         form.  All other type names are unmodified.
         """
         if isarray(type):
-            t = array_base_type(type)
+            t = without_array(type)
         else:
             t = type
 
@@ -1569,7 +1627,7 @@ class unique_name_dict:
         (indexed by "type") of (base_name, 1).
         """
         if isarray(type):
-            t = array_base_type(type)
+            t = without_array(type)
         else:
             t = type
 
@@ -1682,8 +1740,7 @@ class block_member(object):
         self.row_major = row_major
 
         if isarray(GLSL_type):
-            base_type = array_base_type(GLSL_type)
-
+            base_type = without_array(GLSL_type)
             if isstructure(base_type):
                 self.API_type = None
             else:
