@@ -345,17 +345,6 @@ find_actual_mrd(GLdouble *next_to_near, GLdouble *next_to_far,
 		- base_depth;
 }
 
-static void
-draw_2x2_quad(void) 
-{
-	glBegin(GL_QUADS);
-		glVertex2f(-1.0, -1.0);
-		glVertex2f( 1.0, -1.0);
-		glVertex2f( 1.0,  1.0);
-		glVertex2f(-1.0,  1.0);
-	glEnd();
-}
-
 static bool
 check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 {
@@ -414,7 +403,7 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-	draw_2x2_quad();
+	piglit_draw_rect(-1.0, -1.0, 2.0, 2.0);
 
 	gluProject(0.0, 0.0, 0.0, modelview_mat, projection_mat, viewport,
 		centerw + 0, centerw + 1, centerw + 2);
@@ -448,7 +437,7 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(-1.0, 0.0);
 	piglit_present_results();
-	draw_2x2_quad();
+	piglit_draw_rect(-1.0, -1.0, 2.0, 2.0);
 	offset_depth = read_depth(centerw[0], centerw[1]);
 	offset = fmax(base_depth - offset_depth, 0.0);
 	if (offset < mmin || offset > mmax) {
@@ -466,7 +455,7 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 
 	glPolygonOffset(-2.0, 0.0);
 	piglit_present_results();
-	draw_2x2_quad();
+	piglit_draw_rect(-1.0, -1.0, 2.0, 2.0);
 	offset_depth = read_depth(centerw[0], centerw[1]);
 	offset = fmax(base_depth - offset_depth, 0.0);
 	if (offset < 2.0 * mmin || offset > 2.0 * mmax) {
