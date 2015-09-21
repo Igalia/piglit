@@ -70,13 +70,6 @@
  */
 
 #include "piglit-util-gl.h"
-
-#if defined(__APPLE__)
-#  include <OpenGL/glu.h>
-#else
-#  include <GL/glu.h>
-#endif
-
 #include <math.h>
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -93,6 +86,61 @@ struct angle_axis {
 	GLfloat angle;
 	GLfloat axis[3];
 };
+
+static void
+multiply_matrix_with_vector(const double *matrix, double *vector)
+{
+	double tmp[4];
+	unsigned i;
+
+	/* The matrix is stored in the natural OpenGL order: column-major.  In
+	 * GLSL, this would be:
+	 *
+	 *     vp.x = m[0] * v.xxxx;
+	 *     vp.y = m[1] * v.yyyy;
+	 *     vp.z = m[2] * v.zzzz;
+	 *     vp.w = m[3] * v.wwww;
+	 *     v = vp;
+	 */
+	for (i = 0; i < 4; i++)
+		tmp[i] = matrix[i] * vector[0];
+
+	for (i = 0; i < 4; i++)
+		tmp[i] += matrix[i + 4] * vector[1];
+
+	for (i = 0; i < 4; i++)
+		tmp[i] += matrix[i + 8] * vector[2];
+
+	for (i = 0; i < 4; i++)
+		tmp[i] += matrix[i + 12] * vector[3];
+
+	memcpy(vector, tmp, sizeof(tmp));
+}
+
+static void
+project(double x, double y, double z, const double *modelview,
+	const double *projection, const int *viewport, double *result)
+{
+	double vp[4] = { x, y, z, 1.0 };
+
+	/* Calculate v' as P * M * v. */
+	multiply_matrix_with_vector(modelview, vp);
+	multiply_matrix_with_vector(projection, vp);
+
+	if (vp[3] == 0.0) {
+		fprintf(stderr, "Cannot perspective divide by zero.\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	vp[0] /= vp[3];
+	vp[1] /= vp[3];
+	vp[2] /= vp[3];
+
+	/* Calculate the screen position using the same formula a gluProject. */
+	result[0] = viewport[0] + (viewport[2] * ((vp[0] + 1.0) / 2.0));
+	result[1] = viewport[1] + (viewport[3] * ((vp[1] + 1.0) / 2.0));
+	result[2] =                               (vp[2] + 1.0) / 2.0;
+}
 
 static void
 draw_quad_at_distance(GLdouble dist) 
@@ -405,18 +453,17 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 
 	piglit_draw_rect(-1.0, -1.0, 2.0, 2.0);
 
-	gluProject(0.0, 0.0, 0.0, modelview_mat, projection_mat, viewport,
-		centerw + 0, centerw + 1, centerw + 2);
+	project(0.0, 0.0, 0.0, modelview_mat, projection_mat, viewport,
+		centerw);
 	base_depth = read_depth(centerw[0], centerw[1]);
 
-	gluProject(-0.9, -0.9, 0.0, modelview_mat, projection_mat, viewport,
-		p0 + 0, p0 + 1, p0 + 2);
+	project(-0.9, -0.9, 0.0, modelview_mat, projection_mat, viewport, p0);
 	p0[2] = read_depth(p0[0], p0[1]);
-	gluProject( 0.9, -0.9, 0.0, modelview_mat, projection_mat, viewport,
-		p1 + 0, p1 + 1, p1 + 2);
+
+	project( 0.9, -0.9, 0.0, modelview_mat, projection_mat, viewport, p1);
 	p1[2] = read_depth(p1[0], p1[1]);
-	gluProject( 0.9,  0.9, 0.0, modelview_mat, projection_mat, viewport,
-		p2 + 0, p2 + 1, p2 + 2);
+
+	project( 0.9,  0.9, 0.0, modelview_mat, projection_mat, viewport, p2);
 	p2[2] = read_depth(p2[0], p2[1]);
 
 	det = (p0[0] - p1[0]) * (p0[1] - p2[1])
