@@ -125,7 +125,10 @@ red_quad_was_drawn(void)
 void
 piglit_init(int argc, char **argv)
 {
-
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DITHER);
+	glEnable(GL_CULL_FACE);
+	glShadeModel(GL_FLAT);
 }
 
 static void
@@ -562,45 +565,15 @@ piglit_display(void)
 	};
 	
 	glViewport(0, 0, piglit_width, piglit_height);
-	glDepthRange(0.0, 1.0);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(near_1_far_infinity);
 
-	glDisable(GL_LIGHTING);
-
-	glFrontFace(GL_CCW);
-	glDisable(GL_NORMALIZE);
-	glDisable(GL_COLOR_MATERIAL);
-
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glDisable(GL_TEXTURE_2D);
-
-	glDisable(GL_FOG);
-
-	glDisable(GL_SCISSOR_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDisable(GL_STENCIL_TEST);
 	glDepthFunc(GL_LESS);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_DITHER);
-	glDisable(GL_COLOR_LOGIC_OP);
-
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	glDepthMask(GL_TRUE);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
-	glDisable(GL_POLYGON_STIPPLE);
 	glDisable(GL_POLYGON_OFFSET_FILL);
-
-	glShadeModel(GL_FLAT);
-
-	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClearDepth(1.0);
 	
 	find_ideal_mrd(&ideal_mrd_near, &ideal_mrd_far, 
