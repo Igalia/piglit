@@ -35,6 +35,7 @@
 #include <cmath>
 #include "ttexture_srgb.h"
 #include "rand.h"
+#include "piglit-util-gl.h"
 
 
 namespace GLEAN {
@@ -307,7 +308,7 @@ TextureSRGBTest::logOne(TextureSRGBResult &r)
 	else {
 		env->log << name << " FAIL\n";
 		if (errorCode) {
-			env->log << "\tOpenGL Error " << gluErrorString(errorCode)
+			env->log << "\tOpenGL Error " << piglit_get_gl_error_name(errorCode)
 				 << " at " << errorPos << "\n";
 		}
 		else if (errorMsg[0]) {

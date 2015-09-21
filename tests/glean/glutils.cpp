@@ -117,7 +117,7 @@ void
 logGLErrors(Environment& env) {
 	GLenum err;
 	while ((err = glGetError()))
-		env.log << "\tOpenGL error: " << gluErrorString(err) << '\n';
+		env.log << "\tOpenGL error: " << piglit_get_gl_error_name(err) << '\n';
 } // logGLErrors
 
 } // namespace GLUtils

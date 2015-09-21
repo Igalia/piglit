@@ -35,6 +35,7 @@
 #include "tshaderapi.h"
 #include "rand.h"
 #include "image.h"
+#include "piglit-util-gl.h"
 
 
 namespace GLEAN {
@@ -66,7 +67,7 @@ ShaderAPITest::assert_no_error_test(const char *file, int line)
 	if (err != GL_NO_ERROR) {
 		error = true;
 		fprintf(stderr, "%s:%d received error %s\n",
-				file, line, gluErrorString(err));
+				file, line, piglit_get_gl_error_name(err));
 	}
 }
 
@@ -81,7 +82,7 @@ ShaderAPITest::assert_error_test(const char *file, int line, GLenum expect)
 	err = glGetError();
 	if (err != expect) {
 		fprintf(stderr, "%s:%d expected %s but received %s\n",
-				file, line, gluErrorString(expect), gluErrorString(err));
+				file, line, piglit_get_gl_error_name(expect), piglit_get_gl_error_name(err));
 		error = true;
 	}
 

@@ -32,6 +32,7 @@
 #include <cmath>
 #include "tpixelformats.h"
 #include "../util/rgb9e5.h"
+#include "piglit-util-gl.h"
 
 
 // Set to 1 to help debug test failures:
@@ -890,7 +891,7 @@ PixelFormatsTest::CheckError(const char *where) const
 	if (err) {
 		char msg[1000];
 		sprintf(msg, "GL Error: %s (0x%x) in %s\n",
-				gluErrorString(err), err, where);
+				piglit_get_gl_error_name(err), err, where);
 		env->log << msg;
 		return true;
 	}

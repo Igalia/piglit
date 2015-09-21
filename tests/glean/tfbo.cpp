@@ -39,6 +39,7 @@
 #include <cassert>
 #include <math.h>
 #include <cstring>
+#include "piglit-util-gl.h"
 
 namespace GLEAN
 {
@@ -437,7 +438,7 @@ FBOTest::testRender2SingleTexture(void)
                                                          &params);
                                                 if (params != TEXSIZE) {
                                                         REPORT_FAILURE("Get Renderbuffer width failed");
-                                                        printf("glGetRenderbufferParameterivEXT: %s\n", gluErrorString(glGetError()));
+                                                        printf("glGetRenderbufferParameterivEXT: %s\n", piglit_get_gl_error_name(glGetError()));
                                                         printf("width = %d\n", params);
                                                         return false;
                                                 }
@@ -447,7 +448,7 @@ FBOTest::testRender2SingleTexture(void)
                                                          &params);
                                                 if (params != height) {
                                                         REPORT_FAILURE("Get Renderbuffer height failed");
-                                                        printf("glGetRenderbufferParameterivEXT: %s\n", gluErrorString(glGetError()));
+                                                        printf("glGetRenderbufferParameterivEXT: %s\n", piglit_get_gl_error_name(glGetError()));
                                                         return false;
                                                 }
                                         }
@@ -474,7 +475,7 @@ FBOTest::testRender2SingleTexture(void)
                                                          &type);
                                                 if (type != GL_RENDERBUFFER_EXT) {
                                                         REPORT_FAILURE("Get Framebuffer attached object type failed");
-                                                        printf("glGetFramebufferParameterivEXT: %s\n", gluErrorString(glGetError()));
+                                                        printf("glGetFramebufferParameterivEXT: %s\n", piglit_get_gl_error_name(glGetError()));
                                                         printf("type = %d\n", type);
                                                         return false;
                                                 }
@@ -497,7 +498,7 @@ FBOTest::testRender2SingleTexture(void)
                                                          &name);
                                                 if ((GLuint)name != textures[0]) {
                                                         REPORT_FAILURE("Get Framebuffer attached texture name failed");
-                                                        printf("glGetFramebufferParameterivEXT: %s\n", gluErrorString(glGetError()));
+                                                        printf("glGetFramebufferParameterivEXT: %s\n", piglit_get_gl_error_name(glGetError()));
                                                         printf("name = %d\n", name);
                                                         return false;
                                                 }
@@ -519,7 +520,7 @@ FBOTest::testRender2SingleTexture(void)
                                                          &level);
                                                 if (level != 0) {
                                                         REPORT_FAILURE("Get Framebuffer attached texture level failed");
-                                                        printf("glGetFramebufferParameterivEXT: %s\n", gluErrorString(glGetError()));
+                                                        printf("glGetFramebufferParameterivEXT: %s\n", piglit_get_gl_error_name(glGetError()));
                                                         printf("level = %d\n", level);
                                                         return false;
                                                 }
@@ -545,7 +546,7 @@ FBOTest::testRender2SingleTexture(void)
 
                                                 if (zoffset != maxzoffset-1) {
                                                         REPORT_FAILURE("Get Framebuffer attached 3D texture z-offset failed");
-                                                        printf("glGetFramebufferParameterivEXT: %s\n", gluErrorString(glGetError()));
+                                                        printf("glGetFramebufferParameterivEXT: %s\n", piglit_get_gl_error_name(glGetError()));
                                                         printf("zoffset = %d\n", zoffset);
                                                         return false;
                                                 }
@@ -567,7 +568,7 @@ FBOTest::testRender2SingleTexture(void)
                                                     GL_TEXTURE_CUBE_MAP_POSITIVE_Z)
                                                 {
                                                         REPORT_FAILURE("Get Framebuffer attached cube map face failed");
-                                                        printf("glGetFramebufferParameterivEXT: %s\n", gluErrorString(glGetError()));
+                                                        printf("glGetFramebufferParameterivEXT: %s\n", piglit_get_gl_error_name(glGetError()));
                                                         printf("face = %d\n", face);
                                                        return false;
                                                 }
