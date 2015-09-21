@@ -53,7 +53,7 @@ FBOTest::setup(void)
         glMatrixMode(GL_PROJECTION);
 
         glLoadIdentity();
-        gluOrtho2D(0, 100, 0, 100);
+        glOrtho(0, 100, 0, 100, -1, 1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glDrawBuffer(GL_FRONT);
