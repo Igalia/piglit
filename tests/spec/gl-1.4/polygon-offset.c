@@ -442,14 +442,14 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 	offset = fmax(base_depth - offset_depth, 0.0);
 	if (offset < mmin || offset > mmax) {
 		if (offset < mmin)
-			printf("\tDepth-slope related offset was too small");
+			printf("Depth-slope related offset was too small");
 		else
-			printf("\tDepth-slope related offset was too large");
+			printf("Depth-slope related offset was too large");
 		printf("; first failure at:\n");
-		printf("\t\tAngle = %f degrees, axis = (%f, %f, %f)\n",
+		printf("\tAngle = %f degrees, axis = (%f, %f, %f)\n",
 			aa->angle, aa->axis[0], aa->axis[1], aa->axis[2]);
-		printf("\t\tFailing offset was %.16f\n", offset);
-		printf("\t\tAllowable range is (%f, %f)\n", mmin, mmax);
+		printf("\tFailing offset was %.16f\n", offset);
+		printf("\tAllowable range is (%f, %f)\n", mmin, mmax);
 		return false;
 	}
 
@@ -460,14 +460,14 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 	offset = fmax(base_depth - offset_depth, 0.0);
 	if (offset < 2.0 * mmin || offset > 2.0 * mmax) {
 		if (offset < 2.0 * mmin)
-			printf("\tDepth-slope related offset was too small");
+			printf("Depth-slope related offset was too small");
 		else
-			printf("\tDepth-slope related offset was too large");
+			printf("Depth-slope related offset was too large");
 		printf("; first failure at:\n");
-		printf("\t\tAngle = %f degrees, axis = (%f, %f, %f)\n",
+		printf("\tAngle = %f degrees, axis = (%f, %f, %f)\n",
 			aa->angle, aa->axis[0], aa->axis[1], aa->axis[2]);
-		printf("\t\tFailing offset was %.16f\n", offset);
-		printf("\t\tAllowable range is (%f, %f)\n", 2.0 * mmin, 
+		printf("\tFailing offset was %.16f\n", offset);
+		printf("\tAllowable range is (%f, %f)\n", 2.0 * mmin, 
 			2.0 * mmax);
 		return false;
 	}
@@ -579,23 +579,23 @@ piglit_display(void)
 
 	/* Print the results */
 	if (!big_enough_mrd) {
-		printf("\tActual MRD is too small ");
+		printf("Actual MRD is too small ");
 		printf("(may cause incorrect results)\n");
 	}
 
 	if (!small_enough_mrd) {
-		printf("\tActual MRD is too large ");
+		printf("Actual MRD is too large ");
 		printf("(may waste depth-buffer range)\n\n");
 	}
 
 	glGetIntegerv(GL_DEPTH_BITS, &dbits);
-	printf("\tIdeal  MRD at near plane is ");
+	printf("Ideal  MRD at near plane is ");
 	log_mrd(ideal_mrd_near, dbits);
-	printf("\tActual MRD at near plane is ");
+	printf("Actual MRD at near plane is ");
 	log_mrd(actual_mrd_near, dbits);
-	printf("\tIdeal  MRD at infinity is ");
+	printf("Ideal  MRD at infinity is ");
 	log_mrd(ideal_mrd_far, dbits);
-	printf("\tActual MRD at infinity is ");
+	printf("Actual MRD at infinity is ");
 	log_mrd(actual_mrd_far, dbits);
 	printf("\n");
 
