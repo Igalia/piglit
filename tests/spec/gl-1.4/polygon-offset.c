@@ -518,11 +518,11 @@ check_slope_offsets(GLdouble* ideal_mrd_near)
 } /* check_slope_offsets */
 
 static void
-log_mrd(double mrd, GLint dbits) 
+log_mrd(const char *pre, double mrd, GLint dbits) 
 {
 	int bits;
 	bits = (int)(0.5 + (pow(2.0, dbits) - 1.0) * mrd);
-	printf("%e (nominally %i %s)\n", mrd, bits, 
+	printf("%s %e (nominally %i %s)\n", pre, mrd, bits, 
 		(bits == 1) ? "bit": "bits");
 } /* log_mrd */
 
@@ -589,15 +589,10 @@ piglit_display(void)
 	}
 
 	glGetIntegerv(GL_DEPTH_BITS, &dbits);
-	printf("Ideal  MRD at near plane is ");
-	log_mrd(ideal_mrd_near, dbits);
-	printf("Actual MRD at near plane is ");
-	log_mrd(actual_mrd_near, dbits);
-	printf("Ideal  MRD at infinity is ");
-	log_mrd(ideal_mrd_far, dbits);
-	printf("Actual MRD at infinity is ");
-	log_mrd(actual_mrd_far, dbits);
-	printf("\n");
+	log_mrd("Ideal  MRD at near plane is", ideal_mrd_near, dbits);
+	log_mrd("Actual MRD at near plane is", actual_mrd_near, dbits);
+	log_mrd("Ideal  MRD at infinity is", ideal_mrd_far, dbits);
+	log_mrd("Actual MRD at infinity is", actual_mrd_far, dbits);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
