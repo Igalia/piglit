@@ -17,7 +17,6 @@ link_libraries (
 	hiz-util
 
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable(hiz-depth-stencil-test-fbo-d0-s8 hiz-depth-stencil-test-fbo-d0-s8.c)

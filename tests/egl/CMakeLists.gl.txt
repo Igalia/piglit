@@ -8,7 +8,6 @@ link_libraries (
 	piglitutil_${piglit_target_api}
 	${EGL_LDFLAGS}
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

@@ -6,7 +6,6 @@ include_directories(
 link_libraries (
 	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable (map_buffer_range_error_check map_buffer_range_error_check.c)

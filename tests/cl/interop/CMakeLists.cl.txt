@@ -8,7 +8,6 @@ IF(EGL_FOUND AND PIGLIT_BUILD_GLES2_TESTS)
 		piglitutil_gles2
 		${EGL_LDFLAGS}
 		${OPENGL_gl_LIBRARY}
-		${OPENGL_glu_LIBRARY}
 	)
 
 	piglit_cl_add_interop_test (egl_khr_cl_event2 egl_khr_cl_event2.c)

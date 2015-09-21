@@ -6,7 +6,6 @@ include_directories(
 link_libraries (
 	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable (arb_direct_state_access-bind-texture-unit bind-texture-unit.c)

@@ -6,7 +6,6 @@ include_directories(
 link_libraries (
 	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable (arb_vertex_type_10f_11f_11f_rev-api-errors api-errors.c)

@@ -12,7 +12,6 @@ endif(PIGLIT_BUILD_GLX_TESTS)
 
 link_libraries (
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
 )
 
 IF(PIGLIT_BUILD_GLX_TESTS)
