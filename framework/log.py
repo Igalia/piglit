@@ -32,6 +32,14 @@ import abc
 import itertools
 import threading
 import collections
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+from framework.core import PIGLIT_CONFIG
 
 __all__ = ['LogManager']
 
@@ -252,6 +260,65 @@ class DummyLog(BaseLog):
         pass
 
 
+class HTTPLogServer(threading.Thread):
+    class RequestHandler(BaseHTTPRequestHandler):
+        INDENT = 4
+
+        def do_GET(self):
+            if self.path == "/summary":
+                self.send_response(200)
+                self.end_headers()
+                with self.server.state_lock:
+                    status = {
+                        "complete": self.server.state["complete"],
+                        "running" : self.server.state["running"],
+                        "total"   : self.server.state["total"],
+                        "results" : self.server.state["summary"],
+                    }
+                self.wfile.write(json.dumps(status, indent=self.INDENT))
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+    def __init__(self, state, state_lock):
+        super(HTTPLogServer, self).__init__()
+        port = int(PIGLIT_CONFIG.safe_get("http", "port", fallback=8080))
+        self._httpd = HTTPServer(("", port), HTTPLogServer.RequestHandler)
+        self._httpd.state = state
+        self._httpd.state_lock = state_lock
+
+    def run(self):
+        while True:
+            with self._httpd.state_lock:
+                # stop handling requests after the request for the final results
+                if self._httpd.state["complete"] == self._httpd.state["total"]:
+                    break;
+            self._httpd.handle_request()
+
+
+class HTTPLog(BaseLog):
+    """ A Logger that serves status information over http """
+
+    def __init__(self, state, state_lock):
+        super(HTTPLog, self).__init__(state, state_lock)
+        self._name = None
+
+    def start(self, name):
+        with self._LOCK:
+            self._name = name
+            self._state['running'].append(self._name)
+
+    def log(self, status):
+        with self._LOCK:
+            self._state['running'].remove(self._name)
+            self._state['complete'] += 1
+            assert status in self.SUMMARY_KEYS
+            self._state['summary'][str(status)] += 1
+
+    def summary(self):
+        pass
+
+
 class LogManager(object):
     """ Creates new log objects
 
@@ -274,6 +341,7 @@ class LogManager(object):
         'quiet': QuietLog,
         'verbose': VerboseLog,
         'dummy': DummyLog,
+        'http': HTTPLog,
     }
 
     def __init__(self, logger, total):
@@ -287,6 +355,11 @@ class LogManager(object):
             'running': [],
         }
         self._state_lock = threading.Lock()
+
+        # start the http server for http logger
+        if logger == 'http':
+            self.log_server = HTTPLogServer(self._state, self._state_lock)
+            self.log_server.start()
 
     def get(self):
         """ Return a new log instance """

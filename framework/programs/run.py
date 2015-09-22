@@ -158,7 +158,7 @@ def _run_parser(input_):
     log_parser.add_argument("-l", "--log-level",
                             dest="log_level",
                             action="store",
-                            choices=['quiet', 'verbose', 'dummy'],
+                            choices=['quiet', 'verbose', 'dummy', 'http'],
                             default='quiet',
                             help="Set the logger verbosity level")
     parser.add_argument("--test-list",
