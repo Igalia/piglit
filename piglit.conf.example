@@ -71,6 +71,16 @@ testB
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
 
+[cts]
+; path to the cts executable
+; can be overwritten by PIGLIT_CTS_BIN environment variable
+;bin=/home/knuth/cts/cts/glcts
+
+; Space-separated list of extra command line arguments for cts. The
+; option is not required. The environment variable PIGLIT_CTS_EXTRA_ARGS
+; overrides the value set here.
+;extra_args=--deqp-visibility hidden
+
 ; Section for specific oclconform test.  One of these sections is required for
 ; each test list in the oclconform section and must be called:
 ; oclconform-$testname
