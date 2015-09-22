@@ -82,8 +82,10 @@ def gen_caselist_txt(bin_, caselist, extra_args):
     caselist_path = os.path.join(basedir, caselist)
 
     # TODO: need to catch some exceptions here...
-    subprocess.check_call(
-        [bin_, '--deqp-runmode=txt-caselist'] + extra_args, cwd=basedir)
+    with open(os.devnull, 'w') as d:
+        subprocess.check_call(
+            [bin_, '--deqp-runmode=txt-caselist'] + extra_args, cwd=basedir,
+            stdout=d, stderr=d)
     assert os.path.exists(caselist_path)
     return caselist_path
 
