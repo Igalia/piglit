@@ -231,7 +231,9 @@ TexgenTest::runOne(BasicResult& r, Window&) {
 			redBlueCheck[(x+(256*y))*3 + 2] = ((xPastHalf && !yPastHalf) || (!xPastHalf && yPastHalf)) ? 255 : 0;
 		}
 	}
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, 256, 256, GL_RGB, GL_UNSIGNED_BYTE, redBlueCheck);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB,
+		     GL_UNSIGNED_BYTE, redBlueCheck);
     
     // Setup our arrays of configuration info; we loop over the rendering pass a number of times,
     // using a different GL primitive path each time.
