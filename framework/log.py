@@ -51,9 +51,10 @@ class BaseLog(object):
     SUMMARY_KEYS = set([
         'pass', 'fail', 'warn', 'crash', 'skip', 'dmesg-warn', 'dmesg-fail',
         'dry-run', 'timeout'])
-    _LOCK = threading.Lock()
+    _LOCK = None
 
-    def __init__(self, state):
+    def __init__(self, state, state_lock):
+        self._LOCK = state_lock
         self._state = state
         self._pad = len(str(state['total']))
 
@@ -238,7 +239,7 @@ class VerboseLog(QuietLog):
 
 class DummyLog(BaseLog):
     """ A Logger that does nothing """
-    def __init__(self, state):
+    def __init__(self, state, state_lock):
         pass
 
     def start(self, name):
@@ -285,7 +286,8 @@ class LogManager(object):
             'complete': 0,
             'running': [],
         }
+        self._state_lock = threading.Lock()
 
     def get(self):
         """ Return a new log instance """
-        return self._log(self._state)
+        return self._log(self._state, self._state_lock)
