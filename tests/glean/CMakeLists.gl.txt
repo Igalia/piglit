@@ -63,7 +63,6 @@ piglit_add_executable (glean
 target_link_libraries (glean
 	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
 )
 
 if (WIN32)

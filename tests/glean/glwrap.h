@@ -52,14 +52,11 @@
 
 #if defined(__WIN__)
 #  include <windows.h>
-#  include <GL/glu.h>
 #elif defined(__X11__)
 #  include <GL/glx.h>
    // glx.h covers Xlib.h and gl.h, among others
-#  include <GL/glu.h>
 #elif defined(__AGL__)
 #  include <Carbon/Carbon.h>
-#  include <OpenGL/glu.h>
 #  include <OpenGL/glext.h>
 #  include <AGL/agl.h>
 #  include <AGL/aglRenderers.h>
