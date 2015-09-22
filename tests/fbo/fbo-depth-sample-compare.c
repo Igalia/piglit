@@ -369,16 +369,7 @@ draw_quad_with_depth_texture(void)
    glBindTexture(TexTarget, DepthTex);
    glEnable(TexTarget);
 
-   glBegin(GL_POLYGON);
-   glTexCoord2f(0, 0);
-   glVertex2f(-1, -1);
-   glTexCoord2f(s1, 0);
-   glVertex2f( 1, -1);
-   glTexCoord2f(s1, t1);
-   glVertex2f( 1,  1);
-   glTexCoord2f(0, t1);
-   glVertex2f(-1,  1);
-   glEnd();
+   piglit_draw_rect_tex(-1, -1, 2, 2, 0, 0, s1, t1);
 
    glDisable(TexTarget);
 }
