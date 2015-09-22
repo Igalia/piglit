@@ -230,7 +230,6 @@ class Image {
 
 	void draw();				// Invoke glDrawPixels.
 	void read(GLint x, GLint y);		// Invoke glReadPixels.
-	void makeMipmaps(GLenum intFormat);	// Load texture mipmaps.
 
 }; // class Image
 
