@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 VMware, Inc.
+ * Copyright © 2015 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -39,13 +40,6 @@
 #include <assert.h>
 #include "piglit-util-gl.h"
 
-#if defined(__APPLE__)
-#  include <OpenGL/glu.h>
-#else
-#  include <GL/glu.h>
-#endif
-
-
 /** Set DEBUG to 1 to enable extra output when trying to debug failures */
 #define DEBUG 0
 
@@ -66,7 +60,6 @@ static GLuint ColorTex, DepthTex, FBO;
 static GLuint ShaderProg;
 static GLint Zbits;
 static GLenum TexTarget = GL_TEXTURE_2D;
-static GLUquadricObj *sphereObj = NULL;
 
 
 static void
@@ -237,13 +230,135 @@ find_uint_min_max_center(const GLuint *buf, GLuint n,
 static void
 draw_sphere(void)
 {
-   GLdouble radius = 0.95;
-   GLint slices = 40;
-   GLint stacks = 20;
+   /* Without this enum hack, GCC complains about variable length arrays
+    * below... even if you make the variables const.
+    */
+   enum {
+      slices = 40,
+      stacks = 20,
 
-   gluQuadricDrawStyle(sphereObj, GLU_FILL);
-   gluQuadricNormals(sphereObj, GLU_SMOOTH);
-   gluSphere(sphereObj, radius, slices, stacks);
+      /* There are (stacks - 1) interior stacks (see the comment before y
+       * below).  Each interior stack is (slices + 1) vertices.  There is on
+       * additional vertex at the top, and there is one at the bottom.
+       */
+      num_vertices = (stacks - 1) * (slices + 1) + 2,
+
+      /* Each slice is a single triangle strip.  There is a triangle at the
+       * top (3 elements), and there is one at the bottom (1 element).
+       * Between is (stacks - 2) quadrilaterals (2 elements each).
+       */
+      elements_per_slice = 3 + ((stacks - 2) * 2) + 1,
+   };
+
+   const GLdouble radius = 0.95;
+   unsigned i;
+
+   static float vertex_data[num_vertices * 4];
+   static unsigned element_data[elements_per_slice * slices];
+   static bool generated = false;
+
+   if (!generated) {
+      float *v = vertex_data;
+      unsigned *e = element_data;
+      unsigned j;
+
+      assert(num_vertices < 65535);
+
+      for (i = 1; i < stacks; i++) {
+	 /* The y values of the sphere interpolate from -radius to radius.
+	  * The two extrema have a single point (in terms of the "circular
+	  * slice" mentioned below, r_c = 0).  Those points are generated at
+	  * the very end.  If there are N slices of the sphere, there are N+1
+	  * layers of data.  This loop generates data for layers 1 through
+	  * N-1, inclusive.  Layers 0 and N are the extrema previously
+	  * mentioned.
+	  *
+	  * NOTE: Then angle range from the north pole to the south pole is
+	  * PI.  When going around the equator (inner loop below), the angle
+	  * range is 0 to 2PI.
+	  */
+	 const double y = -cos(i * M_PI / stacks) * radius;
+
+	 /* The radius of the sphere is, r_s, sqrt(x**2 + y**2 + z**2).  The
+	  * radius of the circular slice of the sphere parallel to the X/Z
+	  * plane, r_c, is sqrt(x**2 + z**2).  r_s and y are known.  Solve for
+	  * r_c.
+	  *
+	  *     r_s**2 = x**2 + y**2 + z**2
+	  *     r_s**2 = r_c**2 + y**2
+	  *     r_c**2 = r_s**2 - y**2
+	  *     r_c = sqrt(r_s**2 - y**2)
+	  */
+	 const double r_c = sqrt((radius * radius) - (y * y));
+
+	 for (j = 0; j <= slices; j++) {
+	    const double angle = j * 2.0 * M_PI / slices;
+
+	    v[0] = r_c * sin(angle);
+	    v[1] = y;
+	    v[2] = r_c * cos(angle);
+	    v[3] = 1.0;
+
+	    assert(fabs(v[0] * v[0] + v[1] * v[1] + v[2] * v[2] -
+			radius * radius) < 1e-6);
+	    v += 4;
+	    assert(v < &vertex_data[ARRAY_SIZE(vertex_data)]);
+	 }
+      }
+
+      v[0] = 0.0;
+      v[1] = -radius;
+      v[2] = 0.0;
+      v[3] = 1.0;
+
+      v[4] = 0.0;
+      v[5] = radius;
+      v[6] = 0.0;
+      v[7] = 1.0;
+      assert(&v[8] == &vertex_data[ARRAY_SIZE(vertex_data)]);
+
+      for (i = 0; i < slices; i++) {
+	 /* The outer loop walks around the first circluar slice of vertex
+	  * data.  This occupies vertices [0, slices].  Looking at the sphere,
+	  * there is a vertex on the left side of the polygon being emitted,
+	  * and the next vertex in the sequence is on the right.
+	  */
+	 unsigned left = i;
+
+	 /* Emit the "base" triangle. */
+	 e[0] = num_vertices - 2;
+	 e++;
+	 assert(e < &element_data[ARRAY_SIZE(element_data)]);
+
+	 for (j = 0; j < (stacks - 1); j++) {
+	    const unsigned right = left + 1;
+
+	    e[0] = left;
+	    e[1] = right;
+	    e += 2;
+	    assert(e < &element_data[ARRAY_SIZE(element_data)]);
+
+	    left += (slices + 1);
+	 }
+
+	 /* Emit the bottom vertex for the final triangle. */
+	 e[0] = num_vertices - 1;
+	 e++;
+	 assert(e <= &element_data[ARRAY_SIZE(element_data)]);
+      }
+
+      assert(e == &element_data[ARRAY_SIZE(element_data)]);
+      generated = true;
+   }
+
+   glVertexPointer(4, GL_FLOAT, 4 * sizeof(float), vertex_data);
+   glEnableClientState(GL_VERTEX_ARRAY);
+   for (i = 0; i < slices; i++) {
+      glDrawElements(GL_TRIANGLE_STRIP,
+		     elements_per_slice,
+		     GL_UNSIGNED_INT,
+		     &element_data[i * elements_per_slice]);
+   }
 }
 
 
@@ -527,8 +642,6 @@ piglit_init(int argc, char **argv)
    }
 
    create_frag_shader();
-
-   sphereObj = gluNewQuadric();
 
    if (!piglit_automatic) {
       printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
