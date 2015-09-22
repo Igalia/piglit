@@ -165,17 +165,11 @@ create_frag_shader(void)
       "   gl_FragColor = vec4(diff, 0, 0, 0); \n"
       "   gl_FragDepth = gl_FragCoord.z; \n"
       "} \n";
-   GLuint fs;
    GLint zTex, errorScale, sizeScale;
+   const char *const fs_source = (TexTarget == GL_TEXTURE_2D)
+	   ? text_2d : text_rect;
 
-   if (TexTarget == GL_TEXTURE_2D)
-      fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, text_2d);
-   else
-      fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, text_rect);
-
-   assert(fs);
-
-   ShaderProg = piglit_link_simple_program(0, fs);
+   ShaderProg = piglit_build_simple_program(NULL, fs_source);
    assert(ShaderProg);
 
    glUseProgram(ShaderProg);
