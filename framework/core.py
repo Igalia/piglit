@@ -58,7 +58,7 @@ class PiglitConfig(ConfigParser.SafeConfigParser):
         ConfigParser.SafeConfigParser.readfp(self, fp, filename)
         self.filename = os.path.abspath(filename or fp.name)
 
-    def safe_get(self, *args, **kwargs):
+    def safe_get(self, section, option, fallback=None, **kwargs):
         """A version of self.get that doesn't raise NoSectionError or
         NoOptionError.
 
@@ -67,9 +67,9 @@ class PiglitConfig(ConfigParser.SafeConfigParser):
 
         """
         try:
-            return self.get(*args, **kwargs)
+            return self.get(section, option, **kwargs)
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-            return None
+            return fallback
 
     def required_get(self, section, option, **kwargs):
         """A version fo self.get that raises PiglitFatalError.

@@ -267,3 +267,7 @@ class TestPiglitConfig(object):
         """core.PiglitConfig: required_get raises PiglitFatalError if the section is missing
         """
         self.conf.required_get('invalid', 'invalid')
+
+    def test_safe_get_fallback(self):
+        """core.PiglitConfig: safe_get returns the value of fallback when the section or option is missing"""
+        nt.eq_(self.conf.safe_get('invalid', 'invalid', fallback='foo'), 'foo')
