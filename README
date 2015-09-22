@@ -120,7 +120,6 @@ Install development packages.
   - python
   - python-numpy
   - libglut-devel
-  - libGLU-devel
 
 Configure and build.
   $ cmake .

@@ -310,7 +310,7 @@ if (WIN32)
 endif (WIN32)
 
 if (APPLE)
-	# Don't warn about using deprecated OpenGL/GLU/GLUT functions.
+	# Don't warn about using deprecated OpenGL/GLUT functions.
 	# TODO: It would be nice to silence just the deprecation macros from
 	# OpenGLAvailability.h as opposed to all deprecated functions.
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
