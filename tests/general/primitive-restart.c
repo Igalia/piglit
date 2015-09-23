@@ -190,10 +190,8 @@ static void
 enable_restart(GLuint restart_index)
 {
    if (TestGL31) {
-#ifdef GL_VERSION_3_1
       glEnable(GL_PRIMITIVE_RESTART);
       glPrimitiveRestartIndex(restart_index);
-#endif
    }
    else {
       glEnableClientState(GL_PRIMITIVE_RESTART_NV);
@@ -206,9 +204,7 @@ static void
 disable_restart(void)
 {
    if (TestGL31) {
-#ifdef GL_VERSION_3_1
       glDisable(GL_PRIMITIVE_RESTART);
-#endif
    }
    else {
       glDisableClientState(GL_PRIMITIVE_RESTART_NV);
