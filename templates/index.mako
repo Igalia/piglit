@@ -161,8 +161,9 @@
                                                    escape_filename(test)))
             else:
               raw = res.tests.get(grouptools.groupname(test))
-              if raw is not None:
-                result = raw.subtests[grouptools.testname(test)]
+              name = grouptools.testname(test)
+              if raw is not None and name in raw.subtests:
+                result = raw.subtests[name]
                 href = normalize_href(posixpath.join(escape_pathname(res.name),
                                                      escape_filename(grouptools.groupname(test))))
               else:
