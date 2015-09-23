@@ -704,10 +704,6 @@ piglit_init(int argc, char **argv)
    }
 
    /* Debug */
-   /* NOTE!  glew 1.5.2's OpenGL 3.1 detection is broken.  You'll need
-    * to upgrade to a newer version if you want to test the GL 3.1
-    * primitive restart feature!
-    */
    if (0) {
       printf("Have NV: %d\n", Have_NV);
       printf("Have 31: %d\n", Have_31);
