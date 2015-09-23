@@ -69,25 +69,25 @@ static const GLfloat red[4] = {1.0, 0.0, 0.0, 1.0};
 static const GLfloat green[4] = {0.0, 1.0, 0.0, 0.0};
 static const GLfloat black[4] = {0.0, 0.0, 0.0, 0.0};
 
-static GLboolean Have_NV;
-static GLboolean Have_31;
-static GLboolean TestGL31;
+static bool Have_NV;
+static bool Have_31;
+static bool TestGL31;
 
 
-static GLboolean
+static bool
 check_rendering(void)
 {
    const GLfloat x0 = 0.0, x1 = piglit_width - 10.0, dx = 20.0;
    const GLint iy = piglit_height / 2;
-   GLboolean draw = GL_TRUE;
+   bool draw = true;
    GLfloat x;
 
    if (!piglit_probe_pixel_rgb(0, 0, black)) {
-      return GL_FALSE;
+      return false;
    }
 
    for (x = x0 + 0.5 * dx; x < x1; x += dx) {
-      GLboolean pass;
+      bool pass;
       const int ix = (int) x;
 
       if (draw) {
@@ -106,27 +106,27 @@ check_rendering(void)
       }
 
       if (!pass) {
-         return GL_FALSE;
+         return false;
       }
 
       draw = !draw;
    }
 
-   return GL_TRUE;
+   return true;
 }
 
 
 /**
  * Test glBegin(GL_TRIANGLE/LINE_STRIP), glPrimitiveRestartNV(), glEnd().
  */
-static GLboolean
+static bool
 test_begin_end(GLenum primMode)
 {
    const GLfloat x0 = 0.0, x1 = piglit_width - 10.0, dx = 20.0;
    const GLfloat y0 = 0.5 * piglit_height - 10.0, y1 = y0 + 20.0, dy = 20.0;
    GLfloat x, y;
    GLint vert;
-   GLboolean pass;
+   bool pass;
 
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -284,8 +284,8 @@ static void do_ArrayElement(GLenum mode, GLsizei count,
 /**
  * Test glDrawElements() with glPrimitiveRestartIndexNV().
  */
-static GLboolean
-test_draw_by_index(VBO_CFG vbo_cfg, GLboolean one_by_one, GLenum primMode, GLenum indexType)
+static bool
+test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum indexType)
 {
 #define NUM_VERTS 48
 #define NUM_ELEMS (NUM_VERTS * 5 / 4)
@@ -294,21 +294,21 @@ test_draw_by_index(VBO_CFG vbo_cfg, GLboolean one_by_one, GLenum primMode, GLenu
    GLfloat x, dx;
    GLuint restart_index;
    GLuint num_elems;
-   GLboolean pass;
+   bool pass;
    const char *typeStr = NULL, *primStr = NULL;
    GLuint vbo1, vbo2;
-   GLboolean create_vbo1 = GL_FALSE;
-   GLboolean create_vbo2 = GL_FALSE;
+   bool create_vbo1 = false;
+   bool create_vbo2 = false;
    uintptr_t index_offset = 0;
    uintptr_t vbo_data_size = sizeof(verts) + sizeof(indices);
    GLuint i, j;
 
    if ((vbo_cfg != DISABLE_VBO) && (vbo_cfg != VBO_INDEX_ONLY)) {
-      create_vbo1 = GL_TRUE;
+      create_vbo1 = true;
    }
 
    if ((vbo_cfg == VBO_INDEX_ONLY) || (vbo_cfg == VBO_SEPARATE_VERTEX_AND_INDEX)) {
-      create_vbo2 = GL_TRUE;
+      create_vbo2 = true;
    }
 
    if ((vbo_cfg == DISABLE_VBO) || (vbo_cfg == VBO_VERTEX_ONLY)) {
@@ -485,20 +485,20 @@ test_draw_by_index(VBO_CFG vbo_cfg, GLboolean one_by_one, GLenum primMode, GLenu
 /**
  * Test glDrawElements() with glPrimitiveRestartIndexNV().
  */
-static GLboolean
+static bool
 test_draw_elements(VBO_CFG vbo_cfg, GLenum primMode, GLenum indexType)
 {
-   return test_draw_by_index(vbo_cfg, GL_FALSE, primMode, indexType);
+   return test_draw_by_index(vbo_cfg, false, primMode, indexType);
 }
 
 
 /**
  * Test glArrayElement() with glPrimitiveRestartIndexNV().
  */
-static GLboolean
+static bool
 test_array_element(VBO_CFG vbo_cfg, GLenum primMode, GLenum indexType)
 {
-   return test_draw_by_index(vbo_cfg, GL_TRUE, primMode, indexType);
+   return test_draw_by_index(vbo_cfg, true, primMode, indexType);
 }
 
 
@@ -506,7 +506,7 @@ test_array_element(VBO_CFG vbo_cfg, GLenum primMode, GLenum indexType)
  * Test glDrawArrayss() with glPrimitiveRestartIndexNV().
  * We only test a line strip.
  */
-static GLboolean
+static bool
 test_draw_arrays(VBO_CFG vbo_cfg)
 {
 #define NUM_VERTS 12
@@ -514,7 +514,7 @@ test_draw_arrays(VBO_CFG vbo_cfg)
    const GLfloat dx = 20.0;
    GLfloat x;
    GLuint restart_index;
-   GLboolean pass = GL_TRUE;
+   bool pass = true;
    const char *primStr = "GL_LINE_STRIP";
    GLuint test;
    const GLenum primMode = GL_LINE_STRIP;
@@ -590,7 +590,7 @@ test_draw_arrays(VBO_CFG vbo_cfg)
                if (!piglit_probe_pixel_rgb(ix, iy, black)) {
                   if (0)
                      fprintf(stderr, "bad pixel drawn\n");
-                  pass = GL_FALSE;
+                  pass = false;
                }
             }
             else {
@@ -598,7 +598,7 @@ test_draw_arrays(VBO_CFG vbo_cfg)
                if (!piglit_probe_pixel_rgb(ix, iy, green)) {
                   if (0)
                      fprintf(stderr, "bad pixel drawn\n");
-                  pass = GL_FALSE;
+                  pass = false;
                }
             }
          }
@@ -621,13 +621,13 @@ test_draw_arrays(VBO_CFG vbo_cfg)
 }
 
 
-GLboolean
+bool
 primitive_restart_test(VBO_CFG vbo_cfg)
 {
-   GLboolean pass = GL_TRUE;
+   bool pass = true;
 
    if (Have_NV) {
-      TestGL31 = GL_FALSE;
+      TestGL31 = false;
       pass = pass && test_begin_end(GL_TRIANGLE_STRIP);
       pass = pass && test_begin_end(GL_LINE_STRIP);
       pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
@@ -646,7 +646,7 @@ primitive_restart_test(VBO_CFG vbo_cfg)
    }
 
    if (Have_31) {
-      TestGL31 = GL_TRUE;
+      TestGL31 = true;
       pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
       pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
       pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
