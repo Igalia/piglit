@@ -294,7 +294,7 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
    GLfloat x, dx;
    GLuint restart_index;
    GLuint num_elems;
-   bool pass;
+   bool pass = true;
    const char *typeStr = NULL, *primStr = NULL;
    GLuint vbo1, vbo2;
    bool create_vbo1 = false;
@@ -438,8 +438,8 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
    }
 
    glEnableClientState(GL_VERTEX_ARRAY);
+   pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-   assert(glGetError()==0);
    enable_restart(restart_index);
 
    /* Draw */
@@ -466,13 +466,13 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
       glDeleteBuffers(1, &vbo2);
    }
 
-   pass = check_rendering();
-   if (!pass) {
+   if (!check_rendering()) {
       fprintf(stderr, "%s: failure drawing with %s(%s, %s), %s\n",
               TestName,
               one_by_one ? "glArrayElement" : "glDrawElements",
               primStr, typeStr,
               vbo_cfg_names[vbo_cfg]);
+      pass = false;
    }
 
    piglit_present_results();
@@ -550,8 +550,8 @@ test_draw_arrays(VBO_CFG vbo_cfg)
    }
 
    glEnableClientState(GL_VERTEX_ARRAY);
-
-   assert(glGetError()==0);
+   if (!piglit_check_gl_error(GL_NO_ERROR))
+      return false;
 
    /*
     * Render and do checks.
