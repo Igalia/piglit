@@ -34,9 +34,31 @@ __all__ = [
 ]
 
 
-class Subtests(dict):
+class Subtests(collections.MutableMapping):
+    """A dict-like object that stores Statuses as values."""
+    def __init__(self, dict_=None):
+        self.__container = {}
+
+        if dict_ is not None:
+            self.update(dict_)
+
     def __setitem__(self, name, value):
-        super(Subtests, self).__setitem__(name, status.status_lookup(value))
+        self.__container[name] = status.status_lookup(value)
+
+    def __getitem__(self, name):
+        return self.__container[name]
+
+    def __delitem__(self, name):
+        del self.__container[name]
+
+    def __iter__(self):
+        return iter(self.__container)
+
+    def __len__(self):
+        return len(self.__container)
+
+    def __repr__(self):
+        return repr(self.__container)
 
     def to_json(self):
         res = dict(self)
@@ -45,10 +67,10 @@ class Subtests(dict):
 
     @classmethod
     def from_dict(cls, dict_):
-        res = cls(dict_)
+        if '__type__' in dict_:
+            del dict_['__type__']
 
-        if '__type__' in res:
-            del res['__type__']
+        res = cls(dict_)
 
         return res
 

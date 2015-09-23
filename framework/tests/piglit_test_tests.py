@@ -72,8 +72,7 @@ def test_piglitest_no_clobber():
     test.result.returncode = 0
     test.interpret_result()
 
-    nt.assert_dict_equal(test.result.subtests,
-                         {'test1': 'pass', 'test2': 'pass'})
+    nt.eq_(test.result.subtests, {'test1': 'pass', 'test2': 'pass'})
 
 
 def test_piglittest_command_getter_serial():

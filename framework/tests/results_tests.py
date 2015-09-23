@@ -68,7 +68,7 @@ def test_Subtests_to_json():
     test['foo'] = status.PASS
     test['bar'] = status.CRASH
 
-    nt.assert_dict_equal(baseline, test.to_json())
+    nt.eq_(baseline, test.to_json())
 
 
 def test_Subtests_from_dict():
