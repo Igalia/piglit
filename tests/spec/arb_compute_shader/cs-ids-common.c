@@ -63,8 +63,10 @@ static const char *compute_shader_source =
 	"\n"
 	"#ifdef GLOBAL_ID_TEST\n"
 	"#define ID_VAR gl_GlobalInvocationID\n"
+	"#define ID_DIM(a) (gl_NumWorkGroups.a * gl_WorkGroupSize.a)\n"
 	"#else\n"
 	"#define ID_VAR gl_LocalInvocationID\n"
+	"#define ID_DIM(a) (gl_WorkGroupSize.a)\n"
 	"#endif\n"
 	"\n"
 	"void main()\n"
@@ -72,9 +74,9 @@ static const char *compute_shader_source =
 	"    uint x = ID_VAR.x;\n"
 	"    uint y = ID_VAR.y;\n"
 	"    uint z = ID_VAR.z;\n"
-	"    uint hx = gl_WorkGroupSize.x / 2u;\n"
-	"    uint hy = gl_WorkGroupSize.y / 2u;\n"
-	"    uint hz = gl_WorkGroupSize.z / 2u;\n"
+	"    uint hx = ID_DIM(x) / 2u;\n"
+	"    uint hy = ID_DIM(y) / 2u;\n"
+	"    uint hz = ID_DIM(z) / 2u;\n"
 	"\n"
 	"    if (((x & y) & z) == 0u)\n"
 	"	 atomicCounterIncrement(a0);\n"
@@ -121,15 +123,15 @@ confirm_size()
 	ys = local_y;
 	zs = local_z;
 
-	hx = xs / 2u;
-	hy = ys / 2u;
-	hz = zs / 2u;
-
 	if (global_id) {
 		xs *= global_x;
 		ys *= global_y;
 		zs *= global_z;
 	}
+
+	hx = xs / 2u;
+	hy = ys / 2u;
+	hz = zs / 2u;
 
 	memset(&values, 0, sizeof values);
 
