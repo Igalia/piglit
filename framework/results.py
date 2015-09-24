@@ -147,13 +147,14 @@ class TestResult(object):
         """Return the TestResult as a json serializable object."""
         obj = {
             '__type__': 'TestResult',
-            'returncode': self.returncode,
+            'command': self.command,
+            'environment': self.environment,
             'err': self.err,
             'out': self.out,
-            'time': self.time,
-            'environment': self.environment,
-            'subtests': self.subtests,
             'result': self.result,
+            'returncode': self.returncode,
+            'subtests': self.subtests,
+            'time': self.time,
         }
         return obj
 
