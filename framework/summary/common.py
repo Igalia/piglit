@@ -126,11 +126,15 @@ class Names(object):
 
     @lazy_property
     def regressions(self):
-        return self.__diff(operator.lt)
+        # By ensureing tha min(x, y) is >= so.PASS we eleminate NOTRUN and SKIP
+        # from these pages
+        return self.__diff(lambda x, y: x < y and min(x, y) >= so.PASS)
 
     @lazy_property
     def fixes(self):
-        return self.__diff(operator.gt)
+        # By ensureing tha min(x, y) is >= so.PASS we eleminate NOTRUN and SKIP
+        # from these pages
+        return self.__diff(lambda x, y: x > y and min(x, y) >= so.PASS)
 
     @lazy_property
     def enabled(self):
