@@ -1,0 +1,33 @@
+# Tests that we can succesfully query properties of varyings
+# that have interface GL_PROGRAM_INPUT in fragment stage.
+#
+# This tests that possible optimization for packing variables
+# does not lose information about individual variables.
+#
+[require]
+GLSL >= 1.10
+GL_ARB_program_interface_query
+
+[vertex shader]
+#version 110
+varying float r, g, b;
+void main()
+{
+	r = 1.0;
+	g = 0.0;
+	b = 1.0;
+	gl_Position = vec4(0.0);
+}
+
+[fragment shader]
+#version 110
+varying float r, g, b;
+void main()
+{
+	gl_FragColor = vec4(r, g, b, 1.0);
+}
+
+[test]
+verify program_interface_query GL_PROGRAM_INPUT r GL_ARRAY_SIZE 1
+verify program_interface_query GL_PROGRAM_INPUT g GL_TYPE GL_FLOAT
+verify program_interface_query GL_PROGRAM_INPUT b GL_REFERENCED_BY_FRAGMENT_SHADER 1
