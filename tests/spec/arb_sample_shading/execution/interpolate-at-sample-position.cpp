@@ -24,9 +24,9 @@
 /**
  * @file interpolate-at-sample-position.cpp
  *
- * Tests that 'in' variables in fragment shader are interpolated at sample
- * positions when using per sample shading.
- *
+ * Tests that 'in' and 'centroid in" variables used at the same time
+ * in a fragment shader are interpolated at sample positions when using
+ * per sample shading.
  */
 #include "piglit-util-gl.h"
 #include "piglit-fbo.h"
@@ -38,7 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 21;
 	config.supports_gl_core_version = 31;
         config.window_width = 2 * pattern_width;
-        config.window_height = pattern_height;
+        config.window_height = 2 * pattern_height;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -52,8 +52,10 @@ piglit_display(void)
 {
 	float pos[2];
 	bool result = true, pass = true;
+	GLenum buffers[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_fbo.handle);
+	glDrawBuffers(2, buffers);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Draw test image in to left half of multisample fbo*/
@@ -68,6 +70,7 @@ piglit_display(void)
 		/* Draw reference image in to right half of multisample fbo */
 		glUseProgram(draw_prog_right);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_fbo.handle);
+		glDrawBuffers(2, buffers);
 		glGetMultisamplefv(GL_SAMPLE_POSITION, i, pos);
 		glUniform2fv(sample_pos_loc, 1, pos);
 		glEnable(GL_SCISSOR_TEST);
@@ -77,12 +80,21 @@ piglit_display(void)
 		piglit_draw_rect(-1, -1, 2, 2);
 		glDisable(GL_SCISSOR_TEST);
 
-		/* Draw sample color from multisample texture in to winsys fbo */
+		/* Draw sample color from multisample texture in to winsys fbo.
+		 * The first color attachment should be in the upper half of
+		 * the screen and the second one should be in the lower half.
+		 */
 		glUseProgram(test_prog);
 		glUniform1i(sample_id_loc, i);
-		glViewport(0, 0, 2 * pattern_width, pattern_height);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, multisampled_fbo.color_tex[0]);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, multisampled_fbo.color_tex[1]);
+
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+		glDrawBuffer(GL_BACK);
 		glClear(GL_COLOR_BUFFER_BIT);
+		glViewport(0, 0, 2 * pattern_width, 2 * pattern_height);
 		piglit_draw_rect(-1, -1, 2, 2);
 
 		result = piglit_probe_rect_halves_equal_rgba(0, 0,
@@ -127,7 +139,8 @@ piglit_init(int argc, char**argv)
 
 	FboConfig msConfig(num_samples, piglit_width, piglit_height);
 	msConfig.num_rb_attachments = 0;
-	msConfig.num_tex_attachments = 1;
+	msConfig.num_tex_attachments = 2;
+	msConfig.tex_attachment[1] = GL_COLOR_ATTACHMENT1;
 	multisampled_fbo.setup(msConfig);
 
 	/* Reduced tolerence for stricter color matching */
@@ -136,17 +149,21 @@ piglit_init(int argc, char**argv)
 		"#version 130\n"
 		"#extension GL_ARB_sample_shading: require\n"
 		"in vec4 piglit_vertex;\n"
-		"out vec2 test;\n"
+		"out vec2 test_center;\n"
+		"centroid out vec2 test_centroid;\n"
 		"void main() {\n"
 		"	gl_Position = piglit_vertex;\n"
-		"	test = piglit_vertex.xy;\n"
+		"	test_center = piglit_vertex.xy;\n"
+		"	test_centroid = piglit_vertex.xy;\n"
 		"}\n",
 
 		"#version 130\n"
 		"#extension GL_ARB_sample_shading: require\n"
-		"in vec2 test;\n"
+		"in vec2 test_center;\n"
+		"centroid in vec2 test_centroid;\n"
 		"void main() {\n"
-		"	gl_FragColor = vec4(abs(test), 0, 1);\n"
+		"	gl_FragData[0] = vec4(abs(test_center), 0, 1);\n"
+		"	gl_FragData[1] = vec4(abs(test_centroid), 0, 1);\n"
 		"}\n");
 
 	draw_prog_right = piglit_build_simple_program(
@@ -168,7 +185,8 @@ piglit_init(int argc, char**argv)
 		"#version 130\n"
 		"in vec2 ref;\n"
 		"void main() {\n"
-		"	gl_FragColor = vec4(abs(ref), 0, 1);\n"
+		"	gl_FragData[0] = vec4(abs(ref), 0, 1);\n"
+		"	gl_FragData[1] = vec4(abs(ref), 0, 1);\n"
 		"}\n");
 	sample_pos_loc = glGetUniformLocation(draw_prog_right, "sample_pos");
 
@@ -182,13 +200,17 @@ piglit_init(int argc, char**argv)
 		"#version 130\n"
 		"#extension GL_ARB_texture_multisample: require\n"
 		"uniform int sample_id;\n"
-		"uniform sampler2DMS tex;\n"
+		"uniform sampler2DMS tex_center;\n"
+		"uniform sampler2DMS tex_centroid;\n"
 		"void main() {\n"
-		"	gl_FragColor =  texelFetch(tex, ivec2(gl_FragCoord.xy),\n"
-		"				   sample_id);\n"
+		"       ivec2 coord = ivec2(gl_FragCoord.xy);\n"
+		"	gl_FragColor = coord.y < 128 ? \n"
+		"		texelFetch(tex_center, coord, sample_id) :\n"
+		"		texelFetch(tex_centroid, coord - ivec2(0, 128), sample_id);\n"
 		"}\n");
 
 	glUseProgram(test_prog);
-	glUniform1i(glGetUniformLocation(test_prog, "tex"), 0);
+	glUniform1i(glGetUniformLocation(test_prog, "tex_center"), 0);
+	glUniform1i(glGetUniformLocation(test_prog, "tex_centroid"), 1);
 	sample_id_loc = glGetUniformLocation(test_prog, "sample_id");
 }
