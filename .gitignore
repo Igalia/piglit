@@ -24,6 +24,7 @@ tests/glslparsertest/glslcompiler
 generated_tests/cl
 
 .makotmp
+.tox/
 
 *.css
 *.html

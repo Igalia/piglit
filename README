@@ -42,6 +42,8 @@ Optionally, you can install the following:
 
   - nose. A python test framework, used for running the python framework
     test suite. (https://nose.readthedocs.org/en/latest/)
+  - tox. A tool for testing python packages against multiple configurations of
+    python (https://tox.readthedocs.org/en/latest/index.html)
   - lxml. An accelerated python xml library using libxml2 (http://lxml.de/)
   - simplejson. A fast C based implementation of the python json library.
     (https://simplejson.readthedocs.org/en/latest/)
