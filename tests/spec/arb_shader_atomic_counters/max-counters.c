@@ -39,11 +39,60 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static char *
+iterate_template(const char *template, unsigned n)
+{
+        char *ss;
+        int i, ret;
+
+        ss = strdup("");
+        assert(ss);
+
+        for (i = 0; i < n; ++i) {
+                char *s, *tmp = ss;
+
+                ret = asprintf(&s, template, i);
+                assert(ret >= 0);
+
+                ret = asprintf(&ss, "%s%s", tmp, s);
+                assert(ret >= 0);
+
+                free(tmp);
+                free(s);
+        }
+
+        return ss;
+}
+
+/**
+ * Generate source code by substituting the first occurrence of "%s"
+ * in \a src_template with \a n copies of \a decl_template and the
+ * second occurrence of "%s" with \a n copies of \a insn_template.
+ */
+static char *
+generate_source(const char *src_template,
+                const char *decl_template, const char *insn_template,
+                unsigned n)
+{
+        char *decls = iterate_template(decl_template, n);
+        char *insns = iterate_template(insn_template, n);
+        char *src;
+        int ret;
+
+        ret = asprintf(&src, src_template, decls, insns);
+        assert(ret);
+
+        free(decls);
+        free(insns);
+
+        return src;
+}
+
 static bool
 run_test_vertex_max_counters(unsigned num_counters)
 {
         /* Generate a shader with 'num_counters' counters. */
-        char *vs_source = atomic_counters_generate_source(
+        char *vs_source = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
@@ -74,7 +123,7 @@ static bool
 run_test_fragment_max_counters(unsigned num_counters)
 {
         /* Generate a shader with 'num_counters' counters. */
-        char *fs_source = atomic_counters_generate_source(
+        char *fs_source = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
@@ -104,7 +153,7 @@ run_test_combined_max_counters(unsigned num_fragment_counters,
                                unsigned num_vertex_counters)
 {
         /* Generate a shader with 'num_fragment_counters' counters. */
-        char *fs_source = atomic_counters_generate_source(
+        char *fs_source = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
@@ -122,7 +171,7 @@ run_test_combined_max_counters(unsigned num_fragment_counters,
                 "       y += atomicCounterDecrement(fx%d);\n",
                 num_fragment_counters);
         /* Generate a shader with 'num_vertex_counters' counters. */
-        char *vs_source = atomic_counters_generate_source(
+        char *vs_source = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
@@ -155,7 +204,7 @@ static bool
 run_test_fragment_max_buffers(unsigned num_buffers)
 {
         /* Generate a shader with 'num_buffers' buffers. */
-        char *src = atomic_counters_generate_source(
+        char *src = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "#define PASTE(A,B) A ## B\n"
@@ -188,7 +237,7 @@ static bool
 run_test_vertex_max_buffers(unsigned num_buffers)
 {
         /* Generate a shader with 'num_buffers' buffers. */
-        char *src = atomic_counters_generate_source(
+        char *src = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "#define PASTE(A,B) A ## B\n"
@@ -224,7 +273,7 @@ run_test_combined_max_buffers(unsigned num_fragment_buffers,
                               unsigned num_vertex_buffers)
 {
         /* Generate a shader with 'num_fragment_buffers' buffers. */
-        char *fs_source = atomic_counters_generate_source(
+        char *fs_source = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "#define PASTE(A,B) A ## B\n"
@@ -245,7 +294,7 @@ run_test_combined_max_buffers(unsigned num_fragment_buffers,
                 "       x += atomicCounterDecrement(y%d);\n",
                 num_fragment_buffers);
         /* Generate a shader with 'num_vertex_buffers' buffers. */
-        char *vs_source = atomic_counters_generate_source(
+        char *vs_source = generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "#define PASTE(A,B) A ## B\n"

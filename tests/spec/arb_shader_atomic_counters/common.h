@@ -56,10 +56,6 @@ atomic_counters_draw_patch(GLuint prog, unsigned buf_size,
 bool
 atomic_counters_supported(GLenum shader_stage);
 
-char *
-atomic_counters_generate_source(const char *src_template, const char *decl_template,
-                                const char *insn_template, unsigned n);
-
 struct atomic_counters_limits {
         int fragment_counters;
         int vertex_counters;
