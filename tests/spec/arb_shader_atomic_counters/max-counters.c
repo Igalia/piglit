@@ -441,28 +441,30 @@ piglit_init(int argc, char **argv)
                                 !run_test_vertex_max_buffers,
                                 ls.vertex_buffers + 1);
 
-        if (ls.vertex_buffers + ls.fragment_buffers > ls.combined_buffers) {
-                int max_safe_vs = MIN2(ls.vertex_buffers,
-				       ls.combined_buffers -
-				       ls.fragment_buffers);
+        const int combined_test_max_vs_bufs =
+           MIN2(ls.vertex_buffers, ls.combined_buffers - ls.fragment_buffers);
+
+        if (combined_test_max_vs_bufs > 0) {
                 atomic_counters_subtest(&status, GL_NONE,
                                         "Combined test under maximum "
                                         "number of atomic counter buffers",
                                         run_test_combined_max_buffers,
                                         ls.fragment_buffers,
-                                        max_safe_vs);
+                                        combined_test_max_vs_bufs);
+        } else {
+                piglit_report_subtest_result(
+                        PIGLIT_SKIP, "Combined test under maximum "
+                        "number of atomic counter buffers");
+        }
 
+        if (combined_test_max_vs_bufs < ls.vertex_buffers) {
                 atomic_counters_subtest(&status, GL_NONE,
                                         "Combined test above maximum "
                                         "number of atomic counter buffers",
                                         !run_test_combined_max_buffers,
                                         ls.fragment_buffers,
-                                        max_safe_vs + 1);
-
+                                        combined_test_max_vs_bufs + 1);
         } else {
-                piglit_report_subtest_result(
-                        PIGLIT_SKIP, "Combined test under maximum "
-                        "number of atomic counter buffers");
                 piglit_report_subtest_result(
                         PIGLIT_SKIP, "Combined test above maximum "
                         "number of atomic counter buffers");
