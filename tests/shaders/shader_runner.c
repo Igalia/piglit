@@ -113,6 +113,7 @@ GLenum geometry_layout_input_type = GL_TRIANGLES;
 GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
 GLint geometry_layout_vertices_out = 0;
 GLuint atomics_bo = 0;
+GLuint ssbo = 0;
 
 #define SHADER_TYPES 6
 static GLuint *subuniform_locations[SHADER_TYPES];
@@ -2898,6 +2899,13 @@ piglit_display(void)
 			glShadeModel(GL_SMOOTH);
 		} else if (string_match("shade model flat", line)) {
 			glShadeModel(GL_FLAT);
+		} else if (sscanf(line, "ssbo %d", &x) == 1) {
+			GLuint *ssbo_init = calloc(x, 1);
+			glGenBuffers(1, &ssbo);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, x,
+				     ssbo_init, GL_DYNAMIC_DRAW);
+			free(ssbo_init);
 		} else if (sscanf(line, "texture rgbw %d ( %d", &tex, &w) == 2) {
 			GLenum int_fmt = GL_RGBA;
 			int num_scanned =
