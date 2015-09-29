@@ -284,7 +284,7 @@ run_test_combined_max_buffers(unsigned num_fragment_buffers,
                 "%s"
                 "\n"
                 "void main() {\n"
-                "       uint x = 0;\n"
+                "       uint x = 0u;\n"
                 "       %s\n"
                 "       fcolor.x = int(x);\n"
                 "}\n",
@@ -306,7 +306,7 @@ run_test_combined_max_buffers(unsigned num_fragment_buffers,
                 "%s"
                 "\n"
                 "void main() {\n"
-                "       uint x = 0;\n"
+                "       uint x = 0u;\n"
                 "       %s\n"
                 "       vcolor.x = int(x);\n"
                 "       gl_Position = position;\n"
