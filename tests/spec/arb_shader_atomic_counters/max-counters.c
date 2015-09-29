@@ -312,7 +312,7 @@ run_test_combined_max_buffers(unsigned num_fragment_buffers,
                 "       gl_Position = position;\n"
                 "}\n",
                 "#define I %d\n"
-                "layout(binding=I, offset=0) uniform atomic_uint X(I);\n"
+                "layout(binding=I, offset=4) uniform atomic_uint X(I);\n"
                 "#undef I\n",
                 "       x += atomicCounterDecrement(x%d);\n",
                 num_vertex_buffers);
