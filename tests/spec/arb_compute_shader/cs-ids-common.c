@@ -209,7 +209,8 @@ build_program_for_size(uint32_t x, uint32_t y, uint32_t z)
 
 	if (global_id) {
 		src = concat(hunk("#define GLOBAL_ID_TEST\n"),
-			     hunk(compute_shader_source));
+			     hunk(compute_shader_source),
+			     NULL);
 	} else {
 		src = hunk(compute_shader_source);
 	}
