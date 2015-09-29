@@ -162,11 +162,13 @@ def test_parse_listfile_tilde():
 
     """
     contents = "~/foo\n"
+    expected = os.path.expandvars("$HOME/foo")
 
     with utils.tempfile(contents) as tfile:
         results = core.parse_listfile(tfile)
 
-    nt.ok_(results[0] == os.path.expandvars("$HOME/foo"))
+    nt.eq_(results[0], expected,
+           msg='expected: {} but got: {}'.format(expected, results[0]))
 
 
 @_save_core_config
