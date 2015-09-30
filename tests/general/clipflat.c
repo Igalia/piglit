@@ -1,5 +1,6 @@
 /*
  * Copyright © 2009, 2013 VMware, Inc.
+ * Copyright © 2015 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -316,13 +317,56 @@ checkResult(GLfloat badColor[3])
 }
 
 
+char *
+calcQuadrant(GLfloat x, GLfloat y)
+{
+	const char *strx, *stry;
+	char *ret;
+	int _x, _y;
+	_x = (int) x;
+	_y = (int) y;
+
+	switch (_x) {
+	case -1:
+		strx = "left";
+		break;
+	case 0:
+		strx = "center";
+		break;
+	case 1:
+		strx = "right";
+		break;
+	default:
+		assert(0);
+	}
+
+	switch (_y) {
+	case 1:
+		stry = "top";
+		break;
+	case 0:
+		stry = "middle";
+		break;
+	case -1:
+		stry = "bottom";
+		break;
+	default:
+		assert(0);
+	}
+
+	asprintf(&ret, "%s %s", strx, stry);
+	return ret;
+}
+
+
 static void
-reportFailure(GLenum mode, int drawMode, GLuint facing,
+reportSubtest(GLenum mode, int drawMode, GLuint facing,
               GLuint fill,
-              const GLfloat badColor[3], GLfloat x, GLfloat y)
+              const GLfloat badColor[3], GLfloat x, GLfloat y,
+              bool pass)
 {
 	const char *m, *d, *f, *p;
-	char msg1[100], msg2[100], msg3[100];
+	char *q;
 
 	switch (mode) {
 	case GL_TRIANGLES:
@@ -372,22 +416,29 @@ reportFailure(GLenum mode, int drawMode, GLuint facing,
 	else
 		p = "GL_LINE";
 
-	snprintf(msg1, sizeof(msg1), "clipflat: Failure for %s(%s),"
-		 " glFrontFace(%s), glPolygonMode(%s)\n",
-		 d, m, f, p);
+	q = calcQuadrant(x, y);
 
-	if (testing_first_pv)
-		snprintf(msg2, sizeof(msg2),
-			 "\tGL_EXT_provoking_vertex test: "
-			 "GL_FIRST_VERTEX_CONVENTION_EXT mode\n");
-	else
-		msg2[0] = 0;
+	if (!pass) {
+		printf("clipflat: Failure for %s(%s), glFrontFace(%s), "
+		       "glPolygonMode(%s), quadrant: %s\n",
+		       d, m, f, p, q);
 
-	snprintf(msg3, sizeof(msg3),
-		 "\tExpected color (0, 1, 0) but found (%g, %g, %g)\n",
-		 badColor[0], badColor[1], badColor[2]);
+		if (testing_first_pv) {
+			printf("\tGL_EXT_provoking_vertex test: "
+			       "GL_FIRST_VERTEX_CONVENTION_EXT mode\n");
+		}
 
-	piglit_report_subtest_result(PIGLIT_FAIL, "%s%s%s", msg1, msg2, msg3);
+		printf("Expected color (0, 1, 0) but found (%g, %g, %g)\n",
+		       badColor[0], badColor[1], badColor[2]);
+		printf("\n");
+	}
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "%s(%s), glFrontFace(%s), glPolygonMode(%s), "
+				     "quadrant: %s",
+				     d, m, f, p, q);
+
+	free(q);
 }
 
 
@@ -398,6 +449,7 @@ testPrim(GLenum mode, const GLfloat *verts, GLuint count)
 	GLfloat x, y;
 	GLuint facing, fill;
 	int drawMode;
+	bool pass = true;
 
 	// Loop over polygon mode: filled vs. outline
 	for (fill = 0; fill < 2; fill++) {
@@ -425,6 +477,7 @@ testPrim(GLenum mode, const GLfloat *verts, GLuint count)
 				// Only the center location will be unclipped.
 				for (y = -1.0; y <= 1.0; y += 1.0) {
 					for (x = -1.0; x <= 1.0; x += 1.0) {
+						bool quad_pass;
 						GLfloat badColor[3];
 
 						glPushMatrix();
@@ -448,16 +501,16 @@ testPrim(GLenum mode, const GLfloat *verts, GLuint count)
 
 						glPopMatrix();
 
-						if (!checkResult(badColor)) {
-							reportFailure(mode, drawMode, facing, fill, badColor, x, y);
-							return false;
-						}
+						quad_pass = checkResult(badColor);
+						pass = pass && quad_pass;
+						reportSubtest(mode, drawMode, facing, fill,
+							      badColor, x, y, quad_pass);
 					}
 				}
 			}
 		}
 	}
-	return true;
+	return pass;
 }
 
 
