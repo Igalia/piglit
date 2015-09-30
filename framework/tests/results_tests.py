@@ -194,6 +194,7 @@ class TestTestResult_to_json(object):
                 'b': 'fail',
             },
             'result': 'crash',
+            'exception': 'an exception',
         }
 
         test = results.TestResult.from_dict(cls.dict)
@@ -211,6 +212,10 @@ class TestTestResult_to_json(object):
     def test_out(self):
         """results.TestResult.to_json: sets the out correctly"""
         nt.eq_(self.dict['out'], self.json['out'])
+
+    def test_out(self):
+        """results.TestResult.to_json: sets the exception correctly"""
+        nt.eq_(self.dict['exception'], self.json['exception'])
 
     def test_time(self):
         """results.TestResult.to_json: sets the time correctly"""
@@ -244,6 +249,7 @@ class TestTestResult_from_dict(object):
                 'b': 'fail',
             },
             'result': 'crash',
+            'exception': 'an exception',
         }
 
         cls.test = results.TestResult.from_dict(cls.dict)
@@ -267,6 +273,10 @@ class TestTestResult_from_dict(object):
     def test_environment(self):
         """results.TestResult.from_dict: sets environment properly"""
         nt.eq_(self.test.environment, self.dict['environment'])
+
+    def test_exception(self):
+        """results.TestResult.from_dict: sets exception properly"""
+        nt.eq_(self.test.exception, self.dict['exception'])
 
     def test_subtests(self):
         """results.TestResult.from_dict: sets subtests properly"""

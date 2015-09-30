@@ -106,7 +106,8 @@ class StringDescriptor(object):  # pylint: disable=too-few-public-methods
 class TestResult(object):
     """An object represting the result of a single test."""
     __slots__ = ['returncode', '_err', '_out', 'time', 'command', 'traceback',
-                 'environment', 'subtests', 'dmesg', '__result', 'images']
+                 'environment', 'subtests', 'dmesg', '__result', 'images',
+                 'exception']
     err = StringDescriptor('_err')
     out = StringDescriptor('_out')
 
@@ -119,6 +120,7 @@ class TestResult(object):
         self.dmesg = str()
         self.images = None
         self.traceback = None
+        self.exception = None
         if result:
             self.result = result
         else:
@@ -155,6 +157,7 @@ class TestResult(object):
             'returncode': self.returncode,
             'subtests': self.subtests,
             'time': self.time,
+            'exception': self.exception,
         }
         return obj
 
@@ -174,7 +177,7 @@ class TestResult(object):
         inst = cls()
 
         # TODO: There's probably a more clever way to do this
-        for each in ['returncode', 'time', 'command',
+        for each in ['returncode', 'time', 'command', 'exception',
                      'environment', 'result', 'dmesg']:
             if each in dict_:
                 setattr(inst, each, dict_[each])
