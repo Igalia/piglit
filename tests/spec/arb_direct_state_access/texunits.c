@@ -117,11 +117,13 @@ test_texture_params(void)
 
    maxUnit = MAX2(MaxTextureCombinedUnits, MaxTextureCoordUnits);
 
-   /* this should generate an error */
+   /* This should generate an error.  The GL_ARB_direct_state_access extension
+    * isn't explicit about which error should be generated, but the typical
+    * error for a out-of-range int/uint is GL_INVALID_VALUE.  That's what
+    * NVIDIA's driver does.
+    */
    glBindTextureUnit(maxUnit, tex[0]);
-   /* INVALID_OPERATION is expected */
-   /* (see the GL 4.4 spec for glBindTextures) */
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
+   if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
       return false;
    }
 
