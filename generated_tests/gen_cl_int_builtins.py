@@ -50,6 +50,7 @@ CLC_VERSION_MIN = {
     'rotate': 10,
     'sub_sat': 10,
     'upsample': 10,
+    'popcount': 12,
     'mad24': 10,
     'mul24': 10
 }
@@ -83,6 +84,8 @@ def clz(type, val):
                 count = count + 1
         return DATA_SIZES[type] - count
 
+def popcount(val):
+    return bin(val).count('1')
 
 def div(val1, val2):
     return val1 // val2
@@ -103,10 +106,6 @@ def mul(val1, val2):
 def mul_hi(x, y, type):
     res = (x*y) >> DATA_SIZES[type]
     return res
-
-# def pop(val,type):
-#     # TODO: Calculate number of non-zero bits in value (CLC 1.2)
-#     return 0
 
 
 def pow(val, pow):
@@ -298,6 +297,17 @@ generic_tests = {
             [1, 1,  MAX, 0,   0, 1],
             [0, 1, UMAX, 0, MAX, 7]
         ]
+    },
+    'popcount': {
+        'arg_types': [T, T],
+        'function_type': 'ttt',
+        'values': [
+            [[popcount,   1],
+             [popcount,   3],
+             [popcount,   0],
+             [popcount, MAX],
+             [popcount, MIN]],
+            [1, 3, 0, MAX, MIN]]
     }
 }
 
