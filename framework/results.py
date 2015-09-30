@@ -241,6 +241,7 @@ class TestrunResult(object):
         self.options = None
         self.glxinfo = None
         self.wglinfo = None
+        self.clinfo = None
         self.lspci = None
         self.time_elapsed = None
         self.tests = {}
@@ -288,7 +289,7 @@ class TestrunResult(object):
         """
         res = cls()
         for name in ['name', 'uname', 'options', 'glxinfo', 'wglinfo', 'lspci',
-                     'tests', 'totals', 'results_version']:
+                     'tests', 'totals', 'results_version', 'clinfo']:
             value = dict_.get(name)
             if value:
                 setattr(res, name, value)

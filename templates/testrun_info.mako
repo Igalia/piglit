@@ -58,6 +58,12 @@
           <pre>${glxinfo}</pre>
         </td>
       </tr>
+      <tr>
+        <td>clinfo</td>
+        <td>
+          <pre>${clinfo}</pre>
+        </td>
+      </tr>
     </table>
     <p>
       <a href="../index.html">Back to summary</a>

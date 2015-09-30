@@ -89,6 +89,7 @@ def _make_testrun_info(results, destination, exclude):
                 options=each.options,
                 uname=each.uname,
                 glxinfo=each.glxinfo,
+                clinfo=each.clinfo,
                 lspci=each.lspci))
 
         # Then build the individual test results

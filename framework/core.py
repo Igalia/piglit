@@ -194,6 +194,7 @@ def collect_system_info():
     progs = [('wglinfo', ['wglinfo']),
              ('glxinfo', ['glxinfo']),
              ('uname', ['uname', '-a']),
+             ('clinfo', ['clinfo']),
              ('lspci', ['lspci'])]
 
     result = {}

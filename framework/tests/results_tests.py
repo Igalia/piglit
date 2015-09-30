@@ -456,6 +456,7 @@ class TestTestrunResultToJson(object):
         test.uname = 'this is uname'
         test.options = {'some': 'option'}
         test.glxinfo = 'glxinfo'
+        test.clinfo = 'clinfo'
         test.wglinfo = 'wglinfo'
         test.lspci = 'this is lspci'
         test.time_elapsed = 1.23
@@ -482,6 +483,10 @@ class TestTestrunResultToJson(object):
     def test_wglinfo(self):
         """results.TestrunResult.to_json: wglinfo is properly encoded"""
         nt.eq_(self.test['wglinfo'], 'wglinfo')
+
+    def test_clinfo(self):
+        """results.TestrunResult.to_json: clinfo is properly encoded"""
+        nt.eq_(self.test['clinfo'], 'clinfo')
 
     def test_lspci(self):
         """results.TestrunResult.to_json: lspci is properly encoded"""
@@ -513,6 +518,7 @@ class TestTestrunResultFromDict(object):
         test.options = {'some': 'option'}
         test.glxinfo = 'glxinfo'
         test.wglinfo = 'wglinfo'
+        test.clinfo = 'clinfo'
         test.lspci = 'this is lspci'
         test.time_elapsed = 1.23
         test.tests = {
@@ -532,7 +538,7 @@ class TestTestrunResultFromDict(object):
             nt.eq_(baseline, test)
 
         for attrib in ['name', 'uname', 'glxinfo', 'wglinfo', 'lspci',
-                       'time_elapsed', 'results_version']:
+                       'time_elapsed', 'results_version', 'clinfo']:
             test.description = ('results.TestrunResult.from_dict: '
                                 '{} is restored correctly'.format(attrib))
             yield (test,
