@@ -1,0 +1,80 @@
+# simple double through vs->tcs->tes->fs.
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#extension GL_ARB_gpu_shader_fp64: require
+in vec4 vertex;
+
+out double vs_var0;
+
+void main()
+{
+	gl_Position = vertex;
+	vs_var0 = 1.0LF;
+}
+
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_gpu_shader_fp64: require
+layout(vertices = 3) out;
+
+in double vs_var0[];
+out double tcs_var0[];
+
+void main() {
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+	tcs_var0[gl_InvocationID] = vs_var0[gl_InvocationID] + 2.0LF;
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_gpu_shader_fp64: require
+layout(triangles) in;
+
+in double tcs_var0[];
+flat out double tes_var0;
+
+void main() {
+        dvec2 temp;
+	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
+	            + gl_in[1].gl_Position * gl_TessCoord[1]
+	            + gl_in[2].gl_Position * gl_TessCoord[2];
+
+	tes_var0 = tcs_var0[0] + 3.0LF;
+}
+
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64: require
+flat in double tes_var0;
+
+void main()
+{
+	if (tes_var0 == 6.0LF)
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
