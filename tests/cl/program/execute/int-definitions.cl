@@ -51,14 +51,14 @@ kernel void test_short(global int* out) {
 
 kernel void test_int(global int* out) {
   int i = 0;
-  out[i++] = INT_MAX;
-  out[i++] = INT_MIN;
-  out[i++] = UINT_MAX;
+  out[i++] = (INT_MAX - (int2)(0)).s0;
+  out[i++] = (INT_MIN - (int2)(0)).s0;
+  out[i++] = (UINT_MAX - (uint2)(0)).s0;
 }
 
 kernel void test_long(global long* out) {
   int i = 0;
-  out[i++] = LONG_MAX;
-  out[i++] = LONG_MIN;
-  out[i++] = ULONG_MAX;
+  out[i++] = (LONG_MAX - (long2)(0)).s0;
+  out[i++] = (LONG_MIN - (long2)(0)).s0;
+  out[i++] = (ULONG_MAX - (ulong2)(0)).s0;
 }
