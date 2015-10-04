@@ -51,10 +51,10 @@ PIGLIT_CL_API_TEST_CONFIG_END
 
 
 const char* strings[] = {
-	"int get_number() { return 42; }",
+	"int get_number() { return 42; }\n",
 	"int get_number();\n",
-	"kernel void test_kernel() { int i = get_number(); }",
-	"int get_number() { return 0; }"
+	"kernel void test_kernel() { int i = get_number(); }\n",
+	"int get_number() { return 0; }\n"
 };
 
 #if defined(CL_VERSION_1_2)
@@ -87,8 +87,16 @@ compile_program(cl_context context,
 	                       NULL, NULL);
 
 	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		int i;
 		fprintf(stderr, "Failed (error code: %s): Compile program (for the %s).\n",
 		        piglit_cl_get_error_name(errNo), err_str);
+
+		for(i = 0; i < num_devices; ++i) {
+			char *build_log = piglit_cl_get_program_build_info(program, device_list[i], CL_PROGRAM_BUILD_LOG);
+			fprintf(stderr, "Build log:\n%s\n", build_log);
+			free(build_log);
+		}
+
 		clReleaseProgram(program);
 		return NULL;
 	}
@@ -143,12 +151,28 @@ piglit_cl_test(const int argc,
 #if defined(CL_VERSION_1_2)
 	enum piglit_result result = PIGLIT_PASS;
 
+	bool linker_available;
 	int i;
 	cl_program_binary_type* binary_type;
 	cl_program compiled_programs[2];
 	cl_program function_prog;
 	cl_program kernel_prog;
 	cl_program linked_prog;
+
+	linker_available = false;
+	for(i = 0; i < env->context->num_devices; ++i) {
+		cl_bool* dev_linker =
+			piglit_cl_get_device_info(env->context->device_ids[i],
+			                          CL_DEVICE_LINKER_AVAILABLE);
+
+		if (*dev_linker)
+			linker_available |= true;
+
+		free(dev_linker);
+	}
+
+	if (!linker_available)
+		return PIGLIT_SKIP;
 
 	/* Create compiled program */
 	function_prog = compile_program(env->context->cl_ctx,
@@ -332,12 +356,12 @@ piglit_cl_test(const int argc,
 	 * for param_name for clGetDeviceInfo is set to CL_FALSE.
 	 */
 	for(i = 0; i < env->context->num_devices; ++i) {
-		cl_bool* linker_available =
+		cl_bool* dev_linker =
 			piglit_cl_get_device_info(env->context->device_ids[i],
 			                          CL_DEVICE_LINKER_AVAILABLE);
-			if(!(*linker_available)) {
+			if(!(*dev_linker)) {
 				test(env->context->cl_ctx,
-				     env->context->num_devices, env->context->device_ids,
+				     1, &env->context->device_ids[i],
 				     "",
 				     2, compiled_programs,
 				     NULL, NULL,
@@ -345,7 +369,7 @@ piglit_cl_test(const int argc,
 				     CL_LINKER_NOT_AVAILABLE, &result,
 				     "Trigger CL_LINKER_NOT_AVAILABLE if a linker is not available");
 		}
-		free(linker_available);
+		free(dev_linker);
 	}
 
 
