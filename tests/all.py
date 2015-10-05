@@ -1069,6 +1069,7 @@ with profile.group_manager(
     g(['gl-2.0-edgeflag'])
     g(['gl-2.0-edgeflag-immediate'])
     g(['gl-2.0-large-point-fs'])
+    g(['gl-2.0-two-sided-stencil'])
     g(['gl-2.0-vertexattribpointer'])
     g(['gl-2.0-vertex-const-attr'])
     g(['gl-2.0-reuse_fragment_shader'])
