@@ -4180,6 +4180,11 @@ with profile.group_manager(
     g(['khr_compressed_astc-miptree_gles2'], 'miptree-gles')
 
 with profile.group_manager(
+         PiglitGLTest,
+         grouptools.join('spec', 'nv_read_depth')) as g:
+    g(['read_depth_gles3'])
+
+with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_compressed_paletted_texture')) as g:
     g(['oes_compressed_paletted_texture-api'], 'basic API')
