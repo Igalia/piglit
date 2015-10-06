@@ -29,6 +29,7 @@
  */
 
 #include "piglit-util-gl.h"
+#include "dsa-utils.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
