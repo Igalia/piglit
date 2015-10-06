@@ -257,7 +257,6 @@ with profile.group_manager(GleanTest, 'glean') as g:
     # exactRGBA is not included intentionally, because it's too strict and
     # the equivalent functionality is covered by other tests
     g('shaderAPI')
-    g('stencil2')
     g('texCombine')
     g('texCube')
     g('texEnv')
