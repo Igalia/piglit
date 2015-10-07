@@ -212,6 +212,8 @@ class JUnitBackend(FileBackend):
             # Add stderr
             err = etree.SubElement(element, 'system-err')
             err.text = data.err
+            err.text += '\n\nstart time: {}\nend time: {}\n'.format(
+                data.time.start, data.time.end)
             calculate_result()
         else:
             etree.SubElement(element, 'failure', message='Incomplete run.')
