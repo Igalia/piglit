@@ -64,7 +64,7 @@ test_readdrawpixels(void)
 	for (i = 0; i < 4; i++) {
 		if (image[i] != readback[i]) {
 			printf("Image returned by glReadPixels didn't match"
-			       " the expected result (0x%x != 0x%x)",
+			       " the expected result (0x%x != 0x%x)\n",
 			       readback[i], image[i]);
 			return false;
 		}
@@ -83,7 +83,7 @@ test_readdrawpixels(void)
 	for (i = 0; i < 4; i++) {
 		if (readback[i] != 0xffffff02) {
 			printf("Image returned by glReadPixels didn't match"
-			       " the expected result (0x%x != 0xffffff02)",
+			       " the expected result (0x%x != 0xffffff02)\n",
 			       readback[i]);
 			return false;
 		}
