@@ -278,6 +278,18 @@ class TestV0toV1(object):
             with open(t, 'r') as f:
                 backends.json._update_zero_to_one(backends.json._load(f))
 
+    @utils.DocFormatter({'current': backends.json.CURRENT_JSON_VERSION})
+    def test_load_results(self):
+        """backends.json.update_results (1 -> {current}): load_results properly updates"""
+        with utils.tempdir() as d:
+            tempfile = os.path.join(d, 'results.json')
+            with open(tempfile, 'w') as f:
+                json.dump(self.DATA, f, default=backends.json.piglit_encoder)
+            with open(tempfile, 'r') as f:
+                result = backends.json.load_results(tempfile, 'none')
+                nt.eq_(result.results_version,
+                       backends.json.CURRENT_JSON_VERSION)
+
 
 class TestV2Update(object):
     """Test V1 to V2 of results."""
@@ -740,12 +752,3 @@ class TestV6toV7(object):
         """backends.json.update_results (6 -> 7): Totals are populated"""
         nt.ok_(self.result.totals != {})
 
-    def test_load_results(self):
-        """backends.json.update_results (6 -> 7): load_results properly updates."""
-        with utils.tempdir() as d:
-            tempfile = os.path.join(d, 'results.json')
-            with open(tempfile, 'w') as f:
-                json.dump(self.DATA, f, default=backends.json.piglit_encoder)
-            with open(tempfile, 'r') as f:
-                result = backends.json.load_results(tempfile, 'none')
-                nt.eq_(result.results_version, 7)
