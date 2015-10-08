@@ -469,7 +469,7 @@ class TestTestrunResultToJson(object):
         test.clinfo = 'clinfo'
         test.wglinfo = 'wglinfo'
         test.lspci = 'this is lspci'
-        test.time_elapsed = 1.23
+        test.time_elapsed.end = 1.23
         test.tests = {'a test': results.TestResult('pass')}
 
         cls.test = test.to_json()
@@ -504,7 +504,7 @@ class TestTestrunResultToJson(object):
 
     def test_time(self):
         """results.TestrunResult.to_json: time_elapsed is properly encoded"""
-        nt.eq_(self.test['time_elapsed'], 1.23)
+        nt.eq_(self.test['time_elapsed'].end, 1.23)
 
     def test_tests(self):
         """results.TestrunResult.to_json: tests is properly encoded"""
@@ -530,7 +530,7 @@ class TestTestrunResultFromDict(object):
         test.wglinfo = 'wglinfo'
         test.clinfo = 'clinfo'
         test.lspci = 'this is lspci'
-        test.time_elapsed = 1.23
+        test.time_elapsed.end = 1.23
         test.tests = {
             'a test': results.TestResult('pass'),
             'subtest': subtest,
@@ -548,7 +548,7 @@ class TestTestrunResultFromDict(object):
             nt.eq_(baseline, test)
 
         for attrib in ['name', 'uname', 'glxinfo', 'wglinfo', 'lspci',
-                       'time_elapsed', 'results_version', 'clinfo']:
+                       'results_version', 'clinfo']:
             test.description = ('results.TestrunResult.from_dict: '
                                 '{} is restored correctly'.format(attrib))
             yield (test,
@@ -581,6 +581,17 @@ class TestTestrunResultFromDict(object):
                           status.Status),
                msg='Subtests should be type Status, but was "{}"'.format(
                    type(self.test.tests['subtest'].subtests['foo'])))
+
+    def test_time_elapsed(self):
+        """results.TestrunRresult.from_dict: time_elapsed is restored correctly
+        """
+        nt.eq_(self.baseline.time_elapsed.end, self.test.time_elapsed.end)
+
+    def test_time(self):
+        """results.TestrunResult.from_dict: time_elapsed is TimeAttribute instance"""
+        nt.ok_(isinstance(self.test.time_elapsed, results.TimeAttribute),
+               msg='time_elapsed should be tpe TimeAttribute, '
+                   'but was "{}"'.format(type(self.test.time_elapsed)))
 
 
 def test_TimeAttribute_to_json():

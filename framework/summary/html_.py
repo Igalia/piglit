@@ -36,7 +36,7 @@ from mako.lookup import TemplateLookup
 # the module
 from framework import backends, exceptions
 
-from .common import Results, escape_filename, escape_pathname, time_as_delta
+from .common import Results, escape_filename, escape_pathname
 
 __all__ = [
     'html',
@@ -85,7 +85,7 @@ def _make_testrun_info(results, destination, exclude):
             out.write(_TEMPLATES.get_template('testrun_info.mako').render(
                 name=each.name,
                 totals=each.totals['root'],
-                time=time_as_delta(each.time_elapsed),
+                time=each.time_elapsed.delta,
                 options=each.options,
                 uname=each.uname,
                 glxinfo=each.glxinfo,
@@ -104,9 +104,6 @@ def _make_testrun_info(results, destination, exclude):
                 # ensure that it doesn't
                 if not os.path.exists(temp_path):
                     os.makedirs(temp_path)
-
-                if value.time:
-                    value.time = time_as_delta(value.time)
 
                 with open(html_path, 'w') as out:
                     out.write(_TEMPLATES.get_template(

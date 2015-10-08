@@ -24,7 +24,6 @@
 
 from __future__ import absolute_import, division, print_function
 import itertools
-import datetime
 import re
 import operator
 
@@ -265,13 +264,6 @@ def escape_filename(key):
 def escape_pathname(key):
     """ Remove / and \\ from names """
     return re.sub(r'[/\\]', '_', key)
-
-
-def time_as_delta(time):
-    """Convert time to a time delta, or return None."""
-    if time is not None:
-        return datetime.timedelta(0, time)
-    return None
 
 
 def find_diffs(results, tests, comparator, handler=lambda *a: None):

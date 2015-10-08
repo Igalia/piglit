@@ -42,7 +42,7 @@ __all__ = [
 ]
 
 # The current version of the JSON results
-CURRENT_JSON_VERSION = 7
+CURRENT_JSON_VERSION = 8
 
 # The level to indent a final file
 INDENT = 4
@@ -290,6 +290,7 @@ def _update_results(results, filepath):
             4: _update_four_to_five,
             5: _update_five_to_six,
             6: _update_six_to_seven,
+            7: _update_seven_to_eight,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -563,6 +564,26 @@ def _update_six_to_seven(result):
     if not result.totals:
         result.calculate_group_totals()
     result.results_version = 7
+
+    return result
+
+
+def _update_seven_to_eight(result):
+    """Update json results from version 7 to 8.
+
+    This update replaces the time attribute float with a TimeAttribute object,
+    which stores a start time and an end time, and provides methods for getting
+    total and delta.
+
+    This value is used for both TestResult.time and TestrunResult.time_elapsed.
+
+    """
+    for test in result.tests.viewvalues():
+        test.time = results.TimeAttribute(end=test.time)
+
+    result.time_elapsed = results.TimeAttribute(end=result.time_elapsed)
+
+    result.results_version = 8
 
     return result
 

@@ -89,7 +89,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
 
         result = results.TestResult()
-        result.time = 1.2345
+        result.time.end = 1.2345
         result.result = 'pass'
         result.out = 'this is stdout'
         result.err = 'this is stderr'
@@ -120,7 +120,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
         super(TestJUnitMultiTest, cls).setup_class()
 
         result = results.TestResult()
-        result.time = 1.2345
+        result.time.end = 1.2345
         result.result = 'pass'
         result.out = 'this is stdout'
         result.err = 'this is stderr'
@@ -152,7 +152,7 @@ def test_junit_replace():
     """backends.junit.JUnitBackend.write_test(): '{separator}' is replaced with '.'"""
     with utils.tempdir() as tdir:
         result = results.TestResult()
-        result.time = 1.2345
+        result.time.end = 1.2345
         result.result = 'pass'
         result.out = 'this is stdout'
         result.err = 'this is stderr'
@@ -175,7 +175,7 @@ def test_junit_skips_bad_tests():
     """backends.junit.JUnitBackend: skips illformed tests"""
     with utils.tempdir() as tdir:
         result = results.TestResult()
-        result.time = 1.2345
+        result.time.end = 1.2345
         result.result = 'pass'
         result.out = 'this is stdout'
         result.err = 'this is stderr'
@@ -237,8 +237,8 @@ class TestJUnitLoad(utils.StaticDirectory):
     def test_time(self):
         """backends.junit._load: Time is loaded correctly."""
         time = self.xml().tests[self.testname].time
-        nt.assert_is_instance(time, float)
-        nt.assert_equal(time, 1.12345)
+        nt.assert_is_instance(time, results.TimeAttribute)
+        nt.assert_equal(time.total, 1.12345)
 
     def test_command(self):
         """backends.junit._load: command is loaded correctly."""

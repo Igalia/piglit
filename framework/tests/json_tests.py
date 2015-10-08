@@ -75,7 +75,7 @@ class TestJsonOutput(utils.StaticDirectory):
         backend.initialize(_create_metadata(args, 'test', core.Options()))
         with backend.write_test('result') as t:
             t(results.TestResult('pass'))
-        backend.finalize({'time_elapsed': 1.22})
+        backend.finalize({'time_elapsed': results.TimeAttribute(end=1.2)})
         with open(os.path.join(cls.tdir, 'results.json'), 'r') as f:
             cls.json = json.load(f)
 

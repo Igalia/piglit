@@ -752,3 +752,68 @@ class TestV6toV7(object):
         """backends.json.update_results (6 -> 7): Totals are populated"""
         nt.ok_(self.result.totals != {})
 
+
+class TestV7toV8(object):
+    DATA = {
+        "results_version": 7,
+        "name": "test",
+        "options": {
+            "profile": ['quick'],
+            "dmesg": False,
+            "verbose": False,
+            "platform": "gbm",
+            "sync": False,
+            "valgrind": False,
+            "filter": [],
+            "concurrent": "all",
+            "test_count": 0,
+            "exclude_tests": [],
+            "exclude_filter": [],
+            "env": {
+                "lspci": "stuff",
+                "uname": "more stuff",
+                "glxinfo": "and stuff",
+                "wglinfo": "stuff"
+            }
+        },
+        "tests": {
+            'a@test': results.TestResult('pass'),
+        },
+        "time_elapsed": 1.2,
+    }
+
+    @classmethod
+    def setup_class(cls):
+        """Class setup. Create a TestrunResult with v4 data."""
+        cls.DATA['tests']['a@test'] = cls.DATA['tests']['a@test'].to_json()
+        cls.DATA['tests']['a@test']['time'] = 1.2
+
+        with utils.tempfile(
+                json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
+            with open(t, 'r') as f:
+                cls.result = backends.json._update_seven_to_eight(
+                    backends.json._load(f))
+
+    def test_time(self):
+        """backends.json.update_results (7 -> 8): test time is stored as start and end"""
+        nt.eq_(self.result.tests['a@test'].time.start, 0.0)
+        nt.eq_(self.result.tests['a@test'].time.end, 1.2)
+
+    def test_time_inst(self):
+        """backends.json.update_results (7 -> 8): test time is a TimeAttribute instance"""
+        nt.ok_(
+            isinstance(self.result.tests['a@test'].time, results.TimeAttribute),
+            msg='Testresult.time should have been TimeAttribute, '
+                'but was "{}"'.format(type(self.result.tests['a@test'].time)))
+
+    def test_time_elapsed_inst(self):
+        """backends.json.update_results (7 -> 8): total time is stored as TimeAttribute"""
+        nt.ok_(
+            isinstance(self.result.time_elapsed, results.TimeAttribute),
+            msg='TestrunResult.time_elapsed should have been TimeAttribute, '
+                'but was "{}"'.format(type(self.result.time_elapsed)))
+
+    def test_time_elapsed(self):
+        """backends.json.update_results (7 -> 8): total time is stored as start and end"""
+        nt.eq_(self.result.time_elapsed.start, 0.0)
+        nt.eq_(self.result.time_elapsed.end, 1.2)

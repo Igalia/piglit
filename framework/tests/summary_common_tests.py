@@ -344,19 +344,6 @@ def test_Results_get_results_missing_subtest():
            [status.PASS, status.NOTRUN])
 
 
-def test_time_as_delta():
-    """summary.time_as_delta: converts a time into a delta"""
-    input_ = 1.2
-    expected = datetime.timedelta(0, input_)
-
-    nt.eq_(expected, summary.time_as_delta(input_))
-
-
-def test_time_as_delta_none():
-    """summary.time_as_delta: returns None when input is None"""
-    nt.eq_(None, summary.time_as_delta(None))
-
-
 def test_escape_filename():
     """summary.escape_filename: replaces invalid characters with '_'"""
     invalid = r'<>:"|?*#'

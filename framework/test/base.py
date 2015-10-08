@@ -177,10 +177,10 @@ class Test(object):
         # Run the test
         if self.OPTS.execute:
             try:
-                time_start = time.time()
+                self.result.time.start = time.time()
                 dmesg.update_dmesg()
                 self.run()
-                self.result.time = time.time() - time_start
+                self.result.time.end = time.time()
                 self.result = dmesg.update_result(self.result)
             # This is a rare case where a bare exception is okay, since we're
             # using it to log exceptions

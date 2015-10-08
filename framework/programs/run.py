@@ -269,14 +269,13 @@ def run(input_):
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
 
-    time_start = time.time()
+    results.time_elapsed.start = time.time()
     # Set the dmesg type
     if args.dmesg:
         profile.dmesg = args.dmesg
     profile.run(opts, args.log_level, backend)
-    time_end = time.time()
 
-    results.time_elapsed = time_end - time_start
+    results.time_elapsed.end = time.time()
     backend.finalize({'time_elapsed': results.time_elapsed})
 
     print('Thank you for running Piglit!\n'

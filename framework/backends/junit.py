@@ -196,7 +196,7 @@ class JUnitBackend(FileBackend):
         element = etree.Element('testcase', name=full_test_name,
                                 classname=classname,
                                 # Incomplete will not have a time.
-                                time=str(data.time),
+                                time=str(data.time.total),
                                 status=str(data.result))
 
         # If this is an incomplete status then none of these values will be
@@ -253,7 +253,7 @@ def _load(results_file):
             name = name[:-1]
 
         result.result = test.attrib['status']
-        result.time = float(test.attrib['time'])
+        result.time = results.TimeAttribute(end=float(test.attrib['time']))
         result.err = test.find('system-err').text
 
         # The command is prepended to system-out, so we need to separate those
@@ -263,7 +263,7 @@ def _load(results_file):
         result.out = '\n'.join(out[1:])
 
         run_result.tests[name] = result
-    
+
     return run_result
 
 

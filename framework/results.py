@@ -151,7 +151,7 @@ class TestResult(object):
 
     def __init__(self, result=None):
         self.returncode = None
-        self.time = float()
+        self.time = TimeAttribute()
         self.command = str()
         self.environment = str()
         self.subtests = Subtests()
@@ -214,9 +214,8 @@ class TestResult(object):
         # pylint: disable=assigning-non-slot
         inst = cls()
 
-        # TODO: There's probably a more clever way to do this
-        for each in ['returncode', 'time', 'command', 'exception',
-                     'environment', 'result', 'dmesg']:
+        for each in ['returncode', 'command', 'exception', 'environment',
+                     'time', 'result', 'dmesg']:
             if each in dict_:
                 setattr(inst, each, dict_[each])
 
@@ -284,7 +283,7 @@ class TestrunResult(object):
         self.wglinfo = None
         self.clinfo = None
         self.lspci = None
-        self.time_elapsed = None
+        self.time_elapsed = TimeAttribute()
         self.tests = {}
         self.totals = collections.defaultdict(Totals)
 
@@ -330,14 +329,11 @@ class TestrunResult(object):
         """
         res = cls()
         for name in ['name', 'uname', 'options', 'glxinfo', 'wglinfo', 'lspci',
-                     'tests', 'totals', 'results_version', 'clinfo']:
+                     'time_elapsed', 'tests', 'totals', 'results_version',
+                     'clinfo']:
             value = dict_.get(name)
             if value:
                 setattr(res, name, value)
-
-        # This could be replaced with a getter/setter property
-        time = dict_.get('time_elapsed')
-        res.time_elapsed = None if time is None else float(time)
 
         if not res.totals and not _no_totals:
             res.calculate_group_totals()

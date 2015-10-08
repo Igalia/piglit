@@ -26,7 +26,7 @@
       </tr>
       <tr>
         <td>Time</td>
-        <td>${value.time}</b>
+        <td>${value.time.delta}</b>
       </tr>
     % if value.images:
       <tr>
