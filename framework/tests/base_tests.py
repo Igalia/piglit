@@ -23,6 +23,7 @@
 from __future__ import print_function, absolute_import
 
 import nose.tools as nt
+from nose.plugins.attrib import attr
 
 import framework.tests.utils as utils
 from framework.test.base import (
@@ -59,6 +60,7 @@ def test_run_return_early():
     test.run()
 
 
+@attr('slow')
 def test_timeout():
     """test.base.Test.run(): kills tests that exceed timeout when set"""
     utils.binary_check('sleep', 1)
@@ -73,6 +75,7 @@ def test_timeout():
     nt.eq_(test.result.result, 'timeout')
 
 
+@attr('slow')
 def test_timeout_pass():
     """test.base.Test.run(): Result is returned when timeout is set but not exceeded
     """
