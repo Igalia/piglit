@@ -29,6 +29,15 @@ from framework import results, status, exceptions, grouptools
 import framework.tests.utils as utils
 
 
+def dict_eq(one, two):
+    """Assert two dict-like objects are equal.
+
+    Casts to dict, and then uses nose.tools.assert_dict_equal.
+
+    """
+    nt.assert_dict_equal(dict(one), dict(two))
+
+
 @utils.nose_generator
 def test_generate_initialize():
     """ Generator that creates tests to initialize all of the classes in core
@@ -79,7 +88,7 @@ def test_Subtests_from_dict():
 
     test = results.Subtests.from_dict(baseline.to_json())
 
-    nt.assert_dict_equal(baseline, test)
+    dict_eq(baseline, test)
 
 
 def test_Subtests_from_dict_instance():
@@ -386,7 +395,7 @@ class TestTestrunResultTotals(object):
         root['crash'] += 1
         root['skip'] += 1
 
-        nt.assert_dict_equal(self.test['root'], root)
+        dict_eq(self.test['root'], root)
 
     def test_recurse(self):
         """results.TestrunResult.totals: Recurses correctly"""
@@ -394,14 +403,14 @@ class TestTestrunResultTotals(object):
         expected['fail'] += 1
         expected['crash'] += 1
         expected['skip'] += 1
-        nt.assert_dict_equal(self.test['foo'], expected)
+        dict_eq(self.test['foo'], expected)
 
     def test_two_parents(self):
         """results.TestrunResult.totals: Handles multiple parents correctly"""
         expected = results.Totals()
         expected['crash'] += 1
         expected['skip'] += 1
-        nt.assert_dict_equal(self.test[grouptools.join('foo', 'foo')], expected)
+        dict_eq(self.test[grouptools.join('foo', 'foo')], expected)
 
 
 class TestTestrunResultTotalsSubtests(object):
@@ -425,7 +434,7 @@ class TestTestrunResultTotalsSubtests(object):
         expect['pass'] += 1
         expect['crash'] += 1
         expect['fail'] += 1
-        nt.assert_dict_equal(self.test['root'], expect)
+        dict_eq(self.test['root'], expect)
 
     def test_node(self):
         """results.TestrunResult.totals: Tests with subtests are treated as groups"""
@@ -439,7 +448,7 @@ class TestTestrunResultTotalsSubtests(object):
         expect['pass'] += 1
         expect['crash'] += 1
         expect['fail'] += 1
-        nt.assert_dict_equal(self.test[grouptools.join('sub', 'test')], expect)
+        dict_eq(self.test[grouptools.join('sub', 'test')], expect)
 
 
 def test_totals_false():
@@ -484,7 +493,7 @@ class TestTestrunResultToJson(object):
 
     def test_options(self):
         """results.TestrunResult.to_json: options is properly encoded"""
-        nt.assert_dict_equal(self.test['options'], {'some': 'option'})
+        dict_eq(self.test['options'], {'some': 'option'})
 
     def test_glxinfo(self):
         """results.TestrunResult.to_json: glxinfo is properly encoded"""
@@ -568,7 +577,7 @@ class TestTestrunResultFromDict(object):
 
     def test_totals(self):
         """results.TestrunResult.from_dict: totals is restored correctly"""
-        nt.assert_dict_equal(self.baseline.totals, self.test.totals)
+        dict_eq(self.baseline.totals, self.test.totals)
 
     def test_subtests(self):
         """results.TestrunResult.from_dict: subtests are restored correctly"""
