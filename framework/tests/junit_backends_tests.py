@@ -47,7 +47,11 @@ _XML = """\
     <testsuite name="piglit" tests="1">
       <testcase classname="piglit.foo.bar" name="a-test" status="pass" time="1.12345">
         <system-out>this/is/a/command\nThis is stdout</system-out>
-        <system-err>this is stderr</system-err>
+        <system-err>this is stderr
+
+time start: 1.0
+time end: 4.5
+        </system-err>
       </testcase>
     </testsuite>
   </testsuites>
@@ -234,11 +238,17 @@ class TestJUnitLoad(utils.StaticDirectory):
         nt.assert_is_instance(self.xml().tests[self.testname].result,
                               status.Status)
 
-    def test_time(self):
-        """backends.junit._load: Time is loaded correctly."""
+    def test_time_start(self):
+        """backends.junit._load: Time.start is loaded correctly."""
         time = self.xml().tests[self.testname].time
         nt.assert_is_instance(time, results.TimeAttribute)
-        nt.assert_equal(time.total, 1.12345)
+        nt.eq_(time.start, 1.0)
+
+    def test_time_end(self):
+        """backends.junit._load: Time.end is loaded correctly."""
+        time = self.xml().tests[self.testname].time
+        nt.assert_is_instance(time, results.TimeAttribute)
+        nt.eq_(time.end, 4.5)
 
     def test_command(self):
         """backends.junit._load: command is loaded correctly."""
@@ -253,7 +263,9 @@ class TestJUnitLoad(utils.StaticDirectory):
     def test_err(self):
         """backends.junit._load: stderr is loaded correctly."""
         test = self.xml().tests[self.testname].err
-        nt.assert_equal(test, 'this is stderr')
+        nt.eq_(
+            test, 'this is stderr\n\ntime start: 1.0\ntime end: 4.5\n        ')
+
 
     @utils.no_error
     def test_load_file(self):

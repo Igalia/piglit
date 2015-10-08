@@ -255,6 +255,9 @@ def _load(results_file):
             name = name[:-1]
 
         result.result = test.attrib['status']
+
+        # This is the fallback path, we'll try to overwrite this with the value
+        # in stderr
         result.time = results.TimeAttribute(end=float(test.attrib['time']))
         result.err = test.find('system-err').text
 
@@ -263,6 +266,15 @@ def _load(results_file):
         out = test.find('system-out').text.split('\n')
         result.command = out[0]
         result.out = '\n'.join(out[1:])
+
+        # Try to get the values in stderr for time
+        if 'time start' in result.err:
+            for line in result.err.split('\n'):
+                if line.startswith('time start:'):
+                    result.time.start = float(line[len('time start: '):])
+                elif line.startswith('time end:'):
+                    result.time.end = float(line[len('time end: '):])
+                    break
 
         run_result.tests[name] = result
 
