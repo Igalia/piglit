@@ -278,6 +278,8 @@ def _load(results_file):
 
         run_result.tests[name] = result
 
+    run_result.calculate_group_totals()
+
     return run_result
 
 

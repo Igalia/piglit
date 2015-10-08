@@ -266,6 +266,10 @@ class TestJUnitLoad(utils.StaticDirectory):
         nt.eq_(
             test, 'this is stderr\n\ntime start: 1.0\ntime end: 4.5\n        ')
 
+    def test_totals(self):
+        """backends.junit._load: Totals are calculated."""
+        nt.ok_(bool(self.xml()))
+
 
     @utils.no_error
     def test_load_file(self):
