@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2015 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -213,7 +213,7 @@ class TestTestResult_to_json(object):
         """results.TestResult.to_json: sets the out correctly"""
         nt.eq_(self.dict['out'], self.json['out'])
 
-    def test_out(self):
+    def test_exception(self):
         """results.TestResult.to_json: sets the exception correctly"""
         nt.eq_(self.dict['exception'], self.json['exception'])
 
@@ -581,3 +581,33 @@ class TestTestrunResultFromDict(object):
                           status.Status),
                msg='Subtests should be type Status, but was "{}"'.format(
                    type(self.test.tests['subtest'].subtests['foo'])))
+
+
+def test_TimeAttribute_to_json():
+    """results.TimeAttribute.to_json(): returns expected dictionary"""
+    baseline = {'start': 0.1, 'end': 1.0}
+    test = results.TimeAttribute(**baseline)
+    baseline['__type__'] = 'TimeAttribute'
+
+    nt.assert_dict_equal(baseline, test.to_json())
+
+
+def test_TimeAttribute_from_dict():
+    """results.TimeAttribute.from_dict: returns expected value"""
+    # Type is included because to_json() adds it.
+    baseline = {'start': 0.1, 'end': 1.0, '__type__': 'TimeAttribute'}
+    test = results.TimeAttribute.from_dict(baseline).to_json()
+
+    nt.assert_dict_equal(baseline, test)
+
+
+def test_TimeAttribute_total():
+    """results.TimeAttribute.total: returns the difference between end and start"""
+    test = results.TimeAttribute(1.0, 5.0)
+    nt.eq_(test.total, 4.0)
+
+
+def test_TimeAttribute_delta():
+    """results.TimeAttribute.delta: returns the delta of the values"""
+    test = results.TimeAttribute(1.0, 5.0)
+    nt.eq_(test.delta, '0:00:04')

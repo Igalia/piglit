@@ -51,6 +51,7 @@ _DECODER_TABLE = {
     'Subtests': results.Subtests,
     'TestResult': results.TestResult,
     'TestrunResult': results.TestrunResult,
+    'TimeAttribute': results.TimeAttribute,
     'Totals': results.Totals,
 }
 

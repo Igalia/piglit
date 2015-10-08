@@ -25,6 +25,7 @@ from __future__ import print_function, absolute_import
 
 import collections
 import copy
+import datetime
 
 from framework import status, exceptions, grouptools
 
@@ -101,6 +102,43 @@ class StringDescriptor(object):  # pylint: disable=too-few-public-methods
 
     def __delete__(self, instance):
         raise NotImplementedError
+
+
+class TimeAttribute(object):
+    """Attribute of TestResult for time.
+
+    This attribute provides a couple of nice helpers. It stores the start and
+    end time and provides methods for getting the total and delta of the times.
+
+    """
+    __slots__ = ['start', 'end']
+
+    def __init__(self, start=0.0, end=0.0):
+        self.start = start
+        self.end = end
+
+    @property
+    def total(self):
+        return self.end - self.start
+
+    @property
+    def delta(self):
+        return str(datetime.timedelta(seconds=self.total))
+
+    def to_json(self):
+        return {
+            'start': self.start,
+            'end': self.end,
+            '__type__': 'TimeAttribute',
+        }
+
+    @classmethod
+    def from_dict(cls, dict_):
+        dict_ = copy.copy(dict_)
+
+        if '__type__' in dict_:
+            del dict_['__type__']
+        return cls(**dict_)
 
 
 class TestResult(object):
