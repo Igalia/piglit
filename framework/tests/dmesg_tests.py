@@ -36,6 +36,7 @@ except ImportError:
     import json
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
+from nose.plugins.attrib import attr
 
 from framework import dmesg, status
 import framework.core
@@ -150,7 +151,7 @@ def test_get_dmesg_linux():
                       "but it actually returned {}".format(type(posix))))
 
 
-@utils.privileged_test
+@attr('privliged')
 def test_update_dmesg_with_updates():
     """dmesg.Dmesg.update_dmesg(): updates results when there is a new entry in dmesg
 
@@ -172,7 +173,7 @@ def test_update_dmesg_with_updates():
                              "has been updated.".format(test.__class__)))
 
 
-@utils.privileged_test
+@attr('privliged')
 def test_update_dmesg_without_updates():
     """dmesg.Dmesg.update_dmesg(): does not update results when there is no change in dmesg
 
@@ -381,7 +382,7 @@ def test_json_serialize_updated_result():
     encoder.encode(result)
 
 
-@privileged_generator
+@attr('privliged')
 def test_testclasses_dmesg():
     """ Generator that creates tests for """
     lists = [(framework.test.PiglitGLTest, ['attribs'], 'PiglitGLTest'),

@@ -292,18 +292,6 @@ def nose_generator(func):
     return test_wrapper
 
 
-def privileged_test(func):
-    """ Wrapper to name the tests as sudo
-
-    This makes the name of the function contain begin with sudo, which is
-    useful for excluding tests with privileged execution requirements
-
-    """
-    func.__name__ = 'sudo_' + func.__name__
-
-    return func
-
-
 def binary_check(bin_, errno_=None):
     """Check for the existance of a binary or raise SkipTest.
 
