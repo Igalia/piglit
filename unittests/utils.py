@@ -34,6 +34,7 @@ import tempfile as tempfile_
 import functools
 import subprocess
 import errno
+import importlib
 from contextlib import contextmanager
 
 try:
@@ -312,6 +313,14 @@ def binary_check(bin_, errno_=None):
                 raise SkipTest(
                     'Binary provided bad returncode of {} (wanted {})'.format(
                         e.returncode, errno_))
+
+
+def module_check(module):
+    """Check that an external module is available or skip."""
+    try:
+        importlib.import_module(module)
+    except ImportError:
+        raise SkipTest('Required module {} not available.'.format(module))
 
 
 def platform_check(plat):

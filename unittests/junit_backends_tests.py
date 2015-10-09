@@ -113,8 +113,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
 
     def test_xml_valid(self):
         """backends.junit.JUnitBackend.write_test(): (once) produces valid xml"""
-        if etree.__name__ != 'lxml.etree':
-            raise SkipTest('Test requires lxml features')
+        utils.module_check('lxml')
         schema = etree.XMLSchema(file=JUNIT_SCHEMA)
         with open(self.test_file, 'r') as f:
             nt.ok_(schema.validate(etree.parse(f)), msg='xml is not valid')
