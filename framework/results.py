@@ -196,6 +196,7 @@ class TestResult(object):
             'subtests': self.subtests,
             'time': self.time,
             'exception': self.exception,
+            'dmesg': self.dmesg,
         }
         return obj
 

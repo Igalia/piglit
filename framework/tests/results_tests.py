@@ -204,6 +204,7 @@ class TestTestResult_to_json(object):
             },
             'result': 'crash',
             'exception': 'an exception',
+            'dmesg': 'this is dmesg',
         }
 
         test = results.TestResult.from_dict(cls.dict)
@@ -242,6 +243,10 @@ class TestTestResult_to_json(object):
         """results.TestResult.to_json: adds the __type__ hint"""
         nt.eq_(self.json['__type__'], 'TestResult')
 
+    def test_dmesg(self):
+        """results.TestResult.to_json: Adds the dmesg attribute"""
+        nt.eq_(self.json['dmesg'], 'this is dmesg')
+
 
 class TestTestResult_from_dict(object):
     """Tests for the from_dict method."""
@@ -259,6 +264,7 @@ class TestTestResult_from_dict(object):
             },
             'result': 'crash',
             'exception': 'an exception',
+            'dmesg': 'this is dmesg',
         }
 
         cls.test = results.TestResult.from_dict(cls.dict)
@@ -295,6 +301,10 @@ class TestTestResult_from_dict(object):
         """results.TestResult.from_dict: subtests are Status instances"""
         nt.assert_is(self.test.subtests['a'], status.PASS)
         nt.assert_is(self.test.subtests['b'], status.FAIL)
+
+    def test_dmesg(self):
+        """results.TestResult.from_dict: sets dmesg properly"""
+        nt.eq_(self.test.dmesg, self.dict['dmesg'])
 
 
 def test_TestResult_update():
