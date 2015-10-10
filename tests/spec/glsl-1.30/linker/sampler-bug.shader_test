@@ -1,0 +1,37 @@
+# This reproduces a bug in the GLSL compiler or st/mesa.
+# The shaders can't be simplified more.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+in vec4 pos;
+
+void main()
+{
+	gl_Position = pos;
+}
+
+[fragment shader]
+#version 130
+
+struct light
+{
+	vec3 diffuse;
+};
+
+uniform light u_DynamicLights[8];
+uniform sampler2D tex1;
+uniform sampler2D tex2;
+uniform sampler2D tex3;
+
+void main()
+{
+	int i = 0;
+	gl_FragColor = u_DynamicLights[i].diffuse.xyzz +
+		       texture(tex1, gl_FragCoord.xy) +
+		       texture(tex2, gl_FragCoord.xy) +
+		       texture(tex3, gl_FragCoord.xy);
+}
