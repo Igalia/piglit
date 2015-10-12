@@ -30,10 +30,6 @@ import os
 import subprocess
 import re
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 from nose.plugins.attrib import attr
@@ -41,7 +37,6 @@ from nose.plugins.attrib import attr
 from framework import dmesg, status
 import framework.core
 import framework.test
-import framework.backends
 import framework.tests.utils as utils
 
 
@@ -340,20 +335,6 @@ def test_update_result_add_dmesg():
 
     nt.eq_(result.dmesg, '\n'.join(messages),
            msg="result does not have dmesg member but should")
-
-
-def test_json_serialize_updated_result():
-    """dmesg.Dmesg.update_result: The TestResult is still json serializable"""
-    test = TestDmesg()
-
-    result = framework.results.TestResult()
-    result.result = 'pass'
-
-    test._new_messages = ['some', 'new', 'messages']
-    result = test.update_result(result)
-
-    encoder = json.JSONEncoder(default=framework.backends.json.piglit_encoder)
-    encoder.encode(result)
 
 
 @attr('privileged')
