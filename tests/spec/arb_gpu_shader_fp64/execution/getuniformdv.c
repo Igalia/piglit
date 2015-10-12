@@ -50,6 +50,7 @@ static const char vs_text[] =
    "uniform s1 s;\n"
    "uniform double d2; \n"
    "uniform float f1; \n"
+   "uniform vec4 fv1; \n"
    "uniform uint ui1; \n"
    "uniform int i1; \n"
    "uniform bool b1; \n"
@@ -59,6 +60,7 @@ static const char vs_text[] =
    "{\n"
    "  gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n"
    "  dvec4 t = dvec4(s.a, s.b, s.c, s.d) * d1 + d2 + double(f1) + double(ui1) + double(i1) + double(b1);\n"
+   "  t += fv1.x + fv1.y + fv1.z + fv1.w;\n"
    "  t += v[0] + v[1] + v[2]; \n"
    "  color = vec4(t); \n"
    "}\n";
@@ -81,8 +83,8 @@ piglit_init(int argc, char **argv)
 {
    GLuint vs, fs, prog;
    GLint numUniforms, i;
-   GLint expectedNum = 11;
-   GLint loc_d1, loc_d2, loc_sa, loc_sd, loc_v1, loc_f1, loc_ui1, loc_i1, loc_b1;
+   GLint expectedNum = 12;
+   GLint loc_d1, loc_d2, loc_sa, loc_sd, loc_v1, loc_f1, loc_fv1, loc_ui1, loc_i1, loc_b1;
    GLdouble v[4];
    GLfloat f[4];
    GLuint ui[4];
@@ -136,8 +138,11 @@ piglit_init(int argc, char **argv)
          expectedType = GL_DOUBLE;
          expectedSize = 1;
       } else if (name[0] == 'f') {
-         expectedType = GL_FLOAT;
-         expectedSize = 1;
+	if (name[1] == 'v')
+	  expectedType = GL_FLOAT_VEC4;
+	else
+	  expectedType = GL_FLOAT;
+	expectedSize = 1;
       } else if (name[0] == 'i') {
          expectedType = GL_INT;
          expectedSize = 1;
@@ -170,6 +175,7 @@ piglit_init(int argc, char **argv)
    loc_sd = glGetUniformLocation(prog, "s.d");
    loc_v1 = glGetUniformLocation(prog, "v[1]");
    loc_f1 = glGetUniformLocation(prog, "f1");
+   loc_fv1 = glGetUniformLocation(prog, "fv1");
    loc_ui1 = glGetUniformLocation(prog, "ui1");
    loc_i1 = glGetUniformLocation(prog, "i1");
    loc_b1 = glGetUniformLocation(prog, "b1");
@@ -179,6 +185,7 @@ piglit_init(int argc, char **argv)
    glUniform1d(loc_sd, 20.0);
    glUniform4dv(loc_v1, 1, vVals);
    glUniform1f(loc_f1, 40.0);
+   glUniform4f(loc_fv1, 40.0, 30.0, 20.0, 10.0);
    glUniform1ui(loc_ui1, 100);
    glUniform1i(loc_i1, -100);
 
@@ -249,6 +256,15 @@ piglit_init(int argc, char **argv)
       piglit_report_result(PIGLIT_FAIL);
    }
 
+   glGetUniformfv(prog, loc_v1, f);
+   if (f[0] != 30.0 ||
+       f[1] != 31.0 ||
+       f[2] != 32.0 ||
+       f[3] != 33.0) {
+      printf("%s: wrong value for v[1] (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
+             TestName, f[0], f[1], f[2], f[3], 30.0, 31.0, 32.0, 33.0);
+      piglit_report_result(PIGLIT_FAIL);
+   }
    /* use double getters on non-doubles */
    glGetUniformdv(prog, loc_f1, v);
    if (v[0] != 40.0) {
@@ -256,6 +272,13 @@ piglit_init(int argc, char **argv)
              TestName, v[0], 40.0);
       piglit_report_result(PIGLIT_FAIL);
    }
+   glGetUniformdv(prog, loc_fv1, v);
+   if (v[0] != 40.0 || v[1] != 30.0 || v[2] != 20.0 || v[3] != 10.0) {
+      printf("%s: wrong value for fv1 (found %f,%f,%f,%f, expected %f,%f,%f,%f)\n",
+             TestName, v[0], v[1], v[2], v[3], 40.0, 30.0, 20.0, 10.0);
+      piglit_report_result(PIGLIT_FAIL);
+   }
+
    glGetUniformdv(prog, loc_ui1, v);
    if (v[0] != 100.0) {
       printf("%s: wrong value for ui1 (found %f, expected %f)\n",
