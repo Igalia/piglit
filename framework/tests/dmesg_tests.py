@@ -73,27 +73,18 @@ def _write_dev_kmesg():
         raise SkipTest("Writing to the ringbuffer failed")
 
 
-class DummyJsonWriter(object):
-    """ A very simple dummy for json writer """
-    def __init__(self):
-        self.result = None
-
-    def write_dict_item(self, _, result):
-        self.result = result
-
-
 class DummyLog(object):
     """ A very smiple dummy for the Logger """
     def __init__(self):
         pass
 
-    def pre_log(self, *args):
+    def start(self, *args):
         return None
 
     def log(self, *args):
         pass
 
-    def post_log(self, *args):
+    def summary(self, *args):
         pass
 
 
@@ -366,46 +357,28 @@ def test_json_serialize_updated_result():
 
 
 @attr('privileged')
-def test_testclasses_dmesg():
-    """ Generator that creates tests for """
-    lists = [(framework.test.PiglitGLTest, ['attribs'], 'PiglitGLTest'),
-             (framework.test.PiglitCLTest,
-              ['cl-api-build-program'], 'PiglitCLTest'),
-             (framework.test.GleanTest, 'basic', "GleanTest"),
-             (framework.test.ShaderTest,
-              'tests/shaders/loopfunc.shader_test', 'ShaderTest'),
-             (framework.test.GLSLParserTest,
-              'tests/glslparsertest/shaders/main1.vert', 'GLSLParserTest')]
+def test_execute_dmesg():
+    """test.base.Test.execute: dmesg statuses are applied
 
-    for tclass, tfile, desc in lists:
-        check_classes_dmesg.description = \
-            "dmesg.Dmesg: works with test class '{}'".format(desc)
-        yield check_classes_dmesg, tclass, tfile
+    This tests only one contrived test for dmesg handling. It does though test
+    that the path in execute to change the status works, which makes it a
+    comprehensive test.
 
-
-def check_classes_dmesg(test_class, test_args):
-    """ Do the actual check on the provided test class for dmesg """
-    # There is so much magic in this test that pylint freaks out needlessly,
-    # please ignore all of those errors
-    # pylint: disable=no-init,too-few-public-methods,super-on-old-class
-    # pylint: disable=no-member
+    """
     if not os.path.exists('bin'):
         raise SkipTest("This tests requires a working, built version of "
                        "piglit")
-
-    test = _get_dmesg()
+    utils.binary_check('true')
 
     # Create the test and then write to dmesg to ensure that it actually works
-    class _localclass(test_class):
+    class _localclass(utils.Test):
         def run(self):
             _write_dev_kmesg()
             super(_localclass, self).run()
 
-    test = _localclass(test_args)
+        def interpret_result(self):
+            self.result.result = 'pass'
 
-    json = DummyJsonWriter()
-
-    test.execute(None, DummyLog(), json, test)
-
-    nt.assert_in(json.result.result, ['dmesg-warn', 'dmesg-fail'],
-                 msg="{0} did not update status with dmesg".format(type(test)))
+    test = _localclass(['true'])
+    test.execute(None, DummyLog(), _get_dmesg())
+    nt.eq_(test.result.result, 'dmesg-warn')
