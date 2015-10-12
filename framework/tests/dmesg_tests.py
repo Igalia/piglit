@@ -73,23 +73,6 @@ def _write_dev_kmesg():
         raise SkipTest("Writing to the ringbuffer failed")
 
 
-def privileged_generator(func):
-    """Like utils.nose_generator, but for privileged tests.
-
-    This makes the tests yielded privlileged, which means using '-e sudo' will
-    exclude them
-    
-    """
-
-    def sudo_test_wrapper(*args, **kwargs):
-        for x in func(*args, **kwargs):
-            x = list(x)
-            x[0] = utils.privileged_test(utils.GeneratedTestWrapper(x[0]))
-            yield tuple(x)
-
-    return sudo_test_wrapper
-
-
 class DummyJsonWriter(object):
     """ A very simple dummy for json writer """
     def __init__(self):
