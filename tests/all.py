@@ -3954,6 +3954,7 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_draw_buffers_blend')) as g:
+    g(['arb_draw_buffers_blend-state_set_get'])
     g(['fbo-draw-buffers-blend'], run_concurrent=False)
 
 with profile.group_manager(
