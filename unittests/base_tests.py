@@ -67,7 +67,7 @@ def test_run_return_early():
 
 @attr('slow')
 def test_timeout():
-    """test.base.Test.run(): kills tests that exceed timeout when set"""
+    """test.base.Test.run(): Sets status to 'timeout' when timeout exceeded"""
     utils.binary_check('sleep', 1)
 
     class _Test(Test):
@@ -82,7 +82,7 @@ def test_timeout():
 
 @attr('slow')
 def test_timeout_pass():
-    """test.base.Test.run(): Result is returned when timeout is set but not exceeded
+    """test.base.Test.run(): Doesn't change status when timeout not exceeded
     """
     utils.binary_check('true')
 
