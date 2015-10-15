@@ -2458,6 +2458,8 @@ with profile.group_manager(
       'sampling-2d-array-as-cubemap')
     g(['arb_texture_view-sampling-2d-array-as-cubemap-array'],
       'sampling-2d-array-as-cubemap-array')
+    g(['arb_texture_view-sampling-2d-array-as-2d-layer'],
+      'sampling-2d-array-as-2d-layer')
 
 with profile.group_manager(
         PiglitGLTest,
