@@ -52,6 +52,11 @@ class TestTest(Test):
         self.test_interpret_result()
 
 
+class TimeoutTest(Test):
+    def interpret_result(self):
+        super(TimeoutTest, self).interpret_result()
+
+
 # Tests
 def test_run_return_early():
     """ Test.run() exits early when Test._run_command() has exception """
@@ -70,29 +75,20 @@ def test_timeout():
     """test.base.Test.run(): Sets status to 'timeout' when timeout exceeded"""
     utils.binary_check('sleep', 1)
 
-    class _Test(Test):
-        def interpret_result(self):
-            super(_Test, self).interpret_result()
-
-    test = _Test(['sleep', '60'])
+    test = TimeoutTest(['sleep', '60'])
     test.timeout = 1
     test.run()
     nt.eq_(test.result.result, 'timeout')
 
 
-@attr('slow')
 def test_timeout_pass():
     """test.base.Test.run(): Doesn't change status when timeout not exceeded
     """
     utils.binary_check('true')
 
-    def helper():
-        if (test.result.returncode == 0):
-            test.result.result = "pass"
-
-    test = TestTest(['true'])
-    test.test_interpret_result = helper
+    test = TimeoutTest(['true'])
     test.timeout = 1
+    test.result.result = 'pass'
     test.run()
     nt.eq_(test.result.result, 'pass')
 
