@@ -30,6 +30,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import subprocess
 import functools
+import sys
 
 import nose.tools as nt
 
@@ -42,6 +43,16 @@ BLACKLIST = {
 }
 BLACKLIST = set([os.path.abspath(os.path.join(os.path.dirname(__file__), _p))
                  for _p in BLACKLIST])
+
+
+# This dict holds the name of a generator expected to fail, and then a value of
+# True or False (True if it is expected to fail. This allows us to have
+# condtional failures, like when we expect python3 to fail.
+EXPECTED_FAILS = {
+    'gen_tes_input_tests.py': sys.version.startswith('3'),
+    'gen_tcs_input_tests.py': sys.version.startswith('3'),
+}
+
 
 
 def discover_generators():
@@ -121,22 +132,32 @@ def nose_generator(func):
 def test_generators():
     """Generate tests for the various generators."""
 
-    def test(name):
-        """Tester function."""
+    def test(name, fail=False):
+        """Tester function.
+
+        If fail is true the the test is expected to Fail
+
+        """
         msg = ''
+        rcode = 0
 
         try:
             with open(os.devnull, 'w') as d:
                 rcode = subprocess.check_call(['python', name], stderr=d,
                                               stdout=d)
         except subprocess.CalledProcessError as e:
-            msg = "While calling {}:\n{}".format(name, str(e))
-            rcode = e.returncode
+            if not fail:
+                msg = "While calling {}:\n{}".format(name, str(e))
+                rcode = e.returncode
+        else:
+            if fail:
+                raise AssertionError("Expected failure for {} not encountered")
 
         nt.eq_(rcode, 0, msg)
 
     description = 'generator: {} runs successfully'
 
     for generator in discover_generators():
-        test.description = description.format(os.path.basename(generator))
-        yield test, generator
+        name = os.path.basename(generator)
+        test.description = description.format(name)
+        yield test, generator, EXPECTED_FAILS.get(name, False)
