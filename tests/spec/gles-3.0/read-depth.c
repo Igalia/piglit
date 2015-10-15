@@ -122,12 +122,14 @@ piglit_display(void)
 {
 	GLboolean pass = true;
 	const float step = 0.1;
+	unsigned j;
+	float i;
 
 	glEnable(GL_DEPTH_TEST);
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
 	/* Loop through formats listed in 'tests'. */
-	for (unsigned j = 0; j < ARRAY_SIZE(tests); j += 2) {
+	for (j = 0; j < ARRAY_SIZE(tests); j += 2) {
 
 		float expect = 0.0;
 
@@ -138,7 +140,7 @@ piglit_display(void)
 		/* Step from -1.0 to 1.0, linear depth. Render a rectangle at
 		 * depth i, read pixel and verify expected depth value.
 		 */
-		for (float i = -1.0; !equals(i, 1.0 + step); i += step) {
+		for (i = -1.0; !equals(i, 1.0 + step); i += step) {
 
 			glClear(GL_DEPTH_BUFFER_BIT);
 			glUniform1f(glGetUniformLocation(prog, "depth"), i);
