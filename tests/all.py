@@ -2227,6 +2227,12 @@ with profile.group_manager(
     g(['arb_occlusion_query2-api'], 'api')
     g(['arb_occlusion_query2-render'], 'render')
 
+# Group EXT_texture_format_BGRA8888 tests
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'EXT_texture_format_BGRA8888')) as g:
+    g(['ext_texture_format_bgra8888-api-errors'], 'api-errors')
+
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_pixel_buffer_object')) as g:
