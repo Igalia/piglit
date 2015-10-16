@@ -875,6 +875,7 @@ with profile.group_manager(
     g(['line-aa-width'], run_concurrent=False)
     g(['line-flat-clip-color'])
     g(['lineloop'], run_concurrent=False)
+    g(['lineloop', '-dlist'], 'lineloop-dlist', run_concurrent=False)
     g(['linestipple'], run_concurrent=False)
     g(['longprim'], run_concurrent=False)
     g(['masked-clear'])

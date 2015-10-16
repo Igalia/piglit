@@ -43,16 +43,21 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const char *TestName = "lineloop";
 static int vert_count = 10000;
+static bool use_dlist = false;
+static GLuint dlist;
+
 
 static void
-draw(GLuint numVerts)
+draw(GLuint numVerts, float radius)
 {
    GLuint i;
 
    glColor3f(1,0,1);
    glBegin(GL_LINE_LOOP);
    for (i = 0; i < numVerts; i++) {
-      glVertex3f(sin(i*M_PI*2/numVerts), cos(i*M_PI*2/numVerts),0);
+      float x = radius * sin(i*M_PI*2/numVerts);
+      float y = radius * cos(i*M_PI*2/numVerts);
+      glVertex3f(x, y, 0);
    }
    glEnd();
 }
@@ -62,8 +67,14 @@ test_prims(void)
 {
    if (!piglit_automatic)
       printf("%s: %u vertices\n", TestName, vert_count);
+
    glClear(GL_COLOR_BUFFER_BIT);
-   draw(vert_count);
+
+   if (use_dlist) {
+      glCallList(dlist);
+   } else {
+      draw(vert_count, 1.0);
+   }
    piglit_present_results();
 }
 
@@ -87,13 +98,28 @@ piglit_init(int argc, char**argv)
 {
    int i;
    for (i = 1; i < argc; ++i) {
-      if (i + 1 < argc) {
+      if (i < argc) {
          if (strcmp(argv[i], "-count") == 0) {
-            vert_count = strtoul(argv[++i], NULL, 0);
+            i++;
+            if (i == argc) {
+               printf("please specify vertex count\n");
+               piglit_report_result(PIGLIT_FAIL);
+            }
+            vert_count = strtoul(argv[i], NULL, 0);
+         }
+         else if (strcmp(argv[i], "-dlist") == 0) {
+            use_dlist = true;
          }
       }
    }
  
    glViewport(0,0, WSIZE, WSIZE);
    glOrtho(-1,1,-1,1,-1,1);
+
+   if (use_dlist) {
+      dlist = glGenLists(1);
+      glNewList(dlist, GL_COMPILE);
+      draw(vert_count, 1.0);
+      glEndList();
+   }
 }
