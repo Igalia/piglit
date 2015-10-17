@@ -365,7 +365,7 @@ compile_glsl(GLenum target)
 			piglit_require_extension("GL_ARB_geometry_shader4");
 		break;
 	case GL_COMPUTE_SHADER:
-		if (gl_version.num < 43)
+		if (gl_version.num < (gl_version.es ? 31 : 43))
 			piglit_require_extension("GL_ARB_compute_shader");
 		break;
 	}
