@@ -215,7 +215,7 @@ init_xfb_varyings(int max_varyings)
 	/* Initialise arrays of arrays */
 	for (i = 0; i < AOA_OUTER_DIM; ++i) {
 		for (j = 0; j < inner_dim; ++j) {
-			char *buf = malloc(8);
+			char *buf = malloc(16);
 			sprintf(buf, "v[%d][%d]", i, j);
 			xfb_varying_aoa[count++] = buf;
 		}
