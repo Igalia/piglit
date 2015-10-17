@@ -81,6 +81,46 @@ static const char gs_tmpl[] =
 	"  EndStreamPrimitive(1);\n"
 	"}";
 
+static const char gs_tmpl_blocks[] =
+	"#version 150\n"
+	"#extension GL_ARB_gpu_shader5 : enable\n"
+	"layout(points, invocations = %d) in;\n"
+	"layout(points, max_vertices = 4) out;\n"
+	"out float stream0_0_out;\n"
+	"layout(stream = 1) out Block1 {\n"
+	"  vec2 stream1_0_out;\n"
+	"  vec3 stream1_1_out;\n"
+	"};\n"
+	"layout(stream = 2) out Block2 {\n"
+	"  float stream2_0_out;\n"
+	"  vec4 stream2_1_out;\n"
+	"} blockWithName;\n"
+	"layout(stream = 3) out vec3 stream3_0_out;\n"
+	"void main() {\n"
+	"  gl_Position = gl_in[0].gl_Position;\n"
+
+	"  stream0_0_out = 1.0 + gl_InvocationID;\n"
+	"  EmitVertex();\n"
+	"  EndPrimitive();\n"
+
+	"  stream3_0_out = vec3(12.0 + gl_InvocationID, 13.0 + gl_InvocationID,\n"
+	"                       14.0 + gl_InvocationID);\n"
+	"  EmitStreamVertex(3);\n"
+	"  EndStreamPrimitive(3);\n"
+
+	"  blockWithName.stream2_0_out = 7.0 + gl_InvocationID;\n"
+	"  blockWithName.stream2_1_out = vec4(8.0 + gl_InvocationID, 9.0 + gl_InvocationID,\n"
+	"                                     10.0 + gl_InvocationID, 11.0 + gl_InvocationID);\n"
+	"  EmitStreamVertex(2);\n"
+	"  EndStreamPrimitive(2);\n"
+
+	"  stream1_0_out = vec2(2.0 + gl_InvocationID, 3.0 + gl_InvocationID);\n"
+	"  stream1_1_out = vec3(4.0 + gl_InvocationID, 5.0 + gl_InvocationID,\n"
+	"                       6.0 + gl_InvocationID);\n"
+	"  EmitStreamVertex(1);\n"
+	"  EndStreamPrimitive(1);\n"
+	"}";
+
 const char *stream_names[] = { "first", "second", "third", "forth" };
 int stream_float_counts[] = { 1, 5, 5, 3 };
 
@@ -93,29 +133,39 @@ static const char *varyings[] = {
 	"stream3_0_out"
 };
 
-static void
-build_and_use_program(GLint gs_invocation_n)
+static const char *varyings_blocks[] = {
+	"stream0_0_out", "gl_NextBuffer",
+	"stream1_0_out", "stream1_1_out", "gl_NextBuffer",
+	"Block2.stream2_0_out", "Block2.stream2_1_out",
+	"gl_NextBuffer", "stream3_0_out"
+};
+
+static bool
+build_and_use_program(GLint gs_invocation_n, const char *gs_template,
+                      const char **gs_varyings, int array_size)
 {
 	GLuint prog;
 
 	char *gs_text;
 
-	asprintf(&gs_text, gs_tmpl, gs_invocation_n);
+	asprintf(&gs_text, gs_template, gs_invocation_n);
 	prog = piglit_build_simple_program_multiple_shaders(
 				GL_VERTEX_SHADER, vs_pass_thru_text,
 				GL_GEOMETRY_SHADER, gs_text, 0);
 	free(gs_text);
 
-	glTransformFeedbackVaryings(prog, ARRAY_SIZE(varyings), varyings,
+	glTransformFeedbackVaryings(prog, array_size, gs_varyings,
 				GL_INTERLEAVED_ATTRIBS);
 
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
-		piglit_report_result(PIGLIT_FAIL);
+		return false;
 	if (!piglit_check_gl_error(GL_NO_ERROR))
-		piglit_report_result(PIGLIT_FAIL);
+		return false;
 
 	glUseProgram(prog);
+
+	return true;
 }
 
 static bool
@@ -136,13 +186,13 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 		if (query_result != primitive_n) {
 			printf("Expected %u primitives generated, got %u\n",
 			       primitive_n, query_result);
-			piglit_report_result(PIGLIT_FAIL);
+			return false;
 		}
 		glGetQueryObjectuiv(queries[STREAMS+i], GL_QUERY_RESULT, &query_result);
 		if (query_result != primitive_n) {
 			printf("Expected %u TF primitives written, got %u\n",
 			       primitive_n, query_result);
-			piglit_report_result(PIGLIT_FAIL);
+			return false;
 		}
 	}
 
@@ -185,9 +235,9 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 	return pass;
 }
 
-void
-piglit_init(int argc, char **argv)
-{
+static bool
+run_subtest(const char *gs_template, const char **gs_varyings,
+	    int array_size) {
 	bool pass;
 	unsigned primitive_n;
 	GLint gs_invocation_n;
@@ -201,17 +251,20 @@ piglit_init(int argc, char **argv)
 
 	glGetIntegerv(GL_MAX_GEOMETRY_SHADER_INVOCATIONS, &gs_invocation_n);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
-		piglit_report_result(PIGLIT_FAIL);
+		return false;
 
 	if (gs_invocation_n <= 0) {
 		printf("Maximum amount of geometry shader invocations "
 		       "needs to be positive (%u).\n", gs_invocation_n);
-		piglit_report_result(PIGLIT_FAIL);
+		return false;
 	}
 
 	primitive_n = gs_invocation_n;
 
-	build_and_use_program(gs_invocation_n);
+	if (!build_and_use_program(gs_invocation_n, gs_template, gs_varyings,
+				   array_size)) {
+		return false;
+	}
 
 	/* Set up the transform feedback buffers. */
 	glGenBuffers(ARRAY_SIZE(xfb), xfb);
@@ -227,7 +280,7 @@ piglit_init(int argc, char **argv)
 	glEnable(GL_RASTERIZER_DISCARD);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
-		piglit_report_result(PIGLIT_FAIL);
+		return false;
 
 	glGenQueries(ARRAY_SIZE(queries), queries);
 	for (i = 0; i < STREAMS; i++) {
@@ -251,14 +304,32 @@ piglit_init(int argc, char **argv)
 	glDeleteVertexArrays(1, &vao);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
-		piglit_report_result(PIGLIT_FAIL);
+		return false;
 
 	pass = probe_buffers(xfb, queries, primitive_n);
 
 	glDeleteBuffers(ARRAY_SIZE(xfb), xfb);
 	glDeleteQueries(ARRAY_SIZE(queries), queries);
 
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+	return pass;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	bool test1;
+	bool test2;
+
+	test1 = run_subtest(gs_tmpl, varyings, ARRAY_SIZE(varyings));
+	piglit_report_subtest_result(test1 ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "arb_gpu_shader5-xfb-streams");
+
+	test2 = run_subtest(gs_tmpl_blocks, varyings_blocks,
+			    ARRAY_SIZE(varyings_blocks));
+	piglit_report_subtest_result(test2 ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "arb_gpu_shader5-xfb-streams-blocks");
+
+	piglit_report_result(test1 && test2 ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
 enum piglit_result
