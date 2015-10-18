@@ -357,12 +357,16 @@ compile_glsl(GLenum target)
 		break;
 	case GL_TESS_CONTROL_SHADER:
 	case GL_TESS_EVALUATION_SHADER:
-		if (gl_version.num < 40)
-			piglit_require_extension("GL_ARB_tessellation_shader");
+		if (gl_version.num < (gl_version.es ? 32 : 40))
+			piglit_require_extension(gl_version.es ?
+						 "GL_OES_tessellation_shader" :
+						 "GL_ARB_tessellation_shader");
 		break;
 	case GL_GEOMETRY_SHADER:
 		if (gl_version.num < 32)
-			piglit_require_extension("GL_ARB_geometry_shader4");
+			piglit_require_extension(gl_version.es ?
+						 "GL_OES_geometry_shader" :
+						 "GL_ARB_geometry_shader4");
 		break;
 	case GL_COMPUTE_SHADER:
 		if (gl_version.num < (gl_version.es ? 31 : 43))
