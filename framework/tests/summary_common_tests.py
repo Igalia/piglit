@@ -89,7 +89,7 @@ class TestResults(object):
 
     def test_names_all(self):
         """summary.Names.all: contains a set of all tests"""
-        baseline = {'foo', 'bar', 'oink', 'bonk', 'bor', 'tonk'} 
+        baseline = {'foo', 'bar', 'oink', 'bonk', 'bor', 'tonk'}
         nt.assert_set_equal(self.test.names.all, baseline)
 
     def test_names_changes_all(self):
@@ -219,30 +219,87 @@ class TestNamesSubtests(object):
         res1.tests['bar'] = results.TestResult('fail')
         res1.tests['oink'] = results.TestResult('crash')
         res1.tests['bonk'] = results.TestResult('warn')
-        res1.tests['bor'] = results.TestResult('skip')
-        res1.tests['bor'].subtests['1'] = 'skip'
+        res1.tests['bor'] = results.TestResult('crash')
+        res1.tests['bor'].subtests['1'] = 'pass'
         res1.tests['bor'].subtests['2'] = 'skip'
-        res1.tests['bor'].subtests['3'] = 'skip'
+        res1.tests['bor'].subtests['3'] = 'fail'
+        res1.tests['bor'].subtests['4'] = 'pass'
 
         res2 = results.TestrunResult()
         res2.tests['foo'] = results.TestResult('fail')
         res2.tests['bar'] = results.TestResult('pass')
         res2.tests['oink'] = results.TestResult('crash')
         res2.tests['tonk'] = results.TestResult('incomplete')
+        res2.tests['bor'] = results.TestResult('crash')
+        res2.tests['bor'].subtests['1'] = 'fail'
+        res2.tests['bor'].subtests['2'] = 'skip'
+        res2.tests['bor'].subtests['3'] = 'pass'
+        res2.tests['bor'].subtests['5'] = 'pass'
 
         cls.test = summary.Results([res1, res2])
 
     def test_all(self):
         """summary.Names.all: Handles subtests as groups"""
         baseline = {'foo', 'bar', 'oink', 'bonk', 'oink', 'tonk'}
-        for x in xrange(1, 4):
+        for x in xrange(1, 6):
             baseline.add(grouptools.join('bor', str(x)))
 
         nt.eq_(self.test.names.all, baseline)
 
-    def test_sublcass_name(self):
+    def test_sublcass_names(self):
         """summary.Names.all: subtest in all"""
-        nt.ok_(grouptools.join('bor', '1') in self.test.names.all)
+        expected = grouptools.join('bor', '1')
+        source = self.test.names.all
+
+        nt.ok_(expected in source,
+               msg='{} not found in {}'.format(expected, source))
+
+    @utils.nose_generator
+    def test_gen_tests(self):
+        """generate a bunch of different tests."""
+        def test(attr):
+            expected = grouptools.join('bor', '1')
+            source = getattr(self.test.names, attr)[1]
+
+            nt.ok_(expected in source,
+                   msg='{} not found in "{}"'.format(expected, source))
+
+        desc = 'summary.Names.{}: tests added properly'
+        for attr in ['changes', 'problems', 'regressions']:
+            test.description = desc.format(attr)
+            yield test, attr
+
+    def test_names_fixes(self):
+        """summary.Names.fixes: subtests added properly"""
+        expected = grouptools.join('bor', '3')
+        source = self.test.names.fixes[1]
+
+        nt.ok_(expected in source,
+               msg='{} not found in "{}"'.format(expected, source))
+
+    def test_names_skips(self):
+        """summary.Names.skips: subtests added properly"""
+        expected = grouptools.join('bor', '2')
+        source = self.test.names.skips[1]
+
+        nt.ok_(expected in source,
+               msg='{} not found in "{}"'.format(expected, source))
+
+    def test_names_enabled(self):
+        """summary.Names.enabled: subtests added properly"""
+        expected = grouptools.join('bor', '5')
+        source = self.test.names.enabled[1]
+
+        nt.ok_(expected in source,
+               msg='{} not found in "{}"'.format(expected, source))
+
+    def test_names_disabled(self):
+        """summary.Names.disabled: subtests added properly"""
+        expected = grouptools.join('bor', '4')
+        source = self.test.names.disabled[1]
+
+        nt.ok_(expected in source,
+               msg='{} not found in "{}"'.format(expected, source))
 
 
 class TestNamesSingle(object):
