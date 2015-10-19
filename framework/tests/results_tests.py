@@ -641,3 +641,31 @@ def test_TimeAttribute_delta():
     """results.TimeAttribute.delta: returns the delta of the values"""
     test = results.TimeAttribute(1.0, 5.0)
     nt.eq_(test.delta, '0:00:04')
+
+
+class TestTestrunResult_get_result(object):
+    """Tests for TestrunResult.get_result."""
+    @classmethod
+    def setup_class(cls):
+        tr = results.TestResult('crash')
+        tr.subtests['foo'] = status.PASS
+
+        run = results.TestrunResult()
+        run.tests['sub'] = tr
+        run.tests['test'] = results.TestResult('pass')
+        run.calculate_group_totals()
+
+        cls.inst = run
+
+    def test_get_test(self):
+        """results.TestrunResult.get_result: gets non-subtests"""
+        nt.eq_(self.inst.get_result('test'), 'pass')
+
+    def test_get_subtest(self):
+        """results.TestrunResult.get_result: gets subtests"""
+        nt.eq_(self.inst.get_result(grouptools.join('sub', 'foo')), 'pass')
+
+    @nt.raises(KeyError)
+    def test_get_nonexist(self):
+        """results.TestrunResult.get_result: raises KeyError if test doesn't exist"""
+        self.inst.get_result('fooobar')

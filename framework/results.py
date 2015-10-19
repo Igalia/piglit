@@ -288,6 +288,26 @@ class TestrunResult(object):
         self.tests = {}
         self.totals = collections.defaultdict(Totals)
 
+    def get_result(self, key):
+        """Get the result of a test or subtest.
+
+        If neither a test nor a subtest instance exist, then raise the original
+        KeyError generated from looking up <key> in the tests attribute. It is
+        the job of the caller to handle this error.
+
+        Arguments:
+        key -- the key name of the test to return
+
+        """
+        try:
+            return self.tests[key].result
+        except KeyError as e:
+            name, test = grouptools.splitname(key)
+            try:
+                return self.tests[name].subtests[test]
+            except KeyError:
+                raise e
+
     def calculate_group_totals(self):
         """Calculate the number of pases, fails, etc at each level."""
         for name, result in self.tests.iteritems():
