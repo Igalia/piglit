@@ -55,19 +55,9 @@ class Results(object):  # pylint: disable=too-few-public-methods
         results = []
         for res in self.results:
             try:
-                results.append(res.tests[name].result)
+                results.append(res.get_result(name))
             except KeyError:
                 results.append(so.NOTRUN)
-        if all(x == so.NOTRUN for x in results):
-            # this is likely a subtest, see if that's the case
-            name, test = grouptools.splitname(name)
-
-            results = []
-            for res in self.results:
-                try:
-                    results.append(res.tests[name].subtests[test])
-                except KeyError:
-                    results.append(so.NOTRUN)
         return results
 
 
@@ -138,8 +128,9 @@ class Names(object):
     @lazy_property
     def enabled(self):
         def handler(names, name, prev, cur):
-            if name not in prev.tests and name in cur.tests:
+            if _result_in(name, cur) and not _result_in(name, prev):
                 names.add(name)
+
         return self.__diff(
             lambda x, y: x is so.NOTRUN and y is not so.NOTRUN,
             handler=handler)
@@ -147,8 +138,9 @@ class Names(object):
     @lazy_property
     def disabled(self):
         def handler(names, name, prev, cur):
-            if name in prev.tests and name not in cur.tests:
+            if _result_in(name, prev) and not _result_in(name, cur):
                 names.add(name)
+
         return self.__diff(
             lambda x, y: x is not so.NOTRUN and y is so.NOTRUN,
             handler=handler)
@@ -266,6 +258,17 @@ def escape_pathname(key):
     return re.sub(r'[/\\]', '_', key)
 
 
+def _result_in(name, result):
+    """If a result (or a subtest result) exists return True, else False."""
+    try:
+        # This is a little hacky, but I don't know of a better way where we
+        # ensure the value is truthy
+        _ = result.get_result(name)
+        return True
+    except KeyError:
+        return False
+
+
 def find_diffs(results, tests, comparator, handler=lambda *a: None):
     """Generate diffs between two or more sets of results.
 
@@ -290,7 +293,7 @@ def find_diffs(results, tests, comparator, handler=lambda *a: None):
         names = set()
         for name in tests:
             try:
-                if comparator(prev.tests[name].result, cur.tests[name].result):
+                if comparator(prev.get_result(name), cur.get_result(name)):
                     names.add(name)
             except KeyError:
                 handler(names, name, prev, cur)
@@ -305,7 +308,7 @@ def find_single(results, tests, func):
         names = set()
         for name in tests:
             try:
-                if func(res.tests[name].result):
+                if func(res.get_result(name)):
                     names.add(name)
             except KeyError:
                 pass

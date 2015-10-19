@@ -93,7 +93,7 @@ class Test_print_summary(object):
             incomplete=template.format('0', '0'),
             dmesg_warn=template.format('0', '0'),
             dmesg_fail=template.format('0', '0'),
-            changes=template.format('0', '1'),
+            changes=template.format('0', '2'),
             fixes=template.format('0', '1'),
             regressions=template.format('0', '0'),
             total=template.format('3', '3')).split('\n')
