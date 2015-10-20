@@ -22,7 +22,7 @@
 # Authors: Tom Stellard <thomas.stellard@amd.com>
 #
 
-from __future__ import print_function, absolute_import 
+from __future__ import print_function, absolute_import
 import re
 
 from .base import Test
@@ -44,4 +44,5 @@ class GTest(Test):
         else:
             #If we get here, then the test probably exited early.
             self.result.result = 'fail'
-        return out
+
+        super(GTest, self).interpret_result()

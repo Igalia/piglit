@@ -22,6 +22,8 @@
 
 from __future__ import print_function, absolute_import
 
+import nose.tools as nt
+
 from framework.tests import utils
 from framework.test import GTest
 
@@ -30,3 +32,12 @@ from framework.test import GTest
 def test_initialize_gtest():
     """test.gtest.GTest: Class initializes"""
     GTest(['/bin/true'])
+
+
+def test_crash():
+    """test.gtest.GTest.interpret_result: Crashes are set to crash"""
+    test = GTest(['foo'])
+    test.result.returncode = -5
+    test.interpret_result()
+
+    nt.eq_(test.result.result, 'crash')
