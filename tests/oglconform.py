@@ -62,6 +62,8 @@ class OGLCTest(Test):
         else:
             self.result.result = 'fail'
 
+        super(OGLCTest, self).interpret_result()
+
 # Create a new top-level 'oglconform' category
 
 testlist_file = '/tmp/oglc.tests'
