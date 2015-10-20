@@ -92,3 +92,12 @@ def test_is_skip_glx_egl():
     GleanTest.OPTS.env['PIGLIT_PLATFORM'] = 'mixed_glx_egl'
     test = GleanTest('foo')
     test.is_skip()
+
+
+def test_crash():
+    """test.gleantest.GleanTest.interpret_result: Crashes are set to crash"""
+    test = GleanTest('foo')
+    test.result.returncode = -5
+    test.interpret_result()
+
+    nt.eq_(test.result.result, 'crash')

@@ -57,6 +57,7 @@ class GleanTest(Test):
             self.result.result = 'fail'
         else:
             self.result.result = 'pass'
+        super(GleanTest, self).interpret_result()
 
     def is_skip(self):
         # Glean tests require glx
