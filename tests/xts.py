@@ -160,6 +160,8 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
 
         self.result.images = self._process_log_for_images(log)
 
+        super(XTSTest, self).interpret_result()
+
 
 class RendercheckTest(Test):
     def __init__(self, args):
@@ -173,6 +175,8 @@ class RendercheckTest(Test):
             self.result.result = 'skip'
         else:
             self.result.result = 'fail'
+
+        super(RendercheckTest, self).interpret_result()
 
 
 def _populate_profile_xts(profile):
