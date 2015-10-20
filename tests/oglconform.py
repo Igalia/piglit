@@ -55,12 +55,12 @@ class OGLCTest(Test):
                                         '-test', category, subtest])
 
     def interpret_result(self):
-        if self.skip_re.search(self.result['out']) is not None:
-            self.result['result'] = 'skip'
-        elif re.search('Total Passed : 1', self.result['out']) is not None:
-            self.result['result'] = 'pass'
+        if self.skip_re.search(self.result.out) is not None:
+            self.result.result = 'skip'
+        elif re.search('Total Passed : 1', self.result.out) is not None:
+            self.result.result = 'pass'
         else:
-            self.result['result'] = 'fail'
+            self.result.result = 'fail'
 
 # Create a new top-level 'oglconform' category
 
