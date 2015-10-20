@@ -118,6 +118,8 @@ class IGTTest(Test):
         else:
             self.result.result = 'fail'
 
+        super(IGTTest, self).interpret_result()
+
 
 def list_tests(listname):
     """Parse igt test list and return them as a list."""
