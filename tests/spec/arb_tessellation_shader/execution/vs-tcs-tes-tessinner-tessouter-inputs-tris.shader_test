@@ -33,8 +33,10 @@ void main() {
 	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
 	            + gl_in[1].gl_Position * gl_TessCoord[1]
 	            + gl_in[2].gl_Position * gl_TessCoord[2];
-	color = gl_TessLevelOuter == float[4](3.0, 2.0, 4.0, 5.0) &&
-		gl_TessLevelInner == float[2](6.0, 7.0) ?
+	color = gl_TessLevelOuter[0] == 3.0 &&
+		gl_TessLevelOuter[1] == 2.0 &&
+		gl_TessLevelOuter[2] == 4.0 &&
+		gl_TessLevelInner[0] == 6.0 ?
 			vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
