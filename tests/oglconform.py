@@ -27,7 +27,8 @@ import subprocess
 import tempfile
 
 from framework import grouptools, exceptions, core
-from framework.profile import TestProfile, Test
+from framework.profile import TestProfile
+from framework.test.base import Test
 
 __all__ = ['profile']
 
