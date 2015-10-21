@@ -115,6 +115,7 @@ confirm_size()
 	uint32_t i, x, y, z;
 	uint32_t xs, ys, zs;
 	uint32_t hx, hy, hz;
+	bool pass = true;
 
 	xs = local_x;
 	ys = local_y;
@@ -172,26 +173,27 @@ confirm_size()
 	}
 
 	for (i = 0; i < NUM_ATOMIC_COUNTERS; i++) {
+		uint32_t found = p[i];
 		if (verbose)
 			printf("Atomic counter %d\n"
 			       "  Reference: %u\n"
 			       "  Observed:  %u\n"
 			       "  Result: %s\n",
-			       i, values[i], p[i],
-			       values[i] == p[i] ? "pass" : "fail");
-		if (values[i] != p[i]) {
+			       i, values[i], found,
+			       values[i] == found ? "pass" : "fail");
+		if (values[i] != found) {
 			printf("Atomic counter test %d failed for (%d, %d, %d)\n",
 			       i, xs, ys, zs);
 			printf("  Reference: %u\n", values[i]);
-			printf("  Observed:  %u\n", p[i]);
-			glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-			return PIGLIT_FAIL;
+			printf("  Observed:  %u\n", found);
+			pass = false;
+			break;
 		}
 	}
 
 	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 
-	return PIGLIT_PASS;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
