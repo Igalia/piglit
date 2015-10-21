@@ -36,7 +36,6 @@ if not os.path.exists(bin_oglconform):
     raise exceptions.PiglitFatalError(
         'Cannot find binary {}'.format(bin_oglconform))
 
-profile = TestProfile()
 
 
 class OGLCTest(Test):
@@ -64,20 +63,26 @@ class OGLCTest(Test):
 
         super(OGLCTest, self).interpret_result()
 
-# Create a new top-level 'oglconform' category
 
-testlist_file = '/tmp/oglc.tests'
+def _make_profile():
+    profile = TestProfile()
+    testlist_file = '/tmp/oglc.tests'
 
-with open(os.devnull, "w") as devnull:
-    subprocess.call([bin_oglconform, '-generateTestList', testlist_file],
-                    stdout=devnull.fileno(), stderr=devnull.fileno())
+    with open(os.devnull, "w") as devnull:
+        subprocess.call([bin_oglconform, '-generateTestList', testlist_file],
+                        stdout=devnull.fileno(), stderr=devnull.fileno())
 
-with open(testlist_file) as f:
-    testlist = f.read().splitlines()
-    for l in testlist:
-        try:
-            category, test = l.split()
-            profile.test_list[grouptools.join('oglconform', category, test)] \
-                = OGLCTest(category, test)
-        except:
-            continue
+    with open(testlist_file) as f:
+        testlist = f.read().splitlines()
+        for l in testlist:
+            try:
+                category, test = l.split()
+                profile.test_list[grouptools.join('oglconform', category, test)] \
+                    = OGLCTest(category, test)
+            except:
+                continue
+
+    return profile
+
+
+profile = _make_profile()  # pylint: disable=invalid-name
