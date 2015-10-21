@@ -78,23 +78,26 @@ class TestResults(object):
         res1.tests['oink'] = results.TestResult('crash')
         res1.tests['bonk'] = results.TestResult('warn')
         res1.tests['bor'] = results.TestResult('skip')
+        res1.tests['red'] = results.TestResult('skip')
 
         res2 = results.TestrunResult()
         res2.tests['foo'] = results.TestResult('fail')
         res2.tests['bar'] = results.TestResult('pass')
         res2.tests['oink'] = results.TestResult('crash')
         res2.tests['tonk'] = results.TestResult('incomplete')
+        res2.tests['red'] = results.TestResult('pass')
 
         cls.test = summary.Results([res1, res2])
 
     def test_names_all(self):
         """summary.Names.all: contains a set of all tests"""
-        baseline = {'foo', 'bar', 'oink', 'bonk', 'bor', 'tonk'}
+        baseline = {'foo', 'bar', 'oink', 'bonk', 'bor', 'tonk', 'red'}
         nt.assert_set_equal(self.test.names.all, baseline)
 
     def test_names_changes_all(self):
         """summary.Names.all_changes: contains a set of all changed tests"""
-        nt.assert_set_equal(self.test.names.all_changes, {'foo', 'bar'})
+        nt.assert_set_equal(self.test.names.all_changes,
+                            {'foo', 'bar', 'tonk', 'red', 'bonk'})
 
     def test_names_problems_all(self):
         """summary.Names.all_problems: contains a set of all problems"""
@@ -103,7 +106,7 @@ class TestResults(object):
 
     def test_names_skips_all(self):
         """summary.Names.all_skips: contains a set of all skips"""
-        nt.eq_(self.test.names.all_skips, {'bor'})
+        nt.eq_(self.test.names.all_skips, {'bor', 'red'})
 
     def test_names_regressions_all(self):
         """summary.Names.all_regressions: contains a set of all regressions"""
@@ -130,7 +133,8 @@ class TestResults(object):
         """summary.Names.changes: contains a list of differences between results"""
         # We can safely throw away the first value, since it's a padding value
         # (since nothing comes before the first value it can't have changes)
-        nt.assert_set_equal(self.test.names.changes[1], {'foo', 'bar'})
+        nt.assert_set_equal(self.test.names.changes[1],
+                            {'foo', 'bar', 'tonk', 'red', 'bonk'})
 
     def test_names_problems(self):
         """summary.Names.problems: contains a list of problems in each run"""
@@ -139,7 +143,7 @@ class TestResults(object):
 
     def test_names_skips(self):
         """summary.Names.skips: contains a list of skips in each run"""
-        baseline = [{'bor'}, set()]
+        baseline = [{'bor', 'red'}, set()]
         nt.eq_(self.test.names.skips, baseline)
 
     def test_names_regressions(self):
@@ -169,13 +173,13 @@ class TestResults(object):
 
     def test_counts_all(self):
         """summary.Counts.all: Is the total number of unique tests"""
-        nt.eq_(self.test.counts.all, 6)
+        nt.eq_(self.test.counts.all, 7)
 
     def test_counts_changes(self):
         """summary.Counts.changes: contains a list of the number of differences between results"""
         # We can safely throw away the first value, since it's a padding value
         # (since nothing comes before the first value it can't have changes)
-        nt.eq_(self.test.counts.changes[1], 2)
+        nt.eq_(self.test.counts.changes[1], 5)
 
     def test_counts_problems(self):
         """summary.Counts.problems: contains a list of the number of problems in each run"""
@@ -183,7 +187,7 @@ class TestResults(object):
 
     def test_counts_skips(self):
         """summary.Counts.skips: contains a list of skips in each run"""
-        nt.eq_(self.test.counts.skips, [1, 0])
+        nt.eq_(self.test.counts.skips, [2, 0])
 
     def test_counts_regressions(self):
         """summary.Counts.regressions: contains a list of the number of regressions between results"""
