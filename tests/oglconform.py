@@ -82,10 +82,11 @@ def _make_profile():
         for l in f.readlines():
             try:
                 category, test = l.split()
-                group = grouptools.join('oglconform', category, test)
-                profile.test_list[group] = OGLCTest(category, test)
-            except:
+            except ValueError:
                 continue
+
+            group = grouptools.join('oglconform', category, test)
+            profile.test_list[group] = OGLCTest(category, test)
 
     return profile
 
