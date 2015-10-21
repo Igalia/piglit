@@ -23,6 +23,7 @@
 from __future__ import print_function, absolute_import
 import sys
 import collections
+import threading
 
 import nose.tools as nt
 
@@ -41,7 +42,7 @@ def test_initialize():
     for name, class_ in [('QuiteLog', log.QuietLog),
                          ('VerboseLog', log.VerboseLog)]:
         check_initialize.description = "log.{}: class initializes".format(name)
-        yield check_initialize, class_, TEST_STATE
+        yield check_initialize, class_, TEST_STATE, 'lock'  # TODO: use mock
 
     check_initialize.description = "log.LogManager: class initializes"
     yield check_initialize, log.LogManager, 'quiet', 100
@@ -109,12 +110,12 @@ def test_print_when_expected():
     printing = []
 
     # Test QuietLog
-    quiet = log.QuietLog(TEST_STATE)
+    quiet = log.QuietLog(TEST_STATE, threading.Lock())  # TODO: use mock
     printing.append(('QuietLog.log', quiet.log, ['pass']))
     printing.append(('QuietLog.summary', quiet.summary, []))
 
     # Test VerboseLog
-    verbose = log.VerboseLog(TEST_STATE)
+    verbose = log.VerboseLog(TEST_STATE, threading.Lock())  # TODO: use mock
     printing.append(('VerboseLog.start', verbose.start, ['a test']))
     printing.append(('VerboseLog.log', verbose.log, ['pass']))
     printing.append(('VerboseLog.summary', verbose.summary, []))
@@ -154,11 +155,11 @@ def test_noprint_when_expected():
     printing = []
 
     # Test QuietLog
-    quiet = log.QuietLog(TEST_STATE)
+    quiet = log.QuietLog(TEST_STATE, threading.Lock())  # TODO: use mock
     printing.append(('QuietLog.start', quiet.start, ['name']))
 
     # Test DummyLog
-    dummy = log.DummyLog(TEST_STATE)
+    dummy = log.DummyLog(TEST_STATE, threading.Lock())  # TODO: use mock
     printing.append(('DummyLog.start', dummy.start, ['name']))
     printing.append(('DummyLog.log', dummy.log, ['pass']))
     printing.append(('DummyLog.summary', dummy.summary, []))
