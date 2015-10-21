@@ -31,12 +31,11 @@ from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
 
-bin_oglconform = core.PIGLIT_CONFIG.required_get('oglconform', 'path')
+BIN = core.PIGLIT_CONFIG.required_get('oglconform', 'path')
 
-if not os.path.exists(bin_oglconform):
+if not os.path.exists(BIN):
     raise exceptions.PiglitFatalError(
-        'Cannot find binary {}'.format(bin_oglconform))
-
+        'Cannot find binary {}'.format(BIN))
 
 
 class OGLCTest(Test):
@@ -55,7 +54,7 @@ class OGLCTest(Test):
 
     @Test.command.getter
     def command(self):
-        return [bin_oglconform, '-minFmt', '-v', '4', '-test'] + \
+        return [BIN, '-minFmt', '-v', '4', '-test'] + \
             super(OGLCTest, self).command
 
     def interpret_result(self):
@@ -70,11 +69,12 @@ class OGLCTest(Test):
 
 
 def _make_profile():
-    profile = TestProfile()
+    """Create and populate a TestProfile instance."""
+    profile_ = TestProfile()
 
     with tempfile.NamedTemporaryFile() as f:
         with open(os.devnull, "w") as devnull:
-            subprocess.call([bin_oglconform, '-generateTestList', f.name],
+            subprocess.call([BIN, '-generateTestList', f.name],
                             stdout=devnull.fileno(), stderr=devnull.fileno())
 
         f.seek(0)
@@ -86,9 +86,9 @@ def _make_profile():
                 continue
 
             group = grouptools.join('oglconform', category, test)
-            profile.test_list[group] = OGLCTest(category, test)
+            profile_.test_list[group] = OGLCTest(category, test)
 
-    return profile
+    return profile_
 
 
 profile = _make_profile()  # pylint: disable=invalid-name
