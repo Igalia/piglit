@@ -35,6 +35,7 @@ atomic_counters_probe_buffer(unsigned base, unsigned count,
         uint32_t *p = glMapBufferRange(
                 GL_ATOMIC_COUNTER_BUFFER, base * sizeof(uint32_t),
                 count * sizeof(uint32_t), GL_MAP_READ_BIT);
+        bool pass = true;
         unsigned i;
 
         if (!p) {
@@ -43,17 +44,18 @@ atomic_counters_probe_buffer(unsigned base, unsigned count,
         }
 
         for (i = 0; i < count; ++i) {
-                if (p[i] != expected[i]) {
+                uint32_t found = p[i];
+                if (found != expected[i]) {
                         printf("Probe value at (%i)\n", i);
                         printf("  Expected: 0x%08x\n", expected[i]);
-                        printf("  Observed: 0x%08x\n", p[i]);
-                        glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-                        return false;
+                        printf("  Observed: 0x%08x\n", found);
+                        pass = false;
+                        break;
                 }
         }
 
         glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-        return true;
+        return pass;
 }
 
 bool
