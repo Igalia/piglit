@@ -50,6 +50,8 @@ Optionally, you can install the following:
   - backports.lzma. A packport of python3's lzma module to python2,
     this enables fast native xz (de)compression in piglit for results files
     (https://github.com/peterjc/backports.lzma)
+  - mock. A python module for mocking other python modules. Required only for
+    unittests (https://github.com/testing-cabal/mock)
 
 Now configure the build system:
 
