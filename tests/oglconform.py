@@ -51,8 +51,12 @@ class OGLCTest(Test):
                          r'scheduled due to lack of compatible fbconfig')
 
     def __init__(self, category, subtest):
-        super(OGLCTest, self).__init__([bin_oglconform, '-minFmt', '-v', '4',
-                                        '-test', category, subtest])
+        super(OGLCTest, self).__init__([category, subtest])
+
+    @Test.command.getter
+    def command(self):
+        return [bin_oglconform, '-minFmt', '-v', '4', '-test'] + \
+            super(OGLCTest, self).command
 
     def interpret_result(self):
         if self.skip_re.search(self.result.out) is not None:
