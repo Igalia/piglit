@@ -2575,6 +2575,7 @@ static bool
 probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
 {
         uint32_t *p;
+	uint32_t observed;
 	enum comparison cmp;
 	bool result;
 
@@ -2589,13 +2590,14 @@ probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
                 return false;
         }
 
-	result = compare_uint(value, *p, cmp);
+	observed = *p;
+	result = compare_uint(value, observed, cmp);
 
 	if (!result) {
 		printf("Atomic counter %d test failed: Reference %s Observed\n",
 		       counter_num, comparison_string(cmp));
 		printf("  Reference: %u\n", value);
-		printf("  Observed:  %u\n", *p);
+		printf("  Observed:  %u\n", observed);
 		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 		return false;
         }
