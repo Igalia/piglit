@@ -101,7 +101,26 @@ class Names(object):
 
     @lazy_property
     def changes(self):
-        return self.__diff(operator.ne)
+        def handler(names, name, prev, cur):
+            """Handle missing tests.
+
+            For changes we want literally anything where the first result
+            isn't the same as the second result.
+
+            """
+            def _get(res):
+                try:
+                    return res.get_result(name)
+                except KeyError:
+                    return so.NOTRUN
+
+            # Add any case of a != b except skip <-> notrun
+            cur = _get(cur)
+            prev = _get(prev)
+            if cur != prev and {cur, prev} != {so.SKIP, so.NOTRUN}:
+                names.add(name)
+
+        return self.__diff(operator.ne, handler=handler)
 
     @lazy_property
     def problems(self):
