@@ -24,6 +24,7 @@
 import os
 import re
 import subprocess
+import tempfile
 
 from framework import grouptools, exceptions, core
 from framework.profile import TestProfile, Test
@@ -66,19 +67,19 @@ class OGLCTest(Test):
 
 def _make_profile():
     profile = TestProfile()
-    testlist_file = '/tmp/oglc.tests'
 
-    with open(os.devnull, "w") as devnull:
-        subprocess.call([bin_oglconform, '-generateTestList', testlist_file],
-                        stdout=devnull.fileno(), stderr=devnull.fileno())
+    with tempfile.NamedTemporaryFile() as f:
+        with open(os.devnull, "w") as devnull:
+            subprocess.call([bin_oglconform, '-generateTestList', f.name],
+                            stdout=devnull.fileno(), stderr=devnull.fileno())
 
-    with open(testlist_file) as f:
-        testlist = f.read().splitlines()
-        for l in testlist:
+        f.seek(0)
+
+        for l in f.readlines():
             try:
                 category, test = l.split()
-                profile.test_list[grouptools.join('oglconform', category, test)] \
-                    = OGLCTest(category, test)
+                group = grouptools.join('oglconform', category, test)
+                profile.test_list[group] = OGLCTest(category, test)
             except:
                 continue
 
