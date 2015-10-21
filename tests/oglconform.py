@@ -73,9 +73,9 @@ def _make_profile():
     profile_ = TestProfile()
 
     with tempfile.NamedTemporaryFile() as f:
-        with open(os.devnull, "w") as devnull:
+        with open(os.devnull, "w") as d:
             subprocess.call([BIN, '-generateTestList', f.name],
-                            stdout=devnull.fileno(), stderr=devnull.fileno())
+                            stdout=d, stderr=d)
 
         f.seek(0)
 
