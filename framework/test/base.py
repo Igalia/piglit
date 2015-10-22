@@ -25,16 +25,43 @@
 from __future__ import print_function, absolute_import
 import errno
 import os
-import subprocess
 import time
 import sys
 import traceback
-from datetime import datetime
-import threading
-import signal
 import itertools
 import abc
 import copy
+import signal
+import warnings
+
+try:
+    # subprocess32 only supports *nix systems, this is important because
+    # "start_new_session" is not a valid argument on windows
+
+    import subprocess32 as subprocess
+    _EXTRA_POPEN_ARGS = {'start_new_session': True}
+except ImportError:
+    # If there is no timeout support, fake it. Add a TimeoutExpired exception
+    # and a Popen that accepts a timeout parameter (and ignores it), then
+    # shadow the actual Popen with this wrapper.
+
+    import subprocess
+
+    class TimeoutExpired(Exception):
+        pass
+
+    class Popen(subprocess.Popen):
+        """Sublcass of Popen that accepts and ignores a timeout argument."""
+        def communicate(self, *args, **kwargs):
+            if 'timeout' in kwargs:
+                del kwargs['timeout']
+            return super(Popen, self).communicate(*args, **kwargs)
+
+    subprocess.TimeoutExpired = TimeoutExpired
+    subprocess.Popen = Popen
+    _EXTRA_POPEN_ARGS = {}
+
+    warnings.warn('Timeouts are not available')
 
 from framework import exceptions, options
 from framework.results import TestResult
@@ -60,56 +87,6 @@ class TestRunError(exceptions.PiglitException):
     def __init__(self, message, status):
         super(TestRunError, self).__init__(message)
         self.status = status
-
-
-class ProcessTimeout(threading.Thread):
-    """ Timeout class for test processes
-
-    This class is for terminating tests that run for longer than a certain
-    amount of time. Create an instance by passing it a timeout in seconds
-    and the Popen object that is running your test. Then call the start
-    method (inherited from Thread) to start the timer. The Popen object is
-    killed if the timeout is reached and it has not completed. Wait for the
-    outcome by calling the join() method from the parent.
-
-    """
-
-    def __init__(self, timeout, proc):
-        threading.Thread.__init__(self)
-        self.proc = proc
-        self.timeout = timeout
-        self.status = 0
-
-    def run(self):
-        start_time = datetime.now()
-        delta = 0
-
-        # poll() returns the returncode attribute, which is either the return
-        # code of the child process (which could be zero), or None if the
-        # process has not yet terminated.
-
-        while delta < self.timeout and self.proc.poll() is None:
-            time.sleep(1)
-            delta = (datetime.now() - start_time).total_seconds()
-
-        # if the test is not finished after timeout, first try to terminate it
-        # and if that fails, send SIGKILL to all processes in the test's
-        # process group
-
-        if self.proc.poll() is None:
-            self.status = 1
-            self.proc.terminate()
-            time.sleep(5)
-
-        if self.proc.poll() is None:
-            self.status = 2
-            if hasattr(os, 'killpg'):
-                os.killpg(self.proc.pid, signal.SIGKILL)
-            self.proc.wait()
-
-    def join(self):
-        threading.Thread.join(self)
-        return self.status
 
 
 def is_crash_returncode(returncode):
@@ -147,10 +124,10 @@ class Test(object):
     """
     __metaclass__ = abc.ABCMeta
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
-                 '__proc_timeout']
-    timeout = 0
+                 'timeout']
+    timeout = None
 
-    def __init__(self, command, run_concurrent=False):
+    def __init__(self, command, run_concurrent=False, timeout=None):
         assert isinstance(command, list), command
 
         self.run_concurrent = run_concurrent
@@ -158,7 +135,9 @@ class Test(object):
         self.env = {}
         self.result = TestResult()
         self.cwd = None
-        self.__proc_timeout = None
+        if timeout is not None:
+            assert isinstance(timeout, int)
+            self.timeout = timeout
 
     def execute(self, path, log, dmesg):
         """ Run a test
@@ -205,11 +184,7 @@ class Test(object):
         """Convert the raw output of the test into a form piglit understands.
         """
         if is_crash_returncode(self.result.returncode):
-            # check if the process was terminated by the timeout
-            if self.timeout > 0 and self.__proc_timeout.join() > 0:
-                self.result.result = 'timeout'
-            else:
-                self.result.result = 'crash'
+            self.result.result = 'crash'
         elif self.result.returncode != 0:
             if self.result.result == 'pass':
                 self.result.result = 'warn'
@@ -258,10 +233,6 @@ class Test(object):
         """
         pass
 
-    def __set_process_group(self):
-        if hasattr(os, 'setpgrp'):
-            os.setpgrp()
-
     def _run_command(self):
         """ Run the test command and get the result
 
@@ -288,11 +259,6 @@ class Test(object):
                                           self.env.iteritems()):
             fullenv[key] = str(value)
 
-        # preexec_fn is not supported on Windows platforms
-        if sys.platform == 'win32':
-            preexec_fn = None
-        else:
-            preexec_fn = self.__set_process_group
 
         try:
             proc = subprocess.Popen(self.command,
@@ -301,19 +267,10 @@ class Test(object):
                                     cwd=self.cwd,
                                     env=fullenv,
                                     universal_newlines=True,
-                                    preexec_fn=preexec_fn)
-
-            # create a ProcessTimeout object to watch out for test hang if the
-            # process is still going after the timeout, then it will be killed
-            # forcing the communicate function (which is a blocking call) to
-            # return
-            if self.timeout > 0:
-                self.__proc_timeout = ProcessTimeout(self.timeout, proc)
-                self.__proc_timeout.start()
+                                    **_EXTRA_POPEN_ARGS)
 
             self.result.pid = proc.pid
-
-            out, err = proc.communicate()
+            out, err = proc.communicate(timeout=self.timeout)
             returncode = proc.returncode
         except OSError as e:
             # Different sets of tests get built under different build
@@ -323,6 +280,27 @@ class Test(object):
                 raise TestRunError("Test executable not found.\n", 'skip')
             else:
                 raise e
+        except subprocess.TimeoutExpired:
+            # This can only be reached if subprocess32 is present, since
+            # TimeoutExpired is never raised by the fallback code.
+
+            proc.terminate()
+
+            # XXX: A number of the os calls in this block don't work on windows,
+            # when porting to python 3 this will likely require an
+            # "if windows/else" block
+            if proc.poll() is None:
+                time.sleep(3)
+                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+
+            # Since the process isn't running it's safe to get any remaining
+            # stdout/stderr values out and store them.
+            self.result.out, self.result.err = proc.communicate()
+
+            raise TestRunError(
+                'Test run time exceeded timeout value ({} seconds)\n'.format(
+                    self.timeout),
+                'timeout')
 
         # The setter handles the bytes/unicode conversion
         self.result.out = out

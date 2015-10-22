@@ -21,19 +21,27 @@
 """ Tests for the exectest module """
 
 from __future__ import print_function, absolute_import
+import tempfile
+import textwrap
+import os
 
 import mock
 import nose.tools as nt
 from nose.plugins.attrib import attr
 
+try:
+    import psutil
+except ImportError:
+    pass
+
 from . import utils
+from .status_tests import PROBLEMS, STATUSES
 from framework.test.base import (
     Test,
     TestRunError,
     ValgrindMixin,
     WindowResizeMixin,
 )
-from .status_tests import PROBLEMS, STATUSES
 from framework.options import _Options as Options
 
 # pylint: disable=invalid-name
@@ -71,8 +79,111 @@ def test_run_return_early():
 
 
 @attr('slow')
+@nt.timed(6)
+def test_timeout_kill_children():
+    """test.base.Test: kill children if terminate fails
+
+    This creates a process that forks multiple times, and then checks that the
+    children have been killed.
+
+    This test could leave processes running if it fails.
+
+    """
+    utils.module_check('subprocess32')
+    utils.module_check('psutil')
+
+    import subprocess32  # pylint: disable=import-error
+
+    class PopenProxy(object):
+        """An object that proxies Popen, and saves the Popen instance as an
+        attribute.
+
+        This is useful for testing the Popen instance.
+
+        """
+        def __init__(self):
+            self.popen = None
+
+        def __call__(self, *args, **kwargs):
+            self.popen = subprocess32.Popen(*args, **kwargs)
+
+            # if commuincate cis called successfully then the proc will be
+            # reset to None, whic will make the test fail.
+            self.popen.communicate = mock.Mock(return_value=('out', 'err'))
+
+            return self.popen
+
+    with tempfile.NamedTemporaryFile() as f:
+        # Create a file that will be executed as a python script
+        # Create a process with two subproccesses (not threads) that will run
+        # for a long time.
+        f.write(textwrap.dedent("""\
+            import time
+            from multiprocessing import Process
+
+            def p():
+                for _ in range(100):
+                    time.sleep(1)
+
+            a = Process(target=p)
+            b = Process(target=p)
+            a.start()
+            b.start()
+            a.join()
+            b.join()
+        """))
+        f.seek(0)  # we'll need to read the file back
+
+        # Create an object that will return a popen object, but also store it
+        # so we can access it later
+        proxy = PopenProxy()
+
+        test = TimeoutTest(['python', f.name])
+        test.timeout = 1
+
+        # mock out subprocess.Popen with our proxy object
+        with mock.patch('framework.test.base.subprocess') as mock_subp:
+            mock_subp.Popen = proxy
+            mock_subp.TimeoutExpired = subprocess32.TimeoutExpired
+            test.run()
+
+        # Check to see if the Popen has children, even after it should have
+        # recieved a TimeoutExpired.
+        proc = psutil.Process(os.getsid(proxy.popen.pid))
+        children = proc.children(recursive=True)
+
+        if children:
+            # If there are still running children attempt to clean them up,
+            # starting with the final generation and working back to the first
+            for child in reversed(children):
+                child.kill()
+
+            raise utils.TestFailure(
+                'Test process had children when it should not')
+
+
+@attr('slow')
+@nt.timed(6)
 def test_timeout():
-    """test.base.Test.run(): Sets status to 'timeout' when timeout exceeded"""
+    """test.base.Test: Stops running test after timeout expires
+
+    This is a little bit of extra time here, but without a sleep of 60 seconds
+    if the test runs 5 seconds it's run too long
+
+    """
+    utils.module_check('subprocess32')
+    utils.binary_check('sleep', 1)
+
+    test = TimeoutTest(['sleep', '60'])
+    test.timeout = 1
+    test.run()
+
+
+@attr('slow')
+@nt.timed(6)
+def test_timeout_timeout():
+    """test.base.Test: Sets status to 'timeout' when timeout exceeded"""
+    utils.module_check('subprocess32')
     utils.binary_check('sleep', 1)
 
     test = TimeoutTest(['sleep', '60'])
@@ -81,9 +192,11 @@ def test_timeout():
     nt.eq_(test.result.result, 'timeout')
 
 
+@nt.timed(2)
 def test_timeout_pass():
-    """test.base.Test.run(): Doesn't change status when timeout not exceeded
+    """test.base.Test: Doesn't change status when timeout not exceeded
     """
+    utils.module_check('subprocess32')
     utils.binary_check('true')
 
     test = TimeoutTest(['true'])
