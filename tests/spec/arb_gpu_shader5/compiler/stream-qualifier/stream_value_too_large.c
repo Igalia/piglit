@@ -33,6 +33,8 @@
  * "If an implementation supports <N> vertex streams, the
  *  individual streams are numbered 0 through <N>-1"
  *
+ * "If any stream declaration specifies a non-existent stream number,
+ *  the shader will fail to compile."
  */
 
 #include "piglit-util-gl.h"
@@ -68,6 +70,7 @@ static const char *gs_template =
 	"\n"
 	"layout(points) in;\n"
 	"layout(points, stream = %d, max_vertices=1) out;\n"
+	"out vec4 streamout;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
