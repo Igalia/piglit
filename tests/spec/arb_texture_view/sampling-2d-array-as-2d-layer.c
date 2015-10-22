@@ -149,7 +149,7 @@ piglit_display(void)
 			subtest_pass &= test_single_layer(&testparams[n], layer);
 		}
 		piglit_report_subtest_result(subtest_pass ? PIGLIT_PASS : PIGLIT_FAIL,
-			testparams[n].desc);
+			"%s", testparams[n].desc);
 		pass &= subtest_pass;
 	}
 
