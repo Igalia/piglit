@@ -136,9 +136,6 @@ piglit_cl_test(const int argc,
 	cl_device_id* devices;
 	cl_context cl_ctx;
 
-	bool found_invalid_platform = false;
-	cl_platform_id* platform_ids;
-	unsigned int num_platform_ids;
 	cl_platform_id invalid_platform_id = NULL;
 
 	//TODO: test also CL_CONTEXT_INTEROP_USER_SYNC
