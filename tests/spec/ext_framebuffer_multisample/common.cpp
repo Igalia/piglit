@@ -530,15 +530,6 @@ Test::measure_accuracy()
 		}
 	}
 
-	printf("Pixels that should be unlit\n");
-	unlit_stats.summarize();
-	pass = unlit_stats.is_perfect() && pass;
-	printf("Pixels that should be totally lit\n");
-	totally_lit_stats.summarize();
-	pass = totally_lit_stats.is_perfect() && pass;
-	printf("Pixels that should be partially lit\n");
-	partially_lit_stats.summarize();
-
 	double error_threshold;
 	if (test_resolve) {
 		/* For depth and stencil resolves, the implementation
@@ -558,7 +549,39 @@ Test::measure_accuracy()
 		error_threshold = 0.333 *
 			pow(0.6, log((double)effective_num_samples) / log(2.0));
 	}
-	printf("The error threshold for this test is %f\n", error_threshold);
+
+	/* The unlit and totally_lit stats are supposed to count the
+	 * pixels where either a primitive completely covers the pixel
+	 * or no primitive touches it at all. However this is
+	 * effectively only determined by checking whether any
+	 * primitive has intersected one of the supersample positions
+	 * of the reference image. It's completely possible for a
+	 * primitive to intersect the pixel boundary but completely
+	 * miss any of the supersample positions. The GL
+	 * implementation is free to pick whatever multisample
+	 * positions it wants within the pixel boundary so it's also
+	 * possible for a primitive to intersect a multisample
+	 * position but miss all of the supersample positions of the
+	 * reference image. To cope with this we allow a small margin
+	 * of error for the pixels that are either fully lit or fully
+	 * unlit.
+	 */
+	double full_pixel_threshold = error_threshold * 0.05f;
+
+	printf("Pixels that should be unlit\n");
+	unlit_stats.summarize();
+	pass = unlit_stats.is_better_than(full_pixel_threshold) && pass;
+	printf("Pixels that should be totally lit\n");
+	totally_lit_stats.summarize();
+	pass = totally_lit_stats.is_better_than(full_pixel_threshold) && pass;
+	printf("The error threshold for unlit and totally lit "
+               "pixels test is %f\n",
+               full_pixel_threshold);
+	printf("Pixels that should be partially lit\n");
+	partially_lit_stats.summarize();
+
+	printf("The error threshold for partially lit pixels is %f\n",
+               error_threshold);
 	pass = partially_lit_stats.is_better_than(error_threshold) && pass;
 	// TODO: deal with sRGB.
 	return pass;
