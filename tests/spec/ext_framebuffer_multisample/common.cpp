@@ -542,12 +542,12 @@ Test::measure_accuracy()
 		 * about 0.25, and each additional factor of 2
 		 * overampling reduces the error by a factor of about
 		 * 0.6.  Leaving some room for variation, we'll set
-		 * the error threshold to 0.333 * 0.6 ^
+		 * the error threshold to 0.333 * 0.62 ^
 		 * log2(num_samples).
 		 */
 		int effective_num_samples = num_samples == 0 ? 1 : num_samples;
 		error_threshold = 0.333 *
-			pow(0.6, log((double)effective_num_samples) / log(2.0));
+			pow(0.62, ffs(effective_num_samples) - 1);
 	}
 
 	/* The unlit and totally_lit stats are supposed to count the
