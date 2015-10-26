@@ -46,9 +46,10 @@ class OGLCTest(Test):
     will obtain a list of tests from oglconform and add them all.
 
     """
-    skip_re = re.compile(r'Total Not run: 1|no test in schedule is '
-                         r'compat|GLSL [13].[345]0 is not supported|wont be '
-                         r'scheduled due to lack of compatible fbconfig')
+    skip_re = re.compile(
+        r'no test in schedule is compat|'
+        r'GLSL [13].[345]0 is not supported|'
+        r'wont be scheduled due to lack of compatible fbconfig')
 
     def __init__(self, category, subtest):
         super(OGLCTest, self).__init__([category, subtest])
@@ -59,10 +60,19 @@ class OGLCTest(Test):
             super(OGLCTest, self).command
 
     def interpret_result(self):
-        if self.skip_re.search(self.result.out) is not None:
-            self.result.result = 'skip'
-        elif re.search('Total Passed : 1', self.result.out) is not None:
+        # Most of what we want to search for is in the last three lines of the
+        # the output
+        split = self.result.out.rsplit('\n', 4)[1:]
+        if 'Total Passed : 1' in split:
             self.result.result = 'pass'
+        elif 'Total Failed : 1' in split:
+            # This is a fast path to avoid the regular expression.
+            self.result.result = 'fail'
+        elif ('Total Not run: 1' in split or
+              self.skip_re.search(self.result.out) is not None):
+            # Lazy evaluation means that the re (which is slow) is only tried if
+            # the more obvious case is not true
+            self.result.result = 'skip'
         else:
             self.result.result = 'fail'
 
