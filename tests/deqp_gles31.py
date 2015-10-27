@@ -35,7 +35,7 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES31_EXTRA_ARGS',
 
 class DEQPGLES31Test(deqp.DEQPBaseTest):
     deqp_bin = _DEQP_GLES31_BIN
-    extra_args = [x for x in _EXTRA_ARGS if not x.startsiwth('--deqp-case')]
+    extra_args = [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
