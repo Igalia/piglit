@@ -712,6 +712,13 @@ with profile.test_list.group_manager(
     g(['getteximage-targets', '2D'])
     g(['teximage-scale-bias'])
     g(['tex-upside-down-miptree'])
+
+    for prim in ['GL_POINTS', 'GL_LINE_LOOP', 'GL_LINE_STRIP', 'GL_LINES',
+                 'GL_TRIANGLES', 'GL_TRIANGLE_STRIP', 'GL_TRIANGLE_FAN',
+                 'GL_QUADS', 'GL_QUAD_STRIP', 'GL_POLYGON']:
+        for mode in ['varray', 'vbo']:
+            g(['gl-1.1-drawarrays-vertex-count', '100000', mode, prim])
+
     add_msaa_visual_plain_tests(g, ['draw-pixels'])
     add_msaa_visual_plain_tests(g, ['read-front'], run_concurrent=False)
     add_msaa_visual_plain_tests(g, ['read-front', 'clear-front-first'],
