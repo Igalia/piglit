@@ -222,10 +222,9 @@ bool draw_compare_levels(bool check_error, bool check_srgb,
 enum piglit_result
 test_miptrees(void* input_type)
 {
-	int subtest =  0;
-	enum test_type * type = (enum test_type*) input_type;
-	bool is_srgb_test = *type == TEST_TYPE_SRGB;
-	bool is_hdr_test  = *type == TEST_TYPE_HDR;
+	const enum test_type subtest = *(enum test_type*) input_type;
+	const bool is_srgb_test = subtest == TEST_TYPE_SRGB;
+	const bool is_hdr_test  = subtest == TEST_TYPE_HDR;
 
 	static const char * tests[3] = {"hdr", "ldrl", "ldrs"};
 	static const char * block_dim_str[14] = {
@@ -245,62 +244,47 @@ test_miptrees(void* input_type)
 		"12x12"
 	};
 
-	bool has_hdr = piglit_is_extension_supported(
-			"GL_KHR_texture_compression_astc_hdr");
-
-	/* If testing sRGB mode, fast-forward to the srgb test. */
-	if (is_srgb_test) {
-		subtest =  TEST_TYPE_SRGB;
-	} else {
-		/* Skip if on an HDR system not running the HDR test
-		 * or if on an LDR system running the HDR test.
-		 */
-		if (has_hdr != is_hdr_test)
-			return PIGLIT_SKIP;
+	if (!is_srgb_test)
 		piglit_require_extension("GL_EXT_texture_sRGB_decode");
-
-	}
 
 	GLint pixel_offset_loc = glGetUniformLocation(prog, "pixel_offset");
 	GLint level_pixel_size_loc = glGetUniformLocation(prog,
 							"level_pixel_size");
 
-	/* Test each submode */
-	for (; subtest < ARRAY_SIZE(tests); ++subtest) {
+	/*  Check for error color if an LDR-only sys reading an HDR
+	 *  texture. No need to draw a reference mipmap in this case.
+	 */
+	const bool has_hdr = piglit_is_extension_supported(
+		"GL_KHR_texture_compression_astc_hdr");
+	const bool check_error = is_hdr_test && !has_hdr;
+	int block_dims;
+	for (block_dims = 0; block_dims < ARRAY_SIZE(block_dim_str); ++block_dims) {
 
-		/*  Check for error color if an LDR-only sys reading an HDR
-		 *  texture. No need to draw a reference mipmap in this case.
-		 */
-		int check_error = !has_hdr && subtest == TEST_TYPE_HDR;
-		int block_dims = 0;
-		for (; block_dims < ARRAY_SIZE(block_dim_str); ++block_dims) {
+		/* Texture objects. */
+		GLuint tex_compressed = 0;
+		GLuint tex_decompressed = 0;
 
-			/* Texture objects. */
-			GLuint tex_compressed;
-			GLuint tex_decompressed;
-
-			/* Load texture for current submode and block size */
-			load_texture("compressed", tests[subtest],
+		/* Load texture for current submode and block size */
+		load_texture("compressed", tests[subtest],
+				block_dim_str[block_dims],
+				&tex_compressed);
+		if (!check_error) {
+			load_texture("decompressed", tests[subtest],
 					block_dim_str[block_dims],
-					&tex_compressed);
-			if (!check_error) {
-				load_texture("decompressed", tests[subtest],
-						block_dim_str[block_dims],
-						&tex_decompressed);
-			}
+					&tex_decompressed);
+		}
 
-			/* Draw and compare each level of the two textures */
-			glClear(GL_COLOR_BUFFER_BIT);
-			if (!draw_compare_levels(check_error, is_srgb_test,
-						level_pixel_size_loc,
-						pixel_offset_loc,
-						tex_compressed,
-						tex_decompressed)) {
-				piglit_loge("Mode %s Block %s.",
+		/* Draw and compare each level of the two textures */
+		glClear(GL_COLOR_BUFFER_BIT);
+		if (!draw_compare_levels(check_error, is_srgb_test,
+					level_pixel_size_loc,
+					pixel_offset_loc,
+					tex_compressed,
+					tex_decompressed)) {
+			piglit_loge("Mode %s Block %s.",
 					tests[subtest],
 					block_dim_str[block_dims]);
-				return PIGLIT_FAIL;
-			}
+			return PIGLIT_FAIL;
 		}
 	}
 	return PIGLIT_PASS;
