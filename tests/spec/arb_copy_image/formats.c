@@ -273,6 +273,9 @@ are_formats_compatible(struct texture_format *f1, struct texture_format *f2)
 	if (f1 == f2)
 		return true;
 
+	if (!f1->can_be_reinterpreted || !f2->can_be_reinterpreted)
+		return false;
+
 	if (is_format_compressed(f1)) {
 		if (is_format_compressed(f2))
 			/* Compressed-to-compressed copies are not supported */
@@ -282,8 +285,7 @@ are_formats_compatible(struct texture_format *f1, struct texture_format *f2)
 	} else if (is_format_compressed(f2)) {
 		return f1->bytes == f2->bytes;
 	} else {
-		return f1->can_be_reinterpreted && f2->can_be_reinterpreted &&
-		       f1->bytes == f2->bytes;
+		return f1->bytes == f2->bytes;
 	}
 }
 
