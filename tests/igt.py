@@ -37,7 +37,7 @@ import os
 import re
 import subprocess
 
-from framework import grouptools, exceptions, core
+from framework import grouptools, exceptions, core, options
 from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
@@ -88,8 +88,8 @@ else:
 
 class IGTTestProfile(TestProfile):
     """Test profile for intel-gpu-tools tests."""
-    def _pre_run_hook(self, opts):
-        if opts.execute:
+    def _pre_run_hook(self):
+        if options.OPTIONS.execute:
             try:
                 check_environment()
             except exceptions.PiglitInternalError as e:

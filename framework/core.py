@@ -25,7 +25,6 @@
 from __future__ import print_function, absolute_import
 import errno
 import os
-import re
 import subprocess
 import sys
 import ConfigParser
@@ -36,7 +35,6 @@ __all__ = [
     'PIGLIT_CONFIG',
     'PLATFORMS',
     'PiglitConfig',
-    'Options',
     'collect_system_info',
     'parse_listfile',
 ]
@@ -133,54 +131,6 @@ def checkDir(dirname, failifexists):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
-
-class Options(object):
-    """ Contains options for a piglit run
-
-    Options are as follows:
-    concurrent -- True if concurrency is to be used
-    execute -- False for dry run
-    filter -- list of compiled regex which include exclusively tests that match
-    exclude_filter -- list of compiled regex which exclude tests that match
-    valgrind -- True if valgrind is to be used
-    dmesg -- True if dmesg checking is desired. This forces concurrency off
-    env -- environment variables set for each test before run
-
-    """
-    def __init__(self, concurrent=True, execute=True, include_filter=None,
-                 exclude_filter=None, valgrind=False, dmesg=False, sync=False):
-        self.concurrent = concurrent
-        self.execute = execute
-        self.filter = \
-            [re.compile(x, re.IGNORECASE) for x in include_filter or []]
-        self.exclude_filter = \
-            [re.compile(x, re.IGNORECASE) for x in exclude_filter or []]
-        self.exclude_tests = set()
-        self.valgrind = valgrind
-        self.dmesg = dmesg
-        self.sync = sync
-
-        # env is used to set some base environment variables that are not going
-        # to change across runs, without sending them to os.environ which is
-        # fickle and easy to break
-        self.env = {
-            'PIGLIT_SOURCE_DIR':
-                os.environ.get(
-                    'PIGLIT_SOURCE_DIR',
-                    os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                 '..')))
-        }
-
-    def __iter__(self):
-        for key, values in self.__dict__.iteritems():
-            # If the values are regex compiled then yield their pattern
-            # attribute, which is the original plaintext they were compiled
-            # from, otherwise yield them normally.
-            if key in ['filter', 'exclude_filter']:
-                yield (key, [x.pattern for x in values])
-            else:
-                yield (key, values)
 
 
 def collect_system_info():

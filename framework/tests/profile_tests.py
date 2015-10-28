@@ -24,10 +24,11 @@ from __future__ import print_function, absolute_import
 import sys
 import copy
 
+import mock
 import nose.tools as nt
 
 from framework.tests import utils
-from framework import grouptools, core, dmesg, profile, exceptions
+from framework import grouptools, dmesg, profile, exceptions, options
 from framework.test import GleanTest
 
 # Don't print sys.stderr to the console
@@ -114,6 +115,15 @@ class TestPrepareTestListMatches(object):
             grouptools.join('group3', 'test5'): 'other',
             grouptools.join('group4', 'Test9'): 'is_caps',
         }
+        self.opts = None
+        self.__patcher = mock.patch('framework.profile.options.OPTIONS',
+                                    new_callable=options._Options)
+
+    def setup(self):
+        self.opts = self.__patcher.start()
+
+    def teardown(self):
+        self.__patcher.stop()
 
     def test_matches_filter_mar_1(self):
         """profile.TestProfile.prepare_test_list: 'not env.filter or matches_any_regex()' env.filter is False
@@ -121,21 +131,19 @@ class TestPrepareTestListMatches(object):
         Nothing should be filtered.
 
         """
-        env = core.Options()
-
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
-        profile_._prepare_test_list(env)
+        profile_._prepare_test_list()
 
         nt.assert_dict_equal(profile_.test_list, self.data)
 
     def test_matches_filter_mar_2(self):
         """profile.TestProfile.prepare_test_list: 'not env.filter or matches_any_regex()' mar is False"""
-        env = core.Options(include_filter=['test5'])
+        self.opts.include_filter = ['test5']
 
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
-        profile_._prepare_test_list(env)
+        profile_._prepare_test_list()
 
         baseline = {grouptools.join('group3', 'test5'): 'other'}
 
@@ -143,12 +151,11 @@ class TestPrepareTestListMatches(object):
 
     def test_matches_env_exclude(self):
         """profile.TestProfile.prepare_test_list: 'not path in env.exclude_tests'"""
-        env = core.Options()
-        env.exclude_tests.add(grouptools.join('group3', 'test5'))
+        self.opts.exclude_tests.add(grouptools.join('group3', 'test5'))
 
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
-        profile_._prepare_test_list(env)
+        profile_._prepare_test_list()
 
         baseline = copy.deepcopy(self.data)
         del baseline[grouptools.join('group3', 'test5')]
@@ -157,11 +164,11 @@ class TestPrepareTestListMatches(object):
 
     def test_matches_exclude_mar(self):
         """profile.TestProfile.prepare_test_list: 'not matches_any_regexp()'"""
-        env = core.Options(exclude_filter=['test5'])
+        self.opts.exclude_filter = ['test5']
 
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
-        profile_._prepare_test_list(env)
+        profile_._prepare_test_list()
 
         baseline = copy.deepcopy(self.data)
         del baseline[grouptools.join('group3', 'test5')]
@@ -170,11 +177,11 @@ class TestPrepareTestListMatches(object):
 
     def test_matches_include_caps(self):
         """profile.TestProfile.prepare_test_list: matches capitalized tests"""
-        env = core.Options(exclude_filter=['test9'])
+        self.opts.exclude_filter = ['test9']
 
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
-        profile_._prepare_test_list(env)
+        profile_._prepare_test_list()
 
         nt.assert_not_in(grouptools.join('group4', 'Test9'), profile_.test_list)
 

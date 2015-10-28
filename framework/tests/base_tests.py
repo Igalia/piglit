@@ -22,6 +22,7 @@
 
 from __future__ import print_function, absolute_import
 
+import mock
 import nose.tools as nt
 from nose.plugins.attrib import attr
 
@@ -30,6 +31,7 @@ from framework.test.base import (
     Test, WindowResizeMixin, ValgrindMixin, TestRunError
 )
 from framework.tests.status_tests import PROBLEMS, STATUSES
+from framework.options import _Options as Options
 
 # pylint: disable=invalid-name
 
@@ -168,16 +170,16 @@ def test_mutation():
     nt.assert_list_equal(args, ['a', 'b'])
 
 
-def test_ValgrindMixin_command():
+@mock.patch('framework.test.base.options.OPTIONS', new_callable=Options)
+def test_ValgrindMixin_command(mock_opts):
     """test.base.ValgrindMixin.command: overrides self.command"""
     class _Test(ValgrindMixin, utils.Test):
         pass
+    mock_opts.valgrind = True
 
     test = _Test(['foo'])
-    test.OPTS.valgrind = True
     nt.eq_(test.command, ['valgrind', '--quiet', '--error-exitcode=1',
                           '--tool=memcheck', 'foo'])
-    test.OPTS.valgrind = False
 
 
 class TestValgrindMixinRun(object):
@@ -194,12 +196,16 @@ class TestValgrindMixinRun(object):
 
     @utils.nose_generator
     def test_bad_valgrind_true(self):
-        """Test non-pass status when OPTS.valgrind is True."""
+        """Test non-pass status when options.OPTIONS.valgrind is True."""
         def test(status, expected):
             test = self.test(['foo'])
-            test.OPTS.valgrind = True
             test.result.result = status
-            test.run()
+
+            with mock.patch('framework.test.base.options.OPTIONS',
+                    new_callable=Options) as mock_opts:
+                mock_opts.valgrind = True
+                test.run()
+
             nt.eq_(test.result.result, expected)
 
         desc = ('test.base.ValgrindMixin.run: '
@@ -211,12 +217,16 @@ class TestValgrindMixinRun(object):
 
     @utils.nose_generator
     def test_valgrind_false(self):
-        """Test non-pass status when OPTS.valgrind is False."""
+        """Test non-pass status when options.OPTIONS.valgrind is False."""
         def test(status):
             test = self.test(['foo'])
-            test.OPTS.valgrind = False
             test.result.result = status
-            test.run()
+
+            with mock.patch('framework.test.base.options.OPTIONS',
+                    new_callable=Options) as mock_opts:
+                mock_opts.valgrind = False
+                test.run()
+
             nt.eq_(test.result.result, status)
 
         desc = ('test.base.ValgrindMixin.run: when status is "{}" '
@@ -226,21 +236,23 @@ class TestValgrindMixinRun(object):
             test.description = desc.format(status)
             yield test, status
 
-    def test_pass(self):
+    @mock.patch('framework.test.base.options.OPTIONS', new_callable=Options)
+    def test_pass(self, mock_opts):
         """test.base.ValgrindMixin.run: when test is 'pass' and returncode is '0' result is pass
         """
         test = self.test(['foo'])
-        test.OPTS.valgrind = True
+        mock_opts.valgrind = True
         test.result.result = 'pass'
         test.result.returncode = 0
         test.run()
         nt.eq_(test.result.result, 'pass')
 
-    def test_fallthrough(self):
+    @mock.patch('framework.test.base.options.OPTIONS', new_callable=Options)
+    def test_fallthrough(self, mock_opts):
         """test.base.ValgrindMixin.run: when a test is 'pass' but returncode is not 0 it's 'fail'
         """
         test = self.test(['foo'])
-        test.OPTS.valgrind = True
+        mock_opts.valgrind = True
         test.result.result = 'pass'
         test.result.returncode = 1
         test.run()

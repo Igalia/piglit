@@ -31,8 +31,8 @@ try:
 except ImportError:
     import json
 
+from framework import core, options
 from .base import Test, WindowResizeMixin, ValgrindMixin, TestIsSkip
-import framework.core as core
 
 
 __all__ = [
@@ -129,7 +129,7 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
         any glx specific tests.
 
         """
-        platform = self.OPTS.env['PIGLIT_PLATFORM']
+        platform = options.OPTIONS.env['PIGLIT_PLATFORM']
         if self.__require_platforms and platform not in self.__require_platforms:
             raise TestIsSkip(
                 'Test requires one of the following platforms "{}" '

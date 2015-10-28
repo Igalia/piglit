@@ -29,7 +29,7 @@ import time
 import ConfigParser
 import ctypes
 
-from framework import core, backends, exceptions
+from framework import core, backends, exceptions, options
 import framework.results
 import framework.profile
 from . import parsers
@@ -176,17 +176,15 @@ def _run_parser(input_):
     return parser.parse_args(unparsed)
 
 
-def _create_metadata(args, name, opts):
+def _create_metadata(args, name):
     """Create and return a metadata dict for Backend.initialize()."""
-    options = {}
-    options['profile'] = args.test_profile
-    options['log_level'] = args.log_level
-    for key, value in opts:
-        options[key] = value
+    opts = dict(options.OPTIONS)
+    opts['profile'] = args.test_profile
+    opts['log_level'] = args.log_level
     if args.platform:
-        options['platform'] = args.platform
+        opts['platform'] = args.platform
 
-    metadata = {'options': options}
+    metadata = {'options': opts}
     metadata['name'] = name
     metadata.update(core.collect_system_info())
 
@@ -235,16 +233,16 @@ def run(input_):
                 args.include_tests.append(line.rstrip())
 
     # Pass arguments into Options
-    opts = core.Options(concurrent=args.concurrency,
-                        exclude_filter=args.exclude_tests,
-                        include_filter=args.include_tests,
-                        execute=args.execute,
-                        valgrind=args.valgrind,
-                        dmesg=args.dmesg,
-                        sync=args.sync)
+    options.OPTIONS.concurrent = args.concurrency
+    options.OPTIONS.exclude_filter = args.exclude_tests
+    options.OPTIONS.include_filter = args.include_tests
+    options.OPTIONS.execute = args.execute
+    options.OPTIONS.valgrind = args.valgrind
+    options.OPTIONS.dmesg = args.dmesg
+    options.OPTIONS.sync = args.sync
 
     # Set the platform to pass to waffle
-    opts.env['PIGLIT_PLATFORM'] = args.platform
+    options.OPTIONS.env['PIGLIT_PLATFORM'] = args.platform
 
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -262,9 +260,8 @@ def run(input_):
 
     backend = backends.get_backend(args.backend)(
         args.results_path,
-        file_fsync=opts.sync,
         junit_suffix=args.junit_suffix)
-    backend.initialize(_create_metadata(args, results.name, opts))
+    backend.initialize(_create_metadata(args, results.name))
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
@@ -273,7 +270,7 @@ def run(input_):
     # Set the dmesg type
     if args.dmesg:
         profile.dmesg = args.dmesg
-    profile.run(opts, args.log_level, backend)
+    profile.run(args.log_level, backend)
 
     results.time_elapsed.end = time.time()
     backend.finalize({'time_elapsed': results.time_elapsed})
@@ -302,17 +299,17 @@ def resume(input_):
     _disable_windows_exception_messages()
 
     results = backends.load(args.results_path)
-    opts = core.Options(concurrent=results.options['concurrent'],
-                        exclude_filter=results.options['exclude_filter'],
-                        include_filter=results.options['filter'],
-                        execute=results.options['execute'],
-                        valgrind=results.options['valgrind'],
-                        dmesg=results.options['dmesg'],
-                        sync=results.options['sync'])
+    options.OPTIONS.concurrent = results.options['concurrent']
+    options.OPTIONS.exclude_filter = results.options['exclude_filter']
+    options.OPTIONS.include_filter = results.options['filter']
+    options.OPTIONS.execute = results.options['execute']
+    options.OPTIONS.valgrind = results.options['valgrind']
+    options.OPTIONS.dmesg = results.options['dmesg']
+    options.OPTIONS.sync = results.options['sync']
 
     core.get_config(args.config_file)
 
-    opts.env['PIGLIT_PLATFORM'] = results.options['platform']
+    options.OPTIONS.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results.options['env'] = core.collect_system_info()
     results.options['name'] = results.name
@@ -320,7 +317,6 @@ def resume(input_):
     # Resume only works with the JSON backend
     backend = backends.get_backend('json')(
         args.results_path,
-        file_fsync=opts.sync,
         file_start_count=len(results.tests) + 1)
     # Specifically do not initialize again, everything initialize does is done.
 
@@ -328,15 +324,15 @@ def resume(input_):
     # have obviously not completed.
     for name, result in results.tests.iteritems():
         if args.no_retry or result.result != 'incomplete':
-            opts.exclude_tests.add(name)
+            options.OPTIONS.exclude_tests.add(name)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])
     profile.results_dir = args.results_path
-    if opts.dmesg:
-        profile.dmesg = opts.dmesg
+    if options.OPTIONS.dmesg:
+        profile.dmesg = options.OPTIONS.dmesg
 
     # This is resumed, don't bother with time since it wont be accurate anyway
-    profile.run(opts, results.options['log_level'], backend)
+    profile.run(results.options['log_level'], backend)
 
     backend.finalize()
 

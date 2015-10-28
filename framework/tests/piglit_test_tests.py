@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2015 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,13 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Tests for the exectest module """
+"""Tests for the piglit_test module"""
 
 from __future__ import print_function, absolute_import
 
+import mock
 import nose.tools as nt
 
 from framework.tests import utils
+from framework.options import _Options as Options
 from framework.test.base import TestIsSkip
 from framework.test.piglit_test import (PiglitBaseTest, PiglitGLTest,
                                         PiglitCLTest)
@@ -96,33 +98,37 @@ def test_PiglitGLTest_include_and_exclude():
                      exclude_platforms=['gbm'])
 
 
+@mock.patch('framework.test.piglit_test.options.OPTIONS', new_callable=Options)
 @utils.not_raises(TestIsSkip)
-def test_PiglitGLTest_platform_in_require():
+def test_PiglitGLTest_platform_in_require(mock_opts):
     """test.piglit_test.PiglitGLTest.is_skip(): does not skip if platform is in require_platforms"""
-    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
+    mock_opts.env['PIGLIT_PLATFORM'] = 'glx'
     test = PiglitGLTest(['foo'], require_platforms=['glx'])
     test.is_skip()
 
 
+@mock.patch('framework.test.piglit_test.options.OPTIONS', new_callable=Options)
 @nt.raises(TestIsSkip)
-def test_PiglitGLTest_platform_not_in_require():
+def test_PiglitGLTest_platform_not_in_require(mock_opts):
     """test.piglit_test.PiglitGLTest.is_skip(): skips if platform is not in require_platforms"""
-    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
+    mock_opts.env['PIGLIT_PLATFORM'] = 'gbm'
     test = PiglitGLTest(['foo'], require_platforms=['glx'])
     test.is_skip()
 
 
+@mock.patch('framework.test.piglit_test.options.OPTIONS', new_callable=Options)
 @nt.raises(TestIsSkip)
-def test_PiglitGLTest_platform_in_exclude():
+def test_PiglitGLTest_platform_in_exclude(mock_opts):
     """test.piglit_test.PiglitGLTest.is_skip(): skips if platform is in exclude_platforms"""
-    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
+    mock_opts.env['PIGLIT_PLATFORM'] = 'glx'
     test = PiglitGLTest(['foo'], exclude_platforms=['glx'])
     test.is_skip()
 
 
+@mock.patch('framework.test.piglit_test.options.OPTIONS', new_callable=Options)
 @utils.not_raises(TestIsSkip)
-def test_PiglitGLTest_platform_not_in_exclude():
+def test_PiglitGLTest_platform_not_in_exclude(mock_opts):
     """test.piglit_test.PiglitGLTest.is_skip(): does not skip if platform is in exclude_platforms"""
-    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
+    mock_opts.env['PIGLIT_PLATFORM'] = 'gbm'
     test = PiglitGLTest(['foo'], exclude_platforms=['glx'])
     test.is_skip()

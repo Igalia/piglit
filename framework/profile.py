@@ -34,7 +34,7 @@ import importlib
 import contextlib
 import itertools
 
-from framework import grouptools, exceptions
+from framework import grouptools, exceptions, options
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
 from framework.test.base import Test
@@ -175,15 +175,12 @@ class TestProfile(object):
         """
         self._dmesg = get_dmesg(not_dummy)
 
-    def _prepare_test_list(self, opts):
+    def _prepare_test_list(self):
         """ Prepare tests for running
 
         Flattens the nested group hierarchy into a flat dictionary using '/'
         delimited groups by calling self.flatten_group_hierarchy(), then
         runs it's own filters plus the filters in the self.filters name
-
-        Arguments:
-        opts - a core.Options instance
 
         """
         def matches_any_regexp(x, re_list):
@@ -192,10 +189,10 @@ class TestProfile(object):
         # The extra argument is needed to match check_all's API
         def test_matches(path, test):
             """Filter for user-specified restrictions"""
-            return ((not opts.filter or
-                     matches_any_regexp(path, opts.filter)) and
-                    path not in opts.exclude_tests and
-                    not matches_any_regexp(path, opts.exclude_filter))
+            return ((not options.OPTIONS.include_filter or
+                     matches_any_regexp(path, options.OPTIONS.include_filter))
+                    and path not in options.OPTIONS.exclude_tests
+                    and not matches_any_regexp(path, options.OPTIONS.exclude_filter))
 
         filters = self.filters + [test_matches]
 
@@ -215,61 +212,49 @@ class TestProfile(object):
             raise exceptions.PiglitFatalError(
                 'There are no tests scheduled to run. Aborting run.')
 
-    def _pre_run_hook(self, opts):
+    def _pre_run_hook(self):
         """ Hook executed at the start of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
         set this to do something, as be default it will no-op
-
-        Arguments:
-        opts -- a core.Options instance
         """
         pass
 
-    def _post_run_hook(self, opts):
+    def _post_run_hook(self):
         """ Hook executed at the end of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
         set this to do something, as be default it will no-op
-
-        Arguments:
-        opts -- a core.Options instance
         """
         pass
 
-    def run(self, opts, logger, backend):
+    def run(self, logger, backend):
         """ Runs all tests using Thread pool
 
         When called this method will flatten out self.tests into
-        self.test_list, then will prepare a logger, pass opts to the Test
-        class, and begin executing tests through it's Thread pools.
+        self.test_list, then will prepare a logger, and begin executing tests
+        through it's Thread pools.
 
-        Based on the value of opts.concurrent it will either run all the tests
-        concurrently, all serially, or first the thread safe tests then the
-        serial tests.
+        Based on the value of options.OPTIONS.concurrent it will either run all
+        the tests concurrently, all serially, or first the thread safe tests
+        then the serial tests.
 
         Finally it will print a final summary of the tests
 
         Arguments:
-        opts -- a core.Options instance
         backend -- a results.Backend derived instance
 
         """
 
-        self._pre_run_hook(opts)
-        Test.OPTS = opts
+        self._pre_run_hook()
 
         chunksize = 1
 
-        self._prepare_test_list(opts)
+        self._prepare_test_list()
         log = LogManager(logger, len(self.test_list))
 
         def test(pair):
-            """ Function to call test.execute from .map
-
-            Adds opts which are needed by Test.execute()
-
-            """
+            """Function to call test.execute from map"""
             name, test = pair
             with backend.write_test(name) as w:
                 test.execute(name, log.get(), self.dmesg)
@@ -288,9 +273,9 @@ class TestProfile(object):
         single = multiprocessing.dummy.Pool(1)
         multi = multiprocessing.dummy.Pool()
 
-        if opts.concurrent == "all":
+        if options.OPTIONS.concurrent == "all":
             run_threads(multi, self.test_list.iteritems())
-        elif opts.concurrent == "none":
+        elif options.OPTIONS.concurrent == "none":
             run_threads(single, self.test_list.iteritems())
         else:
             # Filter and return only thread safe tests to the threaded pool
@@ -302,7 +287,7 @@ class TestProfile(object):
 
         log.get().summary()
 
-        self._post_run_hook(opts)
+        self._post_run_hook()
 
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function

@@ -39,7 +39,7 @@ X_TEST_SUITE = core.PIGLIT_CONFIG.required_get('xts', 'path')
 
 class XTSProfile(TestProfile):  # pylint: disable=too-few-public-methods
     """ A subclass of TestProfile that provides a setup hook for XTS """
-    def _pre_run_hook(self, opts):
+    def _pre_run_hook(self):
         """ This hook sets the XTSTest.results_path variable
 
         Setting this variable allows images created by XTS to moved into the

@@ -36,8 +36,7 @@ import itertools
 import abc
 import copy
 
-from framework import exceptions
-from framework.core import Options
+from framework import exceptions, options
 from framework.results import TestResult
 
 
@@ -145,7 +144,6 @@ class Test(object):
     run_concurrent -- If True the test is thread safe. Default: False
 
     """
-    OPTS = Options()
     __metaclass__ = abc.ABCMeta
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
                  '__proc_timeout']
@@ -175,7 +173,7 @@ class Test(object):
         """
         log.start(path)
         # Run the test
-        if self.OPTS.execute:
+        if options.OPTIONS.execute:
             try:
                 self.result.time.start = time.time()
                 dmesg.update_dmesg()
@@ -226,7 +224,7 @@ class Test(object):
         self.result.command = ' '.join(self.command)
         self.result.environment = " ".join(
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
-                self.OPTS.env.iteritems(), self.env.iteritems()))
+                options.OPTIONS.env.iteritems(), self.env.iteritems()))
 
         try:
             self.is_skip()
@@ -281,7 +279,7 @@ class Test(object):
         #
         fullenv = dict()
         for key, value in itertools.chain(os.environ.iteritems(),
-                                          self.OPTS.env.iteritems(),
+                                          options.OPTIONS.env.iteritems(),
                                           self.env.iteritems()):
             fullenv[key] = str(value)
 
@@ -369,7 +367,7 @@ class ValgrindMixin(object):
     @Test.command.getter
     def command(self):
         command = super(ValgrindMixin, self).command
-        if self.OPTS.valgrind:
+        if options.OPTIONS.valgrind:
             return ['valgrind', '--quiet', '--error-exitcode=1',
                     '--tool=memcheck'] + command
         else:
@@ -386,7 +384,7 @@ class ValgrindMixin(object):
         """
         super(ValgrindMixin, self).interpret_result()
 
-        if self.OPTS.valgrind:
+        if options.OPTIONS.valgrind:
             # If the underlying test failed, simply report
             # 'skip' for this valgrind test.
             if self.result.result != 'pass':

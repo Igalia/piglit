@@ -36,7 +36,7 @@ except ImportError:
     import json
 
 import framework.tests.utils as utils
-from framework import core, results
+from framework import results
 from framework.backends.json import JSONBackend
 from framework.programs.run import _create_metadata
 
@@ -72,7 +72,7 @@ class TestJsonOutput(utils.StaticDirectory):
         args.log_level = 'verbose'
 
         backend = JSONBackend(cls.tdir, file_fsync=True)
-        backend.initialize(_create_metadata(args, 'test', core.Options()))
+        backend.initialize(_create_metadata(args, 'test'))
         with backend.write_test('result') as t:
             t(results.TestResult('pass'))
         backend.finalize({'time_elapsed': results.TimeAttribute(end=1.2)})
@@ -150,8 +150,8 @@ class TestJsonOutput(utils.StaticDirectory):
         nt.assert_in('concurrent', self.json['options'])
 
     def test_options_filter(self):
-        """JSON: filter is an options key."""
-        nt.assert_in('filter', self.json['options'])
+        """JSON: include_filter is an options key."""
+        nt.assert_in('include_filter', self.json['options'])
 
     def test_options_exclude_tests(self):
         """JSON: exclude_tests is an options key."""

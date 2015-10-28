@@ -190,13 +190,12 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
 
     def __iter__(self):
         for key, values in self.__dict__.iteritems():
-            # If the values are regex compiled then yield their pattern
-            # attribute, which is the original plaintext they were compiled
-            # from, otherwise yield them normally.
-            if key in ['filter', 'exclude_filter']:
-                yield (key, [x.pattern for x in values])
-            else:
-                yield (key, values)
+            if not key.startswith('_'):
+                yield key, values
+
+        # Handle the attributes that have a descriptor separately
+        yield 'include_filter', self.include_filter
+        yield 'exclude_filter', self.exclude_filter
 
 
 OPTIONS = _Options()

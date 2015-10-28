@@ -22,8 +22,10 @@
 
 from __future__ import print_function, absolute_import
 
+import mock
 import nose.tools as nt
 
+from framework.options import _Options as Options
 from framework.test import GleanTest
 from framework.tests import utils
 from framework.test.base import TestIsSkip
@@ -69,27 +71,30 @@ def test_bad_returncode():
     nt.assert_equal(test.result.result, 'fail')
 
 
+@mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
 @nt.raises(TestIsSkip)
-def test_is_skip_not_glx():
+def test_is_skip_not_glx(mock_opts):
     """test.gleantest.GleanTest.is_skip: Skips when platform isn't glx"""
-    GleanTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
+    mock_opts.env['PIGLIT_PLATFORM'] = 'gbm'
     test = GleanTest('foo')
     test.is_skip()
 
 
+@mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
 @utils.not_raises(TestIsSkip)
-def test_is_skip_glx():
+def test_is_skip_glx(mock_opts):
     """test.gleantest.GleanTest.is_skip: Does not skip when platform is glx"""
-    GleanTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
+    mock_opts.env['PIGLIT_PLATFORM'] = 'glx'
     test = GleanTest('foo')
     test.is_skip()
 
 
+@mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
 @utils.not_raises(TestIsSkip)
-def test_is_skip_glx_egl():
+def test_is_skip_glx_egl(mock_opts):
     """test.gleantest.GleanTest.is_skip: Does not skip when platform is mixed_glx_egl
     """
-    GleanTest.OPTS.env['PIGLIT_PLATFORM'] = 'mixed_glx_egl'
+    mock_opts.env['PIGLIT_PLATFORM'] = 'mixed_glx_egl'
     test = GleanTest('foo')
     test.is_skip()
 

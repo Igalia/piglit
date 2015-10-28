@@ -27,7 +27,7 @@ import os
 
 import nose.tools as nt
 
-from framework import core, backends
+from framework import backends, options
 import framework.tests.utils as utils
 
 
@@ -35,7 +35,7 @@ BACKEND_INITIAL_META = {
     'name': 'name',
     'test_count': 0,
     'env': {},
-    'options': {k: v for k, v in core.Options()},
+    'options': {k: v for k, v in options.OPTIONS},
 }
 
 
@@ -208,7 +208,7 @@ def test_load_trailing_dot():
     Basically if this reaches a BackendNotImplementedError, then the '.' was
     handled correctly, otherwise if it's '.' then we should reach the
     BackendError, which is incorrect.
-    
+
     """
     backends.load('foo.test_backend..gz')
 
@@ -221,7 +221,7 @@ def test_load_old():
 
     If this raises a BackendError it means it didn't find a backend to use,
     thus it skipped the file ending in '.old'.
-    
+
     """
     os.mkdir('test')
     file_path = os.path.join('test', 'results.test_backend.old')

@@ -32,6 +32,7 @@ import itertools
 import os
 import shutil
 
+from framework import options
 from . import compression
 from framework.results import TestResult
 from framework.status import INCOMPLETE
@@ -49,7 +50,7 @@ def write_compressed(filename):
     """
     mode = compression.get_mode()
     if mode != 'none':
-        # if the suffix (final .xxx) is a knwon compression suffix 
+        # if the suffix (final .xxx) is a knwon compression suffix
         suffix = os.path.splitext(filename)[1]
         if suffix in compression.COMPRESSION_SUFFIXES:
             filename = '{}.{}'.format(os.path.splitext(filename)[0], mode)
@@ -77,7 +78,7 @@ class Backend(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def __init__(self, dest, metadata, **options):
+    def __init__(self, dest, metadata, **kwargs):
         """ Generic constructor
 
         This method should setup the container and open any files or conections
@@ -85,7 +86,7 @@ class Backend(object):
         store, that job is for the iniitalize method.
 
         In addition it takes keyword arguments that define options for the
-        backends. options should be prefixed to identify which backends they
+        backends. Options should be prefixed to identify which backends they
         apply to. For example, a json specific value should be passed as
         json_*, while a file specific value should be passed as file_*)
 
@@ -161,14 +162,11 @@ class FileBackend(Backend):
                         tests. It is important for resumes that this is not
                         overlapping as the Inheriting classes assume they are
                         not. Default: 0
-    file_sync -- If file_sync is truthy then the _fsync method will flush and
-                 sync files to disk, otherwise it will pass. Defualt: False
 
     """
-    def __init__(self, dest, file_start_count=0, file_fsync=False, **kwargs):
+    def __init__(self, dest, file_start_count=0, **kwargs):
         self._dest = dest
         self._counter = itertools.count(file_start_count)
-        self._file_sync = file_fsync
         self._write_final = write_compressed
 
     __INCOMPLETE = TestResult(result=INCOMPLETE)
@@ -176,11 +174,11 @@ class FileBackend(Backend):
     def __fsync(self, file_):
         """ Sync the file to disk
 
-        If self._file_sync is truthy this will sync self._file to disk
+        If options.OPTIONS.sync is truthy this will sync self._file to disk
 
         """
         file_.flush()
-        if self._file_sync:
+        if options.OPTIONS.sync:
             os.fsync(file_.fileno())
 
     @abc.abstractmethod

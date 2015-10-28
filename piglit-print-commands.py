@@ -29,14 +29,14 @@ import os
 import os.path as path
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
-import framework.core as core
+from framework import options
+from framework.programs import parsers
 import framework.profile
 from framework.test import Test, GleanTest
 
 
 def main():
-    core.get_config()
-    parser = argparse.ArgumentParser(sys.argv)
+    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument("-t", "--include-tests",
                         default=[],
                         action="append",
@@ -54,8 +54,8 @@ def main():
                         help="Path to results folder")
     args = parser.parse_args()
 
-    opts = core.Options(exclude_filter=args.exclude_tests,
-                        include_filter=args.include_tests)
+    options.OPTIONS.exclude_filter = args.exclude_tests
+    options.OPTIONS.include_filter = args.include_tests
 
     # Change to the piglit's path
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -76,7 +76,7 @@ def main():
         command += ' '.join(testCommand)
         return command
 
-    profile._prepare_test_list(opts)
+    profile._prepare_test_list()
     for name, test in profile.test_list.items():
         assert(isinstance(test, Test))
         print(name, ':::', getCommand(test))
