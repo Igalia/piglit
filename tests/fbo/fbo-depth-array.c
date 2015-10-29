@@ -65,11 +65,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 33;
 	config.supports_gl_core_version = 33;
 
-	if (piglit_use_fbo && !test_single_size) {
-		config.window_width = MAX_DIM;
-		config.window_height = MAX_DIM;
-	}
-	else {
+	if (!piglit_use_fbo || test_single_size) {
 		config.window_width = (width + 2) * MIN2(layers, 4);
 		config.window_height = (height + 2) * ((layers + 2) / 3);
 	}
@@ -359,7 +355,10 @@ done:
  * array texture.
  */
 static void
-draw_layer(int x, int y, int depth)
+draw_layer(int x, int y,
+	   int tx, int ty,
+	   int tw, int th,
+	   int depth)
 {
 	GLfloat depth_coord = (GLfloat)depth;
 	GLuint prog = test_stencil ? program_texstencil : program_texdepth;
@@ -385,18 +384,41 @@ draw_layer(int x, int y, int depth)
 
 	piglit_draw_rect_tex((double)x / piglit_width * 2 - 1,
 			     (double)y / piglit_height * 2 - 1,
-			     (double)width / piglit_width * 2,
-			     (double)height / piglit_height * 2,
-			     0, 0, 1, 1);
+			     (double)tw / piglit_width * 2,
+			     (double)th / piglit_height * 2,
+			     tx / (float) width, ty / (float) height,
+			     tw / (float) width, th / (float) height);
 	glUseProgram(0);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 }
 
-static GLboolean test_layer_drawing(int start_x, int start_y, float expected)
+static GLboolean draw_and_test_layer(int start_x, int start_y,
+				     int layer)
 {
-	return piglit_probe_rect_r_ubyte(start_x, start_y, width, height,
-					 expected * 255.0);
+	float expected = (test_stencil ?
+			  get_stencil_value_float(layer) :
+			  get_depth_value(layer));
+	int tx, ty, tw, th;
+	GLboolean pass = GL_TRUE;
+
+	for (ty = 0; ty < height; ty += piglit_height - start_y) {
+		for (tx = 0; tx < width; tx += piglit_width - start_x) {
+			tw = MIN2(piglit_width - start_x, width - tx);
+			th = MIN2(piglit_height - start_y, height - ty);
+			draw_layer(start_x, start_y,
+				   tx, ty,
+				   tw, th,
+				   layer);
+
+			pass = piglit_probe_rect_r_ubyte(start_x, start_y,
+							 tw, th,
+							 expected * 255.0) &&
+				pass;
+		}
+	}
+
+	return pass;
 }
 
 static bool
@@ -424,12 +446,7 @@ test_once(void)
 			x = 1 + (layer % 3) * (width + 1);
 			y = 1 + (layer / 3) * (height + 1);
 		}
-		draw_layer(x, y, layer);
-
-		pass &= test_layer_drawing(x, y,
-					   test_stencil ?
-					   get_stencil_value_float(layer) :
-					   get_depth_value(layer));
+		draw_and_test_layer(x, y, layer);
 
 		if (piglit_use_fbo && !test_single_size && layer < layers-1) {
 			glClearColor(0.2, 0.1, 0.1, 1.0);
