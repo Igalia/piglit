@@ -161,7 +161,7 @@ check_draw_beyond_end(void)
 static bool
 check_draw_misaligned(void)
 {
-	/* An INVALID_OPERATION error is generated
+	/* An INVALID_VALUE error is generated
 	 * .. or if <indirect> is not word aligned.
 	 */
 
@@ -172,7 +172,7 @@ check_draw_misaligned(void)
 
 	glDrawArraysIndirect(GL_TRIANGLES, (GLvoid const *)1);	/* misaligned */
 	
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
 		return false;
 
 	return true;
