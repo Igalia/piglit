@@ -28,7 +28,10 @@ from nose.plugins.attrib import attr
 
 import framework.tests.utils as utils
 from framework.test.base import (
-    Test, WindowResizeMixin, ValgrindMixin, TestRunError
+    Test,
+    TestRunError,
+    ValgrindMixin,
+    WindowResizeMixin,
 )
 from framework.tests.status_tests import PROBLEMS, STATUSES
 from framework.options import _Options as Options
