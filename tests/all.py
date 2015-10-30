@@ -4477,5 +4477,17 @@ with profile.group_manager(
         grouptools.join('spec', 'ext_framebuffer_blit')) as g:
     g(['ext_framebuffer_blit-blit-early'], 'blit-early')
 
+# Group OES_draw_elements_base_vertex
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'OES_draw_elements_base_vertex')) as g:
+    g(['oes_draw_elements_base_vertex-drawelements'], run_concurrent=False)
+    g(['oes_draw_elements_base_vertex-drawelements-instanced'],
+      run_concurrent=False)
+    g(['oes_draw_elements_base_vertex-drawrangeelements'],
+      run_concurrent=False)
+    g(['oes_draw_elements_base_vertex-multidrawelements'],
+      run_concurrent=False)
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
