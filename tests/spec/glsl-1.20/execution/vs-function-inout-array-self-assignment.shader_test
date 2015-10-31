@@ -1,0 +1,50 @@
+// Tests a scenario in Mesa with function inout parameters which only
+// seems to appear when an assignment is done to an array element followed by
+// an assignment to another element where the element is either assigned to
+// itself or itself multiplied or divided by 1.
+//
+// The result is we end up with an assignment in the IR where the lhs and rhs
+// are referencing the same variable. This ends up tripping an assert,
+// presumably the assignment should just be detected and optimised out.
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+varying vec4 color;
+
+void array_mod(inout int b[2])
+{
+  b[0] = int(2);
+  b[1] = b[1] * int(1);
+}
+
+void main()
+{
+  int a[2];
+
+  a[0] = int(1);
+  a[1] = int(2);
+  array_mod(a);
+
+  if (a[0] == int(2) && a[1] == int(2)) {
+    color = vec4(0, 1, 0, 1);
+  } else {
+    color = vec4(1, 0, 0, 1);
+  }
+
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 0 1 0
