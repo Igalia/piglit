@@ -918,6 +918,7 @@ with profile.group_manager(
     g(['getteximage-formats'], run_concurrent=False)
     g(['getteximage-luminance'], run_concurrent=False)
     g(['getteximage-simple'], run_concurrent=False)
+    g(['getteximage-depth'], run_concurrent=True)
     g(['incomplete-texture', 'fixed'], 'incomplete-texture-fixed')
     g(['max-texture-size'], run_concurrent=False)
     g(['max-texture-size-level'])
