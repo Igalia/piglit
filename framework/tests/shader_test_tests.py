@@ -106,7 +106,7 @@ def test_add_auto():
     nt.assert_in('-auto', test.command)
 
 
-def test_find_requirements():
+def test_find_requirements_gl_requirements():
     """test.shader_test.ShaderTest: populates gl_requirements properly"""
 
     data = ('[require]\n'
@@ -117,6 +117,30 @@ def test_find_requirements():
         test = testm.ShaderTest(temp)
 
     nt.eq_(test.gl_required, set(['GL_ARB_ham_sandwhich']))
+
+
+def test_find_requirements_gl_version():
+    """test.shader_test.ShaderTest: finds gl_version."""
+    data = ('[require]\n'
+            'GL = 2.0\n'
+            'GL_ARB_ham_sandwhich\n')
+
+    with mock.patch('framework.test.shader_test.open',
+                    mock.mock_open(read_data=data)):
+        test = testm.ShaderTest('null')
+    nt.eq_(test.gl_version, 2.0)
+
+
+def test_find_requirements_gles_version():
+    """test.shader_test.ShaderTest: finds gles_version."""
+    data = ('[require]\n'
+            'GL ES = 2.0\n'
+            'GL_ARB_ham_sandwhich\n')
+
+    with mock.patch('framework.test.shader_test.open',
+                    mock.mock_open(read_data=data)):
+        test = testm.ShaderTest('null')
+    nt.eq_(test.gles_version, 2.0)
 
 
 @utils.nose_generator

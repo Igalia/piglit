@@ -43,6 +43,8 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
 
     """
     _is_gl = re.compile(r'GL (<|<=|=|>=|>) \d\.\d')
+    _match_gl_version = re.compile(
+        r'^GL\s+(?P<es>ES)?\s*(?P<op>(<|<=|=|>=|>))\s*(?P<ver>\d\.\d)')
 
     def __init__(self, filename):
         self.gl_required = set()
@@ -108,6 +110,15 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         for line in lines:
             if line.startswith('GL_') and not line.startswith('GL_MAX'):
                 self.gl_required.add(line.strip())
+            elif not (self.gl_version or self.gles_version):
+                # Find any gles requirements
+                m = self._match_gl_version.match(line)
+                if m:
+                    if m.group('op') not in ['<', '<=']:
+                        if m.group('es'):
+                            self.gles_version = float(m.group('ver'))
+                        else:
+                            self.gl_version = float(m.group('ver'))
             elif line.startswith('['):
                 break
 
