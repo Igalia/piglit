@@ -558,6 +558,8 @@ class ShaderTest(object):
         shader_test = '[require]\n'
         shader_test += 'GLSL >= {0:1.2f}\n'.format(
             float(self.glsl_version()) / 100)
+        for extension in self.extensions():
+            shader_test += 'GL_{}\n'.format(extension)
         shader_test += self.make_additional_requirements()
         shader_test += '\n'
         vs = self.make_vertex_shader()
