@@ -149,6 +149,64 @@ class WflInfo(object):
 
         return {e.strip() for e in all_}
 
+    @core.lazy_property
+    def gl_version(self):
+        """Calculate the maximum opengl version.
+
+        This will try (in order): core, compat, and finally no profile,
+        stopping when it finds a profile. It assumes taht most implementations
+        will have core and compat as equals, or core as superior to compat in
+        terms of support.
+
+        """
+        ret = None
+        for profile in ['core', 'compat', 'none']:
+            try:
+                raw = self.__call_wflinfo(['--api', 'gl', '--profile', profile])
+            except StopWflinfo as e:
+                if e.reason == 'Called':
+                    continue
+                elif e.reason == 'OSError':
+                    break
+                raise
+            else:
+                ret = float(self.__getline(
+                    raw.split('\n'), 'OpenGL version string').split()[3])
+                break
+        return ret
+
+    @core.lazy_property
+    def gles_version(self):
+        """Calculate the maximum opengl es version.
+
+        The design of this function isn't 100% correct. GLES1 and GLES2+ behave
+        differently, since 2+ can be silently promoted, but 1 cannot. This
+        means that a driver can implement 2, 3, 3.1, etc, but never have 1
+        support.
+
+        I don't think this is a big deal for a couple of reasons. First, piglit
+        has a very small set of GLES1 tests, so they shouldn't have big impact
+        on runtime, and second, the design of the FastSkipMixin is
+        conservative: it would rather run a few tests that should be skipped
+        than skip a few tests that should be run.
+
+        """
+        ret = None
+        for api in ['gles3', 'gles2', 'gles1']:
+            try:
+                raw = self.__call_wflinfo(['--api', api])
+            except StopWflinfo as e:
+                if e.reason == 'Called':
+                    continue
+                elif e.reason == 'OSError':
+                    break
+                raise
+            else:
+                ret = float(self.__getline(
+                    raw.split('\n'), 'OpenGL version string').split()[5])
+                break
+        return ret
+
 
 class FastSkipMixin(object):
     """Fast test skipping for OpenGL based suites.
@@ -202,5 +260,21 @@ class FastSkipMixin(object):
                     raise TestIsSkip(
                         'Test requires extension {} '
                         'which is not available'.format(extension))
+
+        if (self.__info.gl_version is not None
+                and self.gl_version is not None
+                and self.gl_version > self.__info.gl_version):
+            raise TestIsSkip(
+                'Test requires OpenGL version {}, '
+                'but only {} is available'.format(
+                    self.gl_version, self.__info.gl_version))
+
+        if (self.__info.gles_version is not None
+                and self.gles_version is not None
+                and self.gles_version > self.__info.gles_version):
+            raise TestIsSkip(
+                'Test requires OpenGL ES version {}, '
+                'but only {} is available'.format(
+                    self.gles_version, self.__info.gles_version))
 
         super(FastSkipMixin, self).is_skip()
