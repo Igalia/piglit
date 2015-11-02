@@ -23,11 +23,35 @@
 from __future__ import print_function, absolute_import
 import os
 
+import mock
 import nose.tools as nt
 
 from framework import exceptions
 import framework.test as testm
 import framework.tests.utils as utils
+
+# pylint: disable=invalid-name
+
+
+class _Setup(object):
+    def __init__(self):
+        self.__patchers = []
+        self.__patchers.append(mock.patch.dict(
+            'framework.test.base.options.OPTIONS.env',
+            {'PIGLIT_PLATFORM': 'foo'}))
+
+    def setup(self):
+        for patcher in self.__patchers:
+            patcher.start()
+
+    def teardown(self):
+        for patcher in self.__patchers:
+            patcher.stop()
+
+
+_setup = _Setup()
+setup = _setup.setup
+teardown = _setup.teardown
 
 
 def test_initialize_shader_test():
@@ -80,3 +104,46 @@ def test_add_auto():
     """test.shader_test.ShaderTest: -auto is added to the command"""
     test = testm.ShaderTest('tests/spec/glsl-es-1.00/execution/sanity.shader_test')
     nt.assert_in('-auto', test.command)
+
+
+def test_find_requirements():
+    """test.shader_test.ShaderTest: populates gl_requirements properly"""
+
+    data = ('[require]\n'
+            'GL = 2.0\n'
+            'GL_ARB_ham_sandwhich\n')
+
+    with utils.tempfile(data) as temp:
+        test = testm.ShaderTest(temp)
+
+    nt.eq_(test.gl_required, set(['GL_ARB_ham_sandwhich']))
+
+
+@utils.nose_generator
+def test_ignore_shader_runner_directives():
+    """test.shader_test.ShaderTest: Doesn't add shader_runner command to gl_required list"""
+    should_ignore = [
+        'GL_MAX_VERTEX_OUTPUT_COMPONENTS',
+        'GL_MAX_FRAGMENT_UNIFORM_COMPONENTS',
+        'GL_MAX_VERTEX_UNIFORM_COMPONENTS',
+        'GL_MAX_VARYING_COMPONENTS',
+    ]
+
+    def test(config):
+        with mock.patch('framework.test.shader_test.open',
+                        mock.mock_open(read_data=config)):
+            test = testm.ShaderTest('null')
+        nt.eq_(test.gl_required, {'GL_foobar'})
+
+    for ignore in should_ignore:
+        config = '\n'.join([
+            '[require]',
+            'GL >= 1.0',
+            'GL_foobar',
+            ignore,
+        ])
+        test.description = ('test.shader_test.ShaderTest: doesn\'t add '
+                            'shader_runner command {} to gl_required'.format(
+                                ignore))
+
+        yield test, config
