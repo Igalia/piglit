@@ -207,6 +207,48 @@ class WflInfo(object):
                 break
         return ret
 
+    @core.lazy_property
+    def glsl_version(self):
+        """Calculate the maximum OpenGL Shader Language version."""
+        ret = None
+        for profile in ['core', 'compat', 'none']:
+            try:
+                raw = self.__call_wflinfo(
+                    ['--verbose', '--api', 'gl', '--profile', profile])
+            except StopWflinfo as e:
+                if e.reason == 'Called':
+                    continue
+                elif e.reason == 'OSError':
+                    break
+                raise
+            else:
+                ret = float(self.__getline(
+                    raw.split('\n'), 'OpenGL shading language').split()[-1])
+                break
+        return ret
+
+    @core.lazy_property
+    def glsl_es_version(self):
+        """Calculate the maximum OpenGL ES Shader Language version."""
+        ret = None
+        for api in ['gles3', 'gles2']:
+            try:
+                raw = self.__call_wflinfo(['--verbose', '--api', api])
+            except StopWflinfo as e:
+                if e.reason == 'Called':
+                    continue
+                elif e.reason == 'OSError':
+                    break
+                raise
+            else:
+                # GLSL ES version numbering is insane.
+                # For version >= 3 the numbers are 3.00, 3.10, etc.
+                # For version 2, they are 1.0.xx
+                ret = float(self.__getline(
+                    raw.split('\n'), 'OpenGL shading language').split()[-1][:3])
+                break
+        return ret
+
 
 class FastSkipMixin(object):
     """Fast test skipping for OpenGL based suites.
@@ -276,5 +318,21 @@ class FastSkipMixin(object):
                 'Test requires OpenGL ES version {}, '
                 'but only {} is available'.format(
                     self.gles_version, self.__info.gles_version))
+
+        if (self.__info.glsl_version is not None
+                and self.glsl_version is not None
+                and self.glsl_version > self.__info.glsl_version):
+            raise TestIsSkip(
+                'Test requires OpenGL Shader Language version {}, '
+                'but only {} is available'.format(
+                    self.glsl_version, self.__info.glsl_version))
+
+        if (self.__info.glsl_es_version is not None
+                and self.glsl_es_version is not None
+                and self.glsl_es_version > self.__info.glsl_es_version):
+            raise TestIsSkip(
+                'Test requires OpenGL ES Shader Language version {}, '
+                'but only {} is available'.format(
+                    self.glsl_es_version, self.__info.glsl_es_version))
 
         super(FastSkipMixin, self).is_skip()

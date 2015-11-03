@@ -30,7 +30,9 @@ import framework.tests.utils as utils
 from framework.test import opengl
 from framework.test.base import TestIsSkip
 
-# pylint: disable=invalid-name,protected-access,line-too-long,pointless-statement,attribute-defined-outside-init
+# pylint: disable=invalid-name,protected-access,line-too-long,
+# pylint: disable=pointless-statement,attribute-defined-outside-init
+# pylint: disable=too-many-public-methods
 
 
 class TestWflInfo(object):
@@ -89,6 +91,52 @@ class TestWflInfo(object):
                         mock.Mock(return_value=rv)):
             nt.eq_(7.1, self._test.gles_version)
 
+    def test_glsl_version(self):
+        """test.opengl.WflInfo.glsl_version: Provides a version number"""
+        rv = (
+            'Waffle platform: gbm\n'
+            'Waffle api: gl\n'
+            'OpenGL vendor string: Intel Open Source Technology Center\n'
+            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
+            'OpenGL version string: 1.1 (Core Profile) Mesa 11.0.4\n'
+            'OpenGL context flags: 0x0\n'
+            'OpenGL shading language version string: 9.30\n'
+            'OpenGL extensions: this is some extension strings.\n'
+        )
+        with mock.patch('framework.test.opengl.subprocess.check_output',
+                        mock.Mock(return_value=rv)):
+            nt.eq_(9.3, self._test.glsl_version)
+
+    def test_glsl_es_version_1(self):
+        """test.opengl.WflInfo.glsl_es_version: works with gles2"""
+        rv = (
+            'Waffle platform: gbm\n'
+            'Waffle api: gles2\n'
+            'OpenGL vendor string: Intel Open Source Technology Center\n'
+            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
+            'OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4\n'
+            'OpenGL shading language version string: OpenGL ES GLSL ES 1.0.17\n'
+            'OpenGL extensions: this is some extension strings.\n'
+        )
+        with mock.patch('framework.test.opengl.subprocess.check_output',
+                        mock.Mock(return_value=rv)):
+            nt.eq_(1.0, self._test.glsl_es_version)
+
+    def test_glsl_es_version_3plus(self):
+        """test.opengl.WflInfo.glsl_es_version: works with gles3"""
+        rv = (
+            'Waffle platform: gbm\n'
+            'Waffle api: gles3\n'
+            'OpenGL vendor string: Intel Open Source Technology Center\n'
+            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
+            'OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4\n'
+            'OpenGL shading language version string: OpenGL ES GLSL ES 5.00\n'
+            'OpenGL extensions: this is some extension strings.\n'
+        )
+        with mock.patch('framework.test.opengl.subprocess.check_output',
+                        mock.Mock(return_value=rv)):
+            nt.eq_(5.0, self._test.glsl_es_version)
+
 
 class TestWflInfoOSError(object):
     """Tests for the Wflinfo functions to handle OSErrors."""
@@ -123,14 +171,24 @@ class TestWflInfoOSError(object):
         self.inst.gl_extensions
 
     @utils.not_raises(OSError)
-    def test_get_gl_version(self):
+    def test_gl_version(self):
         """test.opengl.WflInfo.get_gl_version: Handles OSError "no file" gracefully"""
         self.inst.gl_version
 
     @utils.not_raises(OSError)
-    def test_get_gles_version(self):
+    def test_gles_version(self):
         """test.opengl.WflInfo.get_gles_version: Handles OSError "no file" gracefully"""
         self.inst.gles_version
+
+    @utils.not_raises(OSError)
+    def test_glsl_version(self):
+        """test.opengl.WflInfo.glsl_version: Handles OSError "no file" gracefully"""
+        self.inst.glsl_version
+
+    @utils.not_raises(OSError)
+    def test_glsl_es_version(self):
+        """test.opengl.WflInfo.glsl_es_version: Handles OSError "no file" gracefully"""
+        self.inst.glsl_es_version
 
 
 class TestWflInfoCalledProcessError(object):
@@ -174,6 +232,16 @@ class TestWflInfoCalledProcessError(object):
     def test_gles_version(self):
         """test.opengl.WflInfo.gles_version: Handles CalledProcessError gracefully"""
         self.inst.gles_version
+
+    @utils.not_raises(subprocess.CalledProcessError)
+    def test_glsl_version(self):
+        """test.opengl.WflInfo.glsl_version: Handles CalledProcessError gracefully"""
+        self.inst.glsl_version
+
+    @utils.not_raises(subprocess.CalledProcessError)
+    def test_glsl_es_version(self):
+        """test.opengl.WflInfo.glsl_es_version: Handles CalledProcessError gracefully"""
+        self.inst.glsl_es_version
 
 
 class TestFastSkipMixin(object):
@@ -280,4 +348,52 @@ class TestFastSkipMixin(object):
     @utils.not_raises(TestIsSkip)
     def test_max_gles_version_set(self):
         """test.opengl.FastSkipMixin.is_skip: runs if gles_version is None"""
+        self.test.is_skip()
+
+    @nt.raises(TestIsSkip)
+    def test_max_glsl_version_lt(self):
+        """test.opengl.FastSkipMixin.is_skip: skips if glsl_version > __max_glsl_version"""
+        self.test.glsl_version = 4.0
+        self.test.is_skip()
+
+    @utils.not_raises(TestIsSkip)
+    def test_max_glsl_version_gt(self):
+        """test.opengl.FastSkipMixin.is_skip: runs if glsl_version < __max_glsl_version"""
+        self.test.glsl_version = 1.0
+
+    @utils.not_raises(TestIsSkip)
+    def test_max_glsl_version_unset(self):
+        """test.opengl.FastSkipMixin.is_skip: runs if __max_glsl_version is None"""
+        self.test.glsl_version = 1.0
+        with mock.patch.object(self.test._FastSkipMixin__info, 'glsl_version',  # pylint: disable=no-member
+                               None):
+            self.test.is_skip()
+
+    @utils.not_raises(TestIsSkip)
+    def test_max_glsl_version_set(self):
+        """test.opengl.FastSkipMixin.is_skip: runs if glsl_version is None"""
+        self.test.is_skip()
+
+    @nt.raises(TestIsSkip)
+    def test_max_glsl_es_version_lt(self):
+        """test.opengl.FastSkipMixin.is_skip: skips if glsl_es_version > __max_glsl_es_version"""
+        self.test.glsl_es_version = 4.0
+        self.test.is_skip()
+
+    @utils.not_raises(TestIsSkip)
+    def test_max_glsl_es_version_gt(self):
+        """test.opengl.FastSkipMixin.is_skip: runs if glsl_es_version < __max_glsl_es_version"""
+        self.test.glsl_es_version = 1.0
+
+    @utils.not_raises(TestIsSkip)
+    def test_max_glsl_es_version_unset(self):
+        """test.opengl.FastSkipMixin.is_skip: runs if __max_glsl_es_version is None"""
+        self.test.glsl_es_version = 1.0
+        with mock.patch.object(self.test._FastSkipMixin__info, 'glsl_es_version',  # pylint: disable=no-member
+                               None):
+            self.test.is_skip()
+
+    @utils.not_raises(TestIsSkip)
+    def test_max_glsl_es_version_set(self):
+        """test.opengl.FastSkipMixin.is_skip: runs if glsl_es_version is None"""
         self.test.is_skip()
