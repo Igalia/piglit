@@ -378,6 +378,40 @@ def test_get_glslparsertest_gles2():
         yield test, content.format(version)
 
 
+def test_set_glsl_version():
+    """test.glsl_parser_test.GLSLParserTest: sets glsl_version"""
+    rt = {'glsl_version': '4.3'}
+    with mock.patch.object(glsl.GLSLParserTest, '_GLSLParserTest__parser',
+                           mock.Mock(return_value=rt)):
+        with mock.patch.object(glsl.GLSLParserTest,
+                               '_GLSLParserTest__get_command'):
+            with mock.patch('framework.test.glsl_parser_test.super',
+                            mock.Mock()):
+                with mock.patch('framework.test.glsl_parser_test.open',
+                                mock.mock_open()):
+                    with mock.patch('framework.test.glsl_parser_test.os.stat',
+                                    mock.mock_open()):
+                        test = glsl.GLSLParserTest('foo')
+    nt.eq_(test.glsl_version, 4.3)
+
+
+def test_set_glsl_es_version():
+    """test.glsl_parser_test.GLSLParserTest: sets glsl_es_version"""
+    rt = {'glsl_version': '3.00 es'}
+    with mock.patch.object(glsl.GLSLParserTest, '_GLSLParserTest__parser',
+                           mock.Mock(return_value=rt)):
+        with mock.patch.object(glsl.GLSLParserTest,
+                               '_GLSLParserTest__get_command'):
+            with mock.patch('framework.test.glsl_parser_test.super',
+                            mock.Mock()):
+                with mock.patch('framework.test.glsl_parser_test.open',
+                                mock.mock_open()):
+                    with mock.patch('framework.test.glsl_parser_test.os.stat',
+                                    mock.mock_open()):
+                        test = glsl.GLSLParserTest('foo')
+    nt.eq_(test.glsl_es_version, 3.0)
+
+
 def test_set_gl_required():
     """test.glsl_parser_test.GLSLParserTest: sets glsl_es_version"""
     rt = {'require_extensions': 'GL_ARB_foobar GL_EXT_foobar'}

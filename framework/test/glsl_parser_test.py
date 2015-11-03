@@ -77,6 +77,15 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
 
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
 
+        glsl = config.get('glsl_version')
+        if glsl:
+            if glsl in ['1.00', '3.00']:
+                self.glsl_es_version = float(glsl)
+            elif glsl.endswith('es'):
+                self.glsl_es_version = float(glsl.split()[0])
+            else:
+                self.glsl_version = float(glsl)
+
         req = config.get('require_extensions')
         if req:
             self.gl_required = set(req.split())
