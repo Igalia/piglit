@@ -27,6 +27,7 @@ import re
 
 from framework import exceptions
 from .piglit_test import PiglitBaseTest
+from .opengl import FastSkipMixin
 
 __all__ = [
     'GLSLParserTest',
@@ -42,7 +43,7 @@ class GLSLParserInternalError(exceptions.PiglitInternalError):
     pass
 
 
-class GLSLParserTest(PiglitBaseTest):
+class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
     """ Read the options in a glsl parser test and create a Test object
 
     Specifically it is necessary to parse a glsl_parser_test to get information
@@ -68,13 +69,17 @@ class GLSLParserTest(PiglitBaseTest):
         # section to a StringIO and pass that to ConfigParser
         with open(filepath, 'r') as testfile:
             try:
-                command = self.__get_command(self.__parser(testfile, filepath),
-                                             filepath)
+                config = self.__parser(testfile, filepath)
+                command = self.__get_command(config, filepath)
             except GLSLParserInternalError as e:
                 raise exceptions.PiglitFatalError(
                     'In file "{}":\n{}'.format(filepath, str(e)))
 
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
+
+        req = config.get('require_extensions')
+        if req:
+            self.gl_required = set(req.split())
 
     def __get_command(self, config, filepath):
         """ Create the command argument to pass to super()

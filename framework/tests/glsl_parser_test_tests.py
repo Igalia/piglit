@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2015 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ from __future__ import print_function, absolute_import
 import os
 import textwrap
 
+import mock
 import nose.tools as nt
 
 from framework import exceptions
@@ -32,6 +33,27 @@ import framework.tests.utils as utils
 from framework.test import TEST_BIN_DIR
 
 # pylint: disable=line-too-long,invalid-name
+
+
+class _Setup(object):
+    def __init__(self):
+        self.__patchers = []
+        self.__patchers.append(mock.patch.dict(
+            'framework.test.opengl.OPTIONS.env',
+            {'PIGLIT_PLATFORM': 'foo'}))
+
+    def setup(self):
+        for patcher in self.__patchers:
+            patcher.start()
+
+    def teardown(self):
+        for patcher in self.__patchers:
+            patcher.stop()
+
+
+_setup = _Setup()
+setup = _setup.setup
+teardown = _setup.teardown
 
 
 def _check_config(content):
@@ -354,3 +376,20 @@ def test_get_glslparsertest_gles2():
     for version in ['1.00', '3.00']:
         test.description = description.format(version)
         yield test, content.format(version)
+
+
+def test_set_gl_required():
+    """test.glsl_parser_test.GLSLParserTest: sets glsl_es_version"""
+    rt = {'require_extensions': 'GL_ARB_foobar GL_EXT_foobar'}
+    with mock.patch.object(glsl.GLSLParserTest, '_GLSLParserTest__parser',
+                           mock.Mock(return_value=rt)):
+        with mock.patch.object(glsl.GLSLParserTest,
+                               '_GLSLParserTest__get_command'):
+            with mock.patch('framework.test.glsl_parser_test.super',
+                            mock.Mock()):
+                with mock.patch('framework.test.glsl_parser_test.open',
+                                mock.mock_open()):
+                    with mock.patch('framework.test.glsl_parser_test.os.stat',
+                                    mock.mock_open()):
+                        test = glsl.GLSLParserTest('foo')
+    nt.eq_(test.gl_required, set(['GL_ARB_foobar', 'GL_EXT_foobar']))
