@@ -143,6 +143,32 @@ def test_find_requirements_gles_version():
     nt.eq_(test.gles_version, 2.0)
 
 
+def test_find_requirements_glsl_version():
+    """test.shader_test.ShaderTest: finds glsl_version."""
+    data = ('[require]\n'
+            'GL = 2.0\n'
+            'GLSL >= 1.0\n'
+            'GL_ARB_ham_sandwhich\n')
+
+    with mock.patch('framework.test.shader_test.open',
+                    mock.mock_open(read_data=data)):
+        test = testm.ShaderTest('null')
+    nt.eq_(test.glsl_version, 1.0)
+
+
+def test_find_requirements_glsl_es_version():
+    """test.shader_test.ShaderTest: finds glsl_es_version."""
+    data = ('[require]\n'
+            'GL ES = 2.0\n'
+            'GLSL ES > 2.00\n'
+            'GL_ARB_ham_sandwhich\n')
+
+    with mock.patch('framework.test.shader_test.open',
+                    mock.mock_open(read_data=data)):
+        test = testm.ShaderTest('null')
+    nt.eq_(test.glsl_es_version, 2.0)
+
+
 @utils.nose_generator
 def test_ignore_shader_runner_directives():
     """test.shader_test.ShaderTest: Doesn't add shader_runner command to gl_required list"""
