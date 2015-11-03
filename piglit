@@ -139,6 +139,10 @@ def main():
                                           add_help=False,
                                           help="Aggregate incomplete piglit run.")
     aggregate.set_defaults(func=summary.aggregate)
+    feature = summary_parser.add_parser('feature',
+                                        add_help=False,
+                                        help="generate feature readiness html report.")
+    feature.set_defaults(func=summary.feature)
 
     # Parse the known arguments (piglit run or piglit summary html for
     # example), and then pass the arguments that this parser doesn't know about

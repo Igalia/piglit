@@ -37,9 +37,11 @@ from mako.lookup import TemplateLookup
 from framework import backends, exceptions
 
 from .common import Results, escape_filename, escape_pathname
+from .feature import FeatResults
 
 __all__ = [
     'html',
+    'feat'
 ]
 
 _TEMP_DIR = os.path.join(
@@ -62,8 +64,9 @@ def _copy_static_files(destination):
                 os.path.join(destination, "result.css"))
 
 
-def _make_testrun_info(results, destination, exclude):
+def _make_testrun_info(results, destination, exclude=None):
     """Create the pages for each results file."""
+    exclude = exclude or {}
     result_css = os.path.join(destination, "result.css")
     index = os.path.join(destination, "index.html")
 
@@ -146,6 +149,14 @@ def _make_comparison_pages(results, destination, exclude):
                         page=page, pages=pages))
 
 
+def _make_feature_info(results, destination):
+    """Create the feature readiness page."""
+
+    with open(os.path.join(destination, "feature.html"), 'w') as out:
+        out.write(_TEMPLATES.get_template('feature.mako').render(
+            results=results))
+
+
 def html(results, destination, exclude):
     """
     Produce HTML summaries.
@@ -161,3 +172,13 @@ def html(results, destination, exclude):
     _copy_static_files(destination)
     _make_testrun_info(results, destination, exclude)
     _make_comparison_pages(results, destination, exclude)
+
+
+def feat(results, destination, feat_desc):
+    """Produce HTML feature readiness summary."""
+
+    feat_res = FeatResults([backends.load(i) for i in results], feat_desc)
+
+    _copy_static_files(destination)
+    _make_testrun_info(feat_res, destination)
+    _make_feature_info(feat_res, destination)

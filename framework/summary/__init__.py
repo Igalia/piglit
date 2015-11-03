@@ -25,5 +25,5 @@
 # public parts here, so that we have a nice interface to work with.
 
 from __future__ import absolute_import, division, print_function
-from .html_ import html
+from .html_ import html, feat
 from .console_ import console

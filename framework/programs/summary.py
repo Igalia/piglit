@@ -35,6 +35,7 @@ __all__ = [
     'console',
     'csv',
     'html',
+    'feature'
 ]
 
 
@@ -224,3 +225,39 @@ def aggregate(input_):
 
     print("Aggregated file written to: {}.{}".format(
         outfile, backends.compression.get_mode()))
+
+
+@exceptions.handler
+def feature(input_):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--overwrite",
+                        action="store_true",
+                        help="Overwrite existing directories")
+    parser.add_argument("featureFile",
+                        metavar="<Feature json file>",
+                        help="Json file containing the features description")
+    parser.add_argument("summaryDir",
+                        metavar="<Summary Directory>",
+                        help="Directory to put HTML files in")
+    parser.add_argument("resultsFiles",
+                        metavar="<Results Files>",
+                        nargs="*",
+                        help="Results files to include in HTML")
+    args = parser.parse_args(input_)
+
+    # If args.list and args.resultsFiles are empty, then raise an error
+    if not args.featureFile and not args.resultsFiles:
+        raise parser.error("Missing required option -l or <resultsFiles>")
+
+    # If args.list and args.resultsFiles are empty, then raise an error
+    if not args.resultsFiles or not path.exists(args.featureFile):
+        raise parser.error("Missing json file")
+
+    # if overwrite is requested delete the output directory
+    if path.exists(args.summaryDir) and args.overwrite:
+        shutil.rmtree(args.summaryDir)
+
+    # If the requested directory doesn't exist, create it or throw an error
+    core.checkDir(args.summaryDir, not args.overwrite)
+
+    summary.feat(args.resultsFiles, args.summaryDir, args.featureFile)
