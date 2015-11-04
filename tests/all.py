@@ -142,6 +142,8 @@ def add_msaa_formats_tests(adder, extension):
         adder(['ext_framebuffer_multisample-formats', str(num_samples),
                extension],
               'multisample-formats {} {}'.format(num_samples, extension))
+    adder(['ext_framebuffer_multisample-fast-clear', extension],
+          'multisample-fast-clear {}'.format(extension))
 
 
 def add_texwrap_target_tests(adder, target):
@@ -2754,6 +2756,7 @@ with profile.group_manager(
     g(['ext_framebuffer_multisample-alpha-blending'], 'alpha-blending')
     g(['ext_framebuffer_multisample-alpha-blending', 'slow_cc'],
       'alpha-blending slow_cc')
+    g(['ext_framebuffer_multisample-fast-clear'], 'fast-clear')
 
     for num_samples in MSAA_SAMPLE_COUNTS:
         if num_samples % 2 != 0:

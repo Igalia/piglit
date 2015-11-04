@@ -65,3 +65,4 @@ piglit_add_executable (ext_framebuffer_multisample-sample-alpha-to-one common.cp
 piglit_add_executable (ext_framebuffer_multisample-turn-on-off common.cpp turn-on-off.cpp)
 piglit_add_executable (ext_framebuffer_multisample-unaligned-blit common.cpp unaligned-blit.cpp)
 piglit_add_executable (ext_framebuffer_multisample-upsample common.cpp upsample.cpp)
+piglit_add_executable (ext_framebuffer_multisample-fast-clear fast-clear.c)
