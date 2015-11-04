@@ -291,8 +291,17 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_get_texture_sub_image");
 	piglit_require_extension("GL_ARB_compressed_texture_pixel_storage");
-	piglit_require_extension("GL_EXT_texture_compression_s3tc");
-	piglit_require_extension("GL_ARB_texture_non_power_of_two");
+
+	if (!piglit_is_extension_supported("GL_EXT_texture_compression_s3tc") &&
+	    !(piglit_is_extension_supported("GL_EXT_texture_compression_dxt1") &&
+	      piglit_is_extension_supported("GL_ANGLE_texture_compression_dxt3") &&
+	      piglit_is_extension_supported("GL_ANGLE_texture_compression_dxt5"))) {
+                printf("Test requires either GL_EXT_texture_compression_s3tc "
+		       "or GL_EXT_texture_compression_dxt1, "
+		       "GL_ANGLE_texture_compression_dxt3, and "
+		       "GL_ANGLE_texture_compression_dxt5\n");
+                piglit_report_result(PIGLIT_SKIP);
+        }
 
 	pass = test_getsubimage(GL_TEXTURE_2D, 256, 128, 1,
 				GL_COMPRESSED_RGB_S3TC_DXT1_EXT) && pass;
