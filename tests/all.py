@@ -4017,14 +4017,15 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_buffer_storage')) as g:
-    g(['bufferstorage-persistent', 'draw'])
-    g(['bufferstorage-persistent', 'draw', 'coherent'])
-    g(['bufferstorage-persistent', 'draw', 'client-storage'])
-    g(['bufferstorage-persistent', 'draw', 'coherent', 'client-storage'])
-    g(['bufferstorage-persistent', 'read'])
-    g(['bufferstorage-persistent', 'read', 'coherent'])
-    g(['bufferstorage-persistent', 'read', 'client-storage'])
-    g(['bufferstorage-persistent', 'read', 'coherent', 'client-storage'])
+    for mode in ['read', 'draw']:
+        g(['bufferstorage-persistent', mode])
+        g(['bufferstorage-persistent', mode, 'coherent'])
+        g(['bufferstorage-persistent', mode, 'client-storage'])
+        g(['bufferstorage-persistent', mode, 'coherent', 'client-storage'])
+        g(['bufferstorage-persistent_gles3', mode])
+        g(['bufferstorage-persistent_gles3', mode, 'coherent'])
+        g(['bufferstorage-persistent_gles3', mode, 'client-storage'])
+        g(['bufferstorage-persistent_gles3', mode, 'coherent', 'client-storage'])
 
 with profile.group_manager(
         PiglitGLTest,

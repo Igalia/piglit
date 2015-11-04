@@ -34,7 +34,14 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 10;
+#else // PIGLIT_USE_OPENGL_ES3
+       config.supports_gl_es_version = 31;
+       config.window_width = 100;
+       config.window_height = 100;
+#endif
+
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -44,6 +51,26 @@ enum test_flag {
 	READ,
 	DRAW
 };
+
+#ifdef PIGLIT_USE_OPENGL_ES3
+const char *vs_source = {
+       "#version 300 es\n"
+       "in vec2 vertex;\n"
+       "void main() {\n"
+       "       gl_Position = vec4(vertex.xy, 0, 1);\n"
+       "}\n"
+};
+
+const char *fs_source = {
+       "#version 300 es\n"
+       "out highp vec4 ocol;\n"
+       "void main() {\n"
+       "       ocol = vec4(1, 1, 1, 1);\n"
+       "}\n"
+};
+
+static GLuint vao;
+#endif
 
 static GLuint buffer;
 static GLfloat *map;
@@ -84,6 +111,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	piglit_require_gl_version(15);
@@ -96,6 +124,16 @@ piglit_init(int argc, char **argv)
 	if (!coherent) { /* for MemoryBarrier */
 		piglit_require_extension("GL_ARB_shader_image_load_store");
 	}
+#else // PIGLIT_USE_OPENGL_ES3
+       GLuint program;
+       GLuint vertex_index;
+
+       piglit_require_extension("GL_EXT_buffer_storage");
+
+       /* Create program */
+       program = piglit_build_simple_program(vs_source, fs_source);
+       glUseProgram(program);
+#endif
 
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -117,6 +155,20 @@ piglit_init(int argc, char **argv)
 
 	if (!map)
 		piglit_report_result(PIGLIT_FAIL);
+#ifdef PIGLIT_USE_OPENGL_ES3
+	/* Gen VAO */
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	/* Retrieve indices from vs */
+	vertex_index = glGetAttribLocation(program, "vertex");
+
+	/* Enable vertex attrib array */
+	glEnableVertexAttribArray(vertex_index);
+	glVertexAttribPointer(vertex_index, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	piglit_check_gl_error(GL_NO_ERROR);
+#endif
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -124,9 +176,11 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display(void)
 {
-	float white[4] = {1.0, 1.0, 1.0, 0.0};
+	float white[4] = {1.0, 1.0, 1.0, 1.0};
 	GLboolean pass = GL_TRUE;
 	int i;
+
+#ifdef PIGLIT_USE_OPENGL
 	float array[] = {
 		17, 13, 0,
 		17, 18, 0,
@@ -145,14 +199,40 @@ piglit_display(void)
 		42, 13, 0,
 		42, 18, 0
 	};
+#else // PIGLIT_USE_OPENGL_ES3
+	float array[] = {
+		1.00, 0.75, 0.0,
+		1.00, 1.00, 0.0,
+		0.75, 0.75, 0.0,
+		0.75, 1.00, 0.0,
 
+		0.50, 0.75, 0.0,
+		0.50, 1.00, 0.0,
+		0.25, 0.75, 0.0,
+		0.25, 1.00, 0.0,
+
+		0.00, 0.75, 0.0,
+		0.00, 1.00, 0.0,
+		-0.25, 0.75, 0.0,
+		-0.25, 1.00, 0.0,
+
+		-0.50, 0.75, 0.0,
+		-0.50, 1.00, 0.0,
+		-0.75, 0.75, 0.0,
+		-0.75, 1.00, 0.0,
+       };
+#endif
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (test == DRAW) {
+#ifdef PIGLIT_USE_OPENGL
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+#else // PIGLIT_USE_OPENGL_ES3
+		glBindVertexArray(vao);
+#endif
 
 		memcpy(map, array, 12 * sizeof(float));
 		if (!coherent)
@@ -180,12 +260,19 @@ piglit_display(void)
 
 		piglit_check_gl_error(0);
 
+#ifdef PIGLIT_USE_OPENGL
 		pass = pass && piglit_probe_pixel_rgb(15, 15, white);
 		pass = pass && piglit_probe_pixel_rgb(25, 15, white);
 		pass = pass && piglit_probe_pixel_rgb(35, 15, white);
 		pass = pass && piglit_probe_pixel_rgb(45, 15, white);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
+#else // PIGLIT_USE_OPENGL_ES3
+		pass = pass && piglit_probe_pixel_rgba(13, 87, white);
+		pass = pass && piglit_probe_pixel_rgba(39, 87, white);
+		pass = pass && piglit_probe_pixel_rgba(65, 87, white);
+		pass = pass && piglit_probe_pixel_rgba(91, 87, white);
+#endif
 	}
 	else if (test == READ) {
 		GLuint srcbuf;
