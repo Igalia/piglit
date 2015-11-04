@@ -1,0 +1,40 @@
+// [config]
+// expect_result: pass
+// glsl_version: 4.20
+// require_extensions: GL_ARB_compute_shader
+// [end config]
+
+#version 420
+#extension GL_ARB_compute_shader: enable
+
+shared uint u;
+shared int i;
+
+layout(local_size_x = 1) in;
+
+void main()
+{
+    atomicAdd(u, 1u);
+    atomicAdd(i, 1);
+
+    atomicMin(u, 1u);
+    atomicMin(i, 1);
+
+    atomicMax(u, 1u);
+    atomicMax(i, 1);
+
+    atomicAnd(u, 1u);
+    atomicAnd(i, 1);
+
+    atomicOr(u, 1u);
+    atomicOr(i, 1);
+
+    atomicXor(u, 1u);
+    atomicXor(i, 1);
+
+    atomicExchange(u, 1u);
+    atomicExchange(i, 1);
+
+    atomicCompSwap(u, 1u, 2u);
+    atomicCompSwap(i, 1, 2);
+}
