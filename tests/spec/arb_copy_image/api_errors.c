@@ -226,7 +226,7 @@ test_compressed_alignment_errors()
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16UI, 32, 32);
 
-	/* Check for aligntmet constaints */
+	/* Check for alignment constaints */
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 0, 0, 0,
 			   tex[1], GL_TEXTURE_2D, 0, 0, 0, 0, 21, 24, 1);
 	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
