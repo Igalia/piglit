@@ -227,15 +227,19 @@ test_compressed_alignment_errors()
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16UI, 32, 32);
 
 	/* Check for alignment constaints */
+	/* bad width = 21 */
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 0, 0, 0,
 			   tex[1], GL_TEXTURE_2D, 0, 0, 0, 0, 21, 24, 1);
 	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+	/* bad height = 22 */
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 0, 0, 0,
 			   tex[1], GL_TEXTURE_2D, 0, 0, 0, 0, 20, 22, 1);
 	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+	/* bad srcX = 2 */
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 2, 0, 0,
 			   tex[1], GL_TEXTURE_2D, 0, 0, 0, 0, 20, 24, 1);
 	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+	/* bad srcY = 1 */
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 0, 1, 0,
 			   tex[1], GL_TEXTURE_2D, 0, 0, 0, 0, 20, 24, 1);
 	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
