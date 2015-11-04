@@ -45,6 +45,12 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		const unsigned int int_version
 			= parse_glsl_version_number(argv[3]);
 		switch (int_version) {
+		/* This is a hack to support es
+		 *
+		 * This works because version 1.00, 3.00, 3.10, 3.20 (even
+		 * though 3.x should include "es") are unique to GLES, there is
+		 * no desktop OpenGL shader language 1.00, 3.00, 3.10, or 3.20
+		 */
 		case 100:
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_es_version = 20;
@@ -52,6 +58,14 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		case 300:
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_es_version = 30;
+			break;
+		case 310:
+			config.supports_gl_compat_version = 10;
+			config.supports_gl_es_version = 31;
+			break;
+		case 320:
+			config.supports_gl_compat_version = 10;
+			config.supports_gl_es_version = 32;
 			break;
 		default: {
 			const unsigned int gl_version
@@ -145,6 +159,15 @@ get_shader_name(GLenum type)
 	return NULL;
 }
 
+static bool
+glsl_is_es(int version)
+{
+	if (version == 100 || version == 300 || version == 310 || version == 320) {
+		return true;
+	}
+	return false;
+}
+
 /**
  * Attach a dumy shader of the given type.
  */
@@ -154,6 +177,8 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 	const char *shader_template;
 	char shader_text[4096];
 	GLint shader;
+	/* this sets the 'es' string at the end of the version, 1.00 doesn't have that */
+	bool es_flag = (glsl_is_es(requested_version) && requested_version != 100);
 
 	switch (type) {
 	case GL_VERTEX_SHADER:
@@ -183,7 +208,7 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 	snprintf(shader_text, sizeof(shader_text),
 		 shader_template,
 		 requested_version,
-		 (requested_version == 300) ? "es" : "");
+		 es_flag ? "es" : "");
 	shader = piglit_compile_shader_text(type, shader_text);
 	glAttachShader(shader_prog, shader);
 }
@@ -302,8 +327,9 @@ test(void)
 
 		shader_prog = glCreateProgram();
 		glAttachShader(shader_prog, prog);
-		if (requested_version == 100 || requested_version == 300)
+		if (glsl_is_es(requested_version)) {
 			attach_complementary_shader(shader_prog, type);
+		}
 #if PIGLIT_USE_OPENGL
 		if (type == GL_GEOMETRY_SHADER ||
 		    type == GL_TESS_CONTROL_SHADER ||
@@ -449,6 +475,12 @@ check_version(unsigned glsl_version)
 			return;
 		} else if (requested_version == 300) {
 			piglit_require_extension("GL_ARB_ES3_compatibility");
+			return;
+		} else if (requested_version == 310) {
+			piglit_require_extension("GL_ARB_ES3_1_compatibility");
+			return;
+		} else if (requested_version == 320) {
+			piglit_require_extension("GL_ARB_ES3_2_compatibility");
 			return;
 		}
 	}
