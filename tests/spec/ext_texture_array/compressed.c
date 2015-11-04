@@ -184,9 +184,14 @@ piglit_init(int argc, char **argv)
 	/* Make sure required GL features are present */
 #ifdef PIGLIT_USE_OPENGL
 	piglit_require_gl_version(21);
-	piglit_require_extension("GL_ARB_texture_compression");
-	piglit_require_extension("GL_EXT_texture_compression_s3tc");
 	piglit_require_extension("GL_EXT_texture_array");
+
+	if (!piglit_is_extension_supported("GL_EXT_texture_compression_s3tc") &&
+	    !piglit_is_extension_supported("GL_EXT_texture_compression_dxt1")) {
+                printf("Test requires either GL_EXT_texture_compression_s3tc "
+		       "or GL_EXT_texture_compression_dxt1.\n");
+                piglit_report_result(PIGLIT_SKIP);
+        }
 #endif
 
 	/* We're using texture unit 0 for this entire test */
