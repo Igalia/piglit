@@ -1,0 +1,15 @@
+// [config]
+// expect_result: pass
+// glsl_version: 4.20
+// require_extensions: GL_ARB_compute_shader
+// [end config]
+
+#version 420
+#extension GL_ARB_compute_shader: enable
+
+layout(local_size_x = 1) in;
+
+void main()
+{
+    memoryBarrierBuffer();
+}
