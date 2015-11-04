@@ -86,24 +86,22 @@ PIGLIT_GL_TEST_CONFIG_END
 static const char vs_text[] =
 #ifdef PIGLIT_USE_OPENGL
 	"#version 120\n"
-	"#define piglit_Vertex gl_Vertex\n"
-	"#define piglit_MultiTexCoord0 gl_MultiTexCoord0\n"
 	"#define piglit_in attribute\n"
 	"#define piglit_out varying\n"
 #else // PIGLIT_USE_OPENGL_ES3
 	"#version 300 es\n"
 	"#define piglit_in in\n"
 	"#define piglit_out out\n"
-	"piglit_in vec4 piglit_Vertex;\n"
-	"piglit_in vec4 piglit_MultiTexCoord0;\n"
 #endif
+	"piglit_in vec4 piglit_vertex;\n"
+	"piglit_in vec4 piglit_texcoord;\n"
 	"piglit_out vec3 texcoord;\n"
 	"uniform mat4 proj;\n"
 	"uniform int layer;\n"
 	"void main()\n"
 	"{\n"
-	"  gl_Position = proj * piglit_Vertex;\n"
-	"  texcoord = vec3(piglit_MultiTexCoord0.xy, float(layer));\n"
+	"  gl_Position = proj * piglit_vertex;\n"
+	"  texcoord = vec3(piglit_texcoord.xy, float(layer));\n"
 	"}\n";
 
 static const char fs_text[] =
@@ -251,12 +249,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	/* Create the shaders */
-	prog = piglit_build_simple_program_unlinked(vs_text, fs_text);
-	glBindAttribLocation(prog, PIGLIT_ATTRIB_POS, "piglit_Vertex");
-	glBindAttribLocation(prog, PIGLIT_ATTRIB_TEX, "piglit_MultiTexCoord0");
-	glLinkProgram(prog);
-	if (!piglit_link_check_status(prog))
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_text, fs_text);
 	proj_loc = glGetUniformLocation(prog, "proj");
 	layer_loc = glGetUniformLocation(prog, "layer");
 	if (!piglit_check_gl_error(GL_NO_ERROR))
