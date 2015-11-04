@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Intel Corporation
+ * Copyright © 2012, 2015 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -24,14 +24,22 @@
 /**
  * @file blit-mismatched-formats.cpp
  *
- * This test verifies if glBlitFramebuffer() throws GL_INVALID_OPERATION with
- * non-matching formats for multisample framebuffer objects.
+ * This test verifies that calling glBlitFramebuffer to blit between
+ * two multisampled framebuffers works even if they have different
+ * formats. Note that originally the GL spec required that blitting
+ * between differing formats should report a GL_INVALID_OPERATION
+ * error. However in practice most drivers allowed it anyway and in
+ * the GL 4.4 spec the restriction was removed. I think it can be
+ * considered a mistake in the spec that this was not the case
+ * originally so this test assumes that it should be possible in any
+ * version.
  *
- * We initialize two FBOs with minimum supported sample count and different
- * buffer formats, do blitting operation between them and then query the gl
- * error.
+ * We initialize two FBOs with minimum supported sample count and
+ * different buffer formats, do blitting operation between them and
+ * verify the expected results.
  *
- * Author: Anuj Phogat <anuj.phogat@gmail.com>
+ * Authors: Anuj Phogat <anuj.phogat@gmail.com>
+ *	    Neil Roberts <neil@linux.intel.com>
  */
 
 #include "piglit-test-pattern.h"
@@ -50,24 +58,70 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 const int pattern_width = 256; const int pattern_height = 256;
-Fbo src_fbo, dst_fbo;
+Fbo src_fbo, dst_fbo, ss_fbo;
+ColorGradientSunburst *test_pattern;
+GLfloat *reference_image;
 
-static GLenum color_formats[] = {
-	GL_RED,
-	GL_RG,
-	GL_RGB,
-	GL_ALPHA};
+enum component {
+	COMPONENT_RED = (1 << 0),
+	COMPONENT_GREEN = (1 << 1),
+	COMPONENT_BLUE = (1 << 2),
+	COMPONENT_ALPHA = (1 << 3),
+};
+
+struct color_format {
+	GLenum name;
+	GLbitfield components;
+};
+
+static struct color_format
+color_formats[] = {
+	{ GL_ALPHA, COMPONENT_ALPHA },
+	{ GL_RED, COMPONENT_RED },
+	{ GL_RG, COMPONENT_RED | COMPONENT_GREEN },
+	{ GL_RGB, COMPONENT_RED | COMPONENT_GREEN | COMPONENT_BLUE }
+};
+
+static GLfloat *
+generate_expected_image(const GLfloat *ref_image,
+			int pattern_width, int pattern_height,
+			GLbitfield components)
+{
+	GLfloat *expected_image = (GLfloat *) malloc(pattern_width *
+						     pattern_height * 4 *
+						     sizeof(GLfloat));
+	GLfloat *dst = expected_image;
+	const GLfloat *src = ref_image;
+	int i;
+
+	for (i = 0; i < pattern_width * pattern_height; i++) {
+		dst[0] = (components & COMPONENT_RED) ? src[0] : 0.0f;
+		dst[1] = (components & COMPONENT_GREEN) ? src[1] : 0.0f;
+		dst[2] = (components & COMPONENT_BLUE) ? src[2] : 0.0f;
+		dst[3] = (components & COMPONENT_ALPHA) ? src[3] : 1.0f;
+		src += 4;
+		dst += 4;
+	}
+
+	return expected_image;
+}
 
 enum piglit_result
 piglit_display()
 {
 	bool pass = true;
+	GLfloat *expected_image;
 	GLuint i;
 
 	FboConfig config_ms(1 , pattern_width, pattern_height);
 
 	for(i = 0; i < ARRAY_SIZE(color_formats); i++) {
-		config_ms.color_internalformat = color_formats[i];
+		expected_image =
+			generate_expected_image(reference_image,
+						pattern_width, pattern_height,
+						color_formats[i].components);
+
+		config_ms.color_internalformat = color_formats[i].name;
 		src_fbo.setup(config_ms);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
@@ -75,18 +129,73 @@ piglit_display()
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
+		glBindFramebuffer(GL_FRAMEBUFFER, src_fbo.handle);
+		test_pattern->draw(TestPattern::no_projection);
+
 		/* Blit multisample-to-multisample with non-matching formats */
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo.handle);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst_fbo.handle);
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
 		glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 				  0, 0, pattern_width, pattern_height,
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-		/* Blitting between different formats is not allowed for
-		 * multisample frambuffers. Here GL_INVALID_OPERATION is an
-		 * expected gl error.
+		/* Blitting between different formats shouldn't
+		 * generate an error.
 		 */
-		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		/* Downsample the blitted buffer so we can read the
+		 * results
+		 */
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, dst_fbo.handle);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ss_fbo.handle);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBlitFramebuffer(0, 0, pattern_width, pattern_height,
+				  0, 0, pattern_width, pattern_height,
+				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, ss_fbo.handle);
+		pass = piglit_probe_image_rgba(0, 0,
+					       pattern_width, pattern_height,
+					       expected_image) && pass;
+
+		/* Also try a downsample blit with mismatched formats
+		 */
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo.handle);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ss_fbo.handle);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBlitFramebuffer(0, 0, pattern_width, pattern_height,
+				  0, 0, pattern_width, pattern_height,
+				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, ss_fbo.handle);
+		pass = piglit_probe_image_rgba(0, 0,
+					       pattern_width, pattern_height,
+					       expected_image) && pass;
+
+		/* Blit the result to the window system buffer so that
+		 * something will be displayed in a non-automatic
+		 * test.
+		 */
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, ss_fbo.handle);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBlitFramebuffer(0, 0, pattern_width, pattern_height,
+				  0, 0, pattern_width, pattern_height,
+				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		piglit_present_results();
+
+		free(expected_image);
 	}
 
 	return (pass ? PIGLIT_PASS : PIGLIT_FAIL);
@@ -110,8 +219,40 @@ piglit_init(int argc, char **argv)
 				pattern_width,
 				pattern_height));
 
+	/* Single-sampled FBO used so that we can call glReadPixels to
+	 * examine the results.
+	 */
+	ss_fbo.setup(FboConfig(0 /* sample count */,
+			       pattern_width,
+			       pattern_height));
+
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("Error setting up frame buffer objects\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
+	test_pattern = new ColorGradientSunburst(GL_FLOAT);
+	test_pattern->compile();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, src_fbo.handle);
+	test_pattern->draw(TestPattern::no_projection);
+
+	/* Generate a reference image by downsampling between matching
+	 * formats.
+	 */
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo.handle);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ss_fbo.handle);
+	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
+			  0, 0, pattern_width, pattern_height,
+			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
+
+	reference_image = (GLfloat *) malloc(pattern_width *
+					     pattern_height * 4 *
+					     sizeof(GLfloat));
+
+	glBindFramebuffer(GL_FRAMEBUFFER, ss_fbo.handle);
+	glReadPixels(0, 0, pattern_width, pattern_height,
+		     GL_RGBA, GL_FLOAT, reference_image);
 }
