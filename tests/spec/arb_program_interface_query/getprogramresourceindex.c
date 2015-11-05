@@ -144,43 +144,47 @@ struct subtest_index_t {
 
 	GLenum programInterface;
 	const char *name;
-	GLint expect_value; /* 0 == any number >= 0, -1 == INVALID_INDEX */
+	bool valid_index;
+	GLint expect_value; /* -1, means don't check for an epected value */
 	GLenum expected_error;
 
 	const char *programInterface_str;
 	const char *error_str;
 };
 
-#define ST(vs_text, programInterface, name, value, error) { \
-	(vs_text), (programInterface), (name), (value), (error), \
+#define ST(vs_text, programInterface, name, valid, value, error) { \
+	(vs_text), (programInterface), (name), (valid), (value), (error), \
 	#programInterface, #error \
 }
 
 /* Test for arrays of arrays */
 static const struct subtest_index_t index_subtests[] = {
- ST(vs_empty,      GL_ATOMIC_COUNTER_BUFFER,              "dummy", -1, GL_INVALID_ENUM),
- ST(vs_empty,                    GL_UNIFORM,                 NULL, -1, GL_NO_ERROR),
- ST(vs_empty,                    GL_UNIFORM,              "dummy", -1, GL_NO_ERROR),
- ST(vs_empty,                       GL_TRUE,           "vs_input",  0, GL_INVALID_ENUM),
- ST(vs_array,              GL_PROGRAM_INPUT,           "vs_input",  0, GL_NO_ERROR),
- ST(vs_array,              GL_PROGRAM_INPUT,        "vs_input[0]",  0, GL_NO_ERROR),
- ST(vs_array,              GL_PROGRAM_INPUT,        "vs_input[1]", -1, GL_NO_ERROR),
- ST(vs_array,                    GL_UNIFORM,              "hello", -1, GL_NO_ERROR),
- ST(vs_array,                    GL_UNIFORM,        "sa[0].hello",  0, GL_NO_ERROR),
- ST(vs_array,                    GL_UNIFORM,        "sa[0].world",  0, GL_NO_ERROR),
- ST(vs_array,                    GL_UNIFORM,     "sa[0].world[0]",  0, GL_NO_ERROR),
- ST(vs_array,                    GL_UNIFORM,        "sa[1].hello", -1, GL_NO_ERROR),
- ST( vs_aofa,              GL_PROGRAM_INPUT,          "vs_input2", -1, GL_NO_ERROR),
- ST( vs_aofa,              GL_PROGRAM_INPUT,       "vs_input2[0]",  0, GL_NO_ERROR),
- ST( vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[0][0]",  0, GL_NO_ERROR),
- ST( vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[1][0]", -1, GL_NO_ERROR),
- ST( vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[0][1]", -1, GL_NO_ERROR),
- ST(  vs_sub,          GL_VERTEX_SUBROUTINE,                "vss",  0, GL_NO_ERROR),
- ST(vs_empty, GL_TRANSFORM_FEEDBACK_VARYING,      "gl_NextBuffer", -1, GL_NO_ERROR),
- ST(vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents1", -1, GL_NO_ERROR),
- ST(vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents2", -1, GL_NO_ERROR),
- ST(vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents3", -1, GL_NO_ERROR),
- ST(vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents4", -1, GL_NO_ERROR),
+ ST( vs_empty,      GL_ATOMIC_COUNTER_BUFFER,              "dummy", false, -1, GL_INVALID_ENUM),
+ ST( vs_empty,                    GL_UNIFORM,                 NULL, false, -1, GL_NO_ERROR),
+ ST( vs_empty,                    GL_UNIFORM,              "dummy", false, -1, GL_NO_ERROR),
+ ST( vs_empty,                       GL_TRUE,           "vs_input",  true, -1, GL_INVALID_ENUM),
+ ST( vs_array,              GL_PROGRAM_INPUT,           "vs_input",  true, -1, GL_NO_ERROR),
+ ST( vs_array,              GL_PROGRAM_INPUT,        "vs_input[0]",  true, -1, GL_NO_ERROR),
+ ST( vs_array,              GL_PROGRAM_INPUT,        "vs_input[1]", false, -1, GL_NO_ERROR),
+ ST( vs_array,                    GL_UNIFORM,              "hello", false, -1, GL_NO_ERROR),
+ ST( vs_array,                    GL_UNIFORM,        "sa[0].hello",  true, -1, GL_NO_ERROR),
+ ST( vs_array,                    GL_UNIFORM,        "sa[0].world",  true, -1, GL_NO_ERROR),
+ ST( vs_array,                    GL_UNIFORM,     "sa[0].world[0]",  true, -1, GL_NO_ERROR),
+ ST( vs_array,                    GL_UNIFORM,        "sa[1].hello", false, -1, GL_NO_ERROR),
+ ST(  vs_aofa,              GL_PROGRAM_INPUT,          "vs_input2", false, -1, GL_NO_ERROR),
+ ST(  vs_aofa,              GL_PROGRAM_INPUT,       "vs_input2[0]",  true, -1, GL_NO_ERROR),
+ ST(  vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[0][0]",  true, -1, GL_NO_ERROR),
+ ST(  vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[1][0]", false, -1, GL_NO_ERROR),
+ ST(  vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[0][1]", false, -1, GL_NO_ERROR),
+ ST(   vs_sub,          GL_VERTEX_SUBROUTINE,                "vss",  true, -1, GL_NO_ERROR),
+ ST(   vs_sub,          GL_VERTEX_SUBROUTINE,               "vss2",  true, -1, GL_NO_ERROR),
+ ST(vs_subidx,          GL_VERTEX_SUBROUTINE,            "vss_idx",  true,  5, GL_NO_ERROR),
+ ST(vs_subidx,          GL_VERTEX_SUBROUTINE,           "vss2_idx",  true, -1, GL_NO_ERROR),
+ ST( vs_empty, GL_TRANSFORM_FEEDBACK_VARYING,      "gl_NextBuffer", false, -1, GL_NO_ERROR),
+ ST( vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents1", false, -1, GL_NO_ERROR),
+ ST( vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents2", false, -1, GL_NO_ERROR),
+ ST( vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents3", false, -1, GL_NO_ERROR),
+ ST( vs_empty, GL_TRANSFORM_FEEDBACK_VARYING, "gl_SkipComponents4", false, -1, GL_NO_ERROR),
 };
 
 static bool
@@ -278,11 +282,16 @@ run_index_subtest(const struct subtest_index_t st, bool *pass)
 		       index);
 		local_pass = false;
 	} else if (st.expected_error == GL_NO_ERROR) {
-		if (index >=0 && st.expect_value != 0) {
+                if (index >=0 && !st.valid_index) {
 			printf("Invalid index for '%s': expected INVALID_INDEX "
 			       "but got %i\n", st.name, index);
 			local_pass = false;
-		} else if (index == GL_INVALID_INDEX && st.expect_value != -1) {
+                } else if (index >=0 && st.expect_value != -1 &&
+                           st.expect_value != index) {
+			printf("For index of '%s': expected %d "
+			       "but got %i\n", st.name, st.expect_value, index);
+			local_pass = false;
+		} else if (index == GL_INVALID_INDEX && st.valid_index) {
 			printf("Invalid index for '%s': expected a valid index "
 			       "but got INVALID_INDEX\n", st.name);
 			local_pass = false;
