@@ -1711,6 +1711,29 @@ static const char *fp_offset =
 	"   } \n"
 	"} \n";
 
+static bool
+get_test_by_name(const char *name, const struct test_desc **t)
+{
+	unsigned i;
+
+	for (i = 0; test_sets[i].name; i++) {
+		if (strcmp(name, test_sets[i].name) == 0) {
+			int j;
+			for (j = 0; j < ARRAY_SIZE(test_sets[i].ext); j++) {
+				if (test_sets[i].ext[j]) {
+					piglit_require_extension(test_sets[i].ext[j]);
+				}
+			}
+
+			printf("Testing %s.\n", test_sets[i].name);
+			*t = &test_sets[i];
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void piglit_init(int argc, char **argv)
 {
 	unsigned i, p, fp;
@@ -1780,19 +1803,8 @@ void piglit_init(int argc, char **argv)
 			continue;
 		}
 
-		for (i = 0; test_sets[i].name; i++) {
-			if (strcmp(argv[p], test_sets[i].name) == 0) {
-				int j;
-				for (j = 0; j < ARRAY_SIZE(test_sets[i].ext); j++) {
-					if (test_sets[i].ext[j]) {
-						piglit_require_extension(test_sets[i].ext[j]);
-					}
-				}
-				test = &test_sets[i];
-				printf("Testing %s.\n", test->name);
-				goto outer_continue;
-			}
-		}
+		if (get_test_by_name(argv[p], &test))
+			continue;
 
 		if (test) {
 			/* Formats. */
