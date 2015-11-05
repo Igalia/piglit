@@ -407,7 +407,20 @@ choose_varyings(struct varying_desc *varyings,
 		}
 	}
 	for (i = 0; i < num_extra_varyings; ++i) {
-		varyings[num_varyings].type = &float_type;
+		switch(test_type->base) {
+		case BASE_TYPE_UINT:
+			varyings[num_varyings].type = &uint_type;
+			break;
+		case BASE_TYPE_INT:
+			varyings[num_varyings].type = &int_type;
+			break;
+		case BASE_TYPE_FLOAT:
+			varyings[num_varyings].type = &float_type;
+			break;
+		case BASE_TYPE_DOUBLE:
+			varyings[num_varyings].type = &double_type;
+			break;
+		}
 		varyings[num_varyings].two_dim_array_elems = 0;
 		varyings[num_varyings].one_dim_array_elems = 0;
 		++num_varyings;
