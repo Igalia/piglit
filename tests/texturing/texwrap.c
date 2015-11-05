@@ -1712,6 +1712,15 @@ static const char *fp_offset =
 	"} \n";
 
 static bool
+s3tc_supported(void)
+{
+	return piglit_is_extension_supported("GL_EXT_texture_compression_s3tc") ||
+	       (piglit_is_extension_supported("GL_EXT_texture_compression_dxt1") &&
+		piglit_is_extension_supported("GL_ANGLE_texture_compression_dxt3") &&
+		piglit_is_extension_supported("GL_ANGLE_texture_compression_dxt5"));
+}
+
+static bool
 get_test_by_name(const char *name, const struct test_desc **t)
 {
 	unsigned i;
@@ -1720,9 +1729,25 @@ get_test_by_name(const char *name, const struct test_desc **t)
 		if (strcmp(name, test_sets[i].name) == 0) {
 			int j;
 			for (j = 0; j < ARRAY_SIZE(test_sets[i].ext); j++) {
-				if (test_sets[i].ext[j]) {
-					piglit_require_extension(test_sets[i].ext[j]);
-				}
+				const char *ext = test_sets[i].ext[j];
+
+				if (ext == NULL)
+					break;
+
+				if (piglit_is_extension_supported(ext))
+					continue;
+
+				/* The test doesn't use online compression, so
+				 * the full-featured S3TC extension or the
+				 * full set of extensions that only support
+				 * pre-compressed data will work.
+				 */
+				if (strcmp("GL_EXT_texture_compression_s3tc", ext) == 0 &&
+				    s3tc_supported())
+					continue;
+
+				printf("Test requires %s\n", ext);
+				piglit_report_result(PIGLIT_SKIP);
 			}
 
 			printf("Testing %s.\n", test_sets[i].name);
