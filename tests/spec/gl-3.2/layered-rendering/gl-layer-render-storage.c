@@ -90,7 +90,6 @@ static GLuint color_uniform;
 
 GLuint
 create_bind_texture(GLenum textureType) {
-	int i;
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(textureType, texture);
