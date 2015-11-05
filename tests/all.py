@@ -4614,6 +4614,11 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'arb_query_buffer_object')) as g:
+    g(['arb_query_buffer_object'], 'qbo')
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_framebuffer_blit')) as g:
     g(['ext_framebuffer_blit-blit-early'], 'blit-early')
 
