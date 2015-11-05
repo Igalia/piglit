@@ -3708,6 +3708,7 @@ with profile.group_manager(
     g(['arb_clear_texture-depth-stencil'])
     g(['arb_clear_texture-srgb'])
     g(['arb_clear_texture-stencil'])
+    g(['arb_clear_texture-texview'])
 
 with profile.group_manager(
         PiglitGLTest,
