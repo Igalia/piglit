@@ -139,38 +139,11 @@ static const struct {
 static bool
 test_format(const int i)
 {
-	static const char *const data_7f   = "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f"
-					     "\x7f\x7f\x7f\x7f";
+	static const char *const clear_data = "\x01\x02\x02\x03"
+					      "\x04\x05\x06\x07"
+					      "\x08\x09\x10\x11"
+					      "\x12\x13\x14\x15";
+
 	static const char *const data_init = "\xff\xff\xff\xff"
 					     "\xff\xff\xff\xff"
 					     "\x00\x00\x00\x00"
@@ -203,10 +176,10 @@ test_format(const int i)
 			piglit_get_gl_enum_name(formats[i].internal_format));
 	fill_array_buffer(64, data_init);
 	glClearBufferData(GL_ARRAY_BUFFER, formats[i].internal_format,
-			formats[i].format, formats[i].type, data_7f);
+			formats[i].format, formats[i].type, clear_data);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR) ||
-			!check_array_buffer_data(formats[i].size, data_7f)) {
+	    !check_array_buffer_data(formats[i].size, clear_data)) {
 		printf("Failed!\n");
 		return false;
 	}
