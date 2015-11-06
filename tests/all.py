@@ -3706,6 +3706,7 @@ with profile.group_manager(
     g(['arb_clear_buffer_object-sub-mapped'])
     g(['arb_clear_buffer_object-sub-overlap'])
     g(['arb_clear_buffer_object-sub-simple'])
+    g(['arb_clear_buffer_object-unaligned'])
     g(['arb_clear_buffer_object-zero-size'])
 
 with profile.group_manager(

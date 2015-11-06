@@ -18,6 +18,7 @@ piglit_add_executable (arb_clear_buffer_object-sub-invalid-size sub-invalid-size
 piglit_add_executable (arb_clear_buffer_object-sub-mapped sub-mapped.c common.c)
 piglit_add_executable (arb_clear_buffer_object-sub-overlap sub-overlap.c common.c)
 piglit_add_executable (arb_clear_buffer_object-sub-simple sub-simple.c common.c)
+piglit_add_executable (arb_clear_buffer_object-unaligned unaligned.c common.c)
 piglit_add_executable (arb_clear_buffer_object-zero-size zero-size.c common.c)
 
 # vim: ft=cmake:
