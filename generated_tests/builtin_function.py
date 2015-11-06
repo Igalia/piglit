@@ -52,6 +52,7 @@ from __future__ import print_function, division, absolute_import
 import collections
 import itertools
 import functools
+import warnings
 
 from six.moves import range
 import numpy as np
@@ -1279,10 +1280,13 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
       [floats+vecs+mats+ints+ivecs+uints+uvecs,
        floats+vecs+mats+ints+ivecs+uints+uvecs],
       template='{0};\n  result += {1}')
-    f('op-assign-sub', 2, 110, lambda x, y: x - y, match_assignment_operators,
-      [floats+vecs+mats+ints+ivecs+uints+uvecs,
-       floats+vecs+mats+ints+ivecs+uints+uvecs],
-      template='{0};\n  result -= {1}')
+    # This can generate an overflow warning, this is expected
+    with warnings.catch_warnings(RuntimeWarning):
+        f('op-assign-sub', 2, 110,
+          lambda x, y: x - y, match_assignment_operators,
+          [floats+vecs+mats+ints+ivecs+uints+uvecs,
+           floats+vecs+mats+ints+ivecs+uints+uvecs],
+          template='{0};\n  result -= {1}')
     f('op-assign-mult', 2, 110, _multiply, match_assignment_multiply,
       [floats+vecs+mats+ints+ivecs+uints+uvecs,
        floats+vecs+mats+ints+ivecs+uints+uvecs],
@@ -1321,10 +1325,12 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
       [floats+vecs+mats+ints+ivecs+uints+uvecs,
        floats+vecs+mats+ints+ivecs+uints+uvecs],
       template='({0} + {1})')
-    f('op-sub', 2, 110, lambda x, y: x - y, match_simple_binop,
-      [floats+vecs+mats+ints+ivecs+uints+uvecs,
-       floats+vecs+mats+ints+ivecs+uints+uvecs],
-      template='({0} - {1})')
+    # This can generate an overflow warning, this is expected
+    with warnings.catch_warnings(RuntimeWarning):
+        f('op-sub', 2, 110, lambda x, y: x - y, match_simple_binop,
+          [floats+vecs+mats+ints+ivecs+uints+uvecs,
+           floats+vecs+mats+ints+ivecs+uints+uvecs],
+          template='({0} - {1})')
     f('op-mult', 2, 110, _multiply, match_multiply,
       [floats+vecs+mats+ints+ivecs+uints+uvecs,
        floats+vecs+mats+ints+ivecs+uints+uvecs],
