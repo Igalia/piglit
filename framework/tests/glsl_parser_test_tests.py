@@ -30,25 +30,32 @@ import nose.tools as nt
 from framework import exceptions
 import framework.test.glsl_parser_test as glsl
 import framework.tests.utils as utils
-from framework.test import TEST_BIN_DIR
+from framework.test import TEST_BIN_DIR, TestIsSkip
 
 # pylint: disable=line-too-long,invalid-name
 
 
 class _Setup(object):
+    """A class holding setup and teardown methods.
+
+    These methods need to share data, and a class is a nice way to encapsulate
+    that.
+
+    """
     def __init__(self):
-        self.__patchers = []
-        self.__patchers.append(mock.patch.dict(
-            'framework.test.opengl.OPTIONS.env',
-            {'PIGLIT_PLATFORM': 'foo'}))
+        self.patchers = [
+            mock.patch('framework.test.glsl_parser_test._HAS_GL_BIN', True),
+            mock.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', True),
+            mock.patch.dict('framework.test.opengl.OPTIONS.env', {'PIGLIT_PLATFORM': 'foo'}),
+        ]
 
     def setup(self):
-        for patcher in self.__patchers:
-            patcher.start()
+        for p in self.patchers:
+            p.start()
 
     def teardown(self):
-        for patcher in self.__patchers:
-            patcher.stop()
+        for p in self.patchers:
+            p.stop()
 
 
 _setup = _Setup()
@@ -354,12 +361,10 @@ def test_good_extensions():
 @utils.nose_generator
 def test_get_glslparsertest_gles2():
     """GLSLParserTest: gets gles2 binary if glsl is 1.00 or 3.00"""
-
-    @utils.no_error
-    def test(content):
+    def test(content, expected):
         with utils.tempfile(content) as f:
             t = glsl.GLSLParserTest(f)
-            nt.eq_(os.path.basename(t.command[0]), 'glslparsertest_gles2')
+            nt.eq_(os.path.basename(t.command[0]), expected)
 
     content = textwrap.dedent("""\
         /*
@@ -369,16 +374,22 @@ def test_get_glslparsertest_gles2():
          * [end config]
          */
         """)
-
-    description = ("test.glsl_parser_test.GLSLParserTest: "
-                   "gets gles2 binary if glsl is {}")
-
     versions = ['1.00', '3.00', '3.10', '3.20', '3.00 es', '3.10 es',
                 '3.20 es']
+    description = ("test.glsl_parser_test.GLSLParserTest: "
+                   "gets gles2 binary if glsl is '{}' and gles2 binary exists")
 
     for version in versions:
         test.description = description.format(version)
-        yield test, content.format(version)
+        yield test, content.format(version), 'glslparsertest_gles2'
+
+    description = ("test.glsl_parser_test.GLSLParserTest: "
+                   "gets gl binary if glsl is '{}' and gles2 binary doesn't exist")
+
+    with mock.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', False):
+        for version in versions:
+            test.description = description.format(version)
+            yield test, content.format(version), 'glslparsertest'
 
 
 def test_set_glsl_version():
@@ -387,14 +398,13 @@ def test_set_glsl_version():
     with mock.patch.object(glsl.GLSLParserTest, '_GLSLParserTest__parser',
                            mock.Mock(return_value=rt)):
         with mock.patch.object(glsl.GLSLParserTest,
-                               '_GLSLParserTest__get_command'):
-            with mock.patch('framework.test.glsl_parser_test.super',
-                            mock.Mock()):
-                with mock.patch('framework.test.glsl_parser_test.open',
+                               '_GLSLParserTest__get_command',
+                               return_value=['foo']):
+            with mock.patch('framework.test.glsl_parser_test.open',
+                            mock.mock_open()):
+                with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
-                    with mock.patch('framework.test.glsl_parser_test.os.stat',
-                                    mock.mock_open()):
-                        test = glsl.GLSLParserTest('foo')
+                    test = glsl.GLSLParserTest('foo')
     nt.eq_(test.glsl_version, 4.3)
 
 
@@ -404,29 +414,80 @@ def test_set_glsl_es_version():
     with mock.patch.object(glsl.GLSLParserTest, '_GLSLParserTest__parser',
                            mock.Mock(return_value=rt)):
         with mock.patch.object(glsl.GLSLParserTest,
-                               '_GLSLParserTest__get_command'):
-            with mock.patch('framework.test.glsl_parser_test.super',
-                            mock.Mock()):
-                with mock.patch('framework.test.glsl_parser_test.open',
+                               '_GLSLParserTest__get_command',
+                               return_value=['foo']):
+            with mock.patch('framework.test.glsl_parser_test.open',
+                            mock.mock_open()):
+                with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
-                    with mock.patch('framework.test.glsl_parser_test.os.stat',
-                                    mock.mock_open()):
-                        test = glsl.GLSLParserTest('foo')
+                    test = glsl.GLSLParserTest('foo')
     nt.eq_(test.glsl_es_version, 3.0)
 
 
 def test_set_gl_required():
-    """test.glsl_parser_test.GLSLParserTest: sets glsl_es_version"""
+    """test.glsl_parser_test.GLSLParserTest: sets gl_required"""
     rt = {'require_extensions': 'GL_ARB_foobar GL_EXT_foobar'}
     with mock.patch.object(glsl.GLSLParserTest, '_GLSLParserTest__parser',
                            mock.Mock(return_value=rt)):
         with mock.patch.object(glsl.GLSLParserTest,
-                               '_GLSLParserTest__get_command'):
-            with mock.patch('framework.test.glsl_parser_test.super',
-                            mock.Mock()):
-                with mock.patch('framework.test.glsl_parser_test.open',
+                               '_GLSLParserTest__get_command',
+                               return_value=['foo']):
+            with mock.patch('framework.test.glsl_parser_test.open',
+                            mock.mock_open()):
+                with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
-                    with mock.patch('framework.test.glsl_parser_test.os.stat',
-                                    mock.mock_open()):
-                        test = glsl.GLSLParserTest('foo')
+                    test = glsl.GLSLParserTest('foo')
     nt.eq_(test.gl_required, set(['GL_ARB_foobar', 'GL_EXT_foobar']))
+
+
+@mock.patch('framework.test.glsl_parser_test._HAS_GL_BIN', False)
+@nt.raises(TestIsSkip)
+def test_binary_skip():
+    """test.glsl_parser_test.GLSLParserTest.is_skip: skips OpenGL tests when not built with desktop support"""
+    content = textwrap.dedent("""\
+        /*
+         * [config]
+         * expect_result: pass
+         * glsl_version: 1.10
+         * [end config]
+         */
+        """)
+
+    with utils.tempfile(content) as f:
+        test = glsl.GLSLParserTest(f)
+        test.is_skip()
+
+
+@utils.nose_generator
+def test_add_compatability():
+    """test.glsl_parser_test.GLSLParserTest: Adds ARB_ES<ver>_COMPATIBILITY
+    when shader is gles but only gl is available"""
+    content = textwrap.dedent("""\
+        /*
+         * [config]
+         * expect_result: pass
+         * glsl_version: {}
+         * require_extensions: GL_ARB_ham_sandwhich
+         * [end config]
+         */
+        """)
+
+    @mock.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', False)
+    def test(ver, expected):
+        with utils.tempfile(content.format(ver)) as f:
+            test = glsl.GLSLParserTest(f)
+        nt.assert_in(expected, test.gl_required)
+
+    desc = ('test.glsl_parser_test.GLSLParserTest: Add {} to gl_extensions '
+            'for GLES tests on OpenGL')
+
+    vers = [
+        ('1.00', 'ARB_ES2_compatibility'),
+        ('3.00', 'ARB_ES3_compatibility'),
+        ('3.10', 'ARB_ES3_1_compatibility'),
+        ('3.20', 'ARB_ES3_2_compatibility'),
+    ]
+
+    for ver, expected in vers:
+        test.description = desc.format(expected)
+        yield test, ver, expected
