@@ -373,7 +373,10 @@ def test_get_glslparsertest_gles2():
     description = ("test.glsl_parser_test.GLSLParserTest: "
                    "gets gles2 binary if glsl is {}")
 
-    for version in ['1.00', '3.00']:
+    versions = ['1.00', '3.00', '3.10', '3.20', '3.00 es', '3.10 es',
+                '3.20 es']
+
+    for version in versions:
         test.description = description.format(version)
         yield test, content.format(version)
 

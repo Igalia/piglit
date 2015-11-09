@@ -35,6 +35,19 @@ __all__ = [
 ]
 
 
+def _is_gles_version(version):
+    """Return True if version is es, otherwsie false."""
+    if isinstance(version, basestring):
+        # GLES 3+ versions should have "es" appended, even though
+        # glslparsertest doesn't require them. If the version ends in "es" then
+        # it is a GLES test for sure.
+        if version.endswith('es'):
+            return True
+        version = float(version)
+
+    return version in [1.0, 3.0, 3.1, 3.2]
+
+
 class GLSLParserNoConfigError(exceptions.PiglitInternalError):
     pass
 
@@ -108,7 +121,7 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         # Create the command and pass it into a PiglitTest()
         glsl = config['glsl_version']
         command = [
-            'glslparsertest_gles2' if glsl in ['1.00', '3.00'] else 'glslparsertest',
+            'glslparsertest_gles2' if _is_gles_version(glsl) else 'glslparsertest',
             filepath,
             config['expect_result'],
             config['glsl_version']
