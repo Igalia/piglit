@@ -3060,6 +3060,8 @@ piglit_display(void)
 			if (link_ok) {
 				printf("shader link error expected, but it was successful!\n");
 				piglit_report_result(PIGLIT_FAIL);
+			} else {
+				fprintf(stderr, "Failed to link:\n%s\n", prog_err_info);
 			}
 		} else if (string_match("link success", line)) {
 			program_must_be_in_use();
