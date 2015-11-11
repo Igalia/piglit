@@ -25,6 +25,9 @@ tests
 
 """
 
+from __future__ import absolute_import, division, print_function
+
+import mock
 import nose.tools as nt
 
 from framework import profile, grouptools, exceptions
@@ -137,42 +140,118 @@ def test_DEQPBaseTest_command():
     nt.eq_(test.command[-1], 'extra')
 
 
-def test_DEQPBaseTest_interpret_result_returncode():
-    """deqp.DEQPBaseTest.interpret_result: if returncode is not 0 result is fail
+class TestDEQPBaseTestInterpretResult(object):
+    """Tests for DEQPBaseTest.interpret_result.
+
+    This specifically tests the part that searches stdout.
+
     """
-    test = _DEQPTestTest('a.deqp.test')
-    test.result.returncode = 1
-    test.interpret_result()
+    def __init__(self):
+        self.test = None
 
-    nt.eq_(test.result.result, 'fail')
+    def setup(self):
+        self.test = _DEQPTestTest('a.deqp.test')
+
+    def test_crash(self):
+        """deqp.DEQPBaseTest.interpret_result: if returncode is < 0 stauts is crash"""
+        self.test.result.returncode = -9
+        self.test.interpret_result()
+        nt.eq_(self.test.result.result, 'crash')
+
+    def test_returncode_fail(self):
+        """deqp.DEQPBaseTest.interpret_result: if returncode is > 0 result is fail"""
+        self.test.result.returncode = 1
+        self.test.interpret_result()
+        nt.eq_(self.test.result.result, 'fail')
+
+    def test_fallthrough(self):
+        """deqp.DEQPBaseTest.interpret_result: if no case is hit set to fail"""
+        self.test.result.returncode = 0
+        self.test.result.out = ''
+        self.test.interpret_result()
+        nt.eq_(self.test.result.result, 'fail')
+
+    def test_windows_returncode_3(self):
+        """deqp.DEQPBaseTest.interpret_result: on windows returncode 3 is crash"""
+        self.test.result.returncode = 3
+        with mock.patch('framework.test.base.sys.platform', 'win32'):
+            self.test.interpret_result()
+        nt.eq_(self.test.result.result, 'crash')
 
 
-def test_DEQPBaseTest_interpret_result_fallthrough():
-    """deqp.DEQPBaseTest.interpret_result: if no case is hit set to fail
-    """
-    test = _DEQPTestTest('a.deqp.test')
-    test.result.returncode = 0
-    test.result.out = ''
-    test.interpret_result()
+class TestDEQPBaseTestIntepretResultStatus(object):
+    """Tests for DEQPBaseTest.__find_map."""
+    def __init__(self):
+        self.inst = None
 
-    nt.eq_(test.result.result, 'fail')
+    __OUT = (
+        "dEQP Core 2014.x (0xcafebabe) starting..\n"
+        "arget implementation = 'DRM'\n"
+        "\n"
+        "Test case 'dEQP-GLES2.functional.shaders.conversions.vector_to_vector.vec3_to_ivec3_fragment'..\n"
+        "Vertex shader compile time = 0.129000 ms\n"
+        "Fragment shader compile time = 0.264000 ms\n"
+        "Link time = 0.814000 ms\n"
+        "Test case duration in microseconds = 487155 us\n"
+        "{stat} ({stat})\n"
+        "\n"
+        "DONE!\n"
+        "\n"
+        "Test run totals:\n"
+        "Passed:        {pass_}/1 (100.0%)\n"
+        "Failed:        {fail}/1 (0.0%)\n"
+        "Not supported: {supp}/1 (0.0%)\n"
+        "Warnings:      {warn}/1 (0.0%)\n"
+    )
 
+    def __gen_stdout(self, status):
+        assert status in ['Fail', 'NotSupported', 'Pass', 'QualityWarning',
+                          'InternalError', 'Crash']
 
-@utils.nose_generator
-def test_DEQPBaseTest_interpret_result_status():
-    """generate tests for each status possiblility."""
-    def test(status, expected):
-        inst = _DEQPTestTest('a.deqp.test')
-        inst.result.returncode = 0
-        inst.result.out = status
-        inst.interpret_result()
-        nt.eq_(inst.result.result, expected)
+        return self.__OUT.format(
+            stat=status,
+            pass_=1 if status == 'Pass' else 0,
+            fail=1 if status in ['Crash', 'Fail'] else 0,
+            supp=1 if status == 'InternalError' else 0,
+            warn=1 if status == 'QualityWarning' else 0,
+        )
 
-    desc = ('deqp.DEQPBaseTest.interpret_result: '
-            'when "{}" in stdout status is set to "{}"')
+    def setup(self):
+        self.inst = _DEQPTestTest('a.deqp.test')
+        self.inst.result.returncode = 0
 
-    _map = deqp.DEQPBaseTest._DEQPBaseTest__RESULT_MAP.iteritems()  # pylint: disable=no-member,protected-access
+    def test_fail(self):
+        """test.deqp.DEQPBaseTest.interpret_result: when Fail in result the result is 'fail'"""
+        self.inst.result.out = self.__gen_stdout('Fail')
+        self.inst.interpret_result()
+        nt.eq_(self.inst.result.result, 'fail')
 
-    for status, expected in _map:
-        test.description = desc.format(status, expected)
-        yield test, status, expected
+    def test_pass(self):
+        """test.deqp.DEQPBaseTest.interpret_result: when Pass in result the result is 'Pass'"""
+        self.inst.result.out = self.__gen_stdout('Pass')
+        self.inst.interpret_result()
+        nt.eq_(self.inst.result.result, 'pass')
+
+    def test_warn(self):
+        """test.deqp.DEQPBaseTest.interpret_result: when QualityWarning in result the result is 'warn'"""
+        self.inst.result.out = self.__gen_stdout('QualityWarning')
+        self.inst.interpret_result()
+        nt.eq_(self.inst.result.result, 'warn')
+
+    def test_error(self):
+        """test.deqp.DEQPBaseTest.interpret_result: when InternalError in result the result is 'fail'"""
+        self.inst.result.out = self.__gen_stdout('InternalError')
+        self.inst.interpret_result()
+        nt.eq_(self.inst.result.result, 'fail')
+
+    def test_crash(self):
+        """test.deqp.DEQPBaseTest.interpret_result: when InternalError in result the result is 'crash'"""
+        self.inst.result.out = self.__gen_stdout('Crash')
+        self.inst.interpret_result()
+        nt.eq_(self.inst.result.result, 'crash')
+
+    def test_skip(self):
+        """test.deqp.DEQPBaseTest.interpret_result: when NotSupported in result the result is 'skip'"""
+        self.inst.result.out = self.__gen_stdout('NotSupported')
+        self.inst.interpret_result()
+        nt.eq_(self.inst.result.result, 'skip')

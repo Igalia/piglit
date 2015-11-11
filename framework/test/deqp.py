@@ -24,7 +24,8 @@ import subprocess
 
 # Piglit modules
 from framework import core, grouptools, exceptions
-from framework.profile import Test, TestProfile
+from framework.profile import TestProfile
+from framework.test.base import Test, is_crash_returncode
 
 __all__ = [
     'DEQPBaseTest',
@@ -141,11 +142,10 @@ class DEQPBaseTest(Test):
         command = super(DEQPBaseTest, self).command
         return command + self.extra_args
 
-    def interpret_result(self):
-        if self.result.returncode != 0:
-            self.result.result = 'fail'
-            return
-
+    def __find_map(self):
+        """Run over the lines and set the result."""
+        # splitting this into a separate function allows us to return cleanly,
+        # otherwise this requires some break/else/continue madness
         for line in self.result.out.split('\n'):
             line = line.lstrip()
             for k, v in self.__RESULT_MAP.iteritems():
@@ -153,5 +153,14 @@ class DEQPBaseTest(Test):
                     self.result.result = v
                     return
 
+    def interpret_result(self):
+        if is_crash_returncode(self.result.returncode):
+            self.result.result = 'crash'
+        elif self.result.returncode != 0:
+            self.result.result = 'fail'
+        else:
+            self.__find_map()
+
         # We failed to parse the test output. Fallback to 'fail'.
-        self.result.result = 'fail'
+        if self.result.result == 'notrun':
+            self.result.result = 'fail'

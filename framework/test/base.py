@@ -46,6 +46,7 @@ __all__ = [
     'TestRunError',
     'ValgrindMixin',
     'WindowResizeMixin',
+    'is_crash_returncode',
 ]
 
 
@@ -111,7 +112,7 @@ class ProcessTimeout(threading.Thread):
         return self.status
 
 
-def _is_crash_returncode(returncode):
+def is_crash_returncode(returncode):
     """Determine whether the given process return code correspond to a
     crash.
     """
@@ -202,7 +203,7 @@ class Test(object):
     def interpret_result(self):
         """Convert the raw output of the test into a form piglit understands.
         """
-        if _is_crash_returncode(self.result.returncode):
+        if is_crash_returncode(self.result.returncode):
             # check if the process was terminated by the timeout
             if self.timeout > 0 and self.__proc_timeout.join() > 0:
                 self.result.result = 'timeout'
