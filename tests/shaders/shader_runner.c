@@ -3119,12 +3119,19 @@ piglit_init(int argc, char **argv)
 	if (piglit_get_gl_version() >= 32)
 		glGetIntegerv(GL_MAX_VERTEX_OUTPUT_COMPONENTS,
 			      &gl_max_vertex_output_components);
-	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
-		      &gl_max_fragment_uniform_components);
-	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
-		      &gl_max_vertex_uniform_components);
-	glGetIntegerv(GL_MAX_VARYING_COMPONENTS,
-		      &gl_max_varying_components);
+	if (piglit_get_gl_version() >= 20 ||
+	    piglit_is_extension_supported("GL_ARB_fragment_shader"))
+		glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
+			      &gl_max_fragment_uniform_components);
+	if (piglit_get_gl_version() >= 20 ||
+	    piglit_is_extension_supported("GL_ARB_vertex_shader"))
+		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
+			      &gl_max_vertex_uniform_components);
+	if (piglit_get_gl_version() >= 30 ||
+	    piglit_is_extension_supported("GL_ARB_geometry_shader4") ||
+	    piglit_is_extension_supported("GL_EXT_geometry_shader4"))
+		glGetIntegerv(GL_MAX_VARYING_COMPONENTS,
+			      &gl_max_varying_components);
 	glGetIntegerv(GL_MAX_CLIP_PLANES, &gl_max_clip_planes);
 #else
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,
