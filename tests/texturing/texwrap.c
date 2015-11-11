@@ -1134,7 +1134,7 @@ static GLboolean test_format_npot(const struct format_desc *format, GLboolean np
 		 * It has to be enabled on the command line.
 		 */
 		if (!texture_swizzle && !npot && !test_border_color && has_texture_swizzle) {
-			pass = pass && test_format_npot_swizzle(format, npot, 1);
+			pass = test_format_npot_swizzle(format, npot, 1) && pass;
 		}
 	}
 	return pass;
@@ -1149,7 +1149,7 @@ static GLboolean test_format(const struct format_desc *format)
 	} else {
 		pass = test_format_npot(format, 0);
 		if (has_npot && !test_border_color) {
-			pass = pass && test_format_npot(format, 1);
+			pass = test_format_npot(format, 1) && pass;
 		}
 	}
 	return pass;
@@ -1163,7 +1163,7 @@ enum piglit_result piglit_display()
 		pass = test_format(init_format ? init_format : &test->format[0]);
 	} else {
 		if (init_format) {
-			pass = pass && test_format(init_format);
+			pass = test_format(init_format) && pass;
 		} else {
 			int i;
 			for (i = 0; i < test->num_formats; i++) {
