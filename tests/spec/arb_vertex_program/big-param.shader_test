@@ -1,7 +1,6 @@
 [require]
 GL >= 1.3
 ARB_vertex_program
-ARB_fragment_program
 
 [vertex program]
 !!ARBvp1.0
@@ -26,11 +25,6 @@ MUL tmp2.x, tmp2.x, 256.0;
 FLR tmp3.z, tmp2.x;
 
 MUL result.color, tmp3, 0.00390625;
-END
-
-[fragment program]
-!!ARBfp1.0
-MOV result.color, fragment.color;
 END
 
 [test]
