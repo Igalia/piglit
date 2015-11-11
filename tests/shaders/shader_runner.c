@@ -3089,8 +3089,12 @@ piglit_display(void)
 	if (piglit_automatic) {
 	        free_subroutine_uniforms();
 		/* Free our resources, useful for valgrinding. */
-		glDeleteProgram(prog);
-		glUseProgram(0);
+		if (prog != 0) {
+			glDeleteProgram(prog);
+			glUseProgram(0);
+		} else {
+			glDeleteProgramsARB(1, &prog);
+		}
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
