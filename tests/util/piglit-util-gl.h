@@ -298,15 +298,6 @@ extern const GLenum cube_face_targets[6];
 	"DP4	oPos.z, mvp[2], iPos;\n"		\
 	"DP4	oPos.w, mvp[3], iPos;\n"
 
-/**
- * Handle to a generic fragment program that passes the input color to output
- *
- * \note
- * Either \c piglit_use_fragment_program or \c piglit_require_fragment_program
- * must be called before using this program handle.
- */
-extern GLint piglit_ARBfp_pass_through;
-
 static const GLint PIGLIT_ATTRIB_POS = 0;
 static const GLint PIGLIT_ATTRIB_TEX = 1;
 

@@ -1950,24 +1950,11 @@ bool piglit_probe_buffer_doubles(GLuint buf, GLenum target, const char *label,
 
 	return status;
 }
-GLint piglit_ARBfp_pass_through = 0;
 
 int piglit_use_fragment_program(void)
 {
-	static const char source[] =
-		"!!ARBfp1.0\n"
-		"MOV	result.color, fragment.color;\n"
-		"END\n"
-		;
-
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
-	if (!piglit_is_extension_supported("GL_ARB_fragment_program"))
-		return 0;
-
-	piglit_ARBfp_pass_through =
-		piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, source);
-
-	return (piglit_ARBfp_pass_through != 0);
+	return piglit_is_extension_supported("GL_ARB_fragment_program");
 }
 
 void piglit_require_fragment_program(void)
