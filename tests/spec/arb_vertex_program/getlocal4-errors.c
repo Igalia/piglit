@@ -64,8 +64,8 @@ piglit_init(int argc, char **argv)
 	prog = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, source);
 	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, prog);
 
-	glGetProgramiv(GL_VERTEX_PROGRAM_ARB,
-		       GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &max_local);
+	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,
+		          GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &max_local);
 
 	/* Check that an error is generated for going beyond max. */
 	glGetProgramLocalParameterfvARB(GL_VERTEX_PROGRAM_ARB, max_local,
