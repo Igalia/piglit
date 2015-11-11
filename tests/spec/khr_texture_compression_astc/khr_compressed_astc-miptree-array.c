@@ -238,7 +238,7 @@ piglit_init(int argc, char **argv)
 		"#version 300 es\n"
 		"precision highp float;\n"
 		"\n"
-		"uniform sampler2DArray tex;\n"
+		"uniform highp sampler2DArray tex;\n"
 		"uniform int index;\n"
 		"in vec2 tex_coord;\n"
 		"out vec4 fragment_color;\n"
