@@ -117,7 +117,6 @@ piglit_init(int argc, char **argv)
 	(void) argv;
 
 	piglit_require_vertex_program();
-	piglit_require_fragment_program();
 	piglit_require_extension("GL_NV_vertex_program2_option");
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -133,9 +132,7 @@ piglit_init(int argc, char **argv)
 						  shader_source);
 	}
 
-	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	glEnable(GL_VERTEX_PROGRAM_ARB);
-	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, piglit_ARBfp_pass_through);
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 }

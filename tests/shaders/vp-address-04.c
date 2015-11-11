@@ -233,7 +233,6 @@ piglit_init(int argc, char **argv)
 	(void) argv;
 
 	piglit_require_vertex_program();
-	piglit_require_fragment_program();
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,
@@ -274,9 +273,7 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	glEnable(GL_VERTEX_PROGRAM_ARB);
-	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, piglit_ARBfp_pass_through);
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 }
