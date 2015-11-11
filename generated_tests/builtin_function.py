@@ -1281,7 +1281,8 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
        floats+vecs+mats+ints+ivecs+uints+uvecs],
       template='{0};\n  result += {1}')
     # This can generate an overflow warning, this is expected
-    with warnings.catch_warnings(RuntimeWarning):
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning)
         f('op-assign-sub', 2, 110,
           lambda x, y: x - y, match_assignment_operators,
           [floats+vecs+mats+ints+ivecs+uints+uvecs,
@@ -1326,7 +1327,8 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
        floats+vecs+mats+ints+ivecs+uints+uvecs],
       template='({0} + {1})')
     # This can generate an overflow warning, this is expected
-    with warnings.catch_warnings(RuntimeWarning):
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning)
         f('op-sub', 2, 110, lambda x, y: x - y, match_simple_binop,
           [floats+vecs+mats+ints+ivecs+uints+uvecs,
            floats+vecs+mats+ints+ivecs+uints+uvecs],
