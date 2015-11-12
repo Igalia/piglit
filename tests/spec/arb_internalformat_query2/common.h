@@ -156,7 +156,10 @@ static const GLenum invalid_pnames[] = {
 
 /* From spec:
  *
- *  "<internalformats> that must be supported (in GL 4.2 or later)
+ *  "INTERNALFORMAT_SUPPORTED:
+ *  <skip>
+ *
+ * <internalformats> that must be supported (in GL 4.2 or later)
  *   include the following:
  *    - "sized internal formats" from Table 3.12, 3.13, and 3.15,
  *    - any specific "compressed internal format" from Table 3.14,
@@ -262,4 +265,38 @@ static const GLenum valid_internalformats[] = {
         GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT,
 };
 
+/* Generic callback type, doing a cast of params to void*, to avoid
+ * having two paths (32 and 64) for each check */
+typedef void (*GetInternalformat)(GLenum target, GLenum internalformat,
+                                  GLenum pname, GLsizei bufsize,
+                                  void *params);
+struct test_data {
+        /* int instead of a bool to make easier iterate on the
+         * possible values. */
+        int testing64;
+        int params_size;
+        void *params;
+        GetInternalformat callback;
+};
 
+void sync_test_data(struct test_data *data);
+
+void clean_test_data(struct test_data *data);
+
+bool check_supported(const GLenum target, const GLenum internalformat,
+                     struct test_data data);
+
+bool check_params_zero(struct test_data data);
+
+bool check_possible_values(struct test_data data,
+                           const GLint *possible_values,
+                           unsigned num_possible_values);
+
+bool try_basic(const GLenum *targets, unsigned num_targets,
+               const GLenum *internalformats, unsigned num_internalformats,
+               const GLenum pname,
+               const GLint *possible_values, unsigned num_possible_values,
+               struct test_data data);
+
+void print_failing_case(const GLenum target, const GLenum internalformat,
+                        const GLenum pname, struct test_data data);
