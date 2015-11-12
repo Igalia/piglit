@@ -3596,6 +3596,7 @@ with profile.group_manager(
     g(['arb_internalformat_query2-samples-pnames'], 'misc. SAMPLES and NUM_SAMPLE_COUNTS pname checks')
     g(['arb_internalformat_query2-internalformat-size-checks'], 'misc. All INTERNALFORMAT_<X>_SIZE pname checks')
     g(['arb_internalformat_query2-internalformat-type-checks'], 'misc. All INTERNALFORMAT_<X>_TYPE pname checks')
+    g(['arb_internalformat_query2-image-format-compatibility-type'], 'misc. IMAGE_FORMAT_COMPATIBILITY_TYPE pname check')
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
