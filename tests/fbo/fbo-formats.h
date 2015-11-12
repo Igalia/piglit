@@ -274,7 +274,7 @@ static const struct format_desc ext_texture_snorm[] = {
         FORMAT(GL_R8_SNORM, GL_RED),
         FORMAT(GL_RG_SNORM, GL_RG),
         FORMAT(GL_RG8_SNORM, GL_RG),
-        FORMAT(GL_RGB_SNORM, GL_RG),
+        FORMAT(GL_RGB_SNORM, GL_RGB),
         FORMAT(GL_RGB8_SNORM, GL_RGB),
         FORMAT(GL_RGBA_SNORM, GL_RGBA),
         FORMAT(GL_RGBA8_SNORM, GL_RGBA),
