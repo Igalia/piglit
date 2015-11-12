@@ -225,6 +225,119 @@ try_basic(const GLenum *targets, unsigned num_targets,
 }
 
 /*
+ * Builds a a texture using @target and @internalformat, and compares
+ * the result of calling GetTexLevelParameter using @pname with the
+ * result included at @data.params.
+ *
+ * Returns true if the value is the same, false otherwise
+ */
+bool
+check_params_against_get_tex_level_parameter(struct test_data data,
+                                             const GLenum target,
+                                             const GLenum pname,
+                                             const GLenum internalformat)
+{
+        GLint param;
+        bool result = true;
+        GLuint tex;
+        GLuint buffer;
+        GLint type = GL_UNSIGNED_BYTE;
+        GLint format = GL_RGBA;
+        unsigned i;
+        GLenum real_target = target;
+        int height = 16;
+        int width = 16;
+        int depth = 16;
+
+        glGenTextures(1, &tex);
+        glBindTexture(target, tex);
+
+        switch(target) {
+        case GL_TEXTURE_1D:
+                glTexImage1D(target, 0, internalformat, width, 0,
+                             format, type, NULL);
+                break;
+        case GL_TEXTURE_1D_ARRAY:
+        case GL_TEXTURE_2D:
+        case GL_TEXTURE_RECTANGLE:
+                glTexImage2D(target, 0, internalformat, width, height, 0,
+                             format, type, NULL);
+                break;
+        case GL_TEXTURE_CUBE_MAP:
+                /* GetTexLevelParameter receives one of the face
+                 * targets, or proxy */
+                real_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+                for (i = 0; i < 6; i++) {
+                        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                                     internalformat, width, height, 0, format, type,
+                                     NULL);
+                }
+                break;
+
+        case GL_TEXTURE_CUBE_MAP_ARRAY:
+                /* cube map arrays also use TexImage3D buth depth
+                 * needs to be a multiple of six */
+                depth = 6;
+        case GL_TEXTURE_2D_ARRAY:
+        case GL_TEXTURE_3D:
+                glTexImage3D(target, 0, internalformat, width, height, depth, 0,
+                             format, type, NULL);
+                break;
+        case GL_TEXTURE_2D_MULTISAMPLE:
+		glTexImage2DMultisample(target, 1, internalformat, width, height,
+                                        GL_FALSE);
+		break;
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+		glTexImage3DMultisample(target, 1, internalformat, width, height,
+                                        depth, GL_FALSE);
+		break;
+        case GL_TEXTURE_BUFFER:
+                glGenBuffers(1, &buffer);
+                glBindBuffer(GL_TEXTURE_BUFFER, buffer);
+                glTexBuffer(GL_TEXTURE_BUFFER, internalformat, buffer);
+                break;
+        default:
+                result = false;
+                fprintf(stderr, "\tError: %s is not a texture target\n",
+                        piglit_get_gl_enum_name(target));
+                goto cleanup;
+        }
+
+        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+                result = false;
+                fprintf(stderr, "\tError creating a texture with "
+                        "target %s, internalformat %s\n",
+                        piglit_get_gl_enum_name(target),
+                        piglit_get_gl_enum_name(internalformat));
+                goto cleanup;
+        }
+
+        glGetTexLevelParameteriv(real_target, 0, pname, &param);
+        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+                result = false;
+                fprintf(stderr, "\tError calling glGetTexLevelParameter\n");
+                goto cleanup;
+        }
+
+        if (data.testing64)
+                result = ((GLint64*)data.params)[0] == param;
+        else
+                result = ((GLint*)data.params)[0] == param;
+
+        if (!result) {
+                fprintf(stderr, "\tError comparing glGetInternalformat "
+                        "and glGetTexLevelParameter, params value=%i, "
+                        "expected value=%i\n",
+                        ((GLint*)data.params)[0], param);
+        }
+
+cleanup:
+        glDeleteTextures(1, &tex);
+        glDeleteBuffers(1, &buffer);
+        return result;
+}
+
+/*
  * Sets the value of @data params at @index to @value.
 */
 void

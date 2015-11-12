@@ -62,6 +62,20 @@ static const GLenum invalid_targets[] = {
 	GL_TEXTURE_RENDERBUFFER_NV,
 };
 
+static const GLenum texture_targets[] = {
+        GL_TEXTURE_1D,
+        GL_TEXTURE_1D_ARRAY,
+        GL_TEXTURE_2D,
+        GL_TEXTURE_2D_ARRAY,
+        GL_TEXTURE_3D,
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_CUBE_MAP_ARRAY,
+        GL_TEXTURE_RECTANGLE,
+        GL_TEXTURE_BUFFER,
+        GL_TEXTURE_2D_MULTISAMPLE,
+        GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+};
+
 static const GLenum valid_pnames[] = {
         GL_SAMPLES,
         GL_NUM_SAMPLE_COUNTS,
@@ -308,3 +322,8 @@ bool try_basic(const GLenum *targets, unsigned num_targets,
 
 void print_failing_case(const GLenum target, const GLenum internalformat,
                         const GLenum pname, struct test_data data);
+
+bool check_params_against_get_tex_level_parameter(struct test_data data,
+                                                  const GLenum target,
+                                                  const GLenum pname,
+                                                  const GLenum internalformat);
