@@ -100,6 +100,8 @@ piglit_display()
 			{ 1, 0, .5, 0 }
 		},
 	};
+	const bool have_ARB_texture_rg =
+		piglit_is_extension_supported("GL_ARB_texture_rg");
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -107,6 +109,9 @@ piglit_display()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	for (i = 0; i < ARRAY_SIZE(tests); i++) {
+		if (tests[i].depth_mode == GL_RED && !have_ARB_texture_rg)
+			continue;
+
 		glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE,
 				tests[i].depth_mode);
 		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA,
@@ -180,7 +185,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_EXT_texture_swizzle");
-	piglit_require_extension("GL_ARB_texture_rg");
 
 	setup_shaders();
 	setup_texture();
