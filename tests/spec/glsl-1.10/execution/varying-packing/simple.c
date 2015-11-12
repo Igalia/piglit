@@ -377,8 +377,8 @@ choose_varyings(struct varying_desc *varyings,
 		 = num_test_varyings / outer_dim_size;
 	unsigned num_extra_arrays = 0;
 	unsigned num_extra_varyings
-		= max_varying_floats
-		- num_test_varyings * components_in_test_type;
+		= (max_varying_floats -
+		   num_test_varyings * components_in_test_type) / element_size;
 	unsigned i;
 	if (array_type == ARRAYS_OF_ARRAYS) {
 		varyings[num_varyings].type = test_type;
