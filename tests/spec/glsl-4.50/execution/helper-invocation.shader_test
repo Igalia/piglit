@@ -1,0 +1,27 @@
+[require]
+GL >= 4.5
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 450
+out vec4 color;
+void main() {
+  float helper = float(gl_HelperInvocation);
+  color = vec4(abs(dFdxFine(helper)), abs(dFdyFine(helper)), helper, 1);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+# A single pixel being drawn, guaranteed that both the X and Y
+# derivatives will be 1.
+draw rect ortho 0 0 1 1
+probe rect rgba (0, 0, 1, 1) (1, 1, 0, 1)
+
+# A larger rect being drawn, check that the first 2x2 quad, all of
+# which is definitely going to be covered, actually ended up as all 0's
+draw rect ortho 2 2 10 10
+probe rect rgba (2, 2, 2, 2) (0, 0, 0, 1)
