@@ -279,6 +279,14 @@ struct test_data {
         GetInternalformat callback;
 };
 
+void set_params_at_index(struct test_data *data,
+                         unsigned index,
+                         GLint64 value);
+
+bool equal_at_index(struct test_data data,
+                    struct test_data data_copy,
+                    unsigned index);
+
 void sync_test_data(struct test_data *data);
 
 void clean_test_data(struct test_data *data);

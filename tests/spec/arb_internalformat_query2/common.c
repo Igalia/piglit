@@ -223,3 +223,49 @@ try_basic(const GLenum *targets, unsigned num_targets,
 
 	return pass;
 }
+
+/*
+ * Sets the value of @data params at @index to @value.
+*/
+void
+set_params_at_index(struct test_data *data,
+                    unsigned index,
+                    GLint64 value)
+{
+        if (index > data->params_size || index < 0) {
+                fprintf(stderr, "ERROR: invalid index while setting"
+                        " auxiliar test data\n");
+                return;
+        }
+
+        if (data->testing64) {
+                ((GLint64*)data->params)[index] = value;
+        } else {
+                ((GLint*)data->params)[index] = value;
+        }
+}
+
+bool equal_at_index(struct test_data data,
+                    struct test_data data_copy,
+                    unsigned index)
+{
+        if (data.testing64 != data_copy.testing64) {
+                fprintf(stderr, "ERROR: trying to compare imcompatible"
+                        " auxiliar test data structures\n");
+                return false;
+        }
+        if (data.params_size != data_copy.params_size) {
+                fprintf(stderr, "ERROR: trying to compare imcompatible"
+                        " auxiliar test data structures\n");
+                return false;
+        }
+        if (index > data.params_size || index < 0) {
+                fprintf(stderr, "ERROR: invalid index while setting"
+                        " auxiliar test data\n");
+                return false;
+        }
+
+        return (data.testing64 ?
+                ((GLint64*)data.params)[index] == ((GLint64*)data_copy.params)[index] :
+                ((GLint*)data.params)[index] == ((GLint*)data_copy.params)[index]);
+}
