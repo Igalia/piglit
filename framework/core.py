@@ -117,17 +117,13 @@ def get_config(arg=None):
 
 # Ensure the given directory exists
 def checkDir(dirname, failifexists):
-    exists = True
     try:
         os.stat(dirname)
     except OSError as e:
-        if e.errno in [errno.ENOENT, errno.ENOTDIR]:
-            exists = False
-
-    if exists and failifexists:
-        print("%(dirname)s exists already.\nUse --overwrite if "
-              "you want to overwrite it.\n" % locals(), file=sys.stderr)
-        exit(1)
+        if e.errno not in [errno.ENOENT, errno.ENOTDIR] and failifexists:
+            print("%(dirname)s exists already.\nUse --overwrite if "
+                  "you want to overwrite it.\n" % locals(), file=sys.stderr)
+            exit(1)
 
     try:
         os.makedirs(dirname)
