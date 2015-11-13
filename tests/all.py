@@ -2708,6 +2708,7 @@ with profile.group_manager(
     g(['fbo-srgb-blit'])
     g(['fbo-sys-blit'], run_concurrent=False)
     g(['fbo-sys-sub-blit'], run_concurrent=False)
+    g(['fbo-generatemipmap-versus-READ_FRAMEBUFFER'])
 
 with profile.group_manager(
         PiglitGLTest,
