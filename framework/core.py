@@ -121,7 +121,7 @@ def checkDir(dirname, failifexists):
     try:
         os.stat(dirname)
     except OSError as e:
-        if e.errno == errno.ENOENT or e.errno == errno.ENOTDIR:
+        if e.errno in [errno.ENOENT, errno.ENOTDIR]:
             exists = False
 
     if exists and failifexists:
