@@ -115,7 +115,7 @@ def get_config(arg=None):
 
 
 # Ensure the given directory exists
-def check_dir(dirname, failifexists):
+def check_dir(dirname, failifexists=False):
     try:
         os.stat(dirname)
     except OSError as e:
