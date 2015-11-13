@@ -101,7 +101,13 @@ def html(input_):
         shutil.rmtree(args.summaryDir)
 
     # If the requested directory doesn't exist, create it or throw an error
-    core.checkDir(args.summaryDir, not args.overwrite)
+    try:
+        core.checkDir(args.summaryDir, not args.overwrite)
+    except exceptions.PiglitException:
+        raise exceptions.PiglitFatalError(
+            '{} already exists.\n'
+            'use -o/--overwrite if you want to overwrite it.'.format(
+                args.summaryDir))
 
     # Merge args.list and args.resultsFiles
     if args.list:

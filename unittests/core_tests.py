@@ -278,7 +278,7 @@ class TestPiglitConfig(object):
 
 
 @utils.capture_stderr
-@nt.raises(exceptions.PiglitFatalError)
+@nt.raises(exceptions.PiglitException)
 def test_check_dir_exists_fail():
     """core.check_dir: if the directory exists and failifexsits is True fail"""
     with mock.patch('framework.core.os.stat', mock.Mock(side_effect=OSError)):

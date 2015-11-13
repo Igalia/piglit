@@ -120,9 +120,7 @@ def checkDir(dirname, failifexists):
         os.stat(dirname)
     except OSError as e:
         if e.errno not in [errno.ENOENT, errno.ENOTDIR] and failifexists:
-            raise exceptions.PiglitFatalError(
-                "%(dirname)s exists already.\nUse --overwrite if "
-                "you want to overwrite it.\n" % locals())
+            raise exceptions.PiglitException
 
     try:
         if not os.path.exists(dirname):
