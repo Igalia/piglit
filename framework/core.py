@@ -28,7 +28,6 @@ from __future__ import (
 import errno
 import os
 import subprocess
-import sys
 
 from six.moves import configparser
 
@@ -121,9 +120,9 @@ def checkDir(dirname, failifexists):
         os.stat(dirname)
     except OSError as e:
         if e.errno not in [errno.ENOENT, errno.ENOTDIR] and failifexists:
-            print("%(dirname)s exists already.\nUse --overwrite if "
-                  "you want to overwrite it.\n" % locals(), file=sys.stderr)
-            exit(1)
+            raise exceptions.PiglitFatalError(
+                "%(dirname)s exists already.\nUse --overwrite if "
+                "you want to overwrite it.\n" % locals())
 
     try:
         if not os.path.exists(dirname):
