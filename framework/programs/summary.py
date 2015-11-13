@@ -102,7 +102,7 @@ def html(input_):
 
     # If the requested directory doesn't exist, create it or throw an error
     try:
-        core.checkDir(args.summaryDir, not args.overwrite)
+        core.check_dir(args.summaryDir, not args.overwrite)
     except exceptions.PiglitException:
         raise exceptions.PiglitFatalError(
             '{} already exists.\n'

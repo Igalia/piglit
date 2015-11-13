@@ -282,7 +282,7 @@ class TestPiglitConfig(object):
 def test_check_dir_exists_fail():
     """core.check_dir: if the directory exists and failifexsits is True fail"""
     with mock.patch('framework.core.os.stat', mock.Mock(side_effect=OSError)):
-        core.checkDir('foo', True)
+        core.check_dir('foo', True)
 
 
 def test_check_dir_stat_ENOENT():
@@ -290,7 +290,7 @@ def test_check_dir_stat_ENOENT():
     with mock.patch('framework.core.os.stat',
                     mock.Mock(side_effect=OSError('foo', errno.ENOENT))):
         with mock.patch('framework.core.os.makedirs') as makedirs:
-            core.checkDir('foo', False)
+            core.check_dir('foo', False)
             nt.eq_(makedirs.called, 1)
 
 
@@ -299,7 +299,7 @@ def test_check_dir_stat_ENOTDIR():
     with mock.patch('framework.core.os.stat',
                     mock.Mock(side_effect=OSError('foo', errno.ENOTDIR))):
         with mock.patch('framework.core.os.makedirs') as makedirs:
-            core.checkDir('foo', False)
+            core.check_dir('foo', False)
             nt.eq_(makedirs.called, 1)
 
 
@@ -309,7 +309,7 @@ def test_check_dir_makedirs_pass():
     with mock.patch('framework.core.os.stat', mock.Mock()):
         with mock.patch('framework.core.os.makedirs',
                         mock.Mock(side_effect=OSError(errno.EEXIST, 'foo'))):
-            core.checkDir('foo', False)
+            core.check_dir('foo', False)
 
 
 @nt.raises(OSError)
@@ -320,4 +320,4 @@ def test_check_dir_makedirs_fail():
                         mock.Mock(return_value=False)):
             with mock.patch('framework.core.os.makedirs',
                             mock.Mock(side_effect=OSError)):
-                core.checkDir('foo', False)
+                core.check_dir('foo', False)
