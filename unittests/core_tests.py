@@ -316,6 +316,8 @@ def test_check_dir_makedirs_pass():
 def test_check_dir_makedirs_fail():
     """core.check_dir: If makedirs fails with any other raise"""
     with mock.patch('framework.core.os.stat', mock.Mock()):
-        with mock.patch('framework.core.os.makedirs',
-                        mock.Mock(side_effect=OSError)):
-            core.checkDir('foo', False)
+        with mock.patch('framework.core.os.path.exists',
+                        mock.Mock(return_value=False)):
+            with mock.patch('framework.core.os.makedirs',
+                            mock.Mock(side_effect=OSError)):
+                core.checkDir('foo', False)

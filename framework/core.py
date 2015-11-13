@@ -126,7 +126,8 @@ def checkDir(dirname, failifexists):
             exit(1)
 
     try:
-        os.makedirs(dirname)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
