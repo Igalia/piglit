@@ -24,10 +24,19 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import collections
+import errno
 import functools
 import os
 import shutil
 import textwrap
+
+# There is a very high potential that one of these will raise an ImportError
+# pylint: disable=import-error
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+# pylint: enable=import-error
 
 import nose.tools as nt
 import six
@@ -266,3 +275,47 @@ class TestPiglitConfig(object):
     def test_safe_get_fallback(self):
         """core.PiglitConfig: safe_get returns the value of fallback when the section or option is missing"""
         nt.eq_(self.conf.safe_get('invalid', 'invalid', fallback='foo'), 'foo')
+
+
+@utils.capture_stderr
+@nt.raises(SystemExit)
+def test_check_dir_exists_fail():
+    """core.check_dir: if the directory exists and failifexsits is True fail"""
+    with mock.patch('framework.core.os.stat', mock.Mock(side_effect=OSError)):
+        core.checkDir('foo', True)
+
+
+def test_check_dir_stat_ENOENT():
+    """core.check_dir: if the directory exists (ENOENT) and failifexsits is False continue"""
+    with mock.patch('framework.core.os.stat',
+                    mock.Mock(side_effect=OSError('foo', errno.ENOENT))):
+        with mock.patch('framework.core.os.makedirs') as makedirs:
+            core.checkDir('foo', False)
+            nt.eq_(makedirs.called, 1)
+
+
+def test_check_dir_stat_ENOTDIR():
+    """core.check_dir: if the directory exists (ENOTDIR) and failifexsits is False continue"""
+    with mock.patch('framework.core.os.stat',
+                    mock.Mock(side_effect=OSError('foo', errno.ENOTDIR))):
+        with mock.patch('framework.core.os.makedirs') as makedirs:
+            core.checkDir('foo', False)
+            nt.eq_(makedirs.called, 1)
+
+
+@utils.not_raises(OSError)
+def test_check_dir_makedirs_pass():
+    """core.check_dir: If makedirs fails with EEXIST pass"""
+    with mock.patch('framework.core.os.stat', mock.Mock()):
+        with mock.patch('framework.core.os.makedirs',
+                        mock.Mock(side_effect=OSError(errno.EEXIST, 'foo'))):
+            core.checkDir('foo', False)
+
+
+@nt.raises(OSError)
+def test_check_dir_makedirs_fail():
+    """core.check_dir: If makedirs fails with any other raise"""
+    with mock.patch('framework.core.os.stat', mock.Mock()):
+        with mock.patch('framework.core.os.makedirs',
+                        mock.Mock(side_effect=OSError)):
+            core.checkDir('foo', False)
