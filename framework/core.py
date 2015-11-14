@@ -114,8 +114,24 @@ def get_config(arg=None):
                 pass
 
 
-# Ensure the given directory exists
 def check_dir(dirname, failifexists=False):
+    """Check for the existance of a directory and create it if possible.
+
+    This function will check for the existance of a directory. If that
+    directory doesn't exist it will try to create it. If the directory does
+    exist than it does one of two things.
+    1) If "failifexists" is False (default): it will just return
+    2) If "failifexists" is True it will raise an PiglitException, it is the
+    job of the caller using failifexists=True to handle this exception
+
+    Arguments:
+    dirname -- the name of the directory to check
+
+    Keyword Arguments:
+    failifexists -- If True and the directory exists then PiglitException will
+                    be raised (default: False)
+
+    """
     try:
         os.stat(dirname)
     except OSError as e:
