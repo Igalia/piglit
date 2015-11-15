@@ -41,19 +41,23 @@ __all__ = [
 def get_test_section_name(test):
     return 'oclconform-{}'.format(test)
 
-class OCLConform(Test):
 
+class OCLConform(Test):
     def interpret_result(self):
         if self.result.returncode != 0 or 'FAIL' in self.result.out:
             self.result.result = 'fail'
         else:
             self.result.result = 'pass'
 
+
 def add_sub_test(profile, test_name, subtest_name, subtest):
-    profile.test_list[grouptools.join('oclconform', test_name, subtest_name)] = subtest
+    profile.test_list[grouptools.join('oclconform', test_name,
+                                      subtest_name)] = subtest
+
 
 def add_test(profile, test_name, test):
     profile.test_list[grouptools.join('oclconform', test_name)] = test
+
 
 def add_oclconform_tests(profile):
     section_name = 'oclconform'
@@ -68,30 +72,37 @@ def add_oclconform_tests(profile):
     for test in tests:
         test_section_name = get_test_section_name(test)
         if not PIGLIT_CONFIG.has_section(test_section_name):
-            print("Warning: no section defined for {}".format(test), file=stderr)
+            print("Warning: no section defined for {}".format(test),
+                  file=stderr)
             continue
 
         test_name = PIGLIT_CONFIG.get(test_section_name, 'test_name')
-        should_run_concurrent = PIGLIT_CONFIG.has_option(test_section_name, 'concurrent')
+        should_run_concurrent = PIGLIT_CONFIG.has_option(test_section_name,
+                                                         'concurrent')
         if PIGLIT_CONFIG.has_option(test_section_name, 'list_subtests'):
-            list_tests = PIGLIT_CONFIG.get(test_section_name, 'list_subtests')
-            subtest_regex = PIGLIT_CONFIG.get(test_section_name, 'subtest_regex')
+            list_tests = PIGLIT_CONFIG.get(test_section_name,
+                                           'list_subtests')
+            subtest_regex = PIGLIT_CONFIG.get(test_section_name,
+                                              'subtest_regex')
             subtest_regex.encode('string_escape')
             run_subtests = PIGLIT_CONFIG.get(test_section_name, 'run_subtest')
-            list_tests =list_tests.split()
+            list_tests = list_tests.split()
 
-            subtests = subprocess.check_output(args=list_tests, cwd=bindir).split('\n')
+            subtests = subprocess.check_output(args=list_tests,
+                                               cwd=bindir).split('\n')
             for subtest in subtests:
                 m = re.match(subtest_regex, subtest)
                 if not m:
                     continue
                 subtest = m.group(1)
-                subtest_command = join(bindir, run_subtests.replace('<subtest>', subtest))
+                subtest_command = join(bindir,
+                                       run_subtests.replace('<subtest>',
+                                                            subtest))
                 add_sub_test(profile, test_name, subtest,
-		             OCLConform(command=subtest_command.split(),
-			                run_concurrent=should_run_concurrent))
+                             OCLConform(command=subtest_command.split(),
+                                        run_concurrent=should_run_concurrent))
         else:
             run_test = PIGLIT_CONFIG.get(test_section_name, 'run_test')
-            add_test(profile, test_name, OCLConform(command=run_test.split(),
-	                                            run_concurrent=should_run_concurrent))
-
+            add_test(profile, test_name,
+                     OCLConform(command=run_test.split(),
+                                run_concurrent=should_run_concurrent))
