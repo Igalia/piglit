@@ -158,6 +158,50 @@ static const GLenum pnames_zero_check[] = {
         GL_MAX_COMBINED_DIMENSIONS,
 };
 
+
+/* From query2 spec:
+ *
+ * "TEXTURE_IMAGE_FORMAT:
+ * <skip>
+ * Possible values include any value that is legal to pass for the
+ * <format> parameter to the Tex*Image*D commands, or NONE if the
+ * resource is not supported for this operation."
+ *
+ * From 4.2 core spec:
+ * "TexImage3D
+ * <skip>
+ * format, type, and data specify the format of the image data, the
+ * type of those data, and a reference to the image data in the cur-
+ * rently bound pixel unpack buffer or client memory, as described in
+ * section 3.7.2. The format STENCIL_INDEX is not allowed."
+ *
+ * This is basically Table 3.3 (defined at section 3.7.2) minus
+ * STENCIL_INDEX.
+ */
+static GLint possible_values_texture_image_format[] = {
+        /* Table 3.3 minus STENCIL_INDEX */
+        GL_DEPTH_COMPONENT,
+        GL_DEPTH_STENCIL,
+        GL_RED,
+        GL_GREEN,
+        GL_BLUE,
+        GL_RG,
+        GL_RGB,
+        GL_RGBA,
+        GL_BGR,
+        GL_BGRA,
+        GL_RED_INTEGER,
+        GL_GREEN_INTEGER,
+        GL_BLUE_INTEGER,
+        GL_RG_INTEGER,
+        GL_RGB_INTEGER,
+        GL_RGBA_INTEGER,
+        GL_BGR_INTEGER,
+        GL_BGRA_INTEGER,
+        /* GL_NONE from query2 TEXTURE_IMAGE_FORMAT spec */
+        GL_NONE
+};
+
 enum piglit_result
 piglit_display(void)
 {
@@ -247,6 +291,11 @@ piglit_init(int argc, char **argv)
 
         pass = check_basic(pnames_zero_check, ARRAY_SIZE(pnames_zero_check),
                            NULL, 0)
+                && pass;
+
+        pname = GL_TEXTURE_IMAGE_FORMAT;
+        pass = check_basic(&pname, 1, possible_values_texture_image_format,
+                           ARRAY_SIZE(possible_values_texture_image_format))
                 && pass;
 
         piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
