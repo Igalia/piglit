@@ -276,17 +276,12 @@ are_formats_compatible(struct texture_format *f1, struct texture_format *f2)
 	if (!f1->can_be_reinterpreted || !f2->can_be_reinterpreted)
 		return false;
 
-	if (is_format_compressed(f1)) {
-		if (is_format_compressed(f2))
-			/* Compressed-to-compressed copies are not supported */
-			return false;
-
-		return f1->bytes == f2->bytes;
-	} else if (is_format_compressed(f2)) {
-		return f1->bytes == f2->bytes;
-	} else {
-		return f1->bytes == f2->bytes;
+	if (is_format_compressed(f1) && is_format_compressed(f2)) {
+		/* Compressed-to-compressed copies are not supported */
+		return false;
 	}
+
+	return f1->bytes == f2->bytes;
 }
 
 static const float green[3] = {0.0, 1.0, 0.0};
