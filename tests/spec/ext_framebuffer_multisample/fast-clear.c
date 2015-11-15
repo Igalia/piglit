@@ -273,6 +273,10 @@ test_format(const struct format_desc *format)
 		type_param = GL_TEXTURE_RED_TYPE;
 	else if (a_size > 0)
 		type_param = GL_TEXTURE_ALPHA_TYPE;
+	else {
+		assert(0);
+		type_param = GL_NONE;
+	}
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE,
 				 0, /* level */
 				 type_param,
