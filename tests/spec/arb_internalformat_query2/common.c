@@ -382,3 +382,25 @@ bool equal_at_index(struct test_data data,
                 ((GLint64*)data.params)[index] == ((GLint64*)data_copy.params)[index] :
                 ((GLint*)data.params)[index] == ((GLint*)data_copy.params)[index]);
 }
+
+/*
+ * Code readibility utility method that returns the value of
+ * params[index] as a GLint. This is only correct for tests which the
+ * returned value can be stored on a GLint, like GL_NUM_SAMPLES or
+ * GL_SAMPLES.
+ *
+ */
+GLint
+get_params_at_index(struct test_data data,
+                    unsigned index)
+{
+        if (index > data.params_size || index < 0) {
+                fprintf(stderr, "ERROR: invalid index while retrieving"
+                        " data from auxiliar test data\n");
+                return -1;
+        }
+
+        return data.testing64 ?
+                ((GLint64*)data.params)[index] :
+                ((GLint*)data.params)[index];
+}

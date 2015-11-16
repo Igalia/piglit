@@ -301,6 +301,9 @@ bool equal_at_index(struct test_data data,
                     struct test_data data_copy,
                     unsigned index);
 
+GLint get_params_at_index(struct test_data data,
+                          unsigned index);
+
 void sync_test_data(struct test_data *data);
 
 void clean_test_data(struct test_data *data);
