@@ -3599,6 +3599,7 @@ with profile.group_manager(
     g(['arb_internalformat_query2-image-format-compatibility-type'], 'misc. IMAGE_FORMAT_COMPATIBILITY_TYPE pname check')
     g(['arb_internalformat_query2-dimensions'], 'misc. dimensions related pname checks')
     g(['arb_internalformat_query2-color-encoding'], 'misc. COLOR_ENCODING pname check')
+    g(['arb_internalformat_query2-texture-compressed-block'], 'misc. All TEXTURE_COMPRESSED_BLOCK_<X> pname checks')
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
