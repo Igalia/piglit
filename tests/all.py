@@ -2161,6 +2161,8 @@ with profile.group_manager(
       'Rendezvous by name')
     g(['arb_separate_shader_object-rendezvous_by_name_interpolation'],
       'Rendezvous by name with multiple interpolation qualifier')
+    g(['arb_separate_shader_object-mixed_explicit_and_non_explicit_locations'],
+      'Mixed explicit and non-explicit locations')
     g(['arb_separate_shader_object-rendezvous_by_location', '-fbo'],
       'Rendezvous by location', run_concurrent=False)
     g(['arb_separate_shader_object-rendezvous_by_location-5-stages'],
