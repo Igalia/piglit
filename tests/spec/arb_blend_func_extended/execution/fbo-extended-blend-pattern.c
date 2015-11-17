@@ -48,7 +48,13 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
    config.supports_gl_compat_version = 30;
+#elif PIGLIT_USE_OPENGL_ES3
+   config.supports_gl_es_version = 30;
+#else // PIGLIT_USE_OPENGL_ES2
+   config.supports_gl_es_version = 20;
+#endif
    config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -57,10 +63,12 @@ static const char *TestName = "fbo-extended-blend-pattern";
 
 static GLint uniform_src0, uniform_src1, uniform_src2;
 
+#ifdef PIGLIT_USE_OPENGL
 static const char *vs_text =
    "#version 130\n"
+   "in vec4 piglit_vertex;\n"
    "void main() {\n"
-   "  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+   "  gl_Position = piglit_vertex;\n"
    "}\n"
    ;
 
@@ -83,6 +91,64 @@ static const char *fs_text =
    "      col1 = src2;\n"
    "}\n"
    ;
+#elif PIGLIT_USE_OPENGL_ES3
+static const char *vs_text =
+   "#version 300 es\n"
+   "in vec4 piglit_vertex;\n"
+   "void main() {\n"
+   "  gl_Position = piglit_vertex;\n"
+   "}\n"
+   ;
+
+static const char *fs_text =
+   "#version 300 es\n"
+   "#extension GL_EXT_blend_func_extended : enable\n"
+   "precision highp float;\n"
+   "uniform vec4 src0;\n"
+   "uniform vec4 src1;\n"
+   "uniform vec4 src2;\n"
+   "layout(location = 0, index = 0) out vec4 col0;\n"
+   "layout(location = 0, index = 1) out vec4 col1;\n"
+   "void main() {\n"
+   "   int a = int(gl_FragCoord.x) / 10;\n"
+   "   int b = int(gl_FragCoord.y) / 10;\n"
+   "   int c = int(mod(a + b, 2));\n"
+   "   col0 = src0;\n"
+   "   if (c == 0)\n"
+   "      col1 = src1;\n"
+   "   else\n"
+   "      col1 = src2;\n"
+   "}\n"
+   ;
+#else // PIGLIT_USE_OPENGL_ES2
+static const char *vs_text =
+   "#version 100\n"
+   "attribute vec4 piglit_vertex;\n"
+   "void main() {\n"
+   "  gl_Position = piglit_vertex;\n"
+   "}\n"
+   ;
+
+static const char *fs_text =
+   "#version 100\n"
+   "#extension GL_EXT_blend_func_extended : enable\n"
+   "precision highp float;\n"
+   "uniform vec4 src0;\n"
+   "uniform vec4 src1;\n"
+   "uniform vec4 src2;\n"
+   "void main() {\n"
+   "   float a = floor(gl_FragCoord.x / 10.0);\n"
+   "   float b = floor(gl_FragCoord.y / 10.0);\n"
+   "   float c = floor(mod(a + b, 2.0));\n"
+   "   gl_FragColor = src0;\n"
+   "   if (c == 0.0)\n"
+   "      gl_SecondaryFragColorEXT = src1;\n"
+   "   else\n"
+   "      gl_SecondaryFragColorEXT = src2;\n"
+   "}\n"
+   ;
+
+#endif
 
 static void
 check_error(int line)
@@ -98,13 +164,13 @@ static void
 blend(const float *src, const float *src1, const float *src2, const float *dst)
 {
    glUniform4fv(uniform_src0, 1, dst);
-   piglit_draw_rect(0, 0, piglit_width, piglit_height);
+   piglit_draw_rect(-1, -1, 2, 2);
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_COLOR, GL_SRC1_COLOR);
    glUniform4fv(uniform_src0, 1, src);
    glUniform4fv(uniform_src1, 1, src1);
    glUniform4fv(uniform_src2, 1, src2);
-   piglit_draw_rect(0, 0, piglit_width, piglit_height);
+   piglit_draw_rect(-1, -1, 2, 2);
    glDisable(GL_BLEND);
    glFinish();
 }
@@ -148,7 +214,10 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+#ifdef PIGLIT_USE_OPENGL
    piglit_require_extension("GL_ARB_blend_func_extended");
    piglit_require_extension("GL_ARB_explicit_attrib_location");
-   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+#else // PIGLIT_USE_OPENGL_ES{2, 3}
+   piglit_require_extension("GL_EXT_blend_func_extended");
+#endif
 }

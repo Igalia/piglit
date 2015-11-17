@@ -1,0 +1,6 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable (arb_blend_func_extended-fbo-extended-blend_${piglit_target_api} fbo-extended-blend.c)
+piglit_add_executable (arb_blend_func_extended-fbo-extended-blend-explicit_${piglit_target_api} fbo-extended-blend-explicit.c)
+piglit_add_executable (arb_blend_func_extended-fbo-extended-blend-pattern_${piglit_target_api} fbo-extended-blend-pattern.c)
+# vim: ft=cmake:

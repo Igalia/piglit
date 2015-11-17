@@ -1,0 +1,5 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable (arb_blend_func_extended-blend-api_${piglit_target_api} blend-api.c)
+piglit_add_executable (arb_blend_func_extended-builtins_${piglit_target_api} builtins.c)
+# vim: ft=cmake:

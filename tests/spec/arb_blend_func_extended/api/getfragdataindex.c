@@ -30,11 +30,16 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 10;
+#else // PIGLIT_USE_OPENGL_ES3
+	config.supports_gl_es_version = 30;
+#endif
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#ifdef PIGLIT_USE_OPENGL
 static const char *vs_text =
 	"#version 130\n"
 	"in vec4 vertex;\n"
@@ -51,6 +56,25 @@ static const char *fs_text =
 	"    a[1] = vec4(2.0);\n"
 	"}\n"
 	;
+#else // PIGLIT_USE_OPENGL_ES3
+static const char *vs_text =
+	"#version 300 es\n"
+	"in vec4 vertex;\n"
+	"void main() { gl_Position = vertex; }\n"
+	;
+
+static const char *fs_text =
+	"#version 300 es\n"
+	"#extension GL_EXT_blend_func_extended : enable\n"
+	"out highp vec4 v;\n"
+	"out highp vec4 a[2];\n"
+	"void main() {\n"
+	"    v = vec4(0.0);\n"
+	"    a[0] = vec4(1.0);\n"
+	"    a[1] = vec4(2.0);\n"
+	"}\n"
+	;
+#endif
 
 enum piglit_result
 piglit_display(void)
@@ -66,8 +90,12 @@ void piglit_init(int argc, char **argv)
 	GLuint fs;
 	GLint idx;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_gl_version(30);
 	piglit_require_extension("GL_ARB_blend_func_extended");
+#else // PIGLIT_USE_OPENGL_ES3
+	piglit_require_extension("GL_EXT_blend_func_extended");
+#endif
 
 	/* This test needs some number of draw buffers, so make sure the
 	 * implementation isn't broken.  This enables the test to generate a
@@ -84,7 +112,7 @@ void piglit_init(int argc, char **argv)
 	glGetIntegerv(GL_MAX_DUAL_SOURCE_DRAW_BUFFERS, &max_dual_source);
 	if (max_dual_source < 1) {
 		fprintf(stderr,
-			"ARB_blend_func_extended requires GL_MAX_DUAL_SOURCE_DRAW_BUFFERS >= 1.  "
+			"blend_func_extended requires GL_MAX_DUAL_SOURCE_DRAW_BUFFERS >= 1.  "
 			"Only got %d!\n",
 			max_dual_source);
 		piglit_report_result(PIGLIT_FAIL);
@@ -105,7 +133,11 @@ void piglit_init(int argc, char **argv)
 	 *     or if an error occurs, -1 will be returned."
 	 */
 	printf("Querying index before linking...\n");
+#ifdef PIGLIT_USE_OPENGL
 	idx = glGetFragDataIndex(prog, "v");
+#else // PIGLIT_USE_OPENGLES3
+	idx = glGetFragDataIndexEXT(prog, "v");
+#endif
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
 
@@ -123,7 +155,11 @@ void piglit_init(int argc, char **argv)
 	}
 
 	printf("Querying index of nonexistent variable...\n");
+#ifdef PIGLIT_USE_OPENGL
 	idx = glGetFragDataIndex(prog, "waldo");
+#else // PIGLIT_USE_OPENGLES3
+	idx = glGetFragDataIndexEXT(prog, "waldo");
+#endif
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 

@@ -30,11 +30,16 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_core_version = 31;
+#else // PIGLIT_USE_OPENGLES3
+	config.supports_gl_es_version = 30;
+#endif
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#ifdef PIGLIT_USE_OPENGL
 static const char *vs_text =
 	"#version 150\n"
 	"in vec4 vertex;\n"
@@ -51,6 +56,24 @@ static const char *fs_template =
 	"    b = vec4(1.0);\n"
 	"}\n"
 	;
+#else // PIGLIT_USE_OPENGLES3
+static const char *vs_text =
+	"#version 300 es\n"
+	"in vec4 vertex;\n"
+	"void main() { gl_Position = vertex; }\n"
+	;
+
+static const char *fs_template =
+	"#version 300 es\n"
+	"#extension GL_EXT_blend_func_extended : enable\n"
+	"layout(location = 0, index = 0) out highp vec4 a;\n"
+	"layout(location = %d, index = 1) out highp vec4 b;\n"
+	"void main() {\n"
+	"    a = vec4(0.0);\n"
+	"    b = vec4(1.0);\n"
+	"}\n"
+	;
+#endif
 
 enum piglit_result
 piglit_display(void)
@@ -64,8 +87,12 @@ void piglit_init(int argc, char **argv)
 	GLuint prog;
 	char fs_text[256];
 
-	piglit_require_extension("GL_ARB_blend_func_extended");
 
+#ifdef PIGLIT_USE_OPENGL
+	piglit_require_extension("GL_ARB_blend_func_extended");
+#else // PIGLIT_USE_OPENGLES3
+	piglit_require_extension("GL_EXT_blend_func_extended");
+#endif
 	glGetIntegerv(GL_MAX_DUAL_SOURCE_DRAW_BUFFERS, &max_dual_source);
 
 	if (max_dual_source < 1) {

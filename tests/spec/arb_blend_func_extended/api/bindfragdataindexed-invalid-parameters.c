@@ -31,7 +31,11 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 10;
+#else // PIGLIT_USE_OPENGLES3
+	config.supports_gl_es_version = 30;
+#endif
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -47,8 +51,12 @@ void piglit_init(int argc, char **argv)
 	GLint max_draw_buffers, max_dual_source;
 	GLuint prog;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_gl_version(30);
 	piglit_require_extension("GL_ARB_blend_func_extended");
+#else // PIGLIT_USE_OPENGLES3
+	piglit_require_extension("GL_EXT_blend_func_extended");
+#endif
 
 	glGetIntegerv(GL_MAX_DRAW_BUFFERS, &max_draw_buffers);
 	glGetIntegerv(GL_MAX_DUAL_SOURCE_DRAW_BUFFERS, &max_dual_source);

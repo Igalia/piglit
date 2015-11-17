@@ -39,7 +39,11 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 30;
+#else // PIGLIT_USE_OPENGL_ES3
+	config.supports_gl_es_version = 30;
+#endif
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -92,13 +96,13 @@ static void blend(const float *src, const float *src1, const float *dst,
 		  GLenum blendsrc, GLenum blenddst, GLenum blendop)
 {
 	glUniform4fv(uniform_src0, 1, dst);
-	piglit_draw_rect(0, 0, piglit_width, piglit_height);
+	piglit_draw_rect(-1, -1, 2, 2);
 	glEnable(GL_BLEND);
 	glBlendEquation(blendop);
 	glBlendFunc(blendsrc, blenddst);
 	glUniform4fv(uniform_src0, 1, src);
 	glUniform4fv(uniform_src1, 1, src1);
-	piglit_draw_rect(0, 0, piglit_width, piglit_height);
+	piglit_draw_rect(-1, -1, 2, 2);
 	glDisable(GL_BLEND);
 }
 
@@ -200,11 +204,12 @@ static void blend_expected(float *expected, const float *src, const float *src1,
 	}
 }
 
+#ifdef PIGLIT_USE_OPENGL
 static const char *vs_text =
 	"#version 130\n"
+	"in vec4 piglit_vertex;\n"
 	"void main() {\n"
-	"        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-	"        gl_FrontColor = gl_Color;\n"
+	"        gl_Position = piglit_vertex;\n"
 	"}\n"
 	;
 
@@ -219,6 +224,28 @@ static const char *fs_text =
 	"        col1 = src1;\n"
 	"}\n"
 	;
+#else // PIGLIT_USE_OPENGL_ES3
+static const char *vs_text =
+	"#version 300 es\n"
+	"in vec4 piglit_vertex;\n"
+	"void main() {\n"
+	"        gl_Position = piglit_vertex;\n"
+	"}\n"
+	;
+
+static const char *fs_text =
+	"#version 300 es\n"
+	"#extension GL_EXT_blend_func_extended : enable\n"
+	"uniform highp vec4 src0;\n"
+	"uniform highp vec4 src1;\n"
+	"out highp vec4 col0;\n"
+	"out highp vec4 col1;\n"
+	"void main() {\n"
+	"        col0 = src0;\n"
+	"        col1 = src1;\n"
+	"}\n"
+	;
+#endif
 
 static void
 create_fbo(void)
@@ -226,6 +253,7 @@ create_fbo(void)
 	GLuint rb[32];
 	int i;
 
+#ifdef PIGLIT_USE_OPENGL
 	glGenFramebuffersEXT(1, &fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 
@@ -246,6 +274,28 @@ create_fbo(void)
 					 piglit_width, piglit_height);
 		check_error(__LINE__);
 	}
+#else // PIGLIT_USE_OPENGL_ES3
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER_EXT, fbo);
+
+	glGenRenderbuffers(max_ds_buffers, rb);
+	check_error(__LINE__);
+
+	for (i = 0; i < max_ds_buffers; i++) {
+		glBindRenderbuffer(GL_RENDERBUFFER_EXT, rb[i]);
+		check_error(__LINE__);
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER_EXT,
+					     GL_COLOR_ATTACHMENT0 + i,
+					     GL_RENDERBUFFER_EXT,
+					     rb[i]);
+		check_error(__LINE__);
+
+		glRenderbufferStorage(GL_RENDERBUFFER_EXT, GL_RGBA8,
+					 piglit_width, piglit_height);
+		check_error(__LINE__);
+	}
+#endif
 }
 
 static enum piglit_result
@@ -278,7 +328,12 @@ test(void)
 
 	create_fbo();
 
+#ifdef PIGLIT_USE_OPENGL
 	glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+#else // PIGLIT_USE_OPENGL_ES3
+	GLenum bufs[] = {GL_COLOR_ATTACHMENT0_EXT};
+	glDrawBuffers(1, bufs);
+#endif
 
 	glLinkProgram(prog);
 	glUseProgram(prog);
@@ -327,9 +382,11 @@ void
 piglit_init(int argc, char**argv)
 {
 	enum piglit_result result;
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_blend_func_extended");
+#else // PIGLIT_USE_OPENGL_ES3
+	piglit_require_extension("GL_EXT_blend_func_extended");
+#endif
 
 	glGetIntegerv(GL_MAX_DUAL_SOURCE_DRAW_BUFFERS, &max_ds_buffers);
 

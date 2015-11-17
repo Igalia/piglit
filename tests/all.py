@@ -3993,6 +3993,19 @@ with profile.group_manager(
       run_concurrent=False)
     g(['arb_blend_func_extended-fbo-extended-blend-pattern'],
       run_concurrent=False)
+    g(['arb_blend_func_extended-blend-api_gles2'], run_concurrent=False)
+    g(['arb_blend_func_extended-builtins_gles2'], run_concurrent=False)
+    g(['arb_blend_func_extended-bindfragdataindexed-invalid-parameters_gles3'],
+      run_concurrent=False)
+    g(['arb_blend_func_extended-output-location_gles3'], run_concurrent=False)
+    g(['arb_blend_func_extended-getfragdataindex_gles3'], run_concurrent=False)
+    g(['arb_blend_func_extended-fbo-extended-blend-pattern_gles2'],
+      run_concurrent=False)
+    g(['arb_blend_func_extended-fbo-extended-blend-pattern_gles3'],
+      run_concurrent=False)
+    g(['arb_blend_func_extended-fbo-extended-blend_gles3'], run_concurrent=False)
+    g(['arb_blend_func_extended-fbo-extended-blend-explicit_gles3'],
+      run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,

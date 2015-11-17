@@ -30,7 +30,11 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 10;
+#else // PIGLIT_USE_OPENGL_ES2
+	config.supports_gl_es_version = 20;
+#endif
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -45,8 +49,12 @@ void piglit_init(int argc, char **argv)
 {
 	GLint max_dual_source;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_gl_version(30);
 	piglit_require_extension("GL_ARB_blend_func_extended");
+#else // PIGLIT_USE_OPENGL_ES2
+	piglit_require_extension("GL_EXT_blend_func_extended");
+#endif
 
 	/* This test needs some number of draw buffers, so make sure the
 	 * implementation isn't broken.  This enables the test to generate a
