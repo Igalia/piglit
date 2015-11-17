@@ -301,7 +301,7 @@ def resume(input_):
     results = backends.load(args.results_path)
     options.OPTIONS.concurrent = results.options['concurrent']
     options.OPTIONS.exclude_filter = results.options['exclude_filter']
-    options.OPTIONS.include_filter = results.options['filter']
+    options.OPTIONS.include_filter = results.options['include_filter']
     options.OPTIONS.execute = results.options['execute']
     options.OPTIONS.valgrind = results.options['valgrind']
     options.OPTIONS.dmesg = results.options['dmesg']
