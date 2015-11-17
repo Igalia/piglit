@@ -124,7 +124,7 @@ setup_program(GLuint *prog, GLuint *pipe, GLuint *vao,
 
 	*prog = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
 				      (const GLchar *const *) fs_code);
-	piglit_link_check_status(*prog);
+	pass = piglit_link_check_status(*prog) && pass;
 
 	glGenProgramPipelines(1, pipe);
 	glUseProgramStages(*pipe,
