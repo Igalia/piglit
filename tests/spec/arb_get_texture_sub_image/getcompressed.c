@@ -40,10 +40,9 @@ test_getsubimage(GLenum target,
 		 GLsizei width, GLsizei height, GLsizei numSlices,
 		 GLenum intFormat)
 {
-	const GLint bufSize = width * height * 4 * sizeof(GLubyte);
 	GLubyte *texData;
-	GLubyte *refData = malloc(6 * bufSize); /* 6 for cubemaps */
-	GLubyte *testData = malloc(6 * bufSize); /* 6 for cubemaps */
+	GLubyte *refData;
+	GLubyte *testData;
 	GLuint tex;
 	int i, slice, compressedSize, compSize;
 	int blockWidth, blockHeight, blockSize;
