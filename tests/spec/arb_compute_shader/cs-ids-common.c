@@ -300,7 +300,7 @@ cs_ids_run_test()
 	}
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-	result = confirm_size(local_x, local_y, local_z);
+	result = confirm_size();
 	if (result != PIGLIT_PASS)
 		piglit_report_result(result);
 
