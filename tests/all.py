@@ -1925,6 +1925,7 @@ with profile.group_manager(
     g(['arb_draw_indirect-draw-elements-prim-restart'])
     g(['arb_draw_indirect-draw-elements-prim-restart-ugly'])
     g(['arb_draw_indirect-draw-arrays-instances'])
+    g(['arb_draw_indirect-draw-arrays-shared-binding'])
     g(['arb_draw_indirect-vertexid'],
       'gl_VertexID used with glDrawArraysIndirect')
     g(['arb_draw_indirect-vertexid', 'elements'],

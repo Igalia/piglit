@@ -18,5 +18,6 @@ piglit_add_executable (arb_draw_indirect-draw-elements-prim-restart draw-element
 piglit_add_executable (arb_draw_indirect-draw-elements-prim-restart-ugly draw-elements-prim-restart-ugly.c)
 piglit_add_executable (arb_draw_indirect-draw-arrays-instances draw-arrays-instances.c)
 piglit_add_executable (arb_draw_indirect-vertexid vertexid.c)
+piglit_add_executable (arb_draw_indirect-draw-arrays-shared-binding draw-arrays-shared-binding.c)
 
 # vim: ft=cmake:
