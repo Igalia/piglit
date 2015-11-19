@@ -4542,5 +4542,12 @@ with profile.group_manager(
     g(['oes_draw_elements_base_vertex-multidrawelements'],
       run_concurrent=False)
 
+# Group EXT_shader_samples_identical
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'EXT_shader_samples_identical')) as g:
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+        g(['ext_shader_samples_identical', sample_count])
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
