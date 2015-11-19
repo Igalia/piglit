@@ -53,9 +53,9 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vs_src_draw =
 	"#version 130 \n"
-	"in vec4 pos;\n"
+	"in vec4 piglit_vertex;\n"
 	"void main() { \n"
-	"   gl_Position = pos; \n"
+	"   gl_Position = piglit_vertex; \n"
 	"} \n";
 
 static const char *fs_src_draw =
@@ -67,12 +67,12 @@ static const char *fs_src_draw =
 
 static const char *vs_src_readback =
 	"#version 130 \n"
-	"in vec4 pos; \n"
-	"in vec2 coord_vs;\n"
+	"in vec4 piglit_vertex; \n"
+	"in vec2 piglit_texcoord;\n"
 	"out vec2 coord_fs;\n"
 	"void main() { \n"
-	"   gl_Position = pos; \n"
-	"   coord_fs = coord_vs; \n"
+	"   gl_Position = piglit_vertex; \n"
+	"   coord_fs = piglit_texcoord; \n"
 	"} \n";
 
 static const char *fs_src_readback =
@@ -98,7 +98,6 @@ static GLuint tex;
 static GLuint fbo;
 static GLuint readback_prog, draw_prog;
 static GLint sample_pos_uniform;
-static GLint draw_pos_attr, readback_pos_attr, readback_texcoord_attr;
 static int num_samples = 0;
 
 
@@ -139,11 +138,11 @@ piglit_display(void)
 	piglit_check_gl_error(GL_NO_ERROR);
 
 	glUseProgram(draw_prog);
-	glVertexAttribPointer(draw_pos_attr, 2, GL_FLOAT,
+	glVertexAttribPointer(PIGLIT_ATTRIB_POS, 2, GL_FLOAT,
 			      GL_FALSE, 0, tri_verts);
-	glEnableVertexAttribArray(draw_pos_attr);
+	glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDisableVertexAttribArray(draw_pos_attr);
+	glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
 
 	piglit_check_gl_error(GL_NO_ERROR);
 
@@ -168,15 +167,15 @@ piglit_display(void)
 		/* fetch the i-th sample */
 		glUniform1i(sample_pos_uniform, i);
 
-		glVertexAttribPointer(readback_pos_attr, 2, GL_FLOAT,
+		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 2, GL_FLOAT,
 				      GL_FALSE, 0, quad_verts);
-		glVertexAttribPointer(readback_texcoord_attr, 2, GL_FLOAT,
+		glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT,
 				      GL_FALSE, 0, quad_texcoords);
-		glEnableVertexAttribArray(readback_pos_attr);
-		glEnableVertexAttribArray(readback_texcoord_attr);
+		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
+		glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glDisableVertexAttribArray(readback_pos_attr);
-		glDisableVertexAttribArray(readback_texcoord_attr);
+		glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+		glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
 
 		glReadPixels(0, 0, 32, 32, GL_RGBA, GL_FLOAT, images[i]);
 	}
@@ -300,13 +299,10 @@ piglit_init(int argc, char **argv)
 	tex_uniform = glGetUniformLocation(readback_prog, "tex");
 	glUniform1i(tex_uniform, 0); /* unit 0 */
 	sample_pos_uniform = glGetUniformLocation(readback_prog, "samplePos");
-	readback_pos_attr = glGetAttribLocation(readback_prog, "pos");
-	readback_texcoord_attr = glGetAttribLocation(readback_prog, "coord_vs");
 
 	/* create triangle drawing shader */
 	draw_prog = piglit_build_simple_program(vs_src_draw, fs_src_draw);
 	glUseProgram(draw_prog);
-	draw_pos_attr = glGetAttribLocation(draw_prog, "pos");
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
