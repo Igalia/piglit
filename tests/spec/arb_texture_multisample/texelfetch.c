@@ -109,18 +109,6 @@ piglit_display(void)
 		{ 0.8, -0.9 },
 		{ 0.1, 1}
 	};
-	static const GLfloat quad_verts[4][2] = {
-		{ -1, -1 },
-		{  1, -1 },
-		{  1,  1 },
-		{ -1,  1 }
-	};
-	static const GLfloat quad_texcoords[4][2] = {
-		{ 0, 0 },
-		{ 31, 0 },
-		{ 31, 31 },
-		{ 0, 31 }
-	};
 	unsigned i, j, num_diffs;
 	GLfloat *images[MAX_SAMPLES], *average;
 
@@ -167,15 +155,7 @@ piglit_display(void)
 		/* fetch the i-th sample */
 		glUniform1i(sample_pos_uniform, i);
 
-		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 2, GL_FLOAT,
-				      GL_FALSE, 0, quad_verts);
-		glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT,
-				      GL_FALSE, 0, quad_texcoords);
-		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
-		glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-		glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
-		glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+		piglit_draw_rect_tex(-1, -1, 2, 2, 0, 0, 31, 31);
 
 		glReadPixels(0, 0, 32, 32, GL_RGBA, GL_FLOAT, images[i]);
 	}
