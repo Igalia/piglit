@@ -40,6 +40,7 @@
  *    before clearing the buffer so that it can test that the color
  *    gets correctly converted to SRGB before being stored in the
  *    color buffer.
+ *  single-sample: A single sample texture will be created instead.
  */
 
 #include "piglit-util-gl.h"
@@ -64,9 +65,10 @@ vertex_source[] =
 
 static const char
 fragment_source_float[] =
-	"#extension GL_ARB_texture_multisample : require\n"
+	"#version 130\n"
+	"%s\n"
 	"\n"
-	"uniform sampler2DMS tex;\n"
+	"uniform %s tex;\n"
 	"\n"
 	"void\n"
 	"main()\n"
@@ -77,9 +79,9 @@ fragment_source_float[] =
 static const char
 fragment_source_int[] =
 	"#version 130\n"
-	"#extension GL_ARB_texture_multisample : require\n"
+	"%s\n"
 	"\n"
-	"uniform isampler2DMS tex;\n"
+	"uniform i%s tex;\n"
 	"\n"
 	"void\n"
 	"main()\n"
@@ -90,9 +92,9 @@ fragment_source_int[] =
 static const char
 fragment_source_uint[] =
 	"#version 130\n"
-	"#extension GL_ARB_texture_multisample : require\n"
+	"%s\n"
 	"\n"
-	"uniform usampler2DMS tex;\n"
+	"uniform u%s tex;\n"
 	"\n"
 	"void\n"
 	"main()\n"
@@ -129,6 +131,7 @@ struct component_sizes {
 static GLuint prog_float, prog_int, prog_uint;
 static GLuint result_fbo;
 static bool enable_fb_srgb = false;
+static bool single_sample = false;
 
 static void
 convert_srgb_color(const struct format_desc *format,
@@ -332,6 +335,7 @@ test_format(const struct format_desc *format)
 	enum piglit_result color_result;
 	struct component_sizes sizes;
 	GLenum type_param;
+	GLenum tex_target;
 	GLenum tex_error;
 	GLint type;
 	GLuint tex;
@@ -347,47 +351,82 @@ test_format(const struct format_desc *format)
 
 	printf("Testing %s\n", format->name);
 
+	if (single_sample)
+		tex_target = GL_TEXTURE_2D;
+	else
+		tex_target = GL_TEXTURE_2D_MULTISAMPLE;
+
 	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+	glBindTexture(tex_target, tex);
 
-	piglit_reset_gl_error();
+	if (single_sample) {
+		glTexParameteri(tex_target,
+				GL_TEXTURE_MAG_FILTER,
+				GL_NEAREST);
+		glTexParameteri(tex_target,
+				GL_TEXTURE_MIN_FILTER,
+				GL_NEAREST);
+		glTexParameteri(tex_target,
+				GL_TEXTURE_MAX_LEVEL,
+				0);
+		/* The pitch of the texture needs to at least as wide
+		 * as a tile and taller than 1 pixel so that it will
+		 * be y-tiled in the i965 driver. Otherwise fast
+		 * clears will be disabled and the test will be
+		 * pointless.
+		 */
+		glTexImage2D(tex_target,
+			     0, /* level */
+			     format->internalformat,
+			     128, 128, /* width/height */
+			     0, /* border */
+			     GL_RGBA, GL_UNSIGNED_BYTE,
+			     NULL);
+	} else {
+		piglit_reset_gl_error();
 
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-				1, /* samples */
-				format->internalformat,
-				1, 1, /* width/height */
-				GL_FALSE /* fixed sample locations */);
+		/* The size doesn't matter on the i965 driver for
+		 * multisample surfaces because it will always
+		 * allocate an MCS buffer and so it will always do
+		 * fast clears.
+		 */
+		glTexImage2DMultisample(tex_target,
+					2, /* samples */
+					format->internalformat,
+					1, 1, /* width/height */
+					GL_FALSE /* fixed sample locations */);
+		tex_error = glGetError();
 
-	tex_error = glGetError();
+		if (tex_error != GL_NO_ERROR) {
+			glDeleteTextures(1, &tex);
 
-	if (tex_error != GL_NO_ERROR) {
-		glDeleteTextures(1, &tex);
-
-		if (tex_error == GL_INVALID_ENUM) {
-			/* You're only supposed to pass color renderable
-			 * formats to glTexImage2DMultisample.
-			 */
-			printf("Format is not color renderable\n");
-			return PIGLIT_SKIP;
-		} else {
-			printf("Unexpected GL error: %s 0x%x\n",
-			       piglit_get_gl_error_name(tex_error),
-			       tex_error);
-			return PIGLIT_FAIL;
+			if (tex_error == GL_INVALID_ENUM) {
+				/* You're only supposed to pass color
+				 * renderable formats to
+				 * glTexImage2DMultisample.
+				 */
+				printf("Format is not color renderable\n");
+				return PIGLIT_SKIP;
+			} else {
+				printf("Unexpected GL error: %s 0x%x\n",
+				       piglit_get_gl_error_name(tex_error),
+				       tex_error);
+				return PIGLIT_FAIL;
+			}
 		}
 	}
 
-	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
+	glGetTexLevelParameteriv(tex_target, 0,
 				 GL_TEXTURE_LUMINANCE_SIZE, &sizes.l);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
+	glGetTexLevelParameteriv(tex_target, 0,
 				 GL_TEXTURE_ALPHA_SIZE, &sizes.a);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
+	glGetTexLevelParameteriv(tex_target, 0,
 				 GL_TEXTURE_INTENSITY_SIZE, &sizes.i);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
+	glGetTexLevelParameteriv(tex_target, 0,
 				 GL_TEXTURE_RED_SIZE, &sizes.r);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
+	glGetTexLevelParameteriv(tex_target, 0,
 				 GL_TEXTURE_GREEN_SIZE, &sizes.g);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
+	glGetTexLevelParameteriv(tex_target, 0,
 				 GL_TEXTURE_BLUE_SIZE, &sizes.b);
 
 	if (sizes.l > 0)
@@ -402,7 +441,7 @@ test_format(const struct format_desc *format)
 		assert(0);
 		type_param = GL_NONE;
 	}
-	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE,
+	glGetTexLevelParameteriv(tex_target,
 				 0, /* level */
 				 type_param,
 				 &type);
@@ -438,7 +477,7 @@ test_format(const struct format_desc *format)
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER,
 			       GL_COLOR_ATTACHMENT0,
-			       GL_TEXTURE_2D_MULTISAMPLE,
+			       tex_target,
 			       tex,
 			       0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
@@ -476,8 +515,19 @@ build_program(const char *fragment_source)
 {
 	GLint tex_location;
 	GLuint prog;
+	char *source;
 
-	prog = piglit_build_simple_program(vertex_source, fragment_source);
+	asprintf(&source,
+		 fragment_source,
+		 single_sample ?
+		 "" :
+		 "#extension GL_ARB_texture_multisample : require\n",
+		 single_sample ? "sampler2D" : "sampler2DMS");
+
+	prog = piglit_build_simple_program(vertex_source, source);
+
+	free(source);
+
 	glUseProgram(prog);
 	tex_location = glGetUniformLocation(prog, "tex");
 	glUniform1i(tex_location, 0);
@@ -489,22 +539,24 @@ void
 piglit_init(int argc, char **argv)
 {
 	int test_set_index = 0;
-	int glsl_major, glsl_minor;
 	GLuint rb;
-	bool es;
 	int i;
 
 	for (i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "enable-fb-srgb")) {
 			enable_fb_srgb = true;
 			piglit_require_extension("GL_ARB_framebuffer_sRGB");
+		} else if (!strcmp(argv[i], "single-sample")) {
+			single_sample = true;
 		} else {
 			test_set_index = fbo_lookup_test_set(argv[i]);
 		}
 	}
 
-	piglit_require_extension("GL_ARB_texture_multisample");
+	if (!single_sample)
+		piglit_require_extension("GL_ARB_texture_multisample");
 	piglit_require_extension("GL_ARB_texture_float");
+	piglit_require_GLSL_version(130);
 
 	test_set = test_set + test_set_index;
 
@@ -534,11 +586,6 @@ piglit_init(int argc, char **argv)
 	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
 	prog_float = build_program(fragment_source_float);
-
-	piglit_get_glsl_version(&es, &glsl_major, &glsl_minor);
-
-	if (!es && (glsl_major > 1 || (glsl_major == 1 && glsl_minor >= 3))) {
-		prog_int = build_program(fragment_source_int);
-		prog_uint = build_program(fragment_source_uint);
-	}
+	prog_int = build_program(fragment_source_int);
+	prog_uint = build_program(fragment_source_uint);
 }

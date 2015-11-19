@@ -135,6 +135,10 @@ def add_fbo_formats_tests(adder, extension, suffix=''):
               'fbo-alphatest-formats{}'.format(suffix))
         adder(['fbo-colormask-formats', extension],
               'fbo-colormask-formats{}'.format(suffix))
+        adder(['ext_framebuffer_multisample-fast-clear',
+               extension,
+               'single-sample'],
+              'fbo-fast-clear{}'.format(suffix))
 
 
 def add_msaa_formats_tests(adder, extension):
@@ -2043,6 +2047,11 @@ with profile.group_manager(
        'GL_EXT_texture_sRGB',
        'enable-fb-srgb'],
       'msaa-fast-clear')
+    g(['ext_framebuffer_multisample-fast-clear',
+       'GL_EXT_texture_sRGB',
+       'enable-fb-srgb',
+       'single-sample'],
+      'fbo-fast-clear')
 
 with profile.group_manager(
         PiglitGLTest,
@@ -2939,6 +2948,8 @@ with profile.group_manager(
     g(['fbo-storage-completeness'])
     g(['fbo-storage-formats'])
     g(['getteximage-formats', 'init-by-rendering'])
+    g(['ext_framebuffer_multisample-fast-clear', 'single-sample'],
+      'fbo-fast-clear')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX1')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX4')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX8')
@@ -3243,6 +3254,10 @@ with profile.group_manager(
     #   'fbo-blending-formats')
     g(['fbo-alphatest-formats', 'GL_EXT_texture_sRGB'],
       'fbo-alphatest-formats')
+    g(['ext_framebuffer_multisample-fast-clear',
+       'GL_EXT_texture_sRGB',
+       'single-sample'],
+      'fbo-fast-clear')
     add_msaa_formats_tests(g, 'GL_EXT_texture_sRGB')
     add_texwrap_format_tests(g, 'GL_EXT_texture_sRGB')
     add_texwrap_format_tests(g, 'GL_EXT_texture_sRGB-s3tc', '-s3tc')
