@@ -230,6 +230,7 @@ test_format(const struct format_desc *format)
 	enum piglit_result color_result;
 	GLint l_size, i_size, r_size, g_size, b_size, a_size;
 	GLenum type_param;
+	GLenum tex_error;
 	GLint type;
 	GLuint tex;
 	GLuint fbo;
@@ -246,11 +247,33 @@ test_format(const struct format_desc *format)
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+
+	piglit_reset_gl_error();
+
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 				1, /* samples */
 				format->internalformat,
 				1, 1, /* width/height */
 				GL_FALSE /* fixed sample locations */);
+
+	tex_error = glGetError();
+
+	if (tex_error != GL_NO_ERROR) {
+		glDeleteTextures(1, &tex);
+
+		if (tex_error == GL_INVALID_ENUM) {
+			/* You're only supposed to pass color renderable
+			 * formats to glTexImage2DMultisample.
+			 */
+			printf("Format is not color renderable\n");
+			return PIGLIT_SKIP;
+		} else {
+			printf("Unexpected GL error: %s 0x%x\n",
+			       piglit_get_gl_error_name(tex_error),
+			       tex_error);
+			return PIGLIT_FAIL;
+		}
+	}
 
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
 				 GL_TEXTURE_LUMINANCE_SIZE, &l_size);
