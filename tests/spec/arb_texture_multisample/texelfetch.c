@@ -104,10 +104,11 @@ static int num_samples = 0;
 enum piglit_result
 piglit_display(void)
 {
-	static const GLfloat tri_verts[3][2] = {
-		{ -0.8, -1 },
-		{ 0.8, -0.9 },
-		{ 0.1, 1}
+	static const GLfloat quad_verts[4][4] = {
+		{  0.8,  0.1, 0, 1 },
+		{  0.1,  1.0, 0, 1 },
+		{ -0.1, -1.0, 0, 1 },
+		{ -0.8, -0.1, 0, 1 },
 	};
 	unsigned i, j, num_diffs;
 	GLfloat *images[MAX_SAMPLES], *average;
@@ -126,11 +127,7 @@ piglit_display(void)
 	piglit_check_gl_error(GL_NO_ERROR);
 
 	glUseProgram(draw_prog);
-	glVertexAttribPointer(PIGLIT_ATTRIB_POS, 2, GL_FLOAT,
-			      GL_FALSE, 0, tri_verts);
-	glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	piglit_draw_rect_from_arrays(quad_verts, NULL, false);
 
 	piglit_check_gl_error(GL_NO_ERROR);
 
