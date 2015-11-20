@@ -255,7 +255,7 @@ for dirpath, _, filenames in os.walk(_basedir):
             ['asmparsertest', type_, os.path.join(dirpath, filename)])
 
 # List of all of the MSAA sample counts we wish to test
-MSAA_SAMPLE_COUNTS = ('2', '4', '6', '8', '16', '32')
+MSAA_SAMPLE_COUNTS = ['2', '4', '6', '8', '16', '32']
 
 with profile.group_manager(GleanTest, 'glean') as g:
     g('basic')
@@ -984,7 +984,7 @@ with profile.group_manager(
     for format in color_formats:
         g(['teximage-colors', format], run_concurrent=False)
 
-    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ['0'] + MSAA_SAMPLE_COUNTS:
         add_fbo_depthstencil_tests(
             grouptools.join('spec', '!opengl 1.1'), 'default_fb', num_samples)
 
@@ -2245,7 +2245,7 @@ with profile.group_manager(
         grouptools.join('spec', 'ARB_sample_shading')) as g:
     g(['arb_sample_shading-api'], run_concurrent=False)
 
-    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ['0'] + MSAA_SAMPLE_COUNTS:
         g(['arb_sample_shading-builtin-gl-num-samples', num_samples],
           'builtin-gl-num-samples {0}'.format(num_samples),
           run_concurrent=False)
@@ -2266,7 +2266,7 @@ with profile.group_manager(
           'ignore-centroid-qualifier {}'.format(sample_count),
           run_concurrent=False)
 
-    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ['0'] + MSAA_SAMPLE_COUNTS:
         g(['arb_sample_shading-builtin-gl-sample-mask-simple',
            num_samples],
           'builtin-gl-sample-mask-simple {}'.format(num_samples))
@@ -2869,7 +2869,7 @@ with profile.group_manager(
            sample_count],
           'alpha-blending-after-rendering {}'.format(sample_count))
 
-    for num_samples in ('all_samples',) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ['all_samples'] + MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample-formats', num_samples],
           'formats {}'.format(num_samples))
 
@@ -2886,7 +2886,7 @@ with profile.group_manager(
     # Note: the interpolation tests also check for sensible behaviour with
     # non-multisampled framebuffers, so go ahead and test them with
     # num_samples==0 as well.
-    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ['0'] + MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample-blit-multiple-render-targets',
            num_samples],
           'blit-multiple-render-targets {}'.format(num_samples))
