@@ -115,9 +115,9 @@ def add_msaa_visual_plain_tests(adder, args, **kwargs):
     assert isinstance(args, list)
 
     adder(args, **kwargs)
-    for num_samples in MSAA_SAMPLE_COUNTS:
-        adder(args + ['-samples={}'.format(num_samples)],
-              ' '.join(args + ['samples={}'.format(num_samples)]),
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+        adder(args + ['-samples={}'.format(sample_count)],
+              ' '.join(args + ['samples={}'.format(sample_count)]),
               **kwargs)
 
 
@@ -142,10 +142,10 @@ def add_fbo_formats_tests(adder, extension, suffix=''):
 
 
 def add_msaa_formats_tests(adder, extension):
-    for num_samples in MSAA_SAMPLE_COUNTS:
-        adder(['ext_framebuffer_multisample-formats', str(num_samples),
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+        adder(['ext_framebuffer_multisample-formats', sample_count,
                extension],
-              'multisample-formats {} {}'.format(num_samples, extension))
+              'multisample-formats {} {}'.format(sample_count, extension))
     adder(['ext_framebuffer_multisample-fast-clear', extension],
           'multisample-fast-clear {}'.format(extension))
 
@@ -2218,13 +2218,12 @@ with profile.group_manager(
           'builtin-gl-sample-position {}'.format(num_samples),
           run_concurrent=False)
 
-    for num_samples in MSAA_SAMPLE_COUNTS:
-        g(['arb_sample_shading-interpolate-at-sample-position',
-           str(num_samples)],
-          'interpolate-at-sample-position {}'.format(num_samples),
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+        g(['arb_sample_shading-interpolate-at-sample-position', sample_count],
+          'interpolate-at-sample-position {}'.format(sample_count),
           run_concurrent=False)
-        g(['arb_sample_shading-ignore-centroid-qualifier', str(num_samples)],
-          'ignore-centroid-qualifier {}'.format(num_samples),
+        g(['arb_sample_shading-ignore-centroid-qualifier', sample_count],
+          'ignore-centroid-qualifier {}'.format(sample_count),
           run_concurrent=False)
 
     for num_samples in (0,) + MSAA_SAMPLE_COUNTS:
@@ -2743,15 +2742,15 @@ with profile.group_manager(
     g(['ext_framebuffer_multisample_blit_scaled-negative-blit-scaled'],
       'negative-blit-scaled')
 
-    for num_samples in MSAA_SAMPLE_COUNTS:
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
         g(['ext_framebuffer_multisample_blit_scaled-blit-scaled',
-           str(num_samples)],
-          'blit-scaled samples={}'.format(num_samples))
+           sample_count],
+          'blit-scaled samples={}'.format(sample_count))
 
-    for num_samples in MSAA_SAMPLE_COUNTS:
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
         g(['ext_framebuffer_multisample_blit_scaled-blit-scaled',
-           str(num_samples), 'array'],
-          'blit-scaled samples={} with GL_TEXTURE_2D_MULTISAMPLE_ARRAY'.format(num_samples))
+           sample_count, 'array'],
+          'blit-scaled samples={} with GL_TEXTURE_2D_MULTISAMPLE_ARRAY'.format(sample_count))
 
 with profile.group_manager(
         PiglitGLTest,
@@ -2823,9 +2822,9 @@ with profile.group_manager(
                test_type],
               'interpolation {} {}'.format(num_samples, test_type))
 
-    for num_samples in MSAA_SAMPLE_COUNTS:
-        g(['ext_framebuffer_multisample-turn-on-off', str(num_samples)],
-          'turn-on-off {}'.format(num_samples), run_concurrent=False)
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+        g(['ext_framebuffer_multisample-turn-on-off', sample_count],
+          'turn-on-off {}'.format(sample_count), run_concurrent=False)
 
         for buffer_type in ('color', 'depth', 'stencil'):
             if buffer_type == 'color':
@@ -2834,31 +2833,31 @@ with profile.group_manager(
                 sensible_options = []
 
             for options in power_set(sensible_options):
-                g(['ext_framebuffer_multisample-upsample', str(num_samples),
+                g(['ext_framebuffer_multisample-upsample', sample_count,
                    buffer_type] + options,
                   'upsample {} {}'.format(
-                      num_samples, ' '.join([buffer_type] + options)))
+                      sample_count, ' '.join([buffer_type] + options)))
                 g(['ext_framebuffer_multisample-multisample-blit',
-                   str(num_samples), buffer_type] + options,
+                   sample_count, buffer_type] + options,
                   'multisample-blit {}'.format(
-                      ' '.join([str(num_samples), buffer_type] + options)))
+                      ' '.join([sample_count, buffer_type] + options)))
 
             for blit_type in ('msaa', 'upsample', 'downsample'):
                 g(['ext_framebuffer_multisample-unaligned-blit',
-                   str(num_samples), buffer_type, blit_type],
+                   sample_count, buffer_type, blit_type],
                   'unaligned-blit {} {} {}'.format(
-                      num_samples, buffer_type, blit_type))
+                      sample_count, buffer_type, blit_type))
 
         for test_mode in ('inverted', 'non-inverted'):
-            g(['ext_framebuffer_multisample-sample-coverage', str(num_samples),
+            g(['ext_framebuffer_multisample-sample-coverage', sample_count,
                test_mode],
-              'sample-coverage {} {}'.format(num_samples, test_mode))
+              'sample-coverage {} {}'.format(sample_count, test_mode))
 
         for buffer_type in ('color', 'depth'):
             g(['ext_framebuffer_multisample-sample-alpha-to-coverage',
-               str(num_samples), buffer_type],
+               sample_count, buffer_type],
               'sample-alpha-to-coverage {} {}'.format(
-                  num_samples, buffer_type))
+                  sample_count, buffer_type))
 
         for test in ['line-smooth', 'point-smooth', 'polygon-smooth',
                      'sample-alpha-to-one',
@@ -2874,31 +2873,29 @@ with profile.group_manager(
                      'alpha-to-one-single-sample-buffer',
                      'bitmap', 'polygon-stipple']:
             g(['ext_framebuffer_multisample-{}'.format(test),
-               str(num_samples)],
-              '{} {}'.format(test, num_samples))
+               sample_count],
+              '{} {}'.format(test, sample_count))
 
         for blit_type in ('msaa', 'upsample', 'downsample', 'normal'):
             g(['ext_framebuffer_multisample-clip-and-scissor-blit',
-               str(num_samples), blit_type],
-              'clip-and-scissor-blit {} {}'.format(str(num_samples),
-                                                   blit_type))
+               sample_count, blit_type],
+              'clip-and-scissor-blit {} {}'.format(sample_count, blit_type))
 
         for flip_direction in ('x', 'y'):
-            g(['ext_framebuffer_multisample-blit-flipped', str(num_samples),
+            g(['ext_framebuffer_multisample-blit-flipped', sample_count,
                flip_direction],
-              'blit-flipped {} {}'.format(str(num_samples), flip_direction))
+              'blit-flipped {} {}'.format(sample_count, flip_direction))
 
         for buffer_type in ('color', 'depth', 'stencil'):
-            g(['ext_framebuffer_multisample-clear', str(num_samples),
-               buffer_type],
-              'clear {} {}'.format(str(num_samples), buffer_type))
+            g(['ext_framebuffer_multisample-clear', sample_count, buffer_type],
+              'clear {} {}'.format(sample_count, buffer_type))
 
         for test_type in ('depth', 'depth-computed', 'stencil'):
             for buffer_config in ('combined', 'separate', 'single'):
-                g(['ext_framebuffer_multisample-no-color', str(num_samples),
+                g(['ext_framebuffer_multisample-no-color', sample_count,
                    test_type, buffer_config],
                   'no-color {} {} {}'.format(
-                      num_samples, test_type, buffer_config))
+                      sample_count, test_type, buffer_config))
 
 with profile.group_manager(
         PiglitGLTest,
