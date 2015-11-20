@@ -2784,12 +2784,10 @@ with profile.group_manager(
       'alpha-blending slow_cc')
     g(['ext_framebuffer_multisample-fast-clear'], 'fast-clear')
 
-    for num_samples in MSAA_SAMPLE_COUNTS:
-        if num_samples % 2 != 0:
-            continue
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
         g(['ext_framebuffer_multisample-alpha-blending-after-rendering',
-           str(num_samples)],
-          'alpha-blending-after-rendering {}'.format(num_samples))
+           sample_count],
+          'alpha-blending-after-rendering {}'.format(sample_count))
 
     for num_samples in ('all_samples', ) + MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample-formats', str(num_samples)],
