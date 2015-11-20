@@ -65,9 +65,9 @@ def add_fbo_depthstencil_tests(group, format, num_samples):
         prefix = 'fbo-'
         create_test = PiglitGLTest
 
-    if num_samples > 1:
-        suffix = ' samples=' + str(num_samples)
-        psamples = '-samples=' + str(num_samples)
+    if int(num_samples) > 1:
+        suffix = ' samples=' + num_samples
+        psamples = '-samples=' + num_samples
     else:
         suffix = ''
         psamples = ''
@@ -123,7 +123,7 @@ def add_msaa_visual_plain_tests(adder, args, **kwargs):
     assert isinstance(args, list)
 
     adder(args, **kwargs)
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         adder(args + ['-samples={}'.format(sample_count)],
               ' '.join(args + ['samples={}'.format(sample_count)]),
               **kwargs)
@@ -150,7 +150,7 @@ def add_fbo_formats_tests(adder, extension, suffix=''):
 
 
 def add_msaa_formats_tests(adder, extension):
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         adder(['ext_framebuffer_multisample-formats', sample_count,
                extension],
               'multisample-formats {} {}'.format(sample_count, extension))
@@ -255,7 +255,7 @@ for dirpath, _, filenames in os.walk(_basedir):
             ['asmparsertest', type_, os.path.join(dirpath, filename)])
 
 # List of all of the MSAA sample counts we wish to test
-MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
+MSAA_SAMPLE_COUNTS = ('2', '4', '6', '8', '16', '32')
 
 with profile.group_manager(GleanTest, 'glean') as g:
     g('basic')
@@ -984,7 +984,7 @@ with profile.group_manager(
     for format in color_formats:
         g(['teximage-colors', format], run_concurrent=False)
 
-    for num_samples in (0, ) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
         add_fbo_depthstencil_tests(
             grouptools.join('spec', '!opengl 1.1'), 'default_fb', num_samples)
 
@@ -1450,7 +1450,7 @@ for stage in ['vs', 'gs', 'fs']:
 
     for type in ('i', 'u', ''):
         for sampler in ('sampler2DMS', 'sampler2DMSArray'):
-            for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+            for sample_count in MSAA_SAMPLE_COUNTS:
                 stype = '{}{}'.format(type, sampler)
                 profile.test_list[grouptools.join(
                     'spec', 'arb_shader_texture_image_samples',
@@ -1764,7 +1764,7 @@ with profile.group_manager(
     g(['texelFetch', 'fs', 'sampler2DMSArray', '4', '98x129x1-98x129x9'])
     g(['arb_texture_multisample-texstate'])
     g(['arb_texture_multisample-errors'])
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['arb_texture_multisample-texelfetch', sample_count])
     g(['arb_texture_multisample-sample-mask'])
     g(['arb_texture_multisample-sample-mask-value'])
@@ -1783,7 +1783,7 @@ with profile.group_manager(
         grouptools.join('spec', 'ARB_texture_multisample',
                         'fb-completeness')) as g:
 
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         # fb-completeness
         g(['arb_texture_multisample-fb-completeness', sample_count],
           sample_count)
@@ -1794,7 +1794,7 @@ with profile.group_manager(
 
     stages = ['vs', 'gs', 'fs']
     for sampler, stage, sample_count in itertools.product(
-            samplers_atm, stages, (str(x) for x in MSAA_SAMPLE_COUNTS)):
+            samplers_atm, stages, MSAA_SAMPLE_COUNTS):
         g(['texelFetch', stage, sampler, sample_count],
           '{}-{}-{}'.format(sample_count, stage, sampler))
 
@@ -1803,7 +1803,7 @@ with profile.group_manager(
         grouptools.join('spec', 'ARB_texture_multisample',
                         'sample-position')) as g:
     # sample positions
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['arb_texture_multisample-sample-position', sample_count],
           sample_count)
 
@@ -2245,20 +2245,20 @@ with profile.group_manager(
         grouptools.join('spec', 'ARB_sample_shading')) as g:
     g(['arb_sample_shading-api'], run_concurrent=False)
 
-    for num_samples in (0,) + MSAA_SAMPLE_COUNTS:
-        g(['arb_sample_shading-builtin-gl-num-samples', str(num_samples)],
+    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
+        g(['arb_sample_shading-builtin-gl-num-samples', num_samples],
           'builtin-gl-num-samples {0}'.format(num_samples),
           run_concurrent=False)
-        g(['arb_sample_shading-builtin-gl-sample-id', str(num_samples)],
+        g(['arb_sample_shading-builtin-gl-sample-id', num_samples],
           'builtin-gl-sample-id {}'.format(num_samples), run_concurrent=False)
-        g(['arb_sample_shading-builtin-gl-sample-mask', str(num_samples)],
+        g(['arb_sample_shading-builtin-gl-sample-mask', num_samples],
           'builtin-gl-sample-mask {}'.format(num_samples),
           run_concurrent=False)
-        g(['arb_sample_shading-builtin-gl-sample-position', str(num_samples)],
+        g(['arb_sample_shading-builtin-gl-sample-position', num_samples],
           'builtin-gl-sample-position {}'.format(num_samples),
           run_concurrent=False)
 
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['arb_sample_shading-interpolate-at-sample-position', sample_count],
           'interpolate-at-sample-position {}'.format(sample_count),
           run_concurrent=False)
@@ -2266,9 +2266,9 @@ with profile.group_manager(
           'ignore-centroid-qualifier {}'.format(sample_count),
           run_concurrent=False)
 
-    for num_samples in (0,) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
         g(['arb_sample_shading-builtin-gl-sample-mask-simple',
-           str(num_samples)],
+           num_samples],
           'builtin-gl-sample-mask-simple {}'.format(num_samples))
 
     g(['arb_sample_shading-builtin-gl-sample-mask-mrt-alpha'])
@@ -2822,12 +2822,12 @@ with profile.group_manager(
     g(['ext_framebuffer_multisample_blit_scaled-negative-blit-scaled'],
       'negative-blit-scaled')
 
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample_blit_scaled-blit-scaled',
            sample_count],
           'blit-scaled samples={}'.format(sample_count))
 
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample_blit_scaled-blit-scaled',
            sample_count, 'array'],
           'blit-scaled samples={} with GL_TEXTURE_2D_MULTISAMPLE_ARRAY'.format(sample_count))
@@ -2864,13 +2864,13 @@ with profile.group_manager(
       'alpha-blending slow_cc')
     g(['ext_framebuffer_multisample-fast-clear'], 'fast-clear')
 
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample-alpha-blending-after-rendering',
            sample_count],
           'alpha-blending-after-rendering {}'.format(sample_count))
 
-    for num_samples in ('all_samples', ) + MSAA_SAMPLE_COUNTS:
-        g(['ext_framebuffer_multisample-formats', str(num_samples)],
+    for num_samples in ('all_samples',) + MSAA_SAMPLE_COUNTS:
+        g(['ext_framebuffer_multisample-formats', num_samples],
           'formats {}'.format(num_samples))
 
         for test_type in ('color', 'srgb', 'stencil_draw', 'stencil_resolve',
@@ -2879,28 +2879,27 @@ with profile.group_manager(
             if test_type in ('color', 'srgb'):
                 sensible_options.append('linear')
             for options in power_set(sensible_options):
-                g(['ext_framebuffer_multisample-accuracy', str(num_samples),
+                g(['ext_framebuffer_multisample-accuracy', num_samples,
                    test_type] + options,
-                  ' '.join(['accuracy', str(num_samples), test_type] +
-                           options))
+                  ' '.join(['accuracy', num_samples, test_type] + options))
 
     # Note: the interpolation tests also check for sensible behaviour with
     # non-multisampled framebuffers, so go ahead and test them with
     # num_samples==0 as well.
-    for num_samples in (0,) + MSAA_SAMPLE_COUNTS:
+    for num_samples in ('0',) + MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample-blit-multiple-render-targets',
-           str(num_samples)],
+           num_samples],
           'blit-multiple-render-targets {}'.format(num_samples))
 
         for test_type in ('non-centroid-disabled', 'centroid-disabled',
                           'centroid-edges', 'non-centroid-deriv',
                           'non-centroid-deriv-disabled', 'centroid-deriv',
                           'centroid-deriv-disabled'):
-            g(['ext_framebuffer_multisample-interpolation', str(num_samples),
+            g(['ext_framebuffer_multisample-interpolation', num_samples,
                test_type],
               'interpolation {} {}'.format(num_samples, test_type))
 
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['ext_framebuffer_multisample-turn-on-off', sample_count],
           'turn-on-off {}'.format(sample_count), run_concurrent=False)
 
@@ -4674,7 +4673,7 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'EXT_shader_samples_identical')) as g:
-    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+    for sample_count in MSAA_SAMPLE_COUNTS:
         g(['ext_shader_samples_identical', sample_count])
     g(['ext_shader_samples_identical-simple-fs'], 'simple-fs')
 
