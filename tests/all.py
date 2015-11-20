@@ -24,6 +24,10 @@ __all__ = ['profile']
 # doesn't trigger an error)
 # pylint: disable=bad-continuation
 
+# Shadowing variables is a bad practice. It's just nearly impossible with the
+# format of this module to avoid it.
+# pylint: disable=redefined-outer-name
+
 
 def add_single_param_test_set(adder, name, *params):
     for param in params:
@@ -205,7 +209,7 @@ def power_set(s):
 
 ######
 # Collecting all tests
-profile = TestProfile()
+profile = TestProfile()  # pylint: disable=invalid-name
 
 # Find and add all shader tests.
 for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
