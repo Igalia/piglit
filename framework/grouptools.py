@@ -30,7 +30,9 @@ posix paths they may not start with a leading '/'.
 """
 
 __all__ = [
+    'SEPARATOR',
     'commonprefix',
+    'format',
     'from_path',
     'groupname',
     'join',
@@ -161,3 +163,18 @@ def from_path(path):
     if '.' == path:
         return ''
     return path
+
+
+def format(name):
+    """Format an internal name for printing.
+
+    It doesn't matter how the name is stored internally, presenting a
+    consistence, clean interface on the command line that doesn't contain any
+    ugly or problematic characters is important.
+
+    This replaces SEPARATOR with '/', which is what most devs are used to and
+    want to see.
+
+    """
+    assert isinstance(name, basestring)
+    return name.replace(SEPARATOR, '/')

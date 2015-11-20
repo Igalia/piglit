@@ -28,7 +28,7 @@ import framework.grouptools as grouptools
 import framework.tests.utils as utils
 
 doc_formatter = utils.DocFormatter({  # pylint: disable=invalid-name
-    'seperator': grouptools.SEPARATOR,
+    'separator': grouptools.SEPARATOR,
 })
 
 
@@ -69,7 +69,7 @@ def test_grouptools_join():
 
 @doc_formatter
 def test_grouptools_join_notrail():
-    """grouptools.join: doesn't add trailing {seperator} with empty element"""
+    """grouptools.join: doesn't add trailing {separator} with empty element"""
     test = grouptools.join('g1', 'g2', '')
     nt.ok_(not test.endswith(grouptools.SEPARATOR))
 
@@ -81,7 +81,7 @@ def test_split_input_empty():
 
 @doc_formatter
 def test_from_path_posix():
-    """grouptools.from_path: converts / to {seperator} in posix paths."""
+    """grouptools.from_path: converts / to {separator} in posix paths."""
     # Since we already have tests for grouptools.join we can trust it to do the
     # right thing here. This also means that the test doesn't need to be
     # updated if the separator is changed.
@@ -91,7 +91,7 @@ def test_from_path_posix():
 
 @doc_formatter
 def test_from_path_nt():
-    """grouptools.from_path: converts \\ to {seperator} in nt paths."""
+    """grouptools.from_path: converts \\ to {separator} in nt paths."""
     nt.assert_equal(grouptools.from_path('foo\\bar'),
                     grouptools.join('foo', 'bar'))
 
@@ -119,3 +119,10 @@ def test_join_empty():
 def test_commonprefix_none():
     """grouptools.commonprefix: returns '' when no values are the same"""
     nt.eq_('', grouptools.commonprefix(['foo', 'bar']))
+
+
+@doc_formatter
+def test_format():
+    """grouptools.format: replaces {separator} with '/'"""
+    test_str = grouptools.SEPARATOR.join(['foo', 'bar', 'boink'])
+    nt.eq_(grouptools.format(test_str), 'foo/bar/boink')

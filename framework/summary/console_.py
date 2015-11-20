@@ -91,7 +91,7 @@ def _print_result(results, list_):
     """Takes a list of test names to print and prints the name and result."""
     for test in sorted(list_):
         print("{test}: {statuses}".format(
-            test='/'.join(test.split(grouptools.SEPARATOR)),
+            test=grouptools.format(test),
             statuses=' '.join(str(r) for r in results.get_result(test))))
 
 
