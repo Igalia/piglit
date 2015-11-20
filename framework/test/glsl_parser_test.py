@@ -39,6 +39,10 @@ __all__ = [
 _HAS_GL_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest'))
 _HAS_GLES_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest_gles2'))
 
+# This forces testing with compatibility extensions, even when GLES support is
+# built
+_FORCE_DESKTOP_VERSION = os.environ.get('PIGLIT_FORCE_GLSLPARSER_DESKTOP', False)
+
 
 def _is_gles_version(version):
     """Return True if version is es, otherwsie false."""
@@ -138,7 +142,9 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         then the test will be skipped in the python layer.
 
         """
-        if _is_gles_version(version) and _HAS_GLES_BIN:
+        if (_is_gles_version(version)
+                and _HAS_GLES_BIN
+                and not _FORCE_DESKTOP_VERSION):
             return 'glslparsertest_gles2'
         elif _HAS_GL_BIN:
             return 'glslparsertest'

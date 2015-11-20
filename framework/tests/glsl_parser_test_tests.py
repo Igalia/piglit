@@ -391,6 +391,16 @@ def test_get_glslparsertest_gles2():
             test.description = description.format(version)
             yield test, content.format(version), 'glslparsertest'
 
+    description = ("test.glsl_parser_test.GLSLParserTest: "
+                   "gets gl binary if glsl is '{}' and "
+                   "PIGLIT_FORCE_GLSLPARSER_DESKTOP is true")
+
+    with mock.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', False):
+        with mock.patch('framework.test.glsl_parser_test._FORCE_DESKTOP_VERSION', True):
+            for version in versions:
+                test.description = description.format(version)
+                yield test, content.format(version), 'glslparsertest'
+
 
 def test_set_glsl_version():
     """test.glsl_parser_test.GLSLParserTest: sets glsl_version"""
