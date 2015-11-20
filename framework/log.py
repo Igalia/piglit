@@ -40,6 +40,7 @@ except ImportError:
     import json
 
 from framework.core import PIGLIT_CONFIG
+from framework import grouptools
 
 __all__ = ['LogManager']
 
@@ -213,7 +214,7 @@ class VerboseLog(QuietLog):
         status line should.
 
         """
-        super(VerboseLog, self)._print(out)
+        super(VerboseLog, self)._print(grouptools.format(out))
         if newline:
             sys.stdout.write('\n')
             sys.stdout.flush()
