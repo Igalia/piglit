@@ -1432,13 +1432,13 @@ for stage in ['vs', 'gs', 'fs']:
 
     for type in ('i', 'u', ''):
         for sampler in ('sampler2DMS', 'sampler2DMSArray'):
-            for samples in ('2', '4', '8'):
+            for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
                 stype = '{}{}'.format(type, sampler)
                 profile.test_list[grouptools.join(
                     'spec', 'arb_shader_texture_image_samples',
-                    'textureSamples', '{}-{}-{}'.format(stage, stype, samples))
+                    'textureSamples', '{}-{}-{}'.format(stage, stype, sample_count))
                 ] = PiglitGLTest([
-                    'textureSamples', stage, stype, samples])
+                    'textureSamples', stage, stype, sample_count])
 
 with profile.group_manager(
         PiglitGLTest,
@@ -1746,9 +1746,8 @@ with profile.group_manager(
     g(['texelFetch', 'fs', 'sampler2DMSArray', '4', '98x129x1-98x129x9'])
     g(['arb_texture_multisample-texstate'])
     g(['arb_texture_multisample-errors'])
-    g(['arb_texture_multisample-texelfetch', '2'])
-    g(['arb_texture_multisample-texelfetch', '4'])
-    g(['arb_texture_multisample-texelfetch', '8'])
+    for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
+        g(['arb_texture_multisample-texelfetch', sample_count])
     g(['arb_texture_multisample-sample-mask'])
     g(['arb_texture_multisample-sample-mask-value'])
     g(['arb_texture_multisample-sample-mask-execution'])
@@ -2228,7 +2227,7 @@ with profile.group_manager(
           'ignore-centroid-qualifier {}'.format(num_samples),
           run_concurrent=False)
 
-    for num_samples in [0, 2, 4, 6, 8]:
+    for num_samples in (0,) + MSAA_SAMPLE_COUNTS:
         g(['arb_sample_shading-builtin-gl-sample-mask-simple',
            str(num_samples)],
           'builtin-gl-sample-mask-simple {}'.format(num_samples))
