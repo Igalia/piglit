@@ -106,6 +106,22 @@ class _ReList(collections.MutableSequence):
         return [l.pattern for l in self]
 
 
+class _FilterReList(_ReList):
+    """A version of ReList that handles group madness.
+
+    Groups are printed with '/' as a separator, but internally something else
+    may be used. This version replaces '/' with '.'.
+
+    """
+    def __setitem__(self, index, value):
+        # Replace '/' with '.', this solves the problem of '/' not matching
+        # grouptools.SEPARATOR, but without needing to import grouptools
+        super(_FilterReList, self).__setitem__(index, value.replace('/', '.'))
+
+    def insert(self, index, value):
+        super(_FilterReList, self).insert(index, value.replace('/', '.'))
+
+
 class _ReListDescriptor(object):
     """A Descriptor than ensures reassignment of _{in,ex}clude_filter is an
     _ReList
@@ -115,8 +131,9 @@ class _ReListDescriptor(object):
     point.
 
     """
-    def __init__(self, name):
+    def __init__(self, name, type_=_ReList):
         self.__name = name
+        self.__type = type_
 
     def __get__(self, instance, cls):
         try:
@@ -131,10 +148,10 @@ class _ReListDescriptor(object):
 
     def __set__(self, instance, value):
         assert isinstance(value, (collections.Sequence, collections.Set))
-        if isinstance(value, _ReList):
+        if isinstance(value, self.__type):
             setattr(instance, self.__name, value)
         else:
-            setattr(instance, self.__name, _ReList(value))
+            setattr(instance, self.__name, self.__type(value))
 
     def __delete__(self, instance):
         raise NotImplementedError('Cannot delete {} from {}'.format(
@@ -160,8 +177,8 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     env -- environment variables set for each test before run
 
     """
-    include_filter = _ReListDescriptor('_include_filter')
-    exclude_filter = _ReListDescriptor('_exclude_filter')
+    include_filter = _ReListDescriptor('_include_filter', type_=_FilterReList)
+    exclude_filter = _ReListDescriptor('_exclude_filter', type_=_FilterReList)
 
     def __init__(self):
         self.concurrent = True

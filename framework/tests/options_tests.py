@@ -185,3 +185,17 @@ def test_options_clear():
     test.clear()
 
     nt.eq_(list(iter(baseline)), list(iter(test)))
+
+
+def test_filterrelist_set():
+    """options._FilterReList.__setitem__: replaces '/' with '.'"""
+    test = options._FilterReList(['foo'])
+    test[0] = 'foo/bar'
+    nt.eq_(test[0].pattern, 'foo.bar')
+
+
+def test_filterrelist_insert():
+    """options._FilterReList.insert: replaces '/' with '.'"""
+    test = options._FilterReList()
+    test.insert(0, 'foo/bar')
+    nt.eq_(test[0].pattern, 'foo.bar')
