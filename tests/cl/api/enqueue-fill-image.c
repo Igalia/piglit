@@ -114,6 +114,9 @@ piglit_cl_test(const int argc,
 		return PIGLIT_SKIP;
 	}
 
+	free(image_support);
+	image_support = NULL;
+
 	img_format.image_channel_order = CL_RGBA;
 	img_format.image_channel_data_type = CL_UNSIGNED_INT8;
 	img_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
@@ -325,7 +328,6 @@ piglit_cl_test(const int argc,
 	 */
 	/* This is a per device test, clCreateImage would have failed before */
 
-	free(image_support);
 	clReleaseMemObject(image);
 	return result;
 #else
