@@ -247,8 +247,8 @@ consistency_check(GLuint prog, const struct subtest_index_t st, GLint index)
 	}
 
 	if (index != old_index) {
-		printf("Index inconsistent with the old API: %i vs %i\n",
-		       index, old_index);
+		printf("Index inconsistent with the old API for %S: %i vs %i\n",
+		       st.name, index, old_index);
 		return false;
 	} else
 		return true;
