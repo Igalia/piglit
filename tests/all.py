@@ -2156,6 +2156,8 @@ with profile.group_manager(
       'UseProgramStages - non-separable program')
     g(['arb_separate_shader_object-ProgramUniform-coverage'],
       'ProgramUniform coverage')
+    g(['arb_separate_shader_object-rendezvous_by_name'],
+      'Rendezvous by name')
     g(['arb_separate_shader_object-rendezvous_by_location', '-fbo'],
       'Rendezvous by location', run_concurrent=False)
     g(['arb_separate_shader_object-rendezvous_by_location-5-stages'],
