@@ -2158,6 +2158,8 @@ with profile.group_manager(
       'ProgramUniform coverage')
     g(['arb_separate_shader_object-rendezvous_by_name'],
       'Rendezvous by name')
+    g(['arb_separate_shader_object-rendezvous_by_name_interpolation'],
+      'Rendezvous by name with multiple interpolation qualifier')
     g(['arb_separate_shader_object-rendezvous_by_location', '-fbo'],
       'Rendezvous by location', run_concurrent=False)
     g(['arb_separate_shader_object-rendezvous_by_location-5-stages'],

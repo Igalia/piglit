@@ -19,5 +19,6 @@ piglit_add_executable (arb_separate_shader_object-rendezvous_by_location rendezv
 piglit_add_executable (arb_separate_shader_object-rendezvous_by_location-3-stages rendezvous_by_location-3-stages.c)
 piglit_add_executable (arb_separate_shader_object-rendezvous_by_location-5-stages rendezvous_by_location-5-stages.c)
 piglit_add_executable (arb_separate_shader_object-rendezvous_by_name rendezvous_by_name.c sso-common.c)
+piglit_add_executable (arb_separate_shader_object-rendezvous_by_name_interpolation rendezvous_by_name_interpolation.c sso-common.c)
 piglit_add_executable (arb_separate_shader_object-UseProgramStages-non-separable UseProgramStages-non-separable.c)
 piglit_add_executable (arb_separate_shader_object-ValidateProgramPipeline ValidateProgramPipeline.c)
