@@ -2188,6 +2188,8 @@ with profile.group_manager(
       '400 combinations by name', run_concurrent=False)
     g(['arb_separate_shader_object-active-sampler-conflict'],
       'active sampler conflict')
+    g(['arb_separate_shader_object-atomic-counter'],
+      'atomic counter')
 
 # Group ARB_sampler_objects
 with profile.group_manager(
