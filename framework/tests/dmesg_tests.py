@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2015 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,348 +18,324 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Provides tests for the dmesg class
+"""Tests for the dmesg module.
 
-Tests that require sudo have sudo in their name, if you don't have sudo or
-don't want to run them use '-e sudo' with nosetests
+This module makes extensive use of mock to avoid actually calling into dmesg,
+which allows us to test all classes on all platforms, including windows.
 
 """
 
-from __future__ import print_function, absolute_import
-import os
-import subprocess
+from __future__ import absolute_import, division, print_function
 import re
+import warnings
 
+import mock
 import nose.tools as nt
-from nose.plugins.skip import SkipTest
-from nose.plugins.attrib import attr
 
-from framework import dmesg, status
-import framework.core
-import framework.test
-import framework.tests.utils as utils
+from . import utils
+from framework import dmesg, status, results
+
+# pylint: disable=invalid-name,line-too-long,attribute-defined-outside-init
 
 
-# Helpers
-def _get_dmesg():
-    """ checks to ensure dmesg is not DummyDmesg, raises skip if it is
-
-    If we are on a non-posix system we will get a dummy dmesg, go ahead and
-    skip in that case
-    """
-    test = dmesg.get_dmesg()
-    if isinstance(test, dmesg.DummyDmesg):
-        raise SkipTest("A DummyDmesg was returned, testing dmesg impossible.")
-    return test
-
-
-def _write_dev_kmesg():
-    """ Try to write to /dev/kmesg, skip if not possible
-
-    Writing to the dmesg ringbuffer at /dev/kmesg ensures that we varies
-    functionality in the LinuxDmesg class will go down the
-    dmesg-has-new-entries path.
-
-    If we anything goes wrong here just skip.
-    """
-    err = subprocess.call(['sudo', 'sh', '-c',
-                           'echo "piglit dmesg test" > /dev/kmsg'])
-    if err != 0:
-        raise SkipTest("Writing to the ringbuffer failed")
-
-
-class DummyLog(object):
-    """ A very smiple dummy for the Logger """
-    def __init__(self):
-        pass
-
-    def start(self, *args):
-        return None
-
-    def log(self, *args):
-        pass
-
-    def summary(self, *args):
-        pass
-
-
+@nt.nottest
 class TestDmesg(dmesg.BaseDmesg):
-    """ A special implementation of Dmesg that is easy to test with """
-    def update_dmesg(self):
+    """Test Dmesg class. stubs update_dmesg and __init__"""
+    def update_dmesg(self, *args, **kwargs):
         pass
 
-
-# Tests
-@utils.no_error
-def test_linux_initialization():
-    """dmesg.LinuxDmesg: class initializes"""
-    dmesg.LinuxDmesg()
+    def __init__(self):
+        super(TestDmesg, self).__init__()
+        self._new_messages = ['some', 'new', 'messages']
 
 
-@utils.no_error
-def test_dummy_initialization():
-    """dmesg.DummyDmesg: class initializes"""
-    dmesg.DummyDmesg()
+class TestBaseDmesg(object):
+    """Tests for the BaseDmesg class."""
+    @classmethod
+    def setup_class(cls):
+        cls.dmesg = TestDmesg()
+
+    def setup(self):
+        self.result = results.TestResult()
+        self.result.dmesg = mock.sentinel.dmesg
+
+    def test_update_result_dmesg(self):
+        """dmesg.BaseDmesg.update_result: records new dmesg content in result"""
+        self.dmesg.update_result(self.result)
+        nt.assert_is_not(self.result.dmesg, mock.sentinel.dmesg)
+
+    def test_update_result_status_unchanged(self):
+        """dmesg.BaseDmesg.update_result: Doesn't change status it shouldn't
+
+        Only 'pass', 'warn', and 'fail' should be changed.
+
+        """
+        failed = set()
+
+        for stat in status.ALL:
+            if stat in ['pass', 'warn', 'fail']:
+                continue
+            self.result.result = stat
+            self.dmesg.update_result(self.result)
+            if self.result.result != stat:
+                failed.add(stat)
+
+        if failed:
+            raise AssertionError(
+                "The following status(es) were changed which should not have "
+                "been:\n"
+                "{}\n".format('\n'.join(failed)))
+
+    def test_update_result_status_changed(self):
+        """dmesg.BaseDmesg.update_result: changes pass fail and warn"""
+        failed = set()
+
+        for stat in ['pass', 'warn', 'fail']:
+            self.result.result = stat
+            self.dmesg.update_result(self.result)
+            if self.result.result == stat:
+                failed.add(stat)
+
+        if failed:
+            raise AssertionError(
+                "The following status(es) were not changed which should not "
+                "have been:\n"
+                "{}\n".format('\n'.join(failed)))
+
+    def test_update_result_subtest_unchanged(self):
+        """dmesg.BaseDmesg.update_result: Doesn't change subtests it shouldn't
+
+        Only 'pass', 'warn', and 'fail' should be changed.
+
+        """
+        failed = set()
+
+        for stat in status.ALL:
+            if stat in ['pass', 'warn', 'fail']:
+                continue
+            self.result.subtests['foo'] = stat
+            self.dmesg.update_result(self.result)
+            if self.result.subtests['foo'] != stat:
+                failed.add(stat)
+
+        if failed:
+            raise AssertionError(
+                "The following status(es) were changed which should not have "
+                "been:\n"
+                "{}\n".format('\n'.join(failed)))
+
+    def test_update_subtest_changed(self):
+        """dmesg.BaseDmesg.update_result: changes subtests pass fail and warn"""
+        failed = set()
+
+        for stat in status.ALL:
+            if stat in ['pass', 'warn', 'fail']:
+                continue
+            self.result.subtests['foo'] = stat
+            self.dmesg.update_result(self.result)
+            if self.result.subtests['foo'] != stat:
+                failed.add(stat)
+
+        if failed:
+            raise AssertionError(
+                "The following status(es) were changed which should not have "
+                "been:\n"
+                "{}\n".format('\n'.join(failed)))
+
+
+def test_update_result_regex_no_match():
+    """dmesg.BaseDmesg.update_result: if no regex matches dont change status"""
+    dmesg_ = TestDmesg()
+    dmesg_.regex = re.compile(r'nomatchforthisreally')
+    result = results.TestResult('pass')
+    dmesg_.update_result(result)
+
+    nt.eq_(result.result, 'pass')
+
+
+def test_update_result_regex_match():
+    """dmesg.BaseDmesg.update_result: if regex matches change status"""
+    dmesg_ = TestDmesg()
+    dmesg_.regex = re.compile(r'.*')
+    result = results.TestResult('pass')
+    dmesg_.update_result(result)
+
+    nt.assert_not_equal(result.result, 'pass')
+
+
+@utils.nose_generator
+def test_update_result_specific():
+    """Generator that tests specific result mappings."""
+    dmesg_ = TestDmesg()
+    tests = [
+        ('pass', 'dmesg-warn'),
+        ('warn', 'dmesg-fail'),
+        ('fail', 'dmesg-fail'),
+    ]
+    description = 'dmesg.BaseDmesg.update_result: replaces {} with {}'
+
+    def test(initial, expected):
+        result = results.TestResult(initial)
+        dmesg_.update_result(result)
+        nt.eq_(result.result, expected)
+
+    for initial, expected in tests:
+        test.description = description.format(initial, expected)
+        yield test, initial, expected
+
+
+@utils.nose_generator
+def test_linuxdmesg_gzip_errors():
+    """Generator to test exceptions that need to be passed when reading
+    config.gz.
+
+    """
+    exceptions = {
+        OSError,
+        IOError,
+    }
+    description = "dmesg.LinuxDmesg: Doesn't stop on {} when reading gzip."
+
+    @mock.patch('framework.dmesg.LinuxDmesg.update_dmesg', mock.Mock())
+    def test(exception):
+        try:
+            with mock.patch('framework.dmesg.gzip.open',
+                            mock.Mock(side_effect=exception)):
+                with warnings.catch_warnings():
+                    warnings.simplefilter('error')
+                    dmesg.LinuxDmesg()
+        except (dmesg.DmesgError, RuntimeWarning):
+            pass
+
+    for exception in exceptions:
+        test.description = description.format(exception.__name__)
+        yield test, exception
+
+
+@nt.raises(dmesg.DmesgError)
+@mock.patch('framework.dmesg.gzip.open', mock.Mock(side_effect=IOError))
+def test_linuxdmesg_timestamp():
+    """dmesg.LinuxDmesg: If timestamps are not detected raise"""
+    with mock.patch('framework.dmesg.subprocess.check_output',
+                    mock.Mock(return_value='foo\nbar\n')):
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            dmesg.LinuxDmesg()
+
+
+@nt.raises(RuntimeWarning)
+@mock.patch('framework.dmesg.gzip.open', mock.Mock(side_effect=IOError))
+def test_linuxdmesg_warn():
+    """dmesg.LinuxDmesg: Warn if timestamp support is uncheckable"""
+    with mock.patch('framework.dmesg.LinuxDmesg.update_dmesg', mock.Mock()):
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            dmesg.LinuxDmesg()
+
+
+def test_linuxdmesg_update_dmesg_update():
+    """dmesg.LinuxDmesg.update_dmesg: calculate dmesg changes correctly with changes"""
+    result = results.TestResult('pass')
+
+    with mock.patch('framework.dmesg.subprocess.check_output',
+                    mock.Mock(return_value='[1.0]this')):
+        dmesg_ = dmesg.LinuxDmesg()
+
+    with mock.patch('framework.dmesg.subprocess.check_output',
+                    mock.Mock(return_value='[1.0]this\n[2.0]is\n[3.0]dmesg\n')):
+        dmesg_.update_result(result)
+
+    nt.eq_(result.dmesg, '[2.0]is\n[3.0]dmesg')
+
+
+def test_linuxdmesg_update_dmesg_update_no_change():
+    """dmesg.LinuxDmesg.update_dmesg: calculate dmesg changes correctly with no changes"""
+    result = results.TestResult('pass')
+    result.dmesg = mock.sentinel.dmesg
+
+    with mock.patch('framework.dmesg.subprocess.check_output',
+                    mock.Mock(return_value='[1.0]this')):
+        dmesg_ = dmesg.LinuxDmesg()
+        dmesg_.update_result(result)
+
+    nt.eq_(result.dmesg, mock.sentinel.dmesg)
+
+
+def test_dummydmesg_uupate_result():
+    """dmesg.DummyDmesg.update_result: returns result unmodified"""
+    dmesg_ = dmesg.DummyDmesg()
+    result = mock.MagicMock(spec=results.TestResult())
+    result.dmesg = mock.sentinel.dmesg
+    result.result = mock.sentinel.result
+    dmesg_.update_result(result)
+
+    nt.eq_(result.dmesg, mock.sentinel.dmesg)
+    nt.eq_(result.result, mock.sentinel.result)
+
+
+@utils.nose_generator
+def test_get_dmesg():
+    """Generate tests for get_dmesg."""
+    tests = [
+        ('linux', dmesg.LinuxDmesg),
+        # There is no dmesg on windows, thus it will always get the dummy
+        ('win32', dmesg.DummyDmesg),
+    ]
+    description = 'dmesg.get_dmesg: returns correct class when platform is {}'
+
+    def test(platform, class_):
+        with mock.patch('framework.dmesg.sys.platform', platform):
+            ret = dmesg.get_dmesg()
+        nt.assert_is_instance(ret, class_)
+
+    for platform, class_ in tests:
+        test.description = description.format(platform)
+        yield test, platform, class_
 
 
 def test_get_dmesg_dummy():
-    """dmesg.get_dmesg: Returns a DummyDmesg when not_dummy is False"""
-    dummy = dmesg.get_dmesg(not_dummy=False)
-    nt.assert_is(type(dummy), dmesg.DummyDmesg,
-                 msg=("Error: get_dmesg should have returned DummyDmesg, "
-                      "but it actually returned {}".format(type(dummy))))
+    """dmesg.get_dmesg: when not_dummy=False a dummy is provided"""
+    # Linux was selected since it would normally return LinuxDmesg
+    with mock.patch('framework.dmesg.sys.platform', 'linux'):
+        ret = dmesg.get_dmesg(False)
+    nt.assert_is_instance(ret, dmesg.DummyDmesg)
 
 
-def test_get_dmesg_linux():
-    """dmesg.get_dmesg: Returns a LinuxDmesg when not_dummy is True and the OS is Linux
-    """
-    utils.platform_check('linux')
-    posix = _get_dmesg()
-    nt.assert_is(type(posix), dmesg.LinuxDmesg,
-                 msg=("Error: get_dmesg should have returned LinuxDmesg, "
-                      "but it actually returned {}".format(type(posix))))
+def test_partial_wrap():
+    """dmesg.LinuxDmesg.update_dmesg: correctly handles partial wrap
 
-
-@attr('privileged')
-def test_update_dmesg_with_updates():
-    """dmesg.Dmesg.update_dmesg(): updates results when there is a new entry in dmesg
-
-    This will skip on non-Posix systems, since there is no way to actually test
-    it.
-
-    Because this test needs to write into the dmesg ringbuffer to assure that
-    the ringbuffer has changed and that our class successfully catches that
-    change it requires root access, gained by sudo. In the event that it cannot
-    get sudo it will skip.
+    Since dmesg is a ringbuffer (at least on Linux) it can roll over, and we
+    need to ensure that we're handling that correctly.
 
     """
-    test = _get_dmesg()
-    _write_dev_kmesg()
+    result = results.TestResult()
 
-    test.update_dmesg()
-    nt.assert_not_equal(test._new_messages, [],
-                        msg=("{0} does not return updates, even when dmesg "
-                             "has been updated.".format(test.__class__)))
+    mock_out = mock.Mock(return_value='[1.0]This\n[2.0]is\n[3.0]dmesg')
+    with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
+        test = dmesg.LinuxDmesg()
+
+    mock_out.return_value = '[3.0]dmesg\n[4.0]whoo!'
+    with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
+        test.update_result(result)
+
+    nt.eq_(result.dmesg, '[4.0]whoo!')
 
 
-@attr('privileged')
-def test_update_dmesg_without_updates():
-    """dmesg.Dmesg.update_dmesg(): does not update results when there is no change in dmesg
+def test_complete_wrap():
+    """dmesg.LinuxDmesg.update_dmesg: correctly handles complete wrap
 
-    This will skip on non-Posix systems, since there is no way to actually test
-    it.
-
-    Because this test needs to write into the dmesg ringbuffer to assure that
-    the ringbuffer has changed and that our class successfully catches that
-    change it requires root access, gained by sudo. In the event that it cannot
-    get sudo it will skip.
+    Since dmesg is a ringbuffer (at least on Linux) it can roll over, and we
+    need to ensure that we're handling that correctly.
 
     """
-    test = _get_dmesg()
-    test.update_dmesg()
-    nt.assert_equal(test._new_messages, [],
-                    msg=("{0} returned updates, even when dmesg has not been "
-                         "updated.".format(test.__class__)))
+    result = results.TestResult()
 
+    mock_out = mock.Mock(return_value='[1.0]This\n[2.0]is\n[3.0]dmesg')
+    with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
+        test = dmesg.LinuxDmesg()
 
-def test_dmesg_wrap_partial():
-    """dmesg.Dmesg.update_dmesg(): still works after partial wrap of dmesg
+    mock_out.return_value = '[4.0]whoo!\n[5.0]doggy'
+    with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
+        test.update_result(result)
 
-    We can overwrite the DMESG_COMMAND class variable to emluate dmesg being
-    filled up and overflowing. What this test does is starts with a string that
-    looks like this: "a\nb\nc\n" (this is used to emluate the contents of
-    dmesg), we then replace that with "b\nc\nd\n", and ensure that the update
-    of dmesg contains only 'd', becasue 'd' is the only new value in the
-    updated dmesg.
-
-    """
-    # We don't want weird side effects of changing DMESG_COMMAND globally, so
-    # instead we set it as a class instance and manually clear the
-    # _last_messages attribute
-    test = dmesg.LinuxDmesg()
-    test.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
-    test.update_dmesg()
-
-    # Update the DMESG_COMMAND to add d\n and remove a\n, this simluates the
-    # wrap
-    test.DMESG_COMMAND = ['echo', 'b\nc\nd\n']
-    test.update_dmesg()
-
-    nt.assert_items_equal(test._new_messages, ['d'],
-                          msg=("_new_messages should be equal to ['d'], but is"
-                               " {} instead.".format(test._new_messages)))
-
-
-def test_dmesg_wrap_complete():
-    """dmesg.Dmesg.update_dmesg(): still works acter complete wrap of dmesg
-
-    just like the partial version, but with nothing in common.
-
-    """
-    # We don't want weird side effects of changing DMESG_COMMAND globally, so
-    # instead we set it as a class instance and manually clear the
-    # _last_messages attribute
-    test = dmesg.LinuxDmesg()
-    test.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
-    test.update_dmesg()
-
-    # Udamte the DMESG_COMMAND to add d\n and remove a\n, this simluates the
-    # wrap
-    test.DMESG_COMMAND = ['echo', '1\n2\n3\n']
-    test.update_dmesg()
-
-    nt.assert_items_equal(test._new_messages, ['1', '2', '3'],
-                          msg=("_new_messages should be equal to "
-                               "['1', '2', '3'], but is {} instead".format(
-                                   test._new_messages)))
-
-
-@utils.nose_generator
-def test_update_result_replace():
-    """ Generates tests for update_result """
-
-    def create_test_result(res):
-        result = framework.results.TestResult()
-        result.result = res
-        result.subtests['test'] = res
-        return result
-
-    dmesg = TestDmesg()
-    for res in [status.status_lookup(x) for x in
-                ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']]:
-        dmesg.regex = None
-        dmesg._new_messages = ['add', 'some', 'stuff']
-        new_result = dmesg.update_result(create_test_result(res))
-
-        check_update_result.description = \
-            "dmesg.Dmesg.update_result: '{0}' replaced correctly".format(res)
-        yield check_update_result, new_result.result, res
-
-        check_update_result.description = \
-            "dmesg.Dmesg.update_result: subtest '{0}' replaced correctly".format(res)
-        yield check_update_result, new_result.subtests['test'], res
-
-
-@utils.nose_generator
-def test_update_result_no_match_regex():
-    """ Generates tests for update_result """
-
-    def create_test_result(res):
-        result = framework.results.TestResult()
-        result.result = res
-        result.subtests['test'] = res
-        return result
-
-    dmesg = TestDmesg()
-    for res in [status.status_lookup(x) for x in
-                ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']]:
-        # check that the status is not updated when Dmesg.regex is set and does
-        # not match the dmesg output
-        dmesg.regex = re.compile("(?!)")
-        dmesg._new_messages = ['more', 'new', 'stuff']
-        new_result = dmesg.update_result(create_test_result(res))
-
-        check_equal_result.description = \
-            "dmesg.Dmesg.update_result: with non-matching regex '{0}'".format(res)
-        yield check_equal_result, new_result.result, res
-
-
-@utils.nose_generator
-def test_update_result_match_regex():
-    """ Generates tests for update_result """
-
-    def create_test_result(res):
-        result = framework.results.TestResult()
-        result.result = res
-        result.subtests['test'] = res
-        return result
-
-    dmesg = TestDmesg()
-    for res in [status.status_lookup(x) for x in
-                ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']]:
-        # check that the status is updated when Dmesg.regex is set and matches
-        # the dmesg output
-        dmesg.regex = re.compile("piglit.*test")
-        dmesg._new_messages = ['piglit.awesome.test', 'and', 'stuff']
-        new_result = dmesg.update_result(create_test_result(res))
-
-        check_update_result.description = \
-            "dmesg.Dmesg.update_result: with matching regex '{0}'".format(res)
-        yield check_update_result, new_result.result, res
-
-
-def check_equal_result(result, status):
-    """ Tests that the result and status are equal
-
-    Dmesg.update_results() should not change the status if Dmesg.regex is set
-    and the dmesg output did not match it.
-
-    """
-
-    nt.assert_equal(result, status,
-                    msg="status should not have changed from {} to {}".format(
-                        status, result))
-
-
-def check_update_result(result, status):
-    """ Tests that update result replaces results correctly
-
-    Dmesg.update_results() should take a TestResult instance and replace the
-    result instance with a dmesg-statuses when appropriate. Appropriate
-    instances to be replaced are: pass, warn, fail.
-
-    """
-    if status == "pass":
-        nt.assert_equal(result, 'dmesg-warn',
-                        msg="pass should be replaced with dmesg-warn")
-    elif status in ['warn', 'fail']:
-        nt.assert_equal(result, 'dmesg-fail',
-                        msg="{} should be replaced with dmesg-fail".format(
-                            status))
-    else:
-        nt.assert_equal(result, status,
-                        msg="{} should not have changed, but was {}.".format(
-                            result, status))
-
-
-def test_update_result_add_dmesg():
-    """dmesg.Dmesg.update_result: sets the dmesg attribute"""
-    test = TestDmesg()
-
-    result = framework.results.TestResult()
-    result.result = 'pass'
-    messages = ['some', 'new', 'messages']
-
-    test._new_messages = messages
-    result = test.update_result(result)
-
-    nt.eq_(result.dmesg, '\n'.join(messages),
-           msg="result does not have dmesg member but should")
-
-
-@attr('privileged')
-def test_execute_dmesg():
-    """test.base.Test.execute: dmesg statuses are applied
-
-    This tests only one contrived test for dmesg handling. It does though test
-    that the path in execute to change the status works, which makes it a
-    comprehensive test.
-
-    """
-    if not os.path.exists('bin'):
-        raise SkipTest("This tests requires a working, built version of "
-                       "piglit")
-    utils.binary_check('true')
-
-    # Create the test and then write to dmesg to ensure that it actually works
-    class _localclass(utils.Test):
-        def run(self):
-            _write_dev_kmesg()
-            super(_localclass, self).run()
-
-        def interpret_result(self):
-            self.result.result = 'pass'
-
-    test = _localclass(['true'])
-    test.execute(None, DummyLog(), _get_dmesg())
-    nt.eq_(test.result.result, 'dmesg-warn')
+    nt.eq_(result.dmesg, '[4.0]whoo!\n[5.0]doggy')
