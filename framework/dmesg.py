@@ -36,19 +36,19 @@ dmesg implementation for their OS.
 """
 
 from __future__ import print_function, absolute_import
-import re
-import sys
-import subprocess
-import warnings
 import abc
 import gzip
+import re
+import subprocess
+import sys
+import warnings
 
 from framework import exceptions
 
 __all__ = [
     'BaseDmesg',
-    'LinuxDmesg',
     'DummyDmesg',
+    'LinuxDmesg',
     'get_dmesg',
 ]
 
