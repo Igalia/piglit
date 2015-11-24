@@ -168,9 +168,9 @@ class LinuxDmesg(BaseDmesg):
         # First check to see if we can find the live kernel config.
         try:
             with gzip.open("/proc/config.gz", 'r') as f:
-                    for line in f:
-                            if line.startswith("CONFIG_PRINTK_TIME=y"):
-                                    return
+                for line in f:
+                    if line.startswith("CONFIG_PRINTK_TIME=y"):
+                        return
         # If there is a malformed or missing file, just ignore it and try the
         # regex match (which may not exist if dmesg ringbuffer was cleared).
         except Exception:
