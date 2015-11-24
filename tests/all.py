@@ -2052,6 +2052,7 @@ with profile.group_manager(
        'enable-fb-srgb',
        'single-sample'],
       'fbo-fast-clear')
+    g(['arb_framebuffer_srgb-fast-clear-blend'])
 
 with profile.group_manager(
         PiglitGLTest,
