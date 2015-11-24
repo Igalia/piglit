@@ -43,6 +43,8 @@ import warnings
 import abc
 import gzip
 
+from framework import exceptions
+
 __all__ = [
     'BaseDmesg',
     'LinuxDmesg',
@@ -188,7 +190,7 @@ class LinuxDmesg(BaseDmesg):
             # Do an initial check to ensure that dmesg has timestamps, we need
             # timestamps to work correctly. A proper linux dmesg timestamp
             # looks like this: [    0.00000]
-            raise DmesgError(
+            raise exceptions.PiglitFatalError(
                 "Your kernel does not seem to support timestamps, which "
                 "are required by the --dmesg option")
 
@@ -235,10 +237,6 @@ class DummyDmesg(BaseDmesg):
     def update_result(self, result):
         """ Dummy version of update_result """
         return result
-
-
-class DmesgError(EnvironmentError):
-    pass
 
 
 def get_dmesg(not_dummy=True):

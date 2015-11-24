@@ -33,7 +33,7 @@ import mock
 import nose.tools as nt
 
 from . import utils
-from framework import dmesg, status, results
+from framework import dmesg, status, results, exceptions
 
 # pylint: disable=invalid-name,line-too-long,attribute-defined-outside-init
 
@@ -190,7 +190,7 @@ def test_linuxdmesg_gzip_errors():
     config.gz.
 
     """
-    exceptions = {
+    exceptions_ = {
         OSError,
         IOError,
     }
@@ -204,15 +204,15 @@ def test_linuxdmesg_gzip_errors():
                 with warnings.catch_warnings():
                     warnings.simplefilter('error')
                     dmesg.LinuxDmesg()
-        except (dmesg.DmesgError, RuntimeWarning):
+        except (exceptions.PiglitFatalError, RuntimeWarning):
             pass
 
-    for exception in exceptions:
+    for exception in exceptions_:
         test.description = description.format(exception.__name__)
         yield test, exception
 
 
-@nt.raises(dmesg.DmesgError)
+@nt.raises(exceptions.PiglitFatalError)
 @mock.patch('framework.dmesg.gzip.open', mock.Mock(side_effect=IOError))
 def test_linuxdmesg_timestamp():
     """dmesg.LinuxDmesg: If timestamps are not detected raise"""
