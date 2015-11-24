@@ -33,6 +33,13 @@
  * various different code paths to implement a fast clear optimisation
  * and the path taken depends on the color chosen to a certain
  * degree.
+ *
+ * The test can take the following additional arguments:
+ *
+ *  enable-fb-srgb: This will cause it to enable GL_FRAMEBUFFER_SRGB
+ *    before clearing the buffer so that it can test that the color
+ *    gets correctly converted to SRGB before being stored in the
+ *    color buffer.
  */
 
 #include "piglit-util-gl.h"
@@ -109,6 +116,36 @@ clear_colors[][4] = {
 };
 
 static GLuint prog_float, prog_int, prog_uint;
+static bool enable_fb_srgb = false;
+
+static void
+convert_srgb_color(const struct format_desc *format,
+		   float *color)
+{
+	int i;
+
+	/* If the texture is not an sRGB format then no conversion is
+	 * needed regardless of the sRGB settings.
+	 */
+	if (strstr(format->name, "SRGB") == NULL &&
+	    strstr(format->name, "SLUMINANCE") == NULL)
+		return;
+
+	/* If GL_FRAMEBUFFER_SRGB was enabled when we did the clear
+	 * then the clear color would have been converted to SRGB
+	 * before being written. When it is sampled it will be
+	 * converted back to linear. The two conversions cancel each
+	 * other out so we don't need to do anything.
+	 */
+	if (enable_fb_srgb)
+		return;
+
+	/* Otherwise we need to compensate for the color being
+	 * converted to linear when sampled.
+	 */
+	for (i = 0; i < 3; i++)
+		color[i] = piglit_srgb_to_linear(color[i]);
+}
 
 static enum piglit_result
 test_color(GLuint fbo,
@@ -119,9 +156,11 @@ test_color(GLuint fbo,
 {
 	float expected_color[4];
 	float alpha_override;
-	int i;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	if (enable_fb_srgb)
+		glEnable(GL_FRAMEBUFFER_SRGB);
 
 	switch (clear_type) {
 	case GL_INT: {
@@ -167,6 +206,9 @@ test_color(GLuint fbo,
 		break;
 	}
 
+	if (enable_fb_srgb)
+		glDisable(GL_FRAMEBUFFER_SRGB);
+
 	memcpy(expected_color, clear_color, sizeof expected_color);
 
 	switch (format->base_internal_format) {
@@ -204,13 +246,7 @@ test_color(GLuint fbo,
 		break;
 	}
 
-	if (strstr(format->name, "SRGB") ||
-	    strstr(format->name, "SLUMINANCE")) {
-		for (i = 0; i < 3; i++) {
-			expected_color[i] =
-				piglit_srgb_to_linear(expected_color[i]);
-		}
-	}
+	convert_srgb_color(format, expected_color);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	piglit_draw_rect(offset * 16 * 2.0f / piglit_width - 1.0f,
@@ -395,9 +431,16 @@ piglit_init(int argc, char **argv)
 	int test_set_index = 0;
 	int glsl_major, glsl_minor;
 	bool es;
+	int i;
 
-	if (argc >= 2)
-		test_set_index = fbo_lookup_test_set(argv[1]);
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "enable-fb-srgb")) {
+			enable_fb_srgb = true;
+			piglit_require_extension("GL_ARB_framebuffer_sRGB");
+		} else {
+			test_set_index = fbo_lookup_test_set(argv[i]);
+		}
+	}
 
 	piglit_require_extension("GL_ARB_texture_multisample");
 

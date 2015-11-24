@@ -2039,6 +2039,10 @@ with profile.group_manager(
     g(['framebuffer-srgb'], run_concurrent=False)
     g(['arb_framebuffer_srgb-clear'])
     g(['arb_framebuffer_srgb-pushpop'])
+    g(['ext_framebuffer_multisample-fast-clear',
+       'GL_EXT_texture_sRGB',
+       'enable-fb-srgb'],
+      'msaa-fast-clear')
 
 with profile.group_manager(
         PiglitGLTest,
