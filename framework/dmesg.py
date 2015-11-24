@@ -68,6 +68,8 @@ class BaseDmesg(object):
     first, test B will be marked as having the dmesg error.
 
     """
+    __metaclass__ = abc.ABCMeta
+
     @abc.abstractmethod
     def __init__(self):
         # A list containing all messages since the last time dmesg was read.
