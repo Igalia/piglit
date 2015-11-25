@@ -1,0 +1,96 @@
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader passthrough]
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader : require
+layout(triangles) in;
+out vec4 color;
+
+void main() {
+	gl_Position =
+		gl_in[0].gl_Position * gl_TessCoord[0] +
+		gl_in[1].gl_Position * gl_TessCoord[1] +
+		gl_in[2].gl_Position * gl_TessCoord[2];
+	color = tan(vec4(gl_TessCoord[0], gl_TessCoord[1], gl_TessCoord[2], 1.0));
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+in vec4 color[3];
+
+out vec4 color2;
+out vec3 bary;
+
+void main() {
+	color2 = color[0];
+	bary = vec3(1.0, 0.0, 0.0);
+	gl_Position = gl_in[0].gl_Position;
+	EmitVertex();
+
+	color2 = color[1];
+	bary = vec3(0.0, 1.0, 0.0);
+	gl_Position = gl_in[1].gl_Position;
+	EmitVertex();
+
+	color2 = color[2];
+	bary = vec3(0.0, 0.0, 1.0);
+	gl_Position = gl_in[2].gl_Position;
+	EmitVertex();
+}
+
+[fragment shader]
+in vec4 color2;
+in vec3 bary;
+
+void main()
+{
+	// antialias lines to make it a bit easier to see the gradient behind - note half
+	// of the line belongs to this triangle, half to the neighboring one,
+	// linewidth = 1 pixel
+	vec3 a = smoothstep(vec3(0.0), fwidth(bary), bary);
+	float halfedge = min(min(a.x, a.y), a.z);
+	gl_FragColor = mix(vec4(1.0), color2, halfedge);
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+
+[test]
+patch parameter default level outer 1 1 1 1
+patch parameter default level inner 4 4
+
+clear color 0.5 0.5 0.5 1.0
+clear
+patch parameter vertices 3
+
+draw arrays GL_PATCHES 0 6
+
+tolerance 0.15 0.15 0.15 0.0
+
+# first patch check colors close to the corners are correct
+relative probe rgba ( 0.064 , 0.016 ) ( 1.0 , 0.0 , 0.0 , 1.0 )
+relative probe rgba ( 0.872 , 0.016 ) ( 0.0 , 1.0 , 0.0 , 1.0 )
+relative probe rgba ( 0.016 , 0.872 ) ( 0.0 , 0.0 , 1.0 , 1.0 )
+
+# second patch
+relative probe rgba ( 0.064 , 0.984 ) ( 1.0 , 0.0 , 0.0 , 1.0 )
+relative probe rgba ( 0.98 , 0.12 ) ( 0.0 , 1.0 , 0.0 , 1.0 )
+relative probe rgba ( 0.888 , 0.872 ) ( 0.0 , 0.0 , 1.0 , 1.0 )
+
+# check that color close to center of first patch is correct
+# since the vertex color computation is nonlinear we can tell if the patches
+# have been tessellated or not
+relative probe rgba ( 0.364, 0.336 ) ( 0.306, 0.388, 0.353, 1.0 )
+
+# second patch
+relative probe rgba ( 0.624, 0.66 ) ( 0.306, 0.388, 0.353, 1.0 )
