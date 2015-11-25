@@ -145,7 +145,7 @@ def collect_system_info():
              ('glxinfo', ['glxinfo']),
              ('uname', ['uname', '-a']),
              ('clinfo', ['clinfo']),
-             ('lspci', ['lspci'])]
+             ('lspci', ['lspci', '-nn'])]
 
     result = {}
 
