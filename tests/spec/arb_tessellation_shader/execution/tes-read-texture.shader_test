@@ -1,0 +1,64 @@
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader passthrough]
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader : require
+layout(triangles) in;
+out vec4 color;
+uniform sampler2D tex;
+
+void main() {
+	gl_Position =
+		gl_in[0].gl_Position * gl_TessCoord[0] +
+		gl_in[1].gl_Position * gl_TessCoord[1] +
+		gl_in[2].gl_Position * gl_TessCoord[2];
+	color = texture(tex, gl_Position.xy*0.5 + vec2(0.5));
+}
+
+[fragment shader]
+in vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+patch parameter default level outer 25 25 25 25
+patch parameter default level inner 25 25
+
+clear color 0.5 0.5 0.5 1.0
+clear
+patch parameter vertices 3
+uniform int tex 0
+texture checkerboard 0 0 (32, 32) (0.0, 0.0, 0.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+draw arrays GL_PATCHES 0 6
+
+# black portion of checkerboard
+relative probe rgba (0, 0) (0, 0, 0, 0)
+relative probe rgba (0.25, 0.25) (0,0,0,0)
+relative probe rgba (0.75, 0.75) (0,0,0,0)
+
+# green portion of checkerboard
+relative probe rgba (0, 0.75) (0,1,0,0)
+relative probe rgba (0.75, 0.25) (0,1,0,0)
+relative probe rgba (0.5, 0.5) (0,1,0,0)
+
+# should hit the red border color of the texture
+tolerance 0.1 0.1 0 0.1
+relative probe rgba (1, 1) (1,0,0,1)
+relative probe rgba (0, 1) (1,0,0,1)
+relative probe rgba (1, 0) (1,0,0,1)
