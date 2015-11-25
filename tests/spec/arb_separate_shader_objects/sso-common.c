@@ -54,3 +54,19 @@ pick_a_glsl_version(void)
 
 	return glsl_version;
 }
+
+GLuint
+format_and_link_program(GLenum type, const char* code, unsigned glsl_version)
+{
+	char *source;
+	GLuint prog;
+
+	asprintf(&source, code, glsl_version);
+	prog = glCreateShaderProgramv(type, 1,
+			(const GLchar *const *) &source);
+
+	piglit_link_check_status(prog);
+	free(source);
+
+	return prog;
+}

@@ -26,4 +26,7 @@
 
 unsigned pick_a_glsl_version(void);
 
+GLuint format_and_link_program(GLenum type, const char* code,
+                               unsigned glsl_version);
+
 #endif /* SSO_COMMON_H */

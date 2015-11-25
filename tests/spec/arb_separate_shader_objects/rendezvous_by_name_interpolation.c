@@ -131,8 +131,8 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-GLuint format_and_link_program(GLenum type, const char* code, unsigned glsl_version,
-		unsigned q1, unsigned q2, unsigned q3)
+GLuint format_and_link_program_with_qualifiers(GLenum type, const char* code,
+		unsigned glsl_version, unsigned q1, unsigned q2, unsigned q3)
 {
 	char *source;
 	GLuint prog;
@@ -171,15 +171,15 @@ void piglit_init(int argc, char **argv)
 		int next = (i+1) % 4;
 		int prev = (i-1) % 4;
 		printf("Compile vs_prog[%d]\n", i);
-		vs_prog[i] = format_and_link_program(GL_VERTEX_SHADER,
+		vs_prog[i] = format_and_link_program_with_qualifiers(GL_VERTEX_SHADER,
 				vs_code_template, glsl_version, prev, i, next);
 
 		printf("Compile fs_prog_match[%d]\n", i);
-		fs_prog_match[i] = format_and_link_program(GL_FRAGMENT_SHADER,
+		fs_prog_match[i] = format_and_link_program_with_qualifiers(GL_FRAGMENT_SHADER,
 				fs_code_template, glsl_version, prev, i, next);
 
 		printf("Compile fs_prog_unmatch[%d]\n", i);
-		fs_prog_unmatch[i] = format_and_link_program(GL_FRAGMENT_SHADER,
+		fs_prog_unmatch[i] = format_and_link_program_with_qualifiers(GL_FRAGMENT_SHADER,
 				fs_code_template, glsl_version, next, prev, i);
 	}
 
