@@ -84,7 +84,7 @@ fragment_source_int[] =
 	"void\n"
 	"main()\n"
 	"{\n"
-	"	 gl_FragColor = vec4(texelFetch(tex, ivec2(0), 0)) / 127.0;\n"
+	"	 gl_FragColor = vec4(texelFetch(tex, ivec2(0), 0));\n"
 	"}\n";
 
 static const char
@@ -97,7 +97,7 @@ fragment_source_uint[] =
 	"void\n"
 	"main()\n"
 	"{\n"
-	"	 gl_FragColor = vec4(texelFetch(tex, ivec2(0), 0)) / 255.0;\n"
+	"	 gl_FragColor = vec4(texelFetch(tex, ivec2(0), 0));\n"
 	"}\n";
 
 static const struct test_desc *
@@ -113,9 +113,21 @@ clear_colors[][4] = {
 	{ 0.25f, 0.5f, 0.75f, 1.0f },
 	{ 0.75f, 0.5f, 0.25f, 0.0f },
 	{ 0.5f, 0.25f, 0.75f, 0.5f },
+
+	{ 2.0f, 3.0f, 0.5f, 1.0f },
+	{ -2.0f, 0.0f, 0.25f, 1.0f },
+	{ -0.5f, 0.0f, 0.25f, 1.0f },
+};
+
+struct component_sizes {
+	int r, g, b;
+	int a;
+	int l;
+	int i;
 };
 
 static GLuint prog_float, prog_int, prog_uint;
+static GLuint result_fbo;
 static bool enable_fb_srgb = false;
 
 static void
@@ -147,52 +159,67 @@ convert_srgb_color(const struct format_desc *format,
 		color[i] = piglit_srgb_to_linear(color[i]);
 }
 
+static int
+clamp_signed(int value, int size)
+{
+	return CLAMP(value,
+		     -1 << (size - 1),
+		     (int) (UINT32_MAX >> (33 - size)));
+}
+
+static unsigned int
+clamp_unsigned(int value, int size)
+{
+	if (value < 0)
+		return 0;
+	return CLAMP((unsigned int) value, 0, UINT32_MAX >> (32 - size));
+}
+
 static enum piglit_result
-test_color(GLuint fbo,
+test_color(GLuint test_fbo,
 	   int offset,
 	   const struct format_desc *format,
 	   GLenum clear_type,
+	   const struct component_sizes *sizes,
 	   const float *clear_color)
 {
 	float expected_color[4];
-	float alpha_override;
+	int i;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, test_fbo);
 
 	if (enable_fb_srgb)
 		glEnable(GL_FRAMEBUFFER_SRGB);
 
+	memcpy(expected_color, clear_color, sizeof expected_color);
+
 	switch (clear_type) {
 	case GL_INT: {
-		GLint clear_color_int[4] = {
-			clear_color[0] * 127,
-			clear_color[1] * 127,
-			clear_color[2] * 127,
-			clear_color[3] * 127
-		};
+		GLint clear_color_int[4];
+		for (i = 0; i < 4; i++) {
+			expected_color[i] *= 127;
+			clear_color_int[i] = expected_color[i];
+		}
 		if (prog_int == 0)
 			return PIGLIT_SKIP;
 		glUseProgram(prog_int);
 		glClearBufferiv(GL_COLOR,
 				0, /* draw buffer */
 				clear_color_int);
-		alpha_override = 1.0f / 127.0f;
 		break;
 	}
 	case GL_UNSIGNED_INT: {
-		GLint clear_color_uint[4] = {
-			clear_color[0] * 255,
-			clear_color[1] * 255,
-			clear_color[2] * 255,
-			clear_color[3] * 255
-		};
+		GLuint clear_color_uint[4];
+		for (i = 0; i < 4; i++) {
+			expected_color[i] *= 255;
+			clear_color_uint[i] = MAX2(expected_color[i], 0);
+		}
 		if (prog_uint == 0)
 			return PIGLIT_SKIP;
 		glUseProgram(prog_uint);
-		glClearBufferiv(GL_COLOR,
-				0, /* draw buffer */
-				clear_color_uint);
-		alpha_override = 1.0f / 255.0f;
+		glClearBufferuiv(GL_COLOR,
+				 0, /* draw buffer */
+				 clear_color_uint);
 		break;
 	}
 	default:
@@ -202,14 +229,11 @@ test_color(GLuint fbo,
 			     clear_color[2],
 			     clear_color[3]);
 		glClear(GL_COLOR_BUFFER_BIT);
-		alpha_override = 1.0f;
 		break;
 	}
 
 	if (enable_fb_srgb)
 		glDisable(GL_FRAMEBUFFER_SRGB);
-
-	memcpy(expected_color, clear_color, sizeof expected_color);
 
 	switch (format->base_internal_format) {
 	case GL_ALPHA:
@@ -218,43 +242,85 @@ test_color(GLuint fbo,
 		expected_color[2] = 0.0f;
 		break;
 	case GL_INTENSITY:
-		expected_color[0] = clear_color[0];
-		expected_color[1] = clear_color[0];
-		expected_color[2] = clear_color[0];
-		expected_color[3] = clear_color[0];
+		expected_color[1] = expected_color[0];
+		expected_color[2] = expected_color[0];
+		expected_color[3] = expected_color[0];
 		break;
 	case GL_LUMINANCE:
-		expected_color[1] = clear_color[0];
-		expected_color[2] = clear_color[0];
-		expected_color[3] = alpha_override;
+		expected_color[1] = expected_color[0];
+		expected_color[2] = expected_color[0];
+		expected_color[3] = 1.0f;
 		break;
 	case GL_LUMINANCE_ALPHA:
-		expected_color[1] = clear_color[0];
-		expected_color[2] = clear_color[0];
+		expected_color[1] = expected_color[0];
+		expected_color[2] = expected_color[0];
 		break;
 	case GL_RED:
 		expected_color[1] = 0.0f;
 		expected_color[2] = 0.0f;
-		expected_color[3] = alpha_override;
+		expected_color[3] = 1.0f;
 		break;
 	case GL_RG:
 		expected_color[2] = 0.0f;
-		expected_color[3] = alpha_override;
+		expected_color[3] = 1.0f;
 		break;
 	case GL_RGB:
-		expected_color[3] = alpha_override;
+		expected_color[3] = 1.0f;
 		break;
 	}
 
 	convert_srgb_color(format, expected_color);
 
+	if (clear_type == GL_UNSIGNED_NORMALIZED) {
+		for (i = 0; i < 4; i++) {
+			expected_color[i] =
+				CLAMP(expected_color[i], 0.0f, 1.0f);
+		}
+	} else if (clear_type == GL_SIGNED_NORMALIZED) {
+		for (i = 0; i < 4; i++) {
+			expected_color[i] =
+				CLAMP(expected_color[i], -1.0f, 1.0f);
+		}
+	} else if (clear_type == GL_INT) {
+		/* The clear colors are multiplied by 127 for integer
+		 * formats so some of them will be large values. The
+		 * GL spec states that out-of-range integer values
+		 * written to the framebuffer will be clamped so we
+		 * need to replicate this in the expected values. For
+		 * example, the -2.0 color will be set to -254, and
+		 * this will be clamped to -128 for an 8-bit integer
+		 * surface.
+		 */
+		expected_color[0] = clamp_signed(expected_color[0], sizes->r);
+		expected_color[1] = clamp_signed(expected_color[1], sizes->g);
+		expected_color[2] = clamp_signed(expected_color[2], sizes->b);
+		expected_color[3] = clamp_signed(expected_color[3], sizes->a);
+	} else if (clear_type == GL_UNSIGNED_INT) {
+		expected_color[0] = clamp_unsigned(expected_color[0], sizes->r);
+		expected_color[1] = clamp_unsigned(expected_color[1], sizes->g);
+		expected_color[2] = clamp_unsigned(expected_color[2], sizes->b);
+		expected_color[3] = clamp_unsigned(expected_color[3], sizes->a);
+	} else if (test_sets[test_index].format == ext_packed_float) {
+		/* These formats can't store negative values */
+		for (i = 0; i < 4; i++)
+			expected_color[i] = MAX2(expected_color[i], 0.0f);
+	}
+
+	/* Display something on the winsys FBO just so that something
+	 * will be shown. This isn't used for the test results because
+	 * the winsys buffer is a normalised format and some of the
+	 * values we want to detect will be out of the range [0,1].
+	 */
 	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	piglit_draw_rect(offset * 16 * 2.0f / piglit_width - 1.0f,
 			 -1.0f,
 			 16 * 2.0f / piglit_width,
 			 16 * 2.0f / piglit_height);
-	return piglit_probe_rect_rgba(offset * 16, 0, 16, 16,
-				      expected_color) ?
+
+	glBindFramebuffer(GL_FRAMEBUFFER, result_fbo);
+	piglit_draw_rect(-1, -1, 2, 2);
+
+	return piglit_probe_rect_rgba(0, 0, 1, 1, expected_color) ?
 		PIGLIT_PASS :
 		PIGLIT_FAIL;
 }
@@ -264,7 +330,7 @@ test_format(const struct format_desc *format)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	enum piglit_result color_result;
-	GLint l_size, i_size, r_size, g_size, b_size, a_size;
+	struct component_sizes sizes;
 	GLenum type_param;
 	GLenum tex_error;
 	GLint type;
@@ -312,25 +378,25 @@ test_format(const struct format_desc *format)
 	}
 
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
-				 GL_TEXTURE_LUMINANCE_SIZE, &l_size);
+				 GL_TEXTURE_LUMINANCE_SIZE, &sizes.l);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
-				 GL_TEXTURE_ALPHA_SIZE, &a_size);
+				 GL_TEXTURE_ALPHA_SIZE, &sizes.a);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
-				 GL_TEXTURE_INTENSITY_SIZE, &i_size);
+				 GL_TEXTURE_INTENSITY_SIZE, &sizes.i);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
-				 GL_TEXTURE_RED_SIZE, &r_size);
+				 GL_TEXTURE_RED_SIZE, &sizes.r);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
-				 GL_TEXTURE_GREEN_SIZE, &g_size);
+				 GL_TEXTURE_GREEN_SIZE, &sizes.g);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D_MULTISAMPLE, 0,
-				 GL_TEXTURE_BLUE_SIZE, &b_size);
+				 GL_TEXTURE_BLUE_SIZE, &sizes.b);
 
-	if (l_size > 0)
+	if (sizes.l > 0)
 		type_param = GL_TEXTURE_LUMINANCE_TYPE;
-	else if (i_size > 0)
+	else if (sizes.i > 0)
 		type_param = GL_TEXTURE_INTENSITY_TYPE;
-	else if (r_size > 0)
+	else if (sizes.r > 0)
 		type_param = GL_TEXTURE_RED_TYPE;
-	else if (a_size > 0)
+	else if (sizes.a > 0)
 		type_param = GL_TEXTURE_ALPHA_TYPE;
 	else {
 		assert(0);
@@ -343,36 +409,30 @@ test_format(const struct format_desc *format)
 
 	switch (format->base_internal_format) {
 	case GL_ALPHA:
-		r_size = g_size = b_size = 8;
+		sizes.r = sizes.g = sizes.b = 8;
 		break;
 	case GL_INTENSITY:
-		r_size = g_size = b_size = a_size = i_size;
+		sizes.r = sizes.g = sizes.b = sizes.a = sizes.i;
 		break;
 	case GL_LUMINANCE:
-		r_size = g_size = b_size = l_size;
-		a_size = 8;
+		sizes.r = sizes.g = sizes.b = sizes.l;
+		sizes.a = 8;
 		break;
 	case GL_LUMINANCE_ALPHA:
-		r_size = g_size = b_size = l_size;
+		sizes.r = sizes.g = sizes.b = sizes.l;
 		break;
 	case GL_RED:
-		g_size = b_size = a_size = 8;
+		sizes.g = sizes.b = sizes.a = 8;
 		break;
 	case GL_RG:
-		b_size = a_size = 8;
+		sizes.b = sizes.a = 8;
 		break;
 	case GL_RGB:
-		a_size = 8;
+		sizes.a = 8;
 		break;
 	}
 
-	/* We can't measure more bits than what the winsys buffer has */
-	r_size = MIN2(r_size, 8);
-	g_size = MIN2(g_size, 8);
-	b_size = MIN2(b_size, 8);
-	a_size = MIN2(a_size, 8);
-
-	piglit_set_tolerance_for_bits(r_size, g_size, b_size, a_size);
+	piglit_set_tolerance_for_bits(sizes.r, sizes.g, sizes.b, sizes.a);
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -384,7 +444,7 @@ test_format(const struct format_desc *format)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
 	    GL_FRAMEBUFFER_COMPLETE) {
 		for (i = 0; i < ARRAY_SIZE(clear_colors); i++) {
-			color_result = test_color(fbo, i, format, type,
+			color_result = test_color(fbo, i, format, type, &sizes,
 						  clear_colors[i]);
 			if (color_result == PIGLIT_SKIP) {
 				if (result == PIGLIT_PASS)
@@ -430,6 +490,7 @@ piglit_init(int argc, char **argv)
 {
 	int test_set_index = 0;
 	int glsl_major, glsl_minor;
+	GLuint rb;
 	bool es;
 	int i;
 
@@ -443,11 +504,34 @@ piglit_init(int argc, char **argv)
 	}
 
 	piglit_require_extension("GL_ARB_texture_multisample");
+	piglit_require_extension("GL_ARB_texture_float");
 
 	test_set = test_set + test_set_index;
 
 	fbo_formats_init_test_set(test_set_index,
 				  GL_TRUE /* print_options */);
+
+	/* Create a floating point fbo to store the result of
+	 * sampling. It is only used to store a single color sampled
+	 * from the texture so it doesn't need to bigger than 1x1.
+	 */
+	glGenFramebuffers(1, &result_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, result_fbo);
+	glGenRenderbuffers(1, &rb);
+	glBindRenderbuffer(GL_RENDERBUFFER, rb);
+	glRenderbufferStorage(GL_RENDERBUFFER,
+			      GL_RGBA32F,
+			      1, 1 /* width/height */);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+				  GL_COLOR_ATTACHMENT0,
+				  GL_RENDERBUFFER,
+				  rb);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
+	    GL_FRAMEBUFFER_COMPLETE) {
+		printf("Couldn't create RGBA32F FBO\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
 	prog_float = build_program(fragment_source_float);
 
