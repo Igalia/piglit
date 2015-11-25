@@ -97,6 +97,7 @@ piglit_init(int argc, char **argv)
 	GLuint prog, vbo, indirect;
 
 	piglit_require_GLSL();
+	piglit_require_extension("GL_ARB_draw_indirect");
 
 	prog = piglit_build_simple_program(vs_text, fs_text);
 	glUseProgram(prog);
