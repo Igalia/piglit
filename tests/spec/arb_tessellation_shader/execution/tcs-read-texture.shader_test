@@ -1,0 +1,72 @@
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader passthrough]
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader : require
+layout(vertices = 3) out;
+out vec4 color1[];
+uniform sampler2D tex;
+
+void main() {
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
+	gl_TessLevelInner = float[2](1.0, 1.0);
+	vec2 texcoord = gl_in[gl_InvocationID].gl_Position.xy*0.25+0.5;
+	color1[gl_InvocationID] = texture(tex, texcoord);
+}
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader : require
+layout(triangles) in;
+in vec4 color1[];
+out vec4 color;
+
+void main() {
+	gl_Position =
+		gl_in[0].gl_Position * gl_TessCoord[0] +
+		gl_in[1].gl_Position * gl_TessCoord[1] +
+		gl_in[2].gl_Position * gl_TessCoord[2];
+	color = color1[0] * gl_TessCoord[0] +
+		color1[1] * gl_TessCoord[1] +
+		color1[2] * gl_TessCoord[2];
+}
+
+[fragment shader]
+in vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.5 0.5 0.5 1.0
+clear
+patch parameter vertices 3
+uniform int tex 0
+texture checkerboard 0 0 (32, 32) (0.0, 0.0, 1.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+draw arrays GL_PATCHES 0 6
+
+tolerance 0 0.02 0.02 1
+# blue in bottom left and top right corners, green elsewhere
+# patch 0
+relative probe rgba ( 0, 0 ) ( 0, 0, 1, 1 )
+
+# patch 1
+relative probe rgba ( 1, 1 ) ( 0, 0, 1, 1 )
+relative probe rgba ( 0, 1 ) ( 0, 1, 0, 1 )
+relative probe rgba ( 1, 0 ) ( 0, 1, 0, 1 )
+relative probe rgba ( 0.5, 0.5 ) ( 0, 1, 0, 1 )
