@@ -687,10 +687,12 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex,
 
 		/* If there is a current program and that program has an
 		 * active attribute named piglit_vertex, don't use the fixed
-		 * function inputs.
+		 * function inputs. Never use fixed function inputs on core
+		 * profile.
 		 */
-		use_fixed_function_attributes = (prog == 0)
-			|| glGetAttribLocation(prog, "piglit_vertex") == -1;
+		use_fixed_function_attributes = ((prog == 0)
+			|| glGetAttribLocation(prog, "piglit_vertex") == -1)
+			&& !piglit_is_core_profile;
 	} else {
 		use_fixed_function_attributes = true;
 	}
