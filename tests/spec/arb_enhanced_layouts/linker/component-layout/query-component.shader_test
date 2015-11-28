@@ -1,0 +1,66 @@
+# Test GetProgramResourceiv returns the expected value for
+# GL_LOCATION_COMPONENT.
+
+[require]
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+GL_ARB_separate_shader_objects
+GL_ARB_explicit_attrib_location
+
+[vertex shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_explicit_attrib_location: require
+
+// consume X/Y/Z components of 6 vectors
+layout(location = 0) in vec3 a[6];
+
+// consumes W component of 6 vectors
+layout(location = 0, component = 3) in float b[6];
+
+in vec4 piglit_vertex;
+
+out vec4 c[6];
+
+void main()
+{
+  c[0] = vec4(a[0], b[0]);
+  c[1] = vec4(b[0], a[0]);
+  c[2] = vec4(a[0], b[0]);
+  c[3] = vec4(b[0], a[0]);
+  c[4] = vec4(a[0], b[0]);
+  c[5] = vec4(b[0], a[0]);
+
+  gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_explicit_attrib_location: require
+
+uniform int i;
+
+in vec4 c[6];
+
+// consume X/Y components
+layout(location = 0) out vec2 d;
+
+// consumes Z/W components
+layout(location = 0, component = 2) out vec2 e;
+
+void main()
+{
+  d = c[i].xy;
+  e = c[i].zw;
+}
+
+[test]
+draw rect -1 -1 2 2
+
+verify program_interface_query GL_PROGRAM_INPUT a[0] GL_LOCATION_COMPONENT 0
+verify program_interface_query GL_PROGRAM_INPUT b[0] GL_LOCATION_COMPONENT 3
+verify program_interface_query GL_PROGRAM_OUTPUT d GL_LOCATION_COMPONENT 0
+verify program_interface_query GL_PROGRAM_OUTPUT e GL_LOCATION_COMPONENT 2
