@@ -120,7 +120,6 @@ read_depth(GLenum type, float expect)
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass = true;
 	const float step = 0.1;
 	unsigned j;
 	float i;
@@ -154,7 +153,7 @@ piglit_display(void)
 		}
 		glDeleteFramebuffers(1, &fbo);
 	}
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return PIGLIT_PASS;
 }
 
 void
