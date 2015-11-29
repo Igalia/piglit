@@ -385,12 +385,10 @@ bool equal_at_index(struct test_data data,
 
 /*
  * Code readibility utility method that returns the value of
- * params[index] as a GLint. This is only correct for tests which the
- * returned value can be stored on a GLint, like GL_NUM_SAMPLES or
- * GL_SAMPLES.
+ * params[index] as a GLint64.
  *
  */
-GLint
+GLint64
 get_params_at_index(struct test_data data,
                     unsigned index)
 {
