@@ -26,6 +26,9 @@
  *
  * Handle checks for several pnames involving dimensions:
  *
+ * MAX_WIDTH: From spec: If the resource is unsupported, zero is
+ * returned."
+ *
  * MAX_HEIGHT: From spec "If the resource does not have at least two
  *   dimensions, or if the resource is unsupported, zero is returned."
  *
@@ -132,6 +135,10 @@ try(const GLenum *targets, unsigned num_targets,
 
                         /* From the spec:
                          *
+                         * MAX_WIDTH
+                         * "If the resource is unsupported, zero is
+                         *  returned."
+                         *
                          * MAX_HEIGHT
                          * "If the resource does not have at least two
                          *  dimensions, or if the resource is
@@ -141,7 +148,7 @@ try(const GLenum *targets, unsigned num_targets,
                          * "If the resource does not have at least
                          * three dimensions, or if the resource is
                          * unsupported, zero is returned."
-
+                         *
                          * We can only check if on those cases the value is zero.
                          */
                         if (!supported || num_dimensions(targets[i]) < min_dimensions) {
@@ -354,6 +361,7 @@ piglit_init(int argc, char **argv)
         piglit_require_extension("GL_ARB_framebuffer_object");
         piglit_require_extension("GL_ARB_internalformat_query2");
 
+        pass = check_max_dimension(GL_MAX_WIDTH, 1) && pass;
         pass = check_max_dimension(GL_MAX_HEIGHT, 2) && pass;
         pass = check_max_dimension(GL_MAX_DEPTH, 3) && pass;
         pass = check_max_layers() && pass;
