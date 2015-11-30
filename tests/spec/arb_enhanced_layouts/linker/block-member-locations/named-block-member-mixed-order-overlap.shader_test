@@ -1,0 +1,59 @@
+// [config]
+// expect_result: fail
+// glsl_version: 1.50
+// require_extensions: GL_ARB_enhanced_layouts GL_ARB_separate_shader_objects
+// [end config]
+//
+// From Section 4.4.1 (Input Layout Qualifiers) of the GLSL 4.50 spec:
+//
+//    "Subsequent members are again assigned consecutive locations, based on
+//    the newest location, until the next member declared with a location
+//    qualifier."
+
+[require]
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+
+layout(location = 0) out block {
+	layout(location = 3) vec4 a;
+	layout(location = 2) float f1;
+	float f2;                      // Error: Location 3 used by a
+	layout(location = 1) float f3;
+} name;
+
+void main()
+{
+	name.a = vec4(1.0);
+	name.f1 = 0.0;
+	name.f2 = 1.0;
+	name.f3 = 1.0;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+
+layout(location = 0) in block {
+	layout(location = 3) vec4 a;
+	layout(location = 2) float f1;
+	float f2;                      // Error: Location 3 used by a
+	layout(location = 1) float f3;
+} name;
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(name.f1 + name.a.x, name.f2 + name.a.y,
+			name.f3 + name.a.z, name.a.w);
+}
+
+[test]
+link error
