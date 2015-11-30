@@ -446,7 +446,7 @@ test_once(void)
 			x = 1 + (layer % 3) * (width + 1);
 			y = 1 + (layer / 3) * (height + 1);
 		}
-		draw_and_test_layer(x, y, layer);
+		pass = draw_and_test_layer(x, y, layer) && pass;
 
 		if (piglit_use_fbo && !test_single_size && layer < layers-1) {
 			glClearColor(0.2, 0.1, 0.1, 1.0);
