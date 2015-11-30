@@ -209,6 +209,22 @@ is_1d_array(const GLenum target)
         }
 }
 
+/*
+ * From the spec:
+ *
+ * "MAX_LAYERS: The maximum supported number of layers for the
+ *  resource is returned in <params>. For 1D array targets, the value
+ *  returned is the same as the MAX_HEIGHT. For 2D and cube array
+ *  targets, the value returned is the same as the MAX_DEPTH. If the
+ *  resource does not support layers, or if the resource is
+ *  unsupported, zero is returned."
+ *
+ * This function is a check to ensure that the value is the same that
+ * the other pnames. So this function calls GetInternalformat with the
+ * pname MAX_HEIGHT or MAX_DEPTH (depends on @target), and compare it
+ * against the value stored at @data, that is a test_data that have
+ * just called GetInternalformat with MAX_LAYERS.
+ */
 static bool
 check_params_against_dimension(struct test_data data,
                                const GLenum target,
