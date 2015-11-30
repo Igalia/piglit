@@ -78,11 +78,11 @@ piglit_init(int argc, char **argv)
 
 	tcs_prog = glCreateShaderProgramv(GL_TESS_CONTROL_SHADER, 1,
 					  (const GLchar *const*)&tcs_source);
-	piglit_link_check_status(tcs_prog);
+	pass = piglit_link_check_status(tcs_prog) && pass;
 
 	tes_prog = glCreateShaderProgramv(GL_TESS_EVALUATION_SHADER, 1,
 					  (const GLchar *const*)&tes_source);
-	piglit_link_check_status(tes_prog);
+	pass = piglit_link_check_status(tes_prog) && pass;
 
 	for (i = 0; i < ARRAY_SIZE(tes_params); ++i ) {
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
