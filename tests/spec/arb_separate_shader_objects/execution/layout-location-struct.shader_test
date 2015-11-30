@@ -1,0 +1,51 @@
+// Test that inputs and outputs are assigned the correct location when using
+// a struct and explicit locations.
+
+[require]
+GLSL >= 1.50
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 150
+#extension GL_ARB_separate_shader_objects: require
+
+in vec4 piglit_vertex;
+
+layout(location = 0) out struct S {
+	vec4 a;
+} s;
+
+layout(location = 2) out struct S2 {
+	vec4 a;
+} s2;
+
+void main()
+{
+	s.a = vec4(1.0, 0.0, 0.0, 1.0);
+	s2.a = vec4(0.0, 1.0, 1.0, 1.0);
+
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_separate_shader_objects: require
+
+layout(location = 2) in struct S {
+	vec4 a;
+} s;
+
+layout(location = 0) in struct S1 {
+	vec4 a;
+} s2;
+
+out vec4 color;
+
+void main()
+{
+	color = s2.a;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 1 0 0
