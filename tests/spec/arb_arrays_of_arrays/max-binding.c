@@ -123,7 +123,7 @@ run_test_ac_vertex_max_bindings(unsigned binding)
 static void
 subtest_fail(enum piglit_result *status, char *name)
 {
-	piglit_report_subtest_result(PIGLIT_FAIL, name);
+	piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
 	*status = PIGLIT_FAIL;
 }
 
