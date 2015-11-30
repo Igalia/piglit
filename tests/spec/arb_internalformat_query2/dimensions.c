@@ -148,10 +148,12 @@ try(const GLenum *targets, unsigned num_targets,
                                 value_test = check_params_zero(data);
                         }
 
-                        if (error_test && value_test)
+                        if (error_test && value_test) {
+                                print_case(targets[i], internalformats[j], pname, data, true);
                                 continue;
+                        }
 
-                        print_failing_case(targets[i], internalformats[j], pname, data);
+                        print_case(targets[i], internalformats[j], pname, data, false);
 
                         pass = false;
                 }
@@ -305,11 +307,14 @@ try_max_layers(const GLenum *targets, unsigned num_targets,
                                                                internalformats[i]) :
                                 check_params_zero(data);
 
-                        if (error_test && value_test)
+                        if (error_test && value_test) {
+                                print_case(targets[i], internalformats[j],
+                                           GL_MAX_LAYERS, data, true);
                                 continue;
+                        }
 
-                        print_failing_case(targets[i], internalformats[j],
-                                           GL_MAX_LAYERS, data);
+                        print_case(targets[i], internalformats[j],
+                                   GL_MAX_LAYERS, data, false);
 
                         pass = false;
                 }

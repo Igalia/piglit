@@ -106,8 +106,9 @@ clean_test_data(struct test_data *data)
 }
 
 void
-print_failing_case(const GLenum target, const GLenum internalformat,
-                   const GLenum pname, struct test_data data)
+print_case(const GLenum target, const GLenum internalformat,
+           const GLenum pname, struct test_data data,
+           bool is_passing)
 {
         /* Knowing if it is supported is interesting in order to know
          * if the test is being too restrictive */
@@ -124,9 +125,14 @@ print_failing_case(const GLenum target, const GLenum internalformat,
          * (GL_TRUE/GL_FALSE) or just threat them like the pnames that
          * return integer.
          */
+        if (is_passing)
+                fprintf(stderr, "    Failing ");
+        else
+                fprintf(stderr, "    Passing ");
+
         if (data.testing64) {
                 fprintf(stderr,
-                        "    64 bit failing case: "
+                        "64 bit case "
                         "pname = %s, "
                         "target = %s, internalformat = %s, "
                         "params[0] = (%" PRIu64 ",%s), "
@@ -139,7 +145,7 @@ print_failing_case(const GLenum target, const GLenum internalformat,
                         supported);
         } else {
                 fprintf(stderr,
-                        "    32 bit failing case: "
+                        "32 bit case "
                         "pname = %s, "
                         "target = %s, internalformat = %s, "
                         "params[0] = (%i,%s) supported=%i\n",
@@ -214,8 +220,8 @@ try_basic(const GLenum *targets, unsigned num_targets,
                         if (error_test && value_test)
                                 continue;
 
-                        print_failing_case(targets[i], internalformats[j],
-                                           pname, data);
+                        print_case(targets[i], internalformats[j],
+                                   pname, data, false);
 
                         pass = false;
                 }

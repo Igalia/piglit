@@ -323,8 +323,9 @@ bool try_basic(const GLenum *targets, unsigned num_targets,
                const GLint *possible_values, unsigned num_possible_values,
                struct test_data data);
 
-void print_failing_case(const GLenum target, const GLenum internalformat,
-                        const GLenum pname, struct test_data data);
+void print_case(const GLenum target, const GLenum internalformat,
+                const GLenum pname, struct test_data data,
+                bool is_passing);
 
 bool check_params_against_get_tex_level_parameter(struct test_data data,
                                                   const GLenum target,
