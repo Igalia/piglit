@@ -668,6 +668,9 @@ check_prop(GLuint prog, GLenum programInterface, int index, const char *name,
 		case GL_BUFFER_VARIABLE:
 			pif = GL_SHADER_STORAGE_BLOCK;
 			break;
+		default:
+			assert(!"unexpected programInterface value");
+			pif = GL_NONE;
 		}
 
 		parent_idx = glGetProgramResourceIndex(prog, pif,
@@ -739,6 +742,9 @@ check_prop(GLuint prog, GLenum programInterface, int index, const char *name,
 		case GL_COMPUTE_SUBROUTINE_UNIFORM:
 			pif = GL_COMPUTE_SUBROUTINE;
 			break;
+		default:
+			assert(!"unexpected programInterface value");
+			pif = GL_NONE;
 		}
 
 		/* check that the return count is as expected */
