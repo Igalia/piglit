@@ -123,10 +123,12 @@ GLint shader_string_size;
 const char *vertex_data_start = NULL;
 const char *vertex_data_end = NULL;
 GLuint prog;
+GLuint pipeline;
 size_t num_vbo_rows = 0;
 bool vbo_present = false;
 bool link_ok = false;
 bool prog_in_use = false;
+bool sso_in_use = false;
 GLchar *prog_err_info = NULL;
 GLuint vao = 0;
 GLuint fbo = 0;
@@ -480,6 +482,44 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 	prog_in_use = true;
 }
 
+void
+link_sso(GLenum target)
+{
+	GLint ok;
+
+	glLinkProgram(prog);
+
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+	if (ok) {
+		link_ok = true;
+	} else {
+		GLint size;
+
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		prog_err_info = malloc(size);
+
+		glGetProgramInfoLog(prog, size, NULL, prog_err_info);
+
+		fprintf(stderr, "SSO glLinkProgram(%s) failed: %s\n",
+			target_to_short_name(target),
+			prog_err_info);
+
+		free(prog_err_info);
+		piglit_report_result(PIGLIT_FAIL);
+
+		return;
+	}
+
+	switch (target) {
+	case GL_VERTEX_SHADER:
+		glUseProgramStages(pipeline, GL_VERTEX_SHADER_BIT, prog);
+		break;
+	case GL_FRAGMENT_SHADER:
+		glUseProgramStages(pipeline, GL_FRAGMENT_SHADER_BIT, prog);
+		break;
+	}
+}
+
 /**
  * Compare two values given a specified comparison operator
  */
@@ -705,13 +745,14 @@ process_requirement(const char *line)
 		return;
 	}
 
-	/* There are four types of requirements that a test can currently
+	/* There are five types of requirements that a test can currently
 	 * have:
 	 *
 	 *    * Require that some GL extension be supported
 	 *    * Require some particular versions of GL
 	 *    * Require some particular versions of GLSL
 	 *    * Require some particular number of uniform components
+	 *    * Require shaders be built as separate shader objects
 	 *
 	 * The tests for GL and GLSL versions can be equal, not equal,
 	 * less, less-or-equal, greater, or greater-or-equal.  Extension tests
@@ -797,6 +838,12 @@ process_requirement(const char *line)
 		}
 
 		piglit_set_rlimit(lim);
+	}  else if (string_match("SSO", line)) {
+		line = eat_whitespace(line + 3);
+		if (string_match("ENABLED", line)) {
+			piglit_require_extension("GL_ARB_separate_shader_objects");
+			sso_in_use = true;
+		}
 	}
 }
 
@@ -900,44 +947,18 @@ leave_state(enum states state, const char *line)
 
 
 void
-link_and_use_shaders(void)
+process_shader(GLenum target, unsigned num_shaders, GLuint *shaders)
 {
-	unsigned i;
-	GLenum err;
-	GLint ok;
-
-	if ((num_vertex_shaders == 0)
-	    && (num_fragment_shaders == 0)
-	    && (num_tess_ctrl_shaders == 0)
-	    && (num_tess_eval_shaders == 0)
-	    && (num_geometry_shaders == 0)
-	    && (num_compute_shaders == 0))
+	if (num_shaders == 0)
 		return;
 
-	prog = glCreateProgram();
-
-	for (i = 0; i < num_vertex_shaders; i++) {
-		glAttachShader(prog, vertex_shaders[i]);
+	if (sso_in_use) {
+		prog = glCreateProgram();
+		glProgramParameteri(prog, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	}
 
-	for (i = 0; i < num_tess_ctrl_shaders; i++) {
-		glAttachShader(prog, tess_ctrl_shaders[i]);
-	}
-
-	for (i = 0; i < num_tess_eval_shaders; i++) {
-		glAttachShader(prog, tess_eval_shaders[i]);
-	}
-
-	for (i = 0; i < num_geometry_shaders; i++) {
-		glAttachShader(prog, geometry_shaders[i]);
-	}
-
-	for (i = 0; i < num_fragment_shaders; i++) {
-		glAttachShader(prog, fragment_shaders[i]);
-	}
-
-	for (i = 0; i < num_compute_shaders; i++) {
-		glAttachShader(prog, compute_shaders[i]);
+	for (unsigned i = 0; i < num_shaders; i++) {
+		glAttachShader(prog, shaders[i]);
 	}
 
 #ifdef PIGLIT_USE_OPENGL
@@ -962,7 +983,39 @@ link_and_use_shaders(void)
 	glBindAttribLocation(prog, PIGLIT_ATTRIB_POS, "piglit_vertex");
 	glBindAttribLocation(prog, PIGLIT_ATTRIB_TEX, "piglit_texcoord");
 
-	glLinkProgram(prog);
+	if (sso_in_use) {
+		link_sso(target);
+	}
+}
+
+
+void
+link_and_use_shaders(void)
+{
+	unsigned i;
+	GLenum err;
+	GLint ok;
+
+	if ((num_vertex_shaders == 0)
+	    && (num_fragment_shaders == 0)
+	    && (num_tess_ctrl_shaders == 0)
+	    && (num_tess_eval_shaders == 0)
+	    && (num_geometry_shaders == 0)
+	    && (num_compute_shaders == 0))
+		return;
+
+	if (!sso_in_use)
+		prog = glCreateProgram();
+
+	process_shader(GL_VERTEX_SHADER, num_vertex_shaders, vertex_shaders);
+	process_shader(GL_TESS_CONTROL_SHADER, num_tess_ctrl_shaders, tess_ctrl_shaders);
+	process_shader(GL_TESS_EVALUATION_SHADER, num_tess_eval_shaders, tess_eval_shaders);
+	process_shader(GL_GEOMETRY_SHADER, num_geometry_shaders, geometry_shaders);
+	process_shader(GL_FRAGMENT_SHADER, num_fragment_shaders, fragment_shaders);
+	process_shader(GL_COMPUTE_SHADER, num_compute_shaders, compute_shaders);
+
+	if (!sso_in_use)
+		glLinkProgram(prog);
 
 	for (i = 0; i < num_vertex_shaders; i++) {
 		glDeleteShader(vertex_shaders[i]);
@@ -988,21 +1041,23 @@ link_and_use_shaders(void)
 		glDeleteShader(compute_shaders[i]);
 	}
 
-	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
-	if (ok) {
-		link_ok = true;
-	} else {
-		GLint size;
+	if (!sso_in_use) {
+		glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+		if (ok) {
+			link_ok = true;
+		} else {
+			GLint size;
 
-		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-		prog_err_info = malloc(size);
+			glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+			prog_err_info = malloc(size);
 
-		glGetProgramInfoLog(prog, size, NULL, prog_err_info);
+			glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 
-		return;
+			return;
+		}
+
+		glUseProgram(prog);
 	}
-
-	glUseProgram(prog);
 
 	err = glGetError();
 	if (!err) {
@@ -3094,8 +3149,10 @@ piglit_display(void)
 			glDeleteProgram(prog);
 			glUseProgram(0);
 		} else {
-			glDeleteProgramsARB(1, &prog);
+			if (!sso_in_use)
+				glDeleteProgramsARB(1, &prog);
 		}
+		glDeleteProgramPipelines(1, &pipeline);
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
@@ -3138,6 +3195,9 @@ piglit_init(int argc, char **argv)
 		glGetIntegerv(GL_MAX_VARYING_COMPONENTS,
 			      &gl_max_varying_components);
 	glGetIntegerv(GL_MAX_CLIP_PLANES, &gl_max_clip_planes);
+
+	if (piglit_is_extension_supported("GL_ARB_separate_shader_objects"))
+		glGenProgramPipelines(1, &pipeline);
 #else
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,
 		      &gl_max_fragment_uniform_components);
@@ -3157,6 +3217,10 @@ piglit_init(int argc, char **argv)
 
 	process_test_script(argv[1]);
 	link_and_use_shaders();
+
+	if (sso_in_use)
+		glBindProgramPipeline(pipeline);
+
 	if (link_ok && vertex_data_start != NULL) {
 		program_must_be_in_use();
 		bind_vao_if_supported();
