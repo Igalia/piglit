@@ -123,6 +123,8 @@ GLint shader_string_size;
 const char *vertex_data_start = NULL;
 const char *vertex_data_end = NULL;
 GLuint prog;
+GLuint sso_vertex_prog;
+GLuint sso_fragment_prog;
 GLuint pipeline;
 size_t num_vbo_rows = 0;
 bool vbo_present = false;
@@ -512,9 +514,11 @@ link_sso(GLenum target)
 
 	switch (target) {
 	case GL_VERTEX_SHADER:
+		sso_vertex_prog = prog;
 		glUseProgramStages(pipeline, GL_VERTEX_SHADER_BIT, prog);
 		break;
 	case GL_FRAGMENT_SHADER:
+		sso_fragment_prog = prog;
 		glUseProgramStages(pipeline, GL_FRAGMENT_SHADER_BIT, prog);
 		break;
 	}
@@ -2702,6 +2706,15 @@ piglit_display(void)
 			next_line++;
 
 		if (line[0] == '\0') {
+		} else if (sscanf(line, "active shader program %s", s) == 1) {
+			switch (get_shader_from_string(s, &x)) {
+			case GL_VERTEX_SHADER:
+				glActiveShaderProgram(pipeline, sso_vertex_prog);
+			break;
+			case GL_FRAGMENT_SHADER:
+				glActiveShaderProgram(pipeline, sso_fragment_prog);
+			break;
+			}
 		} else if (sscanf(line, "atomic counters %d", &x) == 1) {
 			GLuint *atomics_buf = calloc(x, sizeof(GLuint));
 			glGenBuffers(1, &atomics_bo);
