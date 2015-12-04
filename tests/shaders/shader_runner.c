@@ -1626,26 +1626,30 @@ set_uniform(const char *line, int ubo_array_index)
 	double d[16];
 	int ints[16];
 	unsigned uints[16];
-	GLuint prog;
 	GLint loc;
 	const char *type;
-
-	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
 
 	type = eat_whitespace(line);
 	line = eat_text(type);
 
 	line = strcpy_to_space(name, eat_whitespace(line));
 
-	if (set_ubo_uniform(name, type, line, ubo_array_index))
-		return;
+	if (isdigit(name[0])) {
+		loc = strtol(name, NULL, 0);
+	} else {
+		GLuint prog;
 
-	loc = glGetUniformLocation(prog, name);
-	if (loc < 0) {
-		printf("cannot get location of uniform \"%s\"\n",
-		       name);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+		if (set_ubo_uniform(name, type, line, ubo_array_index))
+			return;
+
+		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
+		loc = glGetUniformLocation(prog, name);
+		if (loc < 0) {
+			printf("cannot get location of uniform \"%s\"\n",
+			       name);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+        }
 
 	if (string_match("float", type)) {
 		get_floats(line, f, 1);
