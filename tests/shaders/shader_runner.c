@@ -124,7 +124,11 @@ const char *vertex_data_start = NULL;
 const char *vertex_data_end = NULL;
 GLuint prog;
 GLuint sso_vertex_prog;
+GLuint sso_tess_control_prog;
+GLuint sso_tess_eval_prog;
+GLuint sso_geometry_prog;
 GLuint sso_fragment_prog;
+GLuint sso_compute_prog;
 GLuint pipeline;
 size_t num_vbo_rows = 0;
 bool vbo_present = false;
@@ -517,9 +521,25 @@ link_sso(GLenum target)
 		sso_vertex_prog = prog;
 		glUseProgramStages(pipeline, GL_VERTEX_SHADER_BIT, prog);
 		break;
+	case GL_TESS_CONTROL_SHADER:
+		sso_tess_control_prog = prog;
+		glUseProgramStages(pipeline, GL_TESS_CONTROL_SHADER_BIT, prog);
+		break;
+	case GL_TESS_EVALUATION_SHADER:
+		sso_tess_eval_prog = prog;
+		glUseProgramStages(pipeline, GL_TESS_EVALUATION_SHADER_BIT, prog);
+		break;
+	case GL_GEOMETRY_SHADER:
+		sso_geometry_prog = prog;
+		glUseProgramStages(pipeline, GL_GEOMETRY_SHADER_BIT, prog);
+		break;
 	case GL_FRAGMENT_SHADER:
 		sso_fragment_prog = prog;
 		glUseProgramStages(pipeline, GL_FRAGMENT_SHADER_BIT, prog);
+		break;
+	case GL_COMPUTE_SHADER:
+		sso_compute_prog = prog;
+		glUseProgramStages(pipeline, GL_COMPUTE_SHADER_BIT, prog);
 		break;
 	}
 }
@@ -2711,8 +2731,20 @@ piglit_display(void)
 			case GL_VERTEX_SHADER:
 				glActiveShaderProgram(pipeline, sso_vertex_prog);
 			break;
+			case GL_TESS_CONTROL_SHADER:
+				glActiveShaderProgram(pipeline, sso_tess_control_prog);
+			break;
+			case GL_TESS_EVALUATION_SHADER:
+				glActiveShaderProgram(pipeline, sso_tess_eval_prog);
+			break;
+			case GL_GEOMETRY_SHADER:
+				glActiveShaderProgram(pipeline, sso_geometry_prog);
+			break;
 			case GL_FRAGMENT_SHADER:
 				glActiveShaderProgram(pipeline, sso_fragment_prog);
+			break;
+			case GL_COMPUTE_SHADER:
+				glActiveShaderProgram(pipeline, sso_compute_prog);
 			break;
 			}
 		} else if (sscanf(line, "atomic counters %d", &x) == 1) {
