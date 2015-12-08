@@ -22,6 +22,7 @@
 
 from __future__ import absolute_import, division, print_function
 import subprocess
+import textwrap
 
 import mock
 import nose.tools as nt
@@ -136,6 +137,92 @@ class TestWflInfo(object):
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(5.0, self._test.glsl_es_version)
+
+    def test_gl_version_patch(self):
+        """test.opengl.WflInfo.gl_version: Works with patch versions"""
+        rv = (
+            'Waffle platform: gbm\n'
+            'Waffle api: gl\n'
+            'OpenGL vendor string: Intel Open Source Technology Center\n'
+            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
+            'OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4\n'
+            'OpenGL context flags: 0x0\n'
+        )
+        with mock.patch('framework.test.opengl.subprocess.check_output',
+                        mock.Mock(return_value=rv)):
+            nt.eq_(18.0, self._test.gl_version)
+
+    def test_glsl_version_patch(self):
+        """test.opengl.WflInfo.glsl_version: Works with patch versions"""
+        rv = (
+            'Waffle platform: gbm\n'
+            'Waffle api: gl\n'
+            'OpenGL vendor string: Intel Open Source Technology Center\n'
+            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
+            'OpenGL version string: 1.1 (Core Profile) Mesa 11.0.4\n'
+            'OpenGL context flags: 0x0\n'
+            'OpenGL shading language version string: 9.30.7\n'
+            'OpenGL extensions: this is some extension strings.\n'
+        )
+        with mock.patch('framework.test.opengl.subprocess.check_output',
+                        mock.Mock(return_value=rv)):
+            nt.eq_(9.3, self._test.glsl_version)
+
+
+class TestWflInfo_WAFFLEINFO_GL_ERROR(object):
+    """Test class for WflInfo when "WFLINFO_GL_ERROR" is returned."""
+    __patchers = []
+
+    def setup(self):
+        """Setup each instance, patching necissary bits."""
+        self._test = opengl.WflInfo()
+        self.__patchers.append(mock.patch.dict(
+            'framework.test.opengl.OPTIONS.env',
+            {'PIGLIT_PLATFORM': 'foo'}))
+        self.__patchers.append(mock.patch(
+            'framework.test.opengl.WflInfo._WflInfo__shared_state', {}))
+
+        rv = (textwrap.dedent("""
+            Waffle platform: glx
+            Waffle api: gles3
+            OpenGL vendor string: WFLINFO_GL_ERROR
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: WFLINFO_GL_ERROR
+            OpenGL context flags: 0x0\n
+            OpenGL shading language version string: WFLINFO_GL_ERROR
+            OpenGL extensions: WFLINFO_GL_ERROR
+        """))
+
+        self.__patchers.append(mock.patch(
+            'framework.test.opengl.subprocess.check_output',
+            mock.Mock(return_value=rv)))
+
+        for f in self.__patchers:
+            f.start()
+
+    def teardown(self):
+        for p in self.__patchers:
+            p.stop()
+
+    def test_gl_version(self):
+        """test.opengl.WflInfo.gl_version: handles WFLINFO_GL_ERROR correctly"""
+        nt.eq_(None, self._test.gl_version)
+
+    def test_gles_version(self):
+        """test.opengl.WflInfo.gles_version: handles WFLINFO_GL_ERROR correctly"""
+        nt.eq_(None, self._test.gles_version)
+
+    def test_glsl_version(self):
+        """test.opengl.WflInfo.glsl_version: handles WFLINFO_GL_ERROR correctly"""
+        nt.eq_(None, self._test.glsl_version)
+
+    def test_glsl_es_version(self):
+        """test.opengl.WflInfo.glsl_es_version: handles WFLINFO_GL_ERROR correctly"""
+        nt.eq_(None, self._test.glsl_es_version)
+
+    def test_gl_extensions(self):
+        """test.opengl.WflInfo.gl_extensions: handles WFLINFO_GL_ERROR correctly"""
+        nt.eq_(set(), self._test.gl_extensions)
 
 
 class TestWflInfoOSError(object):

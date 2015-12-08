@@ -147,7 +147,11 @@ class WflInfo(object):
                 return set()
             raise
 
-        return {e.strip() for e in all_}
+        # Don't return a set with only WFLINFO_GL_ERROR.
+        ret = {e.strip() for e in all_}
+        if ret == {'WFLINFO_GL_ERROR'}:
+            return set()
+        return ret
 
     @core.lazy_property
     def gl_version(self):
@@ -170,8 +174,14 @@ class WflInfo(object):
                     break
                 raise
             else:
-                ret = float(self.__getline(
-                    raw.split('\n'), 'OpenGL version string').split()[3])
+                try:
+                    # Grab the GL version string, trim any release_number values
+                    ret = float(self.__getline(
+                        raw.split('\n'),
+                        'OpenGL version string').split()[3][:3])
+                except (IndexError, ValueError):
+                    # This is caused by wlfinfo returning an error
+                    pass
                 break
         return ret
 
@@ -202,8 +212,15 @@ class WflInfo(object):
                     break
                 raise
             else:
-                ret = float(self.__getline(
-                    raw.split('\n'), 'OpenGL version string').split()[5])
+                try:
+                    # Yes, search for "OpenGL version string" in GLES
+                    # GLES doesn't support patch versions.
+                    ret = float(self.__getline(
+                        raw.split('\n'),
+                        'OpenGL version string').split()[5])
+                except (IndexError, ValueError):
+                    # This is caused by wlfinfo returning an error
+                    pass
                 break
         return ret
 
@@ -222,8 +239,14 @@ class WflInfo(object):
                     break
                 raise
             else:
-                ret = float(self.__getline(
-                    raw.split('\n'), 'OpenGL shading language').split()[-1])
+                try:
+                    # GLSL versions are M.mm formatted
+                    ret = float(self.__getline(
+                        raw.split('\n'),
+                        'OpenGL shading language').split()[-1][:4])
+                except (IndexError, ValueError):
+                    # This is caused by wflinfo returning an error
+                    pass
                 break
         return ret
 
@@ -241,11 +264,16 @@ class WflInfo(object):
                     break
                 raise
             else:
-                # GLSL ES version numbering is insane.
-                # For version >= 3 the numbers are 3.00, 3.10, etc.
-                # For version 2, they are 1.0.xx
-                ret = float(self.__getline(
-                    raw.split('\n'), 'OpenGL shading language').split()[-1][:3])
+                try:
+                    # GLSL ES version numbering is insane.
+                    # For version >= 3 the numbers are 3.00, 3.10, etc.
+                    # For version 2, they are 1.0.xx
+                    ret = float(self.__getline(
+                        raw.split('\n'),
+                        'OpenGL shading language').split()[-1][:3])
+                except (IndexError, ValueError):
+                    # Handle wflinfo internal errors
+                    pass
                 break
         return ret
 
