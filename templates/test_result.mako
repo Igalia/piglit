@@ -75,6 +75,14 @@
           </pre>${value.command}</pre>
         </td>
       </tr>
+    % if value.exception:
+      <tr>
+        <td>Exception</td>
+        <td>
+          <pre>${value.exception | h}</pre>
+        </td>
+      </tr>
+    % endif
     % if value.traceback:
       <tr>
         <td>Traceback</td>

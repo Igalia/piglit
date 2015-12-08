@@ -197,6 +197,7 @@ class TestResult(object):
             'subtests': self.subtests,
             'time': self.time,
             'exception': self.exception,
+            'traceback': self.traceback,
             'dmesg': self.dmesg,
             'pid': self.pid,
         }
@@ -218,7 +219,7 @@ class TestResult(object):
         inst = cls()
 
         for each in ['returncode', 'command', 'exception', 'environment',
-                     'time', 'result', 'dmesg', 'pid']:
+                     'time', 'traceback', 'result', 'dmesg', 'pid']:
             if each in dict_:
                 setattr(inst, each, dict_[each])
 
