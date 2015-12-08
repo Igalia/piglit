@@ -184,11 +184,12 @@ class Test(object):
             # This is a rare case where a bare exception is okay, since we're
             # using it to log exceptions
             except:
-                exception = sys.exc_info()
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback.print_exc(file=sys.stderr)
                 self.result.result = 'fail'
-                self.result.exception = "{}{}".format(*exception[:2])
+                self.result.exception = "{}{}".format(exc_type, exc_value)
                 self.result.traceback = "".join(
-                    traceback.format_tb(exception[2]))
+                    traceback.format_tb(exc_traceback))
 
             log.log(self.result.result)
         else:
