@@ -144,12 +144,14 @@ class EnumCode(object):
         enums = cls.get_enums_in_default_namespace(gl_registry)
         unique_enums = cls.get_unique_enums(enums)
         enums_by_name = cls.get_enums_by_name(enums)
+        memory_barrier = cls.get_enums_in_memory_barrier_group(gl_registry)
         render_template(
             cls.C_TEMPLATE,
             out_dir,
             gl_registry=gl_registry,
             sorted_unique_enums_in_default_namespace=unique_enums,
-            sorted_enums_by_name=enums_by_name)
+            sorted_enums_by_name=enums_by_name,
+            sorted_by_name_memory_barrier_enums=memory_barrier)
 
     @classmethod
     def get_enums_in_default_namespace(cls, gl_registry):
@@ -159,6 +161,16 @@ class EnumCode(object):
                 for enum in enum_group.enums:
                     enums.append(enum)
         return enums
+
+    @classmethod
+    def get_enums_in_memory_barrier_group(cls, gl_registry):
+        enums = []
+        for enum_group in gl_registry.enum_groups:
+            if enum_group.name == 'MemoryBarrierMask':
+	        if enum_group.type == 'bitmask':
+                    for enum in enum_group.enums:
+                        enums.append(enum)
+        return cls.get_enums_by_name(enums)
 
     @classmethod
     def get_unique_enums(cls, enums):

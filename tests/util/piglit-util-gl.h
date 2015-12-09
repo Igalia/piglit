@@ -95,6 +95,9 @@ const char *piglit_get_gl_enum_name(GLenum param);
  */
 GLenum piglit_get_gl_enum_from_name(const char *name);
 
+GLenum
+piglit_get_gl_memory_barrier_enum_from_name(const char *name);
+
 /**
  * \brief Convert a GL primitive type enum value to a string.
  *
