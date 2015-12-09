@@ -52,6 +52,7 @@ fb tex 2d 2
 draw rect -1 -1 2 2
 
 # Test the result of imageStore 0
+memory barrier GL_FRAMEBUFFER_BARRIER_BIT
 fb tex 2d 0
 probe all rgba 1.0 0.0 0.0 1.0
 
@@ -62,5 +63,6 @@ fb tex 2d 2
 draw rect -1 -1 2 2
 
 # Test the result of imageStore 1
+memory barrier GL_FRAMEBUFFER_BARRIER_BIT
 fb tex 2d 1
 probe all rgba 0.0 1.0 0.0 1.0
