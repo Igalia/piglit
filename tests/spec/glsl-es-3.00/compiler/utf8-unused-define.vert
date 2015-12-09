@@ -15,10 +15,10 @@
  *     invalid characters."
  *
  * Further discussion in Khronos has determined that UTF-8 in unused
- * preprocessor defines as well.
+ * preprocessor defines should also be allowed.
  */
 
-#define eat_sushi_using_chopsticks 寿司使用して箸を食べます。
+#define eat_sushi_with_chopsticks 箸で寿司を食べます。
 
 void main()
 {
