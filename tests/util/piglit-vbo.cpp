@@ -36,10 +36,21 @@
  *
  * The format consists of a row of column headers followed by any
  * number of rows of data.  Each column header has the form
- * "ATTRNAME/TYPE/COUNT", where ATTRNAME is the name of the vertex
- * attribute to be bound to this column, TYPE is the type of data that
- * follows ("float", "int", or "uint"), and COUNT is the vector length
- * of the data (e.g. "3" for vec3 data).
+ * "ATTRNAME/TYPE/COUNT/MATRIX_COLUMN", where ATTRNAME is the name of
+ * the vertex attribute to be bound to this column, TYPE is the type
+ * of data that follows ("float", "int", or "uint"), COUNT is the
+ * vector length of the data (e.g. "3" for vec3 data) and
+ * MATRIX_COLUMN is the column number of the data in case of being a
+ * matrix. MATRIX_COLUMN can also be used for arrays of
+ * arrays. MATRIX_COLUMN doesn't need to be be specified if it is not
+ * a matrix column as in the example before. So another example, if
+ * you want to specify the data of a mat2x3:
+ *
+ *  \verbatim
+ *  foomatrix/float/3/0 foomatrix/float/3/1
+ *  0.0 1.0 2.0         3.0 4.0 5.0
+ *  6.0 7.0 8.0         9.0 10.0 11.0
+ *  \endverbatim
  *
  * The data follows the column headers in space-separated form.  "#"
  * can be used for comments, as in shell scripts.
@@ -52,8 +63,8 @@
  * If an error occurs, setup_vbo_from_text() will print out a
  * description of the error and exit with PIGLIT_FAIL.
  *
- * For the example above, the call to setup_vbo_from_text() is roughly
- * equivalent to the following GL operations:
+ * For the first example above, the call to setup_vbo_from_text() is
+ * roughly equivalent to the following GL operations:
  *
  * \code
  * struct vertex_attributes {
@@ -151,6 +162,11 @@ public:
 	size_t count;
 
 	/**
+	 * Index of the matrix column for this attribute.
+	 */
+	size_t matrix_index;
+
+	/**
 	 * Index of this vertex attribute in the linked program.
 	 */
 	GLuint index;
@@ -171,7 +187,8 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 	/* Split the column header into name/type/count fields */
 	const char *first_slash = strchr(text, '/');
 	if (first_slash == NULL) {
-		printf("Column headers must be in the form name/type/count.  "
+		printf("Column headers must be in the form name/type/count/matrix_column.\n"
+		       "Note: matrix_column is optional.\n"
 		       "Got: %s\n",
 		       text);
 		piglit_report_result(PIGLIT_FAIL);
@@ -179,7 +196,7 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 	std::string name(text, first_slash);
 	const char *second_slash = strchr(first_slash + 1, '/');
 	if (second_slash == NULL) {
-		printf("Column headers must be in the form name/type/count.  "
+		printf("Column headers must be in the form name/type/count/matrix_column.\n"
 		       "Got: %s\n",
 		       text);
 		piglit_report_result(PIGLIT_FAIL);
@@ -188,11 +205,26 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 	this->data_type = decode_type(type_str.c_str());
 	char *endptr;
 	this->count = strtoul(second_slash + 1, &endptr, 10);
+
 	if (*endptr != '\0') {
-		printf("Column headers must be in the form name/type/count.  "
-		       "Got: %s\n",
-		       text);
-		piglit_report_result(PIGLIT_FAIL);
+		const char *third_slash = strchr(second_slash + 1, '/');
+		this->matrix_index = strtoul(third_slash + 1, &endptr, 10);
+
+		if (this->matrix_index < 0 || this->matrix_index > 3) {
+			printf("Matrix column index must be between 0 and 3.  Got: %lu\n",
+				(unsigned long) this->matrix_index);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (*endptr != '\0') {
+			printf("Column headers must be in the form name/type/matrix_column.\n"
+			       "Note: matrix_column is optional.\n"
+			       "Got: %s\n",
+			       text);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	} else {
+		this->matrix_index = 0;
 	}
 
 	GLint attrib_location = glGetAttribLocation(prog, name.c_str());
@@ -293,7 +325,7 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 	int attribute_size = ATTRIBUTE_SIZE;
 	switch (this->data_type) {
 	case GL_FLOAT:
-		glVertexAttribPointer(this->index, this->count,
+		glVertexAttribPointer(this->index + this->matrix_index, this->count,
 				      this->data_type, GL_FALSE, stride,
 				      (void *) *offset);
 		break;
@@ -302,7 +334,7 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 			fprintf(stderr,"vertex_attrib_description fail. no 64-bit float support\n");
 			return;
 		}
-		glVertexAttribLPointer(this->index, this->count,
+		glVertexAttribLPointer(this->index + this->matrix_index, this->count,
 				      this->data_type, stride,
 				      (void *) *offset);
 		attribute_size *= 2;
@@ -312,12 +344,12 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 			fprintf(stderr,"vertex_attrib_description fail. no int support\n");
 			return;
 		}
-		glVertexAttribIPointer(this->index, this->count,
+		glVertexAttribIPointer(this->index + this->matrix_index, this->count,
 				       this->data_type, stride,
 				       (void *) *offset);
 		break;
 	}
-	glEnableVertexAttribArray(index);
+	glEnableVertexAttribArray(index + this->matrix_index);
 	*offset += attribute_size * this->count;
 }
 
