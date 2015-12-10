@@ -32,6 +32,7 @@
 
 #include <X11/XKBlib.h>
 #include "piglit-util-gl.h"
+#include "piglit-util-egl.h"
 #include "egl-util.h"
 
 static int automatic;
@@ -175,17 +176,11 @@ event_loop(struct egl_state *state, const struct egl_test *test)
 static void
 check_extensions(struct egl_state *state, const struct egl_test *test)
 {
-	const char *extensions;
 	int i;
 
-	extensions = eglQueryString(state->egl_dpy, EGL_EXTENSIONS);
-	for (i = 0; test->extensions[i]; i++) {
-		if (!strstr(extensions, test->extensions[i])) {
-			fprintf(stderr, "missing extension %s\n",
-				test->extensions[i]);
-			piglit_report_result(PIGLIT_SKIP);
-		}
-	}
+	for (i = 0; test->extensions[i]; i++)
+		piglit_require_egl_extension(state->egl_dpy,
+					     test->extensions[i]);
 }
 
 enum piglit_result

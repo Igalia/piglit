@@ -22,6 +22,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include "piglit-util-egl.h"
 #include "common.h"
 
 static Display *dpy = NULL;
@@ -69,20 +70,8 @@ parse_version_string(const char *string, int *major, int *minor)
 static void
 check_extensions(void)
 {
-	static const char *extensions[] = {
-		"EGL_KHR_create_context",
-		"EGL_KHR_surfaceless_context"
-	};
-	int i;
-
-	const char *extension_string = eglQueryString(egl_dpy, EGL_EXTENSIONS);
-	for (i = 0; i < ARRAY_SIZE(extensions); i++) {
-		if (!strstr(extension_string, extensions[i])) {
-			fprintf(stderr, "missing extension %s\n",
-				extensions[i]);
-			piglit_report_result(PIGLIT_SKIP);
-		}
-	}
+	piglit_require_egl_extension(egl_dpy, "EGL_KHR_create_context");
+	piglit_require_egl_extension(egl_dpy, "EGL_KHR_surfaceless_context");
 }
 
 bool
