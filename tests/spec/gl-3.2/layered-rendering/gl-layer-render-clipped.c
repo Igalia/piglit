@@ -87,7 +87,6 @@ static GLuint color_uniform;
 
 GLuint
 create_bind_texture() {
-	int i;
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
@@ -118,7 +117,7 @@ bool check_framebuffer_status(GLenum target, GLenum expected) {
 
 bool
 probe_texture_layered_rgb(GLuint texture, int x, int y,
-			  int z, int w, int h, int d, float *expected)
+			  int z, int w, int h, int d, const float *expected)
 {
 	int k;
 	GLuint fbo;
@@ -143,7 +142,7 @@ probe_texture_layered_rgb(GLuint texture, int x, int y,
 void
 piglit_init(int argc, char **argv)
 {
-	int i, j;
+	int j;
 	bool pass = true;
 	GLuint fbo, texture, program;
 
