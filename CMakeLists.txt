@@ -224,6 +224,12 @@ if (NOT MSVC)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 	ENDIF (CXX_COMPILER_FLAG_WALL)
 
+	# Target C99.  GCC's default is gnu11 for 5.0 and newer, gnu89 for
+	# older versions.
+	check_c_compiler_flag ("-std=gnu99" C_COMPILER_FLAG_STD_GNU99)
+	if (C_COMPILER_FLAG_STD_GNU99)
+		set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
+	endif ()
 	# MSVC does not support C99 variable length arrays
 	CHECK_C_COMPILER_FLAG("-Werror=vla" C_COMPILER_FLAG_WEVLA)
 	IF (C_COMPILER_FLAG_WEVLA)
