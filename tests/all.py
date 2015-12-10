@@ -4554,5 +4554,20 @@ with profile.group_manager(
     for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
         g(['ext_shader_samples_identical', sample_count])
 
+# Group ARB_shader_draw_parameters
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_shader_draw_parameters')) as g:
+    g(['arb_shader_draw_parameters-drawid', 'drawid'], 'drawid')
+    g(['arb_shader_draw_parameters-drawid', 'vertexid'], 'drawid-vertexid')
+    g(['arb_shader_draw_parameters-basevertex', 'basevertex'], 'basevertex')
+    g(['arb_shader_draw_parameters-basevertex', 'baseinstance'], 'baseinstance')
+    g(['arb_shader_draw_parameters-basevertex', 'basevertex-baseinstance'], 'basevertex-baseinstance')
+    g(['arb_shader_draw_parameters-basevertex', 'vertexid-zerobased'], 'vertexid-zerobased')
+    g(['arb_shader_draw_parameters-drawid-indirect', 'drawid'], 'drawid-indirect')
+    g(['arb_shader_draw_parameters-drawid-indirect', 'basevertex'], 'drawid-indirect-basevertex')
+    g(['arb_shader_draw_parameters-drawid-indirect', 'baseinstance'], 'drawid-indirect-baseinstance')
+    g(['arb_shader_draw_parameters-drawid-indirect', 'vertexid'], 'drawid-indirect-vertexid')
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
