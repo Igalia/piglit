@@ -973,6 +973,8 @@ leave_state(enum states state, const char *line)
 void
 process_shader(GLenum target, unsigned num_shaders, GLuint *shaders)
 {
+	unsigned i;
+
 	if (num_shaders == 0)
 		return;
 
@@ -981,7 +983,7 @@ process_shader(GLenum target, unsigned num_shaders, GLuint *shaders)
 		glProgramParameteri(prog, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	}
 
-	for (unsigned i = 0; i < num_shaders; i++) {
+	for (i = 0; i < num_shaders; i++) {
 		glAttachShader(prog, shaders[i]);
 	}
 
