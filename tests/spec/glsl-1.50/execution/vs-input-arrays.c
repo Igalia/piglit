@@ -59,6 +59,7 @@ static const char vs_text[] =
 	"in float a[2];\n"
 	"in int   b[2];\n"
 	"in vec3  c[2];\n"
+	"in mat2  d[2];\n"
 	"\n"
 	"out float i_failed;\n"
 	"\n"
@@ -82,6 +83,15 @@ static const char vs_text[] =
 	"	if( c[1].x != 4.0 + float(gl_VertexID) ) failed = true;\n"
 	"	if( c[1].y != 5.0 + float(gl_VertexID) ) failed = true;\n"
 	"	if( c[1].z != 6.0 + float(gl_VertexID) ) failed = true;\n"
+	"\n"
+	"	if( d[0][0].x != 1.0 + float(gl_VertexID) ) failed = true;\n"
+	"	if( d[0][0].y != 2.0 + float(gl_VertexID) ) failed = true;\n"
+	"	if( d[0][1].x != 3.0 + float(gl_VertexID) ) failed = true;\n"
+	"	if( d[0][1].y != 4.0 + float(gl_VertexID) ) failed = true;\n"
+	"	if( d[1][0].x != 5.0 + float(gl_VertexID) ) failed = true;\n"
+	"	if( d[1][0].y != 6.0 + float(gl_VertexID) ) failed = true;\n"
+	"	if( d[1][1].x != 7.0 + float(gl_VertexID) ) failed = true;\n"
+	"	if( d[1][1].y != 8.0 + float(gl_VertexID) ) failed = true;\n"
 	"	\n"
 	"	if (failed)\n"
 	"		i_failed = 1;\n"
@@ -116,33 +126,42 @@ struct vertex_inputs {
         GLfloat a[2];
         GLint b[2];
         GLfloat c[2][3];
+        GLfloat d[4][2];
 } vertex_data[] = {
 	{ { -1.0, -1.0, 0.0 },
 	  { 10.0, 20.0 },
 	  { 30, 40 },
 	  { { 1.0, 2.0, 3.0 },
-	    { 4.0, 5.0, 6.0 } }
+	    { 4.0, 5.0, 6.0 } },
+	  { { 1.0, 2.0 }, { 3.0, 4.0 },
+	    { 5.0, 6.0 }, { 7.0, 8.0 } }
 	},
 
 	{ { -1.0, 1.0, 0.0 },
 	  { 11.0, 21.0 },
 	  { 31, 41 },
 	  { { 2.0, 3.0, 4.0 },
-	    { 5.0, 6.0, 7.0 } }
+	    { 5.0, 6.0, 7.0 } },
+	  { { 2.0, 3.0 }, { 4.0, 5.0 },
+	    { 6.0, 7.0 }, { 8.0, 9.0 } }
 	},
 
 	{ { 1.0, 1.0, 0.0 },
 	  { 12.0, 22.0 },
 	  { 32, 42 },
 	  { { 3.0, 4.0, 5.0 },
-	    { 6.0, 7.0, 8.0 } }
+	    { 6.0, 7.0, 8.0 } },
+	  { { 3.0, 4.0 }, { 5.0, 6.0 },
+	    { 7.0, 8.0 }, { 9.0, 10.0 } }
 	},
 
 	{ { 1.0, -1.0, 0.0 },
 	  { 13.0, 23.0 },
 	  { 33, 43 },
 	  { { 4.0, 5.0, 6.0 },
-	    { 7.0, 8.0, 9.0 } }
+	    { 7.0, 8.0, 9.0 } },
+	  { { 4.0, 5.0 }, { 6.0, 7.0 },
+	    { 8.0, 9.0 }, { 10.0, 11.0 } }
 	}
 };
 
@@ -156,6 +175,7 @@ piglit_init(int argc, char **argv)
 	GLint a_index;
 	GLint b_index;
 	GLint c_index;
+	GLint d_index[2];
 
 	prog = piglit_build_simple_program(vs_text, fs_text);
 
@@ -174,6 +194,8 @@ piglit_init(int argc, char **argv)
 	a_index = glGetAttribLocation( prog, "a" );
 	b_index = glGetAttribLocation( prog, "b" );
 	c_index = glGetAttribLocation( prog, "c" );
+	d_index[0] = glGetAttribLocation( prog, "d[0]" );
+	d_index[1] = glGetAttribLocation( prog, "d[1]" );
 
 	/* create buffers */
 	glGenBuffers( 1, &vbo );
@@ -201,6 +223,15 @@ piglit_init(int argc, char **argv)
 	glVertexAttribPointer( c_index + 1, 3, GL_FLOAT, GL_FALSE, stride,
 			       (void*) offsetof( vertex_inputs, c[1] ));
 
+	glVertexAttribPointer( d_index[0], 2, GL_FLOAT, GL_FALSE, stride,
+			       (void*) offsetof( vertex_inputs, d[0] ));
+	glVertexAttribPointer( d_index[0] + 1, 2, GL_FLOAT, GL_FALSE, stride,
+			       (void*) offsetof( vertex_inputs, d[1] ));
+	glVertexAttribPointer( d_index[1], 2, GL_FLOAT, GL_FALSE, stride,
+			       (void*) offsetof( vertex_inputs, d[2] ));
+	glVertexAttribPointer( d_index[1] + 1, 2, GL_FLOAT, GL_FALSE, stride,
+			       (void*) offsetof( vertex_inputs, d[3] ));
+
 	/* enable vertex attrib arrays */
 	glEnableVertexAttribArray( vertex_index );
 	glEnableVertexAttribArray( a_index );
@@ -209,6 +240,10 @@ piglit_init(int argc, char **argv)
 	glEnableVertexAttribArray( b_index + 1 );
 	glEnableVertexAttribArray( c_index );
 	glEnableVertexAttribArray( c_index + 1 );
+	glEnableVertexAttribArray( d_index[0] );
+	glEnableVertexAttribArray( d_index[0] + 1);
+	glEnableVertexAttribArray( d_index[1] );
+	glEnableVertexAttribArray( d_index[1] + 1);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
