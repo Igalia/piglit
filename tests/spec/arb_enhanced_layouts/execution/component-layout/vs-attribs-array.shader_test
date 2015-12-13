@@ -1,0 +1,57 @@
+# This tests that explicit component packing
+# works correctly for vertex shader attribute arrays
+#
+[require]
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+GL_ARB_explicit_attrib_location
+
+[vertex shader]
+#extension GL_ARB_enhanced_layouts : require
+#extension GL_ARB_explicit_attrib_location : require
+
+uniform int index;
+
+layout(location = 0) in vec3 vertex;
+layout(location = 1, component = 1) in vec3 gba[3];
+layout(location = 1) in float red[3];
+out vec4 fscolor;
+void main()
+{
+        gl_Position = vec4(vertex, 1.0);
+	fscolor = vec4(red[index], gba[index]);
+}
+
+[fragment shader]
+#extension GL_ARB_enhanced_layouts : require
+
+in vec4 fscolor;
+out vec4 color;
+void main()
+{
+  color = fscolor;
+}
+
+[vertex data]
+vertex/float/3   gba/float/4      gba/float/4/1     gba/float/4/2
+-1.0 -1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
+ 1.0 -1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
+ 1.0  1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
+-1.0  1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+
+uniform int index 0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 1.0 1.0 1.0 1.0
+
+uniform int index 1
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 1.0 1.0
+
+uniform int index 2
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 0.0 1.0 1.0
+
