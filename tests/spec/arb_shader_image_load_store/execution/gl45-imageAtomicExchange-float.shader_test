@@ -40,5 +40,6 @@ relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 0.0, 0.0)
 relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.0, 0.0, 0.0)
 relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (1.0, 1.0, 1.0)
 
+memory barrier GL_FRAMEBUFFER_BARRIER_BIT
 fb tex 2d 0
 probe all rgb 0.5 0.0 0.0
