@@ -136,7 +136,8 @@ class QuietLog(BaseLog):
         self._state['complete'] += 1
 
         # Add to the summary dict
-        assert status in self.SUMMARY_KEYS
+        assert status in self.SUMMARY_KEYS, \
+            'Invalid status for logger: {}'.format(status)
         self._state['summary'][status] += 1
 
         self._print_summary()
