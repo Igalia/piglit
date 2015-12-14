@@ -210,8 +210,11 @@ class Test(object):
                 self.result.result = 'timeout'
             else:
                 self.result.result = 'crash'
-        elif self.result.returncode != 0 and self.result.result == 'pass':
-            self.result.result = 'warn'
+        elif self.result.returncode != 0:
+            if self.result.result == 'pass':
+                self.result.result = 'warn'
+            else:
+                self.result.result = 'fail'
 
     def run(self):
         """

@@ -260,3 +260,18 @@ class TestValgrindMixinRun(object):
         test.result.returncode = 1
         test.run()
         nt.eq_(test.result.result, 'fail')
+
+
+def test_interpret_result_greater_zero():
+    """test.base.Test.interpret_result: A test with status > 0 is fail"""
+    class _Test(Test):
+        def interpret_result(self):
+            super(_Test, self).interpret_result()
+
+    test = _Test(['foobar'])
+    test.result.returncode = 1
+    test.result.out = 'this is some\nstdout'
+    test.result.err = 'this is some\nerrors'
+    test.interpret_result()
+
+    nt.eq_(test.result.result, 'fail')
