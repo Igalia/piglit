@@ -1,0 +1,60 @@
+// This tests that when a struct has explicit location were reserve enough
+// locations for all the struct members and don't assign other inputs/outputs
+// the same location.
+
+[require]
+GLSL >= 1.50
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 150
+#extension GL_ARB_separate_shader_objects: require
+
+in vec4 piglit_vertex;
+
+layout(location = 0) out struct S {
+	vec3 a;
+	vec3 b;
+	vec3 c;
+} s;
+
+out vec3 d;
+out vec3 e;
+out vec3 f;
+
+void main()
+{
+	s.a = vec3(0.25, 0, 0);
+	s.b = vec3(0, 0.25, 0);
+	s.c = vec3(0, 0, 0.25);
+	d = vec3(0.5, 0, 0);
+	e = vec3(0, 0.5, 0);
+	f = vec3(0, 0, 0.5);
+
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_separate_shader_objects: require
+
+layout(location = 0) in struct S {
+	vec3 a; /* should get vec3(0.25, 0, 0) */
+	vec3 b; /* should get vec3(0, 0.25, 0) */
+	vec3 c; /* should get vec3(0, 0, 0.25) */
+} s;
+
+in vec3 d; /* should get vec3(0.5, 0, 0) */
+in vec3 e; /* should get vec3(0, 0.5, 0) */
+in vec3 f; /* should get vec3(0, 0, 0.5) */
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(s.a.x + d.x, s.b.y + e.y, s.c.z + f.z, 1);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 0.75 0.75 0.75
