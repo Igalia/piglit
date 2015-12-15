@@ -301,6 +301,9 @@ test_data_execute_with_size(test_data *data,
 void test_data_set_testing64(test_data *data,
                              const int testing64);
 
+void test_data_set_params_size(test_data *data,
+                               const int params_size);
+
 bool test_data_equal_at_index(test_data *data,
                               test_data *data_copy,
                               const unsigned index);
