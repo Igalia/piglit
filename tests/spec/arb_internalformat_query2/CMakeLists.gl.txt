@@ -12,5 +12,6 @@ piglit_add_executable (arb_internalformat_query2-api-errors api-errors.c)
 piglit_add_executable (arb_internalformat_query2-generic-pname-checks generic-pname-checks.c common.c)
 piglit_add_executable (arb_internalformat_query2-samples-pnames samples-pnames.c common.c)
 piglit_add_executable (arb_internalformat_query2-internalformat-size-checks internalformat-size-checks.c common.c)
+piglit_add_executable (arb_internalformat_query2-internalformat-type-checks internalformat-type-checks.c common.c)
 
 # vim: ft=cmake:

@@ -3622,6 +3622,7 @@ with profile.group_manager(
     g(['arb_internalformat_query2-generic-pname-checks'], 'Individual most generic pname checks')
     g(['arb_internalformat_query2-samples-pnames'], 'SAMPLES and NUM_SAMPLE_COUNTS pname checks')
     g(['arb_internalformat_query2-internalformat-size-checks'], 'All INTERNALFORMAT_<X>_SIZE pname checks')
+    g(['arb_internalformat_query2-internalformat-type-checks'], 'All INTERNALFORMAT_<X>_TYPE pname checks')
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
