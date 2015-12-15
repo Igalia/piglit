@@ -188,6 +188,55 @@ static GLint possible_values_texture_image_format[] = {
         GL_NONE
 };
 
+/*
+ * From query2 spec:
+ *
+ * "TEXTURE_IMAGE_TYPE:
+ * <skip>
+ * Possible values include any value that is legal to pass for the
+ * <type> parameter to the Tex*Image*D commands, or NONE if the
+ * resource is not supported for this operation."
+ *
+ * From 4.2 core spec:
+ * "TexImage3D
+ * <skip>
+ * format, type, and data specify the format of the image data, the
+ * type of those data, and a reference to the image data in the cur-
+ * rently bound pixel unpack buffer or client memory, as described in
+ * section 3.7.2. The format STENCIL_INDEX is not allowed."
+ *
+ * This is basically Table 3.2 (defined at section 3.7.2)
+ */
+static GLint possible_values_texture_image_type[] = {
+        /* Table 3.2 */
+        GL_UNSIGNED_BYTE,
+        GL_BYTE,
+        GL_UNSIGNED_SHORT,
+        GL_SHORT,
+        GL_UNSIGNED_INT,
+        GL_INT,
+        GL_HALF_FLOAT,
+        GL_FLOAT,
+        GL_UNSIGNED_BYTE_3_3_2,
+        GL_UNSIGNED_BYTE_2_3_3_REV,
+        GL_UNSIGNED_SHORT_5_6_5,
+        GL_UNSIGNED_SHORT_5_6_5_REV,
+        GL_UNSIGNED_SHORT_4_4_4_4,
+        GL_UNSIGNED_SHORT_4_4_4_4_REV,
+        GL_UNSIGNED_SHORT_5_5_5_1,
+        GL_UNSIGNED_SHORT_1_5_5_5_REV,
+        GL_UNSIGNED_INT_8_8_8_8,
+        GL_UNSIGNED_INT_8_8_8_8_REV,
+        GL_UNSIGNED_INT_10_10_10_2,
+        GL_UNSIGNED_INT_2_10_10_10_REV,
+        GL_UNSIGNED_INT_24_8,
+        GL_UNSIGNED_INT_10F_11F_11F_REV,
+        GL_UNSIGNED_INT_5_9_9_9_REV,
+        GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+        /* GL_NONE from query2 TEXTURE_IMAGE_TYPE spec */
+        GL_NONE
+};
+
 enum piglit_result
 piglit_display(void)
 {
@@ -277,6 +326,11 @@ piglit_init(int argc, char **argv)
         pname = GL_TEXTURE_IMAGE_FORMAT;
         pass = check_basic(&pname, 1, possible_values_texture_image_format,
                            ARRAY_SIZE(possible_values_texture_image_format))
+                && pass;
+
+        pname = GL_TEXTURE_IMAGE_TYPE;
+        pass = check_basic(&pname, 1, possible_values_texture_image_type,
+                           ARRAY_SIZE(possible_values_texture_image_type))
                 && pass;
 
         piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
