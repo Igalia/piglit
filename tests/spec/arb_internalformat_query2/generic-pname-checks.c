@@ -191,6 +191,57 @@ static GLint possible_values_texture_image_format[] = {
 /*
  * From query2 spec:
  *
+ * "GET_TEXTURE_IMAGE_FORMAT:
+ *  <skip>
+ * Possible values include any value that is legal to pass for the
+ * <format> parameter to GetTexImage, or NONE if the resource does not
+ * support this operation, or if GetTexImage is not supported."
+ *
+ * From 4.2 core spec (section 6.1.4):
+ * "format is a pixel format from table 3.3"
+ * "Calling GetTexImage with a format of STENCIL_INDEX causes the
+ *  error INVALID_ENUM ."
+ *
+ * So on 4.2 the possible values would be the same that
+ * texture_image_format.
+ *
+ * But, since 4.4 (section 8.11.4) STENCIL_INDEX is a valid enum, and
+ * INVALID_OPERATION would be raised if used in combination with a
+ * wrong internalformat.
+ *
+ * So possible_values_get_texture_image_format would include
+ * STENCIL_INDEX. When passing possible values to
+ * GET_TEXTURE_IMAGE_FORMAT, it would need to fallback to
+ * possible_values_texture_image_format if needed.
+ */
+static GLint possible_values_get_texture_image_format[] = {
+        /* Table 3.3 */
+        GL_STENCIL_INDEX,
+        GL_DEPTH_COMPONENT,
+        GL_DEPTH_STENCIL,
+        GL_RED,
+        GL_GREEN,
+        GL_BLUE,
+        GL_RG,
+        GL_RGB,
+        GL_RGBA,
+        GL_BGR,
+        GL_BGRA,
+        GL_RED_INTEGER,
+        GL_GREEN_INTEGER,
+        GL_BLUE_INTEGER,
+        GL_RG_INTEGER,
+        GL_RGB_INTEGER,
+        GL_RGBA_INTEGER,
+        GL_BGR_INTEGER,
+        GL_BGRA_INTEGER,
+        /* GL_NONE from query2 TEXTURE_IMAGE_FORMAT spec */
+        GL_NONE
+};
+
+/*
+ * From query2 spec:
+ *
  * "TEXTURE_IMAGE_TYPE:
  * <skip>
  * Possible values include any value that is legal to pass for the
@@ -332,6 +383,20 @@ piglit_init(int argc, char **argv)
         pass = check_basic(&pname, 1, possible_values_texture_image_type,
                            ARRAY_SIZE(possible_values_texture_image_type))
                 && pass;
+
+        pname = GL_GET_TEXTURE_IMAGE_FORMAT;
+
+        /* To know why this gl version if needed, see comment at
+         * possible_values_get_texture_image_format */
+        if (piglit_get_gl_version() < 44) {
+                pass = check_basic(&pname, 1, possible_values_texture_image_format,
+                                   ARRAY_SIZE(possible_values_texture_image_format))
+                        && pass;
+        } else {
+                pass = check_basic(&pname, 1, possible_values_get_texture_image_format,
+                                   ARRAY_SIZE(possible_values_get_texture_image_format))
+                        && pass;
+        }
 
         piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
