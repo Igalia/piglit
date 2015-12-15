@@ -105,6 +105,20 @@ test_data_execute(test_data *data,
                        data->params_size, data->params);
 }
 
+/* Usually we want to call GetInternalformati*v with the size of the
+ * buffer, but there are some cases where we want to specify a
+ * different size */
+void
+test_data_execute_with_size(test_data *data,
+                            const GLenum target,
+                            const GLenum internalformat,
+                            const GLenum pname,
+                            int size)
+{
+        data->callback(target, internalformat, pname,
+                       size, data->params);
+}
+
 void
 test_data_set_testing64(test_data *data,
                         const int testing64)
@@ -311,4 +325,66 @@ try_basic(const GLenum *targets, unsigned num_targets,
         }
 
 	return pass;
+}
+
+/*
+ * Sets the value of @data params at @index to @value.
+*/
+void
+test_data_set_value_at_index(test_data *data,
+                             const int index,
+                             const GLint64 value)
+{
+        if (index > data->params_size || index < 0) {
+                fprintf(stderr, "ERROR: invalid index while setting"
+                        " auxiliar test data\n");
+                return;
+        }
+
+        if (data->testing64) {
+                ((GLint64*)data->params)[index] = value;
+        } else {
+                ((GLint*)data->params)[index] = value;
+        }
+}
+
+bool
+test_data_equal_at_index(test_data *data,
+                         test_data *data_copy,
+                         unsigned index)
+{
+        if (data->testing64 != data_copy->testing64) {
+                fprintf(stderr, "ERROR: trying to compare imcompatible"
+                        " auxiliar test data structures\n");
+                return false;
+        }
+        if (data->params_size != data_copy->params_size) {
+                fprintf(stderr, "ERROR: trying to compare imcompatible"
+                        " auxiliar test data structures\n");
+                return false;
+        }
+        if (index > data->params_size || index < 0) {
+                fprintf(stderr, "ERROR: invalid index while setting"
+                        " auxiliar test data\n");
+                return false;
+        }
+
+        return (test_data_value_at_index(data, index) ==
+                test_data_value_at_index(data_copy, index));
+}
+
+test_data*
+test_data_clone(test_data *data)
+{
+        test_data *clone;
+
+        clone = test_data_new(data->testing64, data->params_size);
+
+        return clone;
+}
+
+int
+test_data_get_params_size(test_data *data)
+{
+        return data->params_size;
 }
