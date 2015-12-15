@@ -39,6 +39,12 @@
  *   the same as the MAX_HEIGHT. For 2D and cube array targets, the
  *   value returned is the same as the MAX_DEPTH."
  *
+ * MAX_COMBINED_DIMENSIONS: From spec "The maximum combined dimensions
+ *   for the resource is returned in <params>. The combined dimensions
+ *   is the product of the individual dimensions of the
+ *   resource. <skip> If the resource is unsupported, zero is
+ *   returned."
+ *
  * Additionally it also checks that the returned values are the same
  * that the ones you receive calling GetIntegerv with equivalent
  * pnames like GL_MAX_TEXTURE_SIZE, GL_MAX_3D_TEXTURE_SIZE, etc.
@@ -66,9 +72,14 @@
  *
  * So at this point, taking into account the current implementation,
  * it makes sense to check against those values.
+ *
+ * For MAX_COMBINED_DIMENSIONS it compares the returned value against
+ * a combination of MAX_WIDH, MAX_HEIGHT, MAX_DEPTH, MAX_LAYERS and
+ * SAMPLES if supported. Compares against 0 if unsupported.
  */
 
 #include "common.h"
+#include <limits.h> /* For INT_MAX */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -456,6 +467,162 @@ check_max_layers()
         return pass;
 }
 
+static bool
+is_cubemap(GLenum target)
+{
+        switch(target) {
+        case GL_TEXTURE_CUBE_MAP:
+        case GL_TEXTURE_CUBE_MAP_ARRAY:
+                return true;
+        default:
+                return false;
+        }
+}
+
+static bool
+is_multisample(GLenum target)
+{
+        switch(target) {
+        case GL_TEXTURE_2D_MULTISAMPLE:
+        case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+                return true;
+        default:
+                return false;
+        }
+}
+
+/* It computes the max dimension for @target and @internalformat, and
+ * compares it against the content of @data */
+static bool
+check_against_combined_dimensions(test_data *data,
+                                  GLenum target,
+                                  GLenum internalformat,
+                                  GLint64 *_combined_value)
+{
+        GLint current_value;
+        GLint64 combined_value = 1;
+        /* We don't include MAX_LAYERS, because his value is returned
+           as HEIGHT (on 1d arrays) or DEPTH (on 2d arrays) */
+        GLenum max_dimensions_pnames[] = {
+                GL_MAX_WIDTH,
+                GL_MAX_HEIGHT,
+                GL_MAX_DEPTH,
+                GL_SAMPLES
+        };
+        unsigned i;
+        test_data *local_data = test_data_clone(data);
+
+        for (i = 0; i < ARRAY_SIZE(max_dimensions_pnames); i++) {
+                if (max_dimensions_pnames[i] == GL_SAMPLES &&
+                    !is_multisample(target))
+                        continue;
+
+                test_data_execute(local_data, target, internalformat,
+                                  max_dimensions_pnames[i]);
+
+                current_value = test_data_value_at_index(local_data, 0);
+                if (current_value != 0)
+                        combined_value *= current_value;
+        }
+
+        test_data_clear(&local_data);
+
+        /* From query2 spec: "For cube map targets this is the maximum
+         * combined width, height and faces. "*/
+        if (is_cubemap(target))
+                combined_value *= 6;
+
+        *_combined_value = combined_value;
+        /* query2 spec doesn't specify what the 32-bit query would
+         * return on cases where a 64-bit integer is needed. NVIDIA
+         * drivers returns a 0, but nothing would prevent to just
+         * return INT_MAX. We assume that in this case, any value
+         * would be correct.
+         */
+        if (!test_data_get_testing64(data) && combined_value > INT_MAX)
+          return true;
+
+        return combined_value == test_data_value_at_index(data, 0);
+}
+/*
+ * From the spec:
+ *
+ * "MAX_COMBINED_DIMENSIONS: The maximum combined dimensions for the
+ *  resource is returned in <params>. The combined dimensions is the
+ *  product of the individual dimensions of the resource. <skip> If
+ *  the resource is unsupported, zero is returned"
+ *
+ * This method compares against zero if unsupported. If supported it
+ * computes the value using MAX_WIDTH, MAX_HEIGHT, MAX_DEPTH,
+ * MAX_LAYERS and SAMPLES, and compare it agains the returned value.
+ */
+static bool
+try_max_combined_dimensions(const GLenum *targets, unsigned num_targets,
+                            const GLenum *internalformats, unsigned num_internalformats,
+                            test_data *data)
+{
+        bool pass = true;
+        unsigned i;
+        unsigned j;
+        GLint64 combined_value;
+
+	for (i = 0; i < num_targets; i++) {
+		for (j = 0; j < num_internalformats; j++) {
+                        bool error_test;
+                        bool value_test = true;
+                        bool supported;
+
+                        supported = test_data_check_supported(data, targets[i],
+                                                              internalformats[j]);
+
+                        test_data_execute(data, targets[i], internalformats[j],
+                                          GL_MAX_COMBINED_DIMENSIONS);
+
+                        error_test =
+                                piglit_check_gl_error(GL_NO_ERROR);
+
+                        value_test = supported ?
+                                check_against_combined_dimensions(data,
+                                                                  targets[i],
+                                                                  internalformats[j],
+                                                                  &combined_value) :
+                                test_data_is_zero(data);
+
+                        if (error_test && value_test)
+                                continue;
+
+                        print_failing_case_full(targets[i], internalformats[j],
+                                                GL_MAX_COMBINED_DIMENSIONS,
+                                                combined_value, data);
+
+                        pass = false;
+                }
+        }
+
+	return pass;
+}
+
+static bool
+check_max_combined_dimensions()
+{
+        bool pass = true;
+        test_data *data = test_data_new(0, 1);
+        int testing64;
+
+        for (testing64 = 0; testing64 <= 1; testing64++) {
+                test_data_set_testing64(data, testing64);
+
+                pass = try_max_combined_dimensions(valid_targets, ARRAY_SIZE(valid_targets),
+                                                   valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                                   data)
+                        && pass;
+        }
+
+        piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+                                     "%s", piglit_get_gl_enum_name(GL_MAX_COMBINED_DIMENSIONS));
+        return pass;
+}
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -473,6 +640,7 @@ piglit_init(int argc, char **argv)
         pass = check_max_dimension(GL_MAX_HEIGHT, 2) && pass;
         pass = check_max_dimension(GL_MAX_DEPTH, 3) && pass;
         pass = check_max_layers() && pass;
+        pass = check_max_combined_dimensions() && pass;
 
         piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
