@@ -62,6 +62,20 @@ static const GLenum invalid_targets[] = {
         GL_TEXTURE_RENDERBUFFER_NV,
 };
 
+static const GLenum texture_targets[] = {
+        GL_TEXTURE_1D,
+        GL_TEXTURE_1D_ARRAY,
+        GL_TEXTURE_2D,
+        GL_TEXTURE_2D_ARRAY,
+        GL_TEXTURE_3D,
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_CUBE_MAP_ARRAY,
+        GL_TEXTURE_RECTANGLE,
+        GL_TEXTURE_BUFFER,
+        GL_TEXTURE_2D_MULTISAMPLE,
+        GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+};
+
 static const GLenum valid_pnames[] = {
         GL_SAMPLES,
         GL_NUM_SAMPLE_COUNTS,
@@ -332,3 +346,12 @@ bool check_query2_dependencies(const GLenum pname,
 
 bool test_data_is_unsupported_response(test_data *data,
                                        GLenum pname);
+
+bool test_data_check_against_get_tex_level_parameter(test_data *data,
+                                                     const GLenum target,
+                                                     const GLenum pname,
+                                                     const GLenum internalformat);
+bool create_texture(const GLenum target,
+                    const GLenum internalformat,
+                    GLuint *tex_out,
+                    GLuint *buffer_out);
