@@ -277,8 +277,19 @@ void test_data_execute(test_data *data,
                        const GLenum internalformat,
                        const GLenum pname);
 
+void
+test_data_execute_with_size(test_data *data,
+                            const GLenum target,
+                            const GLenum internalformat,
+                            const GLenum pname,
+                            int size);
+
 void test_data_set_testing64(test_data *data,
                              const int testing64);
+
+bool test_data_equal_at_index(test_data *data,
+                              test_data *data_copy,
+                              const unsigned index);
 
 bool test_data_check_supported(const test_data *data,
                                const GLenum target,
@@ -292,6 +303,14 @@ bool test_data_check_possible_values(test_data *data,
 
 GLint64 test_data_value_at_index(test_data *data,
                                  const int index);
+
+void test_data_set_value_at_index(test_data *data,
+                                  const int index,
+                                  const GLint64 value);
+
+test_data* test_data_clone(test_data *data);
+
+int test_data_get_params_size(test_data *data);
 
 bool try_basic(const GLenum *targets, unsigned num_targets,
                const GLenum *internalformats, unsigned num_internalformats,
