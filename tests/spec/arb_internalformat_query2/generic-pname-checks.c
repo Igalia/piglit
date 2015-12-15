@@ -398,5 +398,24 @@ piglit_init(int argc, char **argv)
                         && pass;
         }
 
+        /*
+         * From spec:
+         * "GET_TEXTURE_IMAGE_TYPE:
+         *  <skip>
+         *  Possible values include any value that is legal to pass
+         *  for the <type> parameter to GetTexImage, or NONE if the
+         *  resource does not support this operation, or if
+         *  GetTexImage is not supported."
+         *
+         * From 4.2 spec (section 6.1.4) this is table 3.2, that are
+         * also the possible values for TEXTURE_IMAGE_TYPE, so we
+         * reuse that list here.
+         *
+         **/
+        pname = GL_GET_TEXTURE_IMAGE_TYPE;
+        pass = check_basic(&pname, 1, possible_values_texture_image_type,
+                           ARRAY_SIZE(possible_values_texture_image_type))
+                && pass;
+
         piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
