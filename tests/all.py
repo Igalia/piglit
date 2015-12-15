@@ -3609,6 +3609,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_internalformat_query2')) as g:
     g(['arb_internalformat_query2-api-errors'], 'misc. API error checks')
+    g(['arb_internalformat_query2-generic-pname-checks'], 'misc. Individual most generic pname checks')
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:

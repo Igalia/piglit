@@ -156,7 +156,10 @@ static const GLenum invalid_pnames[] = {
 
 /* From spec:
  *
- *  "<internalformats> that must be supported (in GL 4.2 or later)
+ *  "INTERNALFORMAT_SUPPORTED:
+ *  <skip>
+ *
+ * <internalformats> that must be supported (in GL 4.2 or later)
  *   include the following:
  *    - "sized internal formats" from Table 3.12, 3.13, and 3.15,
  *    - any specific "compressed internal format" from Table 3.14,
@@ -262,4 +265,47 @@ static const GLenum valid_internalformats[] = {
         GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT,
 };
 
+typedef struct _test_data test_data;
 
+test_data* test_data_new(int testing64,
+                         int params_size);
+
+void test_data_clear(test_data **data);
+
+void test_data_execute(test_data *data,
+                       const GLenum target,
+                       const GLenum internalformat,
+                       const GLenum pname);
+
+void test_data_set_testing64(test_data *data,
+                             const int testing64);
+
+bool test_data_check_supported(const test_data *data,
+                               const GLenum target,
+                               const GLenum internalformat);
+
+bool test_data_is_zero(test_data *data);
+
+bool test_data_check_possible_values(test_data *data,
+                                     const GLint *possible_values,
+                                     const unsigned num_possible_values);
+
+GLint64 test_data_value_at_index(test_data *data,
+                                 const int index);
+
+bool try_basic(const GLenum *targets, unsigned num_targets,
+               const GLenum *internalformats, unsigned num_internalformats,
+               const GLenum pname,
+               const GLint *possible_values, unsigned num_possible_values,
+               test_data *data);
+
+void print_failing_case(const GLenum target, const GLenum internalformat,
+                        const GLenum pname, test_data *data);
+
+void print_failing_case_full(const GLenum target, const GLenum internalformat,
+                             const GLenum pname, GLint64 expected_value,
+                             test_data *data);
+
+bool value_on_set(const GLint *set,
+                  const unsigned set_size,
+                  GLint value);
