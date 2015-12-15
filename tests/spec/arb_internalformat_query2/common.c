@@ -327,6 +327,216 @@ try_basic(const GLenum *targets, unsigned num_targets,
 	return pass;
 }
 
+/* Returns a valid format for @internalformat, so it would be possible
+ * to create a texture using glTexImageXD with that
+ * format/internalformat combination */
+static GLenum
+format_for_internalformat(const GLenum internalformat)
+{
+        switch(internalformat) {
+        case GL_DEPTH_COMPONENT:
+        case GL_DEPTH_COMPONENT16:
+        case GL_DEPTH_COMPONENT24:
+        case GL_DEPTH_COMPONENT32:
+        case GL_DEPTH_COMPONENT32F:
+                return GL_DEPTH_COMPONENT;
+        case GL_DEPTH_STENCIL:
+        case GL_DEPTH24_STENCIL8:
+        case GL_DEPTH32F_STENCIL8:
+                return GL_DEPTH_STENCIL;
+        case GL_RGB10_A2UI:
+        case GL_R8I:
+        case GL_R8UI:
+        case GL_R16I:
+        case GL_R16UI:
+        case GL_R32I:
+        case GL_R32UI:
+        case GL_RG8I:
+        case GL_RG16I:
+        case GL_RG16UI:
+        case GL_RG32I:
+        case GL_RG32UI:
+        case GL_RGB8I:
+        case GL_RGB8UI:
+        case GL_RGB16I:
+        case GL_RGB16UI:
+        case GL_RGB32I:
+        case GL_RGB32UI:
+        case GL_RGBA8I:
+        case GL_RGBA8UI:
+        case GL_RGBA16I:
+        case GL_RGBA16UI:
+        case GL_RGBA32I:
+        case GL_RGBA32UI:
+                return GL_RGBA_INTEGER;
+        default:
+                return GL_RGBA;
+        }
+}
+
+static GLenum
+type_for_internalformat(const GLenum internalformat)
+{
+        switch(internalformat) {
+        case GL_DEPTH_STENCIL:
+        case GL_DEPTH24_STENCIL8:
+        case GL_DEPTH32F_STENCIL8:
+                return GL_UNSIGNED_INT_24_8;
+        default:
+                return GL_UNSIGNED_BYTE;
+        }
+}
+
+/*
+ * Some GetInternalformati*v pnames returns the same that
+ * GetTexParameter and GetTexLevelParameter. In order to use those, a
+ * texture is needed to be bound. This method creates and bind one
+ * texture based on @target and @internalformat. It returns the
+ * texture name on @tex_out.  If target is GL_TEXTURE_BUFFER, a buffer
+ * is also needed, and returned on @buffer_out. Caller is responsible
+ * to free both if the call is successful.
+ *
+ * Returns true if it was possible to create the texture. False
+ * otherwhise.
+ */
+bool
+create_texture(const GLenum target,
+               const GLenum internalformat,
+               GLuint *tex_out,
+               GLuint *buffer_out)
+{
+        GLuint tex = 0;
+        GLuint buffer = 0;
+        GLenum type = type_for_internalformat(internalformat);
+        GLenum format = format_for_internalformat(internalformat);
+        bool result = true;
+        int height = 16;
+        int width = 16;
+        int depth = 16;
+        unsigned i;
+
+        glGenTextures(1, &tex);
+        glBindTexture(target, tex);
+
+        switch(target) {
+        case GL_TEXTURE_1D:
+                glTexImage1D(target, 0, internalformat, width, 0,
+                             format, type, NULL);
+                break;
+        case GL_TEXTURE_1D_ARRAY:
+        case GL_TEXTURE_2D:
+        case GL_TEXTURE_RECTANGLE:
+                glTexImage2D(target, 0, internalformat, width, height, 0,
+                             format, type, NULL);
+                break;
+        case GL_TEXTURE_CUBE_MAP:
+                for (i = 0; i < 6; i++) {
+                        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                                     internalformat, width, height, 0, format, type,
+                                     NULL);
+                }
+                break;
+
+        case GL_TEXTURE_CUBE_MAP_ARRAY:
+                /* cube map arrays also use TexImage3D buth depth
+                 * needs to be a multiple of six */
+                depth = 6;
+        case GL_TEXTURE_2D_ARRAY:
+        case GL_TEXTURE_3D:
+                glTexImage3D(target, 0, internalformat, width, height, depth, 0,
+                             format, type, NULL);
+                break;
+        case GL_TEXTURE_2D_MULTISAMPLE:
+		glTexImage2DMultisample(target, 1, internalformat, width, height,
+                                        GL_FALSE);
+		break;
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+		glTexImage3DMultisample(target, 1, internalformat, width, height,
+                                        depth, GL_FALSE);
+		break;
+        case GL_TEXTURE_BUFFER:
+                glGenBuffers(1, &buffer);
+                glBindBuffer(GL_TEXTURE_BUFFER, buffer);
+                glTexBuffer(GL_TEXTURE_BUFFER, internalformat, buffer);
+                break;
+        default:
+                result = false;
+                fprintf(stderr, "\tError: %s is not a texture target\n",
+                        piglit_get_gl_enum_name(target));
+        }
+
+        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+                result = false;
+                fprintf(stderr, "\tError creating a texture with "
+                        "target %s, internalformat %s\n",
+                        piglit_get_gl_enum_name(target),
+                        piglit_get_gl_enum_name(internalformat));
+        }
+
+        if (!result) {
+                glDeleteTextures(1, &tex);
+                glDeleteBuffers(1, &buffer);
+        } else {
+                *tex_out = tex;
+                *buffer_out = buffer;
+        }
+        return result;
+}
+/*
+ * Builds a a texture using @target and @internalformat, and compares
+ * the result of calling GetTexLevelParameter using @pname with the
+ * result included at @data.params.
+ *
+ * At this point it is assumed that @target/@internalformat is a valid
+ * combination to create a texture. type and format would need to be
+ * guessed.
+ *
+ * Returns true if the value is the same, false otherwise
+ */
+bool
+test_data_check_against_get_tex_level_parameter(test_data *data,
+                                                const GLenum target,
+                                                const GLenum pname,
+                                                const GLenum internalformat)
+{
+        GLint param;
+        bool result = true;
+        GLuint tex;
+        GLuint buffer;
+        GLenum real_target = target;
+
+        result = create_texture(target, internalformat, &tex, &buffer);
+        if (!result)
+                return result;
+
+        /* For cube maps GetTexLevelParameter receives one of the face
+         * targets, or proxy */
+        if (target == GL_TEXTURE_CUBE_MAP) {
+                real_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+        }
+        glGetTexLevelParameteriv(real_target, 0, pname, &param);
+        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+                result = false;
+                fprintf(stderr, "\tError calling glGetTexLevelParameter\n");
+                goto cleanup;
+        }
+
+        result = test_data_value_at_index(data, 0) == param;
+
+        if (!result) {
+                fprintf(stderr, "\tError comparing glGetInternalformat "
+                        "and glGetTexLevelParameter, params value=%" PRIu64 ", "
+                        "expected value=%i\n",
+                        test_data_value_at_index(data, 0), param);
+        }
+
+cleanup:
+        glDeleteTextures(1, &tex);
+        glDeleteBuffers(1, &buffer);
+
+        return result;
+}
+
 /*
  * Sets the value of @data params at @index to @value.
 */
