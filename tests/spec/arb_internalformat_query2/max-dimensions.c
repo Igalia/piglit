@@ -39,6 +39,33 @@
  *   the same as the MAX_HEIGHT. For 2D and cube array targets, the
  *   value returned is the same as the MAX_DEPTH."
  *
+ * Additionally it also checks that the returned values are the same
+ * that the ones you receive calling GetIntegerv with equivalent
+ * pnames like GL_MAX_TEXTURE_SIZE, GL_MAX_3D_TEXTURE_SIZE, etc.
+ *
+ * All those are internal format-independent, meanwhile
+ * GetInternalformat allows to specify the internal format. So in
+ * theory there is the possibility of being different for some
+ * internal format. But in practice, this is not happening on any
+ * driver at this moment. Query2 spec mentions this case:
+ *
+ *   "7) There some <pnames> which it makes no sense to be qualified
+ *    by a per-format/target scope, how should we handle them?
+ *    e.g. MAX_WIDTH and MAX_HEIGHT might be the same for all formats.
+ *    e.g. properties like AUTO_GENERATE_MIPMAP and
+ *    MANUAL_GENERATE_MIPMAP might depend only on the GL version.
+ *
+ *    <skip>
+ *
+ *    A) Just use this entry point as is, if there are no per-format
+ *    or target differences, it is perfectly acceptable to have the
+ *    implementation return the same information for all valid
+ *    parameters. This does allow implementations to report caveats
+ *    that may exist for some formats but not others, even though all
+ *    formats/targets may be supported."
+ *
+ * So at this point, taking into account the current implementation,
+ * it makes sense to check against those values.
  */
 
 #include "common.h"
@@ -54,6 +81,84 @@ enum piglit_result
 piglit_display(void)
 {
 	return PIGLIT_FAIL;
+}
+
+/* Returns the equivalent GetInteger pname for a Getinternalformat
+ * pname/target combination. Values 0 due number of dimensions should
+ * be already filtered out */
+static GLenum
+equivalentPname(GLenum target,
+                GLenum pname)
+{
+	switch (target) {
+	case GL_TEXTURE_1D:
+	case GL_TEXTURE_2D:
+        case GL_TEXTURE_2D_MULTISAMPLE:
+		return GL_MAX_TEXTURE_SIZE;
+	case GL_TEXTURE_3D:
+		return GL_MAX_3D_TEXTURE_SIZE;
+	case GL_TEXTURE_CUBE_MAP_ARB:
+		return GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB;
+	case GL_TEXTURE_RECTANGLE:
+		return GL_MAX_RECTANGLE_TEXTURE_SIZE;
+	case GL_RENDERBUFFER_EXT:
+		return GL_MAX_RENDERBUFFER_SIZE_EXT;
+        case GL_TEXTURE_1D_ARRAY:
+                if (pname == GL_MAX_HEIGHT)
+                        return GL_MAX_ARRAY_TEXTURE_LAYERS;
+                else
+                        return GL_MAX_TEXTURE_SIZE;
+        case GL_TEXTURE_2D_ARRAY:
+        case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+                if (pname == GL_MAX_DEPTH)
+                        return GL_MAX_ARRAY_TEXTURE_LAYERS;
+                else
+                        return GL_MAX_TEXTURE_SIZE;
+        case GL_TEXTURE_CUBE_MAP_ARRAY:
+                if (pname == GL_MAX_DEPTH)
+                        return GL_MAX_ARRAY_TEXTURE_LAYERS;
+                else
+                        return GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB;
+        case GL_TEXTURE_BUFFER:
+                return GL_MAX_TEXTURE_BUFFER_SIZE;
+	default:
+		fprintf(stderr, "Invalid texture target %s\n",
+                        piglit_get_gl_enum_name(target));
+		return 0;
+	}
+}
+
+static bool
+has_layers(GLenum target)
+{
+        switch(target) {
+
+        case GL_TEXTURE_1D_ARRAY:
+        case GL_TEXTURE_2D_ARRAY:
+        case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+        case GL_TEXTURE_CUBE_MAP_ARRAY:
+                return true;
+	default:
+                return false;
+        }
+}
+
+static bool
+check_params_against_get_integer(test_data *data,
+                                 GLenum pname)
+{
+        GLint size;
+        GLint size_at_params;
+
+        glGetIntegerv(pname, &size);
+        size_at_params = test_data_value_at_index(data, 0);
+
+        if (size != size_at_params) {
+                fprintf(stderr, "GetInternalformat returns %i while GetInteger returns %i\n",
+                        size_at_params, size);
+        }
+
+        return size == size_at_params;
 }
 
 /*
@@ -147,10 +252,18 @@ try(const GLenum *targets, unsigned num_targets,
                          * three dimensions, or if the resource is
                          * unsupported, zero is returned."
                          *
-                         * We can only check if on those cases the value is zero.
+                         * For all those cases, we test that is zero.
                          */
+
                         if (!supported || num_dimensions(targets[i]) < min_dimensions) {
                                 value_test = test_data_is_zero(data);
+                        } else {
+                                /*
+                                 * If suppported and enough dimensions, we compare against the values
+                                 * returned by GetInteger
+                                 */
+                                value_test = check_params_against_get_integer(data,
+                                                                              equivalentPname(targets[i], pname));
                         }
 
                         if (error_test && value_test)
@@ -293,11 +406,21 @@ try_max_layers(const GLenum *targets, unsigned num_targets,
                         error_test =
                                 piglit_check_gl_error(GL_NO_ERROR);
 
-                        value_test = supported ?
-                                check_params_against_dimension(data,
-                                                               targets[i],
-                                                               internalformats[i]) :
-                                test_data_is_zero(data);
+                        if (!supported || !has_layers(targets[i])) {
+                                value_test = test_data_is_zero(data);
+                        } else {
+                                /* We check that MAX_LAYERS is the
+                                 * equal to the equivalent
+                                 * MAX_HEIGHT/WIDTH */
+                                value_test =
+                                        check_params_against_dimension(data,
+                                                                       targets[i],
+                                                                       internalformats[i]);
+                                /* We check that is the returned value by GetInteger */
+                                value_test = value_test &&
+                                        check_params_against_get_integer(data,
+                                                                         GL_MAX_ARRAY_TEXTURE_LAYERS);
+                        }
 
                         if (error_test && value_test)
                                 continue;
@@ -340,6 +463,11 @@ piglit_init(int argc, char **argv)
 
         piglit_require_extension("GL_ARB_framebuffer_object");
         piglit_require_extension("GL_ARB_internalformat_query2");
+        piglit_require_extension("GL_ARB_texture_cube_map");
+        piglit_require_extension("GL_ARB_texture_cube_map_array");
+        piglit_require_extension("GL_ARB_texture_rectangle");
+        piglit_require_extension("GL_ARB_multisample");
+        piglit_require_extension("GL_EXT_texture_array");
 
         pass = check_max_dimension(GL_MAX_WIDTH, 1) && pass;
         pass = check_max_dimension(GL_MAX_HEIGHT, 2) && pass;
