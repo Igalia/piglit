@@ -3671,6 +3671,7 @@ with profile.group_manager(
     g(['arb_internalformat_query2-internalformat-type-checks'], 'All INTERNALFORMAT_<X>_TYPE pname checks')
     g(['arb_internalformat_query2-image-format-compatibility-type'], 'IMAGE_FORMAT_COMPATIBILITY_TYPE pname checks')
     g(['arb_internalformat_query2-max-dimensions'], 'Max dimensions related pname checks')
+    g(['arb_internalformat_query2-color-encoding'], 'COLOR_ENCODING pname check')
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
