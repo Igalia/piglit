@@ -130,6 +130,17 @@ test_data_set_testing64(test_data *data,
         sync_test_data(data);
 }
 
+void
+test_data_set_params_size(test_data *data,
+                          const int params_size)
+{
+        if (data->params_size == params_size)
+                return;
+
+        data->params_size = params_size;
+        sync_test_data(data);
+}
+
 GLint64
 test_data_value_at_index(test_data *data,
                          const int index)
