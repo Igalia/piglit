@@ -3606,6 +3606,11 @@ with profile.group_manager(
     g(['arb_internalformat_query-minmax'], 'minmax')
 
 with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_internalformat_query2')) as g:
+    g(['arb_internalformat_query2-api-errors'], 'misc. API error checks')
+
+with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
     g(['map_buffer_range_error_check'], run_concurrent=False)
     g(['map_buffer_range_test'], run_concurrent=False)
