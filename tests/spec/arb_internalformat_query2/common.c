@@ -594,6 +594,12 @@ test_data_clone(test_data *data)
 }
 
 int
+test_data_get_testing64(test_data *data)
+{
+        return data->testing64;
+}
+
+int
 test_data_get_params_size(test_data *data)
 {
         return data->params_size;

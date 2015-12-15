@@ -324,6 +324,8 @@ void test_data_set_value_at_index(test_data *data,
 
 test_data* test_data_clone(test_data *data);
 
+int test_data_get_testing64(test_data *data);
+
 int test_data_get_params_size(test_data *data);
 
 bool try_basic(const GLenum *targets, unsigned num_targets,
