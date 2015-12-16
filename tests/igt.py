@@ -109,6 +109,8 @@ class IGTTest(Test):
         self.timeout = 600
 
     def interpret_result(self):
+        super(IGTTest, self).interpret_result()
+
         if self.result.returncode == 0:
             self.result.result = 'pass'
         elif self.result.returncode == 77:
@@ -117,8 +119,6 @@ class IGTTest(Test):
             self.result.result = 'timeout'
         else:
             self.result.result = 'fail'
-
-        super(IGTTest, self).interpret_result()
 
 
 def list_tests(listname):
