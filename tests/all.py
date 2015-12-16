@@ -4592,5 +4592,13 @@ with profile.group_manager(
     g(['arb_indirect_parameters-tf-count-arrays'], 'tf-count-arrays')
     g(['arb_indirect_parameters-tf-count-elements'], 'tf-count-elements')
 
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('object namespace pollution')) as g:
+    for object_type in ("buffer", "texture"):
+        for operation in ("glClear", "glGenerateMipmap"):
+            g(['object-namespace-pollution', operation, object_type],
+              '{} with {}'.format(object_type, operation))
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
