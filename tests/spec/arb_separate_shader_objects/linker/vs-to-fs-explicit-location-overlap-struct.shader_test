@@ -1,0 +1,54 @@
+// Test for explicit varying location overlap by structs
+
+[require]
+GLSL >= 1.50
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 150
+#extension GL_ARB_separate_shader_objects : require
+
+in vec4 piglit_vertex;
+
+layout(location = 0) out struct S {
+	vec4 out1;
+	vec4 out2;
+} s;
+
+layout(location = 1) out vec4 out3;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	s.out1 = vec4(1.0, 0.0, 0.0, 1.0);
+	s.out2 = vec4(1.0, 1.0, 0.0, 1.0);
+	out3 = vec4(0.0);
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_separate_shader_objects : require
+
+uniform int i;
+
+layout(location = 0) in struct S {
+	vec4 out1;
+	vec4 out2;
+} s;
+
+layout(location = 1) in vec4 out3;
+
+out vec4 color;
+
+void main()
+{
+	if (i == 0)
+		color = s.out1;
+	else if (i == 1)
+		color = s.out2;
+	else
+		color = out3;
+}
+
+[test]
+link error
