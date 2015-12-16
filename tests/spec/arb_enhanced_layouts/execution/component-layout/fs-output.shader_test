@@ -3,11 +3,13 @@
 [require]
 GLSL >= 1.50
 GL_ARB_enhanced_layouts
+GL_ARB_explicit_attrib_location
 
 [vertex shader passthrough]
 
 [fragment shader]
 #extension GL_ARB_enhanced_layouts : require
+#extension GL_ARB_explicit_attrib_location : require
 
 layout(location = 0, component = 1) out vec3 color;
 layout(location = 0) out float colour;
