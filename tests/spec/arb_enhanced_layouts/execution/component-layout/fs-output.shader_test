@@ -1,0 +1,23 @@
+# Simple test of component layout qualifier for fragment shader outputs
+#
+[require]
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_enhanced_layouts : require
+
+layout(location = 0, component = 1) out vec3 color;
+layout(location = 0) out float colour;
+
+void main()
+{
+  color = vec3(1.0, 0.0, 1.0);
+  colour = 1.0;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 1 1 0
