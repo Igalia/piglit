@@ -242,6 +242,9 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_internalformat_query");
+        /* ARB_internalformat_query2 redefines and extend this
+         * extension. That extension have their own tests*/
+        piglit_require_not_extension("GL_ARB_internalformat_query2");
 
 	/* Need GL 3 or extensions to support the valid_formats[] above */
         if (piglit_get_gl_version() < 30) {
