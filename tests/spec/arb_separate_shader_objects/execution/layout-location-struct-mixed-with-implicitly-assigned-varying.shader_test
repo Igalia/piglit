@@ -1,4 +1,4 @@
-// This tests that when a struct has explicit location were reserve enough
+// This tests that when a struct has an explicit location we reserve enough
 // locations for all the struct members and don't assign other inputs/outputs
 // the same location.
 
