@@ -1,0 +1,52 @@
+// From section 4.4.1 (Input Layout Qualifiers) of the GLSL 4.50 spec:
+//
+//    "If a non-vertex shader input is a scalar or vector type other than
+//    dvec3 or dvec4, it will consume a single location, while types dvec3 or
+//    dvec4 will consume two consecutive locations."
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_separate_shader_objects : require
+
+in vec4 piglit_vertex;
+
+layout(location = 0) flat out dvec4 dout1;
+layout(location = 1) flat out dvec4 dout2;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	dout1 = dvec4(1.0);
+	dout2 = dvec4(0.0);
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_separate_shader_objects : require
+
+uniform dvec4 expected;
+
+layout(location = 0) flat in dvec4 dout1;
+layout(location = 1) flat in dvec4 dout2;
+
+out vec4 color;
+
+void main()
+{
+	if (expected == dout1)
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (expected == dout2)
+		color = vec4(1.0, 1.0, 0.0, 1.0);
+	else
+		color = vec4(1.0, 1.0, 1.0, 1.0);
+}
+
+[test]
+link error
