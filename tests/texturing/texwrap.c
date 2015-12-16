@@ -724,6 +724,10 @@ static void sample_nearest(int x, int y, int z,
 				image[(coords[2]*size_y*size_x +
 				       coords[1]*size_x + coords[0])];
 		result[3] = 1;
+	} else if (format->stencil) {
+		result[0] = result[1] = result[2] = result[3] =
+				image[(coords[2]*size_y*size_x +
+				       coords[1]*size_x + coords[0])];
 	} else {
 		memcpy(result,
 		       &image[(coords[2]*size_y*size_x +
@@ -1020,6 +1024,16 @@ static GLboolean probe_pixels(const struct format_desc *format, GLboolean npot, 
 		if (format->intensity) {
 			for (j = 0; j < 4; j++) {
 				deltamax[j] = deltamax_lut[format->intensity];
+			}
+		} else if (format->stencil && !format->depth) {
+			deltamax[0] = deltamax_lut[format->stencil];
+			/*
+			 * XXX unless someone can figure out what the hell all
+			 * those channels should actually return... Right now
+			 * the test would expect the same value for all channels.
+			 */
+			for (j = 1; j < 4; j++) {
+				deltamax[j] = 255;
 			}
 		} else {
 			if (format->luminance) {
@@ -1427,7 +1441,7 @@ static void init_int_texture(const struct format_desc *format,
 	black = colors[5];
 
 	/* Set the colors to match the base format. */
-	if (format->intensity) {
+	if (format->intensity || format->stencil) {
 		for (i = 0; i < 7; i++) {
 			colors[i][3] = colors[i][2] = colors[i][1] = colors[i][0];
 		}
