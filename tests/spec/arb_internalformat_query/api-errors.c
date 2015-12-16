@@ -63,9 +63,6 @@ static const GLenum invalid_targets[] = {
 	GL_STENCIL_ATTACHMENT,
 	GL_TEXTURE_4D_SGIS,
 	GL_TEXTURE_RENDERBUFFER_NV,
-};
-
-static const GLenum invalid_targets_without_query2[] = {
 	GL_TEXTURE_1D,
 	GL_TEXTURE_1D_ARRAY,
 	GL_TEXTURE_2D,
@@ -152,9 +149,6 @@ static const GLenum invalid_pnames[] = {
 	GL_TEXTURE_WIDTH,
 	GL_TEXTURE_HEIGHT,
 	GL_TEXTURE_COMPONENTS,
-};
-
-static const GLenum invalid_pnames_without_query2[] = {
 	GL_INTERNALFORMAT_SUPPORTED,
 	GL_INTERNALFORMAT_PREFERRED,
 	GL_INTERNALFORMAT_RED_SIZE,
@@ -285,6 +279,9 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_internalformat_query");
+        /* ARB_internalformat_query2 redefines and extend this
+         * extension. That extension have their own tests*/
+        piglit_require_not_extension("GL_ARB_internalformat_query2");
 
 	/* The GL_ARB_internalformat_query spec says:
 	 *
@@ -310,22 +307,7 @@ piglit_init(int argc, char **argv)
 	 *     then TEXTURE_2D_MULTISAMPLE and TEXTURE_2D_MULTISAMPLE_ARRAY
 	 *     are not supported <target> parameters to GetInternalformativ."
 	 *
-	 * However, GL_ARB_internalformat_query2 adds GL_TEXTURE_1D,
-	 * GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY,
-	 * GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_ARRAY,
-	 * GL_TEXTURE_RECTANGLE, and GL_TEXTURE_BUFFER to the list of
-	 * available targets.
-	 *
 	 */
-	if (!piglit_is_extension_supported("GL_ARB_internalformat_query2")) {
-		pass = try(invalid_targets_without_query2,
-			   ARRAY_SIZE(invalid_targets_without_query2),
-			   valid_formats, ARRAY_SIZE(valid_formats),
-			   valid_pnames, ARRAY_SIZE(valid_pnames),
-			   GL_INVALID_ENUM)
-			&& pass;
-	}
-
 	if (!piglit_is_extension_supported("GL_ARB_texture_multisample")) {
 		pass = try(invalid_targets_without_tms,
 			   ARRAY_SIZE(invalid_targets_without_tms),
@@ -346,18 +328,7 @@ piglit_init(int argc, char **argv)
 	 *     "If the <pname> parameter to GetInternalformativ is not SAMPLES
 	 *     or NUM_SAMPLE_COUNTS, then an INVALID_ENUM error is generated."
 	 *
-	 * However, GL_ARB_internalformat_query2 adds a giant pile of possible
-	 * enums to this list.
 	 */
-	if (!piglit_is_extension_supported("GL_ARB_internalformat_query2")) {
-		pass = try(valid_targets, ARRAY_SIZE(valid_targets),
-			   valid_formats, ARRAY_SIZE(valid_formats),
-			   invalid_pnames_without_query2,
-			   ARRAY_SIZE(invalid_pnames_without_query2),
-			   GL_INVALID_ENUM)
-			&& pass;
-	}
-
 	pass = try(valid_targets, ARRAY_SIZE(valid_targets),
 		   valid_formats, ARRAY_SIZE(valid_formats),
 		   invalid_pnames, ARRAY_SIZE(invalid_pnames),
