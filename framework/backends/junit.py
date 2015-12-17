@@ -150,7 +150,7 @@ class JUnitBackend(FileBackend):
                 else:
                     res = etree.SubElement(element, 'failure')
 
-            elif data.result == 'crash':
+            elif data.result in ['crash', 'timeout']:
                 if expected_result == "error":
                     err.text += "\n\nWARN: passing test as an expected crash"
                     res = etree.SubElement(element, 'skipped',
