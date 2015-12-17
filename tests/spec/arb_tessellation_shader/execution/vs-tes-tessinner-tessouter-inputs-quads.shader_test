@@ -14,14 +14,12 @@ void main()
 
 [tessellation evaluation shader]
 #extension GL_ARB_tessellation_shader: require
-layout(triangles) in;
+layout(quads) in;
 
 out vec4 color;
 
 void main() {
-	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
-	            + gl_in[1].gl_Position * gl_TessCoord[1]
-	            + gl_in[2].gl_Position * gl_TessCoord[2];
+	gl_Position = vec4(gl_TessCoord.xy * 2 - 1, 0, 1);
 	color = gl_TessLevelOuter == float[4](2.0, 4.0, 7.0, 6.0) &&
 		gl_TessLevelInner == float[2](5.0, 3.0) ?
 			vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
@@ -48,8 +46,8 @@ vertex/float/2
 [test]
 clear color 0.1 0.1 0.1 0.1
 clear
-patch parameter vertices 3
+patch parameter vertices 1
 patch parameter default level outer 2 4 7 6
 patch parameter default level inner 5 3
-draw arrays GL_PATCHES 0 6
+draw arrays GL_PATCHES 0 1
 probe all rgba 0.0 1.0 0.0 1.0
