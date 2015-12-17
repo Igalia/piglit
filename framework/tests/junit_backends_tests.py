@@ -37,7 +37,7 @@ import framework.tests.utils as utils
 from .backends_tests import BACKEND_INITIAL_META
 
 
-JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'
+JUNIT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema', 'junit-7.xsd')
 
 doc_formatter = utils.DocFormatter({'separator': grouptools.SEPARATOR})
 
