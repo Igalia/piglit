@@ -76,6 +76,10 @@ __all__ = [
     'is_crash_returncode',
 ]
 
+# Allows timeouts to be suppressed by setting the environment variable
+# PIGLIT_NO_TIMEOUT to anything that bool() will resolve as True
+_SUPPRESS_TIMEOUT = bool(os.environ.get('PIGLIT_NO_TIMEOUT', False))
+
 
 class TestIsSkip(exceptions.PiglitException):
     """Exception raised in is_skip() if the test is a skip."""
@@ -270,7 +274,10 @@ class Test(object):
                                     **_EXTRA_POPEN_ARGS)
 
             self.result.pid = proc.pid
-            out, err = proc.communicate(timeout=self.timeout)
+            if not _SUPPRESS_TIMEOUT:
+                out, err = proc.communicate(timeout=self.timeout)
+            else:
+                out, err = proc.communicate()
             returncode = proc.returncode
         except OSError as e:
             # Different sets of tests get built under different build

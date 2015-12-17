@@ -304,6 +304,10 @@ behaves.
        undesirable, setting this environment variable to True will disable this
        system.
 
+ PIGLIT_NO_TIMEOUT
+       When this variable is true in python then any timeouts given by tests
+       will be ignored, and they will run until completion or they are killed.
+
 3.2 Note
 --------
 
