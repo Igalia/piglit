@@ -30,7 +30,7 @@ import functools
 import nose.tools as nt
 
 from framework import core, exceptions
-import framework.tests.utils as utils
+from . import utils
 
 # pylint: disable=line-too-long,invalid-name
 

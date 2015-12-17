@@ -27,7 +27,7 @@ import textwrap
 import mock
 import nose.tools as nt
 
-import framework.tests.utils as utils
+from . import utils
 from framework.test import opengl
 from framework.test.base import TestIsSkip
 

@@ -33,7 +33,7 @@ import nose.tools as nt
 from nose.plugins.skip import SkipTest
 
 from framework import results, backends, grouptools, status
-import framework.tests.utils as utils
+from . import utils
 from .backends_tests import BACKEND_INITIAL_META
 
 

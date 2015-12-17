@@ -22,7 +22,7 @@
 
 from __future__ import print_function, absolute_import
 
-from framework.tests import utils
+from . import utils
 from framework.test import OpenCVTest
 
 

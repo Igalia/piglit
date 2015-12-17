@@ -25,7 +25,7 @@ from StringIO import StringIO
 import mock
 import nose.tools as nt
 
-from framework.tests import utils
+from . import utils
 from framework import grouptools
 
 with mock.patch('framework.core.PIGLIT_CONFIG.required_get',

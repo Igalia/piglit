@@ -28,7 +28,7 @@ import nose.tools as nt
 
 from framework import exceptions
 import framework.test as testm
-import framework.tests.utils as utils
+from . import utils
 
 # pylint: disable=invalid-name
 

@@ -24,7 +24,7 @@ from __future__ import print_function, absolute_import
 
 import nose.tools as nt
 
-from framework.tests import utils
+from . import utils
 from framework.test import GTest
 
 

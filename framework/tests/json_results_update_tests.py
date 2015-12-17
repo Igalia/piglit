@@ -31,7 +31,7 @@ except ImportError:
     import json
 import nose.tools as nt
 
-import framework.tests.utils as utils
+from . import utils
 from framework import backends, results
 
 # Disable some errors that cannot be fixed either because tests need to probe

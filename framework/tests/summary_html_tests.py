@@ -28,7 +28,7 @@ import os
 import nose.tools as nt
 
 from framework.summary import html_
-from framework.tests import utils
+from . import utils
 
 
 @utils.test_in_tempdir

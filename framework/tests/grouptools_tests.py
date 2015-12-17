@@ -25,7 +25,7 @@ from __future__ import print_function
 import nose.tools as nt
 
 import framework.grouptools as grouptools
-import framework.tests.utils as utils
+from . import utils
 
 doc_formatter = utils.DocFormatter({  # pylint: disable=invalid-name
     'separator': grouptools.SEPARATOR,

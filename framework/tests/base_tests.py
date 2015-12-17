@@ -26,7 +26,7 @@ import mock
 import nose.tools as nt
 from nose.plugins.attrib import attr
 
-import framework.tests.utils as utils
+from . import utils
 from framework.test.base import (
     Test,
     TestRunError,

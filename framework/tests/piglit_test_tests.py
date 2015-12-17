@@ -25,7 +25,7 @@ from __future__ import print_function, absolute_import
 import mock
 import nose.tools as nt
 
-from framework.tests import utils
+from . import utils
 from framework.options import _Options as Options
 from framework.test.base import TestIsSkip
 from framework.test.piglit_test import (PiglitBaseTest, PiglitGLTest,

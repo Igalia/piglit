@@ -27,7 +27,7 @@ import copy
 import mock
 import nose.tools as nt
 
-from framework.tests import utils
+from . import utils
 from framework import grouptools, dmesg, profile, exceptions, options
 from framework.test import GleanTest
 

@@ -33,7 +33,7 @@ import nose.tools as nt
 from nose.plugins.skip import SkipTest
 
 from framework import results
-from framework.tests import utils
+from . import utils
 from framework.backends import compression, abstract
 
 # pylint: disable=line-too-long,protected-access

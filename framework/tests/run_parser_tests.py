@@ -28,7 +28,7 @@ import shutil
 import nose.tools as nt
 
 from framework import core, exceptions
-import framework.tests.utils as utils
+from . import utils
 import framework.programs.run as run
 
 

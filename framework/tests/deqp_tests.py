@@ -32,7 +32,7 @@ import nose.tools as nt
 
 from framework import profile, grouptools, exceptions
 from framework.test import deqp
-from framework.tests import utils
+from . import utils
 
 # pylint:disable=line-too-long,invalid-name
 

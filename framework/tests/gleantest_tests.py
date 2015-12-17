@@ -27,7 +27,7 @@ import nose.tools as nt
 
 from framework.options import _Options as Options
 from framework.test import GleanTest
-from framework.tests import utils
+from . import utils
 from framework.test.base import TestIsSkip
 
 

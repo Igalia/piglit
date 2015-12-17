@@ -32,7 +32,7 @@ import os.path as path
 
 from nose.plugins.skip import SkipTest
 
-import framework.tests.utils as utils
+from . import utils
 
 
 @utils.nose_generator

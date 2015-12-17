@@ -28,7 +28,7 @@ import nose.tools as nt
 
 from framework import results, status, grouptools
 from framework.summary import common as summary
-from framework.tests import utils
+from . import utils
 
 
 def test_find_diffs():

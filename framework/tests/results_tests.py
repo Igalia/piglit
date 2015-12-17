@@ -26,7 +26,7 @@ from __future__ import print_function, absolute_import
 import nose.tools as nt
 
 from framework import results, status, exceptions, grouptools
-import framework.tests.utils as utils
+from . import utils
 
 
 def dict_eq(one, two):

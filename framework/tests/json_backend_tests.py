@@ -32,7 +32,7 @@ except ImportError:
 import nose.tools as nt
 
 from framework import results, backends, exceptions, grouptools
-import framework.tests.utils as utils
+from . import utils
 from .backends_tests import BACKEND_INITIAL_META
 
 

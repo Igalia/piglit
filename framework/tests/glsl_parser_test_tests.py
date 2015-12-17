@@ -27,9 +27,9 @@ import textwrap
 import mock
 import nose.tools as nt
 
-from framework import exceptions
+from . import utils
 import framework.test.glsl_parser_test as glsl
-import framework.tests.utils as utils
+from framework import exceptions
 from framework.test import TEST_BIN_DIR, TestIsSkip
 
 # pylint: disable=line-too-long,invalid-name

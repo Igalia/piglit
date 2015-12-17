@@ -28,7 +28,7 @@ import threading
 import nose.tools as nt
 
 import framework.log as log
-import framework.tests.utils as utils
+from . import utils
 
 TEST_STATE = {'total': 0, 'complete': 0, 'lastlength': 0, 'running': [],
               'summary': collections.defaultdict(lambda: 0)}

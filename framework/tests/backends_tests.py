@@ -28,7 +28,7 @@ import os
 import nose.tools as nt
 
 from framework import backends, options
-import framework.tests.utils as utils
+from . import utils
 
 
 BACKEND_INITIAL_META = {

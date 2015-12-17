@@ -31,7 +31,7 @@ import itertools
 import nose.tools as nt
 
 import framework.status as status
-import framework.tests.utils as utils
+from . import utils
 
 # pylint: disable=expression-not-assigned,invalid-name,line-too-long
 
