@@ -33,7 +33,7 @@ from framework.test.base import (
     ValgrindMixin,
     WindowResizeMixin,
 )
-from framework.tests.status_tests import PROBLEMS, STATUSES
+from .status_tests import PROBLEMS, STATUSES
 from framework.options import _Options as Options
 
 # pylint: disable=invalid-name
