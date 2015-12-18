@@ -428,6 +428,20 @@ do_Clear(void)
 }
 
 static bool
+do_CopyPixels(void)
+{
+	/* Set non-1.0 pixel zoom to avoid i965 blit path. */
+	glPixelZoom(1.5f, 1.5f);
+
+	glRasterPos2f(0.5, 0.5);
+	glCopyPixels(0, 0, 4, 4, GL_COLOR);
+
+	glPixelZoom(1.0f, 1.0f);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
 do_DrawPixels(void)
 {
 	GLuint pixels[16 * 16];
@@ -477,6 +491,7 @@ static const struct operation {
 } operation_table[] = {
 	{ "glBitmap", do_Bitmap },
 	{ "glClear", do_Clear },
+	{ "glCopyPixels", do_CopyPixels },
 	{ "glDrawPixels", do_DrawPixels },
 	{ "glGenerateMipmap", do_GenerateMipmap },
 };
