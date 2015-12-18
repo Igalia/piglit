@@ -104,6 +104,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 12;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -427,6 +428,19 @@ do_Clear(void)
 }
 
 static bool
+do_DrawPixels(void)
+{
+	GLuint pixels[16 * 16];
+
+	memset(pixels, 0x81, sizeof(pixels));
+	glDrawPixels(16, 16, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, pixels);
+	glDrawPixels(16, 16, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, pixels);
+	glDrawPixels(16, 16, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, pixels);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
 do_GenerateMipmap(void)
 {
 	const GLuint tex = FIRST_SPARE_OBJECT;
@@ -463,6 +477,7 @@ static const struct operation {
 } operation_table[] = {
 	{ "glBitmap", do_Bitmap },
 	{ "glClear", do_Clear },
+	{ "glDrawPixels", do_DrawPixels },
 	{ "glGenerateMipmap", do_GenerateMipmap },
 };
 
