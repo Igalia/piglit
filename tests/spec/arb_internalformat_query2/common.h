@@ -337,6 +337,13 @@ bool try_basic(const GLenum *targets, unsigned num_targets,
                const GLint *possible_values, unsigned num_possible_values,
                test_data *data);
 
+void print_case(const GLenum target, const GLenum internalformat,
+                const GLenum pname, test_data *data);
+
+void print_case_full(const GLenum target, const GLenum internalformat,
+                     const GLenum pname, GLint64 expected_value,
+                     test_data *data);
+
 void print_failing_case(const GLenum target, const GLenum internalformat,
                         const GLenum pname, test_data *data);
 

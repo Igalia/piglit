@@ -217,7 +217,7 @@ test_data_check_possible_values(test_data *data,
 }
 
 /*
- * Prints the info of a failing case for a given pname.
+ * Prints the info of a case for a given pname.
  *
  * Note that it tries to get the name of the value at @data as if it
  * were a enum, as it is useful on that case. But there are several
@@ -225,19 +225,19 @@ test_data_check_possible_values(test_data *data,
  * for those just printing the value.
  */
 void
-print_failing_case(const GLenum target, const GLenum internalformat,
-                   const GLenum pname, test_data *data)
+print_case(const GLenum target, const GLenum internalformat,
+           const GLenum pname, test_data *data)
 {
-        print_failing_case_full(target, internalformat, pname, -1, data);
+        print_case_full(target, internalformat, pname, -1, data);
 }
 
 /*
  * Prints the info of a failing case. If expected_value is smaller
  * that 0, it is not printed.
 */
-void print_failing_case_full(const GLenum target, const GLenum internalformat,
-                             const GLenum pname, GLint64 expected_value,
-                             test_data *data)
+void print_case_full(const GLenum target, const GLenum internalformat,
+                     const GLenum pname, GLint64 expected_value,
+                     test_data *data)
 {
         /* Knowing if it is supported is interesting in order to know
          * if the test is being too restrictive */
@@ -245,9 +245,9 @@ void print_failing_case_full(const GLenum target, const GLenum internalformat,
         GLint64 current_value = test_data_value_at_index(data, 0);
 
         if (data->testing64) {
-                fprintf(stderr,  "    64 bit failing case: ");
+                fprintf(stderr,  "64 bit case: ");
         } else {
-                fprintf(stderr,  "    32 bit failing case: ");
+                fprintf(stderr,  "32 bit case: ");
         }
 
         fprintf(stderr, "pname = %s, "
@@ -265,6 +265,21 @@ void print_failing_case_full(const GLenum target, const GLenum internalformat,
                 current_value,
                 piglit_get_gl_enum_name(current_value),
                 supported);
+}
+
+void print_failing_case(const GLenum target, const GLenum internalformat,
+                        const GLenum pname, test_data *data)
+{
+        fprintf(stderr, "Failing ");
+        print_case(target, internalformat, pname, data);
+}
+
+void print_failing_case_full(const GLenum target, const GLenum internalformat,
+                             const GLenum pname, GLint64 expected_value,
+                             test_data *data)
+{
+        fprintf(stderr, "Failing ");
+        print_case_full(target, internalformat, pname, expected_value, data);
 }
 
 /*
@@ -328,8 +343,8 @@ try_basic(const GLenum *targets, unsigned num_targets,
                         if (error_test && value_test)
                                 continue;
 
-                        print_failing_case(targets[i], internalformats[j],
-                                           pname, data);
+                        print_case(targets[i], internalformats[j],
+                                   pname, data);
 
                         pass = false;
                 }
