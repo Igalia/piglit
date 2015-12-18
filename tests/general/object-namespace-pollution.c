@@ -397,6 +397,22 @@ validate_texture(unsigned name)
 /** \name GL operation wrapper functions. */
 /*@{*/
 static bool
+do_Bitmap(void)
+{
+	uint8_t bitmap[16 * 16 / 8];
+
+	/* Enable depth test to avoid i965 blit path. */
+	glEnable(GL_DEPTH_TEST);
+
+	memset(bitmap, 0xff, sizeof(bitmap));
+	glBitmap(16, 16, 0, 0, 0, 0, bitmap);
+
+	glDisable(GL_DEPTH_TEST);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
 do_Clear(void)
 {
 	/* Pick a clear value that should avoid common hardware "fast clear"
@@ -445,6 +461,7 @@ static const struct operation {
 	const char *name;
 	bool (*func)(void);
 } operation_table[] = {
+	{ "glBitmap", do_Bitmap },
 	{ "glClear", do_Clear },
 	{ "glGenerateMipmap", do_GenerateMipmap },
 };
