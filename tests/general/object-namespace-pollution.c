@@ -428,6 +428,37 @@ do_Clear(void)
 }
 
 static bool
+do_ClearTexSubImage(void)
+{
+	GLuint tex = FIRST_SPARE_OBJECT;
+
+	/* Pick a clear value that should avoid common hardware "fast clear"
+	 * optimizations.
+	 */
+	const GLuint clear_data = 0xDEADBEEF;
+
+	if (!piglit_is_extension_supported("GL_ARB_clear_texture")) {
+		printf("%s requires GL_ARB_clear_texture.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA,
+		     GL_UNSIGNED_INT_8_8_8_8, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glClearTexSubImage(tex, 0 /* level */,
+			   0 /* xoffset */, 0 /* yoffset */, 0 /* zoffset */,
+			   16 /* width */, 16 /* height */, 1 /* depth */,
+			   GL_RGBA, GL_UNSIGNED_INT_8_8_8_8,
+			   &clear_data);
+
+	glDeleteTextures(1, &tex);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
 do_CopyPixels(void)
 {
 	/* Set non-1.0 pixel zoom to avoid i965 blit path. */
@@ -518,6 +549,7 @@ static const struct operation {
 } operation_table[] = {
 	{ "glBitmap", do_Bitmap },
 	{ "glClear", do_Clear },
+	{ "glClearTexSubImage", do_ClearTexSubImage },
 	{ "glCopyPixels", do_CopyPixels },
 	{ "glCopyTexSubImage2D", do_CopyTexSubImage2D },
 	{ "glDrawPixels", do_DrawPixels },
