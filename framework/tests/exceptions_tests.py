@@ -34,27 +34,3 @@ from framework import exceptions
 def test_handle_PiglitFatalError():
     """exceptions.handler: Handles PiglitFatalError"""
     raise exceptions.PiglitFatalError
-
-
-@nt.raises(SystemExit)
-@utils.capture_stderr
-@exceptions.handler
-def test_handle_PiglitInternalError():
-    """exceptions.handler: Handles PiglitInternalError"""
-    raise exceptions.PiglitInternalError
-
-
-@nt.raises(SystemExit)
-@utils.capture_stderr
-@exceptions.handler
-def test_handle_PiglitException():
-    """exceptions.handler: Handles PiglitException"""
-    raise exceptions.PiglitException
-
-
-@nt.raises(SystemExit)
-@utils.capture_stderr
-@exceptions.handler
-def test_handle_Exception():
-    """exceptions.handler: Handles Exception"""
-    raise Exception

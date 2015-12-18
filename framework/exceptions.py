@@ -21,7 +21,6 @@
 """Exception and error classes for piglit, and exception handlers."""
 
 from __future__ import print_function, absolute_import, division
-import os
 import sys
 import functools
 
@@ -31,8 +30,6 @@ __all__ = [
     'PiglitException',
     'handler',
 ]
-
-_DEBUG = bool(os.environ.get('PIGLIT_DEBUG', False))
 
 
 def handler(func):
@@ -51,22 +48,6 @@ def handler(func):
         except PiglitFatalError as e:
             print('Fatal Error: {}'.format(str(e)), file=sys.stderr)
             sys.exit(1)
-        except (PiglitInternalError, PiglitException) as e:
-            print('Warning: An internal exception that should have '
-                  'been handled was not. This is bug and should be reported.\n'
-                  'BUG: {}'.format(str(e)),
-                  file=sys.stderr)
-            if _DEBUG:
-                raise
-            sys.exit(1)
-        except Exception as e:  # pylint: disable=broad-except
-            print('Warning: A python exception that should have '
-                  'been handled was not. This is bug and should be reported.\n'
-                  'BUG: {}'.format(str(e)),
-                  file=sys.stderr)
-            if _DEBUG:
-                raise
-            sys.exit(1)
 
     return _inner
 
@@ -78,6 +59,9 @@ class PiglitException(Exception):
     uncaught that is a bug in piglit.
 
     """
+    def __str__(self):
+        return ('An internal exception that should have been handled was not:'
+                '\n{}'.format(super(PiglitException, self).__str__()))
 
 
 class PiglitInternalError(Exception):
@@ -86,6 +70,9 @@ class PiglitInternalError(Exception):
     These should always be handled.
 
     """
+    def __str__(self):
+        return 'An internal error occured:\n{}'.format(
+            super(PiglitInternalError, self).__str__())
 
 
 class PiglitFatalError(Exception):
