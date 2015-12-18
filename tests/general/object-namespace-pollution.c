@@ -442,6 +442,33 @@ do_CopyPixels(void)
 }
 
 static bool
+do_CopyTexSubImage2D(void)
+{
+	GLuint tex = FIRST_SPARE_OBJECT;
+
+	/* Set non-1.0 pixel zoom to avoid i965 blorp path. */
+	glPixelZoom(1.5f, 1.5f);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	/* Pick GL_LUMINANCE8_ALPHA8 because most hardware can support it
+	 * natively, and most hardware cannot use a blit fast path from RGB or
+	 * RGBA to LA.  i965 currently cannot.
+	 */
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE8_ALPHA8, 16, 16, 0,
+		     GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, NULL);
+
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 16, 16);
+
+	glPixelZoom(1.0f, 1.0f);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteTextures(1, &tex);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
 do_DrawPixels(void)
 {
 	GLuint pixels[16 * 16];
@@ -492,6 +519,7 @@ static const struct operation {
 	{ "glBitmap", do_Bitmap },
 	{ "glClear", do_Clear },
 	{ "glCopyPixels", do_CopyPixels },
+	{ "glCopyTexSubImage2D", do_CopyTexSubImage2D },
 	{ "glDrawPixels", do_DrawPixels },
 	{ "glGenerateMipmap", do_GenerateMipmap },
 };
