@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 	 */
 	pass = try_version(1, 2) && pass;
 	pass = try_version(2, 1) && pass;
-	pass = try_version(3, 2) && pass;
+	pass = try_version(3, 3) && pass;
 
 	GLX_ARB_create_context_teardown();
 
