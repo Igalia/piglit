@@ -113,6 +113,8 @@ struct enum_value_pair {
 	GLint expected;
 };
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 /**
  * Spare objects used by test cases.
  *
@@ -541,6 +543,69 @@ do_GenerateMipmap(void)
 
 	return piglit_check_gl_error(GL_NO_ERROR) && pass;
 }
+
+static bool
+do_TexSubImage2D(void)
+{
+	const GLuint tex = FIRST_SPARE_OBJECT;
+	const GLuint pbo = FIRST_SPARE_OBJECT;
+	uint8_t data[TEXTURE_DATA_SIZE];
+	bool pass = true;
+
+	if (!piglit_is_extension_supported("GL_EXT_pixel_buffer_object") &&
+	    piglit_get_gl_version() < 30) {
+		printf("%s requires pixel buffer objects.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (glIsTexture(tex)) {
+		printf("\t%s,%d: %u is already a texture\n",
+		       __func__, __LINE__, tex);
+		pass = false;
+	}
+
+	if (glIsBuffer(pbo)) {
+		printf("\t%s,%d: %u is already a buffer object\n",
+		       __func__, __LINE__, pbo);
+		pass = false;
+	}
+
+	/* Generate the initial texture object.
+	 *
+	 * NOTE: This must occur before binding the PBO.  Otherwise
+	 * the NULL texel pointer will be interpreted as a zero offset
+	 * in the buffer, and glTexImage2D will upload data from the
+	 * PBO.  This is not the intent of this test.
+	 */
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA,
+		     GL_UNSIGNED_INT_8_8_8_8, NULL);
+
+
+	/* Generate the buffer object that will be used for the PBO upload
+	 * to the texture.
+	 */
+	generate_random_data(data, sizeof(data), GL_PIXEL_UNPACK_BUFFER, pbo);
+
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+	glBufferData(GL_PIXEL_UNPACK_BUFFER, sizeof(data), data,
+		     GL_STATIC_DRAW);
+
+	/* Do the "real" test. */
+	glTexSubImage2D(GL_TEXTURE_2D, 0 /* level */,
+			0 /* xoffset */, 0 /* yoffset */,
+			16 /* width */, 16 /* height */,
+			GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, BUFFER_OFFSET(0));
+
+	/* Final clean up. */
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteTextures(1, &tex);
+
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+	glDeleteBuffers(1, &pbo);
+
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
 /*@}*/
 
 static const struct operation {
@@ -554,6 +619,7 @@ static const struct operation {
 	{ "glCopyTexSubImage2D", do_CopyTexSubImage2D },
 	{ "glDrawPixels", do_DrawPixels },
 	{ "glGenerateMipmap", do_GenerateMipmap },
+	{ "glTexSubImage2D", do_TexSubImage2D },
 };
 
 static const struct object_type {
