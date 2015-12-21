@@ -15,6 +15,7 @@ piglit_add_executable (arb_separate_shader_object-compat-builtins compat-builtin
 piglit_add_executable (arb_separate_shader_object-GetProgramPipelineiv GetProgramPipelineiv.c)
 piglit_add_executable (arb_separate_shader_object-IsProgramPipeline IsProgramPipeline.c)
 piglit_add_executable (arb_separate_shader_object-mixed_explicit_and_non_explicit_locations mixed_explicit_and_non_explicit_locations.c sso-common.c)
+piglit_add_executable (arb_separate_shader_object-mix-and-match-tcs-tes mix-and-match-tcs-tes.c)
 piglit_add_executable (arb_separate_shader_object-ProgramUniform-coverage ProgramUniform-coverage.c)
 piglit_add_executable (arb_separate_shader_object-rendezvous_by_location rendezvous_by_location.c sso-common.c)
 piglit_add_executable (arb_separate_shader_object-rendezvous_by_location-3-stages rendezvous_by_location-3-stages.c)
