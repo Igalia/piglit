@@ -416,6 +416,74 @@ do_Bitmap(void)
 }
 
 static bool
+do_BlitFramebuffer(void)
+{
+	const GLuint fbos[2] = { FIRST_SPARE_OBJECT, FIRST_SPARE_OBJECT + 1 };
+	const GLuint tex[2] = { FIRST_SPARE_OBJECT, FIRST_SPARE_OBJECT + 1 };
+	bool pass = true;
+
+	/* GL_ARB_framebuffer_object and OpenGL 3.0 require that
+	 * glGenFramebuffers be used.  This test really does require
+	 * GL_EXT_framebuffer_object and GL_EXT_framebuffer_blit.
+	 */
+	if (!(piglit_is_extension_supported("GL_EXT_framebuffer_object") &&
+	      piglit_is_extension_supported("GL_EXT_framebuffer_blit"))) {
+		printf("%s requires EXT framebuffer objects.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	/* Generate the texture objects that will be attached to the
+	 * framebuffer objects for the test.
+	 */
+	glBindTexture(GL_TEXTURE_2D, tex[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, tex[1]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	/* Generate the framebuffer objects. */
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, fbos[0]);
+	glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				  GL_TEXTURE_2D, tex[0], 0 /* level */);
+	if (glCheckFramebufferStatusEXT(GL_DRAW_FRAMEBUFFER) !=
+	    GL_FRAMEBUFFER_COMPLETE) {
+		printf("\t%s,%d: Draw framebuffer is not complete.\n",
+		       __func__, __LINE__);
+		pass = false;
+	}
+
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER, fbos[1]);
+	glFramebufferTexture2DEXT(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				  GL_TEXTURE_2D, tex[1], 0 /* level */);
+	if (glCheckFramebufferStatusEXT(GL_READ_FRAMEBUFFER) !=
+	    GL_FRAMEBUFFER_COMPLETE) {
+		printf("\t%s,%d: Read framebuffer is not complete.\n",
+		       __func__, __LINE__);
+		pass = false;
+	}
+
+	/* Do the "real" test. */
+	glBlitFramebufferEXT(0 /* srcX0 */, 0 /* srcY0 */,
+			     8 /* srcX1 */, 8 /* srcY1 */,
+			     0 /* dstX0 */, 0 /* dstY0 */,
+			     8 /* dstX1 */, 8 /* dstY1 */,
+			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+	/* Final clean up. */
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+
+	glDeleteTextures(ARRAY_SIZE(tex), tex);
+	glDeleteFramebuffersEXT(ARRAY_SIZE(fbos), fbos);
+
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+
+static bool
 do_Clear(void)
 {
 	/* Pick a clear value that should avoid common hardware "fast clear"
@@ -668,6 +736,7 @@ static const struct operation {
 	bool (*func)(void);
 } operation_table[] = {
 	{ "glBitmap", do_Bitmap },
+	{ "glBlitFramebuffer", do_BlitFramebuffer },
 	{ "glClear", do_Clear },
 	{ "glClearTexSubImage", do_ClearTexSubImage },
 	{ "glCopyPixels", do_CopyPixels },
