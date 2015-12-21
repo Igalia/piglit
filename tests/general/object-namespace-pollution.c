@@ -545,6 +545,61 @@ do_GenerateMipmap(void)
 }
 
 static bool
+do_GetTexImage(void)
+{
+	const GLuint tex = FIRST_SPARE_OBJECT;
+	const GLuint pbo = FIRST_SPARE_OBJECT;
+	uint8_t data[TEXTURE_DATA_SIZE];
+	bool pass = true;
+
+	if (!piglit_is_extension_supported("GL_EXT_pixel_buffer_object") &&
+	    piglit_get_gl_version() < 30) {
+		printf("%s requires pixel buffer objects.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (glIsTexture(tex)) {
+		printf("\t%s,%d: %u is already a texture\n",
+		       __func__, __LINE__, tex);
+		pass = false;
+	}
+
+	if (glIsBuffer(pbo)) {
+		printf("\t%s,%d: %u is already a buffer object\n",
+		       __func__, __LINE__, pbo);
+		pass = false;
+	}
+
+	/* Generate the initial texture object.  The random number seed values
+	 * used are irrelevant.
+	 */
+	generate_random_data(data, sizeof(data), GL_PIXEL_UNPACK_BUFFER, pbo);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, data);
+
+
+	/* Generate the buffer object that will be used for the PBO download
+	 * from the texture.
+	 */
+	glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
+	glBufferData(GL_PIXEL_PACK_BUFFER, sizeof(data), NULL, GL_STATIC_READ);
+
+	/* Do the "real" test. */
+	glGetTexImage(GL_TEXTURE_2D, 0 /* level */,
+		      GL_RGBA, GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
+
+	/* Final clean up. */
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteTextures(1, &tex);
+
+	glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+	glDeleteBuffers(1, &pbo);
+
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+
+static bool
 do_TexSubImage2D(void)
 {
 	const GLuint tex = FIRST_SPARE_OBJECT;
@@ -619,6 +674,7 @@ static const struct operation {
 	{ "glCopyTexSubImage2D", do_CopyTexSubImage2D },
 	{ "glDrawPixels", do_DrawPixels },
 	{ "glGenerateMipmap", do_GenerateMipmap },
+	{ "glGetTexImage", do_GetTexImage },
 	{ "glTexSubImage2D", do_TexSubImage2D },
 };
 
