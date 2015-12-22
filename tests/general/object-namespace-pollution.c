@@ -529,6 +529,38 @@ do_ClearTexSubImage(void)
 }
 
 static bool
+do_CopyImageSubData(void)
+{
+	const GLuint tex[2] = { FIRST_SPARE_OBJECT, FIRST_SPARE_OBJECT + 1 };
+
+	if (!piglit_is_extension_supported("GL_ARB_copy_image")) {
+		printf("%s requires GL_ARB_copy_image.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, tex[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, tex[1]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0 /* srcLevel */,
+			   0 /* srcX */, 0 /* srcY */, 0 /* srcZ */,
+			   tex[1], GL_TEXTURE_2D, 0 /* dstLevel */,
+			   0 /* dstX */, 0 /* dstY */, 0 /* dstZ */,
+			   16 /* srcWidth */, 16 /* srcHeight */,
+			   1 /* srcDepth */);
+
+	glDeleteTextures(ARRAY_SIZE(tex), tex);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
 do_CopyPixels(void)
 {
 	/* Set non-1.0 pixel zoom to avoid i965 blit path. */
@@ -739,6 +771,7 @@ static const struct operation {
 	{ "glBlitFramebuffer", do_BlitFramebuffer },
 	{ "glClear", do_Clear },
 	{ "glClearTexSubImage", do_ClearTexSubImage },
+	{ "glCopyImageSubData", do_CopyImageSubData },
 	{ "glCopyPixels", do_CopyPixels },
 	{ "glCopyTexSubImage2D", do_CopyTexSubImage2D },
 	{ "glDrawPixels", do_DrawPixels },
