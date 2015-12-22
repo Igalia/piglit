@@ -340,6 +340,73 @@ validate_framebuffer(unsigned name)
 }
 /*@}*/
 
+/** \name Methods for operating on renderbuffer objects */
+/*@{*/
+static bool
+create_renderbuffer(unsigned name)
+{
+	if (!piglit_is_extension_supported("GL_EXT_framebuffer_object")) {
+		printf("%s requires GL_EXT_framebuffer_object.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (glIsRenderbufferEXT(name)) {
+		printf("\t%s,%d: %u is already a renderbuffer\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindRenderbufferEXT(GL_RENDERBUFFER, name);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER, GL_RGBA8,
+				 17 /* width */, 15 /* height */);
+
+	glBindRenderbufferEXT(GL_RENDERBUFFER, 0);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
+validate_renderbuffer(unsigned name)
+{
+	static const struct enum_value_pair test_vectors[] = {
+		{ GL_RENDERBUFFER_WIDTH, 17 },
+		{ GL_RENDERBUFFER_HEIGHT, 15 },
+		{ GL_RENDERBUFFER_INTERNAL_FORMAT, GL_RGBA8 },
+		{ GL_RENDERBUFFER_DEPTH_SIZE, 0 },
+		{ GL_RENDERBUFFER_STENCIL_SIZE, 0 },
+	};
+	bool pass = true;
+
+	if (!glIsRenderbufferEXT(name)) {
+		printf("\t%s,%d: %u is not a renderbuffer\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindRenderbufferEXT(GL_RENDERBUFFER, name);
+
+	for (unsigned i = 0; i < ARRAY_SIZE(test_vectors); i++) {
+		GLint got;
+
+		glGetRenderbufferParameterivEXT(GL_RENDERBUFFER,
+						test_vectors[i].value,
+						&got);
+
+		if (got != test_vectors[i].expected) {
+			printf("\t%s,%d: %s of %u: got 0x%x, expected 0x%x\n",
+			       __func__, __LINE__,
+			       piglit_get_gl_enum_name(test_vectors[i].value),
+			       name, got, test_vectors[i].expected);
+			pass = false;
+		}
+	}
+
+	glBindRenderbufferEXT(GL_RENDERBUFFER, 0);
+
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+/*@}*/
+
 /** \name Methods for operating on texture objects */
 /*@{*/
 #define TEXTURE_DATA_SIZE (16 * 16 * sizeof(GLuint))
@@ -918,6 +985,7 @@ static const struct object_type {
 } object_type_table[] = {
 	{ "buffer", create_buffer, validate_buffer },
 	{ "framebuffer", create_framebuffer, validate_framebuffer },
+	{ "renderbuffer", create_renderbuffer, validate_renderbuffer },
 	{ "texture", create_texture, validate_texture },
 };
 

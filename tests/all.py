@@ -4595,7 +4595,7 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('object namespace pollution')) as g:
-    for object_type in ("buffer", "framebuffer", "texture"):
+    for object_type in ("buffer", "framebuffer", "renderbuffer", "texture"):
         for operation in ("glBitmap", "glBlitFramebuffer", "glClear", "glClearTexSubImage", "glCopyImageSubData", "glCopyPixels", "glCopyTexSubImage2D", "glDrawPixels", "glGenerateMipmap", "glGetTexImage", "glGetTexImage-compressed", "glTexSubImage2D"):
             g(['object-namespace-pollution', operation, object_type],
               '{} with {}'.format(object_type, operation))
