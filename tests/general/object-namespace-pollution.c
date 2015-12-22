@@ -763,6 +763,73 @@ do_GetTexImage(void)
 }
 
 static bool
+do_GetTexImage_compressed(void)
+{
+	const GLuint tex = FIRST_SPARE_OBJECT;
+	const GLenum internal_format =
+		piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")
+		? GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
+		: GL_COMPRESSED_RGBA_FXT1_3DFX;
+
+	/* DXT1 has 4x4 block size.  The image will be 16x16 texels,
+	 * so that means 16 blocks.  Each block is 64-bits (or 8
+	 * bytes).  That's a total of 16 * 8 = 128 bytes.
+	 *
+	 * FXT1 has 8x4 block size.  The image will be 16x16 texels,
+	 * so that means 8 blocks.  Each block is 128-bits (or 16
+	 * bytes).  That's a total of 8 * 16 = 128 bytes.
+	 */
+	uint8_t data[128];
+
+	/* Buffer to hold the decompressed texture. */
+	uint8_t texels[16 * 16 * 4];
+
+	bool pass = true;
+
+	/* This test requires:
+	 *
+	 *   GL_EXT_texture_compression_s3tc or GL_3DFX_texture_compression_FXT1
+	 *
+	 * and
+	 *
+	 *   GL_ARB_texture_compression or OpenGL 1.3
+	 */
+	if (!(piglit_is_extension_supported("GL_ARB_texture_compression") ||
+	      piglit_get_gl_version() >= 13) ||
+	    !(piglit_is_extension_supported("GL_EXT_texture_compression_s3tc") ||
+	      piglit_is_extension_supported("GL_3DFX_texture_compression_FXT1"))) {
+		printf("%s requires either S3TC or FXT1 texture compression.\n",
+		       __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (glIsTexture(tex)) {
+		printf("\t%s,%d: %u is already a texture\n",
+		       __func__, __LINE__, tex);
+		pass = false;
+	}
+
+	/* Generate the initial texture object.  The random number seed values
+	 * used are irrelevant.
+	 */
+	generate_random_data(data, sizeof(data), GL_PIXEL_UNPACK_BUFFER, tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glCompressedTexImage2D(GL_TEXTURE_2D, 0 /* level */, internal_format,
+			       16 /* width */, 16 /* height */, 0 /* border */,
+			       sizeof(data), data);
+
+	/* Do the "real" test. */
+	glGetTexImage(GL_TEXTURE_2D, 0 /* level */,
+		      GL_RGBA, GL_UNSIGNED_BYTE, texels);
+
+	/* Final clean up. */
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteTextures(1, &tex);
+
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+
+static bool
 do_TexSubImage2D(void)
 {
 	const GLuint tex = FIRST_SPARE_OBJECT;
@@ -840,6 +907,7 @@ static const struct operation {
 	{ "glDrawPixels", do_DrawPixels },
 	{ "glGenerateMipmap", do_GenerateMipmap },
 	{ "glGetTexImage", do_GetTexImage },
+	{ "glGetTexImage-compressed", do_GetTexImage_compressed },
 	{ "glTexSubImage2D", do_TexSubImage2D },
 };
 
