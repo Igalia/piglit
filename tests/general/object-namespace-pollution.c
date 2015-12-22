@@ -277,6 +277,69 @@ validate_buffer(unsigned name)
 }
 /*@}*/
 
+/** \name Methods for operating on framebuffer objects */
+/*@{*/
+static bool
+create_framebuffer(unsigned name)
+{
+	if (!piglit_is_extension_supported("GL_EXT_framebuffer_object")) {
+		printf("%s requires GL_EXT_framebuffer_object.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (glIsFramebufferEXT(name)) {
+		printf("\t%s,%d: %u is already a framebuffer\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER, name);
+	glBindFramebufferEXT(GL_FRAMEBUFFER, piglit_winsys_fbo);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
+validate_framebuffer(unsigned name)
+{
+	static const struct enum_value_pair test_vectors[] = {
+		{ GL_COLOR_ATTACHMENT0, 0 },
+		{ GL_DEPTH_ATTACHMENT, 0 },
+		{ GL_STENCIL_ATTACHMENT, 0 },
+	};
+	bool pass = true;
+
+	if (!glIsFramebufferEXT(name)) {
+		printf("\t%s,%d: %u is not a framebuffer\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER, name);
+
+	for (unsigned i = 0; i < ARRAY_SIZE(test_vectors); i++) {
+		GLint got;
+
+		glGetFramebufferAttachmentParameterivEXT(GL_FRAMEBUFFER,
+							 test_vectors[i].value,
+							 GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+							 &got);
+
+		if (got != test_vectors[i].expected) {
+			printf("\t%s,%d: %s of %u: got 0x%x, expected 0x%x\n",
+			       __func__, __LINE__,
+			       piglit_get_gl_enum_name(test_vectors[i].value),
+			       name, got, test_vectors[i].expected);
+			pass = false;
+		}
+	}
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER, piglit_winsys_fbo);
+
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+/*@}*/
+
 /** \name Methods for operating on texture objects */
 /*@{*/
 #define TEXTURE_DATA_SIZE (16 * 16 * sizeof(GLuint))
@@ -786,6 +849,7 @@ static const struct object_type {
 	bool (*validate)(unsigned name);
 } object_type_table[] = {
 	{ "buffer", create_buffer, validate_buffer },
+	{ "framebuffer", create_framebuffer, validate_framebuffer },
 	{ "texture", create_texture, validate_texture },
 };
 
@@ -817,6 +881,7 @@ piglit_init(int argc, char **argv)
 	const struct object_type *object_type = NULL;
 	const struct operation *operation = NULL;
 	unsigned first_unused_texture;
+	unsigned first_unused_framebuffer;
 
 	if (argc != 3)
 		usage(argv[0]);
@@ -863,6 +928,16 @@ piglit_init(int argc, char **argv)
 	if (first_unused_texture >= 16)
 		piglit_report_result(PIGLIT_FAIL);
 
+	for (first_unused_framebuffer = 1;
+	     first_unused_framebuffer < 16;
+	     first_unused_framebuffer++) {
+		if (!glIsFramebufferEXT(first_unused_framebuffer))
+			break;
+	}
+
+	if (first_unused_framebuffer >= 16)
+		piglit_report_result(PIGLIT_FAIL);
+
 	pass = operation->func() && pass;
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
@@ -870,6 +945,10 @@ piglit_init(int argc, char **argv)
 	for (unsigned name = 1; name < 16; name++) {
 		if (strcmp("texture", object_type->name) == 0 &&
 		    name < first_unused_texture)
+			continue;
+
+		if (strcmp("framebuffer", object_type->name) == 0 &&
+		    name < first_unused_framebuffer)
 			continue;
 
 		pass = object_type->create(name) && pass;
@@ -884,6 +963,10 @@ piglit_init(int argc, char **argv)
 	for (unsigned name = 1; name < 16; name++) {
 		if (strcmp("texture", object_type->name) == 0 &&
 		    name < first_unused_texture)
+			continue;
+
+		if (strcmp("framebuffer", object_type->name) == 0 &&
+		    name < first_unused_framebuffer)
 			continue;
 
 		pass = object_type->validate(name) && pass;
