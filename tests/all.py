@@ -2175,6 +2175,8 @@ with profile.group_manager(
       'Rendezvous by name')
     g(['arb_separate_shader_object-rendezvous_by_name_interpolation'],
       'Rendezvous by name with multiple interpolation qualifier')
+    g(['arb_separate_shader_object-mix-and-match-tcs-tes'],
+      'mix-and-match-tcs-tes'),
     g(['arb_separate_shader_object-mixed_explicit_and_non_explicit_locations'],
       'Mixed explicit and non-explicit locations')
     g(['arb_separate_shader_object-rendezvous_by_location', '-fbo'],
