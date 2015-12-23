@@ -75,11 +75,10 @@ print_pname_values(const GLenum *targets, unsigned num_targets,
                                 piglit_check_gl_error(GL_NO_ERROR);
 
                         if (!error_test)
-                                fprintf(stderr, "ERROR\n");
+                                fprintf(stderr, "ERROR:");
 
-                        if (!error_test)
-                                print_case(targets[i], internalformats[j],
-                                           pname, data);
+                        print_case(targets[i], internalformats[j],
+                                   pname, data);
 
                 }
         }
