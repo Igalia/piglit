@@ -68,10 +68,6 @@ print_pname_values(const GLenum *targets, unsigned num_targets,
 	for (i = 0; i < num_targets; i++) {
                 for (j = 0; j < num_internalformats; j++) {
                         bool error_test;
-                        bool supported;
-
-                        supported = test_data_check_supported(data, targets[i],
-                                                              internalformats[j]);
 
                         test_data_execute(data, targets[i], internalformats[j], pname);
 
@@ -81,7 +77,7 @@ print_pname_values(const GLenum *targets, unsigned num_targets,
                         if (!error_test)
                                 fprintf(stderr, "ERROR\n");
 
-                        if (supported || !error_test)
+                        if (!error_test)
                                 print_case(targets[i], internalformats[j],
                                            pname, data);
 
@@ -101,7 +97,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_internalformat_query2");
 
         /* FIXME: as an utility executable, how about getting it from argc/argv? */
-        pname = GL_FILTER;
+        pname = GL_INTERNALFORMAT_SUPPORTED;
         print_pname_values(valid_targets, ARRAY_SIZE(valid_targets),
                            valid_internalformats, ARRAY_SIZE(valid_internalformats),
                            pname, data);
