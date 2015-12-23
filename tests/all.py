@@ -2193,6 +2193,7 @@ with profile.group_manager(
       'active sampler conflict')
     g(['arb_separate_shader_object-atomic-counter'],
       'atomic counter')
+    g(['arb_separate_shader_object-compat-builtins'], 'compat-builtins')
 
 # Group ARB_sampler_objects
 with profile.group_manager(
