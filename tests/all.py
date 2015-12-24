@@ -3509,6 +3509,7 @@ with profile.group_manager(
     g(['arb_transform_feedback3-ext_interleaved_two_bufs', 'gs_max'],
       'arb_transform_feedback3-ext_interleaved_two_bufs_gs_max',
       run_concurrent=False)
+    g(['arb_transform_feedback3-begin_end'], run_concurrent=False)
 
     for param in ['gl_NextBuffer-1', 'gl_NextBuffer-2', 'gl_SkipComponents1-1',
                   'gl_SkipComponents1-2', 'gl_SkipComponents1-3',
