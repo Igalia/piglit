@@ -2716,6 +2716,7 @@ with profile.group_manager(
     g(['arb_viewport_array-queries'], 'queries')
     g(['arb_viewport_array-minmax'], 'minmax')
     g(['arb_viewport_array-render-viewport'], 'render-viewport')
+    g(['arb_viewport_array-render-viewport-2'], 'render-viewport-2')
     g(['arb_viewport_array-render-depthrange'], 'render-depthrange')
     g(['arb_viewport_array-render-scissor'], 'render-scissor')
     g(['arb_viewport_array-clear'], 'clear')
