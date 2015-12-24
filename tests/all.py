@@ -4556,6 +4556,7 @@ with profile.group_manager(
         grouptools.join('spec', 'EXT_shader_samples_identical')) as g:
     for sample_count in (str(x) for x in MSAA_SAMPLE_COUNTS):
         g(['ext_shader_samples_identical', sample_count])
+    g(['ext_shader_samples_identical-simple-fs'], 'simple-fs')
 
 # Group ARB_shader_draw_parameters
 with profile.group_manager(
