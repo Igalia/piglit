@@ -742,6 +742,9 @@ check_prop(GLuint prog, GLenum programInterface, int index, const char *name,
 		case GL_COMPUTE_SUBROUTINE_UNIFORM:
 			pif = GL_COMPUTE_SUBROUTINE;
 			break;
+		case GL_ATOMIC_COUNTER_BUFFER:
+			/* do nothing */
+			break;
 		default:
 			assert(!"unexpected programInterface value");
 			pif = GL_NONE;
