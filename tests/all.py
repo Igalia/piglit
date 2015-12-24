@@ -2053,6 +2053,7 @@ with profile.group_manager(
        'single-sample'],
       'fbo-fast-clear')
     g(['arb_framebuffer_srgb-fast-clear-blend'])
+    g(['arb_framebuffer_srgb-srgb_conformance'])
 
 with profile.group_manager(
         PiglitGLTest,
