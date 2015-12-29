@@ -6,11 +6,9 @@
 // [end config]
 //
 // ARB_enhanced_layouts spec says:
-//    "The specified offset must be a
-//    multiple of the base alignment of the type of the block member it
-//    qualifies, or a compile-time error results."
 //
-// Tests for successful compilation, when the block is of std140 layout.
+//    "The specified offset must be a multiple of the base alignment of the
+//    type of the block member it qualifies, or a compile-time error results."
 //
 
 #version 140
