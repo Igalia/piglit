@@ -71,10 +71,10 @@ layout(location = 0, component = 1) in vec3 a_tcs[];
 // consumes X component
 layout(location = 0) in float b_tcs[];
 
-// consume Y/Z/W components of 6 vectors
+// consume Y/Z/W components
 layout(location = 0, component = 1) out vec3 a_tes;
 
-// consumes X component of 6 vectors
+// consumes X component
 layout(location = 0) out float b_tes;
 
 void main() {
