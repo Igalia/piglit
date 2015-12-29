@@ -16,7 +16,7 @@
 #version 140
 #extension GL_ARB_enhanced_layouts : enable
 
-const int start = 8;
+const int start = 16;
 
 layout(std140) uniform block {
        layout(offset = start + 0) vec4 var1;

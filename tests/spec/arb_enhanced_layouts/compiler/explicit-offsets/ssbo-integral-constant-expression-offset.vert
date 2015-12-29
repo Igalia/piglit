@@ -17,7 +17,7 @@
 #extension GL_ARB_enhanced_layouts : enable
 #extension GL_ARB_shader_storage_buffer_object : enable
 
-const int start = 8;
+const int start = 16;
 
 layout(std430) buffer b {
        layout(offset = start + 0) vec4 var1;
