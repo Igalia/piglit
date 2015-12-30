@@ -23,6 +23,8 @@ void f()
 #extension GL_ARB_enhanced_layouts : enable
 #extension GL_ARB_shader_storage_buffer_object : enable
 
+in vec4 piglit_vertex;
+
 layout(std430) buffer b {
        layout(offset = 0) vec4 var1;
        layout(offset = 64) vec4 var2; // Wrong: members and their respective offset across identically named blocks must be the same
@@ -34,7 +36,7 @@ void main()
 {
   f();
 
-  gl_Position = gl_Vertex;
+  gl_Position = piglit_vertex;
 }
 
 [test]
