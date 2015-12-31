@@ -415,3 +415,71 @@ python framework:
 
    It is generally unnecessary to call this class directly as it uses a helper
    function to search directories for tests.
+
+
+6. Integration
+--------------
+
+Piglit provides integration for other test suites as well. The rational for
+this is that it provides piglit's one process per test protections (one test
+crashing does not crash the whole suite), and access to piglit's reporting
+tools.
+
+Most integration is done through the use of piglit.conf, or through environment
+variables, with piglit.conf being the preferred method.
+
+
+6.1 dEQP
+--------
+
+Piglit provides a generic layer for dEQP based test suites, and specific
+integration for several suites.
+
+I suggest using Chad Versace's repo of dEQP, which contains a gbm target.
+https://github.com/chadversary/deqp
+
+It should be built as follows:
+cmake . -DDEQP_TARGET=gbm -GNinja
+
+Additional targets are available in the targets directory. gbm isn't compatible
+for most (any?) blob driver, so another target might be necessary if that is a
+requirement. One of the x11_* targets or drm is probably a good choice.
+
+The use of ninja is optional.
+
+Once dEQP is built add the following information to piglit.conf, which can
+either be located in the root of the piglit repo, or in $XDG_CONFIG_HOME
+(usually $HOME/.config).
+
+"""
+[deqp-gles2]
+bin=<deqp source dir>/modules/gles2/deqp-gles2
+
+[deqp-gles3]
+exe=<deqp source dir>/modules/gles3/deqp-gles3
+
+[deqp-gles31]
+bin=<deqp source dir>/modules/gles31/deqp-gles31
+"""
+
+NOTE: for historical reasons gles3 uses 'exe' instead of 'bin'
+
+These platforms can be run using deqp_gles*.py as a suite in piglit.
+For example: ./piglit run deqp_gles31 my_results -c
+
+It is also possible to mix integrated suites and piglit profiles together:
+./piglit run deqp_gles31 quick cl my_results
+
+dEQP profiles generally contain all of the tests from the previous profile, so
+gles31 covers gles3 and gles2.
+
+
+6.2 Khronos CTS
+---------------
+
+Add the following to your piglit.conf file:
+
+"""
+[cts]
+bin=<cts source dir>/cts/glcts
+"""
