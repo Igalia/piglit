@@ -4585,5 +4585,12 @@ with profile.group_manager(
     g(['arb_shader_draw_parameters-drawid-indirect', 'baseinstance'], 'drawid-indirect-baseinstance')
     g(['arb_shader_draw_parameters-drawid-indirect', 'vertexid'], 'drawid-indirect-vertexid')
 
+# Group ARB_indirect_parameters
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_indirect_parameters')) as g:
+    g(['arb_indirect_parameters-tf-count-arrays'], 'tf-count-arrays')
+    g(['arb_indirect_parameters-tf-count-elements'], 'tf-count-elements')
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
