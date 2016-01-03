@@ -3203,7 +3203,10 @@ piglit_display(void)
 			if (!sso_in_use)
 				glDeleteProgramsARB(1, &prog);
 		}
-		glDeleteProgramPipelines(1, &pipeline);
+#ifdef PIGLIT_USE_OPENGL
+		if (piglit_is_extension_supported("GL_ARB_separate_shader_objects"))
+			glDeleteProgramPipelines(1, &pipeline);
+#endif
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
