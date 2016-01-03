@@ -338,7 +338,7 @@ run_test_tess_evaluation(void)
                 "               gl_in[1].gl_Position * gl_TessCoord.y +\n"
                 "               gl_in[2].gl_Position * gl_TessCoord.z;\n"
                 "       \n"
-                "       if (gl_TessCoord.z == 1.0) {\n"
+                "       if (gl_TessCoord.y == 0.0 && gl_TessCoord.x == 1.0) {\n"
                 "               tecolor.x = int(atomicCounterDecrement(x));\n"
                 "               tecolor.y = int(atomicCounterIncrement(x));\n"
                 "               tecolor.z = int(atomicCounterIncrement(x));\n"
