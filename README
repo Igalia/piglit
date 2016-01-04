@@ -297,6 +297,13 @@ behaves.
       glslparsertest. This can be used to test ES<x>_COMPATABILITY extensions
       for OpenGL
 
+ PIGLIT_NO_FAST_SKIP
+       Piglit has a mechanism run in the python layer for skipping tests with
+       unmet OpenGL or window system dependencies without starting a new
+       process (which is expensive). Sometimes this system doesn't work or is
+       undesirable, setting this environment variable to True will disable this
+       system.
+
 3.2 Note
 --------
 

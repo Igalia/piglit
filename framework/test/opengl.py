@@ -24,6 +24,7 @@ from __future__ import absolute_import, division, print_function
 import errno
 import os
 import subprocess
+import warnings
 
 from framework import exceptions, core
 from framework.options import OPTIONS
@@ -34,6 +35,10 @@ from .base import TestIsSkip
 __all__ = [
     'FastSkipMixin',
 ]
+
+# An environment variable that when set to true disables the FastSkipMixin by
+# stubbing it out
+_DISABLED = bool(os.environ.get('PIGLIT_NO_FAST_SKIP', False))
 
 
 class StopWflinfo(exceptions.PiglitException):
@@ -364,3 +369,23 @@ class FastSkipMixin(object):
                     self.glsl_es_version, self.__info.glsl_es_version))
 
         super(FastSkipMixin, self).is_skip()
+
+
+class FastSkipMixinDisabled(object):
+    def __init__(self, *args, **kwargs):
+        # Tests that implement the FastSkipMixin expect to have these values
+        # set, so just fill them in with the default values.
+        self.gl_required = set()
+        self.gl_version = None
+        self.gles_version = None
+        self.glsl_version = None
+        self.glsl_es_version = None
+
+        super(FastSkipMixinDisabled, self).__init__(*args, **kwargs)
+
+
+# Shadow the real FastSkipMixin with the Disabled version if
+# PIGLIT_NO_FAST_SKIP is truthy
+if _DISABLED:
+    warnings.warn('Fast Skipping Disabled')
+    FastSkipMixin = FastSkipMixinDisabled
