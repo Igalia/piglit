@@ -48,7 +48,7 @@ vertex/float/2
 [test]
 # Corner case: bits == 0 -> result == base
 uniform int bits 0
-uniform int offset 0
+uniform int offset 32
 
 uniform int test_signed 1
 uniform ivec4 iinsert 2147483647 15 7 3
@@ -64,7 +64,7 @@ uniform uvec4 uresult 42 56 72 97
 draw arrays GL_TRIANGLE_FAN 0 4
 probe all rgba 0.0 1.0 0.0 1.0
 
-# Test overwriting set bits in <base>.
+## Test overwriting set bits in <base>.
 uniform int bits 4
 uniform int offset 16
 
@@ -105,5 +105,23 @@ uniform int test_signed 0
 uniform uvec4 uinsert 0xE 0x9 0x4 0x1
 uniform uvec4 ubase 0xF 0xF 0xF 0xF
 uniform uvec4 uresult 0x000E000F 0x0009000F 0x0004000F 0x0001000F
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Copy the whole integer
+uniform int bits 32
+uniform int offset 0
+
+uniform int test_signed 1
+uniform ivec4 iinsert 3203386110 3735928559 2343432205 3741239934
+uniform ivec4 ibase   0 0 0 0
+uniform ivec4 iresult 3203386110 3735928559 2343432205 3741239934
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int test_signed 0
+uniform uvec4 uinsert 0xBEEFCAFE 0xDEADBEEF 0x8BADF00D 0xDEFECA7E
+uniform uvec4 ubase   0 0 0 0
+uniform uvec4 uresult 0xBEEFCAFE 0xDEADBEEF 0x8BADF00D 0xDEFECA7E
 draw arrays GL_TRIANGLE_FAN 0 4
 probe all rgba 0.0 1.0 0.0 1.0

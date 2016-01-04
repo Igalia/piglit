@@ -50,7 +50,7 @@ vertex/float/2
 [test]
 # Corner case: bits == 0 -> result == 0
 uniform int bits 0
-uniform int offset 0
+uniform int offset 32
 
 uniform int test_signed 1
 uniform ivec4 iextract 0 0 0 0
@@ -109,5 +109,21 @@ probe all rgba 0.0 1.0 0.0 1.0
 uniform int test_signed 0
 uniform uvec4 uextract 0xF  0x0 0x1 0x3
 uniform uvec4 uinput 0x000F0000 0x0000F000 0x0001C000 0x00038000
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Copy the whole integer
+uniform int bits 32
+uniform int offset 0
+
+uniform int test_signed 1
+uniform ivec4 iextract 3203386110 3735928559 2343432205 3741239934
+uniform ivec4 iinput   3203386110 3735928559 2343432205 3741239934
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int test_signed 0
+uniform uvec4 uextract 0xBEEFCAFE 0xDEADBEEF 0x8BADF00D 0xDEFECA7E
+uniform uvec4 uinput   0xBEEFCAFE 0xDEADBEEF 0x8BADF00D 0xDEFECA7E
 draw arrays GL_TRIANGLE_FAN 0 4
 probe all rgba 0.0 1.0 0.0 1.0
