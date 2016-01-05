@@ -129,8 +129,7 @@ class Test(object):
 
     """
     __metaclass__ = abc.ABCMeta
-    __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
-                 'timeout']
+    __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command']
     timeout = None
 
     def __init__(self, command, run_concurrent=False, timeout=None):
