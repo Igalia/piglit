@@ -21,13 +21,14 @@
 """ Module providing tests for the core module """
 
 from __future__ import absolute_import, division, print_function
-import os
 import collections
+import functools
+import os
 import shutil
 import textwrap
-import functools
 
 import nose.tools as nt
+from six.moves import getcwd
 
 from framework import core, exceptions
 from . import utils
@@ -200,7 +201,7 @@ def test_piglit_root():
     """core.get_config() finds "piglit root"/piglit.conf"""
     with open('piglit.conf', 'w') as f:
         f.write(_CONF_FILE)
-    return_dir = os.getcwd()
+    return_dir = getcwd()
     try:
         os.chdir('..')
         core.get_config()

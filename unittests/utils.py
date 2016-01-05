@@ -42,6 +42,7 @@ try:
 except ImportError:
     import json
 from nose.plugins.skip import SkipTest
+from six.moves import getcwdb
 
 from framework import test, backends, core, results
 
@@ -336,7 +337,7 @@ def test_in_tempdir(func):
     returns to the original directory after the test completes.
 
     """
-    original_dir = os.getcwd()
+    original_dir = getcwdb()
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):

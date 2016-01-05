@@ -26,6 +26,7 @@ from __future__ import absolute_import, division, print_function
 import os
 
 import nose.tools as nt
+from six.moves import getcwd
 
 from framework.summary import html_
 from . import utils
@@ -34,6 +35,6 @@ from . import utils
 @utils.test_in_tempdir
 def test_copy_static():
     """summary.html_._copy_static: puts status content in correct locations"""
-    html_._copy_static_files(os.getcwd())
+    html_._copy_static_files(getcwd())
     nt.ok_(os.path.exists('index.css'), msg='index.css not created correctly')
     nt.ok_(os.path.exists('result.css'), msg='result.css not created correctly')
