@@ -145,7 +145,7 @@ class TestResult(object):
     """An object represting the result of a single test."""
     __slots__ = ['returncode', '_err', '_out', 'time', 'command', 'traceback',
                  'environment', 'subtests', 'dmesg', '__result', 'images',
-                 'exception']
+                 'exception', 'pid']
     err = StringDescriptor('_err')
     out = StringDescriptor('_out')
 
@@ -159,6 +159,7 @@ class TestResult(object):
         self.images = None
         self.traceback = None
         self.exception = None
+        self.pid = None
         if result:
             self.result = result
         else:
@@ -197,6 +198,7 @@ class TestResult(object):
             'time': self.time,
             'exception': self.exception,
             'dmesg': self.dmesg,
+            'pid': self.pid,
         }
         return obj
 
@@ -216,7 +218,7 @@ class TestResult(object):
         inst = cls()
 
         for each in ['returncode', 'command', 'exception', 'environment',
-                     'time', 'result', 'dmesg']:
+                     'time', 'result', 'dmesg', 'pid']:
             if each in dict_:
                 setattr(inst, each, dict_[each])
 

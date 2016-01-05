@@ -205,6 +205,7 @@ class TestTestResult_to_json(object):
         test.result = 'crash'
         test.exception = 'an exception'
         test.dmesg = 'this is dmesg'
+        test.pid = 1934
 
         cls.test = test
         cls.json = test.to_json()
@@ -254,6 +255,10 @@ class TestTestResult_to_json(object):
         """results.TestResult.to_json: Adds the dmesg attribute"""
         nt.eq_(self.test.dmesg, self.json['dmesg'])
 
+    def test_pid(self):
+        """results.TestResult.to_json: Adds the pid attribute"""
+        nt.eq_(self.test.pid, self.json['pid'])
+
 
 class TestTestResult_from_dict(object):
     """Tests for the from_dict method."""
@@ -275,6 +280,7 @@ class TestTestResult_from_dict(object):
             'result': 'crash',
             'exception': 'an exception',
             'dmesg': 'this is dmesg',
+            'pid': 1934,
         }
 
         cls.test = results.TestResult.from_dict(cls.dict)
@@ -326,6 +332,10 @@ class TestTestResult_from_dict(object):
     def test_dmesg(self):
         """results.TestResult.from_dict: sets dmesg properly"""
         nt.eq_(self.test.dmesg, self.dict['dmesg'])
+
+    def test_pid(self):
+        """results.TestResult.from_dict: sets pid properly"""
+        nt.eq_(self.test.pid, self.dict['pid'])
 
 
 def test_TestResult_update():

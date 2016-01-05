@@ -302,6 +302,7 @@ class Test(object):
                                     env=fullenv,
                                     universal_newlines=True,
                                     preexec_fn=preexec_fn)
+
             # create a ProcessTimeout object to watch out for test hang if the
             # process is still going after the timeout, then it will be killed
             # forcing the communicate function (which is a blocking call) to
@@ -309,6 +310,8 @@ class Test(object):
             if self.timeout > 0:
                 self.__proc_timeout = ProcessTimeout(self.timeout, proc)
                 self.__proc_timeout.start()
+
+            self.result.pid = proc.pid
 
             out, err = proc.communicate()
             returncode = proc.returncode

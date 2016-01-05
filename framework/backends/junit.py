@@ -212,8 +212,8 @@ class JUnitBackend(FileBackend):
             # Add stderr
             err = etree.SubElement(element, 'system-err')
             err.text = data.err
-            err.text += '\n\nstart time: {}\nend time: {}\n'.format(
-                data.time.start, data.time.end)
+            err.text += '\n\npid: {}\nstart time: {}\nend time: {}\n'.format(
+                data.pid, data.time.start, data.time.end)
             calculate_result()
         else:
             etree.SubElement(element, 'failure', message='Incomplete run.')
@@ -267,14 +267,18 @@ def _load(results_file):
         result.command = out[0]
         result.out = '\n'.join(out[1:])
 
-        # Try to get the values in stderr for time
-        if 'time start' in result.err:
-            for line in result.err.split('\n'):
-                if line.startswith('time start:'):
-                    result.time.start = float(line[len('time start: '):])
-                elif line.startswith('time end:'):
-                    result.time.end = float(line[len('time end: '):])
-                    break
+        # Try to get the values in stderr for time and pid
+        for line in result.err.split('\n'):
+            if line.startswith('time start:'):
+                result.time.start = float(line[len('time start: '):])
+                continue
+            elif line.startswith('time end:'):
+                result.time.end = float(line[len('time end: '):])
+                continue
+            elif line.startswith('pid:'):
+                result.pid = int(line[len('pid: '):])
+                continue
+
 
         run_result.tests[name] = result
 

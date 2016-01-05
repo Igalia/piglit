@@ -49,6 +49,7 @@ _XML = """\
         <system-out>this/is/a/command\nThis is stdout</system-out>
         <system-err>this is stderr
 
+pid: 1934
 time start: 1.0
 time end: 4.5
         </system-err>
@@ -98,6 +99,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
         result.out = 'this is stdout'
         result.err = 'this is stderr'
         result.command = 'foo'
+        result.pid = 1034
 
         test = backends.junit.JUnitBackend(cls.tdir)
         test.initialize(BACKEND_INITIAL_META)
@@ -129,6 +131,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
         result.out = 'this is stdout'
         result.err = 'this is stderr'
         result.command = 'foo'
+        result.pid = 1034
 
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
         test = backends.junit.JUnitBackend(cls.tdir)
@@ -203,7 +206,7 @@ class TestJUnitLoad(utils.StaticDirectory):
     def setup_class(cls):
         super(TestJUnitLoad, cls).setup_class()
         cls.xml_file = os.path.join(cls.tdir, 'results.xml')
-        
+
         with open(cls.xml_file, 'w') as f:
             f.write(_XML)
 
@@ -263,12 +266,21 @@ class TestJUnitLoad(utils.StaticDirectory):
     def test_err(self):
         """backends.junit._load: stderr is loaded correctly."""
         test = self.xml().tests[self.testname].err
-        nt.eq_(
-            test, 'this is stderr\n\ntime start: 1.0\ntime end: 4.5\n        ')
+        expected = ('this is stderr\n\n'
+                    'pid: 1934\n'
+                    'time start: 1.0\n'
+                    'time end: 4.5\n'
+                    '        ')
+        nt.eq_(test, expected)
 
     def test_totals(self):
         """backends.junit._load: Totals are calculated."""
         nt.ok_(bool(self.xml()))
+
+    def test_pid(self):
+        """backends.junit._load: pid is loaded correctly."""
+        test = self.xml().tests[self.testname].pid
+        nt.eq_(test, 1934)
 
 
     @utils.no_error
