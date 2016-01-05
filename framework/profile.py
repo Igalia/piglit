@@ -384,8 +384,8 @@ class TestProfile(object):
 
             self.test_list[lgroup] = test_class(
                 args,
-                **{k: v for k, v in itertools.chain(default_args.iteritems(),
-                                                    kwargs.iteritems())})
+                **dict(itertools.chain(six.iteritems(default_args),
+                                       six.iteritems(kwargs))))
 
         yield adder
 
