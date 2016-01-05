@@ -27,7 +27,8 @@ import errno
 import os
 import subprocess
 import sys
-import ConfigParser
+
+from six.moves import configparser
 
 from framework import exceptions
 
@@ -42,18 +43,18 @@ __all__ = [
 PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl"]
 
 
-class PiglitConfig(ConfigParser.SafeConfigParser):
+class PiglitConfig(configparser.SafeConfigParser):
     """Custom Config parser that provides a few extra helpers."""
     def __init__(self, *args, **kwargs):
         # In Python2 the ConfigParser classes are old style, you can't use
         # super() on them. sigh
-        ConfigParser.SafeConfigParser.__init__(self, *args, **kwargs)
+        configparser.SafeConfigParser.__init__(self, *args, **kwargs)
         self.filename = None
 
     def readfp(self, fp, filename=None):
         # In Python2 the ConfigParser classes are old style, you can't use
         # super() on them. sigh
-        ConfigParser.SafeConfigParser.readfp(self, fp, filename)
+        configparser.SafeConfigParser.readfp(self, fp, filename)
         self.filename = os.path.abspath(filename or fp.name)
 
     def safe_get(self, section, option, fallback=None, **kwargs):
@@ -66,7 +67,7 @@ class PiglitConfig(ConfigParser.SafeConfigParser):
         """
         try:
             return self.get(section, option, **kwargs)
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        except (configparser.NoOptionError, configparser.NoSectionError):
             return fallback
 
     def required_get(self, section, option, **kwargs):
@@ -78,12 +79,12 @@ class PiglitConfig(ConfigParser.SafeConfigParser):
         """
         try:
             return self.get(section, option, **kwargs)
-        except ConfigParser.NoSectionError:
+        except configparser.NoSectionError:
             raise exceptions.PiglitFatalError(
                 'No Section "{}" in file "{}".\n'
                 'This section is required.'.format(
                     section, self.filename))
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             raise exceptions.PiglitFatalError(
                 'No option "{}"  from section "{}" in file "{}".\n'
                 'This option is required.'.format(
