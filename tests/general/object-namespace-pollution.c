@@ -340,6 +340,215 @@ validate_framebuffer(unsigned name)
 }
 /*@}*/
 
+/** \name Methods for operating on vertex or fragment program objects */
+/*@{*/
+static char *
+generate_program_source(GLenum target, unsigned key)
+{
+	char *source = NULL;
+
+	if (target == GL_VERTEX_PROGRAM_ARB) {
+		const char *position;
+		const char *normal;
+		const char *other;
+		const char *mvp;
+		const char *mv_invtrans;
+
+		if ((key & 2) != 0) {
+			mvp = "state.matrix.mvp";
+			position =
+				"DP4   p.x, mvp[0], vp;\n"
+				"DP4   p.y, mvp[1], vp;\n"
+				"DP4   p.z, mvp[2], vp;\n"
+				"DP4   p.w, mvp[3], vp;\n"
+				;
+		} else {
+			mvp = "state.matrix.mvp.transpose";
+			position =
+				"MUL   r0, mvp[0], vp.xxxx;\n"
+				"MAD   r0, mvp[1], vp.yyyy, r0;\n"
+				"MAD   r0, mvp[2], vp.zzzz, r0;\n"
+				"MAD   r0, mvp[3], vp.wwww, r0;\n"
+				"MOV   p, r0;\n"
+				;
+		}
+
+		if ((key & 4) != 0) {
+			mv_invtrans = "state.matrix.modelview.invtrans";
+			normal =
+				"DP3   n.x, mv_invtrans[0], vn;\n"
+				"DP3   n.y, mv_invtrans[1], vn;\n"
+				"DP3   n.z, mv_invtrans[2], vn;\n"
+				;
+		} else {
+			mv_invtrans = "state.matrix.modelview.inverse";
+			normal =
+				"MUL   r0.xyz, mv_invtrans[0], vn;\n"
+				"MAD   r0.xyz, mv_invtrans[1], vn, r0;\n"
+				"MAD   r0.xyz, mv_invtrans[2], vn, r0;\n"
+				"SWZ   n, r0, x, y, z, 0;\n"
+				;
+		}
+
+		if ((key & 8) != 0) {
+			other =
+				"# Output the color\n"
+				"MOV   t, vertex.color;\n"
+				;
+		} else {
+			other =
+				"# Output the texture coordinate\n"
+				"MOV   t, vertex.texcoord[0];\n"
+				;
+		}
+
+		asprintf(&source,
+			 "!!ARBvp1.0\n"
+			 "# Program key 0x%04x\n"
+			 "ATTRIB vp = vertex.position;\n"
+			 "ATTRIB vn = vertex.normal;\n"
+			 "PARAM mvp[4] = { %s.row[0..3] };\n"
+			 "PARAM mv_invtrans[3] = { %s.row[0..2] };\n"
+			 "OUTPUT p = result.position;\n"
+			 "OUTPUT n = result.texcoord[0];\n"
+			 "OUTPUT t = result.texcoord[1];\n"
+			 "TEMP r0;\n"
+			 "\n"
+			 "# Transform the vertex to clip coordinates.\n"
+			 "%s"
+			 "\n"
+			 "# Transform the normal to eye coordinates.\n"
+			 "%s"
+			 "\n"
+			 "%s"
+			 "END",
+			 key,
+			 mvp,
+			 mv_invtrans,
+			 position,
+			 normal,
+			 other);
+	} else {
+		printf("Unknown program target %s (0x%04x) in %s.\n",
+		       piglit_get_gl_enum_name(target), target,
+		       __func__);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	return source;
+}
+
+/**
+ * Selects a program target based on the key and the supported extensions.
+ */
+static GLenum
+select_program_target(unsigned key)
+{
+	GLenum target = 0;
+
+	(void) key;
+
+	if (piglit_is_extension_supported("GL_ARB_vertex_program")) {
+		target = GL_VERTEX_PROGRAM_ARB;
+	}
+
+	return target;
+}
+
+static bool
+create_program(unsigned name)
+{
+	char *source;
+	const GLenum target = select_program_target(name);
+
+	if (target == 0) {
+		printf("%s requires GL_ARB_vertex_program.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (glIsProgramARB(name)) {
+		printf("\t%s,%d: %u is already a program\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindProgramARB(target, name);
+
+	source = generate_program_source(target, name);
+	glProgramStringARB(target, GL_PROGRAM_FORMAT_ASCII_ARB,
+			   strlen(source), source);
+
+	free(source);
+
+	glBindProgramARB(target, 0);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
+validate_program(unsigned name)
+{
+	bool pass = true;
+	const GLenum target = select_program_target(name);
+	char *expected = generate_program_source(target, name);
+	const int expected_length = strlen(expected);
+	char *got;
+	GLint length;
+
+	if (!glIsProgramARB(name)) {
+		printf("\t%s,%d: %u is not a program\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindProgramARB(target, name);
+
+	/* The GL_ARB_vertex_program spec does not say whether or not length
+	 * includes a terminating NUL.  It says:
+	 *
+	 *     "If <pname> is PROGRAM_LENGTH_ARB ... GetProgramivARB returns
+	 *     one integer holding the program string length (in bytes)
+	 *     ... for the program object currently bound to <target>."
+	 *
+	 * and, with respect to glGetProgramStringARB it says:
+	 *
+	 *     "<n> ubytes are returned into the array program where <n> is
+	 *     the length of the program in ubytes, as returned by
+	 *     GetProgramivARB when <pname> is PROGRAM_LENGTH_ARB."
+	 */
+	glGetProgramivARB(target,
+			  GL_PROGRAM_LENGTH_ARB,
+			  &length);
+	if (length != expected_length && length != (expected_length + 1)) {
+		printf("\t%s,%d: Program %u length invalid: got %d, expected "
+		       "%d or %d.\n",
+		       __func__, __LINE__,
+		       name,
+		       length, expected_length, expected_length + 1);
+		pass = false;
+	}
+
+	got = calloc(length, sizeof(char));
+	glGetProgramStringARB(target,
+			      GL_PROGRAM_STRING_ARB,
+			      got);
+
+	if (memcmp(expected, got, expected_length) != 0) {
+		printf("\t%s,%d: %u source mismatch\n",
+		       __func__, __LINE__,
+		       name);
+		pass = false;
+	}
+
+	free(got);
+	free(expected);
+
+	glBindProgramARB(target, 0);
+
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+/*@}*/
+
 /** \name Methods for operating on renderbuffer objects */
 /*@{*/
 static bool
@@ -985,6 +1194,7 @@ static const struct object_type {
 } object_type_table[] = {
 	{ "buffer", create_buffer, validate_buffer },
 	{ "framebuffer", create_framebuffer, validate_framebuffer },
+	{ "program", create_program, validate_program },
 	{ "renderbuffer", create_renderbuffer, validate_renderbuffer },
 	{ "texture", create_texture, validate_texture },
 };
