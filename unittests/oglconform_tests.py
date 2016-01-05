@@ -22,7 +22,11 @@
 
 from __future__ import absolute_import, division, print_function
 
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import nose.tools as nt
 from six.moves import cStringIO as StringIO
 

@@ -25,7 +25,11 @@ import tempfile
 import textwrap
 import os
 
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import nose.tools as nt
 from nose.plugins.attrib import attr
 

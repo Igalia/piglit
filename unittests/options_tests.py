@@ -23,7 +23,11 @@
 from __future__ import absolute_import, division, print_function
 import re
 
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import nose.tools as nt
 
 from . import utils
