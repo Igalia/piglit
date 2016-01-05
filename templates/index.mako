@@ -3,6 +3,7 @@
   import posixpath  # this must be posixpath, since we want /'s not \'s
   import re
 
+  import six
   from six.moves import range
 
   from framework import grouptools, status
@@ -23,7 +24,7 @@
           return status.NOTRUN
 
       return max([status.status_lookup(s) for s, v in
-                  result.totals[group].iteritems() if v > 0])
+                  six.iteritems(result.totals[group]) if v > 0])
 
   def group_fraction(result, group):
       """Get the fraction value for a group."""
@@ -32,7 +33,7 @@
 
       num = 0
       den = 0
-      for k, v in result.totals[group].iteritems():
+      for k, v in six.iteritems(result.totals[group]):
           if v > 0:
               s = status.status_lookup(k)
               num += s.fraction[0] * v

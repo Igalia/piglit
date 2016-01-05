@@ -26,6 +26,7 @@ from __future__ import absolute_import, division, print_function
 import os
 
 import nose.tools as nt
+import six
 
 from framework import backends, options
 from . import utils
@@ -77,7 +78,7 @@ def test_get_backend():
     def check(n, i):
         return nt.assert_is(backends.get_backend(n), i)
 
-    for name, inst in backends_.iteritems():
+    for name, inst in six.iteritems(backends_):
         check.description = \
             'backends.get_backend({0}): returns {0} backend'.format(name)
         yield check, name, inst

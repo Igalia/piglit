@@ -420,7 +420,7 @@ def set_env(**envargs):
         def _inner(*args, **kwargs):
             """The returned function."""
             backup = {}
-            for key, value in envargs.iteritems():
+            for key, value in six.iteritems(envargs):
                 backup[key] = os.environ.get(key, "__DONOTRESTORE__")
                 if value is not None:
                     os.environ[key] = value
@@ -430,7 +430,7 @@ def set_env(**envargs):
             try:
                 func(*args, **kwargs)
             finally:
-                for key, value in backup.iteritems():
+                for key, value in six.iteritems(backup):
                     if value == "__DONOTRESTORE__" and key in os.environ:
                         del os.environ[key]
                     elif value != '__DONOTRESTORE__':

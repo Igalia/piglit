@@ -141,7 +141,7 @@ class BaseDmesg(object):
             result.result = replace(result.result)
 
             # Replace the results of any subtests
-            for key, value in result.subtests.iteritems():
+            for key, value in six.iteritems(result.subtests):
                 result.subtests[key] = replace(value)
 
             # Add the dmesg values to the result

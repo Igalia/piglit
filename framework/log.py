@@ -165,7 +165,7 @@ class QuietLog(BaseLog):
             done=str(self._state['complete']).zfill(self._pad),
             total=str(self._state['total']).zfill(self._pad),
             status=', '.join('{0}: {1}'.format(k, v) for k, v in
-                             sorted(self._state['summary'].iteritems())),
+                             sorted(six.iteritems(self._state['summary']))),
             running=''.join('|/-\\'[x % 4] for x in self._state['running'])
         )
 

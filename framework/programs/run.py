@@ -28,6 +28,8 @@ import time
 import ConfigParser
 import ctypes
 
+import six
+
 from framework import core, backends, exceptions, options
 import framework.results
 import framework.profile
@@ -321,7 +323,7 @@ def resume(input_):
 
     # Don't re-run tests that have already completed, incomplete status tests
     # have obviously not completed.
-    for name, result in results.tests.iteritems():
+    for name, result in six.iteritems(results.tests):
         if args.no_retry or result.result != 'incomplete':
             options.OPTIONS.exclude_tests.add(name)
 

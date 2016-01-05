@@ -31,6 +31,8 @@ try:
 except ImportError:
     import json
 
+import six
+
 from framework import status, results, exceptions
 from .abstract import FileBackend, write_compressed
 from .register import Registry
@@ -348,7 +350,7 @@ def _update_zero_to_one(result):
     updated_results = {}
     remove = set()
 
-    for name, test in result.tests.iteritems():
+    for name, test in six.iteritems(result.tests):
         assert not isinstance(test, results.TestResult), \
             'Test was erroniaously turned into a TestResult'
 
@@ -400,7 +402,7 @@ def _update_zero_to_one(result):
         #
         # this must be the last thing done in this loop, or there will be pain
         if test.get('subtest'):
-            for sub in test['subtest'].iterkeys():
+            for sub in six.iterkeys(test['subtest']):
                 # adding the leading / ensures that we get exactly what we
                 # expect, since endswith does a character by chacter match, if
                 # the subtest name is duplicated it wont match, and if there
@@ -528,7 +530,7 @@ def _update_four_to_five(results):
     """Updates json results from version 4 to version 5."""
     new_tests = {}
 
-    for name, test in results.tests.iteritems():
+    for name, test in six.iteritems(results.tests):
         new_tests[name.replace('/', '@').replace('\\', '@')] = test
 
     results.tests = new_tests
@@ -546,7 +548,7 @@ def _update_five_to_six(result):
     """
     new_tests = {}
 
-    for name, test in result.tests.iteritems():
+    for name, test in six.iteritems(result.tests):
         new_tests[name] = results.TestResult.from_dict(test)
 
     result.tests = new_tests
@@ -578,7 +580,7 @@ def _update_seven_to_eight(result):
     This value is used for both TestResult.time and TestrunResult.time_elapsed.
 
     """
-    for test in result.tests.viewvalues():
+    for test in six.viewvalues(result.tests):
         test.time = results.TimeAttribute(end=test.time)
 
     result.time_elapsed = results.TimeAttribute(end=result.time_elapsed)

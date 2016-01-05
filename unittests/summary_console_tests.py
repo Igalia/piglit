@@ -31,6 +31,7 @@ from __future__ import absolute_import, division, print_function
 import sys
 
 import nose.tools as nt
+import six
 from six.moves import cStringIO as StringIO
 
 from . import utils
@@ -131,7 +132,7 @@ class Test_print_summary(object):
 
         description = "summary.console_._print_summary: calculates {} correctly"
 
-        for key, value in self._ENUMS.iteritems():
+        for key, value in six.iteritems(self._ENUMS):
             test.description = description.format(key)
             yield test, value
 

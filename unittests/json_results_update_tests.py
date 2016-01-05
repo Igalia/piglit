@@ -29,7 +29,9 @@ try:
     import simplejson as json
 except ImportError:
     import json
+
 import nose.tools as nt
+import six
 
 from . import utils
 from framework import backends, results
@@ -164,7 +166,7 @@ class TestV0toV1(object):
 
     def test_info_delete(self):
         """backends.json.update_results (0 -> 1): Remove the info name from results"""
-        for value in self.RESULT.tests.itervalues():
+        for value in six.itervalues(self.RESULT.tests):
             nt.ok_('info' not in value)
 
     def test_returncode_from_info(self):
@@ -215,12 +217,12 @@ class TestV0toV1(object):
 
         expected = 'group2/groupA/test/subtest 1'
         nt.assert_not_in(
-            expected, self.RESULT.tests.iterkeys(),
+            expected, six.iterkeys(self.RESULT.tests),
             msg='{0} found in result, when it should not be'.format(expected))
 
     def test_handle_fixed_subtests(self):
         """backends.json.update_results (0 -> 1): Correctly handle new single entry subtests correctly"""
-        nt.ok_('group3/groupA/test' in self.RESULT.tests.iterkeys())
+        nt.ok_('group3/groupA/test' in six.iterkeys(self.RESULT.tests))
 
     def _load_with_update(self, data=None):
         """If the file is not results.json, it will be renamed.

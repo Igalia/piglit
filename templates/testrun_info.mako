@@ -1,3 +1,6 @@
+<%!
+  import six
+%>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//END"
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -21,10 +24,10 @@
         <td>totals</td>
         <td>
           <table>
-            % for key, value in sorted(totals.iteritems(), key=lambda (k,v): (v,k), reverse=True):
+            % for key, value in sorted(six.iteritems(totals), key=lambda i: (i[1], i[0]), reverse=True):
             <tr><td>${key}</td><td>${value}</td></tr>
             % endfor
-            <tr><td>total</td><td>${sum(totals.itervalues())}</td></tr>
+            <tr><td>total</td><td>${sum(six.itervalues(totals))}</td></tr>
           </table>
         </td>
       </tr>

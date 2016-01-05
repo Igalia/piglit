@@ -31,6 +31,7 @@ import sys
 import errno
 
 from mako.lookup import TemplateLookup
+import six
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
@@ -96,7 +97,7 @@ def _make_testrun_info(results, destination, exclude=None):
                 lspci=each.lspci))
 
         # Then build the individual test results
-        for key, value in each.tests.iteritems():
+        for key, value in six.iteritems(each.tests):
             html_path = os.path.join(destination, name,
                                      escape_filename(key + ".html"))
             temp_path = os.path.dirname(html_path)

@@ -22,7 +22,6 @@
 """ Module for results generation """
 
 from __future__ import absolute_import, division, print_function
-
 import collections
 import copy
 import datetime
@@ -176,7 +175,7 @@ class TestResult(object):
 
         """
         if self.subtests:
-            return max(self.subtests.itervalues())
+            return max(six.itervalues(self.subtests))
         return self.__result
 
     @result.setter
@@ -226,7 +225,7 @@ class TestResult(object):
                 setattr(inst, each, dict_[each])
 
         if 'subtests' in dict_:
-            for name, value in dict_['subtests'].iteritems():
+            for name, value in six.iteritems(dict_['subtests']):
                 inst.subtests[name] = value
 
         # out and err must be set manually to avoid replacing the setter
@@ -263,7 +262,7 @@ class Totals(dict):
         # Since totals are prepopulated, calling 'if not <Totals instance>'
         # will always result in True, this will cause it to return True only if
         # one of the values is not zero
-        for each in self.itervalues():
+        for each in six.itervalues(self):
             if each != 0:
                 return True
         return False
@@ -316,11 +315,11 @@ class TestrunResult(object):
 
     def calculate_group_totals(self):
         """Calculate the number of pases, fails, etc at each level."""
-        for name, result in self.tests.iteritems():
+        for name, result in six.iteritems(self.tests):
             # If there are subtests treat the test as if it is a group instead
             # of a test.
             if result.subtests:
-                for res in result.subtests.itervalues():
+                for res in six.itervalues(result.subtests):
                     res = str(res)
                     temp = name
 

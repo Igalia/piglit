@@ -23,6 +23,7 @@
 from __future__ import absolute_import, division, print_function
 
 import nose.tools as nt
+import six
 
 from framework import results, status, exceptions, grouptools
 from . import utils
@@ -500,7 +501,7 @@ def test_totals_true():
     """results.Totals: bool() returns True when any value is not 0"""
     # This might deserve a generator, but it seems so simple that it it's a lot
     # of work for no gain
-    for key in results.Totals().iterkeys():
+    for key in six.iterkeys(results.Totals()):
         test = results.Totals()
         test[key] += 1
         nt.ok_(bool(test), msg='Returns false with status {}'.format(key))

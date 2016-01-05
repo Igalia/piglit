@@ -25,8 +25,8 @@
 from __future__ import absolute_import, division, print_function
 import textwrap
 
-# a local variable status exists, prevent accidental overloading by renaming
-# the module
+import six
+
 from framework import grouptools, backends
 from .common import Results
 
@@ -83,7 +83,7 @@ def _print_summary(results):
         regressions=print_template.format(
             *[str(s) for s in results.counts.regressions]),
         total=print_template.format(*[
-            str(sum(x.totals['root'].itervalues()))
+            str(sum(six.itervalues(x.totals['root'])))
             for x in results.results])))
 
 

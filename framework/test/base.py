@@ -210,7 +210,7 @@ class Test(object):
         self.result.command = ' '.join(self.command)
         self.result.environment = " ".join(
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
-                options.OPTIONS.env.iteritems(), self.env.iteritems()))
+                six.iteritems(options.OPTIONS.env), six.iteritems(self.env)))
 
         try:
             self.is_skip()
@@ -260,9 +260,9 @@ class Test(object):
         # requirements.
         #
         fullenv = dict()
-        for key, value in itertools.chain(os.environ.iteritems(),
-                                          options.OPTIONS.env.iteritems(),
-                                          self.env.iteritems()):
+        for key, value in itertools.chain(six.iteritems(os.environ),
+                                          six.iteritems(options.OPTIONS.env),
+                                          six.iteritems(self.env)):
             fullenv[key] = str(value)
 
 

@@ -30,6 +30,8 @@ import collections
 import os
 import re
 
+import six
+
 __all__ = ['OPTIONS']
 
 # pylint: disable=too-few-public-methods
@@ -206,7 +208,7 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.__init__()
 
     def __iter__(self):
-        for key, values in self.__dict__.iteritems():
+        for key, values in six.iteritems(self.__dict__):
             if not key.startswith('_'):
                 yield key, values
 

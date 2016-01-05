@@ -45,6 +45,8 @@ from __future__ import absolute_import, division, print_function
 import os
 import importlib
 
+import six
+
 from .register import Registry
 from .compression import COMPRESSION_SUFFIXES
 
@@ -160,7 +162,7 @@ def load(file_path):
 
     extension, compression = get_extension(file_path)
 
-    for backend in BACKENDS.itervalues():
+    for backend in six.itervalues(BACKENDS):
         if extension in backend.extensions:
             loader = backend.load
 

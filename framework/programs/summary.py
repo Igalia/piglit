@@ -27,6 +27,8 @@ import os.path as path
 import sys
 import errno
 
+import six
+
 from framework import summary, status, core, backends, exceptions
 from . import parsers
 
@@ -179,7 +181,7 @@ def csv(input_):
     testrun = backends.load(args.testResults)
 
     def write_results(output):
-        for name, result in testrun.tests.iteritems():
+        for name, result in six.iteritems(testrun.tests):
             output.write("{},{},{},{}\n".format(name, result.time,
                                                 result.returncode,
                                                 result.result))

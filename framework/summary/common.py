@@ -26,6 +26,7 @@ from __future__ import absolute_import, division, print_function
 import re
 import operator
 
+import six
 from six.moves import zip
 
 # a local variable status exists, prevent accidental overloading by renaming
@@ -92,11 +93,11 @@ class Names(object):
         """A set of all tests in all runs."""
         all_ = set()
         for res in self.__results:
-            for key, value in res.tests.iteritems():
+            for key, value in six.iteritems(res.tests):
                 if not value.subtests:
                     all_.add(key)
                 else:
-                    for subt in value.subtests.iterkeys():
+                    for subt in six.iterkeys(value.subtests):
                         all_.add(grouptools.join(key, subt))
         return all_
 

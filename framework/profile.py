@@ -207,7 +207,7 @@ class TestProfile(object):
             return True
 
         # Filter out unwanted tests
-        self.test_list = dict(item for item in self.test_list.iteritems()
+        self.test_list = dict(item for item in six.iteritems(self.test_list)
                               if check_all(item))
 
         if not self.test_list:
@@ -276,15 +276,15 @@ class TestProfile(object):
         multi = multiprocessing.dummy.Pool()
 
         if options.OPTIONS.concurrent == "all":
-            run_threads(multi, self.test_list.iteritems())
+            run_threads(multi, six.iteritems(self.test_list))
         elif options.OPTIONS.concurrent == "none":
-            run_threads(single, self.test_list.iteritems())
+            run_threads(single, six.iteritems(self.test_list))
         else:
             # Filter and return only thread safe tests to the threaded pool
-            run_threads(multi, (x for x in self.test_list.iteritems()
+            run_threads(multi, (x for x in six.iteritems(self.test_list)
                                 if x[1].run_concurrent))
             # Filter and return the non thread safe tests to the single pool
-            run_threads(single, (x for x in self.test_list.iteritems()
+            run_threads(single, (x for x in six.iteritems(self.test_list)
                                  if not x[1].run_concurrent))
 
         log.get().summary()

@@ -150,7 +150,7 @@ class DEQPBaseTest(Test):
         # otherwise this requires some break/else/continue madness
         for line in self.result.out.split('\n'):
             line = line.lstrip()
-            for k, v in self.__RESULT_MAP.iteritems():
+            for k, v in six.iteritems(self.__RESULT_MAP):
                 if line.startswith(k):
                     self.result.result = v
                     return
