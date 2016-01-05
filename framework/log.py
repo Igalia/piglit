@@ -32,12 +32,13 @@ import abc
 import itertools
 import threading
 import collections
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 try:
     import simplejson as json
 except ImportError:
     import json
+
+from six.moves.BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 from framework.core import PIGLIT_CONFIG
 from framework import grouptools
