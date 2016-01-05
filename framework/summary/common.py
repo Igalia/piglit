@@ -23,9 +23,10 @@
 """Shared functions for summary generation."""
 
 from __future__ import absolute_import, division, print_function
-import itertools
 import re
 import operator
+
+from six.moves import zip
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
@@ -308,7 +309,7 @@ def find_diffs(results, tests, comparator, handler=lambda *a: None):
 
     """
     diffs = [] # There can't be changes from nil -> 0
-    for prev, cur in itertools.izip(results[:-1], results[1:]):
+    for prev, cur in zip(results[:-1], results[1:]):
         names = set()
         for name in tests:
             try:
