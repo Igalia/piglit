@@ -25,7 +25,6 @@ import sys
 import os
 import os.path as path
 import time
-import ConfigParser
 import ctypes
 
 import six
@@ -58,15 +57,12 @@ def _default_platform():
     if os.environ.get('PIGLIT_PLATFORM'):
         return os.environ.get('PIGLIT_PLATFORM')
     else:
-        try:
-            plat = core.PIGLIT_CONFIG.get('core', 'platform')
-            if plat not in core.PLATFORMS:
-                raise exceptions.PiglitFatalError(
-                    'Platform is not valid\nvalid platforms are: {}'.format(
-                        core.PLATFORMS))
-            return plat
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-            return 'mixed_glx_egl'
+        plat = core.PIGLIT_CONFIG.safe_get('core', 'platform', 'mixed_glx_egl')
+        if plat not in core.PLATFORMS:
+            raise exceptions.PiglitFatalError(
+                'Platform is not valid\nvalid platforms are: {}'.format(
+                    core.PLATFORMS))
+        return plat
 
 
 def _default_backend():
@@ -76,15 +72,12 @@ def _default_backend():
     the one in the config file. The default if that fails is to use json
 
     """
-    try:
-        backend = core.PIGLIT_CONFIG.get('core', 'backend')
-        if backend not in backends.BACKENDS.keys():
-            raise exceptions.PiglitFatalError(
-                'Backend is not valid\nvalid backends are: {}'.format(
-                      ' '.join(backends.BACKENDS.keys())))
-        return backend
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        return 'json'
+    backend = core.PIGLIT_CONFIG.safe_get('core', 'backend', 'json')
+    if backend not in backends.BACKENDS.keys():
+        raise exceptions.PiglitFatalError(
+            'Backend is not valid\nvalid backends are: {}'.format(
+                ' '.join(backends.BACKENDS.keys())))
+    return backend
 
 
 def _run_parser(input_):
