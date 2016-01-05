@@ -37,37 +37,68 @@ import warnings
 import six
 from six.moves import range
 
-try:
-    # subprocess32 only supports *nix systems, this is important because
-    # "start_new_session" is not a valid argument on windows
-
-    import subprocess32 as subprocess
-    _EXTRA_POPEN_ARGS = {'start_new_session': True}
-except ImportError:
-    # If there is no timeout support, fake it. Add a TimeoutExpired exception
-    # and a Popen that accepts a timeout parameter (and ignores it), then
-    # shadow the actual Popen with this wrapper.
-
-    import subprocess
-
-    class TimeoutExpired(Exception):
-        pass
-
-    class Popen(subprocess.Popen):
-        """Sublcass of Popen that accepts and ignores a timeout argument."""
-        def communicate(self, *args, **kwargs):
-            if 'timeout' in kwargs:
-                del kwargs['timeout']
-            return super(Popen, self).communicate(*args, **kwargs)
-
-    subprocess.TimeoutExpired = TimeoutExpired
-    subprocess.Popen = Popen
-    _EXTRA_POPEN_ARGS = {}
-
-    warnings.warn('Timeouts are not available')
-
 from framework import exceptions, options
 from framework.results import TestResult
+
+# We're doing some special crazy here to make timeouts work on python 2. pylint
+# is going to complain a lot
+# pylint: disable=wrong-import-position,wrong-import-order
+if six.PY2:
+    try:
+        # subprocess32 only supports *nix systems, this is important because
+        # "start_new_session" is not a valid argument on windows
+
+        import subprocess32 as subprocess
+        _EXTRA_POPEN_ARGS = {'start_new_session': True}
+    except ImportError:
+        # If there is no timeout support, fake it. Add a TimeoutExpired
+        # exception and a Popen that accepts a timeout parameter (and ignores
+        # it), then shadow the actual Popen with this wrapper.
+
+        import subprocess
+
+        class TimeoutExpired(Exception):
+            pass
+
+        class Popen(subprocess.Popen):
+            """Sublcass of Popen that accepts and ignores a timeout argument."""
+            def communicate(self, *args, **kwargs):
+                if 'timeout' in kwargs:
+                    del kwargs['timeout']
+                return super(Popen, self).communicate(*args, **kwargs)
+
+        subprocess.TimeoutExpired = TimeoutExpired
+        subprocess.Popen = Popen
+        _EXTRA_POPEN_ARGS = {}
+
+        warnings.warn('Timeouts are not available')
+elif six.PY3:
+    # In python3.2+ this all just works, no need for the madness above.
+    import subprocess
+    _EXTRA_POPEN_ARGS = {}
+
+    if sys.platform == 'win32':
+        # There is no implementation in piglit to make timeouts work in
+        # windows, this uses the same Popen snippet as python 2 without
+        # subprocess32 to mask it. Patches are welcome.
+        # XXX: Should this also include cygwin?
+        warnings.warn('Timeouts are not implemented on Windows.')
+
+        class Popen(subprocess.Popen):
+            """Sublcass of Popen that accepts and ignores a timeout argument."""
+            def communicate(self, *args, **kwargs):
+                if 'timeout' in kwargs:
+                    del kwargs['timeout']
+                return super(Popen, self).communicate(*args, **kwargs)
+
+        subprocess.Popen = Popen
+    elif os.name == 'posix':
+        # This should work for all *nix systems, Linux, the BSDs, and OSX.
+        # This speicifically creates a session group for each test, so that
+        # it's children can be killed if it times out.
+        _EXTRA_POPEN_ARGS = {'start_new_session': True}
+
+# pylint: enable=wrong-import-position,wrong-import-order
 
 
 __all__ = [
@@ -290,14 +321,14 @@ class Test(object):
             else:
                 raise e
         except subprocess.TimeoutExpired:
-            # This can only be reached if subprocess32 is present, since
-            # TimeoutExpired is never raised by the fallback code.
+            # This can only be reached if subprocess32 is present or on python
+            # 3.x, since # TimeoutExpired is never raised by the python 2.7
+            # fallback code.
 
             proc.terminate()
 
-            # XXX: A number of the os calls in this block don't work on windows,
-            # when porting to python 3 this will likely require an
-            # "if windows/else" block
+            # XXX: This is probably broken on windows, since os.getpgid doesn't
+            # exist on windows. What is the right way to handle this?
             if proc.poll() is None:
                 time.sleep(3)
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
