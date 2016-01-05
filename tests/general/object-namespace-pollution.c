@@ -428,6 +428,57 @@ generate_program_source(GLenum target, unsigned key)
 			 position,
 			 normal,
 			 other);
+	} else if (target == GL_FRAGMENT_PROGRAM_ARB) {
+		const char *tex;
+		const char *half_dir;
+		const char *light_dir;
+
+		if ((key & 2) != 0) {
+			tex = "TEX   r0, t, texture[0], 2D;";
+		} else {
+			tex = "TEX   r0, t, texture[0], 1D;";
+		}
+
+		if ((key & 4) != 0) {
+			light_dir = "program.env[0]";
+		} else {
+			light_dir = "state.light[0].position";
+		}
+
+		if ((key & 4) != 0) {
+			half_dir = "program.env[1]";
+		} else {
+			half_dir = "state.light[0].half";
+		}
+
+		asprintf(&source,
+			 "!!ARBfp1.0\n"
+			 "# Program key 0x%04x\n"
+			 "ATTRIB n = fragment.texcoord[0];\n"
+			 "ATTRIB t = fragment.texcoord[1];\n"
+			 "PARAM light_dir = %s;\n"
+			 "PARAM half_dir = %s;\n"
+			 "OUTPUT c = result.color;\n"
+			 "TEMP r0, r1;\n"
+			 "\n"
+			 "# Sample the texture\n"
+			 "%s"
+			 "\n"
+			 "# Compute lighting\n"
+			 "DP3   r1.x, n, light_dir;\n"
+			 "DP3   r1.y, n, half_dir;\n"
+			 "MOV   r1.w, 126.2;\n"
+			 "LIT   r1, r1;\n"
+			 "\n"
+			 "# Combine lighting and texture\n"
+			 "MUL   r0, r1.y, r0;\n"
+			 "ADD   c.xyz, r1.z, r0;\n"
+			 "MOV   c.w, 1.0;\n"
+			 "END",
+			 key,
+			 light_dir,
+			 half_dir,
+			 tex);
 	} else {
 		printf("Unknown program target %s (0x%04x) in %s.\n",
 		       piglit_get_gl_enum_name(target), target,
@@ -446,10 +497,13 @@ select_program_target(unsigned key)
 {
 	GLenum target = 0;
 
-	(void) key;
-
 	if (piglit_is_extension_supported("GL_ARB_vertex_program")) {
 		target = GL_VERTEX_PROGRAM_ARB;
+	}
+
+	if (piglit_is_extension_supported("GL_ARB_fragment_program")) {
+		if (target == 0 || (key & 1) == 0)
+			target = GL_FRAGMENT_PROGRAM_ARB;
 	}
 
 	return target;
@@ -462,7 +516,9 @@ create_program(unsigned name)
 	const GLenum target = select_program_target(name);
 
 	if (target == 0) {
-		printf("%s requires GL_ARB_vertex_program.\n", __func__);
+		printf("%s requires GL_ARB_vertex_program or "
+		       "GL_ARB_fragment_program.\n",
+		       __func__);
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
