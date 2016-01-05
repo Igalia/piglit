@@ -31,6 +31,7 @@ posix paths they may not start with a leading '/'.
 
 from __future__ import absolute_import, division, print_function
 
+import six
 from six.moves import zip
 
 __all__ = [
@@ -158,7 +159,7 @@ def from_path(path):
     This safely handles both Windows and Unix style paths.
 
     """
-    assert isinstance(path, (str, unicode)), 'Type must be string or unicode'
+    assert isinstance(path, six.string_types), 'Type must be string or unicode'
 
     if '\\' in path:
         path = path.replace('\\', SEPARATOR)
@@ -180,5 +181,5 @@ def format(name):
     want to see.
 
     """
-    assert isinstance(name, basestring)
+    assert isinstance(name, six.string_types)
     return name.replace(SEPARATOR, '/')

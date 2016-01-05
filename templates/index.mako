@@ -2,6 +2,9 @@
   import os
   import posixpath  # this must be posixpath, since we want /'s not \'s
   import re
+
+  from six.moves import range
+
   from framework import grouptools, status
 
   def group_changes(test, current):
@@ -86,7 +89,7 @@
 
         ## Status columns
         ## Create an additional column for each summary
-        % for _ in xrange(len(results.results)):
+        % for _ in range(len(results.results)):
         <col />
         % endfor
       </colgroup>

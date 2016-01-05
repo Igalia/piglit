@@ -216,15 +216,15 @@ class Test(object):
             self.is_skip()
         except TestIsSkip as e:
             self.result.result = 'skip'
-            self.result.out = unicode(e)
+            self.result.out = six.text_type(e)
             self.result.returncode = None
             return
 
         try:
             self._run_command()
         except TestRunError as e:
-            self.result.result = unicode(e.status)
-            self.result.out = unicode(e)
+            self.result.result = six.text_type(e.status)
+            self.result.out = six.text_type(e)
             self.result.returncode = None
             return
 

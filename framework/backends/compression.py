@@ -27,8 +27,8 @@ DECOMPRESSORS, which use compression modes ('bz2', 'gz', 'xz', 'none') to
 provide open-like functions with correct mode settings for writing or reading,
 respectively.
 
-They should always take unicode objects. It is up to the caller to ensure that
-they're passing unicode and not bytes.
+They should always take unicode (str in python 3.x) objects. It is up to the
+caller to ensure that they're passing unicode and not bytes.
 
 A helper, get_mode(), is provided to return the user selected mode (it will try
 the PIGLIT_COMPRESSION environment variable, then the piglit.conf
@@ -46,6 +46,7 @@ import os
 import subprocess
 import contextlib
 
+import six
 from six.moves import cStringIO as StringIO
 
 from framework import exceptions
@@ -59,13 +60,14 @@ __all__ = [
 ]
 
 
+@six.python_2_unicode_compatible
 class UnsupportedCompressor(exceptions.PiglitInternalError):
     def __init__(self, method, *args, **kwargs):
         super(UnsupportedCompressor, self).__init__(*args, **kwargs)
         self.__method = method
 
     def __str__(self):
-        return 'unsupported compression method {}'.format(self.__method)
+        return u'unsupported compression method {}'.format(self.__method)
 
 
 # TODO: in python3 the bz2 module has an open function

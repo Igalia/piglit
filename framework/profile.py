@@ -34,6 +34,8 @@ import importlib
 import contextlib
 import itertools
 
+import six
+
 from framework import grouptools, exceptions, options
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
@@ -73,7 +75,7 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
 
         """
         # keys should be strings
-        if not isinstance(key, basestring):
+        if not isinstance(key, six.string_types):
             raise exceptions.PiglitFatalError(
                 "TestDict keys must be strings, but was {}".format(type(key)))
 
@@ -348,7 +350,7 @@ class TestProfile(object):
         ...     g(['power', 'test'], 'powertest')
 
         """
-        assert isinstance(group, basestring), type(group)
+        assert isinstance(group, six.string_types), type(group)
 
         def adder(args, name=None, **kwargs):
             """Helper function that actually adds the tests.
@@ -374,10 +376,10 @@ class TestProfile(object):
                 if isinstance(args, list):
                     name = ' '.join(args)
                 else:
-                    assert isinstance(args, basestring)
+                    assert isinstance(args, six.string_types)
                     name = args
 
-            assert isinstance(name, basestring)
+            assert isinstance(name, six.string_types)
             lgroup = grouptools.join(group, name)
 
             self.test_list[lgroup] = test_class(

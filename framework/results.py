@@ -27,6 +27,8 @@ import collections
 import copy
 import datetime
 
+import six
+
 from framework import status, exceptions, grouptools
 
 __all__ = [
@@ -83,8 +85,8 @@ class StringDescriptor(object):  # pylint: disable=too-few-public-methods
     returns a unicode object.
 
     """
-    def __init__(self, name, default=unicode()):
-        assert isinstance(default, unicode)
+    def __init__(self, name, default=six.text_type()):
+        assert isinstance(default, six.text_type)
         self.__name = name
         self.__default = default
 
@@ -92,12 +94,12 @@ class StringDescriptor(object):  # pylint: disable=too-few-public-methods
         return getattr(instance, self.__name, self.__default)
 
     def __set__(self, instance, value):
-        if isinstance(value, str):
+        if isinstance(value, six.binary_type):
             setattr(instance, self.__name, value.decode('utf-8', 'replace'))
-        elif isinstance(value, unicode):
+        elif isinstance(value, six.text_type):
             setattr(instance, self.__name, value)
         else:
-            raise TypeError('{} attribute must be a str or unicode instance, '
+            raise TypeError('{} attribute must be a unicode or bytes instance, '
                             'but was {}.'.format(self.__name, type(value)))
 
     def __delete__(self, instance):

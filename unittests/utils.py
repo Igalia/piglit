@@ -42,6 +42,7 @@ try:
 except ImportError:
     import json
 from nose.plugins.skip import SkipTest
+import six
 from six.moves import getcwdb
 
 from framework import test, backends, core, results
@@ -87,6 +88,7 @@ JSON_DATA = {
 _SAVED_COMPRESSION = os.environ.get('PIGLIT_COMPRESSION')
 
 
+@six.python_2_unicode_compatible
 class TestFailure(AssertionError):
     """An exception to be raised when a test fails.
 
@@ -105,7 +107,7 @@ class TestFailure(AssertionError):
 
     def __str__(self):
         if isinstance(self.__arg, Exception):
-            return 'exception type "{}" with message "{}" raised.'.format(
+            return u'exception type "{}" with message "{}" raised.'.format(
                 type(self.__arg), str(self.__arg))
         else:
             return self.__arg

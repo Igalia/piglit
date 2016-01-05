@@ -2,6 +2,8 @@
   import posixpath  # this must be posixpath, since we want /'s not \'s
   import re
 
+  from six.moves import range
+
 
   def feat_result(result):
       """Percentage result string"""
@@ -41,7 +43,7 @@
 
         ## Status columns
         ## Create an additional column for each summary
-        % for _ in xrange(len(results.results)):
+        % for _ in range(len(results.results)):
         <col />
         % endfor
       </colgroup>

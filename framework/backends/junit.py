@@ -104,7 +104,7 @@ class JUnitBackend(FileBackend):
                     continue
 
         # set the test count by counting the number of tests.
-        # This must be bytes or unicode
+        # This must be unicode (py3 str)
         piglit.attrib['tests'] = str(len(piglit))
 
         with open(os.path.join(self._dest, 'results.xml'), 'w') as f:

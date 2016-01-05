@@ -29,6 +29,7 @@ from __future__ import absolute_import, division, print_function
 
 import mock
 import nose.tools as nt
+import six
 
 from framework import profile, grouptools, exceptions
 from framework.test import deqp

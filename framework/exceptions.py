@@ -24,6 +24,8 @@ from __future__ import print_function, absolute_import, division
 import sys
 import functools
 
+import six
+
 __all__ = [
     'PiglitInternalError',
     'PiglitFatalError',
@@ -52,6 +54,7 @@ def handler(func):
     return _inner
 
 
+@six.python_2_unicode_compatible
 class PiglitException(Exception):
     """Class for non-error exceptions.
 
@@ -60,10 +63,11 @@ class PiglitException(Exception):
 
     """
     def __str__(self):
-        return ('An internal exception that should have been handled was not:'
+        return (u'An internal exception that should have been handled was not:'
                 '\n{}'.format(super(PiglitException, self).__str__()))
 
 
+@six.python_2_unicode_compatible
 class PiglitInternalError(Exception):
     """Class for errors in piglit.
 
@@ -71,7 +75,7 @@ class PiglitInternalError(Exception):
 
     """
     def __str__(self):
-        return 'An internal error occured:\n{}'.format(
+        return u'An internal error occured:\n{}'.format(
             super(PiglitInternalError, self).__str__())
 
 
