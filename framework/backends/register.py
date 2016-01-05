@@ -20,6 +20,7 @@
 
 """An object for registering backends."""
 
+from __future__ import absolute_import, division, print_function
 import collections
 
 Registry = collections.namedtuple(

@@ -26,7 +26,7 @@ are represented by a TestProfile or a TestProfile derived object.
 
 """
 
-from __future__ import print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 import os
 import multiprocessing
 import multiprocessing.dummy
