@@ -34,6 +34,8 @@ import copy
 import signal
 import warnings
 
+from six.moves import range
+
 try:
     # subprocess32 only supports *nix systems, this is important because
     # "start_new_session" is not a valid argument on windows
@@ -341,7 +343,7 @@ class WindowResizeMixin(object):
         Test.run() to return early.
 
         """
-        for _ in xrange(5):
+        for _ in range(5):
             super(WindowResizeMixin, self)._run_command()
             if "Got spurious window resize" not in self.result.out:
                 return

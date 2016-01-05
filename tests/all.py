@@ -6,6 +6,8 @@ import itertools
 import os
 import platform
 
+from six.moves import range
+
 from framework import grouptools
 from framework.profile import TestProfile
 from framework.test import (PiglitGLTest, GleanTest, ShaderTest,
@@ -2077,7 +2079,7 @@ with profile.group_manager(
     for stage, type_, comp, sampler in itertools.product(
             stages, types, comps, samplers):
         for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets']:
-            for cs in xrange(len(comp)):
+            for cs in range(len(comp)):
                 assert cs <= 3
                 address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
                 cmd = ['textureGather', stage,

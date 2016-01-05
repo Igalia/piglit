@@ -25,6 +25,7 @@ from __future__ import absolute_import, division, print_function
 import datetime
 
 import nose.tools as nt
+from six.moves import range
 
 from framework import results, status, grouptools
 from framework.summary import common as summary
@@ -245,7 +246,7 @@ class TestNamesSubtests(object):
     def test_all(self):
         """summary.Names.all: Handles subtests as groups"""
         baseline = {'foo', 'bar', 'oink', 'bonk', 'oink', 'tonk'}
-        for x in xrange(1, 6):
+        for x in range(1, 6):
             baseline.add(grouptools.join('bor', str(x)))
 
         nt.eq_(self.test.names.all, baseline)
