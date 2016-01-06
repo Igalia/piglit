@@ -1,0 +1,75 @@
+// Test that inputs and outputs are not assigned overlapping locations when
+// using interface blocks and explicit locations.
+
+[require]
+GLSL >= 1.50
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 150
+#extension GL_ARB_separate_shader_objects: require
+
+in vec4 piglit_vertex;
+
+struct S {
+	vec4 a;
+	vec4 b;
+};
+
+layout(location = 0) out block {
+	S s;
+	vec4 c;
+};
+
+void main()
+{
+	s.a = vec4(1.0, 0.0, 0.0, 1.0);
+	s.b = vec4(0.0, 1.0, 0.0, 1.0);
+	c = vec4(1.0, 1.0, 1.0, 1.0);
+
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_separate_shader_objects: require
+
+struct S {
+	vec4 a;
+	vec4 b;
+};
+
+layout(location = 0) in block {
+	S s;
+	vec4 c;
+};
+
+uniform int i;
+
+out vec4 color;
+
+void main()
+{
+	if (i == 0)
+		color = s.a;
+	else if (i == 1)
+		color = s.b;
+	else
+		color = c;
+}
+
+[test]
+uniform int i 0
+draw rect 0 -1 1 1
+
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (1.0, 0.0, 0.0)
+
+uniform int i 1
+draw rect -1 0 1 1
+
+relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 1.0, 0.0)
+
+uniform int i 2
+draw rect 0 0 1 1
+
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (1.0, 1.0, 1.0)

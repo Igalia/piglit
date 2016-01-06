@@ -1,0 +1,80 @@
+// Test that inputs and outputs are not assigned overlapping locations when
+// using interface blocks and explicit locations.
+
+[require]
+GLSL >= 1.50
+GL_ARB_separate_shader_objects
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#version 150
+#extension GL_ARB_arrays_of_arrays: require
+#extension GL_ARB_separate_shader_objects: require
+
+in vec4 piglit_vertex;
+
+layout(location = 0) out block {
+	vec4 a[2][2];
+	vec4 b;
+};
+
+void main()
+{
+	a[0][0] = vec4(1.0, 0.0, 0.0, 1.0);
+	a[0][1] = vec4(0.0, 1.0, 0.0, 1.0);
+	a[1][0] = vec4(0.0, 0.0, 1.0, 1.0);
+	a[1][1] = vec4(1.0, 0.0, 1.0, 1.0);
+	b = vec4(1.0, 1.0, 1.0, 1.0);
+
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_arrays_of_arrays: require
+#extension GL_ARB_separate_shader_objects: require
+
+layout(location = 0) in block {
+	vec4 a[2][2];
+	vec4 b;
+};
+
+uniform int i;
+
+out vec4 color;
+
+void main()
+{
+	if (i < 4)
+		color = a[i/2][int(mod(i, 2))];
+	else
+		color = b;
+}
+
+[test]
+uniform int i 0
+draw rect 0 -1 1 1
+
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (1.0, 0.0, 0.0)
+
+uniform int i 1
+draw rect -1 0 1 1
+
+relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 1.0, 0.0)
+
+uniform int i 2
+draw rect 0 0 1 1
+
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (0.0, 0.0, 1.0)
+
+uniform int i 3
+draw rect -1 -0.5 1 0.5
+
+# shader runner has a window size of 250 * 250 so we need to tweak our
+# probe values to work around this.
+relative probe rect rgb (0.0, 0.3, 0.5, 0.20) (1.0, 0.0, 1.0)
+
+uniform int i 4
+draw rect -1 -1 1 0.5
+
+relative probe rect rgb (0.0, 0.0, 0.5, 0.25) (1.0, 1.0, 1.0)
