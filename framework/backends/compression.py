@@ -44,6 +44,9 @@ import functools
 import gzip
 import os
 import subprocess
+import contextlib
+
+from six.moves import cStringIO as StringIO
 
 from framework import exceptions
 from framework.core import PIGLIT_CONFIG
@@ -99,11 +102,6 @@ except ImportError:
     except OSError:
         pass
     else:
-        import contextlib
-        try:
-            import cStringIO as StringIO
-        except ImportError:
-            import StringIO
 
         @contextlib.contextmanager
         def _compress_xz(filename):
@@ -162,7 +160,7 @@ except ImportError:
 
             # We need a file-like object, so the contents must be placed in
             # a StringIO object.
-            io = StringIO.StringIO()
+            io = StringIO()
             io.write(string)
             io.seek(0)
 

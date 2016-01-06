@@ -21,10 +21,10 @@
 """Tests for the oglconform integration."""
 
 from __future__ import absolute_import, division, print_function
-from StringIO import StringIO
 
 import mock
 import nose.tools as nt
+from six.moves import cStringIO as StringIO
 
 from . import utils
 from framework import grouptools
@@ -40,7 +40,7 @@ with mock.patch('framework.core.PIGLIT_CONFIG.required_get',
 @mock.patch.object(oglconform.tempfile, 'NamedTemporaryFile')
 def test_make_profile(mock_temp):
     """tests.oglconform._make_profile: Adds test names"""
-    io_ = StringIO('group test.name\n')
+    io_ = mock.Mock(wraps=StringIO(u'group test.name\n'))
     io_.name = mock.Mock()
     mock_file = mock.MagicMock()
     mock_file.__enter__.return_value = io_
@@ -58,7 +58,7 @@ def test_make_profile(mock_temp):
 @mock.patch.object(oglconform.tempfile, 'NamedTemporaryFile')
 def test_make_profile_missing(mock_temp):
     """tests.oglconform._make_profile: handles missing groups"""
-    io_ = StringIO('test.name\n')
+    io_ = mock.Mock(wraps=StringIO(u'test.name\n'))
     io_.name = mock.Mock()
     mock_file = mock.MagicMock()
     mock_file.__enter__.return_value = io_

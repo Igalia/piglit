@@ -29,9 +29,9 @@ generator.
 
 from __future__ import absolute_import, division, print_function
 import sys
-from cStringIO import StringIO
 
 import nose.tools as nt
+from six.moves import cStringIO as StringIO
 
 from . import utils
 from framework import results, grouptools
