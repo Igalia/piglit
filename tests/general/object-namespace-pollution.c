@@ -792,6 +792,202 @@ validate_texture(unsigned name)
 }
 /*@}*/
 
+/** \name Methods for operating on Apple vertex array objects */
+/*@{*/
+static float dummy_vao_data[257];
+
+static const int vao_vertex_size[] = { 2, 3, 4 };
+static const int vao_color_size[] = { 3, 4 };
+static const int vao_texture_size[] = { 1, 2, 3, 4 };
+static const GLenum vao_vertex_type[] = { GL_SHORT, GL_INT, GL_FLOAT, GL_DOUBLE };
+static const GLenum vao_normal_type[] = { GL_BYTE, GL_SHORT, GL_INT, GL_FLOAT, GL_DOUBLE };
+static const GLenum vao_color_type[] = {
+	GL_BYTE, GL_UNSIGNED_BYTE,
+	GL_SHORT, GL_UNSIGNED_SHORT,
+	GL_INT,	GL_UNSIGNED_INT,
+	GL_FLOAT,
+	GL_DOUBLE
+};
+
+#define PICK(a, i) a[i % ARRAY_SIZE(a)]
+#define STRIDE(x) (((x) % 16) * sizeof(int))
+
+/* 4 arrays, and each has at most 4 values. */
+#define VAO_DATA_SIZE (4 * 4)
+
+static bool
+create_vertex_array(unsigned name)
+{
+	uint8_t data[VAO_DATA_SIZE];
+
+	if (!piglit_is_extension_supported("GL_APPLE_vertex_array_object")) {
+		printf("%s requires GL_APPLE_vertex_array_object.\n", __func__);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (glIsVertexArrayAPPLE(name)) {
+		printf("\t%s,%d: %u is already a vertex array\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindVertexArrayAPPLE(name);
+
+	generate_random_data(data,
+			     sizeof(data),
+			     GL_VERTEX_ARRAY_BINDING_APPLE,
+			     name);
+
+	glVertexPointer(PICK(vao_vertex_size, data[0]),
+			PICK(vao_vertex_type, data[1]),
+			STRIDE(data[2]),
+			&dummy_vao_data[data[3]]);
+	glNormalPointer(PICK(vao_normal_type, data[4]),
+			STRIDE(data[5]),
+			&dummy_vao_data[data[6]]);
+	glColorPointer(PICK(vao_color_size, data[7]),
+		       PICK(vao_color_type, data[8]),
+		       STRIDE(data[9]),
+		       &dummy_vao_data[data[10]]);
+	glTexCoordPointer(PICK(vao_texture_size, data[11]),
+			  PICK(vao_vertex_type, data[12]),
+			  STRIDE(data[13]),
+			  &dummy_vao_data[data[14]]);
+
+	glBindVertexArrayAPPLE(0);
+
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
+check_integer_query(GLenum pname, int expected, unsigned name,
+		    const char *caller)
+{
+	int got;
+
+	glGetIntegerv(pname, &got);
+	if (got != expected) {
+		printf("\t%s,%d: %s of %u: got 0x%x, expected 0x%x\n",
+		       caller, __LINE__,
+		       piglit_get_gl_enum_name(pname),
+		       name,
+		       got, expected);
+		return false;
+	}
+
+	return true;
+}
+
+static bool
+check_pointer_query(GLenum pname, const void *expected, unsigned name,
+		    const char *caller)
+{
+	void *got;
+
+	glGetPointerv(pname, &got);
+	if (got != expected) {
+		printf("\t%s,%d: %s of %u: got %p, expected %p\n",
+		       caller, __LINE__,
+		       piglit_get_gl_enum_name(pname),
+		       name,
+		       got, expected);
+		return false;
+	}
+
+	return true;
+}
+
+static bool
+validate_vertex_array(unsigned name)
+{
+	uint8_t data[VAO_DATA_SIZE];
+	bool pass = true;
+
+	if (!piglit_is_extension_supported("GL_APPLE_vertex_array_object"))
+		return true;
+
+	if (!glIsVertexArrayAPPLE(name)) {
+		printf("\t%s,%d: %u is not a vertex array\n",
+		       __func__, __LINE__, name);
+		return false;
+	}
+
+	glBindVertexArrayAPPLE(name);
+
+	generate_random_data(data,
+			     sizeof(data),
+			     GL_VERTEX_ARRAY_BINDING_APPLE,
+			     name);
+
+	pass = check_integer_query(GL_VERTEX_ARRAY_SIZE,
+				   PICK(vao_vertex_size, data[0]),
+				   name,
+				   __func__) && pass;
+	pass = check_integer_query(GL_VERTEX_ARRAY_TYPE,
+				   PICK(vao_vertex_type, data[1]),
+				   name,
+				   __func__) && pass;
+	pass = check_integer_query(GL_VERTEX_ARRAY_STRIDE,
+				   STRIDE(data[2]),
+				   name,
+				   __func__) && pass;
+	pass = check_pointer_query(GL_VERTEX_ARRAY_POINTER,
+				   &dummy_vao_data[data[3]],
+				   name,
+				   __func__) && pass;
+
+	pass = check_integer_query(GL_NORMAL_ARRAY_TYPE,
+				   PICK(vao_normal_type, data[4]),
+				   name,
+				   __func__) && pass;
+	pass = check_integer_query(GL_NORMAL_ARRAY_STRIDE,
+				   STRIDE(data[5]),
+				   name,
+				   __func__) && pass;
+	pass = check_pointer_query(GL_NORMAL_ARRAY_POINTER,
+				   &dummy_vao_data[data[6]],
+				   name,
+				   __func__) && pass;
+
+	pass = check_integer_query(GL_COLOR_ARRAY_SIZE,
+				   PICK(vao_color_size, data[7]),
+				   name,
+				   __func__) && pass;
+	pass = check_integer_query(GL_COLOR_ARRAY_TYPE,
+				   PICK(vao_color_type, data[8]),
+				   name,
+				   __func__) && pass;
+	pass = check_integer_query(GL_COLOR_ARRAY_STRIDE,
+				   STRIDE(data[9]),
+				   name,
+				   __func__) && pass;
+	pass = check_pointer_query(GL_COLOR_ARRAY_POINTER,
+				   &dummy_vao_data[data[10]],
+				   name,
+				   __func__) && pass;
+
+	pass = check_integer_query(GL_TEXTURE_COORD_ARRAY_SIZE,
+				   PICK(vao_texture_size, data[11]),
+				   name,
+				   __func__) && pass;
+	pass = check_integer_query(GL_TEXTURE_COORD_ARRAY_TYPE,
+				   PICK(vao_vertex_type, data[12]),
+				   name,
+				   __func__) && pass;
+	pass = check_integer_query(GL_TEXTURE_COORD_ARRAY_STRIDE,
+				   STRIDE(data[13]),
+				   name,
+				   __func__) && pass;
+	pass = check_pointer_query(GL_TEXTURE_COORD_ARRAY_POINTER,
+				   &dummy_vao_data[data[14]],
+				   name,
+				   __func__) && pass;
+
+	glBindVertexArrayAPPLE(0);
+	return piglit_check_gl_error(GL_NO_ERROR) && pass;
+}
+/*@}*/
+
 /** \name GL operation wrapper functions. */
 /*@{*/
 static bool
@@ -1253,6 +1449,7 @@ static const struct object_type {
 	{ "program", create_program, validate_program },
 	{ "renderbuffer", create_renderbuffer, validate_renderbuffer },
 	{ "texture", create_texture, validate_texture },
+	{ "vertex-array", create_vertex_array, validate_vertex_array },
 };
 
 static NORETURN void
