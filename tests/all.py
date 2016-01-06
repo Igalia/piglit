@@ -888,6 +888,7 @@ with profile.group_manager(
     g(['masked-clear'])
     g(['point-line-no-cull'], run_concurrent=False)
     g(['polygon-mode'], run_concurrent=False)
+    g(['polygon-mode-facing'])
     g(['polygon-mode-offset'])
     g(['polygon-offset'], run_concurrent=False)
     g(['push-pop-texture-state'])
