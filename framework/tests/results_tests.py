@@ -192,52 +192,59 @@ class TestTestResult_to_json(object):
     """Tests for the attributes of the to_json method."""
     @classmethod
     def setup_class(cls):
-        cls.dict = {
-            'returncode': 100,
-            'err': 'this is an err',
-            'out': 'this is some text',
-            'time': 0.5,
-            'environment': 'some env stuff',
-            'subtests': {
-                'a': 'pass',
-                'b': 'fail',
-            },
-            'result': 'crash',
-            'exception': 'an exception',
-            'dmesg': 'this is dmesg',
-        }
+        test = results.TestResult()
+        test.returncode = 100
+        test.err = 'this is an err'
+        test.out = 'this is some text'
+        test.time.start = 0.3
+        test.time.end = 0.5
+        test.environment = 'some env stuff'
+        test.subtests.update({
+            'a': 'pass',
+            'b': 'fail'})
+        test.result = 'crash'
+        test.exception = 'an exception'
+        test.dmesg = 'this is dmesg'
 
-        test = results.TestResult.from_dict(cls.dict)
-
+        cls.test = test
         cls.json = test.to_json()
+
+        # the TimeAttribute needs to be dict-ified as well. There isn't really
+        # a good way to do this that doesn't introduce a lot of complexity,
+        # such as:
+        # json.loads(json.dumps(test, default=piglit_encoder),
+        #            object_hook=piglit_decoder)
+        cls.json['time'] = cls.json['time'].to_json()
 
     def test_returncode(self):
         """results.TestResult.to_json: sets the returncode correctly"""
-        nt.eq_(self.dict['returncode'], self.json['returncode'])
+        nt.eq_(self.test.returncode, self.json['returncode'])
 
     def test_err(self):
         """results.TestResult.to_json: sets the err correctly"""
-        nt.eq_(self.dict['err'], self.json['err'])
+        nt.eq_(self.test.err, self.json['err'])
 
     def test_out(self):
         """results.TestResult.to_json: sets the out correctly"""
-        nt.eq_(self.dict['out'], self.json['out'])
+        nt.eq_(self.test.out, self.json['out'])
 
     def test_exception(self):
         """results.TestResult.to_json: sets the exception correctly"""
-        nt.eq_(self.dict['exception'], self.json['exception'])
+        nt.eq_(self.test.exception, self.json['exception'])
 
     def test_time(self):
         """results.TestResult.to_json: sets the time correctly"""
-        nt.eq_(self.dict['time'], self.json['time'])
+        # pylint: disable=unsubscriptable-object
+        nt.eq_(self.test.time.start, self.json['time']['start'])
+        nt.eq_(self.test.time.end, self.json['time']['end'])
 
     def test_environment(self):
         """results.TestResult.to_json: sets the environment correctly"""
-        nt.eq_(self.dict['environment'], self.json['environment'])
+        nt.eq_(self.test.environment, self.json['environment'])
 
     def test_subtests(self):
         """results.TestResult.to_json: sets the subtests correctly"""
-        nt.eq_(self.dict['subtests'], self.json['subtests'])
+        nt.eq_(self.test.subtests, self.json['subtests'])
 
     def test_type(self):
         """results.TestResult.to_json: adds the __type__ hint"""
@@ -245,7 +252,7 @@ class TestTestResult_to_json(object):
 
     def test_dmesg(self):
         """results.TestResult.to_json: Adds the dmesg attribute"""
-        nt.eq_(self.json['dmesg'], 'this is dmesg')
+        nt.eq_(self.test.dmesg, self.json['dmesg'])
 
 
 class TestTestResult_from_dict(object):
@@ -256,7 +263,10 @@ class TestTestResult_from_dict(object):
             'returncode': 100,
             'err': 'this is an err',
             'out': 'this is some text',
-            'time': 0.5,
+            'time': {
+                'start': 0.5,
+                'end': 0.9,
+            },
             'environment': 'some env stuff',
             'subtests': {
                 'a': 'pass',
@@ -282,8 +292,19 @@ class TestTestResult_from_dict(object):
         nt.eq_(self.test.out, self.dict['out'])
 
     def test_time(self):
-        """results.TestResult.from_dict: sets time properly"""
-        nt.eq_(self.test.time, self.dict['time'])
+        """results.TestResult.from_dict: sets time properly
+
+        Ultimatley time needs to be converted to a TimeAttribute object, not a
+        dictionary, however, that functionality is handled by
+        backends.json.piglit_decoder, not by the from_dict method of
+        TestResult. So in this case the test is that the object is a
+        dictionary, not a TimeAttribute because this method shouldn't make the
+        coversion.
+
+        """
+        # pylint: disable=unsubscriptable-object
+        nt.eq_(self.test.time['start'], self.dict['time']['start'])
+        nt.eq_(self.test.time['end'], self.dict['time']['end'])
 
     def test_environment(self):
         """results.TestResult.from_dict: sets environment properly"""
