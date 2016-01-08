@@ -277,7 +277,27 @@ The summary shows the 'status' of a test:
 There are also dmesg-* statuses. These have the same meaning as above, but are
 triggered by dmesg related messages.
 
-3.1 Note
+3.1 Environment Variables
+-------------------------
+
+There are a number of environment variables that control the way piglit
+behaves.
+
+ PIGLIT_COMPRESSION    
+      Overrides the compression method used. The same values that piglit.conf
+      allows for core:compression.
+
+ PIGLIT_PLATFORM
+      Overrides the platform run on. These allow the same values as ``piglit
+      run -p``. This values is honored by the tests themselves, and can be used
+      when running a single test.
+
+ PIGLIT_FORCE_GLSLPARSER_DESKTOP
+      Force glslparser tests to be run with the desktop (non-gles) version of
+      glslparsertest. This can be used to test ES<x>_COMPATABILITY extensions
+      for OpenGL
+
+3.2 Note
 --------
 
 The way 'piglit run' and 'piglit summary' count tests are different, 'piglit
