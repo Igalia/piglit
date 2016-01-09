@@ -222,6 +222,45 @@ num_dimensions(const GLenum target)
 }
 
 static bool
+is_supported_renderbuffer(const GLenum target, const GLenum internalformat)
+{
+        GLuint rb;
+        bool result = true;
+
+        glGenRenderbuffers(1, &rb);
+        glBindRenderbuffer(GL_RENDERBUFFER, rb);
+        glRenderbufferStorage(GL_RENDERBUFFER, internalformat, 16, 16);
+
+        if (!piglit_check_gl_error(GL_NO_ERROR))
+                result = false;
+
+        glDeleteRenderbuffers(1, &rb);
+        return result;
+}
+
+static bool
+is_resource_supported(const test_data *data, const GLenum target,
+                      const GLenum internalformat)
+{
+        GLuint tex;
+        GLuint buffer;
+
+        if (!test_data_check_supported(data, target, internalformat))
+                return false;
+
+        if (target == GL_RENDERBUFFER)
+                return is_supported_renderbuffer(target, internalformat);
+
+        if (!create_texture(target, internalformat, &tex, &buffer))
+                return false;
+
+        glDeleteTextures(1, &tex);
+        glDeleteBuffers(1, &buffer);
+
+        return true;
+}
+
+static bool
 try(const GLenum *targets, unsigned num_targets,
     const GLenum *internalformats, unsigned num_internalformats,
     const GLenum pname,
@@ -238,8 +277,8 @@ try(const GLenum *targets, unsigned num_targets,
                         bool value_test = true;
                         bool supported;
 
-                        supported = test_data_check_supported(data, targets[i],
-                                                              internalformats[j]);
+                        supported = is_resource_supported(data, targets[i],
+                                                          internalformats[j]);
 
                         test_data_execute(data, targets[i], internalformats[j],
                                           pname);
@@ -408,8 +447,8 @@ try_max_layers(const GLenum *targets, unsigned num_targets,
                         bool value_test = true;
                         bool supported;
 
-                        supported = test_data_check_supported(data, targets[i],
-                                                              internalformats[j]);
+                        supported = is_resource_supported(data, targets[i],
+                                                          internalformats[j]);
 
                         test_data_execute(data, targets[i], internalformats[j],
                                           GL_MAX_LAYERS);
@@ -572,8 +611,8 @@ try_max_combined_dimensions(const GLenum *targets, unsigned num_targets,
                         bool value_test = true;
                         bool supported;
 
-                        supported = test_data_check_supported(data, targets[i],
-                                                              internalformats[j]);
+                        supported = is_resource_supported(data, targets[i],
+                                                          internalformats[j]);
 
                         test_data_execute(data, targets[i], internalformats[j],
                                           GL_MAX_COMBINED_DIMENSIONS);
