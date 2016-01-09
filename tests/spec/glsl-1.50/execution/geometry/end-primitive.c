@@ -105,7 +105,9 @@ static const char *spiral_text =
 	"  if (vertex_id % 2 == 1) r += 1.0;\n"
 	"  float max_r = b*sqrt(a*float(num_vertices)) + 1.0;\n"
 	"  r /= max_r;\n"
-	"  return r*vec2(cos(theta), sin(theta));\n"
+	"  vec2 tmp = r*vec2(cos(theta), sin(theta));\n"
+	"  // ensure reasonably aligned vertices\n"
+	"  return floor(tmp * 2048.0f) / 2048.0f;\n"
 	"}\n";
 
 /**
