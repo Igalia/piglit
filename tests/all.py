@@ -2377,6 +2377,13 @@ with profile.group_manager(
       'multiple layout qualifiers')
     g(['arb_shading_language_420pack-binding-layout'], 'binding layout')
 
+# Group ARB_enhanced_layouts
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_enhanced_layouts')) as g:
+    g(['arb_enhanced_layouts-explicit-offset-bufferstorage'],
+       'explicit-offset-bufferstorage')
+
 # Group ARB_explicit_attrib_location
 with profile.group_manager(
         PiglitGLTest,
