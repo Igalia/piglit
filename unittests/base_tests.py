@@ -30,6 +30,7 @@ try:
 except ImportError:
     import mock
 
+import six
 import nose.tools as nt
 from nose.plugins.attrib import attr
 import six
@@ -48,6 +49,7 @@ from framework.test.base import (
     WindowResizeMixin,
 )
 from framework.options import _Options as Options
+from framework import log, dmesg
 
 # pylint: disable=invalid-name
 
@@ -394,3 +396,44 @@ def test_interpret_result_greater_zero():
     test.interpret_result()
 
     nt.eq_(test.result.result, 'fail')
+
+
+class TestExecuteTraceback(object):
+    """Test.execute tests for Traceback handling."""
+    @classmethod
+    @utils.capture_stderr  # The exception will be printed
+    def setup_class(cls):
+        test = TestTest(['foo'])
+        test.run = mock.Mock(side_effect=utils.SentinalException)
+
+        test.execute(mock.Mock(spec=six.text_type),
+                     mock.Mock(spec=log.BaseLog),
+                     mock.Mock(spec=dmesg.BaseDmesg))
+
+        cls.test = test.result
+
+    def test_result(self):
+        """Test.execute (exception): Sets the result to fail"""
+        nt.eq_(self.test.result, 'fail')
+
+    def test_traceback(self):
+        """Test.execute (exception): Sets the traceback
+
+        It's fragile to record the actual traceback, and it's unlikely
+        that it can easily be implemented differently than the way the original
+        code is implimented, so this doesn't do that, it just verifies there is
+        a value.
+
+        """
+        nt.assert_not_equal(self.test.traceback, str)
+        nt.assert_is_instance(self.test.traceback, six.string_types)
+
+    def test_exception(self):
+        """Test.execute (exception): Sets the exception
+
+        This is much like the traceback, it's difficult to get the correct
+        value, so just make sure it's being set
+
+        """
+        nt.assert_not_equal(self.test.exception, str)
+        nt.assert_is_instance(self.test.exception, six.string_types)

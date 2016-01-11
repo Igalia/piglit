@@ -121,6 +121,7 @@ class TestTestResultFromDictAttributes(object):
             'environment': 'environment variables',
             'result': 'pass',
             'dmesg': 'this is some dmesg',
+            'exception': 'this is an exception',
         }
 
         cls.test = results.TestResult.from_dict(dict_)
@@ -156,6 +157,10 @@ class TestTestResultFromDictAttributes(object):
     def test_dmesg(self):
         """dmesgs.TestResult.from_dict: sets dmesg correctly"""
         nt.eq_(self.test.dmesg, 'this is some dmesg')
+
+    def test_exception(self):
+        """dmesgs.TestResult.from_dict: sets exception correctly"""
+        nt.eq_(self.test.exception, 'this is an exception')
 
 
 def test_TestResult_result_getter():

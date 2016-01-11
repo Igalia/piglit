@@ -118,6 +118,11 @@ class UtilsError(Exception):
     pass
 
 
+class SentinalException(Exception):
+    """An exception to be used as a sentinal."""
+    pass
+
+
 class StaticDirectory(object):
     """ Helper class providing shared files creation and cleanup
 
