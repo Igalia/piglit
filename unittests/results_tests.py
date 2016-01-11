@@ -122,6 +122,7 @@ class TestTestResultFromDictAttributes(object):
             'result': 'pass',
             'dmesg': 'this is some dmesg',
             'exception': 'this is an exception',
+            'traceback': 'a traceback',
         }
 
         cls.test = results.TestResult.from_dict(dict_)
@@ -161,6 +162,10 @@ class TestTestResultFromDictAttributes(object):
     def test_exception(self):
         """dmesgs.TestResult.from_dict: sets exception correctly"""
         nt.eq_(self.test.exception, 'this is an exception')
+
+    def test_traceback(self):
+        """dmesgs.TestResult.from_dict: sets traceback correctly"""
+        nt.eq_(self.test.traceback, 'a traceback')
 
 
 def test_TestResult_result_getter():
@@ -211,6 +216,7 @@ class TestTestResult_to_json(object):
         test.exception = 'an exception'
         test.dmesg = 'this is dmesg'
         test.pid = 1934
+        test.traceback = 'a traceback'
 
         cls.test = test
         cls.json = test.to_json()
@@ -263,6 +269,10 @@ class TestTestResult_to_json(object):
     def test_pid(self):
         """results.TestResult.to_json: Adds the pid attribute"""
         nt.eq_(self.test.pid, self.json['pid'])
+
+    def test_traceback(self):
+        """results.TestResult.to_json: Adds the traceback attribute"""
+        nt.eq_(self.test.traceback, self.json['traceback'])
 
 
 class TestTestResult_from_dict(object):
