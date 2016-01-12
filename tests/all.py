@@ -3628,6 +3628,7 @@ with profile.group_manager(
     g(['arb_internalformat_query2-color-encoding'], 'COLOR_ENCODING pname check')
     g(['arb_internalformat_query2-texture-compressed-block'], 'All TEXTURE_COMPRESSED_BLOCK_<X> pname checks')
     g(['arb_internalformat_query2-minmax'], 'minmax check for SAMPLES/NUM_SAMPLE_COUNTS')
+    g(['arb_internalformat_query2-image-texture'], 'Checks for pnames related to ARB_image_load_store that return values from Table 3.22 (OpenGL 4.2)')
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
