@@ -934,6 +934,7 @@ with profile.group_manager(
     g(['streaming-texture-leak'], run_concurrent=False)
     g(['texredefine'], run_concurrent=False)
     g(['texsubimage'], run_concurrent=False)
+    g(['texsubimage-unpack'])
     g(['texsubimage-depth-formats'], run_concurrent=False)
     g(['texture-al'], run_concurrent=False)
     g(['triangle-guardband-viewport'])
@@ -2302,6 +2303,7 @@ with profile.group_manager(
     g(['texsubimage', 'pbo'])
     g(['texsubimage', 'array', 'pbo'])
     g(['texsubimage', 'cube_map_array', 'pbo'])
+    g(['texsubimage-unpack', 'pbo'])
 
 # Group ARB_provoking_vertex
 with profile.group_manager(
