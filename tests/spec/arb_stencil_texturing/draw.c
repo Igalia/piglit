@@ -52,7 +52,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 20;
+	config.supports_gl_compat_version = 30;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 	config.window_width = 256 * 2 + 3;
 	config.window_height = 256 * 2 + 3;
@@ -271,7 +271,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_ARB_stencil_texturing");
-	piglit_require_GLSL_version(130); /* for usampler2D */
 
 	setup_textures();
 	setup_shaders();
