@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 VMware, Inc.
+ * Copyright (c) 2015 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -26,6 +27,9 @@
  * Tests GL_ARB_texture_storage
  * Note: only the glTexStorage2D() function is tested with actual rendering.
  * Brian Paul
+ *
+ * Additional author(s):
+ *    Nicolai Hähnle <nicolai.haehnle@amd.com>
  */
 
 #include "piglit-util-gl.h"
@@ -547,6 +551,84 @@ test_immutablity(GLenum target)
 	return pass;
 }
 
+/*
+ * According to the ARB_texture_storage specification, issue #22, it is
+ * possible to use GenerateMipmap with an incomplete mipmap pyramid. Since the
+ * texture is immutable, no new levels are generated.
+ */
+static bool
+test_generate_mipmap()
+{
+	static float level_1_image[2*2*4] = {
+		1.0, 0.0, 0.0, 1.0,
+		0.0, 1.0, 0.0, 1.0,
+		0.0, 0.0, 1.0, 1.0,
+		1.0, 1.0, 0.0, 1.0
+	};
+
+	float level_0_image[4*4*4];
+	float *ptr;
+	GLuint tex;
+	GLint level;
+	int x, y;
+	bool pass = true;
+
+	ptr = level_0_image;
+	for (y = 0; y < 4; ++y) {
+		for (x = 0; x < 4; ++x, ptr += 4) {
+			float *src = &level_1_image[4 * (x / 2 + 2 * (y / 2))];
+			ptr[0] = src[0];
+			ptr[1] = src[1];
+			ptr[2] = src[2];
+			ptr[3] = src[3];
+		}
+	}
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glTexStorage2D(GL_TEXTURE_2D, 2, GL_RGBA8, 4, 4);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 4, 4, GL_RGBA,
+			GL_FLOAT, level_0_image);
+	glGenerateMipmapEXT(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glEnable(GL_TEXTURE_2D);
+
+	for (level = 0; level <= 1 && pass; ++level) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level);
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		piglit_draw_rect_tex(-1.0, -1.0, 2.0, 2.0,
+				     0.0, 0.0, 1.0, 1.0);
+
+		ptr = level_1_image;
+		for (y = 0; y < 2 && pass; ++y) {
+			for (x = 0; x < 2 && pass; ++x, ptr += 4) {
+				int px = (piglit_width / 4) * (1 + 2 * x);
+				int py = (piglit_height / 4) * (1 + 2 * y);
+				if (!piglit_probe_pixel_rgba(px, py, ptr)) {
+					printf("%s: wrong color for mipmap "
+					       "level %d\n", TestName, level);
+					pass = false;
+				}
+			}
+		}
+
+		piglit_present_results();
+	}
+
+	glDisable(GL_TEXTURE_2D);
+
+	glDeleteTextures(1, &tex);
+	return pass;
+}
+
 #define X(f, n)								\
 	do {								\
 		const bool subtest_pass = (f);				\
@@ -583,6 +665,12 @@ piglit_display(void)
 	else
 		piglit_report_subtest_result(PIGLIT_SKIP,
 					     "cube array texture");
+
+	if (piglit_is_extension_supported("GL_EXT_framebuffer_object"))
+		X(test_generate_mipmap(), "generate mipmap");
+	else
+		piglit_report_subtest_result(PIGLIT_SKIP,
+					     "generate mipmap");
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
