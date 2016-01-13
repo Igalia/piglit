@@ -27,6 +27,8 @@ from __future__ import (
 import os
 import re
 
+import six
+
 from framework import exceptions
 from .base import TestIsSkip
 from .opengl import FastSkipMixin
@@ -48,7 +50,10 @@ _FORCE_DESKTOP_VERSION = os.environ.get('PIGLIT_FORCE_GLSLPARSER_DESKTOP', False
 
 def _is_gles_version(version):
     """Return True if version is es, otherwsie false."""
-    if isinstance(version, basestring):
+    assert not isinstance(version, six.binary_type), \
+        '{}({})'.format(version, type(version))
+
+    if isinstance(version, six.text_type):
         # GLES 3+ versions should have "es" appended, even though
         # glslparsertest doesn't require them. If the version ends in "es" then
         # it is a GLES test for sure.
@@ -92,13 +97,19 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
 
         # Parse the config file and get the config section, then write this
         # section to a StringIO and pass that to ConfigParser
-        with open(filepath, 'r') as testfile:
-            try:
+        try:
+            with open(filepath, 'r') as testfile:
+                # Python 2 returns a bytes instance, but python 3 returns str
+                # (unicode) instance.
+                if six.PY2:
+                    testfile = testfile.read().decode('utf-8')
+                elif six.PY3:
+                    testfile = testfile.read()
                 config = self.__parser(testfile, filepath)
-                command = self.__get_command(config, filepath)
-            except GLSLParserInternalError as e:
-                raise exceptions.PiglitFatalError(
-                    'In file "{}":\n{}'.format(filepath, str(e)))
+            command = self.__get_command(config, filepath)
+        except GLSLParserInternalError as e:
+            raise exceptions.PiglitFatalError(
+                'In file "{}":\n{}'.format(filepath, six.text_type(e)))
 
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
 
@@ -200,7 +211,7 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         # This allows us to run the loop until we find the header, stop and
         # then run again looking for the config sections.
         # This reduces the need for if statements substantially
-        lines = (l.strip() for l in testfile)
+        lines = (l.strip() for l in testfile.split('\n'))
 
         is_header = re.compile(r'(//|/\*|\*)\s*\[config\]')
         for line in lines:

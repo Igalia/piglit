@@ -61,10 +61,13 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         # an exception. The second looks for the GL version or raises an
         # exception
         with open(filename, 'r') as shader_file:
+            # The mock in python 3.3 doesn't support readlines(), so use
+            # read().split() as a workaround
             if six.PY3:
-                lines = (l for l in shader_file.readlines())
+                lines = (l for l in shader_file.read().split('\n'))
             elif six.PY2:
-                lines = (l.decode('utf-8') for l in shader_file.readlines())
+                lines = (l.decode('utf-8') for l in
+                         shader_file.read().split(b'\n'))
 
             # Find the config section
             for line in lines:
@@ -72,7 +75,7 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
                 # soon as we do then we can move on to geting the
                 # configuration. The first line needs to be parsed by the next
                 # block.
-                if line.lstrip().startswith('[require]'):
+                if line.startswith('[require]'):
                     break
             else:
                 raise exceptions.PiglitFatalError(

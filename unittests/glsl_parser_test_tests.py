@@ -417,7 +417,7 @@ def test_set_glsl_version():
                                '_GLSLParserTest__get_command',
                                return_value=['foo']):
             with mock.patch('framework.test.glsl_parser_test.open',
-                            mock.mock_open()):
+                            mock.mock_open(), create=True):
                 with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
                     test = glsl.GLSLParserTest('foo')
@@ -433,7 +433,7 @@ def test_set_glsl_es_version():
                                '_GLSLParserTest__get_command',
                                return_value=['foo']):
             with mock.patch('framework.test.glsl_parser_test.open',
-                            mock.mock_open()):
+                            mock.mock_open(), create=True):
                 with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
                     test = glsl.GLSLParserTest('foo')
@@ -449,7 +449,7 @@ def test_set_gl_required():
                                '_GLSLParserTest__get_command',
                                return_value=['foo']):
             with mock.patch('framework.test.glsl_parser_test.open',
-                            mock.mock_open()):
+                            mock.mock_open(), create=True):
                 with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
                     test = glsl.GLSLParserTest('foo')
