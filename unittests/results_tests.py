@@ -397,17 +397,17 @@ class TestStringDescriptor(object):
         self.test.val = 'foo'
         self.test.val = 1
 
-    def test_set_unicode(self):
-        """results.StringDescriptor.__set__: unicode is stored directly"""
-        inst = u'foo'
+    def test_set_str(self):
+        """results.StringDescriptor.__set__: str is stored directly"""
+        inst = 'foo'
         self.test.val = inst
         nt.eq_(self.test.val, inst)
 
-    def test_set_str(self):
-        """results.StringDescriptor.__set__: converts strs to unicode"""
-        inst = 'foo'
+    def test_set_bytes(self):
+        """results.StringDescriptor.__set__: converts bytes to str"""
+        inst = b'foo'
         self.test.val = inst
-        nt.eq_(self.test.val, unicode(inst))
+        nt.eq_(self.test.val, 'foo')
 
     @utils.no_error
     def test_set_str_unicode_literals(self):
