@@ -31,6 +31,7 @@ from __future__ import (
 import itertools
 
 import nose.tools as nt
+import six
 
 import framework.status as status
 from . import utils
@@ -234,8 +235,7 @@ def test_nochangestatus_magic():
     # generator equality tests
     for comp, type_ in [(obj, 'status.NoChangeStatus'),
                         (stat, 'status.Status'),
-                        (u'Test', 'unicode'),
-                        ('Test', 'str')]:
+                        ('Test', 'unicode')]:
         check_operator_equal.description = (
             'Status.NoChangeStatus: Operator eq works with type: {}'.format(type_)
         )
@@ -254,8 +254,7 @@ def test_status_magic():
     comparitor = status.Status('bar', 10, (0, 0))
 
     for func, name, result in [
-            (str, 'str', 'foo'),
-            (unicode, 'unicode', u'foo'),
+            (six.text_type, 'unicode', 'foo'),
             (repr, 'repr', 'foo'),
             (int, 'int', 0)]:
         check_operator.description = \
