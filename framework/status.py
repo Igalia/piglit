@@ -227,6 +227,9 @@ class NoChangeStatus(Status):
             return six.text_type(self) != six.text_type(other)
         raise TypeError("Cannot compare type: {}".format(type(other)))
 
+    def __hash__(self):
+        return hash(self.name)
+
 
 NOTRUN = NoChangeStatus('notrun')
 
