@@ -67,7 +67,7 @@ def piglit_encoder(obj):
 
     """
     if isinstance(obj, status.Status):
-        return str(obj)
+        return six.text_type(obj)
     elif isinstance(obj, set):
         return list(obj)
     elif hasattr(obj, 'to_json'):
