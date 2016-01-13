@@ -154,8 +154,8 @@ def collect_system_info():
 
     for name, command in progs:
         try:
-            result[name] = subprocess.check_output(command,
-                                                   stderr=subprocess.STDOUT)
+            out = subprocess.check_output(command, stderr=subprocess.STDOUT)
+            result[name] = out.decode('utf-8')
         except OSError as e:
             # If we get the 'no file or directory' error then pass, that means
             # that the binary isn't installed or isn't relavent to the system.
