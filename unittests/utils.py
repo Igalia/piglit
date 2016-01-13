@@ -58,6 +58,9 @@ __all__ = [
 
 core.get_config()
 
+_WRITE_MODE = 'w'
+_READ_MODE = 'r'
+
 
 class _Tree(dict):
     """Private helper to make JSON_DATA easier to work with."""
@@ -246,7 +249,7 @@ def resultfile():
     data['tests']['sometest'] = results.TestResult('pass')
     data['tests']['sometest'].time = 1.2
     data = results.TestrunResult.from_dict(data)
-    with tempfile_.NamedTemporaryFile(delete=False) as f:
+    with tempfile_.NamedTemporaryFile(mode=_WRITE_MODE, delete=False) as f:
         json.dump(data, f, default=backends.json.piglit_encoder)
 
     yield f
@@ -268,7 +271,7 @@ def tempfile(contents):
 
     """
     # Do not delete the tempfile as soon as it is closed
-    temp = tempfile_.NamedTemporaryFile(delete=False)
+    temp = tempfile_.NamedTemporaryFile(mode=_WRITE_MODE, delete=False)
     temp.write(contents)
     temp.close()
 
