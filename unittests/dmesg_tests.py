@@ -37,6 +37,7 @@ except ImportError:
     import mock
 
 import nose.tools as nt
+import six
 
 from . import utils
 from framework import dmesg, status, results, exceptions
@@ -223,7 +224,7 @@ def test_linuxdmesg_gzip_errors():
 def test_linuxdmesg_timestamp():
     """dmesg.LinuxDmesg: If timestamps are not detected raise"""
     with mock.patch('framework.dmesg.subprocess.check_output',
-                    mock.Mock(return_value='foo\nbar\n')):
+                    mock.Mock(return_value=b'foo\nbar\n')):
         with warnings.catch_warnings():
             warnings.simplefilter('error')
             dmesg.LinuxDmesg()
@@ -244,11 +245,11 @@ def test_linuxdmesg_update_dmesg_update():
     result = results.TestResult('pass')
 
     with mock.patch('framework.dmesg.subprocess.check_output',
-                    mock.Mock(return_value='[1.0]this')):
+                    mock.Mock(return_value=b'[1.0]this')):
         dmesg_ = dmesg.LinuxDmesg()
 
     with mock.patch('framework.dmesg.subprocess.check_output',
-                    mock.Mock(return_value='[1.0]this\n[2.0]is\n[3.0]dmesg\n')):
+                    mock.Mock(return_value=b'[1.0]this\n[2.0]is\n[3.0]dmesg\n')):
         dmesg_.update_result(result)
 
     nt.eq_(result.dmesg, '[2.0]is\n[3.0]dmesg')
@@ -260,14 +261,14 @@ def test_linuxdmesg_update_dmesg_update_no_change():
     result.dmesg = mock.sentinel.dmesg
 
     with mock.patch('framework.dmesg.subprocess.check_output',
-                    mock.Mock(return_value='[1.0]this')):
+                    mock.Mock(return_value=b'[1.0]this')):
         dmesg_ = dmesg.LinuxDmesg()
         dmesg_.update_result(result)
 
     nt.eq_(result.dmesg, mock.sentinel.dmesg)
 
 
-def test_dummydmesg_uupate_result():
+def test_dummydmesg_update_result():
     """dmesg.DummyDmesg.update_result: returns result unmodified"""
     dmesg_ = dmesg.DummyDmesg()
     result = mock.MagicMock(spec=results.TestResult())
@@ -316,11 +317,11 @@ def test_partial_wrap():
     """
     result = results.TestResult()
 
-    mock_out = mock.Mock(return_value='[1.0]This\n[2.0]is\n[3.0]dmesg')
+    mock_out = mock.Mock(return_value=b'[1.0]This\n[2.0]is\n[3.0]dmesg')
     with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
         test = dmesg.LinuxDmesg()
 
-    mock_out.return_value = '[3.0]dmesg\n[4.0]whoo!'
+    mock_out.return_value = b'[3.0]dmesg\n[4.0]whoo!'
     with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
         test.update_result(result)
 
@@ -336,11 +337,11 @@ def test_complete_wrap():
     """
     result = results.TestResult()
 
-    mock_out = mock.Mock(return_value='[1.0]This\n[2.0]is\n[3.0]dmesg')
+    mock_out = mock.Mock(return_value=b'[1.0]This\n[2.0]is\n[3.0]dmesg')
     with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
         test = dmesg.LinuxDmesg()
 
-    mock_out.return_value = '[4.0]whoo!\n[5.0]doggy'
+    mock_out.return_value = b'[4.0]whoo!\n[5.0]doggy'
     with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
         test.update_result(result)
 

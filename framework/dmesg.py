@@ -147,7 +147,7 @@ class BaseDmesg(object):
                 result.subtests[key] = replace(value)
 
             # Add the dmesg values to the result
-            result.dmesg = "\n".join(self._new_messages).decode('utf-8')
+            result.dmesg = "\n".join(self._new_messages)
 
         return result
 
@@ -204,7 +204,8 @@ class LinuxDmesg(BaseDmesg):
         self.dmesg equal to the just read contents of dmesg.
 
         """
-        dmesg = subprocess.check_output(self.DMESG_COMMAND).strip().splitlines()
+        dmesg = subprocess.check_output(self.DMESG_COMMAND).decode('utf-8')
+        dmesg = dmesg.strip().splitlines()
 
         # Find all new entries, do this by slicing the list of dmesg to only
         # returns elements after the last element stored. If there are not
