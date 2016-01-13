@@ -33,9 +33,10 @@ import functools
 
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
+import six
 
-from framework import results
 from . import utils
+from framework import results
 from framework.backends import compression, abstract
 
 # pylint: disable=line-too-long,protected-access
@@ -236,8 +237,9 @@ def test_update_piglit_conf():
 @utils.test_in_tempdir
 def test_xz_shell_override():
     """framework.backends.compression: the xz shell utility path can overwrite"""
-    # TODO: this test will not be required by python3, where the builtin lzma
-    # module replaces all of this.
+    if six.PY3:
+        raise SkipTest('Test is irrelvent on python 3')
+
     try:
         import backports.lzma  # pylint: disable=unused-variable
     except ImportError:

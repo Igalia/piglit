@@ -72,109 +72,129 @@ class UnsupportedCompressor(exceptions.PiglitInternalError):
         return u'unsupported compression method {}'.format(self.__method)
 
 
-# TODO: in python3 the bz2 module has an open function
-COMPRESSION_SUFFIXES = ['.gz', '.bz2']
 
 DEFAULT = 'bz2'
 
-COMPRESSORS = {
-    'bz2': functools.partial(bz2.BZ2File, mode='w'),
-    'gz': functools.partial(gzip.open, mode='w'),
-    'none': functools.partial(open, mode='w'),
-}
+if six.PY2:
+    COMPRESSION_SUFFIXES = ['.gz', '.bz2']
+    COMPRESSORS = {
+        'bz2': functools.partial(bz2.BZ2File, mode='w'),
+        'gz': functools.partial(gzip.open, mode='w'),
+        'none': functools.partial(open, mode='w'),
+    }
 
-DECOMPRESSORS = {
-    'bz2': functools.partial(bz2.BZ2File, mode='r'),
-    'gz': functools.partial(gzip.open, mode='r'),
-    'none': functools.partial(open, mode='r'),
-}
+    DECOMPRESSORS = {
+        'bz2': functools.partial(bz2.BZ2File, mode='r'),
+        'gz': functools.partial(gzip.open, mode='r'),
+        'none': functools.partial(open, mode='r'),
+    }
 
-# TODO: in python3 there is builtin xz support, and doesn't need this madness
-# First try to use backports.lzma, that's the easiest solution. If that fails
-# then go to trying the shell. If that fails then piglit won't have xz support,
-# and will raise an error if xz is used
-try:
-    import backports.lzma
-
-    COMPRESSORS['xz'] = functools.partial(backports.lzma.open, mode='w')
-    DECOMPRESSORS['xz'] = functools.partial(backports.lzma.open, mode='r')
-    COMPRESSION_SUFFIXES += ['.xz']
-except ImportError:
+    # First try to use backports.lzma, that's the easiest solution. If that
+    # fails then go to trying the shell. If that fails then piglit won't have
+    # xz support, and will raise an error if xz is used
     try:
-        with open(os.devnull, 'w') as d:
-            subprocess.check_call(['xz', '--help'], stdout=d, stderr=d)
-    except OSError:
-        pass
-    else:
+        import backports.lzma  # pylint: disable=wrong-import-position
 
-        @contextlib.contextmanager
-        def _compress_xz(filename):
-            """Emulates an open function in write mode for xz.
-
-            Python 2.x doesn't support xz, but it's dang useful. This
-            function calls out to the shell and tries to use xz from the
-            environment to get xz compression.
-
-            This obviously won't work without a working xz binary.
-
-            This function tries to emulate the default values of the lzma
-            module in python3 as much as possible
-
-            """
-            if filename.endswith('.xz'):
-                filename = filename[:-3]
-
-            with open(filename, 'w') as f:
-                yield f
-
-            try:
-                with open(os.devnull, 'w') as null:
-                    subprocess.check_call(
-                        ['xz', '--compress', '-9', '--force', filename],
-                        stderr=null)
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    raise exceptions.PiglitFatalError(
-                        'No xz binary available')
-                raise
-
-        @contextlib.contextmanager
-        def _decompress_xz(filename):
-            """Eumlates an option function in read mode for xz.
-
-            See the comment in _compress_xz for more information.
-
-            This function tries to emulate the lzma module as much as
-            possible
-
-            """
-            if not filename.endswith('.xz'):
-                filename = '{}.xz'.format(filename)
-
-            try:
-                with open(os.devnull, 'w') as null:
-                    string = subprocess.check_output(
-                        ['xz', '--decompress', '--stdout', filename],
-                        stderr=null)
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    raise exceptions.PiglitFatalError(
-                        'No xz binary available')
-                raise
-
-            # We need a file-like object, so the contents must be placed in
-            # a StringIO object.
-            io = StringIO()
-            io.write(string)
-            io.seek(0)
-
-            yield io
-
-            io.close()
-
-        COMPRESSORS['xz'] = _compress_xz
-        DECOMPRESSORS['xz'] = _decompress_xz
+        COMPRESSORS['xz'] = functools.partial(backports.lzma.open, mode='w')
+        DECOMPRESSORS['xz'] = functools.partial(backports.lzma.open, mode='r')
         COMPRESSION_SUFFIXES += ['.xz']
+    except ImportError:
+        try:
+            with open(os.devnull, 'w') as d:
+                subprocess.check_call(['xz', '--help'], stdout=d, stderr=d)
+        except OSError:
+            pass
+        else:
+
+            @contextlib.contextmanager
+            def _compress_xz(filename):
+                """Emulates an open function in write mode for xz.
+
+                Python 2.x doesn't support xz, but it's dang useful. This
+                function calls out to the shell and tries to use xz from the
+                environment to get xz compression.
+
+                This obviously won't work without a working xz binary.
+
+                This function tries to emulate the default values of the lzma
+                module in python3 as much as possible
+
+                """
+                if filename.endswith('.xz'):
+                    filename = filename[:-3]
+
+                with open(filename, 'w') as f:
+                    yield f
+
+                try:
+                    with open(os.devnull, 'w') as null:
+                        subprocess.check_call(
+                            ['xz', '--compress', '-9', '--force', filename],
+                            stderr=null)
+                except OSError as e:
+                    if e.errno == errno.ENOENT:
+                        raise exceptions.PiglitFatalError(
+                            'No xz binary available')
+                    raise
+
+            @contextlib.contextmanager
+            def _decompress_xz(filename):
+                """Eumlates an option function in read mode for xz.
+
+                See the comment in _compress_xz for more information.
+
+                This function tries to emulate the lzma module as much as
+                possible
+
+                """
+                if not filename.endswith('.xz'):
+                    filename = '{}.xz'.format(filename)
+
+                try:
+                    with open(os.devnull, 'w') as null:
+                        string = subprocess.check_output(
+                            ['xz', '--decompress', '--stdout', filename],
+                            stderr=null)
+                except OSError as e:
+                    if e.errno == errno.ENOENT:
+                        raise exceptions.PiglitFatalError(
+                            'No xz binary available')
+                    raise
+
+                # We need a file-like object, so the contents must be placed in
+                # a StringIO object.
+                io = StringIO()
+                io.write(string)
+                io.seek(0)
+
+                yield io
+
+                io.close()
+
+            COMPRESSORS['xz'] = _compress_xz
+            DECOMPRESSORS['xz'] = _decompress_xz
+            COMPRESSION_SUFFIXES += ['.xz']
+else:
+    # In the case of python 3 this all just works, no monkeying around with
+    # imports and fallbacks. just import the right modules and go
+
+    import lzma  # pylint: disable=wrong-import-position,wrong-import-order
+
+    COMPRESSION_SUFFIXES = ['.gz', '.bz2', '.xz']
+
+    COMPRESSORS = {
+        'bz2': functools.partial(bz2.open, mode='wt'),
+        'gz': functools.partial(gzip.open, mode='wt'),
+        'none': functools.partial(open, mode='w'),
+        'xz': functools.partial(lzma.open, mode='wt'),
+    }
+
+    DECOMPRESSORS = {
+        'bz2': functools.partial(bz2.open, mode='rt'),
+        'gz': functools.partial(gzip.open, mode='rt'),
+        'none': functools.partial(open, mode='r'),
+        'xz': functools.partial(lzma.open, mode='rt'),
+    }
 
 
 def get_mode():
