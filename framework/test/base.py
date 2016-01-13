@@ -133,6 +133,11 @@ def is_crash_returncode(returncode):
     """Determine whether the given process return code correspond to a
     crash.
     """
+    # In python 2 NoneType and other types can be compaired, in python3 this
+    # isn't allowed.
+    if returncode is None:
+        return False
+
     if sys.platform == 'win32':
         # On Windows:
         # - For uncaught exceptions the process terminates with the exception

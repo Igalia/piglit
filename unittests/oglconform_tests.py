@@ -154,6 +154,7 @@ def test_oglctest_interpret_result_fail():
 def test_oglctest_interpret_result_crash():
     """tests.oglconform.OGLCtest.interpret_result: status is crash if returncode is not 0"""
     test = oglconform.OGLCTest('group', 'test')
+    test.result.returncode = -1
     test.interpret_result()
 
     nt.eq_(test.result.result, 'crash')
