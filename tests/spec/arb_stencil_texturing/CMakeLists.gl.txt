@@ -8,4 +8,5 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (arb_stencil_texturing-blit_corrupts_state blit_corrupts_state.c)
 piglit_add_executable (arb_stencil_texturing-draw draw.c)

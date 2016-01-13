@@ -1829,6 +1829,13 @@ with profile.group_manager(
         grouptools.join('spec', 'ARB_stencil_texturing')) as g:
     g(['arb_stencil_texturing-draw'], 'draw')
 
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_stencil_texturing', 'glBlitFramebuffer corrupts state')) as g:
+    for t in ['1D', '2D', 'CUBE_MAP', '1D_ARRAY', '2D_ARRAY', 'CUBE_MAP_ARRAY', '2D_MULTISAMPLE', '2D_MULTISAMPLE_ARRAY', 'RECTANGLE']:
+        target = 'GL_TEXTURE_' + t
+        g(['arb_stencil_texturing-blit_corrupts_state', target], target)
+
 # Group ARB_sync
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_sync')) as g:
