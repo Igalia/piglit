@@ -10,6 +10,9 @@ hardware.
 
 """
 
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 from tests.quick import profile
 from framework.test import GLSLParserTest
 

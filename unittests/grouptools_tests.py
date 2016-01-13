@@ -20,7 +20,9 @@
 
 """Module with tests for grouptools."""
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 
 import nose.tools as nt
 

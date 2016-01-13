@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
+
 from framework import grouptools
 from framework.test import (GleanTest, PiglitGLTest)
 from tests.all import profile

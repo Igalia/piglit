@@ -20,6 +20,10 @@
 
 """Piglit integrations for dEQP GLES31 tests."""
 
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
+
 from framework.test import deqp
 
 __all__ = ['profile']

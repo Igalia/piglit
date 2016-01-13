@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Intel Corporation
+# Copyright (c) 2015-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 # generator functions up, allow for better testing coverage. Then we import the
 # public parts here, so that we have a nice interface to work with.
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 from .html_ import html, feat
 from .console_ import console

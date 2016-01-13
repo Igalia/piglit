@@ -26,7 +26,9 @@ es3conform, etc)
 
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import importlib
 import os.path as path
 

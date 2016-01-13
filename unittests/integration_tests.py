@@ -26,7 +26,9 @@ errors and to ensure that the API hasn't changed without fixing these modules
 
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import importlib
 
 from nose.plugins.skip import SkipTest

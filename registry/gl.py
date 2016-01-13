@@ -23,7 +23,9 @@
 Parse gl.xml into Python objects.
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 
 import os.path
 import re
@@ -182,7 +184,7 @@ class OrderedKeyedSet(object):
         # pair has form {key: [prev, next, key, value])}.
         self.__map = dict()
 
-        if isinstance(key, str):
+        if isinstance(key, six.text_type):
             self.__key_func = lambda elem: getattr(elem, key)
         else:
             self.__key_func = key

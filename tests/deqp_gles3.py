@@ -20,6 +20,10 @@
 
 """Piglit integrations for dEQP GLES3 tests."""
 
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
+
 import xml.etree.cElementTree as ET
 
 from framework.test import deqp

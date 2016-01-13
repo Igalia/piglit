@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2014 Intel Corporation
+# Copyright (c) 2013-2016 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -35,7 +35,9 @@ dmesg implementation for their OS.
 
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import abc
 import gzip
 import re
@@ -145,7 +147,7 @@ class BaseDmesg(object):
                 result.subtests[key] = replace(value)
 
             # Add the dmesg values to the result
-            result.dmesg = "\n".join(self._new_messages)
+            result.dmesg = "\n".join(self._new_messages).decode('utf-8')
 
         return result
 
@@ -172,9 +174,9 @@ class LinuxDmesg(BaseDmesg):
 
         # First check to see if we can find the live kernel config.
         try:
-            with gzip.open("/proc/config.gz", 'r') as f:
+            with gzip.open(b"/proc/config.gz", 'r') as f:
                 for line in f:
-                    if line.startswith("CONFIG_PRINTK_TIME=y"):
+                    if line.startswith(b"CONFIG_PRINTK_TIME=y"):
                         return
         # If there is a malformed or missing file, just ignore it and try the
         # regex match (which may not exist if dmesg ringbuffer was cleared).

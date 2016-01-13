@@ -20,7 +20,9 @@
 
 """Tests for JSON backend version updates."""
 
-from __future__ import print_function, absolute_import, division
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import os
 import copy
 import tempfile

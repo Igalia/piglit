@@ -1,4 +1,4 @@
-# Copyright (C) 2012, 2014, 2015 Intel Corporation
+# Copyright (C) 2012, 2014-2016 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,8 +23,12 @@
 
 """ This module enables running shader tests. """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import re
+
+import six
 
 from framework import exceptions
 from .opengl import FastSkipMixin
@@ -57,7 +61,10 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         # an exception. The second looks for the GL version or raises an
         # exception
         with open(filename, 'r') as shader_file:
-            lines = (l for l in shader_file.readlines())
+            if six.PY3:
+                lines = (l for l in shader_file.readlines())
+            elif six.PY2:
+                lines = (l.decode('utf-8') for l in shader_file.readlines())
 
             # Find the config section
             for line in lines:

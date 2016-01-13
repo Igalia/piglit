@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Intel Corporation
+# Copyright (c) 2015-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,9 @@ argumetns early and acting on them, or by inheriting from a parent object.
 
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import argparse
 
 from framework import core

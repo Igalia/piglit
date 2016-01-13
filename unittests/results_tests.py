@@ -20,7 +20,9 @@
 
 """ Module providing tests for the core module """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 
 import nose.tools as nt
 import six
@@ -383,20 +385,17 @@ class TestStringDescriptor(object):
         """results.StringDescriptor.__get__: returns default when unset"""
         nt.eq_(self.test.val, u'')
 
+    @nt.raises(TypeError)
     def test_set_no_replace(self):
         """results.StringDescriptor.__set__: instance is not replaced
 
-        This test might not make sense if you don't understand the difference
-        between 'is' and '==' in python. '==' is an equavalency test, while
-        'is' returns true only if the instances are the same.
-
-        What this test does is makes sure that self.test.val is not *replaced*
-        by inst, and instead the value is passed into the __set__ method.
+        This works by setting the value to a valid value (either bytes or str)
+        and then trying to set it to an invalid value (int). If the assignment
+        succeeds then the instance has been replaced, if not, it hasn't.
 
         """
-        inst = 'foo'
-        self.test.val = inst
-        nt.ok_(self.test.val is not inst)
+        self.test.val = 'foo'
+        self.test.val = 1
 
     def test_set_unicode(self):
         """results.StringDescriptor.__set__: unicode is stored directly"""

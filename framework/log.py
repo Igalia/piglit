@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Intel Corporation
+# Copyright (c) 2013-2016 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,9 @@ returning BaseLog derived instances to individual tests.
 
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import sys
 import abc
 import itertools

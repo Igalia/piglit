@@ -1,4 +1,4 @@
-# Copyright (c) 2014, 2015 Intel Corporation
+# Copyright (c) 2014-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,9 @@ posix paths they may not start with a leading '/'.
 
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 
 import six
 from six.moves import zip

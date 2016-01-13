@@ -1,4 +1,4 @@
-# Copyright 2013-2015 Intel Corporation
+# Copyright 2013-2016 Intel Corporation
 # Copyright 2013, 2014 Advanced Micro Devices
 # Copyright 2014 VMWare
 
@@ -22,7 +22,9 @@
 
 """Shared functions for summary generation."""
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import re
 import operator
 

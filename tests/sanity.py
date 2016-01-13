@@ -2,6 +2,10 @@
 # Minimal tests to check whether the installation is working
 #
 
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
+
 from framework import grouptools
 from framework.profile import TestProfile
 from framework.test import PiglitGLTest

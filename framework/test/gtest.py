@@ -1,3 +1,4 @@
+# Copyright 2016 Intel Corporation
 # Copyright 2013, 2014 Advanced Micro Devices, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,7 +23,9 @@
 # Authors: Tom Stellard <thomas.stellard@amd.com>
 #
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import re
 
 from .base import Test
