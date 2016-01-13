@@ -2480,6 +2480,7 @@ with profile.group_manager(
     g(['arb_texture_view-cubemap-view'], 'cubemap-view')
     g(['arb_texture_view-texture-immutable-levels'], 'immutable_levels')
     g(['arb_texture_view-max-level'], 'max-level')
+    g(['arb_texture_view-mipgen'], 'mipgen')
     g(['arb_texture_view-params'], 'params')
     g(['arb_texture_view-formats'], 'formats')
     g(['arb_texture_view-targets'], 'targets')
