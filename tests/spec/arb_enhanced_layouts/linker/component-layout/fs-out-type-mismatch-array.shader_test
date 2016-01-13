@@ -1,0 +1,36 @@
+// From Section 4.4.2 (Output Layout Qualifiers) of the GLSL 4.40 spec:
+//
+//   "Additionally, for fragment shader outputs, if two variables are placed
+//   within the same location, they must have the same underlying type
+//   (floating-point or integer). No component aliasing of output variables or
+//   members is allowed."
+
+[require]
+GLSL >= 1.40
+GL_ARB_enhanced_layouts
+GL_ARB_separate_shader_objects
+GL_ARB_explicit_attrib_location
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_explicit_attrib_location: require
+
+// consume X/Y components
+layout(location = 0) out ivec2 a[2];
+
+// consumes Z/W components
+layout(location = 1, component = 2) out vec2 b;
+
+void main()
+{
+  a[0] = ivec2(0);
+  a[1] = ivec2(2);
+  b = vec2(1.0);
+}
+
+[test]
+link error
