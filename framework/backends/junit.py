@@ -25,11 +25,12 @@ from __future__ import (
 )
 import os.path
 import shutil
-
 try:
     from lxml import etree
 except ImportError:
     import xml.etree.cElementTree as etree
+
+import six
 
 from framework import grouptools, results, status, exceptions
 from framework.core import PIGLIT_CONFIG
@@ -113,9 +114,10 @@ class JUnitBackend(FileBackend):
             f.write("<?xml version='1.0' encoding='utf-8'?>\n")
             # lxml has a pretty print we want to use
             if etree.__name__ == 'lxml.etree':
-                f.write(etree.tostring(root, pretty_print=True))
+                out = etree.tostring(root, pretty_print=True)
             else:
-                f.write(etree.tostring(root))
+                out = etree.tostring(root)
+            f.write(out.decode('utf-8'))
 
         shutil.rmtree(os.path.join(self._dest, 'tests'))
 
@@ -220,7 +222,7 @@ class JUnitBackend(FileBackend):
         else:
             etree.SubElement(element, 'failure', message='Incomplete run.')
 
-        f.write(etree.tostring(element))
+        f.write(six.text_type(etree.tostring(element).decode('utf-8')))
 
 
 def _load(results_file):
