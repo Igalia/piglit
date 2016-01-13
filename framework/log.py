@@ -121,7 +121,7 @@ class QuietLog(BaseLog):
         else:
             self._endcode = '\n'
 
-        self.__counter = self._test_counter.next()
+        self.__counter = next(self._test_counter)
         self._state['running'].append(self.__counter)
 
     def start(self, name):
