@@ -139,7 +139,7 @@ def check_no_output(func, args, file_=sys.stdout):
     file_.truncate()
 
     func(*args)
-    file_.seek(-1)
+    file_.seek(0, 2)
     nt.eq_(file_.tell(), 0,
            msg='file.tell() is at {}, but should be at 0'.format(file_.tell()))
 
