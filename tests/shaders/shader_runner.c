@@ -2703,6 +2703,41 @@ probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
         return true;
 }
 
+static bool
+probe_ssbo_uint(GLint ssbo_offset, const char *op, uint32_t value)
+{
+	uint32_t *p;
+	uint32_t observed;
+	enum comparison cmp;
+	bool result;
+
+	process_comparison(op, &cmp);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+	p = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_offset,
+			     sizeof(uint32_t), GL_MAP_READ_BIT);
+
+	if (!p) {
+		printf("Couldn't map ssbo to verify expected value.\n");
+		return false;
+	}
+
+	observed = *p;
+	result = compare_uint(value, observed, cmp);
+
+	if (!result) {
+		printf("SSBO %d test failed: Reference %s Observed\n",
+		       ssbo_offset, comparison_string(cmp));
+		printf("  Reference: %u\n", value);
+		printf("  Observed:  %u\n", observed);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		return false;
+	}
+
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	return true;
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -2958,6 +2993,14 @@ piglit_display(void)
 			if (!probe_atomic_counter(x, s, y)) {
 				piglit_report_result(PIGLIT_FAIL);
 			}
+		} else if (sscanf(line, "probe ssbo uint %d %s 0x%x",
+				  &x, s, &y) == 3) {
+			if (!probe_ssbo_uint(x, s, y))
+				pass = false;
+		} else if (sscanf(line, "probe ssbo uint %d %s %d",
+				  &x, s, &y) == 3) {
+			if (!probe_ssbo_uint(x, s, y))
+				pass = false;
 		} else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
 				  "( %f , %f , %f , %f )",
