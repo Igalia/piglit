@@ -152,6 +152,7 @@ piglit_init(int argc, char **argv)
 	GLuint program;
 	GLuint vao;
 	piglit_require_extension("GL_ARB_viewport_array");
+	piglit_require_extension("GL_ARB_gpu_shader5");
 
 	program = piglit_build_simple_program_multiple_shaders(
 					GL_VERTEX_SHADER, vsSource,
