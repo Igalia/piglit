@@ -208,14 +208,14 @@ Fbo::try_setup(const FboConfig &new_config)
 		if (config.num_samples == 0) {
 
 			/* Attach textures as color attachments */
-			piglit_require_extension("GL_ARB_texture_multisample");
+			piglit_require_extension("GL_ARB_texture_rectangle");
 			for (int i = 0; i < config.num_tex_attachments; i++)
 				attach_color_texture(new_config, i);
 
 		} else {
 
 			/* Attach multisample textures as color attachments */
-			piglit_require_extension("GL_ARB_texture_rectangle");
+			piglit_require_extension("GL_ARB_texture_multisample");
 			for (int i = 0; i < config.num_tex_attachments; i++)
 				attach_multisample_color_texture(new_config, i);
 		}
