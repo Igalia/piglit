@@ -18,7 +18,7 @@ struct S {
   vec4 x;
 };
 
-layout(location = 1, component = 0) uniform S s;
+layout(location = 1, component = 0) in S s;
 
 void main()
 {
