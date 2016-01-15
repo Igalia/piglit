@@ -4601,5 +4601,11 @@ with profile.group_manager(
             g(['object-namespace-pollution', operation, object_type],
               '{} with {}'.format(object_type, operation))
 
+# Group ARB_invalidate_subdata
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_invalidate_subdata')) as g:
+    g(['arb_invalidate_subdata-buffer'], 'buffer')
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
