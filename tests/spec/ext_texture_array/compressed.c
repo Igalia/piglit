@@ -126,6 +126,7 @@ static const char fs_text[] =
 	"  piglit_FragColor = piglit_texture2DArray(samp, texcoord);\n"
 	"}\n";
 
+static bool use_pbo;
 static bool test_texsubimage;
 static GLuint tex;
 static GLuint prog;
@@ -137,7 +138,7 @@ static unsigned expected_gray_levels[8][8][4]; /* x, y, z */
 static void
 print_usage_and_exit(const char *prog_name)
 {
-	printf("Usage: %s <test_mode>\n"
+	printf("Usage: %s <test_mode> [pbo]\n"
 	       "  where <test_mode> is one of the following:\n"
 	       "    teximage: test glCompressedTexImage3D\n"
 	       "    texsubimage: test glCompressedTexSubImage3D\n",
@@ -169,14 +170,29 @@ compute_expected_gray_levels(unsigned width, unsigned height, unsigned depth,
 void
 piglit_init(int argc, char **argv)
 {
+	bool have_type = false;
+	GLuint buffer;
+	unsigned i;
+
 	/* Parse args */
-	if (argc != 2)
-		print_usage_and_exit(argv[0]);
-	if (strcmp(argv[1], "teximage") == 0)
-		test_texsubimage = false;
-	else if (strcmp(argv[1], "texsubimage") == 0)
-		test_texsubimage = true;
-	else
+	for (i = 1; i < argc; ++i) {
+		if (strcmp(argv[i], "teximage") == 0) {
+			if (have_type)
+				print_usage_and_exit(argv[0]);
+			test_texsubimage = false;
+			have_type = true;
+		} else if (strcmp(argv[i], "texsubimage") == 0) {
+			if (have_type)
+				print_usage_and_exit(argv[0]);
+			test_texsubimage = true;
+			have_type = true;
+		} else if (strcmp(argv[i], "pbo") == 0) {
+			use_pbo = true;
+		} else
+			print_usage_and_exit(argv[0]);
+	}
+
+	if (!have_type)
 		print_usage_and_exit(argv[0]);
 
 	/* Make sure required GL features are present */
@@ -203,6 +219,13 @@ piglit_init(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	/* Upload the image */
+	if (use_pbo) {
+		glGenBuffers(1, &buffer);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER,
+			     sizeof(GRAYSCALE_BLOCKS), GRAYSCALE_BLOCKS, GL_STATIC_DRAW);
+	}
+
 	if (!test_texsubimage) {
 		glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, 0,
 				       COMPRESSED_FORMAT,
@@ -211,7 +234,7 @@ piglit_init(int argc, char **argv)
 				       4,
 				       0 /* border */,
 				       256 * BLOCK_BYTES,
-				       GRAYSCALE_BLOCKS);
+				       use_pbo ? NULL : GRAYSCALE_BLOCKS);
 		compute_expected_gray_levels(8, 8, 4, 0, 0, 0, 0);
 	} else {
 		unsigned xoffset, yoffset, zoffset;
@@ -227,6 +250,11 @@ piglit_init(int argc, char **argv)
 		for (xoffset = 0; xoffset < 8; xoffset += 4) {
 			for (yoffset = 0; yoffset < 8; yoffset += 4) {
 				for (zoffset = 0; zoffset < 4; zoffset += 2) {
+					GLubyte *data = (GLubyte*)&GRAYSCALE_BLOCKS[gray_level];
+
+					if (use_pbo)
+						data = (void *)(data - (GLubyte *)&GRAYSCALE_BLOCKS);
+
 					glCompressedTexSubImage3D(
 						GL_TEXTURE_2D_ARRAY, 0,
 						xoffset * BLOCK_WIDTH,
@@ -237,7 +265,7 @@ piglit_init(int argc, char **argv)
 						2,
 						COMPRESSED_FORMAT,
 						4 * 4 * 2 * BLOCK_BYTES,
-						GRAYSCALE_BLOCKS[gray_level]);
+						data);
 					compute_expected_gray_levels(
 						4, 4, 2,
 						xoffset, yoffset, zoffset,
@@ -247,6 +275,9 @@ piglit_init(int argc, char **argv)
 			}
 		}
 	}
+
+	if (use_pbo)
+		glDeleteBuffers(1, &buffer);
 
 	/* Create the shaders */
 	prog = piglit_build_simple_program(vs_text, fs_text);

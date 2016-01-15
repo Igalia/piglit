@@ -3071,6 +3071,9 @@ with profile.group_manager(
         g(['ext_texture_array-compressed', test_mode, '-fbo'],
           'compressed {0}'.format(test_mode),
           run_concurrent=False)
+        g(['ext_texture_array-compressed', test_mode, 'pbo', '-fbo'],
+          'compressed {0} pbo'.format(test_mode),
+          run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
