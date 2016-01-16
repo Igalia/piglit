@@ -985,7 +985,9 @@ test_polygon_stip(void)
 enum piglit_result
 test_error_handling(void)
 {
+	bool pass = true;
 	GLuint fbs[1];
+	GLuint tex;
 
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
@@ -996,8 +998,7 @@ test_error_handling(void)
 	glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, 32 * 32 * 4, NULL,
 						 GL_STREAM_DRAW);
 	glDrawPixels(32, 32 + 1, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-	if (glGetError() != GL_INVALID_OPERATION)
-		return PIGLIT_FAIL;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glDeleteBuffersARB(1, fbs);
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -1008,13 +1009,48 @@ test_error_handling(void)
 	glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, 32 * 32 * 4, NULL,
 						 GL_STREAM_DRAW);
 	glReadPixels(0, 0, 32, 32 + 1, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-	if (glGetError() != GL_INVALID_OPERATION)
-		return PIGLIT_FAIL;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glDeleteBuffersARB(1, fbs);
 	glBindBufferARB(GL_PIXEL_PACK_BUFFER, 0);
 
-	return PIGLIT_PASS;
+	/* test that glTexImage2D raises an error when the buffer is too small */
+	glGenBuffers(1, fbs);
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, fbs[0]);
+	glBufferData(GL_PIXEL_UNPACK_BUFFER, 4 * (32 * 32 - 1), NULL, GL_STREAM_DRAW);
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 16, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, (void*)(32 * 16 * 4));
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
+	glDeleteTextures(1, &tex);
+	glDeleteBuffers(1, fbs);
+
+	/* test that glGetTexImage raises an error when the buffer is too small */
+	glGenBuffers(1, fbs);
+	glBindBuffer(GL_PIXEL_PACK_BUFFER, fbs[0]);
+	glBufferData(GL_PIXEL_PACK_BUFFER, 4 * (32 * 32 - 1), NULL, GL_STREAM_DRAW);
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
+	glDeleteTextures(1, &tex);
+	glDeleteBuffers(1, fbs);
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 struct test_func {
