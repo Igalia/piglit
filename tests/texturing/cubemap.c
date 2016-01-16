@@ -39,7 +39,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-int max_size;
+static bool use_pbo;
+static int max_size;
 
 static GLfloat colors[][3] = {
 	{1.0, 1.0, 1.0},
@@ -52,11 +53,12 @@ static GLfloat colors[][3] = {
 };
 
 static void
-set_face_image(int level, GLenum face, int size, int color)
+set_face_image(GLenum internalformat, int level, GLenum face, int size, int color)
 {
 	GLfloat *color1 = colors[color];
 	GLfloat *color2 = colors[(color + 1) % ARRAY_SIZE(colors)];
 	GLfloat *tex;
+	GLuint buffer;
 	int x, y;
 
 	tex = malloc(size * size * 3 * sizeof(GLfloat));
@@ -79,7 +81,18 @@ set_face_image(int level, GLenum face, int size, int color)
 		}
 	}
 
-	glTexImage2D(face, level, GL_RGB, size, size, 0, GL_RGB, GL_FLOAT, tex);
+	if (use_pbo) {
+		glGenBuffers(1, &buffer);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, size * size * 3 * sizeof(GLfloat),
+			     tex, GL_STREAM_DRAW);
+	}
+
+	glTexImage2D(face, level, internalformat, size, size, 0, GL_RGB, GL_FLOAT,
+		     use_pbo ? NULL : tex);
+
+	if (use_pbo)
+		glDeleteBuffers(1, &buffer);
 
 	free(tex);
 }
@@ -119,7 +132,7 @@ test_results(int x, int y, int size, int level, int face, GLboolean mipmapped,
 }
 
 static GLboolean
-draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
+draw_at_size(GLenum internalformat, int size, int x_offset, int y_offset, GLboolean mipmapped)
 {
 	GLfloat row_y = PAD + y_offset;
 	int dim, face;
@@ -153,7 +166,7 @@ draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
 	/* Fill in faces on each level */
 	for (dim = size; dim > 0; dim /= 2) {
 		for (face = 0; face < 6; face++) {
-			set_face_image(level, cube_face_targets[face],
+			set_face_image(internalformat, level, cube_face_targets[face],
 				       dim, color);
 			color = (color + 1) % ARRAY_SIZE(colors);
 		}
@@ -212,16 +225,13 @@ draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
 	return pass;
 }
 
-
-enum piglit_result
-piglit_display(void)
+static bool
+test_format(GLenum internalformat)
 {
+	bool pass = true;
 	int dim;
-	GLboolean pass = GL_TRUE;
 	int i = 0, y_offset = 0;
 	int row_dim = 0;
-
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	/* Clear background to gray */
 	glClearColor(0.5, 0.5, 0.5, 1.0);
@@ -232,7 +242,7 @@ piglit_display(void)
 	 */
 	y_offset = 0;
 	for (dim = max_size; dim > 0; dim /= 2) {
-		pass = draw_at_size(dim, 0, y_offset, GL_FALSE) && pass;
+		pass = draw_at_size(internalformat, dim, 0, y_offset, GL_FALSE) && pass;
 		y_offset += dim + PAD;
 	}
 
@@ -245,13 +255,31 @@ piglit_display(void)
 
 		row_dim = (row_dim < dim) ? dim : row_dim;
 
-		pass &= draw_at_size(dim, x_offset, y_offset, GL_TRUE);
+		pass &= draw_at_size(internalformat, dim, x_offset, y_offset, GL_TRUE);
 		if (i % 2 == 0) {
 			y_offset += row_dim * 2 + (ffs(dim) + 3) * PAD;
 			row_dim = 0;
 		}
 		i++;
 	}
+
+	return pass;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	static const GLenum internalformats[] = {
+		GL_RGB,
+		GL_RGBA,
+	};
+	GLboolean pass = GL_TRUE;
+	unsigned i;
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	for (i = 0; i < ARRAY_SIZE(internalformats); ++i)
+		pass = test_format(internalformats[i]) && pass;
 
 	piglit_present_results();
 
@@ -271,7 +299,9 @@ piglit_init(int argc, char **argv)
 		if (strcmp(argv[i], "npot") == 0) {
 			piglit_require_extension("GL_ARB_texture_non_power_of_two");
 			max_size = 50;
-			break;
+		} else if (strcmp(argv[i], "pbo") == 0) {
+			piglit_require_extension("GL_ARB_pixel_buffer_object");
+			use_pbo = true;
 		}
 	}
 }

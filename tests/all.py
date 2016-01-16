@@ -2293,6 +2293,8 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_pixel_buffer_object')) as g:
+    g(['cubemap', 'pbo'])
+    g(['cubemap', 'npot', 'pbo'])
     g(['fbo-pbo-readpixels-small'], run_concurrent=False)
     g(['pbo-drawpixels'], run_concurrent=False)
     g(['pbo-read-argb8888'], run_concurrent=False)
