@@ -2519,6 +2519,7 @@ with profile.group_manager(
     g(['arb_texture_view-getteximage-srgb'], 'getteximage-srgb')
     g(['arb_texture_view-texsubimage-levels'], 'texsubimage-levels')
     g(['arb_texture_view-texsubimage-layers'], 'texsubimage-layers')
+    g(['arb_texture_view-texsubimage-layers', 'pbo'], 'texsubimage-layers pbo')
     g(['arb_texture_view-clear-into-view-2d'], 'clear-into-view-2d')
     g(['arb_texture_view-clear-into-view-2d-array'],
       'clear-into-view-2d-array')

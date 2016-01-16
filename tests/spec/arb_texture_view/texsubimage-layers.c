@@ -54,16 +54,30 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint tex, view;
+	GLuint buffer;
 	int i, j;
+	bool use_pbo = false;
 	bool pass = true;
 
 	piglit_require_extension("GL_ARB_texture_view");
+
+	for (i = 1; i < argc; ++i) {
+		if (strcmp(argv[i], "pbo") == 0) {
+			piglit_require_extension("GL_ARB_pixel_buffer_object");
+			use_pbo = true;
+		}
+	}
 
 	/* build a 2d array texture; no mip levels */
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1,
 		GL_RGBA8, TEX_SIZE, TEX_SIZE, NUM_LAYERS);
+
+	if (use_pbo) {
+		glGenBuffers(1, &buffer);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer);
+	}
 
 	for (i=0; i < NUM_LAYERS; i++) {
 		GLubyte *pixels = create_solid_image(TEX_SIZE, TEX_SIZE,
@@ -72,9 +86,14 @@ piglit_init(int argc, char **argv)
 			printf("Allocation failure for layer %d\n", i);
 			piglit_report_result(PIGLIT_FAIL);
 		}
+
+		if (use_pbo) {
+			glBufferData(GL_PIXEL_UNPACK_BUFFER, TEX_SIZE * TEX_SIZE * 4,
+				     pixels, GL_STREAM_DRAW);
+		}
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
 				0, 0, i, TEX_SIZE, TEX_SIZE, 1,
-				GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+				GL_RGBA, GL_UNSIGNED_BYTE, use_pbo ? NULL : pixels);
 		free(pixels);
 	}
 
@@ -95,9 +114,14 @@ piglit_init(int argc, char **argv)
 			printf("Allocation failure for view layer %d\n", i);
 			piglit_report_result(PIGLIT_FAIL);
 		}
+
+		if (use_pbo) {
+			glBufferData(GL_PIXEL_UNPACK_BUFFER, TEX_SIZE * TEX_SIZE * 4,
+				     pixels, GL_STREAM_DRAW);
+		}
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
 				0, 0, i, TEX_SIZE, TEX_SIZE, 1,
-				GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+				GL_RGBA, GL_UNSIGNED_BYTE, use_pbo ? NULL : pixels);
 		free(pixels);
 	}
 
@@ -127,6 +151,9 @@ piglit_init(int argc, char **argv)
 						      TEX_SIZE, TEX_SIZE, 1,
 						      expected_color) && pass;
 	}
+
+	if (use_pbo)
+		glDeleteBuffers(1, &buffer);
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
