@@ -2156,6 +2156,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_shader_subroutine')) as g:
     g(['arb_shader_subroutine-minmax'])
+    g(['arb_shader_subroutine-uniformsubroutinesuiv'])
 
 with profile.group_manager(
         PiglitGLTest,

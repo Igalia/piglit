@@ -9,3 +9,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_shader_subroutine-minmax minmax.c)
+piglit_add_executable (arb_shader_subroutine-uniformsubroutinesuiv uniformsubroutinesuiv.c)
