@@ -35,6 +35,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static bool use_pbo = false;
+
 static GLuint tex[4];
 struct size {
 	int width, height;
@@ -69,6 +71,7 @@ load_texture(int formats_idx, int tex_size_idx)
 	unsigned n_pixels = w_by_2 * h_by_2;
 	unsigned buffer_size = n_pixels * formats[formats_idx].size;
 	void* texDepthData[4];
+	GLuint buffer;
 
 	for (i = 0; i < 4; i++)
 		texDepthData[i] = malloc(buffer_size);
@@ -127,18 +130,37 @@ load_texture(int formats_idx, int tex_size_idx)
 	else
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
+	if (use_pbo) {
+		glGenBuffers(1, &buffer);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer);
+	}
+
+	if (use_pbo)
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, buffer_size, texDepthData[0], GL_STATIC_DRAW);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w_by_2, h_by_2,
 			formats[formats_idx].format, formats[formats_idx].type,
-			texDepthData[0]);
+			use_pbo ? NULL : texDepthData[0]);
+
+	if (use_pbo)
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, buffer_size, texDepthData[1], GL_STATIC_DRAW);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, w_by_2, 0, w_by_2, h_by_2,
 			formats[formats_idx].format, formats[formats_idx].type,
-			texDepthData[1]);
+			use_pbo ? NULL : texDepthData[1]);
+
+	if (use_pbo)
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, buffer_size, texDepthData[2], GL_STATIC_DRAW);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, h_by_2, w_by_2, h_by_2,
 			formats[formats_idx].format, formats[formats_idx].type,
-			texDepthData[2]);
+			use_pbo ? NULL : texDepthData[2]);
+
+	if (use_pbo)
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, buffer_size, texDepthData[3], GL_STATIC_DRAW);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, w_by_2, h_by_2, w_by_2, h_by_2,
 			formats[formats_idx].format, formats[formats_idx].type,
-			texDepthData[3]);
+			use_pbo ? NULL : texDepthData[3]);
+
+	if (use_pbo)
+		glDeleteBuffers(1, &buffer);
 
 	for (i = 0; i < 4; i++)
 		free(texDepthData[i]);
@@ -147,6 +169,13 @@ load_texture(int formats_idx, int tex_size_idx)
 void
 piglit_init(int argc, char **argv)
 {
+	for (int i = 1; i < argc; ++i) {
+		if (!strcmp(argv[i], "pbo")) {
+			piglit_require_extension("GL_ARB_pixel_buffer_object");
+			use_pbo = true;
+		}
+	}
+
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 }

@@ -2303,6 +2303,7 @@ with profile.group_manager(
     g(['texsubimage', 'pbo'])
     g(['texsubimage', 'array', 'pbo'])
     g(['texsubimage', 'cube_map_array', 'pbo'])
+    g(['texsubimage-depth-formats', 'pbo'])
     g(['texsubimage-unpack', 'pbo'])
 
 # Group ARB_provoking_vertex
