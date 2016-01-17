@@ -1108,6 +1108,7 @@ with profile.group_manager(
         grouptools.join('spec', '!opengl 2.1')) as g:
     g(['gl-2.1-minmax'], 'minmax')
     g(['gl-2.1-pbo'], 'pbo')
+    g(['gl-2.1-polygon-stipple-fs'], 'polygon-stipple-fs')
 
 with profile.group_manager(
         PiglitGLTest,
