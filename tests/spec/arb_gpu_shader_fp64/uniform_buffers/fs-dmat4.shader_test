@@ -1,0 +1,23 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+uniform ubo1 {
+	dmat4 m;
+};
+
+void main()
+{
+	gl_FragColor = m[0] + m[1] + m[2] + m[3];
+}
+
+[test]
+uniform dmat4 m 0.25 0.0 0.0 0.0   0.0 0.0 0.75 0.0   0.0 0.5 0.0 0.0   0.0 0.0 0.0 1.0
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.5 0.75 1.0
