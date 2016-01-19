@@ -179,14 +179,13 @@ class TestWflInfo_WAFFLEINFO_GL_ERROR(object):
     """Test class for WflInfo when "WFLINFO_GL_ERROR" is returned."""
     __patchers = []
 
-    def setup(self):
+    @classmethod
+    def setup_class(cls):
         """Setup each instance, patching necissary bits."""
-        self._test = opengl.WflInfo()
-        self.__patchers.append(mock.patch.dict(
+        cls._test = opengl.WflInfo()
+        cls.__patchers.append(mock.patch.dict(
             'framework.test.opengl.OPTIONS.env',
             {'PIGLIT_PLATFORM': 'foo'}))
-        self.__patchers.append(mock.patch(
-            'framework.test.opengl.WflInfo._WflInfo__shared_state', {}))
 
         rv = textwrap.dedent("""\
             Waffle platform: glx
@@ -199,16 +198,25 @@ class TestWflInfo_WAFFLEINFO_GL_ERROR(object):
             OpenGL extensions: WFLINFO_GL_ERROR
         """).encode('utf-8')
 
-        self.__patchers.append(mock.patch(
+        cls.__patchers.append(mock.patch(
             'framework.test.opengl.subprocess.check_output',
             mock.Mock(return_value=rv)))
 
-        for f in self.__patchers:
+        for f in cls.__patchers:
             f.start()
 
-    def teardown(self):
-        for p in self.__patchers:
+    @classmethod
+    def teardown_class(cls):
+        for p in cls.__patchers:
             p.stop()
+
+    def setup(self):
+        self.__state = mock.patch(
+            'framework.test.opengl.WflInfo._WflInfo__shared_state', {})
+        self.__state.start()
+
+    def teardown(self):
+        self.__state.stop()
 
     def test_gl_version(self):
         """test.opengl.WflInfo.gl_version: handles WFLINFO_GL_ERROR correctly"""
