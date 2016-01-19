@@ -201,7 +201,9 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()
 
-find_package(PythonInterp 2.7 REQUIRED)
+set(Python_ADDITIONAL_VERSIONS
+    3.5 3.4 3.3 2.7)
+find_package(PythonInterp REQUIRED)
 find_package(PythonNumpy 1.6.2 REQUIRED)
 find_package(PythonMako 0.8.0 REQUIRED)
 find_package(PythonSix 1.4.0 REQUIRED)
