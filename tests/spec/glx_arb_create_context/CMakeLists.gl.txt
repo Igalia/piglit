@@ -21,6 +21,7 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	link_libraries (
 		${X11_X11_LIB}
 	)
+	piglit_add_executable (glx-create-context-both-es-strings both-es-strings.c common.c)
 	piglit_add_executable (glx-create-context-core-profile core-profile.c common.c)
 	piglit_add_executable (glx-create-context-current-no-framebuffer current-no-framebuffer.c common.c)
 	piglit_add_executable (glx-create-context-default-major-version default-major-version.c common.c)
