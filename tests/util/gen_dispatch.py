@@ -169,7 +169,7 @@ class EnumCode(object):
         enums = []
         for enum_group in gl_registry.enum_groups:
             if enum_group.name == 'MemoryBarrierMask':
-	        if enum_group.type == 'bitmask':
+                if enum_group.type == 'bitmask':
                     for enum in enum_group.enums:
                         enums.append(enum)
         return cls.get_enums_by_name(enums)
