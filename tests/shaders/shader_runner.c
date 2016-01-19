@@ -1210,6 +1210,7 @@ struct requirement_parse_results {
 	bool found_gl;
 	bool found_glsl;
 	bool found_size;
+	bool found_depthbuffer;
 	struct component_version gl_version;
 	struct component_version glsl_version;
 	unsigned size[2];
@@ -1227,6 +1228,7 @@ parse_required_config(struct requirement_parse_results *results,
 	results->found_gl = false;
 	results->found_glsl = false;
 	results->found_size = false;
+	results->found_depthbuffer = false;
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
@@ -1274,6 +1276,8 @@ parse_required_config(struct requirement_parse_results *results,
 			} else if (string_match("SIZE", line)) {
 				results->found_size = true;
 				get_uints(line+4, results->size, 2);
+			} else if (string_match("depthbuffer", line)) {
+				results->found_depthbuffer = true;
 			}
 		}
 
@@ -1330,7 +1334,7 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
  *
  * The requirements section can't be fully processed until after the context
  * is created, but the context can't be created until after the requirements
- * section is processed.  Do a quick can over the requirements section to find
+ * section is processed.  Do a quick scan over the requirements section to find
  * the GL and GLSL version requirements.  Use these to guide context creation.
  */
 void
@@ -1356,6 +1360,10 @@ get_required_config(const char *script_name,
 			config->supports_gl_compat_version = required_gl_version.num;
 	} else {
 		config->supports_gl_compat_version = 10;
+	}
+
+	if (parse_results.found_depthbuffer) {
+		config->window_visual |= PIGLIT_GL_VISUAL_DEPTH;
 	}
 }
 
@@ -2396,6 +2404,7 @@ static const struct string_to_enum enable_table[] = {
 	{ "GL_CLIP_PLANE7", GL_CLIP_PLANE0+7 },
 	{ "GL_VERTEX_PROGRAM_TWO_SIDE", GL_VERTEX_PROGRAM_TWO_SIDE },
 	{ "GL_PROGRAM_POINT_SIZE", GL_PROGRAM_POINT_SIZE },
+	{ "GL_DEPTH_TEST", GL_DEPTH_TEST },
 	{ NULL, 0 }
 };
 
@@ -2759,6 +2768,10 @@ piglit_display(void)
 			get_floats(line + 11, c, 4);
 			glClearColor(c[0], c[1], c[2], c[3]);
 			clear_bits |= GL_COLOR_BUFFER_BIT;
+		} else if (string_match("clear depth", line)) {
+			get_floats(line + 11, c, 1);
+			glClearDepth(c[0]);
+			clear_bits |= GL_DEPTH_BUFFER_BIT;
 		} else if (string_match("clear", line)) {
 			glClear(clear_bits);
 		} else if (sscanf(line,
@@ -2931,6 +2944,12 @@ piglit_display(void)
 			get_floats(line + 10, c, 6);
 			if (!piglit_probe_pixel_rgba((int) c[0], (int) c[1],
 						    & c[2])) {
+				pass = false;
+			}
+		} else if (string_match("probe depth", line)) {
+			get_floats(line + 11, c, 3);
+			if (!piglit_probe_pixel_depth((int) c[0], (int) c[1],
+						      c[2])) {
 				pass = false;
 			}
 		} else if (sscanf(line,
