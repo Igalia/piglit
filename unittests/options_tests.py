@@ -132,7 +132,8 @@ class TestReListDescriptor(object):
         """options._ReListDescriptor.__get__: Returns new _ReList if it doesn't exists"""
         nt.eq_(self.test.notexists, self.test.test_notexists)  # pylint: disable=no-member
 
-    @mock.patch('framework.options.setattr', mock.Mock(side_effect=Exception))
+    @mock.patch('framework.options.setattr', mock.Mock(side_effect=Exception),
+                create=True)
     @nt.raises(AttributeError)
     def test_get_not_exists_fail(self):
         """options._ReListDescriptor.__get__: Raises AttributError if name doesn't exist and cant be created"""
