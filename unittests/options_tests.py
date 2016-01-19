@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Intel Corporation
+# Copyright (c) 2015-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -98,7 +98,7 @@ class TestReList(object):
 
     def test_flags(self):
         """options._ReList.__getitem__: sets flags correctly"""
-        nt.eq_(self.test[0].flags, re.IGNORECASE)
+        nt.assert_not_equal(self.test[0].flags & re.IGNORECASE, 0)
 
     def test_len(self):
         """options._ReList.len: returns expected values"""
