@@ -1,0 +1,22 @@
+[require]
+GLSL >= 1.10
+depthbuffer
+
+[vertex shader passthrough]
+
+[fragment shader]
+void main()
+{
+	if (gl_FragCoord.x < 10.0)
+		discard;
+}
+
+[test]
+clear depth 1.0
+clear
+enable GL_DEPTH_TEST
+draw rect -1 -1 2 2
+probe depth 0 0 1.0
+probe depth 9 0 1.0
+probe depth 10 0 0.5
+probe depth 11 0 0.5
