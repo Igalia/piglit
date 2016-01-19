@@ -54,8 +54,6 @@ _TEMP_DIR = os.path.join(
 _TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), '../..', 'templates')
 _TEMPLATES = TemplateLookup(
     _TEMPLATE_DIR,
-    output_encoding="utf-8",
-    encoding_errors='replace',
     module_directory=os.path.join(_TEMP_DIR, "html-summary"))
 
 
