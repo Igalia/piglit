@@ -32,6 +32,7 @@ except ImportError:
 
 import nose.tools as nt
 from nose.plugins.attrib import attr
+import six
 
 try:
     import psutil
@@ -93,10 +94,12 @@ def test_timeout_kill_children():
     This test could leave processes running if it fails.
 
     """
-    utils.module_check('subprocess32')
     utils.module_check('psutil')
-
-    import subprocess32  # pylint: disable=import-error
+    if six.PY2:
+        utils.module_check('subprocess32')
+        import subprocess32 as subprocess  # pylint: disable=import-error
+    elif six.PY3:
+        import subprocess
 
     class PopenProxy(object):
         """An object that proxies Popen, and saves the Popen instance as an
@@ -109,7 +112,7 @@ def test_timeout_kill_children():
             self.popen = None
 
         def __call__(self, *args, **kwargs):
-            self.popen = subprocess32.Popen(*args, **kwargs)
+            self.popen = subprocess.Popen(*args, **kwargs)
 
             # if commuincate cis called successfully then the proc will be
             # reset to None, whic will make the test fail.
@@ -117,7 +120,7 @@ def test_timeout_kill_children():
 
             return self.popen
 
-    with tempfile.NamedTemporaryFile() as f:
+    with tempfile.NamedTemporaryFile(mode='w+') as f:
         # Create a file that will be executed as a python script
         # Create a process with two subproccesses (not threads) that will run
         # for a long time.
@@ -148,7 +151,7 @@ def test_timeout_kill_children():
         # mock out subprocess.Popen with our proxy object
         with mock.patch('framework.test.base.subprocess') as mock_subp:
             mock_subp.Popen = proxy
-            mock_subp.TimeoutExpired = subprocess32.TimeoutExpired
+            mock_subp.TimeoutExpired = subprocess.TimeoutExpired
             test.run()
 
         # Check to see if the Popen has children, even after it should have
@@ -175,7 +178,8 @@ def test_timeout():
     if the test runs 5 seconds it's run too long
 
     """
-    utils.module_check('subprocess32')
+    if six.PY2:
+        utils.module_check('subprocess32')
     utils.binary_check('sleep', 1)
 
     test = TimeoutTest(['sleep', '60'])
@@ -187,7 +191,8 @@ def test_timeout():
 @nt.timed(6)
 def test_timeout_timeout():
     """test.base.Test: Sets status to 'timeout' when timeout exceeded"""
-    utils.module_check('subprocess32')
+    if six.PY2:
+        utils.module_check('subprocess32')
     utils.binary_check('sleep', 1)
 
     test = TimeoutTest(['sleep', '60'])
@@ -200,7 +205,8 @@ def test_timeout_timeout():
 def test_timeout_pass():
     """test.base.Test: Doesn't change status when timeout not exceeded
     """
-    utils.module_check('subprocess32')
+    if six.PY2:
+        utils.module_check('subprocess32')
     utils.binary_check('true')
 
     test = TimeoutTest(['true'])
