@@ -129,7 +129,7 @@ run_test(const struct image_test_info *test,
                 grid, stage->stage,
                 concat(test_hunk(test, k),
                        image_hunk(img, ""),
-                       hunk("IMAGE_Q uniform IMAGE_T img;\n"
+                       hunk("IMAGE_Q IMAGE_UNIFORM_T img;\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T arg) {\n"
                             "       /*\n"

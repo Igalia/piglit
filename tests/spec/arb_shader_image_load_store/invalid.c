@@ -316,7 +316,7 @@ run_test(const struct image_op_info *op,
         GLuint prog = generate_program(
                 grid, GL_FRAGMENT_SHADER,
                 concat(image_hunk(prog_img, ""),
-                       hunk("uniform IMAGE_T imgs[1];\n"
+                       hunk("IMAGE_UNIFORM_T imgs[1];\n"
                             "uniform int u;\n"
                             "uniform int off;\n"),
                        hunk(op->hunk),

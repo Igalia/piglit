@@ -128,8 +128,8 @@ run_test(const struct image_qualifier_info *qual)
                 GL_FRAGMENT_SHADER,
                 concat(qualifier_hunk(qual),
                        image_hunk(img, ""),
-                       hunk("IMAGE_Q uniform IMAGE_T src_img;\n"
-                            "IMAGE_Q uniform IMAGE_T dst_img;\n"
+                       hunk("IMAGE_Q IMAGE_UNIFORM_T src_img;\n"
+                            "IMAGE_Q IMAGE_UNIFORM_T dst_img;\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T x) {\n"
                             "        int i;\n"

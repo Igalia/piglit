@@ -142,7 +142,7 @@ run_test(const struct image_qualifier_info *qual,
                 stage_w->stage,
                 concat(qualifier_hunk(qual),
                        image_hunk(img, ""),
-                       hunk("IMAGE_Q uniform IMAGE_T img;\n"
+                       hunk("IMAGE_Q IMAGE_UNIFORM_T img;\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T x) {\n"
                             "       imageStore(img, idx, DATA_T(11, 22, 33, 44));"
@@ -158,7 +158,7 @@ run_test(const struct image_qualifier_info *qual,
                 stage_r->stage,
                 concat(qualifier_hunk(qual),
                        image_hunk(img, ""),
-                       hunk("IMAGE_Q uniform IMAGE_T img;\n"
+                       hunk("IMAGE_Q IMAGE_UNIFORM_T img;\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T x) {\n"
                             "       DATA_T v = imageLoad(img, idx);"

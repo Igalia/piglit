@@ -159,7 +159,7 @@ generate_source(const struct grid_info grid,
                  */
                 return concat(stage_hunk(grid, stage),
                               image_hunk(img, ""),
-                              hunk("uniform IMAGE_T IMGS[NUM_IMGS];\n"
+                              hunk("IMAGE_UNIFORM_T IMGS[NUM_IMGS];\n"
                                    "\n"
                                    "GRID_T op(ivec2 idx, GRID_T x) {\n"
                                    "        int i;\n"

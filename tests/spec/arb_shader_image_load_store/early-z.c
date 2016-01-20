@@ -140,7 +140,7 @@ run_test_image(const char *input_layout, GLenum depth_func,
                 grid, GL_FRAGMENT_SHADER,
                 concat(hunk(input_layout),
                        image_hunk(img, ""),
-                       hunk("uniform IMAGE_T img;\n"
+                       hunk("IMAGE_UNIFORM_T img;\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T x) {\n"
                             "        imageStore(img, IMAGE_ADDR(idx),"

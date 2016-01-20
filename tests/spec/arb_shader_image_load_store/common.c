@@ -286,8 +286,8 @@ upload_image_levels(const struct image_info img, unsigned num_levels,
                         grid, GL_FRAGMENT_SHADER,
                         concat(image_hunk(image_info_for_grid(grid), "SRC_"),
                                image_hunk(img, "DST_"),
-                               hunk("readonly uniform SRC_IMAGE_T src_img;\n"
-                                    "writeonly uniform DST_IMAGE_T dst_img;\n"
+                               hunk("readonly SRC_IMAGE_UNIFORM_T src_img;\n"
+                                    "writeonly DST_IMAGE_UNIFORM_T dst_img;\n"
                                     "\n"
                                     "GRID_T op(ivec2 idx, GRID_T x) {\n"
                                     "       imageStore(dst_img, DST_IMAGE_ADDR(idx),\n"
@@ -447,8 +447,8 @@ download_image_levels(const struct image_info img, unsigned num_levels,
                         grid, GL_FRAGMENT_SHADER,
                         concat(image_hunk(img, "SRC_"),
                                image_hunk(image_info_for_grid(grid), "DST_"),
-                               hunk("readonly uniform SRC_IMAGE_T src_img;\n"
-                                    "writeonly uniform DST_IMAGE_T dst_img;\n"
+                               hunk("readonly SRC_IMAGE_UNIFORM_T src_img;\n"
+                                    "writeonly DST_IMAGE_UNIFORM_T dst_img;\n"
                                     "\n"
                                     "GRID_T op(ivec2 idx, GRID_T x) {\n"
                                     "       imageStore(dst_img, DST_IMAGE_ADDR(idx),\n"

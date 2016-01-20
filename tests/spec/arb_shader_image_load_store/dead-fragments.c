@@ -183,7 +183,7 @@ run_test(const struct image_op_info *op,
         GLuint prog = generate_program(
                 grid, GL_FRAGMENT_SHADER,
                 concat(image_hunk(img, ""),
-                       hunk("uniform IMAGE_T img;\n"),
+                       hunk("IMAGE_UNIFORM_T img;\n"),
                        hunk(op->hunk),
                        hunk(body), NULL));
         bool ret = prog &&

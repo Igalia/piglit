@@ -322,8 +322,8 @@ run_test(const struct image_op_info *op,
         GLuint prog = generate_program(
                 grid, stage->stage,
                 concat(image_hunk(img, ""),
-                       hunk("uniform IMAGE_T img;\n"
-                            "uniform IMAGE_T arg_img;\n"
+                       hunk("IMAGE_UNIFORM_T img;\n"
+                            "IMAGE_UNIFORM_T arg_img;\n"
                             "\n"
                             "GRID_T arg(ivec2 idx) {\n"
                             "        return imageLoad(arg_img, IMAGE_ADDR(idx));\n"

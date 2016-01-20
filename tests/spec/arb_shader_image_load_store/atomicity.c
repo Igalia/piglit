@@ -128,7 +128,7 @@ run_test(uint32_t init_value, unsigned check_sz, uint32_t check_value,
         GLuint prog = generate_program(
                 grid, GL_FRAGMENT_SHADER,
                 concat(image_hunk(img, ""),
-                       hunk("volatile uniform IMAGE_T img;\n"),
+                       hunk("volatile IMAGE_UNIFORM_T img;\n"),
                        hunk(op), NULL));
         bool ret = prog &&
                 init_fb(grid) &&

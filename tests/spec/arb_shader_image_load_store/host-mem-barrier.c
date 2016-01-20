@@ -71,8 +71,8 @@ common_hunk(const struct image_info img)
                       hunk("#define RED DATA_T(1, 0, 0, 1)\n"
                            "#define GREEN DATA_T(0, 1, 0, 1)\n"
                            "\n"
-                           "uniform IMAGE_T src_img;\n"
-                           "uniform IMAGE_T dst_img;\n"
+                           "IMAGE_UNIFORM_T src_img;\n"
+                           "IMAGE_UNIFORM_T dst_img;\n"
                            "uniform int pass;\n"), NULL);
 }
 

@@ -64,7 +64,7 @@ image_hunk(const struct image_info img, const char *prefix)
                  "                      ((idx).x + W * (idx).y))\n"
                  "#define %sIMAGE_LAYOUT_Q layout(%s)\n"
                  "#define %sIMAGE_BARE_T %s%s\n"
-                 "#define %sIMAGE_T %sIMAGE_LAYOUT_Q %sIMAGE_BARE_T\n",
+                 "#define %sIMAGE_UNIFORM_T %sIMAGE_LAYOUT_Q uniform %sIMAGE_BARE_T\n",
                  prefix, image_scalar_type_name(img.format),
                  prefix, image_vector_type_name(img.format),
                  prefix, image_format_scale(img.format).x,
@@ -98,7 +98,7 @@ header_hunk(const struct grid_info grid)
                  "#define H %d\n"
                  "#define N %d\n"
                  "#define GRID_T %s\n"
-                 "#define RET_IMAGE_T layout(%s) %s2D\n",
+                 "#define RET_IMAGE_UNIFORM_T uniform layout(%s) %s2D\n",
                  grid.size.x, grid.size.y, product(grid.size),
                  image_vector_type_name(grid.format),
                  grid.format->name, image_type_name(grid.format));
@@ -227,7 +227,7 @@ generate_stage_source(const struct grid_info grid,
                         body,
                         hunk("layout (local_size_x = W) in;\n"
                              "\n"
-                             "uniform RET_IMAGE_T ret_img;\n"
+                             "RET_IMAGE_UNIFORM_T ret_img;\n"
                              "\n"
                              "void main() {\n"
                              "       ivec2 idx = ivec2(gl_GlobalInvocationID);\n"

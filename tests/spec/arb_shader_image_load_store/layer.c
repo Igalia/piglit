@@ -176,7 +176,7 @@ run_test(const struct image_target_info *target,
         GLuint prog = generate_program(
                 grid, GL_FRAGMENT_SHADER,
                 concat(image_hunk(slice_img, ""),
-                       hunk("uniform IMAGE_T img;\n"
+                       hunk("IMAGE_UNIFORM_T img;\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T x) {\n"
                             "        GRID_T v = imageLoad(img, IMAGE_ADDR(idx));\n"

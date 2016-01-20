@@ -359,7 +359,7 @@ run_test_uniform(void)
         GLuint prog = generate_program(
                 grid, GL_FRAGMENT_SHADER,
                 concat(image_hunk(image_info_for_grid(grid), ""),
-                       hunk("uniform IMAGE_T imgs[2];\n"
+                       hunk("IMAGE_UNIFORM_T imgs[2];\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T x) {\n"
                             "        imageStore(imgs[0], IMAGE_ADDR(idx), x);\n"

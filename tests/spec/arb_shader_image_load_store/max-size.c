@@ -92,8 +92,8 @@ run_test(const struct image_target_info *target,
         GLuint prog = generate_program(
                 grid, GL_FRAGMENT_SHADER,
                 concat(image_hunk(img, ""),
-                       hunk("readonly uniform IMAGE_T src_img;\n"
-                            "writeonly uniform IMAGE_T dst_img;\n"
+                       hunk("readonly IMAGE_UNIFORM_T src_img;\n"
+                            "writeonly IMAGE_UNIFORM_T dst_img;\n"
                             "\n"
                             "GRID_T op(ivec2 idx, GRID_T x) {\n"
                             "        imageStore(dst_img, IMAGE_ADDR(idx),"
