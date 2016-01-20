@@ -29,7 +29,7 @@ import datetime
 
 import six
 
-from framework import status, exceptions, grouptools
+from framework import status, exceptions, grouptools, compat
 
 __all__ = [
     'TestrunResult',
@@ -252,13 +252,14 @@ class TestResult(object):
             self.subtests.update(dict_['subtest'])
 
 
+@compat.python_2_bool_compatible
 class Totals(dict):
     def __init__(self, *args, **kwargs):
         super(Totals, self).__init__(*args, **kwargs)
         for each in status.ALL:
             self[str(each)] = 0
 
-    def __nonzero__(self):
+    def __bool__(self):
         # Since totals are prepopulated, calling 'if not <Totals instance>'
         # will always result in True, this will cause it to return True only if
         # one of the values is not zero
