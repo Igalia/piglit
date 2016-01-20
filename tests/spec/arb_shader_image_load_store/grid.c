@@ -98,7 +98,7 @@ header_hunk(const struct grid_info grid)
                  "#define H %d\n"
                  "#define N %d\n"
                  "#define GRID_T %s\n"
-                 "#define RET_IMAGE_UNIFORM_T uniform layout(%s) %s2D\n",
+                 "#define RET_IMAGE_UNIFORM_T layout(%s) uniform %s2D\n",
                  grid.size.x, grid.size.y, product(grid.size),
                  image_vector_type_name(grid.format),
                  grid.format->name, image_type_name(grid.format));
