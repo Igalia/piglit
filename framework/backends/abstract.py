@@ -32,6 +32,8 @@ import itertools
 import os
 import shutil
 
+import six
+
 from framework import options
 from . import compression
 from framework.results import TestResult
@@ -61,6 +63,7 @@ def write_compressed(filename):
         yield f
 
 
+@six.add_metaclass(abc.ABCMeta)
 class Backend(object):
     """ Abstract base class for summary backends
 
@@ -75,8 +78,6 @@ class Backend(object):
     be thread safe and not need to be locked during write)
 
     """
-    __metaclass__ = abc.ABCMeta
-
     @abc.abstractmethod
     def __init__(self, dest, metadata, **kwargs):
         """ Generic constructor

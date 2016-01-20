@@ -23,7 +23,8 @@ import abc
 import os
 import subprocess
 
-# Piglit modules
+import six
+
 from framework import core, grouptools, exceptions
 from framework.profile import TestProfile
 from framework.test.base import Test, is_crash_returncode
@@ -105,8 +106,8 @@ def iter_deqp_test_cases(case_file):
                     'deqp: {}:{}: ill-formed line'.format(case_file, i))
 
 
+@six.add_metaclass(abc.ABCMeta)
 class DEQPBaseTest(Test):
-    __metaclass__ = abc.ABCMeta
     __RESULT_MAP = {"Pass": "pass",
                     "Fail": "fail",
                     "QualityWarning": "warn",

@@ -32,12 +32,12 @@ import abc
 import itertools
 import threading
 import collections
-
 try:
     import simplejson as json
 except ImportError:
     import json
 
+import six
 from six.moves.BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 from framework.core import PIGLIT_CONFIG
@@ -46,6 +46,7 @@ from framework import grouptools
 __all__ = ['LogManager']
 
 
+@six.add_metaclass(abc.ABCMeta)
 class BaseLog(object):
     """ Abstract base class for Log objects
 
@@ -56,8 +57,6 @@ class BaseLog(object):
     state -- the state dict from LogManager
 
     """
-    __metaclass__ = abc.ABCMeta
-
     SUMMARY_KEYS = set([
         'pass', 'fail', 'warn', 'crash', 'skip', 'dmesg-warn', 'dmesg-fail',
         'dry-run', 'timeout'])

@@ -43,6 +43,8 @@ import subprocess
 import sys
 import warnings
 
+import six
+
 from framework import exceptions
 
 __all__ = [
@@ -53,6 +55,7 @@ __all__ = [
 ]
 
 
+@six.add_metaclass(abc.ABCMeta)
 class BaseDmesg(object):
     """ Abstract base class for Dmesg derived objects
 
@@ -70,8 +73,6 @@ class BaseDmesg(object):
     first, test B will be marked as having the dmesg error.
 
     """
-    __metaclass__ = abc.ABCMeta
-
     @abc.abstractmethod
     def __init__(self):
         # A list containing all messages since the last time dmesg was read.

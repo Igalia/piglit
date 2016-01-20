@@ -34,6 +34,7 @@ import copy
 import signal
 import warnings
 
+import six
 from six.moves import range
 
 try:
@@ -109,6 +110,7 @@ def is_crash_returncode(returncode):
         return returncode < 0
 
 
+@six.add_metaclass(abc.ABCMeta)
 class Test(object):
     """ Abstract base class for Test classes
 
@@ -128,7 +130,6 @@ class Test(object):
     run_concurrent -- If True the test is thread safe. Default: False
 
     """
-    __metaclass__ = abc.ABCMeta
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command']
     timeout = None
 
