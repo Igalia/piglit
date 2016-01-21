@@ -145,7 +145,7 @@ run_test(const struct image_format_info *format,
 		grid, GL_FRAGMENT_SHADER,
 		concat(hunk("#extension GL_ARB_shader_image_size : enable\n"),
 		       image_hunk(img, ""),
-		       hunk("readonly uniform IMAGE_T src_img;\n"
+		       hunk("readonly IMAGE_UNIFORM_T src_img;\n"
 			    "\n"
 			    "GRID_T op(ivec2 idx, GRID_T x) {\n"
 			    "        return ivec4(imageSize(src_img), ivec3(1));\n"
