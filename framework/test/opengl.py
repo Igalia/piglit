@@ -28,6 +28,8 @@ import os
 import subprocess
 import warnings
 
+import six
+
 from framework import exceptions, core
 from framework.options import OPTIONS
 from .base import TestIsSkip
@@ -102,7 +104,7 @@ class WflInfo(object):
                 if e.errno == errno.ENOENT:
                     raise StopWflinfo('OSError')
                 raise
-        return raw
+        return raw.decode('utf-8')
 
     @staticmethod
     def __getline(lines, name):

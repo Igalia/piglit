@@ -64,7 +64,7 @@ class TestWflInfo(object):
 
     def test_gl_extension(self):
         """test.opengl.WflInfo.gl_extensions: Provides list of gl extensions"""
-        rv = 'foo\nbar\nboink\nOpenGL extensions: GL_foobar GL_ham_sandwhich\n'
+        rv = b'foo\nbar\nboink\nOpenGL extensions: GL_foobar GL_ham_sandwhich\n'
         expected = set(['GL_foobar', 'GL_ham_sandwhich'])
 
         with mock.patch('framework.test.opengl.subprocess.check_output',
@@ -73,103 +73,103 @@ class TestWflInfo(object):
 
     def test_gl_version(self):
         """test.opengl.WflInfo.gl_version: Provides a version number"""
-        rv = (
-            'Waffle platform: gbm\n'
-            'Waffle api: gl\n'
-            'OpenGL vendor string: Intel Open Source Technology Center\n'
-            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
-            'OpenGL version string: 18 (Core Profile) Mesa 11.0.4\n'
-            'OpenGL context flags: 0x0\n'
-        )
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gl
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: 18 (Core Profile) Mesa 11.0.4
+            OpenGL context flags: 0x0
+        """).encode('utf-8')
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(18.0, self._test.gl_version)
 
     def test_gles_version(self):
         """test.opengl.WflInfo.gles_version: Provides a version number"""
-        rv = (
-            'Waffle platform: gbm\n'
-            'Waffle api: gles3\n'
-            'OpenGL vendor string: Intel Open Source Technology Center\n'
-            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
-            'OpenGL version string: OpenGL ES 7.1 Mesa 11.0.4\n'
-        )
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gles3
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: OpenGL ES 7.1 Mesa 11.0.4
+        """).encode('utf-8')
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(7.1, self._test.gles_version)
 
     def test_glsl_version(self):
         """test.opengl.WflInfo.glsl_version: Provides a version number"""
-        rv = (
-            'Waffle platform: gbm\n'
-            'Waffle api: gl\n'
-            'OpenGL vendor string: Intel Open Source Technology Center\n'
-            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
-            'OpenGL version string: 1.1 (Core Profile) Mesa 11.0.4\n'
-            'OpenGL context flags: 0x0\n'
-            'OpenGL shading language version string: 9.30\n'
-            'OpenGL extensions: this is some extension strings.\n'
-        )
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gl
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: 1.1 (Core Profile) Mesa 11.0.4
+            OpenGL context flags: 0x0
+            OpenGL shading language version string: 9.30
+            OpenGL extensions: this is some extension strings.
+        """).encode('utf-8')
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(9.3, self._test.glsl_version)
 
     def test_glsl_es_version_1(self):
         """test.opengl.WflInfo.glsl_es_version: works with gles2"""
-        rv = (
-            'Waffle platform: gbm\n'
-            'Waffle api: gles2\n'
-            'OpenGL vendor string: Intel Open Source Technology Center\n'
-            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
-            'OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4\n'
-            'OpenGL shading language version string: OpenGL ES GLSL ES 1.0.17\n'
-            'OpenGL extensions: this is some extension strings.\n'
-        )
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gles2
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4
+            OpenGL shading language version string: OpenGL ES GLSL ES 1.0.17
+            OpenGL extensions: this is some extension strings.
+        """).encode('utf-8')
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(1.0, self._test.glsl_es_version)
 
     def test_glsl_es_version_3plus(self):
         """test.opengl.WflInfo.glsl_es_version: works with gles3"""
-        rv = (
-            'Waffle platform: gbm\n'
-            'Waffle api: gles3\n'
-            'OpenGL vendor string: Intel Open Source Technology Center\n'
-            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
-            'OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4\n'
-            'OpenGL shading language version string: OpenGL ES GLSL ES 5.00\n'
-            'OpenGL extensions: this is some extension strings.\n'
-        )
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gles3
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4
+            OpenGL shading language version string: OpenGL ES GLSL ES 5.00
+            OpenGL extensions: this is some extension strings.
+        """).encode('utf-8')
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(5.0, self._test.glsl_es_version)
 
     def test_gl_version_patch(self):
         """test.opengl.WflInfo.gl_version: Works with patch versions"""
-        rv = (
-            'Waffle platform: gbm\n'
-            'Waffle api: gl\n'
-            'OpenGL vendor string: Intel Open Source Technology Center\n'
-            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
-            'OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4\n'
-            'OpenGL context flags: 0x0\n'
-        )
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gl
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4
+            OpenGL context flags: 0x0
+        """).encode('utf-8')
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(18.0, self._test.gl_version)
 
     def test_glsl_version_patch(self):
         """test.opengl.WflInfo.glsl_version: Works with patch versions"""
-        rv = (
-            'Waffle platform: gbm\n'
-            'Waffle api: gl\n'
-            'OpenGL vendor string: Intel Open Source Technology Center\n'
-            'OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile\n'
-            'OpenGL version string: 1.1 (Core Profile) Mesa 11.0.4\n'
-            'OpenGL context flags: 0x0\n'
-            'OpenGL shading language version string: 9.30.7\n'
-            'OpenGL extensions: this is some extension strings.\n'
-        )
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gl
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: 1.1 (Core Profile) Mesa 11.0.4
+            OpenGL context flags: 0x0
+            OpenGL shading language version string: 9.30.7
+            OpenGL extensions: this is some extension strings.
+        """).encode('utf-8')
         with mock.patch('framework.test.opengl.subprocess.check_output',
                         mock.Mock(return_value=rv)):
             nt.eq_(9.3, self._test.glsl_version)
@@ -188,7 +188,7 @@ class TestWflInfo_WAFFLEINFO_GL_ERROR(object):
         self.__patchers.append(mock.patch(
             'framework.test.opengl.WflInfo._WflInfo__shared_state', {}))
 
-        rv = (textwrap.dedent("""
+        rv = textwrap.dedent("""\
             Waffle platform: glx
             Waffle api: gles3
             OpenGL vendor string: WFLINFO_GL_ERROR
@@ -197,7 +197,7 @@ class TestWflInfo_WAFFLEINFO_GL_ERROR(object):
             OpenGL context flags: 0x0\n
             OpenGL shading language version string: WFLINFO_GL_ERROR
             OpenGL extensions: WFLINFO_GL_ERROR
-        """))
+        """).encode('utf-8')
 
         self.__patchers.append(mock.patch(
             'framework.test.opengl.subprocess.check_output',
