@@ -933,7 +933,7 @@ with profile.group_manager(
     g(['sized-texture-format-channels'])
     g(['streaming-texture-leak'], run_concurrent=False)
     g(['texredefine'], run_concurrent=False)
-    g(['texsubimage'], run_concurrent=False)
+    g(['texsubimage'])
     g(['texsubimage-unpack'])
     g(['texsubimage-depth-formats'], run_concurrent=False)
     g(['texture-al'], run_concurrent=False)
