@@ -1573,6 +1573,66 @@ piglit_compare_images_ubyte(int x, int y, int w, int h,
 }
 
 /**
+ * Compare the image (array) stored in \p observed with the image obtained from
+ * \p expected_original with the box described by ux,uy,uz and uw,uh,ud
+ * replaced by \p expected_updated.
+ *
+ * Only the highest \p bits bits of all four channels are compared.
+ */
+int
+piglit_equal_images_update_rgba8(const GLubyte *expected_original,
+				 const GLubyte *expected_updated,
+				 const GLubyte *observed,
+				 unsigned w, unsigned h, unsigned d,
+				 unsigned ux, unsigned uy, unsigned uz,
+				 unsigned uw, unsigned uh, unsigned ud,
+				 unsigned bits)
+{
+	assert(bits > 0 && bits <= 8);
+
+	unsigned x, y, z;
+	const uint8_t compare_mask = 0xff << (8 - bits);
+
+	for (z = 0; z < d; ++z) {
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
+				const GLubyte *ref;
+
+				if (x >= ux && x < ux + uw &&
+				    y >= uy && y < uy + uh &&
+				    z >= uz && z < uz + ud)
+					ref = expected_updated;
+				else
+					ref = expected_original;
+
+				bool fail =
+					((ref[0] ^ observed[0]) |
+					 (ref[1] ^ observed[1]) |
+					 (ref[2] ^ observed[2]) |
+					 (ref[3] ^ observed[3])) &
+					compare_mask;
+				if (fail) {
+					printf("%u,%u,%u: test = %u,%u,%u,%u "
+						"ref = %u,%u,%u,%u (comparing %u bits)\n",
+						x, y, z,
+						observed[0], observed[1],
+						observed[2], observed[3],
+						ref[0], ref[1], ref[2], ref[3],
+						bits);
+					return 0;
+				}
+
+				observed += 4;
+				expected_original += 4;
+				expected_updated += 4;
+			}
+		}
+	}
+
+	return 1;
+}
+
+/**
  * Compare the contents of the current read framebuffer's stencil
  * buffer with the given in-memory byte image.
  */

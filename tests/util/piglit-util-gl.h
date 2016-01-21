@@ -176,6 +176,13 @@ int piglit_probe_image_rgba(int x, int y, int w, int h, const float *image);
 int piglit_compare_images_ubyte(int x, int y, int w, int h,
 				const GLubyte *expected_image,
 				const GLubyte *observed_image);
+int piglit_equal_images_update_rgba8(const GLubyte *expected_original,
+				     const GLubyte *expected_updated,
+				     const GLubyte *observed,
+				     unsigned w, unsigned h, unsigned d,
+				     unsigned ux, unsigned uy, unsigned uz,
+				     unsigned uw, unsigned uh, unsigned ud,
+				     unsigned bits);
 int piglit_probe_image_stencil(int x, int y, int w, int h, const GLubyte *image);
 int piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
 			     const GLubyte *image);

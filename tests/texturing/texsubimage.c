@@ -228,9 +228,6 @@ equal_images(GLenum target,
 	     GLuint tx, GLuint ty, GLuint tz,
 	     GLuint tw, GLuint th, GLuint td)
 {
-	const GLubyte *ref;
-	GLuint z, y, x;
-
 	switch (target) {
 	case GL_TEXTURE_1D:
 		ty = 0;
@@ -243,27 +240,10 @@ equal_images(GLenum target,
 		break;
 	}
 
-	for (z = 0; z < d; z++) {
-		for (y = 0; y < h; y++) {
-			for (x = 0; x < w; x++) {
-				if (x >= tx && x < tx + tw &&
-				    y >= ty && y < ty + th &&
-				    z >= tz && z < tz + td)
-					ref = updated_ref;
-				else
-					ref = original_ref;
-
-				if (memcmp(ref, testImg, 4))
-					return GL_FALSE;
-
-				testImg += 4;
-				original_ref += 4;
-				updated_ref += 4;
-			}
-		}
-	}
-
-	return GL_TRUE;
+	return piglit_equal_images_update_rgba8(original_ref, updated_ref, testImg,
+						w, h, d,
+						tx, ty, tz, tw, th, td,
+						8);
 }
 
 /**
