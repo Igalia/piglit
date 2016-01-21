@@ -132,7 +132,7 @@ void piglit_reset_gl_error(void);
 void piglit_require_gl_version(int required_version_times_10);
 void piglit_require_extension(const char *name);
 void piglit_require_not_extension(const char *name);
-unsigned piglit_num_components(GLenum base_format);
+unsigned piglit_num_components(GLenum format);
 bool piglit_get_luminance_intensity_bits(GLenum internalformat, int *bits);
 int piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *out_probe);
 int piglit_probe_pixel_rgba_silent(int x, int y, const float* expected, float *out_probe);

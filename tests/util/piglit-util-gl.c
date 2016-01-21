@@ -901,26 +901,31 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
 }
 
 unsigned
-piglit_num_components(GLenum base_format)
+piglit_num_components(GLenum format)
 {
-	switch (base_format) {
+	switch (format) {
 	case GL_ALPHA:
 	case GL_DEPTH_COMPONENT:
 	case GL_INTENSITY:
 	case GL_LUMINANCE:
 	case GL_RED:
+	case GL_GREEN:
+	case GL_BLUE:
 		return 1;
 	case GL_DEPTH_STENCIL:
 	case GL_LUMINANCE_ALPHA:
 	case GL_RG:
 		return 2;
 	case GL_RGB:
+	case GL_BGR:
 		return 3;
 	case GL_RGBA:
+	case GL_BGRA:
+	case GL_ABGR_EXT:
 		return 4;
 	default:
 		printf("Unknown num_components for %s\n",
-		       piglit_get_gl_enum_name(base_format));
+		       piglit_get_gl_enum_name(format));
 		piglit_report_result(PIGLIT_FAIL);
 		return 0;
 	}
