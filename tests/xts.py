@@ -227,6 +227,7 @@ def _populate_profile_rendercheck(profile):
     _add_rendercheck_test(profile, 'composite/All/x8r8g8b8', '-t composite -f a8r8g8b8,x8r8g8b8')
     _add_rendercheck_test(profile, 'composite/All/a2r10g10b10', '-t composite -f a8r8g8b8,a2r10g10b10')
     _add_rendercheck_test(profile, 'ca composite/All/a8r8g8b8', '-t cacomposite -f a8r8g8b8')
+    _add_rendercheck_test(profile, 'ca composite/All/a8', '-t cacomposite -f a8r8g8b8,a8')
     _add_rendercheck_test(profile, 'ca composite/All/x8r8g8b8', '-t cacomposite -f a8r8g8b8,x8r8g8b8')
     _add_rendercheck_test(profile, 'ca composite/All/a2r10g10b10', '-t cacomposite -f a8r8g8b8,a2r10g10b10')
     _add_rendercheck_test(profile, 'fill', '-t fill')
