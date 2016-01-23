@@ -135,7 +135,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_draw_rect(-1, -1, 2, 2);
 
-	pass = pass && compare_counter(piglit_width * piglit_height, "Basic");
+	pass &= compare_counter(piglit_width * piglit_height, "Basic");
 
 	/* Reset counter and set 1x1 scissor rectangle. */
 	reset_counter();
@@ -147,7 +147,7 @@ piglit_init(int argc, char **argv)
 
 	glDisable(GL_SCISSOR_TEST);
 
-	pass = pass && compare_counter(1, "glScissor");
+	pass &= compare_counter(1, "glScissor");
 
 	/* Reset counter and set 2x2 viewport. */
 	reset_counter();
@@ -155,7 +155,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_draw_rect(-1, -1, 2, 2);
 
-	pass = pass && compare_counter(4, "glViewport");
+	pass &= compare_counter(4, "glViewport");
 
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteVertexArrays(1, &vao);
