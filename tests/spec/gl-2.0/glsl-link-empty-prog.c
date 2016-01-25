@@ -103,6 +103,8 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 
 	glUseProgram(prog);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
