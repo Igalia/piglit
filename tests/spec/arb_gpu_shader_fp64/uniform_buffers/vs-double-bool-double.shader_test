@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+uniform double arg0;
+uniform bool arg1;
+uniform double arg2;
+
+in vec4 piglit_vertex;
+out vec4 v;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	if (arg1)
+		v = vec4(arg0, arg2, 0.0, 0.0);
+	else
+		v = vec4(arg0, arg2, 1.0, 0.0);
+}
+
+[fragment shader]
+#version 150
+
+in vec4 v;
+
+void main()
+{
+	gl_FragColor = v;
+}
+
+[test]
+uniform double arg0 1.0
+uniform int arg1 1
+uniform double arg2 1.0
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 0.0 0.0
