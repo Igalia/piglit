@@ -1,0 +1,57 @@
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+out vec4 vertex_to_gs;
+
+void main()
+{
+	vertex_to_gs = vertex;
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+uniform ubo1 {
+	mat3x4 m;
+};
+
+in vec4 vertex_to_gs[3];
+out vec4 v;
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = vertex_to_gs[i];
+		v = m[0] + m[1] + m[2];
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 150
+
+in vec4 v;
+
+void main()
+{
+	gl_FragColor = v;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform mat3x4 m 0.25 0.5 0.75 1.0   1.0 2.0 3.0 4.0   -1.0 -2.0 -3.0 -4.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.25 0.5 0.75 1.0
