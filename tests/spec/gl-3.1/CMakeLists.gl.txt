@@ -11,6 +11,7 @@ link_libraries (
 piglit_add_executable (gl-3.1-default-vao default-vao.c)
 piglit_add_executable (gl-3.1-draw-buffers-errors draw-buffers-errors.c)
 piglit_add_executable (gl-3.1-genned-names genned-names.c)
+piglit_add_executable (gl-3.1-link-empty-prog-core glsl-link-empty-prog.c)
 piglit_add_executable (gl-3.1-minmax minmax.c)
 piglit_add_executable (gl-3.1-primitive-restart-xfb primitive-restart-xfb.c)
 piglit_add_executable (gl-3.1-vao-broken-attrib vao-broken-attrib.c)
