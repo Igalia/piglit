@@ -135,6 +135,8 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
         return images
 
     def interpret_result(self):
+        super(XTSTest, self).interpret_result()
+
         try:
             with open(self.test_results_file, 'r') as rfile:
                 log = rfile.read()
@@ -157,12 +159,8 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
                 self.result.result = 'warn'
             else:
                 self.result.result = 'fail'
-        else:
-            self.result.result = 'fail'
 
         self.result.images = self._process_log_for_images(log)
-
-        super(XTSTest, self).interpret_result()
 
 
 class RendercheckTest(Test):
@@ -171,14 +169,12 @@ class RendercheckTest(Test):
         self.testname = "rendercheck " + " ".join(args)
 
     def interpret_result(self):
+        super(RendercheckTest, self).interpret_result()
+
         if self.result.returncode == 0:
             self.result.result = 'pass'
         elif self.result.returncode == 77:
             self.result.result = 'skip'
-        else:
-            self.result.result = 'fail'
-
-        super(RendercheckTest, self).interpret_result()
 
 
 def _populate_profile_xts(profile):
