@@ -1,0 +1,28 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+uniform int index;
+uniform ubo1 {
+	double data[8];
+};
+
+void main()
+{
+	gl_FragColor = vec4(data[index]);
+}
+
+[test]
+uniform int index 2
+uniform double data[0] 0.1
+uniform double data[1] 0.2
+uniform double data[2] 0.3
+uniform double data[3] 0.4
+
+draw rect -1 -1 2 2
+probe all rgba 0.3 0.3 0.3 0.3
