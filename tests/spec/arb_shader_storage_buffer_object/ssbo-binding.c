@@ -53,6 +53,7 @@ PIGLIT_GL_TEST_CONFIG_END
 static GLuint prog;
 
 static const char frag_shader_text[] =
+	"#version 130\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"
 	"\n"
 	"buffer ssbo_a { vec4 a; };\n"

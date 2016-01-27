@@ -58,6 +58,7 @@ static const char vert_shader_text[] =
 	"}\n";
 
 static const char frag_shader_text[] =
+	"#version 130\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"
 	"\n"
 	"buffer ssbo_color { vec4 color; float color_scale; };\n"

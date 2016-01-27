@@ -73,6 +73,7 @@ get_shader(GLenum target, const char *block_prefix, int blocks)
 		"	v = vec4(0)%s;\n"
 		"}\n";
 	const char *fs_source =
+		"#version 130\n"
 		"#extension GL_ARB_shader_storage_buffer_object : enable\n"
 		"#extension GL_ARB_uniform_buffer_object : enable\n"
 		"\n"

@@ -76,6 +76,7 @@ piglit_display(void)
 		"}\n";
 
 	const char *fs_template =
+		"#version 130\n"
 		"#extension GL_ARB_shader_storage_buffer_object : enable\n"
 		"\n"
 		"varying vec4 vary;"
@@ -94,6 +95,7 @@ piglit_display(void)
 		"}\n";
 
 	const char *fs_ssbo_template =
+		"#version 130\n"
 		"#extension GL_ARB_shader_storage_buffer_object : enable\n"
 		"#extension GL_ARB_uniform_buffer_object : enable\n"
 		"\n"
