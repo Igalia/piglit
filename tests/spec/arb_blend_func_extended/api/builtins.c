@@ -35,6 +35,7 @@ bool compile_simple_program(const char* vs_text, const char* fs_text)
 	GLuint vs;
 	GLuint fs;
 	GLuint prog;
+	bool status;
 
 	prog = glCreateProgram();
 
@@ -48,7 +49,9 @@ bool compile_simple_program(const char* vs_text, const char* fs_text)
 	glAttachShader(prog, fs);
 	glLinkProgram(prog);
 
-	return !!prog;
+	status = piglit_link_check_status(prog);
+	glDeleteProgram(prog);
+	return status;
 }
 
 enum piglit_result
