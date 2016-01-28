@@ -14,10 +14,10 @@
 #version 150
 #extension GL_ARB_gpu_shader_fp64: require
 
-out double color;
+out dvec4 color;
 
 void main()
 {
-    color = 0.0;
+    color = dvec4(0.0, 0.0, 0.0, 0.0);
 }
 

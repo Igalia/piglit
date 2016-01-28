@@ -15,10 +15,10 @@
 #version 150
 #extension GL_ARB_gpu_shader_fp64: require
 
-in double vertex;
+in dvec2 vertex;
 
 void main()
 {
-    gl_Position = vec4(vertex, 0.0, 0.0, 0.0);
+    gl_Position = vec4(vertex, 0.0, 0.0);
 }
 
