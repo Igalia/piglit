@@ -4,7 +4,7 @@
 // require_extensions: GL_ARB_gpu_shader_fp64
 // [end config]
 //
-// Declare a non-flat double fragment input.
+// Declare a non-flat dvec3 fragment input.
 //
 // GL_ARB_gpu_shader_fp64 spec states:
 //
@@ -26,10 +26,10 @@
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : enable
 
-in double d;
+in dvec3 v;
 out vec4 color;
 
 void main()
 {
-    color = vec4(d, 0.0, 0.0, 0.0);
+    color = vec4(v.x, v.y, v.z, 0.0);
 }

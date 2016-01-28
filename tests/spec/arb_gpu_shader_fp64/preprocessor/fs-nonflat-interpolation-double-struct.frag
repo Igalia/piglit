@@ -26,10 +26,14 @@
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : enable
 
-in double d;
+struct S {
+    double d;
+};
+
+in S s;
 out vec4 color;
 
 void main()
 {
-    color = vec4(d, 0.0, 0.0, 0.0);
+    color = vec4(s.d, 0.0, 0.0, 0.0);
 }

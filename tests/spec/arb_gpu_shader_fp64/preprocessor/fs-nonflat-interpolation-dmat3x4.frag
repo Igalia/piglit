@@ -4,10 +4,9 @@
 // require_extensions: GL_ARB_gpu_shader_fp64
 // [end config]
 //
-// Declare a non-flat double fragment input.
+// Declare a non-flat dmat3x4 fragment input.
 //
-// GL_ARB_gpu_shader_fp64 spec states:
-//
+// From GL_ARB_gpu_shader_fp64:
 //    "Modifications to The OpenGL Shading Language Specification, Version 1.50
 //     (Revision 09)
 //    ...
@@ -26,10 +25,10 @@
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : enable
 
-in double d;
+in dmat3x4 m;
 out vec4 color;
 
 void main()
 {
-    color = vec4(d, 0.0, 0.0, 0.0);
+    color = m[0] + m[1] + m[2];
 }
