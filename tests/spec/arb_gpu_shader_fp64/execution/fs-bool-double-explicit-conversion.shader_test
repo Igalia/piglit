@@ -1,0 +1,36 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+uniform bool bool_value;
+uniform double double_value;
+
+out vec4 color;
+
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+	double converted = double(bool_value);
+	bool match = converted == double_value;
+	color = match ? GREEN : RED;
+}
+
+[test]
+uniform double double_value 0.0
+uniform int bool_value 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform double double_value 1.0
+uniform int bool_value 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+

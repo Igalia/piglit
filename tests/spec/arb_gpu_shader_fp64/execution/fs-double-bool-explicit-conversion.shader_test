@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+uniform double double_value_1;
+uniform double double_value_2;
+uniform double double_value_3;
+
+out vec4 color;
+
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+	bool converted_1 = bool(double_value_1);
+	bool converted_2 = bool(double_value_2);
+	bool converted_3 = bool(double_value_3);
+	bool match = !converted_1 && converted_2 && converted_3;
+	color = match ? GREEN : RED;
+}
+
+[test]
+uniform double double_value_1 0.0
+uniform double double_value_2 1.0
+uniform double double_value_3 9007199254740992.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
