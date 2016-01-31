@@ -157,6 +157,36 @@ piglit_init(int argc, char **argv)
 
 	pass &= compare_counter(4, "glViewport");
 
+	/* Reset counter and add samples to the default fb */
+	reset_counter();
+	glViewport(0, 0, piglit_width, piglit_height);
+	glFramebufferParameteri(GL_FRAMEBUFFER,
+				GL_FRAMEBUFFER_DEFAULT_SAMPLES, 4);
+
+	piglit_draw_rect(-1, -1, 2, 2);
+
+	if (piglit_width == piglit_height) {
+		/* The seam gets double-drawn */
+		pass &= compare_counter((piglit_width + 1) * piglit_height,
+					"MS4");
+	} else {
+		piglit_report_subtest_result(PIGLIT_SKIP, "MS4");
+	}
+
+	if (piglit_is_extension_supported("GL_ARB_sample_shading")) {
+		/* Reset counter and enable per-sample shading */
+		reset_counter();
+		glEnable(GL_SAMPLE_SHADING_ARB);
+		glMinSampleShadingARB(1.0);
+
+		piglit_draw_rect(-1, -1, 2, 2);
+
+		pass &= compare_counter(piglit_width * piglit_height * 4,
+					"Per-sample");
+	} else {
+		piglit_report_subtest_result(PIGLIT_SKIP, "Per-sample");
+	}
+
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &buffer);
