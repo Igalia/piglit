@@ -2419,6 +2419,7 @@ with profile.group_manager(
     g(['arb_framebuffer_no_attachments-minmax'])
     g(['arb_framebuffer_no_attachments-params'])
     g(['arb_framebuffer_no_attachments-atomic'])
+    g(['arb_framebuffer_no_attachments-query'])
 
 # Group ARB_explicit_uniform_location
 with profile.group_manager(
