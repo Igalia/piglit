@@ -28,6 +28,7 @@ import os
 import os.path as path
 import time
 import ctypes
+import shutil
 
 import six
 
@@ -243,7 +244,14 @@ def run(input_):
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
-    core.checkDir(args.results_path, False)
+
+    # Clear results directory, completely remove it and recreate it whether
+    # it's a directory or a file.
+    if os.path.isdir(args.results_path):
+        shutil.rmtree(args.results_path)
+    else:
+        os.unlink(args.results_path)
+    os.makedirs(args.results_path)
 
     results = framework.results.TestrunResult()
     backends.set_meta(args.backend, results)
