@@ -160,6 +160,10 @@ def _run_parser(input_):
                             help="Set the logger verbosity level")
     parser.add_argument("--test-list",
                         help="A file containing a list of tests to run")
+    parser.add_argument('-o', '--overwrite',
+                        dest='overwrite',
+                        action='store_true',
+                        help='If the results_path already exists, delete it')
     parser.add_argument("test_profile",
                         metavar="<Profile path(s)>",
                         nargs='+',
@@ -245,13 +249,19 @@ def run(input_):
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
 
-    # Clear results directory, completely remove it and recreate it whether
-    # it's a directory or a file.
-    if os.path.isdir(args.results_path):
-        shutil.rmtree(args.results_path)
-    else:
-        os.unlink(args.results_path)
-    os.makedirs(args.results_path)
+    # If the results directory already exists and if overwrite was set, then
+    # clear the directory. If it wasn't set, then raise fatal error.
+    if os.path.exists(args.results_path):
+        if args.overwrite:
+            if os.path.isdir(args.results_path):
+                shutil.rmtree(args.results_path)
+            else:
+                os.unlink(args.results_path)
+        else:
+            raise exceptions.PiglitFatalError(
+                'Cannot overwrite existing folder without the -o/--overwrite '
+                'option being set.')
+    os.mkdir(args.results_path)
 
     results = framework.results.TestrunResult()
     backends.set_meta(args.backend, results)
