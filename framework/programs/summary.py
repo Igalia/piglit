@@ -205,7 +205,8 @@ def aggregate(input_):
     parser.add_argument('results_folder',
                         type=path.realpath,
                         metavar="<results path>",
-                        help="Path to a results folder")
+                        help="Path to a results directory "
+                             "(which contains a tests directory)")
     parser.add_argument('-o', '--output',
                         default="results.json",
                         help="name of output file. Default: results.json")
@@ -213,8 +214,16 @@ def aggregate(input_):
 
     assert os.path.isdir(args.results_folder)
 
+    # args.results_folder must be a path with a 'tests' directory in it, not
+    # the tests directory itself.
     outfile = os.path.join(args.results_folder, args.output)
-    results = backends.load(args.results_folder)
+    try:
+        results = backends.load(args.results_folder)
+    except backends.BackendError:
+        raise exceptions.PiglitFatalError(
+            'Cannot find a tests directory to aggregate in {}.\n'
+            'Are you you sure that you pointed to '
+            'a results directory (not results/tests)?'.format(args.results_folder))
 
     try:
         # FIXME: This works, it fixes the problem, but it only works because
