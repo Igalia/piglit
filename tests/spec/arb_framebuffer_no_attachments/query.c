@@ -79,7 +79,9 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint buffer, fbo, vao;
-	GLint prog;
+	GLint prog, max_samples;
+	int i;
+	unsigned samples[16];
 	bool pass = true;
 
 	piglit_require_gl_version(31);
@@ -165,8 +167,44 @@ piglit_init(int argc, char **argv)
 	piglit_draw_rect(-1, -1, 2, 2);
 	glEndQuery(GL_SAMPLES_PASSED);
 
-	pass &= compare_counter((piglit_width / 2) * (piglit_height / 2),
-				"fb resize");
+	piglit_width /= 2;
+	piglit_height /= 2;
+	pass &= compare_counter(piglit_width * piglit_height, "fb resize");
+
+	/* Go through and check that the number of samples passed
+	 * matches the requested sample count. The implementation may
+	 * silently upgrade the number of samples to some hw-supported
+	 * value, and there's no way to query it until GL 4.5, so we
+	 * just get the values for all the valid sample values, and
+	 * mark the test as skip if the "current" amount is the same
+	 * as the next one. This should account for any non-crazy MS
+	 * level upgrade schemes.
+	 */
+	glGetIntegerv(GL_MAX_FRAMEBUFFER_SAMPLES, &max_samples);
+	max_samples = MIN2(32, max_samples);
+	for (i = 2; i <= max_samples; i += 2) {
+		glFramebufferParameteri(GL_FRAMEBUFFER,
+					GL_FRAMEBUFFER_DEFAULT_SAMPLES, i);
+
+		glBeginQuery(GL_SAMPLES_PASSED, query);
+		piglit_draw_rect(-1, -1, 2, 2);
+		glEndQuery(GL_SAMPLES_PASSED);
+
+		glGetQueryObjectuiv(query, GL_QUERY_RESULT, &samples[i / 2 - 1]);
+	}
+
+	for (i = 2; i <= max_samples; i += 2) {
+		if (i < max_samples && samples[i / 2 - 1] == samples[i / 2]) {
+			piglit_report_subtest_result(PIGLIT_SKIP, "MS%d", i);
+			continue;
+		}
+		if (samples[i / 2 - 1] != i * piglit_width * piglit_height) {
+			piglit_report_subtest_result(PIGLIT_FAIL, "MS%d", i);
+			pass = false;
+		} else {
+			piglit_report_subtest_result(PIGLIT_PASS, "MS%d", i);
+		}
+	}
 
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteVertexArrays(1, &vao);
