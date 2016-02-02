@@ -1,13 +1,13 @@
 /* [config]
  * expect_result: pass
- * glsl_version: 1.40
+ * glsl_version: 1.50
  * require_extensions: GL_ARB_shader_atomic_counters
  * [end config]
  *
  * Check that the builtin constants defined by the extension
  * are present.
  */
-#version 140
+#version 150
 #extension GL_ARB_shader_atomic_counters: require
 
 out ivec4 fcolor;
