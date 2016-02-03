@@ -13,11 +13,13 @@ uniform ubo1 {
 	dvec4 colors[4];
 };
 
+out vec4 color;
+
 void main()
 {
 	dvec4 temp[4] = colors;
 	temp[0] = dvec4(1.0, 0.0, 0.0, 0.0);
-	gl_FragColor = temp[i];
+	color = temp[i];
 }
 
 [test]

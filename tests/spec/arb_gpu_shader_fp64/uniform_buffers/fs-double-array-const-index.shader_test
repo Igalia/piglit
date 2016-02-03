@@ -13,9 +13,11 @@ uniform ubo1 {
   double d[4];
 };
 
+out vec4 color;
+
 void main()
 {
-  gl_FragColor = vec4(d[0], d[1], d[2], d[3]);
+  color = vec4(d[0], d[1], d[2], d[3]);
 }
 
 [test]

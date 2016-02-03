@@ -12,9 +12,11 @@ uniform ubo1 {
 	dvec4 data[4];
 };
 
+out vec4 color;
+
 void main()
 {
-	gl_FragColor = data[index];
+	color = data[index];
 }
 
 [test]

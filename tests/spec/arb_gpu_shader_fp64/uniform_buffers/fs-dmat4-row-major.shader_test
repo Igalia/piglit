@@ -12,9 +12,11 @@ uniform ubo1 {
 	layout(row_major) dmat4 m;
 };
 
+out vec4 color;
+
 void main()
 {
-	gl_FragColor = m[0] + m[1] + m[2] + m[3];
+	color = m[0] + m[1] + m[2] + m[3];
 }
 
 [test]

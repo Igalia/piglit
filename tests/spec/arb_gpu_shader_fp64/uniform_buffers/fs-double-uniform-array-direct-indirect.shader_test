@@ -7,9 +7,10 @@ GL_ARB_gpu_shader_fp64
 [fragment shader]
 #extension GL_ARB_gpu_shader_fp64 : enable
 uniform double arg[7];
+out vec4 color;
 void main()
 {
-	gl_FragColor = vec4(arg[int(arg[6])]);
+	color = vec4(arg[int(arg[6])]);
 }
 
 [test]

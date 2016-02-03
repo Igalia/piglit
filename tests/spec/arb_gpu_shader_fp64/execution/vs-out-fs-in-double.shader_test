@@ -6,9 +6,12 @@ GL_ARB_gpu_shader_fp64
 [vertex shader]
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
+
 uniform double arg0;
+
 in vec4 vertex;
 flat out dvec4 dout1;
+
 void main()
 {
         gl_Position = vertex;
@@ -18,14 +21,17 @@ void main()
 [fragment shader]
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
-#
-flat in dvec4 dout1;
+
 uniform double tolerance;
 uniform double expected;
+
+flat in dvec4 dout1;
+out vec4 color;
+
 void main()
 {
   dvec4 result = trunc(dout1);
-  gl_FragColor = distance(result, dvec4(expected)) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+  color = distance(result, dvec4(expected)) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
 [vertex data]

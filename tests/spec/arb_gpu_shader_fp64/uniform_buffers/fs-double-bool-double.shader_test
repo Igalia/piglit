@@ -13,12 +13,14 @@ uniform double arg0;
 uniform bool arg1;
 uniform double arg2;
 
+out vec4 color;
+
 void main()
 {
   if (arg1)
-    gl_FragColor = vec4(arg0, arg2, 0.0, 0.0);
+    color = vec4(arg0, arg2, 0.0, 0.0);
   else
-    gl_FragColor = vec4(arg0, arg2, 1.0, 0.0);
+    color = vec4(arg0, arg2, 1.0, 0.0);
 }
 
 [test]
