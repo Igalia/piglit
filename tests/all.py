@@ -2116,6 +2116,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_gpu_shader_fp64', 'shader_storage')) as g:
      g(['arb_gpu_shader_fp64-layout-std140-fp64-write-shader'], 'layout-std140-fp64-write-shader')
+     g(['arb_gpu_shader_fp64-layout-std430-fp64-write-shader'], 'layout-std430-fp64-write-shader')
 
 with profile.group_manager(
         PiglitGLTest,

@@ -10,3 +10,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_gpu_shader_fp64-layout-std140-fp64-write-shader layout-std140-fp64-write-shader.c)
+piglit_add_executable (arb_gpu_shader_fp64-layout-std430-fp64-write-shader layout-std430-fp64-write-shader.c)
