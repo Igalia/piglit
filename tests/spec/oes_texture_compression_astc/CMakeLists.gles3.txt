@@ -1,0 +1,4 @@
+link_libraries(piglitutil_${piglit_target_api})
+piglit_add_executable(oes_compressed_astc-miptree-3d_${piglit_target_api} oes_compressed_astc-miptree-3d.c)
+
+# vim: ft=cmake:

@@ -4368,6 +4368,15 @@ with profile.group_manager(
 
 with profile.group_manager(
          PiglitGLTest,
+         grouptools.join('spec', 'oes_texture_compression_astc')) as g:
+    for subtest in ('hdr', 'ldr', 'srgb'):
+        g(['oes_compressed_astc-miptree-3d_gl', '-subtest', subtest],
+           'miptree-3d-gl {}'.format(subtest))
+        g(['oes_compressed_astc-miptree-3d_gles3', '-subtest', subtest],
+           'miptree-3d-gles {}'.format(subtest))
+
+with profile.group_manager(
+         PiglitGLTest,
          grouptools.join('spec', 'nv_read_depth')) as g:
     g(['read_depth_gles3'])
 
