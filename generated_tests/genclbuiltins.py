@@ -109,12 +109,23 @@ B = {
 
 # vecSizes has the layout [in0width, ..., inNwidth] where outType width is
 # assumed to match the width of the first input
-def gen_kernel(f, fnName, inTypes, outType, vecSizes, typePrefix):
+def gen_kernel(f, fnName, inTypes, outTypes, vecSizes, typePrefix, outLoc='private'):
     f.write('kernel void test_' + typePrefix + str(vecSizes[0]) + '_' + fnName
-            + '_' + inTypes[0]+'(global '+outType+'* out')
+            + (('_' + outLoc) if len(outTypes) > 1 else '')
+            + '_' + inTypes[0] + '(global ' + outTypes[0] + '* out')
+    for arg in range(1, len(outTypes)):
+        f.write(', global '+outTypes[arg]+'* out'+str(arg))
     for arg in range(0, len(inTypes)):
         f.write(', global '+inTypes[arg]+'* in'+str(arg))
     f.write('){\n')
+
+    for arg in range(1, len(outTypes)):
+        f.write('  ' + outLoc + ' ' + outTypes[arg] + ('' if vecSizes[0] == 1 else str(vecSizes[0])));
+        if (outLoc == 'global'):
+            f.write(' *tmp' + str(arg) + ' = out' + str(arg) + ';\n');
+        else:
+            #FIXME: This assumes WG size of 1
+            f.write(' tmp' + str(arg) + ';\n');
 
     suffix = ';'
     if (vecSizes[0] == 1):
@@ -134,88 +145,113 @@ def gen_kernel(f, fnName, inTypes, outType, vecSizes, typePrefix):
             f.write('in'+str(arg)+'[get_global_id(0)]')
         else:
             f.write('vload'+str(vecSizes[arg])+'(get_global_id(0), in'+str(arg)+')')
+    for arg in range(1, len(outTypes)):
+        if (outLoc == 'global'):
+            f.write(', &tmp' + str(arg) + '[get_global_id(0)]')
+        else:
+            f.write(', &tmp' + str(arg))
 
-    f.write(suffix+'\n}\n\n')
+    f.write(suffix + '\n')
+
+    if (outLoc != 'global'):
+        for arg in range(1, len(outTypes)):
+            if (vecSizes[0] == 1):
+                f.write('  out'+ str(arg) +'[get_global_id(0)] = tmp' + str(arg))
+            else:
+                f.write('  vstore' + str(vecSizes[0]) + '(tmp' + str(arg) + ', get_global_id(0), out' + str(arg) + ')')
+
+            f.write(';\n')
+
+    f.write('}\n\n')
 
 
 
-def gen_kernel_1_arg(f, fnName, inType, outType):
+def gen_kernel_1_arg(f, fnName, inType, outTypes, loc = 'private'):
     for vecSize in ALL_WIDTHS:
-        gen_kernel(f, fnName, [inType], outType, [vecSize], '')
+        gen_kernel(f, fnName, [inType], outTypes, [vecSize], '', loc)
 
 
 #  2 argument kernel with input types that match their vector size
-def gen_kernel_2_arg_same_size(f, fnName, inTypes, outType):
+def gen_kernel_2_arg_same_size(f, fnName, inTypes, outTypes):
     for vecSize in ALL_WIDTHS:
-        gen_kernel(f, fnName, inTypes, outType, [vecSize, vecSize],
+        gen_kernel(f, fnName, inTypes, outTypes, [vecSize, vecSize],
                    '')
 
 
 #  2 argument kernel with 1 vector and one scalar input argument
-def gen_kernel_2_arg_mixed_size(f, fnName, inTypes, outType):
+def gen_kernel_2_arg_mixed_size(f, fnName, inTypes, outTypes):
     for vecSize in VEC_WIDTHS:
-        gen_kernel(f, fnName, inTypes, outType, [vecSize, 1], 'tss_')
+        gen_kernel(f, fnName, inTypes, outTypes, [vecSize, 1], 'tss_')
 
 
 #  2 argument kernel with 1 vector and one scalar input argument with multiple
 #    input data types
-def gen_kernel_2_arg_mixed_sign(f, fnName, inTypes, outType):
+def gen_kernel_2_arg_mixed_sign(f, fnName, inTypes, outTypes):
     for vecSize in ALL_WIDTHS:
-        gen_kernel(f, fnName, inTypes, outType, [vecSize, vecSize],
+        gen_kernel(f, fnName, inTypes, outTypes, [vecSize, vecSize],
                    '')
 
 
 #  3-argument built-in functions
 
 
-def gen_kernel_3_arg_same_type(f, fnName, inTypes, outType):
+def gen_kernel_3_arg_same_type(f, fnName, inTypes, outTypes):
     for vecSize in ALL_WIDTHS:
-        gen_kernel(f, fnName, inTypes, outType,
+        gen_kernel(f, fnName, inTypes, outTypes,
                    [vecSize, vecSize, vecSize], ''
         )
 
-def gen_kernel_3_arg_mixed_size_tss(f, fnName, inTypes, outType):
+def gen_kernel_3_arg_mixed_size_tss(f, fnName, inTypes, outTypes):
     for vecSize in VEC_WIDTHS:
-        gen_kernel(f, fnName, inTypes, outType,
+        gen_kernel(f, fnName, inTypes, outTypes,
                    [vecSize, 1, 1], 'tss_')
 
-def gen_kernel_3_arg_mixed_size_tts(f, fnName, inTypes, outType):
+def gen_kernel_3_arg_mixed_size_tts(f, fnName, inTypes, outTypes):
     for vecSize in VEC_WIDTHS:
-        gen_kernel(f, fnName, inTypes, outType,
+        gen_kernel(f, fnName, inTypes, outTypes,
                    [vecSize, vecSize, 1], 'tts_')
 
 
 def generate_kernels(f, dataType, fnName, fnDef):
+
     argTypes = getArgTypes(dataType, fnDef['arg_types'])
 
     # For len(argTypes), remember that this includes the output arg
     if (len(argTypes) == 2):
-        gen_kernel_1_arg(f, fnName, argTypes[1], argTypes[0])
+        gen_kernel_1_arg(f, fnName, argTypes[1], [argTypes[0]])
         return
 
     if (len(argTypes) == 3 and not fnName is 'upsample'):
-        gen_kernel_2_arg_same_size(f, fnName,
-                                [argTypes[1], argTypes[2]], argTypes[0])
+        if (getNumOutArgs(fnDef) == 2):
+            gen_kernel_1_arg(f, fnName,
+                             argTypes[2], [argTypes[0], argTypes[1]], 'private')
+            gen_kernel_1_arg(f, fnName,
+                             argTypes[2], [argTypes[0], argTypes[1]], 'local')
+            gen_kernel_1_arg(f, fnName,
+                             argTypes[2], [argTypes[0], argTypes[1]], 'global')
+        else:
+            gen_kernel_2_arg_same_size(f, fnName,
+                                    [argTypes[1], argTypes[2]], [argTypes[0]])
         if (fnDef['function_type'] is 'tss'):
             gen_kernel_2_arg_mixed_size(f, fnName,
-                                [argTypes[1], argTypes[2]], argTypes[0])
+                                [argTypes[1], argTypes[2]], [argTypes[0]])
         return
 
     if (len(argTypes) == 4):
         gen_kernel_3_arg_same_type(f, fnName,
-                   [argTypes[1], argTypes[2], argTypes[3]], argTypes[0])
+                   [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
         if (fnDef['function_type'] is 'tss'):
             gen_kernel_3_arg_mixed_size_tss(f, fnName,
-                   [argTypes[1], argTypes[2], argTypes[3]], argTypes[0])
+                   [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
         if (fnDef['function_type'] is 'tts'):
             gen_kernel_3_arg_mixed_size_tts(f, fnName,
-                   [argTypes[1], argTypes[2], argTypes[3]], argTypes[0])
+                   [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
         return
 
     if (fnName is 'upsample'):
         gen_kernel_2_arg_mixed_sign(f, fnName,
                                     [argTypes[1], argTypes[2]],
-                                    argTypes[0])
+                                    [argTypes[0]])
         return
 
 def getValue(type, val, isVector):
@@ -301,6 +337,15 @@ def getArgTypes(baseType, argTypes):
 def isFloatType(t):
     return t not in U
 
+def getNumOutArgs(functionDef):
+    if 'num_out_args' in functionDef:
+        return functionDef['num_out_args']
+    else:
+        return 1
+
+def isOutArg(functionDef, argIdx):
+    return argIdx < getNumOutArgs(functionDef)
+
 # Print a test with all-vector inputs/outputs and/or mixed vector/scalar args
 def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, fntype):
     # If the test allows mixed vector/scalar arguments, handle the case with
@@ -332,7 +377,7 @@ def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, fntype
     for arg in range(0, argCount):
         argInOut = ''
         argVal = getStrVal(argType, tests[arg], (vecSize > 1))
-        if arg == 0:
+        if isOutArg(functionDef, arg):
             argInOut = 'arg_out: '
         else:
             argInOut = 'arg_in: '
@@ -345,7 +390,7 @@ def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, fntype
                     '[' + str(numTests * vecSize) + '] ' +
                     ''.join(map(lambda x: (x + ' ') * vecSize, argVal.split()))
             )
-            if arg == 0:
+            if isOutArg(functionDef, arg) :
                 f.write(' tolerance {0} '.format(tolerance))
                 # Use ulp tolerance for float types
                 if isFloatType(argTypes[arg]):
@@ -418,8 +463,13 @@ def gen(types, minVersions, functions, testDefs, dirName):
             sizes = sorted(VEC_WIDTHS)
             sizes.insert(0, 1)  # Add 1-wide scalar to the vector widths
             for vecSize in sizes:
-                print_test(f, fnName, dataType, functionDef, tests,
-                           numTests, vecSize, fnType)
+                if (getNumOutArgs(functionDef) == 1):
+                    print_test(f, fnName, dataType, functionDef, tests,
+                               numTests, vecSize, fnType)
+                else:
+                    for loc in ['_private', '_local', '_global']:
+                        print_test(f, fnName + loc, dataType, functionDef, tests,
+                                   numTests, vecSize, fnType)
 
             # Terminate the header section
             f.write('!*/\n\n')
