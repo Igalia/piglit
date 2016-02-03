@@ -172,6 +172,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_GLSL_version(150); /* Required for named blocks */
+	piglit_require_extension("GL_ARB_enhanced_layouts");
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 	piglit_require_extension("GL_ARB_buffer_storage");
 	piglit_require_extension("GL_ARB_map_buffer_range");
