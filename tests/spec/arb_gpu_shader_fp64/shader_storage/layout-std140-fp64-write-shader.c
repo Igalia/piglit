@@ -50,8 +50,10 @@ static const char vs_pass_thru_text[] =
 	"       double a1;\n"
 	"       dvec2 a2[2];\n"
 	"       dmat2 a4;\n"
+	"       double a5;\n"
 	"};\n"
 	"layout(std140, row_major, binding=2) buffer ssbo {\n"
+	"       dvec4 u;\n"
 	"       dvec4 v;\n"
 	"       double d;\n"
 	"       A s;\n"
@@ -61,9 +63,9 @@ static const char vs_pass_thru_text[] =
 	"void main() {\n"
 	"	gl_Position = piglit_vertex;\n"
 	"       d = 4.0lf;\n"
-	"       s.a2[0] = dvec2(6.0, 7.0); \n"
+	"       s.a2[0] = dvec2(6.0, 7.0) * s.a5; \n"
 	"       int index = int(v.x); // index should be zero\n"
-	"       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
+        "       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
         "}\n";
 
 static const char fs_source[] =
@@ -75,8 +77,10 @@ static const char fs_source[] =
 	"       double a1;\n"
 	"       dvec2 a2[2];\n"
 	"       dmat2 a4;\n"
+	"       double a5;\n"
 	"};\n"
 	"layout(std140, row_major, binding=2) buffer ssbo {\n"
+	"       dvec4 u;\n"
 	"       dvec4 v;\n"
 	"       double d;\n"
 	"       A s;\n"
@@ -86,37 +90,58 @@ static const char fs_source[] =
 	"\n"
 	"void main() {\n"
 	"       color = vec4(0,1,0,1);\n"
-	"       v = dvec4(0.0, 1.0, 2.0, 3.0);\n"
-	"       s.a1 = 5.0lf;\n"
+	"       v = u + dvec4(0.0, 1.0, 2.0, 3.0);\n"
+	"       s.a1 = d * 5.0;\n"
 	"       s.a2[1] = dvec2(8.0, 9.0);\n"
 	"       s.a4 = dmat2(10.0, 11.0, 12.0, 13.0);\n"
 	"       int index = int(v.z + gl_FragCoord.x);\n"
-	"       unsized_array[index] = unsized_array.length() * 2.0;\n"
+     	"       unsized_array[index] = unsized_array.length() * 2.0;\n"
 	"}\n";
 
 GLuint prog;
 
-double expected[SSBO_SIZE] = { 0.0,  1.0,  2.0,  3.0, // dvec4 v
-                               4.0,  0.0,             // double d
-                               5.0,  0.0,             // double s.a1
-                               6.0,  7.0,             // dvec2 s.a2[0]
-                               8.0,  9.0,             // dvec2 s.a2[1]
-                               10.0, 12.0,            // dmat2 a4
-                               11.0, 13.0,            // dmat2 a4
-                               14.0, 0.0,             // double unsized_array[0]
-                               14.0, 0.0,             // double unsized_array[1]
-                               28.0, 0.0,             // double unsized_array[2]
-                               28.0, 0.0,             // double unsized_array[3]
-                               28.0, 0.0,             // double unsized_array[4]
-                               28.0, 0.0,             // double unsized_array[5]
-                               28.0, 0.0,             // double unsized_array[6]
-                               28.0, 0.0,             // double unsized_array[7]
-                               28.0, 0.0,             // double unsized_array[8]
-                               28.0, 0.0,             // double unsized_array[9]
-                               28.0, 0.0,             // double unsized_array[10]
-                               28.0, 0.0,             // double unsized_array[11]
-                               28.0, 0.0,             // double unsized_array[12]
-                               28.0, 0.0,             // double unsized_array[13]
+double ssbo_values[SSBO_SIZE] = { 6.0,  7.0, 8.0, 0.0,  // dvec4 u
+                                  0.0,  0.0, 0.0, 0.0,  // dvec4 v
+                                  0.0,  0.0,            // double d
+                                  0.0,  0.0,            // double s.a1
+                                  0.0,  0.0,            // dvec2 s.a2[0]
+                                  0.0,  0.0,            // dvec2 s.a2[1]
+                                  0.0,  0.0,            // dmat2 s.a4
+                                  0.0,  0.0,            // dmat2 s.a4
+                                  2.0,  0.0,            // double s.a5
+                                  0.0,  0.0,            // double unsized_array[0]
+                                  0.0,  0.0,            // double unsized_array[1]
+                                  0.0,  0.0,            // double unsized_array[2]
+                                  0.0,  0.0,            // double unsized_array[3]
+                                  0.0,  0.0,            // double unsized_array[4]
+                                  0.0,  0.0,            // double unsized_array[5]
+                                  0.0,  0.0,            // double unsized_array[6]
+                                  0.0,  0.0,            // double unsized_array[7]
+                                  0.0,  0.0,            // double unsized_array[8]
+                                  0.0,  0.0,            // double unsized_array[9]
+                                  0.0,  0.0,            // double unsized_array[10]
+};
+
+double expected[SSBO_SIZE] = {  6.0,  7.0,  8.0, 0.0,  // dvec4 u                   expected[0]
+                                6.0,  8.0, 10.0, 3.0,  // dvec4 v                   expected[4]
+                                4.0,  0.0,             // double d                  expected[8]
+                               20.0,  0.0,             // double s.a1               expected[10]
+                               12.0, 14.0,             // dvec2 s.a2[0]             expected[12]
+                                8.0,  9.0,             // dvec2 s.a2[1]             expected[14]
+                               10.0, 12.0,             // dmat2 s.a4                expected[16]
+                               11.0, 13.0,             // dmat2 s.a4                expected[18]
+                                2.0,  0.0,             // double s.a5               expected[20]
+                               11.0,  0.0,             // double unsized_array[0]   expected[22]
+                               11.0,  0.0,             // double unsized_array[1]   expected[24]
+                               11.0,  0.0,             // double unsized_array[2]   expected[26]
+                               11.0,  0.0,             // double unsized_array[3]   expected[28]
+                                0.0,  0.0,             // double unsized_array[4]   expected[30]
+                                0.0,  0.0,             // double unsized_array[5]   expected[32]
+                                0.0,  0.0,             // double unsized_array[6]   expected[34]
+                                0.0,  0.0,             // double unsized_array[7]   expected[36]
+                                0.0,  0.0,             // double unsized_array[8]   expected[38]
+                                0.0,  0.0,             // double unsized_array[9]   expected[40]
+                               22.0,  0.0,             // double unsized_array[10]  expected[42]
 };
 
 void
@@ -125,7 +150,6 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	GLuint buffer;
 	unsigned int i;
-	double ssbo_values[SSBO_SIZE] = {0};
 	double *map;
 
 	piglit_require_extension("GL_ARB_shader_storage_buffer_object");
