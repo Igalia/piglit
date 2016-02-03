@@ -56,6 +56,7 @@ CLC_VERSION_MIN = {
     'fmax' : 10,
     'fmin' : 10,
     'fmod' : 10,
+    'fract' : 10,
     'ldexp' : 10,
     'log10' : 10,
     'log1p' : 10,
@@ -306,6 +307,17 @@ tests = {
             [float.fromhex("0x1p-1"),        float("nan"), float.fromhex("-0x1.feb852p+1"), 1.5, 0.0,           float("inf")]
         ],
         'tolerance' : 0
+    },
+   'fract' : {
+        'arg_types': [F, F, F],
+        'function_type': 'ttt',
+        # For fract we have two outputs per address space.
+        'values': [
+            [float("nan"), 0.0,          0.5, 0.0, float.fromhex('0x1.33333p-2'), float.fromhex('0x1.fffffep-1') ], #fract
+            [float("nan"), float("inf"),          1.0, 2.0, -2.0,                          -1.0], #floor
+            [float("nan"), float("inf"), 1.5, 2.0,float.fromhex('-0x1.b33334p+0'), float.fromhex('-0x1.000242p-24')] #src0
+        ],
+        'num_out_args' : 2
     },
     'ldexp' : {
         'arg_types': [F, F, I],
