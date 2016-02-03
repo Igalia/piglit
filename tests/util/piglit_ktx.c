@@ -145,7 +145,7 @@ piglit_ktx_calc_target(struct piglit_ktx *self)
 	} else {
 		if (info->array_length != 0)
 			goto bad_target;
-		if (info->num_faces != 0)
+		if (info->num_faces != 1)
 			goto bad_target;
 
 		info->target = GL_TEXTURE_3D;
