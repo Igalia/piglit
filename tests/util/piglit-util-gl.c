@@ -50,6 +50,12 @@ bool piglit_is_gles(void)
 	return strncmp("OpenGL ES", version_string, 9) == 0;
 }
 
+bool piglit_is_gles3(void)
+{
+	const char *version_string = (const char *) glGetString(GL_VERSION);
+	return strncmp("OpenGL ES 3", version_string, 11) == 0;
+}
+
 int piglit_get_gl_version(void)
 {
 	const char *version_string = (const char *) glGetString(GL_VERSION);

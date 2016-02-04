@@ -678,10 +678,13 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 				     info->gl_type,
 				     img->data);
 		break;
-	case GL_TEXTURE_2D_ARRAY:
-	case GL_TEXTURE_3D:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
 		if (piglit_is_gles())
+			goto unsupported_on_gles;
+		break;
+	case GL_TEXTURE_2D_ARRAY:
+	case GL_TEXTURE_3D:
+		if (piglit_is_gles() && !piglit_is_gles3())
 			goto unsupported_on_gles;
 		else if (info->gl_type == 0)
 			glCompressedTexImage3D(info->target,

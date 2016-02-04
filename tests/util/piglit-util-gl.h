@@ -51,6 +51,11 @@ extern bool piglit_is_core_profile;
 bool piglit_is_gles(void);
 
 /**
+ * Determine if the API is OpenGL ES 3.x.
+ */
+bool piglit_is_gles3(void);
+
+/**
  * \brief Get version of OpenGL or OpenGL ES API.
  *
  * Returned version is multiplied by 10 to make it an integer.  So for
