@@ -2425,6 +2425,7 @@ with profile.group_manager(
     g(['arb_framebuffer_no_attachments-params'])
     g(['arb_framebuffer_no_attachments-atomic'])
     g(['arb_framebuffer_no_attachments-query'])
+    g(['arb_framebuffer_no_attachments-roundup-samples'])
 
 # Group ARB_explicit_uniform_location
 with profile.group_manager(
