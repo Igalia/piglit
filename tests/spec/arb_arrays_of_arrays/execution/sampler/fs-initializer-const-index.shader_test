@@ -39,6 +39,9 @@ void main()
 }
 
 [test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
 texture rgbw 3 (8, 8)
 draw rect -1 -1 2 2
 relative probe rgb (0.25, 0.25) (1.0, 0.0, 0.0)

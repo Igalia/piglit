@@ -27,6 +27,9 @@ void main()
 }
 
 [test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
 uniform int i[1][1].tex[1][1] 1
 texture rgbw 1 (8, 8)
 draw rect -1 -1 2 2
