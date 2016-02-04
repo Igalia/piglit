@@ -630,6 +630,9 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 	const struct piglit_ktx_image *img = &self->images[image];
 	int level = image;
 
+	glTexParameteri(info->target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(info->target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 	switch (info->target) {
 	case GL_TEXTURE_1D:
 		if (piglit_is_gles())
