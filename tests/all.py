@@ -44,14 +44,16 @@ def add_depthstencil_render_miplevels_tests(adder, test_types):
 
 
 def add_fbo_stencil_tests(adder, format):
-    g(['fbo-stencil', 'clear', format], 'fbo-stencil-{}-clear'.format(format))
-    g(['fbo-stencil', 'readpixels', format],
-      'fbo-stencil-{}-readpixels'.format(format))
-    g(['fbo-stencil', 'drawpixels', format],
-      'fbo-stencil-{}-drawpixels'.format(format))
-    g(['fbo-stencil', 'copypixels', format],
-      'fbo-stencil-{}-copypixels'.format(format))
-    g(['fbo-stencil', 'blit', format], 'fbo-stencil-{}-blit'.format(format))
+    adder(['fbo-stencil', 'clear', format],
+          'fbo-stencil-{}-clear'.format(format))
+    adder(['fbo-stencil', 'readpixels', format],
+          'fbo-stencil-{}-readpixels'.format(format))
+    adder(['fbo-stencil', 'drawpixels', format],
+          'fbo-stencil-{}-drawpixels'.format(format))
+    adder(['fbo-stencil', 'copypixels', format],
+          'fbo-stencil-{}-copypixels'.format(format))
+    adder(['fbo-stencil', 'blit', format],
+          'fbo-stencil-{}-blit'.format(format))
 
 
 def add_fbo_depthstencil_tests(group, format, num_samples):
