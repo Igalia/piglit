@@ -2159,13 +2159,13 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_gpu_shader_fp64', 'execution')) as g:
-     g(['arb_gpu_shader_fp64-tf-separate'])
-     g(['arb_gpu_shader_fp64-double-gettransformfeedbackvarying'])
-     g(['arb_gpu_shader_fp64-tf-interleaved'])
-     g(['arb_gpu_shader_fp64-tf-interleaved-aligned'])
-     g(['arb_gpu_shader_fp64-getuniformdv'])
-     g(['arb_gpu_shader_fp64-wrong-type-setter'])
-     g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
+    g(['arb_gpu_shader_fp64-tf-separate'])
+    g(['arb_gpu_shader_fp64-double-gettransformfeedbackvarying'])
+    g(['arb_gpu_shader_fp64-tf-interleaved'])
+    g(['arb_gpu_shader_fp64-tf-interleaved-aligned'])
+    g(['arb_gpu_shader_fp64-getuniformdv'])
+    g(['arb_gpu_shader_fp64-wrong-type-setter'])
+    g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
 
 with profile.group_manager(
         PiglitGLTest,
