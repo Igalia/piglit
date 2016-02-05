@@ -85,6 +85,7 @@ piglit_init(int argc, char **argv)
    GLint expectedNum = 9;
    GLint loc_d1, loc_d2, loc_sa, loc_sd, loc_u1, loc_u2, loc_v1;
    GLdouble v[4];
+   static const GLdouble saVals[1] = {15.0};
    static const GLdouble u1Vals[2] = {5.0, 8.0};
    static const GLdouble u2Vals[3] = {1.0, 1.0, 2.0};
    static const GLdouble vVals[4] = {30.0, 31.0, 32.0, 33.0};
@@ -172,7 +173,7 @@ piglit_init(int argc, char **argv)
 
    glUniform1d(loc_d1, 5.0);
    glUniform1d(loc_d2, 10.0);
-   glUniform1d(loc_sa, 15.0);
+   glUniform1dv(loc_sa, 1, saVals);
    glUniform1d(loc_sd, 20.0);
    glUniform2dv(loc_u1, 1, u1Vals);
    glUniform3dv(loc_u2, 1, u2Vals);
