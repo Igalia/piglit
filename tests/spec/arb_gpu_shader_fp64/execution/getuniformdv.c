@@ -49,20 +49,21 @@ static const char vs_text[] =
    "uniform dvec4 v[3]; \n"
    "uniform s1 s;\n"
    "uniform double d2; \n"
-   "out vec4 color; \n"
+   "out vec4 vscolor; \n"
    "\n"
    "void main()\n"
    "{\n"
    "  gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n"
    "  dvec4 t = dvec4(s.a, s.b, s.c, s.d) * d1 + d2;\n"
    "  t += v[0] + v[1] + v[2]; \n"
-   "  color = vec4(t); \n"
+   "  vscolor = vec4(t); \n"
    "}\n";
 
 static const char fs_text[] =
    "#version 150\n"
-   "in vec4 color;\n"
-   "void main() { gl_FragColor = color; }";
+   "in vec4 vscolor;\n"
+   "out vec4 fscolor;\n"
+   "void main() { fscolor = vscolor; }";
 
 enum piglit_result
 piglit_display(void)
