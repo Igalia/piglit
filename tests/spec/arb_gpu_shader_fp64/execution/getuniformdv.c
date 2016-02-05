@@ -46,7 +46,7 @@ static const char vs_text[] =
    "   double a, b, c, d; \n"
    "}; \n"
    "uniform double d1; \n"
-   "uniform dvec2 u1; \n"
+   "uniform dvec2 u1[2]; \n"
    "uniform dvec3 u2; \n"
    "uniform dvec4 v[3]; \n"
    "uniform s1 s;\n"
@@ -58,7 +58,7 @@ static const char vs_text[] =
    "  gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n"
    "  dvec4 t = dvec4(s.a, s.b, s.c, s.d) * d1 + d2;\n"
    "  t += v[0] + v[1] + v[2]; \n"
-   "  t.rb += u1; \n"
+   "  t.rb += u1[0] + u1[1]; \n"
    "  t.xyw += u2; \n"
    "  vscolor = vec4(t); \n"
    "}\n";
@@ -134,10 +134,10 @@ piglit_init(int argc, char **argv)
          strName = "v";
          expectedType = GL_DOUBLE_VEC4;
          expectedSize = 3;
-      } else if (strcmp(name, "u1") == 0) {
-         strName = name;
+      } else if (strcmp(name, "u1") == 0 || strcmp(name, "u1[0]") == 0) {
+         strName = "u1";
          expectedType = GL_DOUBLE_VEC2;
-         expectedSize = 1;
+         expectedSize = 2;
       } else if (strcmp(name, "u2") == 0) {
          strName = name;
          expectedType = GL_DOUBLE_VEC3;
@@ -167,7 +167,7 @@ piglit_init(int argc, char **argv)
    loc_d2 = glGetUniformLocation(prog, "d2");
    loc_sa = glGetUniformLocation(prog, "s.a");
    loc_sd = glGetUniformLocation(prog, "s.d");
-   loc_u1 = glGetUniformLocation(prog, "u1");
+   loc_u1 = glGetUniformLocation(prog, "u1[1]");
    loc_u2 = glGetUniformLocation(prog, "u2");
    loc_v1 = glGetUniformLocation(prog, "v[1]");
 
@@ -210,7 +210,7 @@ piglit_init(int argc, char **argv)
    glGetUniformdv(prog, loc_u1, v);
    if (v[0] != 5.0  ||
        v[1] != 8.0) {
-      printf("%s: wrong value for u1 (found %g,%g, expected %g,%g)\n",
+      printf("%s: wrong value for u1[0] (found %g,%g, expected %g,%g)\n",
              TestName, v[0], v[1], 5.0, 8.0);
       piglit_report_result(PIGLIT_FAIL);
    }
@@ -231,6 +231,17 @@ piglit_init(int argc, char **argv)
        v[3] != 33.0) {
       printf("%s: wrong value for v[1] (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
              TestName, v[0], v[1], v[2], v[3], 30.0, 31.0, 32.0, 33.0);
+      piglit_report_result(PIGLIT_FAIL);
+   }
+
+   loc_u1 = glGetUniformLocation(prog, "u1[0]");
+   glUniform2d(loc_u1, 12.0, 14.0);
+
+   glGetUniformdv(prog, loc_u1, v);
+   if (v[0] != 12.0 ||
+       v[1] != 14.0) {
+      printf("%s: wrong value for u1[0] (found %g,%g, expected %g,%g)\n",
+             TestName, v[0], v[1], 12.0, 14.0);
       piglit_report_result(PIGLIT_FAIL);
    }
 
