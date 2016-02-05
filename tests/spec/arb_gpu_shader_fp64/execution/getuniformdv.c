@@ -49,6 +49,7 @@ static const char vs_text[] =
    "uniform dvec2 u1[2]; \n"
    "uniform dvec3 u2[4]; \n"
    "uniform dvec4 v[3]; \n"
+   "uniform dmat2 m1; \n"
    "uniform s1 s;\n"
    "uniform double d2; \n"
    "out vec4 vscolor; \n"
@@ -58,7 +59,7 @@ static const char vs_text[] =
    "  gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n"
    "  dvec4 t = dvec4(s.a, s.b, s.c, s.d) * d1 + d2;\n"
    "  t += v[0] + v[1] + v[2]; \n"
-   "  t.rb += u1[0] + u1[1]; \n"
+   "  t.rb += u1[0]*m1 + u1[1]; \n"
    "  t.xyw += u2[0] + u2[1] + u2[2] + u2[3]; \n"
    "  vscolor = vec4(t); \n"
    "}\n";
@@ -82,13 +83,14 @@ piglit_init(int argc, char **argv)
 {
    GLuint vs, fs, prog;
    GLint numUniforms, i;
-   GLint expectedNum = 9;
-   GLint loc_d1, loc_d2, loc_sa, loc_sd, loc_u1, loc_u2, loc_v1;
+   GLint expectedNum = 10;
+   GLint loc_d1, loc_d2, loc_sa, loc_sd, loc_u1, loc_u2, loc_v1, loc_m1;
    GLdouble v[4];
    static const GLdouble saVals[1] = {15.0};
    static const GLdouble u1Vals[2] = {5.0, 8.0};
    static const GLdouble u2Vals[3] = {1.0, 1.0, 2.0};
    static const GLdouble vVals[4] = {30.0, 31.0, 32.0, 33.0};
+   static const GLdouble m1Vals[4] = {1.0, 2.0, 3.0, 4.0};
 
    piglit_require_extension("GL_ARB_gpu_shader_fp64");
 
@@ -142,6 +144,10 @@ piglit_init(int argc, char **argv)
          strName = "u2";
          expectedType = GL_DOUBLE_VEC3;
          expectedSize = 4;
+      } else if (strcmp(name, "m1") == 0) {
+         strName = name;
+         expectedType = GL_DOUBLE_MAT2;
+         expectedSize = 1;
       } else {
          strName = name;
          expectedType = GL_DOUBLE;
@@ -170,6 +176,7 @@ piglit_init(int argc, char **argv)
    loc_u1 = glGetUniformLocation(prog, "u1[1]");
    loc_u2 = glGetUniformLocation(prog, "u2[0]");
    loc_v1 = glGetUniformLocation(prog, "v[1]");
+   loc_m1 = glGetUniformLocation(prog, "m1");
 
    glUniform1d(loc_d1, 5.0);
    glUniform1d(loc_d2, 10.0);
@@ -178,6 +185,7 @@ piglit_init(int argc, char **argv)
    glUniform2dv(loc_u1, 1, u1Vals);
    glUniform3dv(loc_u2, 1, u2Vals);
    glUniform4dv(loc_v1, 1, vVals);
+   glUniformMatrix2dv(loc_m1, 1, false, m1Vals);
 
    glGetUniformdv(prog, loc_d1, v);
    if (v[0] != 5.0) {
@@ -231,6 +239,16 @@ piglit_init(int argc, char **argv)
        v[3] != 33.0) {
       printf("%s: wrong value for v[1] (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
              TestName, v[0], v[1], v[2], v[3], 30.0, 31.0, 32.0, 33.0);
+      piglit_report_result(PIGLIT_FAIL);
+   }
+
+   glGetUniformdv(prog, loc_m1, v);
+   if (v[0] != 1.0 ||
+       v[1] != 2.0 ||
+       v[2] != 3.0 ||
+       v[3] != 4.0) {
+      printf("%s: wrong value for m1 (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
+             TestName, v[0], v[1], v[2], v[3], 1.0, 2.0, 3.0, 4.0);
       piglit_report_result(PIGLIT_FAIL);
    }
 
