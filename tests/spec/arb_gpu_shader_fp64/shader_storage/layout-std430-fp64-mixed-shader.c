@@ -21,11 +21,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/** @file layout-std430-fp64-mixed-write-shader.c
+/** @file layout-std430-fp64-mixed-shader.c
  *
- * Tests that shader storage block writes in GLSL works correctly (offsets and
- * values) when interface packing qualifier is std430, using
- * mixed content.
+ * Tests that shader storage block reads/writes in GLSL works correctly (offsets
+ * and values) when interface packing qualifier is std430, using mixed content.
  *
  * From GL_ARB_shader_storage_buffer_object:
  *

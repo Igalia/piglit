@@ -9,7 +9,7 @@ link_libraries (
        ${OPENGL_glu_LIBRARY}
 )
 
-piglit_add_executable (arb_gpu_shader_fp64-layout-std140-fp64-write-shader layout-std140-fp64-write-shader.c)
-piglit_add_executable (arb_gpu_shader_fp64-layout-std140-fp64-mixed-write-shader layout-std140-fp64-mixed-write-shader.c)
-piglit_add_executable (arb_gpu_shader_fp64-layout-std430-fp64-write-shader layout-std430-fp64-write-shader.c)
-piglit_add_executable (arb_gpu_shader_fp64-layout-std430-fp64-mixed-write-shader layout-std430-fp64-mixed-write-shader.c)
+piglit_add_executable (arb_gpu_shader_fp64-layout-std140-fp64-shader layout-std140-fp64-shader.c)
+piglit_add_executable (arb_gpu_shader_fp64-layout-std140-fp64-mixed-shader layout-std140-fp64-mixed-shader.c)
+piglit_add_executable (arb_gpu_shader_fp64-layout-std430-fp64-shader layout-std430-fp64-shader.c)
+piglit_add_executable (arb_gpu_shader_fp64-layout-std430-fp64-mixed-shader layout-std430-fp64-mixed-shader.c)

@@ -21,10 +21,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/** @file layout-std140-fp64-mixed-write-shader.c
+/** @file layout-std140-fp64-mixed-shader.c
  *
- * Tests that shader storage block writes in GLSL works correctly (offsets and
- * values) when interface packing qualifier is std140 and row_major, using
+ * Tests that shader storage block reads/writes in GLSL works correctly (offsets
+ * and values) when interface packing qualifier is std140 and row_major, using
  * mixed content.
  */
 

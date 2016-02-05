@@ -2115,10 +2115,10 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_gpu_shader_fp64', 'shader_storage')) as g:
-     g(['arb_gpu_shader_fp64-layout-std140-fp64-write-shader'], 'layout-std140-fp64-write-shader')
-     g(['arb_gpu_shader_fp64-layout-std140-fp64-mixed-write-shader'], 'layout-std140-fp64-mixed-write-shader')
-     g(['arb_gpu_shader_fp64-layout-std430-fp64-write-shader'], 'layout-std430-fp64-write-shader')
-     g(['arb_gpu_shader_fp64-layout-std430-fp64-mixed-write-shader'], 'layout-std430-fp64-mixed-write-shader')
+     g(['arb_gpu_shader_fp64-layout-std140-fp64-shader'], 'layout-std140-fp64-shader')
+     g(['arb_gpu_shader_fp64-layout-std140-fp64-mixed-shader'], 'layout-std140-fp64-mixed-shader')
+     g(['arb_gpu_shader_fp64-layout-std430-fp64-shader'], 'layout-std430-fp64-shader')
+     g(['arb_gpu_shader_fp64-layout-std430-fp64-mixed-shader'], 'layout-std430-fp64-mixed-shader')
 
 with profile.group_manager(
         PiglitGLTest,
