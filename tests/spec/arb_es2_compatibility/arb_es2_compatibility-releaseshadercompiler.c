@@ -28,7 +28,9 @@
 /** @file arb_es2_compatibility-releasecompiler.c
  *
  * Tests that compiling a shader works again after doing
- * glReleaseShaderCompiler().
+ * glReleaseShaderCompiler(). Note that it's important that one of the
+ * shaders use builtins, as that tests some of the shader compiler's
+ * innards.
  */
 
 #include "piglit-util-gl.h"
@@ -55,18 +57,20 @@ static const char fs_text[] =
 	"#version 100\n"
 	"uniform mediump vec4 color;\n"
 	"void main () {\n"
-	"    gl_FragColor = color;\n"
+	"    gl_FragColor = clamp(color, vec4(0), vec4(1));\n"
 	"}\n"
 	;
 
 void
-draw(const float *color, float x_offset)
+draw(const float *color, float x_offset, bool release)
 {
 	GLuint prog;
 	GLint color_location;
 	GLint offset_location;
 
 	prog = piglit_build_simple_program(vs_text, fs_text);
+	if (release)
+		glReleaseShaderCompiler();
 
 	glBindAttribLocation(prog, 0, "vertex");
 	glLinkProgram(prog);
@@ -91,9 +95,10 @@ piglit_display(void)
 	float green[] = {0.0, 1.0, 0.0, 0.0};
 	float blue[] = {0.0, 0.0, 1.0, 0.0};
 
-	draw(green, 0.0f);
+	draw(green, 0.0f, false);
 	glReleaseShaderCompiler();
-	draw(blue, 1.0f);
+	draw(blue, 1.0f, true);
+	glReleaseShaderCompiler();
 
 	pass &= piglit_probe_pixel_rgba(piglit_width / 4, piglit_height / 2,
 					green);
