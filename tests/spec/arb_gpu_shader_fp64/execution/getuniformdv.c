@@ -74,6 +74,7 @@ static const char fs_text[] =
    "out vec4 fscolor;\n"
    "void main() { fscolor = vscolor; }";
 
+#define MAX_VALUES 16
 #define UNIFORM_SIZE 9
 
 static struct {
@@ -92,6 +93,42 @@ static struct {
    {"m4",    NULL, GL_DOUBLE_MAT2x3, 1},
    {"m5",    NULL, GL_DOUBLE_MAT2x4, 1}};
 
+enum uniform_enum {
+   d1 = 0, d2, sa, sd, u1_0, u1_1, u2_0, u2_2, v_0, v_1, m1, m2, m3, m4, m5, _last
+};
+
+static struct {
+   char *location;
+   GLint size;
+   GLdouble values[MAX_VALUES];
+} uniform_values[] = {
+   {    "d1",  1, { 5.0 }},
+   {    "d2",  1, {10.0}},
+   {   "s.a",  1, {15.0}},
+   {   "s.d",  1, {20.0}},
+   { "u1[0]",  2, {12.0, 14.0}},
+   { "u1[1]",  2, {5.0, 8.0}},
+   { "u2[0]",  3, {1.0, 1.0, 2.0}},
+   { "u2[2]",  3, {20.0, 20.0, 15.0}},
+   {  "v[0]",  4, {2.0, 3.0, 4.0, 5.0}},
+   {  "v[1]",  4, {1.0, 2.0, 3.0, 4.0}},
+   {    "m1",  4, {1.0, 2.0,
+                   3.0, 4.0}},
+   {    "m2",  9, {1.0, 1.0, 1.0,
+                   2.0, 2.0, 2.0,
+                   3.0, 3.0, 3.0}},
+   { "m3[1]", 16, {1.0, 2.0, 3.0, 4.0,
+                   5.0, 6.0, 7.0, 8.0,
+                   1.5, 2.5, 3.5, 4.5,
+                   5.5, 6.5, 7.5, 8.5}},
+   {    "m4",  6, {15.0, 16.0,
+                   17.0, 18.0,
+                   19.0, 20.0}},
+   {    "m5",  8, {10.0, 11.0,
+                   12.0, 13.0,
+                   14.0, 15.0,
+                   15.0, 17.0}}};
+
 enum piglit_result
 piglit_display(void)
 {
@@ -99,6 +136,35 @@ piglit_display(void)
    return PIGLIT_FAIL;
 }
 
+static bool
+verify_uniform(GLuint prog, enum uniform_enum u)
+{
+   GLint loc;
+   GLdouble val[MAX_VALUES];
+   bool match = true;
+   int i;
+
+   loc = glGetUniformLocation(prog, uniform_values[u].location);
+   glGetUniformdv(prog, loc, val);
+   for (i = 0; i < uniform_values[u].size; i++) {
+      match = match && (val[i] == uniform_values[u].values[i]);
+   }
+
+   if (!match) {
+      printf("%s: wrong value for %s (found ",
+             TestName, uniform_values[u].location);
+      for (i = 0; i < uniform_values[u].size; i++) {
+         printf("%g,", val[i]);
+      }
+      printf("expected ");
+      for (i = 0; i < (uniform_values[u].size - 1); i++) {
+         printf("%g,", uniform_values[u].values[i]);
+      }
+      printf ("%g)\n", uniform_values[u].values[uniform_values[u].size - 1]);
+   }
+
+   return match;
+}
 
 void
 piglit_init(int argc, char **argv)
@@ -107,26 +173,8 @@ piglit_init(int argc, char **argv)
    GLuint vs, fs, prog;
    GLint numUniforms, i;
    GLint expectedNum = 14;
-   GLint loc_d1, loc_d2, loc_sa, loc_sd, loc_u1, loc_u2,
-      loc_v1, loc_m1, loc_m2, loc_m3, loc_m4, loc_m5;
-   GLdouble v[16];
-   static const GLdouble saVals[1] = {15.0};
-   static const GLdouble u1Vals[2] = {5.0, 8.0};
-   static const GLdouble u2Vals[3] = {1.0, 1.0, 2.0};
-   static const GLdouble vVals[4] = {30.0, 31.0, 32.0, 33.0};
-   static const GLdouble m1Vals[4] = {1.0, 2.0, 3.0, 4.0};
-   static const GLdouble m2Vals[9] = {1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0};
-   static const GLdouble m3Vals[16] = { 1.0, 2.0, 3.0, 4.0,
-                                        5.0, 6.0, 7.0, 8.0,
-                                        1.5, 2.5, 3.5, 4.5,
-                                        5.5, 6.5, 7.5, 8.5};
-   static const GLdouble m4Vals[6] = {15.0, 16.0,
-                                      17.0, 18.0,
-                                      19.0, 20.0};
-   static const GLdouble m5Vals[8] = {10.0, 11.0,
-                                      12.0, 13.0,
-                                      14.0, 15.0,
-                                      16.0, 17.0};
+   GLint loc;
+   enum uniform_enum u;
 
    piglit_require_extension("GL_ARB_gpu_shader_fp64");
 
@@ -198,186 +246,61 @@ piglit_init(int argc, char **argv)
 
    /* Check setting/getting values */
 
-   loc_d1 = glGetUniformLocation(prog, "d1");
-   loc_d2 = glGetUniformLocation(prog, "d2");
-   loc_sa = glGetUniformLocation(prog, "s.a");
-   loc_sd = glGetUniformLocation(prog, "s.d");
-   loc_u1 = glGetUniformLocation(prog, "u1[1]");
-   loc_u2 = glGetUniformLocation(prog, "u2[0]");
-   loc_v1 = glGetUniformLocation(prog, "v[1]");
-   loc_m1 = glGetUniformLocation(prog, "m1");
-   loc_m2 = glGetUniformLocation(prog, "m2");
-   loc_m3 = glGetUniformLocation(prog, "m3[1]");
-   loc_m4 = glGetUniformLocation(prog, "m4");
-   loc_m5 = glGetUniformLocation(prog, "m5");
+   loc = glGetUniformLocation(prog, uniform_values[d1].location);
+   glUniform1d(loc, uniform_values[d1].values[0]);
 
-   glUniform1d(loc_d1, 5.0);
-   glUniform1d(loc_d2, 10.0);
-   glUniform1dv(loc_sa, 1, saVals);
-   glUniform1d(loc_sd, 20.0);
-   glUniform2dv(loc_u1, 1, u1Vals);
-   glUniform3dv(loc_u2, 1, u2Vals);
-   glUniform4dv(loc_v1, 1, vVals);
-   glUniformMatrix2dv(loc_m1, 1, false, m1Vals);
-   glUniformMatrix3dv(loc_m2, 1, true, m2Vals);
-   glUniformMatrix4dv(loc_m3, 1, false, m3Vals);
-   glUniformMatrix2x3dv(loc_m4, 1, false, m4Vals);
-   glUniformMatrix2x4dv(loc_m5, 1, false, m5Vals);
+   loc = glGetUniformLocation(prog, uniform_values[d2].location);
+   glUniform1d(loc, uniform_values[d2].values[0]);
 
-   glGetUniformdv(prog, loc_d1, v);
-   if (v[0] != 5.0) {
-      printf("%s: wrong value for d1 (found %f, expected %f)\n",
-             TestName, v[0], 5.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[sa].location);
+   glUniform1dv(loc, 1, uniform_values[sa].values);
 
-   glGetUniformdv(prog, loc_d2, v);
-   if (v[0] != 10.0) {
-      printf("%s: wrong value for d2 (found %f, expected %f)\n",
-             TestName, v[0], 10.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[sd].location);
+   glUniform1d(loc, uniform_values[sd].values[0]);
 
-   glGetUniformdv(prog, loc_sa, v);
-   if (v[0] != 15.0) {
-      printf("%s: wrong value for s.a (found %f, expected %f)\n",
-             TestName, v[0], 15.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[u1_0].location);
+   glUniform2dv(loc, 1, uniform_values[u1_0].values);
 
-   glGetUniformdv(prog, loc_sd, v);
-   if (v[0] != 20.0) {
-      printf("%s: wrong value for s.d (found %f, expected %f)\n",
-             TestName, v[0], 20.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[u2_0].location);
+   glUniform3dv(loc, 1, uniform_values[u2_0].values);
 
-   glGetUniformdv(prog, loc_u1, v);
-   if (v[0] != 5.0  ||
-       v[1] != 8.0) {
-      printf("%s: wrong value for u1[0] (found %g,%g, expected %g,%g)\n",
-             TestName, v[0], v[1], 5.0, 8.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[v_1].location);
+   glUniform4dv(loc, 1, uniform_values[v_1].values);
 
-   glGetUniformdv(prog, loc_u2, v);
-   if (v[0] != 1.0 ||
-       v[1] != 1.0 ||
-       v[2] != 2.0) {
-      printf("%s: wrong value for u2[0] (found %g,%g,%g, expected %g,%g,%g)\n",
-             TestName, v[0], v[1], v[2], 1.0, 1.0, 2.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[m1].location);
+   glUniformMatrix2dv(loc, 1, false, uniform_values[m1].values);
 
-   glGetUniformdv(prog, loc_v1, v);
-   if (v[0] != 30.0 ||
-       v[1] != 31.0 ||
-       v[2] != 32.0 ||
-       v[3] != 33.0) {
-      printf("%s: wrong value for v[1] (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
-             TestName, v[0], v[1], v[2], v[3], 30.0, 31.0, 32.0, 33.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[m2].location);
+   glUniformMatrix3dv(loc, 1, false, uniform_values[m2].values);
 
-   glGetUniformdv(prog, loc_m1, v);
-   if (v[0] != 1.0 ||
-       v[1] != 2.0 ||
-       v[2] != 3.0 ||
-       v[3] != 4.0) {
-      printf("%s: wrong value for m1 (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
-             TestName, v[0], v[1], v[2], v[3], 1.0, 2.0, 3.0, 4.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[m3].location);
+   glUniformMatrix4dv(loc, 1, false, uniform_values[m3].values);
 
-   glGetUniformdv(prog, loc_m2, v);
-   if (v[0] != 1.0 ||
-       v[1] != 2.0 ||
-       v[2] != 3.0 ||
-       v[3] != 1.0 ||
-       v[4] != 2.0 ||
-       v[5] != 3.0 ||
-       v[6] != 1.0 ||
-       v[7] != 2.0 ||
-       v[8] != 3.0) {
-      printf("%s: wrong value for m2 (found %g,%g,%g,%g,%g,%g,%g,%g,%g, expected %g,%g,%g,%g,%g,%g,%g,%g,%g)\n",
-             TestName,
-             v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8],
-             1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[m4].location);
+   glUniformMatrix2x3dv(loc, 1, false, uniform_values[m4].values);
 
-   glGetUniformdv(prog, loc_m3, v);
-   if (v[0] != 1.0 || v[1] != 2.0 || v[2] != 3.0 || v[3] != 4.0 ||
-       v[4] != 5.0 || v[5] != 6.0 || v[6] != 7.0 || v[7] != 8.0 ||
-       v[8] != 1.5 || v[9] != 2.5 || v[10] != 3.5 || v[11] != 4.5 ||
-       v[12] != 5.5 || v[13] != 6.5 || v[14] != 7.5 || v[15] != 8.5) {
-      printf("%s: wrong value for m3 (found %g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g, "
-             "expected %g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g)\n",
-             TestName,
-             v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8],
-             v[9], v[10], v[11], v[12], v[13], v[14], v[15],
-             1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
-             1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[m5].location);
+   glUniformMatrix2x4dv(loc, 1, false, uniform_values[m5].values);
 
-   glGetUniformdv(prog, loc_m4, v);
-   if (v[0] != 15.0 || v[1] != 16.0 ||
-       v[2] != 17.0 || v[3] != 18.0 ||
-       v[4] != 19.0 || v[5] != 20.0) {
-      printf("%s: wrong value for m4 (found %g,%g,%g,%g,%g,%g, "
-             "expected %g,%g,%g,%g,%g,%g)\n",
-             TestName,
-             v[0], v[1], v[2], v[3], v[4], v[5], v[6],
-             15.0, 16.0, 17.0, 18.0, 19.0, 20.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[u1_1].location);
+   glUniform2d(loc, uniform_values[u1_1].values[0], uniform_values[u1_1].values[1]);
 
-   glGetUniformdv(prog, loc_m5, v);
-   if (v[0] != 10.0 || v[1] != 11.0 ||
-       v[2] != 12.0 || v[3] != 13.0 ||
-       v[4] != 14.0 || v[5] != 15.0 ||
-       v[6] != 16.0 || v[7] != 17.0) {
-      printf("%s: wrong value for m5 (found %g,%g,%g,%g,%g,%g,%g,%g, "
-             "expected %g,%g,%g,%g,%g,%g,%g,%g)\n",
-             TestName,
-             v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7],
-             10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0);
-      piglit_pass = false;
-   }
 
-   loc_u1 = glGetUniformLocation(prog, "u1[0]");
-   loc_u2 = glGetUniformLocation(prog, "u2[2]");
-   loc_v1 = glGetUniformLocation(prog, "v[0]");
+   loc = glGetUniformLocation(prog, uniform_values[u2_2].location);
+   glUniform3d(loc,
+               uniform_values[u2_2].values[0],
+               uniform_values[u2_2].values[1],
+               uniform_values[u2_2].values[2]);
 
-   glUniform2d(loc_u1, 12.0, 14.0);
-   glUniform3d(loc_u2, 20.0, 20.0, 15.0);
-   glUniform4d(loc_v1, 2.0, 3.0, 4.0, 5.0);
-   glGetUniformdv(prog, loc_u1, v);
-   if (v[0] != 12.0 ||
-       v[1] != 14.0) {
-      printf("%s: wrong value for u1[0] (found %g,%g, expected %g,%g)\n",
-             TestName, v[0], v[1], 12.0, 14.0);
-      piglit_pass = false;
-   }
+   loc = glGetUniformLocation(prog, uniform_values[v_0].location);
+   glUniform4d(loc,
+               uniform_values[v_0].values[0],
+               uniform_values[v_0].values[1],
+               uniform_values[v_0].values[2],
+               uniform_values[v_0].values[3]);
 
-   glGetUniformdv(prog, loc_u2, v);
-   if (v[0] != 20.0 ||
-       v[1] != 20.0 ||
-       v[2] != 15.0) {
-      printf("%s: wrong value for u2[2] (found %g,%g,%g, expected %g,%g,%g)\n",
-             TestName, v[0], v[1], v[2], 20.0, 20.0, 15.0);
-      piglit_pass = false;
-   }
-
-   glGetUniformdv(prog, loc_v1, v);
-   if (v[0] != 2.0 ||
-       v[1] != 3.0 ||
-       v[2] != 4.0 ||
-       v[3] != 5.0) {
-     printf("%s: wrong value for v[0] (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
-            TestName, v[0], v[1], v[2], v[3], 2.0, 3.0, 4.0, 5.0);
-     piglit_pass = false;
+   for (u = 0; u < _last; u++) {
+      piglit_pass = piglit_pass && verify_uniform(prog, u);
    }
 
    piglit_report_result(piglit_pass ? PIGLIT_PASS : PIGLIT_FAIL);
