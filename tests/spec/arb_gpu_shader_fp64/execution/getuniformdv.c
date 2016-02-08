@@ -74,6 +74,24 @@ static const char fs_text[] =
    "out vec4 fscolor;\n"
    "void main() { fscolor = vscolor; }";
 
+#define UNIFORM_SIZE 9
+
+static struct {
+   char *name;
+   char *altName;
+   GLint expectedType;
+   GLenum expectedSize;
+} uniforms[] = {
+   {NULL,    NULL, GL_DOUBLE,        1},  //default
+   { "v",  "v[0]", GL_DOUBLE_VEC4,   3},
+   {"u1", "u1[0]", GL_DOUBLE_VEC2,   2},
+   {"u2", "u2[0]", GL_DOUBLE_VEC3,   4},
+   {"m1",    NULL, GL_DOUBLE_MAT2,   1},
+   {"m2",    NULL, GL_DOUBLE_MAT3,   1},
+   {"m3", "m3[0]", GL_DOUBLE_MAT4,   3},
+   {"m4",    NULL, GL_DOUBLE_MAT2x3, 1},
+   {"m5",    NULL, GL_DOUBLE_MAT2x4, 1}};
+
 enum piglit_result
 piglit_display(void)
 {
@@ -129,10 +147,9 @@ piglit_init(int argc, char **argv)
    for (i = 0; i < numUniforms; i++) {
       GLcharARB name[100];
       GLsizei len;
-      GLint size, expectedSize;
-      GLenum type, expectedType;
+      GLint size, j;
+      GLenum type;
       GLint loc;
-      char *strName;
 
       glGetActiveUniform(prog, i, sizeof(name), &len, &size, &type, name);
       loc = glGetUniformLocation(prog, name);
@@ -150,53 +167,31 @@ piglit_init(int argc, char **argv)
        * the name.  Earlier versions of the spec are ambiguous.  Accept either
        * name.
        */
-      if (strcmp(name, "v") == 0 || strcmp(name, "v[0]") == 0) {
-         strName = "v";
-         expectedType = GL_DOUBLE_VEC4;
-         expectedSize = 3;
-      } else if (strcmp(name, "u1") == 0 || strcmp(name, "u1[0]") == 0) {
-         strName = "u1";
-         expectedType = GL_DOUBLE_VEC2;
-         expectedSize = 2;
-      } else if (strcmp(name, "u2") == 0 || strcmp(name, "u2[0]") ==0) {
-         strName = "u2";
-         expectedType = GL_DOUBLE_VEC3;
-         expectedSize = 4;
-      } else if (strcmp(name, "m1") == 0) {
-         strName = name;
-         expectedType = GL_DOUBLE_MAT2;
-         expectedSize = 1;
-      } else if (strcmp(name, "m2") == 0) {
-         strName = name;
-         expectedType = GL_DOUBLE_MAT3;
-         expectedSize = 1;
-      } else if (strcmp(name, "m3") == 0 || strcmp(name, "m3[0]") == 0) {
-         strName = "m3";
-         expectedType = GL_DOUBLE_MAT4;
-         expectedSize = 3;
-      } else if (strcmp(name, "m4") == 0) {
-         strName = name;
-         expectedType = GL_DOUBLE_MAT2x3;
-         expectedSize = 1;
-      } else if (strcmp(name, "m5") == 0) {
-         strName = name;
-         expectedType = GL_DOUBLE_MAT2x4;
-         expectedSize = 1;
-      } else {
-         strName = name;
-         expectedType = GL_DOUBLE;
-         expectedSize = 1;
+      for (j = 1; j < UNIFORM_SIZE; j++) {
+         if (strcmp(name, uniforms[j].name) == 0) {
+            break;
+         }
+         if (uniforms[j].altName && strcmp(name, uniforms[j].altName) == 0) {
+            break;
+         }
+      }
+      if (j == UNIFORM_SIZE) {
+         j = 0;
       }
 
-      if (type != expectedType) {
+      if (type != uniforms[j].expectedType) {
          printf("%s: wrong type for '%s' (found 0x%x, expected 0x%x)\n",
-                TestName, strName, type, expectedType);
+                TestName,
+                uniforms[j].name ? uniforms[j].name : name,
+                type, uniforms[j].expectedType);
          piglit_pass = false;
       }
 
-      if (size != expectedSize) {
+      if (size != uniforms[j].expectedSize) {
          printf("%s: wrong size for '%s' (found %d, expected %d)\n",
-                TestName, strName, size, expectedSize);
+                TestName,
+                uniforms[j].name ? uniforms[j].name : name,
+                size, uniforms[j].expectedSize);
          piglit_pass = false;
       }
    }
