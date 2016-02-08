@@ -38,7 +38,12 @@ BLACKLIST = {
     'builtin_function.py',
     'builtin_function_fp64.py',
     'genclbuiltins.py',
-    'test_generators.py'
+    'test_generators.py',
+
+    # these (or some subset) should run eventually.
+    'random_ubo.py',
+    'random_ubo_trim.py',
+    'random_ubo-arb_uniform_buffer_object.py',
 }
 
 BLACKLIST = set([os.path.abspath(os.path.join(os.path.dirname(__file__), _p))
