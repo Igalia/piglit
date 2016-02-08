@@ -76,7 +76,6 @@ static const char fs_text[] =
    "void main() { fscolor = vscolor; }";
 
 #define MAX_VALUES 16
-#define UNIFORM_SIZE 10
 
 static struct {
    char *name;
@@ -84,7 +83,6 @@ static struct {
    GLint expectedType;
    GLenum expectedSize;
 } uniforms[] = {
-   {NULL,    NULL, GL_DOUBLE,        1},  //default
    { "v",  "v[0]", GL_DOUBLE_VEC4,   3},
    {"u1", "u1[0]", GL_DOUBLE_VEC2,   2},
    {"u2", "u2[0]", GL_DOUBLE_VEC3,   4},
@@ -93,7 +91,8 @@ static struct {
    {"m3", "m3[0]", GL_DOUBLE_MAT4,   3},
    {"m4",    NULL, GL_DOUBLE_MAT2x3, 1},
    {"m5",    NULL, GL_DOUBLE_MAT2x4, 1},
-   {"m6",    NULL, GL_DOUBLE_MAT3x2, 1}};
+   {"m6",    NULL, GL_DOUBLE_MAT3x2, 1},
+   {NULL,    NULL, GL_DOUBLE,        1}};  //default
 
 enum uniform_enum {
    d1 = 0, d2, sa, sd, u1_0, u1_1, u2_0, u2_2, v_0, v_1, m1, m2, m3, m4, m5, m6, _last
@@ -219,16 +218,15 @@ piglit_init(int argc, char **argv)
        * the name.  Earlier versions of the spec are ambiguous.  Accept either
        * name.
        */
-      for (j = 1; j < UNIFORM_SIZE; j++) {
+      j = 0;
+      while (uniforms[j].name != NULL) {
          if (strcmp(name, uniforms[j].name) == 0) {
             break;
          }
          if (uniforms[j].altName && strcmp(name, uniforms[j].altName) == 0) {
             break;
          }
-      }
-      if (j == UNIFORM_SIZE) {
-         j = 0;
+         j++;
       }
 
       if (type != uniforms[j].expectedType) {
