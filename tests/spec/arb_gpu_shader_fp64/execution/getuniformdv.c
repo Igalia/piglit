@@ -54,6 +54,7 @@ static const char vs_text[] =
    "uniform dmat4 m3[3]; \n"
    "uniform dmat2x3 m4; \n"
    "uniform dmat2x4 m5; \n"
+   "uniform dmat3x2 m6; \n"
    "uniform s1 s;\n"
    "uniform double d2; \n"
    "out vec4 vscolor; \n"
@@ -64,7 +65,7 @@ static const char vs_text[] =
    "  dvec4 t = dvec4(s.a, s.b, s.c, s.d) * d1 + d2;\n"
    "  t += v[0]*m3[0] + v[1]*m3[1] + v[2]*m3[2]; \n"
    "  t.rb += u1[0]*m1 + u1[1] + u2[0]*m4 + v[0]*m5; \n"
-   "  t.xyw += u2[0]*m2 + u2[1] + u2[2] + u2[3]; \n"
+   "  t.xyw += u2[0]*m2 + u2[1] + u2[2] + u2[3] + u1[1]*m6; \n"
    "  vscolor = vec4(t); \n"
    "}\n";
 
@@ -75,7 +76,7 @@ static const char fs_text[] =
    "void main() { fscolor = vscolor; }";
 
 #define MAX_VALUES 16
-#define UNIFORM_SIZE 9
+#define UNIFORM_SIZE 10
 
 static struct {
    char *name;
@@ -91,10 +92,11 @@ static struct {
    {"m2",    NULL, GL_DOUBLE_MAT3,   1},
    {"m3", "m3[0]", GL_DOUBLE_MAT4,   3},
    {"m4",    NULL, GL_DOUBLE_MAT2x3, 1},
-   {"m5",    NULL, GL_DOUBLE_MAT2x4, 1}};
+   {"m5",    NULL, GL_DOUBLE_MAT2x4, 1},
+   {"m6",    NULL, GL_DOUBLE_MAT3x2, 1}};
 
 enum uniform_enum {
-   d1 = 0, d2, sa, sd, u1_0, u1_1, u2_0, u2_2, v_0, v_1, m1, m2, m3, m4, m5, _last
+   d1 = 0, d2, sa, sd, u1_0, u1_1, u2_0, u2_2, v_0, v_1, m1, m2, m3, m4, m5, m6, _last
 };
 
 static struct {
@@ -127,7 +129,9 @@ static struct {
    {    "m5",  8, {10.0, 11.0,
                    12.0, 13.0,
                    14.0, 15.0,
-                   15.0, 17.0}}};
+                   15.0, 17.0}},
+   {    "m6",  6, {51.0, 52.0, 53.0,
+                   54.0, 55.0, 56.0 }}};
 
 enum piglit_result
 piglit_display(void)
@@ -172,7 +176,7 @@ piglit_init(int argc, char **argv)
    bool piglit_pass = true;
    GLuint vs, fs, prog;
    GLint numUniforms, i;
-   GLint expectedNum = 14;
+   GLint expectedNum = 15;
    GLint loc;
    enum uniform_enum u;
 
@@ -282,9 +286,11 @@ piglit_init(int argc, char **argv)
    loc = glGetUniformLocation(prog, uniform_values[m5].location);
    glUniformMatrix2x4dv(loc, 1, false, uniform_values[m5].values);
 
+   loc = glGetUniformLocation(prog, uniform_values[m6].location);
+   glUniformMatrix3x2dv(loc, 1, false, uniform_values[m6].values);
+
    loc = glGetUniformLocation(prog, uniform_values[u1_1].location);
    glUniform2d(loc, uniform_values[u1_1].values[0], uniform_values[u1_1].values[1]);
-
 
    loc = glGetUniformLocation(prog, uniform_values[u2_2].location);
    glUniform3d(loc,
