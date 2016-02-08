@@ -85,6 +85,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+   bool piglit_pass = true;
    GLuint vs, fs, prog;
    GLint numUniforms, i;
    GLint expectedNum = 14;
@@ -121,7 +122,7 @@ piglit_init(int argc, char **argv)
    if (numUniforms != expectedNum) {
       printf("%s: incorrect number of uniforms (found %d, expected %d)\n",
              TestName, numUniforms, expectedNum);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    /* check types, sizes */
@@ -138,7 +139,7 @@ piglit_init(int argc, char **argv)
 
       if (loc < 0) {
          printf("%s: bad uniform location for %s: %d\n", TestName, name, loc);
-         piglit_report_result(PIGLIT_FAIL);
+         piglit_pass = false;
       }
 
       if (!piglit_automatic) {
@@ -190,13 +191,13 @@ piglit_init(int argc, char **argv)
       if (type != expectedType) {
          printf("%s: wrong type for '%s' (found 0x%x, expected 0x%x)\n",
                 TestName, strName, type, expectedType);
-         piglit_report_result(PIGLIT_FAIL);
+         piglit_pass = false;
       }
 
       if (size != expectedSize) {
          printf("%s: wrong size for '%s' (found %d, expected %d)\n",
                 TestName, strName, size, expectedSize);
-         piglit_report_result(PIGLIT_FAIL);
+         piglit_pass = false;
       }
    }
 
@@ -232,28 +233,28 @@ piglit_init(int argc, char **argv)
    if (v[0] != 5.0) {
       printf("%s: wrong value for d1 (found %f, expected %f)\n",
              TestName, v[0], 5.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_d2, v);
    if (v[0] != 10.0) {
       printf("%s: wrong value for d2 (found %f, expected %f)\n",
              TestName, v[0], 10.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_sa, v);
    if (v[0] != 15.0) {
       printf("%s: wrong value for s.a (found %f, expected %f)\n",
              TestName, v[0], 15.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_sd, v);
    if (v[0] != 20.0) {
       printf("%s: wrong value for s.d (found %f, expected %f)\n",
              TestName, v[0], 20.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_u1, v);
@@ -261,7 +262,7 @@ piglit_init(int argc, char **argv)
        v[1] != 8.0) {
       printf("%s: wrong value for u1[0] (found %g,%g, expected %g,%g)\n",
              TestName, v[0], v[1], 5.0, 8.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_u2, v);
@@ -270,7 +271,7 @@ piglit_init(int argc, char **argv)
        v[2] != 2.0) {
       printf("%s: wrong value for u2[0] (found %g,%g,%g, expected %g,%g,%g)\n",
              TestName, v[0], v[1], v[2], 1.0, 1.0, 2.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_v1, v);
@@ -280,7 +281,7 @@ piglit_init(int argc, char **argv)
        v[3] != 33.0) {
       printf("%s: wrong value for v[1] (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
              TestName, v[0], v[1], v[2], v[3], 30.0, 31.0, 32.0, 33.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_m1, v);
@@ -290,7 +291,7 @@ piglit_init(int argc, char **argv)
        v[3] != 4.0) {
       printf("%s: wrong value for m1 (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
              TestName, v[0], v[1], v[2], v[3], 1.0, 2.0, 3.0, 4.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_m2, v);
@@ -307,23 +308,23 @@ piglit_init(int argc, char **argv)
              TestName,
              v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8],
              1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
-   /* glGetUniformdv(prog, loc_m3, v); */
-   /* if (v[0] != 1.0 || v[1] != 2.0 || v[2] != 3.0 || v[3] != 4.0 || */
-   /*     v[4] != 5.0 || v[5] != 6.0 || v[6] != 7.0 || v[7] != 8.0 || */
-   /*     v[8] != 1.5 || v[9] != 2.5 || v[10] != 3.5 || v[11] != 4.5 || */
-   /*     v[12] != 5.5 || v[13] != 6.5 || v[14] != 7.5 || v[15] != 8.5) { */
-   /*    printf("%s: wrong value for m3 (found %g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g, " */
-   /*           "expected %g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g)\n", */
-   /*           TestName, */
-   /*           v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], */
-   /*           v[9], v[10], v[11], v[12], v[13], v[14], v[15], */
-   /*           1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, */
-   /*           1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5); */
-   /*    piglit_report_result(PIGLIT_FAIL); */
-   /* } */
+   glGetUniformdv(prog, loc_m3, v);
+   if (v[0] != 1.0 || v[1] != 2.0 || v[2] != 3.0 || v[3] != 4.0 ||
+       v[4] != 5.0 || v[5] != 6.0 || v[6] != 7.0 || v[7] != 8.0 ||
+       v[8] != 1.5 || v[9] != 2.5 || v[10] != 3.5 || v[11] != 4.5 ||
+       v[12] != 5.5 || v[13] != 6.5 || v[14] != 7.5 || v[15] != 8.5) {
+      printf("%s: wrong value for m3 (found %g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g, "
+             "expected %g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g)\n",
+             TestName,
+             v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8],
+             v[9], v[10], v[11], v[12], v[13], v[14], v[15],
+             1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
+             1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5);
+      piglit_pass = false;
+   }
 
    glGetUniformdv(prog, loc_m4, v);
    if (v[0] != 15.0 || v[1] != 16.0 ||
@@ -334,7 +335,7 @@ piglit_init(int argc, char **argv)
              TestName,
              v[0], v[1], v[2], v[3], v[4], v[5], v[6],
              15.0, 16.0, 17.0, 18.0, 19.0, 20.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_m5, v);
@@ -347,7 +348,7 @@ piglit_init(int argc, char **argv)
              TestName,
              v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7],
              10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    loc_u1 = glGetUniformLocation(prog, "u1[0]");
@@ -362,7 +363,7 @@ piglit_init(int argc, char **argv)
        v[1] != 14.0) {
       printf("%s: wrong value for u1[0] (found %g,%g, expected %g,%g)\n",
              TestName, v[0], v[1], 12.0, 14.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_u2, v);
@@ -371,7 +372,7 @@ piglit_init(int argc, char **argv)
        v[2] != 15.0) {
       printf("%s: wrong value for u2[2] (found %g,%g,%g, expected %g,%g,%g)\n",
              TestName, v[0], v[1], v[2], 20.0, 20.0, 15.0);
-      piglit_report_result(PIGLIT_FAIL);
+      piglit_pass = false;
    }
 
    glGetUniformdv(prog, loc_v1, v);
@@ -381,8 +382,8 @@ piglit_init(int argc, char **argv)
        v[3] != 5.0) {
      printf("%s: wrong value for v[0] (found %g,%g,%g,%g, expected %g,%g,%g,%g)\n",
             TestName, v[0], v[1], v[2], v[3], 2.0, 3.0, 4.0, 5.0);
-     piglit_report_result(PIGLIT_FAIL);
+     piglit_pass = false;
    }
 
-   piglit_report_result(PIGLIT_PASS);
+   piglit_report_result(piglit_pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
