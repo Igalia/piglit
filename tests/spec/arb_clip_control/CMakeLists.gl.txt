@@ -8,7 +8,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
-piglit_add_executable (clip-control clip-control.c)
-piglit_add_executable (clip-control-depth-precision clip-control-depth-precision.c)
+piglit_add_executable (arb_clip_control-clip-control clip-control.c)
+piglit_add_executable (arb_clip_control-depth-precision clip-control-depth-precision.c)
 
 # vim: ft=cmake:
