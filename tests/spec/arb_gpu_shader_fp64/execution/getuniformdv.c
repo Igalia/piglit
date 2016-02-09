@@ -179,7 +179,7 @@ verify_uniform(GLuint prog, enum uniform_enum u)
       for (i = 0; i < uniform_values[u].size; i++) {
          printf("%g,", val[i]);
       }
-      printf("expected ");
+      printf(" expected ");
       for (i = 0; i < (uniform_values[u].size - 1); i++) {
          printf("%g,", uniform_values[u].values[i]);
       }
