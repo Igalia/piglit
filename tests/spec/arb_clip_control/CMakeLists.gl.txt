@@ -10,5 +10,6 @@ link_libraries (
 
 piglit_add_executable (arb_clip_control-clip-control clip-control.c)
 piglit_add_executable (arb_clip_control-depth-precision clip-control-depth-precision.c)
+piglit_add_executable (arb_clip_control-viewport viewport.c)
 
 # vim: ft=cmake:

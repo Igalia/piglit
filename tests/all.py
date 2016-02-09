@@ -2555,6 +2555,7 @@ with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_clip_control')) as g:
     g(['arb_clip_control-clip-control'])
     g(['arb_clip_control-depth-precision'])
+    g(['arb_clip_control-viewport'])
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_color_buffer_float')) as g:
