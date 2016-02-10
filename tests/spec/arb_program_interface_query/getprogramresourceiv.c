@@ -982,10 +982,6 @@ piglit_init(int argc, char **argv)
 						GL_GEOMETRY_SHADER, gs_stor,
 						GL_FRAGMENT_SHADER, fs_stor,
 						0);
-		if (!piglit_link_check_status(prog_stor)) {
-			glDeleteProgram(prog_stor);
-			piglit_report_result(PIGLIT_FAIL);
-		}
 	}
 
 	if (piglit_is_extension_supported("GL_ARB_explicit_attrib_location") &&
@@ -994,10 +990,6 @@ piglit_init(int argc, char **argv)
 						GL_VERTEX_SHADER, vs_loc,
 						GL_FRAGMENT_SHADER, fs_loc,
 						0);
-		if (!piglit_link_check_status(prog_loc)) {
-			glDeleteProgram(prog_loc);
-			piglit_report_result(PIGLIT_FAIL);
-		}
 	}
 
 	if (piglit_is_extension_supported("GL_ARB_shader_atomic_counters")) {
@@ -1026,10 +1018,6 @@ piglit_init(int argc, char **argv)
 				GL_GEOMETRY_SHADER, gs_sub,
 				GL_FRAGMENT_SHADER, fs_sub,
 				0);
-	if (!piglit_link_check_status(prog_sub)) {
-		glDeleteProgram(prog_sub);
-		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	if (piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
 		prog_sub_tess =
@@ -1052,10 +1040,6 @@ piglit_init(int argc, char **argv)
 		prog_cs = piglit_build_simple_program_multiple_shaders(
 						GL_COMPUTE_SHADER, cs_sub,
 						0);
-		if (!piglit_link_check_status(prog_cs)) {
-			glDeleteProgram(prog_cs);
-			piglit_report_result(PIGLIT_FAIL);
-		}
 	}
 }
 
