@@ -79,7 +79,6 @@ static void
 dispatch_size(uint32_t x, uint32_t y, uint32_t z)
 {
 	char *compute_shader;
-	GLint shader_string_size;
 	GLuint shader = glCreateShader(GL_COMPUTE_SHADER);
 	GLint ok;
 	static GLint prog = 0;
@@ -92,7 +91,7 @@ dispatch_size(uint32_t x, uint32_t y, uint32_t z)
 
 	glShaderSource(shader, 1,
 		       (const GLchar **) &compute_shader,
-		       &shader_string_size);
+		       NULL);
 
 	glCompileShader(shader);
 
