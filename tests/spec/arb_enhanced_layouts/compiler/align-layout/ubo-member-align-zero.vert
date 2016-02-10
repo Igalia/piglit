@@ -16,7 +16,7 @@
 
 layout(std140) uniform block {
 	layout(align = 0) vec4 var1;
-	layout(align = 20) vec4 var2;
+	layout(align = 32) vec4 var2;
 };
 
 void main()
