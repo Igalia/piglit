@@ -91,8 +91,8 @@ def add_oclconform_tests(profile):
             run_subtests = PIGLIT_CONFIG.get(test_section_name, 'run_subtest')
             list_tests = list_tests.split()
 
-            subtests = subprocess.check_output(args=list_tests,
-                                               cwd=bindir).split('\n')
+            subtests = subprocess.check_output(
+                args=list_tests, cwd=bindir).decode('utf-8').split('\n')
             for subtest in subtests:
                 m = re.match(subtest_regex, subtest)
                 if not m:

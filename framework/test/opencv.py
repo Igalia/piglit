@@ -60,7 +60,8 @@ def add_opencv_tests(profile):
         print('Warning: {} does not exist.\nSkipping OpenCV '
               'tests...'.format(opencv_test_ocl))
         return
-    tests = subprocess.check_output([opencv_test_ocl, '--gtest_list_tests'])
+    tests = subprocess.check_output(
+        [opencv_test_ocl, '--gtest_list_tests']).decode('utf-8')
     test_list = tests.splitlines()
     group_name = ''
     full_test_name = ''
