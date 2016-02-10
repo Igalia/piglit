@@ -1,0 +1,435 @@
+#!/bin/bash
+
+# Bash completions for piglit
+# Copyright © 2016 Intel Corporation
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# This provides completions for piglit in bash
+#
+# It requires debian's bash_completions (which are avialable on most
+# linux and BSD OSes) for it's _filedir function.
+
+__piglit_results_extensions="@(json|json.xz|json.gz|json.bz2)"
+
+# Function that handles 'piglit run'
+#
+# This is a *very* complex function. It handles *most*, but not all of the
+# functionality of 'piglit run'.
+#
+# This handles everything piglit run expects, with one small caviat, after the
+# first profile is provided, it mixes profiles and directories together, since
+# either addtional profiles or a directory can be provided. After something
+# that isn't a profile is provided it wont auto complete any more positional
+# arguments.
+__piglit_run() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local opts="-h --help -f --config -n --name -d --dry-run \
+                -t --include-tests -x --exclude-tests -b \
+                --backend -c --all-concurrent -1 \
+                --no-concurrency -p --platform --valgrind \
+                --dmesg -s --sync --junit_suffix -l \
+                --log-level --test-list -p --platform"
+    local with_args=("-f" "--config" "-b" "--backend" "--junit_suffix"
+                     "-l" "--log-level" "--test-list" "-n" "--name"
+                     "-p" "--platform")
+    local profiles=("all" "cl" "cpu" "cts" "deqp_gles2" "deqp_gles3"
+                    "deqp_gles31" "glslparser" "gpu" "igt" "llvmpipe"
+                    "oglconform" "quick_cl" "quick" "sanity" "shader"
+                    "xts" "xts-render")
+
+    # If the argument begins with - then just show the -* options
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "${opts}" -- $cur)  )
+        return 0
+    fi
+
+    case "$prev" in
+        "-f" | "--config")
+            _filedir '@(conf)'
+            return 0
+        ;;
+        "-b" | "--backend")
+            COMPREPLY=( $(compgen -W "json junit" -- $cur)  )
+            return 0
+        ;;
+        "-l" | "--loglevel")
+            COMPREPLY=( $(compgen -W "quiet verbose dummy http" -- $cur) )
+            return 0
+        ;;
+        "--test-list")
+            _filedir
+            return 0
+        ;;
+        "-p" | "--platform")
+            COMPREPLY=( $(compgen -W "glx x11_egl wayland gbm mixed_glx_egl" -- $cur) )
+            return 0
+        ;;
+        "-n" | "--name" | "--junit_suffix")
+            return 0
+        ;;
+    esac
+
+
+    # Find any positional arguments.
+    # Positional arguments are arguments that don't start with - and that don't
+    # follow an argument that requires a positional argument
+    local list=( "${COMP_WORDS[@]:2}" )  # remove "piglit run"
+    local positional=0
+    if [[ ${#list[@]} -gt 0 ]]; then
+        for i in "${!list[@]}"; do
+            # If the element is an option argument continue
+            [[ ${list[$i]} == -* ]] && continue
+
+            # If the previous argument takes a positional argument continue
+            if [[ $i != 0 ]] && [[ "${with_args[@]}" =~ " ${list[$i-1]} " ]]; then
+                continue
+            fi
+
+            # The spaces around list are significant, they prevent partial matches
+            if [[ ${positional} -eq 0 ]] && [[ "${list[$i]}" != "" ]]; then
+                [[ "${profiles[@]}" =~ "${list[$i]}" ]] && ((++positional))
+
+            # if the elemtn is not a profile, and it is a complete file or directory
+            # Then stop, there are no more positional arguments allow, only swithces
+            elif [[ ! "${profiles[@]}" =~ "${list[$i]}" ]]; then
+                [[ -a "${list[$i]}" ]] && [[ "${list[$i+1]}" == '' ]] && return 0
+
+            # Bash and whitespace...
+            elif [[ "${list[$i]}" != "" ]]; then
+                ((++positional))
+            fi
+        done
+    fi
+
+    # 'piglit run' has two positional arguments
+    # TODO: more than one profile can be specified. but how?
+    # 1) The profile to run
+    # 2) the location to save the file to
+    COMPREPLY=( $(compgen -W "${profiles[*]}" -- $cur) )
+    case "$positional" in
+        '0')
+            return 0
+        ;;
+        *)
+            _filedir -d
+            return 0
+        ;;
+    esac
+}
+
+# Handle 'piglit resume'
+#
+# Resume is very simple, it takes only a couple of options, and a single
+# positional argument.
+__piglit_resume() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local with_args=("-f" "--config")
+
+    if [[ "$cur" == -*  ]]; then
+        COMPREPLY=( $(compgen -W "-f --config -n --no-retry -h --help" -- $cur)  )
+        return 0
+    fi
+
+    if [[ "$prev" == "-f" ]] || [[ "$prev" == "--config" ]]; then
+        _filedir -d
+        return 0
+    fi
+
+    local count=0
+    for _ in "${COMP_WORDS[@]:3}"; do  # remove 'piglit resume'
+        if [[ ! "$with_args" =~ " $prev" ]]; then
+            ((++count))
+        fi
+    done
+
+    if [[ $count -eq 0 ]]; then
+        _filedir -d
+        return 0
+    fi
+    return 1
+}
+
+# Handle 'piglit summary aggregate'
+#
+# This is a very simple fution, it takes only one positional argument, and only
+# a single positional argument
+__piglit_summary_aggregate() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local with_args=("-f" "--config" "-o" "--output")
+
+    if [[ "$cur" == -*  ]]; then
+        COMPREPLY=( $(compgen -W "-f --config -o --output --help" -- $cur)  )
+        return 0
+    fi
+
+    case $prev in
+        "-f" | "--config")
+            _filedir -d
+            return 0
+        ;;
+        "-o" | "--output")
+            _filedir "${__piglit_results_extensions}"
+            return 0
+        ;;
+    esac
+
+    local count=0
+    for _ in "${COMP_WORDS[@]:4}"; do  # remove 'piglit resume'
+        if [[ ! "$with_args" =~ "$prev" ]]; then
+            ((++count))
+        fi
+    done
+
+    if [[ $count -eq 0 ]]; then
+        _filedir -d
+        return 0
+    fi
+    return 1
+}
+
+# Completions for 'summary console'
+#
+# This function is extremly simple, it takes an infinite number of positional
+# arguments which are all the same, a couple of switches, and only two of them
+# take arguments.
+__piglit_summary_console() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local opts="-h --help -f --config -d --dif -s --summary -i --incomplete \
+                -l --list"
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "${opts}" -- $cur)  )
+        return 0
+    fi
+
+    case "$prev" in
+        "-f" | "--config")
+            _filedir
+            return 0
+        ;;
+        "-l" | "--list")
+            _filedir
+            return 0
+        ;;
+    esac
+
+    _filedir "${__piglit_results_extensions}"
+    return 0
+}
+
+# Completions for 'summary csv'
+#
+# This is super simple, it has basically no switches, and the one positional
+# arugment can be provided multiple times
+__piglit_summary_csv() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local opts="-h --help -f --config -o --output"
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "${opts}" -- $cur)  )
+        return 0
+    fi
+
+    case "$prev" in
+        "-f" | "--config")
+            _filedir
+            return 0
+        ;;
+        "-o" | "--output")
+            _filedir "@(csv)"
+            return 0
+        ;;
+    esac
+
+    _filedir "${__piglit_results_extensions}"
+    return 0
+
+}
+
+# Completions for 'piglit summary feature'
+#
+# This is a very simple file. It takes 3 positional arguments, the last can be
+# repeated as many times as desired, and two simple switches.
+__piglit_summary_feature() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local opts="-h --help -o --overwrite"
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "${opts}" -- $cur)  )
+        return 0
+    fi
+
+    local list=( "${COMP_WORDS[@]:3}" )  # remove "piglit run"
+    local positional=0
+    if [[ ${#list[@]} -gt 0 ]]; then
+        for i in "${!list[@]}"; do
+            # If the element is an option argument continue
+            [[ ${list[$i]} == '-*' ]] && continue
+
+            # Bash and whitespace...
+            [[ "${list[$i]}" != "" ]] && ((++positional))
+        done
+    fi
+
+    case "${positional}" in
+        '0')
+            _filedir '@(json)'
+            return 0
+        ;;
+        '1')
+            _filedir -d
+            return 0
+        ;;
+        *)
+            _filedir "${__piglit_results_extensions}"
+            return 0
+        ;;
+    esac
+}
+
+# Completions for 'piglit summary html'
+#
+# This is another fairly complex function to complete. It provides two
+# different positional arugments, the first can be specified only once, the
+# second can be privded an infinite number of times.  It also provides a few
+# switches that have positional arguments.
+__piglit_summary_html() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    local opts="-h --help -o --overwrite -f --config -l --list \
+                -e --exclude-details"
+    local with_args=("-f" "--config" "-e" "--exclude")
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W "${opts}" -- $cur)  )
+        return 0
+    fi
+
+    case "$prev" in
+        "-f" | "--config")
+            _filedir '@(conf)'
+            return 0
+        ;;
+        "-e" | "--exclude-details")
+            local exclude="all crash timeout incomplete \
+                           pass dmesg-warn dmesg-fail \
+                           notrun fail warn skip"
+            COMPREPLY=( $(compgen -W "${exclude}" -- $cur) )
+            return 0
+        ;;
+    esac
+
+    local list=( "${COMP_WORDS[@]:3}" )  # remove "piglit run"
+    local positional=0
+    if [[ ${#list[@]} -gt 0 ]]; then
+        for i in "${!list[@]}"; do
+            # If the element is an option argument continue
+            [[ ${list[$i]} == '-*' ]] && continue
+
+            # If the previous argument takes a positional argument continue
+            if [[ $i != 0 ]] && [[ "${with_args[@]}" =~ "${list[$i-1]}" ]]; then
+                continue
+            fi
+
+            # Bash and whitespace...
+            [[ "${list[$i]}" != "" ]] && ((++positional))
+        done
+    fi
+
+    case "$positional" in
+        "0") 
+            _filedir -d
+            return 0
+        ;;
+        *)
+            _filedir "${__piglit_results_extensions}"
+            return 0
+        ;;
+    esac
+}
+
+# Completions for 'piglit'
+#
+# This function provides the completions for piglit, and calls subparsers for
+# 'piglit run' and 'piglit resume', while it handles 'piglit summary' itself,
+# delegating subparsers for the sub commands of 'piglit summary'
+_piglit() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local sub=${COMP_WORDS[1]}
+
+    case "$sub" in
+        "run")
+            __piglit_run
+            return 0
+        ;;
+        "resume")
+            __piglit_resume
+            return 0
+        ;;
+        "summary")
+            case "${COMP_WORDS[2]}" in
+                "aggregate")
+                    __piglit_summary_aggregate
+                    return 0
+                ;;
+                "console")
+                    __piglit_summary_console
+                    return 0
+                ;;
+                "csv")
+                    __piglit_summary_csv
+                    return 0
+                ;;
+                "feature")
+                    __piglit_summary_feature
+                    return 0
+                ;;
+                "html")
+                    __piglit_summary_html
+                    return 0
+                ;;
+                *)
+                    if [[ $COMP_CWORD -gt 2 ]]; then
+                        return 1
+                    fi
+
+                    COMPREPLY=( $(compgen -W "html console csv aggregate feature" -- "${cur}") )
+                    return 0
+                ;;
+            esac
+        ;;
+        *)
+            if [[ $COMP_CWORD -gt 1 ]]; then
+                return 1
+            fi
+
+            COMPREPLY=( $(compgen -W "run summary resume" -- $cur) )
+            return 0
+        ;;
+    esac
+}
+
+complete -F _piglit piglit
