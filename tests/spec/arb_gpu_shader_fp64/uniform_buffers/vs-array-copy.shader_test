@@ -19,7 +19,7 @@ void main()
 	gl_Position = piglit_vertex;
 	dvec4 temp[4] = colors;
 	temp[0] = dvec4(1.0, 0.0, 0.0, 0.0);
-	v = temp[i];
+	v = vec4(temp[i]);
 }
 
 [fragment shader]
