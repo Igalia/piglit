@@ -402,6 +402,7 @@ endif()
 if(EGL_FOUND)
 	add_definitions(-DPIGLIT_HAS_EGL)
 	include_directories(${EGL_INCLUDE_DIRS})
+	add_definitions (${EGL_CFLAGS_OTHER})
 endif()
 
 if(PIGLIT_BUILD_GLES1_TESTS AND NOT EGL_FOUND)
