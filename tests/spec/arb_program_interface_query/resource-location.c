@@ -166,7 +166,7 @@ static const char compute_subroutine_text[] =
 	"#extension GL_ARB_shader_image_load_store : require\n"
 	"#extension GL_ARB_compute_shader : require\n"
 	"layout(local_size_x = 4) in;\n"
-	"layout(size4x32) uniform image2D tex;\n"
+	"layout(rgba32f) uniform image2D tex;\n"
 	"subroutine vec4 com_offset();\n"
 	"layout (location = 3) subroutine uniform com_offset COMPUTE;\n"
 	"subroutine (com_offset) vec4 x() { return vec4(1.0, 0.0, 0.0, 0.0); }\n"

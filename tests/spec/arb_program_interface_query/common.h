@@ -312,7 +312,7 @@ static const char cs_sub[] =
 	"uniform cs_uniform_block {\n"
 	"	uniform vec4 cs_test;\n"
 	"};\n"
-	"layout(size4x32) uniform image2D tex;\n"
+	"layout(rgba32f) uniform image2D tex;\n"
 	"subroutine vec4 com_offset();\n"
 	"subroutine uniform com_offset COMPUTE;\n"
 	"subroutine (com_offset) vec4 css() { return vec4(1, 0, 0, 0); }\n"
