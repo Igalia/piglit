@@ -206,7 +206,7 @@ set(Python_ADDITIONAL_VERSIONS
 find_package(PythonInterp REQUIRED)
 find_package(PythonNumpy 1.6.2 REQUIRED)
 find_package(PythonMako 0.8.0 REQUIRED)
-find_package(PythonSix 1.4.0 REQUIRED)
+find_package(PythonSix 1.5.2 REQUIRED)
 
 # Default to compiling with debug information (`gcc -g`):
 if(NOT CMAKE_BUILD_TYPE)

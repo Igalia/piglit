@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""A small library that adds a single compatability decorator for python 2/3.
+"""A small library that contains libraries equivalent to six
 
 This function is pending upstreaming in six.
 
@@ -30,7 +30,6 @@ from __future__ import (
 
 import six
 
-
 def python_2_bool_compatible(class_):
     """A decorator to fix __bool__/__nonzero__ name changes."""
     if six.PY2:
@@ -41,3 +40,36 @@ def python_2_bool_compatible(class_):
                 "@python_2_bool_compatible cannot be applied to {} because "
                 "it doesn't define __bool__().".format(class_.__name__))
     return class_
+
+
+# Some version of six don't have this function
+try:
+    from six import python_2_unicode_compatible
+except ImportError:
+    def python_2_unicode_compatible(class_):
+        """A decorator to fix __str/__bytes__/__unicode__ name changes."""
+        if six.PY2:
+            failed = False
+            try:
+                class_.__unicode__ = class_.__str__
+            except AttributeError:
+                failed = True
+
+            try:
+                class_.__str__ = class_.__bytes__
+            except AttributeError:
+                if failed:
+                    raise ValueError(
+                        "@python_2_unicode_compatible cannot be applied to {} "
+                        "because it doesn't define __str__() "
+                        "or __bytes__().".format(class_.__name__))
+        return class_
+
+
+try:
+    from six import viewvalues
+except ImportError:
+    if six.PY2:
+        viewvalues = lambda d: d.viewvalues()
+    elif six.PY3:
+        viewvalues = lambda d: d.values()

@@ -45,9 +45,17 @@ except ImportError:
     import json
 from nose.plugins.skip import SkipTest
 import six
-from six.moves import getcwdb
+try:
+    from six.moves import getcwd
+except ImportError:
+    # pylint: disable=no-member
+    if six.PY2:
+        getcwd = os.getcwdu
+    elif six.PY3:
+        getcwd = os.getcwd
+    # pylint: enable=no-member
 
-from framework import test, backends, core, results
+from framework import test, backends, core, results, compat
 
 __all__ = [
     'tempfile',
@@ -93,7 +101,7 @@ JSON_DATA = {
 _SAVED_COMPRESSION = os.environ.get('PIGLIT_COMPRESSION')
 
 
-@six.python_2_unicode_compatible
+@compat.python_2_unicode_compatible
 class TestFailure(AssertionError):
     """An exception to be raised when a test fails.
 
@@ -349,7 +357,7 @@ def test_in_tempdir(func):
     returns to the original directory after the test completes.
 
     """
-    original_dir = getcwdb()
+    original_dir = getcwd()
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):

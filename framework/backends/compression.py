@@ -51,7 +51,7 @@ import contextlib
 import six
 from six.moves import cStringIO as StringIO
 
-from framework import exceptions
+from framework import exceptions, compat
 from framework.core import PIGLIT_CONFIG
 
 __all__ = [
@@ -62,7 +62,7 @@ __all__ = [
 ]
 
 
-@six.python_2_unicode_compatible
+@compat.python_2_unicode_compatible
 class UnsupportedCompressor(exceptions.PiglitInternalError):
     def __init__(self, method, *args, **kwargs):
         super(UnsupportedCompressor, self).__init__(*args, **kwargs)

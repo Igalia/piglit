@@ -62,7 +62,7 @@ from __future__ import (
 
 import six
 
-from framework import exceptions
+from framework import exceptions, compat
 
 __all__ = ['NOTRUN',
            'PASS',
@@ -97,7 +97,7 @@ def status_lookup(status):
         raise StatusException(status)
 
 
-@six.python_2_unicode_compatible
+@compat.python_2_unicode_compatible
 class StatusException(exceptions.PiglitInternalError):
     """ Raise this exception when a string is passed to status_lookup that
     doesn't exists
@@ -116,7 +116,7 @@ class StatusException(exceptions.PiglitInternalError):
         return u'Unknown status "{}"'.format(self.__status)
 
 
-@six.python_2_unicode_compatible
+@compat.python_2_unicode_compatible
 class Status(object):
     """ A simple class for representing the output values of tests.
 

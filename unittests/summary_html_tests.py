@@ -28,7 +28,16 @@ from __future__ import (
 import os
 
 import nose.tools as nt
-from six.moves import getcwd
+import six
+try:
+    from six.moves import getcwd
+except ImportError:
+    # pylint: disable=no-member
+    if six.PY2:
+        getcwd = os.getcwdu
+    elif six.PY3:
+        getcwd = os.getcwd
+    # pylint: enable=no-member
 
 from framework.summary import html_
 from . import utils

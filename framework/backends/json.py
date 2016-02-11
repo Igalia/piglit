@@ -35,7 +35,7 @@ except ImportError:
 
 import six
 
-from framework import status, results, exceptions
+from framework import status, results, exceptions, compat
 from .abstract import FileBackend, write_compressed
 from .register import Registry
 from . import compression
@@ -582,7 +582,7 @@ def _update_seven_to_eight(result):
     This value is used for both TestResult.time and TestrunResult.time_elapsed.
 
     """
-    for test in six.viewvalues(result.tests):
+    for test in compat.viewvalues(result.tests):
         test.time = results.TimeAttribute(end=test.time)
 
     result.time_elapsed = results.TimeAttribute(end=result.time_elapsed)

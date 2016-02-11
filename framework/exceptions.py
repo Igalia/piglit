@@ -24,7 +24,7 @@ from __future__ import print_function, absolute_import, division
 import sys
 import functools
 
-import six
+from framework import compat
 
 __all__ = [
     'PiglitInternalError',
@@ -32,6 +32,7 @@ __all__ = [
     'PiglitException',
     'handler',
 ]
+
 
 
 def handler(func):
@@ -54,7 +55,7 @@ def handler(func):
     return _inner
 
 
-@six.python_2_unicode_compatible
+@compat.python_2_unicode_compatible
 class PiglitException(Exception):
     """Class for non-error exceptions.
 
@@ -67,7 +68,7 @@ class PiglitException(Exception):
                 '\n{}'.format(super(PiglitException, self).__str__()))
 
 
-@six.python_2_unicode_compatible
+@compat.python_2_unicode_compatible
 class PiglitInternalError(Exception):
     """Class for errors in piglit.
 
