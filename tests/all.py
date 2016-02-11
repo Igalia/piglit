@@ -996,6 +996,7 @@ with profile.group_manager(
     g(['gl-1.0-edgeflag-const'])
     g(['gl-1.0-edgeflag-quads'])
     g(['gl-1.0-long-dlist'])
+    g(['gl-1.0-readpixels-oob'])
     g(['gl-1.0-rendermode-feedback'])
     g(['gl-1.0-front-invalidate-back'], run_concurrent=False)
     g(['gl-1.0-swapbuffers-behavior'], run_concurrent=False)
