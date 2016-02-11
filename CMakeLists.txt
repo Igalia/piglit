@@ -216,6 +216,8 @@ else ()
 	find_package(PythonMako 0.8.0 REQUIRED)
 endif (PYTHON_VERSION_STRING VERSION_GREATER 3.4.999999)
 
+find_package(bash-completion CONFIG)
+
 # Default to compiling with debug information (`gcc -g`):
 if(NOT CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE Debug CACHE STRING
@@ -526,6 +528,13 @@ install (
 	FILES_MATCHING REGEX ".*\\.inc$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
+
+if (BASH_COMPLETION_FOUND)
+	install(
+		FILES completions/bash/piglit
+		DESTINATION ${CMAKE_INSTALL_PREFIX}/${BASH_COMPLETION_COMPLETIONSDIR}/
+	)
+endif (BASH_COMPLETION_FOUND)
 
 if (WIN32)
 	set (PYTHON_SUFFIX ".py")
