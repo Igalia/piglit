@@ -75,13 +75,13 @@ static const char vs_code[] =
 	"       double unsized_array[];\n"
 	"};\n"
 	"in vec4 piglit_vertex;\n"
+        "out vec4 vertex_to_gs;\n"
 	"void main() {\n"
-	"	gl_Position = piglit_vertex;\n"
+	"	vertex_to_gs = piglit_vertex;\n"
 	"       v.yz = dvec2(1.0, 2.0);\n"
 	"       f = 4.0;\n"
 	"       s.a2.x = 6.0lf; \n"
 	"       s.a2.y = 7.0lf; \n"
-	"       s.a4[0] = dmat2(10.0, 11.0, 12.0, 13.0);\n"
 	"       s.sb[0].b1[0] = 18.0lf;\n"
 	"       s.sb[0].b1[1] = 19.0lf;\n"
 	"       m[1] = dvec4(25.0, 26.0, 27.0, 28.0);\n"
@@ -92,6 +92,40 @@ static const char vs_code[] =
 	"       int index = int(v.x); // index should be zero\n"
    	"       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
 	"}\n";
+
+static const char gs_source[] =
+	"#version 150\n"
+	"#extension GL_ARB_shader_storage_buffer_object : require\n"
+        "#extension GL_ARB_gpu_shader_fp64 : require\n"
+	"\n"
+	"struct B { double b1[3]; };\n"
+	"struct A {\n"
+	"       double a1;\n"
+	"       dvec3 a2;\n"
+	"       dmat2 a4[2];\n"
+	"       double a5;\n"
+	"       B sb[2];\n"
+	"};\n"
+	"layout(std430, binding=2) buffer ssbo {\n"
+	"       vec2 u;\n"
+	"       dvec4 v;\n"
+	"       float f;\n"
+	"       A s;\n"
+	"       dmat3x4 m;\n"
+	"       dvec2 v2a[3];\n"
+	"       dvec3 v3a[2];\n"
+	"       double unsized_array[];\n"
+	"};\n"
+        "layout(triangles) in;\n"
+        "layout(triangle_strip, max_vertices = 3) out;\n"
+        "in vec4 vertex_to_gs[3];\n"
+        "void main() {\n"
+        "       for (int i = 0; i < 3; i++) {\n"
+        "              gl_Position = vertex_to_gs[i] + vec4(s.a1);\n"
+        "              EmitVertex();\n"
+        "       }\n"
+	"       s.a4[0] = dmat2(10.0, 11.0, 12.0, 13.0);\n"
+        "}\n";
 
 static const char fs_source[] =
 	"#version 150\n"
@@ -121,7 +155,6 @@ static const char fs_source[] =
 	"void main() {\n"
 	"       color = vec4(0,1,0,1);\n"
 	"       v.xw = dvec2(0.0, 3.0) + u;\n"
-	"       s.a1 = 5.0lf;\n"
 	"       s.a2.z = 8.0lf;\n"
 	"       s.a4[1] = dmat2(14.0, 15.0, 16.0, 17.0);\n"
 	"       s.sb[1].b1[2] = 20.0lf;\n"
@@ -148,7 +181,7 @@ float ssbo_values3[SSBO_SIZE3]  = { 0.0, 0.0, 0.0, 0.0,  // float f
 };
 
 double ssbo_values4[SSBO_SIZE4] = { 0.0, 0.0,            // padding
-                                    0.0, 0.0, 0.0, 0.0,  // double s.a1
+                                    1.0, 0.0, 0.0, 0.0,  // double s.a1
                                     0.0, 0.0, 0.0, 0.0,  // dvec3 s.a2
                                     0.0, 0.0, 0.0, 0.0,  // dmat2 s.a4[0]
                                     0.0, 0.0, 0.0, 0.0,  // dmat2 s.a4[1]
@@ -175,7 +208,7 @@ float expected3[SSBO_SIZE3]  = { 4.0, 0.0, 0.0,  0.0,    // float f
 };
 
 double expected4[SSBO_SIZE4] = {  0.0,  0.0,             // padding
-                                  5.0,  0.0,  0.0,  0.0, // double s.a1
+                                  1.0,  0.0,  0.0,  0.0, // double s.a1
                                   6.0,  7.0,  8.0,  0.0, // dvec3 s.a2
                                  10.0, 11.0, 12.0, 13.0, // dmat2 s.a4[0]
                                  14.0, 15.0, 16.0, 17.0, // dmat2 s.a4[1]
@@ -188,7 +221,7 @@ double expected4[SSBO_SIZE4] = {  0.0,  0.0,             // padding
                                  37.0, 38.0,  0.0,  0.0, //
                                  39.0, 40.0, 41.0,  0.0, // dvec3 v3a[2]
                                  42.0, 43.0, 44.0,  0.0, //
-                                  4.0,  4.0,  8.0,  8.0, // double unsized_array[0-3]
+                                  4.0,  4.0,  4.0,  4.0, // double unsized_array[0-3]
 };
 
 void
@@ -206,7 +239,10 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_gpu_shader_fp64");
         piglit_require_GLSL_version(150);
 
-	prog = piglit_build_simple_program(vs_code, fs_source);
+	prog = piglit_build_simple_program_multiple_shaders(GL_VERTEX_SHADER, vs_code,
+                                                            GL_GEOMETRY_SHADER, gs_source,
+                                                            GL_FRAGMENT_SHADER, fs_source,
+                                                            NULL);
 
 	glUseProgram(prog);
 
