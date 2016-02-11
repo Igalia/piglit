@@ -187,6 +187,8 @@ piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 	   pass = false;
 
+        glDeleteProgram(prog);
+
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
