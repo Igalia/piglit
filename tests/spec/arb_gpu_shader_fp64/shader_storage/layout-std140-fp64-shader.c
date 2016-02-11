@@ -41,7 +41,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 #define SSBO_SIZE 44
 
-static const char vs_pass_thru_text[] =
+static const char vs_code[] =
 	"#version 150\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"
         "#extension GL_ARB_gpu_shader_fp64 : require\n"
@@ -156,7 +156,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_gpu_shader_fp64");
         piglit_require_GLSL_version(150);
 
-	prog = piglit_build_simple_program(vs_pass_thru_text, fs_source);
+	prog = piglit_build_simple_program(vs_code, fs_source);
 
 	glUseProgram(prog);
 
