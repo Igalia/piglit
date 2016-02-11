@@ -50,6 +50,7 @@ static const char *TestName = "getteximage-formats";
 static const GLfloat clearColor[4] = { 0.4, 0.4, 0.4, 0.0 };
 static GLuint texture_id;
 static GLboolean init_by_rendering;
+static GLboolean init_by_clearing_first;
 
 #define TEX_SIZE 128
 
@@ -83,7 +84,7 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 
 	memcpy(upperRightTexel, tex[TEX_SIZE-1][TEX_SIZE-1], 4);
 
-	if (init_by_rendering) {
+	if (init_by_rendering || init_by_clearing_first) {
 		/* Initialize the mipmap levels. */
 		for (i = TEX_SIZE, j = 0; i; i >>= 1, j++) {
 			glTexImage2D(GL_TEXTURE_2D, j, intFormat, i, i, 0,
@@ -100,6 +101,11 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 			glDeleteFramebuffers(1, &fb);
 			return GL_FALSE;
+		}
+
+		if (init_by_clearing_first) {
+			glClearColor(1, 0, 0, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
 		}
 
 		glViewport(0, 0, TEX_SIZE, TEX_SIZE);
@@ -365,6 +371,7 @@ test_format(const struct test_desc *test,
 	GLfloat expected[4], pix[4], tolerance[4];
 	GLboolean pass = GL_TRUE;
 
+	glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* The RGBA_DXT1 formats seem to expose a Mesa/libtxc_dxtn bug.
@@ -536,6 +543,11 @@ piglit_init(int argc, char **argv)
 			puts("The textures will be initialized by rendering "
 			     "to them using glDrawPixels.");
 			break;
+		} else if (strcmp(argv[i], "init-by-clear-and-render") == 0) {
+			init_by_clearing_first = GL_TRUE;
+			puts("The textures will be initialized by rendering "
+			     "to them using glCear and glDrawPixels.");
+			break;
 		}
 	}
 
@@ -547,6 +559,4 @@ piglit_init(int argc, char **argv)
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 }

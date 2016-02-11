@@ -2993,6 +2993,7 @@ with profile.group_manager(
     g(['fbo-storage-completeness'])
     g(['fbo-storage-formats'])
     g(['getteximage-formats', 'init-by-rendering'])
+    g(['getteximage-formats', 'init-by-clear-and-render'])
     g(['ext_framebuffer_multisample-fast-clear', 'single-sample'],
       'fbo-fast-clear')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX1')
