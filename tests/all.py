@@ -2110,6 +2110,7 @@ with profile.group_manager(
      g(['arb_gpu_shader_fp64-tf-interleaved-aligned'])
      g(['arb_gpu_shader_fp64-vs-getuniformdv'])
      g(['arb_gpu_shader_fp64-fs-getuniformdv'])
+     g(['arb_gpu_shader_fp64-gs-getuniformdv'])
      g(['arb_gpu_shader_fp64-wrong-type-setter'])
      g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
 
