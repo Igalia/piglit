@@ -65,12 +65,42 @@ static const char vs_code[] =
 	"       double unsized_array[];\n"
 	"};\n"
 	"in vec4 piglit_vertex;\n"
+	"out vec4 vertex_to_gs;\n"
 	"void main() {\n"
-	"	gl_Position = piglit_vertex;\n"
+	"	vertex_to_gs = piglit_vertex;\n"
 	"       f = 4.0;\n"
 	"       s.a2[0] = dvec2(6.0, 7.0) * s.a5; \n"
 	"       int index = int(v.x); // index should be zero\n"
         "       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
+        "}\n";
+
+static const char gs_source[] =
+	"#version 150\n"
+	"#extension GL_ARB_shader_storage_buffer_object : require\n"
+        "#extension GL_ARB_gpu_shader_fp64 : require\n"
+	"\n"
+	"struct A {\n"
+	"       double a1;\n"
+	"       dvec2 a2[2];\n"
+	"       dmat2 a4;\n"
+	"       double a5;\n"
+	"};\n"
+	"layout(std140, row_major, binding=2) buffer ssbo {\n"
+	"       vec4 u;\n"
+	"       dvec4 v;\n"
+	"       float f;\n"
+	"       A s;\n"
+	"       double unsized_array[];\n"
+	"};\n"
+        "layout(triangles) in;\n"
+        "layout(triangle_strip, max_vertices = 3) out;\n"
+        "in vec4 vertex_to_gs[3];\n"
+        "void main() {\n"
+        "       for (int i = 0; i < 3; i++) {\n"
+        "              gl_Position = vertex_to_gs[i] + vec4(s.a1);\n"
+        "              EmitVertex();\n"
+        "       }\n"
+	"       s.a4 = dmat2(10.0, 11.0, 12.0, 13.0);\n"
         "}\n";
 
 static const char fs_source[] =
@@ -96,9 +126,7 @@ static const char fs_source[] =
 	"void main() {\n"
 	"       color = vec4(0,1,0,1);\n"
 	"       v = u + dvec4(0.0, 1.0, 2.0, 3.0);\n"
-	"       s.a1 = f * 5.0LF;\n"
-	"       s.a2[1] = dvec2(8.0, 9.0);\n"
-	"       s.a4 = dmat2(10.0, 11.0, 12.0, 13.0);\n"
+	"       s.a2[1] = dvec2(2.0*f, 9.0);\n"
 	"       int index = int(v.z + gl_FragCoord.x);\n"
      	"       unsized_array[index] = unsized_array.length() * 2.0;\n"
 	"}\n";
@@ -115,7 +143,7 @@ double ssbo_values2[SSBO_SIZE2] = { 0.0, 0.0,            // padding
 float ssbo_values3[SSBO_SIZE3]  = { 0.0, 0.0, 0.0, 0.0,  // float f
 };
 
-double ssbo_values4[SSBO_SIZE4] = { 0.0, 0.0,            // double s.a1
+double ssbo_values4[SSBO_SIZE4] = { 1.0, 0.0,            // double s.a1
                                     0.0, 0.0,            // dvec2 s.a2[0]
                                     0.0, 0.0,            // dvec2 s.a2[1]
                                     0.0, 0.0,            // dmat2 s.a4
@@ -144,7 +172,7 @@ double expected2[SSBO_SIZE2] = { 0.0, 0.0,             // padding
 float expected3[SSBO_SIZE3]  = { 4.0, 0.0, 0.0, 0.0,  // float f
 };
 
-double expected4[SSBO_SIZE4] = { 20.0,  0.0,         // double s.a1
+double expected4[SSBO_SIZE4] = {  1.0,  0.0,         // double s.a1
                                  12.0, 14.0,         // dvec2 s.a2[0]
                                   8.0,  9.0,         // dvec2 s.a2[1]
                                  10.0, 12.0,         // dmat2 s.a4
@@ -160,7 +188,7 @@ double expected4[SSBO_SIZE4] = { 20.0,  0.0,         // double s.a1
                                   0.0,  0.0,         // double unsized_array[7]
                                   0.0,  0.0,         // double unsized_array[8]
                                   0.0,  0.0,         // double unsized_array[9]
-                                 22.0,  0.0,         // double unsized_array[10]
+                                  0.0,  0.0,         // double unsized_array[10]
 };
 
 void
@@ -178,7 +206,10 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_gpu_shader_fp64");
         piglit_require_GLSL_version(150);
 
-	prog = piglit_build_simple_program(vs_code, fs_source);
+	prog = piglit_build_simple_program_multiple_shaders(GL_VERTEX_SHADER, vs_code,
+                                                            GL_GEOMETRY_SHADER, gs_source,
+                                                            GL_FRAGMENT_SHADER, fs_source,
+                                                            NULL);
 
 	glUseProgram(prog);
 
