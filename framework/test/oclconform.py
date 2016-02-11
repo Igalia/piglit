@@ -87,7 +87,7 @@ def add_oclconform_tests(profile):
                                            'list_subtests')
             subtest_regex = PIGLIT_CONFIG.get(test_section_name,
                                               'subtest_regex')
-            subtest_regex.encode('string_escape')
+            subtest_regex.encode('unicode_escape')
             run_subtests = PIGLIT_CONFIG.get(test_section_name, 'run_subtest')
             list_tests = list_tests.split()
 
