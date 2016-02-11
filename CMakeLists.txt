@@ -205,7 +205,7 @@ set(Python_ADDITIONAL_VERSIONS
     3.5 3.4 3.3 2.7)
 find_package(PythonInterp REQUIRED)
 find_package(PythonSix 1.5.2 REQUIRED)
-find_package(PythonNumpy 1.6.2 REQUIRED)
+find_package(PythonNumpy 1.7.0 REQUIRED)
 
 # CMake doesn't have a VERSION_GREATER_EQUAL function, at least as of 3.0,
 # And mako 1.0.2 contains bug fixes required for python 3.5 to work, so
