@@ -318,6 +318,16 @@ result if there are no subtests. This means that the number shown by 'piglit
 run' will be less than or equal to the number calculated by 'piglit summary'.
 
 
+3.3 Shell Completions
+---------------------
+
+Piglit has completions for bash, located in completions/bash/piglit. Once this
+file is sourced into bash `piglit` and `./piglit` will have tab completion
+available. For global availability place the file somewhere that bash will
+source the file on startup. If piglit is installed and bash-completions are
+available, then this completion file will be installed system-wide.
+
+
 4. Available test sets
 ----------------------
 
