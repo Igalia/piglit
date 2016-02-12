@@ -6,8 +6,8 @@ GL_ARB_gpu_shader_fp64
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
 
-uniform int int_value;
-uniform double double_value;
+uniform dvec2 dvec2_value;
+uniform bvec2 bvec2_value;
 
 in vec4 piglit_vertex;
 out vec4 fs_color;
@@ -18,8 +18,8 @@ out vec4 fs_color;
 void main()
 {
     gl_Position = piglit_vertex;
-    double converted = int_value;
-    bool match = converted == double_value;
+    bvec2 converted = bvec2(dvec2_value);
+    bool match = converted == bvec2_value;
     fs_color = match ? GREEN : RED;
 }
 
@@ -35,23 +35,17 @@ void main()
 }
 
 [test]
-uniform int int_value 5
-uniform double double_value 5.0
+uniform ivec2 bvec2_value 0 1
+uniform dvec2 dvec2_value 0.0 1.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform int int_value -5
-uniform double double_value -5.0
+uniform ivec2 bvec2_value 1 0
+uniform dvec2 dvec2_value 9007199254740992.0 0.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform int int_value -2147483648
-uniform double double_value -2147483648.0
+uniform ivec2 bvec2_value 1 1
+uniform dvec2 dvec2_value 1.0 9007199254740992.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
-
-uniform int int_value 2147483647
-uniform double double_value 2147483647.0
-draw rect -1 -1 2 2
-probe all rgba 0.0 1.0 0.0 1.0
-

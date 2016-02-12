@@ -4,11 +4,16 @@ GL_ARB_gpu_shader_fp64
 
 [vertex shader]
 #version 150
-#extension GL_ARB_gpu_shader_fp64 : enable
+#extension GL_ARB_gpu_shader_fp64 : require
 
 uniform double double_value_1;
 uniform double double_value_2;
 uniform double double_value_3;
+uniform double double_value_4;
+uniform double double_value_5;
+uniform double double_value_6;
+uniform double double_value_7;
+uniform double double_value_8;
 
 in vec4 piglit_vertex;
 out vec4 fs_color;
@@ -18,12 +23,17 @@ out vec4 fs_color;
 
 void main()
 {
-	gl_Position = piglit_vertex;
-	bool converted_1 = bool(double_value_1);
-	bool converted_2 = bool(double_value_2);
-	bool converted_3 = bool(double_value_3);
-	bool match = !converted_1 && converted_2 && converted_3;
-	fs_color = match ? GREEN : RED;
+    gl_Position = piglit_vertex;
+    bool converted_1 = bool(double_value_1);
+    bool converted_2 = bool(double_value_2);
+    bool converted_3 = bool(double_value_3);
+    bool converted_4 = bool(double_value_4);
+    bool converted_5 = bool(double_value_5);
+    bool converted_6 = bool(double_value_6);
+    bool converted_7 = bool(double_value_7);
+    bool converted_8 = bool(double_value_8);
+    bool match = !converted_1 && !converted_2 && converted_3 && converted_4 && converted_5 && converted_6 && converted_7 && converted_8;
+    fs_color = match ? GREEN : RED;
 }
 
 [fragment shader]
@@ -34,13 +44,24 @@ out vec4 color;
 
 void main()
 {
-	color = fs_color;
+    color = fs_color;
 }
 
 [test]
 uniform double double_value_1 0.0
-uniform double double_value_2 1.0
-uniform double double_value_3 9007199254740992.0
+# -0.0
+uniform double double_value_2 0x8000000000000000
+# 64bit positive minimum denormalized
+#uniform double double_value_3 0x0000000000000001
+# 32bit positive minimum denormalized
+uniform double double_value_3 0x36A0000000000000
+# 64bit negative minimum denormalized
+#uniform double double_value_4 0x8000000000000001
+# 32bit negative minimum denormalized
+uniform double double_value_4 0xB6A0000000000000
+uniform double double_value_5  1.0
+uniform double double_value_6 -1.0
+uniform double double_value_7  9007199254740992.0
+uniform double double_value_8 -9007199254740992.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
-
