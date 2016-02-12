@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+uniform uvec4 uvec4_value;
+uniform dvec4 dvec4_value;
+
+out vec4 color;
+
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+    uvec4 converted = uvec4(dvec4_value);
+    bool match = converted == uvec4_value;
+    color = match ? GREEN : RED;
+}
+
+[test]
+uniform uvec4 uvec4_value 10 2147483647 4278190080 10
+uniform dvec4 dvec4_value 10.0 2147483647.0 4278190080.0 10.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 uvec4_value 2147483647 4278190080 10 2147483647
+uniform dvec4 dvec4_value 2147483647.0 4278190080.0 10.0 2147483647.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 uvec4_value 4278190080 10 2147483647 4278190080
+uniform dvec4 dvec4_value 4278190080.0 10.0 2147483647.0 4278190080.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

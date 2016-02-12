@@ -6,7 +6,7 @@ GL_ARB_gpu_shader_fp64
 
 [fragment shader]
 #version 150
-#extension GL_ARB_gpu_shader_fp64 : enable
+#extension GL_ARB_gpu_shader_fp64 : require
 
 uniform uint uint_value;
 uniform double double_value;
@@ -18,24 +18,79 @@ out vec4 color;
 
 void main()
 {
-	uint converted = uint(double_value);
-	bool match = converted == uint_value;
-	color = match ? GREEN : RED;
+    uint converted = uint(double_value);
+    bool match = converted == uint_value;
+    color = match ? GREEN : RED;
 }
 
 [test]
+# 64bit -inf
+#uniform double double_value 0x7FF0000000000000
+#uniform uint uint_value 0
+#draw rect -1 -1 2 2
+#probe all rgba 0.0 1.0 0.0 1.0
+
+# Minimum overflow
+uniform double double_value -5.0
+uniform uint uint_value 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Minimum limit overflow
+uniform double double_value 0x8000000000000001
+uniform uint uint_value 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# -0.0
+uniform double double_value 0x8000000000000000
+uniform uint uint_value 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Minimum
+uniform double double_value 0.0
+uniform uint uint_value 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
 uniform double double_value 10.0
 uniform uint uint_value 10
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
+# Signed int low frontier
 uniform double double_value 2147483647.0
 uniform uint uint_value 2147483647
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform double double_value 4278190080.0
-uniform uint uint_value 4278190080
+# Signed int up frontier
+uniform double double_value 2147483648.0
+uniform uint uint_value 2147483648
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
+# Maximum
+uniform double double_value 4294967295.0
+uniform uint uint_value 4294967295
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Maximum limit overflow
+uniform double double_value 4294967296.0
+uniform uint uint_value 4294967295
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Maximum overflow
+uniform double double_value 4294967315.0
+uniform uint uint_value 4294967295
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# 64bit +inf
+#uniform double double_value 0xFFF0000000000000
+#uniform uint uint_value 4294967295
+#draw rect -1 -1 2 2
+#probe all rgba 0.0 1.0 0.0 1.0
