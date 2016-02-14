@@ -654,6 +654,19 @@ get_image_stage(GLenum s)
         return NULL;
 }
 
+/**
+ * Get the number of images internally required by the framework for a
+ * pipeline with the given set of stages.
+ */
+static int
+num_reserved_images(GLbitfield stages)
+{
+        /* One image uniform is reserved in the compute stage for the
+         * grid framework to read back the result of the program.
+         */
+        return (stages & GL_COMPUTE_SHADER_BIT ? 1 : 0);
+}
+
 unsigned
 image_stage_max_images(const struct image_stage_info *stage)
 {
@@ -662,40 +675,35 @@ image_stage_max_images(const struct image_stage_info *stage)
         switch (stage->stage) {
         case GL_FRAGMENT_SHADER:
                 glGetIntegerv(GL_MAX_FRAGMENT_IMAGE_UNIFORMS, &n);
-                return n;
+                break;
 
         case GL_VERTEX_SHADER:
                 glGetIntegerv(GL_MAX_VERTEX_IMAGE_UNIFORMS, &n);
-                return n;
+                break;
 
         case GL_GEOMETRY_SHADER:
                 if (piglit_get_gl_version() >= 32)
                         glGetIntegerv(GL_MAX_GEOMETRY_IMAGE_UNIFORMS, &n);
-                return n;
+                break;
 
         case GL_TESS_CONTROL_SHADER:
                 if (piglit_is_extension_supported("GL_ARB_tessellation_shader"))
                         glGetIntegerv(GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS, &n);
-                return n;
+                break;
 
         case GL_TESS_EVALUATION_SHADER:
                 if (piglit_is_extension_supported("GL_ARB_tessellation_shader"))
                         glGetIntegerv(GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS,
                                       &n);
-                return n;
+                break;
 
         case GL_COMPUTE_SHADER:
                 if (piglit_is_extension_supported("GL_ARB_compute_shader"))
                         glGetIntegerv(GL_MAX_COMPUTE_IMAGE_UNIFORMS, &n);
-                /* One image uniform is reserved in the compute stage
-                 * for the grid framework to read back the result of
-                 * the program.
-                 */
-                return MAX2(0, n - 1);
-
-        default:
-                return 0;
+                break;
         }
+
+        return MAX2(0, n - num_reserved_images(stage->bit));
 }
 
 unsigned
