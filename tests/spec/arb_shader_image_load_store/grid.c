@@ -345,7 +345,7 @@ draw_grid(const struct grid_info grid, GLuint prog)
         }
 
         if (grid.stages & GL_COMPUTE_SHADER_BIT) {
-                set_uniform_int(prog, "ret_img", 7);
+                set_uniform_int(prog, "ret_img", max_image_units());
                 glDispatchCompute(1, grid.size.y, 1);
 
         } else if (grid.stages & (GL_TESS_CONTROL_SHADER_BIT |

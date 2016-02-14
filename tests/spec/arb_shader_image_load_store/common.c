@@ -587,7 +587,7 @@ init_fb(const struct grid_info grid)
                 uint32_t *pixels = malloc(n * sizeof(*pixels));
 
                 ret = init_pixels(img, pixels, 0.5, 0.5, 0.5, 0.5) &&
-                        upload_image(img, 7, pixels);
+                        upload_image(img, max_image_units(), pixels);
 
                 free(pixels);
         } else {
@@ -609,7 +609,8 @@ download_result(const struct grid_info grid, uint32_t *r_pixels)
         if (grid.stages & GL_COMPUTE_SHADER_BIT) {
                 /* No actual framebuffer.  Results are returned into
                  * an image. */
-                return download_image(image_info_for_grid(grid), 7, r_pixels);
+                return download_image(image_info_for_grid(grid),
+                                      max_image_units(), r_pixels);
 
         } else {
                 glReadPixels(0, 0, grid.size.x, grid.size.y,
