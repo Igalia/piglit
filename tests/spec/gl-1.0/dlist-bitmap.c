@@ -41,7 +41,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 enum draw_mode
 {
-	BITMAP,
+	PLAIN_BITMAP,
 	CALL_LIST,
 	CALL_LISTS,
 	CALL_LISTS_IN_LIST,
@@ -99,7 +99,7 @@ draw_bitmaps(enum draw_mode mode, unsigned count)
 	unsigned i;
 
 	switch (mode) {
-	case BITMAP:
+	case PLAIN_BITMAP:
 		for (i = 0; i < NUM_BITMAPS; i++) {
 			glBitmap(bitmaps[i].width, bitmaps[i].height,
 				 bitmaps[i].xorig, bitmaps[i].yorig,
@@ -188,7 +188,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3fv(yellow);
 	glRasterPos2f(-1, 0);
-	draw_bitmaps(/*BITMAP*/CALL_LISTS, NUM_BITMAPS);
+	draw_bitmaps(PLAIN_BITMAP, NUM_BITMAPS);
 	glReadPixels(0, 0, piglit_width, piglit_height,
 		     GL_RGBA, GL_UNSIGNED_BYTE, refImage);
 
