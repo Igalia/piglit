@@ -156,6 +156,18 @@ static const struct image_unit_action actions[] = {
 };
 
 /**
+ * Get the maximum number of image units supported by the
+ * implementation.
+ */
+static unsigned
+first_invalid_image_unit(void)
+{
+        int n;
+        glGetIntegerv(GL_MAX_IMAGE_UNITS, &n);
+        return n;
+}
+
+/**
  * Get the last action that modified the state of image unit \a idx.
  */
 static struct image_unit_action
@@ -198,7 +210,7 @@ exec_action(const struct image_unit_action a)
                                    a.access, a.format);
 
         } else if (a.action == BIND_IDX) {
-                const unsigned idx = MIN2(a.idx, max_image_units());
+                const unsigned idx = MIN2(a.idx, first_invalid_image_unit());
 
                 glBindImageTexture(idx, get_texture(a.obj),
                                    a.level, a.layered, a.layer,
@@ -395,11 +407,11 @@ run_test_uniform(void)
          * GL_INVALID_VALUE is generated if the value specified is
          * greater than or equal to the value of GL_MAX_IMAGE_UNITS.
          */
-        glUniform1i(loc, max_image_units());
+        glUniform1i(loc, first_invalid_image_unit());
         ret &= piglit_check_gl_error(GL_INVALID_VALUE);
 
         v[0] = 3;
-        v[1] = max_image_units() + 1;
+        v[1] = first_invalid_image_unit() + 1;
         glUniform1iv(loc, 2, v);
         ret &= piglit_check_gl_error(GL_INVALID_VALUE);
 
