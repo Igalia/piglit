@@ -712,7 +712,7 @@ max_combined_images(void)
         int n;
 
         glGetIntegerv(GL_MAX_COMBINED_IMAGE_UNIFORMS, &n);
-        return n;
+        return MAX2(0, n - num_reserved_images(~0));
 }
 
 unsigned
@@ -721,7 +721,7 @@ max_image_units(void)
         int n;
 
         glGetIntegerv(GL_MAX_IMAGE_UNITS, &n);
-        return n;
+        return MAX2(0, n - num_reserved_images(~0));
 }
 
 unsigned
