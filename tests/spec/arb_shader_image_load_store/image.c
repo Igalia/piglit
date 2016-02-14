@@ -687,7 +687,11 @@ image_stage_max_images(const struct image_stage_info *stage)
         case GL_COMPUTE_SHADER:
                 if (piglit_is_extension_supported("GL_ARB_compute_shader"))
                         glGetIntegerv(GL_MAX_COMPUTE_IMAGE_UNIFORMS, &n);
-                return n;
+                /* One image uniform is reserved in the compute stage
+                 * for the grid framework to read back the result of
+                 * the program.
+                 */
+                return MAX2(0, n - 1);
 
         default:
                 return 0;
