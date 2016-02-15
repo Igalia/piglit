@@ -61,11 +61,11 @@ struct bitmap_info
 static struct bitmap_info bitmaps[NUM_BITMAPS];
 static GLuint ListBase;
 static GLubyte *refImage;
-static const float yellow[3] = {0.7, 1, 0.5};
+static const float yellow[3] = {1, 1, 0.0};
 
 
 static void
-init_bitmaps(void)
+create_bitmaps(void)
 {
 	unsigned i, j;
 
@@ -93,6 +93,17 @@ init_bitmaps(void)
 }
 
 
+static void
+free_bitmaps(void)
+{
+	glDeleteLists(ListBase, NUM_BITMAPS);
+}
+
+
+/**
+ * Draw all the bitmaps using the given drawing mode.
+ * \param count indicates the number of bitmaps to draw.
+ */
 static void
 draw_bitmaps(enum draw_mode mode, unsigned count)
 {
@@ -182,6 +193,8 @@ piglit_display(void)
 
 	glViewport(0, 0, piglit_width, piglit_height);
 
+	create_bitmaps();
+
 	/*
 	 * draw reference image with plain glBitmap calls
 	 */
@@ -221,9 +234,37 @@ piglit_display(void)
 		pass = false;
 	}
 
+	/*
+	 * Delete three of the bitmap display lists.  This basically
+	 * generates a "hole" in Mesa's bitmap texture atlas which has
+	 * to be coped with.
+	 */
+	glDeleteLists(ListBase + 7, 3);
+
+	/*
+	 * Draw new reference image with separate glCallList calls.
+	 * Calling the deleted list should be a no-op.
+	 */
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3fv(yellow);
+	glRasterPos2f(-1, 0);
+	draw_bitmaps(CALL_LIST, NUM_BITMAPS);
+	glReadPixels(0, 0, piglit_width, piglit_height,
+		     GL_RGBA, GL_UNSIGNED_BYTE, refImage);
+
+	/*
+	 * Draw bitmaps with glCallLists again.
+	 * Calling the deleted list should be a no-op.
+	 */
+	if (!test_mode(CALL_LISTS, NUM_BITMAPS,
+		       "glCallLists(bitmaps) after delete")) {
+		pass = false;
+	}
+
 	piglit_present_results();
 
 	free(refImage);
+	free_bitmaps();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -232,5 +273,4 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	init_bitmaps();
 }
