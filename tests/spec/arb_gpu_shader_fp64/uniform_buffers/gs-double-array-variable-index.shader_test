@@ -18,6 +18,10 @@ void main()
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
+uniform double arg0;
+uniform double tolerance;
+uniform dvec4 expected;
+
 uniform int ri, gi, bi, ai;
 
 uniform ubo1 {
@@ -29,7 +33,8 @@ out vec4 v;
 
 void main()
 {
-	v = vec4(d[ri], d[gi], d[bi], d[ai]);
+	dvec4 result = dvec4(d[ri] + arg0, d[gi], d[bi], d[ai]);
+        v = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
 
         for (int i = 0; i < 3; i++) {
             gl_Position = vertex_to_gs[i];
@@ -49,6 +54,10 @@ void main()
 }
 
 [test]
+uniform double arg0 0.25
+uniform double tolerance 0.0
+uniform dvec4 expected 0.25 1.0 0.0 0.0
+
 uniform int ri 0
 uniform int gi 1
 uniform int bi 2
@@ -59,4 +68,4 @@ uniform double d[1] 1.0
 uniform double d[2] 0.0
 uniform double d[3] 0.0
 draw rect -1 -1 2 2
-probe all rgba 0.0 1.0 0.0 0.0
+probe all rgba 0.0 1.0 0.0 1.0

@@ -8,6 +8,10 @@ GL_ARB_gpu_shader_fp64
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
 
+uniform double arg0;
+uniform double tolerance;
+uniform dvec4 expected;
+
 struct S1 {
 	double r;
 };
@@ -34,10 +38,14 @@ out vec4 color;
 
 void main()
 {
-	color = vec4(s.s1.r, s.s2.g, s.s2.b, s.s2.a);
+        dvec4 result = dvec4(s.s1.r + arg0, s.s2.g, s.s2.b, s.s2.a);
+        color = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
 }
 
 [test]
+uniform double arg0 0.25
+uniform double tolerance 0.0
+uniform dvec4 expected 0.25 1.0 0.0 0.0
 uniform double s.s1.r 0.0
 uniform float s.s2.p1 1.0
 uniform double s.s2.g 1.0
@@ -45,4 +53,4 @@ uniform double s.s2.b 0.0
 uniform float s.s2.p2 1.0
 uniform double s.s2.a 0.0
 draw rect -1 -1 2 2
-probe all rgba 0.0 1.0 0.0 0.0
+probe all rgba 0.0 1.0 0.0 1.0

@@ -9,6 +9,8 @@ GL_ARB_gpu_shader_fp64
 uniform double arg0;
 uniform bool arg1;
 uniform double arg2;
+uniform double tolerance;
+uniform dvec4 expected;
 
 in vec4 piglit_vertex;
 out vec4 v;
@@ -16,10 +18,12 @@ out vec4 v;
 void main()
 {
 	gl_Position = piglit_vertex;
+        dvec4 result;
 	if (arg1)
-		v = vec4(arg0, arg2, 0.0, 0.0);
+		result = dvec4(arg0, arg2, 0.0, 0.0);
 	else
-		v = vec4(arg0, arg2, 1.0, 0.0);
+		result = dvec4(arg0, arg2, 1.0, 0.0);
+        v = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
 }
 
 [fragment shader]
@@ -37,5 +41,7 @@ void main()
 uniform double arg0 1.0
 uniform int arg1 1
 uniform double arg2 1.0
+uniform double tolerance 0.0
+uniform dvec4 expected 1.0 1.0 0.0 0.0
 draw rect -1 -1 2 2
-probe all rgba 1.0 1.0 0.0 0.0
+probe all rgba 0.0 1.0 0.0 1.0

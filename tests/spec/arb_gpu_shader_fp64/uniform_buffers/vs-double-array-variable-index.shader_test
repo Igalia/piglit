@@ -6,6 +6,10 @@ GL_ARB_gpu_shader_fp64
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
 
+uniform double arg0;
+uniform double tolerance;
+uniform dvec4 expected;
+
 uniform int ri, gi, bi, ai;
 
 uniform ubo1 {
@@ -18,7 +22,8 @@ out vec4 v;
 void main()
 {
 	gl_Position = piglit_vertex;
-	v = vec4(d[ri], d[gi], d[bi], d[ai]);
+        dvec4 result = dvec4(d[ri] + arg0, d[gi] + arg0, d[bi] + arg0, d[ai] + arg0);
+        v = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
 }
 
 [fragment shader]
@@ -33,6 +38,9 @@ void main()
 }
 
 [test]
+uniform double arg0 0.25
+uniform double tolerance 0.0
+uniform dvec4 expected 0.25 1.25 0.25 0.25
 uniform int ri 0
 uniform int gi 1
 uniform int bi 2
@@ -43,4 +51,4 @@ uniform double d[1] 1.0
 uniform double d[2] 0.0
 uniform double d[3] 0.0
 draw rect -1 -1 2 2
-probe all rgba 0.0 1.0 0.0 0.0
+probe all rgba 0.0 1.0 0.0 1.0

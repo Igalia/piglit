@@ -7,6 +7,10 @@ GL_ARB_gpu_shader_fp64
 [fragment shader]
 #extension GL_ARB_gpu_shader_fp64 : enable
 
+uniform double arg0;
+uniform double tolerance;
+uniform dvec4 expected;
+
 uniform ubo1 {
         double d1;
 	dvec2  d2;
@@ -18,14 +22,17 @@ out vec4 color;
 
 void main()
 {
-	color = vec4(d1, d2.y, d3.z, d4.w);
+	dvec4 result = dvec4(d1, d2.y, d3.z, d4.w + arg0);
+        color = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
 }
 
 [test]
+uniform double arg0 0.25
+uniform double tolerance 0.0
+uniform dvec4 expected 0.1 0.3 0.6 1.25
 uniform double d1 0.1
 uniform dvec2  d2 0.2 0.3
 uniform dvec3  d3 0.4 0.5 0.6
 uniform dvec4  d4 0.7 0.8 0.9 1.0
 draw rect -1 -1 2 2
-probe all rgba 0.1 0.3 0.6 1.0
-
+probe all rgba 0.0 1.0 0.0 1.0
