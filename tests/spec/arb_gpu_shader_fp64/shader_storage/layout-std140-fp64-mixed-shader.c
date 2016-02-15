@@ -46,6 +46,9 @@ PIGLIT_GL_TEST_CONFIG_END
 #define SSBO_SIZE3 4
 #define SSBO_SIZE4 34
 
+#define TOLERANCE 1e-5
+#define DIFFER(a,b) ((a > b ? a - b : b - a) > TOLERANCE)
+
 static const char vs_code[] =
 	"#version 150\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"
@@ -69,7 +72,7 @@ static const char vs_code[] =
 	"void main() {\n"
 	"	vertex_to_gs = piglit_vertex;\n"
 	"       f = 4.0;\n"
-	"       s.a2[0] = dvec2(6.0, 7.0) * s.a5; \n"
+	"       s.a2[0] = dvec2(6.333333333333333259lf, 7.0) * s.a5; \n"
 	"       int index = int(v.x); // index should be zero\n"
         "       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
         "}\n";
@@ -100,7 +103,7 @@ static const char gs_source[] =
         "              gl_Position = vertex_to_gs[i] + vec4(s.a1);\n"
         "              EmitVertex();\n"
         "       }\n"
-	"       s.a4 = dmat2(10.0, 11.0, 12.0, 13.0);\n"
+	"       s.a4 = dmat2(-1.333333333333333259lf, 11.0, 12.0, 13.0);\n"
         "}\n";
 
 static const char fs_source[] =
@@ -125,7 +128,7 @@ static const char fs_source[] =
 	"\n"
 	"void main() {\n"
 	"       color = vec4(0,1,0,1);\n"
-	"       v = u + dvec4(0.0, 1.0, 2.0, 3.0);\n"
+	"       v = u + dvec4(0.333333333333333259lf, 1.0, 2.0, 3.0);\n"
 	"       s.a2[1] = dvec2(2.0*f, 9.0);\n"
 	"       int index = int(v.z + gl_FragCoord.x);\n"
      	"       unsized_array[index] = unsized_array.length() * 2.0;\n"
@@ -165,30 +168,30 @@ double ssbo_values4[SSBO_SIZE4] = { 1.0, 0.0,            // double s.a1
 float expected1[SSBO_SIZE1]  = { 6.0, 7.0,  8.0, 0.0,  // vec4 u
 };
 
-double expected2[SSBO_SIZE2] = { 0.0, 0.0,             // padding
-                                 6.0, 8.0, 10.0, 3.0,  // dvec4 v
+double expected2[SSBO_SIZE2] = { 0.0, 0.0,                              // padding
+                                 6.333333333333333259, 8.0, 10.0, 3.0,  // dvec4 v
 };
 
 float expected3[SSBO_SIZE3]  = { 4.0, 0.0, 0.0, 0.0,  // float f
 };
 
-double expected4[SSBO_SIZE4] = {  1.0,  0.0,         // double s.a1
-                                 12.0, 14.0,         // dvec2 s.a2[0]
-                                  8.0,  9.0,         // dvec2 s.a2[1]
-                                 10.0, 12.0,         // dmat2 s.a4
-                                 11.0, 13.0,         // dmat2 s.a4
-                                  2.0,  0.0,         // double s.a5
-                                 11.0,  0.0,         // double unsized_array[0]
-                                 11.0,  0.0,         // double unsized_array[1]
-                                 11.0,  0.0,         // double unsized_array[2]
-                                 11.0,  0.0,         // double unsized_array[3]
-                                  0.0,  0.0,         // double unsized_array[4]
-                                  0.0,  0.0,         // double unsized_array[5]
-                                  0.0,  0.0,         // double unsized_array[6]
-                                  0.0,  0.0,         // double unsized_array[7]
-                                  0.0,  0.0,         // double unsized_array[8]
-                                  0.0,  0.0,         // double unsized_array[9]
-                                  0.0,  0.0,         // double unsized_array[10]
+double expected4[SSBO_SIZE4] = {  1.0,  0.0,                   // double s.a1
+                                 12.666666666666666518, 14.0,  // dvec2 s.a2[0]
+                                  8.0,  9.0,                   // dvec2 s.a2[1]
+                                 -1.333333333333333259, 12.0,  // dmat2 s.a4
+                                 11.0, 13.0,                   // dmat2 s.a4
+                                  2.0,  0.0,                   // double s.a5
+                                 11.0,  0.0,                   // double unsized_array[0]
+                                 11.0,  0.0,                   // double unsized_array[1]
+                                 11.0,  0.0,                   // double unsized_array[2]
+                                 11.0,  0.0,                   // double unsized_array[3]
+                                  0.0,  0.0,                   // double unsized_array[4]
+                                  0.0,  0.0,                   // double unsized_array[5]
+                                  0.0,  0.0,                   // double unsized_array[6]
+                                  0.0,  0.0,                   // double unsized_array[7]
+                                  0.0,  0.0,                   // double unsized_array[8]
+                                  0.0,  0.0,                   // double unsized_array[9]
+                                  0.0,  0.0,                   // double unsized_array[10]
 };
 
 void
@@ -245,8 +248,8 @@ piglit_init(int argc, char **argv)
 
 #define CHECK_RESULTS(map, expected, size)                      \
         for (i = 0; i < size; i++) {                            \
-          if (*map != expected[i]) {                            \
-            printf("#expected[%d] = %.2f. Read value %.2f\n",   \
+          if (DIFFER(*map, expected[i])) {                      \
+            printf("#expected[%d] = %.14g. Read value %.14g\n", \
                    i, expected[i], *map);                       \
             pass = false;                                       \
           }                                                     \

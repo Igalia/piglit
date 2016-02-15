@@ -47,6 +47,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 #define SSBO_SIZE 68
+#define TOLERANCE 1e-5
+#define DIFFER(a,b) ((a > b ? a - b : b - a) > TOLERANCE)
 
 static const char vs_code[] =
 	"#version 150\n"
@@ -79,7 +81,7 @@ static const char vs_code[] =
 	"       d = 4.0lf;\n"
 	"       s.a2.x = 6.0lf; \n"
 	"       s.a2.y = 7.0lf; \n"
-	"       s.sb[0].b1[0] = 18.0lf;\n"
+	"       s.sb[0].b1[0] = 18.333333333333333259lf;\n"
 	"       s.sb[0].b1[1] = 19.0lf;\n"
 	"       m[1] = dvec4(25.0, 26.0, 27.0, 28.0);\n"
 	"       v2a[0].yx = dvec2(34.0, 33.0) * s.a5;\n"
@@ -121,7 +123,7 @@ static const char gs_source[] =
         "              gl_Position = vertex_to_gs[i] + vec4(s.a1);\n"
         "              EmitVertex();\n"
         "       }\n"
-	"       s.a4[0] = dmat2(10.0, 11.0, 12.0, 13.0);\n"
+	"       s.a4[0] = dmat2(-1.333333333333333259lf, 11.0, 12.0, 13.0);\n"
         "}\n";
 
 static const char fs_source[] =
@@ -155,7 +157,7 @@ static const char fs_source[] =
 	"       s.a2.z = 8.0lf;\n"
 	"       s.a4[1] = dmat2(14.0, 15.0, 16.0, 17.0);\n"
 	"       s.sb[1].b1[2] = 20.0lf;\n"
-	"       m[0] = dvec4(21.0, 22.0, 23.0, 24.0);\n"
+	"       m[0] = dvec4(21.333333333333333259lf, 22.0, 23.0, 24.0);\n"
 	"       m[2] = dvec4(29.0, 30.0, 31.0, 32.0);\n"
 	"       v2a[1].x = 35.0lf;\n"
 	"       v2a[2].xy = dvec2(37.0, 38.0);\n"
@@ -187,23 +189,23 @@ double ssbo_values[SSBO_SIZE] = { 6.0,  7.0,  0.0,  0.0, // dvec2 u
 };
 
 
-double expected[SSBO_SIZE] = { 6.0,   7.0,  0.0,  0.0, // dvec2 u                    expected[0]
-                               6.0,   1.0,  2.0, 10.0, // dvec4 v                    expected[4]
-                               4.0,   0.0,  0.0,  0.0, // double d                   expected[8]
-                               1.0,   0.0,  0.0,  0.0, // double s.a1                expected[12]
-                               6.0,   7.0,  8.0,  0.0, // dvec3 s.a2                 expected[16]
-                               10.0, 11.0, 12.0, 13.0, // dmat2 s.a4[0]              expected[20]
-                               14.0, 15.0, 16.0, 17.0, // dmat2 s.a4[1]              expected[24]
-                               2.0,  18.0, 19.0,  0.0, // double s.a5, s.sb[0].b1    expected[28]
-                               0.0,   0.0, 20.0,  0.0, // double s.sb[1].b1          expected[32]
-                               21.0, 22.0, 23.0, 24.0, // dmat3x4 m[0]               expected[36]
-                               25.0, 26.0, 27.0, 28.0, // dmat3x4 m[1]               expected[40]
-                               29.0, 30.0, 31.0, 32.0, // dmat3x4 m[2]               expected[44]
-                               66.0, 68.0, 35.0, 36.0, // dvec2 v2a[3]               expected[48]
-                               37.0, 38.0,  0.0,  0.0, //                            expected[52]
-                               39.0, 40.0, 41.0,  0.0, // dvec3 v3a[2]               expected[56]
-                               42.0, 43.0, 44.0,  0.0, //                            expected[60]
-                               4.0,   4.0,  4.0,  4.0, // double unsized_array[0-3]  expected[64]
+double expected[SSBO_SIZE] = { 6.0, 7.0, 0.0, 0.0,                      // dvec2 u                    expected[0]
+                               6.0, 1.0, 2.0, 10.0,                     // dvec4 v                    expected[4]
+                               4.0, 0.0, 0.0, 0.0,                      // double d                   expected[8]
+                               1.0, 0.0, 0.0, 0.0,                      // double s.a1                expected[12]
+                               6.0, 7.0, 8.0, 0.0,                      // dvec3 s.a2                 expected[16]
+                              -1.333333333333333259, 11.0, 12.0, 13.0,  // dmat2 s.a4[0]              expected[20]
+                              14.0, 15.0, 16.0, 17.0,                   // dmat2 s.a4[1]              expected[24]
+                               2.0, 18.333333333333333259, 19.0, 0.0,   // double s.a5, s.sb[0].b1    expected[28]
+                               0.0, 0.0, 20.0, 0.0,                     // double s.sb[1].b1          expected[32]
+                               21.333333333333333259, 22.0, 23.0, 24.0, // dmat3x4 m[0]               expected[36]
+                               25.0, 26.0, 27.0, 28.0,                  // dmat3x4 m[1]               expected[40]
+                               29.0, 30.0, 31.0, 32.0,                  // dmat3x4 m[2]               expected[44]
+                               66.0, 68.0, 35.0, 36.0,                  // dvec2 v2a[3]               expected[48]
+                               37.0, 38.0,  0.0,  0.0,                  //                            expected[52]
+                               39.0, 40.0, 41.0,  0.0,                  // dvec3 v3a[2]               expected[56]
+                               42.0, 43.0, 44.0,  0.0,                  //                            expected[60]
+                               4.0,   4.0,  4.0,  4.0,                  // double unsized_array[0-3]  expected[64]
 };
 
 void
@@ -240,8 +242,8 @@ piglit_init(int argc, char **argv)
 	map = (double *) glMapBuffer(GL_SHADER_STORAGE_BUFFER,  GL_READ_ONLY);
 
 	for (i = 0; i < SSBO_SIZE; i++) {
-		if (map[i] != expected[i]) {
-			printf("expected[%d] = %.2f. Read value: %.2f\n",
+                if (DIFFER(map[i], expected[i])) {
+			printf("expected[%d] = %.14g. Read value: %.14g\n",
 			       i, expected[i], map[i]);
 			pass = false;
 		}
