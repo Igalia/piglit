@@ -1,0 +1,51 @@
+// Test that a large number of unused varyings doesn't cause any issues during
+// linking. This reproduces a bogus assert seen in the game Dead Island.
+
+[require]
+GLSL >= 1.40
+GL_ARB_separate_shader_objects
+SSO ENABLED
+
+[vertex shader]
+#version 140
+#extension GL_ARB_separate_shader_objects: require
+
+in vec4 piglit_vertex;
+
+out vec4 a;
+out vec4 b;
+out vec4 c;
+out vec4 d;
+out vec4 e;
+out vec4 f;
+
+void main()
+{
+	a = vec4(1.0, 0.0, 0.0, 1.0);
+
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 140
+#extension GL_ARB_separate_shader_objects: require
+
+uniform vec4 u;
+
+in vec4 a;
+in vec4 b;
+in vec4 c;
+in vec4 d;
+in vec4 e;
+in vec4 f;
+
+
+out vec4 color;
+
+void main()
+{
+	color = u;
+}
+
+[test]
+link success
