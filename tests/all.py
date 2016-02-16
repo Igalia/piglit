@@ -4196,6 +4196,7 @@ with profile.group_manager(
     g(['arb_compute_shader-indirect-compute'], 'indirect-compute')
     g(['arb_compute_shader-local-id'], 'local-id' + '-explosion')
     g(['arb_compute_shader-render-and-compute'], 'render-and-compute')
+    g(['arb_compute_shader-zero-dispatch-size'], 'zero-dispatch-size')
 
 with profile.group_manager(
         PiglitGLTest,
