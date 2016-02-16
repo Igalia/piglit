@@ -24,7 +24,7 @@
 //
 
 #version 150
-#extension GL_ARB_gpu_shader_fp64 : enable
+#extension GL_ARB_gpu_shader_fp64 : require
 
 in dvec3 v;
 out vec4 color;

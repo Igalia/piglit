@@ -24,7 +24,7 @@
 //
 
 #version 150
-#extension GL_ARB_gpu_shader_fp64 : enable
+#extension GL_ARB_gpu_shader_fp64 : require
 
 struct S {
     double d;
