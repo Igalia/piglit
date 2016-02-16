@@ -135,7 +135,8 @@ confirm_size()
 
 	memset(&values, 0, sizeof values);
 
-	for (z = 0; z < zs; z++) {
+	const bool no_work = global_x == 0 || global_y == 0 || global_z == 0;
+	for (z = 0; z < zs && !no_work; z++) {
 		for (y = 0; y < ys; y++) {
 			for (x = 0; x < xs; x++) {
 				if (((x & y) & z) == 0u)
@@ -280,8 +281,7 @@ cs_ids_run_test()
 		       local_x, local_y, local_z,
 		       global_x, global_y, global_z);
 
-	if (local_x == 0 || local_y == 0 || local_z == 0 ||
-	    global_x == 0 || global_y == 0 || global_z == 0)
+	if (local_x == 0 || local_y == 0 || local_z == 0)
 		return PIGLIT_FAIL;
 
 	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
