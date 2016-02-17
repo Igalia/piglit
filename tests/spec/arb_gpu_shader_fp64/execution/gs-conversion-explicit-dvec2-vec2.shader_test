@@ -20,8 +20,8 @@ void main()
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-uniform vec3 vec3_value;
-uniform dvec3 dvec3_value;
+uniform dvec2 dvec2_value;
+uniform vec2 vec2_value;
 
 in vec4 vertex_to_gs[3];
 out vec4 fs_color;
@@ -31,8 +31,8 @@ out vec4 fs_color;
 
 void main()
 {
-    dvec3 converted = vec3_value;
-    bool match = converted == dvec3_value;
+    vec2 converted = vec2(dvec2_value);
+    bool match = converted == vec2_value;
     fs_color = match ? GREEN : RED;
 
     for (int i = 0; i < 3; i++) {
@@ -53,27 +53,27 @@ void main()
 }
 
 [test]
-uniform dvec3 dvec3_value -5.0 -5.0 -5.0
-uniform vec3 vec3_value -5.0 -5.0 -5.0
+uniform dvec2 dvec2_value -5.0 -5.0
+uniform vec2 vec2_value -5.0 -5.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform dvec3 dvec3_value 5.0 5.0 5.0
-uniform vec3 vec3_value 5.0 5.0 5.0
+uniform dvec2 dvec2_value 5.0 5.0
+uniform vec2 vec2_value 5.0 5.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform dvec3 dvec3_value 1.94673001766204833984375 1.94673001766204833984375 1.94673001766204833984375
-uniform vec3 vec3_value 1.94673001766204833984375 1.94673001766204833984375 1.94673001766204833984375
+uniform dvec2 dvec2_value 1.94673001766204833984375 1.94673001766204833984375
+uniform vec2 vec2_value 1.94673001766204833984375 1.94673001766204833984375
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform dvec3 dvec3_value -16777216.0 -16777216.0 -16777216.0
-uniform vec3 vec3_value -16777216.0 -16777216.0 -16777216.0
+uniform dvec2 dvec2_value -16777216.0 -16777216.0
+uniform vec2 vec2_value -16777216.0 -16777216.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform dvec3 dvec3_value 16777216.0 16777216.0 16777216.0
-uniform vec3 vec3_value 16777216.0 16777216.0 16777216.0
+uniform dvec2 dvec2_value 16777216.0 16777216.0
+uniform vec2 vec2_value 16777216.0 16777216.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
