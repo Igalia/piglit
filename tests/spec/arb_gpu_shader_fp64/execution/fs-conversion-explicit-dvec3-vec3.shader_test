@@ -8,8 +8,8 @@ GL_ARB_gpu_shader_fp64
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
 
-uniform vec3 vec3_value;
 uniform dvec3 dvec3_value;
+uniform vec3 vec3_value;
 
 out vec4 color;
 
@@ -18,8 +18,8 @@ out vec4 color;
 
 void main()
 {
-    dvec3 converted = vec3_value;
-    bool match = converted == dvec3_value;
+    vec3 converted = vec3(dvec3_value);
+    bool match = converted == vec3_value;
     color = match ? GREEN : RED;
 }
 
