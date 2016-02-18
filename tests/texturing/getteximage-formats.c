@@ -534,7 +534,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	fbo_formats_init(1, argv, !piglit_automatic);
+	fbo_formats_init(argc, argv, !piglit_automatic);
 	(void) fbo_formats_display;
 
 	for (i = 1; i < argc; i++) {
