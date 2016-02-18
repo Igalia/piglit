@@ -127,7 +127,7 @@ bool test_builtin_num_samples(const Fbo& ms_fbo)
 	glUseProgram(prog);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ms_fbo.handle);
 	glGetIntegerv(GL_SAMPLES, &samples);
-	glUniform1i(glGetUniformLocation(prog, "samples"), samples);
+	glUniform1i(glGetUniformLocation(prog, "samples"), MAX2(1, samples));
 
 	glClear(GL_COLOR_BUFFER_BIT);
         piglit_draw_rect(-1, -1, 2, 2);
