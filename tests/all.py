@@ -2113,6 +2113,7 @@ with profile.group_manager(
      g(['arb_gpu_shader_fp64-gs-getuniformdv'])
      g(['arb_gpu_shader_fp64-wrong-type-setter'])
      g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
+     g(['arb_gpu_shader_fp64-uniform-invalid-operation'])
 
 with profile.group_manager(
         PiglitGLTest,
