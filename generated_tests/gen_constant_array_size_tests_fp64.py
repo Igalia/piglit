@@ -165,7 +165,7 @@ class ParserTest(object):
             shader += '  double[{0} ? 1 : -1] array{1};\n'.format(
                 self.make_condition(test_vector), i)
             lengths.append('array{0}.length()'.format(i))
-        shader += '  {0} = dvec4({1});\n'.format(
+        shader += '  {0} = vec4({1});\n'.format(
             self.output_var(), ' + '.join(lengths))
         shader += '}\n'
         return shader
