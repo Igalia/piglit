@@ -193,7 +193,7 @@ class ParserTest(object):
         parser_test += ' * [end config]\n'
         parser_test += ' *\n'
         parser_test += ' * Check that the following test vectors are constant'\
-                       'folded correctly:\n'
+                       ' folded correctly:\n'
         for test_vector in self.__test_vectors:
             parser_test += ' * {0} => {1}\n'.format(
                 self.__signature.template.format(
