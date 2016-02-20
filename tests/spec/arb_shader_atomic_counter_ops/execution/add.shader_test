@@ -1,0 +1,27 @@
+[require]
+GLSL >= 1.40
+GL_ARB_shader_atomic_counters
+GL_ARB_shader_atomic_counter_ops
+SIZE 16 16
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 140
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_shader_atomic_counter_ops: require
+
+out vec4 color;
+layout(binding = 0) uniform atomic_uint counter;
+
+void main() {
+  atomicCounterAddARB(counter,
+                      uint(gl_FragCoord.x) + 16u * uint(gl_FragCoord.y));
+  color = vec4(0, 1, 0, 1);
+}
+
+[test]
+atomic counters 1
+
+draw rect -1 -1 2 2
+probe atomic counter 0 == 32640
