@@ -80,7 +80,7 @@ static const char gs_text[] =
    "  t.rb += u1[0]*m1 + u1[1] + u2[0]*m4 + v[0]*m5; \n"
    "  t.xyw += u2[0]*m2 + u2[1] + u2[2] + u2[3] + u1[1]*m6 + v[0]*m7; \n"
    "  for (int i = 0; i < 3; i++) {\n"
-   "    gl_Position = vertex_to_gs[i] + t;\n"
+   "    gl_Position = vertex_to_gs[i] + vec4(t);\n"
    "    EmitVertex();\n"
    "  }\n"
    "}\n";
