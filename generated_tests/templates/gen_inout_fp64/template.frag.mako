@@ -14,10 +14,10 @@
 #version 150
 #extension GL_ARB_gpu_shader_fp64: require
 
-out double color;
+out ${type_name} color;
 
 void main()
 {
-    color = 0.0;
+  color = ${type_name}(0.0);
 }
 

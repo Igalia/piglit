@@ -15,10 +15,10 @@
 #version 150
 #extension GL_ARB_gpu_shader_fp64: require
 
-in dmat3 vertex;
+in ${type_name} vertex;
 
 void main()
 {
-    gl_Position = vec4(vertex[0] + vertex[1] + vertex[2], 0.0);
+  gl_Position = vec4(vertex${extra_params});
 }
 
