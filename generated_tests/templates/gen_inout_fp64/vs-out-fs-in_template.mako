@@ -1,4 +1,6 @@
-# test truncating a double holds precision
+# test emitting a ${type_name} from vs->fs works
+# when originally written this failed in varying lowering
+
 [require]
 GLSL >= 1.50
 GL_ARB_gpu_shader_fp64
@@ -10,28 +12,27 @@ GL_ARB_gpu_shader_fp64
 uniform double arg0;
 
 in vec4 vertex;
-flat out dvec4 dout1;
+flat out ${type_name} dout1;
 
 void main()
 {
-        gl_Position = vertex;
-	dout1 = dvec4(arg0);
+    gl_Position = vertex;
+    dout1 = ${type_name}(arg0);
 }
 
 [fragment shader]
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
 
+flat in ${type_name} dout1;
 uniform double tolerance;
 uniform double expected;
-
-flat in dvec4 dout1;
 out vec4 color;
 
 void main()
 {
-  dvec4 result = trunc(dout1);
-  color = distance(result, dvec4(expected)) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    ${type_name} result = trunc(dout1);
+    color = distance(result, ${type_name}(expected)) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
 [vertex data]
