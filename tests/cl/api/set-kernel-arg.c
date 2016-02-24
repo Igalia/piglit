@@ -44,10 +44,18 @@ PIGLIT_CL_API_TEST_CONFIG_BEGIN
 	config.create_context = true;
 
 	config.program_source =
+		"typedef struct struct_arg {\n"
+		"   int   m1;\n"
+		"   int4  m2;\n"
+		"   float m3;\n"
+		"} struct_arg_t;\n"
+		"\n"
 		"kernel void kernel_fun(__global int* arr,     \
 		                        float float_num,       \
 		                        __local int* int_ptr,  \
-		                        sampler_t sampler) {}";
+		                        sampler_t sampler,     \
+		                        int3 vec3,             \
+		                        struct_arg_t s_arg) {}";
 
 PIGLIT_CL_API_TEST_CONFIG_END
 
@@ -95,6 +103,12 @@ piglit_cl_test(const int argc,
                const struct piglit_cl_api_test_config* config,
                const struct piglit_cl_api_test_env* env)
 {
+	typedef struct struct_arg {
+		cl_int   m1;
+		cl_int4  m2;
+		cl_float m3;
+	} struct_arg_t;
+
 	enum piglit_result result = PIGLIT_PASS;
 
 	cl_int errNo;
@@ -104,6 +118,8 @@ piglit_cl_test(const int argc,
 	cl_float float_num = 1.1;
 	cl_int int_num = 1;
 	cl_sampler sampler = NULL;
+	cl_int3 vec3;
+	struct_arg_t s_arg;
 
 	cl_mem invalid_buffer;
 
@@ -160,7 +176,15 @@ piglit_cl_test(const int argc,
 		     CL_SUCCESS, &result,
 		     "Set kernel argument for sampler");
 	}
-	
+
+	test(kernel, 4, sizeof(cl_int3), &vec3,
+	     CL_SUCCESS, &result,
+	     "Set kernel argument for cl_int3");
+
+	test(kernel, 5, sizeof(struct_arg_t), &s_arg,
+	     CL_SUCCESS, &result,
+	     "Set kernel argument for struct");
+
 	/*
 	 * Next line is also valid.
 	 *
@@ -183,7 +207,7 @@ piglit_cl_test(const int argc,
 	/*
 	 * CL_INVALID_ARG_INDEX if arg_index is not a valid argument index.
 	 */
-	test(kernel, 4, sizeof(cl_float), &float_num,
+	test(kernel, 11, sizeof(cl_float), &float_num,
 	     CL_INVALID_ARG_INDEX, &result,
 	     "Trigger CL_INVALID_ARG_INDEX if arg_index is not a valid argument index");
 
