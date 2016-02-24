@@ -57,6 +57,7 @@ CLC_VERSION_MIN = {
     'fmin' : 10,
     'fmod' : 10,
     'fract' : 10,
+    'frexp' : 10,
     'ilogb' : 10,
     'ldexp' : 10,
     'log10' : 10,
@@ -319,6 +320,17 @@ tests = {
             [float("nan"), float("inf"), 1.5, 2.0,float.fromhex('-0x1.b33334p+0'), float.fromhex('-0x1.000242p-24')] #src0
         ],
         'num_out_args' : 2
+    },
+    'frexp' : {
+        'arg_types': [F, I, F],
+        'function_type': 'ttt',
+        # For frexp we have two outputs per address space.
+        'values': [
+            [0.602783203125, 0.5, float("nan"), float("nan"),  float("inf"), float("-inf"), 0.0],
+            [11,             1,   0,            0,             0,            0,             0],
+            [1234.5,         1.0, float("nan"), float("-nan"), float("inf"), float("-inf"), 0.0]
+        ],
+       'num_out_args' : 2
     },
     'ilogb' : {
         'arg_types': [I, F],
