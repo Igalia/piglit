@@ -51,6 +51,21 @@ PIGLIT_CL_API_TEST_CONFIG_BEGIN
 
 PIGLIT_CL_API_TEST_CONFIG_END
 
+static bool
+get_device_image_support(cl_device_id device)
+{
+	cl_bool *has_image =
+		piglit_cl_get_device_info(device, CL_DEVICE_IMAGE_SUPPORT);
+
+	if (!*has_image) {
+		fprintf(stdout, "No image support. Sampler arg won't be tested\n");
+		free(has_image);
+		return false;
+	}
+
+	free(has_image);
+	return true;
+}
 
 static bool
 test (cl_kernel kernel,
@@ -88,9 +103,12 @@ piglit_cl_test(const int argc,
 	cl_mem buffer;
 	cl_float float_num = 1.1;
 	cl_int int_num = 1;
-	cl_sampler sampler;
+	cl_sampler sampler = NULL;
 
 	cl_mem invalid_buffer;
+
+	cl_bool image_support =
+		get_device_image_support(env->context->device_ids[0]);
 
 	/*** Normal usage ***/
 	kernel = clCreateKernel(env->program, "kernel_fun", &errNo);
@@ -113,16 +131,18 @@ piglit_cl_test(const int argc,
 		return PIGLIT_FAIL;
 	}
 
-	sampler = clCreateSampler(env->context->cl_ctx,
-	                          CL_TRUE,
-	                          CL_ADDRESS_NONE,
-	                          CL_FILTER_NEAREST,
-	                          &errNo);
-	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
-		fprintf(stderr,
-		        "Failed (error code: %s): Create sampler.\n",
-		        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
+	if (image_support) {
+		sampler = clCreateSampler(env->context->cl_ctx,
+		                          CL_TRUE,
+		                          CL_ADDRESS_NONE,
+		                          CL_FILTER_NEAREST,
+		                          &errNo);
+		if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+			fprintf(stderr,
+			        "Failed (error code: %s): Create sampler.\n",
+			        piglit_cl_get_error_name(errNo));
+			return PIGLIT_FAIL;
+		}
 	}
 
 	test(kernel, 0, sizeof(cl_mem), &buffer,
@@ -134,9 +154,12 @@ piglit_cl_test(const int argc,
 	test(kernel, 2, sizeof(cl_int), NULL,
 	     CL_SUCCESS, &result,
 	     "Set kernel argument for array");
-	test(kernel, 3, sizeof(cl_sampler), &sampler,
-	     CL_SUCCESS, &result,
-	     "Set kernel argument for sampler");
+
+	if (image_support) {
+		test(kernel, 3, sizeof(cl_sampler), &sampler,
+		     CL_SUCCESS, &result,
+		     "Set kernel argument for sampler");
+	}
 	
 	/*
 	 * Next line is also valid.
