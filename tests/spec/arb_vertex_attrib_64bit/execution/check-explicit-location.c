@@ -50,7 +50,7 @@ const char *vs_text =
 	"flat out dvec4 fscolor;\n"
 	"void main()\n"
 	"{\n"
-	"gl_Position = vertex;\n"
+	"gl_Position = vec4(vertex);\n"
 	"fscolor = vcolor;\n"
 	"}\n";
 
