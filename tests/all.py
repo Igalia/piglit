@@ -3615,6 +3615,8 @@ with profile.group_manager(
       'referenced-by-shader')
     g(['arb_uniform_buffer_object-rendering'], 'rendering')
     g(['arb_uniform_buffer_object-rendering', 'offset'], 'rendering-offset')
+    g(['arb_uniform_buffer_object-rendering-array'], 'rendering-array')
+    g(['arb_uniform_buffer_object-rendering-array', 'offset'], 'rendering-array-offset')
     g(['arb_uniform_buffer_object-rendering-dsa'], 'rendering-dsa')
     g(['arb_uniform_buffer_object-rendering-dsa', 'offset'], 'rendering-dsa-offset')
     g(['arb_uniform_buffer_object-row-major'], 'row-major')
