@@ -1,0 +1,39 @@
+# Tests linking a shader with a large workgroup and local data set.
+#
+# This is related to:
+# Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=93840
+#
+# There are two important elements to this test:
+#
+# 1. local workgroup size of 1024 based on the spec requirements.
+#
+# 2. Use a 'large' size of live local data. In the test this is
+#    controlled with the SIZE macro. This is hardware specific, and
+#    the value of 64 was chosen because it was observed to fail on the
+#    Mesa i965 driver.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_compute_shader
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+
+layout(local_size_x = 1024) in;
+
+#define SIZE 64
+
+shared int sa[SIZE];
+
+void main()
+{
+    int a[SIZE] = sa;
+    a[int(gl_LocalInvocationIndex) % SIZE] += 1;
+    if (a[int(gl_LocalInvocationIndex) % SIZE] == 0)
+        sa[0] = 1;
+}
+
+[test]
+link success
