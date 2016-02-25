@@ -36,13 +36,13 @@ void main()
 
 [test]
 # 64bit -inf
-uniform double double_value 0x7FF0000000000000
+uniform double double_value 0xFFF0000000000000
 uniform int int_value -2147483648
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
 # 64bit +inf
-uniform double double_value 0xFFF0000000000000
+uniform double double_value 0x7FF0000000000000
 uniform int int_value 2147483647
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
