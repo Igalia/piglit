@@ -52,6 +52,7 @@ CLC_VERSION_MIN = {
     'erfc' : 10,
     'exp' : 10,
     'fabs' : 10,
+    'fdim' : 10,
     'floor' : 10,
     'fmax' : 10,
     'fmin' : 10,
@@ -273,6 +274,15 @@ tests = {
             [0.0, -pi/2, pi, -0.0, float("-inf"), float("inf"), -1.12345] # Arg0
         ],
         'tolerance' : 0
+    },
+    'fdim' : {
+        'arg_types' : [F, F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [0.0, 0.75, 0.0, 0.0, float("inf"),  0.0,          float("nan"), float("nan"), float("nan"), 2.2469 ], # Result
+            [0.3, 1.0,  pi,  0.0, float("inf"),  float("inf"), float("nan"), 1.0,          float("nan"), 1.12345 ], # Arg0
+            [1.5, 0.25, pi, -0.0, float("-inf"), float("inf"), float("nan"), float("nan"), 1.0,          -1.12345] # Arg1
+        ]
     },
     'floor' : {
         'arg_types': [F, F],
