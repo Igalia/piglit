@@ -75,7 +75,7 @@ get_device_image_support(cl_device_id device)
 	return true;
 }
 
-static bool
+static void
 test (cl_kernel kernel,
       cl_uint arg_index,
       size_t arg_size,
@@ -85,16 +85,17 @@ test (cl_kernel kernel,
       const char* test_str)
 {
 	cl_int errNo;
-	
+	enum piglit_result res = PIGLIT_PASS;
+
 	errNo = clSetKernelArg(kernel, arg_index, arg_size, arg_value);
 	if(!piglit_cl_check_error(errNo, expected_error)) {
 		fprintf(stderr, "Failed (error code: %s): %s.\n",
 		        piglit_cl_get_error_name(errNo), test_str);
+		res = PIGLIT_FAIL;
 		piglit_merge_result(result, PIGLIT_FAIL);
-		return false;
 	}
-
-	return true;
+	if (expected_error == CL_SUCCESS)
+		piglit_report_subtest_result(res, "%s", test_str);
 }
 
 enum piglit_result
@@ -110,10 +111,11 @@ piglit_cl_test(const int argc,
 	} struct_arg_t;
 
 	enum piglit_result result = PIGLIT_PASS;
+	const char * test_str = NULL;
 
 	cl_int errNo;
 	cl_kernel kernel;
-	
+
 	cl_mem buffer;
 	cl_float float_num = 1.1;
 	cl_int int_num = 1;
@@ -171,10 +173,12 @@ piglit_cl_test(const int argc,
 	     CL_SUCCESS, &result,
 	     "Set kernel argument for array");
 
+	test_str = "Set kernel argument for sampler";
 	if (image_support) {
 		test(kernel, 3, sizeof(cl_sampler), &sampler,
-		     CL_SUCCESS, &result,
-		     "Set kernel argument for sampler");
+		     CL_SUCCESS, &result, test_str);
+	} else {
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", test_str);
 	}
 
 	test(kernel, 4, sizeof(cl_int3), &vec3,
@@ -196,19 +200,19 @@ piglit_cl_test(const int argc,
 	     "Set kernel argument for buffer which is NULL");
 
 	/*** Errors ***/
-
+	enum piglit_result input_check_result;
 	/*
 	 * CL_INVALID_KERNEL if kernel is not a valid kernel object.
 	 */
 	test(NULL, 1, sizeof(cl_float), &float_num,
-	     CL_INVALID_KERNEL, &result,
+	     CL_INVALID_KERNEL, &input_check_result,
 	     "Trigger CL_INVALID_KERNEL if kernel is not a valid kernel object");
 
 	/*
 	 * CL_INVALID_ARG_INDEX if arg_index is not a valid argument index.
 	 */
 	test(kernel, 11, sizeof(cl_float), &float_num,
-	     CL_INVALID_ARG_INDEX, &result,
+	     CL_INVALID_ARG_INDEX, &input_check_result,
 	     "Trigger CL_INVALID_ARG_INDEX if arg_index is not a valid argument index");
 
 	/*
@@ -222,38 +226,39 @@ piglit_cl_test(const int argc,
 	 * Version : 1.2
 	 */
 	test(kernel, 1, sizeof(cl_float), NULL,
-	     CL_INVALID_ARG_VALUE, &result,
+	     CL_INVALID_ARG_VALUE, &input_check_result,
 	     "Trigger CL_INVALID_ARG_VALUE if arg_value specified is NULL for an argument that is not declared with the __local qualifier");
 	test(kernel, 2, sizeof(cl_int), &int_num,
-	     CL_INVALID_ARG_VALUE, &result,
+	     CL_INVALID_ARG_VALUE, &input_check_result,
 	     "Trigger CL_INVALID_ARG_VALUE if arg_value specified is not NULL for an argument that is declared with the __local qualifier");
 
 	/*
 	 * CL_INVALID_MEM_OBJECT for an argument declared to be a memory object when
 	 * the specified arg_value is not a valid memory object.
 	 */
+	test_str = "Trigger CL_INVALID_MEM_OBJECT for an argument declared to be a memory object when the specified arg_value is not a valid memory object.";
 	errNo = clSetKernelArg(kernel, 0, sizeof(cl_mem), &invalid_buffer);
 	if(   errNo != CL_INVALID_MEM_OBJECT
 	   && errNo != CL_INVALID_ARG_VALUE) { // two possible values
 		piglit_cl_check_error(errNo, CL_INVALID_MEM_OBJECT);
 		fprintf(stderr,
-		        "Failed (error code: %s): Trigger CL_INVALID_MEM_OBJECT for an argument declared to be a memory object when the specified arg_value is not a valid memory object.\n",
-		        piglit_cl_get_error_name(errNo));
-		piglit_merge_result(&result, PIGLIT_FAIL);
+		        "Failed (error code: %s): %s\n",
+		        piglit_cl_get_error_name(errNo), test_str);
+		piglit_merge_result(&input_check_result, PIGLIT_FAIL);
 	}
 
 	/*
 	 * CL_INVALID_SAMPLER for an argument declared to be of type sampler_t when
 	 * the specified arg_value is not a valid sampler object.
 	 */
+	test_str = "Trigger CL_INVALID_SAMPLER for an argument declared to be a memory object when the specified arg_value is not a valid memory object.";
 	errNo = clSetKernelArg(kernel, 3, sizeof(cl_sampler), NULL);
 	if(   errNo != CL_INVALID_SAMPLER
 	   && errNo != CL_INVALID_ARG_VALUE) { // two possible values
 		piglit_cl_check_error(errNo, CL_INVALID_SAMPLER);
-		fprintf(stderr,
-		        "Failed (error code: %s): Trigger CL_INVALID_SAMPLER for an argument declared to be a memory object when the specified arg_value is not a valid memory object.\n",
-		        piglit_cl_get_error_name(errNo));
-		piglit_merge_result(&result, PIGLIT_FAIL);
+		fprintf(stderr, "Failed (error code: %s): %s.\n",
+		        piglit_cl_get_error_name(errNo), test_str);
+		piglit_merge_result(&input_check_result, PIGLIT_FAIL);
 	}
 
 	/*
@@ -264,16 +269,16 @@ piglit_cl_test(const int argc,
 	 * a sampler and arg_size != sizeof(cl_sampler).
 	 */
 	test(kernel, 1, sizeof(cl_float)+1, &float_num,
-	     CL_INVALID_ARG_SIZE, &result,
+	     CL_INVALID_ARG_SIZE, &input_check_result,
 	     "Trigger CL_INVALID_ARG_SIZE if arg_size does not match the size of the data type for an argument that is not a memory object");
 	test(kernel, 0, sizeof(cl_mem)+1, &buffer,
-	     CL_INVALID_ARG_SIZE, &result,
+	     CL_INVALID_ARG_SIZE, &input_check_result,
 	     "Trigger CL_INVALID_ARG_SIZE if the argument is a memory object and arg_size != sizeof(cl_mem)");
 	test(kernel, 2, 0, NULL,
-	     CL_INVALID_ARG_SIZE, &result,
+	     CL_INVALID_ARG_SIZE, &input_check_result,
 	     "Trigger CL_INVALID_ARG_SIZE if arg_size is zero and the argument is declared with the __local qualifier");
 	test(kernel, 3, sizeof(cl_sampler)+1, &sampler,
-	     CL_INVALID_ARG_SIZE, &result,
+	     CL_INVALID_ARG_SIZE, &input_check_result,
 	     "Trigger CL_INVALID_ARG_SIZE if the argument is a sampler and arg_size != sizeof(cl_sampler)");
 
 	/*
@@ -287,6 +292,8 @@ piglit_cl_test(const int argc,
 	 *
 	 * TODO
 	 */
+	piglit_report_subtest_result(input_check_result, "Input checks");
+	piglit_merge_result(&result, input_check_result);
 
 	clReleaseMemObject(buffer);
 	clReleaseSampler(sampler);
