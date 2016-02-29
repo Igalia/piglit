@@ -601,6 +601,10 @@ static void fbo_formats_key_func(unsigned char key, int x, int y)
 	piglit_escape_exit_key(key, x, y);
 }
 
+/**
+ * Look up a test set name (such as "GL_EXT_texture_sRGB").
+ * \return index >= 0 if found, -1 if not found
+ */
 static int
 fbo_lookup_test_set(const char *test_set_name)
 {
@@ -618,8 +622,7 @@ fbo_lookup_test_set(const char *test_set_name)
 		}
 	}
 
-	fprintf(stderr, "Unknown test set: %s\n", test_set_name);
-	exit(1);
+	return -1;
 }
 
 static void
@@ -649,6 +652,10 @@ fbo_formats_init(int argc, char **argv, GLboolean print_options)
 	int test_set_index = 0;
 	if (argc == 2) {
 		test_set_index = fbo_lookup_test_set(argv[1]);
+		if (test_set_index < 0) {
+			fprintf(stderr, "Unknown test set: %s\n", argv[1]);
+			exit(1);
+		}
 	} else if (argc > 2) {
 		printf("More than 1 test set specified\n");
 		exit(1);
