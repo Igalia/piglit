@@ -242,19 +242,20 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
             profile.test_list[group] = test
 
 # Collect and add all asmparsertests
-_basedir = os.path.join(TESTS_DIR, 'asmparsertest', 'shaders')
-for dirpath, _, filenames in os.walk(_basedir):
-    base_group = grouptools.from_path(os.path.join(
-        'asmparsertest', os.path.relpath(dirpath, _basedir)))
-    type_ = os.path.basename(dirpath)
+for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
+    _basedir = os.path.join(basedir, 'asmparsertest', 'shaders')
+    for dirpath, _, filenames in os.walk(_basedir):
+        base_group = grouptools.from_path(os.path.join(
+            'asmparsertest', os.path.relpath(dirpath, _basedir)))
+        type_ = os.path.basename(dirpath)
 
-    for filename in filenames:
-        if not os.path.splitext(filename)[1] == '.txt':
-            continue
+        for filename in filenames:
+            if not os.path.splitext(filename)[1] == '.txt':
+                continue
 
-        group = grouptools.join(base_group, filename)
-        profile.test_list[group] = PiglitGLTest(
-            ['asmparsertest', type_, os.path.join(dirpath, filename)])
+            group = grouptools.join(base_group, filename)
+            profile.test_list[group] = PiglitGLTest(
+                ['asmparsertest', type_, os.path.join(dirpath, filename)])
 
 # List of all of the MSAA sample counts we wish to test
 MSAA_SAMPLE_COUNTS = ['2', '4', '6', '8', '16', '32']
