@@ -107,6 +107,10 @@ static const GLenum *test_targets;
  * from a PBO */
 static GLboolean use_pbo = GL_FALSE;
 
+struct sub_region {
+	int tx, ty, tz, tw, th, td;
+};
+
 static const char fragment_1d_array[] =
 	"#extension GL_EXT_texture_array : require\n"
 	"uniform sampler1DArray tex;\n"
@@ -319,7 +323,7 @@ test_region(GLuint pbo, GLenum target, GLenum internal_format,
 	    const unsigned char *updated_img,
 	    const unsigned char *updated_ref,
 	    unsigned w, unsigned h, unsigned d,
-	    int tx, int ty, int tz, int tw, int th, int td)
+	    const struct sub_region *region)
 {
 	bool pass = true;
 	GLuint tex;
@@ -333,19 +337,23 @@ test_region(GLuint pbo, GLenum target, GLenum internal_format,
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
 
 	/* replace texture region with data from updated image */
-	glPixelStorei(GL_UNPACK_SKIP_PIXELS, tx);
-	glPixelStorei(GL_UNPACK_SKIP_ROWS, ty);
-	glPixelStorei(GL_UNPACK_SKIP_IMAGES, tz);
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, region->tx);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, region->ty);
+	glPixelStorei(GL_UNPACK_SKIP_IMAGES, region->tz);
 	if (d > 1) {
-		glTexSubImage3D(target, 0, tx, ty, tz, tw, th, td,
+		glTexSubImage3D(target, 0,
+				region->tx, region->ty, region->tz,
+				region->tw, region->th, region->td,
 				srcFormat, GL_UNSIGNED_BYTE,
 				use_pbo ? NULL : updated_img);
 	} else if (h > 1) {
-		glTexSubImage2D(target, 0, tx, ty, tw, th,
+		glTexSubImage2D(target, 0,
+				region->tx, region->ty,
+				region->tw, region->th,
 				srcFormat, GL_UNSIGNED_BYTE,
 				use_pbo ? NULL : updated_img);
 	} else if (w > 1) {
-		glTexSubImage1D(target, 0, tx, tw,
+		glTexSubImage1D(target, 0, region->tx, region->tw,
 				srcFormat, GL_UNSIGNED_BYTE,
 				use_pbo ? NULL : updated_img);
 	} else {
@@ -366,12 +374,14 @@ test_region(GLuint pbo, GLenum target, GLenum internal_format,
 	if (!equal_images(target,
 			  original_ref, updated_ref, test_img,
 			  w, h, d,
-			  tx, ty, tz, tw, th, td)) {
+			  region->tx, region->ty, region->tz,
+			  region->tw, region->th, region->td)) {
 		printf("texsubimage failed\n");
 		printf("  target: %s\n", piglit_get_gl_enum_name(target));
 		printf("  internal format: %s\n",
 			piglit_get_gl_enum_name(internal_format));
-		printf("  region: %d, %d  %d x %d\n", tx, ty, tw, th);
+		printf("  region: %d, %d  %d x %d\n",
+		       region->tx, region->ty, region->tw, region->th);
 		pass = false;
 	}
 
@@ -399,18 +409,14 @@ test_region(GLuint pbo, GLenum target, GLenum internal_format,
  */
 static GLboolean
 test_format(GLenum target, GLenum intFormat,
-	    unsigned w, unsigned h, unsigned d)
+	    unsigned w, unsigned h, unsigned d,
+	    const struct sub_region *regions, unsigned num_regions)
 {
 	GLuint tex, i, j, k, n, t;
 	GLubyte *original_img, *original_ref;
 	GLubyte *updated_img, *updated_ref;
 	GLboolean pass = GL_TRUE;
-	GLuint bw, bh, bb, wMask, hMask, dMask;
 	GLuint pbo = 0;
-	piglit_get_compressed_block_size(intFormat, &bw, &bh, &bb);
-	wMask = ~(bw-1);
-	hMask = ~(bh-1);
-	dMask = ~0;
 
 	original_img = (GLubyte *) malloc(w * h * d * 4);
 	original_ref = (GLubyte *) malloc(w * h * d * 4);
@@ -467,26 +473,11 @@ test_format(GLenum target, GLenum intFormat,
 	draw_and_read_texture(w, h, d, updated_ref);
 	glDeleteTextures(1, &tex);
 
-	for (t = 0; t < 10; t++) {
-		/* Choose random region of texture to update.
-		 * Use sizes and positions that are multiples of
-		 * the compressed block size.
-		 */
-		GLint tw = (rand() % w) & wMask;
-		GLint th = (rand() % h) & hMask;
-		GLint td = (rand() % d) & dMask;
-		GLint tx = (rand() % (w - tw)) & wMask;
-		GLint ty = (rand() % (h - th)) & hMask;
-		GLint tz = (rand() % (d - td)) & dMask;
-
-		assert(tx + tw <= w);
-		assert(ty + th <= h);
-		assert(tz + td <= d);
-
+	for (t = 0; t < num_regions; t++) {
 		if (!test_region(pbo, target, intFormat,
 				 original_img, original_ref,
 				 updated_img, updated_ref,
-				 w, h, d, tx, ty, tz, tw, th, td)) {
+				 w, h, d, &regions[t])) {
 			pass = GL_FALSE;
 			break;
 		}
@@ -502,6 +493,35 @@ test_format(GLenum target, GLenum intFormat,
 	return pass;
 }
 
+static void
+select_regions(unsigned w, unsigned h, unsigned d, GLenum internal_format,
+	       struct sub_region *regions, unsigned num_regions)
+{
+	int i;
+	GLuint bw, bh, bb, wMask, hMask, dMask;
+
+	piglit_get_compressed_block_size(internal_format, &bw, &bh, &bb);
+	wMask = ~(bw-1);
+	hMask = ~(bh-1);
+	dMask = ~0;
+
+	for (i = 0; i < num_regions; i++) {
+		/* Choose random region of texture to update.
+		 * Use sizes and positions that are multiples of
+		 * the compressed block size.
+		 */
+		regions[i].tw = (rand() % w) & wMask;
+		regions[i].th = (rand() % h) & hMask;
+		regions[i].td = (rand() % d) & dMask;
+		regions[i].tx = (rand() % (w - regions[i].tw)) & wMask;
+		regions[i].ty = (rand() % (h - regions[i].th)) & hMask;
+		regions[i].tz = (rand() % (d - regions[i].td)) & dMask;
+
+		assert(regions[i].tx + regions[i].tw <= w);
+		assert(regions[i].ty + regions[i].th <= h);
+		assert(regions[i].tz + regions[i].td <= d);
+	}
+}
 
 /**
  * Test all formats in texsubimage_test_sets[] for the given
@@ -561,9 +581,15 @@ test_formats(GLenum target, unsigned w, unsigned h, unsigned d)
 
 		/* loop over formats in the set */
 		for (j = 0; j < set->num_formats; j++) {
+			struct sub_region regions[10];
+
+			select_regions(w, h, d, set->format[j].internalformat,
+				       regions, ARRAY_SIZE(regions));
+
 			if (!test_format(target,
 					 set->format[j].internalformat,
-					 w, h, d)) {
+		                         w, h, d,
+					 regions, ARRAY_SIZE(regions))) {
 				pass = GL_FALSE;
 			}
 		}
