@@ -1,0 +1,67 @@
+# Test proper behavior of the unary '++' operator.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+uniform double tolerance;
+uniform dvec4 starting_value;
+uniform dvec4 expected4;
+uniform dvec3 expected3;
+uniform dvec2 expected2;
+uniform double expected1;
+
+in vec4 piglit_vertex;
+out vec4 vscolor;
+
+void main()
+{
+  gl_Position = piglit_vertex;
+  vscolor = vec4(0.0);
+  dvec4 starting_point = starting_value;
+
+  dvec4 result4 = starting_point++;
+  if (distance(result4, expected4) > tolerance) {
+    vscolor.x = 1.0;
+  }
+
+  dvec3 result3 = ++starting_point.xyz;
+  if (distance(result3, expected3) > tolerance) {
+    vscolor.y = 1.0;
+  }
+
+  dvec2 result2 = starting_point.zw++;
+  if (distance(result2, expected2) > tolerance) {
+    vscolor.z = 1.0;
+  }
+
+  double result1 = ++starting_point.x;
+  if (distance(result1, expected1) > tolerance) {
+    vscolor.w = 1.0;
+  }
+}
+
+[fragment shader]
+#version 150
+
+in vec4 vscolor;
+out vec4 color;
+
+void main() {
+  color = vscolor;
+}
+
+[test]
+uniform double tolerance 0.0
+uniform dvec4 starting_value 0.0 1.0 1.25 0.75
+uniform dvec4 expected4 0.0 1.0 1.25 0.75
+uniform dvec3 expected3 2.0 3.0 3.25
+uniform dvec2 expected2 3.25 1.75
+uniform double expected1 3.0
+
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 0.0 0.0 0.0
