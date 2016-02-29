@@ -111,6 +111,18 @@ struct sub_region {
 	int tx, ty, tz, tw, th, td;
 };
 
+/* If set, format and sub-region are given from command line. */
+struct single_test {
+	bool enabled;
+	GLenum targets[2];
+	GLenum format;
+	struct sub_region region;
+};
+
+static struct single_test manual_dispatch = {
+	.enabled = false, .targets = { GL_NONE, GL_NONE }
+};
+
 static const char fragment_1d_array[] =
 	"#extension GL_EXT_texture_array : require\n"
 	"uniform sampler1DArray tex;\n"
@@ -606,6 +618,46 @@ prepare_tex_to_fbo_blit_program(GLenum target)
 }
 
 static void
+print_usage_and_exit(const char *s)
+{
+	printf("Invalid argument: %s\n", s);
+	printf("Usage: texsubimage <pbo> manual <target> <format> "
+	       "<tx> <ty> <tz> <tw> <th> <tz>");
+}
+
+static unsigned
+read_integer(const char *s)
+{
+	char *endptr = NULL;
+	unsigned res = strtol(s, &endptr, 0);
+
+	if (endptr != s + strlen(s))
+		print_usage_and_exit(s);
+
+	return res;
+}
+
+static void
+init_manual_dispatch(char **argv, unsigned argc)
+{
+	static const unsigned manual_arg_num = 8;
+	if (argc < manual_arg_num)
+		print_usage_and_exit(argv[0]);
+
+	manual_dispatch.targets[0] = piglit_get_gl_enum_from_name(argv[0]);
+	manual_dispatch.format = piglit_get_gl_enum_from_name(argv[1]);
+
+	manual_dispatch.region.tx = read_integer(argv[2]);
+	manual_dispatch.region.ty = read_integer(argv[3]);
+	manual_dispatch.region.tz = read_integer(argv[4]);
+	manual_dispatch.region.tw = read_integer(argv[5]);
+	manual_dispatch.region.th = read_integer(argv[6]);
+	manual_dispatch.region.td = read_integer(argv[7]);
+
+	manual_dispatch.enabled = true;
+}
+
+static void
 adjust_tex_dimensions(GLenum target, unsigned *w, unsigned *h, unsigned *d)
 {
 	if (target == GL_TEXTURE_CUBE_MAP_ARRAY_ARB) {
@@ -626,6 +678,9 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	int i;
 
+	if (manual_dispatch.enabled)
+		test_targets = manual_dispatch.targets;
+
 	/* Loop over 1/2/3D texture targets */
 	for (i = 0; test_targets[i] != GL_NONE; i++) {
 		unsigned w = DEFAULT_TEX_WIDTH;
@@ -635,7 +690,15 @@ piglit_display(void)
 			prepare_tex_to_fbo_blit_program(test_targets[i]);
 
 		adjust_tex_dimensions(test_targets[i], &w, &h, &d);
-		pass = test_formats(test_targets[i], w, h, d) && pass;
+
+		if (manual_dispatch.enabled) {
+			pass = test_format(test_targets[i],
+					   manual_dispatch.format,
+					   w, h, d,
+					   &manual_dispatch.region, 1);
+		} else {
+			pass = test_formats(test_targets[i], w, h, d) && pass;
+		}
 
 		if (program == 0) {
 			glDisable(test_targets[i]);
@@ -685,12 +748,16 @@ piglit_init(int argc, char **argv)
 		} else if (!strcmp(argv[i], "pbo")) {
 			piglit_require_extension("GL_ARB_pixel_buffer_object");
 			use_pbo = GL_TRUE;
+		} else if (!strcmp(argv[i], "manual")) {
+			init_manual_dispatch(argv + i + 1, argc - (i + 1));
+			break;
 		} else {
 			argv[remaining_argc++] = argv[i];
 		}
 	}
 
-	fbo_formats_init(remaining_argc, argv, 0);
+	if (!manual_dispatch.enabled)
+		fbo_formats_init(remaining_argc, argv, 0);
 	(void) fbo_formats_display;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
