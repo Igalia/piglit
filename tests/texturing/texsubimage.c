@@ -398,11 +398,9 @@ test_region(GLuint pbo, GLenum target, GLenum internal_format,
  * \param intFormat  the internal texture format
  */
 static GLboolean
-test_format(GLenum target, GLenum intFormat)
+test_format(GLenum target, GLenum intFormat,
+	    unsigned w, unsigned h, unsigned d)
 {
-	GLuint w = DEFAULT_TEX_WIDTH;
-	GLuint h = DEFAULT_TEX_HEIGHT;
-	GLuint d = DEFAULT_TEX_DEPTH;
 	GLuint tex, i, j, k, n, t;
 	GLubyte *original_img, *original_ref;
 	GLubyte *updated_img, *updated_ref;
@@ -413,16 +411,6 @@ test_format(GLenum target, GLenum intFormat)
 	wMask = ~(bw-1);
 	hMask = ~(bh-1);
 	dMask = ~0;
-
-	if (target == GL_TEXTURE_CUBE_MAP_ARRAY_ARB) {
-		w = h;
-		d *= 6;
-	} else if (target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY) {
-		d = 1;
-	}
-
-	if (target == GL_TEXTURE_1D)
-		h = 1;
 
 	original_img = (GLubyte *) malloc(w * h * d * 4);
 	original_ref = (GLubyte *) malloc(w * h * d * 4);
@@ -520,7 +508,7 @@ test_format(GLenum target, GLenum intFormat)
  * texture target.
  */
 static GLboolean
-test_formats(GLenum target)
+test_formats(GLenum target, unsigned w, unsigned h, unsigned d)
 {
 	GLboolean pass = GL_TRUE;
 	GLuint program = 0;
@@ -574,7 +562,8 @@ test_formats(GLenum target)
 		/* loop over formats in the set */
 		for (j = 0; j < set->num_formats; j++) {
 			if (!test_format(target,
-					 set->format[j].internalformat)) {
+					 set->format[j].internalformat,
+					 w, h, d)) {
 				pass = GL_FALSE;
 			}
 		}
@@ -590,6 +579,20 @@ test_formats(GLenum target)
 	return pass;
 }
 
+static void
+adjust_tex_dimensions(GLenum target, unsigned *w, unsigned *h, unsigned *d)
+{
+	if (target == GL_TEXTURE_CUBE_MAP_ARRAY_ARB) {
+		*w = *h;
+		*d *= 6;
+	} else if (target != GL_TEXTURE_3D &&
+		   target != GL_TEXTURE_2D_ARRAY) {
+		*d = 1;
+	}
+
+	if (target == GL_TEXTURE_1D)
+		*h = 1;
+}
 
 enum piglit_result
 piglit_display(void)
@@ -599,7 +602,12 @@ piglit_display(void)
 
 	/* Loop over 1/2/3D texture targets */
 	for (i = 0; test_targets[i] != GL_NONE; i++) {
-		pass = test_formats(test_targets[i]) && pass;
+		unsigned w = DEFAULT_TEX_WIDTH;
+		unsigned h = DEFAULT_TEX_HEIGHT;
+		unsigned d = DEFAULT_TEX_DEPTH;
+
+		adjust_tex_dimensions(test_targets[i], &w, &h, &d);
+		pass = test_formats(test_targets[i], w, h, d) && pass;
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
