@@ -664,6 +664,24 @@ fbo_formats_init(int argc, char **argv, GLboolean print_options)
 	fbo_formats_init_test_set(test_set_index, print_options);
 }
 
+/**
+ * Try to use the given format test set (such as "GL_EXT_texture_sRGB")
+ * This is an alternative to the fbo_formats_init() function above.
+ * \return true if success, false if unknown test set name
+ */
+bool
+fbo_use_test_set(const char *test_set, bool print_options)
+{
+	int test_set_index = fbo_lookup_test_set(test_set);
+	if (test_set_index >= 0) {
+		fbo_formats_init_test_set(test_set_index,
+					  (GLboolean) print_options);
+		return true;
+	} else {
+		return false;
+	}
+}
+
 static void add_result(bool *all_skip, enum piglit_result *end_result,
 		       enum piglit_result new_result)
 {
