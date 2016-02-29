@@ -527,6 +527,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	bool found_test_set = false;
 	int i;
 
 	if ((piglit_get_gl_version() < 14) && !piglit_is_extension_supported("GL_ARB_window_pos")) {
@@ -534,7 +535,6 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	fbo_formats_init(argc, argv, !piglit_automatic);
 	(void) fbo_formats_display;
 
 	for (i = 1; i < argc; i++) {
@@ -548,6 +548,11 @@ piglit_init(int argc, char **argv)
 			puts("The textures will be initialized by rendering "
 			     "to them using glCear and glDrawPixels.");
 			break;
+		} else if (!found_test_set) {
+			found_test_set = fbo_use_test_set(argv[i], true);
+			if (!found_test_set) {
+				printf("Bad test set name: %s\n", argv[i]);
+			}
 		}
 	}
 
