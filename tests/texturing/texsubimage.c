@@ -98,6 +98,8 @@ static const struct test_desc texsubimage_test_sets[] = {
 #define DEFAULT_TEX_HEIGHT 64
 #define DEFAULT_TEX_DEPTH 8
 
+static const GLenum srcFormat = GL_RGBA;
+
 /* List of texture targets to test, terminated by GL_NONE */
 static const GLenum *test_targets;
 
@@ -310,6 +312,74 @@ create_texture(GLenum target,
 	return tex;
 }
 
+static bool
+test_region(GLuint pbo, GLenum target, GLenum internal_format,
+	    const unsigned char *original_img,
+	    const unsigned char *original_ref,
+	    const unsigned char *updated_img,
+	    const unsigned char *updated_ref,
+	    unsigned w, unsigned h, unsigned d,
+	    int tx, int ty, int tz, int tw, int th, int td)
+{
+	bool pass = true;
+	GLuint tex;
+	unsigned char *test_img = (unsigned char *)malloc(w * h * d * 4);
+
+	/* Recreate the original texture */
+	tex = create_texture(target, internal_format, w, h, d,
+			     srcFormat, original_img);
+
+	if (use_pbo)
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+
+	/* replace texture region with data from updated image */
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, tx);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, ty);
+	glPixelStorei(GL_UNPACK_SKIP_IMAGES, tz);
+	if (d > 1) {
+		glTexSubImage3D(target, 0, tx, ty, tz, tw, th, td,
+				srcFormat, GL_UNSIGNED_BYTE,
+				use_pbo ? NULL : updated_img);
+	} else if (h > 1) {
+		glTexSubImage2D(target, 0, tx, ty, tw, th,
+				srcFormat, GL_UNSIGNED_BYTE,
+				use_pbo ? NULL : updated_img);
+	} else if (w > 1) {
+		glTexSubImage1D(target, 0, tx, tw,
+				srcFormat, GL_UNSIGNED_BYTE,
+				use_pbo ? NULL : updated_img);
+	} else {
+		assert(!"Unknown image dimensions");
+	}
+
+	if (use_pbo)
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+
+	/* draw test image */
+	glClear(GL_COLOR_BUFFER_BIT);
+	draw_and_read_texture(w, h, d, test_img);
+
+	glDeleteTextures(1, &tex);
+
+	piglit_present_results();
+
+	if (!equal_images(target,
+			  original_ref, updated_ref, test_img,
+			  w, h, d,
+			  tx, ty, tz, tw, th, td)) {
+		printf("texsubimage failed\n");
+		printf("  target: %s\n", piglit_get_gl_enum_name(target));
+		printf("  internal format: %s\n",
+			piglit_get_gl_enum_name(internal_format));
+		printf("  region: %d, %d  %d x %d\n", tx, ty, tw, th);
+		pass = false;
+	}
+
+	free(test_img);
+
+	return pass;
+}
+
 /**
  * Create two textures with different reference values. Draw both of
  * the textures to the framebuffer and save the reference images with
@@ -330,14 +400,12 @@ create_texture(GLenum target,
 static GLboolean
 test_format(GLenum target, GLenum intFormat)
 {
-	const GLenum srcFormat = GL_RGBA;
 	GLuint w = DEFAULT_TEX_WIDTH;
 	GLuint h = DEFAULT_TEX_HEIGHT;
 	GLuint d = DEFAULT_TEX_DEPTH;
 	GLuint tex, i, j, k, n, t;
 	GLubyte *original_img, *original_ref;
 	GLubyte *updated_img, *updated_ref;
-	GLubyte *testImg;
 	GLboolean pass = GL_TRUE;
 	GLuint bw, bh, bb, wMask, hMask, dMask;
 	GLuint pbo = 0;
@@ -360,7 +428,6 @@ test_format(GLenum target, GLenum intFormat)
 	original_ref = (GLubyte *) malloc(w * h * d * 4);
 	updated_img = (GLubyte *) malloc(w * h * d * 4);
 	updated_ref = (GLubyte *) malloc(w * h * d * 4);
-	testImg = (GLubyte *) malloc(w * h * d * 4);
 
 	/* fill source tex images */
 	n = 0;
@@ -424,56 +491,14 @@ test_format(GLenum target, GLenum intFormat)
 		GLint ty = (rand() % (h - th)) & hMask;
 		GLint tz = (rand() % (d - td)) & dMask;
 
-		/* Recreate the original texture */
-		tex = create_texture(target, intFormat, w, h, d,
-				     srcFormat, original_img);
-
 		assert(tx + tw <= w);
 		assert(ty + th <= h);
 		assert(tz + td <= d);
 
-		if (use_pbo)
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
-
-		/* replace texture region with data from updated image */
-		glPixelStorei(GL_UNPACK_SKIP_PIXELS, tx);
-		glPixelStorei(GL_UNPACK_SKIP_ROWS, ty);
-		glPixelStorei(GL_UNPACK_SKIP_IMAGES, tz);
-		if (d > 1) {
-			glTexSubImage3D(target, 0, tx, ty, tz, tw, th, td,
-					srcFormat, GL_UNSIGNED_BYTE,
-					use_pbo ? NULL : updated_img);
-		} else if (h > 1) {
-			glTexSubImage2D(target, 0, tx, ty, tw, th,
-					srcFormat, GL_UNSIGNED_BYTE,
-					use_pbo ? NULL : updated_img);
-		} else if (w > 1) {
-			glTexSubImage1D(target, 0, tx, tw,
-					srcFormat, GL_UNSIGNED_BYTE,
-					use_pbo ? NULL : updated_img);
-		} else {
-			assert(!"Unknown image dimensions");
-		}
-
-		if (use_pbo)
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-
-		/* draw test image */
-		glClear(GL_COLOR_BUFFER_BIT);
-		draw_and_read_texture(w, h, d, testImg);
-
-		glDeleteTextures(1, &tex);
-
-		piglit_present_results();
-
-		if (!equal_images(target,
-				  original_ref, updated_ref, testImg,
-				  w, h, d,
-				  tx, ty, tz, tw, th, td)) {
-			printf("texsubimage failed\n");
-			printf("  target: %s\n", piglit_get_gl_enum_name(target));
-			printf("  internal format: %s\n", piglit_get_gl_enum_name(intFormat));
-			printf("  region: %d, %d  %d x %d\n", tx, ty, tw, th);
+		if (!test_region(pbo, target, intFormat,
+				 original_img, original_ref,
+				 updated_img, updated_ref,
+				 w, h, d, tx, ty, tz, tw, th, td)) {
 			pass = GL_FALSE;
 			break;
 		}
@@ -483,7 +508,6 @@ test_format(GLenum target, GLenum intFormat)
 	free(original_ref);
 	free(updated_img);
 	free(updated_ref);
-	free(testImg);
 	if (use_pbo)
 		glDeleteBuffers(1, &pbo);
 
