@@ -23,7 +23,7 @@
 
 """Generate fp64 conversion tests."""
 
-from __future__ import print_function , division, absolute_import
+from __future__ import print_function, division, absolute_import
 import optparse
 import os
 import sys
@@ -37,96 +37,93 @@ from modules import utils
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
 # pylint: disable=bad-whitespace,line-too-long,bad-continuation
-DOUBLE_SPECIAL_VALUES = ['0xFFF0000000000000', # -inf
-                         '0xFFEFFFFFFFFFFFFF', # Negative maximum normalized
-                         '0xC170000000000000', # -16777216.0
-                         '0xC014000000000000', # -5.0
-                         '0xBFFF25CE60000000', # -1.9467300176620483
-                         '0x8010000000000000', # Negative minimum normalized
-                         #'0x800FFFFFFFFFFFFF', # Negative maximum denormalized -- Denormalized may be flushed to 0
-                         #'0x8000000000000001', # Negative minimum denormalized -- Denormalized may be flushed to 0
-                         '0x8000000000000000', # Negative underflow (-0.0)
-                         '0x0000000000000000', # Positive underflow (+0.0)
-                         #'0x0000000000000001', # Positive minimum denormalized -- Denormalized may be flushed to 0
-                         #'0x000FFFFFFFFFFFFF', # Positive maximum denormalized -- Denormalized may be flushed to 0
-                         '0x0010000000000000', # Positive minimum normalized
-                         '0x3FFF25CE60000000', # +1.9467300176620483
-                         '0x4014000000000000', # +5.0
-                         '0x4170000000000000', # +16777216.0
-                         '0x7FEFFFFFFFFFFFFF', # Positive maximum normalized
-                         '0x7FF0000000000000'] # +inf
+DOUBLE_ZEROES               = ['0x8000000000000000', # Negative underflow (-0.0)
+                               '0x0000000000000000'] # Positive underflow (+0.0)
 
-DOUBLE_FLOAT_VALUES   = ['0xC7EFFFFFF0000000', # Negative overflow (-inf)
-                         '0xC7EFFFFFEFFFFFFF', # Negative maximum normalized
-                         '0xB80FFFFFE0000000', # Negative minimum normalized
-                         #'0xB80FFFFFDFFFFFFF', # Negative maximum denormalized -- Denormalized may be flushed to 0
-                         #'0xB6A0000000000000', # Negative minimum denormalized -- Denormalized may be flushed to 0
-                         '0xB69FFFFFFFFFFFFF', # Negative underflow
-                         '0x369FFFFFFFFFFFFF', # Positive underflow
-                         #'0x36A0000000000000', # Positive minimum denormalized -- Denormalized may be flushed to 0
-                         #'0x380FFFFFDFFFFFFF', # Positive maximum denormalized -- Denormalized may be flushed to 0
-                         '0x380FFFFFE0000000', # Positive minimum normalized
-                         '0x47EFFFFFEFFFFFFF', # Positive maximum normalized
-                         '0x47EFFFFFF0000000'] # Positive overflow (+inf)
+# Double values causing an underflow to zero in any other type
+DOUBLE_UNDERFLOW_VALUES     = ['0x8010000000000000', # Negative minimum normalized
+                               '0x800fffffffffffff', # Negative maximum denormalized -- Denormalized may be flushed to 0
+                               '0x8000000000000001', # Negative minimum denormalized -- Denormalized may be flushed to 0
+                               '0x0000000000000001', # Positive minimum denormalized -- Denormalized may be flushed to 0
+                               '0x000fffffffffffff', # Positive maximum denormalized -- Denormalized may be flushed to 0
+                               '0x0010000000000000'] # Positive minimum normalized
 
-DOUBLE_UINT_VALUES    = ['0x0000000000000001', # Positive minimum double denormalized
-                         #'0x8000000000000001', # Minimum overflow                     -- Already checked
-                         #'0x0000000000000000', # Minimum                 (+0)         -- Already checked
-                         '0x000FFFFFFFFFFFFF', # Positive maximum double denormalized
-                         '0x41DFFFFFFFC00000', # Signed int low frontier (+2147483647)
-                         '0x41E0000000000000', # Signed int up frontier  (+2147483648)
-                         '0x41EFFFFFFFE00000', # Maximum                 (+4294967295)
-                         '0x41F0000000000000'] # Maximum overflow        (+4294967296)
+DOUBLE_FLOAT_VALUES         = ['0xc7efffffefffffff', # Negative maximum normalized
+                               '0xc170000000000000', # -16777216.0
+                               '0xc014000000000000', # -5.0
+                               '0xbfff25ce60000000', # -1.9467300176620483
+                               '0xb80fffffe0000000', # Negative minimum normalized
+                               '0xb69fffffffffffff', # Negative underflow
+                               '0x369fffffffffffff', # Positive underflow
+                               '0x380fffffe0000000', # Positive minimum normalized
+                               '0x3fff25ce60000000', # +1.9467300176620483
+                               '0x4014000000000000', # +5.0
+                               '0x4170000000000000', # +16777216.0
+                               '0x47efffffefffffff'] # Positive maximum normalized
 
-DOUBLE_INT_VALUES     = ['0xC1E0000000200000', # Minimum overflow (-2147483649)
-                         '0xC1E0000000000000', # Minimum          (-2147483648)
-                         '0x800FFFFFFFFFFFFF', # Negative maximum double denormalized
-                         #'0x8000000000000001', # Negative minimum double denormalized -- Already checked
-                         #'0x0000000000000000', # Positive minimum double denormalized -- Already checked
-                         '0x000FFFFFFFFFFFFF', # Positive maximum double denormalized
-                         '0x41DFFFFFFFC00000', # Maximum          (+2147483647)
-                         '0x41E0000000000000'] # Maximum overflow (+2147483648)
+DOUBLE_UINT_VALUES          = ['0xbfeccccccccccccd', # -0.9
+                               #'0x800fffffffffffff', # Negative maximum denormalized        -- Already checked
+                               #'0x8000000000000001', # Negative minimum denormalized        -- Already checked
+                               #'0x8000000000000001', # Minimum overflow                     -- Already checked
+                               #'0x8000000000000000', # Negative minimum        (-0)         -- Already checked
+                               #'0x0000000000000000', # Minimum                 (+0)         -- Already checked
+                               '0x3fff25ce60000000', # +1.9467300176620483
+                               '0x4014000000000000', # +5.0
+                               '0x4170000000000000', # +16777216.0
+                               '0x41dfffffffc00000', # Signed int low frontier (+2147483647)
+                               '0x41e0000000000000', # Signed int up frontier  (+2147483648)
+                               '0x41efffffffe00000'] # Maximum                 (+4294967295)
 
-DOUBLE_BOOL_VALUES    = [#'0x8000000000000001', # Minimum negative True value -- Already checked
-                         #'0x0000000000000000', # False                       -- Already checked
-                         #'0x0000000000000001', # Minimum positive True value -- Already checked
-                        ]
+DOUBLE_INT_VALUES           = ['0xc1e0000000000000', # Minimum          (-2147483648)
+                               '0xc170000000000000', # -16777216.0
+                               '0xc014000000000000', # -5.0
+                               '0xbfff25ce60000000', # -1.9467300176620483
+                               #'0x8000000000000000', # Negative minimum        (-0)         -- Already checked
+                               #'0x0000000000000000', # Minimum                 (+0)         -- Already checked
+                               '0x3fff25ce60000000', # +1.9467300176620483
+                               '0x4014000000000000', # +5.0
+                               '0x4170000000000000', # +16777216.0
+                               '0x41dfffffffc00000'] # Maximum          (+2147483647)
 
-FLOAT_VALUES          = ['0xFF800000', # -inf
-                         '0xFF7FFFFF', # Negative maximum normalized
-                         '0xCB800000', # -16777216.0
-                         '0xC0A00000', # -5.0
-                         '0xBFF92E73', # -1.9467300176620483
-                         '0x80800000', # Negative minimum normalized
-                         #'0x807FFFFF', # Negative maximum denormalized -- Denormalized may be flushed to 0
-                         #'0x80000001', # Negative minimum denormalized -- Denormalized may be flushed to 0
-                         '0x80000000', # Negative underflow (-0.0)
-                         '0x00000000', # Positive underflow (+0.0)
-                         #'0x00000001', # Positive minimum denormalized -- Denormalized may be flushed to 0
-                         #'0x007FFFFF', # Positive maximum denormalized -- Denormalized may be flushed to 0
-                         '0x00800000', # Positive minimum normalized
-                         '0x3FF92E73', # +1.9467300176620483
-                         '0x40A00000', # +5.0
-                         '0x4B800000', # +16777216.0
-                         '0x7F7FFFFF', # Positive maximum normalized
-                         '0x7F800000'] # +inf
+DOUBLE_BOOL_VALUES          = [#'0x8000000000000001', # Minimum negative True value -- Already checked
+                               #'0x0000000000000000', # False                       -- Already checked
+                               #'0x0000000000000001', # Minimum positive True value -- Already checked
+                              ]
 
-UINT_VALUES          = ['0', # Minimum
-                        '5',
-                        '2147483647', # Signed int low frontier
-                        '2147483648', # Signed int up frontier
-                        '4294967295'] # Maximum
+FLOAT_ZEROES                = ['0x80000000', # Negative underflow (-0.0)
+                               '0x00000000'] # Positive underflow (+0.0)
 
-INT_VALUES            = ['-2147483648', # Minimum
-                         '-5',
-                         '-1',
-                         '0',
-                         '1',
-                         '5',
-                         '2147483647'] # Maximum
+FLOAT_VALUES                = ['0xff7fffff', # Negative maximum normalized
+                               '0xcb800000', # -16777216.0
+                               '0xc0a00000', # -5.0
+                               '0xbff92e73', # -1.9467300176620483
+                               '0x80800000', # Negative minimum normalized
+                               #'0x807ffffF', # Negative maximum denormalized -- Denormalized may be flushed to 0
+                               #'0x80000001', # Negative minimum denormalized -- Denormalized may be flushed to 0
+                               #'0x00000001', # Positive minimum denormalized -- Denormalized may be flushed to 0
+                               #'0x007ffffF', # Positive maximum denormalized -- Denormalized may be flushed to 0
+                               '0x00800000', # Positive minimum normalized
+                               '0x3ff92e73', # +1.9467300176620483
+                               '0x40a00000', # +5.0
+                               '0x4b800000', # +16777216.0
+                               '0x7f7fffff'] # Positive maximum normalized
 
-BOOL_VALUES          = ['0', # False
-                        '1'] # True
+UINT_VALUES                 = ['0', # Minimum
+                               '5',
+                               '2147483647', # Signed int low frontier
+                               '2147483648', # Signed int up frontier
+                               '4294967295'] # Maximum
+
+INT_VALUES                  = ['-2147483648', # Minimum
+                               '-5',
+                               '-1',
+                               '0',
+                               '1',
+                               '5',
+                               '2147483647'] # Maximum
+
+BOOL_VALUES                 = ['0', # False
+                               '1'] # True
 # pylint: enable=bad-whitespace,line-too-long,bad-continuation
 
 
@@ -245,8 +242,8 @@ class TestTupla(object):
         assert isinstance(names_only, bool)
         assert not (first_dimension != '1' and (second_dimension == '1' or basic_type != 'f'))
 
-        self.__compiler_dirname = compiler_dirname
-        self.__execution_dirname = execution_dirname
+        self.__comp_dirname = compiler_dirname
+        self.__exec_dirname = execution_dirname
         self.__stage = stage
         self.__first_dimension = first_dimension
         self.__second_dimension = second_dimension
@@ -288,11 +285,11 @@ class TestTupla(object):
                 self.__uniform_type = self.__conversion_type
             self.__double_type = 'd' + dimensional_type
 
-    def __generate_compiler_test(self, from_type, to_type, converted_from):
+    def __gen_comp_test(self, from_type, to_type, converted_from):
         filename = os.path.join(
-            self.__compiler_dirname,
+            self.__comp_dirname,
             '{0}-conversion-implicit-{1}-{2}-bad.{3}'.format(self.__stage, from_type, to_type,
-                                                         self.__stage))
+                                                             self.__stage))
 
         self.__filenames.append(filename)
 
@@ -304,13 +301,11 @@ class TestTupla(object):
                         to_type=to_type,
                         converted_from=converted_from))
 
-    def __generate_execution_test(self,
-                                  from_type, to_type,
-                                  uniform_from_type, uniform_to_type,
-                                  explicit, converted_from,
-                                  conversions):
+    def __gen_exec_test(self, from_type, to_type,
+                        uniform_from_type, uniform_to_type,
+                        explicit, converted_from, conversions):
         filename = os.path.join(
-            self.__execution_dirname,
+            self.__exec_dirname,
             '{0}-conversion-{1}-{2}-{3}.shader_test'.format(self.__stage, explicit,
                                                             from_type, to_type))
 
@@ -328,14 +323,14 @@ class TestTupla(object):
                         uniform_to_type=uniform_to_type,
                         conversions=conversions))
 
-    def __generate_to_double(self):
+    def __gen_to_double(self):
         converted_from = 'from'
         explicit = 'implicit'
 
         if self.__basic_type == 'b':
             explicit = 'explicit'
-            self.__generate_compiler_test(self.__conversion_type, self.__double_type,
-                                          converted_from)
+            self.__gen_comp_test(self.__conversion_type, self.__double_type,
+                                 converted_from)
             converted_from = self.__double_type + '(from)'
             conversion_values = BOOL_VALUES
             conversion_function = TestTupla.int_str_to_double_str
@@ -346,7 +341,7 @@ class TestTupla(object):
             conversion_values = UINT_VALUES
             conversion_function = TestTupla.int_str_to_double_str
         elif self.__basic_type == 'f':
-            conversion_values = FLOAT_VALUES
+            conversion_values = FLOAT_ZEROES + FLOAT_VALUES
             conversion_function = TestTupla.float_hex_to_double_hex
         else:
             assert False
@@ -357,15 +352,14 @@ class TestTupla(object):
             item = {'from': value, 'to': to_value}
             conversions.append(item)
 
-        self.__generate_execution_test(self.__conversion_type, self.__double_type,
-                                       self.__uniform_type, self.__double_type,
-                                       explicit, converted_from,
-                                       conversions)
+        self.__gen_exec_test(self.__conversion_type, self.__double_type,
+                             self.__uniform_type, self.__double_type,
+                             explicit, converted_from, conversions)
 
-    def __generate_from_double(self):
+    def __gen_from_double(self):
         converted_from = 'from'
-        self.__generate_compiler_test(self.__double_type, self.__conversion_type,
-                                      converted_from)
+        self.__gen_comp_test(self.__double_type, self.__conversion_type,
+                             converted_from)
 
         converted_from = self.__conversion_type + '(from)'
         explicit = 'explicit'
@@ -386,15 +380,14 @@ class TestTupla(object):
             assert False
 
         conversions = []
-        for value in DOUBLE_SPECIAL_VALUES + conversion_values:
+        for value in DOUBLE_ZEROES + DOUBLE_UNDERFLOW_VALUES + conversion_values:
             to_value = conversion_function(value)
             item = {'from': value, 'to': to_value}
             conversions.append(item)
 
-        self.__generate_execution_test(self.__double_type, self.__conversion_type,
-                                       self.__double_type, self.__uniform_type,
-                                       explicit, converted_from,
-                                       conversions)
+        self.__gen_exec_test(self.__double_type, self.__conversion_type,
+                             self.__double_type, self.__uniform_type,
+                             explicit, converted_from, conversions)
 
     @property
     def filenames(self):
@@ -410,8 +403,8 @@ class TestTupla(object):
         """Generate the GLSL parser tests."""
         self.__filenames = []
 
-        self.__generate_to_double()
-        self.__generate_from_double()
+        self.__gen_to_double()
+        self.__gen_from_double()
 
 
 def main():
@@ -441,6 +434,8 @@ def main():
     if not options.names_only:
         utils.safe_makedirs(compiler_dirname)
         utils.safe_makedirs(execution_dirname)
+
+    np.seterr(divide='ignore')
 
     for test in TestTupla.all_tests(compiler_dirname, execution_dirname,
                                     bool(options.names_only)):
