@@ -376,7 +376,6 @@ test_region(GLuint pbo, GLenum target, GLenum internal_format,
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 	/* draw test image */
-	glClear(GL_COLOR_BUFFER_BIT);
 	draw_and_read_texture(w, h, d, test_img);
 
 	glDeleteTextures(1, &tex);

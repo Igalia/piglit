@@ -2312,6 +2312,8 @@ with profile.group_manager(
     g(['pbo-teximage-tiling'], run_concurrent=False)
     g(['pbo-teximage-tiling-2'], run_concurrent=False)
     g(['texsubimage', 'pbo'])
+    g(['texsubimage', 'pbo', 'manual', 'GL_TEXTURE_2D', 'GL_RGB8', '6',
+        '10', '0', '94', '53', '0'])
     g(['texsubimage', 'array', 'pbo'])
     g(['texsubimage', 'cube_map_array', 'pbo'])
     g(['texsubimage-depth-formats', 'pbo'])
