@@ -531,32 +531,7 @@ static GLboolean
 test_formats(GLenum target, unsigned w, unsigned h, unsigned d)
 {
 	GLboolean pass = GL_TRUE;
-	GLuint program = 0;
 	int i, j;
-
-	switch (target) {
-	case GL_TEXTURE_1D_ARRAY:
-		program = piglit_build_simple_program(NULL, fragment_1d_array);
-		break;
-	case GL_TEXTURE_2D_ARRAY:
-		program = piglit_build_simple_program(NULL, fragment_2d_array);
-		break;
-	case GL_TEXTURE_CUBE_MAP_ARRAY:
-		program = piglit_build_simple_program(vertex_cube_map_array,
-						      fragment_cube_map_array);
-		break;
-	default:
-		glEnable(target);
-		break;
-	}
-
-	if (program != 0) {
-		GLuint tex_location;
-
-		glUseProgram(program);
-		tex_location = glGetUniformLocation(program, "tex");
-		glUniform1i(tex_location, 0);
-	}
 
 	/* loop over the format groups */
 	for (i = 0; i < ARRAY_SIZE(texsubimage_test_sets); i++) {
@@ -595,14 +570,39 @@ test_formats(GLenum target, unsigned w, unsigned h, unsigned d)
 		}
 	}
 
-	if (program == 0) {
-		glDisable(target);
-	} else {
-		glUseProgram(0);
-		glDeleteProgram(program);
+	return pass;
+}
+
+static GLuint
+prepare_tex_to_fbo_blit_program(GLenum target)
+{
+	GLuint program = 0;
+
+	switch (target) {
+	case GL_TEXTURE_1D_ARRAY:
+		program = piglit_build_simple_program(NULL, fragment_1d_array);
+		break;
+	case GL_TEXTURE_2D_ARRAY:
+		program = piglit_build_simple_program(NULL, fragment_2d_array);
+		break;
+	case GL_TEXTURE_CUBE_MAP_ARRAY:
+		program = piglit_build_simple_program(vertex_cube_map_array,
+						      fragment_cube_map_array);
+		break;
+	default:
+		glEnable(target);
+		break;
 	}
 
-	return pass;
+	if (program != 0) {
+		GLuint tex_location;
+
+		glUseProgram(program);
+		tex_location = glGetUniformLocation(program, "tex");
+		glUniform1i(tex_location, 0);
+	}
+
+	return program;
 }
 
 static void
@@ -631,9 +631,18 @@ piglit_display(void)
 		unsigned w = DEFAULT_TEX_WIDTH;
 		unsigned h = DEFAULT_TEX_HEIGHT;
 		unsigned d = DEFAULT_TEX_DEPTH;
+		const GLuint program =
+			prepare_tex_to_fbo_blit_program(test_targets[i]);
 
 		adjust_tex_dimensions(test_targets[i], &w, &h, &d);
 		pass = test_formats(test_targets[i], w, h, d) && pass;
+
+		if (program == 0) {
+			glDisable(test_targets[i]);
+		} else {
+			glUseProgram(0);
+			glDeleteProgram(program);
+		}
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
