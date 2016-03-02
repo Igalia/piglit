@@ -25,8 +25,6 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
-import copy
-
 try:
     import simplejson as json
 except ImportError:
@@ -68,7 +66,8 @@ class FeatResults(object):  # pylint: disable=too-few-public-methods
             options.OPTIONS.exclude_filter = exclude_filter
             options.OPTIONS.include_filter = include_filter
 
-            profiles[feature] = copy.deepcopy(profile_orig)
+            profiles[feature] = profile.TestProfile()
+            profiles[feature].update(profile_orig)
 
             # An empty list will raise PiglitFatalError exception
             # But for reporting we need to handle this situation
