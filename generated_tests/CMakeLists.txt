@@ -146,6 +146,12 @@ piglit_make_generated_tests(
 	templates/gen_vp_tex/arbvp.mako
 	templates/gen_vp_tex/nvvp3.mako
 	templates/gen_vp_tex/nvvp3_2.mako)
+piglit_make_generated_tests(
+	variable_index_write_tests.list
+	gen_variable_index_write_tests.py
+	templates/gen_variable_index_write_tests/vs.shader_test.mako
+	templates/gen_variable_index_write_tests/fs.shader_test.mako
+	templates/gen_variable_index_write_tests/helpers.mako)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -192,6 +198,7 @@ add_custom_target(gen-gl-tests
 			variable_index_read_tests.list
 			gen_extensions_defined.list
 			vp-tex.list
+			variable_index_write_tests.list
 )
 
 # Create a custom target for generating OpenCL tests
