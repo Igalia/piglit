@@ -32,7 +32,7 @@ try:
 except ImportError:
     import json
 
-from framework import core, exceptions, profile, status
+from framework import options, exceptions, profile, status
 
 
 class FeatResults(object):  # pylint: disable=too-few-public-methods
@@ -65,15 +65,15 @@ class FeatResults(object):  # pylint: disable=too-few-public-methods
             include_filter = [incl_str] if incl_str and not incl_str.isspace() else []
             exclude_filter = [excl_str] if excl_str and not excl_str.isspace() else []
 
-            opts = core.Options(include_filter=include_filter,
-                                exclude_filter=exclude_filter)
+            options.OPTIONS.exclude_filter = exclude_filter
+            options.OPTIONS.include_filter = include_filter
 
             profiles[feature] = copy.deepcopy(profile_orig)
 
             # An empty list will raise PiglitFatalError exception
             # But for reporting we need to handle this situation
             try:
-                profiles[feature]._prepare_test_list(opts)
+                profiles[feature]._prepare_test_list()
             except exceptions.PiglitFatalError:
                 pass
 
