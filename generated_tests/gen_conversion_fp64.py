@@ -43,6 +43,10 @@ DOUBLE_INFS                 = ['0xfff0000000000000', # -inf
 DOUBLE_ZEROES               = ['0x8000000000000000', # Negative underflow (-0.0)
                                '0x0000000000000000'] # Positive underflow (+0.0)
 
+# Double values causing an overflow in any other type
+DOUBLE_OVERFLOW_VALUES      = ['0xffefffffffffffff', # Negative maximum normalized
+                               '0x7fefffffffffffff'] # Positive maximum normalized
+
 # Double values causing an underflow to zero in any other type
 DOUBLE_UNDERFLOW_VALUES     = ['0x8010000000000000', # Negative minimum normalized
                                '0x800fffffffffffff', # Negative maximum denormalized -- Denormalized may be flushed to 0
@@ -67,6 +71,12 @@ DOUBLE_FLOAT_VALUES         = ['0xc7efffffefffffff', # Negative maximum normaliz
                                '0x4170000000000000', # +16777216.0
                                '0x47efffffefffffff'] # Positive maximum normalized
 
+DOUBLE_UINT_OVERFLOW_VALUES = ['0xc170000000000000', # -16777216.0
+                               '0xc014000000000000', # -5.0
+                               '0xbfff25ce60000000', # -1.9467300176620483
+                               '0xbff0000000000000', # Minimum overflow        (-1)
+                               '0x41f0000000000000'] # Maximum overflow        (+4294967296)
+
 DOUBLE_UINT_VALUES          = ['0xbfeccccccccccccd', # -0.9
                                #'0x800fffffffffffff', # Negative maximum denormalized        -- Already checked
                                #'0x8000000000000001', # Negative minimum denormalized        -- Already checked
@@ -79,6 +89,9 @@ DOUBLE_UINT_VALUES          = ['0xbfeccccccccccccd', # -0.9
                                '0x41dfffffffc00000', # Signed int low frontier (+2147483647)
                                '0x41e0000000000000', # Signed int up frontier  (+2147483648)
                                '0x41efffffffe00000'] # Maximum                 (+4294967295)
+
+DOUBLE_INT_OVERFLOW_VALUES  = ['0xc1e0000000200000', # Minimum overflow (-2147483649)
+                               '0x41e0000000000000'] # Maximum overflow (+2147483648)
 
 DOUBLE_INT_VALUES           = ['0xc1e0000000000000', # Minimum          (-2147483648)
                                '0xc170000000000000', # -16777216.0
@@ -401,7 +414,7 @@ class TestTupla(object):
             self.__gen_inv_exec_test(self.__conversion_type, self.__double_type,
                                      self.__uniform_type, self.__double_type,
                                      explicit, converted_from, conversions)
-            conversion_values = FLOAT_ZEROES + FLOAT_VALUES
+            conversion_values = FLOAT_INFS + FLOAT_ZEROES + FLOAT_VALUES
             conversion_function = TestTupla.float_hex_to_double_hex
         else:
             assert False
@@ -428,10 +441,10 @@ class TestTupla(object):
             conversion_values = DOUBLE_BOOL_VALUES
             conversion_function = TestTupla.doble_hex_to_bool_str
         elif self.__basic_type == 'i':
-            conversion_values = DOUBLE_INT_VALUES
+            conversion_values = DOUBLE_INT_OVERFLOW_VALUES + DOUBLE_INT_VALUES
             conversion_function = TestTupla.doble_hex_to_int_str
         elif self.__basic_type == 'u':
-            conversion_values = DOUBLE_UINT_VALUES
+            conversion_values = DOUBLE_UINT_OVERFLOW_VALUES + DOUBLE_UINT_VALUES
             conversion_function = TestTupla.doble_hex_to_uint_str
         elif self.__basic_type == 'f':
             conversions = []
@@ -442,13 +455,13 @@ class TestTupla(object):
             self.__gen_inv_exec_test(self.__double_type, self.__conversion_type,
                                      self.__double_type, self.__uniform_type,
                                      explicit, converted_from, conversions)
-            conversion_values = DOUBLE_FLOAT_VALUES
+            conversion_values = DOUBLE_FLOAT_INFS + DOUBLE_FLOAT_VALUES
             conversion_function = TestTupla.doble_hex_to_float_hex
         else:
             assert False
 
         conversions = []
-        for value in DOUBLE_ZEROES + DOUBLE_UNDERFLOW_VALUES + conversion_values:
+        for value in DOUBLE_ZEROES + DOUBLE_OVERFLOW_VALUES + DOUBLE_UNDERFLOW_VALUES + conversion_values:
             to_value = conversion_function(value)
             item = {'from': value, 'to': to_value}
             conversions.append(item)
