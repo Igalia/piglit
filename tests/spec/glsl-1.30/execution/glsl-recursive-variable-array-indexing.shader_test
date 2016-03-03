@@ -1,0 +1,45 @@
+# Tests recursive variable indexing into arrays
+# See https://bugs.freedesktop.org/show_bug.cgi?id=89607
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+vec4 temps1[3];
+vec4 temps2[3];
+
+void main()
+{
+	temps1[0] = vec4(1, 0.50, 0.60, 0.90);
+	temps1[1] = vec4(2, 0.30, 0.70, 0.90);
+	temps1[2] = vec4(0, 0.15, 0.25, 0.90);
+
+	temps2[0] = vec4(1, 0.30, 0.40, 0.50);
+	temps2[1] = vec4(2, 0.40, 0.50 ,0.60);
+	temps2[2] = vec4(0, 0.50, 0.60, 0.70);
+
+	color = temps1[int(temps2[int(temps1[int(temps2[0].x)].x)].x)];
+
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 130
+in vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect -1 -1 2 2
+probe rgba  2 2  1.0 0.5 0.6 0.9
+
