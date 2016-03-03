@@ -37,6 +37,9 @@ from modules import utils
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
 # pylint: disable=bad-whitespace,line-too-long,bad-continuation
+DOUBLE_INFS                 = ['0xfff0000000000000', # -inf
+                               '0x7ff0000000000000'] # +inf
+
 DOUBLE_ZEROES               = ['0x8000000000000000', # Negative underflow (-0.0)
                                '0x0000000000000000'] # Positive underflow (+0.0)
 
@@ -47,6 +50,9 @@ DOUBLE_UNDERFLOW_VALUES     = ['0x8010000000000000', # Negative minimum normaliz
                                '0x0000000000000001', # Positive minimum denormalized -- Denormalized may be flushed to 0
                                '0x000fffffffffffff', # Positive maximum denormalized -- Denormalized may be flushed to 0
                                '0x0010000000000000'] # Positive minimum normalized
+
+DOUBLE_FLOAT_INFS           = ['0xc7effffff0000000', # Negative overflow (-inf)
+                               '0x47effffff0000000'] # Positive overflow (+inf)
 
 DOUBLE_FLOAT_VALUES         = ['0xc7efffffefffffff', # Negative maximum normalized
                                '0xc170000000000000', # -16777216.0
@@ -89,6 +95,9 @@ DOUBLE_BOOL_VALUES          = [#'0x8000000000000001', # Minimum negative True va
                                #'0x0000000000000000', # False                       -- Already checked
                                #'0x0000000000000001', # Minimum positive True value -- Already checked
                               ]
+
+FLOAT_INFS                  = ['0xff800000', # -inf
+                               '0x7f800000'] # +inf
 
 FLOAT_ZEROES                = ['0x80000000', # Negative underflow (-0.0)
                                '0x00000000'] # Positive underflow (+0.0)
@@ -187,6 +196,16 @@ class TestTupla(object):
         return TestTupla.double_to_hex(double_value)
 
     @staticmethod
+    def float_hex_to_inv_double_hex(hstr):
+        """Returns the inverted float64 hexadecimal representation
+           from a float32 hexadecimal representation
+        """
+        assert isinstance(hstr, str)
+        temp = TestTupla.hex_to_float(hstr)
+        double_value = np.divide(1.0, temp)
+        return TestTupla.double_to_hex(double_value)
+
+    @staticmethod
     def int_str_to_double_str(istr):
         """Returns a float64 string from an int32 string"""
         assert isinstance(istr, str)
@@ -228,6 +247,16 @@ class TestTupla(object):
         """
         assert isinstance(hstr, str)
         float_double = np.float32(TestTupla.hex_to_double(hstr))
+        return TestTupla.float_to_hex(float_double)
+
+    @staticmethod
+    def doble_hex_to_inv_float_hex(hstr):
+        """Returns the inverted float32 hexadecimal representation
+           from a float64 hexadecimal representation
+        """
+        assert isinstance(hstr, str)
+        temp = np.divide(1.0, TestTupla.hex_to_double(hstr))
+        float_double = np.float32(temp)
         return TestTupla.float_to_hex(float_double)
 
     def __init__(self, compiler_dirname, execution_dirname,
@@ -323,6 +352,29 @@ class TestTupla(object):
                         uniform_to_type=uniform_to_type,
                         conversions=conversions))
 
+    def __gen_inv_exec_test(self, from_type, to_type,
+                            uniform_from_type, uniform_to_type,
+                            explicit, converted_from, conversions):
+        filename = os.path.join(
+            self.__exec_dirname,
+            '{0}-conversion-{1}-{2}-{3}-inversions.shader_test'.format(self.__stage, explicit,
+                                                                       from_type, to_type))
+
+        self.__filenames.append(filename)
+
+        if not self.__names_only:
+            with open(filename, 'w') as test_file:
+                test_file.write(TEMPLATES.get_template(
+                    'execution-inversions.{0}.shader_test.mako'.format(
+                        self.__stage)).render_unicode(
+                            amount=self.__amount,
+                            from_type=from_type,
+                            to_type=to_type,
+                            converted_from=converted_from,
+                            uniform_from_type=uniform_from_type,
+                            uniform_to_type=uniform_to_type,
+                            conversions=conversions))
+
     def __gen_to_double(self):
         converted_from = 'from'
         explicit = 'implicit'
@@ -341,6 +393,14 @@ class TestTupla(object):
             conversion_values = UINT_VALUES
             conversion_function = TestTupla.int_str_to_double_str
         elif self.__basic_type == 'f':
+            conversions = []
+            for value in FLOAT_INFS + FLOAT_ZEROES:
+                to_value = TestTupla.float_hex_to_inv_double_hex(value)
+                item = {'from': value, 'to': to_value}
+                conversions.append(item)
+            self.__gen_inv_exec_test(self.__conversion_type, self.__double_type,
+                                     self.__uniform_type, self.__double_type,
+                                     explicit, converted_from, conversions)
             conversion_values = FLOAT_ZEROES + FLOAT_VALUES
             conversion_function = TestTupla.float_hex_to_double_hex
         else:
@@ -374,6 +434,14 @@ class TestTupla(object):
             conversion_values = DOUBLE_UINT_VALUES
             conversion_function = TestTupla.doble_hex_to_uint_str
         elif self.__basic_type == 'f':
+            conversions = []
+            for value in DOUBLE_INFS + DOUBLE_ZEROES:
+                to_value = TestTupla.doble_hex_to_inv_float_hex(value)
+                item = {'from': value, 'to': to_value}
+                conversions.append(item)
+            self.__gen_inv_exec_test(self.__double_type, self.__conversion_type,
+                                     self.__double_type, self.__uniform_type,
+                                     explicit, converted_from, conversions)
             conversion_values = DOUBLE_FLOAT_VALUES
             conversion_function = TestTupla.doble_hex_to_float_hex
         else:
