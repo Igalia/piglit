@@ -261,7 +261,7 @@ def run(input_):
             raise exceptions.PiglitFatalError(
                 'Cannot overwrite existing folder without the -o/--overwrite '
                 'option being set.')
-    os.mkdir(args.results_path)
+    os.makedirs(args.results_path)
 
     results = framework.results.TestrunResult()
     backends.set_meta(args.backend, results)
