@@ -1,0 +1,38 @@
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+struct C {
+    ivec4 fs_color;
+};
+
+in vec4 piglit_vertex;
+flat out C c;
+
+void main() {
+  gl_Position = piglit_vertex;
+  c.fs_color = ivec4((piglit_vertex.x*2*piglit_vertex.y+3*piglit_vertex.z)*4.0, (piglit_vertex.x*20*piglit_vertex.y+3*piglit_vertex.z)*8.0, (piglit_vertex.x*2*piglit_vertex.y+3*piglit_vertex.z)*14.0, 1.0);
+}
+
+[fragment shader]
+#version 150
+
+struct C {
+    ivec4 fs_color;
+};
+
+flat in C c;
+out vec4 color;
+
+#define GREEN vec4(0.0, 1.0, 0.0, 0.0)
+#define RED vec4(1.0, 0.0, 0.0, 0.0)
+
+void main() {
+  color = bool(c.fs_color.x - c.fs_color.x) ? RED : GREEN;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
