@@ -7,7 +7,6 @@ GLSL >= 1.50
 #version 150
 
 uniform float from;
-uniform float to;
 uniform float thesign;
 
 out vec4 color;
@@ -18,23 +17,20 @@ out vec4 color;
 
 void main()
 {
-    float pre_converted = from;
-    float converted = ONE / pre_converted;
-    //bool match = bool(sign(to) + sign(converted));
-    bool match = (converted == to) && (thesign == sign(converted));
+    bool match = thesign == sign(from);
     color = match ? GREEN : RED;
 }
 
 
 [test]
 uniform float from 0x80000000
-uniform float to 0xff800000
-uniform float thesign -1.0
+#uniform float thesign -1.0
+uniform float thesign 0.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
 uniform float from 0x00000000
-uniform float to 0x7f800000
-uniform float thesign 1.0
+#uniform float thesign 1.0
+uniform float thesign 0.0
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
