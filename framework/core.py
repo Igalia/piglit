@@ -114,8 +114,8 @@ def get_config(arg=None):
                 pass
 
 
-def check_dir(dirname, failifexists=False):
-    """Check for the existance of a directory and create it if possible.
+def check_dir(dirname, failifexists=False, handler=None):
+    """Check for the existence of a directory and create it if possible.
 
     This function will check for the existance of a directory. If that
     directory doesn't exist it will try to create it. If the directory does
@@ -124,21 +124,31 @@ def check_dir(dirname, failifexists=False):
     2) If "failifexists" is True it will raise an PiglitException, it is the
     job of the caller using failifexists=True to handle this exception
 
+    Both failifexists and handler can be passed, but failifexists will have
+    precedence.
+
     Arguments:
     dirname -- the name of the directory to check
 
     Keyword Arguments:
     failifexists -- If True and the directory exists then PiglitException will
                     be raised (default: False)
+    handler -- a callable that is passed dirname if the thing to check exists.
 
     """
     try:
         os.stat(dirname)
     except OSError as e:
-        if e.errno not in [errno.ENOENT, errno.ENOTDIR] and failifexists:
-            raise exceptions.PiglitException
+        # If the error is not "no file or directory" or "not a dir", then
+        # either raise an exception, call the handler function, or return
+        if e.errno not in [errno.ENOENT, errno.ENOTDIR]:
+            if failifexists:
+                raise exceptions.PiglitException
+            elif handler is not None:
+                handler(dirname)
 
     try:
+        # makedirs is expensive, so check before # calling it.
         if not os.path.exists(dirname):
             os.makedirs(dirname)
     except OSError as e:

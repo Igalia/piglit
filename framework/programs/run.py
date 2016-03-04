@@ -219,6 +219,14 @@ def _disable_windows_exception_messages():
         ctypes.windll.kernel32.SetErrorMode(uMode)
 
 
+def _results_handler(path):
+    """Handler for core.check_dir."""
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    else:
+        os.unlink(path)
+
+
 @exceptions.handler
 def run(input_):
     """ Function for piglit run command
@@ -254,17 +262,14 @@ def run(input_):
 
     # If the results directory already exists and if overwrite was set, then
     # clear the directory. If it wasn't set, then raise fatal error.
-    if os.path.exists(args.results_path):
-        if args.overwrite:
-            if os.path.isdir(args.results_path):
-                shutil.rmtree(args.results_path)
-            else:
-                os.unlink(args.results_path)
-        else:
-            raise exceptions.PiglitFatalError(
-                'Cannot overwrite existing folder without the -o/--overwrite '
-                'option being set.')
-    os.makedirs(args.results_path)
+    try:
+        core.check_dir(args.results_path,
+                       failifexists=args.overwrite,
+                       handler=_results_handler)
+    except exceptions.PiglitException:
+        raise exceptions.PiglitFatalError(
+            'Cannot overwrite existing folder without the -o/--overwrite '
+            'option being set.')
 
     results = framework.results.TestrunResult()
     backends.set_meta(args.backend, results)

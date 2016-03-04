@@ -321,3 +321,12 @@ def test_check_dir_makedirs_fail():
             with mock.patch('framework.core.os.makedirs',
                             mock.Mock(side_effect=OSError)):
                 core.check_dir('foo', False)
+
+
+@nt.raises(utils.SentinalException)
+def test_check_dir_handler():
+    """core.check_dir: Handler is called if not failifexists."""
+    with mock.patch('framework.core.os.stat',
+                    mock.Mock(side_effect=OSError('foo', errno.ENOTDIR))):
+        core.check_dir('foo',
+                       handler=mock.Mock(side_effect=utils.SentinalException))
