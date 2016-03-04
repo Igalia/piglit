@@ -1,0 +1,33 @@
+[require]
+GLSL >= 1.50
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+
+uniform int from;
+uniform int to;
+uniform int thesign;
+
+out vec4 color;
+
+#define ONE 1
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+    int pre_converted = from;
+    int converted = ONE / pre_converted;
+    bool match = (converted == to) && (thesign == sign(converted));
+    color = match ? GREEN : RED;
+}
+
+
+[test]
+uniform int from 0
+uniform int to 2147483647
+uniform int thesign 1.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
