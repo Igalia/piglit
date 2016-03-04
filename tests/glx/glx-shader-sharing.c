@@ -102,7 +102,9 @@ draw(Display *dpy)
    frag_shader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag_shader_text);
    program = piglit_link_simple_program(vert_shader, frag_shader);
    check_error(__LINE__);
-   assert(program);
+   if (!program) {
+      piglit_report_result(PIGLIT_FAIL);
+   }
 
    glUseProgram(program);
    check_error(__LINE__);
