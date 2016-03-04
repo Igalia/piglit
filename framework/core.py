@@ -18,6 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""A collection of various bits that don't seem to belong anywhere else.
+
+This is the classic catchall "utils" module from most projects, that for
+historically reasons is called "core" in piglit.
+
+"""
+
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
