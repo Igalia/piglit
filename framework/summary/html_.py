@@ -38,7 +38,7 @@ import six
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
-from framework import backends, exceptions
+from framework import backends, exceptions, core
 
 from .common import Results, escape_filename, escape_pathname
 from .feature import FeatResults
@@ -85,16 +85,13 @@ def _make_testrun_info(results, destination, exclude=None):
     for each in results.results:
         name = escape_pathname(each.name)
         try:
-            os.mkdir(os.path.join(destination, name))
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                raise exceptions.PiglitFatalError(
-                    'Two or more of your results have the same "name" '
-                    'attribute. Try changing one or more of the "name" '
-                    'values in your json files.\n'
-                    'Duplicate value: {}'.format(name))
-            else:
-                raise e
+            core.check_dir(os.path.join(destination, name), True)
+        except exceptions.PiglitException:
+            raise exceptions.PiglitFatalError(
+                'Two or more of your results have the same "name" '
+                'attribute. Try changing one or more of the "name" '
+                'values in your json files.\n'
+                'Duplicate value: {}'.format(name))
 
         with open(os.path.join(destination, name, "index.html"), 'wb') as out:
             out.write(_TEMPLATES.get_template('testrun_info.mako').render(
@@ -114,11 +111,7 @@ def _make_testrun_info(results, destination, exclude=None):
             temp_path = os.path.dirname(html_path)
 
             if value.result not in exclude:
-                # os.makedirs is very annoying, it throws an OSError if
-                # the path requested already exists, so do this check to
-                # ensure that it doesn't
-                if not os.path.exists(temp_path):
-                    os.makedirs(temp_path)
+                core.check_dir(temp_path)
 
                 with open(html_path, 'wb') as out:
                     out.write(_TEMPLATES.get_template(
