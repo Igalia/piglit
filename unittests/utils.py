@@ -541,3 +541,28 @@ def unset_compression():
         os.environ['PIGLIT_COMPRESSION'] = _SAVED_COMPRESSION
     else:
         del os.environ['PIGLIT_COMPRESSION']
+
+
+def skip(condition, description):
+    """Skip a test if the condition is met.
+
+    Arguments:
+    condition -- If this is truthy then the test will be skippped
+    description -- the message that SkipTest will display if the test is
+                   skipped
+
+    """
+
+    def _wrapper(func):
+        """The function that acutally does the wrapping."""
+
+        @functools.wraps(func)
+        def _inner(*args, **kwargs):
+            """The function that is actually called."""
+            if condition:
+                raise SkipTest(description)
+            return func(*args, **kwargs)
+
+        return _inner
+
+    return _wrapper

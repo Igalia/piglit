@@ -295,7 +295,7 @@ def test_check_dir_stat_ENOENT():
 
 
 def test_check_dir_stat_ENOTDIR():
-    """core.check_dir: if the directory exists (ENOTDIR) and failifexsits is False continue"""
+    """core.check_dir: if a file exists (ENOTDIR) and failifexsits is False continue"""
     with mock.patch('framework.core.os.stat',
                     mock.Mock(side_effect=OSError('foo', errno.ENOTDIR))):
         with mock.patch('framework.core.os.makedirs') as makedirs:
@@ -330,3 +330,13 @@ def test_check_dir_handler():
                     mock.Mock(side_effect=OSError('foo', errno.ENOTDIR))):
         core.check_dir('foo',
                        handler=mock.Mock(side_effect=utils.SentinalException))
+
+
+@utils.skip(not six.PY3, 'Test is only relevant on python 3.x')
+def test_check_dir_stat_FileNotFoundError():
+    """core.check_dir: FileNotFoundError is raised and failifexsits is False continue"""
+    with mock.patch('framework.core.os.stat',
+                    mock.Mock(side_effect=FileNotFoundError)):
+        with mock.patch('framework.core.os.makedirs') as makedirs:
+            core.check_dir('foo', False)
+            nt.eq_(makedirs.called, 1)
