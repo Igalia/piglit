@@ -2,12 +2,10 @@
 # when originally written this failed in varying lowering
 
 [require]
-GLSL >= 1.50
-GL_ARB_gpu_shader_fp64
+${require}\
 
 [vertex shader]
-#version 150
-#extension GL_ARB_gpu_shader_fp64 : require
+${preprocessor}\
 
 uniform double arg0;
 
@@ -21,8 +19,7 @@ void main()
 }
 
 [fragment shader]
-#version 150
-#extension GL_ARB_gpu_shader_fp64 : require
+${preprocessor}\
 
 flat in ${type_name} dout1;
 uniform double tolerance;
