@@ -204,7 +204,7 @@ try(const GLenum *targets, unsigned num_targets,
                                 value_test = test_data_is_unsupported_response(data, pname);
                         } else {
                                 GLint returned_value = test_data_value_at_index(data, 0);
-                                GLint expected_value;
+                                GLint expected_value = -1;
 
                                 switch(pname) {
                                 case GL_COLOR_COMPONENTS:
@@ -217,7 +217,7 @@ try(const GLenum *targets, unsigned num_targets,
                                         expected_value = is_depth_format(internalformats[j]);
                                         break;
                                 default:
-                                        assert("incorrect pname for test");
+                                        assert(!"incorrect pname for test");
                                         break;
                                 }
 
