@@ -3,4 +3,5 @@
 [vertex shader passthrough]
 
 [fragment shader]
-<%include file="base.frag.mako"/>
+<%include file="base-zero-sign.frag.mako"/>
+

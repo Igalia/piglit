@@ -12,7 +12,7 @@ void main()
 }
 
 [geometry shader]
-<%include file="base.geom.mako"/>
+<%include file="base-zero-sign.geom.mako"/>
 [fragment shader]
 #version 150
 

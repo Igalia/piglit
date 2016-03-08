@@ -1,15 +1,7 @@
-// [config]
-// expect_result: fail
-// glsl_version: 1.50
-// require_extensions: GL_ARB_gpu_shader_fp64
-// [end config]
-//
-// GL_ARB_gpu_shader_fp64 spec states:
-//
-//     "No implicit conversions are
-//      provided to convert from unsigned to signed integer types, from
-//      floating-point to integer types, or from higher-precision to
-//      lower-precision types.  There are no implicit array or structure
-//      conversions."
-//
-${next.body()}
+/* [config]
+${config}\
+ * [end config]
+${comments}\
+ */
+
+${next.body()}\

@@ -1,8 +1,7 @@
-<%! from six.moves import range %>
+<%! from six.moves import range %>\
 [require]
-GLSL >= 1.50
-GL_ARB_gpu_shader_fp64
-${next.body()}
+${require}\
+${next.body()}\
 [test]
 % for conversion in conversions:
 uniform ${uniform_from_type} from \

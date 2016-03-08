@@ -1,7 +1,7 @@
 <%inherit file="execution_base.mako"/>\
 
 [vertex shader]
-<%include file="base.vert.mako"/>
+<%include file="base-zero-sign.vert.mako"/>
 [fragment shader]
 #version 150
 
