@@ -92,6 +92,7 @@ test_data_clear(test_data **data)
         free(_data->params);
         _data->params = NULL;
 
+        free(_data);
         *data = NULL;
 }
 
