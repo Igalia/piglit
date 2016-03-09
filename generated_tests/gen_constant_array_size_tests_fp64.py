@@ -99,6 +99,12 @@ class ParserTest(object):
         shader test.
         """
 
+    @abc.abstractmethod
+    def output_var(self):
+        """Return the output variable of the shader test to which it
+        belongs.
+        """
+
     def make_condition(self, test_vector):
         """Generate a GLSL constant expression that should evaluate to
         true if the GLSL compiler's constant evaluation produces the
