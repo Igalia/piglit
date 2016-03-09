@@ -612,13 +612,13 @@ try_max_combined_dimensions(const GLenum *targets, unsigned num_targets,
         bool pass = true;
         unsigned i;
         unsigned j;
-        GLint64 combined_value;
 
 	for (i = 0; i < num_targets; i++) {
 		for (j = 0; j < num_internalformats; j++) {
                         bool error_test;
                         bool value_test = true;
                         bool supported;
+                        GLint64 combined_value = -1;
 
                         supported = is_resource_supported(data, GL_MAX_COMBINED_DIMENSIONS,
                                                           targets[i],
