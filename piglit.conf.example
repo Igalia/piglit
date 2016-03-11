@@ -33,6 +33,10 @@ bindir=/home/usr/oclconform
 testA
 testB
 
+[deqp]
+; Options that affect all deqp based suites
+;extra_args=--deqp-visibility=hidden
+
 [deqp-gles2]
 ; Path to the deqp-gles2 executable
 ; Can be overwritten by PIGLIT_DEQP_GLES2_BIN environment variable

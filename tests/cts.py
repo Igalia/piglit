@@ -59,7 +59,11 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_CTS_EXTRA_ARGS', ('cts', 'extra_args'),
 
 class DEQPCTSTest(deqp.DEQPBaseTest):
     deqp_bin = _CTS_BIN
-    extra_args = [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
+
+    @property
+    def extra_args(self):
+        return super(DEQPCTSTest, self).extra_args + \
+            [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
 
 # Add all of the suites by default, users can use filters to remove them.

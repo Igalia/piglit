@@ -40,17 +40,6 @@ __all__ = [
 ]
 
 
-def make_profile(test_list, test_class):
-    """Create a TestProfile instance."""
-    profile = TestProfile()
-    for testname in test_list:
-        # deqp uses '.' as the testgroup separator.
-        piglit_name = testname.replace('.', grouptools.SEPARATOR)
-        profile.test_list[piglit_name] = test_class(testname)
-
-    return profile
-
-
 def get_option(env_varname, config_option, default=None):
     """Query the given environment variable and then piglit.conf for the option.
 
@@ -64,6 +53,22 @@ def get_option(env_varname, config_option, default=None):
     opt = core.PIGLIT_CONFIG.safe_get(config_option[0], config_option[1])
 
     return opt or default
+
+
+_EXTRA_ARGS = get_option('PIGLIT_DEQP_EXTRA_ARGS',
+                         ('deqp', 'extra_args'),
+                         default='').split()
+
+
+def make_profile(test_list, test_class):
+    """Create a TestProfile instance."""
+    profile = TestProfile()
+    for testname in test_list:
+        # deqp uses '.' as the testgroup separator.
+        piglit_name = testname.replace('.', grouptools.SEPARATOR)
+        profile.test_list[piglit_name] = test_class(testname)
+
+    return profile
 
 
 def gen_caselist_txt(bin_, caselist, extra_args):
@@ -129,6 +134,7 @@ class DEQPBaseTest(Test):
         only works to join two lists together.
 
         """
+        return _EXTRA_ARGS
 
     def __init__(self, case_name):
         command = [self.deqp_bin, '--deqp-case=' + case_name]

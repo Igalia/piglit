@@ -81,7 +81,11 @@ def filter_mustpass(caselist_path):
 
 class DEQPGLES3Test(deqp.DEQPBaseTest):
     deqp_bin = _DEQP_GLES3_EXE
-    extra_args = [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
+
+    @property
+    def extra_args(self):
+        return super(DEQPGLES3Test, self).extra_args + \
+            [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
 
     def __init__(self, *args, **kwargs):
