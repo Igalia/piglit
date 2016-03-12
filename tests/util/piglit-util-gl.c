@@ -2494,6 +2494,41 @@ piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 }
 
 /**
+ * Generates a texture with the given integer internal format.
+ * Pixel data will be filled as R = x, G = y, B = b, A = a.
+ */
+GLuint piglit_integer_texture(GLenum internalFormat, int w, int h, int b, int a)
+{
+	int *img = malloc(w * h * 4 * sizeof(unsigned));
+	int *p;
+	int x, y;
+	GLuint tex;
+
+	for (y = 0, p = img; y < h; ++y) {
+		for (x = 0; x < w; ++x, p += 4) {
+			p[0] = x;
+			p[1] = y;
+			p[2] = b;
+			p[3] = a;
+		}
+	}
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+			GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_NEAREST);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0,
+		     GL_RGBA_INTEGER, GL_INT, img);
+
+	free(img);
+}
+
+/**
  * Create a depth texture.  The depth texture will be a gradient which varies
  * from 0.0 at the left side to 1.0 at the right side.  For a 2D array texture,
  * all the texture layers will have the same gradient.

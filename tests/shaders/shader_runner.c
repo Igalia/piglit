@@ -3101,6 +3101,23 @@ piglit_display(void)
 					    GL_UNSIGNED_NORMALIZED);
 			if (!piglit_is_core_profile)
 				glEnable(GL_TEXTURE_2D);
+		} else if (sscanf(line, "texture integer %d ( %d", &tex, &w) == 2) {
+			GLenum int_fmt;
+			int b, a;
+			int num_scanned =
+				sscanf(line,
+				       "texture integer %d ( %d , %d ) ( %d, %d ) %31s",
+				       &tex, &w, &h, &b, &a, s);
+			if (num_scanned < 6) {
+				fprintf(stderr,
+					"invalid texture integer command!\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			int_fmt = piglit_get_gl_enum_from_name(s);
+
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_integer_texture(int_fmt, w, h, b, a);
 		} else if (sscanf(line, "texture miptree %d", &tex) == 1) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_miptree_texture();
