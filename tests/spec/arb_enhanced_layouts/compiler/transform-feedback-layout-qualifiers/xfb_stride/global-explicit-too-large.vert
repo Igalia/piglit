@@ -1,6 +1,7 @@
 // [config]
 // expect_result: fail
 // glsl_version: 1.40
+// check_link: true
 // require_extensions: GL_ARB_enhanced_layouts
 // [end config]
 //
@@ -13,7 +14,7 @@
 #version 140
 #extension GL_ARB_enhanced_layouts: require
 
-layout (xfb_stride = gl_MaxTransformFeedbackInterleavedComponents + 1) out;
+layout (xfb_stride = (gl_MaxTransformFeedbackInterleavedComponents + 1) * 4) out;
 
 out vec4 var;
 

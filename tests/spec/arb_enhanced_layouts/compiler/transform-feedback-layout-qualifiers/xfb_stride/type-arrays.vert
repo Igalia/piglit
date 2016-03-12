@@ -23,13 +23,13 @@ struct S {
   vec3 x;
 };
 
-layout(xfb_stride = 4) out float var1[2];
+layout(xfb_buffer = 0, xfb_stride = 4) out float var1[2];
 
-layout(xfb_stride = 8) out vec4 var2[2];
+layout(xfb_buffer = 1, xfb_stride = 8) out vec4 var2[2];
 
-layout(xfb_stride = 64) out mat4 var3[2];
+layout(xfb_buffer = 2, xfb_stride = 64) out mat4 var3[2];
 
-layout(xfb_stride = 12) out S s[2];
+layout(xfb_buffer = 3, xfb_stride = 12) out S s[2];
 
 void main()
 {
