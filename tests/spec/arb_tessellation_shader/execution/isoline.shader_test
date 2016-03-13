@@ -1,0 +1,52 @@
+# Check producing a single tessellated isoline doesn't give multiple lines
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader]
+
+void main()
+{
+}
+
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+layout(vertices = 2) out;
+
+void main()
+{
+	gl_TessLevelOuter[0] = 1.0;
+	gl_TessLevelOuter[1] = 4.0;
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+layout(isolines, equal_spacing) in;
+flat out int good;
+
+void main()
+{
+	gl_Position = vec4(gl_TessCoord.xy * 2.0 - 1.0, 0.0, 1.0);
+	good = int(gl_TessCoord.y == 0.0);
+}
+
+
+[fragment shader]
+flat in int good;
+
+void main()
+{
+	if (bool(good))
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.0 1.0 0.0 1.0
+clear
+patch parameter vertices 2
+draw arrays GL_PATCHES 0 2
+probe all rgba 0.0 1.0 0.0 1.0
