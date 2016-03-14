@@ -2108,20 +2108,9 @@ with profile.group_manager(
      g(['arb_gpu_shader_fp64-double-gettransformfeedbackvarying'])
      g(['arb_gpu_shader_fp64-tf-interleaved'])
      g(['arb_gpu_shader_fp64-tf-interleaved-aligned'])
-     g(['arb_gpu_shader_fp64-vs-getuniformdv'])
-     g(['arb_gpu_shader_fp64-fs-getuniformdv'])
-     g(['arb_gpu_shader_fp64-gs-getuniformdv'])
+     g(['arb_gpu_shader_fp64-getuniformdv'])
      g(['arb_gpu_shader_fp64-wrong-type-setter'])
      g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
-     g(['arb_gpu_shader_fp64-uniform-invalid-operation'])
-
-with profile.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'ARB_gpu_shader_fp64', 'shader_storage')) as g:
-     g(['arb_gpu_shader_fp64-layout-std140-fp64-shader'], 'layout-std140-fp64-shader')
-     g(['arb_gpu_shader_fp64-layout-std140-fp64-mixed-shader'], 'layout-std140-fp64-mixed-shader')
-     g(['arb_gpu_shader_fp64-layout-std430-fp64-shader'], 'layout-std430-fp64-shader')
-     g(['arb_gpu_shader_fp64-layout-std430-fp64-mixed-shader'], 'layout-std430-fp64-mixed-shader')
 
 with profile.group_manager(
         PiglitGLTest,
