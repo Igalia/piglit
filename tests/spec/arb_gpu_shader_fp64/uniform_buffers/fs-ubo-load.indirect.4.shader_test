@@ -1,0 +1,52 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+uniform double arg0;
+uniform double tolerance;
+uniform dvec4 expected;
+
+struct S {
+	double d1[2];
+	dvec3  d3[2];
+};
+
+uniform int index1;
+uniform int index2;
+uniform ubo1 {
+	S data[2];
+};
+
+out vec4 color;
+
+void main()
+{
+        dvec4 result = dvec4(data[index1].d3[index2], arg0);
+        color = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+uniform double arg0 0.25
+uniform double tolerance 0.0
+uniform dvec4 expected 0.70 0.71 0.72 0.25
+
+uniform int index1 1
+uniform int index2 1
+
+uniform double data[0].d1[0] 0.0
+uniform dvec3  data[0].d1[1] 0.1
+uniform double data[0].d3[0] 0.20 0.21 0.22
+uniform dvec3  data[0].d3[1] 0.30 0.31 0.32
+
+uniform double data[1].d1[0] 0.4
+uniform dvec3  data[1].d1[1] 0.5
+uniform double data[1].d3[0] 0.60 0.61 0.62
+uniform dvec3  data[1].d3[1] 0.70 0.71 0.72
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
