@@ -1,0 +1,37 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+in vec4 piglit_vertex;
+out vec4 vscolor;
+
+void main()
+{
+	double d1 = 5.0LF;
+	double d2 = 5.0lf;
+
+	gl_Position = piglit_vertex;
+	vscolor = (d1 == d2)
+		? vec4(0.0, 0.0, 0.0, 0.0) : vec4(1.0, 0.0, 0.0, 0.0);
+}
+
+[fragment shader]
+#version 150
+
+in vec4 vscolor;
+out vec4 color;
+
+void main() {
+	color = vscolor;
+}
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+
+clear
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 0.0 0.0 0.0

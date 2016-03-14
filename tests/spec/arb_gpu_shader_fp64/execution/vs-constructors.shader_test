@@ -1,0 +1,127 @@
+# test truncating a double holds precision
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+in vec4 vertex;
+out vec4 cc;
+
+void main()
+{
+	double d1 = 8.0lf;
+	double d2 = 5.0lf;
+	dvec2 v2_1 = dvec2(2.0, 3.0);
+	dvec2 v2_2 = dvec2(4.0, 5.0);
+	dvec3 v3_1 = dvec3(80.0, 81.0, 82.0);
+	dvec3 v3_2 = dvec3(11.0, 12.0, 13.0);
+	dvec3 v3_3 = dvec3(15.0, 16.0, 17.0);
+	dvec4 v4_1 = dvec4(16.0, 17.0, 18.0, 19.0);
+	dvec4 v4_2 = dvec4(20.0, 21.0, 22.0, 23.0);
+	dvec4 v4_3 = dvec4(24.0, 25.0, 26.0, 27.0);
+	dvec4 v4_4 = dvec4(38.0, 39.0, 40.0, 41.0);
+	dmat2 m2 = dmat2(50.0, 51.0, 52.0, 53.0);
+
+	cc = vec4(0.0, 0.0, 0.0, 0.0);
+
+	dmat2 expected_m2 = dmat2(2.0, 3.0, 4.0, 5.0);
+	dmat2 real_m2 = dmat2(v2_1, v2_2);
+	if (expected_m2 != real_m2)
+		cc = vec4(0.5, 0.0, 0.0, 0.0);
+
+	dmat3 expected_m3_1 = dmat3(8.0, 0.0, 0.0,
+				    0.0, 8.0, 0.0,
+				    0.0, 0.0, 8.0);
+	dmat3 real_m3_1 = dmat3(d1);
+	if (expected_m3_1 != real_m3_1)
+		cc = vec4(1.0, 0.0, 0.0, 0.0);
+
+	dmat3 expected_m3_2 = dmat3(80.0, 81.0, 82.0,
+				    11.0, 12.0, 13.0,
+				    15.0, 16.0, 17.0);
+	dmat3 real_m3_2 = dmat3(v3_1, v3_2, v3_3);
+	if (expected_m3_2 != real_m3_2)
+		cc = vec4(0.0, 1.0, 0.0, 0.0);
+
+	dmat4 expected_m4_1 = dmat4(16.0, 17.0, 18.0, 19.0,
+				    20.0, 21.0, 22.0, 23.0,
+				    24.0, 25.0, 26.0, 27.0,
+				    38.0, 39.0, 40.0, 41.0);
+	dmat4 real_m4_1 = dmat4(v4_1, v4_2, v4_3, v4_4);
+	if (expected_m4_1 != real_m4_1)
+		cc = vec4(0.0, 0.0, 1.0, 0.0);
+
+	dmat4 expected_m4_2 = dmat4(50.0, 51.0, 0.0, 0.0,
+				    52.0, 53.0, 0.0, 0.0,
+				    0.0, 0.0, 1.0, 0.0,
+				    0.0, 0.0, 0.0, 1.0);
+	dmat4 real_m4_2 = dmat4(m2);
+	if (expected_m4_2 != real_m4_2)
+		cc = vec4(0.0, 0.0, 0.0, 1.0);
+
+	dmat2x4 expected_m2x4_1 = dmat2x4(80.0, 81.0, 82.0, 8.0,
+					  5.0, 11.0, 12.0, 13.0);
+	dmat2x4 real_m2x4_1 = dmat2x4(v3_1, d1, d2, v3_2);
+	if (expected_m2x4_1 != real_m2x4_1)
+		cc = vec4(1.0, 1.0, 0.0, 0.0);
+
+	dmat2x4 expected_m2x4_2 = dmat2x4(16.0, 17.0, 18.0, 19.0,
+					  20.0, 21.0, 22.0, 23.0);
+	dmat2x4 real_m2x4_2 = dmat2x4(v4_1, v4_2);
+	if (expected_m2x4_2 != real_m2x4_2)
+		cc = vec4(1.0, 0.0, 1.0, 0.0);
+
+	dvec3 expected_v3_1 = dvec3(8.0, 8.0, 8.0);
+	dvec3 real_v3_1 = dvec3(d1);
+	if (expected_v3_1 != real_v3_1)
+		cc = vec4(1.0, 0.0, 0.0, 1.0);
+
+	dvec3 expected_v3_2 = dvec3(8.0, 2.0, 3.0);
+	dvec3 real_v3_2 = dvec3(d1, v2_1);
+	if (expected_v3_2 != real_v3_2)
+		cc = vec4(1.0, 1.0, 1.0, 0.0);
+
+	dvec3 expected_v3_3 = dvec3(16.0, 17.0, 18.0);
+	dvec3 real_v3_3 = dvec3(v4_1);
+	if (expected_v3_3 != real_v3_3)
+		cc = vec4(1.0, 1.0, 1.0, 1.0);
+
+	dvec3 expected_v4_4 = dvec3(50.0, 51.0, 52.0);
+	dvec3 real_v4_4 = dvec3(m2);
+	if (expected_v4_4 != real_v4_4)
+		cc = vec4(0.0, 0.5, 0.0, 1.0);
+
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+uniform double tolerance;
+uniform double expected;
+
+in vec4 cc;
+out vec4 color;
+
+void main()
+{
+	color = cc;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 0.0 0.0 0.0

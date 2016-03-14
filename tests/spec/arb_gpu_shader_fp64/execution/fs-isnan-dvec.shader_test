@@ -1,0 +1,74 @@
+# Test proper behavior of the isnan(vec4) function.
+#
+# Note: testing behavior if isnan() is challenging because the GLSL
+# 1.50 spec does not explicitly define any circumstances under which
+# NaN values are required to be generated.  This test assumes that the
+# expression 0.0/0.0 produces a NaN value when evaluated in the
+# shader.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+uniform double tolerance;
+uniform dvec4 numerator;
+uniform dvec4 denominator;
+uniform dvec4 expected;
+
+void main()
+{
+	gl_FragColor = vec4(0.0);
+
+	dvec4 r4 = numerator/denominator;
+	dvec4 bl4 = dvec4(isnan(r4));
+	if (distance(bl4, expected) > tolerance)
+		gl_FragColor.x = 1.0;
+
+	dvec3 r3 = numerator.xyz/denominator.xyz;
+	dvec3 bl3 = dvec3(isnan(r3));
+	if (distance(bl3, expected.xyz) > tolerance)
+		gl_FragColor.y = 1.0;
+
+	dvec2 r2 = numerator.zw/denominator.zw;
+	dvec2 bl2 = dvec2(isnan(r2));
+	if (distance(bl2, expected.zw) > tolerance)
+		gl_FragColor.z = 1.0;
+
+	double r1 = numerator.x/denominator.x;
+	double bl1 = double(isnan(r1));
+	if (distance(bl1, expected.x) > tolerance)
+		gl_FragColor.w = 1.0;
+}
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+
+clear
+uniform double tolerance  0.0
+uniform dvec4 numerator   1.0 0.0 0.0 1.0
+uniform dvec4 denominator 1.0 0.0 0.0 1.0
+uniform dvec4 expected    0.0 1.0 1.0 0.0
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 0.0 0.0 0.0
+
+clear
+uniform double tolerance  0.0
+uniform dvec4 numerator   0.0 1.0 1.0 0.0
+uniform dvec4 denominator 0.0 1.0 1.0 0.0
+uniform dvec4 expected    1.0 0.0 0.0 1.0
+draw rect -1 -1 2 2
+probe rgba 1 0 0.0 0.0 0.0 0.0
+
+clear
+uniform double tolerance  0.0
+uniform dvec4 numerator   0.0 0.0 1.0 1.0
+uniform dvec4 denominator 0.0 1.0 1.0 0.0
+uniform dvec4 expected    1.0 0.0 0.0 0.0
+draw rect -1 -1 2 2
+probe rgba 2 0 0.0 0.0 0.0 0.0
