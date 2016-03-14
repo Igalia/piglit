@@ -1,0 +1,53 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+uniform double arg0;
+uniform double tolerance;
+uniform dvec4 expected;
+
+uniform ubo1 {
+	double r;
+	float g;
+	double b;
+	double a;
+};
+
+in vec4 piglit_vertex;
+out vec4 v;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	dvec4 result = dvec4(r + arg0, g + arg0, b + arg0, a + arg0);
+	v = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 150
+
+in vec4 v;
+out vec4 color;
+
+void main()
+{
+	color = v;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+
+clear
+uniform double arg0 0.25
+uniform double tolerance 0.0
+uniform dvec4 expected 0.25 1.25 1.25 0.25
+uniform double r 0.0
+uniform float g 1.0
+uniform double b 1.0
+uniform double a 0.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
