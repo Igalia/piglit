@@ -4,6 +4,8 @@ GLSL >= 1.50
 GL_ARB_gpu_shader_fp64
 
 [vertex shader]
+#version 150
+
 in vec4 vertex;
 void main()
 {
@@ -11,17 +13,22 @@ void main()
 }
 
 [fragment shader]
+#version 150
 #extension GL_ARB_gpu_shader_fp64 : require
+
 uniform double arg0;
 uniform double tval[5];
 uniform double tolerance;
 uniform double expected;
 uniform int pick;
+
+out vec4 color;
+
 void main()
 {
   double result;
   result = (tval[pick] + arg0);
-  gl_FragColor = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+  color = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
 [vertex data]

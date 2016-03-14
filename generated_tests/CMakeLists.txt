@@ -124,6 +124,13 @@ piglit_make_generated_tests(
 	templates/gen_flat_interpolation_qualifier_fp64/struct_template.frag.mako
 	)
 piglit_make_generated_tests(
+	inout_fp64.list
+	gen_inout_fp64.py
+	templates/gen_inout_fp64/template.frag.mako
+	templates/gen_inout_fp64/template.vert.mako
+	templates/gen_inout_fp64/vs-out-fs-in_template.mako
+	)
+piglit_make_generated_tests(
 	conversion_fp64.list
 	gen_conversion_fp64.py
 	templates/gen_conversion_fp64/base.frag.mako
@@ -196,6 +203,7 @@ add_custom_target(gen-gl-tests
 			builtin_uniform_tests_fp64.list
 			constant_array_size_tests_fp64.list
 			flat_interpolation_qualifier_fp64.list
+			inout_fp64.list
 			conversion_fp64.list
 			shader_precision_tests.list
 			shader_image_load_store_tests.list
