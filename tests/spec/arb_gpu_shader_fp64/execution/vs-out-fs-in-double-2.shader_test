@@ -1,35 +1,34 @@
-# test emitting a ${type_name} from vs->fs works
+# test emitting a single double from vs->fs works
 # when originally written this failed in varying lowering
 
 [require]
-${require}\
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
 
 [vertex shader]
-${preprocessor}\
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
 
 uniform double arg0;
-
 in vec4 vertex;
-flat out ${type_name} dout1;
-
+flat out double dout1;
 void main()
 {
     gl_Position = vertex;
-    dout1 = ${type_name}(arg0);
+    dout1 = arg0;
 }
 
 [fragment shader]
-${preprocessor}\
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
 
-flat in ${type_name} dout1;
+flat in double dout1;
 uniform double tolerance;
 uniform double expected;
-out vec4 color;
-
 void main()
 {
-    ${type_name} result = trunc(dout1);
-    color = distance(result, ${type_name}(expected)) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    double result = trunc(dout1);
+    gl_FragColor = distance(result, expected) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
 [vertex data]

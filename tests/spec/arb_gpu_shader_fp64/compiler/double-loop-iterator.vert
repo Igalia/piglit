@@ -12,11 +12,11 @@
 void test() {
 
 	double k;
-	dvec4 vertex;
+	vec4 vertex;
 
 	for (k = 0.0lf; k < 1.0lf; k += 0.1lf) {
 		vertex.x += k;
 	}
 
-	gl_Position = vec4(vertex);
+	gl_Position = vertex;
 }
