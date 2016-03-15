@@ -115,12 +115,15 @@ def iter_deqp_test_cases(case_file):
 
 @six.add_metaclass(abc.ABCMeta)
 class DEQPBaseTest(Test):
-    __RESULT_MAP = {"Pass": "pass",
-                    "Fail": "fail",
-                    "QualityWarning": "warn",
-                    "InternalError": "fail",
-                    "Crash": "crash",
-                    "NotSupported": "skip"}
+    __RESULT_MAP = {
+        "Pass": "pass",
+        "Fail": "fail",
+        "QualityWarning": "warn",
+        "InternalError": "fail",
+        "Crash": "crash",
+        "NotSupported": "skip",
+        "ResourceError": "crash",
+    }
 
     @abc.abstractproperty
     def deqp_bin(self):

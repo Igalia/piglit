@@ -28,6 +28,7 @@ tests
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import textwrap
 
 try:
     from unittest import mock
@@ -191,34 +192,35 @@ class TestDEQPBaseTestIntepretResultStatus(object):
     def __init__(self):
         self.inst = None
 
-    __OUT = (
-        "dEQP Core 2014.x (0xcafebabe) starting..\n"
-        "arget implementation = 'DRM'\n"
-        "\n"
-        "Test case 'dEQP-GLES2.functional.shaders.conversions.vector_to_vector.vec3_to_ivec3_fragment'..\n"
-        "Vertex shader compile time = 0.129000 ms\n"
-        "Fragment shader compile time = 0.264000 ms\n"
-        "Link time = 0.814000 ms\n"
-        "Test case duration in microseconds = 487155 us\n"
-        "{stat} ({stat})\n"
-        "\n"
-        "DONE!\n"
-        "\n"
-        "Test run totals:\n"
-        "Passed:        {pass_}/1 (100.0%)\n"
-        "Failed:        {fail}/1 (0.0%)\n"
-        "Not supported: {supp}/1 (0.0%)\n"
-        "Warnings:      {warn}/1 (0.0%)\n"
-    )
+    __OUT = textwrap.dedent("""\
+        dEQP Core 2014.x (0xcafebabe) starting..
+          target implementation = 'DRM'
+
+        Test case 'dEQP-GLES2.functional.shaders.conversions.vector_to_vector.vec3_to_ivec3_fragment'..
+        Vertex shader compile time = 0.129000 ms
+        Fragment shader compile time = 0.264000 ms
+        Link time = 0.814000 ms
+        Test case duration in microseconds = 487155 us
+          {stat} ({stat})
+
+        DONE!
+
+        Test run totals:
+          Passed:        {pass_}/1 (100.0%)
+          Failed:        {fail}/1 (0.0%)
+          Not supported: {supp}/1 (0.0%)
+          Warnings:      {warn}/1 (0.0%)
+        Test run was ABORTED!
+    """)
 
     def __gen_stdout(self, status):
         assert status in ['Fail', 'NotSupported', 'Pass', 'QualityWarning',
-                          'InternalError', 'Crash']
+                          'InternalError', 'Crash', 'ResourceError']
 
         return self.__OUT.format(
             stat=status,
             pass_=1 if status == 'Pass' else 0,
-            fail=1 if status in ['Crash', 'Fail'] else 0,
+            fail=1 if status in ['Crash', 'Fail', 'ResourceError'] else 0,
             supp=1 if status == 'InternalError' else 0,
             warn=1 if status == 'QualityWarning' else 0,
         )
@@ -262,3 +264,9 @@ class TestDEQPBaseTestIntepretResultStatus(object):
         self.inst.result.out = self.__gen_stdout('NotSupported')
         self.inst.interpret_result()
         nt.eq_(self.inst.result.result, 'skip')
+
+    def test_resourceerror(self):
+        """test.deqp.DEQPBaseTest.interpret_result: when ResourceError in result the result is 'crash'"""
+        self.inst.result.out = self.__gen_stdout('ResourceError')
+        self.inst.interpret_result()
+        nt.eq_(self.inst.result.result, 'crash')
