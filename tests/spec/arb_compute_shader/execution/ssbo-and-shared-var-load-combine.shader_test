@@ -1,0 +1,87 @@
+# Verify combining load instructions for SSBO and shared variables
+
+[require]
+GL >= 3.3
+ES >= 3.1
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_atomic_counters: enable
+#extension GL_ARB_shader_storage_buffer_object: enable
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 0) uniform atomic_uint counter;
+layout(std430) buffer SSBO {
+  mat4 mat;
+  mat4 mat1;
+} ssbo;
+uniform mat4 u_mat;
+uniform mat4 u_mat1;
+uniform uint mode;
+
+shared mat4 s_mat;
+shared mat4 s_mat1;
+
+void main()
+{
+  switch (mode) {
+    // SSBO
+    case 0u:
+      ssbo.mat = u_mat;
+      ssbo.mat1 = u_mat1;
+      barrier();
+
+      ssbo.mat1 *= ssbo.mat;
+      ssbo.mat *= ssbo.mat1;
+      ssbo.mat1 *= ssbo.mat;
+      ssbo.mat *= ssbo.mat1;
+
+      break;
+
+    // shared variable
+    case 1u:
+      s_mat = u_mat;
+      s_mat1 = u_mat1;
+      memoryBarrierShared();
+
+      s_mat1 *= s_mat;
+      s_mat *= s_mat1;
+      s_mat1 *= s_mat;
+      s_mat *= s_mat1;
+
+      ssbo.mat = s_mat;
+      break;
+  }
+
+  if (ssbo.mat[0][0] == 1150890541056.0)
+    atomicCounterIncrement(counter);
+
+  if (ssbo.mat[0][1] == 1336307220480.0)
+      atomicCounterIncrement(counter);
+
+  if (ssbo.mat[3][2] == 12217050202112.0)
+    atomicCounterIncrement(counter);
+
+  if (ssbo.mat[3][3] == 13705654829056.0)
+    atomicCounterIncrement(counter);
+}
+
+[test]
+atomic counters 1
+ssbo 128
+
+uniform mat4 u_mat   0.0  1.0  2.0  3.0  4.0  5.0  6.0  7.0  8.0  9.0 10.0 11.0 12.0 13.0 14.0 15.0
+uniform mat4 u_mat1 16.0 17.0 18.0 19.0 20.0 21.0 22.0 23.0 24.0 25.0 26.0 27.0 28.0 29.0 30.0 31.0
+
+uniform uint mode 0
+compute 1 1 1
+probe atomic counter 0 == 4
+
+uniform uint mode 1
+compute 1 1 1
+probe atomic counter 0 == 8
