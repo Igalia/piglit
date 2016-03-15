@@ -124,6 +124,12 @@ piglit_make_generated_tests(
 	templates/gen_inout_fp64/template.shader_test.mako
 	)
 piglit_make_generated_tests(
+	flat_interpolation_qualifier.list
+	gen_flat_interpolation_qualifier.py
+	templates/gen_flat_interpolation_qualifier/compiler.mako
+	templates/gen_flat_interpolation_qualifier/template.frag.mako
+	)
+piglit_make_generated_tests(
 	shader_precision_tests.list
 	gen_shader_precision_tests.py
 	builtin_function.py
@@ -201,6 +207,7 @@ add_custom_target(gen-gl-tests
 			builtin_uniform_tests_fp64.list
 			constant_array_size_tests_fp64.list
 			inout_fp64.list
+			flat_interpolation_qualifier.list
 			shader_precision_tests.list
 			shader_image_load_store_tests.list
 			variable_index_read_tests.list
