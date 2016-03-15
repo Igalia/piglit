@@ -75,6 +75,16 @@ testB
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
 
+[deqp-vk]
+; Path to the deqp-ck executable
+; Can be overwritten by PIGLIT_DEQP_VK_BIN environment variable
+;bin=/home/knuth/Vulkan-CTS/external/vulkancts/modules/vulkan/deqp-vk
+
+; Space-separated list of extra command line arguments for deqp-gles31. The
+; option is not required. The environment variable PIGLIT_DEQP_VK_EXTRA_ARGS
+; overrides the value set here.
+;extra_args=--deqp-visibility hidden
+
 [cts]
 ; path to the cts executable
 ; can be overwritten by PIGLIT_CTS_BIN environment variable
