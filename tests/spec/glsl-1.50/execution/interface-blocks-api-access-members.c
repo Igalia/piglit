@@ -67,16 +67,20 @@ static const char *gstext =
 	"out WithInstArray {\n"
 	"	float e;\n"
 	"	vec3 f;\n"
-	"} instArray[3];\n"
+	"	float g[3];\n"
+	"} instArray[2];\n"
 	"void main()\n"
 	"{\n"
 	"	a = 1.0;\n"
 	"	b = vec3(2.0);\n"
 	"	inst.c = 3.0;\n"
 	"	inst.d = vec3(4.0);\n"
-	"	for(int i = 0; i < 3; i++) {\n"
-	"		instArray[i].e = 5.0 + 2 * i;\n"
-	"		instArray[i].f = vec3(6.0 + 2 * i);\n"
+	"	for(int i = 0; i < 2; i++) {\n"
+	"		instArray[i].e = 5.0 + 5 * i;\n"
+	"		instArray[i].f = vec3(6.0 + 5 * i);\n"
+	"		for(int j = 0; j < 3; j++) {\n"
+	"			instArray[i].g[j] = instArray[i].e + 2.0 + j;\n"
+	"		}\n"
 	"	}\n"
 	"}\n";
 
@@ -88,7 +92,8 @@ static const char *valid_varying_names[] = {
 	"WithInst.c", "WithInst.d",
 	"WithInstArray[0].e", "WithInstArray[0].f",
 	"WithInstArray[1].e", "WithInstArray[1].f",
-	"WithInstArray[2].e", "WithInstArray[2].f"
+	"WithInstArray[0].g[0]", "WithInstArray[0].g[1]", "WithInstArray[0].g[2]",
+	"WithInstArray[1].g[0]", "WithInstArray[1].g[1]", "WithInstArray[1].g[2]"
 };
 
 static const char *invalid_varying_names[] = {
@@ -100,7 +105,8 @@ static const char *invalid_varying_names[] = {
 	"WithInstArray.e", "WithInstArray.f",
 	"instArray[0].e", "instArray[0].f",
 	"instArray[1].e", "instArray[1].f",
-	"instArray[2].e", "instArray[2].f"
+	"instArray[0].g[0]", "instArray[0].g[1]", "WithInstArray[0].g[3]",
+	"instArray[1].g[0]", "instArray[1].g[1]", "instArray[1].g[2]"
 };
 
 void
