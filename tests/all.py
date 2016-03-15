@@ -2419,6 +2419,8 @@ with profile.group_manager(
     g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'gs_max'],
       'arb_enhanced_layouts-transform-feedback-layout-qualifiers_gs_max',
       run_concurrent=False)
+    g(['arb_enhanced_layouts-transform-feedback-layout-query-api'],
+       'transform-feedback-layout-query-api')
 
 # Group ARB_explicit_attrib_location
 with profile.group_manager(
