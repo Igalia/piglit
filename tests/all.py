@@ -2401,6 +2401,24 @@ with profile.group_manager(
         grouptools.join('spec', 'arb_enhanced_layouts')) as g:
     g(['arb_enhanced_layouts-explicit-offset-bufferstorage'],
        'explicit-offset-bufferstorage')
+    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs'],
+      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs',
+      run_concurrent=False)
+    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs_ifc'],
+      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs_interface',
+      run_concurrent=False)
+    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs_named_ifc'],
+      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs_named_interface',
+      run_concurrent=False)
+    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs_struct'],
+      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs_struct',
+      run_concurrent=False)
+    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'gs'],
+      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_gs',
+      run_concurrent=False)
+    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'gs_max'],
+      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_gs_max',
+      run_concurrent=False)
 
 # Group ARB_explicit_attrib_location
 with profile.group_manager(
