@@ -260,9 +260,10 @@ def resultfile():
     with tempfile_.NamedTemporaryFile(mode=_WRITE_MODE, delete=False) as f:
         json.dump(data, f, default=backends.json.piglit_encoder)
 
-    yield f
-
-    os.remove(f.name)
+    try:
+        yield f
+    finally:
+        os.remove(f.name)
 
 
 @contextmanager
@@ -283,17 +284,20 @@ def tempfile(contents):
     temp.write(contents)
     temp.close()
 
-    yield temp.name
-
-    os.remove(temp.name)
+    try:
+        yield temp.name
+    finally:
+        os.remove(temp.name)
 
 
 @contextmanager
 def tempdir():
     """ Creates a temporary directory, returns it, and then deletes it """
     tdir = tempfile_.mkdtemp()
-    yield tdir
-    shutil.rmtree(tdir)
+    try:
+        yield tdir
+    finally:
+        shutil.rmtree(tdir)
 
 
 def nose_generator(func):
