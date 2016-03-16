@@ -151,6 +151,12 @@ class JUnitBackend(FileBackend):
                     err.text += "\n\nWARN: passing test as an expected failure"
                     res = etree.SubElement(element, 'skipped',
                                            message='expected failure')
+                elif expected_result == 'error':
+                    err.text += \
+                        "\n\nERROR: Test should have been crash but was failure"
+                    res = etree.SubElement(element, 'failure',
+                                           message='expected crash, but got '
+                                                   'failure')
                 else:
                     res = etree.SubElement(element, 'failure')
 
@@ -159,6 +165,12 @@ class JUnitBackend(FileBackend):
                     err.text += "\n\nWARN: passing test as an expected crash"
                     res = etree.SubElement(element, 'skipped',
                                            message='expected crash')
+                elif expected_result == 'failure':
+                    err.text += \
+                        "\n\nERROR: Test should have been failure but was crash"
+                    res = etree.SubElement(element, 'crash',
+                                           message='expected failure, but got '
+                                                   'crash')
                 else:
                     res = etree.SubElement(element, 'error')
 
