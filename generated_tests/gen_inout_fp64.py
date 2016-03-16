@@ -24,9 +24,8 @@
 """Generate in/out fp64 tests."""
 
 from __future__ import print_function, division, absolute_import
-import optparse
+import argparse
 import os
-import sys
 import itertools
 
 from templates import template_dir
@@ -106,8 +105,9 @@ def all_compilation_tests(names_only):
                   'dmat4x2', 'dmat4x3', 'dmat4']
     shaders = ['frag', 'vert']
     glsl_ver = ['150', '400']
-    for ver in glsl_ver:
-        utils.safe_makedirs(get_dir_name(ver, 'compiler'))
+    if not names_only:
+        for ver in glsl_ver:
+            utils.safe_makedirs(get_dir_name(ver, 'compiler'))
 
     for t_name, shader, ver in itertools.product(type_names, shaders, glsl_ver):
         yield t_name, shader, ver, names_only
@@ -119,8 +119,9 @@ def all_execution_tests(names_only):
     assert isinstance(names_only, bool)
     type_names = ['double', 'dvec2', 'dvec3', 'dvec4']
     glsl_ver = ['150', '400']
-    for ver in glsl_ver:
-        utils.safe_makedirs(get_dir_name(ver, 'execution'))
+    if not names_only:
+        for ver in glsl_ver:
+            utils.safe_makedirs(get_dir_name(ver, 'execution'))
 
     for t_name, ver in itertools.product(type_names, glsl_ver):
         yield t_name, ver, names_only
@@ -129,27 +130,21 @@ def all_execution_tests(names_only):
 def main():
     """Main function."""
 
-    parser = optparse.OptionParser(
-        description="Generate in/out tests for fp64",
-        usage="usage: %prog [-h] [--names-only]")
-    parser.add_option(
+    parser = argparse.ArgumentParser(
+        description="Generate in/out tests for fp64")
+    parser.add_argument(
         '--names-only',
         dest='names_only',
         action='store_true',
+        default=False,
         help="Don't output files, just generate a list of filenames to stdout")
+    args = parser.parse_args()
 
-    (options, args) = parser.parse_args()
+    for test_args in all_compilation_tests(args.names_only):
+        generate_compilation_tests(*test_args)
 
-    if len(args) != 0:
-        # User gave extra args.
-        parser.print_help()
-        sys.exit(1)
-
-    for args in all_compilation_tests(bool(options.names_only)):
-        generate_compilation_tests(*args)
-
-    for args in all_execution_tests(bool(options.names_only)):
-        generate_execution_tests(*args)
+    for test_args in all_execution_tests(args.names_only):
+        generate_execution_tests(*test_args)
 
 
 if __name__ == '__main__':
