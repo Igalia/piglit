@@ -112,7 +112,7 @@ static GLenum geometry_layout_input_type = GL_TRIANGLES;
 static GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
 static GLint geometry_layout_vertices_out = 0;
 static GLuint atomics_bo = 0;
-static GLuint ssbo = 0;
+static GLuint ssbo[32];
 
 #define SHADER_TYPES 6
 static GLuint *subuniform_locations[SHADER_TYPES];
@@ -2703,7 +2703,7 @@ probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
 }
 
 static bool
-probe_ssbo_uint(GLint ssbo_offset, const char *op, uint32_t value)
+probe_ssbo_uint(GLint ssbo_index, GLint ssbo_offset, const char *op, uint32_t value)
 {
 	uint32_t *p;
 	uint32_t observed;
@@ -2712,7 +2712,7 @@ probe_ssbo_uint(GLint ssbo_offset, const char *op, uint32_t value)
 
 	process_comparison(op, &cmp);
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo[ssbo_index]);
 	p = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_offset,
 			     sizeof(uint32_t), GL_MAP_READ_BIT);
 
@@ -2994,13 +2994,13 @@ piglit_display(void)
 			if (!probe_atomic_counter(x, s, y)) {
 				piglit_report_result(PIGLIT_FAIL);
 			}
-		} else if (sscanf(line, "probe ssbo uint %d %s 0x%x",
-				  &x, s, &y) == 3) {
-			if (!probe_ssbo_uint(x, s, y))
+		} else if (sscanf(line, "probe ssbo uint %d %d %s 0x%x",
+				  &x, &y, s, &z) == 4) {
+			if (!probe_ssbo_uint(x, y, s, z))
 				pass = false;
-		} else if (sscanf(line, "probe ssbo uint %d %s %d",
-				  &x, s, &y) == 3) {
-			if (!probe_ssbo_uint(x, s, y))
+		} else if (sscanf(line, "probe ssbo uint %d %d %s %d",
+				  &x, &y, s, &z) == 4) {
+			if (!probe_ssbo_uint(x, y, s, z))
 				pass = false;
 		} else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
@@ -3075,13 +3075,16 @@ piglit_display(void)
 			glShadeModel(GL_SMOOTH);
 		} else if (string_match("shade model flat", line)) {
 			glShadeModel(GL_FLAT);
-		} else if (sscanf(line, "ssbo %d", &x) == 1) {
-			GLuint *ssbo_init = calloc(x, 1);
-			glGenBuffers(1, &ssbo);
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
-			glBufferData(GL_SHADER_STORAGE_BUFFER, x,
+		} else if (sscanf(line, "ssbo %d %d", &x, &y) == 2) {
+			GLuint *ssbo_init = calloc(y, 1);
+			glGenBuffers(1, &ssbo[x]);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, x, ssbo[x]);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, y,
 				     ssbo_init, GL_DYNAMIC_DRAW);
 			free(ssbo_init);
+		} else if (sscanf(line, "ssbo %d subdata float %d %f", &x, &y, &c[0]) == 3) {
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, 4, &c[0]);
 		} else if (sscanf(line, "texture rgbw %d ( %d", &tex, &w) == 2) {
 			GLenum int_fmt = GL_RGBA;
 			int num_scanned =

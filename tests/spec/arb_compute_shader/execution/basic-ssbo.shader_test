@@ -47,7 +47,7 @@ void main()
 
 [test]
 atomic counters 1
-ssbo 1024
+ssbo 0 1024
 
 uniform uint mode 0
 compute 1 1 1
