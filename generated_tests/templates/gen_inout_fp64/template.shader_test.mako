@@ -2,10 +2,16 @@
 # when originally written this failed in varying lowering
 
 [require]
-${require}\
+GLSL >= ${glsl_version}
+%if glsl_version == '1.50':
+GL_ARB_gpu_shader_fp64
+%endif
 
 [vertex shader]
-${preprocessor}\
+#version ${glsl_version_int}
+%if glsl_version == '1.50':
+#extension GL_ARB_gpu_shader_fp64 : require
+%endif
 
 uniform double arg0;
 
@@ -19,7 +25,10 @@ void main()
 }
 
 [fragment shader]
-${preprocessor}\
+#version ${glsl_version_int}
+%if glsl_version == '1.50':
+#extension GL_ARB_gpu_shader_fp64 : require
+%endif
 
 flat in ${type_name} dout1;
 uniform double tolerance;

@@ -121,7 +121,7 @@ piglit_make_generated_tests(
 	gen_inout_fp64.py
 	templates/gen_inout_fp64/template.frag.mako
 	templates/gen_inout_fp64/template.vert.mako
-	templates/gen_inout_fp64/vs-out-fs-in_template.mako
+	templates/gen_inout_fp64/template.shader_test.mako
 	)
 piglit_make_generated_tests(
 	shader_precision_tests.list
