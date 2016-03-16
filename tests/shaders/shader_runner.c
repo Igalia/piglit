@@ -2893,6 +2893,8 @@ piglit_display(void)
 			do_enable_disable(line + 7, false);
 		} else if (string_match("enable", line)) {
 			do_enable_disable(line + 6, true);
+		} else if (sscanf(line, "depthfunc %31s", s) == 1) {
+			glDepthFunc(piglit_get_gl_enum_from_name(s));
 		} else if (sscanf(line, "fb tex 2d %d", &tex) == 1) {
 			GLenum status;
 			GLint tex_num;
