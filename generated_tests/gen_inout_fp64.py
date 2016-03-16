@@ -67,8 +67,8 @@ def generate_compilation_tests(type_name, shader, ver, names_only):
         with open(filename, 'w') as test_file:
             test_file.write(TEMPLATES.get_template(
                 'template.{0}.mako'.format(shader)).render_unicode(
-                    glsl_version = '{}.{}'.format(ver[0], ver[1:]),
-                    glsl_version_int = ver,
+                    glsl_version='{}.{}'.format(ver[0], ver[1:]),
+                    glsl_version_int=ver,
                     type_name=type_name,
                     extra_params=',0.0' if type_name in ['dvec2', 'dvec3'] else ''))
 
@@ -90,8 +90,8 @@ def generate_execution_tests(type_name, ver, names_only):
         with open(filename, 'w') as test_file:
             test_file.write(TEMPLATES.get_template(
                 'template.shader_test.mako').render_unicode(
-                    glsl_version = '{}.{}'.format(ver[0], ver[1:]),
-                    glsl_version_int = ver,
+                    glsl_version='{}.{}'.format(ver[0], ver[1:]),
+                    glsl_version_int=ver,
                     type_name=type_name))
 
 
