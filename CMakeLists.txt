@@ -216,7 +216,7 @@ else ()
 	find_package(PythonMako 0.8.0 REQUIRED)
 endif (PYTHON_VERSION_STRING VERSION_GREATER 3.4.999999)
 
-find_package(bash-completion CONFIG)
+find_package(bash-completion NO_MODULE)
 
 # Default to compiling with debug information (`gcc -g`):
 if(NOT CMAKE_BUILD_TYPE)
