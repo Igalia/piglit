@@ -3,6 +3,8 @@
 // glsl_version: 1.20
 // [end config]
 
+#version 120
+
 void main() {
 	vec4 f = vec4(1e5f, -1e5f, 1e-5f, -1e-5f);
 	vec4 g = vec4(1e5F, -1e5F, 1e-5F, -1e-5F);
