@@ -1186,6 +1186,8 @@ with profile.group_manager(
     g(['array-depth-roundtrip'], run_concurrent=False)
     g(['depth-cube-map'], run_concurrent=False)
     g(['sampler-cube-shadow'], run_concurrent=False)
+    g(['generatemipmap-base-change', 'size'])
+    g(['generatemipmap-base-change', 'format'])
     g(['generatemipmap-cubemap'])
 
 with profile.group_manager(
