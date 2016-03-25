@@ -31,12 +31,16 @@ capture -h/--help and the results will not be useful.
 
 """
 
-from __future__ import print_function
-
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
+import argparse
 import os
 import os.path as path
 import sys
-import argparse
+
+import six
+
 
 def setup_module_search_path():
     """Add Piglit's data directory to Python's module search path.
@@ -110,6 +114,11 @@ import framework.programs.summary as summary
 
 def main():
     """ Parse argument and call other executables """
+    if six.PY2:
+        input_ = [i.decode('utf-8') for i in sys.argv[1:]]
+    elif six.PY3:
+        input_ = sys.argv[1:]
+
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
 
@@ -147,7 +156,7 @@ def main():
     # Parse the known arguments (piglit run or piglit summary html for
     # example), and then pass the arguments that this parser doesn't know about
     # to that executable
-    parsed, args = parser.parse_known_args()
+    parsed, args = parser.parse_known_args(input_)
     returncode = parsed.func(args)
     sys.exit(returncode)
 

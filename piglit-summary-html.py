@@ -22,7 +22,11 @@
 
 """ Deprecated compatability wrapper for html summary """
 
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import sys
+
 from framework.programs.summary import html
 
-html(sys.argv[1:])
+html([i.decode('utf-8') for i in sys.argv[1:]])

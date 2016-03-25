@@ -26,7 +26,11 @@ Deprecated compatability wrapper
 
 """
 
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import sys
+
 from framework.programs.run import run
 
-run(sys.argv[1:])
+run([i.decode('utf-8') for i in sys.argv[1:]])

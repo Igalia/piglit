@@ -22,7 +22,9 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-from __future__ import print_function
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
 import argparse
 import sys
 import os
@@ -36,6 +38,7 @@ from framework.test import Test, GleanTest
 
 
 def main():
+    input_ = [i.decode('utf-8') for i in sys.argv[1:]]
     parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument("-t", "--include-tests",
                         default=[],
@@ -52,7 +55,7 @@ def main():
     parser.add_argument("testProfile",
                         metavar="<Path to testfile>",
                         help="Path to results folder")
-    args = parser.parse_args()
+    args = parser.parse_args(input_)
 
     options.OPTIONS.exclude_filter = args.exclude_tests
     options.OPTIONS.include_filter = args.include_tests
