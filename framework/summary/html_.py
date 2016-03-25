@@ -51,9 +51,16 @@ _TEMP_DIR = os.path.join(
     tempfile.gettempdir(),
     "piglit-{}".format(getpass.getuser()),
     'version-{}'.format(sys.version.split()[0]))
+
 _TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), '../..', 'templates')
+
+# To ease the bytes/str/uincode between python 2 and python 3 the
+# output_encoding keyword is set below. This means that in both python 2 and 3
+# bytes are returned. This means that the files need to be opened in bytes mode
+# ('wb').
 _TEMPLATES = TemplateLookup(
     _TEMPLATE_DIR,
+    output_encoding='utf-8',
     module_directory=os.path.join(_TEMP_DIR, "html-summary"))
 
 
@@ -85,7 +92,7 @@ def _make_testrun_info(results, destination, exclude=None):
             else:
                 raise e
 
-        with open(os.path.join(destination, name, "index.html"), 'w') as out:
+        with open(os.path.join(destination, name, "index.html"), 'wb') as out:
             out.write(_TEMPLATES.get_template('testrun_info.mako').render(
                 name=each.name,
                 totals=each.totals['root'],
@@ -109,7 +116,7 @@ def _make_testrun_info(results, destination, exclude=None):
                 if not os.path.exists(temp_path):
                     os.makedirs(temp_path)
 
-                with open(html_path, 'w') as out:
+                with open(html_path, 'wb') as out:
                     out.write(_TEMPLATES.get_template(
                         'test_result.mako').render(
                             testname=key,
@@ -126,7 +133,7 @@ def _make_comparison_pages(results, destination, exclude):
     # Index.html is a bit of a special case since there is index, all, and
     # alltests, where the other pages all use the same name. ie,
     # changes.html, changes, and page=changes.
-    with open(os.path.join(destination, "index.html"), 'w') as out:
+    with open(os.path.join(destination, "index.html"), 'wb') as out:
         out.write(_TEMPLATES.get_template('index.mako').render(
             results=results,
             page='all',
@@ -135,7 +142,7 @@ def _make_comparison_pages(results, destination, exclude):
 
     # Generate the rest of the pages
     for page in pages:
-        with open(os.path.join(destination, page + '.html'), 'w') as out:
+        with open(os.path.join(destination, page + '.html'), 'wb') as out:
             # If there is information to display display it
             if sum(getattr(results.counts, page)) > 0:
                 out.write(_TEMPLATES.get_template('index.mako').render(
@@ -153,7 +160,7 @@ def _make_comparison_pages(results, destination, exclude):
 def _make_feature_info(results, destination):
     """Create the feature readiness page."""
 
-    with open(os.path.join(destination, "feature.html"), 'w') as out:
+    with open(os.path.join(destination, "feature.html"), 'wb') as out:
         out.write(_TEMPLATES.get_template('feature.mako').render(
             results=results))
 
