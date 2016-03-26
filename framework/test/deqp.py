@@ -26,10 +26,11 @@ import os
 import subprocess
 
 import six
+from six.moves import range
 
 from framework import core, grouptools, exceptions
 from framework.profile import TestProfile
-from framework.test.base import Test, is_crash_returncode
+from framework.test.base import Test, is_crash_returncode, TestRunError
 
 __all__ = [
     'DEQPBaseTest',
@@ -177,3 +178,12 @@ class DEQPBaseTest(Test):
         # We failed to parse the test output. Fallback to 'fail'.
         if self.result.result == 'notrun':
             self.result.result = 'fail'
+
+    def _run_command(self):
+        """Rerun the command if X11 connection failure happens."""
+        for _ in range(5):
+            super(DEQPBaseTest, self)._run_command()
+            if "FATAL ERROR: Failed to open display" not in self.result.err:
+                return
+
+        raise TestRunError('Failed to connect to X server 5 times', 'fail')
