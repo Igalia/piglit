@@ -254,11 +254,13 @@ test_max_dimensions(const struct image_format_info *format,
 			const struct image_extent size =
 					get_test_extent(target, d);
 
-			subtest(status,
-				!quick &&
-				is_test_reasonable(!slow, size) &&
-				is_format_interesting(format, slow) &&
-				is_stage_interesting(stage, slow),
+			if (quick ||
+			    !is_test_reasonable(!slow, size) ||
+			    !is_format_interesting(format, slow) ||
+			    !is_stage_interesting(stage, slow))
+				continue;
+
+			subtest(status, true,
 				run_test(format, target, size),
 				"%s/%s/image%s max size test/%dx%dx%dx%d",
 				format->name, stage->name, target->name,
@@ -278,9 +280,11 @@ test_small_dimensions(const struct image_format_info *format,
 			image_extent_for_target(target,
 						16, 96);
 
-	subtest(status,
-		is_format_interesting(format, slow) &&
-		is_stage_interesting(stage, slow),
+	if (!is_format_interesting(format, slow) ||
+	    !is_stage_interesting(stage, slow))
+		return;
+
+	subtest(status, true,
 		run_test(format, target, size),
 		"%s/%s/image%s size test/%dx%dx%dx%d",
 		format->name, stage->name, target->name,
