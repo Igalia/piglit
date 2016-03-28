@@ -45,34 +45,42 @@ PIGLIT_GL_TEST_CONFIG_END
 #define H 6
 
 static bool
-check_unorm(const uint32_t *data, const char *name)
+check_unorm(const uint8_t *data, const char *name)
 {
-	static const uint32_t colors[] = {
-		0x000000ff,
-		0xffffffff,
-		0x00ff0000,
-		0x0000ff00
+	static const uint8_t colors[4][4] = {
+		{0xff, 0x00, 0x00, 0x00},
+		{0xff, 0xff, 0xff, 0xff},
+		{0x00, 0x00, 0xff, 0x00},
+		{0x00, 0xff, 0x00, 0x00}
 	};
 	int x, y;
 
 	for (y = 0; y < H; y++) {
 		for (x = 0; x < W; x++) {
 			int i = (y >= H / 2) * 2 + (x >= W / 2);
-			uint32_t expected = colors[i];
+			const uint8_t *expected = &colors[i][0];
+			const uint8_t *observed = &data[(y * W + x) * 4];
 
-			if (data[y * W + x] != expected) {
+			if (expected[0] != observed[0] ||
+			    expected[1] != observed[1] ||
+			    expected[2] != observed[2] ||
+			    expected[3] != observed[3]) {
 				fprintf(stderr,
-					"%s pixel value read at (%d, %d) was "
-					"0x%08x, expected 0x%08x\n",
-					name, x, y, data[y * W + x], expected);
-				fprintf(stderr, "\n");
+					"%s pixel value read at (%d, %d)\n", name, x, y);
+				fprintf(stderr,
+					"  Expected: b = 0x%02x  g = 0x%02x  r = 0x%02x  a = 0x%02x\n",
+						expected[0], expected[1], expected[2], expected[3]);
+				fprintf(stderr,
+					"  Observed: b = 0x%02x  g = 0x%02x  r = 0x%02x  a = 0x%02x\n",
+						observed[0], observed[1], observed[2], observed[3]);
 
 				for (y = 0; y < H; y++) {
 					for (x = 0; x < W; x++) {
-						fprintf(stderr, "0x%08x ",
-							data[y * W + x]);
+						observed = &data[(y * W + x) * 4];
+						fprintf(stderr,
+								"b = 0x%02x  g = 0x%02x  r = 0x%02x  a = 0x%02x\n",
+								observed[0], observed[1], observed[2], observed[3]);
 					}
-					fprintf(stderr, "\n");
 				}
 
 				piglit_report_subtest_result(PIGLIT_FAIL,
@@ -135,7 +143,7 @@ piglit_display(void)
 {
 	bool pass = true;
 	GLuint pbo;
-	uint32_t bgra_unorm[W * H];
+	uint8_t bgra_unorm[W * H * 4];
 	float rgba_float[W * H * 4];
 	void *map;
 
