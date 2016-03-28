@@ -43,12 +43,16 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 static GLboolean
-probe(int x, int y, uint32_t expected, uint32_t observed)
+probe(int x, int y, uint8_t *expected, uint8_t *observed)
 {
-	if ((expected & 0xffffff) != (observed & 0xffffff)) {
+	if (expected[0] != observed[0] ||
+	    expected[1] != observed[1] ||
+	    expected[2] != observed[2]) {
 		printf("Probe color at (%i,%i)\n", x, y);
-		printf("  Expected: 0x%08x\n", expected);
-		printf("  Observed: 0x%08x\n", observed);
+		printf("  Expected: b = 0x%02x  g = 0x%02x  r = 0x%02x  a = 0x%02x\n",
+				expected[0], expected[1], expected[2], expected[3]);
+		printf("  Observed: b = 0x%02x  g = 0x%02x  r = 0x%02x  a = 0x%02x\n",
+				observed[0], observed[1], observed[2], observed[3]);
 
 		return GL_FALSE;
 	} else {
@@ -62,7 +66,9 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	static float red[]   = {1.0, 0.0, 0.0, 0.0};
 	static float green[] = {0.0, 1.0, 0.0, 0.0};
-	uint32_t *addr;
+	uint8_t *addr;
+	static uint8_t exp_green[] = {0x00, 0xFF, 0x00, 0x00};
+	static uint8_t exp_red[]   = {0x00, 0x00, 0xFF, 0x00};
 	GLuint pbo;
 
 	glGenBuffersARB(1, &pbo);
@@ -84,8 +90,8 @@ piglit_display(void)
 
 	addr = glMapBufferARB(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY_ARB);
 
-	pass &= probe(10, 10, 0x0000ff00, addr[0]);
-	pass &= probe(10, 10, 0x00ff0000, addr[1]);
+	pass &= probe(10, 10, exp_green, addr);
+	pass &= probe(10, 10, exp_red, addr + 4);
 
 	glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
 
