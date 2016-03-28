@@ -80,12 +80,16 @@ make_fbo(GLuint *fbo, GLuint *tex)
 }
 
 static GLboolean
-probe(int x, int y, uint32_t expected, uint32_t observed)
+probe(int x, int y, uint8_t *expected, uint8_t *observed)
 {
-	if ((expected & 0xffffff) != (observed & 0xffffff)) {
+	if (expected[0] != observed[0] ||
+	    expected[1] != observed[1] ||
+	    expected[2] != observed[2]) {
 		printf("Probe color at (%i,%i)\n", x, y);
-		printf("  Expected: 0x%08x\n", expected);
-		printf("  Observed: 0x%08x\n", observed);
+		printf("  Expected: b = 0x%02x  g = 0x%02x  r = 0x%02x  a = 0x%02x\n",
+				expected[0], expected[1], expected[2], expected[3]);
+		printf("  Observed: b = 0x%02x  g = 0x%02x  r = 0x%02x  a = 0x%02x\n",
+				observed[0], observed[1], observed[2], observed[3]);
 
 		return GL_FALSE;
 	} else {
@@ -98,7 +102,9 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLuint fbo, tex, pbo;
-	uint32_t *addr;
+	uint8_t *addr;
+	static uint8_t green[] = {0x00, 0xFF, 0x00, 0x00};
+	static uint8_t blue[]  = {0xFF, 0x00, 0x00, 0x00};
 
 	make_fbo(&fbo, &tex);
 
@@ -122,24 +128,25 @@ piglit_display(void)
 	glReadPixels(0, 0, 2, 2,
 		     GL_BGRA, GL_UNSIGNED_BYTE, (void *)(uintptr_t)0);
 	addr = glMapBufferARB(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY_ARB);
-	pass &= probe(0, 0, 0x0000ff00, addr[0]);
-	pass &= probe(1, 0, 0x0000ff00, addr[1]);
-	pass &= probe(0, 1, 0x000000ff, addr[2]);
-	pass &= probe(1, 1, 0x000000ff, addr[3]);
+
+	pass &= probe(0, 0, green, addr);
+	pass &= probe(1, 0, green, addr + 4);
+	pass &= probe(0, 1, blue,  addr + 8);
+	pass &= probe(1, 1, blue,  addr + 12);
 	glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
 
 	/* Read with an offset. */
 	glReadPixels(1, 0, 1, 1,
 		     GL_BGRA, GL_UNSIGNED_BYTE, (void *)(uintptr_t)4);
 	addr = glMapBufferARB(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY_ARB);
-	pass &= probe(1, 0, 0x0000ff00, addr[1]);
+	pass &= probe(1, 0, green, addr + 4);
 	glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
 
 	/* Read with an offset. */
 	glReadPixels(1, 1, 1, 1,
 		     GL_BGRA, GL_UNSIGNED_BYTE, (void *)(uintptr_t)4);
 	addr = glMapBufferARB(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY_ARB);
-	pass &= probe(1, 1, 0x000000ff, addr[1]);
+	pass &= probe(1, 1, blue, addr + 4);
 	glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
 
 	glDeleteBuffersARB(1, &pbo);
