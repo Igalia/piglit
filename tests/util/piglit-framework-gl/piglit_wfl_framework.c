@@ -161,105 +161,31 @@ concat_attrib_lists(const int32_t a[], const int32_t b[])
 }
 
 /**
- * Return a human-readable description of the context specified by an \a
- * attrib_list suitable for waffle_config_choose(). At most \a bufsize bytes,
- * including the terminal null, are written to \a buf.
- */
-static void
-make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[],
-			 enum context_flavor flavor)
-{
-	int32_t api = 0, profile = 0, major_version = 0, minor_version = 0,
-		fwd_compat = 0, debug = 0;
-	const char *api_str = NULL, *profile_str = NULL, *fwd_compat_str = NULL,
-	           *debug_str = NULL;
-
-	if (bufsize == 0) {
-		return;
-	}
-
-	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_API, &api);
-	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_PROFILE, &profile);
-	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MAJOR_VERSION, &major_version);
-	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MINOR_VERSION, &minor_version);
-	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_FORWARD_COMPATIBLE, &fwd_compat);
-	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_DEBUG, &debug);
-
-	switch (api) {
-	case WAFFLE_CONTEXT_OPENGL:
-		api_str = "OpenGL";
-		break;
-	case WAFFLE_CONTEXT_OPENGL_ES1:
-	case WAFFLE_CONTEXT_OPENGL_ES2:
-	case WAFFLE_CONTEXT_OPENGL_ES3:
-		api_str = "OpenGL ES";
-		break;
-	default:
-		assert(0);
-		break;
-	}
-
-	switch (profile) {
-	default:
-		assert(0);
-		break;
-	case WAFFLE_CONTEXT_CORE_PROFILE:
-		profile_str = "Core ";
-		break;
-	case WAFFLE_CONTEXT_COMPATIBILITY_PROFILE:
-		profile_str = "Compatibility ";
-		break;
-	case 0:
-		switch (flavor) {
-			default:
-				assert(0);
-				break;
-			case CONTEXT_GL_CORE:
-				profile_str = "Core ";
-				break;
-			case CONTEXT_GL_COMPAT:
-				profile_str = "Compatibility ";
-				break;
-			case CONTEXT_GL_ES:
-				profile_str = "";
-				break;
-		}
-		break;
-	}
-
-	if (fwd_compat) {
-		fwd_compat_str = "Forward-Compatible ";
-	} else {
-		fwd_compat_str = "";
-	}
-
-	if (debug) {
-		debug_str = "Debug ";
-	} else {
-		debug_str = "";
-	}
-
-	snprintf(buf, bufsize, "%s %d.%d %s%s%sContext",
-		api_str, major_version, minor_version, fwd_compat_str,
-		profile_str, debug_str);
-}
-
-/**
- * \brief Return a attribute list suitable for waffle_config_choose().
+ * \brief Construct human-readable description of the context and an
+ * attribute list suitable for waffle_config_choose().
  *
  * The function deduces the values of WAFFLE_CONTEXT_API,
  * WAFFLE_CONTEXT_PROFILE, WAFFLE_CONTEXT_MAJOR_VERSION,
  * WAFFLE_CONTEXT_MINOR_VERSION, WAFFLE_CONTEXT_FORWARD_COMPATIBLE and
  * WAFFLE_CONTEXT_DEBUG from the given context \a flavor and \a
- * test_config. The \a partial_attrib_list must not contain any of those
+ * test_config. At the same time, it produces human-readable description
+ * of the context. At most \a bufsize bytes, including the terminal null,
+ * are written to \a buf.
+ *
+ * The \a partial_attrib_list must not contain any of those
  * attributes. Any attributes in \a partial_attrib_list are added to the
- * returned attribute list.
+ * returned attribute list \a attrib_list.
  */
-static int32_t*
-make_config_attrib_list(const struct piglit_gl_test_config *test_config,
-              	        enum context_flavor flavor,
-              	        const int32_t partial_attrib_list[])
+static void
+parse_test_config(const struct piglit_gl_test_config *test_config,
+                  enum context_flavor flavor,
+                  char buf[], size_t bufsize,
+                  const int32_t partial_attrib_list[],
+                  const int32_t *attrib_list[])
 {
+	const char *api_str, *profile_str = "", *fwd_compat_str = "",
+	           *debug_str = "";
+	int32_t major_version, minor_version;
 	int32_t head_attrib_list[64];
 	int32_t junk;
 	int i;
@@ -278,38 +204,46 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 			assert(test_config->supports_gl_core_version);
 
 			i = 0;
+			api_str = "OpenGL";
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL;
 
+			profile_str = "Core ";
 			if (test_config->supports_gl_core_version >= 32) {
 				head_attrib_list[i++] = WAFFLE_CONTEXT_PROFILE;
 				head_attrib_list[i++] = WAFFLE_CONTEXT_CORE_PROFILE;
 			}
 
+			major_version = test_config->supports_gl_core_version / 10;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
-			head_attrib_list[i++] = test_config->supports_gl_core_version / 10;
+			head_attrib_list[i++] = major_version;
 
+			minor_version = test_config->supports_gl_core_version % 10;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
-			head_attrib_list[i++] = test_config->supports_gl_core_version % 10;
+			head_attrib_list[i++] = minor_version;
 			break;
 
 		case CONTEXT_GL_COMPAT:
 			assert(test_config->supports_gl_compat_version);
 
 			i = 0;
+			api_str = "OpenGL";
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL;
 
+			profile_str = "Compatibility ";
 			if (test_config->supports_gl_compat_version >= 32) {
 				head_attrib_list[i++] = WAFFLE_CONTEXT_PROFILE;
 				head_attrib_list[i++] = WAFFLE_CONTEXT_COMPATIBILITY_PROFILE;
 			}
 
+			major_version = test_config->supports_gl_compat_version / 10;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
-			head_attrib_list[i++] = test_config->supports_gl_compat_version / 10;
+			head_attrib_list[i++] = major_version;
 
+			minor_version = test_config->supports_gl_compat_version % 10;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
-			head_attrib_list[i++] = test_config->supports_gl_compat_version % 10;
+			head_attrib_list[i++] = minor_version;
 			break;
 
 		case CONTEXT_GL_ES: {
@@ -332,12 +266,17 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 			}
 
 			i = 0;
+			api_str = "OpenGL ES";
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = waffle_context_api;
+
+			major_version = test_config->supports_gl_es_version / 10;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
-			head_attrib_list[i++] = test_config->supports_gl_es_version / 10;
+			head_attrib_list[i++] = major_version;
+
+			minor_version = test_config->supports_gl_es_version % 10;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
-			head_attrib_list[i++] = test_config->supports_gl_es_version % 10;
+			head_attrib_list[i++] = minor_version;
 			break;
 			}
 
@@ -354,17 +293,28 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 	if (test_config->require_forward_compatible_context ||
 	    (flavor == CONTEXT_GL_CORE &&
 	     test_config->supports_gl_core_version == 31)) {
+		fwd_compat_str = "Forward-Compatible ";
+
 		head_attrib_list[i++] = WAFFLE_CONTEXT_FORWARD_COMPATIBLE;
 		head_attrib_list[i++] = true;
 	}
 
 	if (test_config->require_debug_context) {
+		debug_str = "Debug ";
+
 		head_attrib_list[i++] = WAFFLE_CONTEXT_DEBUG;
 		head_attrib_list[i++] = true;
 	}
 
 	head_attrib_list[i++] = 0;
-	return concat_attrib_lists(head_attrib_list, partial_attrib_list);
+
+	if (bufsize != 0) {
+		snprintf(buf, bufsize, "%s %d.%d %s%s%sContext",
+			api_str, major_version, minor_version, fwd_compat_str,
+			profile_str, debug_str);
+	}
+
+	*attrib_list = concat_attrib_lists(head_attrib_list, partial_attrib_list);
 }
 
 /**
@@ -513,11 +463,9 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 	assert(wfl_fw->context == NULL);
 	assert(wfl_fw->window == NULL);
 
-	attrib_list = make_config_attrib_list(test_config, flavor,
-					      partial_config_attrib_list);
+	parse_test_config(test_config, flavor, ctx_desc, sizeof(ctx_desc),
+			  partial_config_attrib_list, &attrib_list);
 	assert(attrib_list);
-	make_context_description(ctx_desc, sizeof(ctx_desc),
-				 attrib_list, flavor);
 	wfl_fw->config = waffle_config_choose(wfl_fw->display, attrib_list);
 	free(attrib_list);
 	if (!wfl_fw->config) {
