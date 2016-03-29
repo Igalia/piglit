@@ -270,6 +270,8 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_PROFILE, &junk) == false);
 	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_MAJOR_VERSION, &junk) == false);
 	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_MINOR_VERSION, &junk) == false);
+	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_FORWARD_COMPATIBLE, &junk) == false);
+	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_DEBUG, &junk) == false);
 
 	switch (flavor) {
 		case CONTEXT_GL_CORE:
