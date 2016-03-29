@@ -80,7 +80,7 @@ static const char *frag_shader_biased =
  "uniform samplerCubeArray tex; \n"
  "void main()\n"
  "{\n"
- " gl_FragColor = texture(tex, gl_TexCoord[0], 3.0f);\n"
+ " gl_FragColor = texture(tex, gl_TexCoord[0], 3.0);\n"
  "}\n";
 
 static const char *frag_shader_explicit =
@@ -88,7 +88,7 @@ static const char *frag_shader_explicit =
  "uniform samplerCubeArray tex; \n"
  "void main()\n"
  "{\n"
- " gl_FragColor = textureLod(tex, gl_TexCoord[0], 3.0f);\n"
+ " gl_FragColor = textureLod(tex, gl_TexCoord[0], 3.0);\n"
  "}\n";
 
 static GLuint frag_shader_cube_array_biased;
