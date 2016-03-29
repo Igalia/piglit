@@ -154,9 +154,11 @@ concat_attrib_lists(const int32_t a[], const int32_t b[])
 	int b_copy_size = 2 * b_length * sizeof(int32_t);
 
 	int32_t *r = calloc(1, r_size);
-	memcpy(r, a, a_copy_size);
-	memcpy(r + 2 * a_length, b, b_copy_size);
-	r[2 * r_length] = 0;
+	if (r) {
+		memcpy(r, a, a_copy_size);
+		memcpy(r + 2 * a_length, b, b_copy_size);
+		r[2 * r_length] = 0;
+	}
 	return r;
 }
 
