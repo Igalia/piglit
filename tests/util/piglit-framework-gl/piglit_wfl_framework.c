@@ -247,9 +247,10 @@ make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[]
 /**
  * \brief Return a attribute list suitable for waffle_config_choose().
  *
- * The funcion deduces the values of WAFFLE_CONTEXT_API,
- * WAFFLE_CONTEXT_PROFILE, WAFFLE_CONTEXT_MAJOR_VERSION, and
- * WAFFLE_CONTEXT_MINOR_VERSION from the given context \a flavor and \a
+ * The function deduces the values of WAFFLE_CONTEXT_API,
+ * WAFFLE_CONTEXT_PROFILE, WAFFLE_CONTEXT_MAJOR_VERSION,
+ * WAFFLE_CONTEXT_MINOR_VERSION, WAFFLE_CONTEXT_FORWARD_COMPATIBLE and
+ * WAFFLE_CONTEXT_DEBUG from the given context \a flavor and \a
  * test_config. The \a partial_attrib_list must not contain any of those
  * attributes. Any attributes in \a partial_attrib_list are added to the
  * returned attribute list.
