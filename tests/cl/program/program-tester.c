@@ -345,7 +345,7 @@ struct test_arg {
 	uint64_t ulp;
 
 	/* image data */
-	cl_image_desc   image_desc;
+	piglit_image_desc   image_desc;
 	cl_image_format image_format;
 
 	/* sampler data */

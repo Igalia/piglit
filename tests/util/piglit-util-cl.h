@@ -527,6 +527,24 @@ bool
 piglit_cl_read_whole_buffer(cl_command_queue command_queue,
                             cl_mem buffer,
                             void *ptr);
+#ifdef CL_VERSION_1_2
+typedef cl_image_desc piglit_image_desc;
+#else
+/** Taken from OpenCL 1.2 specs 5.3.1.2 */
+typedef struct {
+	cl_mem_object_type image_type;
+	size_t             image_width;
+	size_t             image_height;
+	size_t             image_depth;
+	size_t             image_array_size;
+	size_t             image_row_pitch;
+	size_t             image_slice_pitch;
+	cl_uint            num_mip_levels;
+	cl_uint            num_samples;
+	cl_mem             buffer;
+} piglit_image_desc;
+#endif
+
 
 /**
  * \brief Create an image.
@@ -541,7 +559,7 @@ cl_mem
 piglit_cl_create_image(piglit_cl_context context,
                        cl_mem_flags flags,
                        const cl_image_format *format,
-                       const cl_image_desc *desc);
+                       const piglit_image_desc *desc);
 
 /**
  * \brief Blocking write to an image.

@@ -1006,14 +1006,18 @@ piglit_cl_read_whole_buffer(cl_command_queue command_queue, cl_mem buffer,
 
 cl_mem
 piglit_cl_create_image(piglit_cl_context context, cl_mem_flags flags,
-                       const cl_image_format *format, const cl_image_desc *desc)
+                       const cl_image_format *format,
+                       const piglit_image_desc *desc)
 {
 	cl_int errNo;
 	cl_mem image = NULL;
 
+#ifdef CL_VERSION_1_2
 	if (piglit_cl_get_platform_version(context->platform_id) >= 12) {
 		image = clCreateImage(context->cl_ctx, flags, format, desc, NULL, &errNo);
-	} else if (desc->image_type == CL_MEM_OBJECT_IMAGE2D) {
+	} else
+#endif
+	if (desc->image_type == CL_MEM_OBJECT_IMAGE2D) {
 		image = clCreateImage2D(context->cl_ctx, flags, format,
 		                        desc->image_width, desc->image_height, 0,
 		                        NULL, &errNo);
@@ -1068,11 +1072,27 @@ piglit_get_image_region(cl_mem image, size_t *region)
 	free(p);
 
 	switch (*type) {
+#ifdef CL_VERSION_1_2
+		case CL_MEM_OBJECT_IMAGE1D_ARRAY:
+			p = piglit_cl_get_image_info(image, CL_IMAGE_ARRAY_SIZE);
+			region[1] = *p;
+			free(p);
+			region[2] = 1;
+			break;
 		case CL_MEM_OBJECT_IMAGE1D:
 		case CL_MEM_OBJECT_IMAGE1D_BUFFER:
 			region[1] = 1;
 			region[2] = 1;
 			break;
+		case CL_MEM_OBJECT_IMAGE2D_ARRAY:
+			p = piglit_cl_get_image_info(image, CL_IMAGE_HEIGHT);
+			region[1] = *p;
+			free(p);
+			p = piglit_cl_get_image_info(image, CL_IMAGE_ARRAY_SIZE);
+			region[2] = *p;
+			free(p);
+			break;
+#endif
 		case CL_MEM_OBJECT_IMAGE2D:
 			p = piglit_cl_get_image_info(image, CL_IMAGE_HEIGHT);
 			region[1] = *p;
@@ -1084,20 +1104,6 @@ piglit_get_image_region(cl_mem image, size_t *region)
 			region[1] = *p;
 			free(p);
 			p = piglit_cl_get_image_info(image, CL_IMAGE_DEPTH);
-			region[2] = *p;
-			free(p);
-			break;
-		case CL_MEM_OBJECT_IMAGE1D_ARRAY:
-			p = piglit_cl_get_image_info(image, CL_IMAGE_ARRAY_SIZE);
-			region[1] = *p;
-			free(p);
-			region[2] = 1;
-			break;
-		case CL_MEM_OBJECT_IMAGE2D_ARRAY:
-			p = piglit_cl_get_image_info(image, CL_IMAGE_HEIGHT);
-			region[1] = *p;
-			free(p);
-			p = piglit_cl_get_image_info(image, CL_IMAGE_ARRAY_SIZE);
 			region[2] = *p;
 			free(p);
 			break;
