@@ -30,10 +30,9 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
-from framework import options
+from framework import options, profile
 from framework.programs import parsers
 from framework.test import Test, GleanTest
-import framework.profile
 
 
 def main():
@@ -63,7 +62,7 @@ def main():
     piglit_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
 
-    profile = framework.profile.load_test_profile(args.testProfile)
+    profile_ = profile.load_test_profile(args.testProfile)
 
     def getCommand(test):
         command = ''
@@ -78,8 +77,8 @@ def main():
         command += ' '.join(testCommand)
         return command
 
-    profile._prepare_test_list()
-    for name, test in profile.test_list.items():
+    profile_._prepare_test_list()
+    for name, test in profile_.test_list.items():
         assert(isinstance(test, Test))
         print(name, ':::', getCommand(test))
 
