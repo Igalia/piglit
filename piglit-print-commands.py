@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
