@@ -30,6 +30,8 @@ import argparse
 import os
 import sys
 
+import six
+
 sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 from framework import options, profile
 from framework.programs import parsers
@@ -53,7 +55,11 @@ def get_command(test, piglit_dir):
 
 def main():
     """The main function."""
-    input_ = [i.decode('utf-8') for i in sys.argv[1:]]
+    if six.PY2:
+        input_ = [i.decode('utf-8') for i in sys.argv[1:]]
+    elif six.PY3:
+        input_ = sys.argv[1:]
+
     parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument("-t", "--include-tests",
                         default=[],
@@ -82,7 +88,7 @@ def main():
     profile_ = profile.load_test_profile(args.testProfile)
 
     profile_._prepare_test_list()
-    for name, test in profile_.test_list.items():
+    for name, test in six.iteritems(profile_.test_list):
         assert isinstance(test, Test)
         print(name, ':::', get_command(test, piglit_dir))
 
