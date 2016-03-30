@@ -21,6 +21,7 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+"""Print each test's command in a consumable format."""
 
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
@@ -51,6 +52,7 @@ def get_command(test, piglit_dir):
 
 
 def main():
+    """The main function."""
     input_ = [i.decode('utf-8') for i in sys.argv[1:]]
     parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
     parser.add_argument("-t", "--include-tests",
@@ -81,7 +83,7 @@ def main():
 
     profile_._prepare_test_list()
     for name, test in profile_.test_list.items():
-        assert(isinstance(test, Test))
+        assert isinstance(test, Test)
         print(name, ':::', get_command(test, piglit_dir))
 
 
