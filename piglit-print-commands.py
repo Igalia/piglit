@@ -28,9 +28,8 @@ from __future__ import (
 import argparse
 import sys
 import os
-import os.path as path
 
-sys.path.append(path.dirname(path.realpath(sys.argv[0])))
+sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 from framework import options
 from framework.programs import parsers
 import framework.profile
@@ -61,7 +60,7 @@ def main():
     options.OPTIONS.include_filter = args.include_tests
 
     # Change to the piglit's path
-    piglit_dir = path.dirname(path.realpath(sys.argv[0]))
+    piglit_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
 
     profile = framework.profile.load_test_profile(args.testProfile)
