@@ -35,6 +35,21 @@ from framework.programs import parsers
 from framework.test import Test, GleanTest
 
 
+def get_command(test, piglit_dir):
+    """Get just the name of the command with a path relative to bin."""
+    command = ''
+    if isinstance(test, GleanTest):
+        for var, val in test.env.items():
+            command += "{}='{}'".format(var, val)
+
+    # Make the test command relative to the piglit_dir
+    test_command = test.command[:]
+    test_command[0] = os.path.relpath(test_command[0], piglit_dir)
+
+    command += ' '.join(test_command)
+    return command
+
+
 def main():
     input_ = [i.decode('utf-8') for i in sys.argv[1:]]
     parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
@@ -64,23 +79,10 @@ def main():
 
     profile_ = profile.load_test_profile(args.testProfile)
 
-    def getCommand(test):
-        command = ''
-        if isinstance(test, GleanTest):
-            for var, val in test.env.items():
-                command += var + "='" + val + "' "
-
-        # Make the test command relative to the piglit_dir
-        testCommand = test.command[:]
-        testCommand[0] = os.path.relpath(testCommand[0], piglit_dir)
-
-        command += ' '.join(testCommand)
-        return command
-
     profile_._prepare_test_list()
     for name, test in profile_.test_list.items():
         assert(isinstance(test, Test))
-        print(name, ':::', getCommand(test))
+        print(name, ':::', get_command(test, piglit_dir))
 
 
 if __name__ == "__main__":
