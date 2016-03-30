@@ -26,14 +26,14 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import argparse
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 from framework import options
 from framework.programs import parsers
-import framework.profile
 from framework.test import Test, GleanTest
+import framework.profile
 
 
 def main():
