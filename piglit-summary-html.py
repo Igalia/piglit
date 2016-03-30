@@ -1,6 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,11 @@ from __future__ import (
 )
 import sys
 
+import six
+
 from framework.programs.summary import html
 
-html([i.decode('utf-8') for i in sys.argv[1:]])
+if six.PY2:
+    html([i.decode('utf-8') for i in sys.argv[1:]])
+elif six.PY3:
+    html(sys.argv[1:])
