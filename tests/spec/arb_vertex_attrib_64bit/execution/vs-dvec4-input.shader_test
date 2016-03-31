@@ -1,0 +1,49 @@
+# test truncating a double holds precision
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+GL_ARB_vertex_attrib_64bit
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_vertex_attrib_64bit : require
+
+uniform double tolerance;
+uniform dvec4 expected;
+
+in vec3 vertex;
+in dvec4 value;
+out vec4 color;
+
+void main()
+{
+  gl_Position = vec4(vertex, 1.0);
+
+  color = (distance(value, expected) <= tolerance) ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+in vec4 color;
+void main()
+{
+  gl_FragColor = color;
+}
+
+[vertex data]
+vertex/float/3  value/double/4
+-1.0 -1.0 0.0   5.00000000000047073456244106637E0 3.50000000000727684579260312603E02 4.23559999999999980957454681629E0 1.28019883010000000922445906326E2
+ 1.0 -1.0 0.0   5.00000000000047073456244106637E0 3.50000000000727684579260312603E02 4.23559999999999980957454681629E0 1.28019883010000000922445906326E2
+ 1.0  1.0 0.0   5.00000000000047073456244106637E0 3.50000000000727684579260312603E02 4.23559999999999980957454681629E0 1.28019883010000000922445906326E2
+-1.0  1.0 0.0   5.00000000000047073456244106637E0 3.50000000000727684579260312603E02 4.23559999999999980957454681629E0 1.28019883010000000922445906326E2
+
+[test]
+uniform double tolerance 0.0
+uniform dvec4 expected 5.00000000000047073456244106637E0 3.50000000000727684579260312603E02 4.23559999999999980957454681629E0 1.28019883010000000922445906326E2
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
