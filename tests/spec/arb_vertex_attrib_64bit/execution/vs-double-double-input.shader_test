@@ -1,0 +1,54 @@
+# test truncating a double holds precision
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+GL_ARB_vertex_attrib_64bit
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_vertex_attrib_64bit : require
+
+uniform double expected1;
+uniform double expected2;
+
+in vec3 vertex;
+in double value1;
+in double value2;
+out vec4 color;
+
+void main()
+{
+  gl_Position = vec4(vertex, 1.0);
+  color = vec4(0.0, 0.0, 0.0, 1.0);
+
+  if (value1 != expected1)
+     color.r = 1.0;
+  if (value2 != expected2)
+     color.g = 1.0;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+in vec4 color;
+void main()
+{
+  gl_FragColor = color;
+}
+
+[vertex data]
+vertex/float/3  value1/double/1                     value2/double/1
+-1.0 -1.0 0.0   5.00000000000047073456244106637E0   3.50000000000727684579260312603E02
+ 1.0 -1.0 0.0   5.00000000000047073456244106637E0   3.50000000000727684579260312603E02
+ 1.0  1.0 0.0   5.00000000000047073456244106637E0   3.50000000000727684579260312603E02
+-1.0  1.0 0.0   5.00000000000047073456244106637E0   3.50000000000727684579260312603E02
+
+[test]
+uniform double expected1 5.00000000000047073456244106637E00
+uniform double expected2 3.50000000000727684579260312603E02
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 0.0 0.0 1.0
