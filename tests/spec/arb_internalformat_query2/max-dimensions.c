@@ -353,6 +353,7 @@ check_max_dimension(const GLenum pname,
 
         piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
                                      "%s", piglit_get_gl_enum_name(pname));
+        test_data_clear(&data);
         return pass;
 }
 
@@ -402,7 +403,7 @@ check_params_against_dimension(test_data *data,
                                const GLenum target,
                                const GLenum internalformat)
 {
-        test_data *local_data = test_data_clone(data);
+        test_data *local_data;
         GLenum dimension_pname;
         bool result = true;
 
@@ -414,6 +415,8 @@ check_params_against_dimension(test_data *data,
         } else {
                 dimension_pname = GL_MAX_DEPTH;
         }
+
+        local_data = test_data_clone(data);
 
         test_data_execute(local_data, target, internalformat,
                           dimension_pname);
@@ -512,6 +515,7 @@ check_max_layers()
 
         piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
                                      "%s", piglit_get_gl_enum_name(GL_MAX_LAYERS));
+        test_data_clear(&data);
         return pass;
 }
 
@@ -670,6 +674,7 @@ check_max_combined_dimensions()
 
         piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
                                      "%s", piglit_get_gl_enum_name(GL_MAX_COMBINED_DIMENSIONS));
+        test_data_clear(&data);
         return pass;
 }
 
