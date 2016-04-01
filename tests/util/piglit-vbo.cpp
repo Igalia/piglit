@@ -204,8 +204,6 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 				(unsigned long) this->matrix_index);
 			piglit_report_result(PIGLIT_FAIL);
 		}
-		/* Turn the column into an offset */
-		this->matrix_index -= 1;
 
 		if (*endptr != '\0') {
 			printf("Column headers must be in the form name/type/matrix_column.\n"
