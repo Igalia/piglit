@@ -34,7 +34,8 @@ GENERATED_TESTS_DIR = os.path.abspath(
 # If on cygwin convert to a dos style path
 if sys.platform == 'cygwin':
     def dosify(p):
-        return subprocess.check_output(['cygpath', '-d', p]).rstrip()
+        return subprocess.check_output(
+            ['cygpath', '-d', p]).rstrip().decode('utf-8')
 
     TESTS_DIR = dosify(TESTS_DIR)
     GENERATED_TESTS_DIR = dosify(GENERATED_TESTS_DIR)
