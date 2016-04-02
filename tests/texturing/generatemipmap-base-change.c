@@ -44,7 +44,7 @@ piglit_init(int argc, char **argv)
 {
 #define MAX_SIZE 8
 	GLubyte img[MAX_SIZE * MAX_SIZE * 4];
-	bool change_size = true, change_format = false;
+	bool change_size = false, change_format = false;
 	int i;
 	GLuint tex;
 	GLsizei base_size, w0 = 0, h0 = 0;
@@ -64,7 +64,11 @@ piglit_init(int argc, char **argv)
 			change_format = true;
 		}
 	}
-	assert(change_size || change_format);
+
+	if (!change_size && !change_format) {
+		printf("Missing required argument: 'size' or 'format'\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	/* init image data */
 	for (i = 0; i < sizeof(img); i++)
