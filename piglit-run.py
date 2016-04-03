@@ -22,7 +22,7 @@
 
 """ Run a piglit test profile
 
-Deprecated compatability wrapper
+Deprecated compatibility wrapper
 
 """
 

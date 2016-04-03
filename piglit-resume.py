@@ -22,7 +22,7 @@
 
 """ Resume an interupted piglit run
 
-Deprecated compatability wrapper
+Deprecated compatibility wrapper
 
 """
 

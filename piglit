@@ -23,7 +23,7 @@
 """ Wrapper for piglit executables
 
 This imports functions from the framework and calls them with the argument
-parts that the parser defined here doesn't konw how to parse.
+parts that the parser defined here doesn't know how to parse.
 
 It is very important that the final parser not generate a help message
 (add_help=False in the constructor arguments), otherwise this parser will

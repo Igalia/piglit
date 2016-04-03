@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Deprecated compatability wrapper for console summary """
+""" Deprecated compatibility wrapper for console summary """
 
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
