@@ -352,7 +352,7 @@ def pack_half_1x16(f32, func_opts):
     #   - Otherwise, f32 = 2^E * F where 0.5 <= F < 1.0 .
     #
     # Since we decomposed `abs(f32)`, we only need be concerned with the
-    # postive cases.
+    # positive cases.
     if isnan(F):
         # The resultant float16 is NaN.
         e = 31

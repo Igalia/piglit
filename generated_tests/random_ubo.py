@@ -357,7 +357,7 @@ def generate_layouts(fields, required_layouts, allow_row_major_structure):
             layouts.append(lay)
         elif isstructure(type) and not allow_row_major_structure:
             # This would work-around a bug in NVIDIA closed source drivers.
-            # They do not propogate row-major down into structures.
+            # They do not propagate row-major down into structures.
 
             layouts.append("#column_major")
         elif ismatrix(type) or isstructure(type):

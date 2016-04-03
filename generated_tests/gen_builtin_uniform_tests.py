@@ -489,7 +489,7 @@ class ShaderTest(object):
         called.  output_var is the variable that the result of the
         built-in function should be assigned to, after conversion to a
         vec4.  suffix_statements is a string containing any additional
-        statements that need to be inside the main() funciton of the
+        statements that need to be inside the main() function of the
         shader, after the built-in function is called.
         """
         shader = ''

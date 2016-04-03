@@ -41,7 +41,7 @@ def remove_empty_structure(s, do_remove = True):
         if s == x:
             continue
 
-        # A previous caller may be in the proces of deleting this structure
+        # A previous caller may be in the process of deleting this structure
         # type, so just skip it for now.
         if len(struct_types[x]) == 0:
             continue
