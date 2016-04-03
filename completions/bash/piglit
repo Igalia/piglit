@@ -35,7 +35,7 @@ __piglit_results_extensions="@(json|json.xz|json.gz|json.bz2)"
 #
 # This handles everything piglit run expects, with one small caviat, after the
 # first profile is provided, it mixes profiles and directories together, since
-# either addtional profiles or a directory can be provided. After something
+# either additional profiles or a directory can be provided. After something
 # that isn't a profile is provided it wont auto complete any more positional
 # arguments.
 __piglit_run() {
@@ -209,7 +209,7 @@ __piglit_summary_aggregate() {
 
 # Completions for 'summary console'
 #
-# This function is extremly simple, it takes an infinite number of positional
+# This function is extremely simple, it takes an infinite number of positional
 # arguments which are all the same, a couple of switches, and only two of them
 # take arguments.
 __piglit_summary_console() {
