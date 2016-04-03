@@ -88,7 +88,7 @@ def test_get_backend():
 
 @nt.raises(backends.BackendError)
 def test_get_backend_unknown():
-    """backends.get_backend: An error is raised with an unkown backend."""
+    """backends.get_backend: An error is raised with an unknown backend."""
     backends.get_backend('obviously fake backend')
 
 

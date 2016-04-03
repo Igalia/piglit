@@ -200,7 +200,7 @@ class TestV0toV1(object):
     def test_dont_break_single_subtest(self):
         """backends.json.update_results (0 -> 1): Don't break single subtest entries
 
-        A test with a single subtest was written correctly before, dont break it by
+        A test with a single subtest was written correctly before, don't break it by
         removing the name of the test. ex:
         test/foo/bar: {
             ...

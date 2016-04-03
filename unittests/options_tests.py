@@ -136,7 +136,7 @@ class TestReListDescriptor(object):
                 create=True)
     @nt.raises(AttributeError)
     def test_get_not_exists_fail(self):
-        """options._ReListDescriptor.__get__: Raises AttributError if name doesn't exist and cant be created"""
+        """options._ReListDescriptor.__get__: Raises AttributError if name doesn't exist and can't be created"""
         self.test.notexists  # pylint: disable=pointless-statement
 
     def test_set_relist(self):

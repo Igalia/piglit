@@ -146,7 +146,7 @@ def test_not_change():
 
         This checks that new < old and old < new do not return true. This is meant
         for checking skip and notrun, which we don't want to show up as regressions
-        and fixes, but to go in their own special catagories.
+        and fixes, but to go in their own special categories.
 
         """
         nt.assert_false(new < old,

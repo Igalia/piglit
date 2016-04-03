@@ -59,7 +59,7 @@ from framework import log, dmesg
 class TestTest(Test):
     """ A class for testing that implements a dummy interpret_result
 
-    interpret_result() can ve overwritten by setting the
+    interpret_result() can be overwritten by setting the
     self.test_interpret_result name
 
     """
@@ -118,8 +118,8 @@ def test_timeout_kill_children():
         def __call__(self, *args, **kwargs):
             self.popen = subprocess.Popen(*args, **kwargs)
 
-            # if commuincate cis called successfully then the proc will be
-            # reset to None, whic will make the test fail.
+            # if communicate is called successfully then the proc will be
+            # reset to None, which will make the test fail.
             self.popen.communicate = mock.Mock(return_value=('out', 'err'))
 
             return self.popen
@@ -159,7 +159,7 @@ def test_timeout_kill_children():
             test.run()
 
         # Check to see if the Popen has children, even after it should have
-        # recieved a TimeoutExpired.
+        # received a TimeoutExpired.
         proc = psutil.Process(os.getsid(proxy.popen.pid))
         children = proc.children(recursive=True)
 
@@ -423,7 +423,7 @@ class TestExecuteTraceback(object):
 
         It's fragile to record the actual traceback, and it's unlikely
         that it can easily be implemented differently than the way the original
-        code is implimented, so this doesn't do that, it just verifies there is
+        code is implemented, so this doesn't do that, it just verifies there is
         a value.
 
         """

@@ -51,7 +51,7 @@ def test_initialize_testprofile():
 def test_load_test_profile_no_profile():
     """profile.load_test_profile: Loading a module with no profile name exits
 
-    Beacuse load_test_profile uses test.{} to load a module we need a module in
+    Because load_test_profile uses test.{} to load a module we need a module in
     tests that doesn't have a profile attribute. The only module that currently
     meets that requirement is __init__.py
 
@@ -78,7 +78,7 @@ def test_testprofile_default_dmesg():
 
 
 def test_testprofile_set_dmesg_true():
-    """profile.TestProfile: Dmesg returns an apropriate dmesg is ste to True"""
+    """profile.TestProfile: Dmesg returns an appropriate dmesg is set to True"""
     utils.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
@@ -345,7 +345,7 @@ def test_testprofile_allow_reassignment_with_groupmanager():
 def test_testprofile_allow_reassignemnt_stacked():
     """profile.profile.TestDict.allow_reassignment: check stacking cornercase
 
-    There is an odd corner case in the original (obvious) implmentation of this
+    There is an odd corner case in the original (obvious) implementation of this
     function, If one opens two context managers and then returns from the inner
     one assignment will not be allowed, even though one is still inside the
     first context manager.

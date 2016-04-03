@@ -319,7 +319,7 @@ def nose_generator(func):
 
 
 def binary_check(bin_, errno_=None):
-    """Check for the existance of a binary or raise SkipTest.
+    """Check for the existence of a binary or raise SkipTest.
 
     If an errno_ is provided then a skip test will be raised unless the error
     number provided is raised, or no error is raised.

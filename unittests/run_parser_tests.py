@@ -45,7 +45,7 @@ class TestWithEnvClean(object):
     method.
 
     Using this gives us the assurance that we're not relying on settings from
-    other tests, making ours pass or fail, and that os.enviorn is the same
+    other tests, making ours pass or fail, and that os.environ is the same
     going in as it is going out.
 
     This is modeled after Go's defer keyword.
@@ -62,14 +62,14 @@ class TestWithEnvClean(object):
             del os.environ[var]
 
     def defer(self, func, *args):
-        """ Add a function (with arguments) to be run durring cleanup """
+        """ Add a function (with arguments) to be run during cleanup """
         self._teardown_calls.append((func, args))
 
     def teardown(self):
         """ Teardown the test
 
-        Restore any variables that were unset at the begining of the test, and
-        run any differed methods.
+        Restore any variables that were unset at the beginning of the test, and
+        run any deferred methods.
 
         """
         for key, value, restore in self._saved:
@@ -79,7 +79,7 @@ class TestWithEnvClean(object):
             elif restore:
                 os.environ[key] = value
 
-        # Teardown calls is a FIFO stack, the defered calls must be run in
+        # Teardown calls is a FIFO stack, the deferred calls must be run in
         # reversed order to make any sense
         for call, args in reversed(self._teardown_calls):
             call(*args)
@@ -88,7 +88,7 @@ class TestWithEnvClean(object):
 class _Helpers(TestWithEnvClean):
     """ Some helpers to be shared between tests """
     def _unset_config(self):
-        """ Ensure that no config files are being accidently loaded """
+        """ Ensure that no config files are being accidentally loaded """
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
 
@@ -158,7 +158,7 @@ class TestBackend(_Helpers):
         self._unset_config()
         self._move_piglit_conf()
 
-        # This has sideffects, it shouldn't effect anything in this module, but
+        # This has side effects, it shouldn't effect anything in this module, but
         # it may cause later problems. But without this we get ugly error spew
         # from this test.
         sys.stderr = open(os.devnull, 'w')
@@ -251,7 +251,7 @@ class TestPlatform(_Helpers):
         self._unset_config()
         self._move_piglit_conf()
 
-        # This has sideffects, it shouldn't effect anything in this module, but
+        # This has side effects, it shouldn't effect anything in this module, but
         # it may cause later problems. But without this we get ugly error spew
         # from this test.
         sys.stderr = open(os.devnull, 'w')

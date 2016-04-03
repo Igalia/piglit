@@ -156,12 +156,12 @@ def test_update_results_old():
     """backends.json.update_results(): updates results
 
     Because of the design of the our updates (namely that they silently
-    incrementally update from x to y) it's impossible to konw exactly what
+    incrementally update from x to y) it's impossible to know exactly what
     we'll get at th end without having tests that have to be reworked each time
     updates are run. Since there already is (at least for v0 -> v1) a fairly
     comprehensive set of tests, this test only tests that update_results() has
     been set equal to the CURRENT_JSON_VERSION, (which is one of the effects of
-    runing update_results() with the assumption that there is sufficient other
+    running update_results() with the assumption that there is sufficient other
     testing of the update process.
 
     """

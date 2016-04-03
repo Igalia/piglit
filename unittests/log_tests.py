@@ -38,7 +38,7 @@ TEST_STATE = {'total': 0, 'complete': 0, 'lastlength': 0, 'running': [],
 
 @utils.nose_generator
 def test_initialize():
-    """ Generate tests for class initializiation """
+    """ Generate tests for class initialization """
     check_initialize = lambda c, *a: c(*a)
 
     for name, class_ in [('QuiteLog', log.QuietLog),

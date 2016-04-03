@@ -110,7 +110,7 @@ def test_TestResult_from_dict_inst():
 
 
 class TestTestResultFromDictAttributes(object):
-    """A series of tests to show that each attribute is sucessfully populated.
+    """A series of tests to show that each attribute is successfully populated.
     """
     @classmethod
     def setup_class(cls):

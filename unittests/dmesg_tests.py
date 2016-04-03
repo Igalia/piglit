@@ -151,7 +151,7 @@ class TestBaseDmesg(object):
 
 
 def test_update_result_regex_no_match():
-    """dmesg.BaseDmesg.update_result: if no regex matches dont change status"""
+    """dmesg.BaseDmesg.update_result: if no regex matches don't change status"""
     dmesg_ = TestDmesg()
     dmesg_.regex = re.compile(r'nomatchforthisreally')
     result = results.TestResult('pass')

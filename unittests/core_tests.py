@@ -109,7 +109,7 @@ def test_PiglitConfig_init():
 def test_parse_listfile_return():
     """core.parse_listfile(): returns a list-like object
 
-    Given a file with a newline seperated list of results, parse_listfile
+    Given a file with a newline separated list of results, parse_listfile
     should return a list of files with no whitespace
 
     """

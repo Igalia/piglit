@@ -303,7 +303,7 @@ def glslparser_exetensions_seperators():
     """ GlslParserTest() can only have [A-Za-z_] as characters
 
     This test generates a number of tests that should catch the majority of
-    errors relating to seperating extensions in the config block of a
+    errors relating to separating extensions in the config block of a
     glslparser test
 
     """
