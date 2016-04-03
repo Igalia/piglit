@@ -404,7 +404,7 @@ Every test is run as a separate process. This minimizes the impact that
 severe bugs like memory corruption have on the testing process.
 
 Therefore, tests can be implemented in an arbitrary standalone language.
-C is the prefered language for compiled tests, piglit also supports its own
+C is the preferred language for compiled tests, piglit also supports its own
 simple formats for test shaders and glsl parser input.
 
 All new tests must be added to the appropriate profile, all.py profile for
