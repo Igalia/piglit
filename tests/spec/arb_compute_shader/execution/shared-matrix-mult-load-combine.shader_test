@@ -1,0 +1,39 @@
+# Verify combining load instructions for the matrix multiplication
+# of a shared-variable matrix by itself
+
+[require]
+GL >= 3.3
+ES >= 3.1
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_atomic_counters: enable
+#extension GL_ARB_shader_storage_buffer_object: enable
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 0) uniform atomic_uint counter;
+shared mat4 mat;
+uniform mat4 u_mat;
+
+void main()
+{
+  mat = u_mat;
+  mat4 tmp = mat * mat;
+  mat4 tmp1 = u_mat * u_mat;
+
+  if (tmp == tmp1)
+    atomicCounterIncrement(counter);
+}
+
+[test]
+atomic counters 1
+
+uniform mat4 u_mat 0.0  1.0  2.0  3.0  4.0  5.0  6.0  7.0  8.0  9.0 10.0 11.0 12.0 13.0 14.0 15.0
+
+compute 1 1 1
+probe atomic counter 0 == 1

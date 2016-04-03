@@ -1,0 +1,45 @@
+# Verify combining load instructions for shared variables
+
+[require]
+GL >= 3.3
+ES >= 3.1
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_atomic_counters: enable
+#extension GL_ARB_shader_storage_buffer_object: enable
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 0) uniform atomic_uint counter;
+shared float val;
+shared float val1;
+uniform float ref_val;
+
+void main()
+{
+  val = 0.0;
+
+  // this forces a load of val
+  float tmp = val + ref_val;
+
+  // this should not affect the load-combining, because is a different
+  // offset.
+  val1 = 1.0;
+
+  // this comparison triggers a second load, which is combined
+  if (tmp == val + ref_val)
+    atomicCounterIncrement(counter);
+}
+
+[test]
+atomic counters 1
+
+uniform float ref_val 5.0
+
+compute 1 1 1
+probe atomic counter 0 == 1
