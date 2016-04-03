@@ -172,7 +172,7 @@
                                                      escape_filename(grouptools.groupname(test))))
               else:
                 result = status.NOTRUN
-            del raw  # we dont need this, so don't let it leak
+            del raw  # we don't need this, so don't let it leak
           %>
           <td class="${str(result)}">
           % if str(result) not in exclude and result is not status.NOTRUN:

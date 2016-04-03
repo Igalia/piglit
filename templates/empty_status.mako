@@ -12,7 +12,7 @@
     <p>Currently showing: ${page}</p>
     <p>Show:
       ## Index is a logical choice to put first, it will always be a link
-      ## and we don't want in preceeded by a |
+      ## and we don't want in preceded by a |
       <a href="index.html">index</a>
       % for i in pages:
         % if i == page:
