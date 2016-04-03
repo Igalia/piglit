@@ -78,7 +78,7 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
 
     Specifically it is necessary to parse a glsl_parser_test to get information
     about it before actually creating a PiglitTest. Even though this could
-    be done with a funciton wrapper, making it a distinct class makes it easier
+    be done with a function wrapper, making it a distinct class makes it easier
     to sort in the profile.
 
     Arguments:

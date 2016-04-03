@@ -28,7 +28,7 @@ that piglit is never aware of what backend it's using, it just asks for an
 object and receives one.
 
 Most consumers will want to import framework.backends and work directly with
-the helper functions here. For some more detailed uses (test cases expecially)
+the helper functions here. For some more detailed uses (test cases especially)
 the modules themselves may be used.
 
 When this module is loaded it will search through framework/backends for python
@@ -99,7 +99,7 @@ def get_backend(backend):
     is the responsibility of the caller to handle this error.
 
     If the backend module exists, but there is not active implementation then a
-    BackendNotImplementedError will be raised, it is also the responsiblity of
+    BackendNotImplementedError will be raised, it is also the responsibility of
     the caller to handle this error.
 
     """

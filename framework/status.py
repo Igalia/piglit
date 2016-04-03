@@ -45,7 +45,7 @@ crash
 incomplete
 
 SKIP and NOTRUN are not factored into regressions and fixes, they are counted
-seperately. They also derive from a sublcass of Status, which always returns
+separately. They also derive from a sublcass of Status, which always returns
 False
 
 The formula for determining regressions is:
@@ -104,7 +104,7 @@ class StatusException(exceptions.PiglitInternalError):
 
     The primary reason to have a special exception is that otherwise
     status_lookup returns a KeyError, but there are many cases where it is
-    desireable to except a KeyError and have an exception path. Using a custom
+    desirable to except a KeyError and have an exception path. Using a custom
     Error class here allows for more fine-grained control.
 
     """

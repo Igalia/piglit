@@ -167,7 +167,7 @@ class WflInfo(object):
         """Calculate the maximum opengl version.
 
         This will try (in order): core, compat, and finally no profile,
-        stopping when it finds a profile. It assumes taht most implementations
+        stopping when it finds a profile. It assumes that most implementations
         will have core and compat as equals, or core as superior to compat in
         terms of support.
 

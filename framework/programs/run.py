@@ -222,7 +222,7 @@ def run(input_):
     args = _run_parser(input_)
     _disable_windows_exception_messages()
 
-    # If dmesg is requested we must have serial run, this is becasue dmesg
+    # If dmesg is requested we must have serial run, this is because dmesg
     # isn't reliable with threaded run
     if args.dmesg:
         args.concurrency = "none"
@@ -345,7 +345,7 @@ def resume(input_):
     if options.OPTIONS.dmesg:
         profile.dmesg = options.OPTIONS.dmesg
 
-    # This is resumed, don't bother with time since it wont be accurate anyway
+    # This is resumed, don't bother with time since it won't be accurate anyway
     profile.run(results.options['log_level'], backend)
 
     backend.finalize()

@@ -230,7 +230,7 @@ class Names(object):
 
 
 class Counts(object):
-    """Number of tests in each catagory."""
+    """Number of tests in each category."""
     def __init__(self, tests):
         self.__names = tests.names
 

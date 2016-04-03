@@ -60,7 +60,7 @@ def html(input_):
                         help="Overwrite existing directories")
     parser.add_argument("-l", "--list",
                         action="store",
-                        help="Load a newline seperated list of results. These "
+                        help="Load a newline separated list of results. These "
                              "results will be prepended to any Results "
                              "specified on the command line")
     parser.add_argument("-e", "--exclude-details",
@@ -145,7 +145,7 @@ def console(input_):
     parser.add_argument("results",
                         metavar="<Results Path(s)>",
                         nargs="+",
-                        help="Space seperated paths to at least one results "
+                        help="Space separated paths to at least one results "
                              "file")
     args = parser.parse_args(unparsed)
 
@@ -227,7 +227,7 @@ def aggregate(input_):
 
     try:
         # FIXME: This works, it fixes the problem, but it only works because
-        # only the json backend has the ability to agregate results at the
+        # only the json backend has the ability to aggregate results at the
         # moment.
         backends.json._write(results, outfile)
     except IOError as e:

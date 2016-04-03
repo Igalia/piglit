@@ -156,7 +156,7 @@ class Test(object):
     and properties that can be overwritten to produce a specialized class for
     running test suites other than piglit.
 
-    It provides two methods for running tests, excecute and run.
+    It provides two methods for running tests, execute and run.
     execute() provides lots of features, and is invoced when running piglit
     from the command line, run() is a more basic method for running the test,
     and is called internally by execute(), but is can be useful outside of it.

@@ -104,7 +104,7 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
                 error = "and both tests are the same."
 
             raise exceptions.PiglitFatalError(
-                "A test has already been asigned the name: {}\n{}".format(
+                "A test has already been assigned the name: {}\n{}".format(
                     key, error))
 
         super(TestDict, self).__setitem__(key, value)

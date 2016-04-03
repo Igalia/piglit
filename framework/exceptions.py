@@ -76,7 +76,7 @@ class PiglitInternalError(Exception):
 
     """
     def __str__(self):
-        return u'An internal error occured:\n{}'.format(
+        return u'An internal error occurred:\n{}'.format(
             super(PiglitInternalError, self).__str__())
 
 

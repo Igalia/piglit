@@ -191,7 +191,7 @@ def parse_listfile(filename):
 class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-methods
     """Descriptor that replaces the function it wraps with the value generated.
 
-    This makes a property that is truely lazy, it is calculated once on demand,
+    This makes a property that is truly lazy, it is calculated once on demand,
     and stored. This makes this very useful for values that you might want to
     calculate and reuse, but they cannot change.
 

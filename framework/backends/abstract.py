@@ -141,7 +141,7 @@ class Backend(object):
         Should be a context manager, used with the with statement. It should
         first write an incomplete status value, then yield and object that will
         overwrite that value with the final value. That object needs to take a
-        'data' paramter whic is a result.TestResult object.
+        'data' parameter which is a result.TestResult object.
 
         Arguments:
         name -- the name of the test to be written

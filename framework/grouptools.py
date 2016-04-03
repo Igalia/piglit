@@ -21,7 +21,7 @@
 """Module providing utility functions to work with piglit groups.
 
 Instead of using posixpath (or the generic os.path) for working with tests this
-module should be prefered.
+module should be preferred.
 
 Piglit groups look much like posix paths, they are '/' delimited with each
 element representing a group, and the final element being the test name. Unlike

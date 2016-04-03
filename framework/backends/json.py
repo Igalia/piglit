@@ -234,7 +234,7 @@ def _load(results_file):
     except ValueError as e:
         raise exceptions.PiglitFatalError(
             'While loading json results file: "{}",\n'
-            'the following error occured:\n{}'.format(results_file.name,
+            'the following error occurred:\n{}'.format(results_file.name,
                                                       str(e)))
 
     if isinstance(result, results.TestrunResult):
@@ -338,7 +338,7 @@ def _update_zero_to_one(result):
 
     - dmesg is sometimes stored as a list, sometimes stored as a string. In
       version 1 it is always stored as a string
-    - in version 0 subtests are somtimes stored as duplicates, sometimes stored
+    - in version 0 subtests are sometimes stored as duplicates, sometimes stored
       only with a single entry, in version 1 tests with subtests are only
       recorded once, always.
     - Version 0 can have an info entry, or returncode, out, and err entries,
@@ -364,7 +364,7 @@ def _update_zero_to_one(result):
         # have a returncode, out, or attribute we'll want to get those out of
         # info first
         #
-        # This expects that the order of info is rougly returncode, errors,
+        # This expects that the order of info is roughly returncode, errors,
         # output, *extra it can handle having extra information in the middle,
         if (None in [test.get('out'), test.get('err'),
                      test.get('returncode')] and test.get('info')):
@@ -381,7 +381,7 @@ def _update_zero_to_one(result):
             if test.get('returncode') is None:
                 # In some cases the returncode might not be set (like the test
                 # skipped), in that case it will be None, so set it
-                # apropriately
+                # appropriately
                 try:
                     test['returncode'] = int(
                         returncode[len('returncode: '):].strip())
@@ -406,8 +406,8 @@ def _update_zero_to_one(result):
         if test.get('subtest'):
             for sub in six.iterkeys(test['subtest']):
                 # adding the leading / ensures that we get exactly what we
-                # expect, since endswith does a character by chacter match, if
-                # the subtest name is duplicated it wont match, and if there
+                # expect, since endswith does a character by character match, if
+                # the subtest name is duplicated it won't match, and if there
                 # are more trailing characters it will not match
                 #
                 # We expect duplicate names like this:

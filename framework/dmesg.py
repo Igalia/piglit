@@ -69,7 +69,7 @@ class BaseDmesg(object):
     override, as this method is used to to actually read the dmesg ringbuffer,
     and the command used, and the options given are OS dependent.
 
-    This class is not thread safe, becasue it does not black between the start
+    This class is not thread safe, because it does not black between the start
     of the test and the reading of dmesg, which means that if two tests run at
     the same time, and test A creates an entri in dmesg, but test B finishes
     first, test B will be marked as having the dmesg error.
