@@ -40,8 +40,11 @@
 #include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
-
+#if PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 21;
+#else
+	config.supports_gl_es_version = 20;
+#endif
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -65,7 +68,11 @@ piglit_display(void)
 
 	glUniform1f(zflip, 1.0);
 	glClearColor(0, 0, 1, 1);
+#ifdef PIGLIT_USE_OPENGL
 	glClearDepth(0.5);
+#else
+	glClearDepthf(0.5);
+#endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* NOTE: It appears that at least nvidia hw will end up
@@ -152,11 +159,22 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_polygon_offset_clamp");
 
 	prog = piglit_build_simple_program(
+#ifdef PIGLIT_USE_OPENGL
 			"#version 120\n"
+#else
+			"#version 100\n"
+			"attribute vec4 vertex;\n"
+			"#define gl_Vertex vertex\n"
+#endif
 			"uniform float zflip;\n"
 			"void main() { gl_Position = gl_Vertex * vec4(1, 1, zflip, 1); }\n",
 
+#ifdef PIGLIT_USE_OPENGL
 			"#version 120\n"
+#else
+			"#version 100\n"
+			"precision highp float;\n"
+#endif
 			"uniform vec4 color;\n"
 			"void main() { gl_FragColor = color; }\n");
 	color = glGetUniformLocation(prog, "color");

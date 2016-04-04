@@ -4278,6 +4278,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_polygon_offset_clamp')) as g:
     g(['ext_polygon_offset_clamp-draw'])
+    g(['ext_polygon_offset_clamp-draw_gles2'])
     g(['ext_polygon_offset_clamp-dlist'])
 
 with profile.group_manager(
