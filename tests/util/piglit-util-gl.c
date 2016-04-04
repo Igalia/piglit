@@ -1223,11 +1223,11 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 	GLfloat *probe;
 	GLfloat *pixels;
 
-	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGB, NULL);
+	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
 	for (j = 0; j < h; j++) {
 		for (i = 0; i < w; i++) {
-			probe = &pixels[(j*w+i)*3];
+			probe = &pixels[(j*w+i)*4];
 
 			for (p = 0; p < 3; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
