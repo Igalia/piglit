@@ -4144,6 +4144,13 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_base_instance')) as g:
+    g(['arb_base_instance-baseinstance-doesnt-affect-gl-instance-id_gles3'],
+      run_concurrent=False)
+    g(['arb_base_instance-drawarrays_gles3'])
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'arb_buffer_storage')) as g:
     for mode in ['read', 'draw']:
         g(['bufferstorage-persistent', mode])

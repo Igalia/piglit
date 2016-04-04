@@ -29,15 +29,22 @@
 #include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
-
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_core_version = 31;
+#else
+	config.supports_gl_es_version = 30;
+#endif
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vstext =
+#ifdef PIGLIT_USE_OPENGL
 	"#version 140\n"
+#else
+	"#version 300 es\n"
+#endif
 	"in vec3 vertex;\n"
 	"out vec4 passColor;\n"
 	"void main() {\n"
@@ -47,7 +54,12 @@ static const char *vstext =
 	"}\n";
 
 static const char *fstext =
+#ifdef PIGLIT_USE_OPENGL
 	"#version 140\n"
+#else
+	"#version 300 es\n"
+	"precision highp float;\n"
+#endif
 	"in vec4 passColor;\n"
 	"out vec4 color;\n"
 	"void main() {\n"
@@ -78,7 +90,11 @@ piglit_init(int argc, char **argv)
 {
 	GLuint vertIndex;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_base_instance");
+#else
+	piglit_require_extension("GL_EXT_base_instance");
+#endif
 
 	prog = piglit_build_simple_program(vstext, fstext);
 

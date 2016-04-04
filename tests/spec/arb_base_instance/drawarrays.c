@@ -31,7 +31,11 @@
 #include "piglit-matrix.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_core_version = 31;
+#else
+	config.supports_gl_es_version = 30;
+#endif
 	config.window_width = 400;
 	config.window_height = 400;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
@@ -56,8 +60,13 @@ static float modelview[16], projection[16], modelviewproj[16];
  * instanced array.
  */
 static const char *VertShaderText =
+#ifdef PIGLIT_USE_OPENGL
 	"#version 130 \n"
 	"#extension GL_ARB_draw_instanced: enable \n"
+#else
+	"#version 300 es\n"
+	"#define gl_InstanceIDARB gl_InstanceID\n"
+#endif
 	"in vec4 Vertex, Color; \n"
 	"uniform vec2 Pos[8]; \n"
 	"uniform mat4 MVP; \n"
@@ -73,7 +82,12 @@ static const char *VertShaderText =
 
 /* Simple color pass-through */
 static const char *FragShaderText =
+#ifdef PIGLIT_USE_OPENGL
 	"#version 130 \n"
+#else
+	"#version 300 es \n"
+	"precision highp float;\n"
+#endif
 	"in vec4 ColorVarying; \n"
 	"out vec4 FragColor; \n"
 	"void main() \n"
@@ -208,9 +222,13 @@ piglit_init(int argc, char **argv)
 {
 	GLuint vao;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_draw_instanced");
 	piglit_require_extension("GL_ARB_instanced_arrays");
 	piglit_require_extension("GL_ARB_base_instance");
+#else
+	piglit_require_extension("GL_EXT_base_instance");
+#endif
 
 	VertShader = piglit_compile_shader_text(GL_VERTEX_SHADER,
 						VertShaderText);
