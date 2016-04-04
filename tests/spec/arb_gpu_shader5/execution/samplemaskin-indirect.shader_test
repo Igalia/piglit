@@ -1,0 +1,27 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+out vec4 color;
+
+uniform int zero;
+
+void main()
+{
+	color = vec4(1.0, 0.0, 0.0, 1.0);
+
+	/* No MS set up, should just be the current fragment. */
+	if (gl_SampleMaskIn[zero] == 1) {
+		color.rg = vec2(0.0, 1.0);
+	}
+}
+
+[test]
+uniform int zero 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
