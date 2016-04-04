@@ -130,6 +130,29 @@ piglit_make_generated_tests(
 	templates/gen_flat_interpolation_qualifier/template.frag.mako
 	)
 piglit_make_generated_tests(
+	conversion_fp64.list
+	gen_conversion_fp64.py
+	templates/gen_conversion_fp64/base.mako
+	templates/gen_conversion_fp64/compiler.frag.mako
+	templates/gen_conversion_fp64/compiler.geom.mako
+	templates/gen_conversion_fp64/compiler.vert.mako
+	templates/gen_conversion_fp64/compiler_base.mako
+	templates/gen_conversion_fp64/execution-zero-sign.frag.shader_test.mako
+	templates/gen_conversion_fp64/execution-zero-sign.geom.shader_test.mako
+	templates/gen_conversion_fp64/execution-zero-sign.vert.shader_test.mako
+	templates/gen_conversion_fp64/execution.frag.shader_test.mako
+	templates/gen_conversion_fp64/execution.geom.shader_test.mako
+	templates/gen_conversion_fp64/execution.vert.shader_test.mako
+	templates/gen_conversion_fp64/execution_base.mako
+	templates/gen_conversion_fp64/shader-zero-sign.frag.mako
+	templates/gen_conversion_fp64/shader-zero-sign.geom.mako
+	templates/gen_conversion_fp64/shader-zero-sign.vert.mako
+	templates/gen_conversion_fp64/shader.frag.mako
+	templates/gen_conversion_fp64/shader.geom.mako
+	templates/gen_conversion_fp64/shader.vert.mako
+	templates/gen_conversion_fp64/shader_base.mako
+	)
+piglit_make_generated_tests(
 	shader_precision_tests.list
 	gen_shader_precision_tests.py
 	builtin_function.py
@@ -208,6 +231,7 @@ add_custom_target(gen-gl-tests
 			constant_array_size_tests_fp64.list
 			inout_fp64.list
 			flat_interpolation_qualifier.list
+			conversion_fp64.list
 			shader_precision_tests.list
 			shader_image_load_store_tests.list
 			variable_index_read_tests.list
