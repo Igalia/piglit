@@ -21,8 +21,17 @@ void main()
   gl_Position = vec4(vertex, 1.0);
   color = vec4(0.0, 0.0, 0.0, 0.0);
 
-  if (distance(value[2], expected[2]) > tolerance)
+  if (distance(value[0], expected[0]) > tolerance)
     color.b = 1.0;
+
+  if (distance(value[1], expected[1]) > tolerance)
+    color.b = 1.0;
+
+  if (distance(value[2], expected[2]) > tolerance)
+    color.g = 1.0;
+
+  if (distance(value[3], expected[3]) > tolerance)
+    color.a = 1.0;
 }
 
 [fragment shader]
