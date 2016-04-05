@@ -648,17 +648,16 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-getactiveuniform-count',
        os.path.join(TESTS_DIR, 'shaders', 'glsl-getactiveuniform-length.vert'),
        '1'],
-      'glsl-getactiveuniform-count: {}'.format('glsl-getactiveuniform-length'))
+      'glsl-getactiveuniform-count: glsl-getactiveuniform-length')
     g(['glsl-getactiveuniform-count',
        os.path.join(TESTS_DIR, 'shaders',
                     'glsl-getactiveuniform-ftransform.vert'),
        '2'],
-      'glsl-getactiveuniform-count: {}'.format(
-          'glsl-getactiveuniform-ftransform'))
+      'glsl-getactiveuniform-count: glsl-getactiveuniform-ftransform')
     g(['glsl-getactiveuniform-count',
        os.path.join(TESTS_DIR, 'shaders', 'glsl-getactiveuniform-mvp.vert'),
        '2'],
-      'glsl-getactiveuniform-count: {}'.format('glsl-getactiveuniform-mvp'))
+      'glsl-getactiveuniform-count: glsl-getactiveuniform-mvp')
 
     for subtest in ('interstage', 'intrastage', 'vs-gs'):
         g(['version-mixing', subtest])
