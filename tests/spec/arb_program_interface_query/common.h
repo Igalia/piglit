@@ -117,6 +117,31 @@ static const char fs_std[] =
 		"             faub[1].fs_array[3] * faub[3].fs_array[3];\n"
 	"}";
 
+static const char vs_buff_blks[] =
+	"#version 150\n"
+	"#extension GL_ARB_shader_storage_buffer_object : require\n"
+	"buffer vs_buffer_block { vec4 vs_buf_var; };"
+	"uniform vs_uni_block {\n"
+	"	vec4 vs_test;\n"
+	"};\n"
+	"void main() {\n"
+	"	gl_Position = vs_buf_var + vs_test;\n"
+	"}";
+
+static const char fs_buff_blks[] =
+	"#version 150\n"
+	"#extension GL_ARB_shader_storage_buffer_object : require\n"
+	"uniform fs_uni_block {"
+	"	vec4 fs_color;\n"
+	"	float fs_array[4];\n"
+	"};\n"
+	"buffer fs_buffer_block { vec4 fs_buf_var; };\n"
+	"out vec4 fs_output0;\n"
+	"void main() {\n"
+	"	fs_output0 = fs_buf_var + fs_color +\n"
+	"	vec4(fs_array[0], fs_array[1], fs_array[2], fs_array[3]);\n"
+	"}";
+
 static const char vs_stor[] =
 	"#version 150\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"

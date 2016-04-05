@@ -283,6 +283,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 GLuint prog_std = -1; /* (vs,gs,fs)_std */
 GLuint prog_stor = -1; /* (vs,gs,fs)_stor */
+GLuint prog_buff_blks = -1; /* (vs,fs)_buff_blks */
 GLuint prog_sub = -1; /* (vs,gs,fs)_sub */
 GLuint prog_sub_tess = -1; /* tcs_sub */
 GLuint prog_cs = -1; /* cs_sub */
@@ -303,8 +304,11 @@ struct subtest_t {
 	} props[25];
 };
 
+const char *vs_std_vs_uniform_blk[] = {"vs_test", NULL };
 const char *fs_std_fs_uniform_blk[] = {"fs_color", "fs_array[0]", NULL };
+const char *vs_stor_vs_buf_blk[] = {"vs_buf_var", NULL };
 const char *fs_stor_gs_buf_blk[] = {"gs_buf_var", NULL };
+const char *fs_stor_fs_buf_blk[] = {"fs_buf_var", NULL };
 const char *vs_sub_uniforms[] = {"vss", "vss2", NULL };
 const char *tess_sub_uniforms[] = {"tcss", NULL };
 const char *cs_sub_uniforms[] = {"css", NULL };
@@ -503,6 +507,62 @@ static const struct subtest_t subtests[] = {
 	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 1 } },
 	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
+	{ 0, 0, { 0 } }}
+ },
+ { &prog_buff_blks, GL_UNIFORM_BLOCK, "vs_uni_block", vs_std_vs_uniform_blk, {
+	{ GL_NAME_LENGTH, 1, { 13 } },
+	{ GL_BUFFER_BINDING, 1, { 0 } },
+	{ GL_BUFFER_DATA_SIZE, 1, { 16 } }, /* only checks for GL errors */
+	{ GL_NUM_ACTIVE_VARIABLES, 1, { 1 } },
+	{ GL_ACTIVE_VARIABLES, 1, { 0 } },
+	{ GL_REFERENCED_BY_VERTEX_SHADER, 1, { 1 } },
+	{ GL_REFERENCED_BY_TESS_CONTROL_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
+	{ 0, 0, { 0 } }}
+ },
+ { &prog_buff_blks, GL_UNIFORM_BLOCK, "fs_uni_block", fs_std_fs_uniform_blk, {
+	{ GL_NAME_LENGTH, 1, { 13 } },
+	{ GL_BUFFER_BINDING, 1, { 0 } },
+	{ GL_BUFFER_DATA_SIZE, 1, { 32 } }, /* only checks for GL errors */
+	{ GL_NUM_ACTIVE_VARIABLES, 1, { 2 } },
+	{ GL_ACTIVE_VARIABLES, 2, { 0, 0 } },
+	{ GL_REFERENCED_BY_VERTEX_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_CONTROL_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 1 } },
+	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
+	{ 0, 0, { 0 } }}
+ },
+ { &prog_buff_blks, GL_SHADER_STORAGE_BLOCK, "vs_buffer_block", vs_stor_vs_buf_blk, {
+	{ GL_NAME_LENGTH, 1, { 16 } },
+	{ GL_BUFFER_BINDING, 1, { 0 } },
+	{ GL_BUFFER_DATA_SIZE, 1, { 16 } }, /* only checks for GL errors */
+	{ GL_NUM_ACTIVE_VARIABLES, 1, { 1 } },
+	{ GL_ACTIVE_VARIABLES, 1, { 1 } },
+	{ GL_REFERENCED_BY_VERTEX_SHADER, 1, { 1 } },
+	{ GL_REFERENCED_BY_TESS_CONTROL_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
+	{ 0, 0, { 0 } }}
+ },
+ { &prog_buff_blks, GL_SHADER_STORAGE_BLOCK, "fs_buffer_block", fs_stor_fs_buf_blk, {
+	{ GL_NAME_LENGTH, 1, { 16 } },
+	{ GL_BUFFER_BINDING, 1, { 0 } },
+	{ GL_BUFFER_DATA_SIZE, 1, { 16 } }, /* only checks for GL errors */
+	{ GL_NUM_ACTIVE_VARIABLES, 1, { 1 } },
+	{ GL_ACTIVE_VARIABLES, 1, { 1 } },
+	{ GL_REFERENCED_BY_VERTEX_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_CONTROL_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
+	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 1 } },
 	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
 	{ 0, 0, { 0 } }}
  },
@@ -860,7 +920,7 @@ check_extensions(GLuint prog, GLenum programInterface)
 	/* First check the availability of the extensions */
 	if ((programInterface == GL_BUFFER_VARIABLE ||
 	    programInterface == GL_SHADER_STORAGE_BLOCK ||
-	    prog == prog_stor) &&
+	    prog == prog_stor || prog == prog_buff_blks) &&
 	    !piglit_is_extension_supported("GL_ARB_shader_storage_buffer_object")) {
 		return false;
 	}
@@ -981,6 +1041,11 @@ piglit_init(int argc, char **argv)
 						GL_VERTEX_SHADER, vs_stor,
 						GL_GEOMETRY_SHADER, gs_stor,
 						GL_FRAGMENT_SHADER, fs_stor,
+						0);
+
+		prog_buff_blks = piglit_build_simple_program_multiple_shaders(
+						GL_VERTEX_SHADER, vs_buff_blks,
+						GL_FRAGMENT_SHADER, fs_buff_blks,
 						0);
 	}
 
@@ -1137,6 +1202,7 @@ piglit_display(void)
 	glDeleteProgramSafe(prog_sub_tess);
 	glDeleteProgramSafe(prog_sub);
 	glDeleteProgramSafe(prog_stor);
+	glDeleteProgramSafe(prog_buff_blks);
 	glDeleteProgramSafe(prog_std);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
