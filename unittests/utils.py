@@ -368,7 +368,7 @@ def test_in_tempdir(func):
         with tempdir() as tdir:
             try:
                 os.chdir(tdir)
-                func(*args, **kwargs)
+                return func(*args, **kwargs)
             finally:
                 os.chdir(original_dir)
 

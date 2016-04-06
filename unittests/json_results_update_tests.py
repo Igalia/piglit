@@ -226,6 +226,7 @@ class TestV0toV1(object):
         """backends.json.update_results (0 -> 1): Correctly handle new single entry subtests correctly"""
         nt.ok_('group3/groupA/test' in six.iterkeys(self.RESULT.tests))
 
+    @utils.test_in_tempdir
     def _load_with_update(self, data=None):
         """If the file is not results.json, it will be renamed.
 
@@ -235,18 +236,9 @@ class TestV0toV1(object):
         if not data:
             data = self.DATA
 
-        try:
-            with utils.tempfile(
-                    json.dumps(data, default=backends.json.piglit_encoder)) as t:
-                result = backends.json.load_results(t, 'none')
-        except OSError as e:
-            # There is the potential that the file will be renamed. In that event
-            # remove the renamed files
-            if e.errno == 2:
-                os.unlink(os.path.join(tempfile.tempdir, 'results.json'))
-                os.unlink(os.path.join(tempfile.tempdir, 'results.json.old'))
-            else:
-                raise
+        with open('results.json', 'w') as f:
+            json.dump(data, f, default=backends.json.piglit_encoder)
+        result = backends.json.load_results('results.json', 'none')
 
         return result
 
