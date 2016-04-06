@@ -459,6 +459,7 @@ create_texture(const GLenum target,
                 /* cube map arrays also use TexImage3D buth depth
                  * needs to be a multiple of six */
                 depth = 6;
+                /* fall through */
         case GL_TEXTURE_2D_ARRAY:
         case GL_TEXTURE_3D:
                 glTexImage3D(target, 0, internalformat, width, height, depth, 0,
