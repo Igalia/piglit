@@ -877,7 +877,7 @@ test_data_equal_at_index(test_data *data,
                         " auxiliar test data structures\n");
                 return false;
         }
-        if (index > data->params_size || index < 0) {
+        if (index > data->params_size) {
                 fprintf(stderr, "ERROR: invalid index while setting"
                         " auxiliar test data\n");
                 return false;
