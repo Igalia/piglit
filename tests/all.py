@@ -4662,6 +4662,9 @@ with profile.group_manager(
     g(['arb_vertex_attrib_64bit-check-explicit-location'], 'check-explicit-location')
     g(['arb_vertex_attrib_64bit-max-vertex-attrib'], 'max-vertex-attrib')
     g(['arb_vertex_attrib_64bit-getactiveattrib'], 'getactiveattrib')
+    for test_type in ('shader', 'api'):
+        g(['arb_vertex_attrib_64bit-overlapping-locations', test_type],
+          run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
