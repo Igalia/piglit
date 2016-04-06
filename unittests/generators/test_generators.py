@@ -73,6 +73,7 @@ def discover_generators():
 def test_generators():
     """Generate tests for the various generators."""
 
+    @utils.test_in_tempdir
     def test(name):
         """Tester function."""
         msg = ''
