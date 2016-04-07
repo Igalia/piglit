@@ -1015,6 +1015,7 @@ with profile.group_manager(
     g(['gl-1.0-readpixsanity'])
     g(['gl-1.0-logicop'])
     g(['gl-1.0-no-op-paths'])
+    g(['gl-1.0-simple-readbuffer'])
 
 with profile.group_manager(
         PiglitGLTest,
