@@ -132,6 +132,13 @@ piglit_make_generated_tests(
 	templates/gen_variable_index_read_tests/vs.shader_test.mako
 	templates/gen_variable_index_read_tests/fs.shader_test.mako
 	templates/gen_variable_index_read_tests/helpers.mako)
+piglit_make_generated_tests(
+	gen_extensions_defined.list
+	gen_extensions_defined.py
+	templates/gen_extensions_defined/enabled.glsl.mako
+	templates/gen_extensions_defined/disabled.glsl.mako
+	templates/gen_extensions_defined/undefined-require.glsl.mako
+	modules/glsl.py)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -176,6 +183,7 @@ add_custom_target(gen-gl-tests
 			shader_precision_tests.list
 			shader_image_load_store_tests.list
 			variable_index_read_tests.list
+			gen_extensions_defined.list
 )
 
 # Create a custom target for generating OpenCL tests

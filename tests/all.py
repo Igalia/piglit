@@ -490,7 +490,6 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['createshaderprogram-bad-type'])
     g(['createshaderprogram-attached-shaders'])
     g(['glsl-arb-fragment-coord-conventions'])
-    g(['glsl-arb-fragment-coord-conventions-define'])
     g(['glsl-bug-22603'])
     g(['glsl-bindattriblocation'])
     g(['glsl-dlist-getattriblocation'])
