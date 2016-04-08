@@ -342,6 +342,8 @@ void piglit_init(int argc, char **argv)
 {
         bool pass = true;
 
+        piglit_require_extension("GL_ARB_vertex_attrib_64bit");
+
         pass = do_test(vertex_attrib_64bit_tests,
                        ARRAY_SIZE(vertex_attrib_64bit_tests));
 
