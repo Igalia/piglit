@@ -115,8 +115,6 @@ run_test(void)
 
 void piglit_init(int argc, char **argv)
 {
-	piglit_require_gl_version(20);
-
 	piglit_require_extension("GL_ARB_vertex_attrib_64bit");
 
         piglit_report_result(run_test());
