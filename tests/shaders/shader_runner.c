@@ -34,10 +34,10 @@
 static void
 get_required_config(const char *script_name,
 		    struct piglit_gl_test_config *config);
-GLenum
+static GLenum
 decode_drawing_mode(const char *mode_str);
 
-void
+static void
 get_uints(const char *line, unsigned *uints, unsigned count);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -53,7 +53,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-const char passthrough_vertex_shader_source[] =
+static const char passthrough_vertex_shader_source[] =
 	"#if __VERSION__ >= 130\n"
 	"in vec4 piglit_vertex;\n"
 	"#else\n"
@@ -92,53 +92,53 @@ static int gl_max_vertex_uniform_components;
 static int gl_max_varying_components;
 static int gl_max_clip_planes;
 
-const char *path = NULL;
-const char *test_start = NULL;
+static const char *path = NULL;
+static const char *test_start = NULL;
 
-GLuint vertex_shaders[256];
-unsigned num_vertex_shaders = 0;
-GLuint tess_ctrl_shaders[256];
-unsigned num_tess_ctrl_shaders = 0;
-GLuint tess_eval_shaders[256];
-unsigned num_tess_eval_shaders = 0;
-GLuint geometry_shaders[256];
-unsigned num_geometry_shaders = 0;
-GLuint fragment_shaders[256];
-unsigned num_fragment_shaders = 0;
-GLuint compute_shaders[256];
-unsigned num_compute_shaders = 0;
-int num_uniform_blocks;
-GLuint *uniform_block_bos;
-GLenum geometry_layout_input_type = GL_TRIANGLES;
-GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
-GLint geometry_layout_vertices_out = 0;
-GLuint atomics_bo = 0;
-GLuint ssbo = 0;
+static GLuint vertex_shaders[256];
+static unsigned num_vertex_shaders = 0;
+static GLuint tess_ctrl_shaders[256];
+static unsigned num_tess_ctrl_shaders = 0;
+static GLuint tess_eval_shaders[256];
+static unsigned num_tess_eval_shaders = 0;
+static GLuint geometry_shaders[256];
+static unsigned num_geometry_shaders = 0;
+static GLuint fragment_shaders[256];
+static unsigned num_fragment_shaders = 0;
+static GLuint compute_shaders[256];
+static unsigned num_compute_shaders = 0;
+static int num_uniform_blocks;
+static GLuint *uniform_block_bos;
+static GLenum geometry_layout_input_type = GL_TRIANGLES;
+static GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
+static GLint geometry_layout_vertices_out = 0;
+static GLuint atomics_bo = 0;
+static GLuint ssbo = 0;
 
 #define SHADER_TYPES 6
 static GLuint *subuniform_locations[SHADER_TYPES];
 static int num_subuniform_locations[SHADER_TYPES];
-char *shader_string;
-GLint shader_string_size;
-const char *vertex_data_start = NULL;
-const char *vertex_data_end = NULL;
-GLuint prog;
-GLuint sso_vertex_prog;
-GLuint sso_tess_control_prog;
-GLuint sso_tess_eval_prog;
-GLuint sso_geometry_prog;
-GLuint sso_fragment_prog;
-GLuint sso_compute_prog;
-GLuint pipeline;
-size_t num_vbo_rows = 0;
-bool vbo_present = false;
-bool link_ok = false;
-bool prog_in_use = false;
-bool sso_in_use = false;
-GLchar *prog_err_info = NULL;
-GLuint vao = 0;
-GLuint fbo = 0;
-GLint render_width, render_height;
+static char *shader_string;
+static GLint shader_string_size;
+static const char *vertex_data_start = NULL;
+static const char *vertex_data_end = NULL;
+static GLuint prog;
+static GLuint sso_vertex_prog;
+static GLuint sso_tess_control_prog;
+static GLuint sso_tess_eval_prog;
+static GLuint sso_geometry_prog;
+static GLuint sso_fragment_prog;
+static GLuint sso_compute_prog;
+static GLuint pipeline;
+static size_t num_vbo_rows = 0;
+static bool vbo_present = false;
+static bool link_ok = false;
+static bool prog_in_use = false;
+static bool sso_in_use = false;
+static GLchar *prog_err_info = NULL;
+static GLuint vao = 0;
+static GLuint fbo = 0;
+static GLint render_width, render_height;
 
 enum states {
 	none = 0,
@@ -245,7 +245,7 @@ static const struct string_to_enum all_types[] = {
 	{ NULL, 0 }
 };
 
-GLenum
+static GLenum
 lookup_enum_string(const struct string_to_enum *table, const char **line,
 		   const char *error_desc)
 {
@@ -264,7 +264,7 @@ lookup_enum_string(const struct string_to_enum *table, const char **line,
 	return 0;
 }
 
-bool
+static bool
 compare(float ref, float value, enum comparison cmp);
 
 static bool
@@ -328,7 +328,7 @@ version_string(struct component_version *v)
 }
 
 
-const char *
+static const char *
 target_to_short_name(GLenum target)
 {
 	switch (target) {
@@ -350,7 +350,7 @@ target_to_short_name(GLenum target)
 }
 
 
-void
+static void
 compile_glsl(GLenum target)
 {
 	GLuint shader = glCreateShader(target);
@@ -462,7 +462,7 @@ compile_glsl(GLenum target)
 	}
 }
 
-void
+static void
 compile_and_bind_program(GLenum target, const char *start, int len)
 {
 	GLuint prog;
@@ -488,7 +488,7 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 	prog_in_use = true;
 }
 
-void
+static void
 link_sso(GLenum target)
 {
 	GLint ok;
@@ -547,7 +547,7 @@ link_sso(GLenum target)
 /**
  * Compare two values given a specified comparison operator
  */
-bool
+static bool
 compare(float ref, float value, enum comparison cmp)
 {
 	switch (cmp) {
@@ -582,7 +582,7 @@ compare_uint(GLuint ref, GLuint value, enum comparison cmp)
 /**
  * Get the string representation of a comparison operator
  */
-const char *
+static const char *
 comparison_string(enum comparison cmp)
 {
 	switch (cmp) {
@@ -602,7 +602,7 @@ comparison_string(enum comparison cmp)
 /**
  * Parse a binary comparison operator and return the matching token
  */
-const char *
+static const char *
 process_comparison(const char *src, enum comparison *cmp)
 {
 	char buf[32];
@@ -652,7 +652,7 @@ process_comparison(const char *src, enum comparison *cmp)
  * " ES" before the comparison operator indicates the version
  * pertains to GL ES.
  */
-void
+static void
 parse_version_comparison(const char *line, enum comparison *cmp,
 			 struct component_version *v, enum version_tag tag)
 {
@@ -700,7 +700,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 /**
  * Parse and check a line from the requirement section of the test
  */
-void
+static void
 process_requirement(const char *line)
 {
 	char buffer[4096];
@@ -875,7 +875,7 @@ process_requirement(const char *line)
 /**
  * Process a line from the [geometry layout] section of a test
  */
-void
+static void
 process_geometry_layout(const char *line)
 {
 	char s[32];
@@ -898,7 +898,7 @@ process_geometry_layout(const char *line)
 }
 
 
-void
+static void
 leave_state(enum states state, const char *line)
 {
 	switch (state) {
@@ -970,7 +970,7 @@ leave_state(enum states state, const char *line)
 }
 
 
-void
+static void
 process_shader(GLenum target, unsigned num_shaders, GLuint *shaders)
 {
 	if (num_shaders == 0)
@@ -1013,7 +1013,7 @@ process_shader(GLenum target, unsigned num_shaders, GLuint *shaders)
 }
 
 
-void
+static void
 link_and_use_shaders(void)
 {
 	unsigned i;
@@ -1097,7 +1097,7 @@ link_and_use_shaders(void)
 }
 
 
-void
+static void
 process_test_script(const char *script_name)
 {
 	unsigned text_size;
@@ -1337,7 +1337,7 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
  * section is processed.  Do a quick scan over the requirements section to find
  * the GL and GLSL version requirements.  Use these to guide context creation.
  */
-void
+static void
 get_required_config(const char *script_name,
 		    struct piglit_gl_test_config *config)
 {
@@ -1367,7 +1367,7 @@ get_required_config(const char *script_name,
 	}
 }
 
-void
+static void
 get_floats(const char *line, float *f, unsigned count)
 {
 	unsigned i;
@@ -1389,7 +1389,7 @@ get_floats(const char *line, float *f, unsigned count)
 	}
 }
 
-void
+static void
 get_doubles(const char *line, double *d, unsigned count)
 {
 	unsigned i;
@@ -1412,7 +1412,7 @@ get_doubles(const char *line, double *d, unsigned count)
 }
 
 
-void
+static void
 get_ints(const char *line, int *ints, unsigned count)
 {
 	unsigned i;
@@ -1422,7 +1422,7 @@ get_ints(const char *line, int *ints, unsigned count)
 }
 
 
-void
+static void
 get_uints(const char *line, unsigned *uints, unsigned count)
 {
 	unsigned i;
@@ -1437,7 +1437,7 @@ get_uints(const char *line, unsigned *uints, unsigned count)
  * (e.g. through glUniform1ui).  If not, terminate the test with a
  * SKIP.
  */
-void
+static void
 check_unsigned_support(void)
 {
 	if (gl_version.num < 30 && !piglit_is_extension_supported("GL_EXT_gpu_shader4"))
@@ -1449,7 +1449,7 @@ check_unsigned_support(void)
  * (e.g. through glUniform1d).  If not, terminate the test with a
  * SKIP.
  */
-void
+static void
 check_double_support(void)
 {
 	if (gl_version.num < 40 && !piglit_is_extension_supported("GL_ARB_gpu_shader_fp64"))
@@ -1460,7 +1460,7 @@ check_double_support(void)
  * Check that the GL implementation supports shader subroutines
  * If not, terminate the test with a SKIP.
  */
-void
+static void
 check_shader_subroutine_support(void)
 {
 	if (gl_version.num < 40 && !piglit_is_extension_supported("GL_ARB_shader_subroutine"))
@@ -1471,7 +1471,7 @@ check_shader_subroutine_support(void)
  * Handles uploads of UBO uniforms by mapping the buffer and storing
  * the data.  If the uniform is not in a uniform block, returns false.
  */
-bool
+static bool
 set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_index)
 {
 	GLuint uniform_index;
@@ -1650,7 +1650,7 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 	return true;
 }
 
-void
+static void
 set_uniform(const char *line, int ubo_array_index)
 {
 	char name[512];
@@ -1922,7 +1922,7 @@ static GLenum get_shader_from_string(const char *name, int *idx)
 	return 0;
 }
 
-void
+static void
 free_subroutine_uniforms(void)
 {
 	int sidx;
@@ -1930,7 +1930,7 @@ free_subroutine_uniforms(void)
 	    free(subuniform_locations[sidx]);
 }
 
-void
+static void
 program_subroutine_uniforms(void)
 {
 	int sidx;
@@ -1949,7 +1949,7 @@ program_subroutine_uniforms(void)
 	}
 }
 
-void
+static void
 set_subroutine_uniform(const char *line)
 {
 	GLuint prog;
@@ -2018,7 +2018,7 @@ set_subroutine_uniform(const char *line)
  *
  *     active uniform uniform_name GL_PNAME_ENUM GL_TYPE_ENUM
  */
-void
+static void
 active_uniform(const char *line)
 {
 	static const struct string_to_enum all_pnames[] = {
@@ -2153,7 +2153,7 @@ active_uniform(const char *line)
  *
  *  verify program_interface_query GL_INTERFACE_TYPE_ENUM name GL_PNAME_ENUM GL_TYPE_ENUM
  */
-void
+static void
 active_program_interface(const char *line)
 {
 	static const struct string_to_enum all_props[] = {
@@ -2307,7 +2307,7 @@ active_program_interface(const char *line)
 	return;
 }
 
-void
+static void
 set_parameter(const char *line)
 {
 	float f[4];
@@ -2335,7 +2335,7 @@ set_parameter(const char *line)
 	}
 }
 
-void
+static void
 set_patch_parameter(const char *line)
 {
 #ifdef PIGLIT_USE_OPENGL
@@ -2380,7 +2380,7 @@ set_patch_parameter(const char *line)
 #endif
 }
 
-void
+static void
 set_provoking_vertex(const char *line)
 {
 	if (string_match("first", line)) {
@@ -2408,7 +2408,7 @@ static const struct string_to_enum enable_table[] = {
 	{ NULL, 0 }
 };
 
-void
+static void
 do_enable_disable(const char *line, bool enable_flag)
 {
 	GLenum value = lookup_enum_string(enable_table, &line,
@@ -2434,7 +2434,7 @@ static const struct string_to_enum hint_param_table[] = {
 	{ NULL, 0 }
 };
 
-void do_hint(const char *line)
+static void do_hint(const char *line)
 {
 	GLenum target = lookup_enum_string(hint_target_table, &line,
 					   "hint target");
@@ -2476,7 +2476,7 @@ draw_instanced_rect(int primcount, float x, float y, float w, float h)
 }
 
 
-GLenum
+static GLenum
 decode_drawing_mode(const char *mode_str)
 {
 	int i;
@@ -2646,7 +2646,7 @@ setup_ubos(void)
 	}
 }
 
-void
+static void
 program_must_be_in_use(void)
 {
 	if (!link_ok) {
@@ -2659,7 +2659,7 @@ program_must_be_in_use(void)
 
 }
 
-void
+static void
 bind_vao_if_supported()
 {
 	if (vao == 0 && gl_version.num >= 31) {
