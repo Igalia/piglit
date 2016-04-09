@@ -28,9 +28,15 @@
 #include "piglit-util.h"
 #include "piglit-util-gl.h"
 #include "piglit-vbo.h"
+#include "piglit-framework-gl/piglit_gl_framework.h"
 
 #include "shader_runner_gles_workarounds.h"
 #include "parser_utils.h"
+
+#define DEFAULT_WINDOW_WIDTH 250
+#define DEFAULT_WINDOW_HEIGHT 250
+
+static struct piglit_gl_test_config current_config;
 
 static void
 get_required_config(const char *script_name,
@@ -43,14 +49,16 @@ get_uints(const char *line, unsigned *uints, unsigned count);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.window_width = 250;
-	config.window_height = 250;
+	config.window_width = DEFAULT_WINDOW_WIDTH;
+	config.window_height = DEFAULT_WINDOW_HEIGHT;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 	if (argc > 1)
 		get_required_config(argv[1], &config);
 	else
 		config.supports_gl_compat_version = 10;
+
+	current_config = config;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -84,6 +92,7 @@ struct string_to_enum {
 
 extern float piglit_tolerance[4];
 
+static int test_num = 1;
 static struct component_version gl_version;
 static struct component_version glsl_version;
 static struct component_version glsl_req_version;
@@ -109,6 +118,8 @@ static GLuint fragment_shaders[256];
 static unsigned num_fragment_shaders = 0;
 static GLuint compute_shaders[256];
 static unsigned num_compute_shaders = 0;
+static GLuint textures[256];
+static unsigned num_textures = 0;
 static int num_uniform_blocks;
 static GLuint *uniform_block_bos;
 static GLenum geometry_layout_input_type = GL_TRIANGLES;
@@ -141,6 +152,8 @@ static GLchar *prog_err_info = NULL;
 static GLuint vao = 0;
 static GLuint fbo = 0;
 static GLint render_width, render_height;
+
+static bool report_subtests = false;
 
 enum states {
 	none = 0,
@@ -1073,49 +1086,25 @@ link_and_use_shaders(void)
 
 	result = process_shader(GL_VERTEX_SHADER, num_vertex_shaders, vertex_shaders);
 	if (result != PIGLIT_PASS)
-		return result;
+		goto cleanup;
 	result = process_shader(GL_TESS_CONTROL_SHADER, num_tess_ctrl_shaders, tess_ctrl_shaders);
 	if (result != PIGLIT_PASS)
-		return result;
+		goto cleanup;
 	result = process_shader(GL_TESS_EVALUATION_SHADER, num_tess_eval_shaders, tess_eval_shaders);
 	if (result != PIGLIT_PASS)
-		return result;
+		goto cleanup;
 	result = process_shader(GL_GEOMETRY_SHADER, num_geometry_shaders, geometry_shaders);
 	if (result != PIGLIT_PASS)
-		return result;
+		goto cleanup;
 	result = process_shader(GL_FRAGMENT_SHADER, num_fragment_shaders, fragment_shaders);
 	if (result != PIGLIT_PASS)
-		return result;
+		goto cleanup;
 	result = process_shader(GL_COMPUTE_SHADER, num_compute_shaders, compute_shaders);
 	if (result != PIGLIT_PASS)
-		return result;
+		goto cleanup;
 
 	if (!sso_in_use)
 		glLinkProgram(prog);
-
-	for (i = 0; i < num_vertex_shaders; i++) {
-		glDeleteShader(vertex_shaders[i]);
-	}
-
-	for (i = 0; i < num_tess_ctrl_shaders; i++) {
-		glDeleteShader(tess_ctrl_shaders[i]);
-	}
-
-	for (i = 0; i < num_tess_eval_shaders; i++) {
-		glDeleteShader(tess_eval_shaders[i]);
-	}
-
-	for (i = 0; i < num_geometry_shaders; i++) {
-		glDeleteShader(geometry_shaders[i]);
-	}
-
-	for (i = 0; i < num_fragment_shaders; i++) {
-		glDeleteShader(fragment_shaders[i]);
-	}
-
-	for (i = 0; i < num_compute_shaders; i++) {
-		glDeleteShader(compute_shaders[i]);
-	}
 
 	if (!sso_in_use) {
 		glGetProgramiv(prog, GL_LINK_STATUS, &ok);
@@ -1129,7 +1118,8 @@ link_and_use_shaders(void)
 
 			glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 
-			return PIGLIT_PASS;
+			result = PIGLIT_PASS;
+			goto cleanup;
 		}
 
 		glUseProgram(prog);
@@ -1146,7 +1136,39 @@ link_and_use_shaders(void)
 
 		glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 	}
-	return PIGLIT_PASS;
+
+cleanup:
+	for (i = 0; i < num_vertex_shaders; i++) {
+		glDeleteShader(vertex_shaders[i]);
+	}
+	num_vertex_shaders = 0;
+
+	for (i = 0; i < num_tess_ctrl_shaders; i++) {
+		glDeleteShader(tess_ctrl_shaders[i]);
+	}
+	num_tess_ctrl_shaders = 0;
+
+	for (i = 0; i < num_tess_eval_shaders; i++) {
+		glDeleteShader(tess_eval_shaders[i]);
+	}
+	num_tess_eval_shaders = 0;
+
+	for (i = 0; i < num_geometry_shaders; i++) {
+		glDeleteShader(geometry_shaders[i]);
+	}
+	num_geometry_shaders = 0;
+
+	for (i = 0; i < num_fragment_shaders; i++) {
+		glDeleteShader(fragment_shaders[i]);
+	}
+	num_fragment_shaders = 0;
+
+	for (i = 0; i < num_compute_shaders; i++) {
+		glDeleteShader(compute_shaders[i]);
+	}
+	num_compute_shaders = 0;
+
+	return result;
 }
 
 
@@ -2052,8 +2074,10 @@ static void
 free_subroutine_uniforms(void)
 {
 	int sidx;
-	for (sidx = 0; sidx < 4; sidx++)
-	    free(subuniform_locations[sidx]);
+	for (sidx = 0; sidx < 4; sidx++) {
+		free(subuniform_locations[sidx]);
+		subuniform_locations[sidx] = NULL;
+	}
 }
 
 static void
@@ -2772,6 +2796,19 @@ setup_ubos(void)
 	}
 }
 
+static void
+teardown_ubos(void)
+{
+	if (num_uniform_blocks == 0) {
+		return;
+	}
+
+	glDeleteBuffers(num_uniform_blocks, uniform_block_bos);
+	free(uniform_block_bos);
+	uniform_block_bos = NULL;
+	num_uniform_blocks = 0;
+}
+
 static enum piglit_result
 program_must_be_in_use(void)
 {
@@ -3247,8 +3284,11 @@ piglit_display(void)
 			}
 
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_rgbw_texture(int_fmt, w, h, GL_FALSE, GL_FALSE,
-					    GL_UNSIGNED_NORMALIZED);
+			int handle = piglit_rgbw_texture(
+				int_fmt, w, h, GL_FALSE, GL_FALSE,
+				GL_UNSIGNED_NORMALIZED);
+			textures[num_textures] = handle;
+			num_textures++;
 			if (!piglit_is_core_profile)
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line, "texture integer %d ( %d", &tex, &w) == 2) {
@@ -3296,6 +3336,8 @@ piglit_display(void)
 			glBindTexture(GL_TEXTURE_2D_ARRAY, texobj);
 			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
 				     w, h, l, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			textures[num_textures] = texobj;
+			num_textures++;
 		} else if (sscanf(line,
 				  "texture rgbw 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
@@ -3429,8 +3471,11 @@ piglit_display(void)
 	piglit_present_results();
 
 	if (piglit_automatic) {
-	        free_subroutine_uniforms();
 		/* Free our resources, useful for valgrinding. */
+	        free_subroutine_uniforms();
+		glDeleteTextures(num_textures, (const GLuint *) &textures);
+		num_textures = 0;
+
 		if (prog != 0) {
 			glDeleteProgram(prog);
 			glUseProgram(0);
@@ -3477,6 +3522,63 @@ init_test(const char *file)
 	return PIGLIT_PASS;
 }
 
+static void
+recreate_gl_context(char *exec_arg, int param_argc, char **param_argv)
+{
+	int argc = param_argc + 4;
+	char **argv = malloc(sizeof(char*) * argc);
+
+	if (!argv) {
+		fprintf(stderr, "%s: malloc failed.\n", __func__);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	argv[0] = exec_arg;
+	memcpy(&argv[1], param_argv, param_argc * sizeof(char*));
+	argv[argc-3] = "-auto";
+	argv[argc-2] = "-fbo";
+	argv[argc-1] = "-report-subtests";
+
+	if (gl_fw->destroy)
+		gl_fw->destroy(gl_fw);
+	gl_fw = NULL;
+
+	exit(main(argc, argv));
+}
+
+static bool
+validate_current_gl_context(const char *filename)
+{
+	struct piglit_gl_test_config config = {};
+
+	config.window_width = DEFAULT_WINDOW_WIDTH;
+	config.window_height = DEFAULT_WINDOW_HEIGHT;
+
+	get_required_config(filename, &config);
+
+	if (!current_config.supports_gl_compat_version !=
+	    !config.supports_gl_compat_version)
+		return false;
+
+	if (!current_config.supports_gl_core_version !=
+	    !config.supports_gl_core_version)
+		return false;
+
+	if (!current_config.supports_gl_es_version !=
+	    !config.supports_gl_es_version)
+		return false;
+
+	if (current_config.window_width != config.window_width ||
+	    current_config.window_height != config.window_height)
+		return false;
+
+	if (!(current_config.window_visual & PIGLIT_GL_VISUAL_DEPTH) &&
+	    config.window_visual & PIGLIT_GL_VISUAL_DEPTH)
+		return false;
+
+	return true;
+}
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -3485,6 +3587,16 @@ piglit_init(int argc, char **argv)
 	bool core = piglit_is_core_profile;
 	bool es;
 	enum piglit_result result;
+	float default_piglit_tolerance[4];
+
+	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
+	if (argc < 2) {
+		printf("usage: shader_runner <test.shader_test>\n");
+		exit(1);
+	}
+
+	memcpy(default_piglit_tolerance, piglit_tolerance,
+	       sizeof(piglit_tolerance));
 
 	piglit_require_GLSL();
 
@@ -3514,7 +3626,6 @@ piglit_init(int argc, char **argv)
 	    piglit_is_extension_supported("GL_EXT_geometry_shader4"))
 		glGetIntegerv(GL_MAX_VARYING_COMPONENTS,
 			      &gl_max_varying_components);
-	glGetIntegerv(GL_MAX_CLIP_PLANES, &gl_max_clip_planes);
 #else
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,
 		      &gl_max_fragment_uniform_components);
@@ -3525,8 +3636,9 @@ piglit_init(int argc, char **argv)
 	gl_max_fragment_uniform_components *= 4;
 	gl_max_vertex_uniform_components *= 4;
 	gl_max_varying_components *= 4;
-	gl_max_clip_planes = 0;
 #endif
+	glGetIntegerv(GL_MAX_CLIP_PLANES, &gl_max_clip_planes);
+
 	if (gl_version.num >= 20 ||
 	    piglit_is_extension_supported("GL_ARB_vertex_shader"))
 		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS,
@@ -3534,16 +3646,187 @@ piglit_init(int argc, char **argv)
 	else
 		gl_max_vertex_attribs = 16;
 
-	if (argc < 2) {
-		printf("usage: shader_runner <test.shader_test>\n");
-		exit(1);
-	}
+	render_width = piglit_width;
+	render_height = piglit_height;
 
+	/* Automatic mode can run multiple tests per session. */
+	if (report_subtests) {
+		char testname[4096], *ext;
+		int i, j;
+
+		for (i = 1; i < argc; i++) {
+			const char *hit, *filename = argv[i];
+
+			memcpy(piglit_tolerance, default_piglit_tolerance,
+			       sizeof(piglit_tolerance));
+
+			/* Re-initialize the GL context if a different GL config is required. */
+			if (!validate_current_gl_context(filename))
+				recreate_gl_context(argv[0], argc - i, argv + i);
+
+			/* Clear global variables to defaults. */
+			test_start = NULL;
+			assert(num_vertex_shaders == 0);
+			assert(num_tess_ctrl_shaders == 0);
+			assert(num_tess_eval_shaders == 0);
+			assert(num_geometry_shaders == 0);
+			assert(num_fragment_shaders == 0);
+			assert(num_compute_shaders == 0);
+			assert(num_textures == 0);
+			assert(num_uniform_blocks == 0);
+			assert(uniform_block_bos == NULL);
+			geometry_layout_input_type = GL_TRIANGLES;
+			geometry_layout_output_type = GL_TRIANGLE_STRIP;
+			geometry_layout_vertices_out = 0;
+			atomics_bo = 0;
+			memset(ssbo, 0, sizeof(ssbo));
+			for (j = 0; j < ARRAY_SIZE(subuniform_locations); j++)
+				assert(subuniform_locations[j] == NULL);
+			memset(num_subuniform_locations, 0, sizeof(num_subuniform_locations));
+			shader_string = NULL;
+			shader_string_size = 0;
+			vertex_data_start = NULL;
+			vertex_data_end = NULL;
+			prog = 0;
+			sso_vertex_prog = 0;
+			sso_tess_control_prog = 0;
+			sso_tess_eval_prog = 0;
+			sso_geometry_prog = 0;
+			sso_fragment_prog = 0;
+			sso_compute_prog = 0;
+			num_vbo_rows = 0;
+			vbo_present = false;
+			link_ok = false;
+			prog_in_use = false;
+			sso_in_use = false;
+			prog_err_info = NULL;
+			vao = 0;
+			fbo = 0;
+
+			/* Clear GL states to defaults. */
+			glClearColor(0, 0, 0, 0);
+# if PIGLIT_USE_OPENGL
+			glClearDepth(1);
+# else
+			glClearDepthf(1.0);
+# endif
+			glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
+			glActiveTexture(GL_TEXTURE0);
+			glUseProgram(0);
+			glDisable(GL_DEPTH_TEST);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			for (int k = 0; k < gl_max_clip_planes; k++) {
+				glDisable(GL_CLIP_PLANE0 + k);
+			}
+
+			if (!(es) && (gl_version.num >= 20 ||
+			     piglit_is_extension_supported("GL_ARB_vertex_program")))
+				glDisable(GL_PROGRAM_POINT_SIZE);
+
+			for (int i = 0; i < 16; i++)
+				glDisableVertexAttribArray(i);
+
+			if (!piglit_is_core_profile && !es) {
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glMatrixMode(GL_MODELVIEW);
+				glLoadIdentity();
+				glShadeModel(GL_SMOOTH);
+				glDisable(GL_VERTEX_PROGRAM_TWO_SIDE);
+			}
+
+			if (piglit_is_extension_supported("GL_ARB_vertex_program")) {
+				glDisable(GL_VERTEX_PROGRAM_ARB);
+				glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 0);
+			}
+			if (piglit_is_extension_supported("GL_ARB_fragment_program")) {
+				glDisable(GL_FRAGMENT_PROGRAM_ARB);
+				glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, 0);
+			}
+			if (piglit_is_extension_supported("GL_ARB_separate_shader_objects")) {
+				if (!pipeline)
+					glGenProgramPipelines(1, &pipeline);
+				glBindProgramPipeline(0);
+			}
+
+			if (piglit_is_extension_supported("GL_EXT_provoking_vertex"))
+				glProvokingVertexEXT(GL_LAST_VERTEX_CONVENTION_EXT);
+
+# if PIGLIT_USE_OPENGL
+			if (gl_version.num >= 40 ||
+			    piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
+				static float ones[] = {1, 1, 1, 1};
+				glPatchParameteri(GL_PATCH_VERTICES, 3);
+				glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, ones);
+				glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, ones);
+			}
+# else
+			/* Ideally one would use the following code:
+			 *
+			 * if (gl_version.num >= 32) {
+			 *         glPatchParameteri(GL_PATCH_VERTICES, 3);
+			 * }
+			 *
+			 * however, that doesn't work with mesa because those
+			 * symbols apparently need to be exported, but that
+			 * breaks non-gles builds.
+			 *
+			 * It seems rather unlikely that an implementation
+			 * would have GLES 3.2 support but not
+			 * OES_tessellation_shader.
+			 */
+			if (piglit_is_extension_supported("GL_OES_tessellation_shader")) {
+				glPatchParameteriOES(GL_PATCH_VERTICES_OES, 3);
+			}
+# endif
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			/* Strip the file path. */
+			hit = strrchr(filename, PIGLIT_PATH_SEP);
+			if (hit)
+				strcpy(testname, hit+1);
+			else
+				strcpy(testname, filename);
+
+			/* Strip the file extension. */
+			ext = strstr(testname, ".shader_test");
+			if (ext && !ext[12])
+				*ext = 0;
+
+			/* Print the name before we start the test, that way if
+			 * the test fails we can still resume and know which
+			 * test failed */
+			printf("PIGLIT TEST: %i - %s\n", test_num, testname);
+			fprintf(stderr, "PIGLIT TEST: %i - %s\n", test_num, testname);
+			test_num++;
+
+			/* Run the test. */
+			result = init_test(filename);
+
+			if (result == PIGLIT_PASS) {
+				result = piglit_display();
+			}
+			/* Use subtest when running with more than one test,
+			 * but use regular test result when running with just
+			 * one.  This allows the standard process-at-a-time
+			 * mode to keep working.
+			 */
+			if (report_subtests) {
+				piglit_report_subtest_result(
+					result, "%s", testname);
+			} else {
+				piglit_report_result(result);
+			}
+
+			/* destroy GL objects? */
+			teardown_ubos();
+		}
+		exit(0);
+	}
 
 	result = init_test(argv[1]);
 	if (result != PIGLIT_PASS)
 		piglit_report_result(result);
-
-	render_width = piglit_width;
-	render_height = piglit_height;
 }
