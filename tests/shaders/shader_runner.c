@@ -92,7 +92,6 @@ static int gl_max_vertex_uniform_components;
 static int gl_max_varying_components;
 static int gl_max_clip_planes;
 
-static const char *path = NULL;
 static const char *test_start = NULL;
 
 static GLuint vertex_shaders[256];
