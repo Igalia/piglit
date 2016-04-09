@@ -1476,7 +1476,7 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 	GLuint uniform_index;
 	GLint block_index;
 	GLint offset;
-	GLint array_index;
+	GLint array_index = 0;
 	char *data;
 	float f[16];
 	double d[16];
