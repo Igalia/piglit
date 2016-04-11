@@ -2171,6 +2171,16 @@ with profile.group_manager(
     g(['arb_gpu_shader_fp64-wrong-type-setter'])
     g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
     g(['arb_gpu_shader_fp64-uniform-invalid-operation'])
+    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-const'])
+    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-const'])
+    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-ubo'])
+    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-ubo'])
+    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-ssbo'])
+    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-ssbo'])
+    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-alu'])
+    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-alu'])
+    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-packing'])
+    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-packing'])
 
 with profile.group_manager(
         PiglitGLTest,
