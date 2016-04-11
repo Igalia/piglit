@@ -9,3 +9,9 @@ link_libraries (
 )
 
 piglit_add_executable (arb_gpu_shader_fp64-double_in_bool_uniform double_in_bool_uniform.c)
+piglit_add_executable (arb_gpu_shader_fp64-fs-non-uniform-control-flow-ssbo fs-non-uniform-control-flow-ssbo.c)
+piglit_add_executable (arb_gpu_shader_fp64-vs-non-uniform-control-flow-ssbo vs-non-uniform-control-flow-ssbo.c)
+piglit_add_executable (arb_gpu_shader_fp64-fs-non-uniform-control-flow-const fs-non-uniform-control-flow-const.c)
+piglit_add_executable (arb_gpu_shader_fp64-vs-non-uniform-control-flow-const vs-non-uniform-control-flow-const.c)
+piglit_add_executable (arb_gpu_shader_fp64-fs-non-uniform-control-flow-ubo fs-non-uniform-control-flow-ubo.c)
+piglit_add_executable (arb_gpu_shader_fp64-vs-non-uniform-control-flow-ubo vs-non-uniform-control-flow-ubo.c)
