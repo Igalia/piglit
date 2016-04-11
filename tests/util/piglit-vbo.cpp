@@ -102,6 +102,7 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include "piglit-util.h"
 #include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 
@@ -271,16 +272,16 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 	errno = 0;
 	switch (this->data_type) {
 	case GL_FLOAT: {
-		double value = strtod(*text, &endptr);
+		float value = strtof_hex(*text, &endptr);
 		if (errno == ERANGE) {
-			printf("Could not parse as double\n");
+			printf("Could not parse as float\n");
 			return false;
 		}
-		*((GLfloat *) data) = (float) value;
+		*((GLfloat *) data) = value;
 		break;
 	}
 	case GL_DOUBLE: {
-		double value = strtod(*text, &endptr);
+		double value = strtod_hex(*text, &endptr);
 		if (errno == ERANGE) {
 			printf("Could not parse as double\n");
 			return false;
