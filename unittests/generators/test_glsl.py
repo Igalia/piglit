@@ -297,3 +297,177 @@ def test_GLSLESVersion_print_float():
 def test_GLSLESVersion_print_float_es():
     """generated_tests.modules.glsl.GLSLESVersion: print_float() (es version)"""
     nt.eq_(glsl.Version('300 es').print_float(), '3.00 es')
+
+
+class TestMinVersion_for_stage(object):
+    """Tests for generated_tests.modules.glsl.MinVersion.for_stage.
+
+    Each test covers the requested < required and requested == required. If
+    it's possible it also covers requested > required.
+
+    """
+    def _test(self, stage, version, expected):
+        nt.eq_(glsl.MinVersion.for_stage(stage, version), expected,
+               msg='(actual) {} != (expected) {}'.format(
+                   str(version), str(expected)))
+
+    def test_opengl_frag(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: FS (OpenGL)"""
+        self._test('frag', glsl.Version('150'), glsl.Version('150'))
+        self._test('frag', glsl.Version('110'), glsl.Version('110'))
+
+    def test_opengl_vert(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: VS (OpenGL)"""
+        self._test('vert', glsl.Version('150'), glsl.Version('150'))
+        self._test('vert', glsl.Version('110'), glsl.Version('110'))
+
+    def test_opengl_geom(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: GS (OpenGL)"""
+        self._test('geom', glsl.Version('330'), glsl.Version('330'))
+        self._test('geom', glsl.Version('110'), glsl.Version('150'))
+        self._test('geom', glsl.Version('150'), glsl.Version('150'))
+
+    def test_opengl_tesc(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: TCS (OpenGL)"""
+        self._test('tesc', glsl.Version('410'), glsl.Version('410'))
+        self._test('tesc', glsl.Version('400'), glsl.Version('400'))
+        self._test('tesc', glsl.Version('140'), glsl.Version('400'))
+
+    def test_opengl_tese(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: TES (OpenGL)"""
+        self._test('tese', glsl.Version('410'), glsl.Version('410'))
+        self._test('tese', glsl.Version('400'), glsl.Version('400'))
+        self._test('tese', glsl.Version('140'), glsl.Version('400'))
+
+    def test_opengl_comp(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: CS (OpenGL)"""
+        self._test('comp', glsl.Version('440'), glsl.Version('440'))
+        self._test('comp', glsl.Version('430'), glsl.Version('430'))
+        self._test('comp', glsl.Version('140'), glsl.Version('430'))
+
+    def test_opengles_frag(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: FS (OpenGL ES)"""
+        self._test('frag', glsl.Version('300 es'), glsl.Version('300 es'))
+        self._test('frag', glsl.Version('100'), glsl.Version('100'))
+
+    def test_opengles_vert(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: VS (OpenGL ES)"""
+        self._test('vert', glsl.Version('320 es'), glsl.Version('320 es'))
+        self._test('vert', glsl.Version('100'), glsl.Version('100'))
+
+    def test_opengles_geom(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: GS (OpenGL ES)"""
+        self._test('geom', glsl.Version('100'), glsl.Version('320 es'))
+        self._test('geom', glsl.Version('320 es'), glsl.Version('320 es'))
+
+    def test_opengles_tesc(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: TCS (OpenGL ES)"""
+        self._test('tesc', glsl.Version('320 es'), glsl.Version('320 es'))
+        self._test('tesc', glsl.Version('100'), glsl.Version('320 es'))
+
+    def test_opengles_tese(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: TES (OpenGL ES)"""
+        self._test('tese', glsl.Version('320 es'), glsl.Version('320 es'))
+        self._test('tese', glsl.Version('100'), glsl.Version('320 es'))
+
+    def test_opengles_comp(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage: TES (OpenGL ES)"""
+        self._test('comp', glsl.Version('320 es'), glsl.Version('320 es'))
+        self._test('comp', glsl.Version('100'), glsl.Version('310 es'))
+        self._test('comp', glsl.Version('310 es'), glsl.Version('310 es'))
+
+
+class TestMinVersion_for_stage_with_ext(object):
+    """Tests for generated_tests.modules.glsl.MinVersion.for_stage_with_ext."""
+    def _test(self, stage, version, expected):
+        ver, ext = glsl.MinVersion.for_stage_with_ext(stage, version)
+        nt.eq_((ver, ext), expected,
+               msg='(actual) ({}, {}) != (expected) ({}, {})'.format(
+                   str(ver), ext, str(expected[0]), expected[1]))
+
+    def test_opengl_frag(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: FS (OpenGL)"""
+        self._test('frag', glsl.Version('150'), (glsl.Version('150'), None))
+        self._test('frag', glsl.Version('110'), (glsl.Version('110'), None))
+
+    def test_opengl_vert(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: VS (OpenGL)"""
+        self._test('vert', glsl.Version('150'), (glsl.Version('150'), None))
+        self._test('vert', glsl.Version('110'), (glsl.Version('110'), None))
+
+    def test_opengl_geom(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: GS (OpenGL)"""
+        self._test('geom', glsl.Version('330'), (glsl.Version('330'), None))
+        self._test('geom', glsl.Version('110'), (glsl.Version('150'), None))
+        self._test('geom', glsl.Version('150'), (glsl.Version('150'), None))
+
+    def test_opengl_tesc(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: TCS (OpenGL)"""
+        self._test('tesc', glsl.Version('410'), (glsl.Version('410'), None))
+        self._test('tesc', glsl.Version('140'),
+                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+        self._test('tesc', glsl.Version('110'),
+                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+
+    def test_opengl_tese(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: TES (OpenGL)"""
+        self._test('tese', glsl.Version('410'), (glsl.Version('410'), None))
+        self._test('tese', glsl.Version('140'),
+                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+        self._test('tese', glsl.Version('110'),
+                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+
+    def test_opengl_comp(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: CS (OpenGL)"""
+        self._test('comp', glsl.Version('430'), (glsl.Version('430'), None))
+        self._test('comp', glsl.Version('140'),
+                   (glsl.Version('140'), 'GL_ARB_compute_shader'))
+        self._test('comp', glsl.Version('110'),
+                   (glsl.Version('140'), 'GL_ARB_compute_shader'))
+
+    def test_opengles_frag(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: FS (OpenGL ES)"""
+        self._test('frag', glsl.Version('300 es'),
+                   (glsl.Version('300 es'), None))
+        self._test('frag', glsl.Version('100'), (glsl.Version('100'), None))
+
+    def test_opengles_vert(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: VS (OpenGL ES)"""
+        self._test('vert', glsl.Version('300 es'),
+                   (glsl.Version('300 es'), None))
+        self._test('vert', glsl.Version('100'), (glsl.Version('100'), None))
+
+    def test_opengles_geom(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: GS (OpenGL ES)"""
+        self._test('geom', glsl.Version('100'),
+                   (glsl.Version('310 es'), 'GL_OES_geometry_shader'))
+        self._test('geom', glsl.Version('310 es'),
+                   (glsl.Version('310 es'), 'GL_OES_geometry_shader'))
+        self._test('geom', glsl.Version('320 es'),
+                   (glsl.Version('320 es'), None))
+
+    def test_opengles_tesc(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: TCS (OpenGL ES)"""
+        self._test('tesc', glsl.Version('320 es'),
+                   (glsl.Version('320 es'), None))
+        self._test('tesc', glsl.Version('310 es'),
+                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+        self._test('tesc', glsl.Version('100'),
+                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+
+    def test_opengles_tese(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: TES (OpenGL ES)"""
+        self._test('tese', glsl.Version('320 es'),
+                   (glsl.Version('320 es'), None))
+        self._test('tese', glsl.Version('310 es'),
+                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+        self._test('tese', glsl.Version('100'),
+                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+
+    def test_opengles_comp(self):
+        """generated_tests.modules.glsl.MinVersion.for_stage_with_ext: TES (OpenGL ES)"""
+        self._test('comp', glsl.Version('320 es'),
+                   (glsl.Version('320 es'), None))
+        self._test('comp', glsl.Version('100'), (glsl.Version('310 es'), None))
+        self._test('comp', glsl.Version('310 es'),
+                   (glsl.Version('310 es'), None))

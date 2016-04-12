@@ -209,3 +209,129 @@ class GLSLESVersion(object):
             return '{:.2f}'.format(float(self))
         else:
             return '{:.2f} es'.format(float(self))
+
+
+class _MinVersion(object):
+    """A factory class for sorting GLSL and GLSLES versions.
+
+    This stores the minimum version required for various operations (currently
+    only for_stage and for_stage_with_ext).
+
+    This class is not meant to be reinitialized, instead use the provided
+    MinVersion constant.
+
+    """
+    __gl_stage_min = {
+        'frag': Version('110'),
+        'vert': Version('110'),
+        'geom': Version('150'),
+        'tesc': Version('400'),
+        'tese': Version('400'),
+        'comp': Version('430'),
+    }
+    # Only versions that actaly change are here, the function will return the
+    # values from __gl_stage_min if they're not here
+    __gl_stage_min_ext = {
+        # geometry_shader4 is not included here intentionally. It is
+        # significantly different than the geometry shaders in OpenGL 3.2
+        'tesc': (Version('140'), 'GL_ARB_tesselation_shader'),
+        'tese': (Version('140'), 'GL_ARB_tesselation_shader'),
+        'comp': (Version('140'), 'GL_ARB_compute_shader'),
+    }
+    __gles_stage_min = {
+        'frag': Version('100'),
+        'vert': Version('100'),
+        'comp': Version('310 es'),
+        'geom': Version('320 es'),
+        'tesc': Version('320 es'),
+        'tese': Version('320 es'),
+    }
+    # Only versions that actaly change are here, the function will return the
+    # values from __gles_stage_min if they're not here
+    __gles_stage_min_ext = {
+        'geom': (Version('310 es'), 'GL_OES_geometry_shader'),
+        'tesc': (Version('310 es'), 'GL_OES_tesselation_shader'),
+        'tese': (Version('310 es'), 'GL_OES_tesselation_shader'),
+    }
+
+    def for_stage(self, stage, version):
+        """Return max(stage minimum version, requested version).
+
+        When provided a stage and a version, it will return the greater of the
+        provided version and the minimum version of that stage without an
+        extension. For example, in OpenGL teselation is available in GLSL
+        4.00+, or in 1.40+ with ARB_tesselation_shader. Given Version('150')
+        and 'tesc' this method returns Version('400').
+
+        Arguments:
+        stage -- A stage named by the extensions glslparsertest uses (frag,
+                 vert, geom, tesc, tese, comp)
+        version -- A version as returned by the Version function.
+
+        >>> m = _MinVersion()
+        >>> m.for_stage('geom', Version('300 es'))
+        Version('320 es')
+        >>> m.for_stage('frag', Version('130'))
+        Version('130')
+
+        """
+        assert isinstance(version, (GLSLVersion, GLSLESVersion))
+        if isinstance(version, GLSLVersion):
+            _stage = self.__gl_stage_min[stage]
+        elif isinstance(version, GLSLESVersion):
+            _stage = self.__gles_stage_min[stage]
+
+        return _stage if _stage > version else version
+
+    def for_stage_with_ext(self, stage, version):
+        """Return the earliest GLSL version that a stage is supported in with
+        an extension.
+
+        When provided a stage and a version, it will return the greater of the
+        provided version and the minimum version of that stage with an
+        extension, and if necissary the extension as a string. For example, in
+        OpenGL teselation is available in GLSL 4.00+, or in 1.40+ with
+        ARB_tesselation_shader. Given Version('150') and 'tesc' this method
+        returns (Version('150'), 'GL_ARB_tesselation_shader'); but given
+        Version('400') and 'tesc' it returns (Version('400'), None)
+
+        If there is no extension (like with fragment and vertex) then None will
+        be returned as the secon value. It is up to the caller to handle this
+        appropriately. It will also return None for the extension when the GLSL
+        version is high enough to not require an extension.
+
+        Takes the same arguments as for_stage.
+
+        >>> m = _MinVersion()
+        >>> m.for_stage_with_ext('geom', Version('300 es'))
+        (Version('310 es'), 'GL_OES_geometry_shader')
+        >>> m.for_stage_with_ext('frag', Version('130'))
+        (Version('130'), None)
+
+        """
+        assert isinstance(version, (GLSLVersion, GLSLESVersion))
+        if isinstance(version, GLSLVersion):
+            try:
+                _stage, ext = self.__gl_stage_min_ext[stage]
+            except KeyError:
+                _stage, ext = self.__gl_stage_min[stage], None
+        elif isinstance(version, GLSLESVersion):
+            try:
+                _stage, ext = self.__gles_stage_min_ext[stage]
+            except KeyError:
+                _stage, ext = self.__gles_stage_min[stage], None
+
+        # If the version queried is less than the required, return the require
+        # and the ext
+        if _stage > version:
+            return (_stage, ext)
+        # If the requested version is greater or equal to the version that the
+        # feature became core in, return the version and None
+        elif self.for_stage(stage, version) <= version:
+            return (version, None)
+        # Otherwise the requested version and the extension are returned
+        else:
+            return (version, ext)
+
+
+MinVersion = _MinVersion()  # pylint: disable=invalid-name
