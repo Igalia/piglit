@@ -174,6 +174,38 @@ class TestWflInfo(object):
                         mock.Mock(return_value=rv)):
             nt.eq_(9.3, self._test.glsl_version)
 
+    def test_leading_junk(self):
+        """test.opengl.WflInfo.gl_version: Handles leading junk"""
+        rv = textwrap.dedent("""\
+            Warning: I'm a big fat warnngs
+            Waffle platform: gbm
+            Waffle api: gl
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4
+            OpenGL context flags: 0x0
+        """).encode('utf-8')
+        with mock.patch('framework.test.opengl.subprocess.check_output',
+                        mock.Mock(return_value=rv)):
+            nt.eq_(18.0, self._test.gl_version)
+
+    def test_mixed_junk(self):
+        """test.opengl.WflInfo.gl_version: Handles mixed junk"""
+        rv = textwrap.dedent("""\
+            Waffle platform: gbm
+            Waffle api: gl
+            Warning: I'm a big fat warnngs
+            OpenGL vendor string: Intel Open Source Technology Center
+            OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
+            Warning: I'm a big fat warnngs
+            Warning: I'm a big fat warnngs
+            OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4
+            OpenGL context flags: 0x0
+        """).encode('utf-8')
+        with mock.patch('framework.test.opengl.subprocess.check_output',
+                        mock.Mock(return_value=rv)):
+            nt.eq_(18.0, self._test.gl_version)
+
 
 class TestWflInfo_WAFFLEINFO_GL_ERROR(object):
     """Test class for WflInfo when "WFLINFO_GL_ERROR" is returned."""
