@@ -78,15 +78,17 @@ def test_generators():
         """Tester function."""
         msg = ''
 
-        try:
-            with open(os.devnull, 'w') as d:
-                rcode = subprocess.check_call(['python', name], stderr=d,
-                                              stdout=d)
-        except subprocess.CalledProcessError as e:
-            msg = "While calling {}:\n{}".format(name, str(e))
-            rcode = e.returncode
+        with open(os.devnull, 'w') as d:
+            proc = subprocess.Popen(['python', name],
+                                    stderr=subprocess.PIPE,
+                                    stdout=d)
+            _, err = proc.communicate()
 
-        nt.eq_(rcode, 0, msg)
+        if proc.returncode != 0:
+            err = err.decode('utf-8')
+
+            raise utils.TestFailure(
+                "failed with message:\n {}".format(err))
 
     description = 'generator: {} runs successfully'
 
