@@ -104,6 +104,24 @@ static const char *interstage_fs =
 	"  gl_FragColor = vec4(0.0);\n"
 	"}\n";
 
+/* Section 1.2.1 (Summary of Changes from Version 4.10) of the OpenGL
+ * Shading Language 4.20 spec says:
+ *
+ *     Move these previously deprecated features to be only in the
+ *     compatibility profile:
+ *       ...
+ *       * The built-in variables gl_FragColor and gl_FragData.
+ */
+static const char *interstage_fs_420 =
+	"#version %d\n"
+	"\n"
+	"out vec4 color;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"  color = vec4(0.0);\n"
+	"}\n";
+
 static const char *intrastage_vs1 =
 	"#version %d\n"
 	"\n"
@@ -213,8 +231,13 @@ test_interstage(int version_vs, int version_other, bool use_gs)
 			return false;
 		}
 	} else {
+		const char *fs = interstage_fs;
+
+		if (version_other >= 420)
+			fs = interstage_fs_420;
+
 		if (!try_attach_shader(prog, "fragment shader",
-				       GL_FRAGMENT_SHADER, interstage_fs,
+				       GL_FRAGMENT_SHADER, fs,
 				       version_other)) {
 			glDeleteProgram(prog);
 			return false;
