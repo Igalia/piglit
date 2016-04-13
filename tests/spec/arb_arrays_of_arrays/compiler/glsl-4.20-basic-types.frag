@@ -9,7 +9,7 @@
 #version 420
 #extension GL_ARB_arrays_of_arrays: enable
 
-uniform atomic_uint array01[1][1];
+layout (binding = 0) uniform atomic_uint array01[1][1];
 writeonly uniform image1D array02[1][1];
 writeonly uniform iimage1D array03[1][1];
 writeonly uniform uimage1D array04[1][1];
@@ -43,5 +43,6 @@ writeonly uniform uimage2DMS array31[1][1];
 writeonly uniform image2DMSArray array32[1][1];
 writeonly uniform iimage2DMSArray array33[1][1];
 writeonly uniform uimage2DMSArray array34[1][1];
+out vec4 color;
 
-void main() { gl_FragColor = vec4(0.0); }
+void main() { color = vec4(0.0); }
