@@ -25,13 +25,14 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import errno
+import getpass
 import os
 import shutil
-import tempfile
-import getpass
 import sys
-import errno
+import tempfile
 
+import mako
 from mako.lookup import TemplateLookup
 import six
 
@@ -49,8 +50,11 @@ __all__ = [
 
 _TEMP_DIR = os.path.join(
     tempfile.gettempdir(),
-    "piglit-{}".format(getpass.getuser()),
-    'version-{}'.format(sys.version.split()[0]))
+    getpass.getuser(),
+    'python-{}'.format(sys.version.split()[0]),
+    'mako-{}'.format(mako.__version__),
+    'summary',
+    'html')
 
 _TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), '../..', 'templates')
 

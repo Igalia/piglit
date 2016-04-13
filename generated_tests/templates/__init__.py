@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,15 +26,18 @@ import sys
 import getpass
 import tempfile
 
+import mako
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
 
 # Based on a similar setup in framework/summary
 MAKO_TEMP_DIR = os.path.join(tempfile.gettempdir(),
-                             'piglit-{0}'.format(getpass.getuser()),
-                             'version-{0}'.format(sys.version.split()[0]),
-                             'generators', 'templates')
+                             getpass.getuser(),
+                             'piglit',
+                             'python-{}'.format(sys.version.split()[0]),
+                             'mako-{}'.format(mako.__version__),
+                             'generators')
 
 TEMPLATE_DIR = os.path.abspath(os.path.dirname(__file__))
 
