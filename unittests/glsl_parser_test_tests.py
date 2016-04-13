@@ -456,6 +456,22 @@ def test_set_gl_required():
     nt.eq_(test.gl_required, set(['GL_ARB_foobar', 'GL_EXT_foobar']))
 
 
+def test_set_exclude_gl_required():
+    """test.glsl_parser_test.GLSLParserTest: doesn't add excludes to gl_required"""
+    rt = {'require_extensions': 'GL_ARB_foobar !GL_EXT_foobar'}
+    with mock.patch.object(glsl.GLSLParserTest, '_GLSLParserTest__parser',
+                           mock.Mock(return_value=rt)):
+        with mock.patch.object(glsl.GLSLParserTest,
+                               '_GLSLParserTest__get_command',
+                               return_value=['foo']):
+            with mock.patch('framework.test.glsl_parser_test.open',
+                            mock.mock_open(), create=True):
+                with mock.patch('framework.test.glsl_parser_test.os.stat',
+                                mock.mock_open()):
+                    test = glsl.GLSLParserTest('foo')
+    nt.eq_(test.gl_required, set(['GL_ARB_foobar']))
+
+
 @mock.patch('framework.test.glsl_parser_test._HAS_GL_BIN', False)
 @nt.raises(TestIsSkip)
 def test_binary_skip():

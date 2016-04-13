@@ -126,7 +126,8 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
 
         req = config.get('require_extensions')
         if req:
-            self.gl_required = set(req.split())
+            self.gl_required = set(
+                r for r in req.split() if not r.startswith('!'))
 
         # If GLES is requested, but piglit was not built with a gles version,
         # then ARB_ES3<ver>_compatibility is required. Add it to
