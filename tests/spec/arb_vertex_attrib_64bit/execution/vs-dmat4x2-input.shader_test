@@ -1,0 +1,60 @@
+# Checking that a dmat4x4 is properly passed as an vertex attribute
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+GL_ARB_vertex_attrib_64bit
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_vertex_attrib_64bit : require
+
+uniform double tolerance;
+uniform dmat4x2 expected;
+
+in vec3 vertex;
+in dmat4x2 value;
+out vec4 color;
+
+void main()
+{
+  gl_Position = vec4(vertex, 1.0);
+  color = vec4(0.0, 0.0, 0.0, 0.0);
+
+  if (distance(value[0], expected[0]) > tolerance)
+    color.r = 1.0;
+
+  if (distance(value[1], expected[1]) > tolerance)
+    color.g = 1.0;
+
+  if (distance(value[2], expected[2]) > tolerance)
+    color.b = 1.0;
+
+  if (distance(value[3], expected[3]) > tolerance)
+    color.a = 1.0;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+
+in vec4 color;
+void main()
+{
+  gl_FragColor = color;
+}
+
+[vertex data]
+vertex/float/3  value/double/2/0 value/double/2/1 value/double/2/2 value/double/2/3
+-1.0 -1.0 0.0   0 1              4 5              8 9              12 13      
+ 1.0 -1.0 0.0   0 1              4 5              8 9              12 13      
+ 1.0  1.0 0.0   0 1              4 5              8 9              12 13      
+-1.0  1.0 0.0   0 1              4 5              8 9              12 13      
+
+[test]
+uniform double tolerance 2e-05
+uniform dmat4x2 expected 0 1 4 5 8 9 12 13 
+clear color 1.0 1.0 1.0 1.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 0.0 0.0 0.0
