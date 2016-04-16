@@ -54,12 +54,13 @@ static const struct size tex_size[] = {
 struct format_info {
 	GLenum internal_format, format, type;
 	int size;
+	const char *extension;
 };
 static const struct format_info formats[] = {
-	{ GL_DEPTH_COMPONENT16,  GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT,                 sizeof(short) },
-	{ GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT,                          sizeof(float) },
-	{ GL_DEPTH24_STENCIL8,   GL_DEPTH_STENCIL,   GL_UNSIGNED_INT_24_8,              sizeof(int) },
-	{ GL_DEPTH32F_STENCIL8,  GL_DEPTH_STENCIL,   GL_FLOAT_32_UNSIGNED_INT_24_8_REV, sizeof(int) + sizeof(float) }
+	{ GL_DEPTH_COMPONENT16,  GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT,                 sizeof(short), NULL },
+	{ GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT,                          sizeof(float), "GL_ARB_depth_buffer_float" },
+	{ GL_DEPTH24_STENCIL8,   GL_DEPTH_STENCIL,   GL_UNSIGNED_INT_24_8,              sizeof(int), NULL },
+	{ GL_DEPTH32F_STENCIL8,  GL_DEPTH_STENCIL,   GL_FLOAT_32_UNSIGNED_INT_24_8_REV, sizeof(int) + sizeof(float), "GL_ARB_depth_buffer_float" }
 };
 
 static void
@@ -195,6 +196,11 @@ piglit_display(void)
 	glGenTextures(ARRAY_SIZE(formats), tex);
 
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
+		if (formats[i].extension &&
+		    !piglit_is_extension_supported(formats[i].extension)) {
+			continue;
+		}
+
 		for (j = 0; j < ARRAY_SIZE(tex_size); j++) {
 			result = true;
 			load_texture(i, j);
