@@ -74,7 +74,7 @@ bool piglit_is_extension_supported(const char *name);
 /**
  * reinitialize the supported extension List.
  */
-void piglit_gl_reinitialize_extensions();
+void piglit_gl_invalidate_extensions();
 
 /**
  * \brief Convert a GL error to a string.

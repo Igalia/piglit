@@ -115,7 +115,7 @@ static void initialize_piglit_extension_support(void)
 	}
 }
 
-void piglit_gl_reinitialize_extensions()
+void piglit_gl_invalidate_extensions()
 {
 	if (gl_extensions != NULL) {
 		free(gl_extensions);
