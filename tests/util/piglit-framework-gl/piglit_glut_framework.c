@@ -391,9 +391,10 @@ piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
         /* Check if we actually have a core profile */
 	{
 		int actual_version = piglit_get_gl_version();
-		if (actual_version >= 31 &&
-		    !piglit_is_extension_supported("GL_ARB_compatibility"))
-			piglit_is_core_profile = true;
+
+		piglit_is_core_profile =
+			actual_version >= 31 &&
+			!piglit_is_extension_supported("GL_ARB_compatibility");
 	}
 
 	if (!check_gl_version(test_config))

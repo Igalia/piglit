@@ -544,6 +544,8 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		}
 	}
 
+	piglit_is_core_profile = false;
+
 	if (test_config->supports_gl_core_version &&
 	    test_config->supports_gl_compat_version) {
 		/* The above attempt to create a core context failed. */
