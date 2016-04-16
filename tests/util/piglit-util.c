@@ -533,12 +533,6 @@ piglit_source_dir(void)
     return s;
 }
 
-#ifdef _WIN32
-#  define PIGLIT_PATH_SEP '\\'
-#else
-#  define PIGLIT_PATH_SEP '/'
-#endif
-
 size_t
 piglit_join_paths(char buf[], size_t buf_size, int n, ...)
 {

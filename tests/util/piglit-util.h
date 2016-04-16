@@ -131,6 +131,12 @@ ffs(int i)
 #endif /* !__MINGW32__ */
 #endif /* !HAVE_FFS*/
 
+#ifdef _WIN32
+#  define PIGLIT_PATH_SEP '\\'
+#else
+#  define PIGLIT_PATH_SEP '/'
+#endif
+
 enum piglit_result {
 	PIGLIT_PASS,
 	PIGLIT_FAIL,
