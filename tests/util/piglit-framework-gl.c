@@ -177,8 +177,12 @@ piglit_gl_process_args(int *argc, char *argv[],
 static void
 destroy(void)
 {
+	if (!gl_fw)
+		return;
+
 	if (gl_fw->destroy)
 		gl_fw->destroy(gl_fw);
+	gl_fw = NULL;
 }
 
 void
