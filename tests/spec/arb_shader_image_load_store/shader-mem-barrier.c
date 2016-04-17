@@ -48,7 +48,7 @@
 #define W 256
 
 /** Window height. */
-#define H 16
+#define H 64
 
 /** Total number of pixels in the image. */
 #define N (W * H)
@@ -142,15 +142,15 @@ run_test(const struct image_test_info *test,
                             "       int x = (idx.x % K) + (idx.x / (2 * K)) * (2 * K);\n"
                             "       int i, n = 1000;\n"
                             "\n"
-                            "       if (check) {\n"
-                            "              /*\n"
-                            "               * Consumer: Monitor the evolution of a pair of\n"
-                            "               * image locations until the test runs to\n"
-                            "               * completion or an inconsistency is observed.\n"
-                            "               */\n"
-                            "              for (i = 0; i < n; ++i) {\n"
-                            "                     uint u, v;\n"
+                            "       for (i = 0; i < n; ++i) {\n"
+                            "              uint u, v;\n"
                             "\n"
+                            "              if (check) {\n"
+                            "                     /*\n"
+                            "                      * Consumer: Monitor the evolution of a pair of\n"
+                            "                      * image locations until the test runs to\n"
+                            "                      * completion or an inconsistency is observed.\n"
+                            "                      */\n"
                             "                     v = imageLoad(img, ivec2(x, idx.y)).x;\n"
                             "                     MEMORY_BARRIER();\n"
                             "                     u = imageLoad(img, ivec2(x + K, idx.y)).x;\n"
@@ -158,14 +158,12 @@ run_test(const struct image_test_info *test,
                             "                     if (u < v)\n"
                             "                             /* Fail. */\n"
                             "                             return GRID_T(v << 16 | u, 0, 0, 1);\n"
-                            "             }\n"
-                            "       } else {\n"
-                            "              /*\n"
-                            "               * Producer: Update the same pair of image locations\n"
-                            "               * sequentially with increasing values ordering the\n"
-                            "               * stores with a barrier.\n"
-                            "               */\n"
-                            "              for (i = 0; i < n; ++i) {\n"
+                            "             } else {\n"
+                            "                     /*\n"
+                            "                      * Producer: Update the same pair of image locations\n"
+                            "                      * sequentially with increasing values ordering the\n"
+                            "                      * stores with a barrier.\n"
+                            "                      */\n"
                             "                     imageStore(img, ivec2(x + K, idx.y), DATA_T(i));\n"
                             "                     MEMORY_BARRIER();\n"
                             "                     imageStore(img, ivec2(x, idx.y), DATA_T(i));\n"
