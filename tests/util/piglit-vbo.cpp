@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Intel Corporation
+ * Copyright © 2011, 2016 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,29 +28,33 @@
  * tests using a columnar text format, for example:
  *
  *   \verbatim
- *   vertex/float/3 foo/uint/1 bar/int/2
- *   0.0 0.0 0.0    10         0 0 # comment
- *   0.0 1.0 0.0     5         1 1
- *   1.0 1.0 0.0     0         0 1
+ *   vertex/vec3/3	foo/uint/1	bar[0]/int/1	bar[1]/int/1
+ *   0.0 0.0 0.0	10		0		0 # comment
+ *   0.0 1.0 0.0	 5		1		1
+ *   1.0 1.0 0.0	 0		0		1
  *   \endverbatim
  *
  * The format consists of a row of column headers followed by any
  * number of rows of data.  Each column header has the form
- * "ATTRNAME/TYPE/COUNT/MATRIX_COLUMN", where ATTRNAME is the name of
- * the vertex attribute to be bound to this column, TYPE is the type
- * of data that follows ("float", "int", or "uint"), COUNT is the
- * vector length of the data (e.g. "3" for vec3 data) and
- * MATRIX_COLUMN is the column number of the data in case of being a
- * matrix. MATRIX_COLUMN can also be used for arrays of
- * arrays. MATRIX_COLUMN doesn't need to be be specified if it is not
- * a matrix column as in the example before. So another example, if
- * you want to specify the data of a mat2x3:
+ * "ATTRNAME[ARRAY_INDEX]/TYPE/COUNT/MATRIX_COLUMN", where ATTRNAME is
+ * the name of the vertex attribute to be bound to this column,
+ * ARRAY_INDEX is the index, TYPE is the GLSL type of data that
+ * follows ("float", "double", "int", "uint" or any derived type like
+ * vec2, dmat4, etc.), COUNT is the vector length of the data
+ * (e.g. "3" for vec3 data or "2" for mat4x2) and MATRIX_COLUMN is the
+ * column number of the data in case of being a matrix. [ARRAY_INDEX]
+ * is optional and needs to be specified only in case of array
+ * attributes. COUNT is a redundant value that is already specified in
+ * the data type but that has been kept for backward
+ * compatibility. MATRIX_COLUMN doesn't need to be specified if it is
+ * not a matrix column as in the example before. So another example,
+ * if you want to specify the data of a mat2x3:
  *
- *  \verbatim
- *  foomatrix/float/3/0 foomatrix/float/3/1
- *  0.0 1.0 2.0         3.0 4.0 5.0
- *  6.0 7.0 8.0         9.0 10.0 11.0
- *  \endverbatim
+ *   \verbatim
+ *   foomatrix/mat2x3/3/0	foomatrix/mat2x3/3/1
+ *   0.0 1.0 2.0		3.0 4.0 5.0
+ *   6.0 7.0 8.0		9.0 10.0 11.0
+ *   \endverbatim
  *
  * The data follows the column headers in space-separated form.  "#"
  * can be used for comments, as in shell scripts.
@@ -66,35 +70,51 @@
  * For the first example above, the call to setup_vbo_from_text() is
  * roughly equivalent to the following GL operations:
  *
- * \code
- * struct vertex_attributes {
- *         GLfloat vertex[3];
- *         GLuint foo;
- *         GLint bar[2];
- * } vertex_data[] = {
- *         { { 0.0, 0.0, 0.0 }, 10, { 0, 0 } },
- *         { { 0.0, 1.0, 0.0 },  5, { 1, 1 } },
- *         { { 1.0, 1.0, 0.0 },  0, { 0, 1 } }
- * };
- * size_t stride = sizeof(vertex_data[0]);
- * GLint vertex_index = glGetAttribLocation(prog, "vertex");
- * GLint foo_index = glGetAttribLocation(prog, "foo");
- * GLint bar_index = glGetAttribLocation(prog, "bar");
- * GLuint buffer_handle;
- * glGenBuffers(1, &buffer_handle);
- * glBindBuffer(GL_ARRAY_BUFFER, buffer_handle);
- * glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), &vertex_data,
- *              GL_STATIC_DRAW);
- * glVertexAttribPointer(vertex_index, 3, GL_FLOAT, GL_FALSE, stride,
- *                       (void *) offsetof(vertex_attributes, vertex));
- * glVertexAttribIPointer(foo_index, 3, GL_UNSIGNED_INT, stride,
- *                        (void *) offsetof(vertex_attributes, foo));
- * glVertexAttribIPointer(bar_index, 3, GL_INT, stride,
- *                        (void *) offsetof(vertex_attributes, bar));
- * glEnableVertexAttribArray(vertex_index);
- * glEnableVertexAttribArray(foo_index);
- * glEnableVertexAttribArray(bar_index);
- * \endcode
+ *   \code
+ *   struct vertex_attributes {
+ * 	GLfloat vertex[3];
+ * 	GLuint foo;
+ * 	GLint bar[2];
+ *   } vertex_data[] = {
+ * 	{ { 0.0, 0.0, 0.0 }, 10, { 0, 0 } },
+ * 	{ { 0.0, 1.0, 0.0 },  5, { 1, 1 } },
+ * 	{ { 1.0, 1.0, 0.0 },  0, { 0, 1 } }
+ *   };
+ *   size_t stride = sizeof(vertex_data[0]);
+ *   GLint vertex_index = glGetAttribLocation(prog, "vertex");
+ *   GLint foo_index = glGetAttribLocation(prog, "foo");
+ *   GLint bar_index = glGetAttribLocation(prog, "bar");
+ *   GLuint buffer_handle;
+ *   glGenBuffers(1, &buffer_handle);
+ *   glBindBuffer(GL_ARRAY_BUFFER, buffer_handle);
+ *   glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), &vertex_data,
+ * 		  GL_STATIC_DRAW);
+ *   glVertexAttribPointer(vertex_index, 3, GL_FLOAT, GL_FALSE, stride,
+ * 			   (void *) offsetof(vertex_attributes, vertex));
+ *   glVertexAttribIPointer(foo_index, 3, GL_UNSIGNED_INT, stride,
+ * 			    (void *) offsetof(vertex_attributes, foo));
+ *   glVertexAttribIPointer(bar_index, 3, GL_INT, stride,
+ * 			    (void *) offsetof(vertex_attributes, bar));
+ *   glEnableVertexAttribArray(vertex_index);
+ *   glEnableVertexAttribArray(foo_index);
+ *   glEnableVertexAttribArray(bar_index);
+ *   \endcode
+ *
+ * Which could correspond to a vertex shader of this type:
+ *
+ *   \code
+ *   in vec3 vertex;
+ *   in uint foo;
+ *   in int bar[2];
+ *
+ *   void main()
+ *   {
+ *   	if (bar[0] + bar[1] == foo)
+ *   		gl_Position = vec4(vertex, 1.0);
+ *   	else
+ *   		gl_Position = vec4(1.0, vertex);
+ *   }
+ *   \endcode
  */
 
 #include <string>
@@ -117,7 +137,7 @@ const int ATTRIBUTE_SIZE = 4;
  * Convert a type name string to a GLenum.
  */
 GLenum
-decode_type(const char *type)
+decode_type(const char *type, size_t *rows, size_t *cols)
 {
 	static struct type_table_entry {
 		const char *type; /* NULL means end of table */
@@ -127,13 +147,40 @@ decode_type(const char *type)
 		{ "uint",    GL_UNSIGNED_INT   },
 		{ "float",   GL_FLOAT          },
 		{ "double",  GL_DOUBLE         },
-		{ NULL,      0                 }
+		{ "ivec",    GL_INT	       },
+		{ "uvec",    GL_UNSIGNED_INT   },
+		{ "vec",     GL_FLOAT	       },
+		{ "dvec",    GL_DOUBLE	       },
+		{ "mat",     GL_FLOAT	       },
+		{ "dmat",    GL_DOUBLE	       },
+		{ NULL,      0		       }
 	};
 
 
 	for (int i = 0; type_table[i].type; ++i) {
-		if (0 == strcmp(type, type_table[i].type))
+		if (0 == strncmp(type, type_table[i].type,
+				 strlen(type_table[i].type))) {
+			if (i > 3 && (rows || cols)) {
+				size_t type_len = strlen(type);
+				size_t the_rows = type[type_len - 1] - '0';
+				if (rows)
+					*rows = the_rows;
+				if (cols) {
+					if (i > 7)
+						*cols = type[type_len - 2] == 'x'
+							? type[type_len - 3] - '0'
+							: the_rows;
+					else
+						*cols = 1;
+				}
+			} else {
+				if (rows)
+					*rows = 1;
+				if (cols)
+					*cols = 1;
+			}
 			return type_table[i].enum_value;
+		}
 	}
 
 	printf("Unrecognized type: %s\n", type);
@@ -158,6 +205,11 @@ public:
 	GLenum data_type;
 
 	/**
+	 * Number of cols in the data type of this attribute.
+	 */
+	size_t data_type_cols;
+
+	/**
 	 * Vector length of this attribute.
 	 */
 	size_t count;
@@ -166,6 +218,11 @@ public:
 	 * Index of the matrix column for this attribute.
 	 */
 	size_t matrix_index;
+
+	/**
+	 * Index of the array for this attribute.
+	 */
+	size_t array_index;
 
 	/**
 	 * Index of this vertex attribute in the linked program.
@@ -185,25 +242,50 @@ public:
 vertex_attrib_description::vertex_attrib_description(GLuint prog,
 						     const char *text)
 {
-	/* Split the column header into name/type/count fields */
+	/* Split the column header into
+	 * name[array_index]/type/count/matrix_column fields */
 	const char *first_slash = strchr(text, '/');
 	if (first_slash == NULL) {
-		printf("Column headers must be in the form name/type/count/matrix_column.\n"
-		       "Note: matrix_column is optional.\n"
+		printf("Column headers must be in the form"
+		       " name[array_index]/type/count/matrix_column.\n"
+		       "Note: [array_index] and matrix_column are optional.\n"
 		       "Got: %s\n",
 		       text);
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
 	std::string name(text, first_slash);
+
+	/* If the attrib is an array, strip the index */
+	if (name[name.size() - 1] == ']') {
+		std::string::size_type n = name.find('[');
+		if (n == std::string::npos) {
+			printf("Column header looked like an array"
+			       " but couldn't parse it.\n"
+			       "Got: %s\n",
+			       text);
+			piglit_report_result(PIGLIT_FAIL);
+		} else {
+			this->array_index = strtoul(name.substr(n + 1).c_str(),
+						    NULL, 0);
+			name.resize(n);
+		}
+	} else {
+		this->array_index = 0;
+	}
+
 	const char *second_slash = strchr(first_slash + 1, '/');
 	if (second_slash == NULL) {
-		printf("Column headers must be in the form name/type/count/matrix_column.\n"
+		printf("Column headers must be in the form"
+		       " name[array_index]/type/count/matrix_column.\n"
+		       "Note: [array_index] and matrix_column are optional.\n"
 		       "Got: %s\n",
 		       text);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 	std::string type_str(first_slash + 1, second_slash);
-	this->data_type = decode_type(type_str.c_str());
+	this->data_type = decode_type(type_str.c_str(),
+				      &this->count, &this->data_type_cols);
 	char *endptr;
 	this->count = strtoul(second_slash + 1, &endptr, 10);
 
@@ -218,8 +300,9 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 		}
 
 		if (*endptr != '\0') {
-			printf("Column headers must be in the form name/type/matrix_column.\n"
-			       "Note: matrix_column is optional.\n"
+			printf("Column headers must be in the form"
+			       " name[array_index]/type/count/matrix_column.\n"
+			       "Note: [array_index] and matrix_column are optional.\n"
 			       "Got: %s\n",
 			       text);
 			piglit_report_result(PIGLIT_FAIL);
@@ -324,9 +407,11 @@ void
 vertex_attrib_description::setup(size_t *offset, size_t stride) const
 {
 	int attribute_size = ATTRIBUTE_SIZE;
+	GLuint actual_index = this->index + this->matrix_index
+		+ this->array_index * this->data_type_cols;
 	switch (this->data_type) {
 	case GL_FLOAT:
-		glVertexAttribPointer(this->index + this->matrix_index, this->count,
+		glVertexAttribPointer(actual_index, this->count,
 				      this->data_type, GL_FALSE, stride,
 				      (void *) *offset);
 		break;
@@ -335,9 +420,9 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 			fprintf(stderr,"vertex_attrib_description fail. no 64-bit float support\n");
 			return;
 		}
-		glVertexAttribLPointer(this->index + this->matrix_index, this->count,
-				      this->data_type, stride,
-				      (void *) *offset);
+		glVertexAttribLPointer(actual_index, this->count,
+				       this->data_type, stride,
+				       (void *) *offset);
 		attribute_size *= 2;
 		break;
 	default:
@@ -345,12 +430,12 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 			fprintf(stderr,"vertex_attrib_description fail. no int support\n");
 			return;
 		}
-		glVertexAttribIPointer(this->index + this->matrix_index, this->count,
+		glVertexAttribIPointer(actual_index, this->count,
 				       this->data_type, stride,
 				       (void *) *offset);
 		break;
 	}
-	glEnableVertexAttribArray(index + this->matrix_index);
+	glEnableVertexAttribArray(actual_index);
 	*offset += attribute_size * this->count;
 }
 
