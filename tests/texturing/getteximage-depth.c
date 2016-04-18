@@ -605,7 +605,8 @@ piglit_init(int argc, char **argv)
 				continue;
 			break;
 		case GL_TEXTURE_CUBE_MAP:
-			if (!piglit_is_extension_supported("GL_ARB_texture_cube_map"))
+			if (!piglit_is_extension_supported("GL_ARB_texture_cube_map") ||
+			    piglit_get_gl_version() < 30)
 				continue;
 			break;
 		case GL_TEXTURE_1D_ARRAY:
