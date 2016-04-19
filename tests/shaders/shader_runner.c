@@ -25,6 +25,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "piglit-util.h"
 #include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 
@@ -1371,21 +1372,8 @@ get_floats(const char *line, float *f, unsigned count)
 {
 	unsigned i;
 
-	for (i = 0; i < count; i++) {
-		line = eat_whitespace(line);
-
-		if (strncmp(line, "0x", 2) == 0) {
-			union {
-				uint32_t u;
-				float f;
-			} x;
-
-			x.u = strtoul(line, (char **) &line, 16);
-			f[i] = x.f;
-		} else {
-			f[i] = strtod_inf(line, (char **) &line);
-		}
-	}
+	for (i = 0; i < count; i++)
+		f[i] = strtof_hex(line, (char **) &line);
 }
 
 static void
@@ -1393,21 +1381,8 @@ get_doubles(const char *line, double *d, unsigned count)
 {
 	unsigned i;
 
-	for (i = 0; i < count; i++) {
-		line = eat_whitespace(line);
-
-		if (strncmp(line, "0x", 2) == 0) {
-			union {
-				uint64_t u64;
-				double d;
-			} x;
-
-			x.u64 = strtoull(line, (char **) &line, 16);
-			d[i] = x.d;
-		} else {
-			d[i] = strtod_inf(line, (char **) &line);
-		}
-	}
+	for (i = 0; i < count; i++)
+		d[i] = strtod_hex(line, (char **) &line);
 }
 
 

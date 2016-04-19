@@ -221,6 +221,54 @@ strtod_inf(const char *nptr, char **endptr)
 	return strtod(nptr, endptr);
 }
 
+/**
+ * Wrapper for strtod_inf() which allows using an exact hex bit
+ * pattern to generate a float value.
+ */
+static inline float
+strtof_hex(const char *nptr, char **endptr)
+{
+	/* skip spaces and tabs */
+	while (*nptr == ' ' || *nptr == '\t')
+		nptr++;
+
+	if (strncmp(nptr, "0x", 2) == 0) {
+		union {
+			uint32_t u;
+			float f;
+		} x;
+
+		x.u = strtoul(nptr, endptr, 16);
+		return x.f;
+	} else {
+		return strtod_inf(nptr, endptr);
+	}
+}
+
+/**
+ * Wrapper for strtod_inf() which allows using an exact hex bit
+ * pattern to generate a double value.
+ */
+static inline double
+strtod_hex(const char *nptr, char **endptr)
+{
+	/* skip spaces and tabs */
+	while (*nptr == ' ' || *nptr == '\t')
+		nptr++;
+
+	if (strncmp(nptr, "0x", 2) == 0) {
+		union {
+			uint64_t u64;
+			double d;
+		} x;
+
+		x.u64 = strtoull(nptr, endptr, 16);
+		return x.d;
+	} else {
+		return strtod_inf(nptr, endptr);
+	}
+}
+
 #ifndef HAVE_STRCHRNUL
 static inline char *
 strchrnul(const char *s, int c)
