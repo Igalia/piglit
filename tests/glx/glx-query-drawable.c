@@ -37,6 +37,15 @@ int piglit_width = 137;
 int piglit_height = 119;
 GLXFBConfig config = None;
 
+enum _drawable_type {
+    WINDOW,
+    GLXWINDOW,
+    GLXPIXMAP,
+    GLXPBUFFER,
+};
+
+int drawable_type /* = WINDOW */;
+
 void
 usage_error()
 {
@@ -212,15 +221,6 @@ static void query_bad_drawable(Display *display, GLXDrawable draw) {
 /** @} */
 
 /***************************************************************************/
-
-enum _drawable_type {
-    WINDOW,
-    GLXWINDOW,
-    GLXPIXMAP,
-    GLXPBUFFER,
-};
-
-int drawable_type /* = WINDOW */;
 
 static void
 parse_args(int argc, char **argv,
