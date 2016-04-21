@@ -264,6 +264,7 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 	int i;
 
 	/* Derived class must not provide any context attributes. */
+	(void)junk;
 	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_API, &junk) == false);
 	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_PROFILE, &junk) == false);
 	assert(waffle_attrib_list_get(partial_attrib_list, WAFFLE_CONTEXT_MAJOR_VERSION, &junk) == false);
@@ -339,7 +340,7 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 
 		default:
 			assert(0);
-			break;
+			return NULL;
 	}
 
 	/* There are no 3.1 core profiles -- the closest is 3.1 context without
@@ -638,6 +639,7 @@ piglit_wfl_framework_init(struct piglit_wfl_framework *wfl_fw,
 	static bool is_waffle_initialized = false;
 	static int32_t initialized_platform = 0;
 
+	(void)initialized_platform;
 	bool ok = true;
 
 	if (is_waffle_initialized) {

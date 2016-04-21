@@ -492,6 +492,8 @@ piglit_compressed_image_size(GLenum format, unsigned width, unsigned height)
 {
 	unsigned bw, bh, bytes;
 	bool b = piglit_get_compressed_block_size(format, &bw, &bh, &bytes);
+
+	(void)b;
 	assert(b);
 	return ((width + bw - 1) / bw) * ((height + bh - 1) / bh) * bytes;
 }
@@ -508,6 +510,7 @@ piglit_compressed_pixel_offset(GLenum format, unsigned width,
 	unsigned bw, bh, bytes, offset;
 	bool b = piglit_get_compressed_block_size(format, &bw, &bh, &bytes);
 
+	(void)b;
 	assert(b);
 
 	assert(x % bw == 0);
@@ -2555,6 +2558,7 @@ piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 		break;
 	default:
 		assert(0);
+		return 0;
 	}
 
 	glGenTextures(1, &tex);
