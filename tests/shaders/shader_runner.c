@@ -89,6 +89,7 @@ static struct component_version glsl_req_version;
 static int gl_max_vertex_output_components;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
+static int gl_max_vertex_attribs;
 static int gl_max_varying_components;
 static int gl_max_clip_planes;
 
@@ -722,6 +723,11 @@ process_requirement(const char *line)
 			"GL_MAX_VERTEX_UNIFORM_COMPONENTS",
 			&gl_max_vertex_uniform_components,
 			"vertex uniform components",
+		},
+		{
+			"GL_MAX_VERTEX_ATTRIBS",
+			&gl_max_vertex_attribs,
+			"vertex attribs",
 		},
 		{
 			"GL_MAX_VARYING_COMPONENTS",
@@ -3347,6 +3353,13 @@ piglit_init(int argc, char **argv)
 	gl_max_varying_components *= 4;
 	gl_max_clip_planes = 0;
 #endif
+	if (gl_version.num >= 20 ||
+	    piglit_is_extension_supported("GL_ARB_vertex_shader"))
+		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS,
+			      &gl_max_vertex_attribs);
+	else
+		gl_max_vertex_attribs = 16;
+
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
