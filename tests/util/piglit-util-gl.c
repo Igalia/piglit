@@ -1063,12 +1063,25 @@ piglit_read_pixels_float(GLint x, GLint y, GLsizei width, GLsizei height,
 static bool
 piglit_can_probe_ubyte()
 {
-	int r,g,b,a;
+	int r,g,b,a,read;
 
-	glGetIntegerv(GL_RED_BITS, &r);
-	glGetIntegerv(GL_GREEN_BITS, &g);
-	glGetIntegerv(GL_BLUE_BITS, &b);
-	glGetIntegerv(GL_ALPHA_BITS, &a);
+	if (!piglit_is_extension_supported("GL_ARB_framebuffer_object"))
+		return false;
+
+	glGetIntegerv(GL_READ_BUFFER, &read);
+	if (read == GL_FRONT)
+		read = GL_FRONT_LEFT;
+	if (read == GL_BACK)
+		read = GL_BACK_LEFT;
+
+	glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, read,
+					      GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE, &r);
+	glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, read,
+					      GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE, &g);
+	glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, read,
+					      GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE, &b);
+	glGetFramebufferAttachmentParameteriv(GL_READ_FRAMEBUFFER, read,
+					      GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE, &a);
 
 	/* it could be LUMINANCE32F, etc. */
 	if (!r && !g && !b && !a)
