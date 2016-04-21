@@ -143,19 +143,19 @@ dsa_create_program(GLenum target)
 	piglit_get_glsl_version(&es, &major, &minor);
 	ver = ((major * 100 + minor) >= 140) ? "140" : "110";
 
-	asprintf(&vs_source, vs_template, ver);
+	(void)!asprintf(&vs_source, vs_template, ver);
 	switch (target) {
 	case GL_TEXTURE_1D:
-		asprintf(&fs_source, fs_1d_template, ver);
+		(void)!asprintf(&fs_source, fs_1d_template, ver);
 		break;
 	case GL_TEXTURE_2D:
-		asprintf(&fs_source, fs_2d_template, ver);
+		(void)!asprintf(&fs_source, fs_2d_template, ver);
 		break;
 	case GL_TEXTURE_3D:
-		asprintf(&fs_source, fs_3d_template, ver);
+		(void)!asprintf(&fs_source, fs_3d_template, ver);
 		break;
 	case GL_TEXTURE_RECTANGLE_ARB:
-		asprintf(&fs_source, fs_rect_template, ver);
+		(void)!asprintf(&fs_source, fs_rect_template, ver);
 		break;
 	default:
 		fprintf(stderr, "Invalid texture target in %s\n", __func__);

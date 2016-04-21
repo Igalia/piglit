@@ -129,7 +129,7 @@ try_max_separators(GLuint prog, unsigned n)
 	vars = (const char **)malloc(var_n * sizeof(const char *));
 
 	for (i = 0; i <= n; ++i) {
-		asprintf((char **)&vars[2 * i + 0], "x_0x%08x", i);
+		(void)!asprintf((char **)&vars[2 * i + 0], "x_0x%08x", i);
 
 		if (i < n) {
 			static const char separator[] = "gl_NextBuffer";

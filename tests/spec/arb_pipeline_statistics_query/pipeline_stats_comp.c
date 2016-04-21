@@ -87,7 +87,7 @@ dispatch_size(uint32_t x, uint32_t y, uint32_t z)
 		glDeleteProgram(prog);
 	}
 
-	asprintf(&compute_shader, compute_shader_template, x, y, z);
+	(void)!asprintf(&compute_shader, compute_shader_template, x, y, z);
 
 	glShaderSource(shader, 1,
 		       (const GLchar **) &compute_shader,

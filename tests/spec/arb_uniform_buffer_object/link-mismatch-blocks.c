@@ -199,7 +199,7 @@ get_shader(GLenum target, const char *header, const char *body)
 		break;
 	}
 
-	asprintf(&source, template, header, body);
+	(void)!asprintf(&source, template, header, body);
 
 	return source;
 }

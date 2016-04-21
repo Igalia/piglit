@@ -39,7 +39,7 @@ concat(char *hunk0, ...)
 
 	while ((hunk = va_arg(ap, char *))) {
 		char *t = s;
-		asprintf(&s, "%s\n%s", t, hunk);
+		(void)!asprintf(&s, "%s\n%s", t, hunk);
 		free(t);
 		free(hunk);
 	}
@@ -57,7 +57,7 @@ generate_cs_prog(unsigned x, unsigned y, unsigned z, char *ext,
 	if (ext == NULL)
 		ext = hunk("");
 
-	asprintf(&source,
+	(void)!asprintf(&source,
 		 "#version 330\n"
 		 "#extension GL_ARB_compute_shader : enable\n"
 		 "%s\n"

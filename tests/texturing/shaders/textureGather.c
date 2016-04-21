@@ -418,13 +418,13 @@ do_shader_setup(void)
 	bool need_shader5 = (comp_select != -1) || use_offsets || use_nonconst || (comptype == SHADOW_T) || sampler == SAMPLER_2DRECT;
 
 	if (use_offsets)
-		asprintf(&offset_coords, "const ivec2 osets[4] = ivec2[4](ivec2(%d, %d), ivec2(%d, %d), ivec2(3, 3), ivec2(-3, -3));\n",
+		(void)!asprintf(&offset_coords, "const ivec2 osets[4] = ivec2[4](ivec2(%d, %d), ivec2(%d, %d), ivec2(3, 3), ivec2(-3, -3));\n",
 			 min_offset, max_offset, max_offset, min_offset);
 	else if (use_offset)
-		asprintf(&offset_coords, ", ivec2(%d,%d)", min_offset, max_offset);
+		(void)!asprintf(&offset_coords, ", ivec2(%d,%d)", min_offset, max_offset);
 
 	if (stage == VS) {
-		asprintf(&vs_code, "#version %s\n"
+		(void)!asprintf(&vs_code, "#version %s\n"
 				"#extension GL_ARB_explicit_attrib_location: require\n"
 				"#extension GL_ARB_texture_gather: require\n"
 				"%s"
@@ -452,7 +452,7 @@ do_shader_setup(void)
 				comptype == SHADOW_T ? ", 0.5" : "",
 				use_offsets ? ", osets" : use_nonconst ? ", o1+o2" : use_offset ? offset_coords :  "",
 				comp_expr[1 + comp_select]);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 				"#version %s\n"
 				"\n"
 				"in vec4 c;\n"
@@ -463,7 +463,7 @@ do_shader_setup(void)
 				need_shader5 ? "150" : "130");
 	}
 	else {
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 				"#version %s\n"
 				"#extension GL_ARB_explicit_attrib_location: require\n"
 				"layout(location=0) in vec4 pos;\n"
@@ -472,7 +472,7 @@ do_shader_setup(void)
 				"	gl_Position = pos;\n"
 				"}\n",
 				need_shader5 ? "150" : "130");
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 				"#version %s\n"
 				"#extension GL_ARB_texture_gather: require\n"
 				"%s"

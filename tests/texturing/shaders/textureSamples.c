@@ -124,7 +124,7 @@ generate_GLSL(enum shader_target test_stage)
 
 	switch (test_stage) {
 	case VS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "#extension GL_ARB_texture_multisample: enable\n"
 			 "#extension GL_ARB_shader_texture_image_samples: enable\n"
@@ -139,7 +139,7 @@ generate_GLSL(enum shader_target test_stage)
 			 shader_version, sampler.name);
 		break;
 	case GS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "in vec4 piglit_vertex;\n"
 			 "out vec4 pos_to_gs;\n"
@@ -148,7 +148,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    pos_to_gs = piglit_vertex;\n"
 			 "}\n",
 			 shader_version);
-		asprintf(&gs_code,
+		(void)!asprintf(&gs_code,
 			 "#version %d\n"
 			 "#extension GL_ARB_texture_multisample: enable\n"
 			 "#extension GL_ARB_shader_texture_image_samples: enable\n"
@@ -168,7 +168,7 @@ generate_GLSL(enum shader_target test_stage)
 			 shader_version, sampler.name);
 		break;
 	case FS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "in vec4 piglit_vertex;\n"
 			 "void main()\n"
@@ -176,7 +176,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    gl_Position = piglit_vertex;\n"
 			 "}\n",
 			 shader_version);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n"
 			 "#extension GL_ARB_texture_multisample: enable\n"
 			 "#extension GL_ARB_shader_texture_image_samples: enable\n"
@@ -197,7 +197,7 @@ generate_GLSL(enum shader_target test_stage)
 	switch (test_stage) {
 	case VS:
 	case GS:
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n"
 			 "flat in int samples;\n"
 			 "out vec4 color;\n"

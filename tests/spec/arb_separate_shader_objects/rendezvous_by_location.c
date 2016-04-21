@@ -150,20 +150,20 @@ void piglit_init(int argc, char **argv)
 
 	glsl_version = pick_a_glsl_version();
 
-	asprintf(&source, vs_code_template, glsl_version);
+	(void)!asprintf(&source, vs_code_template, glsl_version);
 	vs_prog = glCreateShaderProgramv(GL_VERTEX_SHADER, 1,
 					 (const GLchar *const *) &source);
 	piglit_link_check_status(vs_prog);
 	free(source);
 
-	asprintf(&source, fs_code_same_declaration_order_template, glsl_version);
+	(void)!asprintf(&source, fs_code_same_declaration_order_template, glsl_version);
 	fs_prog_same_declaration_order =
 		glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
 				       (const GLchar *const *) &source);
 	piglit_link_check_status(fs_prog_same_declaration_order);
 	free(source);
 
-	asprintf(&source, fs_code_same_location_order_template, glsl_version);
+	(void)!asprintf(&source, fs_code_same_location_order_template, glsl_version);
 	fs_prog_same_location_order =
 		glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
 				       (const GLchar *const *) &source);

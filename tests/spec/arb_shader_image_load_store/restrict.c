@@ -81,7 +81,7 @@ qualifier_hunk(const struct image_qualifier_info *qual)
 {
         char *s = NULL;
 
-        asprintf(&s, "#define IMAGE_Q %s\n", qual->qualifier);
+        (void)!asprintf(&s, "#define IMAGE_Q %s\n", qual->qualifier);
         return s;
 }
 

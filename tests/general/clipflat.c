@@ -354,7 +354,7 @@ calcQuadrant(GLfloat x, GLfloat y)
 		assert(0);
 	}
 
-	asprintf(&ret, "%s %s", strx, stry);
+	(void)!asprintf(&ret, "%s %s", strx, stry);
 	return ret;
 }
 

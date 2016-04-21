@@ -71,12 +71,12 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_texture_cube_map_array");
 
 	/* setup shaders and program object for Cube rendering */
-	asprintf(&vsCode,
+	(void)!asprintf(&vsCode,
 		 "void main()\n"
 		 "{\n"
 		 "    gl_Position = gl_Vertex;\n"
 		 "}\n");
-	asprintf(&fsCode,
+	(void)!asprintf(&fsCode,
 		 "#extension GL_ARB_texture_cube_map_array: require\n"
 		 "uniform samplerCubeArray tex;\n"
 		 "void main()\n"

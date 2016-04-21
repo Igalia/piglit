@@ -95,7 +95,7 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	asprintf(&gstext, gstemplate, layout);
+	(void)!asprintf(&gstext, gstemplate, layout);
 	gs = glCreateShader(GL_GEOMETRY_SHADER);
 	glShaderSource(gs, 1, (const GLchar **) &gstext, NULL);
 	glCompileShader(gs);

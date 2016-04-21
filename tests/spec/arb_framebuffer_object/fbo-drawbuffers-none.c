@@ -132,7 +132,7 @@ create_shaders(void)
 				GL_FRAGMENT_SHADER, fs_write_red,
 				0);
 
-	asprintf(&fs_write_different, fs_template_write_different,
+	(void)!asprintf(&fs_write_different, fs_template_write_different,
 		 fs_uses_out_variables ?
 		 "#version 130 \nout vec4[4] color;" : "",
 		 fs_uses_out_variables ? "color" : "gl_FragData");

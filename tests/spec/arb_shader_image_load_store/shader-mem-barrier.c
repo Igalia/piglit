@@ -93,7 +93,7 @@ test_hunk(const struct image_test_info *test, unsigned k)
 {
         char *s = NULL;
 
-        asprintf(&s, "#define IMAGE_Q %s\n"
+        (void)!asprintf(&s, "#define IMAGE_Q %s\n"
                  "#define MEMORY_BARRIER() %s\n"
                  "#define K %d\n",
                  test->qualifier, test->barrier, k);

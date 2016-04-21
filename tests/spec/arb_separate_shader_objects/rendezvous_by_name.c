@@ -279,8 +279,8 @@ void piglit_init(int argc, char **argv)
 	fs_prog_1_in = format_and_link_program(GL_FRAGMENT_SHADER,
 			fs_code_1_in_template, glsl_version);
 
-	asprintf(&vs_source, vs_code_inactive_template, glsl_version, max_varying);
-	asprintf(&fs_source, fs_code_inactive_template, glsl_version, max_varying);
+	(void)!asprintf(&vs_source, vs_code_inactive_template, glsl_version, max_varying);
+	(void)!asprintf(&fs_source, fs_code_inactive_template, glsl_version, max_varying);
 
 	pass &= piglit_check_gl_error(0);
 

@@ -186,7 +186,7 @@ try_attach_shader(GLuint prog, const char *shader_desc, GLenum target,
 	GLuint shader = glCreateShader(target);
 	GLint ok;
 
-	asprintf(&shader_text, shader_template, version);
+	(void)!asprintf(&shader_text, shader_template, version);
 	glShaderSource(shader, 1, (const GLchar **) &shader_text, NULL);
 	free(shader_text);
 	glCompileShader(shader);

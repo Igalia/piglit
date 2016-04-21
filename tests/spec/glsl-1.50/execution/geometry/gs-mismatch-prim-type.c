@@ -142,7 +142,7 @@ piglit_init(int argc, char **argv)
 
 	prog = glCreateProgram();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	asprintf(&gstext, gstemplate, layout);
+	(void)!asprintf(&gstext, gstemplate, layout);
 	gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, gstext);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
 	glAttachShader(prog, vs);

@@ -190,21 +190,21 @@ compile_shader(GLenum target)
 
 	char const*target_string;
 	if (target == GL_TEXTURE_2D_MULTISAMPLE) {
-		asprintf(&texel_fetch_macro,
+		(void)!asprintf(&texel_fetch_macro,
 			 "#define TEXEL_FETCH(coord) texelFetch(texSampler, "
 			 "ivec2(coord), %s);\n",
 			 sample_number);
 		target_string = "sampler2DMS";
 	} else {
 		/* The layer for the array texture is hardcoded to 1. */
-		asprintf(&texel_fetch_macro,
+		(void)!asprintf(&texel_fetch_macro,
 			 "#define TEXEL_FETCH(coord) texelFetch(texSampler, "
 			 "ivec3(coord, 1), %s);\n",
 			 sample_number);
 		target_string = "sampler2DMSArray";
 	}
 
-	asprintf(&frag, frag_template, target_string, sample_map,
+	(void)!asprintf(&frag, frag_template, target_string, sample_map,
 		 y_scale, 1.0f / y_scale,
 		 1.0f / samples, texel_fetch_macro);
 

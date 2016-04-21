@@ -152,7 +152,7 @@ piglit_init(int argc, char **argv)
 			char *gstext;
 			vs = piglit_compile_shader_text(GL_VERTEX_SHADER,
 							vstext_gs);
-			asprintf(&gstext, gstext_gs,
+			(void)!asprintf(&gstext, gstext_gs,
 				 mode_gs_out_primtypes[mode]);
 			gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER,
 							gstext);

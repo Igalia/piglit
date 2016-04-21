@@ -76,7 +76,7 @@ test_format(const struct uniform_type *type, bool row_major)
 	else
 		transposed_type = type;
 
-	asprintf(&fs_source, fs_template,
+	(void)!asprintf(&fs_source, fs_template,
 		 row_major ? "layout(row_major) " : "",
 		 type->type);
 	prog = piglit_build_simple_program(NULL, fs_source);

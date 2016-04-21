@@ -122,7 +122,7 @@ piglit_test_int_v(GLenum token, GLuint index, GLint limit, bool max)
 {
 	char *name;
 	GLint val = 9999;
-	asprintf(&name, "%s[%d]", piglit_get_gl_enum_name(token), index);
+	(void)!asprintf(&name, "%s[%d]", piglit_get_gl_enum_name(token), index);
 
 	glGetIntegeri_v(token, index, &val);
 
@@ -288,11 +288,11 @@ void piglit_test_range_float(GLenum token, GLfloat low, GLfloat high)
 
 	pass = piglit_check_gl_error(GL_NO_ERROR);
 
-	asprintf(&temp, "%s[0]", name);
+	(void)!asprintf(&temp, "%s[0]", name);
 	piglit_report_float(temp, low, vals[0], pass && vals[0] <= low);
 	free(temp);
 
-	asprintf(&temp, "%s[1]", name);
+	(void)!asprintf(&temp, "%s[1]", name);
 	piglit_report_float(temp, high, vals[1], pass && vals[1] >= high);
 	free(temp);
 }

@@ -106,7 +106,7 @@ piglit_init(int argc, char **argv)
 	glShaderSource(fs, 1, (const GLchar **) &fs_source, NULL);
 	glCompileShader(fs);
 
-	asprintf(&shader_text, gs_template, max_streams, max_streams);
+	(void)!asprintf(&shader_text, gs_template, max_streams, max_streams);
 	gs = glCreateShader(GL_GEOMETRY_SHADER);
 	glShaderSource(gs, 1, (const GLchar **) &shader_text, NULL);
 	glCompileShader(gs);

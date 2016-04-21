@@ -134,7 +134,7 @@ piglit_display(void)
 static void
 setup_output(char **out, const char *name, float *values)
 {
-	asprintf(out,
+	(void)!asprintf(out,
 		 "	%s = vec4(%f, %f, %f, %f);\n",
 		 name,
 		 values[0],
@@ -186,7 +186,7 @@ piglit_init(int argc, char **argv)
 	if (back2)
 		setup_output(&vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
 
-	asprintf(&vs_source,
+	(void)!asprintf(&vs_source,
 		 "void main()\n"
 		 "{\n"
 		 "	gl_Position = gl_Vertex;\n"

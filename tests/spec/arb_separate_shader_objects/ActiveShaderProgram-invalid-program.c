@@ -80,7 +80,7 @@ piglit_init(int argc, char **argv)
 
 	glBindProgramPipeline(pipe);
 
-	asprintf(&source, vs_code_template, glsl_version);
+	(void)!asprintf(&source, vs_code_template, glsl_version);
 	vs_prog = glCreateShaderProgramv(GL_VERTEX_SHADER, 1,
 					 (const GLchar *const *) &source);
 	piglit_link_check_status(vs_prog);

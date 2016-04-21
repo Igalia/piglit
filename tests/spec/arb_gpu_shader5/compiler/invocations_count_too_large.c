@@ -74,7 +74,7 @@ test_invocations_size(GLint size, bool expect_ok)
 	printf("Invocation count of %d should %s: ", size,
 	       expect_ok ? "compile successfully" : "produce a compile error");
 
-	asprintf(&shader_text, gs_template, size);
+	(void)!asprintf(&shader_text, gs_template, size);
 	shader = glCreateShader(GL_GEOMETRY_SHADER);
 	glShaderSource(shader, 1, (const GLchar **) &shader_text, NULL);
 	glCompileShader(shader);

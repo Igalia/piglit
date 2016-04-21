@@ -490,7 +490,7 @@ piglit_init(int argc, char **argv)
 	/* Generate the version declaration that will be used by all of the
 	 * shaders in the test run.
 	 */
-	asprintf(&version_string,
+	(void)!asprintf(&version_string,
 		 "#version %s\n"
 		 "%s"
 		 "#ifdef GL_ES\n"
@@ -499,7 +499,7 @@ piglit_init(int argc, char **argv)
 		 required_glsl_version_string,
 		 extension_enables);
 
-	asprintf(&passthrough_version_string,
+	(void)!asprintf(&passthrough_version_string,
 		 "#version %s\n"
 		 "#ifdef GL_ES\n"
 		 "precision mediump float;\n"

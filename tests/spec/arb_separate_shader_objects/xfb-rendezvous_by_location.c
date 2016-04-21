@@ -94,7 +94,7 @@ void piglit_init(int argc, char **argv)
 	/* The vertex shader must be created using the "traditional" method
 	 * because we the call glTransformFeedbackVaryings before linking.
 	 */
-	asprintf(&source, vs_template, glsl_version);
+	(void)!asprintf(&source, vs_template, glsl_version);
 
 	if (!CreateShaderProgram_with_xfb(source, varyings,
 					  ARRAY_SIZE(varyings), &vs_prog)) {

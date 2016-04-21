@@ -227,9 +227,9 @@ do_test(const struct test_desc *test)
 		piglit_require_extension("GL_ARB_separate_shader_objects");
 
 		if (piglit_get_gl_version() >= 32)
-			asprintf(&vstext_sep, vstext_sep_template, 150);
+			(void)!asprintf(&vstext_sep, vstext_sep_template, 150);
 		else
-			asprintf(&vstext_sep, vstext_sep_template, 110);
+			(void)!asprintf(&vstext_sep, vstext_sep_template, 110);
 	}
 
 	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS,

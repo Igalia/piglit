@@ -122,11 +122,11 @@ compile_shader(void)
 
 	char *frag_1;
 	if (num_samples)
-	        asprintf(&frag_1, frag_template,
+	        (void)!asprintf(&frag_1, frag_template,
 			 "#extension GL_ARB_texture_multisample : require",
 			 "sampler2DMS", ", i");
 	else
-	        asprintf(&frag_1, frag_template, "", "sampler2DRect", "");
+	        (void)!asprintf(&frag_1, frag_template, "", "sampler2DRect", "");
 
 	prog_1 = piglit_build_simple_program(vert, frag_1);
 	if (!piglit_link_check_status(prog_1)) {

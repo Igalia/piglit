@@ -245,7 +245,7 @@ piglit_present_results(void)
 			     base_format, GL_UNSIGNED_BYTE, image);
 		assert(glGetError() == GL_NO_ERROR);
 
-		asprintf(&filename, "%s%03d.png", fileprefix, frame++);
+		(void)!asprintf(&filename, "%s%03d.png", fileprefix, frame++);
 
 		printf("Writing %s...\n", filename);
 		piglit_write_png(filename, base_format, piglit_width,

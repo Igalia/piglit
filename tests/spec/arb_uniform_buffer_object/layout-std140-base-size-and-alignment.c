@@ -82,7 +82,7 @@ test_format(const struct uniform_type *type, bool row_major)
 	else
 		deref = "u[0].x";
 
-	asprintf(&fs_source, fs_template,
+	(void)!asprintf(&fs_source, fs_template,
 		 row_major && type->size > 16 ? "layout(row_major) " : "",
 		 type->type,
 		 deref);

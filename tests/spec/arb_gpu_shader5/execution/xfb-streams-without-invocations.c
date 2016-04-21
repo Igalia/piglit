@@ -166,7 +166,7 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 	/* Skip Stream = 3 as it has no primitives written nor generated */
 	for (i = 0; i < STREAMS-1; ++i) {
 		char *name;
-		asprintf(&name, "stream%d", i);
+		(void)!asprintf(&name, "stream%d", i);
 		pass = piglit_probe_buffer(xfb[i], GL_TRANSFORM_FEEDBACK_BUFFER,
 				name, 1, expected_n[i], expected[i]);
 		free(name);

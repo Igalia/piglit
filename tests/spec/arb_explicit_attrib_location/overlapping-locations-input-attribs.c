@@ -102,7 +102,7 @@ compile_shader(void)
 		"}\n";
 
 	char *vert;
-	asprintf(&vert, vert_template, locations_in_shader ?
+	(void)!asprintf(&vert, vert_template, locations_in_shader ?
 		 "#extension GL_ARB_explicit_attrib_location : require\n"
 		 "layout (location = 0) in vec2 vertex;\n"
 		 "layout (location = 1) in vec3 color0;\n"

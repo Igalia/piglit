@@ -89,12 +89,12 @@ piglit_init(int argc, char **argv)
 	num_xfb_buffers = ARRAY_SIZE(xfb_buf);
 
 	if (test_gl_ViewportIndex) {
-		asprintf(&gstext, gs_template,
+		(void)!asprintf(&gstext, gs_template,
 			 "#extension GL_ARB_viewport_array : require\n",
 			 "    gl_ViewportIndex = i + 1;\n");
 	} else {
 		printf("Skip testing 'gl_ViewportIndex'\n");
-		asprintf(&gstext, gs_template, "", "");
+		(void)!asprintf(&gstext, gs_template, "", "");
 		num_xfb_buffers -= 1;
 	}
 

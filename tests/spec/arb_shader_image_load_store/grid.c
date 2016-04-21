@@ -40,7 +40,7 @@ concat(char *hunk0, ...)
 
         while ((hunk = va_arg(ap, char *))) {
                 char *t = s;
-                asprintf(&s, "%s\n%s", t, hunk);
+                (void)!asprintf(&s, "%s\n%s", t, hunk);
                 free(t);
                 free(hunk);
         }
@@ -54,7 +54,7 @@ image_hunk(const struct image_info img, const char *prefix)
 {
         char *s = NULL;
 
-        asprintf(&s,
+        (void)!asprintf(&s,
                  "#define %sBASE_T %s\n"
                  "#define %sDATA_T %s\n"
                  "#define %sSCALE vec4(%.8e, %.8e, %.8e, %.8e)\n"
@@ -92,7 +92,7 @@ header_hunk(const struct grid_info grid)
 {
         char *s = NULL;
 
-        asprintf(&s, "#version 150\n"
+        (void)!asprintf(&s, "#version 150\n"
                  "#extension GL_ARB_shader_image_load_store : enable\n"
                  "#define W %d\n"
                  "#define H %d\n"

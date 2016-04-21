@@ -67,7 +67,7 @@ test_format(const struct uniform_type *type)
 		deref = "u[0].x";
 	}
 
-	asprintf(&fs_source, fs_template, type->type, deref);
+	(void)!asprintf(&fs_source, fs_template, type->type, deref);
 	prog = piglit_build_simple_program(NULL, fs_source);
 	free(fs_source);
 

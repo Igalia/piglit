@@ -778,7 +778,7 @@ compile_shader(GLenum target, const char *shader_text)
 	const char *header = choose_header();
 	char *concatenated_text = NULL;
 	GLuint shader;
-	asprintf(&concatenated_text, "%s%s", header, shader_text);
+	(void)!asprintf(&concatenated_text, "%s%s", header, shader_text);
 	shader = piglit_compile_shader_text(target, concatenated_text);
 	free(concatenated_text);
 	return shader;
@@ -797,7 +797,7 @@ prepend_varyings(const char *prefix, const char * const *varyings)
 	char **result = calloc(num_varyings + 1, sizeof(char *));
 	unsigned i;
 	for (i = 0; i < num_varyings; i++)
-		asprintf(&result[i], "%s%s", prefix, varyings[i]);
+		(void)!asprintf(&result[i], "%s%s", prefix, varyings[i]);
 	result[num_varyings] = NULL;
 	return (const char **) result;
 }

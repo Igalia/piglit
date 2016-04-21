@@ -100,19 +100,19 @@ piglit_init(int argc, char **argv)
 
 	prog = glCreateProgram();
 
-	asprintf(&temp_source, vs_source, header);
+	(void)!asprintf(&temp_source, vs_source, header);
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, temp_source);
 	glAttachShader(prog, vs);
 	free(temp_source);
 
 	if (use_gs) {
-		asprintf(&temp_source, gs_source, header);
+		(void)!asprintf(&temp_source, gs_source, header);
 		gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, temp_source);
 		glAttachShader(prog, gs);
 		free(temp_source);
 	}
 
-	asprintf(&temp_source, fs_source, header);
+	(void)!asprintf(&temp_source, fs_source, header);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, temp_source);
 	glAttachShader(prog, fs);
 	free(temp_source);

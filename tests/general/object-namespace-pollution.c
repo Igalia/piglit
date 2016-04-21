@@ -402,7 +402,7 @@ generate_program_source(GLenum target, unsigned key)
 				;
 		}
 
-		asprintf(&source,
+		(void)!asprintf(&source,
 			 "!!ARBvp1.0\n"
 			 "# Program key 0x%04x\n"
 			 "ATTRIB vp = vertex.position;\n"
@@ -451,7 +451,7 @@ generate_program_source(GLenum target, unsigned key)
 			half_dir = "state.light[0].half";
 		}
 
-		asprintf(&source,
+		(void)!asprintf(&source,
 			 "!!ARBfp1.0\n"
 			 "# Program key 0x%04x\n"
 			 "ATTRIB n = fragment.texcoord[0];\n"

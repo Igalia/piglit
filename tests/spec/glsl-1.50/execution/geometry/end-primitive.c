@@ -250,7 +250,7 @@ piglit_init(int argc, char **argv)
 						  vs_test_text);
 	gs_test_main = piglit_compile_shader_text(GL_GEOMETRY_SHADER,
 						  gs_test_text);
-	asprintf(&text, gs_layout_template, num_vertices);
+	(void)!asprintf(&text, gs_layout_template, num_vertices);
 	gs_layout = piglit_compile_shader_text(GL_GEOMETRY_SHADER, text);
 	free(text);
 	fs_main = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);

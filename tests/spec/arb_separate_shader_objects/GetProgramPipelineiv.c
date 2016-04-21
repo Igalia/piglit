@@ -223,7 +223,7 @@ piglit_init(int argc, char **argv)
 		ver = 110;
 	}
 
-	asprintf(&version,
+	(void)!asprintf(&version,
 		 "#version %d\n"
 		 "#extension GL_ARB_separate_shader_objects: enable\n\n",
 		 ver);

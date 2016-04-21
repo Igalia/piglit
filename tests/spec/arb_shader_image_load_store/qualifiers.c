@@ -97,7 +97,7 @@ test_hunk(bool strict_layout_qualifiers,
 {
         char *s = NULL;
 
-        asprintf(&s, "#define SRC_IMAGE_Q IMAGE_LAYOUT_Q %s\n"
+        (void)!asprintf(&s, "#define SRC_IMAGE_Q IMAGE_LAYOUT_Q %s\n"
                  "#define DST_IMAGE_Q %s %s\n",
                  (strict_access_qualifiers ? "readonly" : ""),
                  (strict_layout_qualifiers || !strict_access_qualifiers ?

@@ -259,11 +259,11 @@ piglit_init(int argc, char **argv)
 	pass = true;
 
 	/* create the shader program */
-	asprintf(&vs_source, vs_source_template, version);
-	asprintf(&fs_source, fs_source_template, version);
-	asprintf(&gs_source, gs_source_template, version);
-	asprintf(&te_source, te_source_template, version);
-	asprintf(&tc_source, tc_source_template, version);
+	(void)!asprintf(&vs_source, vs_source_template, version);
+	(void)!asprintf(&fs_source, fs_source_template, version);
+	(void)!asprintf(&gs_source, gs_source_template, version);
+	(void)!asprintf(&te_source, te_source_template, version);
+	(void)!asprintf(&tc_source, tc_source_template, version);
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);

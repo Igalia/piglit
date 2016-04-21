@@ -237,7 +237,7 @@ piglit_init(int argc, char **argv)
 
 		char *source = NULL;
 
-		asprintf(&source, vs_code,
+		(void)!asprintf(&source, vs_code,
 			 glsl_version,
 			 location,
 			 vertex_name,
@@ -259,7 +259,7 @@ piglit_init(int argc, char **argv)
 	for (i = 0; i < ARRAY_SIZE(fs_programs); i++) {
 		char *source = NULL;
 
-		asprintf(&source, fs_code,
+		(void)!asprintf(&source, fs_code,
 			 glsl_version,
 			 location,
 			 fragment_name,

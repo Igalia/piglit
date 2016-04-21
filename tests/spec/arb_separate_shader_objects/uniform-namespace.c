@@ -91,7 +91,7 @@ generate_program(const char *code_template, unsigned glsl_version,
 	char *code = NULL;
 	GLuint prog;
 
-	asprintf(&code, code_template, glsl_version);
+	(void)!asprintf(&code, code_template, glsl_version);
 	prog = glCreateShaderProgramv(program_target, 1,
 				      (const GLchar * const*) &code);
 	free(code);

@@ -517,7 +517,7 @@ build_program(const char *fragment_source)
 	GLuint prog;
 	char *source;
 
-	asprintf(&source,
+	(void)!asprintf(&source,
 		 fragment_source,
 		 single_sample ?
 		 "" :

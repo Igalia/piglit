@@ -119,7 +119,7 @@ bind_images(const struct grid_info grid, GLuint prog)
                         for (i = 0; i < n; ++i) {
                                 char *name = NULL;
 
-                                asprintf(&name, "imgs_%d[%d]", stage_idx, i);
+                                (void)!asprintf(&name, "imgs_%d[%d]", stage_idx, i);
 
                                 if (!set_uniform_int(prog, name,
                                                      (first + i) % m))
@@ -139,7 +139,7 @@ stage_hunk(const struct grid_info grid,
 {
         char *s = NULL;
 
-        asprintf(&s, "#define IMGS imgs_%d\n"
+        (void)!asprintf(&s, "#define IMGS imgs_%d\n"
                  "#define NUM_IMGS %d\n",
                  (int)(stage - image_stages()),
                  num_images_for_stage(grid, stage));

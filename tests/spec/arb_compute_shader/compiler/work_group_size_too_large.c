@@ -79,7 +79,7 @@ test_work_group_size(GLint *size, bool expect_ok)
 	printf("Sizes %d, %d, %d should %s: ", size[0], size[1], size[2],
 	       expect_ok ? "compile successfully" : "produce a compile error");
 
-	asprintf(&shader_text, cs_template, size[0], size[1], size[2]);
+	(void)!asprintf(&shader_text, cs_template, size[0], size[1], size[2]);
 	shader = glCreateShader(GL_COMPUTE_SHADER);
 	glShaderSource(shader, 1, (const GLchar **) &shader_text, NULL);
 	glCompileShader(shader);

@@ -73,7 +73,7 @@ init_images(const struct image_info img, GLuint prog)
                 if (!upload_image(img, unit, pixels[0]))
                         return false;
 
-                asprintf(&name, "imgs[%d]", unit);
+                (void)!asprintf(&name, "imgs[%d]", unit);
                 set_uniform_int(prog, name, unit);
                 free(name);
         }

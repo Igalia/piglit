@@ -73,16 +73,16 @@ piglit_init(int argc, char **argv)
 	char *vs_text;
 
 	if (strcmp(argv[1], "basevertex") == 0) {
-		asprintf(&vs_text, vs_template,
+		(void)!asprintf(&vs_text, vs_template,
 			 "ref.x == gl_BaseVertexARB");
 	} else if (strcmp(argv[1], "baseinstance") == 0) {
-		asprintf(&vs_text, vs_template,
+		(void)!asprintf(&vs_text, vs_template,
 			 "ref.y == gl_BaseInstanceARB");
 	} else if (strcmp(argv[1], "basevertex-baseinstance") == 0) {
-		asprintf(&vs_text, vs_template,
+		(void)!asprintf(&vs_text, vs_template,
 			 "ref.xy == ivec2(gl_BaseVertexARB, gl_BaseInstanceARB)");
 	} else if (strcmp(argv[1], "vertexid-zerobased") == 0) {
-		asprintf(&vs_text, vs_template,
+		(void)!asprintf(&vs_text, vs_template,
 			 "ref.z == gl_VertexID - gl_BaseVertexARB");
 	} else {
                 printf("Unknown subtest: %s\n", argv[1]);

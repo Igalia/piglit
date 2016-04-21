@@ -159,13 +159,13 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_texture_array");
 
 	/* setup shaders and program object for 2DArray rendering */
-	asprintf(&vsCode,
+	(void)!asprintf(&vsCode,
 		 "void main()\n"
 		 "{\n"
 		 "    gl_Position = gl_Vertex;\n"
 		 "    gl_TexCoord[0] = gl_MultiTexCoord0;\n"
 		 "}\n");
-	asprintf(&fsCode,
+	(void)!asprintf(&fsCode,
 		 "#extension GL_EXT_texture_array : enable\n"
 		 "uniform sampler2DArray tex;\n"
 		 "void main()\n"

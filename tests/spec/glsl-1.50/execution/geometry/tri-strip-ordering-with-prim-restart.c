@@ -206,7 +206,7 @@ piglit_init(int argc, char **argv)
 	prog = glCreateProgram();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
 	glAttachShader(prog, vs);
-	asprintf(&gs_text, gs_template, test->input_layout,
+	(void)!asprintf(&gs_text, gs_template, test->input_layout,
 		 test->vertices_per_prim);
 	gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, gs_text);
 	free(gs_text);

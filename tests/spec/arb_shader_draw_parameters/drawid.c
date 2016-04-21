@@ -71,10 +71,10 @@ piglit_init(int argc, char **argv)
 	char *vs_text;
 
 	if (strcmp(argv[1], "drawid") == 0) {
-		asprintf(&vs_text, vs_template,
+		(void)!asprintf(&vs_text, vs_template,
 			 "ref.x == gl_DrawIDARB");
 	} else if (strcmp(argv[1], "vertexid") == 0) {
-		asprintf(&vs_text, vs_template,
+		(void)!asprintf(&vs_text, vs_template,
 			 "ref.x == gl_DrawIDARB && ref.y == gl_VertexID");
 	} else {
                 printf("Unknown subtest: %s\n", argv[1]);

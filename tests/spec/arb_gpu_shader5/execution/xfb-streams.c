@@ -148,7 +148,7 @@ build_and_use_program(GLint gs_invocation_n, const char *gs_template,
 
 	char *gs_text;
 
-	asprintf(&gs_text, gs_template, gs_invocation_n);
+	(void)!asprintf(&gs_text, gs_template, gs_invocation_n);
 	prog = piglit_build_simple_program_multiple_shaders(
 				GL_VERTEX_SHADER, vs_pass_thru_text,
 				GL_GEOMETRY_SHADER, gs_text, 0);
@@ -222,7 +222,7 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 
 	for (i = 0; i < STREAMS; ++i) {
 		char *name;
-		asprintf(&name, "stream%d", i);
+		(void)!asprintf(&name, "stream%d", i);
 		pass = piglit_probe_buffer(xfb[i], GL_TRANSFORM_FEEDBACK_BUFFER,
 					   name, 1, expected_n[i], expected[i]);
 		free(name);

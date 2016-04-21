@@ -129,7 +129,7 @@ build_and_use_program(unsigned gs_invocation_n)
 	} else {
 		char *gs_text;
 
-		asprintf(&gs_text, gs_text_two_sets_tmpl, gs_invocation_n);
+		(void)!asprintf(&gs_text, gs_text_two_sets_tmpl, gs_invocation_n);
 		prog = piglit_build_simple_program_multiple_shaders(
 				GL_VERTEX_SHADER, vs_pass_thru_text,
 				GL_GEOMETRY_SHADER, gs_text, 0);

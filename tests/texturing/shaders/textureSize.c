@@ -266,7 +266,7 @@ generate_GLSL(enum shader_target test_stage)
 
 	switch (test_stage) {
 	case VS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n%s"
 			 "#define ivec1 int\n"
 			 "uniform int lod;\n"
@@ -279,7 +279,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    gl_Position = vertex;\n"
 			 "}\n",
 			 shader_version, extension, sampler.name, size, lod_arg);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "#define vec1 float\n"
@@ -291,7 +291,7 @@ generate_GLSL(enum shader_target test_stage)
 			 shader_version, size, zeroes[3 - size]);
 		break;
 	case GS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "in vec4 vertex;\n"
 			 "out vec4 pos_to_gs;\n"
@@ -300,7 +300,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    pos_to_gs = vertex;\n"
 			 "}\n",
 			 shader_version);
-		asprintf(&gs_code,
+		(void)!asprintf(&gs_code,
 			 "#version %d\n"
 			 "%s\n"
 			 "#define ivec1 int\n"
@@ -320,7 +320,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "}\n",
 			 shader_version, extension, sampler.name, size,
 			 lod_arg);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "#define vec1 float\n"
@@ -332,7 +332,7 @@ generate_GLSL(enum shader_target test_stage)
 			 shader_version, size, zeroes[3 - size]);
 		break;
 	case FS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "in vec4 vertex;\n"
 			 "void main()\n"
@@ -340,7 +340,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    gl_Position = vertex;\n"
 			 "}\n",
 			 shader_version);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n%s"
 			 "#define ivec1 int\n"
 			 "uniform int lod;\n"

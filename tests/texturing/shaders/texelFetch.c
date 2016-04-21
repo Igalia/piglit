@@ -352,7 +352,7 @@ upload_multisample_data(GLuint tex, int width, int height,
             "void main() {\n"
             "   gl_Position = pos;\n"
             "}\n");
-    asprintf(&fs_code,
+    (void)!asprintf(&fs_code,
             "#version 130\n"
             "#extension GL_ARB_explicit_attrib_location: require\n"
             "#extension GL_ARB_fragment_coord_conventions: require\n"
@@ -602,7 +602,7 @@ generate_GLSL(enum shader_target test_stage)
 
 	switch (test_stage) {
 	case VS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "%s\n"
 			 "#define ivec1 int\n"
@@ -623,7 +623,7 @@ generate_GLSL(enum shader_target test_stage)
 			 ((sampler.target == GL_TEXTURE_RECTANGLE) ?
 			  "" : ", texcoord.w"),
 			 offset_arg);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n"
 			 "flat in %s color;\n"
 			 "uniform vec4 divisor;\n"
@@ -635,7 +635,7 @@ generate_GLSL(enum shader_target test_stage)
 			 sampler.return_type);
 		break;
 	case GS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "in vec4 pos;\n"
 			 "in ivec4 texcoord;\n"
@@ -647,7 +647,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    pos_to_gs = pos;\n"
 			 "}\n",
 			 shader_version);
-		asprintf(&gs_code,
+		(void)!asprintf(&gs_code,
 			 "#version %d\n"
 			 "%s\n"
 			 "#define ivec1 int\n"
@@ -672,7 +672,7 @@ generate_GLSL(enum shader_target test_stage)
 			 ((sampler.target == GL_TEXTURE_RECTANGLE) ?
 			  "" : ", texcoord.w"),
 			 offset_arg);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n"
 			 "flat in %s color;\n"
 			 "uniform vec4 divisor;\n"
@@ -684,7 +684,7 @@ generate_GLSL(enum shader_target test_stage)
 			 sampler.return_type);
 		break;
 	case FS:
-		asprintf(&vs_code,
+		(void)!asprintf(&vs_code,
 			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "in vec4 pos;\n"
@@ -696,7 +696,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    gl_Position = pos;\n"
 			 "}\n",
 			 shader_version);
-		asprintf(&fs_code,
+		(void)!asprintf(&fs_code,
 			 "#version %d\n"
 			 "%s\n"
 			 "#define ivec1 int\n"

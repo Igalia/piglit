@@ -292,8 +292,8 @@ piglit_init(int argc, char **argv)
 	piglit_get_glsl_version(&es, &major, &minor);
 	ver = ((major * 100 + minor) >= 140) ? "140" : "110";
 
-	asprintf(&vs_source, vs_template, ver);
-	asprintf(&fs_source, fs_template, ver);
+	(void)!asprintf(&vs_source, vs_template, ver);
+	(void)!asprintf(&fs_source, fs_template, ver);
 
 	builder_prog = piglit_build_simple_program(vs_source, fs_source);
 

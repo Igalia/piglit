@@ -151,13 +151,13 @@ piglit_display(void)
 
 	switch (target) {
 	case GL_VERTEX_SHADER:
-		asprintf(&vs_source, vs_ubo_template, vec4s);
-		asprintf(&fs_source, "%s", fs_template);
+		(void)!asprintf(&vs_source, vs_ubo_template, vec4s);
+		(void)!asprintf(&fs_source, "%s", fs_template);
 		printf("Testing VS with uniform block vec4 v[%d]\n", vec4s);
 		break;
 	case GL_FRAGMENT_SHADER:
-		asprintf(&vs_source, "%s", vs_template);
-		asprintf(&fs_source, fs_ubo_template, vec4s);
+		(void)!asprintf(&vs_source, "%s", vs_template);
+		(void)!asprintf(&fs_source, fs_ubo_template, vec4s);
 		printf("Testing FS with uniform block vec4 v[%d]\n", vec4s);
 		break;
 	default:

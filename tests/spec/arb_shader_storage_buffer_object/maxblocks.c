@@ -112,10 +112,10 @@ get_shader(GLenum target, const char *block_prefix, int blocks)
 
 	switch (target) {
 	case GL_VERTEX_SHADER:
-		asprintf(&shader, vs_source, prefix, body);
+		(void)!asprintf(&shader, vs_source, prefix, body);
 		break;
 	case GL_FRAGMENT_SHADER:
-		asprintf(&shader, fs_source, prefix, body);
+		(void)!asprintf(&shader, fs_source, prefix, body);
 		break;
 	default:
 		piglit_report_result(PIGLIT_FAIL);

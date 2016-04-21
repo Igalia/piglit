@@ -137,7 +137,7 @@ GLuint format_and_link_program_with_qualifiers(GLenum type, const char* code,
 	char *source;
 	GLuint prog;
 
-	asprintf(&source, code, glsl_version, qualifiers[q1], qualifiers[q2], qualifiers[q3]);
+	(void)!asprintf(&source, code, glsl_version, qualifiers[q1], qualifiers[q2], qualifiers[q3]);
 	prog = glCreateShaderProgramv(type, 1,
 			(const GLchar *const *) &source);
 

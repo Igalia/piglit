@@ -235,13 +235,13 @@ piglit_init(int argc, char **argv)
 		gs_string = gs_text;
 		fs_string = fs_text;
 	} else {
-		asprintf((char **)&gs_string,
+		(void)!asprintf((char **)&gs_string,
 			 "#extension GL_ARB_geometry_shader4: enable\n"
 			 "const int n = %d;\n%s", components, gs_text_var);
 		if (transform_feedback)
 			fs_string = NULL;
 		else
-			asprintf((char **)&fs_string,
+			(void)!asprintf((char **)&fs_string,
 				 "const int n = %d;\n%s",
 				 components, fs_text_var);
 	}

@@ -646,12 +646,12 @@ create_program(struct program *program, const char *type)
 		threshold = "ivec4(1)";
 
 	if (test_vs) {
-		asprintf(&vs_source, vs_vert_source, type, type, type, type,
+		(void)!asprintf(&vs_source, vs_vert_source, type, type, type, type,
 			 threshold);
 		fs_source = fs_vert_source;
 	} else {
 		vs_source = vs_frag_source;
-		asprintf(&fs_source, fs_frag_source, type, type, type, type,
+		(void)!asprintf(&fs_source, fs_frag_source, type, type, type, type,
 			 threshold);
 	}
 
