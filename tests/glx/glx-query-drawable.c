@@ -157,9 +157,11 @@ static void query_fbconfig_id(Display *display, GLXDrawable draw) {
 	}
 	
 	if (id != piglit_id) {
-		fprintf(stderr, "error: id=%d but should be %d\n",
-		        id, piglit_id);
-		result = PIGLIT_FAIL;
+		if (!(drawable_type == WINDOW && id == None)) {
+			fprintf(stderr, "error: id=%d but should be %d\n",
+				id, piglit_id);
+			result = PIGLIT_FAIL;
+		}
 	}
 
 	piglit_report_result(result);
