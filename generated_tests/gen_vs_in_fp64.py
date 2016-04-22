@@ -214,6 +214,16 @@ def all_tests(names_only):
     # We need additional directories for GLSL 420
     if not names_only:
         utils.safe_makedirs(get_dir_name('420'))
+    # Uncommenting this will create an addition 100K tests. Up to you!!!
+    # for test_args in (list(create_tests(['GL_ARB_vertex_attrib_64bit', '410'],
+    #                                     create_in_types_array(DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES,
+    #                                                           DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES,
+    #                                                           DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES),
+    #                                     [1, 2, 3, 4],
+    #                                     [[1, 1, 1], [1, 1, 2], [1, 3, 1], [5, 1, 1],
+    #                                      [1, 3, 2], [5, 1, 2], [5, 3, 1], [5, 3, 2]],
+    #                                     names_only))):
+    #     yield test_args
     for test_args in (list(create_tests(['GL_ARB_vertex_attrib_64bit', '410'],
                                         create_in_types_array(DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES,
                                                               FSCALAR_TYPES + FVEC_TYPES + FMAT_TYPES),
