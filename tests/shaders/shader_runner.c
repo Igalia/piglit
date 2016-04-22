@@ -1668,14 +1668,13 @@ set_uniform(const char *line, int ubo_array_index)
 		glUniform1fv(loc, 1, f);
 		return;
 	} else if (string_match("int", type)) {
-		int val = atoi(line);
-		glUniform1i(loc, val);
+		get_ints(line, ints, 1);
+		glUniform1iv(loc, 1, ints);
 		return;
 	} else if (string_match("uint", type)) {
-		unsigned val;
 		check_unsigned_support();
-		val = strtoul(line, NULL, 0);
-		glUniform1ui(loc, val);
+		get_uints(line, uints, 1);
+		glUniform1uiv(loc, 1, uints);
 		return;
 	} else if (string_match("double", type)) {
 		check_double_support();
