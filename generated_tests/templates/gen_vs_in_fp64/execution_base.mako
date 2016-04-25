@@ -25,7 +25,7 @@ GLSL >= ${glsl_version}
 GL_ARB_gpu_shader_fp64
 ${ver}
 % endif
-GL_MAX_VERTEX_ATTRIBS >= ${num_vs_in}
+## GL_MAX_VERTEX_ATTRIBS >= ${num_vs_in}
 ${next.body()}\
 [vertex data]
 % for idx, in_type in enumerate(in_types):
