@@ -81,6 +81,7 @@ piglit_drm_x11_authenticate(void)
 	drm_magic_t magic;
 	xcb_connection_t *conn;
 	int screen;
+	const xcb_setup_t *setup;
 	xcb_screen_iterator_t screen_iter;
 	xcb_dri2_authenticate_cookie_t auth_cookie;
 	xcb_dri2_authenticate_reply_t *auth_reply;
@@ -99,7 +100,13 @@ piglit_drm_x11_authenticate(void)
 		return false;
 	}
 
-	screen_iter = xcb_setup_roots_iterator(xcb_get_setup(conn));
+	setup = xcb_get_setup(conn);
+	if (!setup) {
+		printf("piglit: xcb_get_setup() failed\n");
+		return false;
+	}
+
+	screen_iter = xcb_setup_roots_iterator(setup);
 	auth_cookie = xcb_dri2_authenticate_unchecked(conn,
 	                                              screen_iter.data->root,
 	                                              magic);
