@@ -199,9 +199,9 @@ def create_tests(glsl_vers, in_types_array, position_orders, arrays_array, names
             # dvec* and dmat* didn't appear in GLSL until 4.20
             if (in_type.startswith('dvec') or in_type.startswith('dmat')) and ver == '410':
                 ver = '420'
-        # Skip the test if it needs too many inputs
-        if num_vs_in > MAX_VERTEX_ATTRIBS:
-            continue
+        # # Skip the test if it needs too many inputs
+        # if num_vs_in > MAX_VERTEX_ATTRIBS:
+        #     continue
 
         yield ver, in_types, position_order, arrays, num_vs_in, names_only
 
