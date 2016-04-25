@@ -3122,7 +3122,7 @@ piglit_display(void)
 			int_fmt = piglit_get_gl_enum_from_name(s);
 
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_integer_texture(int_fmt, w, h, b, a);
+			(void)piglit_integer_texture(int_fmt, w, h, b, a);
 		} else if (sscanf(line, "texture miptree %d", &tex) == 1) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_miptree_texture();

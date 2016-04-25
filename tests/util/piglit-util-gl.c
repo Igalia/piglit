@@ -2620,6 +2620,8 @@ GLuint piglit_integer_texture(GLenum internalFormat, int w, int h, int b, int a)
 		     GL_RGBA_INTEGER, GL_INT, img);
 
 	free(img);
+
+	return tex;
 }
 
 /**
