@@ -42,10 +42,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static PFNGLGENRENDERBUFFERSOESPROC piglit_glGenRenderbuffersOES;
-static PFNGLBINDRENDERBUFFEROESPROC piglit_glBindRenderbufferOES;
-static PFNGLDELETERENDERBUFFERSOESPROC piglit_glDeleteRenderbuffersOES;
-
 static EGLImageKHR
 create_image(unsigned w, unsigned h, int fd, unsigned stride, unsigned offset)
 {
@@ -87,13 +83,11 @@ try_as_render_buffer(EGLImageKHR img)
 	GLuint rbo;
 	bool res;
 
-	piglit_glGenRenderbuffersOES(1, &rbo);
-	piglit_glBindRenderbufferOES(GL_RENDERBUFFER_OES, rbo);
-
+	glGenRenderbuffersOES(1, &rbo);
+	glBindRenderbufferOES(GL_RENDERBUFFER_OES, rbo);
 	glEGLImageTargetRenderbufferStorageOES(GL_RENDERBUFFER_OES, img);
 	res = piglit_check_gl_error(GL_NO_ERROR);
-
-	piglit_glDeleteRenderbuffersOES(1, &rbo);
+	glDeleteRenderbuffersOES(1, &rbo);
 
 	return res;
 }
@@ -148,20 +142,6 @@ piglit_init(int argc, char **argv)
 	piglit_require_egl_extension(egl_dpy, "EGL_KHR_image_base");
 	piglit_require_extension("GL_OES_EGL_image");
 	piglit_require_extension("GL_OES_framebuffer_object");
-	
-	piglit_glGenRenderbuffersOES =
-		(PFNGLGENRENDERBUFFERSOESPROC)
-		eglGetProcAddress("glGenRenderbuffersOES");
-	piglit_glBindRenderbufferOES =
-		(PFNGLBINDRENDERBUFFEROESPROC)
-		eglGetProcAddress("glBindRenderbufferOES");
-	piglit_glDeleteRenderbuffersOES =
-		(PFNGLDELETERENDERBUFFERSOESPROC)
-		eglGetProcAddress("glDeleteRenderbuffersOES");
-	if (!piglit_glGenRenderbuffersOES ||
-	    !piglit_glBindRenderbufferOES ||
-	    !piglit_glDeleteRenderbuffersOES)
-		piglit_report_result(PIGLIT_FAIL);
 
 	vendor_str = (const char *)glGetString(GL_VENDOR);
 	if (strncmp(vendor_str, intel_id, sizeof(intel_id) - 1) != 0) {
