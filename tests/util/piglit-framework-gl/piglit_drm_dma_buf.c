@@ -34,8 +34,7 @@
 #include <stdbool.h>
 #include <xcb/dri2.h>
 #include <drm.h>
-
-static const char *drm_device_filename = "/dev/dri/card0";
+#include <unistd.h>
 
 #define ALIGN(value, alignment) (((value) + alignment - 1) & ~(alignment - 1))
 
@@ -48,7 +47,8 @@ struct piglit_dma_buf {
 };
 
 struct piglit_drm_driver {
-	const char *name;
+	int fd;
+	char *name;
 
 	bool
 	(*create)(unsigned w, unsigned h, unsigned cpp,
@@ -62,21 +62,10 @@ struct piglit_drm_driver {
 	(*destroy)(struct piglit_dma_buf *buf);
 };
 
-static int
-piglit_drm_device_get(void)
-{
-	static int fd = 0;
-
-	if (fd)
-		return fd;
-
-	fd = open(drm_device_filename, O_RDWR);
-
-	return fd;
-}
+static const struct piglit_drm_driver *piglit_drm_get_driver(void);
 
 static bool
-piglit_drm_x11_authenticate(void)
+piglit_drm_x11_authenticate(int fd)
 {
 	drm_magic_t magic;
 	xcb_connection_t *conn;
@@ -94,7 +83,7 @@ piglit_drm_x11_authenticate(void)
 		return false;
 	}
 
-	ret = drmGetMagic(piglit_drm_device_get(), &magic);
+	ret = drmGetMagic(fd, &magic);
 	if (ret) {
 		printf("piglit: failed to get DRM magic\n");
 		return false;
@@ -126,18 +115,16 @@ static drm_intel_bufmgr *
 piglit_intel_bufmgr_get(void)
 {
 	static const unsigned batch_sz = 8192 * sizeof(uint32_t);
+	const struct piglit_drm_driver *drv = piglit_drm_get_driver();
 	static drm_intel_bufmgr *mgr = NULL;
 
 	if (mgr)
 		return mgr;
 
-	if (!piglit_drm_device_get())
+	if (!drv)
 		return NULL;
 
-	if (!piglit_drm_x11_authenticate())
-		return NULL;
-
-	mgr = intel_bufmgr_gem_init(piglit_drm_device_get(), batch_sz);
+	mgr = intel_bufmgr_gem_init(drv->fd, batch_sz);
 
 	return mgr;
 }
@@ -195,34 +182,69 @@ piglit_intel_buf_destroy(struct piglit_dma_buf *buf)
 }
 #endif /* HAVE_LIBDRM_INTEL */
 
-/**
- * The framework makes sure one doesn't try to compile without any hardware
- * support.
- */
-static const struct piglit_drm_driver piglit_drm_drivers[] = {
-#ifdef HAVE_LIBDRM_INTEL
-	{ "i915", piglit_intel_buf_create, piglit_intel_buf_export,
-	   piglit_intel_buf_destroy }
-#endif /* HAVE_LIBDRM_INTEL */
-};
-
 static const struct piglit_drm_driver *
 piglit_drm_get_driver(void)
 {
-	unsigned i;
+	static struct piglit_drm_driver drv = { /* fd */ -1 };
 	drmVersionPtr version;
-	int fd = piglit_drm_device_get();
 
-	if (!fd)
-		return NULL;
+	if (drv.fd != -1)
+		return &drv;
 
-	version = drmGetVersion(fd);
-	if (!version || !version->name)
-		return NULL;
+	drv.fd = open("/dev/dri/renderD128", O_RDWR);
 
-	for (i = 0; i < ARRAY_SIZE(piglit_drm_drivers); ++i) {
-		if (strcmp(piglit_drm_drivers[i].name, version->name) == 0)
-			return &piglit_drm_drivers[i];
+	if (drv.fd == -1) {
+		drv.fd = open("/dev/dri/card0", O_RDWR);
+		if (drv.fd == -1) {
+			fprintf(stderr, "error: failed to open /dev/dri/renderD128 and "
+			        "/dev/dri/card0\n");
+			goto fail;
+
+		}
+
+		if (!piglit_drm_x11_authenticate(drv.fd))
+			goto fail;
+	}
+
+	version = drmGetVersion(drv.fd);
+	if (!version || !version->name) {
+		fprintf(stderr, "error: drmGetVersion() failed\n");
+		goto fail;
+	}
+
+	drv.name = strdup(version->name);
+	if (!drv.name) {
+		fprintf(stderr, "out of memory\n");
+		abort();
+	}
+
+	if (0) {
+		/* empty */
+	}
+#ifdef HAVE_LIBDRM_INTEL
+	else if (streq(version->name, "i915")) {
+		drv.create = piglit_intel_buf_create;
+		drv.export = piglit_intel_buf_export;
+		drv.destroy = piglit_intel_buf_destroy;
+	}
+#endif
+	else {
+		fprintf(stderr, "error: unrecognized DRM driver name %s\n",
+			version->name);
+		goto fail;
+	}
+
+	return &drv;
+
+  fail:
+	if (drv.fd != -1) {
+		close(drv.fd);
+		drv.fd = -1;
+	}
+
+	if (drv.name) {
+		free(drv.name);
+		drv.name = NULL;
 	}
 
 	return NULL;
