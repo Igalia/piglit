@@ -25,3 +25,6 @@ void main()
 uniform int early_return 1
 draw rect -1 -1 2 2
 probe all rgba 0.5 0.5 0.5 0.5
+uniform int early_return 0
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.2 0.2 0.2
