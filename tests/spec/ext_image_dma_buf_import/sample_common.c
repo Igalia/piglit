@@ -116,7 +116,7 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 {
 	EGLint error;
 	EGLImageKHR img;
-	EGLint attr[] = {
+	EGLint attr_packed[] = {
 		EGL_WIDTH, w,
 		EGL_HEIGHT, h,
 		EGL_LINUX_DRM_FOURCC_EXT, fourcc,
@@ -126,8 +126,51 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 		EGL_NONE
 	};
 
+	EGLint attr_nv12[] = {
+		EGL_WIDTH, w,
+		EGL_HEIGHT, h,
+		EGL_LINUX_DRM_FOURCC_EXT, fourcc,
+		EGL_DMA_BUF_PLANE0_FD_EXT, fd,
+		EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
+		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE1_FD_EXT, fd,
+		EGL_DMA_BUF_PLANE1_OFFSET_EXT, offset + h * stride,
+		EGL_DMA_BUF_PLANE1_PITCH_EXT, stride,
+		EGL_NONE
+	};
+
+	EGLint attr_yuv420[] = {
+		EGL_WIDTH, w,
+		EGL_HEIGHT, h,
+		EGL_LINUX_DRM_FOURCC_EXT, fourcc,
+		EGL_DMA_BUF_PLANE0_FD_EXT, fd,
+		EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
+		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE1_FD_EXT, fd,
+		EGL_DMA_BUF_PLANE1_OFFSET_EXT, offset + h * stride,
+		EGL_DMA_BUF_PLANE1_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE2_FD_EXT, fd,
+		EGL_DMA_BUF_PLANE2_OFFSET_EXT, offset + h * stride + w / 2,
+		EGL_DMA_BUF_PLANE2_PITCH_EXT, stride,
+		EGL_NONE
+	};
+
+	EGLint *attr;
+	switch (fourcc) {
+	case DRM_FORMAT_NV12:
+		attr = attr_nv12;
+		break;
+	case DRM_FORMAT_YUV420:
+	case DRM_FORMAT_YVU420:
+		attr = attr_yuv420;
+		break;
+	default:
+		attr = attr_packed;
+		break;
+	}
+
 	img = eglCreateImageKHR(eglGetCurrentDisplay(), EGL_NO_CONTEXT,
-			EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)0, attr);
+				EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)0, attr);
 
 	/* Release the creator side of the buffer. */
 	piglit_destroy_dma_buf(buf);
@@ -158,15 +201,29 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 
 enum piglit_result
 dma_buf_create_and_sample_32bpp(unsigned w, unsigned h, unsigned cpp,
-			int fourcc, const unsigned char *src)
+				int fourcc, const unsigned char *src)
 {
 	struct piglit_dma_buf *buf;
 	unsigned stride, offset;
 	int fd;
 	enum piglit_result res;
 
-	res = piglit_create_dma_buf(w, h, cpp, src, w * cpp, &buf, &fd, &stride,
-				&offset);
+	unsigned buffer_height;
+
+	switch (fourcc) {
+	case DRM_FORMAT_NV12:
+	case DRM_FORMAT_YUV420:
+	case DRM_FORMAT_YVU420:
+		buffer_height = h * 3 / 2;
+		break;
+	default:
+		buffer_height = h;
+		break;
+	}
+
+	res = piglit_create_dma_buf(w, buffer_height,
+				    cpp, src, w * cpp, &buf, &fd, &stride,
+				    &offset);
 	if (res != PIGLIT_PASS)
 		return res;
 
