@@ -100,7 +100,9 @@ kernel void so(global int* out) {
 
 	out[i++] = sizeof(half);
 
-#if __OPENCL_C_VERSION__ >= 120
+// Needs cl_khr_fp64
+#ifdef cl_khr_fp64
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
 	out[i++] = sizeof(double);
 	out[i++] = sizeof(double2);
 	out[i++] = sizeof(double3);
