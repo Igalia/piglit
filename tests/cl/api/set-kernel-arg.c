@@ -200,7 +200,7 @@ piglit_cl_test(const int argc,
 	     "Set kernel argument for buffer which is NULL");
 
 	/*** Errors ***/
-	enum piglit_result input_check_result;
+	enum piglit_result input_check_result = PIGLIT_PASS;
 	/*
 	 * CL_INVALID_KERNEL if kernel is not a valid kernel object.
 	 */
