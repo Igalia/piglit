@@ -46,6 +46,22 @@ PIGLIT_CL_API_TEST_CONFIG_BEGIN
 
 PIGLIT_CL_API_TEST_CONFIG_END
 
+static bool context_has_image_support(const piglit_cl_context ctx)
+{
+	int ret = 0;
+	unsigned i;
+	for(i = 0; i < ctx->num_devices; i++) {
+		int *image_support =
+			piglit_cl_get_device_info(ctx->device_ids[i],
+						CL_DEVICE_IMAGE_SUPPORT);
+		if (image_support)
+			ret |= *image_support;
+
+		free(image_support);
+	}
+	return ret;
+}
+
 
 enum piglit_result
 piglit_cl_test(const int argc,
@@ -63,12 +79,17 @@ piglit_cl_test(const int argc,
 		.image_channel_data_type = CL_FLOAT,
 	};
 
+	if (!context_has_image_support(env->context)) {
+		fprintf(stderr, "No device with image support found!\n");
+		return PIGLIT_SKIP;
+	}
+
 	size_t param_value_size;
 	void* param_value;
-	
+
 	int num_image_infos = PIGLIT_CL_ENUM_NUM(cl_image_info, env->version);
 	const cl_image_info* image_infos = PIGLIT_CL_ENUM_ARRAY(cl_image_info);
-	
+
 #if defined CL_VERSION_1_2
 	if(env->version >= 12) {
 		cl_image_desc image_desc = {
