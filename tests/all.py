@@ -572,6 +572,7 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-kwin-blur-2'])
     g(['gpu_shader4_attribs'])
     g(['link-unresolved-function'])
+    g(['shadersource-no-compile'])
     g(['sso-simple'])
     g(['sso-uniforms-01'])
     g(['sso-uniforms-02'])
