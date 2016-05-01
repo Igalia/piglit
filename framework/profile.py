@@ -29,12 +29,13 @@ are represented by a TestProfile or a TestProfile derived object.
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
-import os
+import collections
+import contextlib
+import importlib
+import itertools
 import multiprocessing
 import multiprocessing.dummy
-import importlib
-import contextlib
-import itertools
+import os
 
 import six
 
@@ -50,7 +51,7 @@ __all__ = [
 ]
 
 
-class TestDict(dict):  # pylint: disable=too-few-public-methods
+class TestDict(collections.MutableMapping):
     """A special kind of dict for tests.
 
     This dict lowers the names of keys by default
@@ -61,7 +62,7 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
         # manager is opened, and decremented each time it is closed. This
         # allows stacking of the context manager
         self.__allow_reassignment = 0
-        super(TestDict, self).__init__(*args, **kwargs)
+        self.__container = dict(*args, **kwargs)
 
     def __setitem__(self, key, value):
         """Enforce types on set operations.
@@ -77,7 +78,7 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
 
         """
         # keys should be strings
-        if not isinstance(key, six.string_types):
+        if not isinstance(key, six.text_type):
             raise exceptions.PiglitFatalError(
                 "TestDict keys must be strings, but was {}".format(type(key)))
 
@@ -92,13 +93,14 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
         key = key.lower()
 
         # If there is already a test of that value in the tree it is an error
-        if not self.__allow_reassignment and key in self:
-            if self[key] != value:
+        if not self.__allow_reassignment and key in self.__container:
+            if self.__container[key] != value:
                 error = (
                     'Further, the two tests are not the same,\n'
                     'The original test has this command:   "{0}"\n'
                     'The new test has this command:        "{1}"'.format(
-                        ' '.join(self[key].command), ' '.join(value.command))
+                        ' '.join(self.__container[key].command),
+                        ' '.join(value.command))
                 )
             else:
                 error = "and both tests are the same."
@@ -107,15 +109,21 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
                 "A test has already been assigned the name: {}\n{}".format(
                     key, error))
 
-        super(TestDict, self).__setitem__(key, value)
+        self.__container[key] = value
 
     def __getitem__(self, key):
         """Lower the value before returning."""
-        return super(TestDict, self).__getitem__(key.lower())
+        return self.__container[key.lower()]
 
     def __delitem__(self, key):
         """Lower the value before returning."""
-        return super(TestDict, self).__delitem__(key.lower())
+        del self.__container[key.lower()]
+
+    def __len__(self):
+        return len(self.__container)
+
+    def __iter__(self):
+        return iter(self.__container)
 
     @property
     @contextlib.contextmanager
@@ -442,6 +450,7 @@ def merge_test_profiles(profiles):
 
     """
     profile = load_test_profile(profiles.pop())
-    for p in profiles:
-        profile.update(load_test_profile(p))
+    with profile.allow_reassignment:
+        for p in profiles:
+            profile.update(load_test_profile(p))
     return profile

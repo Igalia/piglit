@@ -34,7 +34,7 @@ except ImportError:
 import nose.tools as nt
 
 from . import utils
-from framework import grouptools, dmesg, profile, exceptions, options
+from framework import grouptools, dmesg, profile, exceptions, options, exceptions
 from framework.test import GleanTest
 
 # Don't print sys.stderr to the console
@@ -107,9 +107,10 @@ def test_testprofile_update_test_list():
     profile2.test_list[group1] = utils.Test(['test3'])
     profile2.test_list[group2] = utils.Test(['test2'])
 
-    profile1.update(profile2)
+    with profile1.allow_reassignment:
+        profile1.update(profile2)
 
-    nt.assert_dict_equal(profile1.test_list, profile2.test_list)
+    nt.assert_dict_equal(dict(profile1.test_list), dict(profile2.test_list))
 
 
 class TestPrepareTestListMatches(object):
@@ -359,3 +360,18 @@ def test_testprofile_allow_reassignemnt_stacked():
         test['a'] = utils.Test(['bar'])
 
     nt.ok_(test['a'].command == ['bar'])
+
+
+@nt.raises(exceptions.PiglitFatalError)
+def test_testdict_update_reassignment():
+    """profile.TestDict.update: Does not implictly allow reassignment"""
+    test1 = utils.Test(['test1'])
+    test2 = utils.Test(['test2'])
+
+    td1 = profile.TestDict()
+    td1['test1'] = test1
+
+    td2 = profile.TestDict()
+    td2['test1'] = test2
+
+    td1.update(td2)
