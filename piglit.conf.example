@@ -162,3 +162,32 @@ run_test=./%(test_name)s
 [expected-crashes]
 ; Like expected-failures, but specifies that a test is expected to
 ; crash.
+
+[monitored-errors]
+; Set the monitoring rules for checking when the system need to be rebooted.
+; Piglit must be launched with --abort-on-monitored-error
+;
+; For each activated monitoring rule a section must be created in this file that
+; contains the type of monitoring (dmesg, file or locked_file).
+; Depending on the type, the parameter 'parameters' is a filename or a list of
+; options. The regex is the pattern that causes Piglit aborting when it's found.
+; Examples :
+;
+;i915_error_state
+;kmsg_monitoring
+;dmesg_error
+;
+;[i915_error_state]
+;type=file
+;parameters=/sys/kernel/debug/dri/0/i915_error_state
+;regex=^((?!no error state collected).)*$
+;
+;[kmsg_monitoring]
+;type=locked_file
+;parameters=/dev/kmsg
+;regex=\*ERROR\* ring create req|\*ERROR\* Failed to reset chip
+;
+;[dmesg_error]
+;type=dmesg
+;parameters=--level emerg,alert,crit,err,warn,notice
+;regex=\*ERROR\* ring create req|\*ERROR\* Failed to reset chip|BUG:|Oops:|turning off the locking correctness validator

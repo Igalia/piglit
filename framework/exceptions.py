@@ -30,6 +30,7 @@ __all__ = [
     'PiglitInternalError',
     'PiglitFatalError',
     'PiglitException',
+    'PiglitAbort',
     'handler',
 ]
 
@@ -51,6 +52,10 @@ def handler(func):
         except PiglitFatalError as e:
             print('Fatal Error: {}'.format(str(e)), file=sys.stderr)
             sys.exit(1)
+        except PiglitAbort as e:
+            print('Aborting Piglit execution: {}'.format(str(e)),
+                  file=sys.stderr)
+            sys.exit(3)
 
     return _inner
 
@@ -82,6 +87,15 @@ class PiglitInternalError(Exception):
 
 class PiglitFatalError(Exception):
     """Class for errors in piglit that cannot be recovered from.
+
+    When this class (or a subclass) is raised it should be raised all the way
+    to the top of the program where it exits.
+
+    """
+
+
+class PiglitAbort(Exception):
+    """Class for non-errors that require piglit aborting.
 
     When this class (or a subclass) is raised it should be raised all the way
     to the top of the program where it exits.

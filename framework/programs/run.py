@@ -137,6 +137,13 @@ def _run_parser(input_):
                         action="store_true",
                         help="Capture a difference in dmesg before and "
                              "after each test. Implies -1/--no-concurrency")
+    parser.add_argument("--abort-on-monitored-error",
+                        action="store_true",
+                        dest="monitored",
+                        help="Enable monitoring according the rules defined "
+                             "in piglit.conf, and stop the execution when a "
+                             "monitored error is detected. Exit code 3. "
+                             "Implies -1/--no-concurrency")
     parser.add_argument("-s", "--sync",
                         action="store_true",
                         help="Sync results to disk after every test")
@@ -225,7 +232,7 @@ def run(input_):
 
     # If dmesg is requested we must have serial run, this is because dmesg
     # isn't reliable with threaded run
-    if args.dmesg:
+    if args.dmesg or args.monitored:
         args.concurrency = "none"
 
     # Pass arguments into Options
@@ -235,6 +242,7 @@ def run(input_):
     options.OPTIONS.execute = args.execute
     options.OPTIONS.valgrind = args.valgrind
     options.OPTIONS.dmesg = args.dmesg
+    options.OPTIONS.monitored = args.monitored
     options.OPTIONS.sync = args.sync
 
     # Set the platform to pass to waffle
@@ -284,6 +292,10 @@ def run(input_):
     # Set the dmesg type
     if args.dmesg:
         profile.dmesg = args.dmesg
+
+    if args.monitored:
+        profile.monitoring = args.monitored
+
     profile.run(args.log_level, backend)
 
     results.time_elapsed.end = time.time()
@@ -319,6 +331,7 @@ def resume(input_):
     options.OPTIONS.execute = results.options['execute']
     options.OPTIONS.valgrind = results.options['valgrind']
     options.OPTIONS.dmesg = results.options['dmesg']
+    options.OPTIONS.monitored = results.options['monitored']
     options.OPTIONS.sync = results.options['sync']
 
     core.get_config(args.config_file)
@@ -344,6 +357,9 @@ def resume(input_):
     profile.results_dir = args.results_path
     if options.OPTIONS.dmesg:
         profile.dmesg = options.OPTIONS.dmesg
+
+    if options.OPTIONS.monitored:
+        profile.monitoring = options.OPTIONS.monitored
 
     # This is resumed, don't bother with time since it won't be accurate anyway
     profile.run(results.options['log_level'], backend)

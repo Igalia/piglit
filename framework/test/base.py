@@ -185,7 +185,7 @@ class Test(object):
             assert isinstance(timeout, int)
             self.timeout = timeout
 
-    def execute(self, path, log, dmesg):
+    def execute(self, path, log, dmesg, monitoring):
         """ Run a test
 
         Run a test, but with features. This times the test, uses dmesg checking
@@ -195,6 +195,7 @@ class Test(object):
         path -- the name of the test
         log -- a log.Log instance
         dmesg -- a dmesg.BaseDmesg derived class
+        monitoring -- a monitoring.Monitoring instance
 
         """
         log.start(path)
@@ -203,9 +204,11 @@ class Test(object):
             try:
                 self.result.time.start = time.time()
                 dmesg.update_dmesg()
+                monitoring.update_monitoring()
                 self.run()
                 self.result.time.end = time.time()
                 self.result = dmesg.update_result(self.result)
+                monitoring.check_monitoring()
             # This is a rare case where a bare exception is okay, since we're
             # using it to log exceptions
             except:

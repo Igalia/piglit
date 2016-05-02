@@ -178,6 +178,7 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     exclude_filter -- list of compiled regex which exclude tests that match
     valgrind -- True if valgrind is to be used
     dmesg -- True if dmesg checking is desired. This forces concurrency off
+    monitored -- True if monitoring is desired. This forces concurrency off
     env -- environment variables set for each test before run
 
     """
@@ -192,6 +193,7 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.exclude_tests = set()
         self.valgrind = False
         self.dmesg = False
+        self.monitored = False
         self.sync = False
 
         # env is used to set some base environment variables that are not going

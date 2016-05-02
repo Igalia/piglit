@@ -42,6 +42,7 @@ import six
 from framework import grouptools, exceptions, options
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
+from framework.monitoring import Monitoring
 from framework.test.base import Test
 
 __all__ = [
@@ -208,6 +209,8 @@ class TestProfile(object):
         self._dmesg = None
         self.dmesg = False
         self.results_dir = None
+        self._monitoring = None
+        self.monitoring = False
 
     @property
     def dmesg(self):
@@ -224,6 +227,22 @@ class TestProfile(object):
 
         """
         self._dmesg = get_dmesg(not_dummy)
+
+    @property
+    def monitoring(self):
+        """ Return monitoring """
+        return self._monitoring
+
+    @monitoring.setter
+    def monitoring(self, monitored):
+        """ Set monitoring
+
+        Arguments:
+        monitored -- if Truthy Monitoring will enable monitoring according the
+                     defined rules
+
+        """
+        self._monitoring = Monitoring(monitored)
 
     def _prepare_test_list(self):
         """ Prepare tests for running
@@ -309,16 +328,18 @@ class TestProfile(object):
         self._prepare_test_list()
         log = LogManager(logger, len(self.test_list))
 
-        def test(pair):
+        def test(pair, this_pool=None):
             """Function to call test.execute from map"""
             name, test = pair
             with backend.write_test(name) as w:
-                test.execute(name, log.get(), self.dmesg)
+                test.execute(name, log.get(), self.dmesg, self.monitoring)
                 w(test.result)
+            if self._monitoring.abort_needed:
+                this_pool.terminate()
 
         def run_threads(pool, testlist):
             """ Open a pool, close it, and join it """
-            pool.imap(test, testlist, chunksize)
+            pool.imap(lambda pair: test(pair, pool), testlist, chunksize)
             pool.close()
             pool.join()
 
@@ -344,6 +365,9 @@ class TestProfile(object):
         log.get().summary()
 
         self._post_run_hook()
+
+        if self._monitoring.abort_needed:
+            raise exceptions.PiglitAbort(self._monitoring.error_message)
 
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function

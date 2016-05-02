@@ -51,7 +51,7 @@ from framework.test.base import (
     WindowResizeMixin,
 )
 from framework.options import _Options as Options
-from framework import log, dmesg
+from framework import log, dmesg, monitoring
 
 # pylint: disable=invalid-name
 
@@ -410,7 +410,8 @@ class TestExecuteTraceback(object):
 
         test.execute(mock.Mock(spec=six.text_type),
                      mock.Mock(spec=log.BaseLog),
-                     mock.Mock(spec=dmesg.BaseDmesg))
+                     mock.Mock(spec=dmesg.BaseDmesg),
+                     mock.Mock(spec=monitoring.Monitoring))
 
         cls.test = test.result
 
