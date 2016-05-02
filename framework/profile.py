@@ -63,13 +63,14 @@ class TestDict(collections.MutableMapping):
     def __init__(self):
         # This is because it had special __setitem__ and __getitem__ protocol
         # methods, and simply passing *args and **kwargs into self.__container
-        # will bypass these methods
+        # will bypass these methods. It will also break the ordering, since a
+        # regular dictionary or keyword arguments are inherintly unordered
         #
         # This counter is incremented once when the allow_reassignment context
         # manager is opened, and decremented each time it is closed. This
         # allows stacking of the context manager
         self.__allow_reassignment = 0
-        self.__container = dict()
+        self.__container = collections.OrderedDict()
 
     def __setitem__(self, key, value):
         """Enforce types on set operations.
