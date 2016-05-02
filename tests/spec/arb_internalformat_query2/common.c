@@ -212,7 +212,7 @@ test_data_check_possible_values(test_data *data,
 }
 
 /*
- * Prints the info of a failing case for a given pname.
+ * Prints the info of a case for a given pname.
  *
  * Note that it tries to get the name of the value at @data as if it
  * were a enum, as it is useful on that case. But there are several
@@ -220,46 +220,223 @@ test_data_check_possible_values(test_data *data,
  * for those just printing the value.
  */
 void
-print_failing_case(const GLenum target, const GLenum internalformat,
-                   const GLenum pname, test_data *data)
+print_case(const GLenum target, const GLenum internalformat,
+           const GLenum pname, bool filter_unsupported, test_data *data)
 {
-        print_failing_case_full(target, internalformat, pname, -1, data);
+        print_case_full(target, internalformat, pname, -1, filter_unsupported, data);
+}
+
+/* There are cases where a pname is returning an already know GL enum
+ * instead of a value. */
+static bool
+_pname_returns_enum(const GLenum pname)
+{
+        switch (pname) {
+        case GL_NUM_SAMPLE_COUNTS:
+        case GL_SAMPLES:
+        case GL_INTERNALFORMAT_RED_SIZE:
+        case GL_INTERNALFORMAT_GREEN_SIZE:
+        case GL_INTERNALFORMAT_BLUE_SIZE:
+        case GL_INTERNALFORMAT_ALPHA_SIZE:
+        case GL_INTERNALFORMAT_DEPTH_SIZE:
+        case GL_INTERNALFORMAT_STENCIL_SIZE:
+        case GL_INTERNALFORMAT_SHARED_SIZE:
+        case GL_MAX_WIDTH:
+        case GL_MAX_HEIGHT:
+        case GL_MAX_DEPTH:
+        case GL_MAX_LAYERS:
+        case GL_MAX_COMBINED_DIMENSIONS:
+        case GL_IMAGE_TEXEL_SIZE:
+        case GL_TEXTURE_COMPRESSED_BLOCK_WIDTH:
+        case GL_TEXTURE_COMPRESSED_BLOCK_HEIGHT:
+        case GL_TEXTURE_COMPRESSED_BLOCK_SIZE:
+                return false;
+        default:
+                return true;
+  }
+}
+
+/* Needed to complement _pname_returns_enum because GL_POINTS/GL_FALSE
+ * and GL_LINES/GL_TRUE has the same value */
+static bool
+_pname_returns_gl_boolean(const GLenum pname)
+{
+        switch(pname) {
+        case GL_INTERNALFORMAT_SUPPORTED:
+        case GL_COLOR_COMPONENTS:
+        case GL_DEPTH_COMPONENTS:
+        case GL_STENCIL_COMPONENTS:
+        case GL_COLOR_RENDERABLE:
+        case GL_DEPTH_RENDERABLE:
+        case GL_STENCIL_RENDERABLE:
+        case GL_MIPMAP:
+        case GL_TEXTURE_COMPRESSED:
+                return true;
+        default:
+                return false;
+        }
+}
+
+/* Needed because GL_NONE has the same value that GL_FALSE and GL_POINTS */
+static bool
+_pname_can_return_gl_none(const GLenum pname)
+{
+        switch(pname) {
+        case GL_INTERNALFORMAT_PREFERRED:
+        case GL_INTERNALFORMAT_RED_TYPE:
+        case GL_INTERNALFORMAT_GREEN_TYPE:
+        case GL_INTERNALFORMAT_BLUE_TYPE:
+        case GL_INTERNALFORMAT_ALPHA_TYPE:
+        case GL_INTERNALFORMAT_DEPTH_TYPE:
+        case GL_INTERNALFORMAT_STENCIL_TYPE:
+        case GL_FRAMEBUFFER_RENDERABLE:
+        case GL_FRAMEBUFFER_RENDERABLE_LAYERED:
+        case GL_FRAMEBUFFER_BLEND:
+        case GL_READ_PIXELS:
+        case GL_READ_PIXELS_FORMAT:
+        case GL_READ_PIXELS_TYPE:
+        case GL_TEXTURE_IMAGE_FORMAT:
+        case GL_TEXTURE_IMAGE_TYPE:
+        case GL_GET_TEXTURE_IMAGE_FORMAT:
+        case GL_GET_TEXTURE_IMAGE_TYPE:
+        case GL_MANUAL_GENERATE_MIPMAP:
+        case GL_AUTO_GENERATE_MIPMAP:
+        case GL_COLOR_ENCODING:
+        case GL_SRGB_READ:
+        case GL_SRGB_WRITE:
+        case GL_SRGB_DECODE_ARB:
+        case GL_FILTER:
+        case GL_VERTEX_TEXTURE:
+        case GL_TESS_CONTROL_TEXTURE:
+        case GL_TESS_EVALUATION_TEXTURE:
+        case GL_GEOMETRY_TEXTURE:
+        case GL_FRAGMENT_TEXTURE:
+        case GL_COMPUTE_TEXTURE:
+        case GL_TEXTURE_SHADOW:
+        case GL_TEXTURE_GATHER:
+        case GL_TEXTURE_GATHER_SHADOW:
+        case GL_SHADER_IMAGE_LOAD:
+        case GL_SHADER_IMAGE_STORE:
+        case GL_SHADER_IMAGE_ATOMIC:
+        case GL_IMAGE_COMPATIBILITY_CLASS:
+        case GL_IMAGE_PIXEL_FORMAT:
+        case GL_IMAGE_PIXEL_TYPE:
+        case GL_IMAGE_FORMAT_COMPATIBILITY_TYPE:
+        case GL_SIMULTANEOUS_TEXTURE_AND_DEPTH_TEST:
+        case GL_SIMULTANEOUS_TEXTURE_AND_STENCIL_TEST:
+        case GL_SIMULTANEOUS_TEXTURE_AND_DEPTH_WRITE:
+        case GL_SIMULTANEOUS_TEXTURE_AND_STENCIL_WRITE:
+        case GL_CLEAR_BUFFER:
+        case GL_TEXTURE_VIEW:
+        case GL_VIEW_COMPATIBILITY_CLASS:
+                return true;
+        default:
+                return false;
+        }
+}
+
+/* wrapper for GL_SAMPLE_COUNTS */
+static GLint64
+_get_num_sample_counts(const GLenum target,
+                       const GLenum internalformat)
+{
+        GLint64 result;
+        test_data *local_data = test_data_new(0, 1);
+
+        test_data_execute(local_data, target, internalformat,
+                          GL_NUM_SAMPLE_COUNTS);
+
+        if (!piglit_check_gl_error(GL_NO_ERROR))
+                result = -1;
+        else
+                result = test_data_value_at_index(local_data, 0);
+
+        test_data_clear(&local_data);
+
+        return result;
+}
+
+static const char*
+_get_value_enum_name(const GLenum pname,
+                     const GLint64 value)
+{
+        if (_pname_returns_gl_boolean(pname))
+                return value ? "GL_TRUE" : "GL_FALSE";
+        else if (_pname_can_return_gl_none(pname) && value == 0)
+                return "GL_NONE";
+        else
+                return piglit_get_gl_enum_name(value);
+}
+/*
+ * Returns the number of values that a given pname returns. For
+ * example, for the case of GL_SAMPLES, it returns as many sample
+ * counts as the valure returned by GL_SAMPLE_COUNTS
+ */
+static unsigned
+_pname_value_count(const GLenum pname,
+                   const GLenum target,
+                   const GLenum internalformat)
+{
+        switch (pname) {
+        case GL_SAMPLES:
+                return _get_num_sample_counts(target, internalformat);
+        default:
+                return 1;
+  }
 }
 
 /*
  * Prints the info of a failing case. If expected_value is smaller
  * that 0, it is not printed.
-*/
-void print_failing_case_full(const GLenum target, const GLenum internalformat,
-                             const GLenum pname, GLint64 expected_value,
-                             test_data *data)
+ */
+void print_case_full(const GLenum target, const GLenum internalformat,
+                     const GLenum pname, GLint64 expected_value,
+                     bool filter_unsupported, test_data *data)
 {
-        /* Knowing if it is supported is interesting in order to know
-         * if the test is being too restrictive */
-        bool supported = test_data_check_supported(data, target, internalformat);
-        GLint64 current_value = test_data_value_at_index(data, 0);
+        bool supported;
 
-        if (data->testing64) {
-                fprintf(stderr,  "    64 bit failing case: ");
-        } else {
-                fprintf(stderr,  "    32 bit failing case: ");
-        }
+        supported = filter_unsupported ?
+                    test_data_check_supported(data, target, internalformat) :
+                    true;
 
-        fprintf(stderr, "pname = %s, "
-                "target = %s, internalformat = %s, ",
+        if (!supported)
+                return;
+
+	fprintf(stdout, "%s, %s, %s, %s, ",
+                data->testing64 ? "64 bit" : "32 bit",
                 piglit_get_gl_enum_name(pname),
                 piglit_get_gl_enum_name(target),
                 piglit_get_gl_enum_name(internalformat));
 
-        if (expected_value >= 0)
-                fprintf(stderr, "expected value = (%" PRIi64 "), ",
-                        expected_value);
+	if (_pname_returns_enum(pname)) {
+                fprintf(stdout, "\"%s\"\n",
+                        _get_value_enum_name(pname, test_data_value_at_index(data, 0)));
 
-        fprintf(stderr, "params[0] = (%" PRIi64 ",%s), "
-                "supported=%i\n",
-                current_value,
-                piglit_get_gl_enum_name(current_value),
-                supported);
+	} else {
+                int count = _pname_value_count(pname, target, internalformat);
+                int i = 0;
+
+                fprintf(stdout, "\"");
+                for (i = 0; i < count - 1; i++) {
+                        fprintf(stdout, "%" PRIi64 ",", test_data_value_at_index(data, i));
+                }
+                fprintf(stdout, "%" PRIi64 "\"\n", test_data_value_at_index(data, i));
+	}
+}
+
+void print_failing_case(const GLenum target, const GLenum internalformat,
+                        const GLenum pname, test_data *data)
+{
+        fprintf(stderr, "Failing ");
+        print_case(target, internalformat, pname, false, data);
+}
+
+void print_failing_case_full(const GLenum target, const GLenum internalformat,
+                             const GLenum pname, GLint64 expected_value,
+                             test_data *data)
+{
+        fprintf(stderr, "Failing ");
+        print_case_full(target, internalformat, pname, expected_value, false, data);
 }
 
 /*
