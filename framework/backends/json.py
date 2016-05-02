@@ -23,10 +23,11 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import collections
 import os
-import sys
-import shutil
 import posixpath
+import shutil
+import sys
 
 try:
     import simplejson as json
@@ -131,7 +132,7 @@ class JSONBackend(FileBackend):
         """
         # Create a dictionary that is full of data to be written to a single
         # file
-        data = {}
+        data = collections.OrderedDict()
 
         # Load the metadata and put it into a dictionary
         with open(os.path.join(self._dest, 'metadata.json'), 'r') as f:
@@ -142,7 +143,7 @@ class JSONBackend(FileBackend):
             data.update(metadata)
 
         # Add the tests to the dictionary
-        data['tests'] = {}
+        data['tests'] = collections.OrderedDict()
 
         test_dir = os.path.join(self._dest, 'tests')
         for test in os.listdir(test_dir):

@@ -292,7 +292,7 @@ class TestrunResult(object):
         self.clinfo = None
         self.lspci = None
         self.time_elapsed = TimeAttribute()
-        self.tests = {}
+        self.tests = collections.OrderedDict()
         self.totals = collections.defaultdict(Totals)
 
     def get_result(self, key):
