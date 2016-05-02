@@ -170,7 +170,7 @@ real_try(GLenum target, GLenum format, GLint max_samples,
                 if (test_data_value_at_index(data_samples, i) <= 0) {
                         ERROR_HEADER(data_samples);
                         fprintf(stderr,
-                                "Invalid sample count [%u] = %" PRIu64 " returned "
+                                "Invalid sample count [%u] = %" PRIi64 " returned "
                                 "for %s/%s (num sample counts = %i)\n",
                                 i, test_data_value_at_index(data_samples, i),
                                 piglit_get_gl_enum_name(target),
@@ -182,7 +182,7 @@ real_try(GLenum target, GLenum format, GLint max_samples,
                 if (previous == test_data_value_at_index(data_samples, i)) {
                         ERROR_HEADER(data_samples);
                         fprintf(stderr,
-                                "Duplicate values [%u] = [%u] = %" PRIu64 " returned "
+                                "Duplicate values [%u] = [%u] = %" PRIi64 " returned "
                                 "for %s/%s (num sample counts = %i)\n",
                                 i - 1, i, test_data_value_at_index(data_samples, i),
                                 piglit_get_gl_enum_name(target),
@@ -195,7 +195,7 @@ real_try(GLenum target, GLenum format, GLint max_samples,
                         ERROR_HEADER(data_samples);
                         fprintf(stderr,
                                 "Values not in descending order "
-                                "([%u] = %d) < ([%u] = %" PRIu64 ") returned "
+                                "([%u] = %d) < ([%u] = %" PRIi64 ") returned "
                                 "for %s/%s (num sample counts = %i)\n",
                                 i - 1, previous,
                                 i, test_data_value_at_index(data_samples, i),
@@ -229,7 +229,7 @@ real_try(GLenum target, GLenum format, GLint max_samples,
         if (test_data_value_at_index(data_samples, 0) < max_samples) {
                 ERROR_HEADER(data_samples);
                 fprintf(stderr,
-                        "GL_SAMPLES (%" PRIu64 ") smaller than %s (%d) "
+                        "GL_SAMPLES (%" PRIi64 ") smaller than %s (%d) "
                         "for %s/%s\n",
                         test_data_value_at_index(data_samples, 0),
                         max_samples_name,

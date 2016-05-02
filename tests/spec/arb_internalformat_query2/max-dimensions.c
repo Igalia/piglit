@@ -424,7 +424,7 @@ check_params_against_dimension(test_data *data,
         result = test_data_equal_at_index(data, local_data, 0);
 
         if (!result)
-                fprintf(stderr, "%s value different to %s value (%" PRIu64 " != %" PRIu64 ")\n",
+                fprintf(stderr, "%s value different to %s value (%" PRIi64 " != %" PRIi64 ")\n",
                         piglit_get_gl_enum_name(GL_MAX_LAYERS),
                         piglit_get_gl_enum_name(dimension_pname),
                         test_data_value_at_index(data, 0),

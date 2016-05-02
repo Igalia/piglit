@@ -252,10 +252,10 @@ void print_failing_case_full(const GLenum target, const GLenum internalformat,
                 piglit_get_gl_enum_name(internalformat));
 
         if (expected_value >= 0)
-                fprintf(stderr, "expected value = (%" PRIu64 "), ",
+                fprintf(stderr, "expected value = (%" PRIi64 "), ",
                         expected_value);
 
-        fprintf(stderr, "params[0] = (%" PRIu64 ",%s), "
+        fprintf(stderr, "params[0] = (%" PRIi64 ",%s), "
                 "supported=%i\n",
                 current_value,
                 piglit_get_gl_enum_name(current_value),
@@ -541,7 +541,7 @@ test_data_check_against_get_tex_level_parameter(test_data *data,
 
         if (!result) {
                 fprintf(stderr, "\tError comparing glGetInternalformat "
-                        "and glGetTexLevelParameter, params value=%" PRIu64 ", "
+                        "and glGetTexLevelParameter, params value=%" PRIi64 ", "
                         "expected value=%i\n",
                         test_data_value_at_index(data, 0), param);
         }
