@@ -859,7 +859,13 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('sign', 1, 110, np.sign, None, [np.linspace(-1.5, 1.5, 5)])
     f('sign', 1, 130, np.sign, None, [ints])
     f('floor', 1, 110, np.floor, None, [np.linspace(-2.0, 2.0, 4)])
-    f('trunc', 1, 130, _trunc, None, [np.linspace(-2.0, 2.0, 8)])
+
+    # Note: with trunc we want to test values in which the floating
+    # point exponent is < 0, > 23 or in the middle. Hence, we append
+    # some numbers to cover all possible scenarios.
+    f('trunc', 1, 130, _trunc, None,
+      [np.append(np.linspace(-2.0, 2.0, 8),
+                 [0.0, 45027112.0, -45027112.0])])
 
     # Note: the direction of rounding used by round() is not specified
     # for half-integer values, so we test it over a range that doesn't
