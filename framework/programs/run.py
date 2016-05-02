@@ -159,6 +159,7 @@ def _run_parser(input_):
                             default='quiet',
                             help="Set the logger verbosity level")
     parser.add_argument("--test-list",
+                        type=os.path.abspath,
                         help="A file containing a list of tests to run")
     parser.add_argument('-o', '--overwrite',
                         dest='overwrite',
@@ -227,12 +228,6 @@ def run(input_):
     if args.dmesg:
         args.concurrency = "none"
 
-    # build up the include filter based on test_list
-    if args.test_list:
-        with open(args.test_list) as test_list:
-            for line in test_list.readlines():
-                args.include_tests.append(line.rstrip())
-
     # Pass arguments into Options
     options.OPTIONS.concurrent = args.concurrency
     options.OPTIONS.exclude_filter = args.exclude_tests
@@ -279,6 +274,11 @@ def run(input_):
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
+    # If a test list is provided then set the forced_test_list value.
+    if args.test_list:
+        with open(args.test_list) as test_list:
+            # Strip newlines
+            profile.forced_test_list = list([t.strip() for t in test_list])
 
     results.time_elapsed.start = time.time()
     # Set the dmesg type

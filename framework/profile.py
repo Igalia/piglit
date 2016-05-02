@@ -167,6 +167,13 @@ class TestDict(collections.MutableMapping):
             if not callable((k, v)):
                 del self[k]
 
+    def reorder(self, order):
+        """Reorder the TestDict to match the order of the provided list."""
+        new = collections.OrderedDict()
+        for k in order:
+            new[k] = self.__container[k]
+        self.__container = new
+
 
 class TestProfile(object):
     """ Class that holds a list of tests for execution
@@ -188,6 +195,7 @@ class TestProfile(object):
     """
     def __init__(self):
         self.test_list = TestDict()
+        self.forced_test_list = []
         self.filters = []
         # Sets a default of a Dummy
         self._dmesg = None
@@ -238,6 +246,13 @@ class TestProfile(object):
                 if not f(path, test):
                     return False
             return True
+
+        if self.forced_test_list:
+            # Remove all tests not in the test list, then reorder the tests to
+            # match the testlist. This still allows additional filters to be
+            # run afterwards.
+            self.test_list.filter(lambda i: i[0] in self.forced_test_list)
+            self.test_list.reorder(self.forced_test_list)
 
         # Filter out unwanted tests
         self.test_list.filter(check_all)
