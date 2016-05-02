@@ -182,7 +182,6 @@ class TestTuple(object):
     @staticmethod
     def hex_to_double(hstr):
         """Returns a float64 value from its hexadecimal representation."""
-
         assert isinstance(hstr, str)
         return struct.unpack('<d', struct.pack('<Q', int(hstr, 16)))[0]
 
