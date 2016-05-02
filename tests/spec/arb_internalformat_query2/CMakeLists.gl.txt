@@ -21,5 +21,6 @@ piglit_add_executable (arb_internalformat_query2-minmax minmax.c common.c)
 piglit_add_executable (arb_internalformat_query2-image-texture image-texture.c common.c)
 piglit_add_executable (arb_internalformat_query2-filter filter.c common.c)
 piglit_add_executable (arb_internalformat_query2-format-components format-components.c common.c)
+piglit_add_executable (arb_internalformat_query2-query2-info query2-info.c common.c)
 
 # vim: ft=cmake:
