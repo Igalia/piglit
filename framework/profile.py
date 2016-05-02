@@ -54,15 +54,22 @@ __all__ = [
 class TestDict(collections.MutableMapping):
     """A special kind of dict for tests.
 
-    This dict lowers the names of keys by default
+    This dict lowers the names of keys by default.
+
+    This class intentionally doesn't accept keyword arguments. This is
+    intentional to avoid breakages.
 
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
+        # This is because it had special __setitem__ and __getitem__ protocol
+        # methods, and simply passing *args and **kwargs into self.__container
+        # will bypass these methods
+        #
         # This counter is incremented once when the allow_reassignment context
         # manager is opened, and decremented each time it is closed. This
         # allows stacking of the context manager
         self.__allow_reassignment = 0
-        self.__container = dict(*args, **kwargs)
+        self.__container = dict()
 
     def __setitem__(self, key, value):
         """Enforce types on set operations.
@@ -144,6 +151,21 @@ class TestDict(collections.MutableMapping):
         yield
         self.__allow_reassignment -= 1
 
+    def filter(self, callable):
+        """Filter tests out of the testdict before running.
+
+        This method destructively filters results out of the test test
+        dictionary list using the callable provided.
+
+        Arguments:
+        callable -- a callable object that returns truthy if the item remains,
+                    falsy if it should be removed
+
+        """
+        for k, v in list(six.iteritems(self)):
+            if not callable((k, v)):
+                del self[k]
+
 
 class TestProfile(object):
     """ Class that holds a list of tests for execution
@@ -217,8 +239,7 @@ class TestProfile(object):
             return True
 
         # Filter out unwanted tests
-        self.test_list = dict(item for item in six.iteritems(self.test_list)
-                              if check_all(item))
+        self.test_list.filter(check_all)
 
         if not self.test_list:
             raise exceptions.PiglitFatalError(

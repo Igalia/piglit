@@ -116,12 +116,11 @@ def test_testprofile_update_test_list():
 class TestPrepareTestListMatches(object):
     """Create tests for TestProfile.prepare_test_list filtering"""
     def __init__(self):
-        self.data = {
-            grouptools.join('group1', 'test1'): 'thingy',
-            grouptools.join('group1', 'group3', 'test2'): 'thing',
-            grouptools.join('group3', 'test5'): 'other',
-            grouptools.join('group4', 'Test9'): 'is_caps',
-        }
+        self.data = profile.TestDict()
+        self.data[grouptools.join('group1', 'test1')] = utils.Test(['thingy'])
+        self.data[grouptools.join('group1', 'group3', 'test2')] = utils.Test(['thing'])
+        self.data[grouptools.join('group3', 'test5')] = utils.Test(['other'])
+        self.data[grouptools.join('group4', 'Test9')] = utils.Test(['is_caps'])
         self.opts = None
         self.__patcher = mock.patch('framework.profile.options.OPTIONS',
                                     new_callable=options._Options)
@@ -142,7 +141,7 @@ class TestPrepareTestListMatches(object):
         profile_.test_list = self.data
         profile_._prepare_test_list()
 
-        nt.assert_dict_equal(profile_.test_list, self.data)
+        nt.assert_dict_equal(dict(profile_.test_list), dict(self.data))
 
     def test_matches_filter_mar_2(self):
         """profile.TestProfile.prepare_test_list: 'not env.filter or matches_any_regex()' mar is False"""
@@ -152,35 +151,35 @@ class TestPrepareTestListMatches(object):
         profile_.test_list = self.data
         profile_._prepare_test_list()
 
-        baseline = {grouptools.join('group3', 'test5'): 'other'}
+        baseline = {grouptools.join('group3', 'test5'): utils.Test(['other'])}
 
-        nt.assert_dict_equal(profile_.test_list, baseline)
+        nt.assert_dict_equal(dict(profile_.test_list), baseline)
 
     def test_matches_env_exclude(self):
         """profile.TestProfile.prepare_test_list: 'not path in env.exclude_tests'"""
         self.opts.exclude_tests.add(grouptools.join('group3', 'test5'))
 
+        baseline = copy.deepcopy(self.data)
+        del baseline[grouptools.join('group3', 'test5')]
+
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
         profile_._prepare_test_list()
 
-        baseline = copy.deepcopy(self.data)
-        del baseline[grouptools.join('group3', 'test5')]
-
-        nt.assert_dict_equal(profile_.test_list, baseline)
+        nt.assert_dict_equal(dict(profile_.test_list), dict(baseline))
 
     def test_matches_exclude_mar(self):
         """profile.TestProfile.prepare_test_list: 'not matches_any_regexp()'"""
         self.opts.exclude_filter = ['test5']
 
+        baseline = copy.deepcopy(self.data)
+        del baseline[grouptools.join('group3', 'test5')]
+
         profile_ = profile.TestProfile()
         profile_.test_list = self.data
         profile_._prepare_test_list()
 
-        baseline = copy.deepcopy(self.data)
-        del baseline[grouptools.join('group3', 'test5')]
-
-        nt.assert_dict_equal(profile_.test_list, baseline)
+        nt.assert_dict_equal(dict(profile_.test_list), dict(baseline))
 
     def test_matches_include_caps(self):
         """profile.TestProfile.prepare_test_list: matches capitalized tests"""
