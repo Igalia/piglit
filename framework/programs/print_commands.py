@@ -18,7 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Print each test's command in a consumable format."""
+"""Print each test's command in a user-defined consumable format.
+
+This is meant to provide a mechanism to export piglit commands to other tools,
+or to create lists of tests to be consumed via "piglit run --test-list"
+
+"""
 
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
@@ -65,6 +70,17 @@ def main(input_):
                         metavar="<regex>",
                         help="Exclude matching tests (can be used more than "
                              "once)")
+    parser.add_argument("--format",
+                        dest="format_string",
+                        default="{name} ::: {command}",
+                        action="store",
+                        help="A template string that defines the output "
+                             "format. It has two replacement tokens that can "
+                             "be provided, along with any arbitrary text, "
+                             "which will be printed verbatim. The two tokens "
+                             "are '{name}', which will be replaced with the "
+                             "name of the test; and '{command}', which will "
+                             "be replaced with the command to run the test.")
     parser.add_argument("testProfile",
                         metavar="<Path to testfile>",
                         help="Path to results folder")
@@ -82,4 +98,6 @@ def main(input_):
     profile_._prepare_test_list()
     for name, test in six.iteritems(profile_.test_list):
         assert isinstance(test, Test)
-        print(name, ':::', get_command(test, piglit_dir))
+        print(args.format_string.format(
+            name=name,
+            command=get_command(test, piglit_dir)))
