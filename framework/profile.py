@@ -170,8 +170,15 @@ class TestDict(collections.MutableMapping):
     def reorder(self, order):
         """Reorder the TestDict to match the order of the provided list."""
         new = collections.OrderedDict()
-        for k in order:
-            new[k] = self.__container[k]
+        try:
+            for k in order:
+                new[k] = self.__container[k]
+        except KeyError:
+            # If there is a name in order that isn't available in self there
+            # will be a KeyError, this is expected. In this case fail
+            # gracefully and report the error to the user.
+            raise exceptions.PiglitFatalError(
+                'Cannot reorder test: "{}", it is not in the profile.'.format(k))
         self.__container = new
 
 
