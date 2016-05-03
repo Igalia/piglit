@@ -110,6 +110,7 @@ def setup_module_search_path():
 setup_module_search_path()
 import framework.programs.run as run
 import framework.programs.summary as summary
+import framework.programs.print_commands as pc
 
 
 def main():
@@ -121,6 +122,10 @@ def main():
 
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
+    print_cmd = subparsers.add_parser('print-cmd',
+                                      add_help=False,
+                                      help="Print piglit commands, one per line.")
+    print_cmd.set_defaults(func=pc.main)
 
     parse_run = subparsers.add_parser('run',
                                       add_help=False,
