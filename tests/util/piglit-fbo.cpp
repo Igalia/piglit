@@ -38,6 +38,7 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 	  width(width),
 	  height(height),
 	  layers(0),
+	  use_rect(num_samples == 0),
 	  attachment_layer(0),
 	  combine_depth_stencil(true),
 	  color_format(GL_RGBA),
@@ -94,12 +95,11 @@ Fbo::attach_color_renderbuffer(const FboConfig &config, int index)
 void
 Fbo::attach_color_texture(const FboConfig &config, int index)
 {
-	glBindTexture(GL_TEXTURE_RECTANGLE, color_tex[index]);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER,
-			GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER,
-			GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_RECTANGLE,
+	GLenum target = config.use_rect ? GL_TEXTURE_RECTANGLE : GL_TEXTURE_2D;
+	glBindTexture(target, color_tex[index]);
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(target,
 		     0 /* level */,
 		     config.color_internalformat,
 		     config.width,
@@ -110,7 +110,7 @@ Fbo::attach_color_texture(const FboConfig &config, int index)
 		     NULL /* data */);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
 			       config.tex_attachment[index],
-			       GL_TEXTURE_RECTANGLE,
+			       target,
 			       color_tex[index],
 			       0 /* level */);
 }

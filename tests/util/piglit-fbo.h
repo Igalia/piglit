@@ -60,6 +60,14 @@ namespace piglit_util_fbo {
 		unsigned layers;
 
 		/**
+		 * If true, GL_TEXTURE_RECTANGLE is used when creating and
+		 * binding textures
+		 *
+		 * Default value is true if num_samples == 0.
+		 */
+		bool use_rect;
+
+		/**
 		 * Specifies the layer of the texture that should be attached
 		 * to the framebuffer.  This must be less than the value of
 		 * ::layers (unless ::layers is zero).
