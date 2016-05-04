@@ -605,26 +605,28 @@ def _simulate_function(test_inputs, python_equivalent, tolerance_function):
     Input sequences for which python_equivalent returns None are
     ignored.
 
-    The function is simulated using 64 bit floats for maximum possible
-    accuracy, but the output is rounded to 32 bits since that is the
-    data type that we expect to get back form OpenGL.
-
     tolerance_function is the function to call to compute the
     tolerance.  It should take the set of arguments and the expected
     result as its parameters.  It is only used for functions that
     return floating point values.
+
+    python_equivalent and tolerance_function are simulated using 64
+    bit floats for maximum possible accuracy. The vector, however, is
+    built with rounded to 32 bits values since that is the data type
+    that we expect to get back from OpenGL.
     """
     test_vectors = []
     for inputs in test_inputs:
-        expected_output = round_to_32_bits(
-            python_equivalent(*[extend_to_64_bits(x) for x in inputs]))
+        expected_output = python_equivalent(
+            *[extend_to_64_bits(x) for x in inputs])
         if expected_output is not None:
             if glsl_type_of(expected_output).base_type != glsl_float:
-                tolerance = np.float32(0.0)
+                tolerance = 0.0
             else:
-                tolerance = np.float32(
-                    tolerance_function(inputs, expected_output))
-            test_vectors.append(TestVector(inputs, expected_output, tolerance))
+                tolerance = tolerance_function(inputs, expected_output)
+            test_vectors.append(TestVector(inputs,
+                                           round_to_32_bits(expected_output),
+                                           round_to_32_bits(tolerance)))
     return test_vectors
 
 
@@ -686,9 +688,10 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
                 arguments.append(
                     np.array([tv.arguments[j] for tv in test_vectors]))
         result = np.array([tv.result for tv in test_vectors])
-        tolerance = np.float32(
-            np.linalg.norm([tv.tolerance for tv in test_vectors]))
+        tolerance = np.linalg.norm(
+            [tv.tolerance for tv in test_vectors])
         return TestVector(arguments, result, tolerance)
+
     vectorized_test_vectors = []
     groups = make_groups(test_vectors)
     for key in sorted(groups.keys()):
