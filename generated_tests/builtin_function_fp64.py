@@ -273,30 +273,6 @@ def glsl_constant(value):
         return '{0}({1})'.format(glsl_type_of(value), ', '.join(values))
 
 
-def round_to_32_bits(value):
-    """If value is a floating point type, round it down to 32 bits.
-    Otherwise return it unchanged.
-    """
-    if isinstance(value, float):
-        return np.float32(value)
-    elif isinstance(value, np.ndarray) and value.dtype == np.float64:
-        return np.array(value, dtype=np.float32)
-    else:
-        return value
-
-
-def extend_to_64_bits(value):
-    """If value is a floating point type, extend it to 64 bits.
-    Otherwise return it unchanged.
-    """
-    if isinstance(value, np.float32):
-        return np.float64(value)
-    elif isinstance(value, np.ndarray) and value.dtype == np.float32:
-        return np.array(value, dtype=np.float64)
-    else:
-        return value
-
-
 # Dictionary containing the test vectors.  Each entry in the
 # dictionary represents a single overload of a single built-in
 # function.  Its key is a Signature tuple, and its value is a list of
@@ -550,10 +526,6 @@ def _simulate_function(test_inputs, python_equivalent, tolerance_function):
     Input sequences for which python_equivalent returns None are
     ignored.
 
-    The function is simulated using 64 bit floats for maximum possible
-    accuracy, but the output is rounded to 32 bits since that is the
-    data type that we expect to get back form OpenGL.
-
     tolerance_function is the function to call to compute the
     tolerance.  It should take the set of arguments and the expected
     result as its parameters.  It is only used for functions that
@@ -561,10 +533,9 @@ def _simulate_function(test_inputs, python_equivalent, tolerance_function):
     """
     test_vectors = []
     for inputs in test_inputs:
-        expected_output = python_equivalent(*[extend_to_64_bits(x) for x in inputs])
+        expected_output = python_equivalent(*inputs)
         if expected_output is not None:
-            tolerance = np.float64(
-                tolerance_function(inputs, expected_output))
+            tolerance = tolerance_function(inputs, expected_output)
             test_vectors.append(TestVector(inputs, expected_output, tolerance))
     return test_vectors
 
@@ -627,9 +598,9 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
                 arguments.append(
                     np.array([tv.arguments[j] for tv in test_vectors]))
         result = np.array([tv.result for tv in test_vectors])
-        tolerance = np.float64(
-            np.linalg.norm([tv.tolerance for tv in test_vectors]))
+        tolerance = np.linalg.norm([tv.tolerance for tv in test_vectors])
         return TestVector(arguments, result, tolerance)
+
     vectorized_test_vectors = []
     groups = make_groups(test_vectors)
     for key in sorted(groups.keys()):
