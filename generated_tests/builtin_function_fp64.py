@@ -742,10 +742,18 @@ def _make_componentwise_test_vectors(test_suite_dict):
 
     # Note: with trunc we want to test values in which the floating
     # point exponent is < 0, > 52 or in the middle. Hence, we append
-    # some numbers to cover all possible scenarios.
+    # some numbers to cover all possible scenarios. In addition, we
+    # want to check bitsize barriers (> 32, > 64, etc.) in case the
+    # conversion is done with a cast to and from another int based
+    # type.
     f('trunc', 1, _trunc, None,
       [np.append(np.linspace(-2.0, 2.0, 8),
-                 [0.0, 4.5027112340958570e19, -4.5027112340958570e19])])
+                 [0.0, 45027112.98414, -45027112.98414,
+                  19584198736.47329, -19584198736.47329,
+                  7.51654162319e17, -7.51654162319e17,
+                  4.502711234095857e19, -4.5027112340958570e19,
+                  8.654196813385455e39, -8.6541968133854550e39,
+                  6.54965168513655e83, -6.54965168513655e83])])
 
     # Note: the direction of rounding used by round() is not specified
     # for half-integer values, so we test it over a range that doesn't
