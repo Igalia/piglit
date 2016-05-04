@@ -70,6 +70,46 @@ ColorGradientSunburst *test_pattern_vec4;
 ColorGradientSunburst *test_pattern_ivec4;
 ColorGradientSunburst *test_pattern_uvec4;
 
+struct int_resolve_check_s {
+	GLuint prog;
+	GLint u_resolve;
+	GLint u_msaa;
+	GLint u_samples;
+} int_resolve_check;
+
+const char int_resolve_check_vs[] =
+	"#version 130\n"
+	"in vec4 piglit_vertex;\n"
+	"void main() {\n"
+	"	gl_Position = piglit_vertex;\n"
+	"}\n";
+
+/* The OpenGL ES 3.2 and OpenGL 4.4 specs both state:
+ *
+ *	"If the source formats are integer types or stencil values, a
+ *	single sample's value is selected for each pixel."
+ *
+ * This shader checks exactly that condition, namely that the result of the
+ * resolve is exactly one of the sample values in the original image.
+ */
+const char int_resolve_check_fs[] =
+	"#version 130\n"
+	"#extension GL_ARB_texture_multisample: require\n"
+	"uniform isampler2DMS msaa;\n"
+	"uniform isampler2D resolve;\n"
+	"uniform int samples;\n"
+	"void main() {\n"
+	"	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
+	"	const vec4 green = vec4(0.0, 1.0, 0.0, 1.0);\n"
+	"	ivec2 pos = ivec2(gl_FragCoord.xy);\n"
+	"	ivec4 res = texelFetch(resolve, pos, 0);\n"
+	"	for (int s = 0; s < samples; s++) {\n"
+	"		if (res == texelFetch(msaa, pos, s)) {\n"
+	"			gl_FragColor = green;\n"
+	"			break;\n"
+	"		}\n"
+	"	}\n"
+	"}\n";
 
 /**
  * This class encapsulates the code necessary to draw the test pattern
@@ -80,7 +120,7 @@ ColorGradientSunburst *test_pattern_uvec4;
 class PatternRenderer
 {
 public:
-	bool try_setup(GLenum internalformat);
+	bool try_setup(GLenum internalformat, bool is_integer);
 	void set_piglit_tolerance();
 	void set_color_clamping_mode();
 	void draw();
@@ -140,10 +180,17 @@ public:
  * incomplete.
  */
 bool
-PatternRenderer::try_setup(GLenum internalformat)
+PatternRenderer::try_setup(GLenum internalformat, bool is_integer)
 {
 	FboConfig config_downsampled(0, pattern_width, pattern_height);
 	config_downsampled.color_internalformat = internalformat;
+
+	if (is_integer) {
+		config_downsampled.color_format = GL_RGBA_INTEGER;
+		config_downsampled.num_rb_attachments = 0;
+		config_downsampled.num_tex_attachments = 1;
+		config_downsampled.use_rect = false;
+	}
 
 	FboConfig config_msaa = config_downsampled;
 	config_msaa.num_samples = num_samples;
@@ -497,7 +544,9 @@ test_format(const struct format_desc *format)
 	 * supported, we might have received a GL error.  In either
 	 * case just skip to the next format.
 	 */
-	bool setup_success = test_renderer.try_setup(format->internalformat);
+	bool is_integer = (test_sets[test_index].basetype == GL_INT);
+	bool setup_success = test_renderer.try_setup(format->internalformat,
+						     is_integer);
 	if (glGetError() != GL_NO_ERROR) {
 		printf("Error setting up test renderbuffers\n");
 		return PIGLIT_SKIP;
@@ -511,7 +560,8 @@ test_format(const struct format_desc *format)
 	 * This shouldn't fail.
 	 */
 	setup_success = ref_renderer.try_setup(test_renderer.is_srgb ?
-					       GL_SRGB8_ALPHA8 : GL_RGBA);
+					       GL_SRGB8_ALPHA8 : GL_RGBA,
+					       false);
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("Error setting up reference renderbuffers\n");
 		return PIGLIT_FAIL;
@@ -521,50 +571,99 @@ test_format(const struct format_desc *format)
 		return PIGLIT_FAIL;
 	}
 
-	/* Draw test and reference images, and read them into memory */
-	test_renderer.set_piglit_tolerance();
 	test_renderer.draw();
 	float *test_image =
 		test_renderer.read_image(format->base_internal_format);
-	ref_renderer.draw();
-	float *ref_image = ref_renderer.read_image(GL_RGBA);
 
-	/* Compute the expected image from the reference image */
-	float *expected_image =
-		compute_expected_image(ref_image,
-				       format->base_internal_format);
+	if (is_integer) {
+		Fbo compare_fbo;
+		compare_fbo.setup(FboConfig(0, pattern_width, pattern_height));
 
-	/* Check that the test image was correct */
-	unsigned num_components =
-		piglit_num_components(format->base_internal_format);
-	float tolerance[4];
-	piglit_compute_probe_tolerance(format->base_internal_format,
-				       tolerance);
-	pass = piglit_compare_images_color(0, 0, pattern_width, pattern_height,
-					   num_components, tolerance,
-					   expected_image, test_image);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, compare_fbo.handle);
+
+		glUseProgram(int_resolve_check.prog);
+		glUniform1i(int_resolve_check.u_msaa, 0);
+		glUniform1i(int_resolve_check.u_resolve, 1);
+		glUniform1i(int_resolve_check.u_samples, num_samples);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE,
+			      test_renderer.fbo_msaa.color_tex[0]);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D,
+			      test_renderer.fbo_downsampled.color_tex[0]);
+
+		glViewport(0, 0, pattern_width, pattern_height);
+		piglit_draw_rect(-1.0, -1.0, 2.0, 2.0);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, compare_fbo.handle);
+
+		const float green[] = { 0.0, 1.0, 0.0, 1.0 };
+		pass = piglit_probe_rect_rgb(0, 0, pattern_width,
+					     pattern_height, green);
+
+		/* Show both the test image and the check result on screen
+		 * so that the user can diagnose problems.
+		 */
+		glViewport(0, 0, piglit_width, piglit_height);
+		piglit_visualize_image(test_image, format->base_internal_format,
+				       pattern_width, pattern_height,
+				       0 /* image_count */,
+				       false /* rhs */);
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, compare_fbo.handle);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+		glBlitFramebuffer(0, 0, pattern_width, pattern_height,
+				  pattern_width, 0,
+				  pattern_width * 2, pattern_height,
+				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	} else {
+		/* Draw test and reference images, and read them into memory */
+		test_renderer.set_piglit_tolerance();
+		ref_renderer.draw();
+		float *ref_image = ref_renderer.read_image(GL_RGBA);
+
+		/* Compute the expected image from the reference image */
+		float *expected_image =
+			compute_expected_image(ref_image,
+					       format->base_internal_format);
+
+		/* Check that the test image was correct */
+		unsigned num_components =
+			piglit_num_components(format->base_internal_format);
+		float tolerance[4];
+		piglit_compute_probe_tolerance(format->base_internal_format,
+					       tolerance);
+		pass = piglit_compare_images_color(0, 0, pattern_width,
+						   pattern_height,
+						   num_components, tolerance,
+						   expected_image, test_image);
 
 
-	/* Show both the test and expected images on screen so that
-	 * the user can diagnose problems. Pass image_count = 0 to
-	 * display image without any offset applied to raster position.
-	 */
-	glViewport(0, 0, piglit_width, piglit_height);
-	piglit_visualize_image(test_image, format->base_internal_format,
-			       pattern_width, pattern_height,
-			       0 /* image_count */,
-			       false /* rhs */);
-	piglit_visualize_image(expected_image, format->base_internal_format,
-			       pattern_width, pattern_height,
-			       0 /* image_count */,
-			       true /* rhs */);
+		/* Show both the test and expected images on screen so that
+		 * the user can diagnose problems. Pass image_count = 0 to
+		 * display image without any offset applied to raster position.
+		 */
+		glViewport(0, 0, piglit_width, piglit_height);
+		piglit_visualize_image(test_image, format->base_internal_format,
+				       pattern_width, pattern_height,
+				       0 /* image_count */,
+				       false /* rhs */);
+		piglit_visualize_image(expected_image,
+				       format->base_internal_format,
+				       pattern_width, pattern_height,
+				       0 /* image_count */,
+				       true /* rhs */);
+
+		free(ref_image);
+		free(expected_image);
+	}
 
 	/* Finally, if any error occurred, count that as a failure. */
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	free(test_image);
-	free(ref_image);
-	free(expected_image);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -613,13 +712,30 @@ piglit_init(int argc, char **argv)
 
 	fbo_formats_init_test_set(test_set,
 				  GL_TRUE /* print_options */);
+
+	bool is_integer = (test_sets[test_index].basetype == GL_INT);
+
 	test_pattern_vec4 = new ColorGradientSunburst(GL_UNSIGNED_NORMALIZED);
 	test_pattern_vec4->compile();
-	if (piglit_get_gl_version() >= 30) {
+	if (is_integer) {
+		piglit_require_gl_version(30);
+		piglit_require_extension("GL_ARB_texture_multisample");
+
 		test_pattern_ivec4 = new ColorGradientSunburst(GL_INT);
 		test_pattern_ivec4->compile();
 		test_pattern_uvec4 = new ColorGradientSunburst(GL_UNSIGNED_INT);
 		test_pattern_uvec4->compile();
+
+		int_resolve_check.prog =
+			piglit_build_simple_program(int_resolve_check_vs,
+						    int_resolve_check_fs);
+		glUseProgram(int_resolve_check.prog);
+		int_resolve_check.u_resolve =
+			glGetUniformLocation(int_resolve_check.prog, "resolve");
+		int_resolve_check.u_msaa =
+			glGetUniformLocation(int_resolve_check.prog, "msaa");
+		int_resolve_check.u_samples =
+			glGetUniformLocation(int_resolve_check.prog, "samples");
 	}
 }
 
