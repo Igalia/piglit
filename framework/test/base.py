@@ -119,7 +119,9 @@ _SUPPRESS_TIMEOUT = bool(os.environ.get('PIGLIT_NO_TIMEOUT', False))
 
 class TestIsSkip(exceptions.PiglitException):
     """Exception raised in is_skip() if the test is a skip."""
-    pass
+    def __init__(self, reason):
+        super(TestIsSkip, self).__init__()
+        self.reason = reason
 
 
 class TestRunError(exceptions.PiglitException):
@@ -254,7 +256,7 @@ class Test(object):
             self.is_skip()
         except TestIsSkip as e:
             self.result.result = 'skip'
-            self.result.out = six.text_type(e)
+            self.result.out = e.reason
             self.result.returncode = None
             return
 
