@@ -168,9 +168,9 @@ class JUnitBackend(FileBackend):
                 elif expected_result == 'failure':
                     err.text += \
                         "\n\nERROR: Test should have been failure but was crash"
-                    res = etree.SubElement(element, 'crash',
+                    res = etree.SubElement(element, 'error',
                                            message='expected failure, but got '
-                                                   'crash')
+                                                   'error')
                 else:
                     res = etree.SubElement(element, 'error')
 
