@@ -211,13 +211,131 @@ test_data_check_possible_values(test_data *data,
                             test_data_value_at_index(data, 0));
 }
 
+/* There are cases where a pname is returning an already know GL enum
+ * instead of a value. */
+static bool
+pname_returns_enum(const GLenum pname)
+{
+        switch (pname) {
+        case GL_NUM_SAMPLE_COUNTS:
+        case GL_SAMPLES:
+        case GL_INTERNALFORMAT_RED_SIZE:
+        case GL_INTERNALFORMAT_GREEN_SIZE:
+        case GL_INTERNALFORMAT_BLUE_SIZE:
+        case GL_INTERNALFORMAT_ALPHA_SIZE:
+        case GL_INTERNALFORMAT_DEPTH_SIZE:
+        case GL_INTERNALFORMAT_STENCIL_SIZE:
+        case GL_INTERNALFORMAT_SHARED_SIZE:
+        case GL_MAX_WIDTH:
+        case GL_MAX_HEIGHT:
+        case GL_MAX_DEPTH:
+        case GL_MAX_LAYERS:
+        case GL_MAX_COMBINED_DIMENSIONS:
+        case GL_IMAGE_TEXEL_SIZE:
+        case GL_TEXTURE_COMPRESSED_BLOCK_WIDTH:
+        case GL_TEXTURE_COMPRESSED_BLOCK_HEIGHT:
+        case GL_TEXTURE_COMPRESSED_BLOCK_SIZE:
+                return false;
+        default:
+                return true;
+        }
+}
+
+/* Needed to complement _pname_returns_enum because GL_POINTS/GL_FALSE
+ * and GL_LINES/GL_TRUE has the same value */
+static bool
+pname_returns_gl_boolean(const GLenum pname)
+{
+        switch(pname) {
+        case GL_INTERNALFORMAT_SUPPORTED:
+        case GL_COLOR_COMPONENTS:
+        case GL_DEPTH_COMPONENTS:
+        case GL_STENCIL_COMPONENTS:
+        case GL_COLOR_RENDERABLE:
+        case GL_DEPTH_RENDERABLE:
+        case GL_STENCIL_RENDERABLE:
+        case GL_MIPMAP:
+        case GL_TEXTURE_COMPRESSED:
+                return true;
+        default:
+                return false;
+        }
+}
+
+/* Needed because GL_NONE has the same value that GL_FALSE and
+ * GL_POINTS */
+static bool
+pname_can_return_gl_none(const GLenum pname)
+{
+        switch(pname) {
+        case GL_INTERNALFORMAT_PREFERRED:
+        case GL_INTERNALFORMAT_RED_TYPE:
+        case GL_INTERNALFORMAT_GREEN_TYPE:
+        case GL_INTERNALFORMAT_BLUE_TYPE:
+        case GL_INTERNALFORMAT_ALPHA_TYPE:
+        case GL_INTERNALFORMAT_DEPTH_TYPE:
+        case GL_INTERNALFORMAT_STENCIL_TYPE:
+        case GL_FRAMEBUFFER_RENDERABLE:
+        case GL_FRAMEBUFFER_RENDERABLE_LAYERED:
+        case GL_FRAMEBUFFER_BLEND:
+        case GL_READ_PIXELS:
+        case GL_READ_PIXELS_FORMAT:
+        case GL_READ_PIXELS_TYPE:
+        case GL_TEXTURE_IMAGE_FORMAT:
+        case GL_TEXTURE_IMAGE_TYPE:
+        case GL_GET_TEXTURE_IMAGE_FORMAT:
+        case GL_GET_TEXTURE_IMAGE_TYPE:
+        case GL_MANUAL_GENERATE_MIPMAP:
+        case GL_AUTO_GENERATE_MIPMAP:
+        case GL_COLOR_ENCODING:
+        case GL_SRGB_READ:
+        case GL_SRGB_WRITE:
+        case GL_SRGB_DECODE_ARB:
+        case GL_FILTER:
+        case GL_VERTEX_TEXTURE:
+        case GL_TESS_CONTROL_TEXTURE:
+        case GL_TESS_EVALUATION_TEXTURE:
+        case GL_GEOMETRY_TEXTURE:
+        case GL_FRAGMENT_TEXTURE:
+        case GL_COMPUTE_TEXTURE:
+        case GL_TEXTURE_SHADOW:
+        case GL_TEXTURE_GATHER:
+        case GL_TEXTURE_GATHER_SHADOW:
+        case GL_SHADER_IMAGE_LOAD:
+        case GL_SHADER_IMAGE_STORE:
+        case GL_SHADER_IMAGE_ATOMIC:
+        case GL_IMAGE_COMPATIBILITY_CLASS:
+        case GL_IMAGE_PIXEL_FORMAT:
+        case GL_IMAGE_PIXEL_TYPE:
+        case GL_IMAGE_FORMAT_COMPATIBILITY_TYPE:
+        case GL_SIMULTANEOUS_TEXTURE_AND_DEPTH_TEST:
+        case GL_SIMULTANEOUS_TEXTURE_AND_STENCIL_TEST:
+        case GL_SIMULTANEOUS_TEXTURE_AND_DEPTH_WRITE:
+        case GL_SIMULTANEOUS_TEXTURE_AND_STENCIL_WRITE:
+        case GL_CLEAR_BUFFER:
+        case GL_TEXTURE_VIEW:
+        case GL_VIEW_COMPATIBILITY_CLASS:
+                return true;
+        default:
+                return false;
+   }
+}
+
+static const char*
+get_value_enum_name(const GLenum pname,
+                    const GLint64 value)
+{
+        if (pname_returns_gl_boolean(pname))
+                return value ? "GL_TRUE" : "GL_FALSE";
+        else if (pname_can_return_gl_none(pname) && value == 0)
+                return "GL_NONE";
+        else
+                return piglit_get_gl_enum_name(value);
+}
+
 /*
  * Prints the info of a failing case for a given pname.
  *
- * Note that it tries to get the name of the value at @data as if it
- * were a enum, as it is useful on that case. But there are several
- * pnames that returns a value. A possible improvement would be that
- * for those just printing the value.
  */
 void
 print_failing_case(const GLenum target, const GLenum internalformat,
@@ -255,11 +373,17 @@ void print_failing_case_full(const GLenum target, const GLenum internalformat,
                 fprintf(stderr, "expected value = (%" PRIi64 "), ",
                         expected_value);
 
-        fprintf(stderr, "params[0] = (%" PRIi64 ",%s), "
-                "supported=%i\n",
-                current_value,
-                piglit_get_gl_enum_name(current_value),
-                supported);
+	if (pname_returns_enum(pname)) {
+                fprintf(stderr, "value = (%s), "
+                        "supported=%i\n",
+                        get_value_enum_name(pname, current_value),
+                        supported);
+	} else {
+                fprintf(stderr, "value = (%" PRIi64 "), "
+                        "supported=%i\n",
+                        current_value,
+                        supported);
+        }
 }
 
 /*
