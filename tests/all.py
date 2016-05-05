@@ -594,70 +594,66 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['point-vertex-id', 'gl_VertexID', 'gl_InstanceID', 'divisor'])
     g(['glsl-vs-int-attrib'])
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01a.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01b.vert'),
-       'pass'],
+       os.path.join('shaders', 'glsl-link-initializer-01a.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01b.vert'), 'pass'],
       'GLSL link single global initializer, 2 shaders')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01c.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01d.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01c.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01d.vert'),
        'pass'],
       'GLSL link matched global initializer, 2 shaders')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01b.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01d.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01b.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01d.vert'),
        'fail'],
       'GLSL link mismatched global initializer, 2 shaders')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01a.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01b.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-01c.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01a.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01b.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-01c.vert'),
        'fail'],
       'GLSL link mismatched global initializer, 3 shaders')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-02a.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-02b.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-02a.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-02b.vert'),
        'fail'],
       'GLSL link mismatched global const initializer')
     g(['glsl-link-initializer-03'],
       'GLSL link two programs, global initializer')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-05a.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-05b.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-05a.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-05b.vert'),
        'fail'],
       'GLSL link matched global initializer expression')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-06a.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-initializer-06b.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-06a.vert'),
+       os.path.join('shaders', 'glsl-link-initializer-06b.vert'),
        'fail'],
       'GLSL link mismatched global initializer expression')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-invariant-01a.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-invariant-01b.vert'),
+       os.path.join('shaders', 'glsl-link-invariant-01a.vert'),
+       os.path.join('shaders', 'glsl-link-invariant-01b.vert'),
        'fail'],
       'GLSL link mismatched invariant')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-centroid-01a.vert'),
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-centroid-01b.vert'),
+       os.path.join('shaders', 'glsl-link-centroid-01a.vert'),
+       os.path.join('shaders', 'glsl-link-centroid-01b.vert'),
        'fail'],
       'GLSL link mismatched centroid')
     g(['glsl-link-test',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-link-struct-array.frag'),
+       os.path.join('shaders', 'glsl-link-struct-array.frag'),
        'pass'],
       'GLSL link array-of-struct-of-array')
     g(['glsl-getactiveuniform-count',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-getactiveuniform-length.vert'),
-       '1'],
-      'glsl-getactiveuniform-count: glsl-getactiveuniform-length')
+       os.path.join('shaders', 'glsl-getactiveuniform-length.vert'), '1'],
+      'glsl-getactiveuniform-count: {}'.format('glsl-getactiveuniform-length'))
     g(['glsl-getactiveuniform-count',
-       os.path.join(TESTS_DIR, 'shaders',
-                    'glsl-getactiveuniform-ftransform.vert'),
-       '2'],
-      'glsl-getactiveuniform-count: glsl-getactiveuniform-ftransform')
+       os.path.join('shaders', 'glsl-getactiveuniform-ftransform.vert'), '2'],
+      'glsl-getactiveuniform-count: {}'.format(
+          'glsl-getactiveuniform-ftransform'))
     g(['glsl-getactiveuniform-count',
-       os.path.join(TESTS_DIR, 'shaders', 'glsl-getactiveuniform-mvp.vert'),
-       '2'],
-      'glsl-getactiveuniform-count: glsl-getactiveuniform-mvp')
+       os.path.join('shaders', 'glsl-getactiveuniform-mvp.vert'), '2'],
+      'glsl-getactiveuniform-count: {}'.format('glsl-getactiveuniform-mvp'))
 
     for subtest in ('interstage', 'intrastage', 'vs-gs'):
         g(['version-mixing', subtest])
