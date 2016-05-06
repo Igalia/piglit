@@ -3721,6 +3721,23 @@ with profile.group_manager(
     g(['arb_internalformat_query2-format-components'], '{COLOR,DEPTH,STENCIL}_COMPONENTS pname checks')
 
 with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_internalformat_query2-gles2')) as g:
+    g(['arb_internalformat_query2-api-errors-gles2'], 'API error checks')
+    g(['arb_internalformat_query2-generic-pname-checks-gles2'], 'Individual most generic pname checks')
+    g(['arb_internalformat_query2-samples-pnames-gles2'], 'SAMPLES and NUM_SAMPLE_COUNTS pname checks')
+    g(['arb_internalformat_query2-internalformat-size-checks-gles2'], 'All INTERNALFORMAT_<X>_SIZE pname checks')
+    g(['arb_internalformat_query2-internalformat-type-checks-gles2'], 'All INTERNALFORMAT_<X>_TYPE pname checks')
+    g(['arb_internalformat_query2-image-format-compatibility-type-gles2'], 'IMAGE_FORMAT_COMPATIBILITY_TYPE pname checks')
+    g(['arb_internalformat_query2-max-dimensions-gles2'], 'Max dimensions related pname checks')
+    g(['arb_internalformat_query2-color-encoding-gles2'], 'COLOR_ENCODING pname check')
+    g(['arb_internalformat_query2-texture-compressed-block-gles2'], 'All TEXTURE_COMPRESSED_BLOCK_<X> pname checks')
+    g(['arb_internalformat_query2-minmax-gles2'], 'minmax check for SAMPLES/NUM_SAMPLE_COUNTS')
+    g(['arb_internalformat_query2-image-texture-gles2'], 'Checks for pnames related to ARB_image_load_store that return values from Table 3.22 (OpenGL 4.2)')
+    g(['arb_internalformat_query2-filter-gles2'], 'FILTER pname checks.')
+    g(['arb_internalformat_query2-format-components-gles2'], '{COLOR,DEPTH,STENCIL}_COMPONENTS pname checks')
+
+with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
     g(['map_buffer_range_error_check'], run_concurrent=False)
     g(['map_buffer_range_test'], run_concurrent=False)
