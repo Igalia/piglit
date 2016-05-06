@@ -596,11 +596,6 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-link-initializer-03'],
       'GLSL link two programs, global initializer')
     g(['glsl-link-test',
-       os.path.join('shaders', 'glsl-link-initializer-05a.vert'),
-       os.path.join('shaders', 'glsl-link-initializer-05b.vert'),
-       'fail'],
-      'GLSL link matched global initializer expression')
-    g(['glsl-link-test',
        os.path.join('shaders', 'glsl-link-initializer-06a.vert'),
        os.path.join('shaders', 'glsl-link-initializer-06b.vert'),
        'fail'],

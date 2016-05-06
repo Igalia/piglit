@@ -1,3 +1,7 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
 uniform float angle;
 uniform float scale;
 float global_variable = sin(angle) * scale;
@@ -6,3 +10,16 @@ float global_variable = sin(angle) * scale;
  * a shader doesn't have any executable code.
  */
 void apple_work_around1() {}
+
+[vertex shader]
+uniform float angle;
+uniform float scale;
+float global_variable = sin(angle) * scale;
+
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[test]
+link error
