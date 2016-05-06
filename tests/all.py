@@ -595,11 +595,6 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-vs-int-attrib'])
     g(['glsl-link-initializer-03'],
       'GLSL link two programs, global initializer')
-    g(['glsl-link-test',
-       os.path.join('shaders', 'glsl-link-invariant-01a.vert'),
-       os.path.join('shaders', 'glsl-link-invariant-01b.vert'),
-       'fail'],
-      'GLSL link mismatched invariant')
     g(['glsl-getactiveuniform-count',
        os.path.join('shaders', 'glsl-getactiveuniform-length.vert'), '1'],
       'glsl-getactiveuniform-count: {}'.format('glsl-getactiveuniform-length'))

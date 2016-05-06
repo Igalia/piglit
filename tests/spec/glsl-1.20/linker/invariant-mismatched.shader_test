@@ -1,0 +1,22 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+invariant varying float var;
+
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[vertex shader]
+#version 120
+varying float var;
+
+void myfunc()
+{
+}
+
+[test]
+link error
