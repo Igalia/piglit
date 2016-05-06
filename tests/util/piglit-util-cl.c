@@ -1004,6 +1004,34 @@ piglit_cl_read_whole_buffer(cl_command_queue command_queue, cl_mem buffer,
 	return success;
 }
 
+bool
+piglit_cl_get_context_image_support(const piglit_cl_context context)
+{
+	bool ret = false;
+
+	unsigned i;
+	for(i = 0; i < context->num_devices; i++)
+		ret |= piglit_cl_get_device_image_support(context->device_ids[i]);
+
+	return ret;
+}
+
+bool
+piglit_cl_get_device_image_support(cl_device_id device)
+{
+	bool ret = false;
+
+	cl_bool *image_support =
+		piglit_cl_get_device_info(device, CL_DEVICE_IMAGE_SUPPORT);
+
+	if (image_support)
+		ret = *image_support;
+
+	free(image_support);
+
+	return ret;
+}
+
 cl_mem
 piglit_cl_create_image(piglit_cl_context context, cl_mem_flags flags,
                        const cl_image_format *format,

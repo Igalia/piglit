@@ -545,6 +545,24 @@ typedef struct {
 } piglit_image_desc;
 #endif
 
+/**
+ * \brief Get context image support.
+ *
+ * @param context      Context on which to create image.
+ * @return             True if there is one device with image support.
+ */
+bool
+piglit_cl_get_context_image_support(const piglit_cl_context context);
+
+/**
+ * \brief Get device image support.
+ *
+ * @param device       Context on which to create image.
+ * @return             True if there the device has image support.
+ */
+bool
+piglit_cl_get_device_image_support(cl_device_id device);
+
 
 /**
  * \brief Create an image.
