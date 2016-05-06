@@ -38,23 +38,6 @@ PIGLIT_CL_API_TEST_CONFIG_BEGIN
 
 PIGLIT_CL_API_TEST_CONFIG_END
 
-static bool context_has_image_support(const piglit_cl_context ctx)
-{
-	unsigned i;
-	for(i = 0; i < ctx->num_devices; i++) {
-		int *image_support =
-			piglit_cl_get_device_info(ctx->device_ids[i],
-						CL_DEVICE_IMAGE_SUPPORT);
-		if (*image_support) {
-			free(image_support);
-			return true;
-		}
-
-		free(image_support);
-	}
-	return false;
-}
-
 static void
 no_image_check_invalid(
 	cl_int errcode_ret,
@@ -107,7 +90,7 @@ piglit_cl_test(const int argc,
                const struct piglit_cl_api_test_config* config,
                const struct piglit_cl_api_test_env* env)
 {
-	if (!context_has_image_support(env->context)) {
+	if (!piglit_cl_get_context_image_support(env->context)) {
 		return no_image_tests(env);
 	} else {
 		return PIGLIT_PASS;

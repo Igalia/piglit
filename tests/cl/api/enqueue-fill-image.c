@@ -104,18 +104,10 @@ piglit_cl_test(const int argc,
 	cl_command_queue queue = env->context->command_queues[0];
 	int i;
 
-	cl_bool *image_support =
-		piglit_cl_get_device_info(env->context->device_ids[0],
-		                          CL_DEVICE_IMAGE_SUPPORT);
-
-	if (!*image_support) {
+	if (!piglit_cl_get_device_image_support(env->context->device_ids[0])) {
 		fprintf(stderr, "No image support\n");
-		free(image_support);
 		return PIGLIT_SKIP;
 	}
-
-	free(image_support);
-	image_support = NULL;
 
 	img_format.image_channel_order = CL_RGBA;
 	img_format.image_channel_data_type = CL_UNSIGNED_INT8;

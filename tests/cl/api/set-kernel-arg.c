@@ -59,22 +59,6 @@ PIGLIT_CL_API_TEST_CONFIG_BEGIN
 
 PIGLIT_CL_API_TEST_CONFIG_END
 
-static bool
-get_device_image_support(cl_device_id device)
-{
-	cl_bool *has_image =
-		piglit_cl_get_device_info(device, CL_DEVICE_IMAGE_SUPPORT);
-
-	if (!*has_image) {
-		fprintf(stdout, "No image support. Sampler arg won't be tested\n");
-		free(has_image);
-		return false;
-	}
-
-	free(has_image);
-	return true;
-}
-
 static void
 test (cl_kernel kernel,
       cl_uint arg_index,
@@ -126,7 +110,7 @@ piglit_cl_test(const int argc,
 	cl_mem invalid_buffer;
 
 	cl_bool image_support =
-		get_device_image_support(env->context->device_ids[0]);
+		piglit_cl_get_device_image_support(env->context->device_ids[0]);
 
 	/*** Normal usage ***/
 	kernel = clCreateKernel(env->program, "kernel_fun", &errNo);
