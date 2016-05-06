@@ -594,11 +594,6 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['point-vertex-id', 'gl_VertexID', 'gl_InstanceID', 'divisor'])
     g(['glsl-vs-int-attrib'])
     g(['glsl-link-test',
-       os.path.join('shaders', 'glsl-link-initializer-01b.vert'),
-       os.path.join('shaders', 'glsl-link-initializer-01d.vert'),
-       'fail'],
-      'GLSL link mismatched global initializer, 2 shaders')
-    g(['glsl-link-test',
        os.path.join('shaders', 'glsl-link-initializer-01a.vert'),
        os.path.join('shaders', 'glsl-link-initializer-01b.vert'),
        os.path.join('shaders', 'glsl-link-initializer-01c.vert'),
