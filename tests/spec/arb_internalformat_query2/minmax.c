@@ -283,7 +283,8 @@ piglit_init(int argc, char **argv)
                 piglit_is_extension_supported("GL_ARB_texture_multisample");
         GLint max_samples;
 
-        piglit_require_extension("GL_ARB_framebuffer_object");
+	if (!piglit_is_gles())
+                piglit_require_extension("GL_ARB_framebuffer_object");
         piglit_require_extension("GL_ARB_internalformat_query2");
 
         /* Need GL 3 or extensions to support the valid_formats[] above */

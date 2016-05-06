@@ -123,7 +123,6 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 
-	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_internalformat_query2");
 
 	/* The GL_ARB_internalformat_query2 spec says:
