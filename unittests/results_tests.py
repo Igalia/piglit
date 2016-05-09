@@ -185,6 +185,19 @@ def test_TestResult_result_getter_subtests():
     nt.eq_(test.result, 'incomplete')
 
 
+def test_TestResult_result_getters_subtests_crash():
+    """results.TestResult.result.__get__: doesn't mask crashes.
+
+    Crash is somewhat unique in that subtests can run and pass, but then the
+    test can crash before all subtests have been run.
+
+    """
+    test = results.TestResult('crash')
+    test.subtests['a'] = 'pass'
+    test.subtests['b'] = 'skip'
+    nt.eq_(test.result, 'crash')
+
+
 def test_TestResult_result_setter():
     """results.TestResult.result: setter makes the result a status"""
     test = results.TestResult('pass')
