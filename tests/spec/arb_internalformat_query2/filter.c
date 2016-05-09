@@ -127,9 +127,20 @@ is_multi_texel_filtering_supported(GLenum target,
  * getting a opengl error
  */
 static void
-print_failing_details(GLenum target,
+print_failing_details(GLenum pname,
+                      GLenum target,
                       GLenum internalformat)
 {
+        if (!check_query2_target_dependencies(target)) {
+                fprintf(stderr, "\tDependencies not fulfilled for target %s\n",
+                        piglit_get_gl_enum_name(target));
+        }
+
+        if (!check_query2_pname_dependencies(pname)) {
+                fprintf(stderr, "\tDependencies not fulfilled for pname %s\n",
+                        piglit_get_gl_enum_name(pname));
+        }
+
         if (target == GL_TEXTURE_BUFFER || is_multisample_target(target))
                 fprintf(stderr, "\tTarget %s doesn't support multi-texel filtering\n",
                         piglit_get_gl_enum_name(target));
@@ -193,7 +204,7 @@ try_local(const GLenum *targets, unsigned num_targets,
                                            pname, data);
 
                         if (!value_test)
-                                print_failing_details(targets[i], internalformats[j]);
+                                print_failing_details(pname, targets[i], internalformats[j]);
 
                         pass = false;
                 }

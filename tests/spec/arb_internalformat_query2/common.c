@@ -644,7 +644,7 @@ cleanup:
  * It is assumed that @pname is a valid query2 pname, as would
  * simplify the implementation of this method.
  */
-static bool
+bool
 check_query2_pname_dependencies(const GLenum pname)
 {
         switch(pname) {
@@ -767,7 +767,7 @@ is_gles31()
  * It is assumed that @target is a valid query2 target, as would
  * simplify the implementation of this method.
  */
-static bool
+bool
 check_query2_target_dependencies(const GLenum target)
 {
         switch(target) {

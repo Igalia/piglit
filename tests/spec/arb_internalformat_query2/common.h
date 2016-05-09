@@ -381,6 +381,10 @@ bool value_on_set(const GLint *set,
 bool check_query2_dependencies(const GLenum pname,
                                const GLenum target);
 
+bool check_query2_target_dependencies(const GLenum target);
+
+bool check_query2_pname_dependencies(const GLenum pname);
+
 bool test_data_is_unsupported_response(test_data *data,
                                        GLenum pname);
 
