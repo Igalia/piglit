@@ -173,10 +173,13 @@ class TestResult(object):
         """Return the result of the test.
 
         If there are subtests return the "worst" value of those subtests. If
-        there are not return the stored value of the test.
+        there are not return the stored value of the test. There is an
+        exception to this rule, and that's if the status is crash; since this
+        status is set by the framework, and can be generated even when some or
+        all unit tests pass.
 
         """
-        if self.subtests:
+        if self.subtests and self.__result != status.CRASH:
             return max(six.itervalues(self.subtests))
         return self.__result
 
