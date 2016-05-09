@@ -214,7 +214,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	bool piglit_pass = true;
-	GLuint vs, fs, prog;
+	GLuint prog;
 	GLint numUniforms, i;
 	GLint loc;
 	enum uniform_enum u;
