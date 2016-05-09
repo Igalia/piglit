@@ -664,6 +664,18 @@ check_query2_pname_dependencies(const GLenum pname)
         return true;
 }
 
+static bool
+is_gles3()
+{
+        return piglit_is_gles() && piglit_get_gl_version() >= 30;
+}
+
+static bool
+is_gles31()
+{
+        return piglit_is_gles() && piglit_get_gl_version() >= 31;
+}
+
 /*
  * Returns if @target query2 dependencies are fulfilled. So for
  * example, TEXTURE_1D_ARRAY needs
@@ -678,8 +690,13 @@ check_query2_target_dependencies(const GLenum target)
 {
         switch(target) {
         case GL_TEXTURE_1D_ARRAY:
-        case GL_TEXTURE_2D_ARRAY:
                 if (!piglit_is_extension_supported("GL_EXT_texture_array"))
+                        return false;
+                break;
+
+        case GL_TEXTURE_2D_ARRAY:
+                if (!(piglit_is_extension_supported("GL_EXT_texture_array") ||
+                      is_gles3()))
                         return false;
                 break;
 
@@ -690,7 +707,8 @@ check_query2_target_dependencies(const GLenum target)
 
         case GL_TEXTURE_2D_MULTISAMPLE:
         case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
-                if (!piglit_is_extension_supported("GL_ARB_texture_multisample"))
+                if (!(piglit_is_extension_supported("GL_ARB_texture_multisample") ||
+                      is_gles31()))
                         return false;
                 break;
 
@@ -700,9 +718,10 @@ check_query2_target_dependencies(const GLenum target)
                 break;
 
         case GL_RENDERBUFFER:
-                if (!piglit_is_extension_supported("GL_ARB_framebuffer_object") &&
-                    !piglit_is_extension_supported("GL_EXT_framebuffer_object"))
-                        return false;
+                if (!(piglit_is_extension_supported("GL_ARB_framebuffer_object") ||
+                      piglit_is_extension_supported("GL_EXT_framebuffer_object") ||
+                      is_gles3()))
+                    return false;
                 break;
 
         case GL_TEXTURE_BUFFER:
