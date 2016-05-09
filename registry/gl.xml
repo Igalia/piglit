@@ -37518,7 +37518,7 @@ typedef unsigned int GLhandleARB;
                 <command name="glGetInternalformativ"/>
             </require>
         </extension>
-        <extension name="GL_ARB_internalformat_query2" supported="gl|glcore">
+        <extension name="GL_ARB_internalformat_query2" supported="gl|glcore|gles2">
             <require>
                 <enum name="GL_IMAGE_FORMAT_COMPATIBILITY_TYPE"/>
                 <enum name="GL_NUM_SAMPLE_COUNTS"/>
