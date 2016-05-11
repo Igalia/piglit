@@ -266,7 +266,7 @@ run_subtest_and_present(void)
 	asprintf(&subtest_name, "query-%s-%s",
 		 piglit_get_gl_enum_name(query_type),
 		 sync_mode_names[sync_mode]);
-	piglit_report_subtest_result(r, subtest_name);
+	piglit_report_subtest_result(r, "%s", subtest_name);
 	free(subtest_name);
 	return r;
 }
