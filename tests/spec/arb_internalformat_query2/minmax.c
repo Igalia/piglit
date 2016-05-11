@@ -36,12 +36,7 @@
         fprintf(stderr, "64 bit query: ") : \
         fprintf(stderr, "32 bit query: ");
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-        config.supports_gl_compat_version = 10;
-        config.window_visual = PIGLIT_GL_VISUAL_RGB;
-
-PIGLIT_GL_TEST_CONFIG_END
+QUERY2_CONFIG
 
 /* These are all the formats that are required to be color-renderable
  * by the OpenGL 3.0 spec.

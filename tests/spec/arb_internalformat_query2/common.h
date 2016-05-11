@@ -23,6 +23,38 @@
 
 #include "piglit-util-gl.h"
 
+#ifdef PIGLIT_USE_OPENGL
+        #define QUERY2_CONFIG                                   \
+                PIGLIT_GL_TEST_CONFIG_BEGIN                     \
+                                                                \
+                config.supports_gl_compat_version = 20;         \
+                config.window_visual = PIGLIT_GL_VISUAL_RGB;    \
+                                                                \
+                PIGLIT_GL_TEST_CONFIG_END
+#endif
+
+#ifdef PIGLIT_USE_OPENGL_ES2
+        #define QUERY2_CONFIG                                   \
+                PIGLIT_GL_TEST_CONFIG_BEGIN                     \
+                                                                \
+                config.supports_gl_compat_version = 10;         \
+                config.supports_gl_es_version = 20;             \
+                config.window_visual = PIGLIT_GL_VISUAL_RGB;    \
+                                                                \
+                PIGLIT_GL_TEST_CONFIG_END
+#endif
+
+#ifdef PIGLIT_USE_OPENGL_ES3
+        #define QUERY2_CONFIG                                   \
+                PIGLIT_GL_TEST_CONFIG_BEGIN                     \
+                                                                \
+                config.supports_gl_compat_version = 10;         \
+                config.supports_gl_es_version = 30;             \
+                config.window_visual = PIGLIT_GL_VISUAL_RGB;    \
+                                                                \
+                PIGLIT_GL_TEST_CONFIG_END
+#endif
+
 static const GLenum valid_targets[] = {
         GL_TEXTURE_1D,
         GL_TEXTURE_1D_ARRAY,

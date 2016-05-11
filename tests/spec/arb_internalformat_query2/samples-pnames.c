@@ -31,12 +31,7 @@
 
 #include "common.h"
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-	config.supports_gl_compat_version = 10;
-	config.window_visual = PIGLIT_GL_VISUAL_RGB;
-
-PIGLIT_GL_TEST_CONFIG_END
+QUERY2_CONFIG
 
 static const GLenum without_multisample_targets[] = {
         GL_TEXTURE_1D,
