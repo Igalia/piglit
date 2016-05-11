@@ -597,6 +597,12 @@ test_data_check_against_get_tex_level_parameter(test_data *data,
         GLuint buffer;
         GLenum real_target = target;
 
+        /* GetTexLevelParameter became available on gl es 3.1. So we
+         * can't use it for gl es 2.0/3.0. On those cases we just
+         * return so the whole check can go on. */
+        if (piglit_is_gles() && piglit_get_gl_version() < 31)
+                return true;
+
         result = create_texture(target, internalformat, &tex, &buffer);
         if (!result)
                 return test_data_is_unsupported_response(data, pname);
