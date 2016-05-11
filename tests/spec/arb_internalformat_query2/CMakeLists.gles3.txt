@@ -1,0 +1,17 @@
+link_libraries (piglitutil_${piglit_target_api})
+
+piglit_add_executable (arb_internalformat_query2-api-errors-${piglit_target_api} api-errors.c)
+piglit_add_executable (arb_internalformat_query2-generic-pname-checks-${piglit_target_api} generic-pname-checks.c common.c)
+piglit_add_executable (arb_internalformat_query2-samples-pnames-${piglit_target_api} samples-pnames.c common.c)
+piglit_add_executable (arb_internalformat_query2-internalformat-size-checks-${piglit_target_api} internalformat-size-checks.c common.c)
+piglit_add_executable (arb_internalformat_query2-internalformat-type-checks-${piglit_target_api} internalformat-type-checks.c common.c)
+piglit_add_executable (arb_internalformat_query2-image-format-compatibility-type-${piglit_target_api} image-format-compatibility-type.c common.c)
+piglit_add_executable (arb_internalformat_query2-max-dimensions-${piglit_target_api} max-dimensions.c common.c)
+piglit_add_executable (arb_internalformat_query2-color-encoding-${piglit_target_api} color-encoding.c common.c)
+piglit_add_executable (arb_internalformat_query2-texture-compressed-block-${piglit_target_api} texture-compressed-block.c common.c)
+piglit_add_executable (arb_internalformat_query2-minmax-${piglit_target_api} minmax.c common.c)
+piglit_add_executable (arb_internalformat_query2-image-texture-${piglit_target_api} image-texture.c common.c)
+piglit_add_executable (arb_internalformat_query2-filter-${piglit_target_api} filter.c common.c)
+piglit_add_executable (arb_internalformat_query2-format-components-${piglit_target_api} format-components.c common.c)
+
+# vim: ft=cmake:
