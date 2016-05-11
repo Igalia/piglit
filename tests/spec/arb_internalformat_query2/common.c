@@ -342,6 +342,57 @@ static GLenum
 format_for_internalformat(const GLenum internalformat)
 {
         switch(internalformat) {
+        case GL_RED:
+        case GL_R8:
+        case GL_R8_SNORM:
+        case GL_R16F:
+        case GL_R32F:
+        case GL_COMPRESSED_RED:
+                return GL_RED;
+        case GL_R8I:
+        case GL_R8UI:
+        case GL_R16I:
+        case GL_R16UI:
+        case GL_R32I:
+        case GL_R32UI:
+                return GL_RED_INTEGER;
+        case GL_RG:
+        case GL_RG8:
+        case GL_RG8_SNORM:
+        case GL_RG16F:
+        case GL_RG32F:
+                return GL_RG;
+        case GL_RG8I:
+        case GL_RG8UI:
+        case GL_RG16I:
+        case GL_RG16UI:
+        case GL_RG32I:
+        case GL_RG32UI:
+                return GL_RG_INTEGER;
+        case GL_RGB:
+        case GL_RGB8:
+	case GL_RGB8_SNORM:
+        case GL_SRGB8:
+        case GL_RGB16F:
+        case GL_RGB32F:
+        case GL_R11F_G11F_B10F:
+        case GL_RGB9_E5:
+                return GL_RGB;
+        case GL_RGB8I:
+        case GL_RGB8UI:
+        case GL_RGB16I:
+        case GL_RGB16UI:
+        case GL_RGB32I:
+        case GL_RGB32UI:
+                return GL_RGB_INTEGER;
+        case GL_RGB10_A2UI:
+        case GL_RGBA8I:
+        case GL_RGBA8UI:
+        case GL_RGBA16I:
+        case GL_RGBA16UI:
+        case GL_RGBA32I:
+        case GL_RGBA32UI:
+                return GL_RGBA_INTEGER;
         case GL_DEPTH_COMPONENT:
         case GL_DEPTH_COMPONENT16:
         case GL_DEPTH_COMPONENT24:
@@ -352,31 +403,7 @@ format_for_internalformat(const GLenum internalformat)
         case GL_DEPTH24_STENCIL8:
         case GL_DEPTH32F_STENCIL8:
                 return GL_DEPTH_STENCIL;
-        case GL_RGB10_A2UI:
-        case GL_R8I:
-        case GL_R8UI:
-        case GL_R16I:
-        case GL_R16UI:
-        case GL_R32I:
-        case GL_R32UI:
-        case GL_RG8I:
-        case GL_RG16I:
-        case GL_RG16UI:
-        case GL_RG32I:
-        case GL_RG32UI:
-        case GL_RGB8I:
-        case GL_RGB8UI:
-        case GL_RGB16I:
-        case GL_RGB16UI:
-        case GL_RGB32I:
-        case GL_RGB32UI:
-        case GL_RGBA8I:
-        case GL_RGBA8UI:
-        case GL_RGBA16I:
-        case GL_RGBA16UI:
-        case GL_RGBA32I:
-        case GL_RGBA32UI:
-                return GL_RGBA_INTEGER;
+
         default:
                 return GL_RGBA;
         }
@@ -386,10 +413,59 @@ static GLenum
 type_for_internalformat(const GLenum internalformat)
 {
         switch(internalformat) {
+        case GL_R8I:
+        case GL_R8_SNORM:
+        case GL_RG8I:
+        case GL_RG8_SNORM:
+        case GL_RGB8I:
+        case GL_RGBA8I:
+	case GL_RGB8_SNORM:
+	case GL_RGBA8_SNORM:
+                return GL_BYTE;
+        case GL_R16I:
+        case GL_RG16I:
+        case GL_RGB16I:
+        case GL_RGBA16I:
+                return GL_SHORT;
+        case GL_R16UI:
+        case GL_RG16UI:
+        case GL_RGB16UI:
+        case GL_RGBA16UI:
+        case GL_DEPTH_COMPONENT16:
+                return GL_UNSIGNED_SHORT;
+        case GL_R32I:
+        case GL_RG32I:
+        case GL_RGB32I:
+        case GL_RGBA32I:
+        case GL_DEPTH_COMPONENT32:
+                return GL_INT;
+        case GL_R32UI:
+        case GL_RG32UI:
+        case GL_RGB32UI:
+        case GL_RGBA32UI:
+        case GL_DEPTH_COMPONENT:
+        case GL_DEPTH_COMPONENT24:
+                return GL_UNSIGNED_INT;
         case GL_DEPTH_STENCIL:
         case GL_DEPTH24_STENCIL8:
-        case GL_DEPTH32F_STENCIL8:
                 return GL_UNSIGNED_INT_24_8;
+        case GL_RGB10_A2:
+        case GL_RGB10_A2UI:
+                return GL_UNSIGNED_INT_2_10_10_10_REV;
+        case GL_R16F:
+        case GL_RG16F:
+        case GL_RGB16F:
+        case GL_RGBA16F:
+        case GL_R32F:
+        case GL_RG32F:
+        case GL_RGB32F:
+        case GL_RGBA32F:
+        case GL_R11F_G11F_B10F:
+        case GL_RGB9_E5:
+        case GL_DEPTH_COMPONENT32F:
+                return GL_FLOAT;
+        case GL_DEPTH32F_STENCIL8:
+                return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
         default:
                 return GL_UNSIGNED_BYTE;
         }
