@@ -137,30 +137,15 @@ real_try(GLenum target, GLenum format, GLint max_samples,
 
         buffer_size_in_elements = test_data_value_at_index(data_counts, 0);
         pass = piglit_check_gl_error(0)
+                && (buffer_size_in_elements >= 0)
                 && pass;
 
-        /* The GL_ARB_internalformat_query spec says:
-         *
-         *     "Add new table 6.X Internalformat-specific
-         *     Implementation Dependent Values after 6.52"
-         *
-         *                                                       Minimum
-         *     Get Value         Type    Get Command              Value
-         *     ---------         ----    -----------              -------
-         *     SAMPLES           0*xZ+   GetInternalformativ       fn1
-         *     NUM_SAMPLE_COUNTS Z+      GetInternalformativ       1
-         *
-         *     fn1: see section 6.X."
+        /* For ARB_internalformat_query2, 0 is a valid value for
+         * NUM_SAMPLE_COUNTS, but it doesn't make sense to go on and
+         * check GL_SAMPLES in that case.
          */
-        if (buffer_size_in_elements < 1) {
-                ERROR_HEADER(data_counts);
-                fprintf(stderr,
-                        "GL_NUM_SAMPLE_COUNTS is %d for %s/%s\n",
-                        buffer_size_in_elements,
-                        piglit_get_gl_enum_name(target),
-                        piglit_get_gl_enum_name(format));
-                return false;
-        }
+        if (buffer_size_in_elements == 0)
+                return pass;
 
         test_data_set_params_size(data_samples, buffer_size_in_elements);
 
