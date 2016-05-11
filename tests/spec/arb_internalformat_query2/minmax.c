@@ -46,7 +46,7 @@ PIGLIT_GL_TEST_CONFIG_END
 /* These are all the formats that are required to be color-renderable
  * by the OpenGL 3.0 spec.
  */
-static const GLenum valid_formats[] = {
+static const GLenum valid_gl_formats[] = {
         GL_RGBA32F,
         GL_RGBA16,
         GL_RGBA16F,
@@ -63,6 +63,23 @@ static const GLenum valid_formats[] = {
         GL_R8,
         GL_ALPHA8,
 };
+
+/* These are all the formats that are required to be color-renderable
+ * by the OpenGL es spec. (See table 8.13 from OpenGL es 3.1 spec)
+ */
+static const GLenum valid_gles_formats[] = {
+        GL_R8,
+        GL_RG8,
+        GL_RGB8,
+        GL_RGB565,
+        GL_RGBA4,
+        GL_RGB5_A1,
+        GL_RGBA8,
+        GL_RGB10_A2,
+        GL_RGB10_A2UI,
+        GL_SRGB8_ALPHA8,
+};
+
 
 static const GLenum valid_integer_formats[] = {
         GL_RGBA32I,
@@ -282,6 +299,7 @@ piglit_init(int argc, char **argv)
         const bool tms_supported =
                 piglit_is_extension_supported("GL_ARB_texture_multisample");
         GLint max_samples;
+        const GLenum *valid_formats;
 
 	if (!piglit_is_gles())
                 piglit_require_extension("GL_ARB_framebuffer_object");
@@ -292,6 +310,8 @@ piglit_init(int argc, char **argv)
                 piglit_require_extension("GL_ARB_texture_rg");
                 piglit_require_extension("GL_ARB_texture_float");
         }
+
+        valid_formats = piglit_is_gles() ? valid_gles_formats : valid_gl_formats;
 
         glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
         for (i = 0; i < ARRAY_SIZE(valid_formats); i++) {
