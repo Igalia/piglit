@@ -1,5 +1,6 @@
 [require]
 GLSL >= 4.00
+GL_ARB_shader_precision
 
 [vertex shader passthrough]
 
