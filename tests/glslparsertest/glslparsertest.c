@@ -227,17 +227,23 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 static void
 attach_complementary_shader(GLuint shader_prog, GLenum type)
 {
-	switch (type) {
-	case GL_FRAGMENT_SHADER:
+	if (type == GL_FRAGMENT_SHADER)
 		attach_dummy_shader(shader_prog, GL_VERTEX_SHADER);
-		break;
-	case GL_VERTEX_SHADER:
+	else if (type == GL_VERTEX_SHADER)
 		attach_dummy_shader(shader_prog, GL_FRAGMENT_SHADER);
-		break;
-	default:
-		fprintf(stderr,
-			"Unexpected type in attach_complementary_shader()");
-		piglit_report_result(PIGLIT_FAIL);
+}
+
+static void
+require_feature(int gl_ver, const char *gl_ext, int es_ver, const char *es_ext)
+{
+	const int required_ver = piglit_is_gles() ? es_ver : gl_ver;
+	const char *required_ext = piglit_is_gles() ? es_ext : gl_ext;
+
+	if (piglit_get_gl_version() < required_ver &&
+	    !piglit_is_extension_supported(required_ext)) {
+		printf("Test requires version %g or %s\n",
+		       required_ver / 10.0, required_ext);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 }
 
@@ -258,7 +264,6 @@ test(void)
 		type = GL_FRAGMENT_SHADER;
 	else if (strcmp(filename + strlen(filename) - 4, "vert") == 0)
 		type = GL_VERTEX_SHADER;
-#ifdef PIGLIT_USE_OPENGL
 	else if (strcmp(filename + strlen(filename) - 4, "tesc") == 0)
 		type = GL_TESS_CONTROL_SHADER;
 	else if (strcmp(filename + strlen(filename) - 4, "tese") == 0)
@@ -267,7 +272,6 @@ test(void)
 		type = GL_GEOMETRY_SHADER;
 	else if (strcmp(filename + strlen(filename) - 4, "comp") == 0)
 		type = GL_COMPUTE_SHADER;
-#endif
 	else {
 		type = GL_NONE;
 		fprintf(stderr, "Couldn't determine type of program %s\n",
@@ -279,21 +283,12 @@ test(void)
 	piglit_require_fragment_shader();
 
 	if (type == GL_TESS_CONTROL_SHADER || type == GL_TESS_EVALUATION_SHADER) {
-		if (!piglit_is_extension_supported("GL_ARB_tessellation_shader") &&
-		    (piglit_is_gles() || piglit_get_gl_version() < 40)) {
-			printf("Test requires GL version 4.0 or "
-			       "GL_ARB_tessellation_shader\n");
-			piglit_report_result(PIGLIT_SKIP);
-		}
+		require_feature(40, "GL_ARB_tessellation_shader",
+				32, "GL_OES_tessellation_shader");
 	}
 
 	if (type == GL_COMPUTE_SHADER) {
-		if (!piglit_is_extension_supported("GL_ARB_compute_shader") &&
-		    (piglit_is_gles() || piglit_get_gl_version() < 43)) {
-			printf("Test requires GL version 4.3 or "
-			       "GL_ARB_compute_shader\n");
-			piglit_report_result(PIGLIT_SKIP);
-		}
+		require_feature(43, "GL_ARB_compute_shader", 31, NULL);
 	}
 
 	prog_string = piglit_load_text_file(filename, NULL);
