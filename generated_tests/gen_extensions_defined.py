@@ -71,7 +71,7 @@ EXTENSIONS = [
     ("GL_ARB_shader_texture_lod", "110"),
     ("GL_AMD_conservative_depth", "110"),
     ("GL_ARB_conservative_depth", "110"),
-    ("GL_ARB_shader_bit_encodign", "110"),
+    ("GL_ARB_shader_bit_encoding", "110"),
     ("GL_ARB_shader_clock", "110"),
     ("GL_ARB_uniform_buffer_object", "110"),
     ("GL_ARB_texture_cube_map_array", "110"),
