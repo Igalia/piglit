@@ -49,7 +49,7 @@ void main(void)
 [test]
 clear color 0.0 1.0 0.0 1.0
 clear
-draw rect -1 -1 2 2
+draw rect -1 -1 1 1
 
 relative probe rgba (0.100, 0.100) (0.0, 1.0, 1.0, 1.0)
 relative probe rgba (0.900, 0.900) (0.0, 1.0, 0.0, 1.0)
