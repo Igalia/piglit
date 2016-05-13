@@ -25,7 +25,7 @@ out float gl_CullDistance[6];
 
 void main()
 {
-  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  gl_Position = gl_Vertex;
 
   // Set each value of gl_CullDistance to a linear transformation of
   // gl_Vertex.
@@ -65,8 +65,6 @@ void main()
 }
 
 [test]
-ortho 0 1 0 1
-
 uniform vec4 transform[0]  1.0  1.0 0.0 0.0 # cullDistance[0] = x + y
 uniform vec4 transform[1]  1.0  2.0 0.0 0.0 # cullDistance[1] = x + 2*y
 uniform vec4 transform[2]  2.0  1.0 0.0 0.0 # cullDistance[2] = 2*x + y
