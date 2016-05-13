@@ -4085,6 +4085,9 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_cull_distance')) as g:
     g(['arb_cull_distance-max-distances'])
+    g(['arb_cull_distance-exceed-limits', 'cull'])
+    g(['arb_cull_distance-exceed-limits', 'clip'])
+    g(['arb_cull_distance-exceed-limits', 'total'])
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_half_float_vertex')) as g:

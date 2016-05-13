@@ -1,0 +1,35 @@
+# Cull triangle 0 with cull distance 0, cull triangle 1 with cull distance 1
+
+[require]
+GLSL >= 1.30
+GL_ARB_cull_distance
+
+[vertex shader]
+#version 130
+#extension GL_ARB_cull_distance: enable
+
+out float gl_CullDistance[2];
+
+void main(void)
+{
+	gl_Position = gl_Vertex;
+
+	gl_CullDistance[0] = gl_VertexID - 3;
+	gl_CullDistance[1] = 0.5 - gl_VertexID;
+}
+
+[fragment shader]
+#version 130
+
+void main(void)
+{
+	gl_FragColor = vec4(0, 0, 1, 1);
+}
+
+[test]
+clear color 0.0 1.0 0.0 1.0
+clear
+draw rect -1 -1 2 2
+
+# Both triangles culled, all should be green.
+probe all rgba 0.0 1.0 0.0 1.0

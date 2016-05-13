@@ -10,4 +10,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_cull_distance-max-distances max-distances.c)
-
+piglit_add_executable (arb_cull_distance-exceed-limits exceed-limits.c)
