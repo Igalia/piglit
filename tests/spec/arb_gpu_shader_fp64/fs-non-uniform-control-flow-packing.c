@@ -76,8 +76,8 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint u0, u1;
-	uint d0[2] = {0x0, 0x40000000};
-	uint d1[2] = {0x0, 0x3FF00000};
+	unsigned int d0[2] = {0x0, 0x40000000};
+	unsigned int d1[2] = {0x0, 0x3FF00000};
 
 	piglit_require_extension("GL_ARB_gpu_shader_fp64");
 
