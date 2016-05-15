@@ -130,7 +130,7 @@ buffer_test(piglit_cl_context *ctx,
 
 	printf("Running the kernel...\n");
 	if (!piglit_cl_enqueue_ND_range_kernel(context->command_queues[0],
-					kernel, 1, &global, &local)) {
+					kernel, 1, NULL, &global, &local)) {
 		ret = PIGLIT_FAIL;
 		goto cleanup;
 	}

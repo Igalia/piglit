@@ -514,7 +514,7 @@ piglit_cl_test(const int argc,
 	piglit_cl_set_kernel_buffer_arg(env->kernel, 23, &buffer);
 
 	piglit_cl_execute_ND_range_kernel(env->context->command_queues[0],
-					env->kernel, 1,
+					env->kernel, 1, NULL,
 					&global_size, &local_size);
 	piglit_cl_read_whole_buffer(env->context->command_queues[0], buffer, data);
 

@@ -116,6 +116,7 @@ piglit_cl_test(const int argc,
 		piglit_cl_execute_ND_range_kernel(env->context->command_queues[0],
 		                                  env->kernel,
 		                                  i+1,
+		                                  NULL,
 		                                  global_size,
 		                                  global_size);
 

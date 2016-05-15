@@ -279,7 +279,9 @@ bool     expect_test_fail = false;
 cl_uint  work_dimensions = 1;
 size_t   global_work_size[3] = {1, 1, 1};
 size_t   local_work_size[3] = {1, 1, 1};
+size_t   global_offset[3] = {0, 0, 0};
 bool     local_work_size_null = false;
+bool     global_offset_null = true;
 
 /* Helper functions */
 
@@ -384,6 +386,8 @@ struct test {
 	size_t global_work_size[3];
 	size_t local_work_size[3];
 	bool local_work_size_null;
+	size_t global_offset[3];
+	bool global_offset_null;
 
 	bool expect_test_fail;
 
@@ -407,6 +411,7 @@ struct test create_test()
 		//.global_work_size = global_work_size,
 		//.local_work_size = local_work_size,
 		.local_work_size_null = local_work_size_null,
+		.global_offset_null = global_offset_null,
 
 		.expect_test_fail = expect_test_fail,
 
@@ -419,6 +424,7 @@ struct test create_test()
 
 	memcpy(t.global_work_size, global_work_size, sizeof(global_work_size));
 	memcpy(t.local_work_size, local_work_size, sizeof(local_work_size));
+	memcpy(t.global_offset, global_offset, sizeof(global_offset));
 
 	return t;
 }
@@ -1736,6 +1742,19 @@ parse_config(const char* config_str,
 					} else {
 						local_work_size_null = true;
 					}
+				} else if(regex_match(key, "^global_offset$")) {
+					if(!regex_match(value, REGEX_FULL_MATCH(REGEX_NULL))) {
+						int i;
+						uint64_t* int_global_offset;
+						get_uint_array(value, &int_global_offset, 3);
+						for(i = 0; i < 3; i++) {
+							global_offset[i] = int_global_offset[i];
+						}
+						global_offset_null = false;
+						free(int_global_offset);
+					} else {
+						global_offset_null = true;
+					}
 				} else {
 					fprintf(stderr,
 					        "Invalid configuration, key '%s' does not belong to a [config] section: %s\n",
@@ -1777,6 +1796,19 @@ parse_config(const char* config_str,
 						free(int_local_work_size);
 					} else {
 						test->local_work_size_null = true;
+					}
+				} else if(regex_match(key, "^global_offset$")) {
+					if(!regex_match(value, REGEX_FULL_MATCH(REGEX_NULL))) {
+						int i;
+						uint64_t* int_global_offset;
+						get_uint_array(value, &int_global_offset, 3);
+						for(i = 0; i < 3; i++) {
+							test->global_offset[i] = int_global_offset[i];
+						}
+						test->global_offset_null = false;
+						free(int_global_offset);
+					} else {
+						test->global_offset_null = true;
 					}
 				} else if(regex_match(key, "^arg_in$")) {
 					get_test_arg(value, test, true);
@@ -2396,6 +2428,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	if(!piglit_cl_execute_ND_range_kernel(env->context->command_queues[0],
 	                                      kernel,
 	                                      test.work_dimensions,
+	                                      test.global_offset_null ? NULL : test.global_offset,
 	                                      test.global_work_size,
 	                                      test.local_work_size_null ? NULL : test.local_work_size)) {
 		printf("Failed to enqueue the kernel\n");

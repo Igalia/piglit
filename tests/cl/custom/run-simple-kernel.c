@@ -61,7 +61,7 @@ piglit_cl_test(const int argc,
 	                       sizeof(cl_int), &data);
 	piglit_cl_set_kernel_buffer_arg(kernel, 0, &buffer);
 	piglit_cl_execute_ND_range_kernel(context->command_queues[0], kernel, 1,
-	                                  &global_size, &local_size);
+	                                  NULL, &global_size, &local_size);
 
 	/* Read the buffer and check the result */
 	piglit_cl_read_buffer(context->command_queues[0], buffer, 0,

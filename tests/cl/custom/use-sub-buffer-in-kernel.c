@@ -98,8 +98,8 @@ piglit_cl_test(const int argc,
 		return PIGLIT_FAIL;
 	}
 
-	if (!piglit_cl_enqueue_ND_range_kernel(queue, kernel, 1, &global_size,
-						&local_size)) {
+	if (!piglit_cl_enqueue_ND_range_kernel(queue, kernel, 1, NULL,
+	                                       &global_size, &local_size)) {
 		return PIGLIT_FAIL;
 	}
 	clFinish(queue);
