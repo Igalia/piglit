@@ -886,6 +886,7 @@ with profile.group_manager(
     g(['geterror-inside-begin'], run_concurrent=False)
     g(['glinfo'])
     g(['gl-1.1-xor'])
+    g(['gl-1.1-xor-copypixels'])
     g(['hiz'], run_concurrent=False)
     g(['infinite-spot-light'], run_concurrent=False)
     g(['line-aa-width'], run_concurrent=False)
