@@ -206,6 +206,11 @@ def shader_runner_format(values):
 
     return retval
 
+def drop_signbit(xs):
+    if (np.isscalar(xs)):
+        return xs.dtype.type(0.0) if xs == 0.0 else xs
+    return np.array([xs.dtype.type(0.0) if x == 0.0 else x for x in xs],
+                    xs.dtype)
 
 def main():
     """ Main function """
@@ -225,7 +230,8 @@ def main():
             complex_tol_type = signature.rettype
             for test_vector in test_vectors:
                 tolerance = _gen_tolerance(signature.name, signature.rettype, test_vector.arguments)
-                refined_test_vectors.append(TestVector(test_vector.arguments, test_vector.result, tolerance))
+                result = drop_signbit(test_vector.result)
+                refined_test_vectors.append(TestVector(test_vector.arguments, result, tolerance))
             # Then generate the shader_test scripts
             for shader_stage in ('vs', 'fs', 'gs'):
                 template = template_file('gen_shader_precision_tests', '{0}.mako'.format(shader_stage))

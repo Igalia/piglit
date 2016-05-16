@@ -33,7 +33,7 @@ void main()
     ## build an array of bit-level representations of the floating point results calculated above
     ##
   int resultbits[${num_elements}] = int[${num_elements}](\
-${', '.join('floatBitsToInt(result{0})'.format(i) for i in indexers)}\
+${', '.join('result{0} == 0.0 ? 0x0 : floatBitsToInt(result{0})'.format(i) for i in indexers)}\
 );
     ##
     ## build an array of bit-level representations of the passed-in floating point expected results
@@ -85,7 +85,7 @@ max(ulps${indexers[len(indexers)-2]}, ulps${indexers[len(indexers)-1]})\
     ##
     ## if there is only a single result value generated, compare it directly
     ##
-  int resultbits = floatBitsToInt(result);
+  int resultbits = result == 0.0 ? 0x0 : floatBitsToInt(result);
   int expectedbits = floatBitsToInt(expected);
   bool signerr = resultbits>>31 != expectedbits>>31;
   float ulps = abs(resultbits - expectedbits);
