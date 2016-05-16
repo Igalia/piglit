@@ -119,7 +119,8 @@ static cl_program create_binary_program(const piglit_cl_context ctx)
 
 	binary_program = clCreateProgramWithBinary (cl_ctx, ctx->num_devices,
 						      ctx->device_ids,
-						      sizes, binaries,
+						      sizes,
+						      (const unsigned char **) binaries,
 						      NULL,
 						      &errNo);
 
