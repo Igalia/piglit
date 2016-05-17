@@ -4674,6 +4674,7 @@ with profile.group_manager(
         grouptools.join('spec', 'arb_vertex_attrib_64bit')) as g:
     g(['arb_vertex_attrib_64bit-double_attribs'], 'double_attribs')
     g(['arb_vertex_attrib_64bit-check-explicit-location'], 'check-explicit-location')
+    g(['arb_vertex_attrib_64bit-getactiveattrib'], 'getactiveattrib')
 
 with profile.group_manager(
         PiglitGLTest,
