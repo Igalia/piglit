@@ -3306,7 +3306,8 @@ piglit_init(int argc, char **argv)
 	    piglit_is_extension_supported("GL_ARB_vertex_shader"))
 		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
 			      &gl_max_vertex_uniform_components);
-	if (piglit_get_gl_version() >= 30 ||
+	if (piglit_get_gl_version() >= 20 ||
+	    piglit_is_extension_supported("GL_ARB_vertex_shader") ||
 	    piglit_is_extension_supported("GL_ARB_geometry_shader4") ||
 	    piglit_is_extension_supported("GL_EXT_geometry_shader4"))
 		glGetIntegerv(GL_MAX_VARYING_COMPONENTS,
