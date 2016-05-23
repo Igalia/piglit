@@ -85,13 +85,23 @@ testB
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
 
-[cts]
-; path to the cts executable
-; can be overwritten by PIGLIT_CTS_BIN environment variable
+[cts_gles]
+; path to the cts opengles executable
+; can be overwritten by PIGLIT_CTS_GLES_BIN environment variable
 ;bin=/home/knuth/cts/cts/glcts
 
 ; Space-separated list of extra command line arguments for cts. The
-; option is not required. The environment variable PIGLIT_CTS_EXTRA_ARGS
+; option is not required. The environment variable PIGLIT_CTS_GLES_EXTRA_ARGS
+; overrides the value set here.
+;extra_args=--deqp-visibility hidden
+
+[cts_gl]
+; path to the cts opengl executable
+; can be overwritten by PIGLIT_CTS_GL_BIN environment variable
+;bin=/home/knuth/cts/cts/glcts
+
+; Space-separated list of extra command line arguments for cts. The
+; option is not required. The environment variable PIGLIT_CTS_GL_EXTRA_ARGS
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
 

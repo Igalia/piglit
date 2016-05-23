@@ -25,20 +25,20 @@ desiring to run only a subset of them should consider using the -t or -x
 options to include or exclude tests.
 
 For example:
-./piglit run cts -c foo -t ES3- would run only ES3 tests (note the dash to
+./piglit run cts_gles -c foo -t ES3- would run only ES3 tests (note the dash to
 exclude ES31 tests)
 
 This integration requires some configuration in piglit.conf, or the use of
 environment variables.
 
 In piglit.conf one should set the following:
-[cts]:bin -- Path to the glcts binary
-[cts]:extra_args -- any extra arguments to be passed to cts (optional)
+[cts_gles]:bin -- Path to the glcts binary
+[cts_gles]:extra_args -- any extra arguments to be passed to cts (optional)
 
 Alternatively (or in addition, since environment variables have precedence),
 one could set:
-PIGLIT_CTS_BIN -- environment equivalent of [cts]:bin
-PIGLIT_CTS_EXTRA_ARGS -- environment equivalent of [cts]:extra_args
+PIGLIT_CTS_GLES_BIN -- environment equivalent of [cts_gles]:bin
+PIGLIT_CTS_GLES_EXTRA_ARGS -- environment equivalent of [cts_gles]:extra_args
 
 """
 
@@ -51,9 +51,9 @@ from framework.test import deqp
 
 __all__ = ['profile']
 
-_CTS_BIN = deqp.get_option('PIGLIT_CTS_BIN', ('cts', 'bin'))
+_CTS_BIN = deqp.get_option('PIGLIT_CTS_GLES_BIN', ('cts_gles', 'bin'))
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_CTS_EXTRA_ARGS', ('cts', 'extra_args'),
+_EXTRA_ARGS = deqp.get_option('PIGLIT_CTS_GLES_EXTRA_ARGS', ('cts_gles', 'extra_args'),
                               default='').split()
 
 
