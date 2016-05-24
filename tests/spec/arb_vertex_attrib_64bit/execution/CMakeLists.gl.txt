@@ -17,3 +17,4 @@ piglit_add_executable (arb_vertex_attrib_64bit-overlapping-locations overlapping
 piglit_add_executable (arb_vertex_attrib_64bit-using-transform-feedback using-transform-feedback.c)
 piglit_add_executable (arb_vertex_attrib_64bit-using-transform-feedback-with-dmat using-transform-feedback-with-dmat.c)
 piglit_add_executable (arb_vertex_attrib_64bit-using-transform-feedback-with-mat using-transform-feedback-with-mat.c)
+piglit_add_executable (arb_vertex_attrib_64bit-using-transform-feedback-with-int using-transform-feedback-with-int.c)
