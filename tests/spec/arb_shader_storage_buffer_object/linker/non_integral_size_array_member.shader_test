@@ -1,0 +1,35 @@
+# From ARB_program_interface_query spec:
+#
+#    "For the property of BUFFER_DATA_SIZE, then the implementation-dependent
+#    minimum total buffer object size, in basic machine units, required to
+#    hold all active variables associated with an active uniform block, shader
+#    storage block, or atomic counter buffer is written to <params>.  If the
+#    final member of an active shader storage block is array with no declared
+#    size, the minimum buffer size is computed assuming the array was declared
+#    as an array with one element."
+
+[require]
+GLSL >= 1.50
+GL_ARB_shader_storage_buffer_object
+
+[vertex shader]
+#version 150
+#extension GL_ARB_shader_storage_buffer_object: require
+
+buffer a {
+	vec4 s[];
+	vec4 a[];
+} b;
+
+uniform int f;
+in vec4 piglit_vertex;
+out vec4 c;
+
+void main(void) {
+	c = b.s[f];
+
+	gl_Position = piglit_vertex;
+}
+
+[test]
+link error
