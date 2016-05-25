@@ -110,6 +110,11 @@ piglit_display(void)
 	if (res != PIGLIT_PASS)
 		return res;
 
+	/* Lower tolerance in case we're running against a 565 render
+	 * target (gbm).
+	 */
+	piglit_set_tolerance_for_bits(5, 6, 5, 8);
+
 	return piglit_probe_image_ubyte(0, 0, 4, 4, GL_RGBA, expected) ?
 			PIGLIT_PASS : PIGLIT_FAIL;
 }
