@@ -208,15 +208,15 @@ static const char *st_r_tess_uniform_block[] = {"tcs_uniform_block",
 						"tes_uniform_block", NULL};
 static const char *st_r_cs_uniform_block[] = {"cs_uniform_block", NULL};
 static const char *st_r_in_vs[] = {"vs_input0", "vs_input1", NULL};
-static const char *st_r_in_gs[] = {"gs_input", "gl_PerVertex.gl_Position", NULL};
+static const char *st_r_in_gs[] = {"gs_input[0]", "gl_PerVertex.gl_Position", NULL};
 static const char *st_r_in_fs[] = {"fs_input1", NULL};
-static const char *st_r_in_tes[] = {"tes_input", "gl_PerVertex.gl_Position", NULL};
-static const char *st_r_in_tcs[] = {"tcs_input", "gl_PerVertex.gl_Position", NULL};
+static const char *st_r_in_tes[] = {"tes_input[0]", "gl_PerVertex.gl_Position", NULL};
+static const char *st_r_in_tcs[] = {"tcs_input[0]", "gl_PerVertex.gl_Position", NULL};
 static const char *st_r_out_vs[] = {"gl_Position", NULL};
 static const char *st_r_out_gs[] = {"gs_output0", "gl_Position", NULL};
 static const char *st_r_out_fs[] = {"fs_output0", "fs_output1", NULL};
 static const char *st_r_out_tes[] = {"tes_output[0]", "gl_Position", NULL};
-static const char *st_r_out_tcs[] = {"tcs_output", "tcs_patch",
+static const char *st_r_out_tcs[] = {"tcs_output[0]", "tcs_patch",
 				     "gl_PerVertex.gl_Position",
 				     "gl_PerVertex.gl_BackColor",
 				     "gl_PerVertex.gl_BackSecondaryColor",
