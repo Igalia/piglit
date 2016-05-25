@@ -1792,7 +1792,9 @@ piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
 			const GLubyte *probe = &pixels[(j * w + i) * c];
 
 			for (p = 0; p < c; ++p) {
-				if (probe[p] == expected[p])
+
+				const int tolerance = ceil(piglit_tolerance[p] * 255);
+				if (abs((int)probe[p] - (int)expected[p]) < tolerance)
 					continue;
 
 				printf("Probe at (%i,%i)\n", x + i, y + j);
