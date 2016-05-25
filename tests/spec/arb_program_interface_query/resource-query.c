@@ -208,21 +208,28 @@ static const char *st_r_tess_uniform_block[] = {"tcs_uniform_block",
 						"tes_uniform_block", NULL};
 static const char *st_r_cs_uniform_block[] = {"cs_uniform_block", NULL};
 static const char *st_r_in_vs[] = {"vs_input0", "vs_input1", NULL};
-static const char *st_r_in_gs[] = {"gs_input", "gl_Position", NULL};
+static const char *st_r_in_gs[] = {"gs_input", "gl_PerVertex.gl_Position", NULL};
 static const char *st_r_in_fs[] = {"fs_input1", NULL};
-static const char *st_r_in_tes[] = {"tes_input", "gl_Position", NULL};
-static const char *st_r_in_tcs[] = {"tcs_input", "gl_Position", NULL};
+static const char *st_r_in_tes[] = {"tes_input", "gl_PerVertex.gl_Position", NULL};
+static const char *st_r_in_tcs[] = {"tcs_input", "gl_PerVertex.gl_Position", NULL};
 static const char *st_r_out_vs[] = {"gl_Position", NULL};
 static const char *st_r_out_gs[] = {"gs_output0", "gl_Position", NULL};
 static const char *st_r_out_fs[] = {"fs_output0", "fs_output1", NULL};
 static const char *st_r_out_tes[] = {"tes_output[0]", "gl_Position", NULL};
-static const char *st_r_out_tcs[] = {"tcs_output", "tcs_patch", "gl_Position",
-				     "gl_BackColor", "gl_BackSecondaryColor",
-				     "gl_ClipDistance[0]", "gl_CullDistance[0]",
-				     "gl_FogFragCoord", "gl_FrontColor",
-				     "gl_FrontSecondaryColor", "gl_Layer",
-				     "gl_PointSize", "gl_TexCoord[0]",
-				     "gl_ViewportIndex", "gl_ViewportMask[0]",
+static const char *st_r_out_tcs[] = {"tcs_output", "tcs_patch",
+				     "gl_PerVertex.gl_Position",
+				     "gl_PerVertex.gl_BackColor",
+				     "gl_PerVertex.gl_BackSecondaryColor",
+				     "gl_PerVertex.gl_ClipDistance[0]",
+				     "gl_PerVertex.gl_CullDistance[0]",
+				     "gl_PerVertex.gl_FogFragCoord",
+				     "gl_PerVertex.gl_FrontColor",
+				     "gl_PerVertex.gl_FrontSecondaryColor",
+				     "gl_PerVertex.gl_Layer",
+				     "gl_PerVertex.gl_PointSize",
+				     "gl_PerVertex.gl_TexCoord[0]",
+				     "gl_PerVertex.gl_ViewportIndex",
+				     "gl_PerVertex.gl_ViewportMask[0]",
 				     NULL};
 static const char *st_r_buffer[] = {"vs_buf_var", "gs_buf_var", "fs_buf_var",
 				    NULL};
@@ -361,15 +368,15 @@ static const struct subtest_t subtests[] = {
  ST( 2, 18, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_UNIFORM_BLOCK, "(tcs,tes)", st_r_tess_uniform_block),
  ST( 1, 17, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_UNIFORM_BLOCK, "(cs)", st_r_cs_uniform_block),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs)", st_r_in_vs),
- ST( 2, 12, -1, -1,    NULL,    NULL,    NULL,  gs_std,    NULL,   NULL, GL_PROGRAM_INPUT, "(gs)", st_r_in_gs),
+ ST( 2, 25, -1, -1,    NULL,    NULL,    NULL,  gs_std,    NULL,   NULL, GL_PROGRAM_INPUT, "(gs)", st_r_in_gs),
  ST( 1, 10, -1, -1,    NULL,    NULL,    NULL,    NULL,  fs_std,   NULL, GL_PROGRAM_INPUT, "(fs)", st_r_in_fs),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,    NULL,  fs_std,   NULL, GL_PROGRAM_INPUT, "(vs,fs)", st_r_in_vs),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,  gs_std,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs,gs)", st_r_in_vs),
- ST( 2, 12, -1, -1,    NULL,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_INPUT, "(gs,fs)", st_r_in_gs),
+ ST( 2, 25, -1, -1,    NULL,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_INPUT, "(gs,fs)", st_r_in_gs),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_INPUT, "(vs,gs,fs)", st_r_in_vs),
- ST( 2, 12, -1, -1,    NULL,    NULL, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tes)", st_r_in_tes),
- ST( 2, 12, -1, -1,    NULL, tcs_sub,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tcs)", st_r_in_tcs),
- ST( 2, 12, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tcs,tes)", st_r_in_tcs),
+ ST( 2, 25, -1, -1,    NULL,    NULL, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tes)", st_r_in_tes),
+ ST( 2, 25, -1, -1,    NULL, tcs_sub,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tcs)", st_r_in_tcs),
+ ST( 2, 25, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tcs,tes)", st_r_in_tcs),
  ST( 2, 10, -1, -1,  vs_std, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs,tcs,tes)", st_r_in_vs),
  ST( 0,  0, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_PROGRAM_INPUT, "(cs)", NULL),
  ST( 1, 12, -1, -1,  vs_std,    NULL,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(vs)", st_r_out_vs),
@@ -380,7 +387,7 @@ static const struct subtest_t subtests[] = {
  ST( 2, 11, -1, -1,    NULL,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_OUTPUT, "(gs,fs)", st_r_out_fs),
  ST( 2, 11, -1, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_OUTPUT, "(vs,gs,fs)", st_r_out_fs),
  ST( 2, 14, -1, -1,    NULL,    NULL, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tes)", st_r_out_tes),
- ST(15, 23, -1, -1,    NULL, tcs_sub,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs)", st_r_out_tcs),
+ ST(15, 36, -1, -1,    NULL, tcs_sub,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs)", st_r_out_tcs),
  ST( 2, 14, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs,tes)", st_r_out_tes),
  ST( 2, 12, -1, -1,    NULL, tcs_sub, tes_sub,  gs_std,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs,tes,gs)", st_r_out_gs),
  ST( 0,  0, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_PROGRAM_OUTPUT, "(cs)", st_r_cs_sub),
