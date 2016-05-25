@@ -71,10 +71,10 @@ const char* piglit_cl_get_error_name(cl_int error);
 
 
 #define PIGLIT_CL_DEFINE_ENUM_PROTOTYPE(type, name)    \
-        const unsigned int piglit_##name##_num_1_0;    \
-        const unsigned int piglit_##name##_num_1_1;    \
-        const unsigned int piglit_##name##_num_1_2;    \
-        const type* piglit_##name;
+        extern const unsigned int piglit_##name##_num_1_0;    \
+        extern const unsigned int piglit_##name##_num_1_1;    \
+        extern const unsigned int piglit_##name##_num_1_2;    \
+        extern const type* piglit_##name;
 
 #define PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(name)        \
         PIGLIT_CL_DEFINE_ENUM_PROTOTYPE(name, name)
