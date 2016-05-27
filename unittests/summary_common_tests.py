@@ -261,7 +261,7 @@ class TestNamesSubtests(object):
         nt.ok_(expected in source,
                msg='{} not found in {}'.format(expected, source))
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_gen_tests(self):
         """generate a bunch of different tests."""
         def test(attr):
@@ -321,7 +321,7 @@ class TestNamesSingle(object):
 
         cls.test = summary.Results([res])
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_compare_status(self):
         """Test statuses that require comparisons.
 
@@ -335,7 +335,7 @@ class TestNamesSingle(object):
                                 'returns empty set'.format(each))
             yield test, each
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_index_zero(self):
         """Test status that return the non-all value in index 0
 

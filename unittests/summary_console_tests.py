@@ -122,7 +122,7 @@ class Test_print_summary(object):
         cls.actual = get_stdout(
             lambda: console_._print_summary(reses)).split('\n')
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_values(self):
         """Generate a bunch of tests."""
         def test(value):

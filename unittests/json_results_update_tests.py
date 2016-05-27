@@ -44,11 +44,11 @@ from framework import backends, results
 
 
 def setup_module():
-    utils.set_compression('none')
+    utils.piglit.set_compression('none')
 
 
 def teardown_module():
-    utils.unset_compression()
+    utils.piglit.unset_compression()
 
 
 class TestV0toV1(object):
@@ -145,7 +145,7 @@ class TestV0toV1(object):
             },
         })
 
-        with utils.tempfile(json.dumps(cls.DATA)) as t:
+        with utils.nose.tempfile(json.dumps(cls.DATA)) as t:
             with open(t, 'r') as f:
                 cls.RESULT = backends.json._update_zero_to_one(backends.json._load(f))
 
@@ -226,7 +226,7 @@ class TestV0toV1(object):
         """backends.json.update_results (0 -> 1): Correctly handle new single entry subtests correctly"""
         nt.ok_('group3/groupA/test' in six.iterkeys(self.RESULT.tests))
 
-    @utils.test_in_tempdir
+    @utils.nose.test_in_tempdir
     def _load_with_update(self, data=None):
         """If the file is not results.json, it will be renamed.
 
@@ -269,15 +269,15 @@ class TestV0toV1(object):
         data['tests']['sometest']['info'] = \
             'Returncode: 1\n\nErrors:stderr\n\nOutput: stdout\n\nmore\n\nstuff'
 
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 backends.json._update_zero_to_one(backends.json._load(f))
 
-    @utils.DocFormatter({'current': backends.json.CURRENT_JSON_VERSION})
+    @utils.nose.DocFormatter({'current': backends.json.CURRENT_JSON_VERSION})
     def test_load_results(self):
         """backends.json.update_results (1 -> {current}): load_results properly updates"""
-        with utils.tempdir() as d:
+        with utils.nose.tempdir() as d:
             tempfile = os.path.join(d, 'results.json')
             with open(tempfile, 'w') as f:
                 json.dump(self.DATA, f, default=backends.json.piglit_encoder)
@@ -326,7 +326,7 @@ class TestV2Update(object):
             }
         }
 
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_one_to_two(
@@ -394,7 +394,7 @@ class TestV2NoUpdate(object):
             }
         }
 
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_one_to_two(
@@ -471,7 +471,7 @@ class TestV2toV3(object):
             }
         }
 
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 # pylint: disable=protected-access
@@ -537,7 +537,7 @@ class TestV3toV4(object):
     @staticmethod
     def _make_result(data):
         """Write data to a file and return a result.TestrunResult object."""
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(data, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 # pylint: disable=protected-access
@@ -571,7 +571,7 @@ class TestV3toV4(object):
         for new in self.new:
             nt.assert_dict_equal(self.result.tests[new], self.TEST_DATA)
 
-    @utils.not_raises(KeyError)
+    @utils.nose.not_raises(KeyError)
     def test_missing(self):
         """backends.json.update_results (3 -> 4): updates successfully when tests to rename are not present"""
         data = copy.copy(self.DATA)
@@ -627,7 +627,7 @@ class TestV4toV5(object):
             "has@windows",
         ]
 
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_four_to_five(backends.json._load(f))
@@ -692,7 +692,7 @@ class TestV5toV6(object):
     @classmethod
     def setup_class(cls):
         """Class setup. Create a TestrunResult with v4 data."""
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_five_to_six(backends.json._load(f))
@@ -735,7 +735,7 @@ class TestV6toV7(object):
     @classmethod
     def setup_class(cls):
         """Class setup. Create a TestrunResult with v4 data."""
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_six_to_seven(backends.json._load(f))
@@ -784,7 +784,7 @@ class TestV7toV8(object):
         cls.DATA['tests']['a@test'] = cls.DATA['tests']['a@test'].to_json()
         cls.DATA['tests']['a@test']['time'] = 1.2
 
-        with utils.tempfile(
+        with utils.nose.tempfile(
                 json.dumps(cls.DATA, default=backends.json.piglit_encoder)) as t:
             with open(t, 'r') as f:
                 cls.result = backends.json._update_seven_to_eight(

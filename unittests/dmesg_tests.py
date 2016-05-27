@@ -170,7 +170,7 @@ def test_update_result_regex_match():
     nt.assert_not_equal(result.result, 'pass')
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_update_result_specific():
     """Generator that tests specific result mappings."""
     dmesg_ = TestDmesg()
@@ -191,7 +191,7 @@ def test_update_result_specific():
         yield test, initial, expected
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_linuxdmesg_gzip_errors():
     """Generator to test exceptions that need to be passed when reading
     config.gz.
@@ -280,7 +280,7 @@ def test_dummydmesg_update_result():
     nt.eq_(result.result, mock.sentinel.result)
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_get_dmesg():
     """Generate tests for get_dmesg."""
     tests = [

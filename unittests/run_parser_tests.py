@@ -131,7 +131,7 @@ class TestBackend(_Helpers):
 
     def test_option_conf(self):
         """ Run parser: backend option replaces conf """
-        with utils.tempdir() as tdir:
+        with utils.nose.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write(self._CONF)
@@ -144,7 +144,7 @@ class TestBackend(_Helpers):
         self._unset_config()
         self._move_piglit_conf()
 
-        with utils.tempdir() as tdir:
+        with utils.nose.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write(self._CONF)
@@ -163,7 +163,7 @@ class TestBackend(_Helpers):
         # from this test.
         sys.stderr = open(os.devnull, 'w')
 
-        with utils.tempdir() as tdir:
+        with utils.nose.tempdir() as tdir:
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write('[core]\nbackend=foobar')
 
@@ -202,7 +202,7 @@ class TestPlatform(_Helpers):
 
     def test_option_conf(self):
         """ Run parser: platform option replaces conf """
-        with utils.tempdir() as tdir:
+        with utils.nose.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write(self._CONF)
@@ -223,7 +223,7 @@ class TestPlatform(_Helpers):
         self._unset_config()
         self._move_piglit_conf()
 
-        with utils.tempdir() as tdir:
+        with utils.nose.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write(self._CONF)
@@ -237,7 +237,7 @@ class TestPlatform(_Helpers):
         self._move_piglit_conf()
         self.__set_env()
 
-        with utils.tempdir() as tdir:
+        with utils.nose.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write(self._CONF)
@@ -256,7 +256,7 @@ class TestPlatform(_Helpers):
         # from this test.
         sys.stderr = open(os.devnull, 'w')
 
-        with utils.tempdir() as tdir:
+        with utils.nose.tempdir() as tdir:
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write('[core]\nplatform=foobar')
 

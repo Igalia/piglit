@@ -58,7 +58,7 @@ class TestMonitoring(object):
     def test_Monitoring_delete_rule(self):
         """monitorin.Monitoring: add and delete rule."""
 
-        with utils.tempfile(self.init_contents) as tfile:
+        with utils.nose.tempfile(self.init_contents) as tfile:
             self.monitoring.add_rule('error_file',
                                      'file',
                                      tfile,
@@ -77,7 +77,7 @@ class TestMonitoring(object):
     def test_Monitoring_add_rule_bad_format(self):
         """monitoring.Monitoring: add non existing type rule."""
 
-        with utils.tempfile(self.init_contents) as tfile:
+        with utils.nose.tempfile(self.init_contents) as tfile:
             self.monitoring.add_rule('error_file_bad_type',
                                      'bad_type',
                                      tfile,
@@ -86,7 +86,7 @@ class TestMonitoring(object):
     def test_Monitoring_file_error(self):
         """monitoring.Monitoring: error found on a file."""
 
-        with utils.tempfile(self.init_contents) as tfile:
+        with utils.nose.tempfile(self.init_contents) as tfile:
             self.monitoring.add_rule('error_file',
                                      'file',
                                      tfile,
@@ -103,7 +103,7 @@ class TestMonitoring(object):
     def test_Monitoring_file_no_error(self):
         """monitoring.Monitoring: no error found on a file."""
 
-        with utils.tempfile(self.init_contents) as tfile:
+        with utils.nose.tempfile(self.init_contents) as tfile:
             self.monitoring.add_rule('no_error_file',
                                      'file',
                                      tfile,
@@ -120,7 +120,7 @@ class TestMonitoring(object):
     def test_Monitoring_locked_file_error(self):
         """monitoring.Monitoring: error found on a locked file."""
 
-        with utils.tempfile(self.init_contents) as tfile:
+        with utils.nose.tempfile(self.init_contents) as tfile:
             self.monitoring.add_rule('error_locked_file',
                                      'locked_file',
                                      tfile,
@@ -137,7 +137,7 @@ class TestMonitoring(object):
     def test_Monitoring_locked_file_no_error(self):
         """monitoring.Monitoring: no error found on a locked file."""
 
-        with utils.tempfile(self.init_contents) as tfile:
+        with utils.nose.tempfile(self.init_contents) as tfile:
             self.monitoring.add_rule('no_error_file',
                                      'locked_file',
                                      tfile,
@@ -154,7 +154,7 @@ class TestMonitoring(object):
     def test_Monitoring_dmesg_error(self):
         """monitoring.Monitoring: error found on the dmesg."""
 
-        utils.platform_check('linux')
+        utils.nose.platform_check('linux')
 
         mock_out = mock.Mock(return_value=b'[1.0]This\n[2.0]is\n[3.0]dmesg')
         with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
@@ -173,7 +173,7 @@ class TestMonitoring(object):
     def test_Monitoring_dmesg_no_error(self):
         """monitoring.Monitoring: no error found on the dmesg."""
 
-        utils.platform_check('linux')
+        utils.nose.platform_check('linux')
 
         mock_out = mock.Mock(return_value=b'[1.0]This\n[2.0]is\n[3.0]dmesg')
         with mock.patch('framework.dmesg.subprocess.check_output', mock_out):

@@ -69,11 +69,11 @@ def discover_generators():
     return contents
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_generators():
     """Generate tests for the various generators."""
 
-    @utils.test_in_tempdir
+    @utils.nose.test_in_tempdir
     def test(name):
         """Tester function."""
         msg = ''
@@ -87,7 +87,7 @@ def test_generators():
         if proc.returncode != 0:
             err = err.decode('utf-8')
 
-            raise utils.TestFailure(
+            raise utils.nose.TestFailure(
                 "failed with message:\n {}".format(err))
 
     description = 'generator: {} runs successfully'

@@ -60,7 +60,7 @@ def test_make_profile(mock_temp):
            msg='{} not in {}'.format(name, profile.test_list.keys()))
 
 
-@utils.not_raises(ValueError)
+@utils.nose.not_raises(ValueError)
 @mock.patch.object(oglconform.tempfile, 'NamedTemporaryFile')
 def test_make_profile_missing(mock_temp):
     """tests.oglconform._make_profile: handles missing groups"""
@@ -114,7 +114,7 @@ def test_oglctest_interpret_result_skip():
     nt.eq_(test.result.result, 'skip')
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_oglctest_interpret_result_skip_re():
     """Generate tests for various skip tests."""
     values = [

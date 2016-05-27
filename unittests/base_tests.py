@@ -35,7 +35,6 @@ except ImportError:
 import six
 import nose.tools as nt
 from nose.plugins.attrib import attr
-import six
 
 try:
     import psutil
@@ -78,7 +77,7 @@ class TimeoutTest(Test):
 def test_run_return_early():
     """ Test.run() exits early when Test._run_command() has exception """
     def helper():
-        raise utils.TestFailure("The test didn't return early")
+        raise utils.nose.TestFailure("The test didn't return early")
 
     # Of course, this won't work if you actually have a foobarcommand in your
     # path...
@@ -98,9 +97,9 @@ def test_timeout_kill_children():
     This test could leave processes running if it fails.
 
     """
-    utils.module_check('psutil')
+    utils.nose.module_check('psutil')
     if six.PY2:
-        utils.module_check('subprocess32')
+        utils.nose.module_check('subprocess32')
         import subprocess32 as subprocess  # pylint: disable=import-error
     elif six.PY3:
         import subprocess
@@ -169,7 +168,7 @@ def test_timeout_kill_children():
             for child in reversed(children):
                 child.kill()
 
-            raise utils.TestFailure(
+            raise utils.nose.TestFailure(
                 'Test process had children when it should not')
 
 
@@ -183,8 +182,8 @@ def test_timeout():
 
     """
     if six.PY2:
-        utils.module_check('subprocess32')
-    utils.binary_check('sleep', 1)
+        utils.nose.module_check('subprocess32')
+    utils.nose.binary_check('sleep', 1)
 
     test = TimeoutTest(['sleep', '60'])
     test.timeout = 1
@@ -196,8 +195,8 @@ def test_timeout():
 def test_timeout_timeout():
     """test.base.Test: Sets status to 'timeout' when timeout exceeded"""
     if six.PY2:
-        utils.module_check('subprocess32')
-    utils.binary_check('sleep', 1)
+        utils.nose.module_check('subprocess32')
+    utils.nose.binary_check('sleep', 1)
 
     test = TimeoutTest(['sleep', '60'])
     test.timeout = 1
@@ -210,8 +209,8 @@ def test_timeout_pass():
     """test.base.Test: Doesn't change status when timeout not exceeded
     """
     if six.PY2:
-        utils.module_check('subprocess32')
-    utils.binary_check('true')
+        utils.nose.module_check('subprocess32')
+    utils.nose.binary_check('true')
 
     test = TimeoutTest(['true'])
     test.timeout = 1
@@ -254,7 +253,7 @@ def test_run_command_early():
     """
     class Test_(Test):
         def interpret_result(self):
-            raise utils.TestFailure("The test didn't return early")
+            raise utils.nose.TestFailure("The test didn't return early")
 
         def _run_command(self):
             raise TestRunError('an error', 'skip')
@@ -299,7 +298,7 @@ def test_mutation():
 @mock.patch('framework.test.base.options.OPTIONS', new_callable=Options)
 def test_ValgrindMixin_command(mock_opts):
     """test.base.ValgrindMixin.command: overrides self.command"""
-    class _Test(ValgrindMixin, utils.Test):
+    class _Test(ValgrindMixin, utils.piglit.Test):
         pass
     mock_opts.valgrind = True
 
@@ -311,7 +310,7 @@ def test_ValgrindMixin_command(mock_opts):
 class TestValgrindMixinRun(object):
     @classmethod
     def setup_class(cls):
-        class _NoRunTest(utils.Test):
+        class _NoRunTest(utils.piglit.Test):
             def run(self):
                 self.interpret_result()
 
@@ -320,7 +319,7 @@ class TestValgrindMixinRun(object):
 
         cls.test = _Test
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_bad_valgrind_true(self):
         """Test non-pass status when options.OPTIONS.valgrind is True."""
         def test(status, expected):
@@ -341,7 +340,7 @@ class TestValgrindMixinRun(object):
             test.description = desc.format(status, 'skip')
             yield test, status, 'skip'
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_valgrind_false(self):
         """Test non-pass status when options.OPTIONS.valgrind is False."""
         def test(status):
@@ -403,10 +402,10 @@ def test_interpret_result_greater_zero():
 class TestExecuteTraceback(object):
     """Test.execute tests for Traceback handling."""
     @classmethod
-    @utils.capture_stderr  # The exception will be printed
+    @utils.nose.capture_stderr  # The exception will be printed
     def setup_class(cls):
         test = TestTest(['foo'])
-        test.run = mock.Mock(side_effect=utils.SentinalException)
+        test.run = mock.Mock(side_effect=utils.nose.SentinalException)
 
         test.execute(mock.Mock(spec=six.text_type),
                      mock.Mock(spec=log.BaseLog),

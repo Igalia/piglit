@@ -28,7 +28,7 @@ from . import utils
 from framework.test import OpenCVTest
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_initialize_opencvtest():
     """test.opencv.OpenCVTest: Class initializes"""
     OpenCVTest('test_prog', 'testname')

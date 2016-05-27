@@ -30,7 +30,7 @@ from . import utils
 from framework.test import GTest
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_initialize_gtest():
     """test.gtest.GTest: Class initializes"""
     GTest(['/bin/true'])

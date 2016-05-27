@@ -41,7 +41,7 @@ from .backends_tests import BACKEND_INITIAL_META
 
 JUNIT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema', 'junit-7.xsd')
 
-doc_formatter = utils.DocFormatter({'separator': grouptools.SEPARATOR})
+doc_formatter = utils.nose.DocFormatter({'separator': grouptools.SEPARATOR})
 
 _XML = """\
 <?xml version='1.0' encoding='utf-8'?>
@@ -62,14 +62,14 @@ time end: 4.5
 
 
 def setup_module():
-    utils.set_compression('none')
+    utils.piglit.set_compression('none')
 
 
 def teardown_module():
-    utils.unset_compression()
+    utils.piglit.unset_compression()
 
 
-class TestJunitNoTests(utils.StaticDirectory):
+class TestJunitNoTests(utils.nose.StaticDirectory):
     @classmethod
     def setup_class(cls):
         super(TestJunitNoTests, cls).setup_class()
@@ -78,7 +78,7 @@ class TestJunitNoTests(utils.StaticDirectory):
         test.finalize()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
 
-    @utils.no_error
+    @utils.nose.no_error
     def test_xml_well_formed(self):
         """backends.junit.JUnitBackend: initialize and finalize produce well formed xml
 
@@ -115,7 +115,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
 
     def test_xml_valid(self):
         """backends.junit.JUnitBackend.write_test(): (once) produces valid xml"""
-        utils.module_check('lxml')
+        utils.nose.module_check('lxml')
         schema = etree.XMLSchema(file=JUNIT_SCHEMA)
         with open(self.test_file, 'r') as f:
             nt.ok_(schema.validate(etree.parse(f)), msg='xml is not valid')
@@ -158,7 +158,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
 @doc_formatter
 def test_junit_replace():
     """backends.junit.JUnitBackend.write_test(): '{separator}' is replaced with '.'"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         result = results.TestResult()
         result.time.end = 1.2345
         result.result = 'pass'
@@ -178,10 +178,10 @@ def test_junit_replace():
                     'piglit.a.test.group')
 
 
-@utils.not_raises(etree.ParseError)
+@utils.nose.not_raises(etree.ParseError)
 def test_junit_skips_bad_tests():
     """backends.junit.JUnitBackend: skips illformed tests"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         result = results.TestResult()
         result.time.end = 1.2345
         result.result = 'pass'
@@ -199,7 +199,7 @@ def test_junit_skips_bad_tests():
         test.finalize()
 
 
-class TestJUnitLoad(utils.StaticDirectory):
+class TestJUnitLoad(utils.nose.StaticDirectory):
     """Methods that test loading JUnit results."""
     __instance = None
 
@@ -219,7 +219,7 @@ class TestJUnitLoad(utils.StaticDirectory):
             cls.__instance = backends.junit._load(cls.xml_file)
         return cls.__instance
 
-    @utils.no_error
+    @utils.nose.no_error
     def test_no_errors(self):
         """backends.junit._load: Raises no errors for valid junit."""
         self.xml()
@@ -284,12 +284,12 @@ class TestJUnitLoad(utils.StaticDirectory):
         nt.eq_(test, 1934)
 
 
-    @utils.no_error
+    @utils.nose.no_error
     def test_load_file(self):
         """backends.junit.load: Loads a file directly"""
         backends.junit.REGISTRY.load(self.xml_file, 'none')
 
-    @utils.no_error
+    @utils.nose.no_error
     def test_load_dir(self):
         """backends.junit.load: Loads a directory"""
         backends.junit.REGISTRY.load(self.tdir, 'none')
@@ -298,7 +298,7 @@ class TestJUnitLoad(utils.StaticDirectory):
 def test_load_file_name():
     """backends.junit._load: uses the filename for name if filename != 'results'
     """
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         filename = os.path.join(tdir, 'foobar.xml')
         with open(filename, 'w') as f:
             f.write(_XML)
@@ -309,7 +309,7 @@ def test_load_file_name():
 
 def test_load_folder_name():
     """backends.junit._load: uses the folder name if the result is 'results'"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         os.mkdir(os.path.join(tdir, 'a cool test'))
         filename = os.path.join(tdir, 'a cool test', 'results.xml')
         with open(filename, 'w') as f:
@@ -319,10 +319,10 @@ def test_load_folder_name():
     nt.assert_equal(test.name, 'a cool test')
 
 
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 def test_load_default_name():
     """backends.junit._load: uses 'junit result' for name as fallback"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         os.chdir(tdir)
 
         filename = 'results.xml'

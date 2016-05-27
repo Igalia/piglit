@@ -67,7 +67,7 @@ def _registry_teardown():
 # Tests
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_get_backend():
     """ Generate tests to get various backends """
     # We use a hand generated list here to ensure that we are getting what we
@@ -101,7 +101,7 @@ def test_get_backend_notimplemented():
 
 
 @nt.with_setup(teardown=_registry_teardown)
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 def test_load():
     """backends.load(): works as expected.
 
@@ -130,7 +130,7 @@ def test_load():
 
 
 @nt.raises(backends.BackendError)
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 def test_load_unknown():
     """backends.load(): An error is raised if no modules supportes `extension`
     """
@@ -141,9 +141,9 @@ def test_load_unknown():
     backends.load(file_path)
 
 
-@utils.no_error
+@utils.nose.no_error
 @nt.with_setup(_notimplemented_setup, _registry_teardown)
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 def test_load_resume():
     """backends.load: works for resuming (no extension known)."""
     backends.BACKENDS['test_backend'] = backends.register.Registry(
@@ -162,7 +162,7 @@ def test_load_resume():
 
 @nt.raises(backends.BackendNotImplementedError)
 @nt.with_setup(_notimplemented_setup, _registry_teardown)
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 def test_load_notimplemented():
     """backends.load(): An error is raised if a loader isn't properly implmented.
     """
@@ -204,7 +204,7 @@ def test_set_meta_notimplemented():
 
 @nt.with_setup(_notimplemented_setup, _registry_teardown)
 @nt.raises(backends.BackendNotImplementedError)
-@utils.not_raises(backends.BackendError)
+@utils.nose.not_raises(backends.BackendError)
 def test_load_trailing_dot():
     """framework.backends.load: handles the result name ending in '.'
 
@@ -217,7 +217,7 @@ def test_load_trailing_dot():
 
 
 @nt.with_setup(_notimplemented_setup, _registry_teardown)
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 @nt.raises(backends.BackendError)
 def test_load_old():
     """backends.load(): Ignores files ending in '.old'

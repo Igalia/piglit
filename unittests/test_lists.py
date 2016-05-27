@@ -37,7 +37,7 @@ from nose.plugins.skip import SkipTest
 from . import utils
 
 
-@utils.nose_generator
+@utils.nose.generator
 def gen_test_import():
     """ Generates a bunch of tests to import the various test modules """
     def check_import(module):

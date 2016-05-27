@@ -29,12 +29,12 @@ import nose.tools as nt
 import framework.grouptools as grouptools
 from . import utils
 
-doc_formatter = utils.DocFormatter({  # pylint: disable=invalid-name
+doc_formatter = utils.nose.DocFormatter({  # pylint: disable=invalid-name
     'separator': grouptools.SEPARATOR,
 })
 
 
-@utils.nose_generator
+@utils.nose.generator
 def generate_tests():
     """Generate tests for the groups tools module.
 

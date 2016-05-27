@@ -71,7 +71,7 @@ teardown = _setup.teardown
 
 def _check_config(content):
     """ This is the test that actually checks the glsl config section """
-    with utils.tempfile(content) as tfile:
+    with utils.nose.tempfile(content) as tfile:
         return glsl.GLSLParserTest(tfile), tfile
 
 
@@ -81,7 +81,7 @@ def test_no_config_start():
     content = ('// expect_result: pass\n'
                '// glsl_version: 1.10\n'
                '// [end config]\n')
-    with utils.tempfile(content) as tfile:
+    with utils.nose.tempfile(content) as tfile:
         with nt.assert_raises(glsl.GLSLParserNoConfigError) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
@@ -96,7 +96,7 @@ def test_find_config_start():
     content = ('// [config]\n'
                '// glsl_version: 1.10\n'
                '//\n')
-    with utils.tempfile(content) as tfile:
+    with utils.nose.tempfile(content) as tfile:
         glsl.GLSLParserTest(tfile)
 
 
@@ -104,7 +104,7 @@ def test_find_config_start():
 def test_no_config_end():
     """test.glsl_parser_test.GLSLParserTest: exception is raised if [end config] section is missing
     """
-    with utils.tempfile('// [config]\n') as tfile:
+    with utils.nose.tempfile('// [config]\n') as tfile:
         glsl.GLSLParserTest(tfile)
 
 
@@ -115,7 +115,7 @@ def test_no_expect_result():
     content = ('// [config]\n'
                '// glsl_version: 1.10\n'
                '//\n')
-    with utils.tempfile(content) as tfile:
+    with utils.nose.tempfile(content) as tfile:
         glsl.GLSLParserTest(tfile)
 
 
@@ -126,7 +126,7 @@ def test_no_glsl_version():
     content = ('// [config]\n'
                '// expect_result: pass\n'
                '// [end config]\n')
-    with utils.tempfile(content) as tfile:
+    with utils.nose.tempfile(content) as tfile:
         glsl.GLSLParserTest(tfile)
 
 
@@ -205,7 +205,7 @@ def test_glslparser_initializer():
          */
         """)
 
-    with utils.tempfile(content) as f:
+    with utils.nose.tempfile(content) as f:
         glsl.GLSLParserTest(f)
 
 
@@ -217,7 +217,7 @@ def check_config_to_command(config, result):
     nt.eq_(inst.command, result)
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_config_to_command():
     """ Generate tests that confirm the config file is correctly parsed """
     content = [
@@ -254,11 +254,11 @@ def test_bad_section_name():
                '// new_awesome_key: foo\n'
                '// [end config]\n')
 
-    with utils.tempfile(content) as tfile:
+    with utils.nose.tempfile(content) as tfile:
         glsl.GLSLParserTest(tfile)
 
 
-@utils.not_raises(exceptions.PiglitFatalError)
+@utils.nose.not_raises(exceptions.PiglitFatalError)
 def test_good_section_names():
     """test.glsl_parser_test.GLSLParserTest: A section name in the _CONFIG_KEYS does not raise an error"""
     content = ('// [config]\n'
@@ -271,14 +271,14 @@ def test_good_section_names():
     _check_config(content)
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_duplicate_entries():
     """ Generate tests for duplicate keys in the config block """
 
     @nt.raises(exceptions.PiglitFatalError)
     def check_no_duplicates(content):
         """ Ensure that duplicate entries raise an error """
-        with utils.tempfile(content) as tfile:
+        with utils.nose.tempfile(content) as tfile:
             glsl.GLSLParserTest(tfile)
 
 
@@ -298,7 +298,7 @@ def test_duplicate_entries():
         yield check_no_duplicates, test
 
 
-@utils.nose_generator
+@utils.nose.generator
 def glslparser_exetensions_seperators():
     """ GlslParserTest() can only have [A-Za-z_] as characters
 
@@ -327,18 +327,18 @@ def glslparser_exetensions_seperators():
 
     for name, value in problems:
         test = content.format(value)
-        with utils.tempfile(test) as tfile:
+        with utils.nose.tempfile(test) as tfile:
             check_bad_character.description = (
                 'test.glsl_parser_test.GLSLParserTest: require_extensions {0} '
                 'should raise an error'.format(name))
             yield check_bad_character, tfile
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_good_extensions():
     """ Generates tests with good extensions which shouldn't raise errors """
 
-    @utils.not_raises(exceptions.PiglitFatalError)
+    @utils.nose.not_raises(exceptions.PiglitFatalError)
     def check_good_extension(file_):
         """ A good extension should not raise a GLSLParserException """
         glsl.GLSLParserTest(file_)
@@ -360,15 +360,15 @@ def test_good_extensions():
             'test.glsl_parser_test.GLSLParserTest: '
             'require_extension {} is valid'.format(x))
 
-        with utils.tempfile(test) as tfile:
+        with utils.nose.tempfile(test) as tfile:
             yield check_good_extension, tfile
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_get_glslparsertest_gles2():
     """GLSLParserTest: gets gles2 binary if glsl is 1.00 or 3.00"""
     def test(content, expected):
-        with utils.tempfile(content) as f:
+        with utils.nose.tempfile(content) as f:
             t = glsl.GLSLParserTest(f)
             nt.eq_(os.path.basename(t.command[0]), expected)
 
@@ -485,12 +485,12 @@ def test_binary_skip():
          */
         """)
 
-    with utils.tempfile(content) as f:
+    with utils.nose.tempfile(content) as f:
         test = glsl.GLSLParserTest(f)
         test.is_skip()
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_add_compatability():
     """test.glsl_parser_test.GLSLParserTest: Adds ARB_ES<ver>_COMPATIBILITY
     when shader is gles but only gl is available"""
@@ -506,7 +506,7 @@ def test_add_compatability():
 
     @mock.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', False)
     def test(ver, expected):
-        with utils.tempfile(content.format(ver)) as f:
+        with utils.nose.tempfile(content.format(ver)) as f:
             test = glsl.GLSLParserTest(f)
         nt.assert_in(expected, test.gl_required)
 

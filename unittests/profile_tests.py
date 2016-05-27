@@ -41,7 +41,7 @@ from framework.test import GleanTest
 sys.stderr = sys.stdout
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_initialize_testprofile():
     """profile.TestProfile: class initializes"""
     profile.TestProfile()
@@ -79,7 +79,7 @@ def test_testprofile_default_dmesg():
 
 def test_testprofile_set_dmesg_true():
     """profile.TestProfile: Dmesg returns an appropriate dmesg is set to True"""
-    utils.platform_check('linux')
+    utils.nose.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
     nt.ok_(isinstance(profile_.dmesg, dmesg.LinuxDmesg))
@@ -87,7 +87,7 @@ def test_testprofile_set_dmesg_true():
 
 def test_testprofile_set_dmesg_false():
     """profile.TestProfile: Dmesg returns a DummyDmesg if set to False"""
-    utils.platform_check('linux')
+    utils.nose.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
     profile_.dmesg = False
@@ -100,12 +100,12 @@ def test_testprofile_update_test_list():
     group1 = grouptools.join('group1', 'test1')
     group2 = grouptools.join('group1', 'test2')
 
-    profile1.test_list[group1] = utils.Test(['test1'])
+    profile1.test_list[group1] = utils.piglit.Test(['test1'])
 
 
     profile2 = profile.TestProfile()
-    profile2.test_list[group1] = utils.Test(['test3'])
-    profile2.test_list[group2] = utils.Test(['test2'])
+    profile2.test_list[group1] = utils.piglit.Test(['test3'])
+    profile2.test_list[group2] = utils.piglit.Test(['test2'])
 
     with profile1.allow_reassignment:
         profile1.update(profile2)
@@ -117,10 +117,10 @@ class TestPrepareTestListMatches(object):
     """Create tests for TestProfile.prepare_test_list filtering"""
     def __init__(self):
         self.data = profile.TestDict()
-        self.data[grouptools.join('group1', 'test1')] = utils.Test(['thingy'])
-        self.data[grouptools.join('group1', 'group3', 'test2')] = utils.Test(['thing'])
-        self.data[grouptools.join('group3', 'test5')] = utils.Test(['other'])
-        self.data[grouptools.join('group4', 'Test9')] = utils.Test(['is_caps'])
+        self.data[grouptools.join('group1', 'test1')] = utils.piglit.Test(['thingy'])
+        self.data[grouptools.join('group1', 'group3', 'test2')] = utils.piglit.Test(['thing'])
+        self.data[grouptools.join('group3', 'test5')] = utils.piglit.Test(['other'])
+        self.data[grouptools.join('group4', 'Test9')] = utils.piglit.Test(['is_caps'])
         self.opts = None
         self.__patcher = mock.patch('framework.profile.options.OPTIONS',
                                     new_callable=options._Options)
@@ -151,7 +151,7 @@ class TestPrepareTestListMatches(object):
         profile_.test_list = self.data
         profile_._prepare_test_list()
 
-        baseline = {grouptools.join('group3', 'test5'): utils.Test(['other'])}
+        baseline = {grouptools.join('group3', 'test5'): utils.piglit.Test(['other'])}
 
         nt.assert_dict_equal(dict(profile_.test_list), baseline)
 
@@ -192,35 +192,35 @@ class TestPrepareTestListMatches(object):
         nt.assert_not_in(grouptools.join('group4', 'Test9'), profile_.test_list)
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_testprofile_group_manager_no_name_args_eq_one():
     """profile.TestProfile.group_manager: no name and len(args) == 1 is valid"""
     prof = profile.TestProfile()
-    with prof.group_manager(utils.Test, 'foo') as g:
+    with prof.group_manager(utils.piglit.Test, 'foo') as g:
         g(['a'])
 
 
 def test_testprofile_group_manager_no_name_args_gt_one():
     """profile.TestProfile.group_manager: no name and len(args) > 1 is valid"""
     prof = profile.TestProfile()
-    with prof.group_manager(utils.Test, 'foo') as g:
+    with prof.group_manager(utils.piglit.Test, 'foo') as g:
         g(['a', 'b'])
 
     nt.assert_in(grouptools.join('foo', 'a b'), prof.test_list)
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_testprofile_group_manager_name():
     """profile.TestProfile.group_manager: name plus len(args) > 1 is valid"""
     prof = profile.TestProfile()
-    with prof.group_manager(utils.Test, 'foo') as g:
+    with prof.group_manager(utils.piglit.Test, 'foo') as g:
         g(['a', 'b'], 'a')
 
 
 def test_testprofile_group_manager_is_added():
     """profile.TestProfile.group_manager: Tests are added to the profile"""
     prof = profile.TestProfile()
-    with prof.group_manager(utils.Test, 'foo') as g:
+    with prof.group_manager(utils.piglit.Test, 'foo') as g:
         g(['a', 'b'], 'a')
 
     nt.assert_in(grouptools.join('foo', 'a'), prof.test_list)
@@ -229,7 +229,7 @@ def test_testprofile_group_manager_is_added():
 def test_testprofile_groupmanager_kwargs():
     """profile.TestProfile.group_manager: Extra kwargs are passed to the Test"""
     prof = profile.TestProfile()
-    with prof.group_manager(utils.Test, 'foo') as g:
+    with prof.group_manager(utils.piglit.Test, 'foo') as g:
         g(['a'], run_concurrent=True)
 
     test = prof.test_list[grouptools.join('foo', 'a')]
@@ -239,7 +239,7 @@ def test_testprofile_groupmanager_kwargs():
 def test_testprofile_groupmanager_default_args():
     """profile.TestProfile.group_manager: group_manater kwargs are passed to the Test"""
     prof = profile.TestProfile()
-    with prof.group_manager(utils.Test, 'foo', run_concurrent=True) as g:
+    with prof.group_manager(utils.piglit.Test, 'foo', run_concurrent=True) as g:
         g(['a'])
 
     test = prof.test_list[grouptools.join('foo', 'a')]
@@ -249,7 +249,7 @@ def test_testprofile_groupmanager_default_args():
 def test_testprofile_groupmanager_kwargs_overwrite():
     """profile.TestProfile.group_manager: default_args are overwritten by kwargs"""
     prof = profile.TestProfile()
-    with prof.group_manager(utils.Test, 'foo', run_concurrent=True) as g:
+    with prof.group_manager(utils.piglit.Test, 'foo', run_concurrent=True) as g:
         g(['a'], run_concurrent=False)
 
     test = prof.test_list[grouptools.join('foo', 'a')]
@@ -277,8 +277,8 @@ def test_testdict_key_not_string():
     """
     test = profile.TestDict()
 
-    for x in [None, utils.Test(['foo']), ['a'], {'a': 1}]:
-        test[x] = utils.Test(['foo'])
+    for x in [None, utils.piglit.Test(['foo']), ['a'], {'a': 1}]:
+        test[x] = utils.piglit.Test(['foo'])
 
 
 @nt.raises(exceptions.PiglitFatalError)
@@ -298,24 +298,24 @@ def test_testdict_value_not_valid():
 def test_testdict_reassignment():
     """profile.TestDict: reassigning a key raises an exception"""
     test = profile.TestDict()
-    test['foo'] = utils.Test(['foo'])
-    test['foo'] = utils.Test(['foo', 'bar'])
+    test['foo'] = utils.piglit.Test(['foo'])
+    test['foo'] = utils.piglit.Test(['foo', 'bar'])
 
 
 @nt.raises(exceptions.PiglitFatalError)
 def test_testdict_reassignment_lower():
     """profile.TestDict: reassigning a key raises an exception (capitalization is ignored)"""
     test = profile.TestDict()
-    test['foo'] = utils.Test(['foo'])
-    test['Foo'] = utils.Test(['foo', 'bar'])
+    test['foo'] = utils.piglit.Test(['foo'])
+    test['Foo'] = utils.piglit.Test(['foo', 'bar'])
 
 
 def test_testdict_allow_reassignment():
     """profile.TestDict: allow_reassignment works"""
     test = profile.TestDict()
-    test['a'] = utils.Test(['foo'])
+    test['a'] = utils.piglit.Test(['foo'])
     with test.allow_reassignment:
-        test['a'] = utils.Test(['bar'])
+        test['a'] = utils.piglit.Test(['bar'])
 
     nt.ok_(test['a'].command == ['bar'])
 
@@ -323,9 +323,9 @@ def test_testdict_allow_reassignment():
 def test_testprofile_allow_reassignment():
     """profile.TestProfile: allow_reassignment wrapper works"""
     prof = profile.TestProfile()
-    prof.test_list['a'] = utils.Test(['foo'])
+    prof.test_list['a'] = utils.piglit.Test(['foo'])
     with prof.allow_reassignment:
-        prof.test_list['a'] = utils.Test(['bar'])
+        prof.test_list['a'] = utils.piglit.Test(['bar'])
 
     nt.ok_(prof.test_list['a'].command == ['bar'])
 
@@ -334,9 +334,9 @@ def test_testprofile_allow_reassignment_with_groupmanager():
     """profile.TestProfile: allow_reassignment wrapper works with groupmanager"""
     testname = grouptools.join('a', 'b')
     prof = profile.TestProfile()
-    prof.test_list[testname] = utils.Test(['foo'])
+    prof.test_list[testname] = utils.piglit.Test(['foo'])
     with prof.allow_reassignment:
-        with prof.group_manager(utils.Test, 'a') as g:
+        with prof.group_manager(utils.piglit.Test, 'a') as g:
             g(['bar'], 'b')
 
     nt.ok_(prof.test_list[testname].command == ['bar'])
@@ -352,11 +352,11 @@ def test_testprofile_allow_reassignemnt_stacked():
 
     """
     test = profile.TestDict()
-    test['a'] = utils.Test(['foo'])
+    test['a'] = utils.piglit.Test(['foo'])
     with test.allow_reassignment:
         with test.allow_reassignment:
             pass
-        test['a'] = utils.Test(['bar'])
+        test['a'] = utils.piglit.Test(['bar'])
 
     nt.ok_(test['a'].command == ['bar'])
 
@@ -364,8 +364,8 @@ def test_testprofile_allow_reassignemnt_stacked():
 @nt.raises(exceptions.PiglitFatalError)
 def test_testdict_update_reassignment():
     """profile.TestDict.update: Does not implictly allow reassignment"""
-    test1 = utils.Test(['test1'])
-    test2 = utils.Test(['test2'])
+    test1 = utils.piglit.Test(['test1'])
+    test2 = utils.piglit.Test(['test2'])
 
     td1 = profile.TestDict()
     td1['test1'] = test1

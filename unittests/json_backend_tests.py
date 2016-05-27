@@ -39,11 +39,11 @@ from .backends_tests import BACKEND_INITIAL_META
 
 
 def setup_module():
-    utils.set_compression('none')
+    utils.piglit.set_compression('none')
 
 
 def teardown_module():
-    utils.unset_compression()
+    utils.piglit.unset_compression()
 
 
 def test_initialize_jsonbackend():
@@ -53,21 +53,21 @@ def test_initialize_jsonbackend():
     arguments
 
     """
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         func = backends.json.JSONBackend(tdir)
         nt.ok_(isinstance(func, backends.json.JSONBackend))
 
 
 def test_json_initialize_metadata():
     """backends.json.JSONBackend.initialize(): produces a metadata.json file"""
-    with utils.tempdir() as f:
+    with utils.nose.tempdir() as f:
         test = backends.json.JSONBackend(f)
         test.initialize(BACKEND_INITIAL_META)
 
         nt.ok_(os.path.exists(os.path.join(f, 'metadata.json')))
 
 
-class TestJSONTestMethod(utils.StaticDirectory):
+class TestJSONTestMethod(utils.nose.StaticDirectory):
     @classmethod
     def setup_class(cls):
         cls.test_name = grouptools.join('a', 'test', 'group', 'test1')
@@ -87,7 +87,7 @@ class TestJSONTestMethod(utils.StaticDirectory):
         """backends.json.JSONBackend.write_test(): adds tests to a 'tests' directory"""
         nt.ok_(os.path.exists(os.path.join(self.tdir, 'tests', '0.json')))
 
-    @utils.no_error
+    @utils.nose.no_error
     def test_json_is_valid(self):
         """backends.json.JSONBackend.write_test(): produces valid json"""
         with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
@@ -101,7 +101,7 @@ class TestJSONTestMethod(utils.StaticDirectory):
         nt.assert_dict_equal({self.test_name: self.result}, test)
 
 
-class TestJSONTestFinalize(utils.StaticDirectory):
+class TestJSONTestFinalize(utils.nose.StaticDirectory):
     # We're explictely setting none here since the default can change from none
     @classmethod
     def setup_class(cls):
@@ -128,7 +128,7 @@ class TestJSONTestFinalize(utils.StaticDirectory):
         """
         nt.ok_(os.path.exists(os.path.join(self.tdir, 'results.json')))
 
-    @utils.no_error
+    @utils.nose.no_error
     def test_results_valid(self):
         """backends.json.JSONBackend.finalize(): results.json is valid"""
         with open(os.path.join(self.tdir, 'results.json'), 'r') as f:
@@ -137,10 +137,10 @@ class TestJSONTestFinalize(utils.StaticDirectory):
 
 def test_update_results_current():
     """backends.json.update_results(): returns early when the results_version is current"""
-    data = utils.JSON_DATA.copy()
+    data = utils.piglit.JSON_DATA.copy()
     data['results_version'] = backends.json.CURRENT_JSON_VERSION
 
-    with utils.tempdir() as d:
+    with utils.nose.tempdir() as d:
         with open(os.path.join(d, 'main'), 'w') as f:
             json.dump(data, f, default=backends.json.piglit_encoder)
 
@@ -165,10 +165,10 @@ def test_update_results_old():
     testing of the update process.
 
     """
-    data = utils.JSON_DATA.copy()
+    data = utils.piglit.JSON_DATA.copy()
     data['results_version'] = 0
 
-    with utils.tempdir() as d:
+    with utils.nose.tempdir() as d:
         with open(os.path.join(d, 'main'), 'w') as f:
             json.dump(data, f)
 
@@ -183,13 +183,13 @@ def test_update_results_old():
 @nt.raises(AssertionError)
 def test_json_resume_non_folder():
     """backends.json._resume: doesn't accept a file"""
-    with utils.tempfile('') as f:
+    with utils.nose.tempfile('') as f:
         backends.json._resume(f)
 
 
 def test_resume_load_valid():
     """backends.json._resume: loads valid results"""
-    with utils.tempdir() as f:
+    with utils.nose.tempdir() as f:
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         with backend.write_test("group1/test1") as t:
@@ -209,7 +209,7 @@ def test_resume_load_valid():
 
 def test_resume_load_invalid():
     """backends.json._resume: ignores invalid results"""
-    with utils.tempdir() as f:
+    with utils.nose.tempdir() as f:
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         with backend.write_test("group1/test1") as t:
@@ -237,7 +237,7 @@ def test_resume_load_incomplete():
     to split some code out and allow this to be done in the resume path.
 
     """
-    with utils.tempdir() as f:
+    with utils.nose.tempdir() as f:
         backend = backends.json.JSONBackend(f)
         backend.initialize(BACKEND_INITIAL_META)
         with backend.write_test("group1/test1") as t:
@@ -258,42 +258,42 @@ def test_resume_load_incomplete():
         )
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_load_results_folder_as_main():
     """backends.json.load_results: takes a folder with a file named main in it
     """
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         with open(os.path.join(tdir, 'main'), 'w') as tfile:
-            tfile.write(json.dumps(utils.JSON_DATA,
+            tfile.write(json.dumps(utils.piglit.JSON_DATA,
                                    default=backends.json.piglit_encoder))
 
         backends.json.load_results(tdir, 'none')
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_load_results_folder():
     """backends.json.load_results: takes a folder with a file named results.json"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         with open(os.path.join(tdir, 'results.json'), 'w') as tfile:
-            tfile.write(json.dumps(utils.JSON_DATA,
+            tfile.write(json.dumps(utils.piglit.JSON_DATA,
                                    default=backends.json.piglit_encoder))
 
         backends.json.load_results(tdir, 'none')
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_load_results_file():
     """backends.json.load_results: Loads a file passed by name"""
-    with utils.resultfile() as tfile:
+    with utils.piglit.resultfile() as tfile:
         backends.json.load_results(tfile.name, 'none')
 
 
 def test_load_json():
     """backends.load(): Loads .json files."""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         filename = os.path.join(tdir, 'results.json')
         with open(filename, 'w') as f:
-            json.dump(utils.JSON_DATA, f, default=backends.json.piglit_encoder)
+            json.dump(utils.piglit.JSON_DATA, f, default=backends.json.piglit_encoder)
 
         result = backends.load(filename)
 
@@ -319,6 +319,6 @@ def test_piglit_decoder_old_result():
 @nt.raises(exceptions.PiglitFatalError)
 def test_load_bad_json():
     """backends.json._load: Raises fatal error if json is corrupt"""
-    with utils.tempfile('{"bad json": }') as f:
+    with utils.nose.tempfile('{"bad json": }') as f:
         with open(f, 'r') as tfile:
             backends.json._load(tfile)

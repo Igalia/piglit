@@ -44,7 +44,7 @@ from . import utils
 
 # pylint:disable=line-too-long,invalid-name
 
-doc_formatter = utils.DocFormatter({'separator': grouptools.SEPARATOR})
+doc_formatter = utils.nose.DocFormatter({'separator': grouptools.SEPARATOR})
 
 
 class _DEQPTestTest(deqp.DEQPBaseTest):
@@ -52,23 +52,23 @@ class _DEQPTestTest(deqp.DEQPBaseTest):
     extra_args = ['extra']
 
 
-@utils.set_piglit_conf(('deqp_test', 'test_env', 'from conf'))
-@utils.set_env(_PIGLIT_TEST_ENV='from env')
+@utils.piglit.set_piglit_conf(('deqp_test', 'test_env', 'from conf'))
+@utils.nose.set_env(_PIGLIT_TEST_ENV='from env')
 def test_get_option_env():
     """deqp.get_option: if env is set it overrides piglit.conf"""
     nt.eq_(deqp.get_option('_PIGLIT_TEST_ENV', ('deqp_test', 'test_env')),
            'from env')
 
 
-@utils.set_piglit_conf(('deqp_test', 'test_env', 'from conf'))
-@utils.set_env(_PIGLIT_TEST_ENV=None)
+@utils.piglit.set_piglit_conf(('deqp_test', 'test_env', 'from conf'))
+@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
 def test_get_option_conf():
     """deqp.get_option: if env is not set a value is taken from piglit.conf"""
     nt.eq_(deqp.get_option('_PIGLIT_TEST_ENV', ('deqp_test', 'test_env')),
            'from conf')
 
 
-@utils.set_env(_PIGLIT_TEST_ENV=None)
+@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
 def test_get_option_default():
     """deqp.get_option: default value is returned when env and conf are unset
     """
@@ -77,7 +77,7 @@ def test_get_option_default():
            'foobar')
 
 
-@utils.set_env(_PIGLIT_TEST_ENV=None)
+@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
 def test_get_option_conf_no_section():
     """deqp.get_option: if a no_section error is raised and env is unset None is return
     """
@@ -85,9 +85,9 @@ def test_get_option_conf_no_section():
 
 
 # The first argument ensures the sectio exists
-@utils.set_piglit_conf(('deqp_test', 'test_env', 'from conf'),
+@utils.piglit.set_piglit_conf(('deqp_test', 'test_env', 'from conf'),
                        ('deqp_test', 'not_exists', None))
-@utils.set_env(_PIGLIT_TEST_ENV=None)
+@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
 def test_get_option_conf_no_option():
     """deqp.get_option: if a no_option error is raised and env is unset None is return
     """
@@ -114,14 +114,14 @@ class TestMakeProfile(object):
 
 def test_iter_deqp_test_cases_test():
     """deqp.iter_deqp_test_cases: correctly detects a TEST: line"""
-    with utils.tempfile('TEST: a.deqp.test') as tfile:
+    with utils.nose.tempfile('TEST: a.deqp.test') as tfile:
         gen = deqp.iter_deqp_test_cases(tfile)
         nt.eq_('a.deqp.test', next(gen))
 
 
 def test_iter_deqp_test_cases_group():
     """deqp.iter_deqp_test_casesgen_caselist_txt: correctly detects a GROUP: line"""
-    with utils.tempfile('GROUP: a group\nTEST: a.deqp.test') as tfile:
+    with utils.nose.tempfile('GROUP: a group\nTEST: a.deqp.test') as tfile:
         gen = deqp.iter_deqp_test_cases(tfile)
         nt.eq_('a.deqp.test', next(gen))
 
@@ -130,12 +130,12 @@ def test_iter_deqp_test_cases_group():
 def test_iter_deqp_test_cases_bad():
     """deqp.iter_deqp_test_casesgen_caselist_txt: PiglitFatalException is raised if line is not TEST: or GROUP:
     """
-    with utils.tempfile('this will fail') as tfile:
+    with utils.nose.tempfile('this will fail') as tfile:
         gen = deqp.iter_deqp_test_cases(tfile)
         nt.eq_('a.deqp.test', next(gen))
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_DEQPBaseTest_initialize():
     """deqp.DEQPBaseTest: can be initialized (with abstract methods overwritten)
     """

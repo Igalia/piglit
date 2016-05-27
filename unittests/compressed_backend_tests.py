@@ -89,7 +89,7 @@ def _add_compression(value):
 def _test_compressor(mode):
     """Helper to simplify testing compressors."""
     func = compression.COMPRESSORS[mode]
-    with utils.tempdir() as t:
+    with utils.nose.tempdir() as t:
         with func(os.path.join(t, 'file')) as f:
             f.write('foo')
 
@@ -99,7 +99,7 @@ def _test_decompressor(mode):
     func = compression.COMPRESSORS[mode]
     dec = compression.DECOMPRESSORS[mode]
 
-    with utils.tempdir() as t:
+    with utils.nose.tempdir() as t:
         path = os.path.join(t, 'file')
 
         with func(path) as f:
@@ -111,7 +111,7 @@ def _test_decompressor(mode):
 
 def _test_extension():
     """Create an final file and return the extension."""
-    with utils.tempdir() as d:
+    with utils.nose.tempdir() as d:
         obj = _TestBackend(d)
         obj.initialize()
         with obj.write_test('foo') as t:
@@ -123,11 +123,11 @@ def _test_extension():
             if each.startswith('results.txt'):
                 name, ext = os.path.splitext(each)
                 if name.endswith('.'):
-                    raise utils.TestFailure(
+                    raise utils.nose.TestFailure(
                         'extra trailing "." in name "{}"'.format(name))
                 break
         else:
-            raise utils.TestFailure('No results file generated')
+            raise utils.nose.TestFailure('No results file generated')
 
     return ext
 
@@ -135,7 +135,7 @@ def _test_extension():
 # Tests
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_compress_none():
     """framework.backends.compression: can compress to 'none'"""
     _test_compressor('none')
@@ -148,28 +148,28 @@ def test_decompress_none():
 
 
 @_add_compression('foobar')
-@utils.set_env(PIGLIT_COMPRESSION='foobar')
+@utils.nose.set_env(PIGLIT_COMPRESSION='foobar')
 def testget_mode_env():
     """framework.backends.compression.get_mode: uses PIGlIT_COMPRESSION environment variable"""
     nt.eq_(compression.get_mode(), 'foobar')
 
 
 @_add_compression('foobar')
-@utils.set_env(PIGLIT_COMPRESSION=None)
-@utils.set_piglit_conf(('core', 'compression', 'foobar'))
+@utils.nose.set_env(PIGLIT_COMPRESSION=None)
+@utils.piglit.set_piglit_conf(('core', 'compression', 'foobar'))
 def testget_mode_piglit_conf():
     """framework.backends.compression.get_mode: uses piglit.conf [core]:compression value if env is unset"""
     nt.eq_(compression.get_mode(), 'foobar')
 
 
-@utils.set_env(PIGLIT_COMPRESSION=None)
-@utils.set_piglit_conf(('core', 'compression', None))
+@utils.nose.set_env(PIGLIT_COMPRESSION=None)
+@utils.piglit.set_piglit_conf(('core', 'compression', None))
 def testget_mode_default():
     """framework.backends.compression.get_mode: uses DEFAULT if env and piglit.conf are unset"""
     nt.eq_(compression.get_mode(), compression.DEFAULT)
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_compress_gz():
     """framework.backends.compression: can compress to 'gz'"""
     _test_compressor('gz')
@@ -180,13 +180,13 @@ def test_decompress_gz():
     _test_decompressor('gz')
 
 
-@utils.set_env(PIGLIT_COMPRESSION='gz')
+@utils.nose.set_env(PIGLIT_COMPRESSION='gz')
 def test_gz_output():
     """framework.backends: when using gz compression a gz file is created"""
     nt.eq_(_test_extension(), '.gz')
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_compress_bz2():
     """framework.backends.compression: can compress to 'bz2'"""
     _test_compressor('bz2')
@@ -197,13 +197,13 @@ def test_decompress_bz2():
     _test_decompressor('bz2')
 
 
-@utils.set_env(PIGLIT_COMPRESSION='bz2')
+@utils.nose.set_env(PIGLIT_COMPRESSION='bz2')
 def test_bz2_output():
     """framework.backends: when using bz2 compression a bz2 file is created"""
     nt.eq_(_test_extension(), '.bz2')
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_compress_xz():
     """framework.backends.compression: can compress to 'xz'"""
     _test_compressor('xz')
@@ -214,15 +214,15 @@ def test_decompress_xz():
     _test_decompressor('xz')
 
 
-@utils.set_env(PIGLIT_COMPRESSION='xz')
+@utils.nose.set_env(PIGLIT_COMPRESSION='xz')
 def test_xz_output():
     """framework.backends: when using xz compression a xz file is created"""
     nt.eq_(_test_extension(), '.xz')
 
 
 @_add_compression('foobar')
-@utils.set_env(PIGLIT_COMPRESSION=None)
-@utils.set_piglit_conf(('core', 'compression', 'foobar'))
+@utils.nose.set_env(PIGLIT_COMPRESSION=None)
+@utils.piglit.set_piglit_conf(('core', 'compression', 'foobar'))
 def test_update_piglit_conf():
     """framework.backends.compression: The compression mode honors updates to piglit.conf.
 
@@ -233,8 +233,8 @@ def test_update_piglit_conf():
     nt.eq_(compression.get_mode(), 'foobar')
 
 
-@utils.set_env(PIGLIT_COMPRESSION='xz')
-@utils.test_in_tempdir
+@utils.nose.set_env(PIGLIT_COMPRESSION='xz')
+@utils.nose.test_in_tempdir
 def test_xz_shell_override():
     """framework.backends.compression: the xz shell utility path can overwrite"""
     if six.PY3:
@@ -254,33 +254,33 @@ def test_xz_shell_override():
         f.write('foobar')
 
 
-@utils.set_piglit_conf(('core', 'compression', 'bz2'))
+@utils.piglit.set_piglit_conf(('core', 'compression', 'bz2'))
 def test_write_compressed_one_suffix_bz2():
     """backends.abstract.write_compressed: bz2 Does not duplicate compression suffixes
     """
-    with utils.tempdir() as d:
+    with utils.nose.tempdir() as d:
         with abstract.write_compressed(os.path.join(d, 'results.txt.bz2')) as f:
             f.write('foo')
 
         nt.eq_(os.listdir(d)[0], 'results.txt.bz2')
 
 
-@utils.set_piglit_conf(('core', 'compression', 'gz'))
+@utils.piglit.set_piglit_conf(('core', 'compression', 'gz'))
 def test_write_compressed_one_suffix_gz():
     """backends.abstract.write_compressed: gz Does not duplicate compression suffixes
     """
-    with utils.tempdir() as d:
+    with utils.nose.tempdir() as d:
         with abstract.write_compressed(os.path.join(d, 'results.txt.gz')) as f:
             f.write('foo')
 
         nt.eq_(os.listdir(d)[0], 'results.txt.gz')
 
 
-@utils.set_piglit_conf(('core', 'compression', 'gz'))
+@utils.piglit.set_piglit_conf(('core', 'compression', 'gz'))
 def test_write_compressed_one_suffix_mixed():
     """backends.abstract.write_compressed: does not generate two different compression suffixes
     """
-    with utils.tempdir() as d:
+    with utils.nose.tempdir() as d:
         with abstract.write_compressed(os.path.join(d, 'results.txt.bz2')) as f:
             f.write('foo')
 

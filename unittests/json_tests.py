@@ -46,11 +46,11 @@ from framework.programs.run import _create_metadata
 
 
 def setup_module():
-    utils.set_compression('none')
+    utils.piglit.set_compression('none')
 
 
 def teardown_module():
-    utils.unset_compression()
+    utils.piglit.unset_compression()
 
 
 # Helpers
@@ -61,7 +61,7 @@ class Namespace(object):
 
 # Tests
 # pylint: disable=too-many-public-methods
-class TestJsonOutput(utils.StaticDirectory):
+class TestJsonOutput(utils.nose.StaticDirectory):
     """Class for testing JSON output."""
     @classmethod
     def setup_class(cls):
@@ -99,20 +99,20 @@ class TestJsonOutput(utils.StaticDirectory):
 
     def test_root_lspci(self):
         """JSON: lspci is a root key."""
-        utils.platform_check('linux')
-        utils.binary_check('lspci')
+        utils.nose.platform_check('linux')
+        utils.nose.binary_check('lspci')
         nt.assert_in('lspci', self.json)
 
     def test_root_uname(self):
         """JSON: uname is a root key."""
-        utils.platform_check('linux')
-        utils.binary_check('uname')
+        utils.nose.platform_check('linux')
+        utils.nose.binary_check('uname')
         nt.assert_in('uname', self.json)
 
     def test_root_glxinfo(self):
         """JSON: glxinfo is a root key."""
-        utils.platform_check('linux')
-        utils.binary_check('glxinfo')
+        utils.nose.platform_check('linux')
+        utils.nose.binary_check('glxinfo')
         nt.assert_in('glxinfo', self.json)
 
     def test_root_time_elapsed(self):

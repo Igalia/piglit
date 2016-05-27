@@ -40,7 +40,7 @@ def dict_eq(one, two):
     nt.assert_dict_equal(dict(one), dict(two))
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_generate_initialize():
     """ Generator that creates tests to initialize all of the classes in core
 
@@ -50,7 +50,7 @@ def test_generate_initialize():
     even work?
 
     """
-    @utils.no_error
+    @utils.nose.no_error
     def check(target):
         target()
 
@@ -422,7 +422,7 @@ class TestStringDescriptor(object):
         self.test.val = inst
         nt.eq_(self.test.val, 'foo')
 
-    @utils.no_error
+    @utils.nose.no_error
     def test_set_str_unicode_literals(self):
         """results.StringDescriptor.__set__: handles unicode litterals in strs
         """
@@ -617,7 +617,7 @@ class TestTestrunResultFromDict(object):
         cls.baseline = test
         cls.test = results.TestrunResult.from_dict(test.to_json())
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_basic(self):
         """Generate tests for basic attributes"""
 

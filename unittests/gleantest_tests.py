@@ -37,7 +37,7 @@ from . import utils
 from framework.test.base import TestIsSkip
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_initialize_gleantest():
     """test.gleantest.GleanTest: class initializes correctly"""
     GleanTest('name')
@@ -87,7 +87,7 @@ def test_is_skip_not_glx(mock_opts):
 
 
 @mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
-@utils.not_raises(TestIsSkip)
+@utils.nose.not_raises(TestIsSkip)
 def test_is_skip_glx(mock_opts):
     """test.gleantest.GleanTest.is_skip: Does not skip when platform is glx"""
     mock_opts.env['PIGLIT_PLATFORM'] = 'glx'
@@ -96,7 +96,7 @@ def test_is_skip_glx(mock_opts):
 
 
 @mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
-@utils.not_raises(TestIsSkip)
+@utils.nose.not_raises(TestIsSkip)
 def test_is_skip_glx_egl(mock_opts):
     """test.gleantest.GleanTest.is_skip: Does not skip when platform is mixed_glx_egl
     """

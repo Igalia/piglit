@@ -88,7 +88,7 @@ def _save_core_config(func):
                 restore_piglitconf = True
             core.PIGLIT_CONFIG = core.PiglitConfig(allow_no_value=True)
         except Exception as e:
-            raise utils.UtilsError(e)
+            raise utils.nose.UtilsError(e)
 
         func(*args, **kwargs)
 
@@ -104,12 +104,12 @@ def _save_core_config(func):
             core.PIGLIT_CONFIG = core.PiglitConfig(
                 allow_no_value=True)
         except Exception as e:
-            raise utils.UtilsError(e)
+            raise utils.nose.UtilsError(e)
 
     return inner
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_PiglitConfig_init():
     """core.PiglitConfig: initializes"""
     core.PiglitConfig()
@@ -124,7 +124,7 @@ def test_parse_listfile_return():
     """
     contents = "/tmp/foo\n/tmp/bar\n"
 
-    with utils.tempfile(contents) as tfile:
+    with utils.nose.tempfile(contents) as tfile:
         results = core.parse_listfile(tfile)
 
     nt.ok_(isinstance(results, collections.Container))
@@ -135,7 +135,7 @@ class Test_parse_listfile_TrailingWhitespace(object):
     @classmethod
     def setup_class(cls):
         contents = "/tmp/foo\n/tmp/foo  \n/tmp/foo\t\n"
-        with utils.tempfile(contents) as tfile:
+        with utils.nose.tempfile(contents) as tfile:
             cls.results = core.parse_listfile(tfile)
 
     def test_newlines(self):
@@ -166,7 +166,7 @@ def test_parse_listfile_tilde():
     contents = "~/foo\n"
     expected = os.path.expandvars("$HOME/foo")
 
-    with utils.tempfile(contents) as tfile:
+    with utils.nose.tempfile(contents) as tfile:
         results = core.parse_listfile(tfile)
 
     nt.eq_(results[0], expected,
@@ -176,7 +176,7 @@ def test_parse_listfile_tilde():
 @_save_core_config
 def test_xdg_config_home():
     """core.get_config() finds $XDG_CONFIG_HOME/piglit.conf"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         os.environ['XDG_CONFIG_HOME'] = tdir
         with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
             f.write(_CONF_FILE)
@@ -189,7 +189,7 @@ def test_xdg_config_home():
 @_save_core_config
 def test_config_home_fallback():
     """core.get_config() finds $HOME/.config/piglit.conf"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         os.environ['HOME'] = tdir
         os.mkdir(os.path.join(tdir, '.config'))
         with open(os.path.join(tdir, '.config/piglit.conf'), 'w') as f:
@@ -201,10 +201,10 @@ def test_config_home_fallback():
 
 
 @_save_core_config
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 def test_local():
     """core.get_config() finds ./piglit.conf"""
-    with utils.tempdir() as tdir:
+    with utils.nose.tempdir() as tdir:
         os.chdir(tdir)
 
         with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
@@ -277,7 +277,7 @@ class TestPiglitConfig(object):
         nt.eq_(self.conf.safe_get('invalid', 'invalid', fallback='foo'), 'foo')
 
 
-@utils.capture_stderr
+@utils.nose.capture_stderr
 @nt.raises(exceptions.PiglitException)
 def test_check_dir_exists_fail():
     """core.check_dir: if the directory exists and failifexsits is True fail"""
@@ -303,7 +303,7 @@ def test_check_dir_stat_ENOTDIR():
             nt.eq_(makedirs.called, 1)
 
 
-@utils.not_raises(OSError)
+@utils.nose.not_raises(OSError)
 def test_check_dir_makedirs_pass():
     """core.check_dir: If makedirs fails with EEXIST pass"""
     with mock.patch('framework.core.os.stat', mock.Mock()):
@@ -323,16 +323,16 @@ def test_check_dir_makedirs_fail():
                 core.check_dir('foo', False)
 
 
-@nt.raises(utils.SentinalException)
+@nt.raises(utils.nose.SentinalException)
 def test_check_dir_handler():
     """core.check_dir: Handler is called if not failifexists."""
     with mock.patch('framework.core.os.stat',
                     mock.Mock(side_effect=OSError('foo', errno.ENOTDIR))):
         core.check_dir('foo',
-                       handler=mock.Mock(side_effect=utils.SentinalException))
+                       handler=mock.Mock(side_effect=utils.nose.SentinalException))
 
 
-@utils.skip(not six.PY3, 'Test is only relevant on python 3.x')
+@utils.nose.skip(not six.PY3, 'Test is only relevant on python 3.x')
 def test_check_dir_stat_FileNotFoundError():
     """core.check_dir: FileNotFoundError is raised and failifexsits is False continue"""
     with mock.patch('framework.core.os.stat',

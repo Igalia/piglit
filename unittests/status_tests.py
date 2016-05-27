@@ -57,22 +57,22 @@ FIXES = list(itertools.combinations(reversed(STATUSES), 2)) + \
 NO_OPS = ('skip', 'notrun')
 
 
-@utils.no_error
+@utils.nose.no_error
 def initialize_status():
     """status.Status: class inializes"""
     status.Status('test', 1)
 
 
-@utils.no_error
+@utils.nose.no_error
 def initialize_nochangestatus():
     """status.NoChangeStatus: class initializes"""
     status.NoChangeStatus('test')
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_gen_lookup():
     """ Generator that attempts to do a lookup on all statuses """
-    @utils.no_error
+    @utils.nose.no_error
     def test(status_):
         status.status_lookup(status_)
 
@@ -96,7 +96,7 @@ def test_status_in():
     nt.ok_(stat in slist)
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_is_regression():
     """ Generate all tests for regressions """
     def is_regression(new, old):
@@ -110,7 +110,7 @@ def test_is_regression():
         yield is_regression, new, old
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_is_fix():
     """ Generates all tests for fixes """
     def is_fix(new, old):
@@ -124,7 +124,7 @@ def test_is_fix():
         yield is_fix, new, old
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_is_change():
     """ Test that status -> !status is a change """
     def is_not_equivalent(new, old):
@@ -138,7 +138,7 @@ def test_is_change():
         yield is_not_equivalent, new, old
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_not_change():
     """ Skip and NotRun should not count as changes """
     def check_not_change(new, old):
@@ -163,7 +163,7 @@ def test_not_change():
                status.status_lookup(stat))
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_max_statuses():
     """ Verify that max() works between skip and non-skip statuses """
     def _max_nochange_stat(nochange, stat):
@@ -226,7 +226,7 @@ def check_operator_not_equal(obj, comp, op, result):
     nt.assert_not_equal(op(obj, comp), result)
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_nochangestatus_magic():
     """ Test that operators unique to NoChangeStatus work """
     obj = status.NoChangeStatus('Test')
@@ -247,7 +247,7 @@ def test_nochangestatus_magic():
         yield check_operator_not_equal, obj, comp, lambda x, y: x.__ne__(y), True
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_status_magic():
     """ Generator for testing magic methods in the Status class """
     obj = status.Status('foo', 0, (0, 0))

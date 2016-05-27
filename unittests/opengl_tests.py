@@ -298,27 +298,27 @@ class TestWflInfoOSError(object):
         for f in cls.__patchers:
             f.stop()
 
-    @utils.not_raises(OSError)
+    @utils.nose.not_raises(OSError)
     def test_gl_extensions(self):
         """test.opengl.WflInfo.gl_extensions: Handles OSError "no file" gracefully"""
         self.inst.gl_extensions
 
-    @utils.not_raises(OSError)
+    @utils.nose.not_raises(OSError)
     def test_gl_version(self):
         """test.opengl.WflInfo.get_gl_version: Handles OSError "no file" gracefully"""
         self.inst.gl_version
 
-    @utils.not_raises(OSError)
+    @utils.nose.not_raises(OSError)
     def test_gles_version(self):
         """test.opengl.WflInfo.get_gles_version: Handles OSError "no file" gracefully"""
         self.inst.gles_version
 
-    @utils.not_raises(OSError)
+    @utils.nose.not_raises(OSError)
     def test_glsl_version(self):
         """test.opengl.WflInfo.glsl_version: Handles OSError "no file" gracefully"""
         self.inst.glsl_version
 
-    @utils.not_raises(OSError)
+    @utils.nose.not_raises(OSError)
     def test_glsl_es_version(self):
         """test.opengl.WflInfo.glsl_es_version: Handles OSError "no file" gracefully"""
         self.inst.glsl_es_version
@@ -351,27 +351,27 @@ class TestWflInfoCalledProcessError(object):
     def setup(self):
         self.inst = opengl.WflInfo()
 
-    @utils.not_raises(subprocess.CalledProcessError)
+    @utils.nose.not_raises(subprocess.CalledProcessError)
     def test_gl_extensions(self):
         """test.opengl.WflInfo.gl_extensions: Handles CalledProcessError gracefully"""
         self.inst.gl_extensions
 
-    @utils.not_raises(subprocess.CalledProcessError)
+    @utils.nose.not_raises(subprocess.CalledProcessError)
     def test_gl_version(self):
         """test.opengl.WflInfo.get_gl_version: Handles CalledProcessError gracefully"""
         self.inst.gl_version
 
-    @utils.not_raises(subprocess.CalledProcessError)
+    @utils.nose.not_raises(subprocess.CalledProcessError)
     def test_gles_version(self):
         """test.opengl.WflInfo.gles_version: Handles CalledProcessError gracefully"""
         self.inst.gles_version
 
-    @utils.not_raises(subprocess.CalledProcessError)
+    @utils.nose.not_raises(subprocess.CalledProcessError)
     def test_glsl_version(self):
         """test.opengl.WflInfo.glsl_version: Handles CalledProcessError gracefully"""
         self.inst.glsl_version
 
-    @utils.not_raises(subprocess.CalledProcessError)
+    @utils.nose.not_raises(subprocess.CalledProcessError)
     def test_glsl_es_version(self):
         """test.opengl.WflInfo.glsl_es_version: Handles CalledProcessError gracefully"""
         self.inst.glsl_es_version
@@ -384,7 +384,7 @@ class TestFastSkipMixin(object):
     @classmethod
     def setup_class(cls):
         """Create a Class with FastSkipMixin, but patch various bits."""
-        class _Test(opengl.FastSkipMixin, utils.Test):
+        class _Test(opengl.FastSkipMixin, utils.piglit.Test):
             pass
 
         cls._class = _Test
@@ -416,13 +416,13 @@ class TestFastSkipMixin(object):
         self.test.gl_required.add('foobar')
         self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_should_not_skip(self):
         """test.opengl.FastSkipMixin.is_skip: runs when requires is in extensions"""
         self.test.gl_required.add('bar')
         self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_extension_empty(self):
         """test.opengl.FastSkipMixin.is_skip: if extensions are empty test runs"""
         self.test.gl_required.add('foobar')
@@ -430,7 +430,7 @@ class TestFastSkipMixin(object):
                                None):
             self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_requires_empty(self):
         """test.opengl.FastSkipMixin.is_skip: if gl_requires is empty test runs"""
         self.test.is_skip()
@@ -441,12 +441,12 @@ class TestFastSkipMixin(object):
         self.test.gl_version = 4.0
         self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_gl_version_gt(self):
         """test.opengl.FastSkipMixin.is_skip: runs if gl_version < __max_gl_version"""
         self.test.gl_version = 1.0
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_gl_version_unset(self):
         """test.opengl.FastSkipMixin.is_skip: runs if __max_gl_version is None"""
         self.test.gl_version = 1.0
@@ -454,7 +454,7 @@ class TestFastSkipMixin(object):
                                None):
             self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_gl_version_set(self):
         """test.opengl.FastSkipMixin.is_skip: runs if gl_version is None"""
         self.test.is_skip()
@@ -465,12 +465,12 @@ class TestFastSkipMixin(object):
         self.test.gles_version = 4.0
         self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_gles_version_gt(self):
         """test.opengl.FastSkipMixin.is_skip: runs if gles_version < __max_gles_version"""
         self.test.gles_version = 1.0
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_gles_version_unset(self):
         """test.opengl.FastSkipMixin.is_skip: runs if __max_gles_version is None"""
         self.test.gles_version = 1.0
@@ -478,7 +478,7 @@ class TestFastSkipMixin(object):
                                None):
             self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_gles_version_set(self):
         """test.opengl.FastSkipMixin.is_skip: runs if gles_version is None"""
         self.test.is_skip()
@@ -489,12 +489,12 @@ class TestFastSkipMixin(object):
         self.test.glsl_version = 4.0
         self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_glsl_version_gt(self):
         """test.opengl.FastSkipMixin.is_skip: runs if glsl_version < __max_glsl_version"""
         self.test.glsl_version = 1.0
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_glsl_version_unset(self):
         """test.opengl.FastSkipMixin.is_skip: runs if __max_glsl_version is None"""
         self.test.glsl_version = 1.0
@@ -502,7 +502,7 @@ class TestFastSkipMixin(object):
                                None):
             self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_glsl_version_set(self):
         """test.opengl.FastSkipMixin.is_skip: runs if glsl_version is None"""
         self.test.is_skip()
@@ -513,12 +513,12 @@ class TestFastSkipMixin(object):
         self.test.glsl_es_version = 4.0
         self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_glsl_es_version_gt(self):
         """test.opengl.FastSkipMixin.is_skip: runs if glsl_es_version < __max_glsl_es_version"""
         self.test.glsl_es_version = 1.0
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_glsl_es_version_unset(self):
         """test.opengl.FastSkipMixin.is_skip: runs if __max_glsl_es_version is None"""
         self.test.glsl_es_version = 1.0
@@ -526,7 +526,7 @@ class TestFastSkipMixin(object):
                                None):
             self.test.is_skip()
 
-    @utils.not_raises(TestIsSkip)
+    @utils.nose.not_raises(TestIsSkip)
     def test_max_glsl_es_version_set(self):
         """test.opengl.FastSkipMixin.is_skip: runs if glsl_es_version is None"""
         self.test.is_skip()

@@ -31,7 +31,7 @@ from framework import exceptions
 
 
 @nt.raises(SystemExit)
-@utils.capture_stderr
+@utils.nose.capture_stderr
 @exceptions.handler
 def test_handle_PiglitFatalError():
     """exceptions.handler: Handles PiglitFatalError"""

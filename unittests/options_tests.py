@@ -40,7 +40,7 @@ from framework import options
 _RETYPE = type(re.compile(''))
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_relist_init():
     """options._ReList: inializes"""
     options._ReList()

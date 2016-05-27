@@ -36,7 +36,7 @@ TEST_STATE = {'total': 0, 'complete': 0, 'lastlength': 0, 'running': [],
               'summary': collections.defaultdict(lambda: 0)}
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_initialize():
     """ Generate tests for class initialization """
     check_initialize = lambda c, *a: c(*a)
@@ -57,7 +57,7 @@ def test_log_factory_returns_log():
     nt.ok_(isinstance(log_inst, log.BaseLog))
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_quietlog_log_state_update():
     """log.QuiteLog.log() updates shared state managed by LogManager"""
     logger = log.LogManager('quiet', 100)
@@ -94,7 +94,7 @@ def check_for_output(func, args, file_=sys.stdout):
     nt.eq_(file_.read(), '')
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_print_when_expected():
     """ Generator that creates tests that ensure that methods print
 
@@ -144,7 +144,7 @@ def check_no_output(func, args, file_=sys.stdout):
            msg='file.tell() is at {}, but should be at 0'.format(file_.tell()))
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_noprint_when_expected():
     """ Generate tests for methods that shouldn't print
 

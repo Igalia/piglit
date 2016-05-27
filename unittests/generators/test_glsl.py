@@ -96,7 +96,7 @@ class TestCompare(object):
         ('>', operator.gt),
     ]
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_glsl_glsl(self):
         """Test GLSLVersion <cmp> GLSLVersion."""
         def expected(first, second, op):
@@ -113,7 +113,7 @@ class TestCompare(object):
                 test.description = desc.format(ver1, name, ver2)
                 yield test, ver1, ver2, op
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_glsles_glsles(self):
         """Test GLSLESVersion <cmp> GLSLESVersion."""
         def expected(first, second, op):
@@ -141,7 +141,7 @@ class TestCompare(object):
         """generated_tests.modules.glsl: GLSLESVersion <cmp> GLSLVersion."""
         return glsl.Version('100') < glsl.Version('110')
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_glsl_int(self):
         """Test GLSLVersion <cmp> GLSLVersion."""
         def expected(first, second, op):
@@ -168,7 +168,7 @@ class TestCompare(object):
                 yield (test, int(ver1), glsl.Version(ver2), op,
                        expected(ver1, ver2, op))
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_glsl_float(self):
         """Test GLSLVersion <cmp> GLSLVersion."""
         def expected(first, second, op):
@@ -195,7 +195,7 @@ class TestCompare(object):
                 yield (test, float(ver1) / 100, glsl.Version(ver2), op,
                        expected(ver1, ver2, op))
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_glsles_int(self):
         """Test GLSLESVersion <cmp> GLSLESVersion."""
         def expected(first, second, op):
@@ -224,7 +224,7 @@ class TestCompare(object):
                 yield (test, int(ver1[:3]), glsl.Version(ver2), op,
                        expected(ver1, ver2, op))
 
-    @utils.nose_generator
+    @utils.nose.generator
     def test_glsles_float(self):
         """Test GLSLESVersion <cmp> GLSLESVersion."""
         def expected(first, second, op):

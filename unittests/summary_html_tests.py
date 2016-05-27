@@ -43,7 +43,7 @@ from framework.summary import html_
 from . import utils
 
 
-@utils.test_in_tempdir
+@utils.nose.test_in_tempdir
 def test_copy_static():
     """summary.html_._copy_static: puts status content in correct locations"""
     html_._copy_static_files(getcwd())

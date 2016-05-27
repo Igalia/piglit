@@ -38,13 +38,13 @@ from framework.test.piglit_test import (PiglitBaseTest, PiglitGLTest,
                                         PiglitCLTest)
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_initialize_piglitgltest():
     """test.piglit_test.PiglitGLTest: Class initializes"""
     PiglitGLTest(['/bin/true'])
 
 
-@utils.no_error
+@utils.nose.no_error
 def test_initialize_piglitcltest():
     """test.piglit_test.PiglitCLTest: Class initializes"""
     PiglitCLTest(['/bin/true'])
@@ -105,7 +105,7 @@ def test_PiglitGLTest_include_and_exclude():
 
 
 @mock.patch('framework.test.piglit_test.options.OPTIONS', new_callable=Options)
-@utils.not_raises(TestIsSkip)
+@utils.nose.not_raises(TestIsSkip)
 def test_PiglitGLTest_platform_in_require(mock_opts):
     """test.piglit_test.PiglitGLTest.is_skip(): does not skip if platform is in require_platforms"""
     mock_opts.env['PIGLIT_PLATFORM'] = 'glx'
@@ -132,7 +132,7 @@ def test_PiglitGLTest_platform_in_exclude(mock_opts):
 
 
 @mock.patch('framework.test.piglit_test.options.OPTIONS', new_callable=Options)
-@utils.not_raises(TestIsSkip)
+@utils.nose.not_raises(TestIsSkip)
 def test_PiglitGLTest_platform_not_in_exclude(mock_opts):
     """test.piglit_test.PiglitGLTest.is_skip(): does not skip if platform is in exclude_platforms"""
     mock_opts.env['PIGLIT_PLATFORM'] = 'gbm'

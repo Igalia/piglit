@@ -69,7 +69,7 @@ def test_parse_gl_test_no_decimal():
     """test.shader_test.ShaderTest: raises if version lacks decminal"""
     data = ('[require]\n'
             'GL = 2\n')
-    with utils.tempfile(data) as temp:
+    with utils.nose.tempfile(data) as temp:
         with nt.assert_raises(exceptions.PiglitFatalError) as exc:
             testm.ShaderTest(temp)
             nt.assert_equal(exc.exception, "No GL version set",
@@ -83,7 +83,7 @@ def test_parse_gles2_test():
     data = ('[require]\n'
             'GL ES >= 2.0\n'
             'GLSL ES >= 1.00\n')
-    with utils.tempfile(data) as temp:
+    with utils.nose.tempfile(data) as temp:
         test = testm.ShaderTest(temp)
 
     nt.assert_equal(
@@ -97,7 +97,7 @@ def test_parse_gles3_test():
     data = ('[require]\n'
             'GL ES >= 3.0\n'
             'GLSL ES >= 3.00\n')
-    with utils.tempfile(data) as temp:
+    with utils.nose.tempfile(data) as temp:
         test = testm.ShaderTest(temp)
 
     nt.assert_equal(
@@ -119,7 +119,7 @@ def test_find_requirements_gl_requirements():
             'GL = 2.0\n'
             'GL_ARB_ham_sandwhich\n')
 
-    with utils.tempfile(data) as temp:
+    with utils.nose.tempfile(data) as temp:
         test = testm.ShaderTest(temp)
 
     nt.eq_(test.gl_required, set(['GL_ARB_ham_sandwhich']))
@@ -175,7 +175,7 @@ def test_find_requirements_glsl_es_version():
     nt.eq_(test.glsl_es_version, 2.0)
 
 
-@utils.nose_generator
+@utils.nose.generator
 def test_ignore_shader_runner_directives():
     """test.shader_test.ShaderTest: Doesn't add shader_runner command to gl_required list"""
     should_ignore = [
