@@ -108,6 +108,7 @@ EXTENSIONS = [
     ("GL_ARB_geometry_shader4", "110"),
     ("GL_OES_EGL_image_external", "100"),
     ("GL_EXT_shader_samples_identical", "110"),
+    ("GL_ARB_shader_group_vote", "110"),
     ("GL_EXT_shader_samples_identical", "310 es"),
     ("GL_OES_sample_variables", "300 es"),
     ("GL_OES_multisample_interpolation", "300 es"),
