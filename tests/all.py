@@ -677,6 +677,7 @@ with profile.group_manager(
     g(['glx-close-display'], run_concurrent=False)
     g(['glx-fbconfig-sanity'], run_concurrent=False)
     g(['glx-fbconfig-compliance'], run_concurrent=False)
+    g(['glx-fbconfig-bad'], run_concurrent=False)
     g(['glx-fbo-binding'], run_concurrent=False)
     g(['glx-multi-context-ib-1'], run_concurrent=False)
     g(['glx-multithread'], run_concurrent=False)
