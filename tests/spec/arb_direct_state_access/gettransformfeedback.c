@@ -218,7 +218,7 @@ piglit_init(int argc, char **argv)
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf[i]);
 		piglit_check_gl_error(GL_NO_ERROR);
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
-				 size, NULL, GL_STREAM_READ);
+			     start + size, NULL, GL_STREAM_READ);
 		piglit_check_gl_error(GL_NO_ERROR);
 		glTransformFeedbackBufferRange(0, i, xfb_buf[i], start, size);
 		piglit_check_gl_error(GL_NO_ERROR);
