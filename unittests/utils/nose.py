@@ -404,38 +404,3 @@ def capture_stderr(func):
             sys.stderr = restore
 
     return _inner
-
-
-def set_env(**envargs):
-    """Decorator that sets environment variables and then unsets them.
-
-    If an value is set to None that key will be deleted from os.environ
-
-    """
-
-    def _decorator(func):
-        """The actual decorator."""
-
-        @functools.wraps(func)
-        def _inner(*args, **kwargs):
-            """The returned function."""
-            backup = {}
-            for key, value in six.iteritems(envargs):
-                backup[key] = os.environ.get(key, "__DONOTRESTORE__")
-                if value is not None:
-                    os.environ[key] = value
-                elif key in os.environ:
-                    del os.environ[key]
-
-            try:
-                func(*args, **kwargs)
-            finally:
-                for key, value in six.iteritems(backup):
-                    if value == "__DONOTRESTORE__" and key in os.environ:
-                        del os.environ[key]
-                    elif value != '__DONOTRESTORE__':
-                        os.environ[key] = value
-
-        return _inner
-
-    return _decorator

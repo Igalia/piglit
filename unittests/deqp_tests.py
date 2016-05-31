@@ -53,7 +53,7 @@ class _DEQPTestTest(deqp.DEQPBaseTest):
 
 
 @utils.piglit.set_piglit_conf(('deqp_test', 'test_env', 'from conf'))
-@utils.nose.set_env(_PIGLIT_TEST_ENV='from env')
+@mock.patch.dict('os.environ', {'_PIGLIT_TEST_ENV': 'from env'})
 def test_get_option_env():
     """deqp.get_option: if env is set it overrides piglit.conf"""
     nt.eq_(deqp.get_option('_PIGLIT_TEST_ENV', ('deqp_test', 'test_env')),
@@ -61,14 +61,14 @@ def test_get_option_env():
 
 
 @utils.piglit.set_piglit_conf(('deqp_test', 'test_env', 'from conf'))
-@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
+@mock.patch.dict('os.environ', {}, True)
 def test_get_option_conf():
     """deqp.get_option: if env is not set a value is taken from piglit.conf"""
     nt.eq_(deqp.get_option('_PIGLIT_TEST_ENV', ('deqp_test', 'test_env')),
            'from conf')
 
 
-@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
+@mock.patch.dict('os.environ', {}, True)
 def test_get_option_default():
     """deqp.get_option: default value is returned when env and conf are unset
     """
@@ -77,7 +77,7 @@ def test_get_option_default():
            'foobar')
 
 
-@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
+@mock.patch.dict('os.environ', {}, True)
 def test_get_option_conf_no_section():
     """deqp.get_option: if a no_section error is raised and env is unset None is return
     """
@@ -86,8 +86,8 @@ def test_get_option_conf_no_section():
 
 # The first argument ensures the sectio exists
 @utils.piglit.set_piglit_conf(('deqp_test', 'test_env', 'from conf'),
-                       ('deqp_test', 'not_exists', None))
-@utils.nose.set_env(_PIGLIT_TEST_ENV=None)
+                              ('deqp_test', 'not_exists', None))
+@mock.patch.dict('os.environ', {}, True)
 def test_get_option_conf_no_option():
     """deqp.get_option: if a no_option error is raised and env is unset None is return
     """

@@ -32,6 +32,10 @@ import os
 import functools
 
 import nose.tools as nt
+try:
+    import mock
+except ImportError:
+    from unittest import mock
 
 from . import utils
 from framework import results
@@ -146,21 +150,21 @@ def test_decompress_none():
 
 
 @_add_compression('foobar')
-@utils.nose.set_env(PIGLIT_COMPRESSION='foobar')
+@mock.patch.dict('os.environ', {'PIGLIT_COMPRESSION': 'foobar'})
 def testget_mode_env():
     """framework.backends.compression.get_mode: uses PIGlIT_COMPRESSION environment variable"""
     nt.eq_(compression.get_mode(), 'foobar')
 
 
 @_add_compression('foobar')
-@utils.nose.set_env(PIGLIT_COMPRESSION=None)
+@mock.patch.dict('os.environ', {}, True)
 @utils.piglit.set_piglit_conf(('core', 'compression', 'foobar'))
 def testget_mode_piglit_conf():
     """framework.backends.compression.get_mode: uses piglit.conf [core]:compression value if env is unset"""
     nt.eq_(compression.get_mode(), 'foobar')
 
 
-@utils.nose.set_env(PIGLIT_COMPRESSION=None)
+@mock.patch.dict('os.environ', {}, True)
 @utils.piglit.set_piglit_conf(('core', 'compression', None))
 def testget_mode_default():
     """framework.backends.compression.get_mode: uses DEFAULT if env and piglit.conf are unset"""
@@ -178,7 +182,7 @@ def test_decompress_gz():
     _test_decompressor('gz')
 
 
-@utils.nose.set_env(PIGLIT_COMPRESSION='gz')
+@mock.patch.dict('os.environ', {'PIGLIT_COMPRESSION': 'gz'})
 def test_gz_output():
     """framework.backends: when using gz compression a gz file is created"""
     nt.eq_(_test_extension(), '.gz')
@@ -195,7 +199,7 @@ def test_decompress_bz2():
     _test_decompressor('bz2')
 
 
-@utils.nose.set_env(PIGLIT_COMPRESSION='bz2')
+@mock.patch.dict('os.environ', {'PIGLIT_COMPRESSION': 'bz2'})
 def test_bz2_output():
     """framework.backends: when using bz2 compression a bz2 file is created"""
     nt.eq_(_test_extension(), '.bz2')
@@ -212,14 +216,14 @@ def test_decompress_xz():
     _test_decompressor('xz')
 
 
-@utils.nose.set_env(PIGLIT_COMPRESSION='xz')
+@mock.patch.dict('os.environ', {'PIGLIT_COMPRESSION': 'xz'})
 def test_xz_output():
     """framework.backends: when using xz compression a xz file is created"""
     nt.eq_(_test_extension(), '.xz')
 
 
 @_add_compression('foobar')
-@utils.nose.set_env(PIGLIT_COMPRESSION=None)
+@mock.patch.dict('os.environ', {}, True)
 @utils.piglit.set_piglit_conf(('core', 'compression', 'foobar'))
 def test_update_piglit_conf():
     """framework.backends.compression: The compression mode honors updates to piglit.conf.
@@ -233,7 +237,7 @@ def test_update_piglit_conf():
 
 @utils.nose.Skip.py3
 @utils.nose.Skip.module('backports.lzma', available=False)
-@utils.nose.set_env(PIGLIT_COMPRESSION='xz')
+@mock.patch.dict('os.environ', {'PIGLIT_COMPRESSION': 'xz'})
 @utils.nose.test_in_tempdir
 def test_xz_shell_override():
     """framework.backends.compression: the xz shell utility path can overwrite"""
