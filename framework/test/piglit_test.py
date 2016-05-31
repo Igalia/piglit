@@ -25,9 +25,9 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import glob
 import os
 import sys
-import glob
 try:
     import simplejson as json
 except ImportError:
@@ -68,14 +68,15 @@ class PiglitBaseTest(ValgrindMixin, Test):
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
 
     def interpret_result(self):
-        outlines = self.result.out.split('\n')
-        outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
+        out = []
 
-        # FIXME: handle this properly. It needs a method in TestResult probably
-        for piglit in outpiglit:
-            self.result.update(json.loads(piglit))
-        self.result.out = '\n'.join(
-            s for s in outlines if not s.startswith('PIGLIT:'))
+        for each in self.result.out.split('\n'):
+            if each.startswith('PIGLIT:'):
+                self.result.update(json.loads(each[8:]))
+            else:
+                out.append(each)
+
+        self.result.out = '\n'.join(out)
 
         super(PiglitBaseTest, self).interpret_result()
 
