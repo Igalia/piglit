@@ -77,17 +77,17 @@ def test_testprofile_default_dmesg():
     nt.ok_(isinstance(profile_.dmesg, dmesg.DummyDmesg))
 
 
+@utils.nose.Skip.platform('linux')
 def test_testprofile_set_dmesg_true():
     """profile.TestProfile: Dmesg returns an appropriate dmesg is set to True"""
-    utils.nose.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
     nt.ok_(isinstance(profile_.dmesg, dmesg.LinuxDmesg))
 
 
+@utils.nose.Skip.platform('linux')
 def test_testprofile_set_dmesg_false():
     """profile.TestProfile: Dmesg returns a DummyDmesg if set to False"""
-    utils.nose.platform_check('linux')
     profile_ = profile.TestProfile()
     profile_.dmesg = True
     profile_.dmesg = False

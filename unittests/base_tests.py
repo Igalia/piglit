@@ -31,6 +31,10 @@ try:
     from unittest import mock
 except ImportError:
     import mock
+try:
+    import subprocess32 as subprocess
+except ImportError:
+    import subprocess
 
 import six
 import nose.tools as nt
@@ -87,6 +91,8 @@ def test_run_return_early():
 
 
 @attr('slow')
+@utils.nose.Skip.module('psutil', available=True)
+@utils.nose.Skip.backport(3.3, 'subprocess32')
 @nt.timed(6)
 def test_timeout_kill_children():
     """test.base.Test: kill children if terminate fails
@@ -97,13 +103,6 @@ def test_timeout_kill_children():
     This test could leave processes running if it fails.
 
     """
-    utils.nose.module_check('psutil')
-    if six.PY2:
-        utils.nose.module_check('subprocess32')
-        import subprocess32 as subprocess  # pylint: disable=import-error
-    elif six.PY3:
-        import subprocess
-
     class PopenProxy(object):
         """An object that proxies Popen, and saves the Popen instance as an
         attribute.
@@ -173,6 +172,8 @@ def test_timeout_kill_children():
 
 
 @attr('slow')
+@utils.nose.Skip.backport(3.3, 'subprocess32')
+@utils.nose.Skip.binary('sleep')
 @nt.timed(6)
 def test_timeout():
     """test.base.Test: Stops running test after timeout expires
@@ -181,37 +182,29 @@ def test_timeout():
     if the test runs 5 seconds it's run too long
 
     """
-    if six.PY2:
-        utils.nose.module_check('subprocess32')
-    utils.nose.binary_check('sleep', 1)
-
     test = TimeoutTest(['sleep', '60'])
     test.timeout = 1
     test.run()
 
 
 @attr('slow')
+@utils.nose.Skip.backport(3.3, 'subprocess32')
+@utils.nose.Skip.binary('sleep')
 @nt.timed(6)
 def test_timeout_timeout():
     """test.base.Test: Sets status to 'timeout' when timeout exceeded"""
-    if six.PY2:
-        utils.nose.module_check('subprocess32')
-    utils.nose.binary_check('sleep', 1)
-
     test = TimeoutTest(['sleep', '60'])
     test.timeout = 1
     test.run()
     nt.eq_(test.result.result, 'timeout')
 
 
+@utils.nose.Skip.backport(3.3, 'subprocess32')
+@utils.nose.Skip.binary('true')
 @nt.timed(2)
 def test_timeout_pass():
     """test.base.Test: Doesn't change status when timeout not exceeded
     """
-    if six.PY2:
-        utils.nose.module_check('subprocess32')
-    utils.nose.binary_check('true')
-
     test = TimeoutTest(['true'])
     test.timeout = 1
     test.result.result = 'pass'

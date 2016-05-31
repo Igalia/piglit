@@ -32,8 +32,6 @@ import os
 import functools
 
 import nose.tools as nt
-from nose.plugins.skip import SkipTest
-import six
 
 from . import utils
 from framework import results
@@ -233,20 +231,12 @@ def test_update_piglit_conf():
     nt.eq_(compression.get_mode(), 'foobar')
 
 
+@utils.nose.Skip.py3
+@utils.nose.Skip.module('backports.lzma', available=False)
 @utils.nose.set_env(PIGLIT_COMPRESSION='xz')
 @utils.nose.test_in_tempdir
 def test_xz_shell_override():
     """framework.backends.compression: the xz shell utility path can overwrite"""
-    if six.PY3:
-        raise SkipTest('Test is irrelvent on python 3')
-
-    try:
-        import backports.lzma  # pylint: disable=unused-variable
-    except ImportError:
-        pass
-    else:
-        raise SkipTest('Test requires shell path, not backports.lzma path.')
-
     with open('foo.json.xz', 'w') as f:
         f.write('foo')
 

@@ -113,9 +113,9 @@ class TestJUnitSingleTest(TestJunitNoTests):
         """backends.junit.JUnitBackend.write_test(): (once) produces well formed xml"""
         super(TestJUnitSingleTest, self).test_xml_well_formed()
 
+    @utils.nose.Skip.module('lxml', available=True)
     def test_xml_valid(self):
         """backends.junit.JUnitBackend.write_test(): (once) produces valid xml"""
-        utils.nose.module_check('lxml')
         schema = etree.XMLSchema(file=JUNIT_SCHEMA)
         with open(self.test_file, 'r') as f:
             nt.ok_(schema.validate(etree.parse(f)), msg='xml is not valid')

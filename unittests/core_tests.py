@@ -33,9 +33,9 @@ import textwrap
 # There is a very high potential that one of these will raise an ImportError
 # pylint: disable=import-error
 try:
-    from unittest import mock
-except ImportError:
     import mock
+except ImportError:
+    from unittest import mock
 # pylint: enable=import-error
 
 import nose.tools as nt
@@ -332,7 +332,7 @@ def test_check_dir_handler():
                        handler=mock.Mock(side_effect=utils.nose.SentinalException))
 
 
-@utils.nose.skip(not six.PY3, 'Test is only relevant on python 3.x')
+@utils.nose.Skip.py2
 def test_check_dir_stat_FileNotFoundError():
     """core.check_dir: FileNotFoundError is raised and failifexsits is False continue"""
     with mock.patch('framework.core.os.stat',

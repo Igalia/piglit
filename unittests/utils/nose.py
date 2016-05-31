@@ -42,6 +42,7 @@ from contextlib import contextmanager
 
 from nose.plugins.skip import SkipTest
 import six
+import wrapt
 try:
     from six.moves import getcwd
 except ImportError:
@@ -244,40 +245,91 @@ def generator(func):
     return test_wrapper
 
 
-def binary_check(bin_, errno_=None):
-    """Check for the existence of a binary or raise SkipTest.
+@wrapt.decorator
+def passthrough(wrapped, _, args, kwargs):
+    return wrapped(*args, **kwargs)
 
-    If an errno_ is provided then a skip test will be raised unless the error
-    number provided is raised, or no error is raised.
+
+class Skip(object):
+    """Class providing conditional skipping support.
+
+    Provides a number of class methods as alternate constructors for special
+    skip conditions, these are merely convenience methods.
 
     """
-    with open(os.devnull, 'w') as null:
-        try:
-            subprocess.check_call([bin_], stdout=null, stderr=null)
-        except OSError as e:
-            if e.errno == errno.ENOENT:
-                raise SkipTest('Binary {} not available'.format(bin_))
-        except subprocess.CalledProcessError as e:
-            if errno_ is not None and e.returncode == errno_:
-                pass
-            else:
-                raise SkipTest(
-                    'Binary provided bad returncode of {} (wanted {})'.format(
-                        e.returncode, errno_))
+    def __init__(self, condition, description):
+        self.__skip = condition
+        self.__description = description
 
+    @classmethod
+    def py3(cls, _=None):
+        """Skip if the interpreter python 3."""
+        return cls(six.PY3, 'Test is not relevant on python 3.x')
 
-def module_check(module):
-    """Check that an external module is available or skip."""
-    try:
-        importlib.import_module(module)
-    except ImportError:
-        raise SkipTest('Required module {} not available.'.format(module))
+    @classmethod
+    def py2(cls, _=None):
+        """Skip if the interpreter is python 2."""
+        return cls(six.PY2, 'Test is not relevant on python 2.x')
 
+    @classmethod
+    def module(cls, name, available=False):
+        """Skip if the provided external module is (not) available."""
+        assert isinstance(available, bool), 'avilable must be bool'
+        def check():
+            try:
+                importlib.import_module(name)
+            except ImportError:
+                return False
+            return True
 
-def platform_check(plat):
-    """If the platform is not in the list specified skip the test."""
-    if not sys.platform.startswith(plat):
-        raise SkipTest('Platform {} is not supported'.format(sys.platform))
+        return cls(check() is not available,
+                   'Test requires that module {} is {}available'.format(
+                       name, '' if available else 'not '))
+
+    @classmethod
+    def backport(cls, version, name):
+        """Skip if the interpreter needs a backport that isn't available.
+
+        Arguments:
+        version -- The minimum version that doesn't require the backport
+        name -- the name of the required module
+
+        """
+        assert isinstance(version, float), 'version must be float'
+        if float('.'.join(str(v) for v in sys.version_info[:2])) < version:
+            return cls.module(name, True)
+        return passthrough
+
+    @classmethod
+    def binary(cls, name):
+        """Skip if the requested binary isn't available."""
+        def check():
+            with open(os.devnull, 'w') as null:
+                try:
+                    # Pass the bogus arg in case the program tries to read
+                    # stdin, like xz
+                    subprocess.check_call([name, 'totallymadeupdoesntexistarg'],
+                                          stdout=null, stderr=null)
+                except OSError as e:
+                    if e.errno == errno.ENOENT:
+                        return False
+                except subprocess.CalledProcessError as e:
+                    pass
+            return True
+
+        return cls(
+            check(), 'Test requires that binary {} is available'.format(name))
+
+    @classmethod
+    def platform(cls, name, is_=False):
+        return cls(sys.platform.startswith(name) is is_,
+                   'Platform {} is not supported'.format(sys.platform))
+
+    @wrapt.decorator
+    def __call__(self, wrapped, instance, args, kwargs):
+        if self.__skip:
+            raise SkipTest(self.__description)
+        return wrapped(*args, **kwargs)
 
 
 def test_in_tempdir(func):
@@ -387,28 +439,3 @@ def set_env(**envargs):
         return _inner
 
     return _decorator
-
-
-def skip(condition, description):
-    """Skip a test if the condition is met.
-
-    Arguments:
-    condition -- If this is truthy then the test will be skippped
-    description -- the message that SkipTest will display if the test is
-                   skipped
-
-    """
-
-    def _wrapper(func):
-        """The function that acutally does the wrapping."""
-
-        @functools.wraps(func)
-        def _inner(*args, **kwargs):
-            """The function that is actually called."""
-            if condition:
-                raise SkipTest(description)
-            return func(*args, **kwargs)
-
-        return _inner
-
-    return _wrapper

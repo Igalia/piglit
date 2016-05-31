@@ -151,11 +151,9 @@ class TestMonitoring(object):
 
         nt.assert_equal(self.monitoring.abort_needed, False)
 
+    @utils.nose.Skip.platform('linux')
     def test_Monitoring_dmesg_error(self):
         """monitoring.Monitoring: error found on the dmesg."""
-
-        utils.nose.platform_check('linux')
-
         mock_out = mock.Mock(return_value=b'[1.0]This\n[2.0]is\n[3.0]dmesg')
         with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
             self.monitoring.add_rule('no_error_file',
@@ -170,11 +168,9 @@ class TestMonitoring(object):
 
         nt.assert_equal(self.monitoring.abort_needed, True)
 
+    @utils.nose.Skip.platform('linux')
     def test_Monitoring_dmesg_no_error(self):
         """monitoring.Monitoring: no error found on the dmesg."""
-
-        utils.nose.platform_check('linux')
-
         mock_out = mock.Mock(return_value=b'[1.0]This\n[2.0]is\n[3.0]dmesg')
         with mock.patch('framework.dmesg.subprocess.check_output', mock_out):
             self.monitoring.add_rule('no_error_file',

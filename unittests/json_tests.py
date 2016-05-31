@@ -97,22 +97,22 @@ class TestJsonOutput(utils.nose.StaticDirectory):
         """JSON: tests is a root key."""
         nt.assert_in('tests', self.json)
 
+    @utils.nose.Skip.platform('linux')
+    @utils.nose.Skip.binary('lspci')
     def test_root_lspci(self):
         """JSON: lspci is a root key."""
-        utils.nose.platform_check('linux')
-        utils.nose.binary_check('lspci')
         nt.assert_in('lspci', self.json)
 
+    @utils.nose.Skip.platform('linux')
+    @utils.nose.Skip.binary('uname')
     def test_root_uname(self):
         """JSON: uname is a root key."""
-        utils.nose.platform_check('linux')
-        utils.nose.binary_check('uname')
         nt.assert_in('uname', self.json)
 
+    @utils.nose.Skip.platform('linux')
+    @utils.nose.Skip.binary('glxinfo')
     def test_root_glxinfo(self):
         """JSON: glxinfo is a root key."""
-        utils.nose.platform_check('linux')
-        utils.nose.binary_check('glxinfo')
         nt.assert_in('glxinfo', self.json)
 
     def test_root_time_elapsed(self):
