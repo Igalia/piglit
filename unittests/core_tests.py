@@ -62,53 +62,6 @@ dir = foo
 """)
 
 
-def _save_core_config(func):
-    """Decorator function that saves and restores environment state.
-
-    This allows the test to modify any protected state, and guarantees that it
-    will be restored afterwords.
-
-    Curerntly this protects a <piglit path>/piglit.conf, and $XDG_CONFIG_HOME
-    and $HOME
-
-    """
-    @functools.wraps(func)
-    def inner(*args, **kwargs):
-        """Save and restore state."""
-        saved_env = {}
-        restore_piglitconf = False
-
-        try:
-            for env in ['XDG_CONFIG_HOME', 'HOME']:
-                if env in os.environ:
-                    saved_env[env] = os.environ.pop(env)
-
-            if os.path.exists('piglit.conf'):
-                shutil.move('piglit.conf', 'piglit.conf.restore')
-                restore_piglitconf = True
-            core.PIGLIT_CONFIG = core.PiglitConfig(allow_no_value=True)
-        except Exception as e:
-            raise utils.nose.UtilsError(e)
-
-        func(*args, **kwargs)
-
-        try:
-            for env in ['XDG_CONFIG_HOME', 'HOME']:
-                if env in saved_env:
-                    os.environ[env] = saved_env[env]
-                elif env in os.environ:
-                    del os.environ[env]
-
-            if restore_piglitconf:
-                shutil.move('piglit.conf.restore', 'piglit.conf')
-            core.PIGLIT_CONFIG = core.PiglitConfig(
-                allow_no_value=True)
-        except Exception as e:
-            raise utils.nose.UtilsError(e)
-
-    return inner
-
-
 @utils.nose.no_error
 def test_PiglitConfig_init():
     """core.PiglitConfig: initializes"""
@@ -173,7 +126,7 @@ def test_parse_listfile_tilde():
            msg='expected: {} but got: {}'.format(expected, results[0]))
 
 
-@_save_core_config
+@mock.patch('framework.core.os.environ', {})
 def test_xdg_config_home():
     """core.get_config() finds $XDG_CONFIG_HOME/piglit.conf"""
     with utils.nose.tempdir() as tdir:
@@ -186,7 +139,7 @@ def test_xdg_config_home():
            msg='$XDG_CONFIG_HOME not found')
 
 
-@_save_core_config
+@mock.patch('framework.core.os.environ', {})
 def test_config_home_fallback():
     """core.get_config() finds $HOME/.config/piglit.conf"""
     with utils.nose.tempdir() as tdir:
@@ -196,11 +149,11 @@ def test_config_home_fallback():
             f.write(_CONF_FILE)
         core.get_config()
 
-    nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
-           msg='$HOME/.config/piglit.conf not found')
+        nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
+               msg='$HOME/.config/piglit.conf not found')
 
 
-@_save_core_config
+@mock.patch('framework.core.os.environ', {})
 @utils.nose.test_in_tempdir
 def test_local():
     """core.get_config() finds ./piglit.conf"""
@@ -216,7 +169,7 @@ def test_local():
            msg='./piglit.conf not found')
 
 
-@_save_core_config
+@mock.patch('framework.core.os.environ', {})
 def test_piglit_root():
     """core.get_config() finds "piglit root"/piglit.conf"""
     with open('piglit.conf', 'w') as f:
