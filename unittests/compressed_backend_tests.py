@@ -237,6 +237,7 @@ def test_update_piglit_conf():
 
 @utils.nose.Skip.py3
 @utils.nose.Skip.module('backports.lzma', available=False)
+@utils.nose.Skip.binary('xz')
 @mock.patch.dict('os.environ', {'PIGLIT_COMPRESSION': 'xz'})
 @utils.nose.test_in_tempdir
 def test_xz_shell_override():
