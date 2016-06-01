@@ -2734,6 +2734,7 @@ piglit_display(void)
 		float c[32];
 		double d[4];
 		int x, y, z, w, h, l, tex, level;
+		unsigned ux, uy;
 		char s[32];
 
 
@@ -2969,9 +2970,9 @@ piglit_display(void)
 				pass = false;
 			}
 		} else if (sscanf(line,
-				  "probe atomic counter %d %s %d",
-				  &x, s, &y) == 3) {
-			if (!probe_atomic_counter(x, s, y)) {
+				  "probe atomic counter %u %s %u",
+				  &ux, s, &uy) == 3) {
+			if (!probe_atomic_counter(ux, s, uy)) {
 				piglit_report_result(PIGLIT_FAIL);
 			}
 		} else if (sscanf(line, "probe ssbo uint %d %d %s 0x%x",
