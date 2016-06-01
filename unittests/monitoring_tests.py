@@ -56,7 +56,7 @@ class TestMonitoring(object):
         self.monitoring = monitoring.Monitoring(False)
 
     def test_Monitoring_delete_rule(self):
-        """monitorin.Monitoring: add and delete rule."""
+        """monitoring.Monitoring: add and delete rule."""
 
         with utils.nose.tempfile(self.init_contents) as tfile:
             self.monitoring.add_rule('error_file',
@@ -65,11 +65,10 @@ class TestMonitoring(object):
                                      self.regex)
             self.monitoring.update_monitoring()
 
-        self.monitoring.delete_rule('error_file')
-        with open(tfile, 'w') as fp:
-            fp.write(self.error_contents)
-            fp.close()
-            self.monitoring.check_monitoring()
+            self.monitoring.delete_rule('error_file')
+            with open(tfile, 'w') as fp:
+                fp.write(self.error_contents)
+                self.monitoring.check_monitoring()
 
         nt.assert_equal(self.monitoring.abort_needed, False)
 
@@ -93,9 +92,8 @@ class TestMonitoring(object):
                                      self.regex)
             self.monitoring.update_monitoring()
 
-        with open(tfile, 'w') as fp:
-            fp.write(self.error_contents)
-            fp.close()
+            with open(tfile, 'w') as fp:
+                fp.write(self.error_contents)
             self.monitoring.check_monitoring()
 
         nt.assert_equal(self.monitoring.abort_needed, True)
@@ -110,9 +108,8 @@ class TestMonitoring(object):
                                      self.regex)
             self.monitoring.update_monitoring()
 
-        with open(tfile, 'w') as fp:
-            fp.write(self.no_error_contents)
-            fp.close()
+            with open(tfile, 'w') as fp:
+                fp.write(self.no_error_contents)
             self.monitoring.check_monitoring()
 
         nt.assert_equal(self.monitoring.abort_needed, False)
@@ -127,9 +124,8 @@ class TestMonitoring(object):
                                      self.regex)
             self.monitoring.update_monitoring()
 
-        with open(tfile, 'w') as fp:
-            fp.write(self.error_contents)
-            fp.close()
+            with open(tfile, 'w') as fp:
+                fp.write(self.error_contents)
             self.monitoring.check_monitoring()
 
         nt.assert_equal(self.monitoring.abort_needed, True)
@@ -144,9 +140,8 @@ class TestMonitoring(object):
                                      self.regex)
             self.monitoring.update_monitoring()
 
-        with open(tfile, 'w') as fp:
-            fp.write(self.no_error_contents)
-            fp.close()
+            with open(tfile, 'w') as fp:
+                fp.write(self.no_error_contents)
             self.monitoring.check_monitoring()
 
         nt.assert_equal(self.monitoring.abort_needed, False)
