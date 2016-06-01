@@ -106,7 +106,7 @@ class Test_parse_listfile_TrailingWhitespace(object):
         nt.assert_equal(self.results[2], "/tmp/foo",
                         msg="Trailing tabs not removed!")
 
-
+@utils.nose.Skip.platform('win32', is_=True)
 def test_parse_listfile_tilde():
     """core.parse_listfile(): tildes (~) are properly expanded.
 
