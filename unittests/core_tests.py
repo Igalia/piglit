@@ -174,7 +174,7 @@ def test_piglit_root():
         f.write(_CONF_FILE)
         with utils.nose.chdir('..'):
             core.get_config()
-        os.unlink('piglit.conf')
+    os.unlink('piglit.conf')
 
     nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
            msg='$PIGLIT_ROOT not found')
