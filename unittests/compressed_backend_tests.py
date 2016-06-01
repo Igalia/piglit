@@ -205,17 +205,37 @@ def test_bz2_output():
     nt.eq_(_test_extension(), '.bz2')
 
 
+@utils.nose.Skip.backport(3.0, 'backports.lzma')
 @utils.nose.no_error
-def test_compress_xz():
-    """framework.backends.compression: can compress to 'xz'"""
+def test_compress_xz_module():
+    """framework.backends.compression: can compress to 'xz' via module"""
     _test_compressor('xz')
 
 
-def test_decompress_xz():
-    """framework.backends.compression: can decompress from 'xz'"""
+@utils.nose.Skip.py3
+@utils.nose.Skip.module('backports.lzma', available=True)
+@utils.nose.Skip.binary('xz')
+@utils.nose.no_error
+def test_compress_xz_binary():
+    """framework.backends.compression: can compress to 'xz' via binary"""
+    _test_compressor('xz')
+
+
+@utils.nose.Skip.backport(3.0, 'backports.lzma')
+def test_decompress_xz_module():
+    """framework.backends.compression: can decompress from 'xz' via module"""
     _test_decompressor('xz')
 
 
+@utils.nose.Skip.py3
+@utils.nose.Skip.module('backports.lzma', available=True)
+@utils.nose.Skip.binary('xz')
+def test_decompress_xz_binary():
+    """framework.backends.compression: can decompress from 'xz' via binary"""
+    _test_decompressor('xz')
+
+
+@utils.nose.Skip.backport(3.0, 'backports.lzma')
 @mock.patch.dict('os.environ', {'PIGLIT_COMPRESSION': 'xz'})
 def test_xz_output():
     """framework.backends: when using xz compression a xz file is created"""
