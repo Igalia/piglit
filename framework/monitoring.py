@@ -36,7 +36,6 @@ from __future__ import (
 )
 import abc
 import errno
-import fcntl
 import os
 import re
 
@@ -219,93 +218,98 @@ class BaseMonitoring(object):
                     return line
 
 
-class MonitoringFile(BaseMonitoring):
-    """Monitoring from a file
+if os.name == 'posix':
+    import fcntl
 
-    This class is for monitoring the system from a file that
-    can be a standard file or a locked file. The locked file
-    algorithm uses fnctl, so it doesn't work on non Unix systems
 
-    Arguments:
-    is_locked -- True if the target is a locked file
+    class MonitoringFile(BaseMonitoring):
+        """Monitoring from a file
 
-    """
-    _is_locked = False
+        This class is for monitoring the system from a file that
+        can be a standard file or a locked file. The locked file
+        algorithm uses fnctl, so it doesn't work on non Unix systems
 
-    def __init__(self, monitoring_source, regex, is_locked=False):
-        """Create a MonitoringFile instance"""
-        self._last_message = None
-        self._is_locked = is_locked
-        super(MonitoringFile, self).__init__(monitoring_source, regex)
-
-    def update_monitoring(self):
-        """Open the file and get the differences
-
-        Get the contents of the file, then calculate new messages.
-        This implements also a specific method for reading locked files.
+        Arguments:
+        is_locked -- True if the target is a locked file
 
         """
+        _is_locked = False
 
-        try:
-            with open(self._monitoring_source, 'r') as f:
-                lines = []
-                if self._is_locked:
-                    # Create a duplicated file descriptor, this avoid lock
-                    fd = os.dup(f.fileno())
-                    # use I/O control for reading the lines
-                    fcntl.fcntl(fd, fcntl.F_SETFL, os.O_NONBLOCK)
+        def __init__(self, monitoring_source, regex, is_locked=False):
+            """Create a MonitoringFile instance"""
+            self._last_message = None
+            self._is_locked = is_locked
+            super(MonitoringFile, self).__init__(monitoring_source, regex)
 
-                    while True:
-                        try:
-                            line = os.read(fd, 1024)
-                            if not line:
-                                break;
-                        except OSError as e:
-                            if e.errno == errno.EAGAIN:
-                                break
-                            else:
-                                raise e
-                        lines.append(line.decode("utf-8", "strict"))
-                    os.close(fd)
+        def update_monitoring(self):
+            """Open the file and get the differences
 
-                else:
-                    lines = f.read().splitlines()
+            Get the contents of the file, then calculate new messages.
+            This implements also a specific method for reading locked files.
 
-                f.close()
+            """
 
-                # Find all new entries, do this by slicing the list of the lines to only
-                # returns elements after the last element stored. If there are not
-                # matches a value error is raised, that means all of the lines are new
-                l = 0
-                for index, item in enumerate(reversed(lines)):
-                    if item == self._last_message:
-                        l = len(lines) - index  # don't include the matched element
-                        break
-                self._new_messages = lines[l:]
-                # Attempt to store the last element of lines,
-                # unless there was no line
-                self._last_message = lines[-1] if lines else None
-        except Exception:
-            # if an error occured, we consider there are no new messages
-            self._new_messages = []
-            pass
+            try:
+                with open(self._monitoring_source, 'r') as f:
+                    lines = []
+                    if self._is_locked:
+                        # Create a duplicated file descriptor, this avoid lock
+                        fd = os.dup(f.fileno())
+                        # use I/O control for reading the lines
+                        fcntl.fcntl(fd, fcntl.F_SETFL, os.O_NONBLOCK)
+
+                        while True:
+                            try:
+                                line = os.read(fd, 1024)
+                                if not line:
+                                    break;
+                            except OSError as e:
+                                if e.errno == errno.EAGAIN:
+                                    break
+                                else:
+                                    raise e
+                            lines.append(line.decode("utf-8", "strict"))
+                        os.close(fd)
+
+                    else:
+                        lines = f.read().splitlines()
+
+                    f.close()
+
+                    # Find all new entries, do this by slicing the list of the
+                    # lines to only returns elements after the last element
+                    # stored. If there are not matches a value error is raised,
+                    # that means all of the lines are new
+                    l = 0
+                    for index, item in enumerate(reversed(lines)):
+                        if item == self._last_message:
+                            l = len(lines) - index  # don't include the matched element
+                            break
+                    self._new_messages = lines[l:]
+                    # Attempt to store the last element of lines,
+                    # unless there was no line
+                    self._last_message = lines[-1] if lines else None
+            except Exception:
+                # if an error occured, we consider there are no new messages
+                self._new_messages = []
+                pass
 
 
-class MonitoringLinuxDmesg(BaseMonitoring, LinuxDmesg):
-    """Monitoring on dmesg
+    class MonitoringLinuxDmesg(BaseMonitoring, LinuxDmesg):
+        """Monitoring on dmesg
 
-    This class is for monitoring on the system dmesg. It's inherited
-    from LinuxDmesg for the dmesg processing methods.
+        This class is for monitoring on the system dmesg. It's inherited
+        from LinuxDmesg for the dmesg processing methods.
 
-    Work only on Linux operating system.
+        Work only on Linux operating system.
 
-    """
-    def __init__(self, monitoring_source, regex):
-        """Create a MonitoringLinuxDmesg instance"""
-        self.DMESG_COMMAND = ['dmesg']+monitoring_source.split()
-        BaseMonitoring.__init__(self, monitoring_source, regex)
-        LinuxDmesg.__init__(self)
+        """
+        def __init__(self, monitoring_source, regex):
+            """Create a MonitoringLinuxDmesg instance"""
+            self.DMESG_COMMAND = ['dmesg']+monitoring_source.split()
+            BaseMonitoring.__init__(self, monitoring_source, regex)
+            LinuxDmesg.__init__(self)
 
-    def update_monitoring(self):
-        """Call update_dmesg"""
-        self.update_dmesg()
+        def update_monitoring(self):
+            """Call update_dmesg"""
+            self.update_dmesg()

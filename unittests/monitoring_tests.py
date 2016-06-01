@@ -55,6 +55,7 @@ class TestMonitoring(object):
         self.error_contents = r'BUG:bar\n'
         self.monitoring = monitoring.Monitoring(False)
 
+    @utils.nose.Skip.platform('linux')
     def test_Monitoring_delete_rule(self):
         """monitoring.Monitoring: add and delete rule."""
 
@@ -82,6 +83,7 @@ class TestMonitoring(object):
                                      tfile,
                                      self.regex)
 
+    @utils.nose.Skip.platform('linux')
     def test_Monitoring_file_error(self):
         """monitoring.Monitoring: error found on a file."""
 
@@ -98,6 +100,7 @@ class TestMonitoring(object):
 
         nt.assert_equal(self.monitoring.abort_needed, True)
 
+    @utils.nose.Skip.platform('linux')
     def test_Monitoring_file_no_error(self):
         """monitoring.Monitoring: no error found on a file."""
 
@@ -114,6 +117,7 @@ class TestMonitoring(object):
 
         nt.assert_equal(self.monitoring.abort_needed, False)
 
+    @utils.nose.Skip.platform('linux')
     def test_Monitoring_locked_file_error(self):
         """monitoring.Monitoring: error found on a locked file."""
 
@@ -130,6 +134,7 @@ class TestMonitoring(object):
 
         nt.assert_equal(self.monitoring.abort_needed, True)
 
+    @utils.nose.Skip.platform('linux')
     def test_Monitoring_locked_file_no_error(self):
         """monitoring.Monitoring: no error found on a locked file."""
 
