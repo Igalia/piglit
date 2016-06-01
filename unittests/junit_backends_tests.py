@@ -323,12 +323,10 @@ def test_load_folder_name():
 def test_load_default_name():
     """backends.junit._load: uses 'junit result' for name as fallback"""
     with utils.nose.tempdir() as tdir:
-        os.chdir(tdir)
-
-        filename = 'results.xml'
-        with open(filename, 'w') as f:
-            f.write(_XML)
-
-        test = backends.junit.REGISTRY.load(filename, 'none')
+        with utils.nose.chdir(tdir):
+            filename = 'results.xml'
+            with open(filename, 'w') as f:
+                f.write(_XML)
+            test = backends.junit.REGISTRY.load(filename, 'none')
 
     nt.assert_equal(test.name, 'junit result')

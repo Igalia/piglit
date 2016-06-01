@@ -158,12 +158,10 @@ def test_config_home_fallback():
 def test_local():
     """core.get_config() finds ./piglit.conf"""
     with utils.nose.tempdir() as tdir:
-        os.chdir(tdir)
-
-        with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
-            f.write(_CONF_FILE)
-
-        core.get_config()
+        with utils.nose.chdir(tdir):
+            with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
+                f.write(_CONF_FILE)
+            core.get_config()
 
     nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
            msg='./piglit.conf not found')
@@ -174,12 +172,8 @@ def test_piglit_root():
     """core.get_config() finds "piglit root"/piglit.conf"""
     with open('piglit.conf', 'w') as f:
         f.write(_CONF_FILE)
-    return_dir = getcwd()
-    try:
-        os.chdir('..')
-        core.get_config()
-    finally:
-        os.chdir(return_dir)
+        with utils.nose.chdir('..'):
+            core.get_config()
         os.unlink('piglit.conf')
 
     nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),

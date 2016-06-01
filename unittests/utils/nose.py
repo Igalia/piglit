@@ -339,16 +339,11 @@ def test_in_tempdir(func):
     returns to the original directory after the test completes.
 
     """
-    original_dir = getcwd()
-
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         with tempdir() as tdir:
-            try:
-                os.chdir(tdir)
+            with chdir(tdir):
                 return func(*args, **kwargs)
-            finally:
-                os.chdir(original_dir)
 
     return wrapper
 
