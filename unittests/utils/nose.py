@@ -404,3 +404,19 @@ def capture_stderr(func):
             sys.stderr = restore
 
     return _inner
+
+
+@contextmanager
+def chdir(goto):
+    """chdir to a directory and back, guaranteed.
+
+    This contextmanager ensures that after changing directory you cahgne back,
+    using a try/finally block.
+
+    """
+    returnto = getcwd()
+    os.chdir(goto)
+    try:
+        yield
+    finally:
+        os.chdir(returnto)
