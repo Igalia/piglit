@@ -29,6 +29,7 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import re
+import sys
 import warnings
 
 try:
@@ -37,7 +38,6 @@ except ImportError:
     import mock
 
 import nose.tools as nt
-import six
 
 from . import utils
 from framework import dmesg, status, results, exceptions
@@ -280,24 +280,13 @@ def test_dummydmesg_update_result():
     nt.eq_(result.result, mock.sentinel.result)
 
 
-@utils.nose.generator
 def test_get_dmesg():
-    """Generate tests for get_dmesg."""
-    tests = [
-        ('linux', dmesg.LinuxDmesg),
-        # There is no dmesg on windows, thus it will always get the dummy
-        ('win32', dmesg.DummyDmesg),
-    ]
-    description = 'dmesg.get_dmesg: returns correct class when platform is {}'
-
-    def test(platform, class_):
-        with mock.patch('framework.dmesg.sys.platform', platform):
-            ret = dmesg.get_dmesg()
-        nt.assert_is_instance(ret, class_)
-
-    for platform, class_ in tests:
-        test.description = description.format(platform)
-        yield test, platform, class_
+    """dmesg.get_dmesg: Returns correct class for platform"""
+    ret = dmesg.get_dmesg()
+    if sys.platform.startswith('win32'):
+        nt.ok_(isinstance(ret, dmesg.DummyDmesg), msg='got {}'.format(type(ret)))
+    elif sys.platform.startswith('linux'):
+        nt.ok_(isinstance(ret, dmesg.LinuxDmesg), msg='got {}'.format(type(ret)))
 
 
 def test_get_dmesg_dummy():
