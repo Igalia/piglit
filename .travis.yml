@@ -1,0 +1,16 @@
+language: python
+python: 3.5
+cache: pip
+env:
+    - TOX_ENV=py27-noaccel
+    - TOX_ENV=py27-accel-nix
+    - TOX_ENV=py33-noaccel
+    - TOX_ENV=py33-accel-nix
+    - TOX_ENV=py34-noaccel
+    - TOX_ENV=py34-accel-nix
+    - TOX_ENV=py35-noaccel
+    - TOX_ENV=py35-accel-nix
+install:
+    pip install tox
+script:
+    - tox -e $TOX_ENV
