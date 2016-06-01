@@ -91,6 +91,7 @@ def test_run_return_early():
 
 
 @attr('slow')
+@utils.nose.Skip.platform('win32', is_=True)
 @utils.nose.Skip.module('psutil', available=True)
 @utils.nose.Skip.backport(3.3, 'subprocess32')
 @nt.timed(6)
