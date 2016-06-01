@@ -302,12 +302,16 @@ class Test(object):
         # Piglit considers environment variables set in all.py (3) to be test
         # requirements.
         #
-        fullenv = dict()
-        for key, value in itertools.chain(six.iteritems(os.environ),
-                                          six.iteritems(options.OPTIONS.env),
-                                          six.iteritems(self.env)):
-            fullenv[key] = str(value)
-
+        # passing this as unicode is basically broken in python2 on windows, it
+        # must be passed a bytes.
+        if six.PY2 and sys.platform.startswith('win32'):
+            f = six.binary_type
+        else:
+            f = six.text_type
+        _base = itertools.chain(six.iteritems(os.environ),
+                                six.iteritems(options.OPTIONS.env),
+                                six.iteritems(self.env))
+        fullenv = {f(k): f(v) for k, v in _base}
 
         try:
             proc = subprocess.Popen(self.command,
