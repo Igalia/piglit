@@ -206,15 +206,15 @@ def tempfile(contents):
                 written directly into the file.
 
     """
-    # Do not delete the tempfile as soon as it is closed
-    temp = tempfile_.NamedTemporaryFile(mode=_WRITE_MODE, delete=False)
-    temp.write(contents)
-    temp.close()
-
-    try:
-        yield temp.name
-    finally:
-        os.remove(temp.name)
+    # It is tempting to use NamedTemporaryFile here (the original
+    # implementation did, in fact), but this won't work on windows beacuse of
+    # implementation details. Since the goal isn't security anyway, just a
+    # unique filename this is implemented in terms of tempdir.
+    with tempdir() as t:
+        name = os.path.join(t, 'tempfile')
+        with open(name, mode=_WRITE_MODE) as f:
+            f.write(contents)
+        yield name
 
 
 @contextmanager
