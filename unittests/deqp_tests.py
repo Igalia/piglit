@@ -117,6 +117,7 @@ def test_iter_deqp_test_cases_test():
     with utils.nose.tempfile('TEST: a.deqp.test') as tfile:
         gen = deqp.iter_deqp_test_cases(tfile)
         nt.eq_('a.deqp.test', next(gen))
+        gen.close()
 
 
 def test_iter_deqp_test_cases_group():
@@ -124,6 +125,7 @@ def test_iter_deqp_test_cases_group():
     with utils.nose.tempfile('GROUP: a group\nTEST: a.deqp.test') as tfile:
         gen = deqp.iter_deqp_test_cases(tfile)
         nt.eq_('a.deqp.test', next(gen))
+        gen.close()
 
 
 @nt.raises(exceptions.PiglitFatalError)
