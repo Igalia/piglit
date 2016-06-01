@@ -119,9 +119,14 @@ piglit_init(int argc, char **argv)
 		"    gl_Position = position;\n"
 		"}\n";
 	static const char fs_source[] =
+		"#if __VERSION__ >= 420\n"
+		"layout(location = 0) out vec4 color;\n"
+		"#else\n"
+		"#define color gl_FragColor\n"
+		"#endif\n"
 		"void main()\n"
 		"{\n"
-		"    gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);\n"
+		"    color = vec4(0.0, 1.0, 0.0, 0.0);\n"
 		"}\n";
 	static const char gs_source[] =
 		"/* At least some versions of AMD's closed-source driver\n"
