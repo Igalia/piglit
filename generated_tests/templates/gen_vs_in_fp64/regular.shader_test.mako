@@ -31,6 +31,16 @@
       glsl_version = '{}.{}'.format(glsl_version_int[0], glsl_version_int[1:3])
 
       return (glsl_version, glsl_version_int)
+
+  def _glsl_to_gl(glsl_type):
+      if glsl_type.startswith("d"):
+          return "double"
+      elif glsl_type.startswith("u"):
+          return "uint"
+      elif glsl_type.startswith("i"):
+          return "int"
+      else:
+          return "float"
 %>
 <% glsl, glsl_int = _version(ver) %>
 
@@ -88,16 +98,16 @@ void main()
 [vertex data]
 % for idx, in_type in enumerate(in_types):
   % if idx == position_order - 1:
-    piglit_vertex/vec3/3 \
+    piglit_vertex/float/vec3 \
   % endif
   % for i in range(arrays[idx]):
     % for j in range(in_type.columns):
-    value${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}/${in_type.name}/${(in_type.rows)}${'/{}'.format(j) if (in_type.columns or 0) > 1 else ''} \
+    value${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}/${_glsl_to_gl(in_type.name)}/${in_type.name}${'/{}'.format(j) if (in_type.columns or 0) > 1 else ''} \
     % endfor
   % endfor
 % endfor
 % if position_order > len(in_types):
-  piglit_vertex/vec3/3\
+  piglit_vertex/float/vec3\
 % endif
 
 % for d in range(len(dvalues)):

@@ -28,7 +28,7 @@
  * tests using a columnar text format, for example:
  *
  *   \verbatim
- *   vertex/vec3/3	foo/uint/1	bar[0]/int/1	bar[1]/int/1
+ *   vertex/double/vec3	foo/uint/uint	bar[0]/int/int	bar[1]/int/int
  *   0.0 0.0 0.0	10		0		0	# comment
  *   0.0 1.0 0.0	 5		1		1
  *   1.0 1.0 0.0	 0		0		1
@@ -36,22 +36,21 @@
  *
  * The format consists of a row of column headers followed by any
  * number of rows of data.  Each column header has the form
- * "ATTRNAME[ARRAY_INDEX]/TYPE/COUNT/MATRIX_COLUMN", where ATTRNAME is
- * the name of the vertex attribute to be bound to this column,
- * ARRAY_INDEX is the index, TYPE is the GLSL type of data that
- * follows ("float", "double", "int", "uint" or any derived type like
- * vec2, dmat4, etc.), COUNT is the vector length of the data
- * (e.g. "3" for vec3 data or "2" for mat4x2) and MATRIX_COLUMN is the
- * column number of the data in case of being a matrix. [ARRAY_INDEX]
- * is optional and needs to be specified only in case of array
- * attributes. COUNT is a redundant value that is already specified in
- * the data type but that has been kept for backward
- * compatibility. MATRIX_COLUMN doesn't need to be specified if it is
- * not a matrix column as in the example before. So another example,
- * if you want to specify the data of a mat2x3:
+ * "ATTRNAME[ARRAY_INDEX]/GL_TYPE/GLSL_TYPE/MATRIX_COLUMN", where
+ * ATTRNAME is the name of the vertex attribute to be bound to this
+ * column, ARRAY_INDEX is the index, GL_TYPE is the GL type of data
+ * that follows ("half", "float", "double", "byte", "ubyte", "short",
+ * "ushort", "int" or "uint"), GLSL_TYPE is the GLSL type of the data
+ * ("int", "uint", "float", "double", "ivec"*, "uvec"*, "vec"*,
+ * "dvec"*, "mat"*, "dmat"*) and MATRIX_COLUMN is the column number of
+ * the data in case of being a matrix. [ARRAY_INDEX] is optional and
+ * needs to be specified only in case of array
+ * attributes. MATRIX_COLUMN doesn't need to be specified if it is not
+ * a matrix column as in the example before. So another example, if
+ * you want to specify the data of a mat2x3:
  *
  *   \verbatim
- *   foomatrix/mat2x3/3/0	foomatrix/mat2x3/3/1
+ *   foomatrix/float/mat2x3/0	foomatrix/float/mat2x3/1
  *   0.0 1.0 2.0		3.0 4.0 5.0
  *   6.0 7.0 8.0		9.0 10.0 11.0
  *   \endverbatim
@@ -130,76 +129,136 @@
 #include <string>
 #include <vector>
 #include <errno.h>
+#include <limits.h>
 #include <ctype.h>
 
 #include "piglit-util.h"
 #include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 
-/**
- * Currently all the attribute types we support (int, uint, and float)
- * are 4 bytes in width.
- */
-const int ATTRIBUTE_SIZE = 4;
-
 
 /**
  * Convert a type name string to a GLenum.
  */
-GLenum
-decode_type(const char *type, size_t *rows, size_t *cols)
+static bool
+decode_type(const char *type,
+	    GLenum *gl_type, size_t *gl_type_size, GLenum *glsl_type)
 {
+	assert(type);
+	assert(gl_type);
+	assert(gl_type_size);
+
 	static struct type_table_entry {
 		const char *type; /* NULL means end of table */
-		GLenum enum_value;
+		GLenum gl_type;
+		size_t gl_type_size;
+		GLenum glsl_type;
 	} const type_table[] = {
-		{ "int",     GL_INT            },
-		{ "uint",    GL_UNSIGNED_INT   },
-		{ "float",   GL_FLOAT          },
-		{ "double",  GL_DOUBLE         },
-		{ "ivec",    GL_INT            },
-		{ "uvec",    GL_UNSIGNED_INT   },
-		{ "vec",     GL_FLOAT          },
-		{ "dvec",    GL_DOUBLE         },
-		{ "mat",     GL_FLOAT          },
-		{ "dmat",    GL_DOUBLE         },
-		{ NULL,      0                 }
+		{ "byte",    GL_BYTE,		1,	GL_INT		},
+		{ "ubyte",   GL_UNSIGNED_BYTE,	1,	GL_UNSIGNED_INT	},
+		{ "short",   GL_SHORT,		2,	GL_INT		},
+		{ "ushort",  GL_UNSIGNED_SHORT,	2,	GL_UNSIGNED_INT	},
+		{ "int",     GL_INT,		4,	GL_INT		},
+		{ "uint",    GL_UNSIGNED_INT,	4,	GL_UNSIGNED_INT	},
+		{ "half",    GL_HALF_FLOAT,	2,	GL_FLOAT	},
+		{ "float",   GL_FLOAT,		4,	GL_FLOAT	},
+		{ "double",  GL_DOUBLE,		8,	GL_DOUBLE	},
+		{ NULL,      0,			0,	0		},
 	};
 
 
 	for (int i = 0; type_table[i].type; ++i) {
-		if (0 == strncmp(type, type_table[i].type, strlen(type_table[i].type))) {
-			/* In case of vectors or matrices, let's
-			 * calculate rows and columns, if needed.
-			 */
-			if (i > 3 && (rows || cols)) {
-				size_t type_len = strlen(type);
-				size_t the_rows = type[type_len - 1] - '0';
-				if (rows)
-					*rows = the_rows;
-				if (cols) {
-					/* In case of matrices, let's
-					 * calculate the columns.
-					 */
-					if (i > 7)
-						*cols = type[type_len - 2] == 'x' ?
-							type[type_len - 3] - '0' : the_rows;
-					else
-						*cols = 1;
-				}
-			} else {
-				if (rows)
-					*rows = 1;
-				if (cols)
-					*cols = 1;
-			}
-			return type_table[i].enum_value;
+		if (0 == strcmp(type, type_table[i].type)) {
+			*gl_type = type_table[i].gl_type;
+			*gl_type_size = type_table[i].gl_type_size;
+			if (glsl_type)
+				*glsl_type = type_table[i].glsl_type;
+			return true;
 		}
 	}
 
-	printf("Unrecognized type: %s\n", type);
-	piglit_report_result(PIGLIT_FAIL);
-	return 0;
+	return false;
+}
+
+
+/**
+ * Convert a GLSL type name string to its basic GLenum type.
+ */
+static bool
+decode_glsl_type(const char *type,
+		 GLenum *glsl_type, size_t *rows, size_t *cols, char **endptr)
+{
+	assert(glsl_type);
+	assert(rows);
+	assert(cols);
+	assert(endptr);
+
+	if (isdigit(type[0])) {
+		*rows = strtoul(type, endptr, 10);
+		*cols = 1;
+		*glsl_type = 0;
+		return true;
+	}
+
+	static struct type_table_entry {
+		const char *type; /* NULL means end of table */
+		GLenum glsl_type;
+	} const type_table[] = {
+		{ "int",	GL_INT		},
+		{ "uint",	GL_UNSIGNED_INT	},
+		{ "float",	GL_FLOAT	},
+		{ "double",	GL_DOUBLE	},
+		{ "ivec",	GL_INT		},
+		{ "uvec",	GL_UNSIGNED_INT	},
+		{ "vec",	GL_FLOAT	},
+		{ "dvec",	GL_DOUBLE	},
+		{ "mat",	GL_FLOAT	},
+		{ "dmat",	GL_DOUBLE	},
+		{ NULL,		0		}
+	};
+
+	for (int i = 0; type_table[i].type; ++i) {
+		const size_t type_len = strlen(type_table[i].type);
+		if (0 == strncmp(type, type_table[i].type, type_len)) {
+			*endptr = const_cast<char *>(&type[type_len]);
+
+			/* In case of vectors or matrices, let's
+			 * calculate rows and columns.
+			 */
+			if (i > 3) {
+				if (!isdigit(**endptr))
+					goto cleanup;
+				*rows = **endptr - '0';
+				++*endptr;
+
+				/* In case of matrices, let's
+				 * calculate the rows.
+				 */
+				if (i > 7) {
+					*cols = *rows;
+				        if (**endptr == 'x') {
+						if (!isdigit(*(++*endptr)))
+							goto cleanup;
+						*rows = **endptr - '0';
+						++*endptr;
+					}
+				} else {
+					*cols = 1;
+				}
+			} else {
+				*rows = 1;
+				*cols = 1;
+			}
+			*glsl_type = type_table[i].glsl_type;
+			return true;
+		}
+	}
+
+cleanup:
+
+	*glsl_type = 0;
+	*endptr = const_cast<char *>(type);
+	return false;
 }
 
 
@@ -214,29 +273,39 @@ public:
 	void setup(size_t *offset, size_t stride) const;
 
 	/**
-	 * Data type of this attribute.
+	 * GL data type of this attribute.
 	 */
 	GLenum data_type;
 
 	/**
-	 * Number of columns in the data type of this attribute.
+	 * Size of the GL data type of this attribute.
 	 */
-	size_t data_type_cols;
+	size_t data_type_size;
 
 	/**
-	 * Vector length of this attribute.
+	 * GLSL data type of this attribute.
 	 */
-	size_t count;
-
-	/**
-	 * Index of the matrix column for this attribute.
-	 */
-	size_t matrix_index;
+	GLenum glsl_data_type;
 
 	/**
 	 * Index of the array for this attribute.
 	 */
 	size_t array_index;
+
+	/**
+	 * Number of columns of the GLSL data type of this attribute.
+	 */
+	size_t cols;
+
+	/**
+	 * Number of rows of the GLSL data type of this attribute.
+	 */
+	size_t rows;
+
+	/**
+	 * Index of the matrix column for this attribute.
+	 */
+	size_t matrix_index;
 
 	/**
 	 * Index of this vertex attribute in the linked program.
@@ -248,7 +317,7 @@ public:
 /**
  * Build a vertex_attrib_description from a column header, by looking
  * up the vertex attribute in the linked program and interpreting the
- * type and count parts of the header.
+ * type, dimensions and mattrix_column parts of the header.
  *
  * If there is a parse failure, print a description of the problem and
  * then exit with PIGLIT_FAIL.
@@ -257,12 +326,12 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 						     const char *text)
 {
 	/* Split the column header into
-	 * name[array_index]/type/count/matrix_column fields.
+	 * name[array_index]/type/dimensions/matrix_column fields.
 	 */
 	const char *first_slash = strchr(text, '/');
 	if (first_slash == NULL) {
 		printf("Column headers must be in the form"
-		       " name[array_index]/type/count/matrix_column.\n"
+		       " name[array_index]/type/dimensions/matrix_column.\n"
 		       "Note: [array_index] and matrix_column are optional.\n"
 		       "Got: %s\n",
 		       text);
@@ -291,17 +360,32 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 	const char *second_slash = strchr(first_slash + 1, '/');
 	if (second_slash == NULL) {
 		printf("Column headers must be in the form"
-		       " name[array_index]/type/count/matrix_column.\n"
+		       " name[array_index]/type/dimensions/matrix_column.\n"
 		       "Note: [array_index] and matrix_column are optional.\n"
 		       "Got: %s\n",
 		       text);
 		piglit_report_result(PIGLIT_FAIL);
 	}
-	std::string type_str(first_slash + 1, second_slash);
-	this->data_type = decode_type(type_str.c_str(),
-				      &this->count, &this->data_type_cols);
+
 	char *endptr;
-	this->count = strtoul(second_slash + 1, &endptr, 10);
+	if (!decode_glsl_type(second_slash + 1,
+			      &this->glsl_data_type,
+			      &this->rows, &this->cols,
+			      &endptr)) {
+		printf("Unrecognized GLSL type: %s\n", second_slash + 1);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	std::string type_str(first_slash + 1, second_slash);
+	GLenum *glsl_data_type = this->glsl_data_type ? 0
+		: &this->glsl_data_type;
+
+	if (!decode_type(type_str.c_str(),
+			 &this->data_type, &this->data_type_size,
+			 glsl_data_type)) {
+		printf("Unrecognized GL type: %s\n", type_str.c_str());
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	if (*endptr != '\0') {
 		const char *third_slash = strchr(second_slash + 1, '/');
@@ -315,7 +399,7 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 
 		if (*endptr != '\0') {
 			printf("Column headers must be in the form"
-			       " name[array_index]/type/count/matrix_column.\n"
+			       " name[array_index]/type/dimensions/matrix_column.\n"
 			       "Note: [array_index] and matrix_column are optional.\n"
 			       "Got: %s\n",
 			       text);
@@ -338,7 +422,7 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 	 * (b) skip itself if integer vertex attribute support is not
 	 * present.
 	 */
-	if (this->data_type != GL_FLOAT &&
+	if (this->glsl_data_type != GL_FLOAT &&
 	    (piglit_is_gles() ||
 	    (piglit_get_gl_version() < 30 &&
 		!piglit_is_extension_supported("GL_EXT_gpu_shader4")))) {
@@ -347,8 +431,15 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	if (this->count < 1 || this->count > 4) {
-		printf("Count must be between 1 and 4.  Got: %lu\n", (unsigned long) count);
+	if (this->rows < 1 || this->rows > 4) {
+		printf("Rows must be between 1 and 4.  Got: %lu\n",
+		       (unsigned long) this->rows);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (this->cols < 1 || this->cols > 4) {
+		printf("Columns must be between 1 and 4.  Got: %lu\n",
+		       (unsigned long) this->cols);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 }
@@ -368,6 +459,15 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 	char *endptr;
 	errno = 0;
 	switch (this->data_type) {
+	case GL_HALF_FLOAT: {
+		unsigned short value = strtohf_hex(*text, &endptr);
+		if (errno == ERANGE) {
+			printf("Could not parse as half float\n");
+			return false;
+		}
+		*((GLhalf *) data) = value;
+		break;
+	}
 	case GL_FLOAT: {
 		float value = strtof_hex(*text, &endptr);
 		if (errno == ERANGE) {
@@ -384,6 +484,42 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 			return false;
 		}
 		*((GLdouble *) data) = value;
+		break;
+	}
+	case GL_BYTE: {
+		long value = strtol_hex(*text, &endptr);
+		if (errno == ERANGE || value < SCHAR_MIN || value > SCHAR_MAX) {
+			printf("Could not parse as signed byte\n");
+			return false;
+		}
+		*((GLbyte *) data) = (GLbyte) value;
+		break;
+	}
+	case GL_UNSIGNED_BYTE: {
+		unsigned long value = strtoul(*text, &endptr, 0);
+		if (errno == ERANGE || value > UCHAR_MAX) {
+			printf("Could not parse as unsigned byte\n");
+			return false;
+		}
+		*((GLubyte *) data) = (GLubyte) value;
+		break;
+	}
+	case GL_SHORT: {
+		long value = strtol_hex(*text, &endptr);
+		if (errno == ERANGE || value < SHRT_MIN || value > SHRT_MAX) {
+			printf("Could not parse as signed short\n");
+			return false;
+		}
+		*((GLshort *) data) = (GLshort) value;
+		break;
+	}
+	case GL_UNSIGNED_SHORT: {
+		unsigned long value = strtoul(*text, &endptr, 0);
+		if (errno == ERANGE || value > USHRT_MAX) {
+			printf("Could not parse as unsigned short\n");
+			return false;
+		}
+		*((GLushort *) data) = (GLushort) value;
 		break;
 	}
 	case GL_INT: {
@@ -420,37 +556,56 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 void
 vertex_attrib_description::setup(size_t *offset, size_t stride) const
 {
-	int attribute_size = ATTRIBUTE_SIZE;
 	GLuint actual_index = this->index + this->matrix_index
-		+ this->array_index * this->data_type_cols;
-	switch (this->data_type) {
+		+ this->array_index * this->cols;
+	switch (this->glsl_data_type) {
 	case GL_FLOAT:
-		glVertexAttribPointer(actual_index, this->count,
+		glVertexAttribPointer(actual_index, this->rows,
 				      this->data_type, GL_FALSE, stride,
 				      (void *) *offset);
 		break;
 	case GL_DOUBLE:
-		if (!piglit_is_extension_supported("GL_ARB_vertex_attrib_64bit")) {
+		if (piglit_is_gles()
+		    || !piglit_is_extension_supported("GL_ARB_vertex_attrib_64bit")) {
 			fprintf(stderr,"vertex_attrib_description fail. no 64-bit float support\n");
 			return;
 		}
-		glVertexAttribLPointer(actual_index, this->count,
+		if (this->data_type != GL_DOUBLE) {
+			fprintf(stderr,"vertex_attrib_description fail. the GL"
+				" type must be 'GL_DOUBLE' and it is '%s'\n",
+				piglit_get_prim_name(this->data_type));
+			return;
+		}
+		glVertexAttribLPointer(actual_index, this->rows,
 				       this->data_type, stride,
 				       (void *) *offset);
-		attribute_size *= 2;
 		break;
 	default:
 		if (piglit_is_gles() && piglit_get_gl_version() < 30) {
 			fprintf(stderr,"vertex_attrib_description fail. no int support\n");
 			return;
 		}
-		glVertexAttribIPointer(actual_index, this->count,
+		switch (this->data_type) {
+		case GL_BYTE:
+		case GL_UNSIGNED_BYTE:
+		case GL_SHORT:
+		case GL_UNSIGNED_SHORT:
+		case GL_INT:
+		case GL_UNSIGNED_INT:
+			break;
+		default:
+			fprintf(stderr,"vertex_attrib_description fail. the GL"
+				" type '%s' is incompatible\n",
+				piglit_get_prim_name(this->data_type));
+			return;
+		}
+		glVertexAttribIPointer(actual_index, this->rows,
 				       this->data_type, stride,
 				       (void *) *offset);
 		break;
 	}
 	glEnableVertexAttribArray(actual_index);
-	*offset += attribute_size * this->count;
+	*offset += this->rows * this->data_type_size;
 }
 
 
@@ -526,7 +681,6 @@ vbo_data::parse_header_line(const std::string &line, GLuint prog)
 			++pos;
 		} else {
 			size_t column_header_end = pos;
-			int mul;
 			while (column_header_end < line.size() &&
 			       !isspace(line[column_header_end]))
 				++column_header_end;
@@ -535,8 +689,7 @@ vbo_data::parse_header_line(const std::string &line, GLuint prog)
 			vertex_attrib_description desc(
 				prog, column_header.c_str());
 			attribs.push_back(desc);
-			mul = (desc.data_type == GL_DOUBLE) ? 2 : 1;
-			this->stride += ATTRIBUTE_SIZE * desc.count * mul;
+			this->stride += desc.rows * desc.data_type_size;
 			pos = column_header_end + 1;
 		}
 	}
@@ -559,8 +712,7 @@ vbo_data::parse_data_line(const std::string &line, unsigned int line_num)
 
 	const char *line_ptr = line.c_str();
 	for (size_t i = 0; i < this->attribs.size(); ++i) {
-		for (size_t j = 0; j < this->attribs[i].count; ++j) {
-			int mul = (this->attribs[i].data_type == GL_DOUBLE) ? 2 : 1;
+		for (size_t j = 0; j < this->attribs[i].rows; ++j) {
 			if (!this->attribs[i].parse_datum(&line_ptr,
 							  data_ptr)) {
 				printf("At line %u of [vertex data] section\n",
@@ -568,7 +720,7 @@ vbo_data::parse_data_line(const std::string &line, unsigned int line_num)
 				printf("Offending text: %s\n", line_ptr);
 				piglit_report_result(PIGLIT_FAIL);
 			}
-			data_ptr += ATTRIBUTE_SIZE * mul;
+			data_ptr += this->attribs[i].data_type_size;
 		}
 	}
 
