@@ -132,7 +132,11 @@ compile_shader(GLenum target)
 	const char*sample_number, *sample_map = "";
 	float x_scale, y_scale;
 
-	x_scale = 2;
+	if (samples == 16)
+		x_scale = 4;
+	else
+		x_scale = 2;
+
 	y_scale = samples / x_scale;
 
 	/* Below switch is used to setup the shader expression, which computes
@@ -166,6 +170,17 @@ compile_shader(GLenum target)
 	 *           ---------                      ---------
 	 *           | 6 | 7 |                      | 7 | 1 |
 	 *           ---------                      ---------
+	 *
+	 * 16X MSAA sample index layout  16x MSAA sample number layout
+	 *         -----------------            -----------------
+	 *         | 0 | 1 | 2 | 3 |            |15 |10 | 9 | 7 |
+	 *         -----------------            -----------------
+	 *         | 4 | 5 | 6 | 7 |            | 4 | 1 | 3 |13 |
+	 *         -----------------            -----------------
+	 *         | 8 | 9 |10 |11 |            |12 | 2 | 0 | 6 |
+	 *         -----------------            -----------------
+	 *         |12 |13 |14 |15 |            |11 | 8 | 5 |14 |
+	 *         -----------------            -----------------
 	 */
 	switch(samples) {
 	case 2:
@@ -177,6 +192,11 @@ compile_shader(GLenum target)
 	case 8:
 		sample_map = "  const int sample_map[8] = int[8](5 , 2, 4, 6, 0, 3, 7, 1);\n";
 		sample_number = "sample_map[int(2 * fract(coord.x) + 8 * fract(coord.y))]";
+		break;
+	case 16:
+		sample_map = "  const int sample_map[16] = int[16](15, 10, 9, 7, 4, 1, 3, 13,\n"
+			     "                                     12, 2, 0, 6, 11, 8, 5, 14);\n";
+		sample_number = "sample_map[int(4 * fract(coord.x) + 16 * fract(coord.y))]";
 		break;
 	default:
 		printf("Unsupported sample count %d\n", samples);
