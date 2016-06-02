@@ -76,51 +76,43 @@ compile_shader(GLenum target)
 		"#version 130\n"
 		"in vec2 piglit_vertex;\n"
 		"in vec2 piglit_texcoord;\n"
-		"out vec2 textureCoord;\n"
+		"out vec2 texCoords;\n"
 		"void main()\n"
 		"{\n"
 		"  gl_Position = vec4(piglit_vertex, 0.0, 1.0);\n"
-		"  textureCoord = piglit_texcoord;\n"
+		"  texCoords = piglit_texcoord;\n"
 		"}\n";
 	/* Bilinear filtering of samples using shader program */
 	static const char *frag_template =
 		"#version 130\n"
 		"#extension GL_ARB_texture_multisample : require\n"
-		"in vec2 textureCoord;\n"
 		"uniform %s texSampler;\n"
-		"uniform float src_width;\n"
-		"uniform float src_height;\n"
+		"uniform float src_width, src_height;\n"
+		"in vec2 texCoords;\n"
 		"out vec4 out_color;\n"
 		"void main()\n"
 		"{\n"
 		"%s"
-		"  float x_f, y_f;\n"
-		"  const float x_scale = 2.0f, x_scale_inv = 0.5f;\n"
-		"  const float y_scale = %ff, y_scale_inv = %ff;\n"
-		"  const float x_offset = 0.25f, y_offset = %ff;\n"
+		"  vec2 interp;\n"
+		"  const vec2 scale = vec2(%ff, %ff);\n"
+		"  const vec2 scale_inv = vec2(%ff, %ff);\n"
+		"  const vec2 s_0_offset = vec2(%ff, %ff);\n"
 		"  vec2 s_0_coord, s_1_coord, s_2_coord, s_3_coord;\n"
 		"  vec4 s_0_color, s_1_color, s_2_color, s_3_color;\n"
 		"  vec4 x_0_color, x_1_color;\n"
+		"  vec2 tex_coord = texCoords - s_0_offset;\n"
 		"\n"
-		"  vec2 tex_coord = vec2(textureCoord.x - x_offset,\n"
-		"                        textureCoord.y - y_offset);\n"
-		"  tex_coord = vec2(x_scale * tex_coord.x, y_scale * tex_coord.y);\n"
-		"\n"
-		"  clamp(tex_coord.x, 0.0f, x_scale * src_width - 1.0f);\n"
-		"  clamp(tex_coord.y, 0.0f, y_scale * src_height - 1.0f);\n"
-		"\n"
-		"  x_f = fract(tex_coord.x);\n"
-		"  y_f = fract(tex_coord.y);\n"
-		"\n"
-		"  tex_coord.x = int(tex_coord.x) * x_scale_inv;\n"
-		"  tex_coord.y = int(tex_coord.y) * y_scale_inv;\n"
-		"\n"
+		"  tex_coord *= scale;\n"
+		"  tex_coord.x = clamp(tex_coord.x, 0.0f, scale.x * src_width - 1.0f);\n"
+		"  tex_coord.y = clamp(tex_coord.y, 0.0f, scale.y * src_height - 1.0f);\n"
+		"  interp = fract(tex_coord);\n"
+		"  tex_coord = ivec2(tex_coord) * scale_inv;\n"
 		"\n"
 		"  /* Compute the sample coordinates used for filtering. */\n"
 		"  s_0_coord = tex_coord;\n"
-		"  s_1_coord = tex_coord + vec2(x_scale_inv, 0.0f);\n"
-		"  s_2_coord = tex_coord + vec2(0.0f, y_scale_inv);\n"
-		"  s_3_coord = tex_coord + vec2(x_scale_inv, y_scale_inv);\n"
+		"  s_1_coord = tex_coord + vec2(scale_inv.x, 0.0f);\n"
+		"  s_2_coord = tex_coord + vec2(0.0f, scale_inv.y);\n"
+		"  s_3_coord = tex_coord + vec2(scale_inv.x, scale_inv.y);\n"
 		"\n"
 		"  /* Fetch sample color values. */\n"
 		"%s"
@@ -131,14 +123,17 @@ compile_shader(GLenum target)
 		"#undef TEXEL_FETCH\n"
 		"\n"
 		"  /* Do bilinear filtering on sample colors. */\n"
-		"  x_0_color =  mix(s_0_color, s_1_color, x_f);\n"
-		"  x_1_color =  mix(s_2_color, s_3_color, x_f);\n"
-		"  out_color = mix(x_0_color, x_1_color, y_f);\n"
+		"  x_0_color = mix(s_0_color, s_1_color, interp.x);\n"
+		"  x_1_color = mix(s_2_color, s_3_color, interp.x);\n"
+		"  out_color = mix(x_0_color, x_1_color, interp.y);\n"
 		"}\n";
 
 	char* frag, *texel_fetch_macro;
 	const char*sample_number, *sample_map = "";
-	const float y_scale = samples * 0.5;
+	float x_scale, y_scale;
+
+	x_scale = 2;
+	y_scale = samples / x_scale;
 
 	/* Below switch is used to setup the shader expression, which computes
 	 * sample index and map it to to a sample number on Intel hardware.
@@ -205,8 +200,10 @@ compile_shader(GLenum target)
 	}
 
 	(void)!asprintf(&frag, frag_template, target_string, sample_map,
-		 y_scale, 1.0f / y_scale,
-		 1.0f / samples, texel_fetch_macro);
+		 x_scale, y_scale,
+		 1.0f / x_scale, 1.0f / y_scale,
+		 0.5f / x_scale, 0.5f / y_scale,
+		 texel_fetch_macro);
 
 	/* Compile program */
 	prog = piglit_build_simple_program(vert, frag);
