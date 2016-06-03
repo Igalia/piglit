@@ -55,7 +55,7 @@ struct texture_format {
 	GLuint block_height;
 };
 
-struct texture_format formats[] = {
+static const struct texture_format formats[] = {
 #define FORMAT(IF, F, D, S, B, W, H) { IF, #IF, F, D, S, B, W, H }
 	FORMAT(GL_RED, GL_RED, GL_UNSIGNED_BYTE, false, 1, 1, 1),
 	FORMAT(GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, true, 1, 1, 1),
@@ -181,11 +181,11 @@ struct texture_format formats[] = {
 
 #define ARRAY_LENGTH(X) (sizeof(X)/sizeof(*(X)))
 
-static struct texture_format *
+static const struct texture_format *
 find_format(const char *str)
 {
 	int i;
-	struct texture_format *format = NULL;
+	const struct texture_format *format = NULL;
 
 	for (i = 0; i < sizeof(formats) / sizeof(*formats); ++i) {
 		if (strcmp(str, formats[i].name) == 0) {
@@ -199,7 +199,7 @@ find_format(const char *str)
 }
 
 static bool
-is_format_snorm(struct texture_format *format)
+is_format_snorm(const struct texture_format *format)
 {
 	switch (format->internal_format) {
 	case GL_R8_SNORM:
@@ -217,13 +217,13 @@ is_format_snorm(struct texture_format *format)
 }
 
 static bool
-is_format_compressed(struct texture_format *format)
+is_format_compressed(const struct texture_format *format)
 {
 	return format->block_width != 1 && format->block_height != 1;
 }
 
 static bool
-is_format_supported(struct texture_format *format)
+is_format_supported(const struct texture_format *format)
 {
 	switch (format->internal_format) {
 #ifdef GL_EXT_texture_compression_rgtc
@@ -268,7 +268,8 @@ is_format_supported(struct texture_format *format)
 }
 
 static bool
-are_formats_compatible(struct texture_format *f1, struct texture_format *f2)
+are_formats_compatible(const struct texture_format *f1,
+		       const struct texture_format *f2)
 {
 	if (f1 == f2)
 		return true;
@@ -286,7 +287,7 @@ are_formats_compatible(struct texture_format *f1, struct texture_format *f2)
 
 static const float green[3] = {0.0, 1.0, 0.0};
 
-struct texture_format *src_format_arg, *dst_format_arg;
+const struct texture_format *src_format_arg, *dst_format_arg;
 unsigned char *rand_data, *src_data, *dst_data, *res_data;
 int samples = 1;
 
@@ -387,8 +388,8 @@ memcpy_rect(void *src, int src_stride, int src_x, int src_y,
 }
 
 static void
-setup_test_data(struct texture_format *src_format,
-		struct texture_format *dst_format)
+setup_test_data(const struct texture_format *src_format,
+		const struct texture_format *dst_format)
 {
 	int i, j, stride, image_size, data_size;
 	unsigned char *src_image, *res_image;
@@ -529,7 +530,7 @@ const char ms_compare_fs_source[] =
 "}\n";
 
 void
-load_compare_program(struct texture_format *format)
+load_compare_program(const struct texture_format *format)
 {
 	static struct {
 		GLuint prog;
@@ -617,8 +618,8 @@ load_compare_program(struct texture_format *format)
 }
 
 static enum piglit_result
-run_multisample_test(struct texture_format *src_format,
-		     struct texture_format *dst_format)
+run_multisample_test(const struct texture_format *src_format,
+		     const struct texture_format *dst_format)
 {
 	bool pass = true;
 	int fbo_width, fbo_height;
@@ -800,7 +801,8 @@ check_texture(GLuint texture, unsigned level,
 }
 
 static enum piglit_result
-run_test(struct texture_format *src_format, struct texture_format *dst_format)
+run_test(const struct texture_format *src_format,
+	 const struct texture_format *dst_format)
 {
 	bool pass = true, warn = false;
 	unsigned src_width, src_height, dst_width, dst_height;
@@ -916,8 +918,8 @@ piglit_display(void)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	enum piglit_result subtest;
-	struct texture_format *src_format_list, *dst_format_list;
-	struct texture_format *src_format, *dst_format;
+	const struct texture_format *src_format_list, *dst_format_list;
+	const struct texture_format *src_format, *dst_format;
 	int sf, df, src_format_count, dst_format_count;
 
 	if (src_format_arg) {
