@@ -87,14 +87,4 @@ uniform ivec4 given_exponent -127 -127 -127 -127
 draw arrays GL_TRIANGLE_FAN 0 4
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform vec4 expected_float 0.0 -0.0 0.0 -0.0
-uniform vec4 given_float 1.1754944e-38 -1.1754944e-38 3.40282347e38 -3.40282347e38
-# For the FLT_MAX case -255 comes from (-127 + -127 + -1).
-#   ldexp(FLT_MAX, -127)           = 0x1.fffffep+0 (1.999999881)
-#   ldexp(FLT_MAX, -127 - 127)     = 0x1p-126 (epsilon above FLT_MIN)
-#   ldexp(FLT_MAX, -127 - 127 - 1) = 0.0
-uniform ivec4 given_exponent -1 -1 -255 -255
-draw arrays GL_TRIANGLE_FAN 0 4
-probe all rgba 0.0 1.0 0.0 1.0
-
 # Overflow is undefined according to the GLSL spec, so nothing to test.
