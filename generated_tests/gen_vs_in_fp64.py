@@ -157,27 +157,10 @@ class TestTuple(object):
 
         self._ver = ver
         self._names_only = names_only
-        self._filenames = []
 
     @abc.abstractmethod
-    def _generate(self):
-        """Generates the test files for conversions to float64."""
-
-    @property
-    def filenames(self):
-        """Returns the test file names this tuple will generate."""
-        if self._filenames == []:
-            tmp = self._names_only
-            self._names_only = True
-            self.generate_test_files()
-            self._names_only = tmp
-        return self._filenames
-
-    def generate_test_files(self):
+    def generate(self):
         """Generate the GLSL parser tests."""
-        self._filenames = []
-
-        self._generate()
 
 
 class RegularTestTuple(TestTuple):
@@ -293,7 +276,7 @@ class RegularTestTuple(TestTuple):
         self._arrays = arrays
         self._num_vs_in = num_vs_in
 
-    def _generate(self):
+    def generate(self):
         """Generate GLSL parser tests."""
 
         filename = os.path.join(TestTuple.get_dir_name(self._ver), 'vs-input')
@@ -307,8 +290,6 @@ class RegularTestTuple(TestTuple):
             filename += '-position'
         filename += '.shader_test'
 
-        self._filenames.append(filename)
-
         if not self._names_only:
             with open(filename, 'w') as test_file:
                 test_file.write(TEMPLATES.get_template(
@@ -320,6 +301,7 @@ class RegularTestTuple(TestTuple):
                         num_vs_in=self._num_vs_in,
                         dvalues=DOUBLE_NORMAL_VALUES + DOUBLE_POS_ZERO,
                         hvalues=HEX_VALUES_32BIT))
+        print(filename)
 
 
 class ColumnsTestTuple(TestTuple):
@@ -352,7 +334,7 @@ class ColumnsTestTuple(TestTuple):
         self._mat = mat
         self._columns = columns
 
-    def _generate(self):
+    def generate(self):
         """Generate GLSL parser tests."""
 
         filename = os.path.join(TestTuple.get_dir_name(self._ver),
@@ -362,8 +344,6 @@ class ColumnsTestTuple(TestTuple):
                 filename += '-{}'.format(idx)
         filename += '.shader_test'
 
-        self._filenames.append(filename)
-
         if not self._names_only:
             with open(filename, 'w') as test_file:
                 test_file.write(TEMPLATES.get_template(
@@ -372,6 +352,7 @@ class ColumnsTestTuple(TestTuple):
                         mat=self._mat,
                         columns=self._columns,
                         dvalues=DOUBLE_NORMAL_VALUES + DOUBLE_POS_ZERO))
+        print(filename)
 
 
 def main():
@@ -389,9 +370,7 @@ def main():
 
     for test in itertools.chain(RegularTestTuple.all_tests(args.names_only),
                                 ColumnsTestTuple.all_tests(args.names_only)):
-        test.generate_test_files()
-        for filename in test.filenames:
-            print(filename)
+        test.generate()
 
 
 if __name__ == '__main__':
