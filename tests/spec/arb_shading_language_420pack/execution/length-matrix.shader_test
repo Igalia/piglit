@@ -22,6 +22,8 @@ GL_ARB_shading_language_420pack
 [fragment shader]
 #extension GL_ARB_shading_language_420pack: enable
 
+out vec4 frag_color;
+
 void main() {
     mat2x2 m2x2;
     mat2x3 m2x3;
@@ -33,7 +35,7 @@ void main() {
     mat4x3 m4x3;
     mat4x4 m4x4;
 
-    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    frag_color = vec4(0.0, 1.0, 0.0, 1.0);
 
     if (m2x2.length() != 2 ||
         m2x3.length() != 2 ||
@@ -44,7 +46,7 @@ void main() {
         m4x2.length() != 4 ||
         m4x3.length() != 4 ||
         m4x4.length() != 4) {
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        frag_color = vec4(1.0, 0.0, 0.0, 1.0);
     }
 }
 
