@@ -28,6 +28,9 @@ import abc
 import argparse
 import itertools
 import os
+import types
+
+from six.moves import range
 
 from templates import template_dir
 from modules import utils
@@ -171,19 +174,15 @@ class RegularTestTuple(TestTuple):
     @staticmethod
     def create_in_types_array(*types_arrays):
         """Creates vertex input combinations."""
-
-        in_types_array = []
         for product_item in itertools.product(*types_arrays):
-            in_types_array.append(product_item)
-
-        return in_types_array
+            yield product_item
 
     @staticmethod
     def create_tests(glsl_vers, in_types_array, position_orders, arrays_array, names_only):
         """Creates combinations for flat qualifier tests."""
 
         assert isinstance(glsl_vers, list)
-        assert isinstance(in_types_array, list)
+        assert isinstance(in_types_array, types.GeneratorType)
         assert isinstance(position_orders, list)
         assert isinstance(arrays_array, list)
         assert isinstance(names_only, bool)
@@ -225,10 +224,10 @@ class RegularTestTuple(TestTuple):
         for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
-                    DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES,
-                    FSCALAR_TYPES + FVEC_TYPES + FMAT_TYPES
-                    + ISCALAR_TYPES + IVEC_TYPES
-                    + USCALAR_TYPES + UVEC_TYPES),
+                    itertools.chain(DSCALAR_TYPES, DVEC_TYPES, DMAT_TYPES),
+                    itertools.chain(FSCALAR_TYPES, FVEC_TYPES, FMAT_TYPES,
+                                    ISCALAR_TYPES, IVEC_TYPES,
+                                    USCALAR_TYPES, UVEC_TYPES)),
                 [1, 2, 3],
                 [[1, 1], [1, 3], [5, 1], [5, 3]],
                 names_only):
@@ -236,10 +235,10 @@ class RegularTestTuple(TestTuple):
         for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
-                    FSCALAR_TYPES + FVEC_TYPES + FMAT_TYPES
-                    + ISCALAR_TYPES + IVEC_TYPES
-                    + USCALAR_TYPES + UVEC_TYPES,
-                    DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES),
+                    itertools.chain(FSCALAR_TYPES, FVEC_TYPES, FMAT_TYPES,
+                                    ISCALAR_TYPES, IVEC_TYPES,
+                                    USCALAR_TYPES, UVEC_TYPES),
+                    itertools.chain(DSCALAR_TYPES, DVEC_TYPES, DMAT_TYPES)),
                 [1, 2, 3],
                 [[1, 1], [1, 2], [3, 1], [3, 2]],
                 names_only):
@@ -247,8 +246,8 @@ class RegularTestTuple(TestTuple):
         for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
-                    DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES,
-                    DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES),
+                    itertools.chain(DSCALAR_TYPES, DVEC_TYPES, DMAT_TYPES),
+                    itertools.chain(DSCALAR_TYPES, DVEC_TYPES, DMAT_TYPES)),
                 [1, 2, 3],
                 [[1, 1], [1, 2], [3, 1], [3, 2]],
                 names_only):
@@ -256,7 +255,7 @@ class RegularTestTuple(TestTuple):
         for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
-                    DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES),
+                    itertools.chain(DSCALAR_TYPES, DVEC_TYPES, DMAT_TYPES)),
                 [1, 2],
                 [[1], [5]],
                 names_only):
