@@ -191,6 +191,7 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	vs_in_fp64.list
 	gen_vs_in_fp64.py
+	templates/gen_vs_in_fp64/columns.shader_test.mako
 	templates/gen_vs_in_fp64/base.mako
 	templates/gen_vs_in_fp64/execution.vert.shader_test.mako
 	templates/gen_vs_in_fp64/execution_base.mako

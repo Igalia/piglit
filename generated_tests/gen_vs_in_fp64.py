@@ -346,7 +346,7 @@ class ColumnsTestTuple(TestTuple):
         if not self._names_only:
             with open(filename, 'w') as test_file:
                 test_file.write(TEMPLATES.get_template(
-                    'columns_execution.vert.shader_test.mako').render_unicode(
+                    'columns.shader_test.mako').render_unicode(
                         ver=self._ver,
                         mat=self._mat,
                         columns=self._columns,
