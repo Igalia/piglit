@@ -888,6 +888,7 @@ with profile.group_manager(
     g(['glinfo'])
     g(['gl-1.1-xor'])
     g(['gl-1.1-xor-copypixels'])
+    g(['gl-1.2-texture-base-level'])
     g(['hiz'], run_concurrent=False)
     g(['infinite-spot-light'], run_concurrent=False)
     g(['line-aa-width'], run_concurrent=False)
