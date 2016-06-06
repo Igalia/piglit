@@ -239,7 +239,7 @@ class RegularTestTuple(TestTuple):
         # We need additional directories for GLSL 420
         if not names_only:
             utils.safe_makedirs(TestTuple.get_dir_name('420'))
-        for test_args in (list(RegularTestTuple.create_tests(
+        for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
                     DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES,
@@ -248,9 +248,9 @@ class RegularTestTuple(TestTuple):
                     + USCALAR_TYPES + UVEC_TYPES),
                 [1, 2, 3],
                 [[1, 1], [1, 3], [5, 1], [5, 3]],
-                names_only))):
+                names_only):
             yield RegularTestTuple(*test_args)
-        for test_args in (list(RegularTestTuple.create_tests(
+        for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
                     FSCALAR_TYPES + FVEC_TYPES + FMAT_TYPES
@@ -259,24 +259,24 @@ class RegularTestTuple(TestTuple):
                     DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES),
                 [1, 2, 3],
                 [[1, 1], [1, 2], [3, 1], [3, 2]],
-                names_only))):
+                names_only):
             yield RegularTestTuple(*test_args)
-        for test_args in (list(RegularTestTuple.create_tests(
+        for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
                     DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES,
                     DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES),
                 [1, 2, 3],
                 [[1, 1], [1, 2], [3, 1], [3, 2]],
-                names_only))):
+                names_only):
             yield RegularTestTuple(*test_args)
-        for test_args in (list(RegularTestTuple.create_tests(
+        for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
                     DSCALAR_TYPES + DVEC_TYPES + DMAT_TYPES),
                 [1, 2],
                 [[1], [5]],
-                names_only))):
+                names_only):
             yield RegularTestTuple(*test_args)
 
     def __init__(self, ver, in_types, position_order, arrays, num_vs_in, names_only):
@@ -387,8 +387,8 @@ def main():
         help="Don't output files, just generate a list of filenames to stdout")
     args = parser.parse_args()
 
-    for test in (list(RegularTestTuple.all_tests(args.names_only)) +
-                 list(ColumnsTestTuple.all_tests(args.names_only))):
+    for test in itertools.chain(RegularTestTuple.all_tests(args.names_only),
+                                ColumnsTestTuple.all_tests(args.names_only)):
         test.generate_test_files()
         for filename in test.filenames:
             print(filename)
