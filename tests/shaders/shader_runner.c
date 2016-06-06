@@ -1398,7 +1398,7 @@ get_ints(const char *line, int *ints, unsigned count)
 	unsigned i;
 
 	for (i = 0; i < count; i++)
-		ints[i] = strtol(line, (char **) &line, 0);
+		ints[i] = strtoll(line, (char **) &line, 0);
 }
 
 
