@@ -34,10 +34,10 @@ out vec4 v;
 void main()
 {
 	dvec4 result = dvec4(d[0] + arg0, d[1], d[2], d[3]);
-	v = distance(result, expected) <= tolerance
-		? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
 
 	for (int i = 0; i < 3; i++) {
+		v = distance(result, expected) <= tolerance
+			? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 1.0, 0.0, 1.0);
 		gl_Position = vertex_to_gs[i];
 		EmitVertex();
 	}
