@@ -292,7 +292,7 @@ class RegularTestTuple(TestTuple):
         if not self._names_only:
             with open(filename, 'w') as test_file:
                 test_file.write(TEMPLATES.get_template(
-                    'regular_execution.vert.shader_test.mako').render_unicode(
+                    'regular.shader_test.mako').render_unicode(
                         ver=self._ver,
                         in_types=self._in_types,
                         position_order=self._position_order,
