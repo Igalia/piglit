@@ -813,6 +813,11 @@ process_requirement(const char *line)
 		return;
 	}
 
+	/* Consume any leading whitespace before requirements. This is
+	 * important for generated test files that may have odd whitespace
+	 */
+	line = eat_whitespace(line);
+
 	if (string_match("GL_", line)) {
 		strcpy_to_space(buffer, line);
 		piglit_require_extension(buffer);
