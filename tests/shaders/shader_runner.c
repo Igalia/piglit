@@ -185,6 +185,14 @@ static const struct string_to_enum all_types[] = {
 	ENUM_STRING(GL_UNSIGNED_INT_VEC2),
 	ENUM_STRING(GL_UNSIGNED_INT_VEC3),
 	ENUM_STRING(GL_UNSIGNED_INT_VEC4),
+	ENUM_STRING(GL_INT64_ARB),
+	ENUM_STRING(GL_INT64_VEC2_ARB),
+	ENUM_STRING(GL_INT64_VEC3_ARB),
+	ENUM_STRING(GL_INT64_VEC4_ARB),
+	ENUM_STRING(GL_UNSIGNED_INT64_ARB),
+	ENUM_STRING(GL_UNSIGNED_INT64_VEC2_ARB),
+	ENUM_STRING(GL_UNSIGNED_INT64_VEC3_ARB),
+	ENUM_STRING(GL_UNSIGNED_INT64_VEC4_ARB),
 	ENUM_STRING(GL_BOOL),
 	ENUM_STRING(GL_BOOL_VEC2),
 	ENUM_STRING(GL_BOOL_VEC3),
@@ -1416,6 +1424,23 @@ get_uints(const char *line, unsigned *uints, unsigned count)
 		uints[i] = strtoul(line, (char **) &line, 0);
 }
 
+static void
+get_int64s(const char *line, int64_t *ints, unsigned count)
+{
+	int i;
+
+	for (i = 0; i < count; i++)
+		ints[i] = strtoll(line, (char **) &line, 0);
+}
+
+static void
+get_uint64s(const char *line, uint64_t *ints, unsigned count)
+{
+	int i;
+
+	for (i = 0; i < count; i++)
+		ints[i] = strtoull(line, (char **) &line, 0);
+}
 
 /**
  * Check that the GL implementation supports unsigned uniforms
@@ -1438,6 +1463,18 @@ static void
 check_double_support(void)
 {
 	if (gl_version.num < 40 && !piglit_is_extension_supported("GL_ARB_gpu_shader_fp64"))
+		piglit_report_result(PIGLIT_SKIP);
+}
+
+/**
+ * Check that the GL implementation supports double uniforms
+ * (e.g. through glUniform1d).  If not, terminate the test with a
+ * SKIP.
+ */
+static void
+check_int64_support(void)
+{
+	if (!piglit_is_extension_supported("GL_ARB_gpu_shader_int64"))
 		piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -1468,6 +1505,8 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 	double d[16];
 	int ints[16];
 	unsigned uints[16];
+	uint64_t uint64s[16];
+	int64_t int64s[16];
 	int name_len = strlen(name);
 
 	if (!num_uniform_blocks)
@@ -1532,6 +1571,12 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 	if (string_match("float", type)) {
 		get_floats(line, f, 1);
 		memcpy(data, f, sizeof(float));
+	} else if (string_match("int64_t", type)) {
+		get_int64s(line, int64s, 1);
+		memcpy(data, int64s, sizeof(int64_t));
+	} else if (string_match("uint64_t", type)) {
+		get_uint64s(line, uint64s, 1);
+		memcpy(data, uint64s, sizeof(uint64_t));
 	} else if (string_match("int", type)) {
 		get_ints(line, ints, 1);
 		memcpy(data, ints, sizeof(int));
@@ -1553,6 +1598,14 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 		int elements = type[4] - '0';
 		get_uints(line, uints, elements);
 		memcpy(data, uints, elements * sizeof(unsigned));
+	} else if (string_match("i64vec", type)) {
+		int elements = type[6] - '0';
+		get_int64s(line, int64s, elements);
+		memcpy(data, int64s, elements * sizeof(int64_t));
+	} else if (string_match("u64vec", type)) {
+		int elements = type[6] - '0';
+		get_uint64s(line, uint64s, elements);
+		memcpy(data, uint64s, elements * sizeof(uint64_t));
 	} else if (string_match("dvec", type)) {
 		int elements = type[4] - '0';
 		get_doubles(line, d, elements);
@@ -1643,6 +1696,8 @@ set_uniform(const char *line, int ubo_array_index)
 	double d[16];
 	int ints[16];
 	unsigned uints[16];
+	int64_t int64s[16];
+	uint64_t uint64s[16];
 	GLint loc;
 	const char *type;
 
@@ -1671,6 +1726,16 @@ set_uniform(const char *line, int ubo_array_index)
 	if (string_match("float", type)) {
 		get_floats(line, f, 1);
 		glUniform1fv(loc, 1, f);
+		return;
+	} else if (string_match("int64_t", type)) {
+		check_int64_support();
+		get_int64s(line, int64s, 1);
+		glUniform1i64vARB(loc, 1, int64s);
+		return;
+	} else if (string_match("uint64_t", type)) {
+		check_int64_support();
+		get_uint64s(line, uint64s, 1);
+		glUniform1ui64vARB(loc, 1, uint64s);
 		return;
 	} else if (string_match("int", type)) {
 		get_ints(line, ints, 1);
@@ -1746,6 +1811,38 @@ set_uniform(const char *line, int ubo_array_index)
 		case '4':
 			get_doubles(line, d, 4);
 			glUniform4dv(loc, 1, d);
+			return;
+		}
+	} else if (string_match("i64vec", type)) {
+		check_int64_support();
+		switch (type[6]) {
+		case '2':
+			get_int64s(line, int64s, 2);
+			glUniform2i64vARB(loc, 1, int64s);
+			return;
+		case '3':
+			get_int64s(line, int64s, 3);
+			glUniform3i64vARB(loc, 1, int64s);
+			return;
+		case '4':
+			get_int64s(line, int64s, 4);
+			glUniform4i64vARB(loc, 1, int64s);
+			return;
+		}
+	} else if (string_match("u64vec", type)) {
+		check_int64_support();
+		switch (type[6]) {
+		case '2':
+			get_uint64s(line, uint64s, 2);
+			glUniform2ui64vARB(loc, 1, uint64s);
+			return;
+		case '3':
+			get_uint64s(line, uint64s, 3);
+			glUniform3ui64vARB(loc, 1, uint64s);
+			return;
+		case '4':
+			get_uint64s(line, uint64s, 4);
+			glUniform4ui64vARB(loc, 1, uint64s);
 			return;
 		}
 	} else if (string_match("mat", type) && type[3] != '\0') {
