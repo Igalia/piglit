@@ -1403,7 +1403,7 @@ get_ints(const char *line, int *ints, unsigned count)
 	unsigned i;
 
 	for (i = 0; i < count; i++)
-		ints[i] = strtoll(line, (char **) &line, 0);
+		ints[i] = strtol_hex(line, (char **) &line);
 }
 
 
