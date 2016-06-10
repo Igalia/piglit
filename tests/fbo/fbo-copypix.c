@@ -25,7 +25,7 @@
  *    Brian Paul
  */
 
-/** @file fbo-readdrawpix.c
+/** @file fbo-copypix.c
  *
  * Test glCopyPixels between FBO and window.
  * See also fbo-blit.c and fbo-readdrawpix.c
