@@ -181,7 +181,14 @@ glsl_mat4x3 = GlslBuiltinType('mat4x3', glsl_float, 4, 3, 120)
 glsl_mat2x4 = GlslBuiltinType('mat2x4', glsl_float, 2, 4, 120)
 glsl_mat3x4 = GlslBuiltinType('mat3x4', glsl_float, 3, 4, 120)
 glsl_mat4x4 = glsl_mat4
-
+glsl_int64_t  = GlslBuiltinType('int64_t', None,       1, 1, 400)
+glsl_i64vec2  = GlslBuiltinType('i64vec2', glsl_int64_t,  1, 2, 400)
+glsl_i64vec3  = GlslBuiltinType('i64vec3', glsl_int64_t,  1, 3, 400)
+glsl_i64vec4  = GlslBuiltinType('i64vec4', glsl_int64_t,  1, 4, 400)
+glsl_uint64_t = GlslBuiltinType('uint64_t', None,       1, 1, 400)
+glsl_u64vec2  = GlslBuiltinType('u64vec2', glsl_uint64_t,  1, 2, 400)
+glsl_u64vec3  = GlslBuiltinType('u64vec3', glsl_uint64_t,  1, 3, 400)
+glsl_u64vec4  = GlslBuiltinType('u64vec4', glsl_uint64_t,  1, 4, 400)
 
 # Named tuple representing the signature of a single overload of a
 # built-in GLSL function or operator:
@@ -240,6 +247,10 @@ def glsl_type_of(value):
         return glsl_int
     elif isinstance(value, UINT32_TYPES):
         return glsl_uint
+    elif isinstance(value, np.int64):
+        return glsl_int64_t
+    elif isinstance(value, np.uint64):
+        return glsl_uint64_t
     else:
         assert isinstance(value, np.ndarray)
         if len(value.shape) == 1:
@@ -248,6 +259,10 @@ def glsl_type_of(value):
             assert 2 <= vector_length <= 4
             if value.dtype in FLOATING_TYPES:
                 return (glsl_vec2, glsl_vec3, glsl_vec4)[vector_length - 2]
+            elif value.dtype == np.int64:
+                return (glsl_i64vec2, glsl_i64vec3, glsl_i64vec4)[vector_length - 2]
+            elif value.dtype == np.uint64:
+                return (glsl_u64vec2, glsl_u64vec3, glsl_u64vec4)[vector_length - 2]
             elif value.dtype == bool:
                 return (glsl_bvec2, glsl_bvec3, glsl_bvec4)[vector_length - 2]
             elif value.dtype in INT32_TYPES:
@@ -286,6 +301,10 @@ def glsl_constant(value):
     column_major = np.reshape(np.array(value), -1, 'F')
     if column_major.dtype == bool:
         values = ['true' if x else 'false' for x in column_major]
+    elif column_major.dtype == np.int64:
+        values = [repr(x) + 'l' for x in column_major]
+    elif column_major.dtype == np.uint64:
+        values = [repr(x) + 'ul' for x in column_major]
     elif column_major.dtype in UINT32_TYPES:
         values = [repr(x) + 'u' for x in column_major]
     else:
@@ -358,7 +377,7 @@ def _divide(x, y):
     if any(y_element == 0 for y_element in column_major_values(y)):
         # Division by zero is undefined.
         return None
-    if glsl_type_of(x).base_type == glsl_int:
+    if glsl_type_of(x).base_type == glsl_int or glsl_type_of(x).base_type == glsl_int64_t:
         # The GLSL spec does not make it clear what the rounding rules
         # are when performing integer division.  C99 requires
         # round-toward-zero, so in the absence of any other
@@ -368,7 +387,7 @@ def _divide(x, y):
         # make sure we get round-toward-zero behavior, divide the
         # absolute values of x and y, and then fix the sign.
         return (np.abs(x) // np.abs(y)) * (np.sign(x) * np.sign(y))
-    elif glsl_type_of(x).base_type == glsl_uint:
+    elif glsl_type_of(x).base_type == glsl_uint or glsl_type_of(x).base_type == glsl_uint64_t:
         return x // y
     else:
         return x / y
@@ -937,6 +956,30 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('smoothstep', 3, 110, _smoothstep, [0, 1],
       [np.linspace(-1.9, 1.9, 4), np.linspace(-1.9, 1.9, 4),
        np.linspace(-2.0, 2.0, 4)])
+
+    f('abs', 1, 150, np.abs, None, [np.linspace(-10, 15, 5, dtype=np.dtype(np.int64))],
+      extension="ARB_gpu_shader_int64")
+    f('sign', 1, 150, np.sign, None, [np.linspace(-15, 15, 5, dtype=np.dtype(np.int64))],
+      extension="ARB_gpu_shader_int64")
+    f('min', 2, 150, min, [1],
+      [np.linspace(-20, 20, 4, dtype=np.dtype(np.int64)), np.linspace(-20, 20, 4, dtype=np.dtype(np.int64))],
+      extension="ARB_gpu_shader_int64")
+    f('min', 2, 150, min, [1],
+      [np.linspace(20, 90, 4, dtype=np.dtype(np.uint64)), np.linspace(20, 90, 4, dtype=np.dtype(np.uint64))],
+      extension="ARB_gpu_shader_int64")
+    f('max', 2, 150, max, [1],
+      [np.linspace(-20, 20, 4, dtype=np.dtype(np.int64)), np.linspace(-20, 20, 4, dtype=np.dtype(np.int64))],
+      extension="ARB_gpu_shader_int64")
+    f('max', 2, 150, max, [1],
+      [np.linspace(20, 90, 4, dtype=np.dtype(np.uint64)), np.linspace(20, 90, 4, dtype=np.dtype(np.uint64))],
+      extension="ARB_gpu_shader_int64")
+    f('clamp', 3, 150, _clamp, [1, 2], [np.linspace(-20, 20, 4, dtype=np.dtype(np.int64)),
+                                   np.linspace(-15, 15, 3, dtype=np.dtype(np.int64)),
+                                   np.linspace(-15, 15, 3, dtype=np.dtype(np.int64))],
+      extension="ARB_gpu_shader_int64")
+    f('mix', 3, 150, lambda x, y, a: y if a else x, None,
+      [np.linspace(-20, 20, 2, dtype=np.dtype(np.int64)), np.linspace(-30, 30, 2, dtype=np.dtype(np.int64)), bools],
+      extension="ARB_gpu_shader_int64")
 _make_componentwise_test_vectors(test_suite)
 
 
@@ -1252,6 +1295,36 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
                   [ 0.14,  0.18, -0.56],
                   [ 0.40, -0.77,  1.76]]),  # mat3x4
         ]
+    int64s = [np.int64(x) for x in [0, -100000000000, 100000000000]]
+    uint64s = [np.uint64(x) for x in [0,  10, 100000000000]]
+
+    int64vecs = [
+        np.array([-10, -12], dtype=np.int64),
+        np.array([-42, 48], dtype=np.int64),
+        np.array([-1333333333333333259, 85, 94], dtype=np.int64),
+        np.array([167, 66, 187], dtype=np.int64),
+        np.array([165, 133, 193, 76], dtype=np.int64),
+        np.array([80, -15, -51, 0], dtype=np.int64)
+        ]
+    int64_i64vecs = int64s + int64vecs
+    i64vec3s = [
+        np.array([-3, -85, -94], dtype=np.int64),
+        np.array([ 1333333333333333259, 66, 87], dtype=np.int64),
+        ]
+
+    uint64vecs = [
+        np.array([10, 12], dtype=np.uint64),
+        np.array([42, 48], dtype=np.uint64),
+        np.array([1333333333333333259, 85, 94], dtype=np.uint64),
+        np.array([167, 66, 187], dtype=np.uint64),
+        np.array([165, 133, 193, 76], dtype=np.uint64),
+        np.array([80, 15, 51, 0], dtype=np.uint64)
+        ]
+    uint64_u64vecs = uint64s + uint64vecs
+    u64vec3s = [
+        np.array([3, 85, 94], dtype=np.uint64),
+        np.array([ 1333333333333333259, 66, 87], dtype=np.uint64),
+        ]
 
     def f(name, arity, glsl_version, python_equivalent,
           filter, test_inputs, tolerance_function=_strict_tolerance,
@@ -1492,6 +1565,86 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('inverse', 1, 140, np.linalg.inv, None, [squaremats])
 
     f('determinant', 1, 150, np.linalg.det, None, [squaremats])
+
+    f('op-add', 2, 150, lambda x, y: x + y, match_simple_binop,
+      [int64s+int64vecs+uint64s+uint64vecs,
+       int64s+int64vecs+uint64s+uint64vecs],
+      template='({0} + {1})',
+      extension="ARB_gpu_shader_int64")
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning)
+        f('op-sub', 2, 150, lambda x, y: x - y, match_simple_binop,
+          [int64s+int64vecs+uint64s+uint64vecs,
+           int64s+int64vecs+uint64s+uint64vecs],
+          template='({0} - {1})',
+          extension="ARB_gpu_shader_int64")
+    f('op-mult', 2, 150, _multiply, match_multiply,
+      [int64s+int64vecs+uint64s+uint64vecs,
+       int64s+int64vecs+uint64s+uint64vecs],
+      template='({0} * {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-div', 2, 150, _divide, match_simple_binop,
+      [int64s+int64vecs,
+       int64s+int64vecs],
+      template='({0} / {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-mod', 2, 150, _modulus, match_simple_binop,
+      [int64s+int64vecs,
+       int64s+int64vecs],
+      template='({0} % {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-gt', 2, 150, lambda x, y: x > y, match_args(0, 1),
+      [int64s+uint64s,
+       int64s+uint64s],
+      template = '({0} > {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-lt', 2, 150, lambda x, y: x < y, match_args(0, 1),
+      [int64s+uint64s,
+       int64s+uint64s],
+      template = '({0} < {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-ge', 2, 150, lambda x, y: x >= y, match_args(0, 1),
+      [int64s+uint64s,
+       int64s+uint64s],
+      template = '({0} >= {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-le', 2, 150, lambda x, y: x <= y, match_args(0, 1),
+      [int64s+uint64s,
+       int64s+uint64s],
+      template = '({0} <= {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-eq', 2, 150, lambda x, y: x == y, match_args(0, 1),
+      [int64s+uint64s,
+       int64s+uint64s],
+      template = '({0} == {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-ne', 2, 150, lambda x, y: x != y, match_args(0, 1),
+      [int64s+uint64s,
+       int64s+uint64s],
+      template = '({0} != {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-bitand', 2, 150, lambda x, y: x & y, match_simple_binop,
+      [int64s+uint64s, int64s+uint64s],
+      template='({0} & {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-bitor', 2, 150, lambda x, y: x | y, match_simple_binop,
+      [int64s+uint64s, int64s+uint64s],
+      template='({0} | {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-bitxor', 2, 150, lambda x, y: x ^ y, match_simple_binop,
+      [int64s+uint64s, int64s+uint64s],
+      template='({0} ^ {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-lshift', 2, 150, _lshift, match_shift,
+      [int64s+uint64s,
+       small_uints],
+      template='({0} << {1})',
+      extension="ARB_gpu_shader_int64")
+    f('op-rshift', 2, 150, _rshift, match_shift,
+      [int64s+uint64s,
+       small_uints],
+      template='({0} >> {1})',
+      extension="ARB_gpu_shader_int64")
 _make_vector_or_matrix_test_vectors(test_suite)
 
 
