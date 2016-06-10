@@ -179,7 +179,6 @@ static const struct texture_format formats[] = {
 #undef FORMAT
 };
 
-#define ARRAY_LENGTH(X) (sizeof(X)/sizeof(*(X)))
 
 static const struct texture_format *
 find_format(const char *str)
@@ -926,7 +925,7 @@ piglit_display(void)
 		src_format_count = 1;
 	} else {
 		src_format_list = formats;
-		src_format_count = ARRAY_LENGTH(formats);
+		src_format_count = ARRAY_SIZE(formats);
 	}
 
 	if (dst_format_arg) {
@@ -934,7 +933,7 @@ piglit_display(void)
 		dst_format_count = 1;
 	} else {
 		dst_format_list = formats;
-		dst_format_count = ARRAY_LENGTH(formats);
+		dst_format_count = ARRAY_SIZE(formats);
 	}
 
 	for (sf = 0; sf < src_format_count; ++sf) {
