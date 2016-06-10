@@ -185,17 +185,16 @@ static const struct texture_format *
 find_format(const char *str)
 {
 	int i;
-	const struct texture_format *format = NULL;
 
 	for (i = 0; i < sizeof(formats) / sizeof(*formats); ++i) {
 		if (strcmp(str, formats[i].name) == 0) {
-			format = &formats[i];
-			break;
+			return &formats[i];
 		}
 	}
 
-	assert(format);
-	return format;
+	printf("Unknown format: %s\n", str);
+	exit(1);
+	return NULL;
 }
 
 static bool
