@@ -31,24 +31,6 @@
       glsl_version = '{}.{}'.format(glsl_version_int[0], glsl_version_int[1:3])
 
       return (glsl_version, glsl_version_int)
-
-
-  def cols(in_type):
-      if 'mat' in in_type:
-          if 'x' in in_type:
-              return int(in_type[-3:][:1])
-          else:
-              return int(in_type[-1:])
-      else:
-          return 1
-
-
-  def rows(in_type):
-      if 'vec' in in_type or 'mat' in in_type:
-          return int(in_type[-1:])
-      else:
-          return 1
-
 %>
 <% glsl, glsl_int = _version(ver) %>
 
@@ -66,9 +48,9 @@ GLSL >= ${glsl}
   #extension GL_ARB_vertex_attrib_64bit : require
 % endif
 
-uniform ${mat} expected;
+uniform ${mat.name} expected;
 
-in ${mat} value;
+in ${mat.name} value;
 in vec3 piglit_vertex;
 out vec4 fs_color;
 
@@ -103,16 +85,16 @@ void main()
 
 [vertex data]
 piglit_vertex/vec3/3\
-  % for i in range(cols(mat)):
-   value/${mat}/${rows(mat)}${'/{}'.format(i) if cols(mat) > 1 else ''}\
+  % for i in range(mat.columns):
+   value/${mat.name}/${mat.rows}${'/{}'.format(i) if mat.columns > 1 else ''}\
   % endfor
 
 % for d in range(len(dvalues)):
   % for vertex in ('-1.0 -1.0  0.0', ' 1.0 -1.0  0.0', ' 1.0  1.0  0.0', '-1.0  1.0  0.0'):
 ${vertex} \
-    % for i in range(cols(mat)):
-      % for j in range(rows(mat)):
-${dvalues[(d + i * rows(mat) + j) % len(dvalues)]}  \
+    % for i in range(mat.columns):
+      % for j in range(mat.rows):
+${dvalues[(d + i * mat.rows + j) % len(dvalues)]}  \
       % endfor
   \
     % endfor
@@ -123,10 +105,10 @@ ${dvalues[(d + i * rows(mat) + j) % len(dvalues)]}  \
 [test]
 % for d in range(len(dvalues)):
 
-  uniform ${mat} expected\
-  % for i in range(cols(mat)):
-    % for j in range(rows(mat)):
-     ${dvalues[(d + i * rows(mat) + j) % len(dvalues)]}\
+  uniform ${mat.name} expected\
+  % for i in range(mat.columns):
+    % for j in range(mat.rows):
+     ${dvalues[(d + i * mat.rows + j) % len(dvalues)]}\
     % endfor
   % endfor
 

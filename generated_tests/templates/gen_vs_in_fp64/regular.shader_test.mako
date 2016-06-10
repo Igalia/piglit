@@ -31,24 +31,6 @@
       glsl_version = '{}.{}'.format(glsl_version_int[0], glsl_version_int[1:3])
 
       return (glsl_version, glsl_version_int)
-
-
-  def cols(in_type):
-      if 'mat' in in_type:
-          if 'x' in in_type:
-              return int(in_type[-3:][:1])
-          else:
-              return int(in_type[-1:])
-      else:
-          return 1
-
-
-  def rows(in_type):
-      if 'vec' in in_type or 'mat' in in_type:
-          return int(in_type[-1:])
-      else:
-          return 1
-
 %>
 <% glsl, glsl_int = _version(ver) %>
 
@@ -68,10 +50,10 @@ GL_MAX_VERTEX_ATTRIBS >= ${num_vs_in}
 % endif
 
 % for idx, in_type in enumerate(in_types):
-  uniform ${in_type} expected${idx}${'[{}]'.format(arrays[idx]) if arrays[idx] - 1 else ''};
+  uniform ${in_type.name} expected${idx}${'[{}]'.format(arrays[idx]) if arrays[idx] - 1 else ''};
 % endfor
 % for idx, in_type in enumerate(in_types):
-  in ${in_type} value${idx}${'[{}]'.format(arrays[idx]) if arrays[idx] - 1 else ''};
+  in ${in_type.name} value${idx}${'[{}]'.format(arrays[idx]) if arrays[idx] - 1 else ''};
 % endfor
 in vec3 piglit_vertex;
 out vec4 fs_color;
@@ -109,8 +91,8 @@ void main()
     piglit_vertex/vec3/3 \
   % endif
   % for i in range(arrays[idx]):
-    % for j in range(cols(in_type)):
-    value${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}/${in_type}/${rows(in_type)}${'/{}'.format(j) if cols(in_type) > 1 else ''} \
+    % for j in range(in_type.columns):
+    value${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}/${in_type.name}/${(in_type.rows)}${'/{}'.format(j) if (in_type.columns or 0) > 1 else ''} \
     % endfor
   % endfor
 % endfor
@@ -125,9 +107,9 @@ void main()
         ${vertex}   \
       % endif
       % for i in range(arrays[idx]):
-        % for j in range(cols(in_type)):
-          % for k in range(rows(in_type)):
-            ${dvalues[(d + (i * cols(in_type) + j) * rows(in_type) + k) % len(dvalues)] if in_type.startswith('d') else hvalues[(d + (i * cols(in_type) + j) * rows(in_type) + k) % len(hvalues)]}  \
+        % for j in range(in_type.columns):
+          % for k in range(in_type.rows):
+            ${dvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(dvalues)] if in_type.type.name == 'double' else hvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(hvalues)]}  \
           % endfor
          \
         % endfor
@@ -145,10 +127,10 @@ void main()
 
   % for idx, in_type in enumerate(in_types):
     % for i in range(arrays[idx]):
-      uniform ${in_type} expected${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}\
-      % for j in range(cols(in_type)):
-        % for k in range(rows(in_type)):
-         ${dvalues[(d + (i * cols(in_type) + j) * rows(in_type) + k) % len(dvalues)] if in_type.startswith('d') else hvalues[(d + (i * cols(in_type) + j) * rows(in_type) + k) % len(hvalues)]}\
+      uniform ${in_type.name} expected${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}\
+      % for j in range(in_type.columns):
+        % for k in range(in_type.rows):
+         ${dvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(dvalues)] if in_type.type.name == 'double' else hvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(hvalues)]}\
         % endfor
       % endfor
 

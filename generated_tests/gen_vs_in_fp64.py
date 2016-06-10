@@ -34,6 +34,7 @@ from six.moves import range
 
 from templates import template_dir
 from modules import utils
+from modules import types as glsltypes
 
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
@@ -71,29 +72,29 @@ DOUBLE_NORMAL_VALUES   = ['0xffefffffffffffff', # Negative maximum normalized
                           '0x4b1e35ed24eb6496', # +7.23401345e+53
                           '0x7fefffffffffffff'] # Positive maximum normalized
 
-DSCALAR_TYPES          = ['double']
+DSCALAR_TYPES          = [glsltypes.DOUBLE]
 
-DVEC_TYPES             = ['dvec2', 'dvec3', 'dvec4']
+DVEC_TYPES             = [glsltypes.DVEC2, glsltypes.DVEC3, glsltypes.DVEC4]
 
-DMAT_TYPES             = ['dmat2', 'dmat2x3', 'dmat2x4',
-                          'dmat3x2', 'dmat3', 'dmat3x4',
-                          'dmat4x2', 'dmat4x3', 'dmat4']
+DMAT_TYPES             = [glsltypes.DMAT2, glsltypes.DMAT2X3, glsltypes.DMAT2X4,
+                          glsltypes.DMAT3X2, glsltypes.DMAT3, glsltypes.DMAT3X4,
+                          glsltypes.DMAT4X2, glsltypes.DMAT4X3, glsltypes.DMAT4]
 
-FSCALAR_TYPES          = ['float']
+FSCALAR_TYPES          = [glsltypes.FLOAT]
 
-FVEC_TYPES             = ['vec2', 'vec3', 'vec4']
+FVEC_TYPES             = [glsltypes.VEC2, glsltypes.VEC3, glsltypes.VEC4]
 
-FMAT_TYPES             = ['mat2', 'mat2x3', 'mat2x4',
-                          'mat3x2', 'mat3', 'mat3x4',
-                          'mat4x2', 'mat4x3', 'mat4']
+FMAT_TYPES             = [glsltypes.MAT2, glsltypes.MAT2X3, glsltypes.MAT2X4,
+                          glsltypes.MAT3X2, glsltypes.MAT3, glsltypes.MAT3X4,
+                          glsltypes.MAT4X2, glsltypes.MAT4X3, glsltypes.MAT4]
 
-ISCALAR_TYPES          = ['int']
+ISCALAR_TYPES          = [glsltypes.INT]
 
-IVEC_TYPES             = ['ivec2', 'ivec3', 'ivec4']
+IVEC_TYPES             = [glsltypes.IVEC2, glsltypes.IVEC3, glsltypes.IVEC4]
 
-USCALAR_TYPES          = ['uint']
+USCALAR_TYPES          = [glsltypes.UINT]
 
-UVEC_TYPES             = ['uvec2', 'uvec3', 'uvec4']
+UVEC_TYPES             = [glsltypes.UVEC2, glsltypes.UVEC3, glsltypes.UVEC4]
 
 HEX_VALUES_32BIT       = ['0xc21620c5', # -3.7532        float, -1038737211 int, 3256230085 uint
                           '0x75bc289b', #  4.7703e32     float,  1975265435 int, 1975265435 uint
@@ -121,26 +122,6 @@ class TestTuple(object):
     """A float64 derived and other type derived tuple to generate the
        needed conversion tests.
     """
-
-    @staticmethod
-    def rows(in_type):
-        """Calculates the amounts of rows in a basic GLSL type."""
-        if 'vec' in in_type or 'mat' in in_type:
-            return int(in_type[-1:])
-        else:
-            return 1
-
-    @staticmethod
-    def cols(in_type):
-        """Calculates the amounts of columns in a basic GLSL type."""
-        if 'mat' in in_type:
-            if 'x' in in_type:
-                return int(in_type[-3:][:1])
-            else:
-                return int(in_type[-1:])
-        else:
-            return 1
-
     @staticmethod
     def get_dir_name(ver):
         """Returns the directory name to save tests given a GLSL version."""
@@ -191,20 +172,17 @@ class RegularTestTuple(TestTuple):
             for ver in glsl_vers:
                 utils.safe_makedirs(TestTuple.get_dir_name(ver))
 
-        for in_types, position_order, arrays, ver in itertools.product(in_types_array,
-                                                                       position_orders,
-                                                                       arrays_array,
-                                                                       glsl_vers):
+        for in_types, position_order, arrays, ver in itertools.product(
+                in_types_array,
+                position_orders,
+                arrays_array,
+                glsl_vers):
             num_vs_in = 1 # We use an additional vec3 piglit_vertex input
             for idx, in_type in enumerate(in_types):
-                if ((in_type.startswith('dvec') or in_type.startswith('dmat'))
-                    and (in_type.endswith('3') or in_type.endswith('4'))):
-                    multiplier = 2
-                else:
-                    multiplier = 1
-                num_vs_in += TestTuple.cols(in_type) * arrays[idx] * multiplier
+                num_vs_in += (in_type.columns or 1) * arrays[idx] * \
+                    (2 if in_type.type.name == 'double' and in_type.rows in [3, 4] else 1)
                 # dvec* and dmat* didn't appear in GLSL until 4.20
-                if (in_type.startswith('dvec') or in_type.startswith('dmat')) and ver == '410':
+                if (in_type.type.name == 'double' and not in_type.scalar) and ver == '410':
                     ver = '420'
             # Skip the test if it needs too many inputs
             if num_vs_in > MAX_VERTEX_ATTRIBS:
@@ -277,13 +255,12 @@ class RegularTestTuple(TestTuple):
 
     def generate(self):
         """Generate GLSL parser tests."""
-
         filename = os.path.join(TestTuple.get_dir_name(self._ver), 'vs-input')
         for idx, in_type in enumerate(self._in_types):
             if idx == self._position_order - 1:
                 filename += '-position'
             filename += '-{}{}'.format(
-                in_type, '-array{}'.format(
+                in_type.name, '-array{}'.format(
                     self._arrays[idx]) if self._arrays[idx] - 1 else '')
         if self._position_order > len(self._in_types):
             filename += '-position'
@@ -320,7 +297,7 @@ class ColumnsTestTuple(TestTuple):
                 utils.safe_makedirs(TestTuple.get_dir_name(ver))
 
         for mat in DMAT_TYPES:
-            for columns in itertools.product(range(2), repeat=TestTuple.cols(mat)):
+            for columns in itertools.product(range(2), repeat=mat.columns):
                 if (0 not in columns) or (1 not in columns):
                     continue
                 for ver in glsl_vers:
@@ -337,7 +314,7 @@ class ColumnsTestTuple(TestTuple):
         """Generate GLSL parser tests."""
 
         filename = os.path.join(TestTuple.get_dir_name(self._ver),
-                                'vs-input-columns-{}'.format(self._mat))
+                                'vs-input-columns-{}'.format(self._mat.name))
         for idx, column in enumerate(self._columns):
             if column == 1:
                 filename += '-{}'.format(idx)
