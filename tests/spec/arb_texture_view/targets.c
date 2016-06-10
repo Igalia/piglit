@@ -107,11 +107,15 @@ test_target_errors(GLenum target)
 		GL_TEXTURE_2D_MULTISAMPLE,
 		GL_TEXTURE_2D_MULTISAMPLE_ARRAY
 	};
-	
-	if (piglit_is_extension_supported("GL_ARB_texture_storage_multisample"))
+	GLsizei texSamples;
+
+	if (piglit_is_extension_supported("GL_ARB_texture_storage_multisample")) {
 		numIllegalTargets = ARRAY_SIZE(illegalTargets);
-	else
+		glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &texSamples);
+	} else {
 		numIllegalTargets =  ARRAY_SIZE(illegalTargets) -2;
+		texSamples = 1;
+	}
 
 	glGenTextures(1, &tex);   /* orig tex */
 	glBindTexture(target, tex);
@@ -167,16 +171,16 @@ test_target_errors(GLenum target)
 				    GL_TEXTURE_CUBE_MAP_ARRAY, 0);
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE:
-		glTexStorage2DMultisample(target, 2, GL_RGBA8, width, height,
-					  GL_TRUE);
+		glTexStorage2DMultisample(target, texSamples, GL_RGBA8,
+					  width, height, GL_TRUE);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
 				    numIllegalTargets,
 				    GL_TEXTURE_2D_MULTISAMPLE,
 				    GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0);
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
-		glTexStorage3DMultisample(target, 4, GL_RGBA8, width, height,
-					  depth, GL_TRUE);
+		glTexStorage3DMultisample(target, texSamples, GL_RGBA8,
+					  width, height, depth, GL_TRUE);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
 				    numIllegalTargets,
 				    GL_TEXTURE_2D_MULTISAMPLE,
