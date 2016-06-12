@@ -4718,5 +4718,16 @@ with profile.group_manager(
         grouptools.join('spec', 'ARB_invalidate_subdata')) as g:
     g(['arb_invalidate_subdata-buffer'], 'buffer')
 
+# Group EXT_window_rectangles
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'EXT_window_rectangles')) as g:
+    g(['ext_window_rectangles-dlist'], 'dlist')
+    g(['ext_window_rectangles-errors'], 'errors')
+    g(['ext_window_rectangles-render'], 'render')
+
+    g(['ext_window_rectangles-errors_gles3'], 'errors_gles3')
+    g(['ext_window_rectangles-render_gles3'], 'render_gles3')
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))

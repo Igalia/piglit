@@ -1,0 +1,15 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+)
+
+piglit_add_executable (ext_window_rectangles-dlist dlist.c)
+piglit_add_executable (ext_window_rectangles-errors errors.c)
+piglit_add_executable (ext_window_rectangles-render render.c)
+
+# vim: ft=cmake:

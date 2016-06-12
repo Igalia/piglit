@@ -1,0 +1,4 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable (ext_window_rectangles-errors_gles3 errors.c)
+piglit_add_executable (ext_window_rectangles-render_gles3 render.c)
