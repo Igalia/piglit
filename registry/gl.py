@@ -316,7 +316,7 @@ class ImmutableError(Exception):
 
 
 # Values that may appear in the XML attributes 'api' and 'supported'.
-VALID_APIS = frozenset(('gl', 'glcore', 'gles1', 'gles2'))
+VALID_APIS = frozenset(('gl', 'glcore', 'gles1', 'gles2', 'glsc2'))
 
 
 class Registry(object):

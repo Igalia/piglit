@@ -85,7 +85,7 @@ class DispatchCode(object):
     }
     APIS['glcore'] = APIS['gl']
 
-    assert set(APIS.keys()) == set(registry.gl.VALID_APIS)
+    assert set(APIS.keys()) | set(['glsc2']) == set(registry.gl.VALID_APIS)
 
     @classmethod
     def emit(cls, out_dir, gl_registry):

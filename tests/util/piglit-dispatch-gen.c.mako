@@ -31,7 +31,7 @@ resolve_${f0.name}(void)
 {
 % for req in alias_set.requirements:
 >-------/* ${req.command.name} (${req.provider.name}) */
-<% apis = sorted(set(dispatch.APIS[x] for x in req.apis)) %>
+<% apis = sorted(set(dispatch.APIS[x] for x in req.apis if x in dispatch.APIS)) %>
 % for api in apis:
 % if loop.first:
 >-------if (
@@ -53,6 +53,7 @@ resolve_${f0.name}(void)
 ................................................................................................. || .
 % endif
 % endfor
+% if apis:
 % if req.has_extension:
 ....................................................................................................)
 >-------    && check_extension("${req.extension.name}")
@@ -64,6 +65,7 @@ resolve_${f0.name}(void)
 >------->-------return get_ext_proc("${req.command.name}");
 % endif
 >-------}
+% endif
 
 % endfor
 >-------unsupported("${f0.name}");
