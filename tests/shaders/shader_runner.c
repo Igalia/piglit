@@ -401,7 +401,7 @@ compile_glsl(GLenum target)
 		char *shader_strings[2];
 		char version_string[100];
 		GLint shader_string_sizes[2];
-		
+
 		/* Add a #version directive based on the GLSL requirement. */
 		sprintf(version_string, "#version %d", glsl_req_version.num);
 		if (glsl_req_version.es && glsl_req_version.num != 100) {
@@ -412,7 +412,7 @@ compile_glsl(GLenum target)
 		shader_string_sizes[0] = strlen(version_string);
 		shader_strings[1] = shader_string;
 		shader_string_sizes[1] = shader_string_size;
-		
+
 		glShaderSource(shader, 2,
 				    (const GLchar **) shader_strings,
 				    shader_string_sizes);
