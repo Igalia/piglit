@@ -117,6 +117,7 @@ EXTENSIONS = [
     ("GL_OES_blend_func_extended", "100"),
     ("GL_OES_shader_image_atomic", "310 es"),
     ("GL_OES_shader_io_blocks", "310 es"),
+    ("GL_EXT_shader_io_blocks", "310 es"),
     ("GL_OES_geometry_shader", "310 es"),
     ("GL_EXT_geometry_shader", "310 es"),
     ("GL_OES_geometry_point_size", "310 es"),
