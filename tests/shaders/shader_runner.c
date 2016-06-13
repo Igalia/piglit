@@ -131,7 +131,7 @@ static GLuint sso_tess_eval_prog;
 static GLuint sso_geometry_prog;
 static GLuint sso_fragment_prog;
 static GLuint sso_compute_prog;
-static GLuint pipeline;
+static GLuint pipeline = 0;
 static size_t num_vbo_rows = 0;
 static bool vbo_present = false;
 static bool link_ok = false;
@@ -883,10 +883,19 @@ process_requirement(const char *line)
 
 		piglit_set_rlimit(lim);
 	}  else if (string_match("SSO", line)) {
+		const char *const ext_name = gl_version.es
+			? "GL_EXT_separate_shader_objects"
+			: "GL_ARB_separate_shader_objects";
+		const unsigned min_version = gl_version.es
+			? 31 : 41;
+
 		line = eat_whitespace(line + 3);
 		if (string_match("ENABLED", line)) {
-			piglit_require_extension("GL_ARB_separate_shader_objects");
+			if (gl_version.num < min_version)
+				piglit_require_extension(ext_name);
+
 			sso_in_use = true;
+			glGenProgramPipelines(1, &pipeline);
 		}
 	}
 }
@@ -3393,10 +3402,9 @@ piglit_display(void)
 			if (!sso_in_use)
 				glDeleteProgramsARB(1, &prog);
 		}
-#ifdef PIGLIT_USE_OPENGL
-		if (piglit_is_extension_supported("GL_ARB_separate_shader_objects"))
+
+		if (pipeline != 0)
 			glDeleteProgramPipelines(1, &pipeline);
-#endif
 	}
 
 	return full_result;
@@ -3440,9 +3448,6 @@ piglit_init(int argc, char **argv)
 		glGetIntegerv(GL_MAX_VARYING_COMPONENTS,
 			      &gl_max_varying_components);
 	glGetIntegerv(GL_MAX_CLIP_PLANES, &gl_max_clip_planes);
-
-	if (piglit_is_extension_supported("GL_ARB_separate_shader_objects"))
-		glGenProgramPipelines(1, &pipeline);
 #else
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,
 		      &gl_max_fragment_uniform_components);
