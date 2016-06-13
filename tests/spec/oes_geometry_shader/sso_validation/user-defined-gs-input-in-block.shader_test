@@ -1,0 +1,70 @@
+[require]
+GL ES >= 3.1
+GLSL ES >= 3.10
+GL_OES_geometry_shader
+SSO ENABLED
+
+[vertex shader]
+#version 310 es
+#extension GL_OES_shader_io_blocks: require
+
+in vec4 piglit_vertex;
+out Vertex {
+    vec4 c;
+} v;
+
+out gl_PerVertex {
+    vec4 gl_Position;
+};
+
+void main()
+{
+    gl_Position = piglit_vertex;
+    v.c = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[geometry shader]
+#version 310 es
+#extension GL_OES_geometry_shader: require
+#extension GL_OES_shader_io_blocks: require
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices=3) out;
+
+in gl_PerVertex {
+    vec4 gl_Position;
+} gl_in[];
+
+in Vertex {
+    vec4 c;
+} v[];
+
+out vec4 fc;
+
+void main()
+{
+    for (int i = 0; i < gl_in.length(); i++) {
+	fc = v[i].c;
+	gl_Position = gl_in[i].gl_Position;
+	EmitVertex();
+    }
+
+    EndPrimitive();
+}
+
+[fragment shader]
+#version 310 es
+
+precision highp float;
+
+in vec4 fc;
+out vec4 piglit_fragcolor;
+
+void main()
+{
+    piglit_fragcolor = fc;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
