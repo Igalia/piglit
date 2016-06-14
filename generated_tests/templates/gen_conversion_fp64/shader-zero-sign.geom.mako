@@ -18,9 +18,9 @@ void main()
 	${to_type} pre_converted = ${converted_from};
 	${to_type} converted = ONE / pre_converted;
 	bool match = converted == to;
-	fs_color = match ? GREEN : RED;
 
 	for (int i = 0; i < 3; i++) {
+		fs_color = match ? GREEN : RED;
 		gl_Position = vertex_to_gs[i];
 		EmitVertex();
 	}
