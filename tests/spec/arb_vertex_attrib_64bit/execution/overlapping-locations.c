@@ -106,7 +106,7 @@ compile_shader(void)
 		"}\n";
 
 	char *vert;
-	asprintf(&vert, vert_template, locations_in_shader ?
+	(void)!asprintf(&vert, vert_template, locations_in_shader ?
 		 "#extension GL_ARB_explicit_attrib_location : require\n"
 		 "#extension GL_ARB_gpu_shader_fp64 : require\n"
 		 "#extension GL_ARB_vertex_attrib_64bit : require\n"
