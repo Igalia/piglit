@@ -31,16 +31,6 @@
       glsl_version = '{}.{}'.format(glsl_version_int[0], glsl_version_int[1:3])
 
       return (glsl_version, glsl_version_int)
-
-  def _glsl_to_gl(glsl_type):
-      if glsl_type.startswith("d"):
-          return "double"
-      elif glsl_type.startswith("u"):
-          return "uint"
-      elif glsl_type.startswith("i"):
-          return "int"
-      else:
-          return "float"
 %>
 <% glsl, glsl_int = _version(ver) %>
 
@@ -102,7 +92,7 @@ void main()
   % endif
   % for i in range(arrays[idx]):
     % for j in range(in_type.columns):
-    value${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}/${_glsl_to_gl(in_type.name)}/${in_type.name}${'/{}'.format(j) if (in_type.columns or 0) > 1 else ''} \
+    value${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}/${gl_types[idx]}/${in_type.name}${'/{}'.format(j) if in_type.columns > 1 else ''} \
     % endfor
   % endfor
 % endfor
@@ -110,7 +100,7 @@ void main()
   piglit_vertex/float/vec3\
 % endif
 
-% for d in range(len(dvalues)):
+% for d in range(len(gl_types_values['double'])):
   % for vertex in ('-1.0 -1.0  0.0', ' 1.0 -1.0  0.0', ' 1.0  1.0  0.0', '-1.0  1.0  0.0'):
     % for idx, in_type in enumerate(in_types):
       % if idx == position_order - 1:
@@ -119,7 +109,7 @@ void main()
       % for i in range(arrays[idx]):
         % for j in range(in_type.columns):
           % for k in range(in_type.rows):
-            ${dvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(dvalues)] if in_type.type.name == 'double' else hvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(hvalues)]}  \
+            ${gl_types_values[gl_types[idx]][(d + (i * in_type.columns + j) * in_type.rows + k) % len(gl_types_values[gl_types[idx]])]}  \
           % endfor
          \
         % endfor
@@ -133,14 +123,15 @@ void main()
 % endfor
 
 [test]
-% for d in range(len(dvalues)):
+% for d in range(len(gl_types_values['double'])):
 
   % for idx, in_type in enumerate(in_types):
     % for i in range(arrays[idx]):
       uniform ${in_type.name} expected${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}\
       % for j in range(in_type.columns):
         % for k in range(in_type.rows):
-         ${dvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(dvalues)] if in_type.type.name == 'double' else hvalues[(d + (i * (in_type.columns) + j) * (in_type.rows) + k) % len(hvalues)]}\
+	  ## Careful: these are the values for the VBO type, not the uniform type. If we use the hex format they should match or the run will fail.
+          ${gl_types_values[gl_types[idx]][(d + (i * in_type.columns + j) * in_type.rows + k) % len(gl_types_values[gl_types[idx]])]}\
         % endfor
       % endfor
 
