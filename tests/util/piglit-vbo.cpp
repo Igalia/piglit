@@ -307,7 +307,7 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 		const char *third_slash = strchr(second_slash + 1, '/');
 		this->matrix_index = strtoul(third_slash + 1, &endptr, 10);
 
-		if (this->matrix_index < 0 || this->matrix_index > 3) {
+		if (this->matrix_index > 3) {
 			printf("Matrix column index must be between 0 and 3.  Got: %lu\n",
 				(unsigned long) this->matrix_index);
 			piglit_report_result(PIGLIT_FAIL);
