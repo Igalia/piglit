@@ -437,6 +437,9 @@ make_gs_program(GLenum input_prim)
 	case GL_TRIANGLE_STRIP_ADJACENCY:
 		gs_text = gs_text_triangles;
 		break;
+	default:
+		assert(!"Unexpected input_prim");
+		return 0;
 	}
 
 	program = piglit_build_simple_program_unlinked_multiple_shaders(
