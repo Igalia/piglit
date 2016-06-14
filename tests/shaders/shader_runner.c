@@ -2252,7 +2252,7 @@ active_program_interface(const char *line)
 				"glGetProgramResourceName(%s, %s): "
 				"expected %d (0x%04x), got %d (0x%04x)\n",
 				name, prop_string,
-				expected, expected, got, got);
+				expected, expected, name_len, name_len);
 			pass = false;
 		}
 
