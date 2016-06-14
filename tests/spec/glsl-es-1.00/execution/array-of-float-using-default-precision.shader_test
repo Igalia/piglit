@@ -1,0 +1,34 @@
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader]
+#version 100
+
+attribute vec4 piglit_vertex;
+varying mediump float f[4];
+
+void main()
+{
+    gl_Position = piglit_vertex;
+    f[0] = 0.0;
+    f[1] = 1.0;
+    f[2] = 0.0;
+    f[3] = 1.0;
+}
+
+[fragment shader]
+#version 100
+
+precision mediump float;
+
+varying float f[4];
+
+void main()
+{
+    gl_FragColor = vec4(f[0], f[1], f[2], f[3]);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
