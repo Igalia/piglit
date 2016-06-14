@@ -158,7 +158,7 @@ draw_frame(Display *dpy, Window win)
         if (Automatic) {
             if (message_count==2) {
                 if (test_events) {
-                    if ( ! Intel_swap_event == 0 ) {
+                    if ( Intel_swap_event != 0 ) {
                         if (verbose) {
                             printf("glXSwapBuffers is called %d times and there\
  is %d Intel_swap_event received in past %3.1f seconds.\n", swap_count,
