@@ -269,6 +269,30 @@ strtod_hex(const char *nptr, char **endptr)
 	}
 }
 
+/**
+ * Wrapper for strtol() which allows using an exact hex bit pattern to
+ * generate a signed int value.
+ */
+static inline int
+strtol_hex(const char *nptr, char **endptr)
+{
+	/* skip spaces and tabs */
+	while (*nptr == ' ' || *nptr == '\t')
+		nptr++;
+
+	if (strncmp(nptr, "0x", 2) == 0) {
+		union {
+			uint32_t u;
+			int32_t i;
+		} x;
+
+		x.u = strtoul(nptr, endptr, 16);
+		return x.i;
+	} else {
+		return strtol(nptr, endptr, 0);
+	}
+}
+
 #ifndef HAVE_STRCHRNUL
 static inline char *
 strchrnul(const char *s, int c)
