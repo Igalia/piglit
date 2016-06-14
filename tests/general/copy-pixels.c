@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Intel Corporation
+ * Copyright © 2016 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -25,14 +25,13 @@
  * @file copy-pixels.c
  *
  * Test to verify glCopyPixels with GL_COLOR, GL_DEPTH and GL_STENCIL
- *
- * Author: Anuj Phogat
  */
 
 #include "piglit-util-gl.h"
 
-#define IMAGE_WIDTH 16
-#define IMAGE_HEIGHT 16
+#define IMAGE_WIDTH 60
+#define IMAGE_HEIGHT 60
+#define OFFSET 16
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -42,62 +41,111 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-enum piglit_result
-piglit_display(void)
+bool
+test_color_copypix(int x, int y)
 {
-	GLint i, j;
-	GLuint width = 16, height = 16;
-	GLint x = 12, y = 12;
-	GLfloat buf[IMAGE_WIDTH][IMAGE_HEIGHT];
-	GLfloat depth_val = 0.75, stencil_val = 2.0;
-	GLfloat green[4] = {0.0, 1.0, 0.0, 0.0};
 	bool pass = true;
+	GLuint tex;
 
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	const float *expected = piglit_rgbw_image(GL_RGBA,
+						  IMAGE_WIDTH, IMAGE_HEIGHT,
+						  GL_FALSE, /* alpha */
+						  GL_UNSIGNED_NORMALIZED);
 
-	glColor4fv(green);
-	piglit_draw_rect(0, 0, width, height);
+	/* Initialize color data */
+	tex = piglit_rgbw_texture(GL_RGBA, IMAGE_WIDTH, IMAGE_HEIGHT,
+				  GL_FALSE, GL_FALSE,
+				  GL_UNSIGNED_NORMALIZED);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glEnable(GL_TEXTURE_2D);
+
+	piglit_draw_rect_tex(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 0, 0, 1, 1);
 
 	glRasterPos2i(x, y);
-	glCopyPixels(0, 0, width, height, GL_COLOR);
-	pass = pass && piglit_probe_rect_rgba(x, y, width, height, green);
+	glCopyPixels(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, GL_COLOR);
+	pass = piglit_probe_image_color(x, y, IMAGE_WIDTH, IMAGE_HEIGHT,
+					GL_RGBA, expected) && pass;
+	return pass;
+}
+
+bool
+test_depth_copypix(int x, int y)
+{
+	int i;
+	bool pass = true;
+	float depth_val = 0.75;
+	float *buf = malloc(IMAGE_WIDTH * IMAGE_HEIGHT * sizeof(float));
+	assert(buf);
 
 	/* Initialize depth data */
-	for (i = 0; i < IMAGE_HEIGHT; i++) {
-		for(j = 0; j < IMAGE_WIDTH; j++)
-			buf[i][j] = depth_val;
-	}
+	for (i = 0; i < IMAGE_WIDTH * IMAGE_HEIGHT; i++)
+		buf[i] = depth_val;
 
-	glClearDepth(0.0);
-	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_ALWAYS);
 
 	glRasterPos2i(0, 0);
-	glDrawPixels(width, height,
+	glDrawPixels(IMAGE_WIDTH, IMAGE_HEIGHT,
 		     GL_DEPTH_COMPONENT, GL_FLOAT, buf);
 	glRasterPos2i(x, y);
-	glCopyPixels(0, 0, width, height, GL_DEPTH);
-	pass = piglit_probe_rect_depth(x, y, width, height, depth_val)
-	       && pass;
+	glCopyPixels(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, GL_DEPTH);
+	free(buf);
+	pass = piglit_probe_rect_depth(x, y, IMAGE_WIDTH, IMAGE_HEIGHT,
+				       depth_val);
+	return pass;
+}
+
+bool
+test_stencil_copypix(int x, int y)
+{
+	int i;
+	bool pass = true;
+	float stencil_val = 2.0;
+	float *buf = malloc(IMAGE_WIDTH * IMAGE_HEIGHT * sizeof(float));
+	assert(buf);
 
 	/* Initialize stencil data */
-	for (i = 0; i < IMAGE_HEIGHT; i++) {
-		for(j = 0; j < IMAGE_WIDTH; j++)
-			buf[i][j] = stencil_val;
-	}
-
-	glClearStencil(0.0);
-	glClear(GL_STENCIL_BUFFER_BIT);
+	for (i = 0; i < IMAGE_WIDTH * IMAGE_HEIGHT; i++)
+		buf[i] = stencil_val;
 
 	glRasterPos2i(0, 0);
-	glDrawPixels(width, height,
+	glDrawPixels(IMAGE_WIDTH, IMAGE_HEIGHT,
 		     GL_STENCIL_INDEX, GL_FLOAT, buf);
 	glRasterPos2i(x, y);
-	glCopyPixels(0, 0, width, height, GL_STENCIL);
-	pass = piglit_probe_rect_stencil(x, y, width, height, stencil_val)
+	glCopyPixels(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, GL_STENCIL);
+	free(buf);
+	pass = piglit_probe_rect_stencil(x, y, IMAGE_WIDTH, IMAGE_HEIGHT,
+					 stencil_val);
+	return pass;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	bool pass = true;
+
+	/* Test overlapping and non-overlapping copypixels with color, depth
+	 * and stencil buffers.
+	 */
+	glClear(GL_COLOR_BUFFER_BIT);
+	pass = test_color_copypix(IMAGE_WIDTH, 0) && pass;
+	pass = test_color_copypix(IMAGE_WIDTH + OFFSET, IMAGE_HEIGHT + OFFSET)
 	       && pass;
+	pass = test_color_copypix(0, IMAGE_HEIGHT - OFFSET) && pass;
+
+	piglit_present_results();
+
+	glClear(GL_DEPTH_BUFFER_BIT);
+	pass = test_depth_copypix(IMAGE_WIDTH, 0) && pass;
+	pass = test_depth_copypix(IMAGE_WIDTH + OFFSET, IMAGE_HEIGHT + OFFSET)
+	       && pass;
+	pass = test_depth_copypix(0, IMAGE_HEIGHT - OFFSET) && pass;
+
+	glClear(GL_STENCIL_BUFFER_BIT);
+	pass = test_stencil_copypix(IMAGE_WIDTH, 0) && pass;
+	pass = test_stencil_copypix(IMAGE_WIDTH + OFFSET, IMAGE_HEIGHT + OFFSET)
+	       && pass;
+	pass = test_stencil_copypix(0, IMAGE_HEIGHT - OFFSET) && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -111,5 +159,10 @@ piglit_init(int argc, char **argv)
 		printf("Requires GL 1.4 or GL_ARB_window_pos");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+
+	glClearColor(0.25, 0.25, 0.25, 1.0);
+	glClearDepth(0.0);
+	glClearStencil(0.0);
+
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
