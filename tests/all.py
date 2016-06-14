@@ -4389,6 +4389,9 @@ with profile.group_manager(
     g(['egl-create-pbuffer-surface'],
       'eglCreatePbufferSurface and then glClear',
       run_concurrent=False)
+    g(['egl-create-msaa-pbuffer-surface'],
+      'eglCreatePbufferSurface with EGL_SAMPLES set',
+      run_concurrent=False)
     g(['egl-create-largest-pbuffer-surface'],
       'largest possible eglCreatePbufferSurface and then glClear',
       run_concurrent=False)
