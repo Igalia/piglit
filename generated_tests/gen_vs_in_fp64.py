@@ -323,6 +323,37 @@ class RegularTestTuple(TestTuple):
         for test_args in RegularTestTuple.create_tests(
                 ['GL_ARB_vertex_attrib_64bit', '410'],
                 RegularTestTuple.create_in_types_array(
+                    itertools.chain(GLSL_USCALAR_TYPES, GLSL_UVEC_TYPES),
+                    itertools.chain(GLSL_ISCALAR_TYPES, GLSL_IVEC_TYPES),
+                    itertools.chain(GLSL_DSCALAR_TYPES, GLSL_DVEC_TYPES, GLSL_DMAT_TYPES)),
+                ['ubyte', 'short', 'double'],
+                [1, 2, 3, 4],
+                [[1, 1, 1]],
+                names_only):
+            yield RegularTestTuple(*test_args)
+        for test_args in RegularTestTuple.create_tests(
+                ['GL_ARB_vertex_attrib_64bit', '410'],
+                RegularTestTuple.create_in_types_array(
+                    itertools.chain(GLSL_ISCALAR_TYPES, GLSL_IVEC_TYPES),
+                    itertools.chain(GLSL_DSCALAR_TYPES, GLSL_DVEC_TYPES, GLSL_DMAT_TYPES)),
+                ['byte', 'double'],
+                [1, 2, 3],
+                [[1, 1]],
+                names_only):
+            yield RegularTestTuple(*test_args)
+        for test_args in RegularTestTuple.create_tests(
+                ['GL_ARB_vertex_attrib_64bit', '410'],
+                RegularTestTuple.create_in_types_array(
+                    itertools.chain(GLSL_USCALAR_TYPES, GLSL_UVEC_TYPES),
+                    itertools.chain(GLSL_DSCALAR_TYPES, GLSL_DVEC_TYPES, GLSL_DMAT_TYPES)),
+                ['ushort', 'double'],
+                [1, 2, 3],
+                [[1, 1]],
+                names_only):
+            yield RegularTestTuple(*test_args)
+        for test_args in RegularTestTuple.create_tests(
+                ['GL_ARB_vertex_attrib_64bit', '410'],
+                RegularTestTuple.create_in_types_array(
                     itertools.chain(GLSL_DSCALAR_TYPES, GLSL_DVEC_TYPES, GLSL_DMAT_TYPES),
                     itertools.chain(GLSL_FSCALAR_TYPES, GLSL_FVEC_TYPES, GLSL_FMAT_TYPES)),
                 ['double', 'float'],
