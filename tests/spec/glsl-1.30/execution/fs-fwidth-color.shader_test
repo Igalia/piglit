@@ -1,0 +1,44 @@
+# Tests that fwidth (as a stand-in for derivatives more generally) works
+# correctly with gl_Color along boundary pixels.
+#
+# A rotated triangle is drawn with a constant color, with the fragment
+# shader returning fwidth(color) -- that is, all drawn pixels should be
+# black.
+#
+# See https://bugs.freedesktop.org/show_bug.cgi?id=95130
+#
+[require]
+GLSL >= 1.30
+GL_ARB_explicit_attrib_location
+
+[vertex shader]
+#version 130
+
+in vec4 piglit_vertex;
+
+void main()
+{
+	float pi = 3.141592653589793;
+	float rotation = 0.13;
+	float angle = float(gl_VertexID) * (2 * pi / 3) + rotation;
+	gl_Position = vec4(sin(angle), -cos(angle), 0.5, 1.0);
+	gl_FrontColor = vec4(0.5);
+}
+
+[fragment shader]
+#version 130
+#extension GL_ARB_explicit_attrib_location : enable
+
+layout(location = 0) out vec4 outcolor;
+in vec4 attrib;
+
+void main()
+{
+	outcolor = fwidth(gl_Color);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLES 0 3
+probe all rgba 0 0 0 0
