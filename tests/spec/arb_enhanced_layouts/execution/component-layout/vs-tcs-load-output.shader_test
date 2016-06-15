@@ -1,0 +1,128 @@
+# The i965 backend has special code to handle TCS output reads. This is a
+# simple test to make sure we handle component packing correctly in that case.
+
+[require]
+GLSL >= 1.50
+GL_ARB_arrays_of_arrays
+GL_ARB_enhanced_layouts
+GL_ARB_tessellation_shader
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+
+in vec4 vertex;
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) out vec3 a;
+
+// consumes X component
+layout(location = 0) out float b;
+
+void main()
+{
+	gl_Position = vertex;
+
+	a = vec3(0.0, 0.75, 1.0);
+	b = 0.25;
+}
+
+
+[tessellation control shader]
+#extension GL_ARB_arrays_of_arrays: require
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_separate_shader_objects: require
+
+layout(vertices = 3) out;
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) in vec3 a[];
+
+// consumes X component
+layout(location = 0) in float b[];
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) patch out vec3 a_tcs[2];
+
+// consumes X component
+layout(location = 0) patch out float b_tcs[2];
+
+void main() {
+        float tmpf[2];
+
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+	a_tcs[1] = a[gl_InvocationID];
+	b_tcs[1] = b[gl_InvocationID];
+
+	// swap output
+	tmpf[0] = a_tcs[1].y;
+	tmpf[1] = b_tcs[1];
+	a_tcs[1].y = tmpf[1];
+	b_tcs[1] = tmpf[0];
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_arrays_of_arrays: require
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_separate_shader_objects: require
+
+layout(triangles) in;
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) patch in vec3 a_tcs[2];
+
+// consumes X component
+layout(location = 0) patch in float b_tcs[2];
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) out vec3 a_tes;
+
+// consumes X component
+layout(location = 0) out float b_tes;
+
+void main() {
+	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
+	            + gl_in[1].gl_Position * gl_TessCoord[1]
+	            + gl_in[2].gl_Position * gl_TessCoord[2];
+
+	a_tes = a_tcs[1];
+	b_tes = b_tcs[1];
+}
+
+
+[fragment shader]
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) in vec3 a_tes;
+
+// consumes X component
+layout(location = 0) in float b_tes;
+
+void main()
+{
+	gl_FragColor = vec4(b_tes, a_tes);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.75 0.0 0.25 1.0

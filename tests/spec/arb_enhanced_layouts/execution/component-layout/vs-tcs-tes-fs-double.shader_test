@@ -1,0 +1,157 @@
+# pass an basic component layout through vs->tcs->tes->fs.
+
+[require]
+GLSL >= 1.50
+GL_ARB_arrays_of_arrays
+GL_ARB_enhanced_layouts
+GL_ARB_tessellation_shader
+GL_ARB_separate_shader_objects
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_gpu_shader_fp64: require
+
+in vec4 vertex;
+
+// consume Y/Z/W components
+layout(location = 0) flat out dvec3 a;
+
+// consumes X component
+layout(location = 1, component = 2) flat out double b;
+
+layout(location = 2, component = 0) flat out double c;
+layout(location = 2, component = 2) flat out double d;
+
+void main()
+{
+	gl_Position = vertex;
+
+	a = dvec3(1.0, 0.0, 1.0);
+	b = 0.25LF;
+	c = 0.5LF;
+	d = 0.75LF;
+}
+
+
+[tessellation control shader]
+#extension GL_ARB_arrays_of_arrays: require
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_gpu_shader_fp64: require
+
+layout(vertices = 3) out;
+
+// consume Y/Z/W components
+layout(location = 0) flat in dvec3 a[];
+
+// consumes X component
+layout(location = 1, component = 2) flat in double b[];
+
+layout(location = 2, component = 0) flat in double c[];
+layout(location = 2, component = 2) flat in double d[];
+
+// consume Y/Z/W components
+layout(location = 0) flat out dvec3 a_tcs[];
+
+// consumes X component
+layout(location = 1, component = 2) flat out double b_tcs[];
+
+layout(location = 2, component = 0) flat out double c_tcs[];
+layout(location = 2, component = 2) flat out double d_tcs[];
+
+void main() {
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+	a_tcs[gl_InvocationID] = a[gl_InvocationID];
+	b_tcs[gl_InvocationID] = b[gl_InvocationID];
+	c_tcs[gl_InvocationID] = c[gl_InvocationID];
+	d_tcs[gl_InvocationID] = d[gl_InvocationID];
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_arrays_of_arrays: require
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_gpu_shader_fp64: require
+
+layout(triangles) in;
+
+// consume Y/Z/W components
+layout(location = 0) flat in dvec3 a_tcs[];
+
+// consumes X component
+layout(location = 1, component = 2) flat in double b_tcs[];
+
+layout(location = 2, component = 0) flat in double c_tcs[];
+layout(location = 2, component = 2) flat in double d_tcs[];
+
+// consume Y/Z/W components
+layout(location = 0) flat out dvec3 a_tes;
+
+// consumes X component
+layout(location = 1, component = 2) flat out double b_tes;
+
+layout(location = 2, component = 0) flat out double c_tes;
+layout(location = 2, component = 2) flat out double d_tes;
+
+void main() {
+	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
+	            + gl_in[1].gl_Position * gl_TessCoord[1]
+	            + gl_in[2].gl_Position * gl_TessCoord[2];
+
+	a_tes = a_tcs[0];
+	b_tes = b_tcs[0];
+	c_tes = c_tcs[1];
+	d_tes = d_tcs[1];
+}
+
+
+[fragment shader]
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_gpu_shader_fp64: require
+
+out vec4 color;
+
+// consume Y/Z/W components
+layout(location = 0) flat in dvec3 a_tes;
+
+// consumes X component
+layout(location = 1, component = 2) flat in double b_tes;
+
+layout(location = 2, component = 0) flat in double c_tes;
+layout(location = 2, component = 2) flat in double d_tes;
+
+void main()
+{
+  color = vec4(1.0, 0.0, 1.0, 1.0);
+
+  if (dvec3(1.0, 0.0, 1.0) != a_tes || 0.25LF != b_tes ||
+      0.50LF != c_tes || 0.75LF != d_tes)
+  {
+    //color = vec4(0.0, 1.0, 1.0, 1.0);
+    color = vec4(b_tes, c_tes, d_tes, 1.0);
+  }
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+probe all rgba 1.0 0.0 1.0 1.0

@@ -1,0 +1,49 @@
+# pass an basic component layout through vs->fs.
+
+[require]
+GLSL >= 1.40
+GL_ARB_enhanced_layouts
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+
+in vec4 piglit_vertex;
+
+// consumes X component
+layout(location = 0) out float b;
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) out vec3 a;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	a = vec3(0.0, 0.75, 1.0);
+	b = 0.5;
+}
+
+[fragment shader]
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+
+out vec4 color;
+
+// consume Y/Z/W components
+layout(location = 0, component = 1) in vec3 a_vs;
+
+// consumes X component
+layout(location = 0) in float b_vs;
+
+void main()
+{
+	color = vec4(b_vs, a_vs);
+}
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.0 0.75 1.0
