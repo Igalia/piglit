@@ -4718,6 +4718,19 @@ with profile.group_manager(
             g(['object-namespace-pollution', operation, object_type],
               '{} with {}'.format(object_type, operation))
 
+# Group ARB_texture_barrier
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_texture_barrier')) as g:
+    for resolution in ['32', '512']:
+        for blend_passes in ['1', '42']:
+            for num_textures in ['1', '8']:
+                for granularity in ['8', '64', '128']:
+                    for draw_passes in ['1', '2', '3', '4', '7', '8']:
+                        g(['arb_texture_barrier-blending-in-shader', resolution,
+                           blend_passes, num_textures, granularity, draw_passes])
+
+
 # Group ARB_invalidate_subdata
 with profile.group_manager(
         PiglitGLTest,
