@@ -289,6 +289,7 @@ test(int bind_size, int num_varyings, int num_primitives, int mode_index)
 			pass = GL_FALSE;
 		}
 	}
+	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER); /* unmap readback */
 
 	if (pass)
 		printf("PASS\n");
