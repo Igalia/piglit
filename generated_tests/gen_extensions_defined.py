@@ -62,7 +62,7 @@ EXTENSIONS = [
     ("GL_ARB_texture_rectangle", "110"),
     ("GL_AMD_shader_trinary_minmax", "110"),
     ("GL_EXT_texture_array", "110"),
-    ("GL_ARB_ES3_1_compatibility", "110"),
+    ("GL_ARB_ES3_1_compatibility", "430"),
     ("GL_ARB_arrays_of_arrays", "110"),
     ("GL_ARB_fragment_coord_conventions", "110"),
     ("GL_ARB_fragment_layer_viewport", "110"),
