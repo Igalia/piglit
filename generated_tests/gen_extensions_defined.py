@@ -82,7 +82,7 @@ EXTENSIONS = [
     ("GL_ARB_gpu_shader5", "110"),
     ("GL_ARB_gpu_shader_fp64", "150"),
     ("GL_ARB_vertex_attrib_64bit", "150"),
-    ("GL_AMD_vertex_shader_layer", "110"),
+    ("GL_AMD_vertex_shader_layer", "130"),
     ("GL_AMD_vertex_shader_viewport_index", "110"),
     ("GL_ARB_shading_language_420pack", "110"),
     ("GL_ARB_sample_shading", "110"),
