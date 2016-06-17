@@ -102,8 +102,15 @@ post_redisplay(struct piglit_gl_framework *gl_fw)
 	piglit_winsys_framework(gl_fw)->need_redisplay = true;
 }
 
+/**
+ * Create a integer array of WAFFLE_x attribute/value pairs from
+ * the given test_config (which specifies color, depth, samples, etc.
+ * \param min_color  minimum bits per channel for color components.
+ * \param min_z  minimum bits for depth/Z buffer.
+ */
 static const int32_t*
-choose_config_attribs(const struct piglit_gl_test_config *test_config)
+choose_config_attribs(const struct piglit_gl_test_config *test_config,
+		      int min_color, int min_z)
 {
 	static int32_t attrib_list[64];
 	int i = 0;
@@ -112,21 +119,21 @@ choose_config_attribs(const struct piglit_gl_test_config *test_config)
 	if (test_config->window_visual &
 	    (PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_RGBA)) {
 		attrib_list[i++] = WAFFLE_RED_SIZE;
-		attrib_list[i++] = 1;
+		attrib_list[i++] = min_color;
 		attrib_list[i++] = WAFFLE_GREEN_SIZE;
-		attrib_list[i++] = 1;
+		attrib_list[i++] = min_color;
 		attrib_list[i++] = WAFFLE_BLUE_SIZE;
-		attrib_list[i++] = 1;
+		attrib_list[i++] = min_color;
 	}
 
 	if (test_config->window_visual & PIGLIT_GL_VISUAL_RGBA) {
 		attrib_list[i++] = WAFFLE_ALPHA_SIZE;
-		attrib_list[i++] = 1;
+		attrib_list[i++] = min_color;
 	}
 
 	if (test_config->window_visual & PIGLIT_GL_VISUAL_DEPTH) {
 		attrib_list[i++] = WAFFLE_DEPTH_SIZE;
-		attrib_list[i++] = 1;
+		attrib_list[i++] = min_z;
 	}
 
 	if (test_config->window_visual & PIGLIT_GL_VISUAL_STENCIL) {
@@ -198,8 +205,15 @@ piglit_winsys_framework_init(struct piglit_winsys_framework *winsys_fw,
 	struct piglit_gl_framework *gl_fw = &wfl_fw->gl_fw;
 	bool ok = true;
 
+	// First try to get 8-bit color channels, 24-bit Z
 	ok = piglit_wfl_framework_init(wfl_fw, test_config, platform,
-	                               choose_config_attribs(test_config));
+				choose_config_attribs(test_config, 8, 24));
+	if (!ok) {
+		// Try shallower color/Z.  We may get 565 color and 16-bit Z.
+		ok = piglit_wfl_framework_init(wfl_fw, test_config, platform,
+				choose_config_attribs(test_config, 1, 1));
+	}
+
 	if (!ok)
 		goto fail;
 
