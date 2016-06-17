@@ -79,7 +79,7 @@ EXTENSIONS = [
     ("GL_ARB_texture_multisample", "110"),
     ("GL_ARB_texture_query_levels", "110"),
     ("GL_ARB_texture_query_lod", "110"),
-    ("GL_ARB_gpu_shader5", "110"),
+    ("GL_ARB_gpu_shader5", "150"),
     ("GL_ARB_gpu_shader_fp64", "150"),
     ("GL_ARB_vertex_attrib_64bit", "150"),
     ("GL_AMD_vertex_shader_layer", "130"),
