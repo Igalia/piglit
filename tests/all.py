@@ -3850,6 +3850,7 @@ with profile.group_manager(
     g(['arb_copy_buffer-data-sync'], 'data-sync')
     g(['arb_copy_buffer-dlist'], 'dlist')
     g(['arb_copy_buffer-get'], 'get')
+    g(['arb_copy_buffer-intra-buffer-copy'], 'intra-buffer-copy')
     g(['arb_copy_buffer-negative-bound-zero'], 'negative-bound-zero')
     g(['arb_copy_buffer-negative-bounds'], 'negative-bounds')
     g(['arb_copy_buffer-negative-mapped'], 'negative-mapped')
