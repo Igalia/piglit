@@ -610,7 +610,7 @@ fbo_lookup_test_set(const char *test_set_name)
 {
 	int i, j;
 
-	for (i = 1; i < (int) ARRAY_SIZE(test_sets); i++) {
+	for (i = 0; i < (int) ARRAY_SIZE(test_sets); i++) {
 		if (!strcmp(test_set_name, test_sets[i].param)) {
 			for (j = 0; j < 3; j++) {
 				if (test_sets[i].ext[j]) {
