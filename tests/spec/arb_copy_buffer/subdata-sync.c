@@ -77,6 +77,9 @@ piglit_init(int argc, char *argv[])
 		fprintf(stderr, "found 0x%08x 0x%08x 0x%08x 0x%08x\n",
 			result_data[0], result_data[1],
 			result_data[2], result_data[3]);
+		fprintf(stderr, "expected 0x%08x 0x%08x 0x%08x 0x%08x\n",
+			good_data[0], good_data[1],
+			good_data[2], good_data[3]);
 		pass = false;
 	}
 	piglit_report_subtest_result(subtest_pass ? PIGLIT_PASS : PIGLIT_FAIL,
@@ -97,6 +100,9 @@ piglit_init(int argc, char *argv[])
 		fprintf(stderr, "found 0x%08x 0x%08x 0x%08x 0x%08x\n",
 			result_data[0], result_data[1],
 			result_data[2], result_data[3]);
+		fprintf(stderr, "expected 0x%08x 0x%08x 0x%08x 0x%08x\n",
+			good_data[0], good_data[1],
+			good_data[2], good_data[3]);
 		pass = false;
 	}
 	piglit_report_subtest_result(subtest_pass ? PIGLIT_PASS : PIGLIT_FAIL,
