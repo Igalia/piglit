@@ -212,6 +212,10 @@ test_mipmap_copypixels(GLenum srcIntFormat, GLenum dstIntFormat,
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, colors[level]);
       if (!p) {
          printf("  Mipmap level %d\n", level);
+	 printf("  Source tex format: %s\n",
+		piglit_get_gl_enum_name(srcIntFormat));
+	 printf("  Destination tex format: %s\n",
+		piglit_get_gl_enum_name(dstIntFormat));
          if (useReadDrawPix)
             printf("  Using glRead/DrawPixels()\n");
          else
