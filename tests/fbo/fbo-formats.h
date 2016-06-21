@@ -653,7 +653,12 @@ fbo_formats_init(int argc, char **argv, GLboolean print_options)
 	if (argc == 2) {
 		test_set_index = fbo_lookup_test_set(argv[1]);
 		if (test_set_index < 0) {
+			unsigned i;
 			fprintf(stderr, "Unknown test set: %s\n", argv[1]);
+			fprintf(stderr, "Test sets:\n");
+			for (i = 0; i < ARRAY_SIZE(test_sets); i++) {
+				fprintf(stderr, "\t%s\n", test_sets[i].param);
+			}
 			exit(1);
 		}
 	} else if (argc > 2) {
