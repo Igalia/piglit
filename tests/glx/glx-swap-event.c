@@ -41,14 +41,7 @@
 static double
 current_time(void)
 {
-    struct timeval tv;
-#ifdef __VMS
-    (void) gettimeofday(&tv, NULL );
-#else
-    struct timezone tz;
-    (void) gettimeofday(&tv, &tz);
-#endif
-    return (double) tv.tv_sec + tv.tv_usec / 1000000.0;
+    return (double) piglit_time_get_nano() / 1000000000.0;
 }
 
 PFNGLXSWAPINTERVALMESAPROC pglXSwapIntervalMESA;
