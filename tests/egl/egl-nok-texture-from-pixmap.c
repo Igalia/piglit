@@ -31,8 +31,6 @@
 #include "piglit-util-gl.h"
 #include "egl-util.h"
 
-#ifdef EGL_NOK_texture_from_pixmap
-
 const char *extensions[] = { "EGL_NOK_texture_from_pixmap", NULL };
 
 static const EGLint pixmap_attribs[] = {
@@ -119,15 +117,3 @@ main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	return EXIT_SUCCESS;
 }
-
-#else
-
-int
-main(int argc, char *argv[])
-{
-	piglit_report_result(PIGLIT_SKIP);
-
-	return 0;
-}
-
-#endif
