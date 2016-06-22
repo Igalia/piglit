@@ -229,7 +229,6 @@ is_format_supported(const struct texture_format *format)
 	case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
 	case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
 		return piglit_is_extension_supported("GL_EXT_texture_compression_s3tc");
-		break;
 
 	case GL_COMPRESSED_RGBA_BPTC_UNORM:
 	case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM:
