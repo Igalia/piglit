@@ -31,8 +31,6 @@
 #include "piglit-util-gl.h"
 #include "egl-util.h"
 
-#ifdef EGL_NOK_swap_region
-
 const char *extensions[] = { "EGL_NOK_swap_region", NULL };
 
 static enum piglit_result
@@ -110,15 +108,3 @@ main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	return EXIT_SUCCESS;
 }
-
-#else
-
-int
-main(int argc, char *argv[])
-{
-	piglit_report_result(PIGLIT_SKIP);
-
-	return 0;
-}
-
-#endif
