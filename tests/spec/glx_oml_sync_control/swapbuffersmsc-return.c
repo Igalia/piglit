@@ -54,7 +54,6 @@ draw(Display *dpy)
 	piglit_set_timeout(5, PIGLIT_FAIL);
 
 	if (swap_interval != -1) {
-#if defined(GLX_MESA_swap_control)
 		PFNGLXSWAPINTERVALMESAPROC pglXSwapIntervalMESA;
 
 		printf("Testing with swap interval %d\n", swap_interval);
@@ -64,12 +63,6 @@ draw(Display *dpy)
 			glXGetProcAddressARB((const GLubyte *)
 					     "glXSwapIntervalMESA");
 		pglXSwapIntervalMESA(swap_interval);
-#else
-		fprintf(stderr,
-			"Testing swap interval %d requires building with GLX_MESA_swap_control\n",
-			swap_interval);
-		piglit_report_result(PIGLIT_SKIP);
-#endif
 	} else {
 		printf("Testing with default swap interval\n");
 	}
