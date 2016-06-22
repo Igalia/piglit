@@ -139,42 +139,29 @@ static const struct texture_format formats[] = {
 	FORMAT(GL_DEPTH_STENCIL, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, false, 4, 1, 1),
 
 	FORMAT(GL_STENCIL_INDEX8, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, false, 1, 1, 1),
-#ifdef GL_EXT_texture_compression_s3tc
+
 	FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_RED, GL_BYTE, true, 8, 4, 4),
 	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_RED, GL_BYTE, true, 8, 4, 4),
 	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, GL_RED, GL_BYTE, true, 16, 4, 4),
 	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_RED, GL_BYTE, true, 16, 4, 4),
-#ifdef GL_EXT_texture_sRGB
+
 	FORMAT(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_RED, GL_BYTE, true, 8, 4, 4),
 	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, GL_RED, GL_BYTE, true, 8, 4, 4),
 	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, GL_RED, GL_BYTE, true, 16, 4, 4),
 	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_RED, GL_BYTE, true, 16, 4, 4),
-#endif
-#endif
 
-#ifdef GL_EXT_texture_compression_rgtc
 	FORMAT(GL_COMPRESSED_RED_RGTC1, GL_RED, GL_BYTE, true, 8, 4, 4),
 	FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1, GL_RED, GL_BYTE, true, 8, 4, 4),
-#endif
 
-#ifdef GL_EXT_texture_compression_s3tc
-#endif
-
-#ifdef GL_EXT_texture_compression_rgtc
 	FORMAT(GL_COMPRESSED_RG_RGTC2, GL_RED, GL_BYTE, true, 16, 4, 4),
 	FORMAT(GL_COMPRESSED_SIGNED_RG_RGTC2, GL_RED, GL_BYTE, true, 16, 4, 4),
-#endif
 
-#ifdef GL_COMPRESSED_RGBA_BPTC_UNORM
 	FORMAT(GL_COMPRESSED_RGBA_BPTC_UNORM, GL_RGBA, GL_BYTE, true, 16, 4, 4),
 	FORMAT(GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM, GL_RGB, GL_BYTE, true, 16, 4, 4),
 	FORMAT(GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT, GL_RGB, GL_BYTE, true, 16, 4, 4),
 	FORMAT(GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, GL_RGB, GL_BYTE, true, 16, 4, 4),
-#endif
 
-#ifdef GL_ARB_depth_buffer_float
-        FORMAT(GL_DEPTH32F_STENCIL8, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, false, 8, 1, 1),
-#endif
+	FORMAT(GL_DEPTH32F_STENCIL8, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, false, 8, 1, 1),
 
 #undef FORMAT
 };
@@ -224,38 +211,32 @@ static bool
 is_format_supported(const struct texture_format *format)
 {
 	switch (format->internal_format) {
-#ifdef GL_EXT_texture_compression_rgtc
 	case GL_COMPRESSED_RED_RGTC1:
 	case GL_COMPRESSED_SIGNED_RED_RGTC1:
 	case GL_COMPRESSED_RG_RGTC2:
 	case GL_COMPRESSED_SIGNED_RG_RGTC2:
 		return piglit_is_extension_supported("GL_EXT_texture_compression_rgtc");
-#endif
 
-#ifdef GL_EXT_texture_compression_s3tc
-#ifdef GL_EXT_texture_sRGB
 	case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
 	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
 	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
 	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
 		if (!piglit_is_extension_supported("GL_EXT_texture_sRGB"))
 			return false;
-#endif
+
 	case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 	case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
 	case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
 	case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
 		return piglit_is_extension_supported("GL_EXT_texture_compression_s3tc");
 		break;
-#endif
 
-#ifdef GL_ARB_texture_compression_bptc
 	case GL_COMPRESSED_RGBA_BPTC_UNORM:
 	case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM:
 	case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT:
 	case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT:
 		return piglit_is_extension_supported("GL_ARB_texture_compression_bptc");
-#endif
+
 	case GL_STENCIL_INDEX8:
 		return piglit_is_extension_supported("GL_ARB_texture_stencil8");
 	case GL_DEPTH32F_STENCIL8:
