@@ -43,7 +43,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#ifdef GL_ARB_ES2_compatibility
 static const char vs_text[] =
 	"#version 100\n"
 	"uniform vec4 offset;\n"
@@ -85,12 +84,10 @@ draw(const float *color, float x_offset, bool release)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDeleteProgram(prog);
 }
-#endif
 
 enum piglit_result
 piglit_display(void)
 {
-#ifdef GL_ARB_ES2_compatibility
 	GLboolean pass = GL_TRUE;
 	float green[] = {0.0, 1.0, 0.0, 0.0};
 	float blue[] = {0.0, 0.0, 1.0, 0.0};
@@ -110,15 +107,11 @@ piglit_display(void)
 	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
-#else
-	return PIGLIT_SKIP;
-#endif /* GL_ARB_ES2_compatibility */
 }
 
 void
 piglit_init(int argc, char **argv)
 {
-#ifdef GL_ARB_ES2_compatibility
 	static const float verts[] = {
 		-1.0,  1.0, 0.0, 1.0,
 		-1.0, -1.0, 0.0, 1.0,
@@ -136,5 +129,4 @@ piglit_init(int argc, char **argv)
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4,
 			      verts);
 	glEnableVertexAttribArray(0);
-#endif
 }

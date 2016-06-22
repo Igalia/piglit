@@ -45,7 +45,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-#ifdef GL_ARB_ES2_compatibility
 	GLboolean pass = GL_TRUE;
 	GLint floats, vecs;
 
@@ -88,8 +87,4 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	else
 		piglit_report_result(PIGLIT_PASS);
-#else
-	piglit_report_result(PIGLIT_SKIP);
-
-#endif /* GL_ARB_ES2_compatibility */
 }
