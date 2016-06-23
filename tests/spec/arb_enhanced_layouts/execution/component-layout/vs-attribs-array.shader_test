@@ -33,11 +33,11 @@ void main()
 }
 
 [vertex data]
-vertex/float/3   gba/float/4      gba/float/4/1     gba/float/4/2
--1.0 -1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
- 1.0 -1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
- 1.0  1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
--1.0  1.0 0.0   1.0 1.0 1.0 1.0  0.0 1.0 1.0 1.0   0.0 0.0 1.0 1.0
+vertex/float/3     gba/float/4      gba/float/4/1      gba/float/4/2
+-1.0 -1.0 0.0   0.25 0.5 0.75 1.0  0.0 0.25 0.5 1.0   0.0 0.0 0.5 1.0
+ 1.0 -1.0 0.0   0.25 0.5 0.75 1.0  0.0 0.25 0.5 1.0   0.0 0.0 0.5 1.0
+ 1.0  1.0 0.0   0.25 0.5 0.75 1.0  0.0 0.25 0.5 1.0   0.0 0.0 0.5 1.0
+-1.0  1.0 0.0   0.25 0.5 0.75 1.0  0.0 0.25 0.5 1.0   0.0 0.0 0.5 1.0
 
 [test]
 clear color 0.0 0.0 1.0 0.0
@@ -45,13 +45,13 @@ clear
 
 uniform int index 0
 draw arrays GL_TRIANGLE_FAN 0 4
-probe rgba 0 0 1.0 1.0 1.0 1.0
+probe rgba 0 0 0.25 0.5 0.75 1.0
 
 uniform int index 1
 draw arrays GL_TRIANGLE_FAN 0 4
-probe rgba 0 0 0.0 1.0 1.0 1.0
+probe rgba 0 0 0.0 0.25 0.5 1.0
 
 uniform int index 2
 draw arrays GL_TRIANGLE_FAN 0 4
-probe rgba 0 0 0.0 0.0 1.0 1.0
+probe rgba 0 0 0.0 0.0 0.5 1.0
 
