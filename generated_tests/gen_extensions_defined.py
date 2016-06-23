@@ -91,7 +91,7 @@ EXTENSIONS = [
     ("GL_ARB_shader_atomic_counter_ops", "140"),
     ("GL_ARB_viewport_array", "110"),
     ("GL_ARB_compute_shader", "110"),
-    ("GL_ARB_shader_image_load_store", "110"),
+    ("GL_ARB_shader_image_load_store", "130"),
     ("GL_ARB_shader_image_size", "110"),
     ("GL_ARB_shader_texture_image_samples", "110"),
     # That is what the original hand written test required.

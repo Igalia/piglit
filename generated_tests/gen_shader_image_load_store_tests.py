@@ -281,23 +281,6 @@ image_types = [
 def main():
     """Main function."""
     #
-    # Test the preprocessor defines.
-    #
-    gen('preprocessor', """\
-        ${header('pass')}
-
-        #if !defined GL_ARB_shader_image_load_store
-        #  error GL_ARB_shader_image_load_store is not defined
-        #elif GL_ARB_shader_image_load_store != 1
-        #  error GL_ARB_shader_image_load_store is not equal to 1
-        #endif
-
-        void main()
-        {
-        }
-    """, shader_stages)
-
-    #
     # Test the early_fragment_tests layout qualifier.
     #
     gen('early-fragment-tests', """\
