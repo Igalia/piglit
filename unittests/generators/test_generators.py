@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (c) 2015-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,74 +22,63 @@
 
 This needs to be compatible with both python2 and python3.
 
+Tests that take more than ~10 seconds should be marked as "slow" and tests that
+take more than ~30 seconds should be marked as "very_slow".
 """
 
-from __future__ import absolute_import, division, print_function
-import os
-import subprocess
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
+import importlib
+try:
+    import mock
+except ImportError:
+    from unittest import mock
 
-import nose.tools as nt
-
-from .. import utils
-
-
-GENERATOR_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', 'generated_tests'))
-
-BLACKLIST = {
-    # These will never need to be tested, they're modules.
-    'builtin_function.py',
-    'builtin_function_fp64.py',
-    'genclbuiltins.py',
-
-    # these (or some subset) should run eventually.
-    'random_ubo.py',
-    'random_ubo_trim.py',
-    'random_ubo-arb_uniform_buffer_object.py',
-}
-
-BLACKLIST = set(os.path.join(GENERATOR_DIR, _p) for _p in BLACKLIST)
+import pytest
 
 
-def discover_generators():
-    """Discover all of the generators and return that as a set.
+@pytest.mark.parametrize('name', [
+    'gen_builtin_packing_tests',
+    'gen_builtin_uniform_tests_fp64',
+    'gen_cl_common_builtins',
+    'gen_cl_int_builtins',
+    'gen_cl_math_builtins',
+    'gen_cl_relational_builtins',
+    'gen_cl_store_tests',
+    'gen_const_builtin_equal_tests',
+    'gen_constant_array_size_tests_fp64',
+    'gen_conversion_fp64',
+    'gen_extensions_defined',
+    'gen_flat_interpolation_qualifier',
+    'gen_inout_fp64',
+    'gen_interpolation_tests',
+    'gen_non-lvalue_tests',
+    'gen_outerproduct_invalid_params',
+    'gen_outerproduct_tests',
+    'gen_shader_bit_encoding_tests',
+    'gen_shader_image_load_store_tests',
+    'gen_shader_precision_tests',
+    'gen_tcs_input_tests',
+    'gen_tes_input_tests',
+    'gen_texture_lod_tests',
+    'gen_texture_query_lod_tests',
+    'gen_uniform_initializer_tests',
+    'gen_variable_index_read_tests',
+    'gen_variable_index_write_tests',
+    'gen_vp_tex',
+    'interpolation-qualifier-built-in-variable',
+    pytest.mark.slow('gen_builtin_uniform_tests'),
+    pytest.mark.slow('gen_constant_array_size_tests'),
+    pytest.mark.very_slow('gen_vs_in_fp64'),
+])
+def test_generators(name, tmpdir):
+    """Teat each generator."""
+    mod = importlib.import_module(name)
+    tmpdir.chdir()
 
-    Removes all generators in the BLACKLIST constant.
-
-    """
-    def fqp(path):
-        """make fully-qualified path."""
-        return os.path.abspath(os.path.join(GENERATOR_DIR, path))
-
-    contents = set(fqp(p) for p in os.listdir(GENERATOR_DIR)
-                   if p.endswith('.py'))
-    contents.difference_update(BLACKLIST)
-    return contents
-
-
-@utils.nose.generator
-def test_generators():
-    """Generate tests for the various generators."""
-
-    @utils.nose.test_in_tempdir
-    def test(name):
-        """Tester function."""
-        msg = ''
-
-        with open(os.devnull, 'w') as d:
-            proc = subprocess.Popen(['python', name],
-                                    stderr=subprocess.PIPE,
-                                    stdout=d)
-            _, err = proc.communicate()
-
-        if proc.returncode != 0:
-            err = err.decode('utf-8')
-
-            raise utils.nose.TestFailure(
-                "failed with message:\n {}".format(err))
-
-    description = 'generator: {} runs successfully'
-
-    for generator in discover_generators():
-        test.description = description.format(os.path.basename(generator))
-        yield test, generator
+    # Some tests do checks for sys.argv, so mock that out. Also mock out
+    # print since we don't want a giant list of tests printed on an error.
+    with mock.patch('sys.argv', [name]), \
+            mock.patch.object(mod, 'print', mock.Mock(), create=True):
+        mod.main()
