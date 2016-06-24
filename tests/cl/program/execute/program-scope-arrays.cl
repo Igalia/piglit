@@ -72,6 +72,32 @@ kernel_name: indirection_2
 arg_in: 1 buffer uchar[4] 3 2 1 0
 arg_out: 0 buffer float[8] 1.0 5.0 2.0 5.0 3.0 5.0 4.0 5.0
 
+[test]
+name: simple-constant-struct
+kernel_name: simple_constant_struct
+arg_out: 0 buffer float[4] 32.0 32.0 32.0 32.0
+arg_out: 1 buffer int[4] 42 42 42 42
+
+[test]
+name: given-constant-struct
+kernel_name: given_constant_struct
+arg_in: 2 int 2
+arg_out: 0 buffer float[4] 33.0 33.0 33.0 33.0
+arg_out: 1 buffer int[4] 43 43 43 43
+
+[test]
+name: simple-gid-struct
+kernel_name: simple_gid_struct
+arg_out: 0 buffer float[4] 31.0 32.0 33.0 34.0
+arg_out: 1 buffer int[4] 41 42 43 44
+
+[test]
+name: indirection-struct
+kernel_name: indirection_struct
+arg_in: 2 buffer uchar[4] 3 2 1 0
+arg_out: 0 buffer float[4] 34.0 33.0 32.0 31.0
+arg_out: 1 buffer int[4] 44 43 42 41
+
 !*/
 
 __constant float arr[] = {
@@ -148,4 +174,38 @@ __kernel void simple_gid_2(__global float2 *out) {
 __kernel void indirection_2(__global float2 *out, __global uchar *in) {
 	int i = get_global_id(0);
 	out[i] = arr2[in[i]];
+}
+
+__constant struct foo {
+	float a;
+	int b;
+} arrs[] = {
+	{31.0, 41},
+	{32.0, 42},
+	{33.0, 43},
+	{34.0, 44}
+};
+
+__kernel void simple_constant_struct(__global float *outa, __global int *outb) {
+	int i = get_global_id(0);
+	outa[i] = arrs[1].a;
+	outb[i] = arrs[1].b;
+}
+
+__kernel void given_constant_struct(__global float *outa, __global int *outb, int c) {
+	int i = get_global_id(0);
+	outa[i] = arrs[c].a;
+	outb[i] = arrs[c].b;
+}
+
+__kernel void simple_gid_struct(__global float *outa, __global int *outb) {
+	int i = get_global_id(0);
+	outa[i] = arrs[i].a;
+	outb[i] = arrs[i].b;
+}
+
+__kernel void indirection_struct(__global float *outa, __global int *outb, __global uchar *in) {
+	int i = get_global_id(0);
+	outa[i] = arrs[in[i]].a;
+	outb[i] = arrs[in[i]].b;
 }
