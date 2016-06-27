@@ -157,15 +157,6 @@ get_core_proc_address(const char *function_name, int gl_10x_version)
 #else /* Linux */
 
 #if defined(PIGLIT_HAS_EGL)
-#define GLES1_LIB "libGLESv1_CM.so.1"
-#define GLES2_LIB "libGLESv2.so.2"
-
-/** dlopen() return value for libGLESv1_CM.so.1 */
-static void *gles1_handle;
-
-/** dlopen() return value for libGLESv2.so.2 */
-static void *gles2_handle;
-
 static void *
 do_dlsym(void **handle, const char *lib_name, const char *function_name)
 {
@@ -240,6 +231,11 @@ static piglit_dispatch_function_ptr
 get_core_proc_address(const char *function_name, int gl_10x_version)
 {
 #if defined(PIGLIT_HAS_EGL)
+#define GLES1_LIB "libGLESv1_CM.so.1"
+#define GLES2_LIB "libGLESv2.so.2"
+	static void *gles1_handle;
+	static void *gles2_handle;
+
 	switch (gl_10x_version) {
 	case 11:
 		return do_dlsym(&gles1_handle, GLES1_LIB, function_name);
