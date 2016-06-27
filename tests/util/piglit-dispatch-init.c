@@ -172,7 +172,7 @@ do_dlsym(void **handle, const char *lib_name, const char *function_name)
     void *result;
 
     if (!*handle)
-        *handle = dlopen(lib_name, RTLD_LAZY | RTLD_LOCAL);
+        *handle = dlopen(lib_name, RTLD_LAZY);
 
     if (!*handle) {
         fprintf(stderr, "Could not open %s: %s\n", lib_name, dlerror());
