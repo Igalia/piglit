@@ -252,5 +252,4 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_ARB_direct_state_access");
-	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 }
