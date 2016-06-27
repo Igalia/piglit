@@ -207,15 +207,8 @@ get_ext_proc_address(const char *function_name)
  * 1.2 and select extensions. Actual driver vendors tend to expose most, if
  * not all, symbols statically from libGL.so.
  *
- * Considering how messy this situation is, the best way to query a core OpenGL
- * function on EGL is eglGetProcAddress (or even glXGetProcAddress!). Sometimes
- * Mesa's libGL doesn't statically expose all OpenGL functions supported by the
- * driver, but Mesa's eglGetProcAddress does work for all GL functions, core
- * and extension.  Some other vendors of desktop OpenGL drivers, such as
- * Nvidia, do the same. (By coincidence, Mesa's glXGetProcAddress also returns
- * the same addresses as eglGetProcAddress). We don't need to worry about
- * platforms on which eglGetProcAddress does not work for core functions, such
- * as Mali, because those platforms support only OpenGL ES.
+ * Considering how messy this situation is, the most robust way to query a core
+ * function on EGL is via dlsym followed by eglGetProcAddress.
  *
  * [1] https://www.opengl.org/registry/ABI/
  */
@@ -227,20 +220,24 @@ get_core_proc_address(const char *function_name, int gl_10x_version)
 #define GLES2_LIB "libGLESv2.so.2"
 	static void *gles1_handle;
 	static void *gles2_handle;
+	piglit_dispatch_function_ptr p = NULL;
 
 	switch (gl_10x_version) {
 	case 11:
-		return do_dlsym(&gles1_handle, GLES1_LIB, function_name);
+		p = do_dlsym(&gles1_handle, GLES1_LIB, function_name);
 	case 20:
-		return do_dlsym(&gles2_handle, GLES2_LIB, function_name);
+		p = do_dlsym(&gles2_handle, GLES2_LIB, function_name);
 	case 10:
 	default:
 		/* We query the address of core OpenGL functions as if they
 		 * were extension functions. Read about the gory details
 		 * above. */
-		(void) gl_10x_version;
-		return get_ext_proc_address(function_name);
+		break;
 	}
+	if (!p)
+		p = get_ext_proc_address(function_name);
+
+	return p;
 #else
 	/* We don't need to worry about the GL version, since when using GLX
 	 * we retrieve all proc addresses in the same way.
@@ -266,8 +263,11 @@ get_wfl_core_proc(const char *name, int gl_10x_version)
 
 	func = (piglit_dispatch_function_ptr)waffle_dl_sym(piglit_waffle_dl,
 							   name);
-	if (!func)
-		wfl_log_error(__FUNCTION__);
+	if (!func) {
+		func = (piglit_dispatch_function_ptr)waffle_get_proc_address(name);
+		if (!func)
+			wfl_log_error(__FUNCTION__);
+        }
 
 	return func;
 }
