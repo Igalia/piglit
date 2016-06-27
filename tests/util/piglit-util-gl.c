@@ -2320,7 +2320,6 @@ bool piglit_probe_buffer_doubles(GLuint buf, GLenum target, const char *label,
 
 int piglit_use_fragment_program(void)
 {
-	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 	return piglit_is_extension_supported("GL_ARB_fragment_program");
 }
 
@@ -2334,7 +2333,6 @@ void piglit_require_fragment_program(void)
 
 int piglit_use_vertex_program(void)
 {
-	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 	return piglit_is_extension_supported("GL_ARB_vertex_program");
 }
 
