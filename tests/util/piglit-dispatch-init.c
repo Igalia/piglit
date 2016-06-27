@@ -79,6 +79,29 @@ default_get_proc_address_failure(const char *function_name)
 	piglit_report_result(PIGLIT_FAIL);
 }
 
+#if defined(__APPLE__) || defined(PIGLIT_HAS_EGL)
+static void *
+do_dlsym(void **handle, const char *lib_name, const char *function_name)
+{
+	void *result;
+
+	if (!*handle)
+		*handle = dlopen(lib_name, RTLD_LAZY);
+
+	if (!*handle) {
+		fprintf(stderr, "Could not open %s: %s\n", lib_name, dlerror());
+		return NULL;
+	}
+
+	result = dlsym(*handle, function_name);
+	if (!result)
+		fprintf(stderr, "%s() not found in %s: %s\n", function_name,
+			lib_name, dlerror());
+
+    return result;
+}
+#endif
+
 #if defined(_WIN32)
 
 /**
@@ -128,15 +151,7 @@ get_ext_proc_address(const char *function_name)
 		"/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL";
 	static void *opengl_lib = NULL;
 
-	/* Dynamically load lib */
-	if (!opengl_lib)
-	{
-		opengl_lib = dlopen(opengl_path, RTLD_LAZY);
-		if (!opengl_lib)
-			return NULL;
-	}
-
-	return (piglit_dispatch_function_ptr) dlsym(opengl_lib, function_name);
+	return do_dlsym(&opengl_lib, opengl_path, function_name);
 }
 
 /**
@@ -155,29 +170,6 @@ get_core_proc_address(const char *function_name, int gl_10x_version)
 }
 
 #else /* Linux */
-
-#if defined(PIGLIT_HAS_EGL)
-static void *
-do_dlsym(void **handle, const char *lib_name, const char *function_name)
-{
-    void *result;
-
-    if (!*handle)
-        *handle = dlopen(lib_name, RTLD_LAZY);
-
-    if (!*handle) {
-        fprintf(stderr, "Could not open %s: %s\n", lib_name, dlerror());
-        return NULL;
-    }
-
-    result = dlsym(*handle, function_name);
-    if (!result)
-        fprintf(stderr, "%s() not found in %s: %s\n", function_name, lib_name,
-                dlerror());
-
-    return result;
-}
-#endif
 
 /**
  * This function is used to retrieve the address of all GL functions
