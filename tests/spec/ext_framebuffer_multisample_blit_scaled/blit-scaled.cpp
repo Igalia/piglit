@@ -342,6 +342,8 @@ piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
+	puts("Testing Intel-specific behavior.");
 }
 
 bool test_ms_blit_scaled(const Fbo& ms_fbo)
@@ -441,5 +443,5 @@ piglit_display()
 	if (multisampled_tex.config.layers == 0)
 		pass = test_ms_blit_scaled(multisampled_fbo) && pass;
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return pass ? PIGLIT_PASS : PIGLIT_WARN;
 }
