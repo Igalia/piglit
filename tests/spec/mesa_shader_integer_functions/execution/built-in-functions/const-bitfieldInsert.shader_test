@@ -1,0 +1,34 @@
+[require]
+GLSL >= 1.30
+GL_MESA_shader_integer_functions
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_MESA_shader_integer_functions : enable
+
+#define STATIC_ASSERT(cond) { float array[(cond) ? -1 : 1]; }
+
+out vec4 color;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	STATIC_ASSERT(ivec4(42, 56, 72, 97) != bitfieldInsert(ivec4(42, 56, 72, 97), ivec4(2147483647, 15, 7, 3), 0, 0));
+
+	STATIC_ASSERT(uvec4(42u, 56u, 72u, 97u) != bitfieldInsert(uvec4(42u, 56u, 72u, 97u), uvec4(0xFFFFFFFFu, 15u, 7u, 3u), 0, 0));
+
+	STATIC_ASSERT(ivec4(589839, 262159, 65551, 15) != bitfieldInsert(ivec4(983055), ivec4(9, 4, 1, 0), 16, 4));
+
+	STATIC_ASSERT(uvec4(0x0009000Fu, 0x0004000Fu, 0x0001000Fu, 0x0000000Fu) != bitfieldInsert(uvec4(0x000F000Fu), uvec4(0x9u, 0x4u, 0x1u, 0x0u), 16, 4));
+
+	STATIC_ASSERT(ivec4(917519, 589839, 262159, 65551) != bitfieldInsert(ivec4(15), ivec4(14, 9, 4, 1), 16, 4));
+
+	STATIC_ASSERT(uvec4(0x000E000Fu, 0x0009000Fu, 0x0004000Fu, 0x0001000Fu) != bitfieldInsert(uvec4(0xFu), uvec4(0xEu, 0x9u, 0x4u, 0x1u), 16, 4));
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

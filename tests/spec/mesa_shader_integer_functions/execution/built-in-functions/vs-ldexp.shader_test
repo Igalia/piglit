@@ -1,0 +1,85 @@
+[require]
+GLSL >= 1.30
+GL_MESA_shader_integer_functions
+GL_ARB_shader_bit_encoding
+
+[vertex shader]
+#extension GL_MESA_shader_integer_functions : enable
+#extension GL_ARB_shader_bit_encoding : enable
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+uniform vec4 expected_float;
+uniform vec4 given_float;
+uniform ivec4 given_exponent;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	/* Compare the results after going through floatBitsToInt() allows us
+	 * to distinguish -0.0f from 0.0f.
+	 */
+	if (floatBitsToInt(expected_float) !=
+	    floatBitsToInt(ldexp(given_float, given_exponent))) {
+		color.r = 1.0;
+	}
+}
+
+[fragment shader]
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+	frag_color = color;
+}
+
+[test]
+# Basic tests with exponent = 0.
+uniform vec4 expected_float 0.0 -0.0 0.5 -0.5
+uniform vec4 given_float 0.0 -0.0 0.5 -0.5
+uniform ivec4 given_exponent 0 0 0 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Basic tests with x = 0.
+uniform vec4 expected_float 0.0 0.0 0.0 0.0
+uniform vec4 given_float 0.0 0.0 0.0 0.0
+uniform ivec4 given_exponent 1 100 -1 -100
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Basic tests.
+uniform vec4 expected_float 0.49 1.0 25.0 100
+uniform vec4 given_float 0.98 0.5 0.78125 0.78125
+uniform ivec4 given_exponent -1 1 5 7
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Test generating FLT_MIN (1.1754944e-38) and FLT_MAX (3.40282347e38).
+uniform vec4 expected_float 1.1754944e-38 -1.1754944e-38 3.40282347e38 -3.40282347e38
+uniform vec4 given_float 0.5 -0.5 0.999999940 -0.999999940
+uniform ivec4 given_exponent -125 -125 128 128
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Test FLT_MIN (1.1754944e-38) and FLT_MAX (3.40282347e38) as inputs.
+uniform vec4 expected_float 0.5 -0.5 0.999999940 -0.999999940
+uniform vec4 given_float 1.1754944e-38 -1.1754944e-38 3.40282347e38 -3.40282347e38
+uniform ivec4 given_exponent 125 125 -128 -128
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Test underflow generates zero with sign of x.
+uniform vec4 expected_float 0.0 -0.0 0.0 -0.0
+uniform vec4 given_float 0.0 -0.0 0.5 -0.5
+uniform ivec4 given_exponent -127 -127 -127 -127
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Overflow is undefined according to the GLSL spec, so nothing to test.
