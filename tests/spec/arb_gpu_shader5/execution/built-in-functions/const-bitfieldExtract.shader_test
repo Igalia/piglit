@@ -2,12 +2,7 @@
 GLSL >= 1.50
 GL_ARB_gpu_shader5
 
-[vertex shader]
-in vec4 vertex;
-
-void main() {
-	gl_Position = vertex;
-}
+[vertex shader passthrough]
 
 [fragment shader]
 #extension GL_ARB_gpu_shader5 : enable
@@ -36,13 +31,6 @@ void main()
 	STATIC_ASSERT(uvec4(0xFu, 0x0u, 0x1u, 0x3u) != bitfieldExtract(uvec4(0x000F0000u, 0x0000F000u, 0x0001C000u, 0x00038000u), 16, 4));
 }
 
-[vertex data]
-vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
