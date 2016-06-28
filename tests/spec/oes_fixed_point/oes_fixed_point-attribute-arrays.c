@@ -37,6 +37,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_es_version = 11;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
