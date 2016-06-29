@@ -69,7 +69,7 @@ piglit_display(void)
 
 	piglit_present_results();
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return pass ? PIGLIT_PASS : PIGLIT_WARN;
 }
 
 
