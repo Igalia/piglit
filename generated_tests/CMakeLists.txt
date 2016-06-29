@@ -193,6 +193,9 @@ piglit_make_generated_tests(
 	gen_vs_in_fp64.py
 	templates/gen_vs_in_fp64/columns.shader_test.mako
 	templates/gen_vs_in_fp64/regular.shader_test.mako)
+piglit_make_generated_tests(
+	shader_framebuffer_fetch_tests.list
+	gen_shader_framebuffer_fetch_tests.py)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -241,6 +244,7 @@ add_custom_target(gen-gl-tests
 			flat_interpolation_qualifier.list
 			conversion_fp64.list
 			shader_precision_tests.list
+			shader_framebuffer_fetch_tests.list
 			shader_image_load_store_tests.list
 			variable_index_read_tests.list
 			gen_extensions_defined.list
