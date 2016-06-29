@@ -2823,7 +2823,7 @@ enum piglit_result
 piglit_display(void)
 {
 	const char *line, *next_line;
-	bool pass = true;
+	enum piglit_result result = PIGLIT_PASS;
 	GLbitfield clear_bits = 0;
 	bool link_error_expected = false;
 	int ubo_array_index = 0;
@@ -3063,13 +3063,13 @@ piglit_display(void)
 			get_floats(line + 10, c, 6);
 			if (!piglit_probe_pixel_rgba((int) c[0], (int) c[1],
 						    & c[2])) {
-				pass = false;
+				result = PIGLIT_FAIL;
 			}
 		} else if (string_match("probe depth", line)) {
 			get_floats(line + 11, c, 3);
 			if (!piglit_probe_pixel_depth((int) c[0], (int) c[1],
 						      c[2])) {
-				pass = false;
+				result = PIGLIT_FAIL;
 			}
 		} else if (sscanf(line,
 				  "probe atomic counter %u %s %u",
@@ -3080,11 +3080,11 @@ piglit_display(void)
 		} else if (sscanf(line, "probe ssbo uint %d %d %s 0x%x",
 				  &x, &y, s, &z) == 4) {
 			if (!probe_ssbo_uint(x, y, s, z))
-				pass = false;
+				result = PIGLIT_FAIL;
 		} else if (sscanf(line, "probe ssbo uint %d %d %s %d",
 				  &x, &y, s, &z) == 4) {
 			if (!probe_ssbo_uint(x, y, s, z))
-				pass = false;
+				result = PIGLIT_FAIL;
 		} else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
 				  "( %f , %f , %f , %f )",
@@ -3098,13 +3098,13 @@ piglit_display(void)
 				y = render_height - 1;
 
 			if (!piglit_probe_pixel_rgba(x, y, &c[2])) {
-				pass = false;
+				result = PIGLIT_FAIL;
 			}
 		} else if (string_match("probe rgb", line)) {
 			get_floats(line + 9, c, 5);
 			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
 						    & c[2])) {
-				pass = false;
+				result = PIGLIT_FAIL;
 			}
 		} else if (sscanf(line,
 				  "relative probe rgb ( %f , %f ) "
@@ -3119,7 +3119,7 @@ piglit_display(void)
 				y = render_height - 1;
 
 			if (!piglit_probe_pixel_rgb(x, y, &c[2])) {
-				pass = false;
+				result = PIGLIT_FAIL;
 			}
 		} else if (sscanf(line, "probe rect rgba "
 				  "( %d , %d , %d , %d ) "
@@ -3127,7 +3127,7 @@ piglit_display(void)
 				  &x, &y, &w, &h,
 				  c + 0, c + 1, c + 2, c + 3) == 8) {
 			if (!piglit_probe_rect_rgba(x, y, w, h, c)) {
-				pass = false;
+				result = PIGLIT_FAIL;
 			}
 		} else if (sscanf(line, "relative probe rect rgb "
 				  "( %f , %f , %f , %f ) "
@@ -3140,18 +3140,20 @@ piglit_display(void)
 			h = c[3] * render_height;
 
 			if (!piglit_probe_rect_rgb(x, y, w, h, &c[4])) {
-				pass = false;
+				result = PIGLIT_FAIL;
 			}
 		} else if (string_match("probe all rgba", line)) {
 			get_floats(line + 14, c, 4);
-			pass = pass &&
-				piglit_probe_rect_rgba(0, 0, render_width,
-						       render_height, c);
+			if (result != PIGLIT_FAIL &&
+			    !piglit_probe_rect_rgba(0, 0, render_width,
+						    render_height, c))
+				result = PIGLIT_FAIL;
 		} else if (string_match("probe all rgb", line)) {
 			get_floats(line + 13, c, 3);
-			pass = pass &&
-				piglit_probe_rect_rgb(0, 0, render_width,
-						      render_height, c);
+			if (result != PIGLIT_FAIL &&
+			    !piglit_probe_rect_rgb(0, 0, render_width,
+						   render_height, c))
+				result = PIGLIT_FAIL;
 		} else if (string_match("tolerance", line)) {
 			get_floats(line + strlen("tolerance"), piglit_tolerance, 4);
 		} else if (string_match("shade model smooth", line)) {
@@ -3375,7 +3377,7 @@ piglit_display(void)
 #endif
 	}
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 
