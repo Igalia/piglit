@@ -3148,6 +3148,12 @@ piglit_display(void)
 			    !piglit_probe_rect_rgba(0, 0, render_width,
 						    render_height, c))
 				result = PIGLIT_FAIL;
+		} else if (string_match("probe warn all rgba", line)) {
+			get_floats(line + 19, c, 4);
+			if (result == PIGLIT_PASS &&
+			    !piglit_probe_rect_rgba(0, 0, render_width,
+						    render_height, c))
+				result = PIGLIT_WARN;
 		} else if (string_match("probe all rgb", line)) {
 			get_floats(line + 13, c, 3);
 			if (result != PIGLIT_FAIL &&

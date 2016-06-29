@@ -7,6 +7,8 @@
 # This test computes dFdx(x*y), which should exactly equal y at every
 # pixel, regardless of whether forward or backward differencing is
 # used.
+#
+# The test expects that GL_FRAGMENT_SHADER_DERIVATIVE_HINT is not ignored.
 
 [require]
 GLSL >= 1.10
@@ -33,4 +35,4 @@ void main()
 [test]
 hint GL_FRAGMENT_SHADER_DERIVATIVE_HINT GL_NICEST
 draw rect -1 -1 2 2
-probe all rgba 0.0 1.0 0.0 1.0
+probe warn all rgba 0.0 1.0 0.0 1.0
