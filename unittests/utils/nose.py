@@ -312,10 +312,10 @@ class Skip(object):
                                           stdout=null, stderr=null)
                 except OSError as e:
                     if e.errno == errno.ENOENT:
-                        return False
+                        return True
                 except subprocess.CalledProcessError as e:
                     pass
-            return True
+            return False
 
         return cls(
             check(), 'Test requires that binary {} is available'.format(name))
