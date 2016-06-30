@@ -25,31 +25,22 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import itertools
-import os
-import sys
 
-import nose.tools as nt
-
-from .. import utils
-
-# Add <piglit root>/generated_tests to the module path, this allows it to be
-# imported for testing.
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', 'generated_tests')))
+import pytest
 
 # pylint can't figure out the sys.path manipulation.
-from modules import types  # pylint: disable=import-error
+from modules import types  # pylint: disable=import-error,wrong-import-order
 
 
-@utils.nose.Skip(not __debug__, 'Test requires debug asserts')
 def test_container_is_type_assert():
-    """modules.types.Container: Only accept one of is_scalar or is_vector or is_matrix"""
+    """modules.types.Container: Only accept one of is_scalar or
+    is_vector or is_matrix"""
     for s, v, m in itertools.product([True, False], repeat=3):
         # Don't test the valid case
         if [s, v, m].count(True) == 0:
             continue
 
-        with nt.assert_raises(AssertionError):
+        with pytest.raises(AssertionError):
             types.Container('foo', is_scalar=s, is_vector=v, is_matrix=m,
                             contains=types.FLOAT)
 
@@ -57,23 +48,21 @@ def test_container_is_type_assert():
 def test_matrix_is_square():
     """modules.types.Matrix.square: works for square matricies"""
     for mat in [types.MAT2, types.DMAT3X3]:
-        nt.eq_(mat.square, True)
+        assert mat.square is True
 
 
 def test_matrix_is_not_square():
     """modules.types.Matrix.square: works for non-square matricies"""
-    nt.eq_(types.MAT2X4.square, False)
+    assert types.MAT2X4.square is False
 
 
-@utils.nose.Skip(not __debug__, 'Test requires debug asserts')
-@nt.raises(AssertionError)
 def test_type_int_float_assert():
     """modules.types.Type: only integer or floating can be passed."""
-    types.Type('foo', integer=True, floating=True, size=32)
+    with pytest.raises(AssertionError):
+        types.Type('foo', integer=True, floating=True, size=32)
 
 
-@utils.nose.Skip(not __debug__, 'Test requires debug asserts')
-@nt.raises(AssertionError)
 def test_type_float_signed_assert():
     """modules.types.Type: floating types must be signed."""
-    types.Type('foo', floating=True, signed=False, size=32)
+    with pytest.raises(AssertionError):
+        types.Type('foo', floating=True, signed=False, size=32)
