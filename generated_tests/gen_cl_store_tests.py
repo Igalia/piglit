@@ -35,7 +35,6 @@ TYPES = ['char', 'uchar', 'short', 'ushort', 'int', 'uint', 'long', 'ulong', 'fl
 VEC_SIZES = ['', '2', '4', '8', '16']
 
 dirName = os.path.join("cl", "store")
-utils.safe_makedirs(dirName)
 
 
 def gen_array(size):
@@ -68,6 +67,8 @@ def begin_test(type_name, addr_space):
 
 
 def main():
+    utils.safe_makedirs(dirName)
+
     for t in TYPES:
         for s in VEC_SIZES:
             if s == '':
