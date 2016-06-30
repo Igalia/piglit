@@ -32,7 +32,6 @@ try:
 except ImportError:
     import xml.etree.cElementTree as etree
 import nose.tools as nt
-from nose.plugins.skip import SkipTest
 
 from framework import results, backends, grouptools, status
 from . import utils
