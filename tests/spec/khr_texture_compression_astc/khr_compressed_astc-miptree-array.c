@@ -193,7 +193,7 @@ test_miptrees(void* odd)
 	for (; subtest < ARRAY_SIZE(tests); ++subtest) {
 
 		/* Load texture for current submode and block size */
-		load_texture("compressed", tests[subtest], cur_file,
+		load_texture("compressed/2D", tests[subtest], cur_file,
 		    &compressed_tex);
 
 		/* Draw and compare each level of the two textures */

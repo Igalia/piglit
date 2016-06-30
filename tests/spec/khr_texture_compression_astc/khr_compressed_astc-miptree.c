@@ -27,9 +27,9 @@
  *
  * This test is an adaptation of the oes_compressed_etc1_rgb8_textures test.
  *
- * The files under compressed/ contain full miptrees, in the
+ * The files under compressed/2D contain full miptrees, in the
  * GL_*_ASTC_* formats, of a 2D texture of waffles and fruit [1]. The base
- * level size was shrunken to 160x106 pixels. The files under the decompressed
+ * level size was shrunken to 160x106 pixels. The files under the decompressed/2D
  * directory contain the same miptree in GL_RGBA format. Each miplevel was
  * obtained by decompressing the corresponding ASTC texture with astcenc [2].
  *
@@ -292,11 +292,11 @@ test_miptrees(void* input_type)
 		GLuint tex_decompressed = 0;
 
 		/* Load texture for current submode and block size */
-		load_texture("compressed", tests[subtest],
+		load_texture("compressed/2D", tests[subtest],
 				block_dim_str[block_dims],
 				&tex_compressed);
 		if (!check_error) {
-			load_texture("decompressed", tests[subtest],
+			load_texture("decompressed/2D", tests[subtest],
 					block_dim_str[block_dims],
 					&tex_decompressed);
 		}
