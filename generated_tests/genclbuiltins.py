@@ -436,48 +436,46 @@ def gen(types, minVersions, functions, testDefs, dirName):
 
             fileName = os.path.join(dirName, fileName)
 
-            f = open(fileName, 'w')
-            print(fileName)
-            # Write the file header
-            f.write('/*!\n' +
-                    '[config]\n' +
-                    'name: Test '+dataType+' '+fnName+' built-in on CL 1.1\n' +
-                    'clc_version_min: '+str(clcVersionMin)+'\n' +
-                    'dimensions: 1\n'
-            )
-            if (dataType == 'double'):
-                f.write('require_device_extensions: cl_khr_fp64\n')
+            with open(fileName, 'w') as f:
+                print(fileName)
+                # Write the file header
+                f.write('/*!\n' +
+                        '[config]\n' +
+                        'name: Test '+dataType+' '+fnName+' built-in on CL 1.1\n' +
+                        'clc_version_min: '+str(clcVersionMin)+'\n' +
+                        'dimensions: 1\n'
+                )
+                if (dataType == 'double'):
+                    f.write('require_device_extensions: cl_khr_fp64\n')
 
-            # Blank line  to provide separation between config header and tests
-            f.write('\n')
+                # Blank line  to provide separation between config header and tests
+                f.write('\n')
 
-            # Write all tests for the built-in function
-            tests = functionDef['values']
-            argCount = len(functionDef['arg_types'])
-            fnType = functionDef['function_type']
+                # Write all tests for the built-in function
+                tests = functionDef['values']
+                argCount = len(functionDef['arg_types'])
+                fnType = functionDef['function_type']
 
-            outputValues = tests[0]
-            numTests = len(outputValues)
+                outputValues = tests[0]
+                numTests = len(outputValues)
 
-            # Handle all available scalar/vector widths
-            sizes = sorted(VEC_WIDTHS)
-            sizes.insert(0, 1)  # Add 1-wide scalar to the vector widths
-            for vecSize in sizes:
-                if (getNumOutArgs(functionDef) == 1):
-                    print_test(f, fnName, dataType, functionDef, tests,
-                               numTests, vecSize, fnType)
-                else:
-                    for loc in ['_private', '_local', '_global']:
-                        print_test(f, fnName + loc, dataType, functionDef, tests,
+                # Handle all available scalar/vector widths
+                sizes = sorted(VEC_WIDTHS)
+                sizes.insert(0, 1)  # Add 1-wide scalar to the vector widths
+                for vecSize in sizes:
+                    if (getNumOutArgs(functionDef) == 1):
+                        print_test(f, fnName, dataType, functionDef, tests,
                                    numTests, vecSize, fnType)
+                    else:
+                        for loc in ['_private', '_local', '_global']:
+                            print_test(f, fnName + loc, dataType, functionDef, tests,
+                                       numTests, vecSize, fnType)
 
-            # Terminate the header section
-            f.write('!*/\n\n')
+                # Terminate the header section
+                f.write('!*/\n\n')
 
-            if (dataType == 'double'):
-                f.write('#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\n')
+                if (dataType == 'double'):
+                    f.write('#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\n')
 
-            # Generate the actual kernels
-            generate_kernels(f, dataType, fnName, functionDef)
-
-        f.close()
+                # Generate the actual kernels
+                generate_kernels(f, dataType, fnName, functionDef)
