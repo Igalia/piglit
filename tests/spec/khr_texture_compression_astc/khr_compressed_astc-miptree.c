@@ -151,7 +151,7 @@ load_texture(const char *dir1, const char *dir2,
 }
 
 /** Compares the compressed texture against the decompressed texture */
-bool draw_compare_levels(bool check_error, bool check_srgb,
+bool draw_compare_levels(bool check_error,
 			GLint level_pixel_size_loc, GLint pixel_offset_loc,
 			GLuint compressed_tex, GLuint decompressed_tex)
 {
@@ -171,20 +171,12 @@ bool draw_compare_levels(bool check_error, bool check_srgb,
 
 		/* Draw miplevel of compressed texture. */
 		glBindTexture(GL_TEXTURE_2D, compressed_tex);
-		if (!check_srgb)
-			glTexParameteri(GL_TEXTURE_2D,
-					GL_TEXTURE_SRGB_DECODE_EXT,
-					GL_SKIP_DECODE_EXT);
 		glUniform2f(pixel_offset_loc, x, y);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_VERTICES);
 
 		/* Draw miplevel of decompressed texture. */
 		if (!check_error) {
 			glBindTexture(GL_TEXTURE_2D, decompressed_tex);
-			if (!check_srgb)
-				glTexParameteri(GL_TEXTURE_2D,
-						GL_TEXTURE_SRGB_DECODE_EXT,
-						GL_SKIP_DECODE_EXT);
 			glUniform2f(pixel_offset_loc, LEVEL0_WIDTH + x, y);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_VERTICES);
 		}
@@ -244,9 +236,6 @@ test_miptrees(void* input_type)
 		"12x12"
 	};
 
-	if (!is_srgb_test)
-		piglit_require_extension("GL_EXT_texture_sRGB_decode");
-
 	GLint pixel_offset_loc = glGetUniformLocation(prog, "pixel_offset");
 	GLint level_pixel_size_loc = glGetUniformLocation(prog,
 							"level_pixel_size");
@@ -276,7 +265,7 @@ test_miptrees(void* input_type)
 
 		/* Draw and compare each level of the two textures */
 		glClear(GL_COLOR_BUFFER_BIT);
-		if (!draw_compare_levels(check_error, is_srgb_test,
+		if (!draw_compare_levels(check_error,
 					level_pixel_size_loc,
 					pixel_offset_loc,
 					tex_compressed,
