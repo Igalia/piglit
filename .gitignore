@@ -24,10 +24,8 @@ tests/glslparsertest/glslcompiler
 generated_tests/cl
 compile_commands.json
 
-.makotmp
 .tox/
+.cache/
 
 *.css
 *.html
-
-main
