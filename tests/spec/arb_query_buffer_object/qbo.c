@@ -263,9 +263,9 @@ run_subtest_and_present(void)
 	char *subtest_name;
 	enum piglit_result r = run_subtest();
 	piglit_present_results();
-	asprintf(&subtest_name, "query-%s-%s",
-		 piglit_get_gl_enum_name(query_type),
-		 sync_mode_names[sync_mode]);
+	(void)!asprintf(&subtest_name, "query-%s-%s",
+			piglit_get_gl_enum_name(query_type),
+			sync_mode_names[sync_mode]);
 	piglit_report_subtest_result(r, "%s", subtest_name);
 	free(subtest_name);
 	return r;
