@@ -165,10 +165,14 @@ class Status(object):
         return self.__fraction
 
     def __repr__(self):
-        return self.name
+        return 'Status("{}", {}, {})'.format(
+            self.name, self.value, self.fraction)
 
     def __bytes__(self):
-        return six.binary_type(self.name)
+        if six.PY2:
+            return str(self.name)
+        elif six.PY3:
+            return bytes(self.name, 'utf-8')
 
     def __str__(self):
         return self.name
