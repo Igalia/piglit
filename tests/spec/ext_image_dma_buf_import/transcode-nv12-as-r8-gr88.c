@@ -294,8 +294,10 @@ piglit_display(void)
 	piglit_tolerance[2] = 0.05;
 	if (!piglit_probe_image_rgba(0, 0, piglit_width, piglit_height,
 				     ref_rgba_image)) {
+		free(ref_rgba_image);
 		return PIGLIT_FAIL;
 	}
 
+	free(ref_rgba_image);
 	return PIGLIT_PASS;
 }
