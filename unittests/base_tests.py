@@ -46,7 +46,7 @@ except ImportError:
     pass
 
 from . import utils
-from .status_tests import PROBLEMS, STATUSES
+from .framework.test_status import PROBLEMS, STATUSES
 from framework.test.base import (
     Test,
     TestRunError,
