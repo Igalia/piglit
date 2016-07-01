@@ -129,9 +129,11 @@ test_simple_errors(GLenum src_target, GLenum dst_target)
 	/* Section 18.3.2 (Copying Between Images) of the OpenGL 4.5 Core
 	 * Profile spec says:
 	 *
-	 *     "An INVALID_VALUE error is generated if either name does not
-	 *     correspond to a valid renderbuffer or texture object according
-	 *     to the corresponding target parameter."
+	 *     "An INVALID_ENUM error is generated if either target is
+	 *      not RENDERBUFFER or a valid non-proxy texture target;
+	 *      is TEXTURE_BUFFER or one of the cubemap face selectors
+	 *      described in table 8.18; or if the target does not
+	 *      match the type of the object."
 	 */
 	if (src_target != GL_RENDERBUFFER_EXT) {
 		for (i = 0; i < ARRAY_LENGTH(targets); ++i) {
@@ -142,7 +144,31 @@ test_simple_errors(GLenum src_target, GLenum dst_target)
 			glCopyImageSubData(src, targets[i], 0, 0, 0, 0,
 					   dst, dst_target, 0, 0, 0, 0,
 					   0, 0, 0);
-			pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+			pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+			if (!pass)
+				return false;
+		}
+	}
+
+	/* Section 18.3.2 (Copying Between Images) of the OpenGL 4.5 Core
+	 * Profile spec says:
+	 *
+	 *     "An INVALID_ENUM error is generated if either target is
+	 *      not RENDERBUFFER or a valid non-proxy texture target;
+	 *      is TEXTURE_BUFFER or one of the cubemap face selectors
+	 *      described in table 8.18; or if the target does not
+	 *      match the type of the object."
+	 */
+	if (dst_target != GL_RENDERBUFFER_EXT) {
+		for (i = 0; i < ARRAY_LENGTH(targets); ++i) {
+			if (targets[i] == dst_target)
+				continue;
+
+			/* here, targets[i] doesn't match dst object's target */
+			glCopyImageSubData(src, src_target, 0, 0, 0, 0,
+					   dst, targets[i], 0, 0, 0, 0,
+					   0, 0, 0);
+			pass &= piglit_check_gl_error(GL_INVALID_ENUM);
 			if (!pass)
 				return false;
 		}
@@ -155,21 +181,6 @@ test_simple_errors(GLenum src_target, GLenum dst_target)
 	 *     correspond to a valid renderbuffer or texture object according
 	 *     to the corresponding target parameter."
 	 */
-	if (dst_target != GL_RENDERBUFFER_EXT) {
-		for (i = 0; i < ARRAY_LENGTH(targets); ++i) {
-			if (targets[i] == dst_target)
-				continue;
-
-			/* here, targets[i] doesn't match dst object's target */
-			glCopyImageSubData(src, src_target, 0, 0, 0, 0,
-					   dst, targets[i], 0, 0, 0, 0,
-					   0, 0, 0);
-			pass &= piglit_check_gl_error(GL_INVALID_VALUE);
-			if (!pass)
-				return false;
-		}
-	}
-
 	/* 4523 should be a bogus renderbuffer/texture */
 	glCopyImageSubData(4523, src_target, 0, 0, 0, 0,
 			   dst, dst_target, 0, 0, 0, 0, 0, 0, 0);
