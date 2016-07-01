@@ -84,9 +84,9 @@ void main()
 }
 
 [vertex data]
-piglit_vertex/vec3/3\
+piglit_vertex/float/vec3\
   % for i in range(mat.columns):
-   value/${mat.name}/${mat.rows}${'/{}'.format(i) if mat.columns > 1 else ''}\
+   value/double/${mat.name}${'/{}'.format(i) if mat.columns > 1 else ''}\
   % endfor
 
 % for d in range(len(dvalues)):
