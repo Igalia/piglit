@@ -4631,6 +4631,11 @@ with profile.group_manager(
     g(['arb_shader_image_size-builtin'], 'builtin')
 
 with profile.group_manager(
+    PiglitGLTest,
+    grouptools.join('spec', 'arb_shader_texture_image_samples')) as g:
+    g(['arb_shader_texture_image_samples-builtin-image'], 'builtin-image')
+
+with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_stencil8')) as g:
     g(['arb_texture_stencil8-draw'], 'draw')
