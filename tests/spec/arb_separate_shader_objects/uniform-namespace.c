@@ -96,7 +96,9 @@ generate_program(const char *code_template, unsigned glsl_version,
 				      (const GLchar * const*) &code);
 	free(code);
 
-	piglit_link_check_status(prog);
+	if (!piglit_link_check_status(prog)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	*uniform_loc = glGetUniformLocation(prog, "a");
 
