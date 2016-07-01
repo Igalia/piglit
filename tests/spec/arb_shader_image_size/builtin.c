@@ -133,16 +133,17 @@ check(const struct grid_info grid, struct image_info img_src)
 static bool
 run_test(const struct image_format_info *format,
 	 const struct image_target_info *target,
+	 const struct image_stage_info *stage,
 	 const struct image_extent size)
 {
-	const struct grid_info grid = grid_info(GL_FRAGMENT_SHADER, GL_RGBA32I,
+	const struct grid_info grid = grid_info(stage->stage, GL_RGBA32I,
 						16, 16);
 	const struct image_info img = {
 		target, format, size,
 		image_format_epsilon(grid.format)
 	};
 	GLuint prog = generate_program(
-		grid, GL_FRAGMENT_SHADER,
+		grid, stage->stage,
 		concat(hunk("#extension GL_ARB_shader_image_size : enable\n"),
 		       image_hunk(img, ""),
 		       hunk("readonly IMAGE_UNIFORM_T src_img;\n"
@@ -261,7 +262,7 @@ test_max_dimensions(const struct image_format_info *format,
 				continue;
 
 			subtest(status, true,
-				run_test(format, target, size),
+				run_test(format, target, stage, size),
 				"%s/%s/image%s max size test/%dx%dx%dx%d",
 				format->name, stage->name, target->name,
 				size.x, size.y, size.z,	size.w);
@@ -285,7 +286,7 @@ test_small_dimensions(const struct image_format_info *format,
 		return;
 
 	subtest(status, true,
-		run_test(format, target, size),
+		run_test(format, target, stage, size),
 		"%s/%s/image%s size test/%dx%dx%dx%d",
 		format->name, stage->name, target->name,
 		size.x, size.y, size.z,	size.w);
