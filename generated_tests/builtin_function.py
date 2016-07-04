@@ -957,28 +957,28 @@ def _make_componentwise_test_vectors(test_suite_dict):
       [np.linspace(-1.9, 1.9, 4), np.linspace(-1.9, 1.9, 4),
        np.linspace(-2.0, 2.0, 4)])
 
-    f('abs', 1, 150, np.abs, None, [np.linspace(-10, 15, 5, dtype=np.dtype(np.int64))],
+    f('abs', 1, 150, np.abs, None, [np.linspace(-10, 15, 54).astype(np.int64)],
       extension="ARB_gpu_shader_int64")
-    f('sign', 1, 150, np.sign, None, [np.linspace(-15, 15, 5, dtype=np.dtype(np.int64))],
-      extension="ARB_gpu_shader_int64")
-    f('min', 2, 150, min, [1],
-      [np.linspace(-20, 20, 4, dtype=np.dtype(np.int64)), np.linspace(-20, 20, 4, dtype=np.dtype(np.int64))],
+    f('sign', 1, 150, np.sign, None, [np.linspace(-15, 15, 5).astype(np.int64)],
       extension="ARB_gpu_shader_int64")
     f('min', 2, 150, min, [1],
-      [np.linspace(20, 90, 4, dtype=np.dtype(np.uint64)), np.linspace(20, 90, 4, dtype=np.dtype(np.uint64))],
+      [np.linspace(-20, 20, 4).astype(np.int64), np.linspace(-20, 20, 4).astype(np.int64)],
+      extension="ARB_gpu_shader_int64")
+    f('min', 2, 150, min, [1],
+      [np.linspace(20, 90, 4).astype(np.uint64), np.linspace(20, 90, 4).astype(np.uint64)],
       extension="ARB_gpu_shader_int64")
     f('max', 2, 150, max, [1],
-      [np.linspace(-20, 20, 4, dtype=np.dtype(np.int64)), np.linspace(-20, 20, 4, dtype=np.dtype(np.int64))],
+      [np.linspace(-20, 20, 4).astype(np.int64), np.linspace(-20, 20, 4).astype(np.int64)],
       extension="ARB_gpu_shader_int64")
     f('max', 2, 150, max, [1],
-      [np.linspace(20, 90, 4, dtype=np.dtype(np.uint64)), np.linspace(20, 90, 4, dtype=np.dtype(np.uint64))],
+      [np.linspace(20, 90, 4).astype(np.uint64), np.linspace(20, 90, 4).astype(np.uint64)],
       extension="ARB_gpu_shader_int64")
-    f('clamp', 3, 150, _clamp, [1, 2], [np.linspace(-20, 20, 4, dtype=np.dtype(np.int64)),
-                                   np.linspace(-15, 15, 3, dtype=np.dtype(np.int64)),
-                                   np.linspace(-15, 15, 3, dtype=np.dtype(np.int64))],
+    f('clamp', 3, 150, _clamp, [1, 2], [np.linspace(-20, 20, 4).astype(np.int64),
+                                   np.linspace(-15, 15, 3).astype(np.int64),
+                                   np.linspace(-15, 15, 3).astype(np.int64)],
       extension="ARB_gpu_shader_int64")
     f('mix', 3, 150, lambda x, y, a: y if a else x, None,
-      [np.linspace(-20, 20, 2, dtype=np.dtype(np.int64)), np.linspace(-30, 30, 2, dtype=np.dtype(np.int64)), bools],
+      [np.linspace(-20, 20, 2).astype(np.int64), np.linspace(-30, 30, 2).astype(np.int64), bools],
       extension="ARB_gpu_shader_int64")
 _make_componentwise_test_vectors(test_suite)
 
