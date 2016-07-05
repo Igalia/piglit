@@ -50,7 +50,9 @@ GL_MAX_VERTEX_ATTRIBS >= ${num_vs_in}
 % endif
 
 % for idx, in_type in enumerate(in_types):
-  uniform ${in_type.name} expected${idx}${'[{}]'.format(arrays[idx]) if arrays[idx] - 1 else ''};
+  % for vidx in range(4):
+    uniform ${in_type.name} expected${idx}${vidx}${'[{}]'.format(arrays[idx]) if arrays[idx] - 1 else ''};
+  % endfor
 % endfor
 % for idx, in_type in enumerate(in_types):
   in ${in_type.name} value${idx}${'[{}]'.format(arrays[idx]) if arrays[idx] - 1 else ''};
@@ -63,13 +65,16 @@ out vec4 fs_color;
 
 void main()
 {
-    gl_Position = vec4(piglit_vertex, 1.0);
-    % for idx, in_type in enumerate(in_types):
-        if (value${idx} != expected${idx}) {
-            fs_color = RED;
-            return;
-        }
-    ## XXX: should this have a break?
+    gl_Position = vec4(piglit_vertex.x, piglit_vertex.y, 0.0, 1.0);
+    % for vidx, vertex in enumerate(['-1.0', '0.0', '1.0', '2.0']):
+      if (piglit_vertex.z == ${vertex}) {
+        % for idx, in_type in enumerate(in_types):
+          if (value${idx} != expected${idx}${vidx}) {
+              fs_color = RED;
+              return;
+          }
+        % endfor
+      }
     % endfor
     fs_color = GREEN;
 }
@@ -101,7 +106,7 @@ void main()
 % endif
 
 % for d in range(len(gl_types_values['double'])):
-  % for vertex in ('-1.0 -1.0  0.0', ' 1.0 -1.0  0.0', ' 1.0  1.0  0.0', '-1.0  1.0  0.0'):
+  % for vidx, vertex in enumerate(['-1.0 -1.0 -1.0', ' 1.0 -1.0  0.0', ' 1.0  1.0  1.0', '-1.0  1.0  2.0']):
     % for idx, in_type in enumerate(in_types):
       % if idx == position_order - 1:
         ${vertex}   \
@@ -109,7 +114,7 @@ void main()
       % for i in range(arrays[idx]):
         % for j in range(in_type.columns):
           % for k in range(in_type.rows):
-            ${gl_types_values[gl_types[idx]][(d + (i * in_type.columns + j) * in_type.rows + k) % len(gl_types_values[gl_types[idx]])]}  \
+            ${gl_types_values[gl_types[idx]][(d + (i * in_type.columns + j) * in_type.rows + k + vidx) % len(gl_types_values[gl_types[idx]])]}  \
           % endfor
          \
         % endfor
@@ -125,16 +130,18 @@ void main()
 [test]
 % for d in range(len(gl_types_values['double'])):
 
-  % for idx, in_type in enumerate(in_types):
-    % for i in range(arrays[idx]):
-      uniform ${in_type.name} expected${idx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}\
-      % for j in range(in_type.columns):
-        % for k in range(in_type.rows):
-	  ## Careful: these are the values for the VBO type, not the uniform type. If we use the hex format they should match or the run will fail.
-          ${gl_types_values[gl_types[idx]][(d + (i * in_type.columns + j) * in_type.rows + k) % len(gl_types_values[gl_types[idx]])]}\
+  % for vidx in range(4):
+    % for idx, in_type in enumerate(in_types):
+      % for i in range(arrays[idx]):
+        uniform ${in_type.name} expected${idx}${vidx}${'[{}]'.format(i) if arrays[idx] > 1 else ''}\
+        % for j in range(in_type.columns):
+          % for k in range(in_type.rows):
+	    ## Careful: these are the values for the VBO type, not the uniform type. If we use the hex format they should match or the run will fail.
+            ${gl_types_values[gl_types[idx]][(d + (i * in_type.columns + j) * in_type.rows + k + vidx) % len(gl_types_values[gl_types[idx]])]}\
+	  % endfor
         % endfor
-      % endfor
 
+      % endfor
     % endfor
   % endfor
   clear color 0.0 0.0 1.0 0.0
