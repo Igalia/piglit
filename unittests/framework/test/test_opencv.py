@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,17 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Module for testing opencv """
+"""Module for testing opencv."""
 
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
-from . import utils
 from framework.test import OpenCVTest
 
 
-@utils.nose.no_error
-def test_initialize_opencvtest():
+def test_initialize():
     """test.opencv.OpenCVTest: Class initializes"""
     OpenCVTest('test_prog', 'testname')
