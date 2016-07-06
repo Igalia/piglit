@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,15 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
-import nose.tools as nt
 
-from . import utils
 from framework.test import GTest
-
-
-@utils.nose.no_error
-def test_initialize_gtest():
-    """test.gtest.GTest: Class initializes"""
-    GTest(['/bin/true'])
+from framework import status
 
 
 def test_crash():
-    """test.gtest.GTest.interpret_result: Crashes are set to crash"""
+    """test.gtest.GTest.interpret_result: Crashes are set to crash."""
     test = GTest(['foo'])
     test.result.returncode = -5
     test.interpret_result()
 
-    nt.eq_(test.result.result, 'crash')
+    assert test.result.result is status.CRASH
