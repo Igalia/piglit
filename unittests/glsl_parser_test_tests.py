@@ -1,4 +1,4 @@
-# Copyright (c) 2014, 2015 Intel Corporation
+# Copyright (c) 2014-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -416,8 +416,8 @@ def test_set_glsl_version():
         with mock.patch.object(glsl.GLSLParserTest,
                                '_GLSLParserTest__get_command',
                                return_value=['foo']):
-            with mock.patch('framework.test.glsl_parser_test.open',
-                            mock.mock_open(), create=True):
+            with mock.patch('framework.test.glsl_parser_test.io.open',
+                            mock.mock_open()):
                 with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
                     test = glsl.GLSLParserTest('foo')
@@ -432,8 +432,8 @@ def test_set_glsl_es_version():
         with mock.patch.object(glsl.GLSLParserTest,
                                '_GLSLParserTest__get_command',
                                return_value=['foo']):
-            with mock.patch('framework.test.glsl_parser_test.open',
-                            mock.mock_open(), create=True):
+            with mock.patch('framework.test.glsl_parser_test.io.open',
+                            mock.mock_open()):
                 with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
                     test = glsl.GLSLParserTest('foo')
@@ -448,8 +448,8 @@ def test_set_gl_required():
         with mock.patch.object(glsl.GLSLParserTest,
                                '_GLSLParserTest__get_command',
                                return_value=['foo']):
-            with mock.patch('framework.test.glsl_parser_test.open',
-                            mock.mock_open(), create=True):
+            with mock.patch('framework.test.glsl_parser_test.io.open',
+                            mock.mock_open()):
                 with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
                     test = glsl.GLSLParserTest('foo')
@@ -464,8 +464,8 @@ def test_set_exclude_gl_required():
         with mock.patch.object(glsl.GLSLParserTest,
                                '_GLSLParserTest__get_command',
                                return_value=['foo']):
-            with mock.patch('framework.test.glsl_parser_test.open',
-                            mock.mock_open(), create=True):
+            with mock.patch('framework.test.glsl_parser_test.io.open',
+                            mock.mock_open()):
                 with mock.patch('framework.test.glsl_parser_test.os.stat',
                                 mock.mock_open()):
                     test = glsl.GLSLParserTest('foo')

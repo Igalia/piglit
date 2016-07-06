@@ -26,7 +26,7 @@ from __future__ import (
 )
 import os
 import re
-
+import io
 import six
 
 from framework import exceptions
@@ -98,13 +98,8 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         # Parse the config file and get the config section, then write this
         # section to a StringIO and pass that to ConfigParser
         try:
-            with open(filepath, 'r') as testfile:
-                # Python 2 returns a bytes instance, but python 3 returns str
-                # (unicode) instance.
-                if six.PY2:
-                    testfile = testfile.read().decode('utf-8')
-                elif six.PY3:
-                    testfile = testfile.read()
+            with io.open(filepath, mode='r', encoding='utf-8') as testfile:
+                testfile = testfile.read()
                 config = self.__parser(testfile, filepath)
             command = self.__get_command(config, filepath)
         except GLSLParserInternalError as e:

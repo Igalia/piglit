@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -131,8 +131,8 @@ def test_find_requirements_gl_version():
             'GL = 2.0\n'
             'GL_ARB_ham_sandwhich\n')
 
-    with mock.patch('framework.test.shader_test.open',
-                    mock.mock_open(read_data=data), create=True):
+    with mock.patch('framework.test.shader_test.io.open',
+                    mock.mock_open(read_data=data)):
         test = testm.ShaderTest('null')
     nt.eq_(test.gl_version, 2.0)
 
@@ -143,8 +143,8 @@ def test_find_requirements_gles_version():
             'GL ES = 2.0\n'
             'GL_ARB_ham_sandwhich\n')
 
-    with mock.patch('framework.test.shader_test.open',
-                    mock.mock_open(read_data=data), create=True):
+    with mock.patch('framework.test.shader_test.io.open',
+                    mock.mock_open(read_data=data)):
         test = testm.ShaderTest('null')
     nt.eq_(test.gles_version, 2.0)
 
@@ -156,8 +156,8 @@ def test_find_requirements_glsl_version():
             'GLSL >= 1.0\n'
             'GL_ARB_ham_sandwhich\n')
 
-    with mock.patch('framework.test.shader_test.open',
-                    mock.mock_open(read_data=data), create=True):
+    with mock.patch('framework.test.shader_test.io.open',
+                    mock.mock_open(read_data=data)):
         test = testm.ShaderTest('null')
     nt.eq_(test.glsl_version, 1.0)
 
@@ -169,8 +169,8 @@ def test_find_requirements_glsl_es_version():
             'GLSL ES > 2.00\n'
             'GL_ARB_ham_sandwhich\n')
 
-    with mock.patch('framework.test.shader_test.open',
-                    mock.mock_open(read_data=data), create=True):
+    with mock.patch('framework.test.shader_test.io.open',
+                    mock.mock_open(read_data=data)):
         test = testm.ShaderTest('null')
     nt.eq_(test.glsl_es_version, 2.0)
 
@@ -186,8 +186,8 @@ def test_ignore_shader_runner_directives():
     ]
 
     def test(config):
-        with mock.patch('framework.test.shader_test.open',
-                        mock.mock_open(read_data=config), create=True):
+        with mock.patch('framework.test.shader_test.io.open',
+                        mock.mock_open(read_data=config)):
             test = testm.ShaderTest('null')
         nt.eq_(test.gl_required, {'GL_foobar'})
 

@@ -27,8 +27,7 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import re
-
-import six
+import io
 
 from framework import exceptions
 from .opengl import FastSkipMixin
@@ -60,14 +59,10 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         # cost. The first one looks for the start of the config block or raises
         # an exception. The second looks for the GL version or raises an
         # exception
-        with open(filename, 'r') as shader_file:
+        with io.open(filename, mode='r', encoding='utf-8') as shader_file:
             # The mock in python 3.3 doesn't support readlines(), so use
             # read().split() as a workaround
-            if six.PY3:
-                lines = (l for l in shader_file.read().split('\n'))
-            elif six.PY2:
-                lines = (l.decode('utf-8') for l in
-                         shader_file.read().split(b'\n'))
+            lines = (l for l in shader_file.read().split('\n'))
 
             # Find the config section
             for line in lines:
