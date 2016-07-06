@@ -24,28 +24,19 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
-import nose.tools as nt
+import pytest
 
 from framework.options import _Options as Options
+from framework import status
 from framework.test import GleanTest
-from . import utils
-from framework.test.base import TestIsSkip
+from framework.test.base import TestIsSkip as _TestIsSkip  # make py.test happy
 
-
-@utils.nose.no_error
-def test_initialize_gleantest():
-    """test.gleantest.GleanTest: class initializes correctly"""
-    GleanTest('name')
+# pylint: disable=invalid-name
 
 
 def test_GLOBAL_PARAMS_assignment():
     """test.gleantest.GleanTest: GLOBAL_PARAMS apply to instances created
-    after GLABL_PARAMS is set
+    after GLABL_PARAMS is set.
 
     Specifically this tests for a bug where GLOBAL_PARAMS only affected
     instances of GleanTest created after GLOBAL_PARAMS were set, so changing the
@@ -60,13 +51,13 @@ def test_GLOBAL_PARAMS_assignment():
     test1 = GleanTest('basic')
     GleanTest.GLOBAL_PARAMS = ['--quick']
     test2 = GleanTest('basic')
-    nt.assert_list_equal(test1.command, test2.command)
+    assert test1.command == test2.command
 
 
 def test_bad_returncode():
-    """test.gleantest.GleanTest: If returncode is 0 the result is 'fail'
+    """test.gleantest.GleanTest: If returncode is 0 the result is 'fail'.
 
-    Currently clean returns 127 if piglit can't find it's libs (LD_LIBRARY_PATH
+    Currently glean returns 127 if piglit can't find it's libs (LD_LIBRARY_PATH
     isn't set properly), and then marks such tests as pass, when they obviously
     are not.
 
@@ -74,33 +65,37 @@ def test_bad_returncode():
     test = GleanTest('basic')
     test.result.returncode = 1
     test.interpret_result()
-    nt.assert_equal(test.result.result, 'fail')
+    assert test.result.result == 'fail'
 
 
-@mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
-@nt.raises(TestIsSkip)
-def test_is_skip_not_glx(mock_opts):
-    """test.gleantest.GleanTest.is_skip: Skips when platform isn't glx"""
-    mock_opts.env['PIGLIT_PLATFORM'] = 'gbm'
+def test_is_skip_not_glx(mocker):
+    """test.gleantest.GleanTest.is_skip: Skips when platform isn't glx."""
+    opts = mocker.patch('framework.test.gleantest.options.OPTIONS',
+                        new_callable=Options)
+    opts.env['PIGLIT_PLATFORM'] = 'gbm'
+
+    test = GleanTest('foo')
+    with pytest.raises(_TestIsSkip):
+        test.is_skip()
+
+
+def test_is_skip_glx(mocker):
+    """test.gleantest.GleanTest.is_skip: Does not skip when platform is glx."""
+    opts = mocker.patch('framework.test.gleantest.options.OPTIONS',
+                        new_callable=Options)
+    opts.env['PIGLIT_PLATFORM'] = 'glx'
+
     test = GleanTest('foo')
     test.is_skip()
 
 
-@mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
-@utils.nose.not_raises(TestIsSkip)
-def test_is_skip_glx(mock_opts):
-    """test.gleantest.GleanTest.is_skip: Does not skip when platform is glx"""
-    mock_opts.env['PIGLIT_PLATFORM'] = 'glx'
-    test = GleanTest('foo')
-    test.is_skip()
+def test_is_skip_glx_egl(mocker):
+    """test.gleantest.GleanTest.is_skip: Does not skip when platform is
+    mixed_glx_egl."""
+    opts = mocker.patch('framework.test.gleantest.options.OPTIONS',
+                        new_callable=Options)
+    opts.env['PIGLIT_PLATFORM'] = 'mixed_glx_egl'
 
-
-@mock.patch('framework.test.gleantest.options.OPTIONS', new_callable=Options)
-@utils.nose.not_raises(TestIsSkip)
-def test_is_skip_glx_egl(mock_opts):
-    """test.gleantest.GleanTest.is_skip: Does not skip when platform is mixed_glx_egl
-    """
-    mock_opts.env['PIGLIT_PLATFORM'] = 'mixed_glx_egl'
     test = GleanTest('foo')
     test.is_skip()
 
@@ -111,4 +106,4 @@ def test_crash():
     test.result.returncode = -5
     test.interpret_result()
 
-    nt.eq_(test.result.result, 'crash')
+    assert test.result.result is status.CRASH
