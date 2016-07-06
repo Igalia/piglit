@@ -173,6 +173,7 @@ def test_timeout_kill_children():
 
 
 @attr('slow')
+@utils.nose.Skip.platform('win32', is_=True)
 @utils.nose.Skip.backport(3.3, 'subprocess32')
 @utils.nose.Skip.binary('sleep')
 @nt.timed(6)
@@ -189,6 +190,7 @@ def test_timeout():
 
 
 @attr('slow')
+@utils.nose.Skip.platform('win32', is_=True)
 @utils.nose.Skip.backport(3.3, 'subprocess32')
 @utils.nose.Skip.binary('sleep')
 @nt.timed(6)
@@ -200,6 +202,7 @@ def test_timeout_timeout():
     nt.eq_(test.result.result, 'timeout')
 
 
+@utils.nose.Skip.platform('win32', is_=True)
 @utils.nose.Skip.backport(3.3, 'subprocess32')
 @utils.nose.Skip.binary('true')
 @nt.timed(2)
