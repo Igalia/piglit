@@ -87,7 +87,11 @@ class ParserTest(object):
         extension requirements that the test has.  Returns the empty
         list by default.
         """
-        return []
+        ret = []
+        if self.__signature.extension:
+            ret.append(self.__signature.extension)
+
+        return ret
 
     @abc.abstractmethod
     def test_suffix(self):
