@@ -48,7 +48,9 @@ GLSL >= ${glsl}
   #extension GL_ARB_vertex_attrib_64bit : require
 % endif
 
-uniform ${mat.name} expected;
+% for vidx in range(4):
+  uniform ${mat.name} expected${vidx};
+% endfor
 
 in ${mat.name} value;
 in vec3 piglit_vertex;
@@ -59,15 +61,18 @@ out vec4 fs_color;
 
 void main()
 {
-  gl_Position = vec4(piglit_vertex, 1.0);
-  % for idx, column in enumerate(columns):
-    % if column == 1:
-      if (value[${idx}] != expected[${idx}]) {
-        fs_color = RED;
-        return;
-      }
-      ## XXX: should we break here?
-    % endif
+  gl_Position = vec4(piglit_vertex.x, piglit_vertex.y, 0.0, 1.0);
+  % for vidx, vertex in enumerate(['-1.0', '0.0', '1.0', '2.0']):
+    if (piglit_vertex.z == ${vertex}) {
+    % for idx, column in enumerate(columns):
+      % if column == 1:
+        if (value[${idx}] != expected${vidx}[${idx}]) {
+            fs_color = RED;
+            return;
+        }
+      % endif
+    % endfor
+    }
   % endfor
   fs_color = GREEN;
 }
@@ -90,11 +95,11 @@ piglit_vertex/float/vec3\
   % endfor
 
 % for d in range(len(dvalues)):
-  % for vertex in ('-1.0 -1.0  0.0', ' 1.0 -1.0  0.0', ' 1.0  1.0  0.0', '-1.0  1.0  0.0'):
+  % for vidx, vertex in enumerate(['-1.0 -1.0  -1.0', ' 1.0 -1.0  0.0', ' 1.0  1.0  1.0', '-1.0  1.0  2.0']):
 ${vertex} \
     % for i in range(mat.columns):
       % for j in range(mat.rows):
-${dvalues[(d + i * mat.rows + j) % len(dvalues)]}  \
+${dvalues[(d + i * mat.rows + j + vidx) % len(dvalues)]}  \
       % endfor
   \
     % endfor
@@ -105,13 +110,15 @@ ${dvalues[(d + i * mat.rows + j) % len(dvalues)]}  \
 [test]
 % for d in range(len(dvalues)):
 
-  uniform ${mat.name} expected\
-  % for i in range(mat.columns):
-    % for j in range(mat.rows):
-     ${dvalues[(d + i * mat.rows + j) % len(dvalues)]}\
+  % for vidx in range(4):
+    uniform ${mat.name} expected${vidx}\
+    % for i in range(mat.columns):
+      % for j in range(mat.rows):
+        ${dvalues[(d + i * mat.rows + j + vidx) % len(dvalues)]}\
+      % endfor
     % endfor
-  % endfor
 
+  % endfor
   clear color 0.0 0.0 1.0 0.0
   clear
   draw arrays GL_TRIANGLE_FAN ${d * 4} 4
