@@ -1,0 +1,72 @@
+[require]
+GLSL >= 1.40
+GL_ARB_shader_atomic_counters
+GL_ARB_shader_atomic_counter_ops
+SIZE 16 16
+
+[vertex shader passthrough]
+
+[fragment shader]
+/* This is just a touch-test to make sure that all of the new atomic functions
+ * are compiled by the driver and can execute.  The results of the atomic
+ * operations are not checked.
+ */
+#version 140
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_shader_atomic_counter_ops: require
+
+out vec4 color;
+layout(binding = 0, offset =  0) uniform atomic_uint c0;
+layout(binding = 0, offset =  4) uniform atomic_uint c1;
+layout(binding = 0, offset =  8) uniform atomic_uint c2;
+layout(binding = 0, offset = 12) uniform atomic_uint c3;
+layout(binding = 0, offset = 16) uniform atomic_uint c4;
+layout(binding = 0, offset = 20) uniform atomic_uint c5;
+layout(binding = 0, offset = 24) uniform atomic_uint c6;
+layout(binding = 0, offset = 28) uniform atomic_uint c7;
+
+uniform uint data[16];
+
+void main()
+{
+    uint x = uint(gl_FragCoord.x) + 16u * uint(gl_FragCoord.y);
+
+
+    switch (x % 9u) {
+    case 0u:
+	atomicCounterAddARB(c0, data[int(gl_FragCoord.y)]);
+	break;
+    case 1u:
+	atomicCounterSubtractARB(c1, data[int(gl_FragCoord.y)]);
+	break;
+    case 2u:
+	atomicCounterMinARB(c2, data[int(gl_FragCoord.y)]);
+	break;
+    case 3u:
+	atomicCounterMaxARB(c3, data[int(gl_FragCoord.y)]);
+	break;
+    case 4u:
+	atomicCounterAndARB(c4, data[int(gl_FragCoord.y)]);
+	break;
+    case 5u:
+	atomicCounterOrARB(c5, data[int(gl_FragCoord.y)]);
+	break;
+    case 6u:
+	atomicCounterXorARB(c6, data[int(gl_FragCoord.y)]);
+	break;
+    case 7u:
+	atomicCounterExchangeARB(c7, data[int(gl_FragCoord.y)]);
+	break;
+    case 8u:
+	atomicCounterCompSwapARB(c0,
+				 data[int(gl_FragCoord.y)],
+				 data[int(gl_FragCoord.x)]);
+	break;
+    }
+
+    color = vec4(0, 1, 0, 1);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
