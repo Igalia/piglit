@@ -151,6 +151,9 @@ class BaseDmesg(object):
 
         return result
 
+    def __repr__(self):
+        return 'BaseDmesg()'
+
 
 class LinuxDmesg(BaseDmesg):
     """ Read dmesg on posix systems
@@ -220,6 +223,9 @@ class LinuxDmesg(BaseDmesg):
         # Attempt to store the last element of dmesg, unless there was no dmesg
         self._last_message = dmesg[-1] if dmesg else None
 
+    def __repr__(self):
+        return 'LinuxDmesg()'
+
 
 class DummyDmesg(BaseDmesg):
     """ An dummy class for dmesg on non unix-like systems
@@ -241,6 +247,9 @@ class DummyDmesg(BaseDmesg):
     def update_result(self, result):
         """ Dummy version of update_result """
         return result
+
+    def __repr__(self):
+        return 'DummyDmesg()'
 
 
 def get_dmesg(not_dummy=True):
