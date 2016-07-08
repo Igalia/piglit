@@ -328,7 +328,9 @@ clean_resources()
 static GLvoid
 draw_rect_tex()
 {
-        unsigned int basic_count = total_indices / draw_passes;
+        /* This multiply and divide by three is a trick to ensure that
+         * basic_count is a multiple of three */
+        unsigned int basic_count = 3 * (total_indices / (3 * draw_passes));
         unsigned int first = 0;
 
         while (first < total_indices) {
