@@ -302,7 +302,9 @@ probe_prims(GLenum prim_mode, const float verts[][2], unsigned num_verts,
 
 	for (prim = 0; prim < num_prims; prim++) {
 		bool pass = false;
-		const float *expected_color = NULL, *bad_color = NULL;
+		const float *expected_color = NULL;
+		float bad_color[4];
+		bool bad_color_found = false;
 		int x, y, i;
 
 		compute_probe_location(prim_mode, prim, verts,
@@ -333,8 +335,13 @@ probe_prims(GLenum prim_mode, const float verts[][2], unsigned num_verts,
 					// check for expected color
 					if (colors_match(expected_color, buf[i]))
 						pass = true;
-					else
-						bad_color = buf[i];
+					else {
+						bad_color_found = true;
+						bad_color[0] = buf[i][0];
+						bad_color[1] = buf[i][1];
+						bad_color[2] = buf[i][2];
+						bad_color[3] = buf[i][3];
+					}
 				}
 			}
 		}
@@ -343,7 +350,7 @@ probe_prims(GLenum prim_mode, const float verts[][2], unsigned num_verts,
 			printf("Failure for %s, "
 			       "prim %u wrong color at (%d,%d)\n",
 			       piglit_get_prim_name(prim_mode), prim, x, y);
-			if (expected_color && bad_color) {
+			if (expected_color && bad_color_found) {
 				printf("Expected %.1g, %.1g, %.1g, %.1g\n",
 				       expected_color[0],
 				       expected_color[1],
