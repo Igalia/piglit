@@ -86,3 +86,47 @@ uniform ivec4 msb 31 30 29 28
 uniform uvec4 uinput 0xFFFFFFFF 0x7FFFFFFF 0x3FFFFFFF 0x1FFFFFFF
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
+
+# Some implementations may handle negative powers of 2 incorrectly (giving an
+# off-by-one result.  Try them all just to be sure.
+uniform int test_signed 1
+
+uniform ivec4 msb 30  29  28  27
+uniform ivec4 iinput  0x80000000 -0x40000000 -0x20000000 -0x10000000
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 26 25 24 23
+uniform ivec4 iinput -0x08000000 -0x04000000 -0x02000000 -0x01000000
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 22 21 20 19
+uniform ivec4 iinput -0x00800000 -0x00400000 -0x00200000 -0x00100000
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 18 17 16 15
+uniform ivec4 iinput -0x00080000 -0x00040000 -0x00020000 -0x00010000
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 14 13 12 11
+uniform ivec4 iinput -0x00008000 -0x00004000 -0x00002000 -0x00001000
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 10  9  8  7
+uniform ivec4 iinput -0x00000800 -0x00000400 -0x00000200 -0x00000100
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb  6  5  4  3
+uniform ivec4 iinput -0x00000080 -0x00000040 -0x00000020 -0x00000010
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb  2  1  0 -1
+uniform ivec4 iinput -0x00000008 -0x00000004 -0x00000002 -0x00000001
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
