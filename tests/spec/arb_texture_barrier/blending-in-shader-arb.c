@@ -510,7 +510,7 @@ parse_args(int argc, char **argv)
         }
 
         draw_passes = atoi(argv[5]);
-        if (granularity < 1 || draw_passes > 10) {
+        if (draw_passes < 1 || draw_passes > 10) {
                 fprintf(stderr, "Wrong value for draw_passes: %s\n", argv[5]);
                 print_usage();
                 piglit_report_result(PIGLIT_FAIL);
