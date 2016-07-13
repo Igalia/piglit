@@ -263,8 +263,10 @@ piglit_display(void)
 	glUniform1i(glGetUniformLocation(prog, "u_r8_tex"), 0);
 	glUniform1i(glGetUniformLocation(prog, "u_gr88_tex"), 1);
 
-	if (!piglit_check_gl_error(GL_NO_ERROR))
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		free(ref_rgba_image);
 		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	glGenBuffers(1, &vb);
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
@@ -282,8 +284,10 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLE_FAN, /*first*/ 0, /*count*/ 4);
 
-	if (!piglit_check_gl_error(GL_NO_ERROR))
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		free(ref_rgba_image);
 		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	/* Increase the tolerance because the conversion path
 	 *     ubyte --(texturing)--> float --(glReadPixels)--> ubyte
