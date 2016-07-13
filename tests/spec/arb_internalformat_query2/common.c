@@ -26,7 +26,7 @@
 
 /* Generic callback type, doing a cast of params to void*, to avoid
  * having two paths (32 and 64) for each check */
-typedef void (*GetInternalformat)(GLenum target, GLenum internalformat,
+typedef void (APIENTRY *GetInternalformat)(GLenum target, GLenum internalformat,
                                   GLenum pname, GLsizei bufsize,
                                   void *params);
 
