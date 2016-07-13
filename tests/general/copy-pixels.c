@@ -47,10 +47,10 @@ test_color_copypix(int x, int y)
 	bool pass = true;
 	GLuint tex;
 
-	const float *expected = piglit_rgbw_image(GL_RGBA,
-						  IMAGE_WIDTH, IMAGE_HEIGHT,
-						  GL_FALSE, /* alpha */
-						  GL_UNSIGNED_NORMALIZED);
+	float *expected = piglit_rgbw_image(GL_RGBA,
+					    IMAGE_WIDTH, IMAGE_HEIGHT,
+					    GL_FALSE, /* alpha */
+					    GL_UNSIGNED_NORMALIZED);
 
 	/* Initialize color data */
 	tex = piglit_rgbw_texture(GL_RGBA, IMAGE_WIDTH, IMAGE_HEIGHT,
@@ -65,6 +65,7 @@ test_color_copypix(int x, int y)
 	glCopyPixels(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, GL_COLOR);
 	pass = piglit_probe_image_color(x, y, IMAGE_WIDTH, IMAGE_HEIGHT,
 					GL_RGBA, expected) && pass;
+	free(expected);
 	return pass;
 }
 
