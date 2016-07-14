@@ -154,7 +154,8 @@ have_gen_mipmap_support()
  *	the TEXTURE_CUBE_MAP_ARRAY target.
  *
  */
-void test_compressed_teximg_3d(int fi, bool have_cube_map_ext, bool have_hdr)
+void test_compressed_teximg_3d(int fi, bool have_cube_map_ext,
+			       bool have_hdr_or_sliced_3d)
 {
 	int j;
 	GLuint tex3D;
@@ -175,7 +176,7 @@ void test_compressed_teximg_3d(int fi, bool have_cube_map_ext, bool have_hdr)
 
 		/* Test expected GL errors */
 		if (good_compressed_tex_3d_targets[j] == GL_TEXTURE_3D
-		    && !have_hdr) {
+		    && !have_hdr_or_sliced_3d) {
 			REQUIRE_ERROR(GL_INVALID_OPERATION);
 		} else {
 			REQUIRE_ERROR(GL_NO_ERROR);
@@ -371,13 +372,17 @@ piglit_display(void)
 	bool have_gen_mipmap   = have_gen_mipmap_support();
 	bool have_hdr = piglit_is_extension_supported(
 			"GL_KHR_texture_compression_astc_hdr");
+	bool have_hdr_or_sliced_3d = have_hdr ||
+			piglit_is_extension_supported(
+			"GL_KHR_texture_compression_astc_sliced_3d");
 
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
 		if (have_cube_map_ext)
 			test_non_square_img(i, have_hdr);
 		if (have_tex_stor_ext)
 			test_sub_img(i);
-		test_compressed_teximg_3d(i, have_cube_map_ext, have_hdr);
+		test_compressed_teximg_3d(i, have_cube_map_ext,
+					  have_hdr_or_sliced_3d);
 		test_tex_img(i, have_gen_mipmap);
 	}
 
