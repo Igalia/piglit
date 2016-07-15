@@ -1,0 +1,103 @@
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#extension GL_ARB_gpu_shader_fp64: require
+
+uniform int index;
+
+in vec4 vertex;
+
+out block {
+	dvec4 vs_var0[4];
+} blk;
+
+void main()
+{
+	gl_Position = vertex;
+	blk.vs_var0[0] = dvec4(0.0LF);
+	blk.vs_var0[1] = dvec4(0.25LF);
+	blk.vs_var0[2] = dvec4(0.50LF);
+	blk.vs_var0[3] = dvec4(0.75LF);
+	blk.vs_var0[index] = dvec4(0.0LF, 1.0LF, 0.0LF, 1.0LF);
+}
+
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_gpu_shader_fp64: require
+layout(vertices = 3) out;
+
+uniform int index;
+in block {
+	dvec4 vs_var0[4];
+} blk[];
+
+out vec4 color[];
+
+void main() {
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+
+	color[gl_InvocationID] = vec4(blk[gl_InvocationID].vs_var0[index]);
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_gpu_shader_fp64: require
+layout(triangles) in;
+
+in vec4 color[];
+out vec4 fs_color;
+
+void main() {
+	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
+	            + gl_in[1].gl_Position * gl_TessCoord[1]
+	            + gl_in[2].gl_Position * gl_TessCoord[2];
+
+	fs_color = vec4(color[0]);
+}
+
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64: require
+in vec4 fs_color;
+
+void main()
+{
+	gl_FragColor = fs_color;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+patch parameter vertices 3
+
+uniform int index 0
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int index 1
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int index 2
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int index 3
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
