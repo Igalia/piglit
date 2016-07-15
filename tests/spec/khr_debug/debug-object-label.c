@@ -230,11 +230,12 @@ test_object_label_types()
 	}
 
 	/* GLES >= 3.0 or GL compat */
-	if (!piglit_is_gles() || piglit_get_gl_version() >= 30) {
+	if (piglit_is_extension_supported("GL_ARB_occlusion_query") ||
+	    piglit_get_gl_version() >= 30) {
 		/* Test QUERY */
 		glGenQueries(1, &query);
-		glBeginQuery(GL_TIME_ELAPSED, query);
-		glEndQuery(GL_TIME_ELAPSED);
+		glBeginQuery(GL_SAMPLES_PASSED, query);
+		glEndQuery(GL_SAMPLES_PASSED);
 		ObjectLabel(GL_QUERY, query, -1, TestLabel);
 		GetObjectLabel(GL_QUERY, query, TestLabelLen + 1, &length[QUERY_IDX], label[QUERY_IDX]);
 
