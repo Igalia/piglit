@@ -61,6 +61,8 @@ test_color_copypix(int x, int y)
 
 	piglit_draw_rect_tex(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 0, 0, 1, 1);
 
+	glDisable(GL_TEXTURE_2D);
+
 	glRasterPos2i(x, y);
 	glCopyPixels(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, GL_COLOR);
 	pass = piglit_probe_image_color(x, y, IMAGE_WIDTH, IMAGE_HEIGHT,
