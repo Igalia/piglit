@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010 Intel Corporation
+ * Copyright © 2010-2016 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,6 +23,70 @@
 #include <string.h>
 #include <ctype.h>
 #include "parser_utils.h"
+
+bool
+parse_whitespace(const char *s, const char **rest)
+{
+	const char *end = s;
+	for (; *end && *end != '\n' && isspace(*end); end++);
+
+	if (rest)
+		*rest = end;
+
+	return end != s;
+}
+
+bool
+parse_str(const char *s, const char *lit, const char **rest)
+{
+	const char *t;
+	parse_whitespace(s, &t);
+	const bool ret = strncmp(t, lit, strlen(lit)) == 0;
+
+	if (rest)
+		*rest = (ret ? t + strlen(lit) : s);
+
+	return ret;
+}
+
+bool
+parse_word(const char *s, const char **t, const char **rest)
+{
+	parse_whitespace(s, t);
+
+	const char *end = *t;
+	for (; *end && !isspace(*end); end++);
+
+	if (rest)
+		*rest = (*t != end ? end : s);
+
+	return *t != end;
+}
+
+bool
+parse_word_copy(const char *s, char *t, unsigned n, const char **rest)
+{
+	const char *start, *end;
+	const bool ret = parse_word(s, &start, &end) && end - start < n;
+
+	if (ret) {
+		memcpy(t, start, end - start);
+		t[end - start] = 0;
+	}
+	if (rest)
+		*rest = (ret ? end : s);
+
+	return ret;
+}
+
+bool
+parse_enum_gl(const char *s, GLenum *e, const char **rest)
+{
+	char name[512];
+	const bool ret = parse_word_copy(s, name, sizeof(name), rest);
+	*e = (ret ? piglit_get_gl_enum_from_name(name) : GL_NONE);
+	return ret;
+}
 
 /**
  * Skip over whitespace upto the end of line
