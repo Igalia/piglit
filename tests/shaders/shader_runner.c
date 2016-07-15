@@ -2987,7 +2987,7 @@ piglit_display(void)
 
 			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &render_width);
 			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &render_height);
-		} else if (sscanf(line, "fb tex layered 2DArray %d", &tex) == 1) {
+		} else if (sscanf(line, "fb tex layered %d", &tex) == 1) {
 			GLenum status;
 			GLint tex_num;
 

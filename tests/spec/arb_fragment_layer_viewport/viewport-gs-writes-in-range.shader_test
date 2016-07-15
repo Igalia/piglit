@@ -65,7 +65,7 @@ void main()
 
 [test]
 texture junk 2DArray 0 ( 64 , 64 , 1 )
-fb tex layered 2DArray 0
+fb tex layered 0
 
 atomic counters 2
 
