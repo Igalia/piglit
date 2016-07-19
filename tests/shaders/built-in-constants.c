@@ -230,7 +230,7 @@ parse_file(const char *filename)
 	required_glsl_version_string[len] = '\0';
 
 	required_glsl_version = strtol(line, &endptr, 10);
-	line = (char *) eat_whitespace(endptr);
+	parse_whitespace(endptr, (const char **)&line);
 	es_shader = strncmp("es\n", line, 3) == 0;
 
 	if (required_glsl_version <= 0 ||
@@ -289,13 +289,13 @@ parse_file(const char *filename)
 	}
 
 	while (line[0] != '\0') {
-		line = (char *) eat_whitespace(line);
+		if (!(parse_word(line, (const char **)&line,
+				 (const char **)&endptr) &&
+		      (parse_str(line, "gl_Max", NULL) ||
+		       parse_str(line, "gl_Min", NULL)))) {
+			char bad_name[80] = "";
+			parse_word_copy(line, bad_name, sizeof(bad_name), NULL);
 
-		if (string_match("gl_Max", line) != 0
-		    && string_match("gl_Min", line) != 0) {
-			char bad_name[80];
-
-			strcpy_to_space(bad_name, line);
 			fprintf(stderr,
 				"Invalid built-in constant name \"%s\".\n",
 				bad_name);
@@ -303,18 +303,14 @@ parse_file(const char *filename)
 		}
 
 		tests[num_tests].name = line;
+		*endptr = 0;
+		line = endptr + 1;
 
-		line = (char *) eat_text(line);
-		line[0] = '\0';
-		line++;
-
-		line = (char *) eat_whitespace(line);
-
-		tests[num_tests].minimum = strtol(line, &endptr, 0);
-		if (endptr == line) {
-			char bad_number[80];
-
-			strcpy_to_space(bad_number, line);
+		if (!parse_int(line, &tests[num_tests].minimum,
+			       (const char **)&endptr)) {
+			char bad_number[80] = "";
+			parse_word_copy(line, bad_number, sizeof(bad_number),
+					NULL);
 
 			fprintf(stderr,
 				"Invalid built-in constant value \"%s\".\n",
@@ -553,7 +549,7 @@ piglit_init(int argc, char **argv)
 	for (i = 0; i < num_tests; i++) {
 		bool subtest_pass = true;
 		const char *comparitor =
-			string_match("gl_Min", tests[i].name) ? "<=" : ">=";
+			parse_str(tests[i].name, "gl_Min", NULL) ? "<=" : ">=";
 
 		/* Generate the uniform declaration for the test.  This will
 		 * be shared by all shader stages.
