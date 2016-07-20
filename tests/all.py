@@ -4530,6 +4530,12 @@ with profile.group_manager(
     g(['egl_chromium_sync_control'], 'conformance')
 
 with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'egl_ext_device_query'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_ext_device_query'], 'conformance')
+
+with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', '!opengl ES 2.0')) as g:
     g(['glsl-fs-pointcoord_gles2'], 'glsl-fs-pointcoord')
     g(['invalid-es3-queries_gles2'])
