@@ -59,6 +59,7 @@ enum test_type
 	TEST_TYPE_HDR,
 	TEST_TYPE_LDR,
 	TEST_TYPE_SRGB,
+	TEST_TYPE_SRGB_FP,
 };
 
 enum piglit_result
@@ -67,6 +68,7 @@ test_miptrees(void* input_type);
 static enum test_type ldr_test  = TEST_TYPE_LDR;
 static enum test_type hdr_test  = TEST_TYPE_HDR;
 static enum test_type srgb_test = TEST_TYPE_SRGB;
+static enum test_type srgb_fp_test = TEST_TYPE_SRGB_FP;
 static const struct piglit_subtest subtests[] = {
 	{
 		"LDR Profile",
@@ -85,6 +87,12 @@ static const struct piglit_subtest subtests[] = {
 		"srgb",
 		test_miptrees,
 		&srgb_test,
+	},
+	{
+		"sRGB decode full precision",
+		"srgb-fp",
+		test_miptrees,
+		&srgb_fp_test,
 	},
 	{NULL},
 };
@@ -218,7 +226,7 @@ test_miptrees(void* input_type)
 	const bool is_srgb_test = subtest == TEST_TYPE_SRGB;
 	const bool is_hdr_test  = subtest == TEST_TYPE_HDR;
 
-	static const char * tests[3] = {"hdr", "ldrl", "ldrs"};
+	static const char * tests[4] = {"hdr", "ldrl", "ldrs", "ldrs"};
 	static const char * block_dim_str[14] = {
 		"4x4",
 		"5x4",

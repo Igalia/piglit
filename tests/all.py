@@ -4355,7 +4355,7 @@ with profile.group_manager(
     g(['khr_compressed_astc-basic_gl'], 'basic-gl')
     g(['khr_compressed_astc-basic_gles2'], 'basic-gles')
 
-    for subtest in ('hdr', 'ldr', 'srgb'):
+    for subtest in ('hdr', 'ldr', 'srgb', "srgb-fp"):
         g(['khr_compressed_astc-miptree_gl', '-subtest', subtest],
            'miptree-gl {}'.format(subtest))
         g(['khr_compressed_astc-miptree_gles2', '-subtest', subtest],
