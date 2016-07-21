@@ -4701,6 +4701,14 @@ with profile.group_manager(
     g(['oes_draw_elements_base_vertex-multidrawelements'],
       run_concurrent=False)
 
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'oes_geometry_shader')) as g:
+    g(['built-in-constants_gles3',
+       os.path.join(TESTS_DIR, 'spec', 'oes_geometry_shader',
+                    'minimum-maximums.txt')],
+      'built-in constants')
+
 # Group EXT_shader_samples_identical
 with profile.group_manager(
         PiglitGLTest,
