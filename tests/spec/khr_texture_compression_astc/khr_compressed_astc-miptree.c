@@ -247,6 +247,16 @@ test_miptrees(void* input_type)
 		"GL_KHR_texture_compression_astc_hdr");
 	const bool check_error = is_hdr_test && !has_hdr;
 	int block_dims;
+
+	if (is_srgb_test)
+		/* Loosen up the tolerence for sRGB tests. This will allow testing
+		 * sRGB formats which have known precision issues in void extent
+		 * blocks. See khronos bug#11294 for details.
+		 */
+		piglit_set_tolerance_for_bits(7, 7, 7, 7);
+	else
+		piglit_set_tolerance_for_bits(8, 8, 8, 8);
+
 	for (block_dims = 0; block_dims < ARRAY_SIZE(block_dim_str); ++block_dims) {
 
 		/* Texture objects. */
