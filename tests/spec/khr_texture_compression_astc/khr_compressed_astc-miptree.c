@@ -60,6 +60,7 @@ enum test_type
 	TEST_TYPE_LDR,
 	TEST_TYPE_SRGB,
 	TEST_TYPE_SRGB_FP,
+	TEST_TYPE_SRGB_SD,
 };
 
 enum piglit_result
@@ -69,6 +70,7 @@ static enum test_type ldr_test  = TEST_TYPE_LDR;
 static enum test_type hdr_test  = TEST_TYPE_HDR;
 static enum test_type srgb_test = TEST_TYPE_SRGB;
 static enum test_type srgb_fp_test = TEST_TYPE_SRGB_FP;
+static enum test_type srgb_skip_test = TEST_TYPE_SRGB_SD;
 static const struct piglit_subtest subtests[] = {
 	{
 		"LDR Profile",
@@ -93,6 +95,12 @@ static const struct piglit_subtest subtests[] = {
 		"srgb-fp",
 		test_miptrees,
 		&srgb_fp_test,
+	},
+	{
+		"sRGB skip decode",
+		"srgb-sd",
+		test_miptrees,
+		&srgb_skip_test,
 	},
 	{NULL},
 };
@@ -159,7 +167,7 @@ load_texture(const char *dir1, const char *dir2,
 }
 
 /** Compares the compressed texture against the decompressed texture */
-bool draw_compare_levels(bool check_error,
+bool draw_compare_levels(bool check_error, bool srgb_skip_decode,
 			GLint level_pixel_size_loc, GLint pixel_offset_loc,
 			GLuint compressed_tex, GLuint decompressed_tex)
 {
@@ -179,12 +187,20 @@ bool draw_compare_levels(bool check_error,
 
 		/* Draw miplevel of compressed texture. */
 		glBindTexture(GL_TEXTURE_2D, compressed_tex);
+		if (srgb_skip_decode)
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_SRGB_DECODE_EXT,
+					GL_SKIP_DECODE_EXT);
 		glUniform2f(pixel_offset_loc, x, y);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_VERTICES);
 
 		/* Draw miplevel of decompressed texture. */
 		if (!check_error) {
 			glBindTexture(GL_TEXTURE_2D, decompressed_tex);
+			if (srgb_skip_decode)
+				glTexParameteri(GL_TEXTURE_2D,
+						GL_TEXTURE_SRGB_DECODE_EXT,
+						GL_SKIP_DECODE_EXT);
 			glUniform2f(pixel_offset_loc, LEVEL0_WIDTH + x, y);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_VERTICES);
 		}
@@ -224,9 +240,10 @@ test_miptrees(void* input_type)
 {
 	const enum test_type subtest = *(enum test_type*) input_type;
 	const bool is_srgb_test = subtest == TEST_TYPE_SRGB;
+	const bool is_srgb_skip_decode_test = subtest == TEST_TYPE_SRGB_SD;
 	const bool is_hdr_test  = subtest == TEST_TYPE_HDR;
 
-	static const char * tests[4] = {"hdr", "ldrl", "ldrs", "ldrs"};
+	static const char * tests[5] = {"hdr", "ldrl", "ldrs", "ldrs", "ldrs"};
 	static const char * block_dim_str[14] = {
 		"4x4",
 		"5x4",
@@ -247,6 +264,9 @@ test_miptrees(void* input_type)
 	GLint pixel_offset_loc = glGetUniformLocation(prog, "pixel_offset");
 	GLint level_pixel_size_loc = glGetUniformLocation(prog,
 							"level_pixel_size");
+
+	if (is_srgb_skip_decode_test)
+		piglit_require_extension("GL_EXT_texture_sRGB_decode");
 
 	/*  Check for error color if an LDR-only sys reading an HDR
 	 *  texture. No need to draw a reference mipmap in this case.
@@ -283,7 +303,7 @@ test_miptrees(void* input_type)
 
 		/* Draw and compare each level of the two textures */
 		glClear(GL_COLOR_BUFFER_BIT);
-		if (!draw_compare_levels(check_error,
+		if (!draw_compare_levels(check_error, is_srgb_skip_decode_test,
 					level_pixel_size_loc,
 					pixel_offset_loc,
 					tex_compressed,
