@@ -376,13 +376,31 @@ create_shader(GLenum type)
 {
 	if (shader_type != 0 && shader_type != type && !is_tessellation_type(shader_type))
 		return 0;
-	if (is_tessellation_type(type) &&
-	    (required_glsl_version < 400 &&
-	     !piglit_is_extension_supported("GL_ARB_tessellation_shader")))
-		return 0;
-	if (type == GL_GEOMETRY_SHADER &&
-	    (required_glsl_version < 150 || required_glsl_version == 300))
-		return 0;
+	if (es_shader) {
+		if (is_tessellation_type(type) &&
+		    required_glsl_version < 320 &&
+		    (required_glsl_version < 310 ||
+		     !piglit_is_extension_supported("GL_OES_tessellation_shader")))
+			return 0;
+
+		if (type == GL_GEOMETRY_SHADER &&
+		    required_glsl_version < 320 &&
+		    (required_glsl_version < 310 ||
+		     !piglit_is_extension_supported("GL_OES_geometry_shader")))
+			return 0;
+	} else {
+		if (is_tessellation_type(type) &&
+		    (required_glsl_version < 400 &&
+		     !piglit_is_extension_supported("GL_ARB_tessellation_shader")))
+			return 0;
+
+		/* Only support geometry shaders on desktop as introduced in
+		 * OpenGL 3.2.
+		 */
+		if (type == GL_GEOMETRY_SHADER &&
+		    required_glsl_version < 320)
+			return 0;
+	}
 	/* Only create compute shaders when explicitly requested
 	 */
 	if (type == GL_COMPUTE_SHADER && shader_type != type)
