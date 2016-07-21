@@ -95,6 +95,14 @@ def test_get_option_conf_no_option():
            None)
 
 
+@mock.patch.dict('os.environ', {}, True)
+@nt.raises(exceptions.PiglitFatalError)
+def test_get_option_required():
+    """deqp.get_option: dies if a required option cannot be retrieved."""
+    deqp.get_option('NOT_REAL', ('fake', 'fake'), default='', required=True)
+
+
+
 class TestMakeProfile(object):
     """Test deqp.make_profile."""
     @classmethod

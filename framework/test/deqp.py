@@ -41,7 +41,7 @@ __all__ = [
 ]
 
 
-def get_option(env_varname, config_option, default=None):
+def get_option(env_varname, config_option, default=None, required=False):
     """Query the given environment variable and then piglit.conf for the option.
 
     Return the value of the default argument if opt is None.
@@ -53,6 +53,10 @@ def get_option(env_varname, config_option, default=None):
 
     opt = core.PIGLIT_CONFIG.safe_get(config_option[0], config_option[1])
 
+    if required and not opt:
+        raise exceptions.PiglitFatalError(
+            'Cannot get env "{}" or conf value "{}:{}"'.format(
+                env_varname, config_option[0], config_option[1]))
     return opt or default
 
 
