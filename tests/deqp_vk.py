@@ -35,7 +35,8 @@ __all__ = ['profile']
 
 # Path to the deqp-gles3 executable.
 _DEQP_VK_BIN = deqp.get_option('PIGLIT_DEQP_VK_BIN',
-                               ('deqp-vk', 'bin'))
+                               ('deqp-vk', 'bin'),
+                               required=True)
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_VK_EXTRA_ARGS',
                               ('deqp-vk', 'extra_args'),

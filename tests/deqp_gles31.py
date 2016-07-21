@@ -30,7 +30,8 @@ __all__ = ['profile']
 
 # Path to the deqp-gles3 executable.
 _DEQP_GLES31_BIN = deqp.get_option('PIGLIT_DEQP_GLES31_BIN',
-                                   ('deqp-gles31', 'bin'))
+                                   ('deqp-gles31', 'bin'),
+                                   required=True)
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES31_EXTRA_ARGS',
                               ('deqp-gles31', 'extra_args'),

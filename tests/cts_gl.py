@@ -50,7 +50,8 @@ from framework.test import deqp
 
 __all__ = ['profile']
 
-_CTS_BIN = deqp.get_option('PIGLIT_CTS_GL_BIN', ('cts_gl', 'bin'))
+_CTS_BIN = deqp.get_option('PIGLIT_CTS_GL_BIN', ('cts_gl', 'bin'),
+                           required=True)
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_CTS_GL_EXTRA_ARGS', ('cts_gl', 'extra_args'),
                               default='').split()

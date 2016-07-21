@@ -32,7 +32,8 @@ __all__ = ['profile']
 
 # Path to the deqp-gles3 executable.
 _DEQP_GLES3_EXE = deqp.get_option('PIGLIT_DEQP_GLES3_EXE',
-                                  ('deqp-gles3', 'exe'))
+                                  ('deqp-gles3', 'exe'),
+                                  required=True)
 
 # Path to the xml file which contained the case list of the subset of dEQP
 # and marked as must pass in CTS.
