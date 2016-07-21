@@ -463,10 +463,13 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 
 	/* Tessellation shaders must use the #extension directive. */
-	if (piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
+	const char *const tess_ext_name = es_shader
+		? "GL_OES_tessellation_shader"
+		: "GL_ARB_tessellation_shader";
+	if (piglit_is_extension_supported(tess_ext_name)) {
 		assert(num_required_extensions < ARRAY_SIZE(required_extensions));
 		required_extensions[num_required_extensions] =
-			strdup("GL_ARB_tessellation_shader");
+			strdup(tess_ext_name);
 		num_required_extensions++;
 	}
 
