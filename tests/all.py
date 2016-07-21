@@ -4354,8 +4354,12 @@ with profile.group_manager(
     g(['khr_compressed_astc-array_gles3'], 'array-gles')
     g(['khr_compressed_astc-basic_gl'], 'basic-gl')
     g(['khr_compressed_astc-basic_gles2'], 'basic-gles')
-    g(['khr_compressed_astc-miptree_gl'], 'miptree-gl')
-    g(['khr_compressed_astc-miptree_gles2'], 'miptree-gles')
+
+    for subtest in ('hdr', 'ldr', 'srgb'):
+        g(['khr_compressed_astc-miptree_gl', '-subtest', subtest],
+           'miptree-gl {}'.format(subtest))
+        g(['khr_compressed_astc-miptree_gles2', '-subtest', subtest],
+           'miptree-gles {}'.format(subtest))
 
 with profile.group_manager(
          PiglitGLTest,
