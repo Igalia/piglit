@@ -4748,16 +4748,19 @@ with profile.group_manager(
               '{} with {}'.format(object_type, operation))
 
 # Group ARB_texture_barrier
+resolution_set = ['32', '512']
+blend_passes_set = ['1', '42']
+num_textures_set = ['1', '8']
+granularity_set = ['8', '64', '128']
+draw_passes_set = ['1', '2', '3', '4', '7', '8']
+
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_barrier')) as g:
-    for resolution in ['32', '512']:
-        for blend_passes in ['1', '42']:
-            for num_textures in ['1', '8']:
-                for granularity in ['8', '64', '128']:
-                    for draw_passes in ['1', '2', '3', '4', '7', '8']:
-                        g(['arb_texture_barrier-blending-in-shader', resolution,
-                           blend_passes, num_textures, granularity, draw_passes])
+    for resolution, blend_passes, num_textures, granularity, draw_passes in itertools.product(
+            resolution_set, blend_passes_set, num_textures_set, granularity_set, draw_passes_set):
+        g(['arb_texture_barrier-blending-in-shader', resolution,
+           blend_passes, num_textures, granularity, draw_passes])
 
 
 # Group ARB_invalidate_subdata
