@@ -39,4 +39,7 @@ enum piglit_result
 egl_image_for_dma_buf_fd(int fd, int fourcc, int w, int h,
 			 unsigned stride, unsigned offset, EGLImageKHR *out_img);
 
+enum piglit_result
+texture_for_egl_image(EGLImageKHR img, GLuint *out_tex);
+
 #endif /* SAMPLE_COMMON_H */

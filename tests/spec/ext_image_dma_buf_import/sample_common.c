@@ -47,10 +47,10 @@ static const char vs_src[] =
 	"	gl_Position = piglit_vertex;\n"
 	"}\n";
 
-static enum piglit_result
-sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
+enum piglit_result
+texture_for_egl_image(EGLImageKHR img, GLuint *out_tex)
 {
-	GLuint prog, tex;
+	GLuint tex;
 	GLenum error;
 
 	glGenTextures(1, &tex);
@@ -78,6 +78,21 @@ sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
 			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER,
 			GL_NEAREST);
+
+	*out_tex = tex;
+
+	return PIGLIT_PASS;
+}
+
+static enum piglit_result
+sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
+{
+	GLuint prog, tex;
+	enum piglit_result res;
+
+	res = texture_for_egl_image(img, &tex);
+	if (res != PIGLIT_PASS)
+		return res;
 
 	prog = piglit_build_simple_program(vs_src, fs_src);
 	
