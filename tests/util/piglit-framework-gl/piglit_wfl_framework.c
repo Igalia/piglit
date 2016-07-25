@@ -281,10 +281,6 @@ parse_test_config(const struct piglit_gl_test_config *test_config,
 			head_attrib_list[i++] = minor_version;
 			break;
 			}
-
-		default:
-			assert(0);
-			return NULL;
 	}
 
 	/* There are no 3.1 core profiles -- the closest is 3.1 context without
