@@ -183,7 +183,7 @@ parse_test_config(const struct piglit_gl_test_config *test_config,
                   enum context_flavor flavor,
                   char buf[], size_t bufsize,
                   const int32_t partial_attrib_list[],
-                  const int32_t *attrib_list[])
+                  int32_t *attrib_list[])
 {
 	const char *api_str, *profile_str = "", *fwd_compat_str = "",
 	           *debug_str = "";
