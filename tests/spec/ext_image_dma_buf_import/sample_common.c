@@ -84,20 +84,16 @@ texture_for_egl_image(EGLImageKHR img, GLuint *out_tex)
 	return PIGLIT_PASS;
 }
 
-static enum piglit_result
-sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
+void
+sample_tex(GLuint tex, unsigned w, unsigned h)
 {
-	GLuint prog, tex;
-	enum piglit_result res;
-
-	res = texture_for_egl_image(img, &tex);
-	if (res != PIGLIT_PASS)
-		return res;
+	GLuint prog;
 
 	prog = piglit_build_simple_program(vs_src, fs_src);
 	
 	glUseProgram(prog);
 
+	glBindTexture(GL_TEXTURE_EXTERNAL_OES, tex);
 	glUniform1i(glGetUniformLocation(prog, "sampler"), 0);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -108,11 +104,6 @@ sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
 
 	glDeleteProgram(prog);
 	glUseProgram(0);
-
-	glDeleteTextures(1, &tex);
-	eglDestroyImageKHR(eglGetCurrentDisplay(), img);
-
-	return PIGLIT_PASS;
 }
 
 enum piglit_result
@@ -207,6 +198,7 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 {
 	enum piglit_result res;
 	EGLImageKHR img;
+	GLuint tex;
 
 	res = egl_image_for_dma_buf_fd(fd, fourcc, w, h, stride, offset, &img);
 
@@ -221,7 +213,17 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 	if (res != PIGLIT_PASS)
 		return res;
 
-	return sample_and_destroy_img(w, h, img);
+	res = texture_for_egl_image(img, &tex);
+	if (res != PIGLIT_PASS)
+		goto destroy;
+
+	sample_tex(tex, w, h);
+
+destroy:
+	glDeleteTextures(1, &tex);
+	eglDestroyImageKHR(eglGetCurrentDisplay(), img);
+
+	return res;
 }
 
 enum piglit_result

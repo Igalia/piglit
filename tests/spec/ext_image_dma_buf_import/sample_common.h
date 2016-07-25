@@ -42,4 +42,7 @@ egl_image_for_dma_buf_fd(int fd, int fourcc, int w, int h,
 enum piglit_result
 texture_for_egl_image(EGLImageKHR img, GLuint *out_tex);
 
+void
+sample_tex(GLuint tex, unsigned w, unsigned h);
+
 #endif /* SAMPLE_COMMON_H */
