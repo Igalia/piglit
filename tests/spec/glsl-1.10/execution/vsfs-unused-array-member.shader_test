@@ -1,0 +1,37 @@
+# This test verifies that varyings are assigned correctly when a fragment
+# shader doesn't read from all elements of a varying array.
+#
+# This used to fail due to a bug in st/mesa that was visible in Overlord.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 data;
+
+varying vec4 a[3];
+varying float b;
+
+void main()
+{
+  a[0] = data.xxxx;
+  a[1] = data.yyyy;
+  a[2] = data.zzzz;
+  b = data.w;
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+varying vec4 a[3];
+varying float b;
+
+void main()
+{
+  gl_FragColor = vec4(a[0].x, a[2].x, b, 1.0);
+}
+
+[test]
+uniform vec4 data 0.2 0.4 0.6 0.8
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.6 0.8 1.0
