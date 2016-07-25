@@ -85,7 +85,7 @@ texture_for_egl_image(EGLImageKHR img, GLuint *out_tex)
 }
 
 void
-sample_tex(GLuint tex, unsigned w, unsigned h)
+sample_tex(GLuint tex, unsigned x, unsigned y, unsigned w, unsigned h)
 {
 	GLuint prog;
 
@@ -96,7 +96,7 @@ sample_tex(GLuint tex, unsigned w, unsigned h)
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, tex);
 	glUniform1i(glGetUniformLocation(prog, "sampler"), 0);
 
-	glViewport(0, 0, w, h);
+	glViewport(x, y, w, h);
 	piglit_draw_rect_tex(-1, -1, 2, 2,
 			     0, 0, 1, 1);
 
@@ -215,7 +215,7 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 	if (res != PIGLIT_PASS)
 		goto destroy;
 
-	sample_tex(tex, w, h);
+	sample_tex(tex, 0, 0, w, h);
 
 destroy:
 	glDeleteTextures(1, &tex);

@@ -43,6 +43,6 @@ enum piglit_result
 texture_for_egl_image(EGLImageKHR img, GLuint *out_tex);
 
 void
-sample_tex(GLuint tex, unsigned w, unsigned h);
+sample_tex(GLuint tex, unsigned x, unsigned y, unsigned w, unsigned h);
 
 #endif /* SAMPLE_COMMON_H */
