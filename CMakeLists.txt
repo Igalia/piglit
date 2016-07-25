@@ -141,6 +141,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	if(GBM_FOUND)
 		set(PIGLIT_HAS_GBM True)
 		add_definitions(-DPIGLIT_HAS_GBM)
+		if (GBM_VERSION VERSION_GREATER "11.1")
+			set(PIGLIT_HAS_GBM_BO_MAP True)
+			add_definitions(-DPIGLIT_HAS_GBM_BO_MAP)
+		endif()
 	endif(GBM_FOUND)
 
 	pkg_check_modules(WAYLAND QUIET wayland-client wayland-egl)
@@ -177,7 +181,8 @@ ENDIF()
 # drm-prime arrived in that version.
 #
 if(LIBDRM_FOUND AND XCB_DRI2_FOUND AND
-   (LIBDRM_INTEL_VERSION VERSION_GREATER "2.4.37"))
+   ((LIBDRM_INTEL_VERSION VERSION_GREATER "2.4.37") OR
+     PIGLIT_HAS_GBM_BO_MAP))
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID true)
 else()
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID false)

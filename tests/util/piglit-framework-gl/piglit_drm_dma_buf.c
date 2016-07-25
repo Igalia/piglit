@@ -26,6 +26,9 @@
 #ifdef HAVE_LIBDRM_INTEL
 #include <libdrm/intel_bufmgr.h>
 #endif
+#ifdef PIGLIT_HAS_GBM_BO_MAP
+#include <gbm.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -182,6 +185,97 @@ piglit_intel_buf_destroy(struct piglit_dma_buf *buf)
 }
 #endif /* HAVE_LIBDRM_INTEL */
 
+#ifdef PIGLIT_HAS_GBM_BO_MAP
+static struct gbm_device *
+piglit_gbm_get(void)
+{
+	const struct piglit_drm_driver *drv = piglit_drm_get_driver();
+	static struct gbm_device *gbm = NULL;
+
+	if (gbm)
+		return gbm;
+
+	gbm = gbm_create_device(drv->fd);
+
+	return gbm;
+}
+
+static bool
+piglit_gbm_buf_create(unsigned w, unsigned h, unsigned cpp,
+			const unsigned char *src_data, unsigned src_stride,
+			struct piglit_dma_buf *buf)
+{
+	unsigned i;
+	struct gbm_bo *bo;
+	uint32_t dst_stride;
+	struct gbm_device *gbm = piglit_gbm_get();
+	void *dst_data;
+	void *map_data = NULL;
+	enum gbm_bo_format format;
+
+	if (!gbm || h % 2)
+		return false;
+
+	/* It would be nice if we took in a fourcc instead of a cpp */
+	switch (cpp) {
+	case 1:
+		format = GBM_FORMAT_C8;
+		break;
+	case 4:
+		format = GBM_BO_FORMAT_ARGB8888;
+		break;
+	default:
+		fprintf(stderr, "Unknown cpp %d\n", cpp);
+		return false;
+	}
+
+	bo = gbm_bo_create(gbm, w, h, format, GBM_BO_USE_RENDERING);
+	if (!bo)
+		return false;
+
+	dst_data = gbm_bo_map(bo, 0, 0, w, h, GBM_BO_TRANSFER_WRITE,
+			      &dst_stride, &map_data);
+	if (!dst_data) {
+		fprintf(stderr, "Failed to map GBM bo\n");
+		gbm_bo_destroy(bo);
+		return NULL;
+	}
+
+	for (i = 0; i < h; ++i) {
+		memcpy((char *)dst_data + i * dst_stride,
+		       src_data + i * src_stride,
+		       w * cpp);
+	}
+	gbm_bo_unmap(bo, map_data);
+
+	buf->w = w;
+	buf->h = h;
+	buf->stride = dst_stride;
+	buf->fd = 0;
+	buf->priv = bo;
+
+	return true;
+}
+
+static bool
+piglit_gbm_buf_export(struct piglit_dma_buf *buf)
+{
+	struct gbm_bo *bo = buf->priv;
+
+	buf->fd = gbm_bo_get_fd(bo);
+
+	return buf->fd >= 0;
+}
+
+static void
+piglit_gbm_buf_destroy(struct piglit_dma_buf *buf)
+{
+	struct gbm_bo *bo = buf->priv;
+
+	gbm_bo_destroy(bo);
+}
+#endif /* PIGLIT_HAS_GBM_BO_MAP */
+
 static const struct piglit_drm_driver *
 piglit_drm_get_driver(void)
 {
@@ -226,6 +320,13 @@ piglit_drm_get_driver(void)
 		drv.create = piglit_intel_buf_create;
 		drv.export = piglit_intel_buf_export;
 		drv.destroy = piglit_intel_buf_destroy;
+	}
+#endif
+#ifdef PIGLIT_HAS_GBM_BO_MAP
+	else if (true) {
+		drv.create = piglit_gbm_buf_create;
+		drv.export = piglit_gbm_buf_export;
+		drv.destroy = piglit_gbm_buf_destroy;
 	}
 #endif
 	else {
