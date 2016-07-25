@@ -27,25 +27,14 @@ from __future__ import (
 )
 import os
 
-import nose.tools as nt
 import six
-try:
-    from six.moves import getcwd
-except ImportError:
-    # pylint: disable=no-member
-    if six.PY2:
-        getcwd = os.getcwdu
-    elif six.PY3:
-        getcwd = os.getcwd
-    # pylint: enable=no-member
 
 from framework.summary import html_
-from . import utils
 
 
-@utils.nose.test_in_tempdir
-def test_copy_static():
+def test_copy_static(tmpdir):
     """summary.html_._copy_static: puts status content in correct locations"""
-    html_._copy_static_files(getcwd())
-    nt.ok_(os.path.exists('index.css'), msg='index.css not created correctly')
-    nt.ok_(os.path.exists('result.css'), msg='result.css not created correctly')
+    tmpdir.chdir()
+    html_._copy_static_files(six.text_type(tmpdir))
+    assert os.path.exists('index.css'), 'index.css not created correctly'
+    assert os.path.exists('result.css'), 'result.css not created correctly'
