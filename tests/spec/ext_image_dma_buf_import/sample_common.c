@@ -110,9 +110,9 @@ sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
 	return PIGLIT_PASS;
 }
 
-static enum piglit_result
-sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
-	unsigned stride, unsigned offset)
+enum piglit_result
+egl_image_for_dma_buf_fd(int fd, int fourcc, int w, int h,
+			 unsigned stride, unsigned offset, EGLImageKHR *out_img)
 {
 	EGLint error;
 	EGLImageKHR img;
@@ -170,10 +170,9 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 	}
 
 	img = eglCreateImageKHR(eglGetCurrentDisplay(), EGL_NO_CONTEXT,
-				EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)0, attr);
-
-	/* Release the creator side of the buffer. */
-	piglit_destroy_dma_buf(buf);
+				 EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)0,
+				 attr);
+	*out_img = img;
 
 	error = eglGetError();
 
@@ -185,9 +184,6 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 		printf("eglCreateImageKHR() failed: %s 0x%x\n",
 			piglit_get_egl_error_name(error), error);
 
-		/* Close the descriptor also, EGL does not have ownership */
-		close(fd);
-
 		return PIGLIT_FAIL;
 	}
 
@@ -195,6 +191,30 @@ sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
 		fprintf(stderr, "image creation succeeded but returned NULL\n");
 		return PIGLIT_FAIL;
 	}
+
+	*out_img = img;
+	return PIGLIT_PASS;
+}
+
+static enum piglit_result
+sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
+	      unsigned stride, unsigned offset)
+{
+	enum piglit_result res;
+	EGLImageKHR img;
+
+	res = egl_image_for_dma_buf_fd(fd, fourcc, w, h, stride, offset, &img);
+
+	/* Release the creator side of the buffer. */
+	piglit_destroy_dma_buf(buf);
+
+	if (!img) {
+		/* Close the descriptor also, EGL does not have ownership */
+		close(fd);
+	}
+
+	if (res != PIGLIT_PASS)
+		return res;
 
 	return sample_and_destroy_img(w, h, img);
 }

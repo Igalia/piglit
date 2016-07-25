@@ -35,4 +35,8 @@ enum piglit_result
 dma_buf_create_and_sample_32bpp(unsigned w, unsigned h, unsigned cpp,
 			        int fourcc, const unsigned char *src);
 
+enum piglit_result
+egl_image_for_dma_buf_fd(int fd, int fourcc, int w, int h,
+			 unsigned stride, unsigned offset, EGLImageKHR *out_img);
+
 #endif /* SAMPLE_COMMON_H */
