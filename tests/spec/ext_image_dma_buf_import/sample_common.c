@@ -37,25 +37,15 @@ static const char fs_src[] =
 	"gl_FragColor = texture2D(sampler, texcoords);\n"
 	"}\n";
 static const char vs_src[] =
-	"attribute vec4 position;\n"
+	"attribute vec4 piglit_vertex;\n"
+	"attribute vec4 piglit_texcoords;\n"
 	"varying vec2 texcoords;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"texcoords = 0.5 * (position.xy + vec2(1.0, 1.0));\n"
-	"gl_Position = position;\n"
+	"	texcoords = piglit_texcoords.xy;\n"
+	"	gl_Position = piglit_vertex;\n"
 	"}\n";
-
-static void
-set_vertices(GLuint prog)
-{
-	static const GLfloat v[] = { -1.0f,  1.0f, -1.0f, -1.0f,
-				      1.0f, -1.0f,  1.0f,  1.0f };
-
-	GLint i = glGetAttribLocation(prog, "position");
-	glVertexAttribPointer(i, 2, GL_FLOAT, GL_FALSE, 0, v);
-	glEnableVertexAttribArray(i);
-}
 
 static enum piglit_result
 sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
@@ -94,12 +84,12 @@ sample_and_destroy_img(unsigned w, unsigned h, EGLImageKHR img)
 	glUseProgram(prog);
 
 	glUniform1i(glGetUniformLocation(prog, "sampler"), 0);
-	set_vertices(prog);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glViewport(0, 0, w, h);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	piglit_draw_rect_tex(-1, -1, 2, 2,
+			     0, 0, 1, 1);
 
 	glDeleteProgram(prog);
 	glUseProgram(0);
