@@ -55,9 +55,11 @@ piglit_display(void)
 		src[ 6], src[ 5], src[ 4], force_alpha_to_one ? 255 : src[ 7],
 		src[10], src[ 9], src[ 8], force_alpha_to_one ? 255 : src[11],
 		src[14], src[13], src[12], force_alpha_to_one ? 255 : src[15] };
-	enum piglit_result res = dma_buf_create_and_sample_32bpp(
-					2, 2, 4, fourcc, src);
+	enum piglit_result res;
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	res = dma_buf_create_and_sample_32bpp(2, 2, 4, fourcc, src);
 	if (res != PIGLIT_PASS)
 		return res;
 

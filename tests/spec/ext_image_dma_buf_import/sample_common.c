@@ -96,8 +96,6 @@ sample_tex(GLuint tex, unsigned w, unsigned h)
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, tex);
 	glUniform1i(glGetUniformLocation(prog, "sampler"), 0);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glViewport(0, 0, w, h);
 	piglit_draw_rect_tex(-1, -1, 2, 2,
 			     0, 0, 1, 1);

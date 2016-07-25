@@ -106,6 +106,8 @@ piglit_display(void)
 		return PIGLIT_SKIP;
 	}
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	res = dma_buf_create_and_sample_32bpp(4, 4, 1, fourcc, t);
 	if (res != PIGLIT_PASS)
 		return res;
