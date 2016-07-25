@@ -115,8 +115,12 @@ piglit_display(void)
 	 */
 	piglit_set_tolerance_for_bits(5, 6, 5, 8);
 
-	return piglit_probe_image_ubyte(0, 0, 4, 4, GL_RGBA, expected) ?
-			PIGLIT_PASS : PIGLIT_FAIL;
+	if (!piglit_probe_image_ubyte(0, 0, 4, 4, GL_RGBA, expected))
+		res = PIGLIT_FAIL;
+
+	piglit_present_results();
+
+	return res;
 }
 
 static int

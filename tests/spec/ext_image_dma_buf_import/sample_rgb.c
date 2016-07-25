@@ -61,8 +61,12 @@ piglit_display(void)
 	if (res != PIGLIT_PASS)
 		return res;
 
-	return piglit_probe_image_ubyte(0, 0, 2, 2, GL_RGBA, expected) ?
-			PIGLIT_PASS : PIGLIT_FAIL;
+	if (!piglit_probe_image_ubyte(0, 0, 2, 2, GL_RGBA, expected))
+		res = PIGLIT_FAIL;
+
+	piglit_present_results();
+
+	return res;
 }
 
 static int
