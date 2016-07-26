@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Intel Corporation
+# Copyright (c) 2014, 2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,12 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Provides tests for external integration with piglit
+"""Provides tests for external integration with piglit.
 
 These tests are by no means comprehensive, nor are they meant to be. The goal
 is mainly just a sanity check to make sure the modules don't contain syntax
 errors and to ensure that the API hasn't changed without fixing these modules
-
 """
 
 from __future__ import (
@@ -31,9 +30,10 @@ from __future__ import (
 )
 import importlib
 
-from nose.plugins.skip import SkipTest
+import pytest
 
-from framework import core, exceptions
+from framework import core
+from framework import exceptions
 
 
 def setup_module():
@@ -47,13 +47,12 @@ def _import(name):
     It is very important that we use import_module to get the module, since we
     need more than just the profile, since we want to ensure that the Test
     derived class is importable.
-
     """
     try:
         return importlib.import_module(name)
     except exceptions.PiglitFatalError:
-        raise SkipTest('The module experienced a fatal error. '
-                       'This may be expected.')
+        pytest.skip('The module experienced a fatal error. '
+                    'This may be expected.')
 
 
 def test_xts_import():
