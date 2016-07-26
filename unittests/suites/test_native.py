@@ -30,27 +30,27 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import importlib
-import os.path as path
+import os.path
 
-from nose.plugins.skip import SkipTest
+import pytest
 
-from . import utils
+MODULES = [
+    'all',
+    pytest.mark.skipif(not os.path.exists('generated_tests/cl/builtin'),
+                       reason='Requires that CL functionality is built')('cl'),
+    'cpu',
+    'glslparser',
+    'gpu',
+    'llvmpipe',
+    'quick',
+    'shader',
+]
 
 
-@utils.nose.generator
-def gen_test_import():
-    """ Generates a bunch of tests to import the various test modules """
-    def check_import(module):
-        """ Test that a module can be imported """
-        if not path.exists('bin'):
-            raise SkipTest(
-                "Piglit has not been compiled, this test will not work")
+@pytest.mark.parametrize('name', MODULES)
+@pytest.mark.skipif(not os.path.exists('bin'),
+                    reason='This test requires the C layer to be built.')
+def test_import(name):
+    """Test that each built-in module can be imported."""
 
-        importlib.import_module(module)
-
-    # Test the various OpenGL modules
-    for module in ['all', 'quick', 'gpu', 'sanity', 'cpu', 'llvmpipe', 'cl',
-                   'quick_cl', 'shader', 'glslparser']:
-        check_import.description = \
-            "tests.{}: Can be successfully imported".format(module)
-        yield check_import, "tests." + module
+    importlib.import_module('tests.{}'.format(name))
