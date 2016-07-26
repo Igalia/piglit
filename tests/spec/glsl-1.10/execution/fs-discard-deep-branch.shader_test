@@ -1,0 +1,42 @@
+# This tests discard in nested if-statements. The additional code in the outer
+# if-statement caused this to miscompile in Mesa.
+
+[require]
+GLSL >= 1.10
+SIZE 20 20
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform bool use_discard;
+uniform float boundary;
+uniform vec4 color;
+
+void main()
+{
+	if (use_discard) {
+		float tmp;
+		tmp = boundary * 0.5;
+		if (gl_FragCoord.x < tmp)
+			discard;
+	}
+
+	gl_FragColor = color;
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+
+uniform uint use_discard 1
+uniform float boundary 20.0
+uniform vec4 color 0.0 1.0 0.0 1.0
+
+draw rect -1 -1 2 2
+probe rect rgba (0, 0, 10, 20) (1.0, 0.0, 0.0, 1.0)
+probe rect rgba (10, 0, 10, 20) (0.0, 1.0, 0.0, 1.0)
+
+uniform uint use_discard 0
+uniform vec4 color 0.0 0.0 1.0 1.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 1.0 1.0
