@@ -55,9 +55,24 @@ def _import(name):
                     'This may be expected.')
 
 
-def test_xts_import():
-    """ xts.py can be imported """
-    _import('tests.xts')
+@pytest.mark.parametrize("name", [
+    'tests.cts_gl',
+    'tests.cts_gles',
+    'tests.deqp_gles2',
+    'tests.deqp_gles3',
+    'tests.deqp_gles31',
+    'tests.deqp_vk',
+    'tests.es3conform',
+    'tests.igt',
+    'tests.oglconform',
+    'tests.xts',
+    'tests.xts-render',
+])
+def test_import(name):
+    """Try to import tests, if they raise an error skip."""
+    # TODO: Figure out what is necissary for each test to run, or catch
+    # specific errors as skips rather than any of them.
+    _import(name)
 
 
 def test_xts_xtstest():
@@ -72,31 +87,16 @@ def test_xts_xtsprofile():
     mod.XTSProfile()
 
 
-def test_igt_import():
-    """ igt.py can be imported """
-    _import('tests.igt')
-
-
 def test_igt_igttest():
     """ igt.IGTTest initializes """
     mod = _import('tests.igt')
     mod.IGTTest('foo')
 
 
-def test_es3conform_import():
-    """ es3conform.py can be imported """
-    _import('tests.es3conform')
-
-
 def test_es3conform_gtftest():
     """ es3conform.GTFTest initializes """
     mod = _import('tests.es3conform')
     mod.GTFTest('testpath')
-
-
-def test_oglconform_import():
-    """ oglconform.py can be imported """
-    _import('tests.oglconform')
 
 
 def test_oglconform_oglctest():
