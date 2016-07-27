@@ -35,8 +35,12 @@ import nose.tools as nt
 
 from framework import results, backends, grouptools, status
 from . import utils
-from .backends_tests import BACKEND_INITIAL_META
 
+BACKEND_INITIAL_META = {
+    'name': 'name',
+    'test_count': 0,
+    'env': {},
+}
 
 JUNIT_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema', 'junit-7.xsd')
 
