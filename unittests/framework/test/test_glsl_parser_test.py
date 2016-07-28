@@ -216,7 +216,6 @@ def test_blank_in_config_c(tmpdir):
                             six.text_type(p), 'pass', '1.10']
 
 
-@pytest.mark.xfail
 def test_empty_in_config_c(tmpdir):
     """test.glsl_parser_test.GLSLParserTest: C style comments can have blank
     commented lines."""

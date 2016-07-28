@@ -224,7 +224,7 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         for line in lines:
             # If strip renendered '' that means we had a blank newline,
             # just go on
-            if line in ['', '//']:
+            if line in ['', '//', '*']:
                 continue
             # If we get to the end of the config break
             elif is_header.match(line):
