@@ -131,8 +131,6 @@ class TestJSONBackend(object):
             with tmpdir.join('results.json').open('r') as f:
                 json.load(f)
 
-        # Currently our concurrent flag is set incorrectly
-        @pytest.mark.xfail
         def test_results_are_valid(self, tmpdir):
             """Test that the values produced are valid."""
             with tmpdir.join('results.json').open('r') as f:
