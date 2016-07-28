@@ -95,6 +95,7 @@ static int gl_max_varying_components;
 static int gl_max_clip_planes;
 
 static const char *test_start = NULL;
+static unsigned test_start_line_num = 0;
 
 static GLuint vertex_shaders[256];
 static unsigned num_vertex_shaders = 0;
@@ -1120,6 +1121,7 @@ static void
 process_test_script(const char *script_name)
 {
 	unsigned text_size;
+	unsigned line_num;
 	char *text = piglit_load_text_file(script_name, &text_size);
 	enum states state = none;
 	const char *line = text;
@@ -1128,6 +1130,8 @@ process_test_script(const char *script_name)
 		printf("could not read file \"%s\"\n", script_name);
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
+	line_num = 1;
 
 	while (line[0] != '\0') {
 		if (line[0] == '[') {
@@ -1172,6 +1176,7 @@ process_test_script(const char *script_name)
 				vertex_data_start = NULL;
 			} else if (string_match("[test]", line)) {
 				test_start = strchrnul(line, '\n');
+				test_start_line_num = line_num + 1;
 				if (test_start[0] != '\0')
 					test_start++;
 				return;
@@ -1220,6 +1225,8 @@ process_test_script(const char *script_name)
 		line = strchrnul(line, '\n');
 		if (line[0] != '\0')
 			line++;
+
+		line_num++;
 	}
 
 	leave_state(state, line);
@@ -2823,7 +2830,8 @@ enum piglit_result
 piglit_display(void)
 {
 	const char *line, *next_line;
-	enum piglit_result result = PIGLIT_PASS;
+	unsigned line_num;
+	enum piglit_result full_result = PIGLIT_PASS;
 	GLbitfield clear_bits = 0;
 	bool link_error_expected = false;
 	int ubo_array_index = 0;
@@ -2832,13 +2840,14 @@ piglit_display(void)
 		return PIGLIT_PASS;
 
 	next_line = test_start;
+	line_num = test_start_line_num;
 	while (next_line[0] != '\0') {
 		float c[32];
 		double d[4];
 		int x, y, z, w, h, l, tex, level;
 		unsigned ux, uy;
 		char s[32];
-
+		enum piglit_result result = PIGLIT_PASS;
 
 		line = eat_whitespace(next_line);
 
@@ -3359,6 +3368,13 @@ piglit_display(void)
 		}
 
 		free((void*) line);
+
+		if (result != PIGLIT_PASS) {
+			printf("Test failure on line %u\n", line_num);
+			full_result = result;
+		}
+
+		line_num++;
 	}
 
 	if (!link_ok && !link_error_expected) {
@@ -3383,7 +3399,7 @@ piglit_display(void)
 #endif
 	}
 
-	return result;
+	return full_result;
 }
 
 
