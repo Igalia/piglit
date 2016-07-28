@@ -429,7 +429,9 @@ class ValgrindMixin(object):
         if options.OPTIONS.valgrind:
             # If the underlying test failed, simply report
             # 'skip' for this valgrind test.
-            if self.result.result != 'pass':
+            if self.result.result != 'pass' and (
+                    self.result.result != 'warn' and
+                    self.result.returncode != 0):
                 self.result.result = 'skip'
             elif self.result.returncode == 0:
                 # Test passes and is valgrind clean.

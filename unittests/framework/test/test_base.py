@@ -395,9 +395,6 @@ class TestValgrindMixin(object):
             test.run()
             assert test.result.result is status.PASS
 
-        # There is a bug in Valgrind mixin, It needs to handle warn, since
-        # Test will set a returncode of != 0 to warn
-        @pytest.mark.xfail
         def test_failed_valgrind(self, mocker):
             """test.base.ValgrindMixin.run: when a test is 'pass' but
             returncode is not 0 it's 'fail'.
