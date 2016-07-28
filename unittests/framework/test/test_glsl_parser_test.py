@@ -454,10 +454,10 @@ def test_add_compatibility_requirement_fastskip(version, extension, tmpdir,
 
 
 @pytest.mark.parametrize("version,extension", [
-    pytest.mark.xfail(('1.00', 'ARB_ES2_compatibility')),
-    pytest.mark.xfail(('3.00', 'ARB_ES3_compatibility')),
-    pytest.mark.xfail(('3.10', 'ARB_ES3_1_compatibility')),
-    pytest.mark.xfail(('3.20', 'ARB_ES3_2_compatibility')),
+    ('1.00', 'ARB_ES2_compatibility'),
+    ('3.00', 'ARB_ES3_compatibility'),
+    ('3.10', 'ARB_ES3_1_compatibility'),
+    ('3.20', 'ARB_ES3_2_compatibility'),
 ])
 def test_add_compatibility_requirement_binary(version, extension, tmpdir,
                                               mocker):

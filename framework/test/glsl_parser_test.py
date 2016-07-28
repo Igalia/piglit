@@ -136,7 +136,9 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
                 ver = '3_1'
             elif self.glsl_es_version == 3.2:
                 ver = '3_2'
-            self.gl_required.add('ARB_ES{}_compatibility'.format(ver))
+            ext = 'ARB_ES{}_compatibility'.format(ver)
+            self.gl_required.add(ext)
+            self._command.append(ext)
 
     @staticmethod
     def __pick_binary(version):
