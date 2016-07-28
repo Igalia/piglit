@@ -33,6 +33,7 @@ try:
 except ImportError:
     from unittests import mock
 
+import jsonschema
 import pytest
 import six
 
@@ -44,6 +45,9 @@ from framework import results
 from . import shared
 
 # pylint: disable=no-self-use,protected-access
+
+SCHEMA = os.path.join(os.path.dirname(__file__), 'schema',
+                      'piglit-{}.json'.format(backends.json.CURRENT_JSON_VERSION))
 
 
 @pytest.yield_fixture(scope='module', autouse=True)
@@ -126,6 +130,18 @@ class TestJSONBackend(object):
             # schema is correct
             with tmpdir.join('results.json').open('r') as f:
                 json.load(f)
+
+        # Currently our concurrent flag is set incorrectly
+        @pytest.mark.xfail
+        def test_results_are_valid(self, tmpdir):
+            """Test that the values produced are valid."""
+            with tmpdir.join('results.json').open('r') as f:
+                json_ = json.load(f)
+
+            with open(SCHEMA, 'r') as f:
+                schema = json.load(f)
+
+            jsonschema.validate(json_, schema)
 
 
 class TestUpdateResults(object):

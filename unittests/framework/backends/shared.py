@@ -25,12 +25,14 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
+from framework.options import OPTIONS
+
 
 INITIAL_METADATA = {
     'name': 'name',
     'test_count': 0,
     'env': {},
-    'options': {},
+    'options': dict(OPTIONS),
 }
 
 # This is current JSON data, in raw form with only the minimum required
