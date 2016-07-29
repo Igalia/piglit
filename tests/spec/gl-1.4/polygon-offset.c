@@ -1,9 +1,9 @@
 /*
  * BEGIN_COPYRIGHT -*- glean -*-
- * 
+ *
  * Copyright (C) 2001  Allen Akin   All Rights Reserved.
- * Copyright (C) 2014  Intel Corporation   All Rights Reserved.  
- * 
+ * Copyright (C) 2014  Intel Corporation   All Rights Reserved.
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,11 +12,11 @@
  * sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the
  * Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
@@ -24,7 +24,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- * 
+ *
  * END_COPYRIGHT
  */
 
@@ -35,7 +35,7 @@
  * This test verifies glPolygonOffset.  It is run on every OpenGL-capable
  * drawing surface configuration that supports creation of a window, has a
  * depth buffer, and is RGB.
- * 
+ *
  * The first subtest verifies that the OpenGL implementation is using a
  * plausible value for the "minimum resolvable difference" (MRD).  This is the
  * offset in window coordinates that is sufficient to provide separation in
@@ -49,7 +49,7 @@
  * the "actual" MRD.  The subtest performs these checks twice, once close to
  * the viewpoint and once far away from it, and passes if the largest of the
  * ideal MRDs and the largest of the actual MRDs are nearly the same.
- * 
+ *
  * The second subtest verifies that the OpenGL implementation is producing
  * plausible values for slope-dependent offsets.  The OpenGL spec requires
  * that the depth slope of a surface be computed by an approximation that is
@@ -76,7 +76,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 11;
 
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | 
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -143,7 +143,7 @@ project(double x, double y, double z, const double *modelview,
 }
 
 static void
-draw_quad_at_distance(GLdouble dist) 
+draw_quad_at_distance(GLdouble dist)
 {
 	glBegin(GL_QUADS);
 		glVertex3d(-dist, -dist, -dist);
@@ -154,7 +154,7 @@ draw_quad_at_distance(GLdouble dist)
 }
 
 static GLdouble
-window_coord_depth(GLdouble dist) 
+window_coord_depth(GLdouble dist)
 {
 	/* Assumes we're using the "far at infinity" projection matrix and
 	 * simple viewport transformation.
@@ -163,7 +163,7 @@ window_coord_depth(GLdouble dist)
 }
 
 static bool
-red_quad_was_drawn(void) 
+red_quad_was_drawn(void)
 {
 	static const float expected[] = {1.0f, 0.0f, 0.0f};
 	return piglit_probe_rect_rgb_silent(0, 0, piglit_width, piglit_height,
@@ -180,8 +180,8 @@ piglit_init(int argc, char **argv)
 }
 
 static void
-find_ideal_mrd(GLdouble *ideal_mrd_near, GLdouble *ideal_mrd_far, 
-	       GLdouble *next_to_near, GLdouble *next_to_far) 
+find_ideal_mrd(GLdouble *ideal_mrd_near, GLdouble *ideal_mrd_far,
+	       GLdouble *next_to_near, GLdouble *next_to_far)
 {
 	/* MRD stands for Minimum Resolvable Difference, the smallest distance
 	 * in depth that suffices to separate any two polygons (or a polygon
@@ -341,7 +341,7 @@ find_ideal_mrd(GLdouble *ideal_mrd_near, GLdouble *ideal_mrd_far,
 }
 
 static double
-read_depth(int x, int y) 
+read_depth(int x, int y)
 {
 	GLuint depth;
 	glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, &depth);
@@ -354,7 +354,7 @@ read_depth(int x, int y)
 
 static void
 find_actual_mrd(GLdouble *next_to_near, GLdouble *next_to_far,
-		GLdouble *actual_mrd_near, GLdouble *actual_mrd_far) 
+		GLdouble *actual_mrd_near, GLdouble *actual_mrd_far)
 {
 	/* Here we use polygon offset to determine the implementation's actual
 	 * MRD.
@@ -514,7 +514,7 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 		printf("\tAngle = %f degrees, axis = (%f, %f, %f)\n",
 			aa->angle, aa->axis[0], aa->axis[1], aa->axis[2]);
 		printf("\tFailing offset was %.16f\n", offset);
-		printf("\tAllowable range is (%f, %f)\n", 2.0 * mmin, 
+		printf("\tAllowable range is (%f, %f)\n", 2.0 * mmin,
 			2.0 * mmax);
 		return false;
 	}
@@ -523,7 +523,7 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 }
 
 static bool
-check_slope_offsets(GLdouble* ideal_mrd_near) 
+check_slope_offsets(GLdouble* ideal_mrd_near)
 {
 	/* This function checks that the implementation is offsetting
 	 * primitives correctly according to their depth slopes.  (Note that
@@ -565,11 +565,11 @@ check_slope_offsets(GLdouble* ideal_mrd_near)
 } /* check_slope_offsets */
 
 static void
-log_mrd(const char *pre, double mrd, GLint dbits) 
+log_mrd(const char *pre, double mrd, GLint dbits)
 {
 	int bits;
 	bits = (int)(0.5 + (pow(2.0, dbits) - 1.0) * mrd);
-	printf("%s %e (nominally %i %s)\n", pre, mrd, bits, 
+	printf("%s %e (nominally %i %s)\n", pre, mrd, bits,
 		(bits == 1) ? "bit": "bits");
 } /* log_mrd */
 
@@ -599,7 +599,7 @@ piglit_display(void)
 		0.0,  0.0, -1.0, -1.0,
 		0.0,  0.0, -2.0,  0.0
 	};
-	
+
 	glViewport(0, 0, piglit_width, piglit_height);
 
 	glMatrixMode(GL_PROJECTION);
@@ -611,10 +611,10 @@ piglit_display(void)
 	glDepthFunc(GL_LESS);
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glClearDepth(1.0);
-	
-	find_ideal_mrd(&ideal_mrd_near, &ideal_mrd_far, 
+
+	find_ideal_mrd(&ideal_mrd_near, &ideal_mrd_far,
 		&next_to_near, &next_to_far);
-	find_actual_mrd(&next_to_near, &next_to_far, 
+	find_actual_mrd(&next_to_near, &next_to_far,
 		&actual_mrd_near, &actual_mrd_far);
 	ideal_mrd = fmax(ideal_mrd_near, ideal_mrd_far);
 	actual_mrd = fmax(actual_mrd_near, actual_mrd_far);
