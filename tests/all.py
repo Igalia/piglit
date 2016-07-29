@@ -4360,7 +4360,7 @@ with profile.group_manager(
            'miptree-gl {}'.format(subtest))
         g(['khr_compressed_astc-miptree_gles2', '-subtest', subtest],
            'miptree-gles {}'.format(subtest))
-    for subtest in ('hdr', 'ldr', 'srgb'):
+    for subtest in ('hdr', 'ldr', 'srgb', 'srgb-fp'):
         g(['khr_compressed_astc-sliced-3d-miptree_gl', '-subtest', subtest],
            'sliced-3d-miptree-gl {}'.format(subtest))
         g(['khr_compressed_astc-sliced-3d-miptree_gles3', '-subtest', subtest],
