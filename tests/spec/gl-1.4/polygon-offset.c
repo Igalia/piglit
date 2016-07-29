@@ -636,6 +636,7 @@ piglit_display(void)
 	}
 
 	glGetIntegerv(GL_DEPTH_BITS, &dbits);
+	printf("GL_DEPTH_BITS = %d\n", dbits);
 	log_mrd("Ideal  MRD at near plane is", ideal_mrd_near, dbits);
 	log_mrd("Actual MRD at near plane is", actual_mrd_near, dbits);
 	log_mrd("Ideal  MRD at infinity is", ideal_mrd_far, dbits);
