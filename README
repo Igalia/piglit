@@ -37,21 +37,37 @@ First of all, you need to make sure that the following are installed:
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
   - waffle (http://www.waffle-gl.org)
+  - mako
 
 Optionally, you can install the following:
 
-  - nose. A python test framework, used for running the python framework
-    test suite. (https://nose.readthedocs.org/en/latest/)
-  - tox. A tool for testing python packages against multiple configurations of
-    python (https://tox.readthedocs.org/en/latest/index.html)
   - lxml. An accelerated python xml library using libxml2 (http://lxml.de/)
   - simplejson. A fast C based implementation of the python json library.
     (https://simplejson.readthedocs.org/en/latest/)
+
+For Python 2.x you can install the following to add features, these are
+unnecessary for python3:
   - backports.lzma. A packport of python3's lzma module to python2,
     this enables fast native xz (de)compression in piglit for results files
     (https://github.com/peterjc/backports.lzma)
+  - subprocess32. A backport of the subprocess from python3.2, which includes
+    timeout support. This only works for Linux
+
+For Testing the python framework
+  - py.test. A python test framework, used for running the python framework
+    test suite.
+  - tox. A tool for testing python packages against multiple configurations of
+    python (https://tox.readthedocs.org/en/latest/index.html)
   - mock. A python module for mocking other python modules. Required only for
     unittests (https://github.com/testing-cabal/mock)
+  - psutil. A portable process library for python
+  - jsonschema. A JSON validator library for python
+  - pytest-mock. A mock plugin for pytest
+  - pytest-pythonpath. A plugin for pytest to do automagic with sys.path
+  - pytest-raises. A plugin for pytest that allows deocrating tests that expect
+    failure
+  - pytest-warnings. A plugin for pytest that handles python warnings
+  - pytest-timeout. A plugin for pytest to timeout tests.
 
 Now configure the build system:
 
