@@ -111,12 +111,14 @@
 // TODO: probably we could use libmpdec to handle this
 //       http://www.bytereef.org/mpdecimal/index.html
 //#define REGEX_TYPE_HALF       "buffer half[1]"
+#define REGEX_TYPE_HALF       REGEX_DEFINE_TYPE("half")
 #define REGEX_TYPE_FLOAT      REGEX_DEFINE_TYPE("float")
 #define REGEX_TYPE_DOUBLE      REGEX_DEFINE_TYPE("double")
 #define REGEX_TYPE  REGEX_TYPE_CHAR "|" REGEX_TYPE_UCHAR "|" \
                     REGEX_TYPE_SHORT "|" REGEX_TYPE_USHORT "|" \
-                    REGEX_TYPE_INT "|" REGEX_TYPE_UINT "|" REGEX_TYPE_LONG "|" \
-                    REGEX_TYPE_ULONG "|" REGEX_TYPE_FLOAT "|" REGEX_TYPE_DOUBLE
+                    REGEX_TYPE_INT "|" REGEX_TYPE_UINT "|" \
+                    REGEX_TYPE_LONG "|" REGEX_TYPE_ULONG "|" \
+                    REGEX_TYPE_HALF "|" REGEX_TYPE_FLOAT "|" REGEX_TYPE_DOUBLE
 
 /* Image types */
 /* TODO: add OpenCL 1.2+ types */
@@ -324,6 +326,7 @@ enum cl_type {
 	TYPE_UINT,
 	TYPE_LONG,
 	TYPE_ULONG,
+	TYPE_HALF,
 	TYPE_FLOAT,
 	TYPE_DOUBLE,
 };
@@ -1002,7 +1005,7 @@ get_test_arg_value(struct test_arg* test_arg, const char* value, size_t length)
 			for(c = 0; c < test_arg->cl_size; c++) {                \
 				ra = i*test_arg->cl_size + c;                       \
 				rb = i*test_arg->cl_mem_size + c;                   \
-				((cl_type*)test_arg->value)[rb] = array[ra%length]; \
+				((cl_type*)test_arg->value)[rb] = convert_##cl_type(array[ra%length]); \
 			}                                                       \
 		}                                                           \
 		break;
@@ -1016,8 +1019,9 @@ get_test_arg_value(struct test_arg* test_arg, const char* value, size_t length)
 		CASE(TYPE_UINT,   cl_uint,    get_uint_array,   uint_array)
 		CASE(TYPE_LONG,   cl_long,    get_int_array,    int_array)
 		CASE(TYPE_ULONG,  cl_ulong,   get_uint_array,   uint_array)
+		CASE(TYPE_HALF,   cl_half,    get_float_array,  float_array)
 		CASE(TYPE_FLOAT,  cl_float,   get_float_array,  float_array)
-		CASE(TYPE_DOUBLE,  cl_double,   get_float_array,  float_array)
+		CASE(TYPE_DOUBLE, cl_double,  get_float_array,  float_array)
 	}
 
 #undef CASE
@@ -1040,6 +1044,7 @@ get_test_arg_tolerance(struct test_arg* test_arg, const char* tolerance_str)
 	                     REG_NEWLINE)) {
 		regex_get_match_str(&value_str, tolerance_str, pmatch, 1);
 		switch(test_arg->cl_type) {
+		case TYPE_HALF:
 		case TYPE_FLOAT:
 		case TYPE_DOUBLE:
 			test_arg->ulp = get_uint(value_str);
@@ -1070,6 +1075,7 @@ get_test_arg_tolerance(struct test_arg* test_arg, const char* tolerance_str)
 		case TYPE_ULONG:
 			test_arg->tolu = get_uint(value_str);
 			break;
+		case TYPE_HALF:
 		case TYPE_FLOAT:
 		case TYPE_DOUBLE: {
 			float value = get_float(value_str);
@@ -1152,6 +1158,7 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 		ELSEIF(REGEX_TYPE_UINT,   TYPE_UINT,   cl_uint)
 		ELSEIF(REGEX_TYPE_LONG,   TYPE_LONG,   cl_long)
 		ELSEIF(REGEX_TYPE_ULONG,  TYPE_ULONG,  cl_ulong)
+		ELSEIF(REGEX_TYPE_HALF,   TYPE_HALF,   cl_half)
 		ELSEIF(REGEX_TYPE_FLOAT,  TYPE_FLOAT,  cl_float)
 		ELSEIF(REGEX_TYPE_DOUBLE,  TYPE_DOUBLE,  cl_double)
 
@@ -2093,6 +2100,21 @@ check_test_arg_value(struct test_arg test_arg,
 			}                                                                \
 		}                                                                    \
 		return true;
+#define CASEH(enum_type, type, cl_type)                                      \
+	case enum_type:                                                          \
+		for(i = 0; i < test_arg.length; i++) {                               \
+			for(c = 0; c < test_arg.cl_size; c++) {                          \
+				rb = i*test_arg.cl_mem_size + c;                             \
+				if(!piglit_cl_probe_half(((cl_type*)value)[rb],          \
+				                             ((cl_type*)test_arg.value)[rb], \
+				                             test_arg.ulp)) {               \
+					ra = i*test_arg.cl_size + c;                             \
+					printf("Error at %s[%zu]\n", type, ra);                  \
+					return false;                                            \
+				}                                                            \
+			}                                                                \
+		}                                                                    \
+		return true;
 #define CASEF(enum_type, type, cl_type)                                      \
 	case enum_type:                                                          \
 		for(i = 0; i < test_arg.length; i++) {                               \
@@ -2118,6 +2140,7 @@ check_test_arg_value(struct test_arg test_arg,
 		CASEU(TYPE_UINT,   "uint",   cl_uint)
 		CASEI(TYPE_LONG,   "long",   cl_long)
 		CASEU(TYPE_ULONG,  "ulong",  cl_ulong)
+		CASEH(TYPE_HALF,   "half",   cl_half)
 		CASEF(TYPE_FLOAT,  "float",  cl_float)
 		CASEF(TYPE_DOUBLE,  "double",  cl_double)
 	}

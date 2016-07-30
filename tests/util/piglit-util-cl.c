@@ -59,6 +59,27 @@ piglit_cl_probe_uinteger(uint64_t value, uint64_t expect, uint64_t tolerance)
 	((isnan(value) && isnan(expect)) || \
 	(isinf(value) && isinf(expect) && ((value > 0) == (expect > 0))))
 
+static float float_from_cl_half(uint32_t in)
+{
+	union {
+		uint32_t bits;
+		float val;
+	} convert;
+	uint32_t exponent = ((in >> 10) & 0x1f);
+	convert.bits = (((in >> 15) & 0x1) << 31) | //sign
+	               ((exponent ? (exponent != 0x1f ? exponent + 112 : 0xff)
+	                 : 0) << 23) | //exponent (0 and 1f are special cases)
+	               (((in >>  0) & 0x3ff) << 13); // mantissa
+	return convert.val;
+}
+
+bool piglit_cl_probe_half(cl_half value, cl_half expect, uint32_t ulp)
+{
+	// after conversion to float the last 13 digits are 0, adjust ulp
+	return piglit_cl_probe_floating(float_from_cl_half(value),
+	                                float_from_cl_half(expect),
+	                                ulp * 8192);
+}
 
 /* TODO: Tolerance should be specified in terms of ULP. */
 bool
@@ -116,6 +137,25 @@ piglit_cl_probe_double(double value, double expect, uint64_t ulp)
 
 	return true;
 
+}
+
+cl_half convert_cl_half(double in)
+{
+	union {
+		uint64_t bits;
+		double val;
+	} convert = { .val = in };
+	/* Bit 63 is sign bit */
+	cl_half sign = (cl_half)((convert.bits >> 63) << 15);
+	/* Get only the top 10 bits of mantissa */
+	cl_half mantissa = (cl_half)((convert.bits >> 42) & 0x3ff);
+	/* 11 bits of exponent */
+	uint64_t exp = (convert.bits >> 52) & 0x7ff;
+	/* 0 and ~0 are special cases that are not adjusted,
+	 * half bias is 15, double bias is 1023 */
+	cl_half exponent = ((exp == 0 || exp == 0x7ff) ? (exp & 0x3ff) :
+	                   (exp - 1008)) << 10;
+	return (sign | exponent | mantissa);
 }
 
 bool

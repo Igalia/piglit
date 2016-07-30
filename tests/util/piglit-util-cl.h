@@ -44,6 +44,25 @@
 extern "C" {
 #endif
 
+#define DIRECT_CONVERT(to, from) \
+static inline from convert_##to(from in) \
+{ \
+	return (to)in; \
+}
+
+DIRECT_CONVERT(cl_char, int64_t);
+DIRECT_CONVERT(cl_uchar, uint64_t);
+DIRECT_CONVERT(cl_short, int64_t);
+DIRECT_CONVERT(cl_ushort, uint64_t);
+DIRECT_CONVERT(cl_int, int64_t);
+DIRECT_CONVERT(cl_uint, uint64_t);
+DIRECT_CONVERT(cl_long, int64_t);
+DIRECT_CONVERT(cl_ulong, uint64_t);
+DIRECT_CONVERT(cl_float, double);
+DIRECT_CONVERT(cl_double, double);
+
+cl_half convert_cl_half(double in);
+
 
 /* Runtime independent */
 
@@ -60,6 +79,12 @@ bool piglit_cl_probe_integer(int64_t value, int64_t expect, uint64_t tolerance);
 bool piglit_cl_probe_uinteger(uint64_t value,
                               uint64_t expect,
                               uint64_t tolerance);
+
+/**
+ * \brief Probe half-floating-point \c value if it compares equal to \c expect with
+ *        tolerance \c ulp.
+ */
+bool piglit_cl_probe_half(cl_half value, cl_half expect, uint32_t ulp);
 
 /**
  * \brief Probe floating-point \c value if it compares equal to \c expect with
