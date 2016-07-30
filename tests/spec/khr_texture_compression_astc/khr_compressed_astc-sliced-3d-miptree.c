@@ -216,10 +216,6 @@ bool draw_compare_levels(bool check_error,
 			y += h;
 	}
 
-	/* Delete bound textures */
-	glDeleteTextures(1, &compressed_tex);
-	glDeleteTextures(1, &decompressed_tex);
-
 	piglit_present_results();
 	return result;
 }
@@ -279,23 +275,21 @@ test_miptrees(void* input_type)
 		piglit_set_tolerance_for_bits(8, 8, 8, 8);
 
 	for ( ; block_dims < ARRAY_SIZE(block_dim_str); block_dims++) {
+		/* Texture objects. */
+		GLuint tex_compressed = 0;
+		GLuint tex_decompressed = 0;
+
+		/* Load texture for current submode and block size */
+		load_texture("compressed/SLICED3D", tests[subtest],
+				block_dim_str[block_dims],
+				&tex_compressed);
+		if (!check_error) {
+			load_texture("decompressed/SLICED3D",
+				     tests[subtest],
+				     block_dim_str[block_dims],
+				     &tex_decompressed);
+		}
 		for (slice = 0 ; slice < LEVEL0_DEPTH; slice++) {
-
-			/* Texture objects. */
-			GLuint tex_compressed = 0;
-			GLuint tex_decompressed = 0;
-
-			/* Load texture for current submode and block size */
-			load_texture("compressed/SLICED3D", tests[subtest],
-					block_dim_str[block_dims],
-					&tex_compressed);
-			if (!check_error) {
-				load_texture("decompressed/SLICED3D",
-					     tests[subtest],
-					     block_dim_str[block_dims],
-					     &tex_decompressed);
-			}
-
 			/* Draw and compare each level of the two textures */
 			glClear(GL_COLOR_BUFFER_BIT);
 			if (!draw_compare_levels(check_error,
@@ -311,6 +305,11 @@ test_miptrees(void* input_type)
 				return PIGLIT_FAIL;
 			}
 		}
+		/* Delete bound textures */
+		glDeleteTextures(1, &tex_compressed);
+		if (!check_error)
+			glDeleteTextures(1, &tex_decompressed);
+
 		block_dims++;
 	}
 	return PIGLIT_PASS;
