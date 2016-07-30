@@ -27,10 +27,10 @@
  *
  * The files under compressed/3D/{hdr, ldrl, ldrs} contain full miptrees, in
  * the GL_*_ASTC_* formats, of a 3D texture of waffles and fruit [1]. The base
- * level size was shrunken to 160x106 pixels. The files under the
- * decompressed/3D/{hdr, ldrl, ldrs} directory contain the same miptree in
- * GL_RGBA format. Each miplevel was obtained by decompressing the
- * corresponding ASTC texture with astcenc [2].
+ * level size was shrunken to 160x106 pixels and used to create a 3D texture
+ * with depth=8. The files under the decompressed/3D/{hdr, ldrl, ldrs} directory
+ * contain the same miptree in GL_RGBA format. Each miplevel was obtained by
+ * decompressing the corresponding ASTC texture with astcenc [2].
  *
  * This test draws miplevels of the compressed textures in a space-efficient
  * manner. It does the same when drawing the decompressed texture on the right.
@@ -146,6 +146,7 @@ load_texture(const char *dir1, const char *dir2,
 	assert(info->target == GL_TEXTURE_3D);
 	assert(info->pixel_width == LEVEL0_WIDTH);
 	assert(info->pixel_height == LEVEL0_HEIGHT);
+	assert(info->pixel_depth == LEVEL0_DEPTH);
 
 	*tex_name = 0;
 	ok = piglit_ktx_load_texture(ktx, tex_name, NULL);
