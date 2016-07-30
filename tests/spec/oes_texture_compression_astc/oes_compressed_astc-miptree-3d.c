@@ -166,14 +166,14 @@ bool draw_compare_levels(bool check_error,
 
 	unsigned y = 0;
 	unsigned x = 0;
-	bool pass = true;
+	bool result = true;
 	int level = 0;
 
 	for (; level < NUM_LEVELS; ++level) {
 		int w = LEVEL0_WIDTH >> level;
 		int h = LEVEL0_HEIGHT >> level;
 		int d = LEVEL0_DEPTH >> level;
-		pass = true;
+		bool pass = true;
 		glUniform2f(level_pixel_size_loc, (float) w, (float) h);
 		glUniform1f(slice_loc, slice);
 		glUniform1f(depth_loc, d);
@@ -183,27 +183,25 @@ bool draw_compare_levels(bool check_error,
 		glUniform2f(pixel_offset_loc, x, y);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_VERTICES);
 
-		/* Draw miplevel of decompressed texture. */
-		if (!check_error) {
+		/* Check the textures (or error-colors) for equivalence. */
+		if (check_error) {
+			pass = piglit_probe_rect_rgba(x, y, w, h,
+						      error_color);
+		} else {
+			/* Draw miplevel of decompressed texture. */
 			glBindTexture(GL_TEXTURE_3D, decompressed_tex);
 			glUniform2f(pixel_offset_loc, LEVEL0_WIDTH + x, y);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, NUM_VERTICES);
+
+			pass = piglit_probe_rects_equal(x, y,
+						LEVEL0_WIDTH + x, y,
+						w, h, GL_RGBA);
 		}
 
-		/* Check the textures (or error-colors) for equivalence. */
-		if (pass) {
-			if (check_error) {
-				pass = piglit_probe_rect_rgba(x, y, w, h,
-							      error_color);
-			} else {
-				pass = piglit_probe_rects_equal(x, y,
-							LEVEL0_WIDTH + x, y,
-							w, h, GL_RGBA);
-			}
-
-			if (!pass)
-				piglit_loge("Slice: %d, Miplevel: %d",
-					    slice, level);
+		if (!pass) {
+			piglit_loge("Slice: %d, Miplevel: %d",
+				    slice, level);
+			result = false;
 		}
 
 		/* Update the next miplevel arrangement */
@@ -218,7 +216,7 @@ bool draw_compare_levels(bool check_error,
 	glDeleteTextures(1, &decompressed_tex);
 
 	piglit_present_results();
-	return pass;
+	return result;
 }
 
 enum piglit_result
