@@ -2801,7 +2801,6 @@ with profile.group_manager(
     g(['fbo-blit'], run_concurrent=False)
     g(['fbo-copypix'], run_concurrent=False)
     g(['fbo-readdrawpix'], run_concurrent=False)
-    g(['fbo-srgb-blit'])
     g(['fbo-sys-blit'], run_concurrent=False)
     g(['fbo-sys-sub-blit'], run_concurrent=False)
     g(['fbo-generatemipmap-versus-READ_FRAMEBUFFER'])

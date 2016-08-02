@@ -81,7 +81,6 @@ piglit_add_executable (fbo-readpixels-depth-formats fbo-readpixels-depth-formats
 piglit_add_executable (fbo-rg fbo-rg.c)
 piglit_add_executable (fbo-scissor-blit fbo-scissor-blit.c)
 piglit_add_executable (fbo-srgb fbo-srgb.c)
-piglit_add_executable (fbo-srgb-blit fbo-srgb-blit.c)
 IF (UNIX)
 	target_link_libraries (fbo-srgb m)
 ENDIF (UNIX)
