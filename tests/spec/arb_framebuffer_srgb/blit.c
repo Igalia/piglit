@@ -25,37 +25,30 @@
  *
  * Test the sRGB behaviour of blits.
  *
- * The GL 4.3 spec is contradictory about how blits should be handled
- * when the source or destination buffer is sRGB.  From section 18.3.1
- * Blitting Pixel Rectangles:
+ * The various GL 4.x specifications contain a lot of conflicting rules
+ * about how blits should be handled when the source or destination buffer
+ * is sRGB.
  *
- * (1) When values are taken from the read buffer, if the value of
- *     FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING for the framebuffer
- *     attachment corresponding to the read buffer is SRGB (see
- *     section 9.2.3), the red, green, and blue components are
+ * Here are the latest rules from GL 4.4 (October 18th, 2013)
+ * section 18.3.1 Blitting Pixel Rectangles:
+ *
+ * (1) When values are taken from the read buffer, if [[FRAMEBUFFER_SRGB
+ *     is enabled and]] the value of FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING
+ *     for the framebuffer attachment corresponding to the read buffer is
+ *     SRGB (see section 9.2.3), the red, green, and blue components are
  *     converted from the non-linear sRGB color space according to
  *     equation 8.14.
  *
- * (2) When values are taken from the read buffer, no linearization is
- *     performed even if the format of the buffer is SRGB.
- *
- * (3) When values are written to the draw buffers, blit operations
+ * (2) When values are written to the draw buffers, blit operations
  *     bypass most of the fragment pipeline. The only fragment
  *     operations which affect a blit are the pixel ownership test,
  *     the scissor test, and sRGB conversion (see section
  *     17.3.9). Color, depth, and stencil masks (see section 17.4.2)
  *     are ignored.
  *
- * (4) If SAMPLE_BUFFERS for either the read framebuffer or draw
- *     framebuffer is greater than zero, no copy is performed and an
- *     INVALID_OPERATION error is generated if the dimensions of the
- *     source and destination rectangles provided to BlitFramebuffer
- *     are not identical, or if the formats of the read and draw
- *     framebuffers are not identical.
- *
  * And from section 17.3.9 sRGB Conversion:
  *
- * (5) If FRAMEBUFFER_SRGB is enabled and the value of
+ * (3) If FRAMEBUFFER_SRGB is enabled and the value of
  *     FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING for the framebuffer
  *     attachment corresponding to the destination buffer is SRGB1
  *     (see section 9.2.3), the R, G, and B values after blending are
@@ -64,19 +57,89 @@
  *     the value of FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING is not SRGB,
  *     then ... [no conversion is applied].
  *
- * Paragraphs (1) and (2) seem irreconcilable: the first says that
- * linearization should happen when reading from SRGB buffers, the
- * second says that it shouldn't.
+ * Rules differ in other specifications:
  *
- * The remaining paragraphs are self-consistent, however they aren't
- * consistent with the observed behaviour of existing drivers (notably
- * nVidia and ATI drivers).  Existing drivers seem to follow the much
- * simpler rule that blits preserve the underlying binary
- * representation of the pixels, regardless of whether the format is
- * sRGB and regardless of the setting of FRAMEBUFFER_SRGB.
- * Furthermore, sRGB and non-sRGB formats are considered "identical"
- * for the purposes of paragraph (4).  Existing games seem to rely on
- * this behaviour.
+ * -------------------------------------------------------------------
+ *
+ * ES 3.0 contains identical rules, however, ES has no FRAMEBUFFER_SRGB
+ * setting.  References to that are deleted, making encode and decode
+ * happen regardless.
+ *
+ * -------------------------------------------------------------------
+ *
+ * The GL 4.3 revision from February 14th, 2013 deletes the bracketed
+ * text in paragraph (1), which appears to indicate that sRGB decode
+ * should happen regardless of the GL_FRAMEBUFFER_SRGB setting.
+ *
+ * This forces decode, but allows encode or no encode.  This makes it
+ * impossible to do blits in a linear colorspace, which is not ideal.
+ *
+ * I believe this was an oversight: it looks like Khronos imported
+ * paragraph (1) from ES 3.x but neglected to add a FRAMEBUFFER_SRGB
+ * interaction on decode.
+ *
+ * -------------------------------------------------------------------
+ *
+ * The older GL 4.3 revision from August 6th, 2012 contains that
+ * same decode-always version of paragraph (1), but also contains
+ * another paragraph immediately after:
+ *
+ * (4) When values are taken from the read buffer, no linearization is
+ *     performed even if the format of the buffer is SRGB.
+ *
+ * These are irreconcilable: the first says that linearization should
+ * happen when reading from SRGB buffers, while the second says that
+ * it shouldn't.  These rules are not implementable, which is probably
+ * why they changed in a point revision.
+ *
+ * -------------------------------------------------------------------
+ *
+ * GL 4.2 omits paragraph (1) entirely but contains (4), suggesting that
+ * decode should never happen, but encode might.
+ *
+ * -------------------------------------------------------------------
+ *
+ * GL 4.1 and earlier specifications omits both paragraphs (1) and (4),
+ * and contain an alternate version of paragraph (2):
+ *
+ * (2b) Blit operations bypass the fragment pipeline.  The only fragment
+ *      operations which affect a blit are the pixel ownership test and
+ *      the scissor test.
+ *
+ * Notably missing is sRGB conversion.
+ *
+ * This suggests that neither encode nor decode should happen, regardless
+ * of the FRAMEBUFFER_SRGB setting.  These are the traditional GL rules.
+ *
+ * -------------------------------------------------------------------
+ *
+ * To summarize the rule differences:
+ *
+ *      Specification   Decoding   Encoding
+ *      ES 3.x          Yes        Yes
+ *      GL 4.1          No         No
+ *      GL 4.2          No         Optional
+ *      GL 4.3 2012     Yes & No   Optional
+ *      GL 4.3 2013     Yes        Optional
+ *      GL 4.4          Optional   Optional
+ *
+ * -------------------------------------------------------------------
+ *
+ * When this test was written in 2012, the author surveyed the nVidia
+ * and AMD drivers of the time.  They appeared to follow the simpler rule
+ * that blits preserved the underlying binary representation of the pixels,
+ * regardless of whether the format was sRGB and regardless of the setting
+ * of FRAMEBUFFER_SRGB.  Left 4 Dead 2 appeared to rely on this behavior
+ * at the time, but no longer does as of 2016.
+ *
+ * Unlike OpenGL, the ES 3.x rules have always been clear: always decode
+ * and encode.  Both dEQP and WebGL conformance tests require this.
+ *
+ * The new GL 4.4 rules are flexible: if GL_FRAMEBUFFER_SRGB is disabled
+ * (the default setting), BlitFramebuffer will neither decode nor encode
+ * (the traditional GL rules).  If it's enabled, then it follows the ES 3
+ * rules (both decode and encode).  This isn't entirely compatible, but it
+ * seems like the best solution possible, and the one we should implement.
  *
  * This test verifies that blitting is permitted, and preserves the
  * underlying binary representation of the pixels, under any specified
@@ -301,6 +364,31 @@ piglit_init(int argc, char **argv)
 		resolve_fbo = 0;
 }
 
+/**
+ * Implements GL 4.4 equation 8.14.
+ */
+static float
+srgb_to_linear(float c_s)
+{
+	return c_s <= 0.04045 ? c_s / 12.92f
+			      : powf((c_s + 0.055f) / 1.055f, 2.4f);
+}
+
+/**
+ * Implements GL 4.4 equation 17.1.
+ */
+static float
+linear_to_srgb(float c_l)
+{
+	if (c_l <= 0.0f)
+		return 0.0f;
+	else if (c_l < 0.0031308f)
+		return 12.92f * c_l;
+	else if (c_l < 1.0f)
+		return 1.055f * powf(c_l, 0.41666f) - 0.055f;
+	return 1.0f;
+}
+
 static bool
 analyze_image(GLuint fbo)
 {
@@ -312,8 +400,16 @@ analyze_image(GLuint fbo)
 	for (y = 0; y < PATTERN_HEIGHT; ++y) {
 		for (x = 0; x < PATTERN_WIDTH; ++x) {
 			for (component = 0; component < 4; ++component) {
+				float val = x / 255.0;
+				if (component < 3 && enable_srgb_framebuffer) {
+					if (src_format == GL_SRGB8_ALPHA8)
+						val = srgb_to_linear(val);
+					if (dst_format == GL_SRGB8_ALPHA8)
+						val = linear_to_srgb(val);
+				}
+
 				expected_data[(y * PATTERN_WIDTH + x)
-					      * 4 + component] = x / 255.0;
+					      * 4 + component] = val;
 			}
 		}
 	}
