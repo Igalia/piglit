@@ -326,10 +326,14 @@ Test::resolve(Fbo *fbo, GLbitfield which_buffers)
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo->handle);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolve_fbo.handle);
 	resolve_fbo.set_viewport();
+
+	if (srgb)
+		glEnable(GL_FRAMEBUFFER_SRGB);
 	glBlitFramebuffer(0, 0, fbo->config.width, fbo->config.height,
 			  0, 0, resolve_fbo.config.width,
 			  resolve_fbo.config.height,
 			  which_buffers, filter_mode);
+	glDisable(GL_FRAMEBUFFER_SRGB);
 }
 
 /**
