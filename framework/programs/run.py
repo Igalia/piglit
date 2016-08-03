@@ -151,6 +151,11 @@ def _run_parser(input_):
                         type=str,
                         default="",
                         help="suffix string to append to each test name in junit")
+    parser.add_argument("--junit-subtests",
+                        action='store_true',
+                        help="Encode tests with subtets as testsuite elements. "
+                             "Some xUnit parsers do not handle nested "
+                             "testsuites, though it is allowed in the spec.")
     log_parser = parser.add_mutually_exclusive_group()
     log_parser.add_argument('-v', '--verbose',
                             action='store_const',
@@ -289,7 +294,8 @@ def run(input_):
 
     backend = backends.get_backend(args.backend)(
         args.results_path,
-        junit_suffix=args.junit_suffix)
+        junit_suffix=args.junit_suffix,
+        junit_subtests=args.junit_subtests)
     backend.initialize(_create_metadata(args, results.name))
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
