@@ -32,7 +32,7 @@ except ImportError:
 
 import six
 
-from framework import grouptools, results, status, exceptions
+from framework import grouptools, results, exceptions
 from framework.core import PIGLIT_CONFIG
 from .abstract import FileBackend
 from .register import Registry
@@ -78,7 +78,7 @@ class JUnitWriter(object):
         # set different root names.
         classname = 'piglit.' + classname
 
-        return (classname, testname)
+        return (classname, junit_escape(testname))
 
     @staticmethod
     def _set_xml_err(element, data, expected_result):
@@ -108,8 +108,12 @@ class JUnitWriter(object):
     def _make_result(element, result, expected_result):
         """Adds the skipped, failure, or error element."""
         res = None
+        # If the result is skip, then just add the skipped message and go on
         if result == 'skip':
             res = etree.SubElement(element, 'skipped')
+        elif result == 'incomplete':
+            res = etree.SubElement(element, 'failure',
+                                   message='Incomplete run.')
         elif result in ['fail', 'dmesg-warn', 'dmesg-fail']:
             if expected_result == "failure":
                 res = etree.SubElement(element, 'skipped',
@@ -139,44 +143,49 @@ class JUnitWriter(object):
         if res is not None:
             res.attrib['type'] = six.text_type(result)
 
-    def __call__(self, f, name, data):
-        classname, testname = self._make_names(name)
-
-        # Jenkins will display special pages when the test has certain names.
-        # https://jenkins-ci.org/issue/18062
-        # https://jenkins-ci.org/issue/19810
-        # The testname variable is used in the calculate_result closure, and
-        # must not have the suffix appended.
-        full_test_name = testname + self._test_suffix
-        if full_test_name in _JUNIT_SPECIAL_NAMES:
-            testname += '_'
-            full_test_name = testname + self._test_suffix
-
-        # Create the root element
-        element = etree.Element('testcase', name=full_test_name,
+    def _make_root(self, testname, classname, data):
+        """Creates and returns the root element."""
+        element = etree.Element('testcase',
+                                name=self._make_full_test_name(testname),
                                 classname=classname,
                                 # Incomplete will not have a time.
                                 time=str(data.time.total),
                                 status=str(data.result))
 
+        return element
+
+    def _make_full_test_name(self, testname):
+        # Jenkins will display special pages when the test has certain names.
+        # https://jenkins-ci.org/issue/18062
+        # https://jenkins-ci.org/issue/19810
+        # The testname variable is used in the calculate_result closure, and
+        # must not have the suffix appended.
+        return testname + self._test_suffix
+
+    def _expected_result(self, name):
+        """Get the expected result of the test."""
+        name = name.replace("=", ".").replace(":", ".")
+        expected_result = "pass"
+
+        if name in self._expected_failures:
+            expected_result = "failure"
+            # a test can either fail or crash, but not both
+            assert name not in self._expected_crashes
+
+        if name in self._expected_crashes:
+            expected_result = "error"
+
+        return expected_result
+
+    def __call__(self, f, name, data):
+        classname, testname = self._make_names(name)
+        element = self._make_root(testname, classname, data)
+        expected_result = self._expected_result(
+            '{}.{}'.format(classname, testname).lower())
+
         # If this is an incomplete status then none of these values will be
         # available, nor
         if data.result != 'incomplete':
-            expected_result = "pass"
-
-            # replace special characters and make case insensitive
-            lname = (classname + "." + testname).lower()
-            lname = lname.replace("=", ".")
-            lname = lname.replace(":", ".")
-
-            if lname in self._expected_failures:
-                expected_result = "failure"
-                # a test can either fail or crash, but not both
-                assert lname not in self._expected_crashes
-
-            if lname in self._expected_crashes:
-                expected_result = "error"
-
             self._set_xml_err(element, data, expected_result)
 
             # Add stdout
@@ -186,9 +195,72 @@ class JUnitWriter(object):
             # Prepend command line to stdout
             out.text = data.command + '\n' + out.text
 
-            self._make_result(element, data.result, expected_result)
+        self._make_result(element, data.result, expected_result)
+
+        f.write(six.text_type(etree.tostring(element).decode('utf-8')))
+
+
+class JUnitSubtestWriter(JUnitWriter):
+    """A JUnitWriter derived class that treats subtest at testsuites.
+
+    This class will turn a piglit test with subtests into a testsuite element
+    with each subtest as a testcase element. This subclass is needed because
+    not all JUnit readers (like the JUnit plugin for Jenkins) handle nested
+    testsuites correctly.
+    """
+
+    def _make_root(self, testname, classname, data):
+        if data.subtests:
+            testname = '{}.{}'.format(classname, testname)
+            element = etree.Element('testsuite',
+                                    name=testname,
+                                    time=str(data.time.total),
+                                    tests=six.text_type(len(data.subtests)))
+            for test, result in six.iteritems(data.subtests):
+                etree.SubElement(element,
+                                 'testcase',
+                                 name=self._make_full_test_name(test),
+                                 classname=testname,
+                                 status=six.text_type(result))
+
         else:
-            etree.SubElement(element, 'failure', message='Incomplete run.')
+            element = super(JUnitSubtestWriter, self)._make_root(
+                testname, classname, data)
+        return element
+
+    def __call__(self, f, name, data):
+        classname, testname = self._make_names(name)
+        element = self._make_root(testname, classname, data)
+
+        # If this is an incomplete status then none of these values will be
+        # available, nor
+        if data.result != 'incomplete':
+            self._set_xml_err(element, data, 'pass')
+
+            # Add stdout
+            out = etree.SubElement(element, 'system-out')
+            out.text = data.out
+            # Prepend command line to stdout
+            out.text = data.command + '\n' + out.text
+
+            if data.subtests:
+                for subname, result in six.iteritems(data.subtests):
+                    # replace special characters and make case insensitive
+                    elem = element.find('.//testcase[@name="{}"]'.format(
+                        self._make_full_test_name(subname)))
+                    assert elem is not None
+                    self._make_result(
+                        elem, result,
+                        self._expected_result('{}.{}.{}'.format(
+                            classname, testname, subname).lower()))
+            else:
+                self._make_result(element, data.result,
+                                  self._expected_result('{}.{}'.format(
+                                      classname, testname).lower()))
+        else:
+            self._make_result(element, data.result,
+                              self._expected_result('{}.{}'.format(
+                                  classname, testname).lower()))
 
         f.write(six.text_type(etree.tostring(element).decode('utf-8')))
 
@@ -203,7 +275,7 @@ class JUnitBackend(FileBackend):
     _file_extension = 'xml'
     _write = None  # this silences the abstract-not-subclassed warning
 
-    def __init__(self, dest, junit_suffix='', **options):
+    def __init__(self, dest, junit_suffix='', junit_subtests=False, **options):
         super(JUnitBackend, self).__init__(dest, **options)
 
         # make dictionaries of all test names expected to crash/fail
@@ -218,8 +290,12 @@ class JUnitBackend(FileBackend):
             for fail, _ in PIGLIT_CONFIG.items("expected-crashes"):
                 expected_crashes[fail.lower()] = True
 
-        self._write = JUnitWriter(junit_suffix, expected_failures,
-                                  expected_crashes)
+        if not junit_subtests:
+            self._write = JUnitWriter(
+                junit_suffix, expected_failures, expected_crashes)
+        else:
+            self._write = JUnitSubtestWriter(  # pylint: disable=redefined-variable-type
+                junit_suffix, expected_failures, expected_crashes)
 
     def initialize(self, metadata):
         """ Do nothing

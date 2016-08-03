@@ -254,3 +254,168 @@ class TestJUnitWriter(object):
             schema = etree.XMLSchema(file=JUNIT_SCHEMA)  # pylint: disable=no-member
             with open(test_file, 'r') as f:
                 assert schema.validate(etree.parse(f))
+
+
+class TestJUnitSubtestWriter(object):
+    """Tests for the JUnitWriter class."""
+
+    def test_junit_replace(self, tmpdir):
+        """backends.junit.JUnitBackend.write_test: grouptools.SEPARATOR is
+        replaced with '.'.
+        """
+        result = results.TestResult()
+        result.time.end = 1.2345
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+        result.subtests['foo'] = 'pass'
+        result.subtests['bar'] = 'fail'
+
+        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+                                           junit_subtests=True)
+        test.initialize(shared.INITIAL_METADATA)
+        with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
+            t(result)
+        test.finalize()
+
+        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = test_value.getroot()
+
+        assert test_value.find('.//testsuite/testsuite').attrib['name'] == \
+            'piglit.a.group.test1'
+
+    def test_junit_replace_suffix(self, tmpdir):
+        """backends.junit.JUnitBackend.write_test: grouptools.SEPARATOR is
+        replaced with '.'.
+        """
+        result = results.TestResult()
+        result.time.end = 1.2345
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+        result.subtests['foo'] = 'pass'
+        result.subtests['bar'] = 'fail'
+
+        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+                                           junit_subtests=True,
+                                           junit_suffix='.foo')
+        test.initialize(shared.INITIAL_METADATA)
+        with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
+            t(result)
+        test.finalize()
+
+        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = test_value.getroot()
+
+        suite = test_value.find('.//testsuite/testsuite')
+        assert suite.attrib['name'] == 'piglit.a.group.test1'
+        assert suite.find('.//testcase[@name="{}"]'.format('foo.foo')) is not None
+
+    def test_subtest_skip(self, tmpdir):
+        result = results.TestResult()
+        result.time.end = 1.2345
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+        result.subtests['foo'] = 'pass'
+        result.subtests['bar'] = 'skip'
+
+        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+                                           junit_subtests=True)
+        test.initialize(shared.INITIAL_METADATA)
+        with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
+            t(result)
+        test.finalize()
+
+        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = test_value.getroot()
+
+        suite = test_value.find('.//testsuite/testsuite')
+        assert suite.attrib['name'] == 'piglit.a.group.test1'
+        assert suite.find('.//testcase[@name="{}"]/skipped'.format('bar')) \
+            is not None
+
+    def test_result_skip(self, tmpdir):
+        result = results.TestResult()
+        result.time.end = 1.2345
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+        result.result = 'skip'
+
+        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+                                           junit_subtests=True)
+        test.initialize(shared.INITIAL_METADATA)
+        with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
+            t(result)
+        test.finalize()
+
+        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = test_value.getroot()
+
+        elem = test_value.find('.//testsuite/testcase[@name="test1"]/skipped')
+        assert elem is not None
+
+    def test_classname(self, tmpdir):
+        result = results.TestResult()
+        result.time.end = 1.2345
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
+        result.subtests['foo'] = 'pass'
+        result.subtests['bar'] = 'skip'
+
+        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+                                           junit_subtests=True)
+        test.initialize(shared.INITIAL_METADATA)
+        with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
+            t(result)
+        test.finalize()
+
+        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = test_value.getroot()
+
+        suite = test_value.find('.//testsuite/testsuite')
+        assert suite.find('.//testcase[@classname="piglit.a.group.test1"]') \
+            is not None
+
+    class TestValid(object):
+        @pytest.fixture
+        def test_file(self, tmpdir):
+            tmpdir.mkdir('foo')
+            p = tmpdir.join('foo')
+
+            result = results.TestResult()
+            result.time.end = 1.2345
+            result.out = 'this is stdout'
+            result.err = 'this is stderr'
+            result.command = 'foo'
+            result.pid = 1034
+            result.subtests['foo'] = 'pass'
+            result.subtests['bar'] = 'fail'
+
+            test = backends.junit.JUnitBackend(six.text_type(p),
+                                               junit_subtests=True)
+            test.initialize(shared.INITIAL_METADATA)
+            with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
+                t(result)
+
+            result.result = 'fail'
+            with test.write_test(grouptools.join('a', 'test', 'test1')) as t:
+                t(result)
+            test.finalize()
+
+            return six.text_type(p.join('results.xml'))
+
+        def test_xml_well_formed(self, test_file):
+            """backends.junit.JUnitBackend.write_test: produces well formed xml."""
+            etree.parse(test_file)
+
+        @pytest.mark.skipif(etree.__name__ != 'lxml.etree',
+                            reason="This test requires lxml")
+        def test_xml_valid(self, test_file):
+            """backends.junit.JUnitBackend.write_test: produces valid JUnit xml."""
+            # This XMLSchema class is unique to lxml
+            schema = etree.XMLSchema(file=JUNIT_SCHEMA)  # pylint: disable=no-member
+            with open(test_file, 'r') as f:
+                assert schema.validate(etree.parse(f))
