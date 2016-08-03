@@ -189,31 +189,32 @@ class TestJUnitBackend(object):
 
             test.finalize()
 
-    class TestWriteTest(object):
-        """Tests for the write_test method."""
 
-        def test_junit_replace(self, tmpdir):
-            """backends.junit.JUnitBackend.write_test: grouptools.SEPARATOR is
-            replaced with '.'.
-            """
-            result = results.TestResult()
-            result.time.end = 1.2345
-            result.result = 'pass'
-            result.out = 'this is stdout'
-            result.err = 'this is stderr'
-            result.command = 'foo'
+class TestJUnitWriter(object):
+    """Tests for the JUnitWriter class."""
 
-            test = backends.junit.JUnitBackend(six.text_type(tmpdir))
-            test.initialize(shared.INITIAL_METADATA)
-            with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
-                t(result)
-            test.finalize()
+    def test_junit_replace(self, tmpdir):
+        """backends.junit.JUnitBackend.write_test: grouptools.SEPARATOR is
+        replaced with '.'.
+        """
+        result = results.TestResult()
+        result.time.end = 1.2345
+        result.result = 'pass'
+        result.out = 'this is stdout'
+        result.err = 'this is stderr'
+        result.command = 'foo'
 
-            test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
-            test_value = test_value.getroot()
+        test = backends.junit.JUnitBackend(six.text_type(tmpdir))
+        test.initialize(shared.INITIAL_METADATA)
+        with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
+            t(result)
+        test.finalize()
 
-            assert test_value.find('.//testcase').attrib['classname'] == \
-                'piglit.a.group'
+        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = test_value.getroot()
+
+        assert test_value.find('.//testcase').attrib['classname'] == \
+            'piglit.a.group'
 
     class TestValid(object):
         @pytest.fixture
