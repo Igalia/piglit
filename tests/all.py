@@ -2071,6 +2071,7 @@ with profile.group_manager(
       'fbo-fast-clear')
     g(['arb_framebuffer_srgb-fast-clear-blend'])
     g(['arb_framebuffer_srgb-srgb_conformance'])
+    g(['arb_framebuffer_srgb-srgb_pbo'])
 
 with profile.group_manager(
         PiglitGLTest,
