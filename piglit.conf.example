@@ -65,9 +65,9 @@ testB
 [deqp-gles3]
 ;
 ; Path to the deqp-gles3 executable. You can also set this with the environment
-; variable PIGLIT_DEQP_GLES3_EXE. Piglit will run the dEQP-GLES3 tests if and
+; variable PIGLIT_DEQP_GLES3_BIN. Piglit will run the dEQP-GLES3 tests if and
 ; only if this option is set.
-;exe=/home/knuth/deqp/modules/gles3/deqp-gles3
+;bin=/home/knuth/deqp/modules/gles3/deqp-gles3
 ;
 ; Space-separated list of extra command line arguments for deqp-gles3. The
 ; option is not required. The environment variable PIGLIT_DEQP_GLES3_EXTRA_ARGS

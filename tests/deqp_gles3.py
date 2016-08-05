@@ -26,31 +26,53 @@ from __future__ import (
 import os
 import warnings
 
+from framework.core import PIGLIT_CONFIG
 from framework.test import deqp
 from framework.options import OPTIONS
-from framework import exceptions
 
 __all__ = ['profile']
 
-# Path to the deqp-gles3 executable.
-_DEQP_GLES3_EXE = deqp.get_option('PIGLIT_DEQP_GLES3_EXE',
-                                  ('deqp-gles3', 'exe'),
-                                  required=True)
 
-_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP3_MUSTPASS',
-                                 ('deqp-gles3', 'mustpasslist'))
-if os.environ.get('PIGLIT_DEQP_MUSTPASS') is not None:
-    # see if the old environment variable was set, if it is uses it, and give a
-    # deprecation warning
-    _DEQP_MUSTPASS = os.environ['PIGLIT_DEQP_MUSTPASS']
-    warnings.warn(
-        'PIGLIT_DEQP_MUSTPASS has been replaced by PIGLIT_DEQP3_MUSTPASS '
-        'and will be removed. You should update and scripts using the old '
-        'environment variable')
+def _deprecated_get(env_, conf_, dep_env=None, dep_conf=('', ''), **kwargs):
+    """Attempt to get deprecated values, then modern vaules.
 
-if OPTIONS.deqp_mustpass and not _DEQP_MUSTPASS:
-    raise exceptions.PiglitFatalError(
-        'Use of mustpasslist requested, but no mustpasslist provided.')
+    If a deprecated value is found give the user a warning, this uses
+    deqp_get_option internally for both the deprecated and undeprecated paths,
+    but prefers the old version and issues a warning if they are encountered.
+    The old version is looked up unconditionally, if it is not found then the
+    new version will be looked up unconditionally, with the default and
+    requires keywords (which the first will not have).
+    """
+    val = None
+    if dep_env is not None and dep_conf is not None:
+        val = deqp.get_option(dep_env, dep_conf)
+
+        if dep_env is not None and os.environ.get(dep_env) is not None:
+            # see if the old environment variable was set, if it is uses it,
+            # and give a deprecation warning
+            warnings.warn(
+                '{} has been replaced by {} and will be removed. You should '
+                'update any scripts using the old environment variable'.format(
+                    dep_env, env_))
+        elif dep_conf != ('', '') and PIGLIT_CONFIG.has_option(*dep_conf):
+            warnings.warn(
+                '{} has been replaced by {} and will be removed. You should '
+                'update any scripts using the old conf variable'.format(
+                    ':'.join(dep_conf), ':'.join(conf_)))
+
+    return val if val is not None else deqp.get_option(env_, conf_, **kwargs)
+
+
+_DEQP_GLES3_BIN = _deprecated_get('PIGLIT_DEQP_GLES3_BIN',
+                                  ('deqp-gles3', 'bin'),
+                                  required=True,
+                                  dep_env='PIGLIT_DEQP_GLES3_EXE',
+                                  dep_conf=('deqp-gles3', 'exe'))
+
+_DEQP_MUSTPASS = _deprecated_get('PIGLIT_DEQP3_MUSTPASS',
+                                 ('deqp-gles3', 'mustpasslist'),
+                                 dep_env='PIGLIT_DEQP_MUSTPASS',
+                                 required=OPTIONS.deqp_mustpass)
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                               ('deqp-gles3', 'extra_args'),
@@ -58,7 +80,7 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
 
 
 class DEQPGLES3Test(deqp.DEQPBaseTest):
-    deqp_bin = _DEQP_GLES3_EXE
+    deqp_bin = _DEQP_GLES3_BIN
 
     @property
     def extra_args(self):
@@ -71,6 +93,6 @@ class DEQPGLES3Test(deqp.DEQPBaseTest):
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
-    deqp.select_source(_DEQP_GLES3_EXE, 'dEQP-GLES3-cases.txt', _DEQP_MUSTPASS,
+    deqp.select_source(_DEQP_GLES3_BIN, 'dEQP-GLES3-cases.txt', _DEQP_MUSTPASS,
                        _EXTRA_ARGS),
     DEQPGLES3Test)
