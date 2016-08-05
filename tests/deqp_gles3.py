@@ -23,6 +23,8 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import os
+import warnings
 
 from framework.test import deqp
 
@@ -33,8 +35,16 @@ _DEQP_GLES3_EXE = deqp.get_option('PIGLIT_DEQP_GLES3_EXE',
                                   ('deqp-gles3', 'exe'),
                                   required=True)
 
-_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP_MUSTPASS',
+_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP3_MUSTPASS',
                                  ('deqp-gles3', 'mustpasslist'))
+if os.environ.get('PIGLIT_DEQP_MUSTPASS') is not None:
+    # see if the old environment variable was set, if it is uses it, and give a
+    # deprecation warning
+    _DEQP_MUSTPASS = os.environ['PIGLIT_DEQP_MUSTPASS']
+    warnings.warn(
+        'PIGLIT_DEQP_MUSTPASS has been replaced by PIGLIT_DEQP3_MUSTPASS '
+        'and will be removed. You should update and scripts using the old '
+        'environment variable')
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                               ('deqp-gles3', 'extra_args'),
@@ -55,6 +65,6 @@ class DEQPGLES3Test(deqp.DEQPBaseTest):
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
-    deqp.select_source(_DEQP_MUSTPASS, _DEQP_GLES3_EXE, 'dEQP-GLES3-cases.txt',
+    deqp.select_source(_DEQP_GLES3_EXE, 'dEQP-GLES3-cases.txt', _DEQP_MUSTPASS,
                        _EXTRA_ARGS),
     DEQPGLES3Test)

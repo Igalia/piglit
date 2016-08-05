@@ -33,6 +33,9 @@ _DEQP_GLES2_BIN = deqp.get_option('PIGLIT_DEQP_GLES2_BIN',
                                   ('deqp-gles2', 'bin'),
                                   required=True)
 
+_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP2_MUSTPASS',
+                                 ('deqp-gles2', 'mustpasslist'))
+
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES2_EXTRA_ARGS',
                               ('deqp-gles2', 'extra_args'),
                               default='').split()
@@ -49,7 +52,6 @@ class DEQPGLES2Test(deqp.DEQPBaseTest):
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
-    deqp.iter_deqp_test_cases(
-        deqp.gen_caselist_txt(_DEQP_GLES2_BIN, 'dEQP-GLES2-cases.txt',
-                              _EXTRA_ARGS)),
+    deqp.select_source(_DEQP_GLES2_BIN, 'dEQP-GLES2-cases.txt', _DEQP_MUSTPASS,
+                       _EXTRA_ARGS),
     DEQPGLES2Test)

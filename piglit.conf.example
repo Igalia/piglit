@@ -57,7 +57,12 @@ testB
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
 
-;[deqp-gles3]
+; Path to the test case list of CTS for deqp-gles2. You can also set this with
+; the environment variable PIGLIT_DEQP2_MUSTPASS. Piglit will run the subset of
+; dEQP-GLES2 tests if this option is set.
+;mustpasslist=/home/knuth/src/deqp/android/cts/com.drawelements.deqp.gles2.xml
+
+[deqp-gles3]
 ;
 ; Path to the deqp-gles3 executable. You can also set this with the environment
 ; variable PIGLIT_DEQP_GLES3_EXE. Piglit will run the dEQP-GLES3 tests if and
@@ -70,10 +75,9 @@ testB
 ;extra_args=--deqp-visibility hidden
 ;
 ; Path to the test case list of CTS for deqp-gles3. You can also set this with
-; the environment variable PIGLIT_DEQP_MUSTPASS. Piglit will run the subset of
-; dEQP-GLES3 tests if and only if this option is set.
-;mustpasslist= \
-; /android/platform/external/deqp/android/cts/com.drawelements.deqp.gles3.xml
+; the environment variable PIGLIT_DEQP3_MUSTPASS. Piglit will run the subset of
+; dEQP-GLES3 tests if this option is set.
+;mustpasslist=/home/knuth/src/deqp/android/cts/com.drawelements.deqp.gles3.xml
 
 [deqp-gles31]
 ; Path to the deqp-gles31 executable
@@ -84,6 +88,11 @@ testB
 ; option is not required. The environment variable PIGLIT_DEQP_GLES31_EXTRA_ARGS
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
+
+; Path to the test case list of CTS for deqp-gles31. You can also set this with
+; the environment variable PIGLIT_DEQP31_MUSTPASS. Piglit will run the subset of
+; dEQP-GLES31 tests if this option is set.
+;mustpasslist=/home/knuth/src/deqp/android/cts/com.drawelements.deqp.gles31.xml
 
 [deqp-vk]
 ; Path to the deqp-ck executable
@@ -201,3 +210,5 @@ run_test=./%(test_name)s
 ;type=dmesg
 ;parameters=--level emerg,alert,crit,err,warn,notice
 ;regex=\*ERROR\* ring create req|\*ERROR\* Failed to reset chip|BUG:|Oops:|turning off the locking correctness validator
+
+; vim: ft=dosini
