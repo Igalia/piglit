@@ -27,6 +27,8 @@ import os
 import warnings
 
 from framework.test import deqp
+from framework.options import OPTIONS
+from framework import exceptions
 
 __all__ = ['profile']
 
@@ -45,6 +47,10 @@ if os.environ.get('PIGLIT_DEQP_MUSTPASS') is not None:
         'PIGLIT_DEQP_MUSTPASS has been replaced by PIGLIT_DEQP3_MUSTPASS '
         'and will be removed. You should update and scripts using the old '
         'environment variable')
+
+if OPTIONS.deqp_mustpass and not _DEQP_MUSTPASS:
+    raise exceptions.PiglitFatalError(
+        'Use of mustpasslist requested, but no mustpasslist provided.')
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                               ('deqp-gles3', 'extra_args'),

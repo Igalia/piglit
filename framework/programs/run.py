@@ -172,6 +172,12 @@ def _run_parser(input_):
                         dest='overwrite',
                         action='store_true',
                         help='If the results_path already exists, delete it')
+    parser.add_argument('--deqp-mustpass-list',
+                        dest='deqp_mustpass',
+                        action='store_true',
+                        help='Run only the tests in the deqp mustpass list '
+                             'when running a deqp gles{2,3,31} profile, '
+                             'otherwise run all tests.')
     parser.add_argument("test_profile",
                         metavar="<Profile path(s)>",
                         nargs='+',
@@ -252,6 +258,7 @@ def run(input_):
     options.OPTIONS.dmesg = args.dmesg
     options.OPTIONS.monitored = args.monitored
     options.OPTIONS.sync = args.sync
+    options.OPTIONS.deqp_mustpass = args.deqp_mustpass
 
     # Set the platform to pass to waffle
     options.OPTIONS.env['PIGLIT_PLATFORM'] = args.platform
@@ -338,6 +345,7 @@ def resume(input_):
     options.OPTIONS.dmesg = results.options['dmesg']
     options.OPTIONS.monitored = results.options['monitored']
     options.OPTIONS.sync = results.options['sync']
+    options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
 
     core.get_config(args.config_file)
 

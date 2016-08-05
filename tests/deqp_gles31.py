@@ -25,6 +25,7 @@ from __future__ import (
 )
 
 from framework.test import deqp
+from framework.options import OPTIONS
 
 __all__ = ['profile']
 
@@ -34,7 +35,8 @@ _DEQP_GLES31_BIN = deqp.get_option('PIGLIT_DEQP_GLES31_BIN',
                                    required=True)
 
 _DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP31_MUSTPASS',
-                                 ('deqp-gles31', 'mustpasslist'))
+                                 ('deqp-gles31', 'mustpasslist'),
+                                 required=OPTIONS.deqp_mustpass)
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES31_EXTRA_ARGS',
                               ('deqp-gles31', 'extra_args'),

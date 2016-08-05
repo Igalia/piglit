@@ -33,6 +33,7 @@ import six
 from six.moves import range
 
 from framework import core, grouptools, exceptions
+from framework import options
 from framework.profile import TestProfile
 from framework.test.base import Test, is_crash_returncode, TestRunError
 
@@ -71,7 +72,7 @@ _EXTRA_ARGS = get_option('PIGLIT_DEQP_EXTRA_ARGS',
 
 def select_source(bin_, filename, mustpass, extra_args):
     """Return either the mustpass list or the generated list."""
-    if mustpass is not None:
+    if options.OPTIONS.deqp_mustpass:
         return gen_mustpass_tests(mustpass)
     else:
         return iter_deqp_test_cases(

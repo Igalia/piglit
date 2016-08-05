@@ -180,8 +180,9 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     dmesg -- True if dmesg checking is desired. This forces concurrency off
     monitored -- True if monitoring is desired. This forces concurrency off
     env -- environment variables set for each test before run
-
+    deqp_mustpass -- True to enable the use of the deqp mustpass list feature.
     """
+
     include_filter = _ReListDescriptor('_include_filter', type_=_FilterReList)
     exclude_filter = _ReListDescriptor('_exclude_filter', type_=_FilterReList)
 
@@ -195,6 +196,7 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.dmesg = False
         self.monitored = False
         self.sync = False
+        self.deqp_mustpass = False
 
         # env is used to set some base environment variables that are not going
         # to change across runs, without sending them to os.environ which is
