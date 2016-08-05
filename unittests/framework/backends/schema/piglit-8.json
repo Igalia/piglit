@@ -47,8 +47,7 @@
                     "type": "array",
                     "items": { "type": "string" }
                 }
-            },
-            "additionalProperties": false
+            }
         },
         "totals": {
             "type": "object",
