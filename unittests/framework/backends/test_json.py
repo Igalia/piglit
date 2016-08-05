@@ -31,7 +31,7 @@ except ImportError:
 try:
     import mock
 except ImportError:
-    from unittests import mock
+    from unittest import mock
 
 import jsonschema
 import pytest
