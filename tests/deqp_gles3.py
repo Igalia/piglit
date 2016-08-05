@@ -24,8 +24,6 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
-import xml.etree.cElementTree as ET
-
 from framework.test import deqp
 
 __all__ = ['profile']
@@ -35,49 +33,12 @@ _DEQP_GLES3_EXE = deqp.get_option('PIGLIT_DEQP_GLES3_EXE',
                                   ('deqp-gles3', 'exe'),
                                   required=True)
 
-# Path to the xml file which contained the case list of the subset of dEQP
-# and marked as must pass in CTS.
 _DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP_MUSTPASS',
                                  ('deqp-gles3', 'mustpasslist'))
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                               ('deqp-gles3', 'extra_args'),
                               default='').split()
-
-
-def _get_test_case(root, root_group, outputfile):
-    """Parser the test case list of Google Android CTS,
-    and store the test case list to dEQP-GLES3-cases.txt
-    """
-    for child in root:
-        root_group.append(child.get('name'))
-        if child.tag == "Test":
-            outputfile.write('TEST: {}\n'.format('.'.join(root_group)))
-            del root_group[-1]
-        else:
-            _get_test_case(child, root_group, outputfile)
-            del root_group[-1]
-
-
-def _load_test_hierarchy(mustpass, case_list):
-    """Google have added a subset of dEQP to CTS test, the case list is stored
-    at some xml files. Such as: com.drawelements.deqp.gles3.xml This function
-    is used to parser the file, and generate a new dEQP-GLES3-cases.txt which
-    only contain the subset of dEQP.
-    """
-    tree = ET.parse(mustpass)
-    root = tree.getroot()
-    root_group = []
-    with open(case_list, 'w') as f:
-        _get_test_case(root, root_group, f)
-
-
-def filter_mustpass(caselist_path):
-    """Filter tests that are not in the DEQP_MUSTPASS profile."""
-    if _DEQP_MUSTPASS is not None:
-        _load_test_hierarchy(_DEQP_MUSTPASS, caselist_path)
-
-    return caselist_path
 
 
 class DEQPGLES3Test(deqp.DEQPBaseTest):
@@ -94,7 +55,6 @@ class DEQPGLES3Test(deqp.DEQPBaseTest):
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
-    deqp.iter_deqp_test_cases(filter_mustpass(
-        deqp.gen_caselist_txt(_DEQP_GLES3_EXE, 'dEQP-GLES3-cases.txt',
-                              _EXTRA_ARGS))),
+    deqp.select_source(_DEQP_MUSTPASS, _DEQP_GLES3_EXE, 'dEQP-GLES3-cases.txt',
+                       _EXTRA_ARGS),
     DEQPGLES3Test)

@@ -24,6 +24,10 @@ from __future__ import (
 import abc
 import os
 import subprocess
+try:
+    from lxml import etree as et
+except ImportError:
+    from xml.etree import cElementTree as et
 
 import six
 from six.moves import range
@@ -65,6 +69,15 @@ _EXTRA_ARGS = get_option('PIGLIT_DEQP_EXTRA_ARGS',
                          default='').split()
 
 
+def select_source(bin_, filename, mustpass, extra_args):
+    """Return either the mustpass list or the generated list."""
+    if mustpass is not None:
+        return gen_mustpass_tests(mustpass)
+    else:
+        return iter_deqp_test_cases(
+            gen_caselist_txt(bin_, filename, extra_args))
+
+
 def make_profile(test_list, test_class):
     """Create a TestProfile instance."""
     profile = TestProfile()
@@ -74,6 +87,25 @@ def make_profile(test_list, test_class):
         profile.test_list[piglit_name] = test_class(testname)
 
     return profile
+
+
+def gen_mustpass_tests(mp_list):
+    """Return a testlist from the mustpass list."""
+    root = et.parse(mp_list).getroot()
+    group = []
+
+    def gen(base):
+        for elem in base:
+            if elem.tag == 'Test':
+                yield '{}.{}'.format('.'.join(group), elem.get('name'))
+            else:
+                group.append(elem.get('name'))
+                for test in gen(elem):
+                    yield test
+                del group[-1]
+
+    for test in gen(root):
+        yield test
 
 
 def gen_caselist_txt(bin_, caselist, extra_args):
