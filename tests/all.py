@@ -1972,6 +1972,7 @@ with profile.test_list.group_manager(
     g(['arb_draw_indirect-draw-elements-prim-restart-ugly'])
     g(['arb_draw_indirect-draw-arrays-instances'])
     g(['arb_draw_indirect-draw-arrays-shared-binding'])
+    g(['arb_draw_indirect-transform-feedback'])
     g(['arb_draw_indirect-vertexid'],
       'gl_VertexID used with glDrawArraysIndirect')
     g(['arb_draw_indirect-vertexid', 'elements'],
