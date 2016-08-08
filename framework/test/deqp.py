@@ -36,8 +36,9 @@ from six.moves import range
 
 from framework import core, grouptools, exceptions
 from framework import options
+from framework import status
+from framework.test import base
 from framework.profile import TestProfile
-from framework.test.base import Test, is_crash_returncode, TestRunError
 
 __all__ = [
     'DEQPBaseTest',
@@ -72,6 +73,14 @@ _EXTRA_ARGS = get_option('PIGLIT_DEQP_EXTRA_ARGS',
                          default='').split()
 
 
+class DEQPUnsupportedMode(exceptions.PiglitInternalError):
+    """An exception raised when dEQP/piglit doesn't support the given mode.
+
+    Primarily this is meant to be used in the deqp_gles* modules, where
+    group-at-a-time can actually make them slower.
+    """
+
+
 def select_source(bin_, filename, mustpass, extra_args):
     """Return either the mustpass list or the generated list."""
     if options.OPTIONS.deqp_mustpass:
@@ -97,8 +106,8 @@ def gen_mustpass_tests(mp_list):
     root = et.parse(mp_list).getroot()
     group = []
 
-    def gen(base):
-        for elem in base:
+    def gen(root):
+        for elem in root:
             if elem.tag == 'Test':
                 yield '{}.{}'.format('.'.join(group), elem.get('name'))
             else:
@@ -152,24 +161,53 @@ def iter_deqp_test_cases(case_file):
                     'deqp: {}:{}: ill-formed line'.format(case_file, i))
 
 
-@six.add_metaclass(abc.ABCMeta)
-class DEQPBaseTest(Test):
-    """Base test class for dEQP suites.
+def format_trie_list(classname, testnames):
+    """Create a trie list from classname and testnames.
 
-    Each particular dEQP implementation will need to override the two abstract
-    properties (the easiest way to do so is as a class attribute), otherwise
-    not other changes are required.
+    dEQP doesn't accept multiple --deqp-case/-n flags, so we need this.  It's
+    called Trie, and it's ugly as heck. Trie is like
+    {group1{group2{test1,test2}}} (as a simple example. Every other method
+    involves creating files, so it's really the only viable method.
+
+    This string looks like gobly-gook, but basicaly in python formatted
+    strings a '{{' becomes a '{' (since {} has special meaning).
+    """
+    return '--deqp-caselist={{{0}{{{1}}}{2}'.format(
+        '{'.join(classname), ','.join(testnames), '}' * len(classname))
+
+
+class _DEQPCase(object):
+    """Mixin to provide the --deqp-case argument."""
+
+    def __init__(self, case_name, *args, **kwargs):
+        super(_DEQPCase, self).__init__('--deqp-case=' + case_name, *args, **kwargs)
+
+
+@six.add_metaclass(abc.ABCMeta)
+class DEQPBaseTest(base.Test):
+    """A shared base class that provides some shared methods and attributes for
+    use by both the Single and Group classes.
     """
 
-    __RESULT_MAP = {
-        "Pass": "pass",
-        "Fail": "fail",
-        "QualityWarning": "warn",
-        "InternalError": "fail",
-        "Crash": "crash",
-        "NotSupported": "skip",
-        "ResourceError": "crash",
+    _RESULT_MAP = {
+        "Pass": status.PASS,
+        "Fail": status.FAIL,
+        "QualityWarning": status.WARN,
+        "InternalError": status.FAIL,
+        "Crash": status.CRASH,
+        "NotSupported": status.SKIP,
+        "ResourceError": status.CRASH,
     }
+
+    def __init__(self, command):
+        command = [self.deqp_bin, command]
+
+        super(DEQPBaseTest, self).__init__(command)
+
+        # dEQP's working directory must be the same as that of the executable,
+        # otherwise it cannot find its data files (2014-12-07).
+        # This must be called after super or super will overwrite it
+        self.cwd = os.path.dirname(self.deqp_bin)
 
     @abc.abstractproperty
     def deqp_bin(self):
@@ -185,23 +223,19 @@ class DEQPBaseTest(Test):
         """
         return _EXTRA_ARGS
 
-    def __init__(self, case_name):
-        command = [self.deqp_bin, '--deqp-case=' + case_name]
-
-        super(DEQPBaseTest, self).__init__(command)
-
-        # dEQP's working directory must be the same as that of the executable,
-        # otherwise it cannot find its data files (2014-12-07).
-        # This must be called after super or super will overwrite it
-        self.cwd = os.path.dirname(self.deqp_bin)
-
     # The error of the getter is a known bug in pylint
     # https://github.com/PyCQA/pylint/issues/844
-    @Test.command.getter  # pylint: disable=no-member
+    @base.Test.command.getter  # pylint: disable=no-member
     def command(self):
         """Return the command plus any extra arguments."""
         command = super(DEQPBaseTest, self).command
         return command + self.extra_args
+
+
+# Pylint can't figure out the six magic.
+@six.add_metaclass(abc.ABCMeta)  # pylint: disable=abstract-method
+class DEQPSingleTest(_DEQPCase, DEQPBaseTest):
+    """Base test class for dEQP tests to run a single test per process."""
 
     def __find_map(self):
         """Run over the lines and set the result."""
@@ -209,13 +243,13 @@ class DEQPBaseTest(Test):
         # otherwise this requires some break/else/continue madness
         for line in self.result.out.split('\n'):
             line = line.lstrip()
-            for k, v in six.iteritems(self.__RESULT_MAP):
+            for k, v in six.iteritems(self._RESULT_MAP):
                 if line.startswith(k):
                     self.result.result = v
                     return
 
     def interpret_result(self):
-        if is_crash_returncode(self.result.returncode):
+        if base.is_crash_returncode(self.result.returncode):
             self.result.result = 'crash'
         elif self.result.returncode != 0:
             self.result.result = 'fail'
@@ -229,10 +263,150 @@ class DEQPBaseTest(Test):
     def _run_command(self, *args, **kwargs):
         """Rerun the command if X11 connection failure happens."""
         for _ in range(5):
-            super(DEQPBaseTest, self)._run_command(*args, **kwargs)
+            super(DEQPSingleTest, self)._run_command(*args, **kwargs)
             x_err_msg = "FATAL ERROR: Failed to open display"
             if x_err_msg in self.result.err or x_err_msg in self.result.out:
                 continue
             return
 
-        raise TestRunError('Failed to connect to X server 5 times', 'fail')
+        raise base.TestRunError('Failed to connect to X server 5 times', 'fail')
+
+
+# Pylint can't figure out the six magic.
+@six.add_metaclass(abc.ABCMeta)  # pylint: disable=abstract-method
+class DEQPGroupTest(base.ReducedProcessMixin, DEQPBaseTest):
+    """A class for running DEQP in a group at a time mode.
+
+    With this class (in contrast to DEQPBaseTest), multiple tests will be run
+    in a single process ("group-at-a-time"), this reduces reliablity somewhat,
+    but vastly reduces runtime, which may be an acceptable tradoff.
+
+    Each test is stored as a subtest, and the stdout and stderr is combined.
+
+    This class is aware of which tests should be run by the process, and if the
+    process ends in a non 0 status it will attempt to resume the tests.
+    """
+
+    def __init__(self, command, case_name, subtests):
+        super(DEQPGroupTest, self).__init__(command, subtests=subtests)
+
+        self.__casename = case_name
+
+    def _populate_subtests(self):
+        # Only add the subtest name, not the group name
+        self.result.subtests.update(
+            {self._subtest_name(x): status.NOTRUN for x in self._expected})
+
+    def interpret_result(self):
+        # We failed to parse the test output. Fallback to 'fail'.
+        if base.is_crash_returncode(self.result.returncode):
+            self.result.result = status.CRASH
+        elif self.result.returncode != 0:
+            self.result.result = status.FAIL
+
+        current = None
+
+        for line in self.result.out.split('\n'):
+            if self._is_subtest(line):
+                # There is one case where it is valid for current to be not
+                # None, and that's when a case crashed, and the resume happens
+                # the case will have no status, but it should have been marked
+                # crash in that case, so if it's still NOTRUN then something is
+                # wrong
+                assert (current is None or
+                        self.result.subtests[current] is not status.NOTRUN), \
+                    'Two test cases opened?'
+
+                # Get only the test name, not the group name
+                current = self._subtest_name(line[:-3])
+                assert current in self.result.subtests
+
+            elif line.startswith('  '):
+                try:
+                    res = self._RESULT_MAP[line.lstrip().split(' ', 1)[0]]
+                except KeyError:
+                    # In general there are only two cases that that will match
+                    # the elif and those are during the first and last lines
+                    # of the output. In some dEQP based suites that number is
+                    # higher (the GLES CTS for example). However the number is
+                    # small enough that simply continue-ing on the exception
+                    # is more efficient to try/except than to write an if
+                    # statement that covers all of the potential cases.
+                    continue
+
+                assert current is not None, 'Result without case?'
+
+                self.result.subtests[current] = res
+
+                # That case is closed, reset current
+                current = None
+
+    def __calculate_resume(self, current):
+        self.result.out += 'Splitting command to avoid too-long argument\n\n'
+        val = ((current // 1000) + 1) * 1000
+        if current % 1000 == 999:
+            val += 1000
+        return val
+
+    def _resume(self, current):
+        # The command needs to be the deqp binary, eachsubtest, and then the
+        # extra args
+        command = [self.command[0]]
+
+        command.append(format_trie_list(
+            self.__casename.split('.'),
+            (self._get_test(s) for s in
+             self._expected[current:self.__calculate_resume(current)])))
+        assert len(command[-1]) < 65000, len(command[-1])
+        command.extend(self.extra_args)
+        return command
+
+    def _is_subtest(self, line):
+        return line.startswith("Test case '") and line.endswith("'..")
+
+    @staticmethod
+    def _get_test(test):
+        return test.rsplit('.', 1)[1]
+
+    def _subtest_name(self, test):
+        return self._get_test(test).lower()
+
+
+# Pylint can't figure out the six magic.
+class DEQPGroupAsteriskTest(_DEQPCase, DEQPGroupTest):  # pylint: disable=abstract-method
+    """A class that uses .* to construct case names.
+
+    This class uses an asterisk append to the end of the group name
+    ("my.group.*") to run multiple cases at a time. This has the advantage of
+    being very succinct, and for the Vulkan CTS avoids the problem of building
+    a "trie" command so long that the binary cannot parse it. But for other
+    suites like the OpenGL CTS this isn't workable because it has groups that
+    contain both tests and groups other groups.
+    """
+
+    def __init__(self, case_name, subtests):
+        # This is not exactly correct since if someone were to turn on the
+        # group at a time mode and try to use the mustpass list it would fail,
+        # but piglit doesn't support that configuration because it's slower than
+        # test at a time, and removes the protections of process isolation.
+        super(DEQPGroupAsteriskTest, self).__init__(
+            case_name + '.*', case_name, subtests=subtests)
+
+
+# Pylint can't figure out the six magic.
+class DEQPGroupTrieTest(DEQPGroupTest):  # pylint: disable=abstract-method
+    """A class that uses trie lists to construct the testcase arguments.
+
+    This class uses trie lists to construct the command for the test. This has
+    the advantage of working correctly for groups that contain both tests and
+    groups, but has the disadvantage of being more verbose, and lists can be
+    constructed that are so large the dEQP binary can't parse them.
+    """
+
+    def __init__(self, case_name, subtests):
+        super(DEQPGroupTrieTest, self).__init__(
+            format_trie_list(
+                case_name.split('.'),
+                (self._get_test(s) for s in subtests)),
+            case_name,
+            subtests=subtests)
