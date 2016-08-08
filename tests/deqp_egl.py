@@ -38,7 +38,7 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_EGL_EXTRA_ARGS',
                               default='').split()
 
 
-class DEQPEGLTest(deqp.DEQPBaseTest):
+class DEQPEGLTest(deqp.DEQPSingleTest):
     deqp_bin = _EGL_BIN
 
     @property

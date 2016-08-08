@@ -46,7 +46,7 @@ _DEQP_ASSERT = re.compile(
     r'deqp-vk: external/vulkancts/.*: Assertion `.*\' failed.')
 
 
-class DEQPVKTest(deqp.DEQPBaseTest):
+class DEQPVKTest(deqp.DEQPSingleTest):
     """Test representation for Khronos Vulkan CTS."""
     timeout = 60
     deqp_bin = _DEQP_VK_BIN

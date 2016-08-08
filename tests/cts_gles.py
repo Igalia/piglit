@@ -58,7 +58,7 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_CTS_GLES_EXTRA_ARGS', ('cts_gles', 'extra_
                               default='').split()
 
 
-class DEQPCTSTest(deqp.DEQPBaseTest):
+class DEQPCTSTest(deqp.DEQPSingleTest):
     deqp_bin = _CTS_BIN
 
     @property

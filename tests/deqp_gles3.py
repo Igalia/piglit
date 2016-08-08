@@ -79,7 +79,7 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                               default='').split()
 
 
-class DEQPGLES3Test(deqp.DEQPBaseTest):
+class DEQPGLES3Test(deqp.DEQPSingleTest):
     deqp_bin = _DEQP_GLES3_BIN
 
     @property

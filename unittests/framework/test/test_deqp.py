@@ -46,7 +46,17 @@ from framework.test import deqp
 # pylint:disable=invalid-name,no-self-use
 
 
-class _DEQPTestTest(deqp.DEQPBaseTest):
+class _DEQPTestTest(deqp.DEQPSingleTest):
+    deqp_bin = 'deqp.bin'
+    extra_args = ['extra']
+
+
+class _DEQPGroupAsteriskTest(deqp.DEQPGroupAsteriskTest):
+    deqp_bin = 'deqp.bin'
+    extra_args = ['extra']
+
+
+class _DEQPGroupTrieTest(deqp.DEQPGroupTrieTest):
     deqp_bin = 'deqp.bin'
     extra_args = ['extra']
 
@@ -146,15 +156,27 @@ class TestIterDeqpTestCases(object):
             self._do_test('this will fail', None, tmpdir)
 
 
-class TestDEQPBaseTest(object):
-    """Test the DEQPBaseTest class."""
+class TestFormatTrieList(object):
+    """Tests for the format_trie_list function."""
+
+    def test_basic(self):
+        classname = ['foo', 'bar']
+        testnames = ['a', 'b']
+        expected = '--deqp-caselist={foo{bar{a,b}}}'
+        actual = deqp.format_trie_list(classname, testnames)
+        assert actual == expected
+
+
+class TestDEQPSingleTest(object):
+    """Test the DEQPSingleTest class."""
 
     @classmethod
     def setup_class(cls):
         cls.test = _DEQPTestTest('a.deqp.test')
 
-    def test_command_adds_extra_args(self):
-        assert self.test.command[-1] == 'extra'
+    def test_command(self):
+        assert self.test.command == \
+            ['deqp.bin', '--deqp-case=a.deqp.test', 'extra']
 
     class TestInterpretResultReturncodes(object):
         """Test the interpret_result method's returncode handling."""
@@ -164,7 +186,7 @@ class TestDEQPBaseTest(object):
             cls.test = _DEQPTestTest('a.deqp.test')
 
         def test_crash(self):
-            """deqp.DEQPBaseTest.interpret_result: if returncode is < 0 stauts
+            """deqp.DEQPSingleTest.interpret_result: if returncode is < 0 stauts
             is crash.
             """
             self.test.result.returncode = -9
@@ -172,7 +194,7 @@ class TestDEQPBaseTest(object):
             assert self.test.result.result is status.CRASH
 
         def test_returncode_fail(self):
-            """deqp.DEQPBaseTest.interpret_result: if returncode is > 0 result
+            """deqp.DEQPSingleTest.interpret_result: if returncode is > 0 result
             is fail.
             """
             self.test.result.returncode = 1
@@ -180,7 +202,7 @@ class TestDEQPBaseTest(object):
             assert self.test.result.result is status.FAIL
 
         def test_fallthrough(self):
-            """deqp.DEQPBaseTest.interpret_result: if no case is hit set to
+            """deqp.DEQPSingleTest.interpret_result: if no case is hit set to
             fail.
             """
             self.test.result.returncode = 0
@@ -189,7 +211,7 @@ class TestDEQPBaseTest(object):
             assert self.test.result.result is status.FAIL
 
         def test_windows_returncode_3(self, mocker):
-            """deqp.DEQPBaseTest.interpret_result: on windows returncode 3 is
+            """deqp.DEQPSingleTest.interpret_result: on windows returncode 3 is
             crash.
             """
             mocker.patch('framework.test.base.sys.platform', 'win32')
@@ -197,8 +219,8 @@ class TestDEQPBaseTest(object):
             self.test.interpret_result()
             assert self.test.result.result is status.CRASH
 
-    class TestDEQPBaseTestIntepretResultOutput(object):
-        """Tests for DEQPBaseTest.__find_map."""
+    class TestIntepretResultOutput(object):
+        """Tests for DEQPSingleTest.__find_map."""
 
         inst = None
         __OUT = textwrap.dedent("""\
@@ -240,31 +262,31 @@ class TestDEQPBaseTest(object):
             self.inst.result.returncode = 0
 
         def test_fail(self):
-            """test.deqp.DEQPBaseTest.interpret_result: when Fail in result the
-            result is 'fail'.
+            """test.deqp.DEQPSingleTest.interpret_result: when Fail in result
+            the result is 'fail'.
             """
             self.inst.result.out = self.__gen_stdout('Fail')
             self.inst.interpret_result()
             assert self.inst.result.result is status.FAIL
 
         def test_pass(self):
-            """test.deqp.DEQPBaseTest.interpret_result: when Pass in result the
-            result is 'Pass'.
+            """test.deqp.DEQPsingleTest.interpret_result: when Pass in result
+            the result is 'Pass'.
             """
             self.inst.result.out = self.__gen_stdout('Pass')
             self.inst.interpret_result()
             assert self.inst.result.result is status.PASS
 
         def test_warn(self):
-            """test.deqp.DEQPBaseTest.interpret_result: when QualityWarning in
-            result the result is 'warn'.
+            """test.deqp.DEQPSingleTest.interpret_result: when QualityWarning
+            in result the result is 'warn'.
             """
             self.inst.result.out = self.__gen_stdout('QualityWarning')
             self.inst.interpret_result()
             assert self.inst.result.result is status.WARN
 
         def test_error(self):
-            """test.deqp.DEQPBaseTest.interpret_result: when InternalError in
+            """test.deqp.DEQPSingleTest.interpret_result: when InternalError in
             result the result is 'fail'.
             """
             self.inst.result.out = self.__gen_stdout('InternalError')
@@ -272,7 +294,7 @@ class TestDEQPBaseTest(object):
             assert self.inst.result.result is status.FAIL
 
         def test_crash(self):
-            """test.deqp.DEQPBaseTest.interpret_result: when InternalError in
+            """test.deqp.DEQPSingleTest.interpret_result: when InternalError in
             result the result is 'crash'.
             """
             self.inst.result.out = self.__gen_stdout('Crash')
@@ -280,7 +302,7 @@ class TestDEQPBaseTest(object):
             assert self.inst.result.result is status.CRASH
 
         def test_skip(self):
-            """test.deqp.DEQPBaseTest.interpret_result: when NotSupported in
+            """test.deqp.DEQPSingleTest.interpret_result: when NotSupported in
             result the result is 'skip'.
             """
             self.inst.result.out = self.__gen_stdout('NotSupported')
@@ -288,12 +310,151 @@ class TestDEQPBaseTest(object):
             assert self.inst.result.result is status.SKIP
 
         def test_resourceerror(self):
-            """test.deqp.DEQPBaseTest.interpret_result: when ResourceError in
+            """test.deqp.DEQPSingleTest.interpret_result: when ResourceError in
             result the result is 'crash'.
             """
             self.inst.result.out = self.__gen_stdout('ResourceError')
             self.inst.interpret_result()
             assert self.inst.result.result is status.CRASH
+
+
+class TestDEQPGroupTest(object):
+    """Tests for the DEQPGroupTest class."""
+
+    def test_asterisk_command(self):
+        test = _DEQPGroupAsteriskTest('foo.bar.aux', ['foo.bar.aux.a'])
+        assert test.command == \
+            ['deqp.bin', "--deqp-case=foo.bar.aux.*", 'extra']
+
+    def test_trie_command(self):
+        test = _DEQPGroupTrieTest('foo.bar.aux',
+                                  ['foo.bar.aux.a', 'foo.bar.aux.b'])
+        assert test.command == \
+            ['deqp.bin', "--deqp-caselist={foo{bar{aux{a,b}}}}", 'extra']
+
+    def test_subtests_prepopulated(self):
+        subtests = {'foo.bar.aux.oh', 'foo.bar.aux.mok', 'foo.bar.aux.go'}
+        expected = {'oh', 'mok', 'go'}
+        test = _DEQPGroupAsteriskTest('foo.bar.aux', subtests)
+        assert set(test.result.subtests.keys()) == expected
+        assert set(test.result.subtests.values()) == {status.NOTRUN}
+
+    class TestInterpretResult(object):
+        """Tests for DEQPGroupTest.interpret_result."""
+
+        def test_subtests_assigned(self):
+            """Each subtest should be updated, not of them should still be
+            status.NOTRUN, and no new ones should be added.
+            """
+            test = _DEQPGroupAsteriskTest(
+                'dEQP-VK.api.smoke',
+                ['dEQP-VK.api.smoke.create_sampler',
+                 'dEQP-VK.api.smoke.create_shader',
+                 'dEQP-VK.api.smoke.triangle',
+                 'dEQP-VK.api.smoke.asm_triangle',
+                 'dEQP-VK.api.smoke.asm_triangle_no_opname',
+                 'dEQP-VK.api.smoke.unused_resolve_attachment',
+                ])
+            test.result.returncode = 0
+            test.result.out = textwrap.dedent("""\
+                dEQP Core git-fc145f51987c742ecaa162c2ef540a5f47482547 (0xfc145f51) starting..
+                  target implementation = 'Null'
+
+                Test case 'dEQP-VK.api.smoke.create_sampler'..
+                Test case duration in microseconds = 4 us
+                  Pass (Creating sampler succeeded)
+
+                Test case 'dEQP-VK.api.smoke.create_shader'..
+                Vertex shader compile time = 8.565000 ms
+                Link time = 0.003000 ms
+                Test case duration in microseconds = 8907 us
+                  Pass (Creating shader module succeeded)
+
+                Test case 'dEQP-VK.api.smoke.triangle'..
+                Fragment shader compile time = 0.268000 ms
+                Link time = 0.002000 ms
+                Vertex shader compile time = 0.256000 ms
+                Link time = 0.003000 ms
+                Test case duration in microseconds = 15645 us
+                  Fail (Image comparison failed)
+
+                Test case 'dEQP-VK.api.smoke.asm_triangle'..
+                SpirV assembly time = 0.063000 ms
+                SpirV assembly time = 0.047000 ms
+                Test case duration in microseconds = 15078 us
+                  Fail (Image comparison failed)
+
+                Test case 'dEQP-VK.api.smoke.asm_triangle_no_opname'..
+                SpirV assembly time = 0.038000 ms
+                SpirV assembly time = 0.064000 ms
+                Test case duration in microseconds = 14866 us
+                  Fail (Image comparison failed)
+
+                Test case 'dEQP-VK.api.smoke.unused_resolve_attachment'..
+                Fragment shader compile time = 0.266000 ms
+                Link time = 0.002000 ms
+                Vertex shader compile time = 0.251000 ms
+                Link time = 0.002000 ms
+                Test case duration in microseconds = 15412 us
+                  Fail (Image comparison failed)
+
+                DONE!
+
+                Test run totals:
+                  Passed:        2/6 (33.3%)
+                  Failed:        4/6 (66.7%)
+                  Not supported: 0/6 (0.0%)
+                  Warnings:      0/6 (0.0%)
+            """)
+            test.interpret_result()
+
+            assert test.result.subtests == {
+                'create_sampler': status.PASS,
+                'create_shader': status.PASS,
+                'triangle': status.FAIL,
+                'asm_triangle': status.FAIL,
+                'asm_triangle_no_opname': status.FAIL,
+                'unused_resolve_attachment': status.FAIL,
+            }
+
+    class TestResume(object):
+        """Tests for the _resume method."""
+
+        def test_basic(self):
+            test = _DEQPGroupAsteriskTest(
+                'foo.bar', ['foo.bar.a', 'foo.bar.b', 'foo.bar.c'])
+            actual = test._resume(1)
+            expected = ['deqp.bin', '--deqp-caselist={foo{bar{b,c}}}', 'extra']
+            assert actual == expected
+
+        def test_large(self):
+            """Test that a very large set of tests doesn't exceed the trielist
+            limit
+            """
+            test = _DEQPGroupAsteriskTest(
+                'foo.bar', ['foo.bar.{}'.format(a) for a in range(2000)])
+            actual = test._resume(1)
+            expected = [
+                'deqp.bin',
+                '--deqp-caselist={{foo{{bar{{{0}}}}}}}'.format(
+                    # The 0 test is failed and shouldn't be rerun
+                    ','.join(six.text_type(s) for s in range(1, 1000))),
+                'extra']
+            assert actual == expected
+
+        def test_large_split(self):
+            """Test that the splitting works correctly when test 999 fails
+            """
+            test = _DEQPGroupAsteriskTest(
+                'foo.bar', ['foo.bar.{}'.format(a) for a in range(2000)])
+            actual = test._resume(999)
+            expected = [
+                'deqp.bin',
+                '--deqp-caselist={{foo{{bar{{{0}}}}}}}'.format(
+                    # The 0 test is failed and shouldn't be rerun
+                    ','.join(six.text_type(s) for s in range(999, 2000))),
+                'extra']
+            assert actual == expected
 
 
 class TestGenMustpassTests(object):
