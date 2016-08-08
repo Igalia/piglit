@@ -39,11 +39,12 @@ import six
 
 from framework import exceptions
 from framework import grouptools
+from framework import options
 from framework import profile
 from framework import status
 from framework.test import deqp
 
-# pylint:disable=invalid-name,no-self-use
+# pylint:disable=no-self-use,protected-access
 
 
 class _DEQPTestTest(deqp.DEQPSingleTest):
@@ -116,44 +117,123 @@ class TestGetOptions(object):
 class TestMakeProfile(object):
     """Test deqp.make_profile."""
 
-    @classmethod
-    def setup_class(cls):
-        cls.profile = deqp.make_profile(['this.is.a.deqp.test'], _DEQPTestTest)
+    class TestSingle(object):
+        """Tests for the single mode."""
 
-    def test_returns_profile(self):
-        """deqp.make_profile: returns a TestProfile."""
-        assert isinstance(self.profile, profile.TestProfile)
+        @classmethod
+        def setup_class(cls):
+            with mock.patch('framework.test.deqp.options.OPTIONS',
+                            new=options._Options()) as mocked:
+                mocked.deqp_mode = 'single'
+                cls.profile = deqp.make_profile([('this.is.a.deqp.test', )],
+                                                single=_DEQPTestTest)
 
-    def test_replaces_separator(self):
-        """deqp.make_profile: replaces '.' with grouptools.separator"""
-        expected = grouptools.join('this', 'is', 'a', 'deqp', 'test')
-        assert expected in self.profile.test_list
+        def test_returns_profile(self):
+            """deqp.make_profile: returns a TestProfile."""
+            assert isinstance(self.profile, profile.TestProfile)
+
+        def test_replaces_separator(self):
+            """deqp.make_profile: replaces '.' with grouptools.separator"""
+            expected = grouptools.join('this', 'is', 'a', 'deqp', 'test')
+            assert expected in self.profile.test_list
+
+    class TestGroup(object):
+        """Tests for group mode."""
+
+        @classmethod
+        def setup_class(cls):
+            with mock.patch('framework.test.deqp.options.OPTIONS',
+                            new=options._Options()) as mocked:
+                mocked.deqp_mode = 'group'
+                cls.profile = deqp.make_profile(
+                    [('this.is.a.deqp', ['this.is.a.deqp.test',
+                                         'this.is.a.deqp.thing'])],
+                    group=_DEQPGroupTrieTest)
+
+        def test_returns_profile(self):
+            """deqp.make_profile: returns a TestProfile."""
+            assert isinstance(self.profile, profile.TestProfile)
+
+        def test_replaces_separator(self):
+            """deqp.make_profile: replaces '.' with grouptools.separator"""
+            expected = grouptools.join('this', 'is', 'a', 'deqp')
+            assert expected in self.profile.test_list
 
 
 class TestIterDeqpTestCases(object):
     """Tests for iter_deqp_test_cases."""
 
-    def _do_test(self, write, expect, tmpdir):
-        """Run the acutal test."""
-        p = tmpdir.join('foo')
-        p.write(write)
-        gen = deqp.iter_deqp_test_cases(six.text_type(p))
-        assert next(gen) == expect
+    class TestSingle(object):
+        """Tests for the single mode."""
 
-    def test_test_cases(self, tmpdir):
-        """Correctly detects a test line."""
-        self._do_test('TEST: a.deqp.test', 'a.deqp.test', tmpdir)
+        @pytest.yield_fixture(autouse=True, scope='class')
+        def group_setup(self):
+            with mock.patch('framework.test.deqp.options.OPTIONS',
+                            new=options._Options()) as mocked:
+                mocked.deqp_mode = 'single'
+                yield
 
-    def test_test_group(self, tmpdir):
-        """Correctly detects a group line."""
-        self._do_test('GROUP: a group\nTEST: a.deqp.test', 'a.deqp.test',
-                      tmpdir)
+        def _do_test(self, write, expect, tmpdir):
+            """Run the acutal test."""
+            p = tmpdir.join('foo')
+            p.write(write)
+            gen = deqp.iter_deqp_test_cases(six.text_type(p))
+            actual = next(gen)
+            assert actual == expect
 
-    def test_bad_entry(self, tmpdir):
-        """A PiglitFatalException is raised if a line is not a TEST or GROUP.
-        """
-        with pytest.raises(exceptions.PiglitFatalError):
-            self._do_test('this will fail', None, tmpdir)
+        def test_test_cases(self, tmpdir):
+            """Correctly detects a test line."""
+            self._do_test('TEST: a.deqp.test', ('a.deqp.test', ), tmpdir)
+
+        def test_test_group(self, tmpdir):
+            """Correctly detects a group line."""
+            self._do_test('GROUP: a group\nTEST: a.deqp.test',
+                          ('a.deqp.test', ), tmpdir)
+
+        def test_bad_entry(self, tmpdir):
+            """A PiglitFatalException is raised if a line is not a TEST or
+            GROUP.
+            """
+            with pytest.raises(exceptions.PiglitFatalError):
+                self._do_test('this will fail', None, tmpdir)
+
+    class TestGroup(object):
+        """Tests for the group mode."""
+
+        @pytest.yield_fixture(autouse=True, scope='class')
+        def group_setup(self):
+            with mock.patch('framework.test.deqp.options.OPTIONS',
+                            new=options._Options()) as mocked:
+                mocked.deqp_mode = 'group'
+                yield
+
+        def _do_test(self, write, expect, tmpdir):
+            """Run the acutal test."""
+            p = tmpdir.join('foo')
+            p.write(write)
+            gen = deqp.iter_deqp_test_cases(six.text_type(p))
+            actual = next(gen)
+            assert actual == expect
+
+        def test_test_cases(self, tmpdir):
+            """Correctly detects a test line."""
+            self._do_test(
+                textwrap.dedent("""\
+                    GROUP: a
+                    GROUP: a.deqp
+                    TEST: a.deqp.test
+                    TEST: a.deqp.failure
+                    TEST: a.deqp.foo
+                """),
+                ('a.deqp', ['a.deqp.test', 'a.deqp.failure', 'a.deqp.foo']),
+                tmpdir)
+
+        def test_bad_entry(self, tmpdir):
+            """A PiglitFatalException is raised if a line is not a TEST or
+            GROUP.
+            """
+            with pytest.raises(exceptions.PiglitFatalError):
+                self._do_test('this will fail', None, tmpdir)
 
 
 class TestFormatTrieList(object):
@@ -460,7 +540,7 @@ class TestDEQPGroupTest(object):
 class TestGenMustpassTests(object):
     """Tests for the gen_mustpass_tests function."""
 
-    _xml = textwrap.dedent("""\
+    xml = textwrap.dedent("""\
         <?xml version="1.0" encoding="UTF-8"?>
         <TestPackage name="dEQP-piglit-test" appPackageName="com.freedesktop.org.piglit.deqp" testType="deqpTest" xmlns:deqp="http://drawelements.com/deqp" deqp:glesVersion="196608">
             <TestSuite name="dEQP.piglit">
@@ -478,13 +558,45 @@ class TestGenMustpassTests(object):
         </TestPackage>
     """)
 
-    def test_basic(self, tmpdir):
-        p = tmpdir.join('foo.xml')
-        p.write(self._xml)
-        tests = set(deqp.gen_mustpass_tests(six.text_type(p)))
-        assert tests == {
-            'dEQP.piglit.group1.test1',
-            'dEQP.piglit.group1.test2',
-            'dEQP.piglit.nested.group2.test3',
-            'dEQP.piglit.nested.group2.test4',
-        }
+    class TestSingle(object):
+        """Tests for single mode."""
+
+        @pytest.yield_fixture(autouse=True, scope='class')
+        def group_setup(self):
+            with mock.patch('framework.test.deqp.options.OPTIONS',
+                            new=options._Options()) as mocked:
+                mocked.deqp_mode = 'single'
+                yield
+
+        def test_basic(self, tmpdir):
+            p = tmpdir.join('foo.xml')
+            p.write(TestGenMustpassTests.xml)
+            tests = set(deqp.gen_mustpass_tests(six.text_type(p)))
+            assert tests == {
+                ('dEQP.piglit.group1.test1', ),
+                ('dEQP.piglit.group1.test2', ),
+                ('dEQP.piglit.nested.group2.test3', ),
+                ('dEQP.piglit.nested.group2.test4', ),
+            }
+
+    class TestGroup(object):
+        """Tests for groupmode."""
+
+        @pytest.yield_fixture(autouse=True, scope='class')
+        def group_setup(self):
+            with mock.patch('framework.test.deqp.options.OPTIONS',
+                            new=options._Options()) as mocked:
+                mocked.deqp_mode = 'group'
+                yield
+
+        def test_basic(self, tmpdir):
+            p = tmpdir.join('foo.xml')
+            p.write(TestGenMustpassTests.xml)
+            tests = list(deqp.gen_mustpass_tests(six.text_type(p)))
+            assert tests == [
+                ('dEQP.piglit.group1',
+                 ['dEQP.piglit.group1.test1', 'dEQP.piglit.group1.test2']),
+                ('dEQP.piglit.nested.group2',
+                 ['dEQP.piglit.nested.group2.test3',
+                  'dEQP.piglit.nested.group2.test4']),
+            ]
