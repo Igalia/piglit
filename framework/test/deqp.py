@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""This module provides integration for dEQP into piglit."""
+
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
@@ -129,7 +131,6 @@ def gen_caselist_txt(bin_, caselist, extra_args):
     basedir = os.path.dirname(bin_)
     caselist_path = os.path.join(basedir, caselist)
 
-    # TODO: need to catch some exceptions here...
     with open(os.devnull, 'w') as d:
         subprocess.check_call(
             [bin_, '--deqp-runmode=txt-caselist'] + extra_args, cwd=basedir,
@@ -153,6 +154,13 @@ def iter_deqp_test_cases(case_file):
 
 @six.add_metaclass(abc.ABCMeta)
 class DEQPBaseTest(Test):
+    """Base test class for dEQP suites.
+
+    Each particular dEQP implementation will need to override the two abstract
+    properties (the easiest way to do so is as a class attribute), otherwise
+    not other changes are required.
+    """
+
     __RESULT_MAP = {
         "Pass": "pass",
         "Fail": "fail",
@@ -187,7 +195,9 @@ class DEQPBaseTest(Test):
         # This must be called after super or super will overwrite it
         self.cwd = os.path.dirname(self.deqp_bin)
 
-    @Test.command.getter
+    # The error of the getter is a known bug in pylint
+    # https://github.com/PyCQA/pylint/issues/844
+    @Test.command.getter  # pylint: disable=no-member
     def command(self):
         """Return the command plus any extra arguments."""
         command = super(DEQPBaseTest, self).command
