@@ -105,10 +105,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const float green[3] = {0.0, 1.0, 0.0};
-static const float red[3] = {1.0, 0.0, 0.0};
-static const float black[3] = {0.0, 0.0, 0.0};
-
 /**
  * The \a filename is relative to the current test's source directory.
  *
