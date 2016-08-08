@@ -196,6 +196,14 @@ def _run_parser(input_):
                         help='Run only the tests in the deqp mustpass list '
                              'when running a deqp gles{2,3,31} profile, '
                              'otherwise run all tests.')
+    parser.add_argument('--deqp-mode',
+                        action='store',
+                        choices=['single', 'group'],
+                        default='single',
+                        help='Whether to run a single test per process, or to '
+                             'run a leaf of the test hierarchy as a process. '
+                             'This makes a trade-off between speed and '
+                             'reliability')
     parser.add_argument('--process-isolation',
                         dest='process_isolation',
                         action='store',
@@ -289,6 +297,7 @@ def run(input_):
     options.OPTIONS.valgrind = args.valgrind
     options.OPTIONS.sync = args.sync
     options.OPTIONS.deqp_mustpass = args.deqp_mustpass
+    options.OPTIONS.deqp_mode = args.deqp_mode
     options.OPTIONS.process_isolation = args.process_isolation
 
     # Set the platform to pass to waffle
@@ -387,6 +396,7 @@ def resume(input_):
     options.OPTIONS.valgrind = results.options['valgrind']
     options.OPTIONS.sync = results.options['sync']
     options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
+    options.OPTIONS.deqp_mode = results.options['deqp_mode']
     options.OPTIONS.proces_isolation = results.options['process_isolation']
 
     core.get_config(args.config_file)

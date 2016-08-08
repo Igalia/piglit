@@ -50,6 +50,8 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     valgrind -- True if valgrind is to be used
     env -- environment variables set for each test before run
     deqp_mustpass -- True to enable the use of the deqp mustpass list feature.
+    deqp_mode -- 'single' for one test per processes or 'group' for one leaf of
+                  tests per process
     """
 
     def __init__(self):
@@ -57,6 +59,7 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.valgrind = False
         self.sync = False
         self.deqp_mustpass = False
+        self.deqp_mode = 'single'
         self.process_isolation = True
 
         # env is used to set some base environment variables that are not going

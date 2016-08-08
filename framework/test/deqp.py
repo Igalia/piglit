@@ -90,13 +90,22 @@ def select_source(bin_, filename, mustpass, extra_args):
             gen_caselist_txt(bin_, filename, extra_args))
 
 
-def make_profile(test_list, test_class):
+def make_profile(test_list, single=None, group=None):
     """Create a TestProfile instance."""
+    if options.OPTIONS.deqp_mode == "single":
+        if isinstance(single, DEQPUnsupportedMode):
+            raise exceptions.PiglitFatalError(single)
+        test_class = single
+    else:
+        if isinstance(group, DEQPUnsupportedMode):
+            raise exceptions.PiglitFatalError(group)
+        test_class = group
+
     profile = TestProfile()
     for testname in test_list:
         # deqp uses '.' as the testgroup separator.
-        piglit_name = testname.replace('.', grouptools.SEPARATOR)
-        profile.test_list[piglit_name] = test_class(testname)
+        piglit_name = testname[0].replace('.', grouptools.SEPARATOR)
+        profile.test_list[piglit_name] = test_class(*testname)
 
     return profile
 
@@ -104,17 +113,34 @@ def make_profile(test_list, test_class):
 def gen_mustpass_tests(mp_list):
     """Return a testlist from the mustpass list."""
     root = et.parse(mp_list).getroot()
-    group = []
+    cur_group = []
 
-    def gen(root):
+    def single(root):
         for elem in root:
             if elem.tag == 'Test':
-                yield '{}.{}'.format('.'.join(group), elem.get('name'))
+                yield ('{}.{}'.format('.'.join(cur_group), elem.get('name')), )
             else:
-                group.append(elem.get('name'))
-                for test in gen(elem):
+                cur_group.append(elem.get('name'))
+                for test in single(elem):
                     yield test
-                del group[-1]
+                del cur_group[-1]
+
+    def group(root):
+        for elem in root:
+            if elem.tag == 'TestCase':
+                case = '{}.{}'.format('.'.join(cur_group), elem.get('name'))
+                yield (case, ['{}.{}'.format(case, t.get('name'))
+                              for t in elem.findall('.//Test')])
+            elif elem.tag == 'TestSuite':
+                cur_group.append(elem.get('name'))
+                for test in group(elem):
+                    yield test
+                del cur_group[-1]
+
+    if options.OPTIONS.deqp_mode == 'single':
+        gen = single
+    else:
+        gen = group
 
     for test in gen(root):
         yield test
@@ -150,15 +176,54 @@ def gen_caselist_txt(bin_, caselist, extra_args):
 
 def iter_deqp_test_cases(case_file):
     """Iterate over original dEQP testcase names."""
-    with open(case_file, 'r') as caselist_file:
-        for i, line in enumerate(caselist_file):
+    def single(f):
+        """Iterate over the txt file, and yield each test instance."""
+        for i, line in enumerate(f):
             if line.startswith('GROUP:'):
                 continue
             elif line.startswith('TEST:'):
-                yield line[len('TEST:'):].strip()
+                # The group mode yields a tuple, so the single mode needs to as
+                # well.
+                yield (line[len('TEST:'):].strip(), )
             else:
                 raise exceptions.PiglitFatalError(
-                    'deqp: {}:{}: ill-formed line'.format(case_file, i))
+                    'deqp: {}:{}: ill-formed line'.format(f.name, i))
+
+    def group(f):
+        """Iterate over the txt file, and yield each group and its members.
+
+        The group must contain actual members to be yielded.
+        """
+        group = ''
+        tests = []
+
+        for i, line in enumerate(f):
+            if line.startswith('GROUP:'):
+                new = line[len('GROUP:'):].strip()
+                if group != new and tests:
+                    yield (group, tests)
+                    tests = []
+                group = new
+            elif line.startswith('TEST:'):
+                tests.append(line[len('TEST:'):].strip())
+            else:
+                raise exceptions.PiglitFatalError(
+                    'deqp: {}:{}: ill-formed line'.format(f.name, i))
+        # If we get to the end of the file and we have new tests (the would
+        # have been cleared if there weren't any.
+        if tests:
+            yield (group, tests)
+
+    adder = None
+    if options.OPTIONS.deqp_mode == 'single':
+        adder = single
+    elif options.OPTIONS.deqp_mode == 'group':
+        adder = group
+    assert adder is not None
+
+    with open(case_file, 'r') as f:
+        for x in adder(f):
+            yield x
 
 
 def format_trie_list(classname, testnames):
