@@ -1,0 +1,36 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+/* Verify that out-of-bounds access to an array does not result in any sort of
+ * program interruption.
+ *
+ * This test case uses a larger array, to cover drivers that have different
+ * lowering paths for different array sizes.
+ *
+ * In this test case the array index will not be constant folded.
+ */
+#version 120
+
+uniform int idx;
+float array[32];
+
+void main()
+{
+   /* Ensure that there can be no constant folding due to undefined values. */
+   array[0] = 0.0;
+   array[1] = 1.0;
+   gl_FragColor = vec4(0.0, 1.0, 0.0, array[idx]);
+}
+
+[test]
+uniform int idx -2
+clear color 0.0 0.0 0.0 0.0
+clear
+draw rect -1 -1 2 2
+
+# The following probe should pass in most implementations, but since we're
+# invoking undefined behavior it is disabled.
+# probe all rgb 0.0 1.0 0.0
