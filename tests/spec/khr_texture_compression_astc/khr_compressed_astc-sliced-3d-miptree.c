@@ -310,7 +310,6 @@ test_miptrees(void* input_type)
 		if (!check_error)
 			glDeleteTextures(1, &tex_decompressed);
 
-		block_dims++;
 	}
 	return PIGLIT_PASS;
 }
