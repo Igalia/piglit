@@ -26,8 +26,8 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
-import re
 import io
+import re
 
 from framework import exceptions
 from .opengl import FastSkipMixin
@@ -52,7 +52,13 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         r'^GLSL\s+(?P<es>ES)?\s*(?P<op>(<|<=|=|>=|>))\s*(?P<ver>\d\.\d+)')
 
     def __init__(self, filename):
-        self.gl_required = set()
+        gl_required = set()
+        gl_version = None
+        gles_version = None
+        glsl_version = None
+        glsl_es_version = None
+        op = None
+        sl_op = None
 
         # Iterate over the lines in shader file looking for the config section.
         # By using a generator this can be split into two for loops at minimal
@@ -76,73 +82,57 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
                 raise exceptions.PiglitFatalError(
                     "In file {}: Config block not found".format(filename))
 
-            lines = list(lines)
-
-        prog = self.__find_gl(lines, filename)
-
-        super(ShaderTest, self).__init__([prog, filename], run_concurrent=True)
-
-        # This needs to be run after super or gl_required will be reset
-        self.__find_requirements(lines)
-
-    def __find_gl(self, lines, filename):
-        """Find the OpenGL API to use."""
-        for line in lines:
-            line = line.strip()
-            if line.startswith('GL ES'):
-                if line.endswith('3.0'):
-                    prog = 'shader_runner_gles3'
-                elif line.endswith('2.0'):
-                    prog = 'shader_runner_gles2'
-                # If we don't set gles2 or gles3 continue the loop,
-                # probably htting the exception in the for/else
-                else:
-                    raise exceptions.PiglitFatalError(
-                        "In File {}: No GL ES version set".format(filename))
-                break
-            elif line.startswith('[') or self._is_gl.match(line):
-                # In the event that we reach the end of the config black
-                # and an API hasn't been found, it's an old test and uses
-                # "GL"
-                prog = 'shader_runner'
-                break
-        else:
-            raise exceptions.PiglitFatalError(
-                "In file {}: No GL version set".format(filename))
-
-        return prog
-
-    def __find_requirements(self, lines):
-        """Find any requirements in the test and record them."""
         for line in lines:
             if line.startswith('GL_') and not line.startswith('GL_MAX'):
-                self.gl_required.add(line.strip())
+                gl_required.add(line.strip())
                 continue
 
-            if not (self.gl_version or self.gles_version):
-                # Find any gles requirements
+            # Find any GLES requirements.
+            if not (gl_version or gles_version):
                 m = self._match_gl_version.match(line)
                 if m:
-                    if m.group('op') not in ['<', '<=']:
-                        if m.group('es'):
-                            self.gles_version = float(m.group('ver'))
-                        else:
-                            self.gl_version = float(m.group('ver'))
-                        continue
+                    op = m.group('op')
+                    if m.group('es'):
+                        gles_version = float(m.group('ver'))
+                    else:
+                        gl_version = float(m.group('ver'))
+                    continue
 
-            if not (self.glsl_version or self.glsl_es_version):
+            if not (glsl_version or glsl_es_version):
                 # Find any GLSL requirements
                 m = self._match_glsl_version.match(line)
                 if m:
-                    if m.group('op') not in ['<', '<=']:
-                        if m.group('es'):
-                            self.glsl_es_version = float(m.group('ver'))
-                        else:
-                            self.glsl_version = float(m.group('ver'))
-                        continue
+                    sl_op = m.group('op')
+                    if m.group('es'):
+                        glsl_es_version = float(m.group('ver'))
+                    else:
+                        glsl_version = float(m.group('ver'))
+                    continue
 
             if line.startswith('['):
                 break
+
+        # Select the correct binary to run the test, but be as conservative as
+        # possible by always selecting the lowest version that meets the
+        # criteria.
+        if gles_version:
+            if op in ['<', '<='] or op in ['=', '>='] and gles_version < 3:
+                prog = 'shader_runner_gles2'
+            else:
+                prog = 'shader_runner_gles3'
+        else:
+            prog = 'shader_runner'
+
+        super(ShaderTest, self).__init__(
+            [prog, filename],
+            run_concurrent=True,
+            gl_required=gl_required,
+            # FIXME: the if here is related to an incomplete feature in the
+            # FastSkipMixin
+            gl_version=gl_version if op not in ['<', '<='] else None,
+            gles_version=gles_version if op not in ['<', '<='] else None,
+            glsl_version=glsl_version if sl_op not in ['<', '<='] else None,
+            glsl_es_version=glsl_es_version if sl_op not in ['<', '<='] else None)
 
     @PiglitBaseTest.command.getter
     def command(self):

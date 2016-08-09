@@ -63,28 +63,40 @@ teardown_module = _setup.teardown
 class TestConfigParsing(object):
     """Tests for ShaderRunner config parsing."""
 
-    def test_no_decimal(self, tmpdir):
-        """test.shader_test.ShaderTest: raises if version lacks decminal."""
+    @pytest.mark.parametrize('gles,operator,expected', [
+        # pylint: disable=bad-whitespace
+        ('2.0', '>=', 'shader_runner_gles2'),
+        ('2.0', '<=', 'shader_runner_gles2'),
+        ('2.0', '=',  'shader_runner_gles2'),
+        ('2.0', '>',  'shader_runner_gles3'),
+        ('3.0', '>=', 'shader_runner_gles3'),
+        ('3.0', '<=', 'shader_runner_gles2'),
+        ('3.0', '=',  'shader_runner_gles3'),
+        ('3.0', '>',  'shader_runner_gles3'),
+        ('3.0', '<',  'shader_runner_gles2'),
+        ('3.1', '>=', 'shader_runner_gles3'),
+        ('3.1', '<=', 'shader_runner_gles2'),
+        ('3.1', '=',  'shader_runner_gles3'),
+        ('3.1', '>',  'shader_runner_gles3'),
+        ('3.1', '<',  'shader_runner_gles2'),
+        ('3.2', '>=', 'shader_runner_gles3'),
+        ('3.2', '<=', 'shader_runner_gles2'),
+        ('3.2', '=',  'shader_runner_gles3'),
+        ('3.2', '<',  'shader_runner_gles2'),
+    ])
+    def test_bin(self, gles, operator, expected, tmpdir):
+        """Test that the shader_runner parse picks the correct binary."""
         p = tmpdir.join('test.shader_test')
         p.write(textwrap.dedent("""\
             [require]
-            GL = 2
-            """))
-
-        with pytest.raises(exceptions.PiglitFatalError):
-            shader_test.ShaderTest(six.text_type(p))
-
-    def test_gles2_bin(self, tmpdir):
-        """test.shader_test.ShaderTest: Identifies GLES2 tests successfully."""
-        p = tmpdir.join('test.shader_test')
-        p.write(textwrap.dedent("""\
-            [require]
-            GL ES >= 2.0
+            GL ES {} {}
             GLSL ES >= 1.00
-            """))
+
+            [next section]
+            """.format(operator, gles)))
         test = shader_test.ShaderTest(six.text_type(p))
 
-        assert os.path.basename(test.command[0]) == "shader_runner_gles2"
+        assert os.path.basename(test.command[0]) == expected
 
     def test_gles3_bin(self, tmpdir):
         """test.shader_test.ShaderTest: Identifies GLES3 tests successfully."""

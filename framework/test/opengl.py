@@ -318,13 +318,15 @@ class FastSkipMixin(object):
     # other than querying each value before starting the thread pool.
     __info = WflInfo()
 
-    def __init__(self, *args, **kwargs):
-        super(FastSkipMixin, self).__init__(*args, **kwargs)
-        self.gl_required = set()
-        self.gl_version = None
-        self.gles_version = None
-        self.glsl_version = None
-        self.glsl_es_version = None
+    def __init__(self, command, gl_required=None, gl_version=None,
+                 gles_version=None, glsl_version=None, glsl_es_version=None,
+                 **kwargs):  # pylint: disable=too-many-arguments
+        super(FastSkipMixin, self).__init__(command, **kwargs)
+        self.gl_required = gl_required or set()
+        self.gl_version = gl_version
+        self.gles_version = gles_version
+        self.glsl_version = glsl_version
+        self.glsl_es_version = glsl_es_version
 
     def is_skip(self):
         """Skip this test if any of it's feature requirements are unmet.
@@ -340,6 +342,7 @@ class FastSkipMixin(object):
                         'Test requires extension {} '
                         'which is not available'.format(extension))
 
+        # TODO: Be able to handle any operator
         if (self.__info.gl_version is not None
                 and self.gl_version is not None
                 and self.gl_version > self.__info.gl_version):
@@ -348,6 +351,7 @@ class FastSkipMixin(object):
                 'but only {} is available'.format(
                     self.gl_version, self.__info.gl_version))
 
+        # TODO: Be able to handle any operator
         if (self.__info.gles_version is not None
                 and self.gles_version is not None
                 and self.gles_version > self.__info.gles_version):
@@ -356,6 +360,7 @@ class FastSkipMixin(object):
                 'but only {} is available'.format(
                     self.gles_version, self.__info.gles_version))
 
+        # TODO: Be able to handle any operator
         if (self.__info.glsl_version is not None
                 and self.glsl_version is not None
                 and self.glsl_version > self.__info.glsl_version):
@@ -364,6 +369,7 @@ class FastSkipMixin(object):
                 'but only {} is available'.format(
                     self.glsl_version, self.__info.glsl_version))
 
+        # TODO: Be able to handle any operator
         if (self.__info.glsl_es_version is not None
                 and self.glsl_es_version is not None
                 and self.glsl_es_version > self.__info.glsl_es_version):
