@@ -46,17 +46,14 @@ _DEQP_ASSERT = re.compile(
     r'deqp-vk: external/vulkancts/.*: Assertion `.*\' failed.')
 
 
-class DEQPVKTest(deqp.DEQPSingleTest):
-    """Test representation for Khronos Vulkan CTS."""
-    timeout = 60
+class _VulkanMixin(object):
+    """Mixin class for vulkan specific bits."""
+
     deqp_bin = _DEQP_VK_BIN
     @property
     def extra_args(self):
-        return super(DEQPVKTest, self).extra_args + \
+        return super(_VulkanMixin, self).extra_args + \
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
-
-    def __init__(self, *args, **kwargs):
-        super(DEQPVKTest, self).__init__(*args, **kwargs)
 
     def interpret_result(self):
         if 'Failed to compile shader at vkGlslToSpirV' in self.result.out:
@@ -68,11 +65,32 @@ class DEQPVKTest(deqp.DEQPSingleTest):
             self.result.out += \
                 '\n\nMarked as skip because of a internal dEQP assertion'
         else:
-            super(DEQPVKTest, self).interpret_result()
+            super(_VulkanMixin, self).interpret_result()
+
+
+class DEQPVKSingleTest(_VulkanMixin, deqp.DEQPSingleTest):
+    """Test representation for Khronos Vulkan CTS."""
+    timeout = 60
+
+
+class DEQPVKGroupTest(_VulkanMixin, deqp.DEQPGroupAsteriskTest):
+    """Test representation for Khronos Vulkan CTS."""
+    timeout = 240
+
+    def _is_cherry(self):
+        """If there's a resource error mark it as crash and start rerunning.
+
+        There are two reasons for not trying this test again. First, there's
+        no easy way to track that we're trying the test again, and without
+        tracking we can get into an infinite loop. Second this is either a
+        driver bug or a test suite bug and we don't want to paper over that.
+        """
+        return (self.result.returncode == 0 and
+                'VK_ERROR_OUT_OF_DEVICE_MEMORY' not in self.result.out)
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     deqp.iter_deqp_test_cases(
         deqp.gen_caselist_txt(_DEQP_VK_BIN, 'dEQP-VK-cases.txt',
                               _EXTRA_ARGS)),
-    DEQPVKTest)
+    single=DEQPVKSingleTest, group=DEQPVKGroupTest)
