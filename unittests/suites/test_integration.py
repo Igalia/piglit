@@ -62,6 +62,7 @@ def _import(name):
     'tests.deqp_gles3',
     'tests.deqp_gles31',
     'tests.deqp_vk',
+    'tests.deqp_egl',
     'tests.es3conform',
     'tests.igt',
     'tests.oglconform',
