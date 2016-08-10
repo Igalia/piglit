@@ -54,17 +54,31 @@ __all__ = ['profile']
 _CTS_BIN = deqp.get_option('PIGLIT_CTS_GLES_BIN', ('cts_gles', 'bin'),
                            required=True)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_CTS_GLES_EXTRA_ARGS', ('cts_gles', 'extra_args'),
+_EXTRA_ARGS = deqp.get_option('PIGLIT_CTS_GLES_EXTRA_ARGS',
+                              ('cts_gles', 'extra_args'),
                               default='').split()
 
 
-class DEQPCTSTest(deqp.DEQPSingleTest):
+class _CTSMixin(object):
+    """Mixin that provides the shared bits for the GL CTS class."""
+
     deqp_bin = _CTS_BIN
 
     @property
     def extra_args(self):
-        return super(DEQPCTSTest, self).extra_args + \
+        return super(_CTSMixin, self).extra_args + \
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
+
+
+class DEQPCTSSingleTest(_CTSMixin, deqp.DEQPSingleTest):
+    """Class For running the GL CTS tests in a one test per process mode."""
+    pass
+
+
+class DEQPCTSGroupTest(_CTSMixin, deqp.DEQPGroupTest):
+    """Class For running the GL CTS tests in a multiple tests per process mode.
+    """
+    pass
 
 
 # Add all of the suites by default, users can use filters to remove them.
@@ -80,4 +94,4 @@ profile = deqp.make_profile(  # pylint: disable=invalid-name
             deqp.gen_caselist_txt(_CTS_BIN, 'ESEXT-CTS-cases.txt',
                                   _EXTRA_ARGS)),
     ),
-    DEQPCTSTest)
+    single=DEQPCTSSingleTest, group=DEQPCTSGroupTest)
