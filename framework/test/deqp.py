@@ -216,10 +216,10 @@ class DEQPBaseTest(Test):
         if self.result.result == 'notrun':
             self.result.result = 'fail'
 
-    def _run_command(self):
+    def _run_command(self, *args, **kwargs):
         """Rerun the command if X11 connection failure happens."""
         for _ in range(5):
-            super(DEQPBaseTest, self)._run_command()
+            super(DEQPBaseTest, self)._run_command(*args, **kwargs)
             if "FATAL ERROR: Failed to open display" not in self.result.err:
                 return
 

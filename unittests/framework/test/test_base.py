@@ -43,7 +43,7 @@ from framework.test import base
 from ..test_status import PROBLEMS
 from .. import skip
 
-# pylint: disable=invalid-name,no-self-use
+# pylint: disable=invalid-name,no-self-use,protected-access
 
 
 class _Test(base.Test):
@@ -297,7 +297,7 @@ class TestWindowResizeMixin(object):
                 super(Mixin, self).__init__(*args, **kwargs)
                 self.__return_spurious = True
 
-            def _run_command(self):
+            def _run_command(self, *args, **kwargs):  # pylint: disable=unused-argument
                 self.result.returncode = None
 
                 # IF this is run only once we'll have "got spurious window resize"
@@ -407,3 +407,137 @@ class TestValgrindMixin(object):
             test.result.returncode = 1
             test.interpret_result()
             assert test.result.result is status.FAIL
+
+
+class TestReducedProcessMixin(object):
+    """Tests for the ReducedProcessMixin class."""
+
+    class MPTest(base.ReducedProcessMixin, _Test):
+        def _resume(self, current):
+            return [self.command[0]] + self._expected[current:]
+
+        def _is_subtest(self, line):
+            return line.startswith('TEST')
+
+    def test_populate_subtests(self):
+        test = self.MPTest(['foobar'], subtests=['a', 'b', 'c'])
+        assert set(test.result.subtests.keys()) == {'a', 'b', 'c'}
+
+    class TestRunCommand(object):
+        """Tests for the _run_command method."""
+
+        @pytest.fixture(scope='module')
+        def test_class(self):
+            """Defines a test class that uses generators to ease testing."""
+            class _Shim(object):
+                """This shim goes between the Mixin and the Test class and
+                provides a way to set the output of the test.
+                """
+
+                def __init__(self, *args, **kwargs):
+                    super(_Shim, self).__init__(*args, **kwargs)
+                    self.gen_rcode = None
+                    self.gen_out = None
+                    self.get_err = None
+
+                def _run_command(self, *args, **kwargs):  # pylint: disable=unused-argument
+                    # pylint: disable=no-member
+                    self.result.returncode = next(self.gen_rcode)
+                    self.result.out = next(self.gen_out)
+                    self.result.err = next(self.gen_err)
+
+            class Test(base.ReducedProcessMixin, _Shim, _Test):
+                """The actual Class returned by the fixture.
+
+                This class implements the abstract bits from
+                ReducedProcessMixin, and inserts the _Shim class. The
+                _is_subtest method is implemented such that any line starting
+                with SUBTEST is a subtest.
+                """
+
+                def _is_subtest(self, line):
+                    return line.startswith('SUBTEST')
+
+                def _resume(self, cur, **kwargs):  # pylint: disable=unused-argument
+                    return self._expected[cur:]
+
+                def interpret_result(self):
+                    name = None
+
+                    for line in self.result.out.split('\n'):
+                        if self._is_subtest(line):
+                            name = line[len('SUBTEST: '):]
+                        elif line.startswith('RESULT: '):
+                            self.result.subtests[name] = line[len('RESULT: '):]
+                            name = None
+
+            return Test
+
+        def test_result(self, test_class):
+            """Test result attributes."""
+            test = test_class(['foobar'], ['a', 'b'])
+            test.gen_out = iter(['SUBTEST: a', 'SUBTEST: b'])
+            test.gen_err = iter(['err output', 'err output'])
+            test.gen_rcode = iter([2, 0])
+            test._run_command()
+            assert test.result.out == \
+                'SUBTEST: a\n\n====RESUME====\n\nSUBTEST: b'
+            assert test.result.err == \
+                'err output\n\n====RESUME====\n\nerr output'
+            assert test.result.returncode == 2
+
+        @pytest.mark.timeout(5)
+        def test_infinite_loop(self, test_class):
+            """Test that we don't get into an infinite loop."""
+            test = test_class(['foobar'], ['a', 'b'])
+            test.gen_out = iter(['a', 'a'])
+            test.gen_err = iter(['a', 'a'])
+            test.gen_rcode = iter([1, 1])
+            test._run_command()
+
+        def test_crash_first(self, test_class):
+            """Handles the first test crashing."""
+            test = test_class(['foo'], ['a', 'b'])
+            test.gen_out = iter(['', 'SUBTEST: a'])
+            test.gen_err = iter(['', ''])
+            test.gen_rcode = iter([1, 0])
+
+            # Since interpret_result isn't called this would normally be left
+            # as NOTRUN, but we want to ensure that _run_command isn't mucking
+            # with it, so we set it to this PASS, which acts as a sentinal
+            test.result.subtests['b'] = status.PASS
+            test._run_command()
+
+            assert test.result.subtests['a'] is status.CRASH
+            assert test.result.subtests['b'] is status.PASS
+
+        def test_middle_crash(self, test_class):
+            """handle the final subtest crashing."""
+            test = test_class(['foo'], ['a', 'b', 'c'])
+            test.gen_out = iter(['SUBTEST: a\nRESULT: pass\nSUBTEST: b\n',
+                                 'SUBTEST: c\nRESULT: pass\n'])
+            test.gen_err = iter(['', ''])
+            test.gen_rcode = iter([1, 0])
+
+            test._run_command()
+            test.interpret_result()
+
+            assert test.result.subtests['a'] == status.PASS
+            assert test.result.subtests['b'] == status.CRASH
+            assert test.result.subtests['c'] == status.PASS
+
+        def test_final_crash(self, test_class):
+            """handle the final subtest crashing."""
+            test = test_class(['foo'], ['a', 'b', 'c'])
+            test.gen_out = iter(['SUBTEST: a\nRESULT: pass\n'
+                                 'SUBTEST: b\nRESULT: pass\n'
+                                 'SUBTEST: c\n'])
+            test.gen_err = iter([''])
+            test.gen_rcode = iter([1])
+
+            test._run_command()
+            test.interpret_result()
+
+            assert test.result.subtests['a'] == status.PASS
+            assert test.result.subtests['b'] == status.PASS
+            assert test.result.subtests['c'] == status.CRASH

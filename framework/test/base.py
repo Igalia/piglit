@@ -40,6 +40,7 @@ import six
 from six.moves import range
 
 from framework import exceptions, options
+from framework import status
 from framework.results import TestResult
 
 # We're doing some special crazy here to make timeouts work on python 2. pylint
@@ -258,7 +259,9 @@ class Test(object):
         try:
             self.is_skip()
         except TestIsSkip as e:
-            self.result.result = 'skip'
+            self.result.result = status.SKIP
+            for each in six.iterkeys(self.result.subtests):
+                self.result.subtests[each] = status.SKIP
             self.result.out = e.reason
             self.result.returncode = None
             return
@@ -267,6 +270,8 @@ class Test(object):
             self._run_command()
         except TestRunError as e:
             self.result.result = six.text_type(e.status)
+            for each in six.iterkeys(self.result.subtests):
+                self.result.subtests[each] = six.text_type(e.status)
             self.result.out = six.text_type(e)
             self.result.returncode = None
             return
@@ -282,13 +287,18 @@ class Test(object):
         """
         pass
 
-    def _run_command(self):
+    def _run_command(self, **kwargs):
         """ Run the test command and get the result
 
         This method sets environment options, then runs the executable. If the
         executable isn't found it sets the result to skip.
 
         """
+        # This allows the ReducedProcessMixin to work without having to whack
+        # self.command (which should be treated as immutable), but is
+        # considered private.
+        command = kwargs.pop('_command', self.command)
+
         # Setup the environment for the test. Environment variables are taken
         # from the following sources, listed in order of increasing precedence:
         #
@@ -314,7 +324,7 @@ class Test(object):
         fullenv = {f(k): f(v) for k, v in _base}
 
         try:
-            proc = subprocess.Popen(self.command,
+            proc = subprocess.Popen(command,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
                                     cwd=self.cwd,
@@ -382,7 +392,7 @@ class WindowResizeMixin(object):
     see: https://bugzilla.gnome.org/show_bug.cgi?id=680214
 
     """
-    def _run_command(self):
+    def _run_command(self, *args, **kwargs):
         """Run a test up 5 times when window resize is detected.
 
         Rerun the command up to 5 times if the window size changes, if it
@@ -391,7 +401,7 @@ class WindowResizeMixin(object):
 
         """
         for _ in range(5):
-            super(WindowResizeMixin, self)._run_command()
+            super(WindowResizeMixin, self)._run_command(*args, **kwargs)
             if "Got spurious window resize" not in self.result.out:
                 return
 
@@ -439,3 +449,130 @@ class ValgrindMixin(object):
             else:
                 # Test passed but has valgrind errors.
                 self.result.result = 'fail'
+
+
+@six.add_metaclass(abc.ABCMeta)
+class ReducedProcessMixin(object):
+    """This Mixin simplifies writing Test classes that run more than one test
+    in a single process.
+
+    Although one of the benefits of piglit is it's process isolation, there are
+    times that process isolation is too expensive for day to day runs, and
+    running more than one test in a single process is a valid trade-off for
+    decreased run times. This class helps to ease writing a Test class for such
+    a purpose, while not suffering all of the drawback of the approach.
+
+    The first way that this helps is that it provides crash detection and
+    recovery, allowing a single subtest to crash
+    """
+
+    def __init__(self, command, subtests=None, **kwargs):
+        assert subtests  # This covers both "not None" and len(subtests) > 1
+        super(ReducedProcessMixin, self).__init__(command, **kwargs)
+        self._expected = subtests
+        self._populate_subtests()
+
+    def __find_sub(self):
+        """Helper for getting the next index."""
+        return len([l for l in self.result.out.split('\n')
+                    if self._is_subtest(l)])
+
+    @staticmethod
+    def _subtest_name(test):
+        """If the name provided isn't the subtest name, this method does."""
+        return test
+
+    def _stop_status(self):
+        """This method returns the status of the test that stopped the run.
+
+        By default this will return status.CRASH, but this may not be suitable
+        for some suites, which may require special considerations and need to
+        require a different status in some cases, like SKIP.
+        """
+        return status.CRASH
+
+    def _run_command(self, *args, **kwargs):
+        """Run the command until all of the subtests have completed or crashed.
+
+        This method will try to run all of the subtests, resuming the run if
+        it's interrupted, and combining the stdout and stderr attributes
+        together for parsing later. I will separate those values with
+        "\n\n====RESUME====\n\n".
+        """
+        super(ReducedProcessMixin, self)._run_command(*args, **kwargs)
+
+        if not self._is_cherry():
+            returncode = self.result.returncode
+            out = [self.result.out]
+            err = [self.result.err]
+            cur_sub = self.__find_sub() or 1
+            last = len(self._expected)
+
+            while cur_sub < last:
+                self.result.subtests[
+                    self._subtest_name(self._expected[cur_sub - 1])] = \
+                        self._stop_status()
+
+                super(ReducedProcessMixin, self)._run_command(
+                    _command=self._resume(cur_sub) + list(args), **kwargs)
+
+                out.append(self.result.out)
+                err.append(self.result.err)
+
+                # If the index is 0 the next test failed without printing a
+                # name, increase by 1 so that test will be marked crash and we
+                # don't get stuck in an infinite loop, otherwise return the
+                # number of tests that did complete.
+                cur_sub += self.__find_sub() or 1
+
+            if not self._is_cherry():
+                self.result.subtests[
+                    self._subtest_name(self._expected[cur_sub - 1])] = \
+                        self._stop_status()
+
+            # Restore and keep the original returncode (so that it remains a
+            # non-pass, since only one test might fail and the resumed part
+            # might return 0)
+            self.result.returncode = returncode
+            self.result.out = '\n\n====RESUME====\n\n'.join(out)
+            self.result.err = '\n\n====RESUME====\n\n'.join(err)
+
+    def _is_cherry(self):
+        """Method used to determine if rerunning is required.
+
+        If this returns True then the rerun path will be entered, otherwise
+        _run_command is effectively a bare call to super().
+
+        Classes using this mixin may need to overwrite this if the binary
+        they're calling can stop prematurely but return 0.
+        """
+        return self.result.returncode == 0
+
+    def _populate_subtests(self):
+        """Default implementation of subtest prepopulation.
+
+        It may be necissary to override this depending on the subtest format.
+        """
+        self.result.subtests.update({x: status.NOTRUN for x in self._expected})
+
+    @abc.abstractmethod
+    def _resume(self, current):
+        """Method that defines how to resume the case if it crashes.
+
+        This method will be provided with a completed count, which is the index
+        into self._expected of the first subtest that hasn't been run. This
+        method should return the command to restart, and the ReduceProcessMixin
+        will handle actually restarting the the process with the new command.
+        """
+
+    @abc.abstractmethod
+    def _is_subtest(self, line):
+        """Determines if a line in stdout contains a subtest name.
+
+        This method is used during the resume detection phase of the
+        _run_command method to determine how many subtests have successfully
+        been run.
+
+        Should simply return True if the line reprents a test starting, or
+        False if it does not.
+        """
