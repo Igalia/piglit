@@ -162,13 +162,13 @@ compile_shader(GLenum target)
 	 *
 	 * 8X MSAA sample index layout    8x MSAA sample number layout
 	 *           ---------                      ---------
-	 *           | 0 | 1 |                      | 5 | 2 |
+	 *           | 0 | 1 |                      | 3 | 7 |
 	 *           ---------                      ---------
-	 *           | 2 | 3 |                      | 4 | 6 |
+	 *           | 2 | 3 |                      | 5 | 0 |
 	 *           ---------                      ---------
-	 *           | 4 | 5 |                      | 0 | 3 |
+	 *           | 4 | 5 |                      | 1 | 2 |
 	 *           ---------                      ---------
-	 *           | 6 | 7 |                      | 7 | 1 |
+	 *           | 6 | 7 |                      | 4 | 6 |
 	 *           ---------                      ---------
 	 *
 	 * 16X MSAA sample index layout  16x MSAA sample number layout
@@ -190,7 +190,7 @@ compile_shader(GLenum target)
 		sample_number =  "int(2 * fract(coord.x) + 4 * fract(coord.y))";
 	break;
 	case 8:
-		sample_map = "  const int sample_map[8] = int[8](5 , 2, 4, 6, 0, 3, 7, 1);\n";
+		sample_map = "  const int sample_map[8] = int[8](3, 7, 5, 0, 1, 2, 4, 6);\n";
 		sample_number = "sample_map[int(2 * fract(coord.x) + 8 * fract(coord.y))]";
 		break;
 	case 16:
