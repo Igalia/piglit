@@ -40,6 +40,7 @@ from .base import Test, WindowResizeMixin, ValgrindMixin, TestIsSkip
 __all__ = [
     'PiglitCLTest',
     'PiglitGLTest',
+    'PiglitBaseTest',
     'CL_CONCURRENT',
     'TEST_BIN_DIR',
 ]
