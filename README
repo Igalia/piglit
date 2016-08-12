@@ -53,7 +53,7 @@ unnecessary for python3:
   - subprocess32. A backport of the subprocess from python3.2, which includes
     timeout support. This only works for Linux
 
-For Testing the python framework
+For testing the python framework using "py.test unittests/framework"
   - py.test. A python test framework, used for running the python framework
     test suite.
   - tox. A tool for testing python packages against multiple configurations of
