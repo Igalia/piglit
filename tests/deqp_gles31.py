@@ -55,4 +55,7 @@ class DEQPGLES31Test(deqp.DEQPSingleTest):
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     deqp.select_source(_DEQP_GLES31_BIN, 'dEQP-GLES31-cases.txt',
                        _DEQP_MUSTPASS, _EXTRA_ARGS),
-    DEQPGLES31Test)
+    single=DEQPGLES31Test,
+    group=deqp.DEQPUnsupportedMode(
+        'dEQP-GLES31 is actually slower in group mode than single mode '
+        'so it has been disabled, please run in single mode.'))
