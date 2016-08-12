@@ -38,17 +38,25 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_EGL_EXTRA_ARGS',
                               default='').split()
 
 
-class DEQPEGLTest(deqp.DEQPSingleTest):
+class _Mixin(object):
     deqp_bin = _EGL_BIN
 
     @property
     def extra_args(self):
-        return super(DEQPEGLTest, self).extra_args + \
+        return super(_Mixin, self).extra_args + \
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
+
+
+class DEQPEGLSingleTest(_Mixin, deqp.DEQPSingleTest):
+    pass
+
+
+class DEQPEGLGroupTest(_Mixin, deqp.DEQPGroupTest):
+    pass
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     deqp.iter_deqp_test_cases(
         deqp.gen_caselist_txt(_EGL_BIN, 'dEQP-EGL-cases.txt',
                               _EXTRA_ARGS)),
-    DEQPEGLTest)
+    single=DEQPEGLSingleTest, group=DEQPEGLGroupTest)
