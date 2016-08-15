@@ -89,17 +89,17 @@ piglit_display(void)
 	/* Now, test that near depth clamping works.*/
 	glEnable(GL_DEPTH_CLAMP);
 	glDepthRange(0.25, 1.0);
-	quad(30, 10, 2); /* 0.25 - drawn. */
+	quad(30, 10, 4); /* 0.25 - drawn. */
 
 	glDepthRange(0.75, 1.0);
-	quad(30, 30, 2); /* 0.75 - not drawn. */
+	quad(30, 30, 4); /* 0.75 - not drawn. */
 
 	/* Test that far clamping works.*/
 	glDepthRange(0.0, 0.25);
-	quad(50, 10, -2); /* 0.25 - drawn. */
+	quad(50, 10, -4); /* 0.25 - drawn. */
 
 	glDepthRange(0.0, 0.75);
-	quad(50, 30, -2); /* 0.75 - not drawn. */
+	quad(50, 30, -4); /* 0.75 - not drawn. */
 
 	/* Now, flip near and far around and make sure that it's doing the
 	 * min/max of near and far in the clamping.
@@ -107,17 +107,17 @@ piglit_display(void)
 
 	/* Test that near (max) clamping works. */
 	glDepthRange(0.25, 0.0);
-	quad(70, 10, 2); /* 0.25 - drawn. */
+	quad(70, 10, 4); /* 0.25 - drawn. */
 
 	glDepthRange(0.75, 0.0);
-	quad(70, 30, 2); /* 0.75 - not drawn. */
+	quad(70, 30, 4); /* 0.75 - not drawn. */
 
 	/* Now, test far (min) clamping works. */
 	glDepthRange(1.0, 0.0);
-	quad(90, 10, -2); /* 0.0 - drawn */
+	quad(90, 10, -4); /* 0.0 - drawn */
 
 	glDepthRange(1.0, 0.75);
-	quad(90, 30, -2); /* 0.75 - not drawn*/
+	quad(90, 30, -4); /* 0.75 - not drawn*/
 
 	pass = piglit_probe_pixel_rgb(15, 15, white) && pass;
 	pass = piglit_probe_pixel_rgb(15, 35, clear) && pass;
