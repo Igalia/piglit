@@ -26,6 +26,7 @@ compile_commands.json
 
 .tox/
 .cache/
+__pycache__/
 
 *.css
 *.html
