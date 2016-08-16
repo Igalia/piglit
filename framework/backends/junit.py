@@ -109,9 +109,7 @@ class JUnitWriter(object):
         """Adds the skipped, failure, or error element."""
         res = None
         # If the result is skip, then just add the skipped message and go on
-        if result == 'skip':
-            res = etree.SubElement(element, 'skipped')
-        elif result == 'incomplete':
+        if result == 'incomplete':
             res = etree.SubElement(element, 'failure',
                                    message='Incomplete run.')
         elif result in ['fail', 'dmesg-warn', 'dmesg-fail']:
@@ -138,6 +136,8 @@ class JUnitWriter(object):
             res = etree.SubElement(element, 'failure',
                                    message="expected {}, but got {}".format(
                                        expected_result, result))
+        elif result == 'skip':
+            res = etree.SubElement(element, 'skipped')
 
         # Add the piglit type to the failure result
         if res is not None:
