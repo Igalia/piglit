@@ -382,7 +382,9 @@ class FastSkipMixin(object):
 
 
 class FastSkipMixinDisabled(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, command, gl_required=None, gl_version=None,
+                 gles_version=None, glsl_version=None, glsl_es_version=None,
+                 **kwargs):  # pylint: disable=too-many-arguments
         # Tests that implement the FastSkipMixin expect to have these values
         # set, so just fill them in with the default values.
         self.gl_required = set()
@@ -391,7 +393,7 @@ class FastSkipMixinDisabled(object):
         self.glsl_version = None
         self.glsl_es_version = None
 
-        super(FastSkipMixinDisabled, self).__init__(*args, **kwargs)
+        super(FastSkipMixinDisabled, self).__init__(command, **kwargs)
 
 
 # Shadow the real FastSkipMixin with the Disabled version if

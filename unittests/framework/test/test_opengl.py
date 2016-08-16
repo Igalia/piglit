@@ -417,6 +417,16 @@ class TestFastSkipMixin(object):  # pylint: disable=too-many-public-methods
     def inst(self):
         return self._Test(['foo'])
 
+    def test_api(self):
+        """Tests that the api works.
+
+        Since you're not suppoed to be able to pass gl and gles version, this
+        uses two seperate constructor calls.
+        """
+        self._Test(['foo'], gl_required={'foo'}, gl_version=3, glsl_version=2)
+        self._Test(['foo'], gl_required={'foo'}, gles_version=3,
+                   glsl_es_version=2)
+
     def test_should_skip(self, inst):
         """test.opengl.FastSkipMixin.is_skip: Skips when requires is missing
         from extensions.
@@ -554,3 +564,34 @@ class TestFastSkipMixin(object):  # pylint: disable=too-many-public-methods
     def test_max_glsl_es_version_set(self, inst):
         """test.opengl.FastSkipMixin.is_skip: runs if glsl_es_version is None"""
         inst.is_skip()
+
+
+class TestFastSkipMixinDisabled(object):
+    """Tests for the sub version."""
+
+    @pytest.yield_fixture(autouse=True, scope='class')
+    def patch(self):
+        """Create a Class with FastSkipMixin, but patch various bits."""
+        _mock_wflinfo = mock.Mock(spec=opengl.WflInfo)
+        _mock_wflinfo.gl_version = 3.3
+        _mock_wflinfo.gles_version = 3.0
+        _mock_wflinfo.glsl_version = 3.3
+        _mock_wflinfo.glsl_es_version = 2.0
+        _mock_wflinfo.gl_extensions = set(['bar'])
+
+        with mock.patch.object(self._Test, '_FastSkipMixin__info',
+                               _mock_wflinfo):
+            yield
+
+    class _Test(opengl.FastSkipMixin, utils.Test):
+        pass
+
+    def test_api(self):
+        """Tests that the api works.
+
+        Since you're not suppoed to be able to pass gl and gles version, this
+        uses two seperate constructor calls.
+        """
+        self._Test(['foo'], gl_required={'foo'}, gl_version=3, glsl_version=2)
+        self._Test(['foo'], gl_required={'foo'}, gles_version=3,
+                   glsl_es_version=2)
