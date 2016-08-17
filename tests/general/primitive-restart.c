@@ -653,13 +653,6 @@ primitive_restart_test(VBO_CFG vbo_cfg)
       pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
       pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
       pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_arrays(vbo_cfg);
    }
 
    return pass;
