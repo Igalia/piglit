@@ -74,6 +74,16 @@ arg_out: 0 buffer int[128]  70809 70809  70810 70809  70811 70809  70812 70809 \
                            101009 70809 101010 70809 101011 70809 101012 70809 \
                            101109 70809 101110 70809 101111 70809 101112 70809
 
+[test]
+name: 3d, input dependent
+kernel_name: dynamic
+dimensions: 3
+global_size: 1 1 1
+local_size: 1 1 1
+global_offset: 9 8 7
+arg_in: 0 buffer int[5] 6 6 6 6 6
+arg_out: 0 buffer int[5] 0 9 8 7 0
+arg_in: 1 int 1
 !*/
 
 kernel void fill(global int* out) {
@@ -82,4 +92,12 @@ kernel void fill(global int* out) {
 	unsigned int offset = get_global_offset(0) + 100 * get_global_offset(1) + 10000 * get_global_offset(2);
 	out[2*pos] = id;
 	out[2*pos+1] = offset;
+}
+
+kernel void dynamic(volatile global int *out, int j) {
+	out[0] = get_global_offset(j-2);
+	out[1] = get_global_offset(j-1);
+	out[2] = get_global_offset(j);
+	out[3] = get_global_offset(j+1);
+	out[4] = get_global_offset(j+2);
 }
