@@ -14,3 +14,4 @@ piglit_add_executable (arb_program_interface_query-getprograminterfaceiv getprog
 piglit_add_executable (arb_program_interface_query-getprogramresourceindex getprogramresourceindex.c)
 piglit_add_executable (arb_program_interface_query-getprogramresourcename getprogramresourcename.c)
 piglit_add_executable (arb_program_interface_query-getprogramresourceiv getprogramresourceiv.c)
+piglit_add_executable (arb_program_interface_query-compare-with-shader-subroutine compare-with-shader-subroutine.c)

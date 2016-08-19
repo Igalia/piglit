@@ -2444,6 +2444,7 @@ with profile.group_manager(
     g(['arb_program_interface_query-getprogramresourceindex'], run_concurrent=False)
     g(['arb_program_interface_query-getprogramresourcename'], run_concurrent=False)
     g(['arb_program_interface_query-getprogramresourceiv'], run_concurrent=False)
+    g(['arb_program_interface_query-compare-with-shader-subroutine'], run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
