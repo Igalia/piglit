@@ -1,0 +1,54 @@
+# Verifies that a clip distance output in VS does not mess things up for GS
+# in the presence of user varyings. In this case, no clip planes are enabled,
+# and GS doesn't output any clip distances either.
+
+[require]
+GLSL >= 1.50
+SSO ENABLED
+
+[vertex shader]
+#version 150
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+void main() {
+  gl_ClipDistance[0] = 1.0;
+  gl_Position = piglit_vertex;
+  color = vec4(0, 1, 0, 1);
+}
+
+[geometry shader]
+#version 150
+
+layout (triangles) in;
+layout (triangle_strip, max_vertices = 3) out;
+
+in vec4 color[];
+out vec4 c;
+
+void main() {
+  int i;
+  for (i = 0; i < 3; i++) {
+    gl_Position = gl_in[i].gl_Position;
+    c = color[i];
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+#version 150
+
+in vec4 c;
+out vec4 color;
+
+void main() {
+  color = c;
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
