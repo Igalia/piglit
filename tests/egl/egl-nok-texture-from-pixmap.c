@@ -46,6 +46,7 @@ draw(struct egl_state *state)
 	EGLint inv;
 	float red[] = { 0.4, 0.0, 0.0, 1.0 };
 	float purple[] = { 0.5, 0.0, 0.5, 1.0 };
+	enum piglit_result result = PIGLIT_PASS;
 
 	if (!eglGetConfigAttrib(state->egl_dpy, state->cfg,
 				EGL_Y_INVERTED_NOK, &inv)) {
@@ -85,7 +86,6 @@ draw(struct egl_state *state)
 
 	eglBindTexImage(state->egl_dpy, pixmap, EGL_BACK_BUFFER);
 	piglit_draw_rect_tex(20, 20, 100, 100,  0, 0, 1, 1);
-	eglSwapBuffers(state->egl_dpy, state->surf);	
 
 	if (!piglit_probe_pixel_rgba(10, 10, red) ||
 	    !piglit_probe_pixel_rgba(50, 10, red) ||
@@ -93,9 +93,11 @@ draw(struct egl_state *state)
 	    !piglit_probe_pixel_rgba(50, 50, purple) ||
 	    !piglit_probe_pixel_rgba(110, 110, purple) ||
 	    !piglit_probe_pixel_rgba(130, 130, red))
-		return PIGLIT_FAIL;
+		result = PIGLIT_FAIL;
 
-	return PIGLIT_PASS;
+	eglSwapBuffers(state->egl_dpy, state->surf);
+
+	return result;
 }
 
 int
