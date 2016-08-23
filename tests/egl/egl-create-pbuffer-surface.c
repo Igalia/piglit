@@ -74,7 +74,6 @@ draw(struct egl_state *state)
 
    eglMakeCurrent(state->egl_dpy, state->surf, state->surf, state->ctx);
    piglit_draw_rect_tex(0, 0, 256, 256, 0, 0, 1, 1);
-   eglSwapBuffers(state->egl_dpy, state->surf);
 
    if (!piglit_probe_rect_rgba(0, 0, 256, 256, purple))
       piglit_report_result(PIGLIT_FAIL);
