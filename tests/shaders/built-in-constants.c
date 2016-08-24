@@ -462,6 +462,17 @@ piglit_init(int argc, char **argv)
 	} else if (glsl_version < required_glsl_version)
 		piglit_report_result(PIGLIT_SKIP);
 
+	/* Geometry shaders must use the #extension directive in GLSL ES
+	 * before version 3.20.
+	 */
+	if (es_shader && required_glsl_version < 320 &&
+	    piglit_is_extension_supported("GL_OES_geometry_shader")) {
+		assert(num_required_extensions < ARRAY_SIZE(required_extensions));
+		required_extensions[num_required_extensions] =
+			strdup("GL_OES_geometry_shader");
+		num_required_extensions++;
+	}
+
 	/* Tessellation shaders must use the #extension directive. */
 	const char *const tess_ext_name = es_shader
 		? "GL_OES_tessellation_shader"
@@ -522,10 +533,12 @@ piglit_init(int argc, char **argv)
 
 	(void)!asprintf(&passthrough_version_string,
 		 "#version %s\n"
+		 "%s"
 		 "#ifdef GL_ES\n"
 		 "precision mediump float;\n"
 		 "#endif\n",
-		 required_glsl_version_string);
+		 required_glsl_version_string,
+		 extension_enables);
 
 
 	/* Create the shaders that will be used for the real part of the test.
