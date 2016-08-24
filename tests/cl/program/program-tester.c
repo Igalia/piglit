@@ -2115,14 +2115,14 @@ check_test_arg_value(struct test_arg test_arg,
 			}                                                                \
 		}                                                                    \
 		return true;
-#define CASEF(enum_type, type, cl_type)                                      \
+#define CASEF(enum_type, type, cl_type, testfn)				\
 	case enum_type:                                                          \
 		for(i = 0; i < test_arg.length; i++) {                               \
 			for(c = 0; c < test_arg.cl_size; c++) {                          \
 				rb = i*test_arg.cl_mem_size + c;                             \
-				if(!piglit_cl_probe_floating(((cl_type*)value)[rb],          \
-				                             ((cl_type*)test_arg.value)[rb], \
-				                             test_arg.ulp)) {               \
+				if(!testfn(((cl_type*)value)[rb],          \
+		                           ((cl_type*)test_arg.value)[rb], \
+		                           test_arg.ulp)) {                \
 					ra = i*test_arg.cl_size + c;                             \
 					printf("Error at %s[%zu]\n", type, ra);                  \
 					return false;                                            \
@@ -2141,8 +2141,8 @@ check_test_arg_value(struct test_arg test_arg,
 		CASEI(TYPE_LONG,   "long",   cl_long)
 		CASEU(TYPE_ULONG,  "ulong",  cl_ulong)
 		CASEH(TYPE_HALF,   "half",   cl_half)
-		CASEF(TYPE_FLOAT,  "float",  cl_float)
-		CASEF(TYPE_DOUBLE,  "double",  cl_double)
+		CASEF(TYPE_FLOAT,  "float",  cl_float, piglit_cl_probe_floating)
+		CASEF(TYPE_DOUBLE,  "double",  cl_double, piglit_cl_probe_double)
 	}
 
 #undef CASEF

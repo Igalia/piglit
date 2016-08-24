@@ -130,7 +130,7 @@ piglit_cl_probe_double(double value, double expect, uint64_t ulp)
 	diff = fabsl(value - expect);
 
 	if(diff > ulp || isnan(value)) {
-		printf("Expecting %f (0x%lx) with tolerance %f (%lu ulps), but got %f (0x%lx)\n",
+		printf("Expecting %f (0x%" PRIx64") with tolerance %f (%lu ulps), but got %f (0x%" PRIx64")\n",
 		       e.f, e.u, t.f, t.u, v.f, v.u);
 		return false;
 	}
