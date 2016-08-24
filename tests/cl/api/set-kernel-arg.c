@@ -107,7 +107,7 @@ piglit_cl_test(const int argc,
 	cl_int3 vec3;
 	struct_arg_t s_arg;
 
-	cl_mem invalid_buffer;
+	cl_mem invalid_buffer = NULL;
 
 	cl_bool image_support =
 		piglit_cl_get_device_image_support(env->context->device_ids[0]);
