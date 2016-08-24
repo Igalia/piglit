@@ -53,7 +53,7 @@ __all__ = [
 ]
 
 # The current version of the JSON results
-CURRENT_JSON_VERSION = 8
+CURRENT_JSON_VERSION = 9
 
 # The level to indent a final file
 INDENT = 4
@@ -339,6 +339,7 @@ def _update_results(results, filepath):
             5: _update_five_to_six,
             6: _update_six_to_seven,
             7: _update_seven_to_eight,
+            8: _update_eight_to_nine,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -632,6 +633,21 @@ def _update_seven_to_eight(result):
     result.time_elapsed = results.TimeAttribute(end=result.time_elapsed)
 
     result.results_version = 8
+
+    return result
+
+
+def _update_eight_to_nine(result):
+    """Update json results from version 8 to 9.
+
+    This changes the PID feild of the TestResult object to alist of Integers or
+    null rather than a single integer or null.
+
+    """
+    for test in compat.viewvalues(result.tests):
+        test.pid = [test.pid]
+
+    result.results_version = 9
 
     return result
 

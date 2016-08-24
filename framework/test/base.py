@@ -322,7 +322,7 @@ class Test(object):
                                     universal_newlines=True,
                                     **_EXTRA_POPEN_ARGS)
 
-            self.result.pid = proc.pid
+            self.result.pid.append(proc.pid)
             if not _SUPPRESS_TIMEOUT:
                 out, err = proc.communicate(timeout=self.timeout)
             else:

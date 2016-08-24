@@ -162,7 +162,7 @@ class TestResult(object):
         self.images = None
         self.traceback = None
         self.exception = None
-        self.pid = None
+        self.pid = []
         if result:
             self.result = result
         else:

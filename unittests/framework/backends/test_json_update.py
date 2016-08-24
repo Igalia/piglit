@@ -34,6 +34,7 @@ try:
 except ImportError:
     from unittest import mock
 
+import jsonschema
 import pytest
 import six
 
@@ -865,3 +866,87 @@ class TestV7toV8(object):
         """
         assert result.time_elapsed.start == 0.0
         assert result.time_elapsed.end == 1.2
+
+    def test_valid(self, result):
+        with open(os.path.join(os.path.dirname(__file__), 'schema',
+                               'piglit-8.json'),
+                  'r') as f:
+            schema = json.load(f)
+        jsonschema.validate(
+            json.loads(json.dumps(result, default=backends.json.piglit_encoder)),
+            schema)
+
+
+class TestV8toV9(object):
+    """Tests for Version 8 to version 9."""
+
+    data = {
+        "results_version": 9,
+        "name": "test",
+        "options": {
+            "profile": ['quick'],
+            "dmesg": False,
+            "verbose": False,
+            "platform": "gbm",
+            "sync": False,
+            "valgrind": False,
+            "filter": [],
+            "concurrent": "all",
+            "test_count": 0,
+            "exclude_tests": [],
+            "exclude_filter": [],
+            "env": {
+                "lspci": "stuff",
+                "uname": "more stuff",
+                "glxinfo": "and stuff",
+                "wglinfo": "stuff"
+            }
+        },
+        "tests": {
+            'a@test': {
+                "time_elapsed": {
+                    'start': 1.2,
+                    'end': 1.8,
+                    '__type__': 'TimeAttribute'
+                },
+                'dmesg': '',
+                'result': 'fail',
+                '__type__': 'TestResult',
+                'command': '/a/command',
+                'traceback': None,
+                'out': '',
+                'environment': 'A=variable',
+                'returncode': 0,
+                'err': '',
+                'pid': 5,
+                'subtests': {
+                    '__type__': 'Subtests',
+                },
+                'exception': None,
+            }
+        },
+        "time_elapsed": {
+            'start': 1.2,
+            'end': 1.8,
+            '__type__': 'TimeAttribute'
+        }
+    }
+
+    @pytest.fixture
+    def result(self, tmpdir):
+        p = tmpdir.join('result.json')
+        p.write(json.dumps(self.data, default=backends.json.piglit_encoder))
+        with p.open('r') as f:
+            return backends.json._update_eight_to_nine(backends.json._load(f))
+
+    def test_pid(self, result):
+        assert result.tests['a@test'].pid == [5]
+
+    def test_valid(self, result):
+        with open(os.path.join(os.path.dirname(__file__), 'schema',
+                               'piglit-9.json'),
+                  'r') as f:
+            schema = json.load(f)
+        jsonschema.validate(
+            json.loads(json.dumps(result, default=backends.json.piglit_encoder)),
+            schema)

@@ -42,7 +42,7 @@ INITIAL_METADATA = {
 # changes. This does not contain piglit specifc objects, only strings, floats,
 # ints, and Nones (instead of JSON's null)
 JSON = {
-    "results_version": 8,
+    "results_version": 9,
     "time_elapsed": {
         "start": 1469638791.2351687,
         "__type__": "TimeAttribute",
@@ -67,7 +67,7 @@ JSON = {
                 "__type__": "TimeAttribute",
                 "end": 1469638791.2439244
             },
-            "pid": 11768,
+            "pid": [11768],
             "__type__": "TestResult",
             "returncode": 1,
             "result": "fail",
