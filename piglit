@@ -121,6 +121,7 @@ def main():
         input_ = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
+    parser.set_defaults(func=lambda *_, **__: parser.print_help())
     subparsers = parser.add_subparsers()
     print_cmd = subparsers.add_parser('print-cmd',
                                       add_help=False,
