@@ -438,6 +438,21 @@ piglit_time_is_monotonic();
 int64_t
 piglit_time_get_nano(void);
 
+/**
+ * \brief Try to delay for a given duration
+ *
+ * \param time_ns	The requested duration to wait for
+ *
+ * Returns the time elapsed which may be cut short or overrun the requested
+ * duration, e.g. due to signal handling or scheduling.
+ *
+ * \sa on Linux nanosleep is used and restarted on SIGINT
+ * \sa usleep() is use on other OSs
+ * \sa the returned duration is timed using piglit_time_get_nano()
+ */
+int64_t
+piglit_delay_ns(int64_t time_ns);
+
 const char**
 piglit_split_string_to_array(const char *string, const char *separators);
 
