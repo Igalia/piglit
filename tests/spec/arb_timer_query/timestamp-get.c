@@ -28,11 +28,19 @@
 #include <unistd.h>    /* for usleep */
 #endif
 
+/* GL_TIMESTAMP isn't expected to be reliable for measuring long durations and
+ * although the ARB_timer_query spec doesn't stipulate what kind of drifting
+ * from wall clock time is acceptable, we at least want a sanity check that
+ * things look reasonable...
+ */
+#define DRIFT_NS_PER_SEC_THRESHOLD	3000000
+
 /**
  * @file timestamp-get.c
  *
  * Test that GL_TIMESTAMP obtained via glGet and glQuery returns roughly
- * the same value.
+ * the same value, and that durations measured via GL_TIMESTAMP have
+ * nanosecond units.
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -80,12 +88,41 @@ validate_times(GLint64 t1, GLint64 t2, GLint64 tolerance)
 	}
 }
 
+static void
+validate_delta(GLint64 gl_ts1, GLint64 gl_ts2, GLint64 cpu_delay_ns)
+{
+	GLint64 gl_ts_delta = gl_ts2 - gl_ts1;
+	int64_t drift = llabs(cpu_delay_ns - gl_ts_delta);
+	int64_t drift_per_sec = drift * 1000000000LL /  cpu_delay_ns;
+
+	/* XXX: technically we shouldn't be as strict about drift when the gpu
+	 * clock is running fast and the duration is longer than expected,
+	 * because we can't easily exclude other factors like OS scheduling
+	 * affecting the measurements. For now though we don't take this into
+	 * account.
+	 */
+	if (drift_per_sec > DRIFT_NS_PER_SEC_THRESHOLD) {
+		printf("GL_TIMESTAMP 1 = %" PRId64 " us\n", gl_ts1 / 1000);
+		printf("GL_TIMESTAMP 2 = %" PRId64 " us\n", gl_ts2 / 1000);
+		printf("delta  = %" PRId64 " us (expect >= %"PRId64" us)\n",
+		       gl_ts_delta / 1000, cpu_delay_ns / 1000);
+
+		piglit_loge("GL_TIMESTAMP drift of %" PRId64 " ns/sec, greater than %" PRId64 " ns/sec",
+			    drift_per_sec,
+			    (int64_t)DRIFT_NS_PER_SEC_THRESHOLD);
+		piglit_report_result(PIGLIT_FAIL);
+	} else
+		printf("GL_TIMESTAMP drift of approx. %" PRId64 " ns/sec\n",
+		       drift_per_sec);
+}
+
 enum piglit_result
 piglit_display(void)
 {
 	GLint64 t1, t2;
 	GLint64 query_overhead, get_overhead, tolerance;
 	GLuint q;
+	int64_t delay;
 
 	glGenQueries(1, &q);
 
@@ -119,6 +156,18 @@ piglit_display(void)
 	t1 = get_gpu_time_via_get(q);
 	t2 = get_gpu_time_via_query(q);
 	validate_times(t1, t2, tolerance);
+
+	puts("Test: wall clock time via glQuery");
+	t1 = get_gpu_time_via_query(q);
+	delay = piglit_delay_ns(1000000000);
+	t2 = get_gpu_time_via_query(q);
+	validate_delta(t1, t2, delay);
+
+	puts("Test: wall clock time via glGet");
+	t1 = get_gpu_time_via_get(q);
+	delay = piglit_delay_ns(1000000000);
+	t2 = get_gpu_time_via_get(q);
+	validate_delta(t1, t2, delay);
 
 	glDeleteQueries(1, &q);
 
