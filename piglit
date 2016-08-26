@@ -162,7 +162,11 @@ def main():
     # example), and then pass the arguments that this parser doesn't know about
     # to that executable
     parsed, args = parser.parse_known_args(input_)
-    returncode = parsed.func(args)
+    try:
+        returncode = parsed.func(args)
+    except AttributeError:
+        parser.print_help()
+        sys.exit(1)
     sys.exit(returncode)
 
 
