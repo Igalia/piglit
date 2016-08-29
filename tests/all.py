@@ -971,6 +971,7 @@ with profile.group_manager(
     g(['gl-1.0-logicop'])
     g(['gl-1.0-no-op-paths'])
     g(['gl-1.0-simple-readbuffer'])
+    g(['gl-1.0-spot-light'])
 
 with profile.group_manager(
         PiglitGLTest,
