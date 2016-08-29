@@ -9,5 +9,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_texture_float-texture-float-formats texture-float-formats.c)
+piglit_add_executable (arb_texture_float-get-tex3d get-tex3d.c)
 
 # vim: ft=cmake:

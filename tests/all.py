@@ -3235,6 +3235,7 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_float')) as g:
     g(['arb_texture_float-texture-float-formats'], run_concurrent=False)
+    g(['arb_texture_float-get-tex3d'], run_concurrent=False)
     add_msaa_formats_tests(g, 'GL_ARB_texture_float')
     add_texwrap_format_tests(g, 'GL_ARB_texture_float')
     add_fbo_formats_tests(g, 'GL_ARB_texture_float')
