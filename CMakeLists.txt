@@ -155,6 +155,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 	pkg_check_modules(LIBDRM QUIET libdrm)
 	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
+	pkg_check_modules(XCB QUIET xcb)
 	pkg_check_modules(XCB_DRI2 QUIET xcb-dri2)
 	pkg_check_modules(GLPROTO QUIET glproto)
 ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
