@@ -11,6 +11,8 @@ set_source_files_properties(
 	PROPERTIES GENERATED 1
 	)
 
+link_libraries(${CMAKE_DL_LIBS})
+
 if(HAVE_LIBCACA)
     link_libraries(caca)
 endif()
