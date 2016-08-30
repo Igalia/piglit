@@ -38,13 +38,9 @@ __all__ = [
 ]
 
 
-class ShaderTest(FastSkipMixin, PiglitBaseTest):
-    """ Parse a shader test file and return a PiglitTest instance
+class Parser(object):
+    """An object responsible for parsing a shader_test file."""
 
-    This function parses a shader test to determine if it's a GL, GLES2 or
-    GLES3 test, and then returns a PiglitTest setup properly.
-
-    """
     _is_gl = re.compile(r'GL (<|<=|=|>=|>) \d\.\d')
     _match_gl_version = re.compile(
         r'^GL\s+(?P<es>ES)?\s*(?P<op>(<|<=|=|>=|>))\s*(?P<ver>\d\.\d)')
@@ -52,20 +48,23 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         r'^GLSL\s+(?P<es>ES)?\s*(?P<op>(<|<=|=|>=|>))\s*(?P<ver>\d\.\d+)')
 
     def __init__(self, filename):
-        gl_required = set()
-        gl_version = None
-        gles_version = None
-        glsl_version = None
-        glsl_es_version = None
-        op = None
-        sl_op = None
+        self.filename = filename
+        self.gl_required = set()
+        self._gl_version = None
+        self._gles_version = None
+        self._glsl_version = None
+        self._glsl_es_version = None
+        self.prog = None
+        self.__op = None
+        self.__sl_op = None
 
+    def parse(self):
         # Iterate over the lines in shader file looking for the config section.
         # By using a generator this can be split into two for loops at minimal
         # cost. The first one looks for the start of the config block or raises
         # an exception. The second looks for the GL version or raises an
         # exception
-        with io.open(filename, mode='r', encoding='utf-8') as shader_file:
+        with io.open(self.filename, mode='r', encoding='utf-8') as shader_file:
             # The mock in python 3.3 doesn't support readlines(), so use
             # read().split() as a workaround
             lines = (l for l in shader_file.read().split('\n'))
@@ -80,33 +79,33 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
                     break
             else:
                 raise exceptions.PiglitFatalError(
-                    "In file {}: Config block not found".format(filename))
+                    "In file {}: Config block not found".format(self.filename))
 
         for line in lines:
             if line.startswith('GL_') and not line.startswith('GL_MAX'):
-                gl_required.add(line.strip())
+                self.gl_required.add(line.strip())
                 continue
 
             # Find any GLES requirements.
-            if not (gl_version or gles_version):
+            if not (self._gl_version or self._gles_version):
                 m = self._match_gl_version.match(line)
                 if m:
-                    op = m.group('op')
+                    self.__op = m.group('op')
                     if m.group('es'):
-                        gles_version = float(m.group('ver'))
+                        self._gles_version = float(m.group('ver'))
                     else:
-                        gl_version = float(m.group('ver'))
+                        self._gl_version = float(m.group('ver'))
                     continue
 
-            if not (glsl_version or glsl_es_version):
+            if not (self._glsl_version or self._glsl_es_version):
                 # Find any GLSL requirements
                 m = self._match_glsl_version.match(line)
                 if m:
-                    sl_op = m.group('op')
+                    self.__sl_op = m.group('op')
                     if m.group('es'):
-                        glsl_es_version = float(m.group('ver'))
+                        self._glsl_es_version = float(m.group('ver'))
                     else:
-                        glsl_version = float(m.group('ver'))
+                        self._glsl_version = float(m.group('ver'))
                     continue
 
             if line.startswith('['):
@@ -115,24 +114,55 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         # Select the correct binary to run the test, but be as conservative as
         # possible by always selecting the lowest version that meets the
         # criteria.
-        if gles_version:
-            if op in ['<', '<='] or op in ['=', '>='] and gles_version < 3:
-                prog = 'shader_runner_gles2'
+        if self._gles_version:
+            if self.__op in ['<', '<='] or (
+                    self.__op in ['=', '>='] and self._gles_version < 3):
+                self.prog = 'shader_runner_gles2'
             else:
-                prog = 'shader_runner_gles3'
+                self.prog = 'shader_runner_gles3'
         else:
-            prog = 'shader_runner'
+            self.prog = 'shader_runner'
+
+    # FIXME: All of these properties are a work-around for the fact that the
+    # FastSkipMixin assumes that operations are always > or >=
+
+    @property
+    def gl_version(self):
+        return self._gl_version if self.__op not in ['<', '<='] else None
+
+    @property
+    def gles_version(self):
+        return self._gles_version if self.__op not in ['<', '<='] else None
+
+    @property
+    def glsl_version(self):
+        return self._glsl_version if self.__sl_op not in ['<', '<='] else None
+
+    @property
+    def glsl_es_version(self):
+        return self._glsl_es_version if self.__sl_op not in ['<', '<='] else None
+
+
+class ShaderTest(FastSkipMixin, PiglitBaseTest):
+    """ Parse a shader test file and return a PiglitTest instance
+
+    This function parses a shader test to determine if it's a GL, GLES2 or
+    GLES3 test, and then returns a PiglitTest setup properly.
+
+    """
+
+    def __init__(self, filename):
+        parser = Parser(filename)
+        parser.parse()
 
         super(ShaderTest, self).__init__(
-            [prog, filename],
+            [parser.prog, parser.filename],
             run_concurrent=True,
-            gl_required=gl_required,
-            # FIXME: the if here is related to an incomplete feature in the
-            # FastSkipMixin
-            gl_version=gl_version if op not in ['<', '<='] else None,
-            gles_version=gles_version if op not in ['<', '<='] else None,
-            glsl_version=glsl_version if sl_op not in ['<', '<='] else None,
-            glsl_es_version=glsl_es_version if sl_op not in ['<', '<='] else None)
+            gl_required=parser.gl_required,
+            gl_version=parser.gl_version,
+            gles_version=parser.gles_version,
+            glsl_version=parser.glsl_version,
+            glsl_es_version=parser.glsl_es_version)
 
     @PiglitBaseTest.command.getter
     def command(self):
