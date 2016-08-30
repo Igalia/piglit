@@ -33,7 +33,6 @@ except ImportError:
 import pytest
 import six
 
-from framework import exceptions
 from framework.test import shader_test
 
 # pylint: disable=invalid-name,no-self-use
@@ -204,3 +203,65 @@ def test_command_add_auto(tmpdir):
     test = shader_test.ShaderTest(six.text_type(p))
 
     assert '-auto' in test.command
+
+
+class TestMultiShaderTest(object):
+    """Tests for the MultiShaderTest class."""
+
+    class TestConstructor(object):
+        """Tests for the constructor object."""
+
+        @pytest.fixture
+        def inst(self, tmpdir):
+            """A fixture that creates an instance to test."""
+            one = tmpdir.join('foo.shader_test')
+            one.write(textwrap.dedent("""\
+                [require]
+                GLSL >= 3.0
+
+                [vertex shader]"""))
+            two = tmpdir.join('bar.shader_test')
+            two.write(textwrap.dedent("""\
+                [require]
+                GLSL >= 4.0
+
+                [vertex shader]"""))
+
+            return shader_test.MultiShaderTest(
+                [six.text_type(one), six.text_type(two)])
+
+        def test_prog(self, inst):
+            assert os.path.basename(inst.command[0]) == 'shader_runner'
+
+        def test_filenames(self, inst):
+            assert os.path.basename(inst.command[1]) == 'foo.shader_test'
+            assert os.path.basename(inst.command[2]) == 'bar.shader_test'
+
+        def test_extra(self, inst):
+            assert inst.command[3] == '-auto'
+
+    @pytest.fixture
+    def inst(self, tmpdir):
+        """A fixture that creates an instance to test."""
+        one = tmpdir.join('foo.shader_test')
+        one.write(textwrap.dedent("""\
+            [require]
+            GLSL >= 3.0
+
+            [vertex shader]"""))
+        two = tmpdir.join('bar.shader_test')
+        two.write(textwrap.dedent("""\
+            [require]
+            GLSL >= 4.0
+
+            [vertex shader]"""))
+
+        return shader_test.MultiShaderTest(
+            [six.text_type(one), six.text_type(two)])
+
+    def test_resume(self, inst):
+        actual = inst._resume(1)  # pylint: disable=protected-access
+        assert os.path.basename(actual[0]) == 'shader_runner'
+        assert os.path.basename(actual[1]) == 'bar.shader_test'
+        assert os.path.basename(actual[2]) == '-auto'
+

@@ -27,9 +27,12 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import io
+import os
 import re
 
 from framework import exceptions
+from framework import status
+from .base import ReducedProcessMixin
 from .opengl import FastSkipMixin
 from .piglit_test import PiglitBaseTest
 
@@ -168,3 +171,70 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
     def command(self):
         """ Add -auto to the test command """
         return self._command + ['-auto']
+
+
+class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
+    """A Shader class that can run more than one test at a time.
+
+    This class can call shader_runner with multiple shader_files at a time, and
+    interpret the results, as well as handle pre-mature exit through crashes or
+    from breaking import assupmtions in the utils about skipping.
+
+    Arguments:
+    filenames -- a list of absolute paths to shader test files
+    """
+
+    def __init__(self, filenames):
+        # TODO fast skip.
+        parser = Parser(filenames[0])
+        parser.parse()
+        prog = parser.prog
+        files = [parser.filename]
+
+        for each in filenames[1:]:
+            parser = Parser(each)
+            parser.parse()
+            assert parser.prog == prog
+            files.append(parser.filename)
+
+        super(MultiShaderTest, self).__init__(
+            [prog] + files,
+            subtests=[os.path.basename(os.path.splitext(f)[0]).lower()
+                      for f in filenames],
+            run_concurrent=True)
+
+    @PiglitBaseTest.command.getter  # pylint: disable=no-member
+    def command(self):
+        """Add -auto to the test command."""
+        return self._command + ['-auto', '-report-subtests']
+
+    def _is_subtest(self, line):
+        return line.startswith('PIGLIT TEST:')
+
+    def _resume(self, current):
+        command = [self.command[0]]
+        command.extend(self.command[current + 1:])
+        return command
+
+    def _stop_status(self):
+        # If the lower level framework skips then return a status for that
+        # subtest as skip, and resume.
+        if self.result.out.endswith('PIGLIT: {"result": "skip" }\n'):
+            return status.SKIP
+        if self.result.returncode > 0:
+            return status.FAIL
+        return status.CRASH
+
+    def _is_cherry(self):
+        # Due to the way that piglt is architected if a particular feature
+        # isn't supported it causes the test to exit with status 0. There is no
+        # straightforward way to fix this, so we work around it by looking for
+        # the message that feature provides and marking the test as not
+        # "cherry" when it is found at the *end* of stdout. (We don't want to
+        # match other places or we'll end up in an infinite loop)
+        return (
+            self.result.returncode == 0 and not
+            self.result.out.endswith(
+                'not supported on this implementation\n') and not
+            self.result.out.endswith(
+                'PIGLIT: {"result": "skip" }\n'))
