@@ -23,7 +23,7 @@ void main()
 
 in block {
 	float v;
-} verts[2];
+} verts[];
 layout(vertices = 1) out;
 
 void main()

@@ -19,7 +19,7 @@ void main()
 #version 150
 #extension GL_ARB_tessellation_shader : require
 
-in float v[2];
+in float v[];
 layout(vertices = 1) out;
 
 void main()
