@@ -1,21 +1,22 @@
 // [config]
 // expect_result: pass
 // glsl_version: 3.10
-// require_extensions: GL_EXT_shader_samples_identical
+// require_extensions: GL_EXT_shader_samples_identical GL_OES_texture_storage_multisample_2d_array
 // [end config]
 
 #version 310 es
-#extension GL_ARB_texture_multisample: require
+#extension GL_OES_texture_storage_multisample_2d_array: require
 #extension GL_EXT_shader_samples_identical: require
 
-uniform sampler2DMS s1;
-uniform isampler2DMS s2;
-uniform usampler2DMS s3;
-uniform sampler2DMSArray s4;
-uniform isampler2DMSArray s5;
-uniform usampler2DMSArray s6;
 
-out vec2 data;
+uniform mediump sampler2DMS s1;
+uniform mediump isampler2DMS s2;
+uniform mediump usampler2DMS s3;
+uniform mediump sampler2DMSArray s4;
+uniform mediump isampler2DMSArray s5;
+uniform mediump usampler2DMSArray s6;
+
+out mediump vec2 data;
 
 void main()
 {
