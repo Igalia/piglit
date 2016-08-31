@@ -239,7 +239,6 @@ def _populate_profile_rendercheck(profile):
     _add_rendercheck_test(profile, 'triangles', '-t triangles')
     _add_rendercheck_test(profile, 'LibreOffice xRGB', '-t libreoffice_xrgb')
     _add_rendercheck_test(profile, 'GTK ARGB vs xBGR', '-t gtk_argb_xbgr')
-    _add_rendercheck_test(profile, 'large blend source', '-t large_blend_src')
 
 
 def _populate_profile():
