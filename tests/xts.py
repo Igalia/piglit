@@ -144,6 +144,7 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
                 os.remove(self.test_results_file)
         except IOError:
             self.result.err = "No results file found"
+            log = ""
 
         if self.result.returncode == 0:
             if re.search('FAIL', self.result.out) is not None:
