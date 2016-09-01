@@ -1095,6 +1095,7 @@ piglit_cl_create_image(piglit_cl_context context, cl_mem_flags flags,
 		                        desc->image_depth, 0, 0,
 		                        NULL, &errNo);
 	} else {
+		errNo = CL_INVALID_OPERATION;
 		fprintf(stderr,
 		        "Invalid image mem object type: %s\n",
 		        piglit_cl_get_enum_name(desc->image_type));
