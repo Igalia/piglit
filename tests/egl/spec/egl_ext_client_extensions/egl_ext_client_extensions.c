@@ -102,7 +102,7 @@ test_2(void)
 
 	dpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	if (!dpy) {
-		printf("Failed to get default display. Skipping.n");
+		printf("Failed to get default display. Skipping.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
