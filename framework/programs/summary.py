@@ -190,7 +190,7 @@ def csv(input_):
 
     def write_results(output):
         for name, result in six.iteritems(testrun.tests):
-            output.write("{},{},{},{}\n".format(name, result.time,
+            output.write("{},{},{},{}\n".format(name, result.time.total,
                                                 result.returncode,
                                                 result.result))
 
