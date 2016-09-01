@@ -859,14 +859,6 @@ with profile.group_manager(
     g(['readpix-z'])
     g(['roundmode-getintegerv'], run_concurrent=False)
     g(['roundmode-pixelstore'], run_concurrent=False)
-    g(['scissor-bitmap'], run_concurrent=False)
-    g(['scissor-clear'], run_concurrent=False)
-    g(['scissor-copypixels'], run_concurrent=False)
-    g(['scissor-depth-clear'], run_concurrent=False)
-    g(['scissor-many'], run_concurrent=False)
-    g(['scissor-offscreen'], run_concurrent=False)
-    g(['scissor-polygon'])
-    g(['scissor-stencil-clear'], run_concurrent=False)
     g(['select', 'gl11'], 'GL_SELECT - no test function', run_concurrent=False)
     g(['select', 'depth'], 'GL_SELECT - depth-test enabled',
       run_concurrent=False)
@@ -972,6 +964,14 @@ with profile.group_manager(
     g(['gl-1.0-no-op-paths'])
     g(['gl-1.0-simple-readbuffer'])
     g(['gl-1.0-spot-light'])
+    g(['gl-1.0-scissor-bitmap'], run_concurrent=False)
+    g(['gl-1.0-scissor-clear'], run_concurrent=False)
+    g(['gl-1.0-scissor-copypixels'], run_concurrent=False)
+    g(['gl-1.0-scissor-depth-clear'], run_concurrent=False)
+    g(['gl-1.0-scissor-many'], run_concurrent=False)
+    g(['gl-1.0-scissor-offscreen'], run_concurrent=False)
+    g(['gl-1.0-scissor-polygon'])
+    g(['gl-1.0-scissor-stencil-clear'], run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
