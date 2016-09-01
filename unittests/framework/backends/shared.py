@@ -30,9 +30,12 @@ from framework.options import OPTIONS
 
 INITIAL_METADATA = {
     'name': 'name',
-    'test_count': 0,
-    'env': {},
     'options': dict(OPTIONS),
+    'clinfo': None,
+    'glxinfo': None,
+    'wglinfo': None,
+    'lspci': None,
+    'uname': None,
 }
 
 # This is current JSON data, in raw form with only the minimum required
