@@ -112,7 +112,8 @@ class TestJSONBackend(object):
             test.initialize(shared.INITIAL_METADATA)
             with test.write_test(self.name) as t:
                 t(self.result)
-            test.finalize()
+            test.finalize(
+                {'time_elapsed': results.TimeAttribute(start=0.0, end=1.0)})
 
         def test_metadata_removed(self, tmpdir):
             assert not tmpdir.join('metadata.json').check()
