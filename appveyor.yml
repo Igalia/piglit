@@ -13,25 +13,25 @@ environment:
         WITH_COMPILER: 'cmd /E:ON /V:ON /C .\ci\appveyor\compiler.cmd'
 
     matrix:
-        - TOXENV: 'py27-{noaccel,accel-win}'
+        - TOXENV: 'py27-{noaccel,accel-win,streams}'
           TOXPYTHON: C:\Python27\python.exe
           PYTHON_HOME: C:\Python27
           PYTHON_VERSION: '2.7'
           PYTHON_ARCH: '32'
 
-        - TOXENV: 'py33-{noaccel,accel-win}'
+        - TOXENV: 'py33-{noaccel,accel-win,streams}'
           TOXPYTHON: C:\Python33\python.exe
           PYTHON_HOME: C:\Python33
           PYTHON_VERSION: '3.3'
           PYTHON_ARCH: '32'
 
-        - TOXENV: 'py34-{noaccel,accel-win}'
+        - TOXENV: 'py34-{noaccel,accel-win,streams}'
           TOXPYTHON: C:\Python34\python.exe
           PYTHON_HOME: C:\Python34
           PYTHON_VERSION: '3.4'
           PYTHON_ARCH: '32'
 
-        - TOXENV: 'py35-{noaccel,accel-win}'
+        - TOXENV: 'py35-{noaccel,accel-win,streams}'
           TOXPYTHON: C:\Python35\python.exe
           PYTHON_HOME: C:\Python35
           PYTHON_VERSION: '3.5'
