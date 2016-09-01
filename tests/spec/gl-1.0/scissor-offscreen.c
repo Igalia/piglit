@@ -25,7 +25,7 @@
  *
  */
 
-/** @file scissor-offscreen.c
+/** @file
  *
  * Test case for setting a scissor that is entirely offscreen. This
  * should clip everything but under current Mesa master with i965 it

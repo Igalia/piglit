@@ -25,7 +25,7 @@
  *
  */
 
-/** @file many-scissors.c
+/** @file
  *
  * Tests drawing to each individual pixel in the drawable using glScissor.
  *

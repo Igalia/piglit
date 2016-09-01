@@ -25,7 +25,7 @@
  *
  */
 
-/** @file scissor-bitmap.c
+/** @file
  *
  * Tests that clipping of glBitmap to the backbuffer works correctly, whether
  * it's to window boundaries or glScissor.

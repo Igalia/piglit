@@ -25,7 +25,7 @@
  *
  */
 
-/** @file scissor-stencil-clear.c
+/** @file
  *
  * Tests that glScissor properly affects glClear of the stencil buffer.
  */

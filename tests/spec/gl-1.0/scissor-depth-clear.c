@@ -25,7 +25,7 @@
  *
  */
 
-/** @file scissor-copypixels.c
+/** @file
  *
  * Tests that glScissor properly affects glClear(GL_DEPTH_BUFFER_BIT).
  */

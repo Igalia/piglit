@@ -25,7 +25,7 @@
  *
  */
 
-/** @file scissor-clear.c
+/** @file
  *
  * Tests that glScissor properly affects glClear(GL_COLOR_BUFFER_BIT)().
  */
