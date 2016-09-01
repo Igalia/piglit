@@ -968,6 +968,7 @@ with profile.group_manager(
     g(['gl-1.0-scissor-clear'])
     g(['gl-1.0-scissor-copypixels'])
     g(['gl-1.0-scissor-depth-clear'])
+    g(['gl-1.0-scissor-depth-clear-negative-xy'])
     g(['gl-1.0-scissor-many'])
     g(['gl-1.0-scissor-offscreen'])
     g(['gl-1.0-scissor-polygon'])
