@@ -73,8 +73,6 @@ piglit_display(void)
 	int dst_x = piglit_width / 2 + 10, dst_y;
 	int dst_w = 10, dst_h = 10;
 
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
 	/* whole window red */
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -115,4 +113,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }

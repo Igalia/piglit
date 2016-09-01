@@ -50,8 +50,6 @@ piglit_display(void)
 	static const GLfloat window_color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	GLboolean pass = GL_TRUE;
 
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
 	/* Clear to white */
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -81,4 +79,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char**argv)
 {
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }

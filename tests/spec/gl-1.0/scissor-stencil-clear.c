@@ -100,17 +100,8 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-
-	piglit_ortho_projection(width, height, GL_FALSE);
-}
-
 void
 piglit_init(int argc, char **argv)
 {
-	reshape(piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }

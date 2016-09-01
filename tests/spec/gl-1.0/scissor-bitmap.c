@@ -157,7 +157,6 @@ piglit_display()
 	int start_x, start_y;
 	struct probes probes;
 	GLboolean pass = GL_TRUE;
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	memset(&probes, 0, sizeof(probes));
 
@@ -305,4 +304,5 @@ void
 piglit_init(int argc, char **argv)
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
