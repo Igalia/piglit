@@ -102,7 +102,7 @@
         }
     },
     "additionalProperties": false,
-    "required": [ "__type__", "clinfo", "glxinfo", "lspci", "wglinfo", "name", "results_version", "uname", "time_elapsed", "totals", "tests" ],
+    "required": [ "__type__", "clinfo", "glxinfo", "lspci", "wglinfo", "name", "results_version", "uname", "time_elapsed", "tests" ],
     "definitions": {
         "timeAttribute": {
             "type": "object",
