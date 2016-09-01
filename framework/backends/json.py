@@ -24,6 +24,7 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import collections
+import functools
 import os
 import posixpath
 import shutil
@@ -35,6 +36,11 @@ except ImportError:
     import json
 
 import six
+try:
+    import jsonstreams
+    _STREAMS = True
+except ImportError:
+    _STREAMS = False
 
 from framework import status, results, exceptions, compat
 from .abstract import FileBackend, write_compressed
@@ -130,41 +136,78 @@ class JSONBackend(FileBackend):
         containers that are still open and closes the file
 
         """
-        # Create a dictionary that is full of data to be written to a single
-        # file
-        data = collections.OrderedDict()
+        # If jsonstreams is not present then build a complete tree of all of
+        # the data and write it with json.dump
+        if not _STREAMS:
+            # Create a dictionary that is full of data to be written to a
+            # single file
+            data = collections.OrderedDict()
 
-        # Load the metadata and put it into a dictionary
-        with open(os.path.join(self._dest, 'metadata.json'), 'r') as f:
-            data.update(json.load(f))
+            # Load the metadata and put it into a dictionary
+            with open(os.path.join(self._dest, 'metadata.json'), 'r') as f:
+                data.update(json.load(f))
 
-        # If there is more metadata add it the dictionary
-        if metadata:
-            data.update(metadata)
+            # If there is more metadata add it the dictionary
+            if metadata:
+                data.update(metadata)
 
-        # Add the tests to the dictionary
-        data['tests'] = collections.OrderedDict()
+            # Add the tests to the dictionary
+            data['tests'] = collections.OrderedDict()
 
-        test_dir = os.path.join(self._dest, 'tests')
-        for test in os.listdir(test_dir):
-            test = os.path.join(test_dir, test)
-            if os.path.isfile(test):
-                # Try to open the json snippets. If we fail to open a test then
-                # throw the whole thing out. This gives us atomic writes, the
-                # writing worked and is valid or it didn't work.
-                try:
-                    with open(test, 'r') as f:
-                        data['tests'].update(json.load(f, object_hook=piglit_decoder))
-                except ValueError:
-                    pass
-        assert data['tests']
+            test_dir = os.path.join(self._dest, 'tests')
+            for test in os.listdir(test_dir):
+                test = os.path.join(test_dir, test)
+                if os.path.isfile(test):
+                    # Try to open the json snippets. If we fail to open a test
+                    # then throw the whole thing out. This gives us atomic
+                    # writes, the writing worked and is valid or it didn't
+                    # work.
+                    try:
+                        with open(test, 'r') as f:
+                            data['tests'].update(
+                                json.load(f, object_hook=piglit_decoder))
+                    except ValueError:
+                        pass
+            assert data['tests']
 
-        data = results.TestrunResult.from_dict(data)
+            data = results.TestrunResult.from_dict(data)
 
-        # write out the combined file. Use the compression writer from the
-        # FileBackend
-        with self._write_final(os.path.join(self._dest, 'results.json')) as f:
-            json.dump(data, f, default=piglit_encoder, indent=INDENT)
+            # write out the combined file. Use the compression writer from the
+            # FileBackend
+            with self._write_final(os.path.join(self._dest, 'results.json')) as f:
+                json.dump(data, f, default=piglit_encoder, indent=INDENT)
+
+        # Otherwise use jsonstreams to write the final dictionary. This uses an
+        # external library, but is slightly faster and uses considerably less
+        # memory that building a complete tree.
+        else:
+            encoder = functools.partial(json.JSONEncoder, default=piglit_encoder)
+
+            with self._write_final(os.path.join(self._dest, 'results.json')) as f:
+                with jsonstreams.Stream(jsonstreams.Type.object, fd=f, indent=4,
+                                        encoder=encoder, pretty=True) as s:
+                    s.write('__type__', 'TestrunResult')
+                    with open(os.path.join(self._dest, 'metadata.json'),
+                              'r') as n:
+                        s.iterwrite(six.iteritems(json.load(n)))
+
+                    if metadata:
+                        s.iterwrite(six.iteritems(metadata))
+
+                    test_dir = os.path.join(self._dest, 'tests')
+                    with s.subobject('tests') as t:
+                        for test in os.listdir(test_dir):
+                            test = os.path.join(test_dir, test)
+                            if os.path.isfile(test):
+                                try:
+                                    with open(test, 'r') as f:
+                                        a = json.load(
+                                            f, object_hook=piglit_decoder)
+                                except ValueError:
+                                    continue
+
+                                t.iterwrite(six.iteritems(a))
+
 
         # Delete the temporary files
         os.unlink(os.path.join(self._dest, 'metadata.json'))
