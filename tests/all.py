@@ -964,14 +964,14 @@ with profile.group_manager(
     g(['gl-1.0-no-op-paths'])
     g(['gl-1.0-simple-readbuffer'])
     g(['gl-1.0-spot-light'])
-    g(['gl-1.0-scissor-bitmap'], run_concurrent=False)
-    g(['gl-1.0-scissor-clear'], run_concurrent=False)
-    g(['gl-1.0-scissor-copypixels'], run_concurrent=False)
-    g(['gl-1.0-scissor-depth-clear'], run_concurrent=False)
-    g(['gl-1.0-scissor-many'], run_concurrent=False)
-    g(['gl-1.0-scissor-offscreen'], run_concurrent=False)
+    g(['gl-1.0-scissor-bitmap'])
+    g(['gl-1.0-scissor-clear'])
+    g(['gl-1.0-scissor-copypixels'])
+    g(['gl-1.0-scissor-depth-clear'])
+    g(['gl-1.0-scissor-many'])
+    g(['gl-1.0-scissor-offscreen'])
     g(['gl-1.0-scissor-polygon'])
-    g(['gl-1.0-scissor-stencil-clear'], run_concurrent=False)
+    g(['gl-1.0-scissor-stencil-clear'])
 
 with profile.group_manager(
         PiglitGLTest,
