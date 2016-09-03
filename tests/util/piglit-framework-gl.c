@@ -265,22 +265,14 @@ piglit_set_reshape_func(void (*func)(int w, int h))
 		gl_fw->set_reshape_func(gl_fw, func);
 }
 
-
 enum piglit_result
-piglit_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
-		      const void *src_data, unsigned src_stride,
-		      struct piglit_dma_buf **buf, int *fd,
-		      unsigned *stride, unsigned *offset)
+piglit_create_dma_buf(unsigned w, unsigned h, unsigned fourcc,
+		      const void *src_data, struct piglit_dma_buf **buf)
 {
-	*fd = 0;
-	*stride = 0;
-	*offset = 0;
-
 	if (!gl_fw->create_dma_buf)
 		return PIGLIT_SKIP;
 
-	return gl_fw->create_dma_buf(w, h, cpp, src_data, src_stride, buf, fd,
-				stride, offset);
+	return gl_fw->create_dma_buf(w, h, fourcc, src_data, buf);
 }
 
 void

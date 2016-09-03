@@ -32,12 +32,11 @@
  * sample it using a shader program.
  */
 enum piglit_result
-dma_buf_create_and_sample_32bpp(unsigned w, unsigned h, unsigned cpp,
+dma_buf_create_and_sample_32bpp(unsigned w, unsigned h,
 			        int fourcc, const unsigned char *src);
 
 enum piglit_result
-egl_image_for_dma_buf_fd(int fd, int fourcc, int w, int h,
-			 unsigned stride, unsigned offset, EGLImageKHR *out_img);
+egl_image_for_dma_buf_fd(struct piglit_dma_buf *buf, int fd, int fourcc, EGLImageKHR *out_img);
 
 enum piglit_result
 texture_for_egl_image(EGLImageKHR img, GLuint *out_tex);

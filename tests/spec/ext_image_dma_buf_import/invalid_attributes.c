@@ -21,6 +21,8 @@
  * IN THE SOFTWARE.
  */
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "image_common.h"
 
 /**
@@ -209,44 +211,41 @@ piglit_display(void)
 	const unsigned w = 2;
 	const unsigned h = 2;
 	const unsigned cpp = 4;
+	const unsigned fourcc = DRM_FORMAT_ARGB8888;
 	const unsigned char *pixels = alloca(w * h * cpp);
 	struct piglit_dma_buf *buf;
-	unsigned stride;
-	unsigned offset;
-	int fd;
 	enum piglit_result res;
 	bool pass = true;
 
-	res = piglit_create_dma_buf(w, h, cpp, pixels, w * cpp,
-				&buf, &fd, &stride, &offset);
+	res = piglit_create_dma_buf(w, h, fourcc, pixels, &buf);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	pass = test_excess_attributes(w, h, fd, stride, offset,
-				EGL_DMA_BUF_PLANE1_FD_EXT, fd) && pass;
-	pass = test_excess_attributes(w, h, fd, stride, offset,
+	pass = test_excess_attributes(w, h, buf->fd, buf->stride[0], buf->offset[0],
+				EGL_DMA_BUF_PLANE1_FD_EXT, buf->fd) && pass;
+	pass = test_excess_attributes(w, h, buf->fd, buf->stride[0], buf->offset[0],
 				EGL_DMA_BUF_PLANE1_OFFSET_EXT, 0) && pass;
-	pass = test_excess_attributes(w, h, fd, stride, offset,
-				EGL_DMA_BUF_PLANE1_PITCH_EXT, stride) && pass;
-	pass = test_excess_attributes(w, h, fd, stride, offset,
-				EGL_DMA_BUF_PLANE2_FD_EXT, fd) && pass;
-	pass = test_excess_attributes(w, h, fd, stride, offset,
+	pass = test_excess_attributes(w, h, buf->fd, buf->stride[0], buf->offset[0],
+				EGL_DMA_BUF_PLANE1_PITCH_EXT, buf->stride[0]) && pass;
+	pass = test_excess_attributes(w, h, buf->fd, buf->stride[0], buf->offset[0],
+				EGL_DMA_BUF_PLANE2_FD_EXT, buf->fd) && pass;
+	pass = test_excess_attributes(w, h, buf->fd, buf->stride[0], buf->offset[0],
 				EGL_DMA_BUF_PLANE2_OFFSET_EXT, 0) && pass;
-	pass = test_excess_attributes(w, h, fd, stride, offset,
-				EGL_DMA_BUF_PLANE2_PITCH_EXT, stride) && pass;
-	pass = test_buffer_not_null(w, h, fd, stride, offset) && pass;
-	pass = test_invalid_context(w, h, fd, stride, offset) && pass;
-	pass = test_invalid_format(w, h, fd, stride, offset) && pass;
-	pass = test_pitch_zero(w, h, fd, stride, offset) && pass;
-
-	piglit_destroy_dma_buf(buf);
+	pass = test_excess_attributes(w, h, buf->fd, buf->stride[0], buf->offset[0],
+				EGL_DMA_BUF_PLANE2_PITCH_EXT, buf->stride[0]) && pass;
+	pass = test_buffer_not_null(w, h, buf->fd, buf->stride[0], buf->offset[0]) && pass;
+	pass = test_invalid_context(w, h, buf->fd, buf->stride[0], buf->offset[0]) && pass;
+	pass = test_invalid_format(w, h, buf->fd, buf->stride[0], buf->offset[0]) && pass;
+	pass = test_pitch_zero(w, h, buf->fd, buf->stride[0], buf->offset[0]) && pass;
 
 	/**
 	 * EGL stack can claim the ownership of the file descriptor only when it
 	 * succeeds. Close the file descriptor here and check that it really
 	 * wasn't closed by EGL.
 	 */
-	pass = (close(fd) == 0) && pass;
+	pass = (close(buf->fd) == 0) && pass;
+
+	piglit_destroy_dma_buf(buf);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

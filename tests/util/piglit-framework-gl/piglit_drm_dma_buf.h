@@ -23,13 +23,18 @@
 #ifndef PIGLIT_DRM_DMA_BUF_H
 #define PIGLIT_DRM_DMA_BUF_H
 
-struct piglit_dma_buf;
+struct piglit_dma_buf {
+	unsigned w;
+	unsigned h;
+	unsigned offset[3];
+	unsigned stride[3];
+	int fd;
+	void *priv;
+};
 
 enum piglit_result
-piglit_drm_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
-			  const void *src_data, unsigned src_stride,
-			  struct piglit_dma_buf **buf, int *fd,
-			  unsigned *stride, unsigned *offset);
+piglit_drm_create_dma_buf(unsigned w, unsigned h, unsigned fourcc,
+			const void *src_data,  struct piglit_dma_buf **buf);
 
 void
 piglit_drm_destroy_dma_buf(struct piglit_dma_buf *buf);

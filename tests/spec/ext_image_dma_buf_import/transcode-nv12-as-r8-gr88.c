@@ -33,6 +33,8 @@
  * and GR88 DRM formats.
  */
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "image_common.h"
 
 #define WINDOW_WIDTH 4
@@ -77,26 +79,20 @@ static const uint8_t v_data[] = {
 };
 
 static GLuint
-create_dma_buf_texture(uint32_t width, uint32_t height,
-		       uint32_t cpp, uint32_t stride,
-		       uint32_t drm_fourcc, const void *pixels)
+create_dma_buf_texture(uint32_t width, uint32_t height, uint32_t fourcc,
+		       const void *pixels)
 {
 	EGLDisplay dpy = eglGetCurrentDisplay();
 
 	enum piglit_result result = PIGLIT_PASS;
 
 	struct piglit_dma_buf *dma_buf;
-	int dma_buf_fd;
-	uint32_t dma_buf_offset;
-	uint32_t dma_buf_stride;
 	EGLImageKHR image;
 	EGLint image_attrs[13];
 	GLuint tex;
 	int i;
 
-	result = piglit_create_dma_buf(width, height, cpp, pixels, stride,
-				       &dma_buf, &dma_buf_fd, &dma_buf_stride,
-				       &dma_buf_offset);
+	result = piglit_create_dma_buf(width, height, fourcc, pixels, &dma_buf);
 
 	if (result != PIGLIT_PASS) {
 		piglit_loge("failed to create dma_buf");
@@ -105,17 +101,17 @@ create_dma_buf_texture(uint32_t width, uint32_t height,
 
 	i = 0;
 	image_attrs[i++] = EGL_LINUX_DRM_FOURCC_EXT;
-	image_attrs[i++] = drm_fourcc;
+	image_attrs[i++] = fourcc;
 	image_attrs[i++] = EGL_WIDTH;
 	image_attrs[i++] = width;
 	image_attrs[i++] = EGL_HEIGHT;
 	image_attrs[i++] = height;
 	image_attrs[i++] = EGL_DMA_BUF_PLANE0_FD_EXT;
-	image_attrs[i++] = dma_buf_fd;
+	image_attrs[i++] = dma_buf->fd;
 	image_attrs[i++] = EGL_DMA_BUF_PLANE0_PITCH_EXT;
-	image_attrs[i++] = dma_buf_stride;
+	image_attrs[i++] = dma_buf->stride[0];
 	image_attrs[i++] = EGL_DMA_BUF_PLANE0_OFFSET_EXT;
-	image_attrs[i++] = dma_buf_offset;
+	image_attrs[i++] = dma_buf->offset[0];
 	image_attrs[i++] = EGL_NONE;
 
 
@@ -191,12 +187,10 @@ create_textures(GLuint *r8_tex, GLuint *gr88_tex, float **ref_rgba_image)
 
 	glActiveTexture(GL_TEXTURE0);
 	*r8_tex = create_dma_buf_texture(width, height,
-					 /*cpp*/ 1, /*stride*/ width,
 					 DRM_FORMAT_R8, r8_pixels);
 
 	glActiveTexture(GL_TEXTURE1);
 	*gr88_tex = create_dma_buf_texture(width / 2, height / 2,
-					   /*cpp*/ 2, /*stride*/ width,
 					   DRM_FORMAT_GR88, gr88_pixels);
 }
 

@@ -23,6 +23,8 @@
 
 #include <unistd.h>
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "image_common.h"
 #include "sample_common.h"
 
@@ -105,47 +107,46 @@ sample_tex(GLuint tex, unsigned x, unsigned y, unsigned w, unsigned h)
 }
 
 enum piglit_result
-egl_image_for_dma_buf_fd(int fd, int fourcc, int w, int h,
-			 unsigned stride, unsigned offset, EGLImageKHR *out_img)
+egl_image_for_dma_buf_fd(struct piglit_dma_buf *buf, int fd, int fourcc, EGLImageKHR *out_img)
 {
 	EGLint error;
 	EGLImageKHR img;
 	EGLint attr_packed[] = {
-		EGL_WIDTH, w,
-		EGL_HEIGHT, h,
+		EGL_WIDTH, buf->w,
+		EGL_HEIGHT, buf->h,
 		EGL_LINUX_DRM_FOURCC_EXT, fourcc,
 		EGL_DMA_BUF_PLANE0_FD_EXT, fd,
-		EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
-		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE0_OFFSET_EXT, buf->offset[0],
+		EGL_DMA_BUF_PLANE0_PITCH_EXT, buf->stride[0],
 		EGL_NONE
 	};
 
 	EGLint attr_nv12[] = {
-		EGL_WIDTH, w,
-		EGL_HEIGHT, h,
+		EGL_WIDTH, buf->w,
+		EGL_HEIGHT, buf->h,
 		EGL_LINUX_DRM_FOURCC_EXT, fourcc,
 		EGL_DMA_BUF_PLANE0_FD_EXT, fd,
-		EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
-		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE0_OFFSET_EXT, buf->offset[0],
+		EGL_DMA_BUF_PLANE0_PITCH_EXT, buf->stride[0],
 		EGL_DMA_BUF_PLANE1_FD_EXT, fd,
-		EGL_DMA_BUF_PLANE1_OFFSET_EXT, offset + h * stride,
-		EGL_DMA_BUF_PLANE1_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE1_OFFSET_EXT, buf->offset[1],
+		EGL_DMA_BUF_PLANE1_PITCH_EXT, buf->stride[1],
 		EGL_NONE
 	};
 
 	EGLint attr_yuv420[] = {
-		EGL_WIDTH, w,
-		EGL_HEIGHT, h,
+		EGL_WIDTH, buf->w,
+		EGL_HEIGHT, buf->h,
 		EGL_LINUX_DRM_FOURCC_EXT, fourcc,
 		EGL_DMA_BUF_PLANE0_FD_EXT, fd,
-		EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
-		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE0_OFFSET_EXT, buf->offset[0],
+		EGL_DMA_BUF_PLANE0_PITCH_EXT, buf->stride[0],
 		EGL_DMA_BUF_PLANE1_FD_EXT, fd,
-		EGL_DMA_BUF_PLANE1_OFFSET_EXT, offset + h * stride,
-		EGL_DMA_BUF_PLANE1_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE1_OFFSET_EXT, buf->offset[1],
+		EGL_DMA_BUF_PLANE1_PITCH_EXT, buf->stride[1],
 		EGL_DMA_BUF_PLANE2_FD_EXT, fd,
-		EGL_DMA_BUF_PLANE2_OFFSET_EXT, offset + h * stride + w / 2,
-		EGL_DMA_BUF_PLANE2_PITCH_EXT, stride,
+		EGL_DMA_BUF_PLANE2_OFFSET_EXT, buf->offset[2],
+		EGL_DMA_BUF_PLANE2_PITCH_EXT, buf->stride[2],
 		EGL_NONE
 	};
 
@@ -191,21 +192,22 @@ egl_image_for_dma_buf_fd(int fd, int fourcc, int w, int h,
 }
 
 static enum piglit_result
-sample_buffer(void *buf, int fd, int fourcc, unsigned w, unsigned h,
-	      unsigned stride, unsigned offset)
+sample_buffer(struct piglit_dma_buf *buf, int fourcc)
 {
 	enum piglit_result res;
 	EGLImageKHR img;
 	GLuint tex;
+	int w = buf->w;
+	int h = buf->h;
 
-	res = egl_image_for_dma_buf_fd(fd, fourcc, w, h, stride, offset, &img);
+	res = egl_image_for_dma_buf_fd(buf, buf->fd, fourcc, &img);
 
 	/* Release the creator side of the buffer. */
 	piglit_destroy_dma_buf(buf);
 
 	if (!img) {
 		/* Close the descriptor also, EGL does not have ownership */
-		close(fd);
+		close(buf->fd);
 	}
 
 	if (res != PIGLIT_PASS)
@@ -225,32 +227,15 @@ destroy:
 }
 
 enum piglit_result
-dma_buf_create_and_sample_32bpp(unsigned w, unsigned h, unsigned cpp,
+dma_buf_create_and_sample_32bpp(unsigned w, unsigned h,
 				int fourcc, const unsigned char *src)
 {
 	struct piglit_dma_buf *buf;
-	unsigned stride, offset;
-	int fd;
 	enum piglit_result res;
 
-	unsigned buffer_height;
-
-	switch (fourcc) {
-	case DRM_FORMAT_NV12:
-	case DRM_FORMAT_YUV420:
-	case DRM_FORMAT_YVU420:
-		buffer_height = h * 3 / 2;
-		break;
-	default:
-		buffer_height = h;
-		break;
-	}
-
-	res = piglit_create_dma_buf(w, buffer_height,
-				    cpp, src, w * cpp, &buf, &fd, &stride,
-				    &offset);
+	res = piglit_create_dma_buf(w, h, fourcc, src, &buf);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	return sample_buffer(buf, fd, fourcc, w, h, stride, offset);
+	return sample_buffer(buf, fourcc);
 }

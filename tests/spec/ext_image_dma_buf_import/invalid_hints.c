@@ -21,6 +21,8 @@
  * IN THE SOFTWARE.
  */
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "image_common.h"
 
 /**
@@ -97,36 +99,33 @@ piglit_display(void)
 	const unsigned w = 2;
 	const unsigned h = 2;
 	const unsigned cpp = 4;
+	const unsigned fourcc = DRM_FORMAT_ARGB8888;
 	const unsigned char *pixels = alloca(w * h * cpp);
 	struct piglit_dma_buf *buf;
-	unsigned stride;
-	unsigned offset;
-	int fd;
 	enum piglit_result res;
 	bool pass = true;
 
-	res = piglit_create_dma_buf(w, h, cpp, pixels, w * cpp,
-				&buf, &fd, &stride, &offset);
+	res = piglit_create_dma_buf(w, h, fourcc, pixels, &buf);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	pass = test_invalid_hint(w, h, fd, stride, offset,
+	pass = test_invalid_hint(w, h, buf->fd, buf->stride[0], buf->offset[0],
 			EGL_YUV_COLOR_SPACE_HINT_EXT, 0) && pass;
-	pass = test_invalid_hint(w, h, fd, stride, offset,
+	pass = test_invalid_hint(w, h, buf->fd, buf->stride[0], buf->offset[0],
 			EGL_SAMPLE_RANGE_HINT_EXT, 0) && pass;
-	pass = test_invalid_hint(w, h, fd, stride, offset,
+	pass = test_invalid_hint(w, h, buf->fd, buf->stride[0], buf->offset[0],
 			EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT, 0) && pass;
-	pass = test_invalid_hint(w, h, fd, stride, offset,
+	pass = test_invalid_hint(w, h, buf->fd, buf->stride[0], buf->offset[0],
 			EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT, 0) && pass;
-
-	piglit_destroy_dma_buf(buf);
 
 	/**
 	 * EGL stack can claim the ownership of the file descriptor only when it
 	 * succeeds. Close the descriptor and check that it really wasn't closed
 	 * by EGL.
 	 */
-	pass = (close(fd) == 0) && pass;
+	pass = (close(buf->fd) == 0) && pass;
+
+	piglit_destroy_dma_buf(buf);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

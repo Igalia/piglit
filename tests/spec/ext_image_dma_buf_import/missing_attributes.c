@@ -21,6 +21,8 @@
  * IN THE SOFTWARE.
  */
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "image_common.h"
 
 /**
@@ -104,48 +106,45 @@ piglit_display(void)
 {
 	const unsigned w = 2;
 	const unsigned h = 2;
-	const unsigned cpp = 2;
+	const unsigned cpp = 4;
+	const unsigned fourcc = DRM_FORMAT_ARGB8888;
 	const unsigned char *pixels = alloca(w * h * cpp);
 	EGLint all[2 * NUM_MANDATORY_ATTRS];
 	EGLint missing[2 * (NUM_MANDATORY_ATTRS - 1) + 1];
 	struct piglit_dma_buf *buf;
-	unsigned stride;
-	unsigned offset;
-	int fd;
 	enum piglit_result res;
 	bool pass = true;
 
-	res = piglit_create_dma_buf(w, h, cpp, pixels, w * cpp,
-				&buf, &fd, &stride, &offset);
+	res = piglit_create_dma_buf(w, h, fourcc, pixels, &buf);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	fill_full_set(w, h, fd, offset, stride, all);
+	fill_full_set(w, h, buf->fd, buf->offset[0], buf->stride[0], all);
 
 	fill_one_missing(all, missing, EGL_HEIGHT);
-	pass = test_missing(fd, missing) && pass;
+	pass = test_missing(buf->fd, missing) && pass;
 
 	fill_one_missing(all, missing, EGL_WIDTH);
-	pass = test_missing(fd, missing) && pass;
+	pass = test_missing(buf->fd, missing) && pass;
 
 	fill_one_missing(all, missing, EGL_LINUX_DRM_FOURCC_EXT);
-	pass = test_missing(fd, missing) && pass;
+	pass = test_missing(buf->fd, missing) && pass;
 
 	fill_one_missing(all, missing, EGL_DMA_BUF_PLANE0_FD_EXT);
-	pass = test_missing(fd, missing) && pass;
+	pass = test_missing(buf->fd, missing) && pass;
 
 	fill_one_missing(all, missing, EGL_DMA_BUF_PLANE0_OFFSET_EXT);
-	pass = test_missing(fd, missing) && pass;
+	pass = test_missing(buf->fd, missing) && pass;
 
 	fill_one_missing(all, missing, EGL_DMA_BUF_PLANE0_PITCH_EXT);
-	pass = test_missing(fd, missing) && pass;
+	pass = test_missing(buf->fd, missing) && pass;
 
 	/**
 	 * EGL stack can claim the ownership of the file descriptor only when it
 	 * succeeds. Close the file descriptor here and check that it really
 	 * wasn't closed by EGL.
 	 */
-	pass = (close(fd) == 0) && pass;
+	pass = (close(buf->fd) == 0) && pass;
 
 	piglit_destroy_dma_buf(buf);
 

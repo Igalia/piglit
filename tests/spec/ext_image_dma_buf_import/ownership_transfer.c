@@ -23,6 +23,8 @@
 
 #include <errno.h>
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "image_common.h"
 
 /**
@@ -113,19 +115,16 @@ piglit_display(void)
 	const unsigned w = 2;
 	const unsigned h = 2;
 	const unsigned cpp = 4;
+	const unsigned fourcc = DRM_FORMAT_ARGB8888;
 	const unsigned char *pixels = alloca(w * h * cpp);
 	struct piglit_dma_buf *buf;
-	unsigned stride;
-	unsigned offset;
-	int fd;
 	enum piglit_result res;
 
-	res = piglit_create_dma_buf(w, h, cpp, pixels, w * cpp,
-				&buf, &fd, &stride, &offset);
+	res = piglit_create_dma_buf(w, h, fourcc, pixels, &buf);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	return test_create_and_destroy(w, h, buf, fd, stride, offset);
+	return test_create_and_destroy(w, h, buf, buf->fd, buf->stride[0], buf->offset[0]);
 }
 
 void

@@ -23,6 +23,7 @@
 
 #include "piglit-util-gl.h"
 #include "piglit_drm_dma_buf.h"
+#include "drm_fourcc.h"
 #ifdef HAVE_LIBDRM_INTEL
 #include <libdrm/intel_bufmgr.h>
 #endif
@@ -41,21 +42,13 @@
 
 #define ALIGN(value, alignment) (((value) + alignment - 1) & ~(alignment - 1))
 
-struct piglit_dma_buf {
-	unsigned w;
-	unsigned h;
-	unsigned stride;
-	int fd;
-	void *priv;
-};
-
 struct piglit_drm_driver {
 	int fd;
 	char *name;
 
 	bool
 	(*create)(unsigned w, unsigned h, unsigned cpp,
-		  const unsigned char *src_data, unsigned src_stride,
+		  const unsigned char *src_data,
 		  struct piglit_dma_buf *buf);
 
 	bool
@@ -133,23 +126,55 @@ piglit_intel_bufmgr_get(void)
 }
 
 static bool
-piglit_intel_buf_create(unsigned w, unsigned h, unsigned cpp,
-			const unsigned char *src_data, unsigned src_stride,
-			struct piglit_dma_buf *buf)
+piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
+			const unsigned char *src_data, struct piglit_dma_buf *buf)
 {
 	unsigned i;
 	drm_intel_bo *bo;
-	unsigned stride = ALIGN(w * cpp, 4);
 	drm_intel_bufmgr *mgr = piglit_intel_bufmgr_get();
+	unsigned stride, src_stride, cpp;
+	unsigned buf_h = h;
 
 	if (!mgr || h % 2)
 		return false;
 
-	bo = drm_intel_bo_alloc(mgr, "piglit_dma_buf", h * stride, 4096);
+	switch (fourcc) {
+	case DRM_FORMAT_R8:
+		cpp = 1;
+		break;
+	case DRM_FORMAT_GR88:
+	case DRM_FORMAT_RG88:
+		cpp = 2;
+		break;
+	case DRM_FORMAT_XRGB8888:
+	case DRM_FORMAT_XBGR8888:
+	case DRM_FORMAT_RGBX8888:
+	case DRM_FORMAT_BGRX8888:
+	case DRM_FORMAT_ARGB8888:
+	case DRM_FORMAT_ABGR8888:
+	case DRM_FORMAT_RGBA8888:
+	case DRM_FORMAT_BGRA8888:
+		cpp = 4;
+		break;
+	case DRM_FORMAT_NV12:
+	case DRM_FORMAT_YUV420:
+	case DRM_FORMAT_YVU420:
+		cpp = 1;
+		buf_h = h * 3 / 2;
+		break;
+	default:
+		fprintf(stderr, "invalid fourcc: %.4s\n", (char *)&fourcc);
+		return false;
+	}
+
+	src_stride = cpp * w;
+	stride = ALIGN(w * cpp, 4);
+
+	bo = drm_intel_bo_alloc(mgr, "piglit_dma_buf", buf_h * stride, 4096);
 	if (!bo)
 		return false;
 
-	for (i = 0; i < h; ++i) {
+	for (i = 0; i < buf_h; ++i) {
 		if (drm_intel_bo_subdata(bo, i * stride, w * cpp,
 			src_data + i * src_stride)) {
 			drm_intel_bo_unreference(bo);
@@ -159,9 +184,26 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned cpp,
 
 	buf->w = w;
 	buf->h = h;
-	buf->stride = stride;
+	buf->offset[0] = 0;
+	buf->stride[0] = stride;
 	buf->fd = 0;
 	buf->priv = bo;
+
+	switch (fourcc) {
+	case DRM_FORMAT_NV12:
+		buf->offset[1] = stride * h;
+		buf->stride[1] = stride;
+		break;
+	case DRM_FORMAT_YUV420:
+	case DRM_FORMAT_YVU420:
+		buf->offset[1] = stride * h;
+		buf->stride[1] = stride / 2;
+		buf->offset[2] = buf->offset[1] + (stride * h / 2 / 2);
+		buf->stride[2] = stride / 2;
+		break;
+	default:
+		break;
+	}
 
 	return true;
 }
@@ -201,9 +243,8 @@ piglit_gbm_get(void)
 }
 
 static bool
-piglit_gbm_buf_create(unsigned w, unsigned h, unsigned cpp,
-			const unsigned char *src_data, unsigned src_stride,
-			struct piglit_dma_buf *buf)
+piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
+			const unsigned char *src_data, struct piglit_dma_buf *buf)
 {
 	unsigned i;
 	struct gbm_bo *bo;
@@ -212,28 +253,73 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned cpp,
 	void *dst_data;
 	void *map_data = NULL;
 	enum gbm_bo_format format;
+	unsigned cpp = 0, src_stride;
+	unsigned buf_w = w;
+	unsigned buf_h = h;
 
-	if (!gbm || h % 2)
+	if (!gbm || h % 2 || w % 2)
 		return false;
 
-	/* It would be nice if we took in a fourcc instead of a cpp */
-	switch (cpp) {
-	case 1:
-		format = GBM_FORMAT_C8;
+	switch (fourcc) {
+	case DRM_FORMAT_R8:
+		format = GBM_FORMAT_R8;
+		cpp = 1;
+		src_stride = cpp * w;
 		break;
-	case 4:
+	case DRM_FORMAT_GR88:
+	case DRM_FORMAT_RG88:
+		format = GBM_FORMAT_GR88;
+		cpp = 2;
+		src_stride = cpp * w;
+		break;
+	case DRM_FORMAT_XRGB8888:
+	case DRM_FORMAT_XBGR8888:
+	case DRM_FORMAT_RGBX8888:
+	case DRM_FORMAT_BGRX8888:
+	case DRM_FORMAT_ARGB8888:
+	case DRM_FORMAT_ABGR8888:
+	case DRM_FORMAT_RGBA8888:
+	case DRM_FORMAT_BGRA8888:
 		format = GBM_BO_FORMAT_ARGB8888;
+		cpp = 4;
+		src_stride = cpp * w;
+		break;
+	/* For YUV formats, the U/V planes might have a greater relative
+	 * pitch.  For example, if the driver needs pitch aligned to 32
+	 * pixels, for a 4x4 YUV image, the stride of both the Y and U/V
+	 * planes will be 32 bytes.  Not 32 for Y and 16 for U/V.  To
+	 * account for this, use a 2cpp format with half the width.  For
+	 * hardware that only has stride requirements in bytes (rather
+	 * than pixels) this will work out the same.  For hardware that
+	 * has pitch alignment requirements in pixels, this will give an
+	 * overly conservative alignment for Y but a sufficient alignment
+	 * for U/V.
+	 */
+	case DRM_FORMAT_NV12:
+		format = GBM_FORMAT_GR88;
+		buf_w = w / 2;
+		buf_h = h * 3 / 2;
+		src_stride = w;
+		cpp = 1;
+		break;
+	case DRM_FORMAT_YUV420:
+	case DRM_FORMAT_YVU420:
+		format = GBM_FORMAT_GR88;
+		buf_w = w / 2;
+		buf_h = h * 2;    /* U/V not interleaved */
+		src_stride = w;
+		cpp = 1;
 		break;
 	default:
-		fprintf(stderr, "Unknown cpp %d\n", cpp);
+		fprintf(stderr, "invalid fourcc: %.4s\n", (char *)&fourcc);
 		return false;
 	}
 
-	bo = gbm_bo_create(gbm, w, h, format, GBM_BO_USE_RENDERING);
+	bo = gbm_bo_create(gbm, buf_w, buf_h, format, GBM_BO_USE_RENDERING);
 	if (!bo)
 		return false;
 
-	dst_data = gbm_bo_map(bo, 0, 0, w, h, GBM_BO_TRANSFER_WRITE,
+	dst_data = gbm_bo_map(bo, 0, 0, buf_w, buf_h, GBM_BO_TRANSFER_WRITE,
 			      &dst_stride, &map_data);
 	if (!dst_data) {
 		fprintf(stderr, "Failed to map GBM bo\n");
@@ -241,18 +327,49 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned cpp,
 		return NULL;
 	}
 
+	buf->w = w;
+	buf->h = h;
+	buf->offset[0] = 0;
+	buf->stride[0] = dst_stride;
+	buf->fd = -1;
+	buf->priv = bo;
+
 	for (i = 0; i < h; ++i) {
 		memcpy((char *)dst_data + i * dst_stride,
 		       src_data + i * src_stride,
 		       w * cpp);
 	}
+
+	switch (fourcc) {
+	case DRM_FORMAT_NV12:
+		buf->offset[1] = dst_stride * h;
+		buf->stride[1] = dst_stride;
+		for (i = 0; i < h/2; ++i) {
+			memcpy(((char *)dst_data + buf->offset[1]) + i * buf->stride[1],
+				(src_data + (w*h)) + i * src_stride, w);
+		}
+		break;
+	case DRM_FORMAT_YUV420:
+	case DRM_FORMAT_YVU420:
+		buf->offset[1] = dst_stride * h;
+		buf->stride[1] = dst_stride / 2;
+		for (i = 0; i < h/2; ++i) {
+			memcpy(((char *)dst_data + buf->offset[1]) + i * buf->stride[1],
+				(src_data + (w*h)) + i * src_stride / 2, w / 2);
+		}
+		buf->offset[2] = buf->offset[1] + (dst_stride * h / 2 / 2);
+		buf->stride[2] = dst_stride / 2;
+		for (i = 0; i < h/2; ++i) {
+			memcpy(((char *)dst_data + buf->offset[2]) + i * buf->stride[2],
+				(src_data + (w*h) + (w*h/4)) + i * src_stride / 2, w / 2);
+		}
+		break;
+	default:
+		break;
+	}
+
 	gbm_bo_unmap(bo, map_data);
 
-	buf->w = w;
-	buf->h = h;
-	buf->stride = dst_stride;
-	buf->fd = 0;
-	buf->priv = bo;
 
 	return true;
 }
@@ -352,10 +469,8 @@ piglit_drm_get_driver(void)
 }
 
 enum piglit_result
-piglit_drm_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
-			const void *src_data, unsigned src_stride,
-			struct piglit_dma_buf **buf, int *fd,
-			unsigned *stride, unsigned *offset)
+piglit_drm_create_dma_buf(unsigned w, unsigned h, unsigned fourcc,
+			const void *src_data,  struct piglit_dma_buf **buf)
 {
 	struct piglit_dma_buf *drm_buf;
 	const struct piglit_drm_driver *drv = piglit_drm_get_driver();
@@ -367,7 +482,7 @@ piglit_drm_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
 	if (!drm_buf)
 		return PIGLIT_FAIL;
 
-	if (!drv->create(w, h, cpp, src_data, src_stride, drm_buf)) {
+	if (!drv->create(w, h, fourcc, src_data, drm_buf)) {
 		free(drm_buf);
 		return PIGLIT_FAIL;
 	}
@@ -378,9 +493,6 @@ piglit_drm_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
 	}
 
 	*buf = drm_buf;
-	*fd = drm_buf->fd;
-	*stride = drm_buf->stride;
-	*offset = 0;
 
 	return PIGLIT_PASS;
 }

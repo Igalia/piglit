@@ -310,16 +310,22 @@ struct piglit_dma_buf;
  * given data (src_data). Different hardware may have different alignment
  * constraints and hence one can specify one stride for the source and get
  * another for the final buffer to be given further to EGL.
- * An opaque handle, file descriptor, stride and offset for the buffer are only
- * returned upon success indicated by the return value PIGLIT_PASS, otherwise
- * no buffer is created. In case the framework simply does not support dma
- * buffers, the return value is PIGLIT_SKIP instead of PIGLIT_FAIL.
+ *
+ * The src stride is inferred from the width and the fourcc.  For planar
+ * YUV formats, for example, the U and V planes for YV12/YU12 have half the
+ * src_stride.
+ *
+ * The resulting per-plane stride and offset, which may be different than
+ * the src_stride due to hw constraints, are in the returned buf object.
+ *
+ * An buf handle is only returned upon success indicated by the return value
+ * PIGLIT_PASS, otherwise no buffer is created. In case the framework simply
+ * does not support dma buffers, the return value is PIGLIT_SKIP instead of
+ * PIGLIT_FAIL.
  */
 enum piglit_result
-piglit_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
-		      const void *src_data, unsigned src_stride,
-		      struct piglit_dma_buf **buf, int *fd,
-		      unsigned *stride, unsigned *offset);
+piglit_create_dma_buf(unsigned w, unsigned h, unsigned fourcc,
+		      const void *src_data, struct piglit_dma_buf **buf);
 
 /**
  * Release all the resources allocated for the designated buffer. If the given

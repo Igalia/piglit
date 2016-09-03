@@ -21,6 +21,8 @@
  * IN THE SOFTWARE.
  */
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "image_common.h"
 
 /**
@@ -98,21 +100,18 @@ piglit_display(void)
 	const unsigned w = 2;
 	const unsigned h = 2;
 	const unsigned cpp = 4;
+	const unsigned fourcc = DRM_FORMAT_ARGB8888;
 	const unsigned char *pixels = alloca(w * h * cpp);
 	struct piglit_dma_buf *buf;
-	unsigned stride;
-	unsigned offset;
-	int fd;
 	EGLImageKHR img;
 	enum piglit_result res;
 	bool pass = true;
 
-	res = piglit_create_dma_buf(w, h, cpp, pixels, w * cpp,
-				&buf, &fd, &stride, &offset);
+	res = piglit_create_dma_buf(w, h, fourcc, pixels, &buf);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	img = create_image(w, h, fd, stride, offset);
+	img = create_image(w, h, buf->fd, buf->stride[0], buf->offset[0]);
 
 	if (!img) {
 		piglit_destroy_dma_buf(buf);

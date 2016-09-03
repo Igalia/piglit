@@ -21,6 +21,8 @@
  * IN THE SOFTWARE.
  */
 
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
+
 #include "sample_common.h"
 #include "image_common.h"
 
@@ -57,8 +59,6 @@ piglit_display(void)
 	int cpp = 4;
 	enum piglit_result res;
 	struct piglit_dma_buf *buf;
-	unsigned stride, offset;
-	int fd;
 	EGLImageKHR img1, img2;
 	GLuint tex1, tex2;
 	/* Scale up factor for drawing the texture to the screen. */
@@ -67,22 +67,19 @@ piglit_display(void)
 	int i;
 	GLubyte *expected;
 
-	res = piglit_create_dma_buf(w, h, cpp, src, w * cpp,
-				    &buf, &fd, &stride, &offset);
+	res = piglit_create_dma_buf(w, h, fourcc, src, &buf);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	res = egl_image_for_dma_buf_fd(dup(fd), fourcc, w, h, stride, offset,
-				       &img1);
+	res = egl_image_for_dma_buf_fd(buf, dup(buf->fd), fourcc, &img1);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	res = egl_image_for_dma_buf_fd(dup(fd), fourcc, w, h, stride, offset,
-				       &img2);
+	res = egl_image_for_dma_buf_fd(buf, dup(buf->fd), fourcc, &img2);
 	if (res != PIGLIT_PASS)
 		return res;
 
-	close(fd);
+	close(buf->fd);
 
 	res = texture_for_egl_image(img1, &tex1);
 	if (res != PIGLIT_PASS)
