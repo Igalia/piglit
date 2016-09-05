@@ -1,0 +1,27 @@
+// [config]
+// expect_result: pass
+// glsl_version: 3.30
+// require_extensions: GL_ARB_compute_variable_group_size
+// [end config]
+//
+// The ARB_compute_variable_group_size spec says:
+//
+//     The built-in variable /gl_LocalGroupSizeARB/ is a compute-shader input
+//     variable containing the local work group size for the current compute-
+//     shader work group. For compute shaders with a fixed local group size
+//     (using *local_size_x*, *local_size_y*, or *local_size_z* layout
+//     qualifiers), its value will be the same as the constant
+//     /gl_WorkGroupSize/. For compute shaders with a variable local group size
+//     (using *local_size_variable*), the value of /gl_LocalGroupSizeARB/ will
+//     be the work group size specified in the OpenGL API command dispatching
+//     the current compute shader work.
+
+#version 330
+#extension GL_ARB_compute_variable_group_size: enable
+
+layout(local_size_variable) in;
+
+void main()
+{
+	uvec3 size = gl_LocalGroupSizeARB;
+}

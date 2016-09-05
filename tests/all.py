@@ -4853,5 +4853,13 @@ with profile.group_manager(
     g(['ext_window_rectangles-errors_gles3'], 'errors_gles3')
     g(['ext_window_rectangles-render_gles3'], 'render_gles3')
 
+# Group ARB_compute_variable_group_size
+with profile.group_manager(
+	PiglitGLTest,
+	grouptools.join('spec', 'ARB_compute_variable_group_size')) as g:
+    g(['arb_compute_variable_group_size-errors'], 'errors')
+    g(['arb_compute_variable_group_size-local-size'], 'local-size')
+    g(['arb_compute_variable_group_size-minmax'], 'minmax')
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
