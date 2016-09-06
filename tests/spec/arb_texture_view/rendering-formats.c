@@ -1130,7 +1130,499 @@ test_by_sampling(const char *test_name,
 
 	/* Draw only one pixel. We don't need more. */
 	piglit_draw_rect(-1, -1, 2.0/TEX_SIZE, 2.0/TEX_SIZE);
-	pass = piglit_probe_pixel_rgba(0, 0, green);
+	pass = piglit_probe_pixel_rgba_silent(0, 0, green, NULL);
+
+	one_result = pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	piglit_report_subtest_result(one_result, "%s", test_name);
+	piglit_merge_result(all, one_result);
+
+	glDeleteProgram(prog);
+}
+
+static bool
+is_any_integer(const struct format_info *vformat)
+{
+	return vformat->format == GL_RGBA_INTEGER ||
+		vformat->format == GL_RGB_INTEGER ||
+		vformat->format == GL_RG_INTEGER ||
+		vformat->format == GL_RED_INTEGER;
+}
+
+static bool
+is_signed(const struct format_info *vformat)
+{
+	return vformat->type == GL_BYTE ||
+		vformat->type == GL_SHORT ||
+		vformat->type == GL_INT;
+}
+
+static unsigned
+get_num_components(const struct format_info *vformat)
+{
+	switch (vformat->format) {
+	case GL_RGBA:
+	case GL_RGBA_INTEGER:
+		return 4;
+	case GL_RGB:
+	case GL_RGB_INTEGER:
+		return 3;
+	case GL_RG:
+	case GL_RG_INTEGER:
+		return 2;
+	case GL_RED:
+	case GL_RED_INTEGER:
+		return 1;
+	default:
+		assert(0);
+		return 0;
+	}
+}
+
+static GLuint
+create_test_clear_program(const struct format_info *base,
+			  const struct format_info *clear)
+{
+	char fs[4096];
+	GLuint prog;
+	const char *sampler = "";
+	const char *conv = "";
+	unsigned expected[4] = {};
+	unsigned i;
+	unsigned base_num_components = get_num_components(base);
+	bool test_nan = false;
+
+	/* Find out what the clear value is when fetched using the base format. */
+	for (i = 0; i < base_num_components; i++) {
+		switch (clear->internalformat) {
+		case GL_RGBA32F:
+		case GL_RGB32F:
+		case GL_RG32F:
+		case GL_R32F:
+			if (base->internalformat == GL_RGBA16UI ||
+			    base->internalformat == GL_RGBA16I ||
+			    base->internalformat == GL_RG16UI ||
+			    base->internalformat == GL_RG16I) {
+				expected[i++] = 0x0000;
+				expected[i] = 0x3f80;
+			} else if (base->internalformat == GL_RGBA16 ||
+				   base->internalformat == GL_RG16) {
+				expected[i++] = 0;
+				expected[i] = 0x3e7e00fe;
+			} else if (base->internalformat == GL_RGBA16_SNORM ||
+				   base->internalformat == GL_RG16_SNORM) {
+				expected[i++] = 0;
+				expected[i] = 0x3efe01fc;
+			} else if (base->internalformat == GL_RGBA16F ||
+				   base->internalformat == GL_RG16F) {
+				expected[i++] = 0;
+				expected[i] = 0x3ff00000;
+			} else if (base->internalformat == GL_RGBA8UI) {
+				expected[i++] = 0x00;
+				expected[i++] = 0x00;
+				expected[i++] = 0x80;
+				expected[i] = 0x3f;
+			} else if (base->internalformat == GL_RGBA8I) {
+				expected[i++] = 0x00;
+				expected[i++] = 0x00;
+				expected[i++] = 0xffffff80;
+				expected[i] = 0x3f;
+			} else if (base->internalformat == GL_RGBA8) {
+				expected[i++] = 0;
+				expected[i++] = 0;
+				expected[i++] = 0x3f008081;
+				expected[i] = 0x3e7cfcfd;
+			} else if (base->internalformat == GL_RGBA8_SNORM) {
+				expected[i++] = 0;
+				expected[i++] = 0;
+				expected[i++] = 0xbf800000;
+				expected[i] = 0x3efdfbf8;
+			} else if (base->internalformat == GL_RGB10_A2UI) {
+				expected[i++] = 0;
+				expected[i++] = 0;
+				expected[i++] = 0x3f8;
+				expected[i] = 0;
+			} else if (base->internalformat == GL_RGB10_A2) {
+				expected[i++] = 0;
+				expected[i++] = 0;
+				expected[i++] = 0x3f7e3f90;
+				expected[i] = 0;
+			} else {
+				expected[i] = 0x3f800000;
+			}
+			break;
+		case GL_RGBA32I:
+		case GL_RGB32I:
+		case GL_RG32I:
+		case GL_R32I:
+			if (base->internalformat == GL_RGBA16UI ||
+			    base->internalformat == GL_RG16UI) {
+				expected[i++] = 0xffff;
+				expected[i] = 0x7fff;
+			} else if (base->internalformat == GL_RGBA16I ||
+				   base->internalformat == GL_RG16I) {
+				expected[i++] = 0xffffffff;
+				expected[i] = 0x7fff;
+			} else if (base->internalformat == GL_RGBA16 ||
+				   base->internalformat == GL_RG16) {
+				expected[i++] = 0x3f800000;
+				expected[i] = 0x3effff00;
+			} else if (base->internalformat == GL_RGBA16_SNORM ||
+				   base->internalformat == GL_RG16_SNORM) {
+				expected[i++] = 0xb8000100;
+				expected[i] = 0x3f800000;
+			} else if (base->internalformat == GL_RGBA16F ||
+				   base->internalformat == GL_RG16F) {
+				test_nan = true;
+				expected[i] = true;
+			} else if (base->internalformat == GL_RGBA8UI) {
+				expected[i++] = 0xff;
+				expected[i++] = 0xff;
+				expected[i++] = 0xff;
+				expected[i] = 0x7f;
+			} else if (base->internalformat == GL_RGBA8I) {
+				expected[i++] = 0xffffffff;
+				expected[i++] = 0xffffffff;
+				expected[i++] = 0xffffffff;
+				expected[i] = 0x7f;
+			} else if (base->internalformat == GL_RGB10_A2UI) {
+				expected[i++] = 0x3ff;
+				expected[i++] = 0x3ff;
+				expected[i++] = 0x3ff;
+				expected[i] = 0x1;
+			} else if (base->internalformat == GL_RGBA8) {
+				expected[i++] = 0x3f800000;
+				expected[i++] = 0x3f800000;
+				expected[i++] = 0x3f800000;
+				expected[i] = 0x3efefeff;
+			} else if (base->internalformat == GL_RGBA8_SNORM) {
+				expected[i++] = 0xbc010204;
+				expected[i++] = 0xbc010204;
+				expected[i++] = 0xbc010204;
+				expected[i] = 0x3f800000;
+			} else if (base->internalformat == GL_RGB10_A2) {
+				expected[i++] = 0x3f800000;
+				expected[i++] = 0x3f800000;
+				expected[i++] = 0x3f800000;
+				expected[i] = 0x3eaaaaab;
+			} else {
+				expected[i] = 0x7fffffff;
+			}
+			break;
+		case GL_RGBA16F:
+		case GL_RGB16F:
+		case GL_RG16F:
+		case GL_R16F:
+			if (base->internalformat == GL_RG32F ||
+			    base->internalformat == GL_RG32I ||
+			    base->internalformat == GL_RG32UI ||
+			    base->internalformat == GL_R32F ||
+			    base->internalformat == GL_R32I ||
+			    base->internalformat == GL_R32UI)
+				expected[i] = 0x3c003c00;
+			else if (base->internalformat == GL_RGBA16UI ||
+				 base->internalformat == GL_RGBA16I ||
+				 base->internalformat == GL_RGB16UI ||
+				 base->internalformat == GL_RGB16I ||
+				 base->internalformat == GL_RG16UI ||
+				 base->internalformat == GL_RG16I ||
+				 base->internalformat == GL_R16UI ||
+				 base->internalformat == GL_R16I)
+				expected[i] = 0x3c00;
+			else if (base->internalformat == GL_RGBA16 ||
+				 base->internalformat == GL_RGB16 ||
+				 base->internalformat == GL_RG16 ||
+				 base->internalformat == GL_R16)
+				expected[i] = 0x3e7000f0;
+			else if (base->internalformat == GL_RGBA16_SNORM ||
+				 base->internalformat == GL_RGB16_SNORM ||
+				 base->internalformat == GL_RG16_SNORM ||
+				 base->internalformat == GL_R16_SNORM)
+				expected[i] = 0x3ef001e0;
+			else if (base->internalformat == GL_RGBA8UI ||
+				 base->internalformat == GL_RGBA8I ||
+				 base->internalformat == GL_RG8UI ||
+				 base->internalformat == GL_RG8I) {
+				expected[i++] = 0x00;
+				expected[i] = 0x3c;
+			} else if (base->internalformat == GL_RGBA8 ||
+				   base->internalformat == GL_RG8) {
+				expected[i++] = 0x00;
+				expected[i] = 0x3e70f0f1;
+			} else if (base->internalformat == GL_RGBA8_SNORM ||
+				   base->internalformat == GL_RG8_SNORM) {
+				expected[i++] = 0x00;
+				expected[i] = 0x3ef1e3c8;
+			} else if (base->internalformat == GL_RGB10_A2UI) {
+				expected[i++] = 0;
+				expected[i++] = 0xf;
+				expected[i++] = 0x3c0;
+				expected[i] = 0;
+			} else if (base->internalformat == GL_RGB10_A2) {
+				expected[i++] = 0;
+				expected[i++] = 0x3c703c0f;
+				expected[i++] = 0x3f703c0f;
+				expected[i] = 0;
+			} else
+				expected[i] = 0x3f800000;
+			break;
+		case GL_RGBA32UI:
+		case GL_RGB32UI:
+		case GL_RG32UI:
+		case GL_R32UI:
+		case GL_RGBA16UI:
+		case GL_RGB16UI:
+		case GL_RG16UI:
+		case GL_R16UI:
+		case GL_RGBA8UI:
+		case GL_RGB8UI:
+		case GL_RG8UI:
+		case GL_R8UI:
+		case GL_RGB10_A2UI:
+		case GL_RGBA16:
+		case GL_RGB16:
+		case GL_RG16:
+		case GL_R16:
+		case GL_RGBA8:
+		case GL_RGB8:
+		case GL_RG8:
+		case GL_R8:
+		case GL_RGB10_A2:
+			if (base->internalformat == GL_RGBA32F ||
+			    base->internalformat == GL_RGB32F ||
+			    base->internalformat == GL_RGBA32UI ||
+			    base->internalformat == GL_RGB32UI ||
+			    base->internalformat == GL_RGBA32I ||
+			    base->internalformat == GL_RGB32I ||
+			    base->internalformat == GL_RG32F ||
+			    base->internalformat == GL_RG32I ||
+			    base->internalformat == GL_RG32UI ||
+			    base->internalformat == GL_R32F ||
+			    base->internalformat == GL_R32I ||
+			    base->internalformat == GL_R32UI ||
+			    base->internalformat == GL_RGBA16I ||
+			    base->internalformat == GL_RGB16I ||
+			    base->internalformat == GL_RG16I ||
+			    base->internalformat == GL_R16I ||
+			    base->internalformat == GL_RGBA8I ||
+			    base->internalformat == GL_RGB8I ||
+			    base->internalformat == GL_RG8I ||
+			    base->internalformat == GL_R8I)
+				expected[i] = 0xffffffff;
+			else if (base->internalformat == GL_RGBA16 ||
+				 base->internalformat == GL_RGB16 ||
+				 base->internalformat == GL_RG16 ||
+				 base->internalformat == GL_R16 ||
+				 base->internalformat == GL_RGBA8 ||
+				 base->internalformat == GL_RGB8 ||
+				 base->internalformat == GL_RG8 ||
+				 base->internalformat == GL_R8 ||
+				 base->internalformat == GL_RGB10_A2)
+				expected[i] = 0x3f800000;
+			else if (base->internalformat == GL_RGBA16_SNORM ||
+				 base->internalformat == GL_RGB16_SNORM ||
+				 base->internalformat == GL_RG16_SNORM ||
+				 base->internalformat == GL_R16_SNORM)
+				expected[i] = 0xb8000100;
+			else if (base->internalformat == GL_RGBA16F ||
+				 base->internalformat == GL_RGB16F ||
+				 base->internalformat == GL_RG16F ||
+				 base->internalformat == GL_R16F) {
+				test_nan = true;
+				expected[i] = true;
+			} else if (base->internalformat == GL_RGBA8UI ||
+				   base->internalformat == GL_RGB8UI ||
+				   base->internalformat == GL_RG8UI ||
+				   base->internalformat == GL_R8UI)
+				expected[i] = 0xff;
+			else if (base->internalformat == GL_RGBA8_SNORM ||
+				 base->internalformat == GL_RGB8_SNORM ||
+				 base->internalformat == GL_RG8_SNORM ||
+				 base->internalformat == GL_R8_SNORM)
+				expected[i] = 0xbc010204;
+			else if (base->internalformat == GL_RGB10_A2UI) {
+				expected[i++] = 0x3ff;
+				expected[i++] = 0x3ff;
+				expected[i++] = 0x3ff;
+				expected[i] = 0x3;
+			} else
+				expected[i] = 0xffff;
+			break;
+		case GL_RGBA16I:
+		case GL_RGB16I:
+		case GL_RG16I:
+		case GL_R16I:
+		case GL_RGBA16_SNORM:
+		case GL_RGB16_SNORM:
+		case GL_RG16_SNORM:
+		case GL_R16_SNORM:
+			if (base->internalformat == GL_RG32F ||
+			    base->internalformat == GL_RG32I ||
+			    base->internalformat == GL_RG32UI ||
+			    base->internalformat == GL_R32F ||
+			    base->internalformat == GL_R32I ||
+			    base->internalformat == GL_R32UI)
+				expected[i] = 0x7fff7fff;
+			else if (base->internalformat == GL_RGBA16 ||
+				 base->internalformat == GL_RGB16 ||
+				 base->internalformat == GL_RG16 ||
+				 base->internalformat == GL_R16)
+				expected[i] = 0x3effff00;
+			else if (base->internalformat == GL_RGBA16_SNORM ||
+				 base->internalformat == GL_RGB16_SNORM ||
+				 base->internalformat == GL_RG16_SNORM ||
+				 base->internalformat == GL_R16_SNORM)
+				expected[i] = 0x3f800000;
+			else if (base->internalformat == GL_RGBA16F ||
+				 base->internalformat == GL_RGB16F ||
+				 base->internalformat == GL_RG16F ||
+				 base->internalformat == GL_R16F) {
+				test_nan = true;
+				expected[i] = true;
+			} else if (base->internalformat == GL_RGBA8UI ||
+				   base->internalformat == GL_RG8UI) {
+				expected[i++] = 0xff;
+				expected[i] = 0x7f;
+			} else if (base->internalformat == GL_RGBA8I ||
+				   base->internalformat == GL_RG8I) {
+				expected[i++] = 0xffffffff;
+				expected[i] = 0x7f;
+			} else if (base->internalformat == GL_RGBA8 ||
+				   base->internalformat == GL_RG8) {
+				expected[i++] = 0x3f800000;
+				expected[i] = 0x3efefeff;
+			} else if (base->internalformat == GL_RGBA8_SNORM ||
+				   base->internalformat == GL_RG8_SNORM) {
+				expected[i++] = 0xbc010204;
+				expected[i] = 0x3f800000;
+			} else if (base->internalformat == GL_RGB10_A2UI) {
+				expected[i++] = 0x3ff;
+				expected[i++] = 0x3df;
+				expected[i++] = 0x3ff;
+				expected[i] = 0x1;
+			} else if (base->internalformat == GL_RGB10_A2) {
+				expected[i++] = 0x3f800000;
+				expected[i++] = 0x3f77fdff;
+				expected[i++] = 0x3f800000;
+				expected[i] = 0x3eaaaaab;
+			} else
+				expected[i] = 0x7fff;
+			break;
+		case GL_RGBA8I:
+		case GL_RGB8I:
+		case GL_RG8I:
+		case GL_R8I:
+		case GL_RGBA8_SNORM:
+		case GL_RGB8_SNORM:
+		case GL_RG8_SNORM:
+		case GL_R8_SNORM:
+			if (base->internalformat == GL_R32F ||
+			    base->internalformat == GL_R32I ||
+			    base->internalformat == GL_R32UI)
+				expected[i] = 0x7f7f7f7f;
+			else if (base->internalformat == GL_RG16UI ||
+				 base->internalformat == GL_RG16I ||
+				 base->internalformat == GL_R16UI ||
+				 base->internalformat == GL_R16I)
+				expected[i] = 0x7f7f;
+			else if (base->internalformat == GL_RG16 ||
+				 base->internalformat == GL_R16 ||
+				 base->internalformat == GL_RGBA8 ||
+				 base->internalformat == GL_RGB8 ||
+				 base->internalformat == GL_RG8 ||
+				 base->internalformat == GL_R8)
+				expected[i] = 0x3efefeff;
+			else if (base->internalformat == GL_RG16F ||
+				 base->internalformat == GL_R16F) {
+				test_nan = true;
+				expected[i] = true;
+			} else if (base->internalformat == GL_RG16_SNORM ||
+				 base->internalformat == GL_R16_SNORM)
+				expected[i] = 0x3f7efffe;
+			else if (base->internalformat == GL_RGBA8UI ||
+				 base->internalformat == GL_RGB8UI ||
+				 base->internalformat == GL_RG8UI ||
+				 base->internalformat == GL_R8UI ||
+				 base->internalformat == GL_RGBA8I ||
+				 base->internalformat == GL_RGB8I ||
+				 base->internalformat == GL_RG8I ||
+				 base->internalformat == GL_R8I)
+				expected[i] = 0x7f;
+			else if (base->internalformat == GL_RGB10_A2UI) {
+				expected[i++] = 0x37f;
+				expected[i++] = 0x3df;
+				expected[i++] = 0x3f7;
+				expected[i] = 0x1;
+			} else if (base->internalformat == GL_RGB10_A2) {
+				expected[i++] = 0x3f5ff7fe;
+				expected[i++] = 0x3f77fdff;
+				expected[i++] = 0x3f7dff80;
+				expected[i] = 0x3eaaaaab;
+			} else
+				expected[i] = 0x3f800000;
+			break;
+		}
+	}
+
+	for (; i < 4; i++)
+		expected[i] = test_nan ? false :
+			      is_any_integer(base) ? (i == 3 ? 1 : 0) :
+						     (i == 3 ? 0x3f800000 : 0);
+
+	if (is_any_integer(base)) {
+		if (is_signed(base)) {
+			sampler = "isampler2D";
+			conv = "uvec4";
+		} else {
+			sampler = "usampler2D";
+		}
+	} else {
+		sampler = "sampler2D";
+		if (test_nan)
+			conv = "test_nan";
+		else
+			conv = "floatBitsToUint";
+	}
+
+	/* Use texelFetch, because normal texture instructions flush denormals
+	 * to 0 on radeonsi.
+	 */
+	snprintf(fs, sizeof(fs),
+		 "#version 130\n"
+		 "#extension GL_ARB_shader_bit_encoding : enable\n"
+		 "uniform %s s;\n"
+		 "uniform uvec4 expected;\n"
+		 "uvec4 test_nan(vec4 v) { return uvec4(isnan(v)); }\n"
+		 "void main() { \n"
+		 "	if (%s(texelFetch(s, ivec2(0), 0)) == expected) {\n"
+		 "		gl_FragColor = vec4(0,1,0,0);\n"
+		 "	} else {\n"
+		 "		gl_FragColor = vec4(1,0,0,0);\n"
+		 "	}\n"
+		 "}\n",
+		 sampler, conv);
+
+	prog = piglit_build_simple_program(vs, fs);
+	glUseProgram(prog);
+	glUniform1i(glGetUniformLocation(prog, "s"), 0);
+	glUniform4uiv(glGetUniformLocation(prog, "expected"), 1, expected);
+	return prog;
+}
+
+static void
+test_clear_by_sampling(const char *test_name,
+		       const struct format_info *base,
+		       const struct format_info *vformat,
+		       enum piglit_result *all)
+{
+	GLuint prog;
+	bool pass;
+	enum piglit_result one_result;
+
+	prog = create_test_clear_program(base, vformat);
+
+	/* Draw only one pixel. We don't need more. */
+	piglit_draw_rect(-1, -1, 2.0/TEX_SIZE, 2.0/TEX_SIZE);
+	pass = piglit_probe_pixel_rgba_silent(0, 0, green, NULL);
 
 	one_result = pass ? PIGLIT_PASS : PIGLIT_FAIL;
 	piglit_report_subtest_result(one_result, "%s", test_name);
@@ -1160,13 +1652,8 @@ render_to_view(const struct format_info *vformat, GLuint tex)
 		return false;
 	}
 
-	if (vformat->format == GL_RGBA_INTEGER ||
-	    vformat->format == GL_RGB_INTEGER ||
-	    vformat->format == GL_RG_INTEGER ||
-	    vformat->format == GL_RED_INTEGER) {
-		if (vformat->type == GL_BYTE ||
-		    vformat->type == GL_SHORT ||
-		    vformat->type == GL_INT) {
+	if (is_any_integer(vformat)) {
+		if (is_signed(vformat)) {
 			glUseProgram(prog_sint);
 			glUniform4iv(loc_sint, 1, (int*)vformat->render_value);
 		} else {
@@ -1180,6 +1667,47 @@ render_to_view(const struct format_info *vformat, GLuint tex)
 
 	/* Fill the whole texture - needed by radeonsi. */
 	piglit_draw_rect(-1, -1, 2, 2);
+
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteTextures(1, &view);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
+	return true;
+}
+
+static bool
+clear_view(const struct format_info *vformat, GLuint tex)
+{
+	/* Use these clear values - needed to test radeonsi codepaths. */
+	static unsigned ucolor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff};
+	static int icolor[] = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
+	static float fcolor[] = {1, 1, 1, 1};
+	GLuint fbo, status, view;
+
+	view = create_view(vformat, tex);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_2D, view, 0);
+
+	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		glDeleteFramebuffers(1, &fbo);
+		glDeleteTextures(1, &view);
+		glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
+		return false;
+	}
+
+	if (is_any_integer(vformat)) {
+		if (is_signed(vformat)) {
+			glClearBufferiv(GL_COLOR, 0, icolor);
+		} else {
+			glClearBufferuiv(GL_COLOR, 0, ucolor);
+		}
+	} else {
+		glClearBufferfv(GL_COLOR, 0, fcolor);
+	}
 
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(1, &view);
@@ -1243,13 +1771,14 @@ piglit_display(void)
 				char test_name[128];
 				GLuint tex;
 
+				tex = create_texture(vclass, base, true);
+				glBindTexture(GL_TEXTURE_2D, 0);
+
+				/* Test rendering. */
 				snprintf(test_name, sizeof(test_name),
 					 "render to %s as %s",
 				         piglit_get_gl_enum_name(base->internalformat),
 				         piglit_get_gl_enum_name(vformat->internalformat));
-
-				tex = create_texture(vclass, base, true);
-				glBindTexture(GL_TEXTURE_2D, 0);
 
 				if (!render_to_view(vformat, tex)) {
 					piglit_report_subtest_result(PIGLIT_SKIP, "%s", test_name);
@@ -1260,6 +1789,25 @@ piglit_display(void)
 
 				glBindTexture(GL_TEXTURE_2D, tex);
 				test_by_sampling(test_name, base, &result);
+				glBindTexture(GL_TEXTURE_2D, 0);
+
+				/* Test clearing. */
+				snprintf(test_name, sizeof(test_name),
+					 "clear %s as %s",
+				         piglit_get_gl_enum_name(base->internalformat),
+				         piglit_get_gl_enum_name(vformat->internalformat));
+
+				if (!clear_view(vformat, tex)) {
+					piglit_report_subtest_result(PIGLIT_SKIP, "%s", test_name);
+					piglit_merge_result(&result, PIGLIT_SKIP);
+					glDeleteTextures(1, &tex);
+					continue;
+				}
+
+				glBindTexture(GL_TEXTURE_2D, tex);
+				test_clear_by_sampling(test_name, base, vformat, &result);
+				glBindTexture(GL_TEXTURE_2D, 0);
+
 				glDeleteTextures(1, &tex);
 
 				piglit_check_gl_error(GL_NO_ERROR);
