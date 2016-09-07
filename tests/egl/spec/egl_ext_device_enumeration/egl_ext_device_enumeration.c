@@ -57,7 +57,7 @@ main(void)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	if (queryDevices(0, NULL, &numdevs)) {
+	if (!queryDevices(0, NULL, &numdevs)) {
 		printf("Failed to get device count\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
