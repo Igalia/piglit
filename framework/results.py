@@ -47,13 +47,13 @@ class Subtests(collections.MutableMapping):
             self.update(dict_)
 
     def __setitem__(self, name, value):
-        self.__container[name] = status.status_lookup(value)
+        self.__container[name.lower()] = status.status_lookup(value)
 
     def __getitem__(self, name):
-        return self.__container[name]
+        return self.__container[name.lower()]
 
     def __delitem__(self, name):
-        del self.__container[name]
+        del self.__container[name.lower()]
 
     def __iter__(self):
         return iter(self.__container)
