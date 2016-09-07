@@ -28,6 +28,7 @@
  * Test EGL_NOK_swap_region.
  */
 
+#define PFNEGLSWAPBUFFERSREGIONNOK PFNEGLSWAPBUFFERSREGIONNOKPROC
 #include "piglit-util-gl.h"
 #include "egl-util.h"
 
@@ -64,10 +65,10 @@ draw(struct egl_state *state)
 		{ 55, 55, red },
 		{ 55, state->height - 55, green },
 	};
-	PFNEGLSWAPBUFFERSREGIONNOK swap_buffers_region;
+	PFNEGLSWAPBUFFERSREGIONNOKPROC swap_buffers_region;
 	int i;
 
-	swap_buffers_region = (PFNEGLSWAPBUFFERSREGIONNOK) 
+	swap_buffers_region = (PFNEGLSWAPBUFFERSREGIONNOKPROC)
 		eglGetProcAddress("eglSwapBuffersRegionNOK");
 
 	if (swap_buffers_region == NULL) {
