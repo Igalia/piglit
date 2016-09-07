@@ -41,6 +41,16 @@ __all__ = ['run',
            'resume']
 
 
+def booltype(val):
+    if val.lower() in ['false', 'no', '0']:
+        return False
+    elif val.lower() in ['true', 'yes', '1']:
+        return True
+    raise argparse.ArgumentTypeError(
+        'Case insensitve values of "yes", "no", "false", "true", and "0" or '
+        '"1" are accepted.')
+
+
 def _default_platform():
     """ Logic to determine the default platform to use
 
@@ -183,6 +193,17 @@ def _run_parser(input_):
                         help='Run only the tests in the deqp mustpass list '
                              'when running a deqp gles{2,3,31} profile, '
                              'otherwise run all tests.')
+    parser.add_argument('--process-isolation',
+                        dest='process_isolation',
+                        action='store',
+                        type=booltype,
+                        default=core.PIGLIT_CONFIG.safe_get(
+                            'core', 'process isolation', 'true'),
+                        metavar='<bool>',
+                        help='Set this to allow tests to run without process '
+                             'isolation. This allows, but does not require, '
+                             'tests to run multiple tests per process. '
+                             'This value can also be set in piglit.conf.')
     parser.add_argument("test_profile",
                         metavar="<Profile path(s)>",
                         nargs='+',
@@ -264,6 +285,7 @@ def run(input_):
     options.OPTIONS.monitored = args.monitored
     options.OPTIONS.sync = args.sync
     options.OPTIONS.deqp_mustpass = args.deqp_mustpass
+    options.OPTIONS.process_isolation = args.process_isolation
 
     # Set the platform to pass to waffle
     options.OPTIONS.env['PIGLIT_PLATFORM'] = args.platform
@@ -352,6 +374,7 @@ def resume(input_):
     options.OPTIONS.monitored = results.options['monitored']
     options.OPTIONS.sync = results.options['sync']
     options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
+    options.OPTIONS.proces_isolation = results.options['process_isolation']
 
     core.get_config(args.config_file)
 

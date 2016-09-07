@@ -4,21 +4,26 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import collections
 import itertools
 import os
 import platform
 
+import six
 from six.moves import range
 
 from framework import grouptools
+from framework import options
 from framework.profile import TestProfile
-from framework.test import (PiglitGLTest, GleanTest, ShaderTest, PiglitBaseTest,
-                            GLSLParserTest, GLSLParserNoConfigError)
 from framework.driver_classifier import DriverClassifier
-
+from framework.test import (PiglitGLTest, GleanTest, PiglitBaseTest,
+                            GLSLParserTest, GLSLParserNoConfigError)
+from framework.test.shader_test import ShaderTest, MultiShaderTest
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
 __all__ = ['profile']
+
+PROCESS_ISOLATION = options.OPTIONS.process_isolation
 
 # Disable bad hanging indent errors in pylint
 # There is a bug in pyling which causes the profile.group_manager to be tagged
@@ -215,13 +220,20 @@ def power_set(s):
 # Collecting all tests
 profile = TestProfile()  # pylint: disable=invalid-name
 
+shader_tests = collections.defaultdict(list)
+
 # Find and add all shader tests.
 for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
     for dirpath, _, filenames in os.walk(basedir):
         for filename in filenames:
             testname, ext = os.path.splitext(filename)
+            groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
             if ext == '.shader_test':
-                test = ShaderTest(os.path.join(dirpath, filename))
+                if PROCESS_ISOLATION:
+                    test = ShaderTest(os.path.join(dirpath, filename))
+                else:
+                    shader_tests[groupname].append(os.path.join(dirpath, filename))
+                    continue
             elif ext in ['.vert', '.tesc', '.tese', '.geom', '.frag', '.comp']:
                 try:
                     test = GLSLParserTest(os.path.join(dirpath, filename))
@@ -236,12 +248,23 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
             else:
                 continue
 
-            group = grouptools.join(
-                grouptools.from_path(os.path.relpath(dirpath, basedir)),
-                testname)
+            group = grouptools.join(groupname, testname)
             assert group not in profile.test_list, group
 
             profile.test_list[group] = test
+
+# Because we need to handle duplicate group names in TESTS and GENERATED_TESTS
+# this dictionary is constructed, then added to the actual test dictionary.
+for group, files in six.iteritems(shader_tests):
+    assert group not in profile.test_list, 'duplicate group: {}'.format(group)
+    # If there is only one file in the directory use a normal shader_test.
+    # Otherwise use a MultiShaderTest
+    if len(files) == 1:
+        group = grouptools.join(
+            group, os.path.basename(os.path.splitext(files[0])[0]))
+        profile.test_list[group] = ShaderTest(files[0])
+    else:
+        profile.test_list[group] = MultiShaderTest(files)
 
 # Collect and add all asmparsertests
 for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:

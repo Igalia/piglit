@@ -170,6 +170,13 @@ run_test=./%(test_name)s
 ; Default: 'bz2'
 ;compression=bz2
 
+; Set this value to change whether piglit defaults to using process isolation
+; or not. Care should be taken when using this option since it provides a
+; performance improvement, but with a cost in stability and reproducibility.
+; 
+; Default: True
+;process isolation=True
+
 [expected-failures]
 ; Provide a list of test names that are expected to fail.  These tests
 ; will be listed as passing in JUnit output when they fail.  Any
