@@ -38,10 +38,12 @@ main(void)
 	const char *client_exts = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
 	bool has_client_ext =
 		client_exts &&
-		piglit_is_extension_in_string(client_exts,
+		((piglit_is_extension_in_string(client_exts,
 			"EGL_EXT_device_query") &&
-		piglit_is_extension_in_string(client_exts,
-			"EGL_EXT_device_enumeration");
+		  piglit_is_extension_in_string(client_exts,
+			"EGL_EXT_device_enumeration")) ||
+		 piglit_is_extension_in_string(client_exts,
+			"EGL_EXT_device_base"));
 
 	if (!has_client_ext) {
 		printf("EGL_EXT_device_enumeration not supported\n");
