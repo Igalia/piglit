@@ -47,7 +47,6 @@ config_is_sufficient(Display *dpy, GLXFBConfig config, int vdepth, int rgba)
 	int caveat;
 	int stencil;
 	int depth;
-	int accum_red, accum_green, accum_blue;
 	int color_buffer_size;
 	int level;
 
@@ -59,9 +58,6 @@ config_is_sufficient(Display *dpy, GLXFBConfig config, int vdepth, int rgba)
 	GetFBConfigAttrib(dpy, config, GLX_BLUE_SIZE, &color_blue);
 	GetFBConfigAttrib(dpy, config, GLX_STENCIL_SIZE, &stencil);
 	GetFBConfigAttrib(dpy, config, GLX_DEPTH_SIZE, &depth);
-	GetFBConfigAttrib(dpy, config, GLX_ACCUM_RED_SIZE, &accum_red);
-	GetFBConfigAttrib(dpy, config, GLX_ACCUM_GREEN_SIZE, &accum_green);
-	GetFBConfigAttrib(dpy, config, GLX_ACCUM_BLUE_SIZE, &accum_blue);
 	GetFBConfigAttrib(dpy, config, GLX_BUFFER_SIZE, &color_buffer_size);
 	GetFBConfigAttrib(dpy, config, GLX_LEVEL, &level);
 	
@@ -98,11 +94,6 @@ config_is_sufficient(Display *dpy, GLXFBConfig config, int vdepth, int rgba)
 
 	/* must have at least 12 bits of depth */
 	if (depth < 12) {
-		return 0;
-	}
-
-	/* must have an accumulation buffer */
-	if ((accum_red + accum_green + accum_blue) < 1) {
 		return 0;
 	}
 
