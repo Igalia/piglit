@@ -38,7 +38,6 @@ from framework.test.base import TestIsSkip as _TestIsSkip
 from .. import utils
 
 # pylint: disable=no-self-use,attribute-defined-outside-init,protected-access
-# pylint: disable=invalid-name
 
 
 def _has_wflinfo():
@@ -396,9 +395,6 @@ class TestWflInfo(object):
 class TestFastSkipMixin(object):  # pylint: disable=too-many-public-methods
     """Tests for the FastSkipMixin class."""
 
-    class _Test(opengl.FastSkipMixin, utils.Test):
-        pass
-
     @pytest.yield_fixture(autouse=True, scope='class')
     def patch(self):
         """Create a Class with FastSkipMixin, but patch various bits."""
@@ -409,13 +405,11 @@ class TestFastSkipMixin(object):  # pylint: disable=too-many-public-methods
         _mock_wflinfo.glsl_es_version = 2.0
         _mock_wflinfo.gl_extensions = set(['bar'])
 
-        with mock.patch.object(self._Test, '_FastSkipMixin__info',
-                               _mock_wflinfo):
+        with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
             yield
 
-    @pytest.fixture
-    def inst(self):
-        return self._Test(['foo'])
+    class _Test(opengl.FastSkipMixin, utils.Test):
+        pass
 
     def test_api(self):
         """Tests that the api works.
@@ -427,143 +421,174 @@ class TestFastSkipMixin(object):  # pylint: disable=too-many-public-methods
         self._Test(['foo'], gl_required={'foo'}, gles_version=3,
                    glsl_es_version=2)
 
+
+class TestFastSkip(object):
+    """Tests for the FastSkip class."""
+
+    @pytest.yield_fixture(autouse=True, scope='class')
+    def patch(self):
+        """Create a Class with FastSkipMixin, but patch various bits."""
+        _mock_wflinfo = mock.Mock(spec=opengl.WflInfo)
+        _mock_wflinfo.gl_version = 3.3
+        _mock_wflinfo.gles_version = 3.0
+        _mock_wflinfo.glsl_version = 3.3
+        _mock_wflinfo.glsl_es_version = 2.0
+        _mock_wflinfo.gl_extensions = set(['bar'])
+
+        with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
+            yield
+
+    @pytest.fixture
+    def inst(self):
+        return opengl.FastSkip()
+
     def test_should_skip(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: Skips when requires is missing
+        """test.opengl.FastSkipMixin.test: Skips when requires is missing
         from extensions.
         """
         inst.gl_required.add('foobar')
         with pytest.raises(_TestIsSkip):
-            inst.is_skip()
+            inst.test()
 
     def test_should_not_skip(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs when requires is in
+        """test.opengl.FastSkipMixin.test: runs when requires is in
         extensions.
         """
         inst.gl_required.add('bar')
-        inst.is_skip()
-
-    def test_extension_empty(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: if extensions are empty test
-        runs.
-        """
-        inst.gl_required.add('foobar')
-        with mock.patch.object(inst._FastSkipMixin__info, 'gl_extensions',  # pylint: disable=no-member
-                               None):
-            inst.is_skip()
-
-    def test_requires_empty(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: if gl_requires is empty test
-        runs.
-        """
-        inst.is_skip()
+        inst.test()
 
     def test_max_gl_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: skips if gl_version >
+        """test.opengl.FastSkipMixin.test: skips if gl_version >
         __max_gl_version.
         """
         inst.gl_version = 4.0
         with pytest.raises(_TestIsSkip):
-            inst.is_skip()
+            inst.test()
 
     def test_max_gl_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if gl_version <
+        """test.opengl.FastSkipMixin.test: runs if gl_version <
         __max_gl_version.
         """
         inst.gl_version = 1.0
 
-    def test_max_gl_version_unset(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if __max_gl_version is
-        None.
-        """
-        inst.gl_version = 1.0
-        with mock.patch.object(inst._FastSkipMixin__info, 'gl_version',  # pylint: disable=no-member
-                               None):
-            inst.is_skip()
-
     def test_max_gl_version_set(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if gl_version is None"""
-        inst.is_skip()
+        """test.opengl.FastSkipMixin.test: runs if gl_version is None"""
+        inst.test()
 
     def test_max_gles_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: skips if gles_version >
+        """test.opengl.FastSkipMixin.test: skips if gles_version >
         __max_gles_version.
         """
         inst.gles_version = 4.0
         with pytest.raises(_TestIsSkip):
-            inst.is_skip()
+            inst.test()
 
     def test_max_gles_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if gles_version <
+        """test.opengl.FastSkipMixin.test: runs if gles_version <
         __max_gles_version.
         """
         inst.gles_version = 1.0
 
-    def test_max_gles_version_unset(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if __max_gles_version is
-        None.
-        """
-        inst.gles_version = 1.0
-        with mock.patch.object(inst._FastSkipMixin__info, 'gles_version',  # pylint: disable=no-member
-                               None):
-            inst.is_skip()
-
     def test_max_gles_version_set(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if gles_version is None"""
-        inst.is_skip()
+        """test.opengl.FastSkipMixin.test: runs if gles_version is None"""
+        inst.test()
 
     def test_max_glsl_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: skips if glsl_version >
+        """test.opengl.FastSkipMixin.test: skips if glsl_version >
         __max_glsl_version.
         """
         inst.glsl_version = 4.0
         with pytest.raises(_TestIsSkip):
-            inst.is_skip()
+            inst.test()
 
     def test_max_glsl_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if glsl_version <
+        """test.opengl.FastSkipMixin.test: runs if glsl_version <
         __max_glsl_version.
         """
         inst.glsl_version = 1.0
 
-    def test_max_glsl_version_unset(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if __max_glsl_version is
-        None.
-        """
-        inst.glsl_version = 1.0
-        with mock.patch.object(inst._FastSkipMixin__info, 'glsl_version',  # pylint: disable=no-member
-                               None):
-            inst.is_skip()
-
     def test_max_glsl_version_set(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if glsl_version is None"""
-        inst.is_skip()
+        """test.opengl.FastSkipMixin.test: runs if glsl_version is None"""
+        inst.test()
 
     def test_max_glsl_es_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: skips if glsl_es_version >
+        """test.opengl.FastSkipMixin.test: skips if glsl_es_version >
         __max_glsl_es_version.
         """
         inst.glsl_es_version = 4.0
         with pytest.raises(_TestIsSkip):
-            inst.is_skip()
+            inst.test()
 
     def test_max_glsl_es_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if glsl_es_version <
+        """test.opengl.FastSkipMixin.test: runs if glsl_es_version <
         __max_glsl_es_version.
         """
         inst.glsl_es_version = 1.0
 
-    def test_max_glsl_es_version_unset(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if __max_glsl_es_version is
+    def test_max_glsl_es_version_set(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if glsl_es_version is None"""
+        inst.test()
+
+    class TestEmpty(object):
+        """Tests for the FastSkip class when values are unset."""
+
+        @pytest.yield_fixture(autouse=True, scope='class')
+        def patch(self):
+            """Create a Class with FastSkipMixin, but patch various bits."""
+            _mock_wflinfo = mock.Mock(spec=opengl.WflInfo)
+            _mock_wflinfo.gl_version = None
+            _mock_wflinfo.gles_version = None
+            _mock_wflinfo.glsl_version = None
+            _mock_wflinfo.glsl_es_version = None
+            _mock_wflinfo.gl_extensions = set()
+
+            with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
+                yield
+
+        @pytest.fixture
+        def inst(self):
+            return opengl.FastSkip()
+
+        def test_extension_empty(self, inst):
+            """test.opengl.FastSkipMixin.test: if extensions are empty test
+            runs.
+            """
+            inst.gl_required.add('foobar')
+            inst.test()
+
+        def test_requires_empty(self, inst):
+            """test.opengl.FastSkipMixin.test: if gl_requires is empty test
+            runs.
+            """
+            inst.test()
+
+        def test_max_gl_version_unset(self, inst):
+            """test.opengl.FastSkipMixin.test: runs if __max_gl_version is
+            None.
+            """
+            inst.gl_version = 1.0
+            inst.test()
+
+        def test_max_glsl_es_version_unset(self, inst):
+            """test.opengl.FastSkipMixin.test: runs if __max_glsl_es_version is
+            None.
+            """
+            inst.glsl_es_version = 1.0
+            inst.test()
+
+    def test_max_glsl_version_unset(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if __max_glsl_version is
         None.
         """
-        inst.glsl_es_version = 1.0
-        with mock.patch.object(inst._FastSkipMixin__info, 'glsl_es_version',  # pylint: disable=no-member
-                               None):
-            inst.is_skip()
+        inst.glsl_version = 1.0
+        inst.test()
 
-    def test_max_glsl_es_version_set(self, inst):
-        """test.opengl.FastSkipMixin.is_skip: runs if glsl_es_version is None"""
-        inst.is_skip()
+    def test_max_gles_version_unset(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if __max_gles_version is
+        None.
+        """
+        inst.gles_version = 1.0
+        inst.test()
 
 
 class TestFastSkipMixinDisabled(object):
@@ -579,8 +604,7 @@ class TestFastSkipMixinDisabled(object):
         _mock_wflinfo.glsl_es_version = 2.0
         _mock_wflinfo.gl_extensions = set(['bar'])
 
-        with mock.patch.object(self._Test, '_FastSkipMixin__info',
-                               _mock_wflinfo):
+        with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
             yield
 
     class _Test(opengl.FastSkipMixin, utils.Test):
