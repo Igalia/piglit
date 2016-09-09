@@ -3344,14 +3344,14 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_timer_query')) as g:
-    g(['ext_timer_query-time-elapsed'], 'time-elapsed')
+    g(['ext_timer_query-time-elapsed'], 'time-elapsed', run_concurrent=False)
     g(['timer_query'], run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_timer_query')) as g:
-    g(['ext_timer_query-time-elapsed', 'timestamp'], 'query GL_TIMESTAMP')
+    g(['ext_timer_query-time-elapsed', 'timestamp'], 'query GL_TIMESTAMP', run_concurrent=False)
     g(['ext_timer_query-lifetime'], 'query-lifetime')
-    g(['arb_timer_query-timestamp-get'], 'timestamp-get')
+    g(['arb_timer_query-timestamp-get'], 'timestamp-get', run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_transform_feedback')) as g:
