@@ -467,10 +467,16 @@ class ReducedProcessMixin(object):
     """
 
     def __init__(self, command, subtests=None, **kwargs):
-        assert subtests  # This covers both "not None" and len(subtests) > 1
+        assert subtests is not None
         super(ReducedProcessMixin, self).__init__(command, **kwargs)
         self._expected = subtests
         self._populate_subtests()
+
+    def is_skip(self):
+        """Skip if the length of expected is 0."""
+        if not self._expected:
+            raise TestIsSkip('All subtests skipped')
+        super(ReducedProcessMixin, self).is_skip()
 
     def __find_sub(self):
         """Helper for getting the next index."""

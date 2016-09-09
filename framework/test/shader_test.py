@@ -32,8 +32,8 @@ import re
 
 from framework import exceptions
 from framework import status
-from .base import ReducedProcessMixin
-from .opengl import FastSkipMixin
+from .base import ReducedProcessMixin, TestIsSkip
+from .opengl import FastSkipMixin, FastSkip
 from .piglit_test import PiglitBaseTest
 
 __all__ = [
@@ -185,23 +185,48 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
     """
 
     def __init__(self, filenames):
-        # TODO fast skip.
-        parser = Parser(filenames[0])
-        parser.parse()
-        prog = parser.prog
-        files = [parser.filename]
+        assert filenames
+        prog = None
+        files = []
+        subtests = []
+        skips = []
 
-        for each in filenames[1:]:
+        # Walk each subtest, and either add it to the list of tests to run, or
+        # determine it is skip, and set the result of that test in the subtests
+        # dictionary to skip without adding it ot the liest of tests to run
+        for each in filenames:
             parser = Parser(each)
             parser.parse()
-            assert parser.prog == prog
+            subtest = os.path.basename(os.path.splitext(each)[0]).lower()
+
+            if prog is not None:
+                assert parser.prog == prog
+            else:
+                prog = parser.prog
+
+            try:
+                skipper = FastSkip(gl_required=parser.gl_required,
+                                   gl_version=parser.gl_version,
+                                   gles_version=parser.gles_version,
+                                   glsl_version=parser.glsl_version,
+                                   glsl_es_version=parser.glsl_es_version)
+                skipper.test()
+            except TestIsSkip:
+                skips.append(subtest)
+                continue
             files.append(parser.filename)
+            subtests.append(subtest)
+
+        assert len(subtests) + len(skips) == len(filenames), \
+            'not all tests accounted for'
 
         super(MultiShaderTest, self).__init__(
             [prog] + files,
-            subtests=[os.path.basename(os.path.splitext(f)[0]).lower()
-                      for f in filenames],
+            subtests=subtests,
             run_concurrent=True)
+
+        for name in skips:
+            self.result.subtests[name] = status.SKIP
 
     @PiglitBaseTest.command.getter  # pylint: disable=no-member
     def command(self):
