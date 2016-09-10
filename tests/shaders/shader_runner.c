@@ -2924,6 +2924,13 @@ piglit_display(void)
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
 			glDispatchCompute(x, y, z);
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		} else if (sscanf(line,
+				  "compute group size %d %d %d %d %d %d",
+				  &x, &y, &z, &w, &h, &l) == 6) {
+			program_must_be_in_use();
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			glDispatchComputeGroupSizeARB(x, y, z, w, h, l);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		} else if (string_match("draw rect tex", line)) {
 			program_must_be_in_use();
 			program_subroutine_uniforms();
