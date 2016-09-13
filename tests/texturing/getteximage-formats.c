@@ -546,7 +546,7 @@ piglit_init(int argc, char **argv)
 		} else if (strcmp(argv[i], "init-by-clear-and-render") == 0) {
 			init_by_clearing_first = GL_TRUE;
 			puts("The textures will be initialized by rendering "
-			     "to them using glCear and glDrawPixels.");
+			     "to them using glClear and glDrawPixels.");
 			break;
 		} else if (!found_test_set) {
 			found_test_set = fbo_use_test_set(argv[i], true);
