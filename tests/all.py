@@ -860,6 +860,7 @@ with profile.group_manager(
     g(['gl-1.1-xor'])
     g(['gl-1.1-xor-copypixels'])
     g(['gl-1.2-texture-base-level'])
+    g(['gl-1.3-alpha_to_coverage_nop'])
     g(['hiz'], run_concurrent=False)
     g(['infinite-spot-light'], run_concurrent=False)
     g(['line-aa-width'], run_concurrent=False)
