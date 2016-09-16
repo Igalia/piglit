@@ -19,9 +19,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+"""Tests for the driver_classifier module."""
+
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals
+)
+
+try:
+    import mock
+except ImportError:
+    from unittest import mock
+
 import pytest
 import six
+
 from framework import driver_classifier
+
 
 class DriverClassifierTester(driver_classifier.DriverClassifier):
     """Test class for the driver classifier, taking in a fixed
@@ -58,3 +71,15 @@ class TestDriverClassifier(object):
         categories list comes back.
         """
         assert DriverClassifierTester(renderer).categories == categories
+
+    def test_collect_glxinfo(self):
+        """Should set self.renderer."""
+        test = driver_classifier.DriverClassifier()
+        with mock.patch('framework.driver_classifier.subprocess.check_output',
+                        mock.Mock(return_value=b'some data\nand some more\n'
+                                               b'OpenGL renderer string: '
+                                               b'sentinal\nand some other '
+                                               b'stuff')):
+            test.collect_glxinfo()
+        assert isinstance(test.renderer, six.text_type)
+        assert test.renderer == 'sentinal'
