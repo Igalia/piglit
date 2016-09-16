@@ -39,6 +39,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -144,7 +145,11 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	GLint maxVP;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	glGetIntegerv(GL_MAX_VIEWPORTS, &maxVP);
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {

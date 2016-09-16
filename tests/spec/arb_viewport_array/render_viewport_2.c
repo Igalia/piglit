@@ -35,21 +35,31 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "150"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
 const char *vsSource = {
-	"#version 150\n"
+	"#version " GLSL_VERSION "\n"
 	"void main() {\n"
 	"}\n"
 };
 
 const char *gsSource = {
-	"#version 150\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_gpu_shader5 : enable\n"
 	"#extension GL_ARB_viewport_array : enable\n"
+	"#extension GL_OES_viewport_array : enable\n"
+	"#extension GL_EXT_geometry_shader : enable\n"
+	"#extension GL_OES_geometry_shader : enable\n"
 	"layout(points, invocations = 16) in;\n"
 	"layout(triangle_strip, max_vertices = 4) out;\n"
 	" flat out int gs_fs_color;\n"
@@ -76,11 +86,15 @@ const char *gsSource = {
 };
 
 const char *fsSource = {
-	"#version 150\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"#endif\n"
 	"flat in int gs_fs_color;\n"
 	"uniform vec3 color;\n"
+	"out vec4 c;\n"
 	"void main() {\n"
-	"	gl_FragColor = vec4(1.0 / float(gs_fs_color + 1), 0.0, 0.0, 1.0);\n"
+	"	c = vec4(1.0 / float(gs_fs_color + 1), 0.0, 0.0, 1.0);\n"
 	"}\n"
 };
 
@@ -99,7 +113,6 @@ draw_multi_viewport(void)
 	idx = 0;
 	for (i = 0; i < divX; i++) {
 		for (j = 0; j < divY; j++) {
-			
 			data[idx * 4 + 0] = (GLfloat)(i * w);
 			data[idx * 4 + 1] = (GLfloat)(j * h);
 			data[idx * 4 + 2] = w;
@@ -117,12 +130,13 @@ draw_multi_viewport(void)
 	for (i = 0; i < divX; i++) {
 		for (j = 0; j < divY; j++) {
 			GLfloat expected[4];
-			
+
 			expected[0] = 1.0 / (1 + i*4 + j);
 			expected[1] = 0.0;
 			expected[2] = 0.0;
-			p = piglit_probe_pixel_rgb(i * w + w/2, j * h + h /2,
-						   expected);
+			expected[3] = 1.0;
+			p = piglit_probe_pixel_rgba(i * w + w/2, j * h + h /2,
+						    expected);
 			if (!p) {
 				printf("Wrong color for viewport i,j %d %d\n",
 				       i, j);
@@ -130,7 +144,7 @@ draw_multi_viewport(void)
 			}
 		}
 	}
-	      
+
 	piglit_present_results();
 
 	return pass;
@@ -151,8 +165,13 @@ piglit_init(int argc, char **argv)
 {
 	GLuint program;
 	GLuint vao;
+
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
 	piglit_require_extension("GL_ARB_gpu_shader5");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	program = piglit_build_simple_program_multiple_shaders(
 					GL_VERTEX_SHADER, vsSource,

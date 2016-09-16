@@ -45,6 +45,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -196,6 +197,12 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "150"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -204,18 +211,25 @@ piglit_init(int argc, char **argv)
 	char *gsSource;
 	char *fsSource;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	(void)!asprintf(&vsSource,
-		 "#version 150\n"
+		 "#version " GLSL_VERSION "\n"
 		 "in vec4 piglit_vertex;\n"
 		 "void main() {\n"
 		 "	gl_Position = piglit_vertex;\n"
 		 "}\n");
 
 	(void)!asprintf(&gsSource,
-		 "#version 150\n"
+		 "#version " GLSL_VERSION "\n"
 		 "#extension GL_ARB_viewport_array : enable\n"
+		 "#extension GL_OES_viewport_array : enable\n"
+		 "#extension GL_EXT_geometry_shader : enable\n"
+		 "#extension GL_OES_geometry_shader : enable\n"
 		 "layout(triangles) in;\n"
 		 "layout(triangle_strip, max_vertices = 18) out;\n"
 		 "out vec3 color;\n"
@@ -224,7 +238,7 @@ piglit_init(int argc, char **argv)
 		 "{\n"
 		 "	for (int j = 0; j < %d; j++) {\n"
 		 "		gl_ViewportIndex = j;\n"
-		 "		color = vec3(1.0 / (j+1), 1.0 / (j+1), 1.0 / (j+1));\n"
+		 "		color = vec3(1.0 / float(j + 1));\n"
 		 "		for(int i = 0; i < gl_in.length(); i++) {\n"
 		 "			gl_Position = gl_in[i].gl_Position;\n"
 		 "			EmitVertex();\n"
@@ -234,10 +248,14 @@ piglit_init(int argc, char **argv)
 		 "}\n", divX * divY);
 
 	(void)!asprintf(&fsSource,
-		 "#version 150\n"
+		 "#version " GLSL_VERSION "\n"
+                 "#ifdef GL_ES\n"
+		 "precision highp float;\n"
+		 "#endif\n"
 		 "in vec3 color;\n"
+		 "out vec4 c;\n"
 		 "void main() {\n"
-		 "	gl_FragColor = vec4(color.xyz, 1.0);\n"
+		 "	c = vec4(color.xyz, 1.0);\n"
 		 "}\n");
 
 

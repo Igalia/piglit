@@ -38,6 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -51,29 +52,45 @@ PIGLIT_GL_TEST_CONFIG_END
 static bool
 check_dr_index(GLuint first, GLsizei count, GLenum expected_error)
 {
+#ifdef PIGLIT_USE_OPENGL
 	static const GLclampd dv[] = {0.213, 1.0};
 	GLclampd *mv, dvGet[2];
+#else
+	static const GLfloat dv[] = {0.213, 1.0};
+	GLfloat *mv, dvGet[2];
+#endif
 	unsigned int i;
 	bool pass = true;
 	const unsigned int numIterate = (expected_error == GL_NO_ERROR) ? count : 1;
 
-	mv = malloc(sizeof(GLclampd) * 2 * count);
+	mv = malloc(sizeof(*dv) * 2 * count);
 	if (mv == NULL)
 		return false;
 	for (i = 0; i < count; i++) {
 		mv[i * 2] = dv[0];
 		mv[i * 2 + 1] = dv[1];
 	}
+#ifdef PIGLIT_USE_OPENGL
 	glDepthRangeArrayv(first, count, mv);
+#else
+	glDepthRangeArrayfvOES(first, count, mv);
+#endif
 	free(mv);
 	pass = piglit_check_gl_error(expected_error) && pass;
 
 	/* only iterate multiple indices for no error case */
 	for (i = count; i > count - numIterate; i--) {
+#ifdef PIGLIT_USE_OPENGL
 		glDepthRangeIndexed(first + i - 1, dv[0], dv[1]);
 		pass = piglit_check_gl_error(expected_error) && pass;
 		glGetDoublei_v(GL_DEPTH_RANGE, first + i - 1, dvGet);
 		pass = piglit_check_gl_error(expected_error) && pass;
+#else
+		glDepthRangeIndexedfOES(first + i - 1, dv[0], dv[1]);
+		pass = piglit_check_gl_error(expected_error) && pass;
+		glGetFloati_vOES(GL_DEPTH_RANGE, first + i - 1, dvGet);
+		pass = piglit_check_gl_error(expected_error) && pass;
+#endif
 	}
 
 	return pass;
@@ -117,7 +134,11 @@ test_dr_indices(GLint maxVP)
 	 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
 	 *    "An INVALID_VALUE error is generated if count is negative."
 	 */
+#ifdef PIGLIT_USE_OPENGL
 	glDepthRangeArrayv(0, -1, NULL);
+#else
+	glDepthRangeArrayfvOES(0, -1, NULL);
+#endif
 	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
 		printf("Wrong error for invalid DepthRange count\n");
 		pass = false;
@@ -139,7 +160,11 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	GLint maxVP;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	glGetIntegerv(GL_MAX_VIEWPORTS, &maxVP);
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {

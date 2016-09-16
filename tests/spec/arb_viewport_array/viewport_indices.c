@@ -42,6 +42,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -146,15 +147,24 @@ test_preserve_invalid_index(GLint maxVP)
 	GLfloat vpGet[4];
 	static const GLint sc[4] = {3, 9, 17, 23};
 	GLint scGet[4];
+#ifdef PIGLIT_USE_OPENGL
 	static const GLdouble dr[2] = {0.3333, 0.66666};
 	GLdouble drGet[2];
+#else
+	static const GLfloat dr[2] = {0.3333, 0.66666};
+	GLfloat drGet[2];
+#endif
 	GLboolean scEnabled;
 	int i;
 
 	/* intialize all indices to know values */
 	for (i = 0; i < maxVP; i++) {
 		glViewportIndexedfv(i, vp);
+#ifdef PIGLIT_USE_OPENGL
 		glDepthRangeIndexed(i, dr[0], dr[1]);
+#else
+		glDepthRangeIndexedfOES(i, dr[0], dr[1]);
+#endif
 		glScissorIndexedv(i, sc);
 		glEnablei(GL_SCISSOR_TEST, i);
 	}
@@ -163,7 +173,11 @@ test_preserve_invalid_index(GLint maxVP)
 	/* set an illegal index and then test that no indices changed*/
 	glViewportIndexedf(maxVP, 0.0, 0.0, 1.0, 1.0);
 	glScissorIndexed(maxVP, 0, 0, 1, 1);
+#ifdef PIGLIT_USE_OPENGL
 	glDepthRangeIndexed(maxVP, 0.0, 0.0);
+#else
+	glDepthRangeIndexedfOES(maxVP, 0.0, 0.0);
+#endif
 	glDisablei(GL_SCISSOR_TEST, maxVP);
 
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
@@ -176,7 +190,11 @@ test_preserve_invalid_index(GLint maxVP)
 			       i);
 			pass = false;
 		}
+#ifdef PIGLIT_USE_OPENGL
 		glGetDoublei_v(GL_DEPTH_RANGE, i, drGet);
+#else
+		glGetFloati_vOES(GL_DEPTH_RANGE, i, drGet);
+#endif
 		if (drGet[0] != dr[0] || drGet[1] != dr[1]) {
 			printf("DepthRange index %d got erroneously changed\n",
 			       i);
@@ -211,7 +229,11 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	GLint maxVP;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	glGetIntegerv(GL_MAX_VIEWPORTS, &maxVP);
 	if (!piglit_check_gl_error(GL_NO_ERROR))

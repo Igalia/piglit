@@ -39,6 +39,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_core_version = 32;
 	config.supports_gl_compat_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
@@ -56,7 +57,11 @@ piglit_init(int argc, char **argv)
 {
 	GLint layer, index;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 	piglit_print_minmax_header();
 
 	piglit_test_min_viewport_dimensions(); /* GL_MAX_VIEWPORT_DIMS */
@@ -69,12 +74,16 @@ piglit_init(int argc, char **argv)
 	 *    least [-16384, 16383].
 	 *    On GL4-capable hardware the VIEWPORT_BOUNDS_RANGE should be at
 	 *    least [-32768, 32767]."
+	 *
+	 * OES_viewport_array requires the larger range.
 	 */
 	/* Since no known way to determine GL3 versus GL4 capable hardware use
 	   GL version instead */
+#ifdef PIGLIT_USE_OPENGL
 	if (piglit_get_gl_version() < 40)
 		piglit_test_range_float(GL_VIEWPORT_BOUNDS_RANGE, -16384, 16383);
 	else
+#endif
 		piglit_test_range_float(GL_VIEWPORT_BOUNDS_RANGE, -32768, 32767);
 
 	/**

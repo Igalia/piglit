@@ -34,6 +34,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -143,12 +144,20 @@ static bool
 depth_range_bounds(GLint maxVP)
 {
 	bool pass = true;
+#ifdef PIGLIT_USE_OPENGL
 	GLdouble dr[2], drGet[2];
+#else
+	GLfloat dr[2], drGet[2];
+#endif
 	int i;
 
 	/* intial values for near, far are 0.0, 1.0 repsectively */
 	for (i = 0; i < maxVP; i++) {
+#ifdef PIGLIT_USE_OPENGL
 		glGetDoublei_v(GL_DEPTH_RANGE, i, dr);
+#else
+		glGetFloati_v(GL_DEPTH_RANGE, i, dr);
+#endif
 		if (dr[0] != 0.0 || dr[1] != 1.0) {
 			printf("depth_range default value wrong for idx %d\n",
 			       i);
@@ -160,14 +169,24 @@ depth_range_bounds(GLint maxVP)
 	/* test clamping of depth_range values */
 	dr[0] = -0.001;
 	dr[1] = 2.0;
+#ifdef PIGLIT_USE_OPENGL
 	glDepthRangeArrayv(0, 1, dr);
 	glGetDoublei_v(GL_DEPTH_RANGE, 0, drGet);
+#else
+	glDepthRangeArrayfvOES(0, 1, dr);
+	glGetFloati_vOES(GL_DEPTH_RANGE, 0, drGet);
+#endif
 	if (drGet[0] != 0.0 || drGet[1] != 1.0) {
 		printf("depth_range clamping failed glDepthRangeArrayv\n");
 		pass = false;
 	}
+#ifdef PIGLIT_USE_OPENGL
 	glDepthRangeIndexed(1, dr[0], dr[1]);
 	glGetDoublei_v(GL_DEPTH_RANGE, 1, drGet);
+#else
+	glDepthRangeIndexedfOES(1, dr[0], dr[1]);
+	glGetFloati_vOES(GL_DEPTH_RANGE, 1, drGet);
+#endif
 	if (drGet[0] != 0.0 || drGet[1] != 1.0) {
 		printf("depth_range clamping failed glDepthRangeIndexed\n");
 		pass = false;
@@ -251,7 +270,11 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	GLint maxVP;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	glGetIntegerv(GL_MAX_VIEWPORTS, &maxVP);
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {

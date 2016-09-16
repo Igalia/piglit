@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -64,7 +65,11 @@ piglit_init(int argc, char **argv)
 	const GLenum indexedTokens[] = {GL_VIEWPORT, GL_DEPTH_RANGE,
 					GL_SCISSOR_BOX};
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	glGetIntegerv(GL_MAX_VIEWPORTS, &maxVP);
 	/**
@@ -80,8 +85,10 @@ piglit_init(int argc, char **argv)
 	for (i = 0; i < ARRAY_SIZE(tokens); i++) {
 		glGetFloati_v(tokens[i], 1, valf);
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+#ifdef PIGLIT_USE_OPENGL
 		glGetDoublei_v(tokens[i], 1, vald);
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+#endif
 	}
 
 	/**
@@ -125,12 +132,16 @@ piglit_init(int argc, char **argv)
 	 * return the same data.
 	 */
 	glViewport(1, 2, 30, 40);
+#ifdef PIGLIT_USE_OPENGL
 	glDepthRange(0.25, 0.75);
+#else
+	glDepthRangef(0.25, 0.75);
+#endif
 	glScissor(3, 4, 50, 60);
 	for (i =0; i < ARRAY_SIZE(indexedTokens); i++) {
 		glGetFloati_v(indexedTokens[i], 1, valf);
+#ifdef PIGLIT_USE_OPENGL
 		glGetDoublei_v(indexedTokens[i], 1, vald);
-		glGetIntegeri_v(indexedTokens[i], 1, vali);
 		if (valf[0] != vald[0] || valf[1] != vald[1] ||
 		    valf[2] != vald[2] || valf[3] != vald[3]) {
 			pass = false;
@@ -141,6 +152,8 @@ piglit_init(int argc, char **argv)
 			printf("vald[0-3] = %f %f %f %f\n", vald[0], vald[1],
 			       vald[2], vald[3]);
 		}
+#endif
+		glGetIntegeri_v(indexedTokens[i], 1, vali);
 		if ((int) (valf[0] + 0.5) != vali[0] ||
 		    (int) (valf[1] + 0.5) != vali[1] ||
 		    (int) (valf[2] + 0.5) != vali[2] ||

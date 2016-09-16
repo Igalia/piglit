@@ -2813,6 +2813,22 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'oes_viewport_array')) as g:
+    g(['arb_viewport_array-viewport-indices_gles3'], 'viewport-indices')
+    g(['arb_viewport_array-depthrange-indices_gles3'], 'depthrange-indices')
+    g(['arb_viewport_array-scissor-check_gles3'], 'scissor-check')
+    g(['arb_viewport_array-scissor-indices_gles3'], 'scissor-indices')
+    g(['arb_viewport_array-bounds_gles3'], 'bounds')
+    g(['arb_viewport_array-queries_gles3'], 'queries')
+    g(['arb_viewport_array-minmax_gles3'], 'minmax')
+    g(['arb_viewport_array-render-viewport_gles3'], 'render-viewport')
+    g(['arb_viewport_array-render-viewport-2_gles3'], 'render-viewport-2')
+    g(['arb_viewport_array-render-depthrange_gles3'], 'render-depthrange')
+    g(['arb_viewport_array-render-scissor_gles3'], 'render-scissor')
+    g(['arb_viewport_array-clear_gles3'], 'clear')
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'nv_vertex_program2_option')) as g:
     g(['vp-address-03'], run_concurrent=False)
     g(['vp-address-05'], run_concurrent=False)

@@ -42,13 +42,20 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "150"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
 const char *vsSource = {
-	"#version 150\n"
+	"#version " GLSL_VERSION "\n"
 	"in vec4 piglit_vertex;\n"
 	"void main() {\n"
 	"	gl_Position = piglit_vertex;\n"
@@ -56,8 +63,11 @@ const char *vsSource = {
 };
 
 const char *gsSource = {
-	"#version 150\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_viewport_array : enable\n"
+	"#extension GL_OES_viewport_array : enable\n"
+	"#extension GL_EXT_geometry_shader : enable\n"
+	"#extension GL_OES_geometry_shader : enable\n"
 	"layout(triangles) in;\n"
 	"layout(triangle_strip, max_vertices = 3) out;\n"
 	"uniform int idx;\n"
@@ -74,10 +84,14 @@ const char *gsSource = {
 };
 
 const char *fsSource = {
-	"#version 150\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"#endif\n"
 	"uniform vec3 color;\n"
+	"out vec4 c;\n"
 	"void main() {\n"
-	"	gl_FragColor = vec4(color.xyz, 1.0);\n"
+	"	c = vec4(color.xyz, 1.0);\n"
 	"}\n"
 };
 
@@ -98,15 +112,15 @@ draw_multi_viewport(const bool changeVPLoc)
 	const int divX=2, divY=4;
 	GLfloat w = (GLfloat) piglit_width / (GLfloat) divX;
 	GLfloat h = (GLfloat) piglit_height / (GLfloat) divY;
-	const GLfloat colors[][3] = {{0.0, 0.0, 1.0},
-				  {0.0, 1.0, 0.0},
-				  {1.0, 0.0, 0.0},
-				  {1.0, 1.0, 0.0},
-				  {0.0, 1.0, 1.0},
-				  {1.0, 0.0, 1.0},
-				  {1.0, 1.0, 1.0},
-				  {0.0, 0.0, 0.5},
-				  {0.0, 0.0, 0.0}};
+	const GLfloat colors[][4] = {{0.0, 0.0, 1.0, 1.0},
+				     {0.0, 1.0, 0.0, 1.0},
+				     {1.0, 0.0, 0.0, 1.0},
+				     {1.0, 1.0, 0.0, 1.0},
+				     {0.0, 1.0, 1.0, 1.0},
+				     {1.0, 0.0, 1.0, 1.0},
+				     {1.0, 1.0, 1.0, 1.0},
+				     {0.0, 0.0, 0.5, 1.0},
+				     {0.0, 0.0, 0.0, 0.0}};
 
 	assert(ARRAY_SIZE(colors) == divX*divY + 1);
 
@@ -128,8 +142,8 @@ draw_multi_viewport(const bool changeVPLoc)
 			glViewportIndexedf(j + i*divY, i * w, j * h, w, h);
 			piglit_draw_rect(-1, -1, 2, 2);
 			pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-			p = piglit_probe_pixel_rgb(i * w + w/2, j * h + h/2,
-						   expected);
+			p = piglit_probe_pixel_rgba(i * w + w/2, j * h + h/2,
+						    expected);
 			piglit_present_results();
 			if (!p) {
 				printf("Wrong color for viewport i,j %d %d changeVP=%d\n",
@@ -157,7 +171,11 @@ piglit_init(int argc, char **argv)
 {
 	GLuint program;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	program = piglit_build_simple_program_multiple_shaders(
 					GL_VERTEX_SHADER, vsSource,

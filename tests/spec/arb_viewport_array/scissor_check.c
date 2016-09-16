@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_core_version = 32;
 	config.supports_gl_compat_version = 32;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -44,17 +45,26 @@ PIGLIT_GL_TEST_CONFIG_END
 #define WIDTH 32
 #define HEIGHT 32
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "150"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
 static bool
 test(void)
 {
 	static const char *vsSrc =
-		"#version 150\n"
+		"#version " GLSL_VERSION "\n"
 		"in vec4 Attr0;"
 		"void main(void) {"
 		"   gl_Position = Attr0;"
 		"}";
 	static const char *fsSrc =
-		"#version 150\n"
+		"#version " GLSL_VERSION "\n"
+		"#ifdef GL_ES\n"
+		"precision highp float;\n"
+		"#endif\n"
 		"out vec4 fragColor0;"
 		"void main(void) {"
 		"   fragColor0 = vec4(1, 0, 0, 1);"
@@ -65,16 +75,13 @@ test(void)
 		-1.0f, -1.0f, 0.0f, 1.0f,
 		-1.0f,  1.0f, 0.0f, 1.0f,
 	};
-	const GLuint white = 0xffffffff;
-	const GLuint red = 0xff0000ff;
-	const GLuint magenta = 0xff00ffff;
-	const unsigned int numPixels = WIDTH * HEIGHT;
-	GLuint texData[WIDTH * HEIGHT];
-	GLuint i, tex, fbo, prog, vertexArray, vertexBuf;
+	const GLfloat white[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	const GLfloat red[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+	const GLfloat magenta[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+	GLbyte texData[WIDTH * HEIGHT * 4];
+	GLuint tex, fbo, prog, vertexArray, vertexBuf;
 
-	for (i = 0; i < numPixels; ++i) {
-		texData[i] = white;
-	}
+	memset(texData, 0xff, sizeof(texData));
 
 	/* Create a white 2D texture. */
 	glGenTextures(1, &tex);
@@ -84,19 +91,13 @@ test(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT,
-			GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
+			GL_RGBA, GL_UNSIGNED_BYTE, texData);
 
 	/* Create FBO with texture color attachment */
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 			       GL_TEXTURE_2D, tex, 0);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
-	    GL_FRAMEBUFFER_COMPLETE) {
-		printf("incomplete framebuffer at line %d\n", __LINE__);
-		return false;
-	}
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
 	    GL_FRAMEBUFFER_COMPLETE) {
 		printf("incomplete framebuffer at line %d\n", __LINE__);
@@ -137,31 +138,11 @@ test(void)
 	 */
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glReadBuffer(GL_COLOR_ATTACHMENT0);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
-	    GL_FRAMEBUFFER_COMPLETE) {
-		printf("incomplete framebuffer at line %d\n", __LINE__);
+	if (!piglit_probe_pixel_rgba(0, 0, white))
 		return false;
-	}
 
-	/* read color buffer */
-	glPixelStorei(GL_PACK_ROW_LENGTH, WIDTH);
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	memset(texData, 0, sizeof(texData));
-	glReadPixels(0, 0, WIDTH, HEIGHT,
-		     GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
-
-	if (texData[0] != white) {
-		printf("At pixel (0,0) expected 0x%x but found 0x%x\n",
-		       white, texData[0]);
+	if (!piglit_probe_pixel_rgba(WIDTH - 1, HEIGHT - 1, magenta))
 		return false;
-	}
-
-	if (texData[numPixels - 1] != magenta) {
-		printf("At pixel (%d,%d) expected 0x%x but found 0x%x\n",
-		       WIDTH - 1, HEIGHT - 1, magenta, texData[numPixels - 1]);
-		return false;
-	}
 
 	/* Draw red quad (fragment shader always emits red).
 	 * With scissor, upper-right 16x16 should be red, leaving the rest
@@ -169,22 +150,11 @@ test(void)
 	 */
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	/* read color buffer */
-	memset(texData, 0, sizeof(texData));
-	glReadPixels(0, 0, WIDTH, HEIGHT,
-		     GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
-
-	if (texData[0] != white) {
-		printf("At pixel (0,0) expected 0x%x but found 0x%x\n",
-		       white, texData[0]);
+	if (!piglit_probe_pixel_rgba(0, 0, white))
 		return false;
-	}
 
-	if (texData[numPixels - 1] != red) {
-		printf("At pixel (%d,%d) expected 0x%x but found 0x%x\n",
-		       WIDTH - 1, HEIGHT - 1, magenta, texData[numPixels - 1]);
+	if (!piglit_probe_pixel_rgba(WIDTH - 1, HEIGHT - 1, red))
 		return false;
-	}
 
 	return true;
 }
@@ -203,8 +173,12 @@ piglit_init(int argc, char **argv)
 {
 	bool pass;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_extension("GL_ARB_viewport_array");
+#else
+	piglit_require_extension("GL_OES_viewport_array");
+#endif
 
 	pass = test();
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
