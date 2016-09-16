@@ -55,8 +55,8 @@ class DriverClassifier(object):
         """
 
         try:
-            output = subprocess.check_output(['glxinfo'],
-                                             stderr=subprocess.STDOUT)
+            output = subprocess.check_output(
+                ['glxinfo'], stderr=subprocess.STDOUT).decode('utf-8')
         except OSError as e:
             if e.errno not in [errno.ENOENT, errno.EACCES]:
                 raise
