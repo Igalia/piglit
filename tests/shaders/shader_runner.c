@@ -2960,65 +2960,68 @@ piglit_display(void)
 		} else if (sscanf(line, "depthfunc %31s", s) == 1) {
 			glDepthFunc(piglit_get_gl_enum_from_name(s));
 		} else if (parse_str(line, "fb ", &rest)) {
-		GLuint fbo = 0;
+			GLuint fbo = 0;
 
-		if (parse_str(rest, "tex 2d ", &rest)) {
-			glGenFramebuffers(1, &fbo);
-			glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+			if (parse_str(rest, "tex 2d ", &rest)) {
+				glGenFramebuffers(1, &fbo);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-			REQUIRE(parse_int(rest, &tex, &rest),
-				"Framebuffer binding command not "
-				"understood at: %s\n", rest);
+				REQUIRE(parse_int(rest, &tex, &rest),
+					"Framebuffer binding command not "
+					"understood at: %s\n", rest);
 
-			glFramebufferTexture2D(GL_FRAMEBUFFER,
-					       GL_COLOR_ATTACHMENT0,
-					       GL_TEXTURE_2D,
-					       get_texture_binding(tex)->obj, 0);
-			if (!piglit_check_gl_error(GL_NO_ERROR)) {
-				fprintf(stderr, "glFramebufferTexture2D error\n");
+				glFramebufferTexture2D(
+					GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+					GL_TEXTURE_2D,
+					get_texture_binding(tex)->obj, 0);
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					fprintf(stderr,
+						"glFramebufferTexture2D error\n");
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				w = get_texture_binding(tex)->width;
+				h = get_texture_binding(tex)->height;
+
+			} else if (sscanf(rest, "tex layered %d", &tex) == 1) {
+				glGenFramebuffers(1, &fbo);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+				glFramebufferTexture(
+					GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+					get_texture_binding(tex)->obj, 0);
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					fprintf(stderr,
+						"glFramebufferTexture error\n");
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				w = get_texture_binding(tex)->width;
+				h = get_texture_binding(tex)->height;
+
+			} else {
+				fprintf(stderr, "Unknown fb bind subcommand "
+					"\"%s\"\n", rest);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
-			w = get_texture_binding(tex)->width;
-			h = get_texture_binding(tex)->height;
-
-		} else if (sscanf(rest, "tex layered %d", &tex) == 1) {
-			glGenFramebuffers(1, &fbo);
-			glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-			glFramebufferTexture(GL_FRAMEBUFFER,
-					     GL_COLOR_ATTACHMENT0,
-					     get_texture_binding(tex)->obj, 0);
-			if (!piglit_check_gl_error(GL_NO_ERROR)) {
-				fprintf(stderr, "glFramebufferTexture error\n");
+			const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (status != GL_FRAMEBUFFER_COMPLETE) {
+				fprintf(stderr, "incomplete fbo (status 0x%x)\n",
+					status);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
-			w = get_texture_binding(tex)->width;
-			h = get_texture_binding(tex)->height;
+			render_width = w;
+			render_height = h;
 
-		} else {
-			fprintf(stderr, "Unknown fb bind subcommand "
-				"\"%s\"\n", rest);
-			piglit_report_result(PIGLIT_FAIL);
-		}
+			/* Delete the previous draw FB in case
+			 * it's no longer reachable.
+			 */
+			if (draw_fbo != 0)
+				glDeleteFramebuffers(1, &draw_fbo);
 
-		const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			fprintf(stderr, "incomplete fbo (status 0x%x)\n", status);
-			piglit_report_result(PIGLIT_FAIL);
-		}
-
-		render_width = w;
-		render_height = h;
-
-		/* Delete the previous draw FB in case
-		 * it's no longer reachable.
-		 */
-		if (draw_fbo != 0)
-			glDeleteFramebuffers(1, &draw_fbo);
-
-		draw_fbo = fbo;
+			draw_fbo = fbo;
 
 		} else if (parse_str(line, "frustum", &rest)) {
 			parse_floats(rest, c, 6, NULL);
