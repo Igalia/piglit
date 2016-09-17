@@ -2968,22 +2968,31 @@ piglit_display(void)
 			GLuint fbo = 0;
 
 			if (parse_str(rest, "tex 2d ", &rest)) {
+				GLenum attachments[32];
+				unsigned num_attachments = 0;
+
 				glGenFramebuffers(1, &fbo);
 				glBindFramebuffer(target, fbo);
 
-				REQUIRE(parse_int(rest, &tex, &rest),
-					"Framebuffer binding command not "
-					"understood at: %s\n", rest);
+				while (parse_int(rest, &tex, &rest)) {
+					attachments[num_attachments] =
+						GL_COLOR_ATTACHMENT0 + num_attachments;
+					glFramebufferTexture2D(
+						target, attachments[num_attachments],
+						GL_TEXTURE_2D,
+						get_texture_binding(tex)->obj, 0);
 
-				glFramebufferTexture2D(
-					target, GL_COLOR_ATTACHMENT0,
-					GL_TEXTURE_2D,
-					get_texture_binding(tex)->obj, 0);
-				if (!piglit_check_gl_error(GL_NO_ERROR)) {
-					fprintf(stderr,
-						"glFramebufferTexture2D error\n");
-					piglit_report_result(PIGLIT_FAIL);
+					if (!piglit_check_gl_error(GL_NO_ERROR)) {
+						fprintf(stderr,
+							"glFramebufferTexture2D error\n");
+						piglit_report_result(PIGLIT_FAIL);
+					}
+
+					num_attachments++;
 				}
+
+				if (target != GL_READ_FRAMEBUFFER)
+					glDrawBuffers(num_attachments, attachments);
 
 				w = get_texture_binding(tex)->width;
 				h = get_texture_binding(tex)->height;
