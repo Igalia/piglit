@@ -3430,6 +3430,41 @@ piglit_display(void)
 				     w, h, l, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			set_texture_binding(tex, texobj, w, h, l);
 
+		} else if (parse_str(line, "texture storage ", &rest)) {
+			GLenum target, format;
+			GLuint tex_obj;
+			int d = h = w = 1;
+
+			REQUIRE(parse_int(rest, &tex, &rest) &&
+				parse_tex_target(rest, &target, &rest) &&
+				parse_enum_gl(rest, &format, &rest) &&
+				parse_str(rest, "(", &rest) &&
+				parse_int(rest, &l, &rest) &&
+				parse_int(rest, &w, &rest),
+				"Texture storage command not understood "
+				"at: %s\n", rest);
+
+			glActiveTexture(GL_TEXTURE0 + tex);
+			glGenTextures(1, &tex_obj);
+			glBindTexture(target, tex_obj);
+
+			if (!parse_int(rest, &h, &rest))
+				glTexStorage1D(target, l, format, w);
+			else if (!parse_int(rest, &d, &rest))
+				glTexStorage2D(target, l, format, w, h);
+			else
+				glTexStorage3D(target, l, format, w, h, d);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr, "glTexStorage error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			if (target == GL_TEXTURE_1D_ARRAY)
+				set_texture_binding(tex, tex_obj, w, 1, h);
+			else
+				set_texture_binding(tex, tex_obj, w, h, d);
+
 		} else if (sscanf(line,
 				  "texture rgbw 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
