@@ -3110,6 +3110,17 @@ piglit_display(void)
 					piglit_report_result(PIGLIT_FAIL);
 				}
 
+			} else if (parse_str(rest, "winsys", &rest)) {
+				fbo = piglit_winsys_fbo;
+				glBindFramebuffer(target, fbo);
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					fprintf(stderr, "glBindFramebuffer error\n");
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				w = piglit_width;
+				h = piglit_height;
+
 			} else {
 				fprintf(stderr, "Unknown fb bind subcommand "
 					"\"%s\"\n", rest);
@@ -3131,6 +3142,7 @@ piglit_display(void)
 				 * it's no longer reachable.
 				 */
 				if (draw_fbo != 0 &&
+				    draw_fbo != piglit_winsys_fbo &&
 				    draw_fbo != (target == GL_DRAW_FRAMEBUFFER ?
 						 read_fbo : 0))
 					glDeleteFramebuffers(1, &draw_fbo);
@@ -3146,6 +3158,7 @@ piglit_display(void)
 				 * it's no longer reachable.
 				 */
 				if (read_fbo != 0 &&
+				    read_fbo != piglit_winsys_fbo &&
 				    read_fbo != (target == GL_READ_FRAMEBUFFER ?
 						 draw_fbo : 0))
 					glDeleteFramebuffers(1, &read_fbo);
