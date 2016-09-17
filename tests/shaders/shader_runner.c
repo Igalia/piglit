@@ -3208,6 +3208,8 @@ piglit_display(void)
 					   GL_FALSE, 0, GL_READ_WRITE, img_fmt);
 		} else if (sscanf(line, "memory barrier %s", s) == 1) {
 			glMemoryBarrier(piglit_get_gl_memory_barrier_enum_from_name(s));
+		} else if (parse_str(line, "blend barrier", NULL)) {
+			glBlendBarrier();
 		} else if (sscanf(line, "ortho %f %f %f %f",
 				  c + 0, c + 1, c + 2, c + 3) == 4) {
 			piglit_gen_ortho_projection(c[0], c[1], c[2], c[3],
