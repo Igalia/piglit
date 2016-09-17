@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010-2016 Intel Corporation
+ * Copyright © 2016 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -189,11 +189,6 @@ parse_enum_tab(const struct string_to_enum *tab,
  */
 bool
 parse_tex_target(const char *s, GLenum *t, const char **rest);
-
-const char *eat_whitespace(const char *src);
-const char *eat_text(const char *src);
-bool string_match(const char *string, const char *line);
-const char *strcpy_to_space(char *dst, const char *src);
 
 enum comparison {
 	equal = 0,

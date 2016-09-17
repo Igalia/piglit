@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010-2016 Intel Corporation
+ * Copyright © 2016 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -262,50 +262,4 @@ parse_comparison_op(const char *s, enum comparison *t, const char **rest)
 	} else {
 		return false;
 	}
-}
-
-/**
- * Skip over whitespace upto the end of line
- */
-const char *
-eat_whitespace(const char *src)
-{
-	while (isspace((int) *src) && (*src != '\n'))
-		src++;
-
-	return src;
-}
-
-
-/**
- * Skip over non-whitespace upto the end of line
- */
-const char *
-eat_text(const char *src)
-{
-	while (!isspace((int) *src) && (*src != '\0'))
-		src++;
-
-	return src;
-}
-
-
-bool
-string_match(const char *string, const char *line)
-{
-	return (strncmp(string, line, strlen(string)) == 0);
-}
-
-
-/**
- * Copy a string until either whitespace or the end of the string
- */
-const char *
-strcpy_to_space(char *dst, const char *src)
-{
-	while (!isspace((int) *src) && (*src != '\0'))
-		*(dst++) = *(src++);
-
-	*dst = '\0';
-	return src;
 }
