@@ -3080,6 +3080,36 @@ piglit_display(void)
 				w = get_texture_binding(tex)->width;
 				h = get_texture_binding(tex)->height;
 
+			} else if (parse_str(rest, "ms ", &rest)) {
+				GLuint rb;
+				GLenum format;
+				int samples;
+
+				REQUIRE(parse_enum_gl(rest, &format, &rest) &&
+					parse_int(rest, &w, &rest) &&
+					parse_int(rest, &h, &rest) &&
+					parse_int(rest, &samples, &rest),
+					"Framebuffer binding command not "
+					"understood at: %s\n", rest);
+
+				glGenFramebuffers(1, &fbo);
+				glBindFramebuffer(target, fbo);
+
+				glGenRenderbuffers(1, &rb);
+				glBindRenderbuffer(GL_RENDERBUFFER, rb);
+
+				glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples,
+								 format, w, h);
+
+				glFramebufferRenderbuffer(target,
+							  GL_COLOR_ATTACHMENT0,
+							  GL_RENDERBUFFER, rb);
+
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					fprintf(stderr, "glFramebufferRenderbuffer error\n");
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
 			} else {
 				fprintf(stderr, "Unknown fb bind subcommand "
 					"\"%s\"\n", rest);
