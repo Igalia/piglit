@@ -2997,6 +2997,73 @@ piglit_display(void)
 				w = get_texture_binding(tex)->width;
 				h = get_texture_binding(tex)->height;
 
+			} else if (parse_str(rest, "tex slice ", &rest)) {
+				GLenum tex_target;
+
+				REQUIRE(parse_tex_target(rest, &tex_target, &rest) &&
+					parse_int(rest, &tex, &rest) &&
+					parse_int(rest, &l, &rest) &&
+					parse_int(rest, &z, &rest),
+					"Framebuffer binding command not "
+					"understood at: %s\n", rest);
+
+				const GLuint tex_obj = get_texture_binding(tex)->obj;
+
+				glGenFramebuffers(1, &fbo);
+				glBindFramebuffer(target, fbo);
+
+				if (tex_target == GL_TEXTURE_1D) {
+					REQUIRE(z == 0,
+						"Invalid layer index provided "
+						"in command: %s\n", line);
+					glFramebufferTexture1D(
+						target, GL_COLOR_ATTACHMENT0,
+						tex_target, tex_obj, l);
+
+				} else if (tex_target == GL_TEXTURE_2D ||
+					   tex_target == GL_TEXTURE_RECTANGLE ||
+					   tex_target == GL_TEXTURE_2D_MULTISAMPLE) {
+					REQUIRE(z == 0,
+						"Invalid layer index provided "
+						"in command: %s\n", line);
+					glFramebufferTexture2D(
+						target, GL_COLOR_ATTACHMENT0,
+						tex_target, tex_obj, l);
+
+				} else if (tex_target == GL_TEXTURE_CUBE_MAP) {
+					static const GLenum cubemap_targets[] = {
+						GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+						GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+						GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+						GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+						GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+						GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+					};
+					REQUIRE(z < ARRAY_SIZE(cubemap_targets),
+						"Invalid layer index provided "
+						"in command: %s\n", line);
+					tex_target = cubemap_targets[z];
+
+					glFramebufferTexture2D(
+						target, GL_COLOR_ATTACHMENT0,
+						tex_target, tex_obj, l);
+
+				} else {
+					glFramebufferTextureLayer(
+						target, GL_COLOR_ATTACHMENT0,
+						tex_obj, l, z);
+				}
+
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					fprintf(stderr, "Error binding texture "
+						"attachment for command: %s\n",
+						line);
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				w = MAX2(1, get_texture_binding(tex)->width >> l);
+				h = MAX2(1, get_texture_binding(tex)->height >> l);
+
 			} else if (sscanf(rest, "tex layered %d", &tex) == 1) {
 				glGenFramebuffers(1, &fbo);
 				glBindFramebuffer(target, fbo);
