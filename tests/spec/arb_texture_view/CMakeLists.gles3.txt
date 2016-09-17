@@ -1,0 +1,3 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable(arb_texture_view-rendering-formats_gles3 rendering-formats.c)

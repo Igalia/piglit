@@ -39,228 +39,310 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = TEX_SIZE,
 	config.window_height = TEX_SIZE,
 	config.supports_gl_compat_version = 30;
+	config.supports_gl_es_version = 31;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "130"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
 static const char *vs =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"in vec4 piglit_vertex;\n"
 	"void main() { \n"
-	"	gl_Position = gl_Vertex;\n"
+	"	gl_Position = piglit_vertex;\n"
 	"}\n";
 
 static const char *fs_render_float =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"#endif\n"
 	"uniform vec4 v;\n"
-	"out vec4 color;"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	color = v;\n"
 	"}\n";
 
 static const char *fs_render_uint =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp int;\n"
+	"#endif\n"
 	"uniform uvec4 v;\n"
-	"out uvec4 color;"
+	"out uvec4 color;\n"
 	"void main() { \n"
 	"	color = v;\n"
 	"}\n";
 
 static const char *fs_render_sint =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp int;\n"
+	"#endif\n"
 	"uniform ivec4 v;\n"
-	"out ivec4 color;"
+	"out ivec4 color;\n"
 	"void main() { \n"
 	"	color = v;\n"
 	"}\n";
 
 static const char *fs128_uint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0x3f800000u,\n"
 	"		0x3e800000u,\n"
 	"		0xbf800000u,\n"
 	"		0x00000000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs128_sint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0x3f800000,\n"
 	"		0x3e800000,\n"
 	"		0xbf800000,\n"
 	"		0x00000000)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs128_float32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (floatBitsToUint(texture(s, vec2(0.0))) == uvec4(\n"
 	"		0x3f800000u,\n"
 	"		0x3e800000u,\n"
 	"		0xbf800000u,\n"
 	"		0x00000000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs96_uint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0x3f800000u,\n"
 	"		0x3e800000u,\n"
 	"		0xbf800000u,\n"
 	"		0x00000001u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs96_sint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0x3f800000,\n"
 	"		0x3e800000,\n"
 	"		0xbf800000,\n"
 	"		0x00000001)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs96_float32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (floatBitsToUint(texture(s, vec2(0.0))) == uvec4(\n"
 	"		0x3f800000u,\n"
 	"		0x3e800000u,\n"
 	"		0xbf800000u,\n"
 	"		0x3f800000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_uint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0x3fe0a4b5u,\n"
 	"		0x439ac3f7u,\n"
 	"		0u,\n"
 	"		1u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_sint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0x3fe0a4b5,\n"
 	"		0x439ac3f7,\n"
 	"		0,\n"
 	"		1)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_float32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (floatBitsToUint(texture(s, vec2(0.0))) == uvec4(\n"
 	"		0x3fe0a4b5u,\n"
 	"		0x439ac3f7u,\n"
 	"		0x00000000u,\n"
 	"		0x3f800000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_float16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shading_language_packing : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 	"	uvec2 h = uvec2(packHalf2x16(t.xy), packHalf2x16(t.zw));\n"
 	"	if (h == uvec2(\n"
 	"		0x3fe0a4b5u,\n"
 	"		0x439ac3f7u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_uint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xa4b5u,\n"
 	"		0x3fe0u,\n"
 	"		0xc3f7u,\n"
 	"		0x439au)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_sint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffa4b5,\n" /* sign-extended */
 	"		0x3fe0,\n"
 	"		0xffffc3f7,\n"
 	"		0x439a)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_unorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 65535.0 + 0.5) == uvec4(\n"
@@ -268,16 +350,21 @@ static const char *fs64_unorm16 =
 	"		0x3fe0u,\n"
 	"		0xc3f7u,\n"
 	"		0x439au)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs64_snorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -290,62 +377,82 @@ static const char *fs64_snorm16 =
 	"		0x3fe0,\n"
 	"		0xffffc3f7,\n"
 	"		0x439a)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs48_float16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shading_language_packing : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 	"	uvec2 h = uvec2(packHalf2x16(t.xy), packHalf2x16(t.zw));\n"
 	"	if (h == uvec2(\n"
 	"		0x3fe0a4b5u,\n"
 	"		0x3c00c3f7u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs48_uint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xa4b5u,\n"
 	"		0x3fe0u,\n"
 	"		0xc3f7u,\n"
 	"		0x0001u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs48_sint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffa4b5,\n" /* sign-extended */
 	"		0x3fe0,\n"
 	"		0xffffc3f7,\n"
 	"		0x0001)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs48_unorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 65535.0 + 0.5) == uvec4(\n"
@@ -353,16 +460,21 @@ static const char *fs48_unorm16 =
 	"		0x3fe0u,\n"
 	"		0xc3f7u,\n"
 	"		0xffffu)) {\n" /* 1.0 */
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs48_snorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -375,108 +487,143 @@ static const char *fs48_snorm16 =
 	"		0x3fe0,\n"
 	"		0xffffc3f7,\n"
 	"		0x7fff)) {\n" /* 1.0 */
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_uint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0x3fe0a4b5u,\n"
 	"		0u,\n"
 	"		0u,\n"
 	"		1u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_sint32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0x3fe0a4b5,\n"
 	"		0,\n"
 	"		0,\n"
 	"		1)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_float32 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (floatBitsToUint(texture(s, vec2(0.0))) == uvec4(\n"
 	"		0x3fe0a4b5u,\n"
 	"		0x00000000u,\n"
 	"		0x00000000u,\n"
 	"		0x3f800000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_float16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shading_language_packing : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 	"	uvec2 h = uvec2(packHalf2x16(t.xy), packHalf2x16(t.zw));\n"
 	"	if (h == uvec2(\n"
 	"		0x3fe0a4b5u,\n"
 	"		0x3c000000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_uint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xa4b5u,\n"
 	"		0x3fe0u,\n"
 	"		0x0000u,\n"
 	"		0x0001u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_sint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffa4b5,\n" /* sign-extended */
 	"		0x3fe0,\n"
 	"		0x0000,\n"
 	"		0x0001)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_unorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 65535.0 + 0.5) == uvec4(\n"
@@ -484,16 +631,21 @@ static const char *fs32_unorm16 =
 	"		0x3fe0u,\n"
 	"		0x0000u,\n"
 	"		0xffffu)) {\n" /* 1.0 */
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_snorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -506,46 +658,61 @@ static const char *fs32_snorm16 =
 	"		0x3fe0,\n"
 	"		0x0000,\n"
 	"		0x7fff)) {\n" /* 1.0 */
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_uint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xb5u,\n"
 	"		0xa4u,\n"
 	"		0xe0u,\n"
 	"		0x3fu)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_sint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffffb5,\n" /* sign-extended */
 	"		0xffffffa4,\n"
 	"		0xffffffe0,\n"
 	"		0x3f)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_unorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 255.0 + 0.5) == uvec4(\n"
@@ -553,16 +720,21 @@ static const char *fs32_unorm8 =
 	"		0xa4u,\n"
 	"		0xe0u,\n"
 	"		0x3fu)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_snorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -575,30 +747,40 @@ static const char *fs32_snorm8 =
 	"		0xffffffa4,\n"
 	"		0xffffffe0,\n"
 	"		0x3f)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_uint10 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0x0b5u,\n"
 	"		0x029u,\n"
 	"		0x3feu,\n"
 	"		0x000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs32_unorm10 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * vec4(1023.0, 1023.0, 1023.0, 3.0) + 0.5) == uvec4(\n"
@@ -606,46 +788,61 @@ static const char *fs32_unorm10 =
 	"		0x029u,\n"
 	"		0x3feu,\n"
 	"		0x000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs24_uint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xb5u,\n"
 	"		0xa4u,\n"
 	"		0xe0u,\n"
 	"		0x01u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs24_sint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffffb5,\n" /* sign-extended */
 	"		0xffffffa4,\n"
 	"		0xffffffe0,\n"
 	"		0x01)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs24_unorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 255.0 + 0.5) == uvec4(\n"
@@ -653,16 +850,21 @@ static const char *fs24_unorm8 =
 	"		0xa4u,\n"
 	"		0xe0u,\n"
 	"		0xffu)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs24_snorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -675,62 +877,82 @@ static const char *fs24_snorm8 =
 	"		0xffffffa4,\n"
 	"		0xffffffe0,\n"
 	"		0x7f)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_float16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shading_language_packing : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 	"	uvec2 h = uvec2(packHalf2x16(t.xy), packHalf2x16(t.zw));\n"
 	"	if (h == uvec2(\n"
 	"		0x0000a4b5u,\n"
 	"		0x3c000000u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_uint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xa4b5u,\n"
 	"		0x0000u,\n"
 	"		0x0000u,\n"
 	"		0x0001u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_sint16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffa4b5,\n" /* sign-extended */
 	"		0x0000,\n"
 	"		0x0000,\n"
 	"		0x0001)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_unorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 65535.0 + 0.5) == uvec4(\n"
@@ -738,16 +960,21 @@ static const char *fs16_unorm16 =
 	"		0x0000u,\n"
 	"		0x0000u,\n"
 	"		0xffffu)) {\n" /* 1.0 */
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_snorm16 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -760,46 +987,61 @@ static const char *fs16_snorm16 =
 	"		0x0000,\n"
 	"		0x0000,\n"
 	"		0x7fff)) {\n" /* 1.0 */
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_uint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xb5u,\n"
 	"		0xa4u,\n"
 	"		0x00u,\n"
 	"		0x01u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_sint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffffb5,\n" /* sign-extended */
 	"		0xffffffa4,\n"
 	"		0x00,\n"
 	"		0x01)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_unorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 255.0 + 0.5) == uvec4(\n"
@@ -807,16 +1049,21 @@ static const char *fs16_unorm8 =
 	"		0xa4u,\n"
 	"		0x00u,\n"
 	"		0xffu)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs16_snorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -829,46 +1076,61 @@ static const char *fs16_snorm8 =
 	"		0xffffffa4,\n"
 	"		0x00,\n"
 	"		0x7f)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs8_uint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp usampler2D;\n"
+	"#endif\n"
 	"uniform usampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == uvec4(\n"
 	"		0xb5u,\n"
 	"		0x00u,\n"
 	"		0x00u,\n"
 	"		0x01u)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs8_sint8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp isampler2D;\n"
+	"#endif\n"
 	"uniform isampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	if (texture(s, vec2(0.0)) == ivec4(\n"
 	"		0xffffffb5,\n" /* sign-extended */
 	"		0x00,\n"
 	"		0x00,\n"
 	"		0x01)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs8_unorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 		/* correct float -> unorm conversion */
 	"	if (uvec4(texture(s, vec2(0.0)) * 255.0 + 0.5) == uvec4(\n"
@@ -876,16 +1138,21 @@ static const char *fs8_unorm8 =
 	"		0x00u,\n"
 	"		0x00u,\n"
 	"		0xffu)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
 static const char *fs8_snorm8 =
-	"#version 130\n"
+	"#version " GLSL_VERSION "\n"
 	"#extension GL_ARB_shader_bit_encoding : enable\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
 	"uniform sampler2D s;\n"
+	"out vec4 color;\n"
 	"void main() { \n"
 	"	vec4 t = texture(s, vec2(0.0));\n"
 		/* correct float -> snorm conversion */
@@ -898,9 +1165,9 @@ static const char *fs8_snorm8 =
 	"		0x00,\n"
 	"		0x00,\n"
 	"		0x7f)) {\n"
-	"		gl_FragColor = vec4(0,1,0,0);\n"
+	"		color = vec4(0,1,0,0);\n"
 	"	} else {\n"
-	"		gl_FragColor = vec4(1,0,0,0);\n"
+	"		color = vec4(1,0,0,0);\n"
 	"	}\n"
 	"}\n";
 
@@ -1587,19 +1854,25 @@ create_test_clear_program(const struct format_info *base,
 	 * to 0 on radeonsi.
 	 */
 	snprintf(fs, sizeof(fs),
-		 "#version 130\n"
+		 "#version " GLSL_VERSION "\n"
 		 "#extension GL_ARB_shader_bit_encoding : enable\n"
+		 "#ifdef GL_ES\n"
+		 "precision highp float;\n"
+		 "precision highp int;\n"
+		 "precision highp %s;\n"
+		 "#endif\n"
+		 "out vec4 color;\n"
 		 "uniform %s s;\n"
 		 "uniform uvec4 expected;\n"
 		 "uvec4 test_nan(vec4 v) { return uvec4(isnan(v)); }\n"
 		 "void main() { \n"
 		 "	if (%s(texelFetch(s, ivec2(0), 0)) == expected) {\n"
-		 "		gl_FragColor = vec4(0,1,0,0);\n"
+		 "		color = vec4(0,1,0,0);\n"
 		 "	} else {\n"
-		 "		gl_FragColor = vec4(1,0,0,0);\n"
+		 "		color = vec4(1,0,0,0);\n"
 		 "	}\n"
 		 "}\n",
-		 sampler, conv);
+		 sampler, sampler, conv);
 
 	prog = piglit_build_simple_program(vs, fs);
 	glUseProgram(prog);
@@ -1712,6 +1985,25 @@ clear_view(const struct format_info *vformat, GLuint tex)
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(1, &view);
 	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
+
+	return true;
+}
+
+static bool norm16;
+
+static bool
+format_supported(const struct format_info *vformat)
+{
+	if (norm16)
+		return true;
+	if ((vformat->format == GL_RED ||
+	     vformat->format == GL_RG ||
+	     vformat->format == GL_RGB ||
+	     vformat->format == GL_RGBA) &&
+	    (vformat->type == GL_SHORT ||
+	     vformat->type == GL_UNSIGNED_SHORT))
+		return false;
+
 	return true;
 }
 
@@ -1733,12 +2025,18 @@ piglit_display(void)
 			GLuint tex;
 			int j;
 
+			if (!format_supported(base))
+				continue;
+
 			tex = create_texture(vclass, base, false);
 
 			for (j = 0; vclass->formats[j].fs; j++) {
 				const struct format_info *vformat = &vclass->formats[j];
 				GLuint view;
 				char test_name[128];
+
+				if (!format_supported(vformat))
+					continue;
 
 				view = create_view(vformat, tex);
 
@@ -1766,10 +2064,16 @@ piglit_display(void)
 			const struct format_info *base = &vclass->formats[i];
 			int j;
 
+			if (!format_supported(base))
+				continue;
+
 			for (j = 0; vclass->formats[j].fs; j++) {
 				const struct format_info *vformat = &vclass->formats[j];
 				char test_name[128];
 				GLuint tex;
+
+				if (!format_supported(vformat))
+					continue;
 
 				tex = create_texture(vclass, base, true);
 				glBindTexture(GL_TEXTURE_2D, 0);
@@ -1824,16 +2128,24 @@ piglit_init(int argc, char **argv)
 {
 	piglit_automatic = true;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_gl_version(30);
 	piglit_require_extension("GL_ARB_texture_view");
 	piglit_require_extension("GL_ARB_shader_bit_encoding");
 	piglit_require_extension("GL_ARB_shading_language_packing");
 	piglit_require_extension("GL_ARB_texture_rgb10_a2ui");
+	norm16 = true;
+#else
+	piglit_require_extension("GL_OES_texture_view");
+	norm16 = piglit_is_extension_supported("GL_EXT_texture_norm16");
+#endif
 
 	glClearColor(0.2, 0.2, 0.2, 0.2);
 
+#ifdef PIGLIT_USE_OPENGL
 	/* Don't clamp SNORM rendering to [0,1]. */
 	glClampColor(GL_CLAMP_FRAGMENT_COLOR, GL_FALSE);
+#endif
 
 	prog_float = piglit_build_simple_program(vs, fs_render_float);
 	loc_float = glGetUniformLocation(prog_float, "v");

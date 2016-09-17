@@ -2590,6 +2590,11 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'OES_texture_view')) as g:
+    g(['arb_texture_view-rendering-formats_gles3'], 'rendering-formats')
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', '3DFX_texture_compression_FXT1')) as g:
     g(['compressedteximage', 'GL_COMPRESSED_RGB_FXT1_3DFX'])
     g(['compressedteximage', 'GL_COMPRESSED_RGBA_FXT1_3DFX'])
