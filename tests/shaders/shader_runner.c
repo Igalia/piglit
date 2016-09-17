@@ -169,16 +169,6 @@ enum states {
 	test,
 };
 
-
-enum comparison {
-	equal = 0,
-	not_equal,
-	less,
-	greater_equal,
-	greater,
-	less_equal
-};
-
 static const struct string_to_enum all_types[] = {
 	ENUM_STRING(GL_FLOAT),
 	ENUM_STRING(GL_FLOAT_VEC2),
@@ -631,56 +621,6 @@ comparison_string(enum comparison cmp)
 	return false;
 }
 
-
-/**
- * Parse a binary comparison operator and return the matching token
- */
-static const char *
-process_comparison(const char *src, enum comparison *cmp)
-{
-	char buf[32];
-
-	switch (src[0]) {
-	case '=':
-		if (src[1] == '=') {
-			*cmp = equal;
-			return src + 2;
-		}
-		break;
-	case '<':
-		if (src[1] == '=') {
-			*cmp = less_equal;
-			return src + 2;
-		} else {
-			*cmp = less;
-			return src + 1;
-		}
-	case '>':
-		if (src[1] == '=') {
-			*cmp = greater_equal;
-			return src + 2;
-		} else {
-			*cmp = greater;
-			return src + 1;
-		}
-	case '!':
-		if (src[1] == '=') {
-			*cmp = not_equal;
-			return src + 2;
-		}
-		break;
-	}
-
-	strncpy(buf, src, sizeof(buf));
-	buf[sizeof(buf) - 1] = '\0';
-	printf("invalid comparison in test script:\n%s\n", buf);
-	piglit_report_result(PIGLIT_FAIL);
-
-	/* Won't get here. */
-	return NULL;
-}
-
-
 /**
  * " ES" before the comparison operator indicates the version
  * pertains to GL ES.
@@ -695,8 +635,8 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	const bool core = parse_str(line, "CORE", &line);
 	const bool es = parse_str(line, "ES", &line);
 
-	line = eat_whitespace(line);
-	line = process_comparison(line, cmp);
+	REQUIRE(parse_comparison_op(line, cmp, &line),
+		"Invalid comparison operation at: %s\n", line);
 
 	REQUIRE(parse_uint(line, &major, &line) &&
 		parse_str(line, ".", &line) &&
@@ -774,9 +714,8 @@ process_requirement(const char *line)
 
 		REQUIRE(parse_enum_gl(line, &int_enum, &line),
 			"Invalid comparison enum at: %s\n", line);
-
-		line = process_comparison(eat_whitespace(line), &cmp);
-
+		REQUIRE(parse_comparison_op(line, &cmp, &line),
+			"Invalid comparison operation at: %s\n", line);
 		REQUIRE(parse_int(line, &comparison_value, &line),
 			"Invalid comparison value at: %s\n", line);
 
@@ -821,8 +760,8 @@ process_requirement(const char *line)
 		if (!parse_str(line, getint_limits[i].name, &line))
 			continue;
 
-		line = eat_whitespace(line);
-		line = process_comparison(line, &cmp);
+		REQUIRE(parse_comparison_op(line, &cmp, &line),
+			"Invalid comparison operation at: %s\n", line);
 
 		maxcomp = atoi(line);
 		if (!compare(maxcomp, *getint_limits[i].val, cmp)) {
@@ -2772,7 +2711,8 @@ probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uin
 	enum comparison cmp;
 	bool result;
 
-	process_comparison(op, &cmp);
+	REQUIRE(parse_comparison_op(op, &cmp, NULL),
+		"Invalid comparison operation at: %s\n", op);
 
 	p = glMapNamedBufferRange(atomics_bos[buffer_num], counter_num * sizeof(uint32_t),
 			     sizeof(uint32_t), GL_MAP_READ_BIT);
@@ -2806,7 +2746,8 @@ probe_ssbo_uint(GLint ssbo_index, GLint ssbo_offset, const char *op, uint32_t va
 	enum comparison cmp;
 	bool result;
 
-	process_comparison(op, &cmp);
+	REQUIRE(parse_comparison_op(op, &cmp, NULL),
+		"Invalid comparison operation at: %s\n", op);
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo[ssbo_index]);
 	p = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_offset,

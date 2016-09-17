@@ -175,6 +175,20 @@ const char *eat_text(const char *src);
 bool string_match(const char *string, const char *line);
 const char *strcpy_to_space(char *dst, const char *src);
 
+enum comparison {
+	equal = 0,
+	not_equal,
+	less,
+	greater_equal,
+	greater,
+	less_equal
+};
+
+/**
+ * Parse a binary comparison operator.
+ */
+bool parse_comparison_op(const char *s, enum comparison *t, const char **rest);
+
 /**
  * Abort the Piglit test with failure status if the boolean expression
  * (typically the result of a chain of parse function calls) evaluates

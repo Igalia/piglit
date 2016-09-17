@@ -196,6 +196,32 @@ parse_enum_gl(const char *s, GLenum *e, const char **rest)
 	return ret;
 }
 
+bool
+parse_comparison_op(const char *s, enum comparison *t, const char **rest)
+{
+	if (parse_str(s, "==", rest)) {
+		*t = equal;
+		return true;
+	} else if (parse_str(s, "!=", rest)) {
+		*t = greater;
+		return true;
+	} else if (parse_str(s, "<=", rest)) {
+		*t = less_equal;
+		return true;
+	} else  if (parse_str(s, "<", rest)) {
+		*t = less;
+		return true;
+	} else if (parse_str(s, ">=", rest)) {
+		*t = greater_equal;
+		return true;
+	} else if (parse_str(s, ">", rest)) {
+		*t = greater;
+		return true;
+	} else {
+		return false;
+	}
+}
+
 /**
  * Skip over whitespace upto the end of line
  */
