@@ -3166,6 +3166,34 @@ piglit_display(void)
 				read_fbo = fbo;
 			}
 
+		} else if (parse_str(line, "blit ", &rest)) {
+			static const struct string_to_enum buffers[] = {
+				{ "color", GL_COLOR_BUFFER_BIT },
+				{ "depth", GL_DEPTH_BUFFER_BIT },
+				{ "stencil", GL_STENCIL_BUFFER_BIT },
+				{ NULL }
+			};
+			static const struct string_to_enum filters[] = {
+				{ "linear", GL_LINEAR },
+				{ "nearest", GL_NEAREST },
+				{ NULL }
+			};
+			unsigned buffer, filter;
+
+			REQUIRE(parse_enum_tab(buffers, rest, &buffer, &rest) &&
+				parse_enum_tab(filters, rest, &filter, &rest),
+				"FB blit command not understood at: %s\n",
+				rest);
+
+			glBlitFramebuffer(0, 0, read_width, read_height,
+					  0, 0, render_width, render_height,
+					  buffer, filter);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr, "glBlitFramebuffer error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
 		} else if (parse_str(line, "frustum", &rest)) {
 			parse_floats(rest, c, 6, NULL);
 			piglit_frustum_projection(false, c[0], c[1], c[2],
