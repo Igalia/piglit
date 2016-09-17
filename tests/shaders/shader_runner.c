@@ -140,8 +140,9 @@ static bool prog_in_use = false;
 static bool sso_in_use = false;
 static GLchar *prog_err_info = NULL;
 static GLuint vao = 0;
-static GLuint draw_fbo = 0;
+static GLuint draw_fbo, read_fbo;
 static GLint render_width, render_height;
+static GLint read_width, read_height;
 
 static bool report_subtests = false;
 
@@ -2960,18 +2961,22 @@ piglit_display(void)
 		} else if (sscanf(line, "depthfunc %31s", s) == 1) {
 			glDepthFunc(piglit_get_gl_enum_from_name(s));
 		} else if (parse_str(line, "fb ", &rest)) {
+			const GLenum target =
+				parse_str(rest, "draw ", &rest) ? GL_DRAW_FRAMEBUFFER :
+				parse_str(rest, "read ", &rest) ? GL_READ_FRAMEBUFFER :
+				GL_FRAMEBUFFER;
 			GLuint fbo = 0;
 
 			if (parse_str(rest, "tex 2d ", &rest)) {
 				glGenFramebuffers(1, &fbo);
-				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+				glBindFramebuffer(target, fbo);
 
 				REQUIRE(parse_int(rest, &tex, &rest),
 					"Framebuffer binding command not "
 					"understood at: %s\n", rest);
 
 				glFramebufferTexture2D(
-					GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+					target, GL_COLOR_ATTACHMENT0,
 					GL_TEXTURE_2D,
 					get_texture_binding(tex)->obj, 0);
 				if (!piglit_check_gl_error(GL_NO_ERROR)) {
@@ -2985,10 +2990,10 @@ piglit_display(void)
 
 			} else if (sscanf(rest, "tex layered %d", &tex) == 1) {
 				glGenFramebuffers(1, &fbo);
-				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+				glBindFramebuffer(target, fbo);
 
 				glFramebufferTexture(
-					GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+					target, GL_COLOR_ATTACHMENT0,
 					get_texture_binding(tex)->obj, 0);
 				if (!piglit_check_gl_error(GL_NO_ERROR)) {
 					fprintf(stderr,
@@ -3005,23 +3010,42 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
-			const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			const GLenum status = glCheckFramebufferStatus(target);
 			if (status != GL_FRAMEBUFFER_COMPLETE) {
 				fprintf(stderr, "incomplete fbo (status 0x%x)\n",
 					status);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
-			render_width = w;
-			render_height = h;
+			if (target != GL_READ_FRAMEBUFFER) {
+				render_width = w;
+				render_height = h;
 
-			/* Delete the previous draw FB in case
-			 * it's no longer reachable.
-			 */
-			if (draw_fbo != 0)
-				glDeleteFramebuffers(1, &draw_fbo);
+				/* Delete the previous draw FB in case
+				 * it's no longer reachable.
+				 */
+				if (draw_fbo != 0 &&
+				    draw_fbo != (target == GL_DRAW_FRAMEBUFFER ?
+						 read_fbo : 0))
+					glDeleteFramebuffers(1, &draw_fbo);
 
-			draw_fbo = fbo;
+				draw_fbo = fbo;
+			}
+
+			if (target != GL_DRAW_FRAMEBUFFER) {
+				read_width = w;
+				read_height = h;
+
+				/* Delete the previous read FB in case
+				 * it's no longer reachable.
+				 */
+				if (read_fbo != 0 &&
+				    read_fbo != (target == GL_READ_FRAMEBUFFER ?
+						 draw_fbo : 0))
+					glDeleteFramebuffers(1, &read_fbo);
+
+				read_fbo = fbo;
+			}
 
 		} else if (parse_str(line, "frustum", &rest)) {
 			parse_floats(rest, c, 6, NULL);
@@ -3075,12 +3099,12 @@ piglit_display(void)
 				  "( %f , %f , %f , %f )",
 				  c + 0, c + 1,
 				  c + 2, c + 3, c + 4, c + 5) == 6) {
-			x = c[0] * render_width;
-			y = c[1] * render_height;
-			if (x >= render_width)
-				x = render_width - 1;
-			if (y >= render_height)
-				y = render_height - 1;
+			x = c[0] * read_width;
+			y = c[1] * read_height;
+			if (x >= read_width)
+				x = read_width - 1;
+			if (y >= read_height)
+				y = read_height - 1;
 
 			if (!piglit_probe_pixel_rgba(x, y, &c[2])) {
 				result = PIGLIT_FAIL;
@@ -3096,12 +3120,12 @@ piglit_display(void)
 				  "( %f , %f , %f )",
 				  c + 0, c + 1,
 				  c + 2, c + 3, c + 4) == 5) {
-			x = c[0] * render_width;
-			y = c[1] * render_height;
-			if (x >= render_width)
-				x = render_width - 1;
-			if (y >= render_height)
-				y = render_height - 1;
+			x = c[0] * read_width;
+			y = c[1] * read_height;
+			if (x >= read_width)
+				x = read_width - 1;
+			if (y >= read_height)
+				y = read_height - 1;
 
 			if (!piglit_probe_pixel_rgb(x, y, &c[2])) {
 				result = PIGLIT_FAIL;
@@ -3119,10 +3143,10 @@ piglit_display(void)
 				  "( %f , %f , %f )",
 				  c + 0, c + 1, c + 2, c + 3,
 				  c + 4, c + 5, c + 6) == 7) {
-			x = c[0] * render_width;
-			y = c[1] * render_height;
-			w = c[2] * render_width;
-			h = c[3] * render_height;
+			x = c[0] * read_width;
+			y = c[1] * read_height;
+			w = c[2] * read_width;
+			h = c[3] * read_height;
 
 			if (!piglit_probe_rect_rgb(x, y, w, h, &c[4])) {
 				result = PIGLIT_FAIL;
@@ -3130,20 +3154,20 @@ piglit_display(void)
 		} else if (parse_str(line, "probe all rgba ", &rest)) {
 			parse_floats(rest, c, 4, NULL);
 			if (result != PIGLIT_FAIL &&
-			    !piglit_probe_rect_rgba(0, 0, render_width,
-						    render_height, c))
+			    !piglit_probe_rect_rgba(0, 0, read_width,
+						    read_height, c))
 				result = PIGLIT_FAIL;
 		} else if (parse_str(line, "probe warn all rgba ", &rest)) {
 			parse_floats(rest, c, 4, NULL);
 			if (result == PIGLIT_PASS &&
-			    !piglit_probe_rect_rgba(0, 0, render_width,
-						    render_height, c))
+			    !piglit_probe_rect_rgba(0, 0, read_width,
+						    read_height, c))
 				result = PIGLIT_WARN;
 		} else if (parse_str(line, "probe all rgb", &rest)) {
 			parse_floats(rest, c, 3, NULL);
 			if (result != PIGLIT_FAIL &&
-			    !piglit_probe_rect_rgb(0, 0, render_width,
-						   render_height, c))
+			    !piglit_probe_rect_rgb(0, 0, read_width,
+						   read_height, c))
 				result = PIGLIT_FAIL;
 		} else if (parse_str(line, "tolerance", &rest)) {
 			parse_floats(rest, piglit_tolerance, 4, NULL);
@@ -3585,8 +3609,8 @@ piglit_init(int argc, char **argv)
 	else
 		gl_max_vertex_attribs = 16;
 
-	render_width = piglit_width;
-	render_height = piglit_height;
+	read_width = render_width = piglit_width;
+	read_height = render_height = piglit_height;
 
 	/* Automatic mode can run multiple tests per session. */
 	if (report_subtests) {
