@@ -104,18 +104,14 @@ update_valid_arrays(GLenum *valid, GLenum *invalid, unsigned int numInvalid,
 void
 draw_3d_depth(float x, float y, float w, float h, int depth)
 {
-	const GLfloat vertices[12] =  {x, y, 0.0,
-				 x+w, y, 0.0,
-				 x+w, y+h, 0.0,
-				 x, y+h, 0.0};
-	const GLfloat texcoords[12] = {0.0, 0.0, depth,
-				 1.0, 0.0, depth,
-				 1.0, 1.0, depth,
-				 0.0, 1.0, depth};
+	const GLfloat vertices[16] =  {x, y, depth, 0.0,
+				 x+w, y, depth, 0.0,
+				 x+w, y+h, depth, 0.0,
+				 x, y+h, depth, 0.0};
+	const GLfloat texcoords[8] = {0.0, 0.0,
+				 1.0, 0.0,
+				 1.0, 1.0,
+				 0.0, 1.0};
 
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointer(3, GL_FLOAT, 0, texcoords);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	piglit_draw_rect_from_arrays(vertices, texcoords, false);
 }

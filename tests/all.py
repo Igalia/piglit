@@ -2592,6 +2592,9 @@ with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'OES_texture_view')) as g:
     g(['arb_texture_view-rendering-formats_gles3'], 'rendering-formats')
+    g(['arb_texture_view-rendering-layers_gles3'], 'rendering-layers')
+    g(['arb_texture_view-rendering-levels_gles3'], 'rendering-levels')
+    g(['arb_texture_view-rendering-target_gles3'], 'rendering-target')
 
 with profile.group_manager(
         PiglitGLTest,

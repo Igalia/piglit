@@ -34,15 +34,15 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 20;
+	config.supports_gl_compat_version = 30;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *TestName = "arb_texture_view-rendering-target";
-static int tex_loc_2Darray, tex_loc_1D;
-static int prog2Darray, prog1D;
+static int prog3D, prog2Darray, prog2D, prog1D;
 
 /**
  * Simple views  of textures; test rendering with various texture view targets
@@ -55,7 +55,6 @@ test_render_with_targets(GLenum target)
 	GLint l;
 	bool pass = true;
 
-	glUseProgram(0);
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
 
@@ -137,7 +136,7 @@ test_render_with_targets(GLenum target)
 			GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	for (l = 0; l < levels; l++) {
-		GLfloat expected[3];
+		GLfloat expected[4];
 		int p;
 
 		glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, l);
@@ -148,34 +147,31 @@ test_render_with_targets(GLenum target)
 		switch (target) {
 		case GL_TEXTURE_1D:
 			glUseProgram(prog1D);
-			glUniform1i(tex_loc_1D, 0);
 			piglit_draw_rect_tex(-1.0, -1.0, 2.0, 2.0, 0.0, 0.0,
 					     1.0, 1.0);
 			break;
 		case GL_TEXTURE_2D:
-			glEnable(target);
+			glUseProgram(prog2D);
 			piglit_draw_rect_tex(-1.0, -1.0, 2.0, 2.0, 0.0, 0.0,
 					     1.0, 1.0);
-			glDisable(target);
 			break;
 		case GL_TEXTURE_2D_ARRAY:
 			glUseProgram(prog2Darray);
-			glUniform1i(tex_loc_2Darray, 0);
 			draw_3d_depth(-1.0, -1.0, 2.0, 2.0, l);
 			break;
 		case GL_TEXTURE_3D:
-			glEnable(target);
+			glUseProgram(prog3D);
 			draw_3d_depth(-1.0, -1.0, 2.0, 2.0, l);
-			glDisable(target);
 			break;
 		}
 
 		expected[0] = Colors[l][0] / 255.0;
 		expected[1] = Colors[l][1] / 255.0;
 		expected[2] = Colors[l][2] / 255.0;
+		expected[3] = 1.0;
 
-		p = piglit_probe_pixel_rgb(piglit_width/2, piglit_height/2,
-					   expected);
+		p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2,
+					    expected);
 
 		piglit_present_results();
 
@@ -210,7 +206,9 @@ enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
+#ifdef PIGLIT_USE_OPENGL
 	X(test_render_with_targets(GL_TEXTURE_1D), "1D view rendering");
+#endif
 	X(test_render_with_targets(GL_TEXTURE_2D), "2D view rendering");
 	X(test_render_with_targets(GL_TEXTURE_3D), "3D view rendering");
 	X(test_render_with_targets(GL_TEXTURE_2D_ARRAY),
@@ -220,49 +218,88 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "130"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
+static const char *vs =
+	"#version " GLSL_VERSION "\n"
+	"in vec4 piglit_vertex;\n"
+	"in vec2 piglit_texcoord;\n"
+	"out vec3 texcoord;\n"
+	"void main() { \n"
+	"	gl_Position = vec4(piglit_vertex.xy, 0.0, 1.0);\n"
+	"	texcoord = vec3(piglit_texcoord, piglit_vertex.z);\n"
+	"}\n";
+
+static const char *fs_3d =
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler3D;\n"
+	"#endif\n"
+	"in vec3 texcoord;\n"
+	"uniform sampler3D tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	color = vec4(texture(tex, texcoord).xyz, 1.0);\n"
+	"}\n";
+
+static const char *fs_2darray =
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2DArray;\n"
+	"#endif\n"
+	"in vec3 texcoord;\n"
+	"uniform sampler2DArray tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	color = vec4(texture(tex, texcoord).xyz, 1.0);\n"
+	"}\n";
+
+static const char *fs_2d =
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
+	"in vec3 texcoord;\n"
+	"uniform sampler2D tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	color = vec4(texture(tex, texcoord.xy).xyz, 1.0);\n"
+	"}\n";
+
+#ifdef PIGLIT_USE_OPENGL
+static const char *fs_1d =
+	"#version " GLSL_VERSION "\n"
+	"in vec3 texcoord;\n"
+	"uniform sampler1D tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	color = vec4(texture(tex, texcoord.x).xyz, 1.0);\n"
+	"}\n";
+#endif
 
 void
 piglit_init(int argc, char **argv)
 {
-	char *vsCode;
-	char *fsCode;
-
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_extension("GL_ARB_texture_view");
 	piglit_require_extension("GL_EXT_texture_array");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
 
-	/* setup shaders and program object for 2DArray rendering */
-	(void)!asprintf(&vsCode,
-		 "void main()\n"
-		 "{\n"
-		 "    gl_Position = gl_Vertex;\n"
-		 "    gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-		 "}\n");
-	(void)!asprintf(&fsCode,
-		 "#extension GL_EXT_texture_array : enable\n"
-		 "uniform sampler2DArray tex;\n"
-		 "void main()\n"
-		 "{\n"
-		 "   vec4 color  = texture2DArray(tex, gl_TexCoord[0].xyz);\n"
-		 "   gl_FragColor = vec4(color.xyz, 1.0);\n"
-		 "}\n");
+	prog3D = piglit_build_simple_program(vs, fs_3d);
+	prog2Darray = piglit_build_simple_program(vs, fs_2darray);
+	prog2D = piglit_build_simple_program(vs, fs_2d);
 
-	prog2Darray = piglit_build_simple_program(vsCode, fsCode);
-	free(fsCode);
-	tex_loc_2Darray = glGetUniformLocation(prog2Darray, "tex");
-
-	/* setup shaders and program object for 1D rendering */
-	(void)!asprintf(&fsCode,
-		 "#extension GL_EXT_texture_array : enable\n"
-		 "uniform sampler1D tex;\n"
-		 "void main()\n"
-		 "{\n"
-		 "   vec4 color  = texture1D(tex, gl_TexCoord[0].x);\n"
-		 "   gl_FragColor = vec4(color.xyz, 1.0);\n"
-		 "}\n");
-	prog1D = piglit_build_simple_program(vsCode, fsCode);
-	free(fsCode);
-	free(vsCode);
-
-	tex_loc_1D = glGetUniformLocation(prog1D, "tex");
+#ifdef PIGLIT_USE_OPENGL
+	prog1D = piglit_build_simple_program(vs, fs_1d);
+#endif
 }

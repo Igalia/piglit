@@ -34,7 +34,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 20;
+	config.supports_gl_compat_version = 30;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -55,7 +56,7 @@ test_render_layers(void)
 	GLint l;
 	GLint numLayers[] = {7, 1, 2, 2};
 	int expectedLayer;
-	GLfloat expected[3];
+	GLfloat expected[4];
 	int p;
 	bool pass = true;
 
@@ -105,9 +106,10 @@ test_render_layers(void)
 		expected[0] = Colors[expectedLayer][0] / 255.0;
 		expected[1] = Colors[expectedLayer][1] / 255.0;
 		expected[2] = Colors[expectedLayer][2] / 255.0;
+		expected[3] = 1.0;
 
-		p = piglit_probe_pixel_rgb(piglit_width/2, piglit_height/2,
-					   expected);
+		p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2,
+					    expected);
 
 		piglit_present_results();
 
@@ -148,34 +150,47 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "130"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
+static const char *vs =
+	"#version " GLSL_VERSION "\n"
+	"in vec4 piglit_vertex;\n"
+	"in vec2 piglit_texcoord;\n"
+	"out vec3 texcoord;\n"
+	"void main() { \n"
+	"	gl_Position = vec4(piglit_vertex.xy, 0.0, 1.0);\n"
+	"	texcoord = vec3(piglit_texcoord, piglit_vertex.z);\n"
+	"}\n";
+
+static const char *fs =
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2DArray;\n"
+	"#endif\n"
+	"in vec3 texcoord;\n"
+	"uniform sampler2DArray tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	color = vec4(texture(tex, texcoord).xyz, 1.0);\n"
+	"}\n";
+
 void
 piglit_init(int argc, char **argv)
 {
-	char *vsCode;
-	char *fsCode;
-
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_extension("GL_ARB_texture_view");
 	piglit_require_extension("GL_EXT_texture_array");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
 
-	/* setup shaders and program object for 2DArray rendering */
-	(void)!asprintf(&vsCode,
-		 "void main()\n"
-		 "{\n"
-		 "    gl_Position = gl_Vertex;\n"
-		 "    gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-		 "}\n");
-	(void)!asprintf(&fsCode,
-		 "#extension GL_EXT_texture_array : enable\n"
-		 "uniform sampler2DArray tex;\n"
-		 "void main()\n"
-		 "{\n"
-		 "   vec4 color  = texture2DArray(tex, gl_TexCoord[0].xyz);\n"
-		 "   gl_FragColor = vec4(color.xyz, 1.0);\n"
-		 "}\n");
-	prog2Darray = piglit_build_simple_program(vsCode, fsCode);
-	free(fsCode);
-	free(vsCode);
+	prog2Darray = piglit_build_simple_program(vs, fs);
 	tex_loc_2Darray = glGetUniformLocation(prog2Darray, "tex");
 
 }

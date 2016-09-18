@@ -34,13 +34,44 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 20;
+	config.supports_gl_compat_version = 30;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *TestName = "arb_texture_view-rendering-levels";
+
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "130"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
+static const char *vs =
+	"#version " GLSL_VERSION "\n"
+	"in vec4 piglit_vertex;\n"
+	"in vec2 piglit_texcoord;\n"
+	"out vec2 texcoord;\n"
+	"void main() { \n"
+	"	gl_Position = piglit_vertex;\n"
+	"	texcoord = piglit_texcoord;\n"
+	"}\n";
+
+static const char *fs =
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
+	"in vec2 texcoord;\n"
+	"uniform sampler2D tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	color = texture(tex, texcoord);\n"
+	"}\n";
+
 
 /**
  * Texture views with varying minimum and number of levels, 2D only
@@ -53,17 +84,14 @@ test_render_levels(void)
 	GLuint numLevels[] = {3,2,2,1};
 	GLint l;
 	int expectedLevel;
-	GLfloat expected[3];
+	GLfloat expected[4];
 	int p;
 	bool pass = true;
-
-	glUseProgram(0);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
 	glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA8, width, height);
-	glEnable(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -92,6 +120,7 @@ test_render_levels(void)
 		glTextureView(new_tex, GL_TEXTURE_2D, tex,  GL_RGBA8, l,
 			      numLevels[l], 0, 1);
 		glBindTexture(GL_TEXTURE_2D, new_tex);
+		glActiveTexture(GL_TEXTURE0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, levels-1);
 
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -103,9 +132,10 @@ test_render_levels(void)
 		expected[0] = Colors[expectedLevel][0] / 255.0;
 		expected[1] = Colors[expectedLevel][1] / 255.0;
 		expected[2] = Colors[expectedLevel][2] / 255.0;
+		expected[3] = 1.0;
 
-		p = piglit_probe_pixel_rgb(piglit_width/(2*(l+3)),
-					   piglit_height/(2*(l+3)), expected);
+		p = piglit_probe_pixel_rgba(piglit_width/(2*(l+3)),
+					    piglit_height/(2*(l+3)), expected);
 
 		piglit_present_results();
 
@@ -141,7 +171,6 @@ test_render_levels(void)
 		glDeleteTextures(1, &new_tex);
 	}
 
-	glDisable(GL_TEXTURE_2D);
 	glDeleteTextures(1, &tex);
 	return pass;
 }
@@ -168,6 +197,14 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	GLuint prog;
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_extension("GL_ARB_texture_view");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
+
+	prog = piglit_build_simple_program(vs, fs);
+	glUseProgram(prog);
 }
