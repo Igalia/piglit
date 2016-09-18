@@ -34,12 +34,14 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 30;
+	config.supports_gl_es_version = 31;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static float green[] = {0, 1, 0, 1};
-static float red[] = {1, 0, 0, 1};
+static const GLubyte green[] = {0, 255, 0, 255};
+static const float greenf[] = {0, 1.0f, 0, 1.0f};
+static const GLubyte red[] = {255, 0, 0, 255};
 
 enum piglit_result
 piglit_display(void)
@@ -52,39 +54,52 @@ piglit_display(void)
 
 	piglit_draw_rect(-1, -1, 2, 2);
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, greenf);
 
 	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "130"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
+static const char *vs =
+	"#version " GLSL_VERSION "\n"
+	"in vec4 piglit_vertex;\n"
+	"void main() { \n"
+	"	gl_Position = piglit_vertex;\n"
+	"}\n";
+
+static const char *fs =
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp samplerCube;\n"
+	"#endif\n"
+	"uniform samplerCube tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	color = vec4(texture(tex, vec3(-1, 0, 0)).xyz, 1.0);\n"
+	"}\n";
+
 void
 piglit_init(int argc, char **argv)
 {
-	char *vsCode;
-	char *fsCode;
 	int tex_loc_cube, prog_cube, l;
 	GLuint tex_2DArray, tex_Cube;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_view");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
 
 	/* setup shaders and program object for Cube rendering */
-	(void)!asprintf(&vsCode,
-		 "void main()\n"
-		 "{\n"
-		 "    gl_Position = gl_Vertex;\n"
-		 "}\n");
-	(void)!asprintf(&fsCode,
-		 "uniform samplerCube tex;\n"
-		 "void main()\n"
-		 "{\n"
-		 "   vec4 color	= textureCube(tex, vec3(-1, 0, 0));\n"
-		 "   gl_FragColor = vec4(color.xyz, 1.0);\n"
-		 "}\n");
-	prog_cube = piglit_build_simple_program(vsCode, fsCode);
-	free(fsCode);
-	free(vsCode);
+	prog_cube = piglit_build_simple_program(vs, fs);
 	tex_loc_cube = glGetUniformLocation(prog_cube, "tex");
 
 	glGenTextures(1, &tex_2DArray);
@@ -95,11 +110,11 @@ piglit_init(int argc, char **argv)
 	/* load each array layer with red */
 	for (l = 0; l < 8; l++) {
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, l,
-				1, 1, 1, GL_RGBA, GL_FLOAT, red);
+				1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, red);
 	}
 	/* make array layer 3 have green */
 	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 3,
-			1, 1, 1, GL_RGBA, GL_FLOAT, green);
+			1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, green);
 
 	glGenTextures(1, &tex_Cube);
 	/* the texture view starts at layer 2, so face 1 (-X) will have green */

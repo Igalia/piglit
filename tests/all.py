@@ -2595,6 +2595,12 @@ with profile.group_manager(
     g(['arb_texture_view-rendering-layers_gles3'], 'rendering-layers')
     g(['arb_texture_view-rendering-levels_gles3'], 'rendering-levels')
     g(['arb_texture_view-rendering-target_gles3'], 'rendering-target')
+    g(['arb_texture_view-sampling-2d-array-as-cubemap_gles3'],
+      'sampling-2d-array-as-cubemap')
+    g(['arb_texture_view-sampling-2d-array-as-cubemap-array_gles3'],
+      'sampling-2d-array-as-cubemap-array')
+    g(['arb_texture_view-sampling-2d-array-as-2d-layer_gles3'],
+      'sampling-2d-array-as-2d-layer')
 
 with profile.group_manager(
         PiglitGLTest,

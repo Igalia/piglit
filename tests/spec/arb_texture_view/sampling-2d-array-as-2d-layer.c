@@ -33,13 +33,14 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 30;
-//	config.supports_gl_core_version = 32;
+	config.supports_gl_es_version = 31;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const float green[] = {0, 1, 0, 1};
-static const float red[] = {1, 0, 0, 1};
+static const GLubyte green[] = {0, 255, 0, 255};
+static const float greenf[] = {0, 1.0f, 0, 1.0f};
+static const GLubyte red[] = {255, 0, 0, 255};
 
 typedef struct Params {
 	int num_layers;
@@ -62,9 +63,9 @@ static const Params testparams[] = {
 	{ 3, 35, 67, "35x67" }
 };
 
-static float *makesolidimage(int w, int h, const float color[4])
+static GLubyte *makesolidimage(int w, int h, const GLubyte color[4])
 {
-	float *p = malloc(w * h * 4 * sizeof(GLfloat));
+	GLubyte *p = malloc(w * h * 4 * sizeof(GLubyte));
 	size_t n;
 	assert(p);
 	for (n = 0; n < w * h; n++) {
@@ -82,7 +83,7 @@ test_single_layer(const Params* p, int layer)
 	int l;
 	GLuint tex_src, tex_view;
 	GLboolean pass;
-	GLfloat *image;
+	GLubyte *image;
 
 	assert(layer < p->num_layers);
 
@@ -95,14 +96,14 @@ test_single_layer(const Params* p, int layer)
 	image = makesolidimage(p->width, p->height, red);
 	for (l = 0; l < p->num_layers; l++) {
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, l,
-				p->width, p->height, 1, GL_RGBA, GL_FLOAT, image);
+				p->width, p->height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image);
 	}
 
 	/* make layer to check red, but green for pixel at (0,0) which should be the only one sampled */
 	memcpy(image, green, sizeof(green));
 
 	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer,
-			p->width, p->height, 1, GL_RGBA, GL_FLOAT, image);
+			p->width, p->height, 1, GL_RGBA, GL_UNSIGNED_BYTE, image);
 
 	free(image);
 
@@ -120,7 +121,7 @@ test_single_layer(const Params* p, int layer)
 	/* draw it! */
 	piglit_draw_rect(-1, -1, 2, 2);
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, greenf);
 	if (!pass) {
 		printf("layer %d failed\n", layer);
 	}
@@ -158,35 +159,48 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+#ifdef PIGLIT_USE_OPENGL
+#define GLSL_VERSION "130"
+#else
+#define GLSL_VERSION "310 es"
+#endif
+
+static const char *vs =
+	"#version " GLSL_VERSION "\n"
+	"in vec4 piglit_vertex;\n"
+	"void main() { \n"
+	"	gl_Position = piglit_vertex;\n"
+	"}\n";
+
+static const char *fs =
+	"#version " GLSL_VERSION "\n"
+	"#ifdef GL_ES\n"
+	"precision highp float;\n"
+	"precision highp sampler2D;\n"
+	"#endif\n"
+	"uniform sampler2D tex;\n"
+	"out vec4 color;\n"
+	"void main() { \n"
+	"	ivec2 size = textureSize(tex, 0);\n"
+	/* texel in (0,0) should be the only green texel in the entire texture */
+	"	vec2 offset = vec2(0.5/float(size.x), 0.5/float(size.y));\n"
+	"	color = vec4(texture(tex, offset).xyz, 1.0);\n"
+	"}\n";
+
 void
 piglit_init(int argc, char **argv)
 {
 	int tex_loc_view, prog_view;
-	char *vsCode;
-	char *fsCode;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_view");
 	piglit_require_extension("GL_ARB_texture_storage");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
 
 	/* setup shaders and program object for texture rendering */
-	vsCode =
-		 "#version 130\n"
-		 "void main()\n"
-		 "{\n"
-		 "    gl_Position = gl_Vertex;\n"
-		 "}\n";
-	fsCode =
-		 "#version 130\n"
-		 "uniform sampler2D tex;\n"
-		 "void main()\n"
-		 "{\n"
-		 "   ivec2 size = textureSize(tex, 0);\n"
-		 /* texel in (0,0) should be the only green texel in the entire texture */
-		 "   vec2 offset = vec2(0.5/float(size.x), 0.5/float(size.y));\n"
-		 "   vec4 color	= texture(tex, offset);\n"
-		 "   gl_FragColor = vec4(color.xyz, 1.0);\n"
-		 "}\n";
-	prog_view = piglit_build_simple_program(vsCode, fsCode);
+	prog_view = piglit_build_simple_program(vs, fs);
 	tex_loc_view = glGetUniformLocation(prog_view, "tex");
 
 	glUseProgram(prog_view);
