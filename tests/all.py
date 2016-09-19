@@ -2601,6 +2601,10 @@ with profile.group_manager(
       'sampling-2d-array-as-cubemap-array')
     g(['arb_texture_view-sampling-2d-array-as-2d-layer_gles3'],
       'sampling-2d-array-as-2d-layer')
+    g(['arb_texture_view-texture-immutable-levels_gles3'], 'immutable_levels')
+    g(['arb_texture_view-formats_gles3'], 'formats')
+    g(['arb_texture_view-queries_gles3'], 'queries')
+    g(['arb_texture_view-targets_gles3'], 'targets')
 
 with profile.group_manager(
         PiglitGLTest,

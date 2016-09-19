@@ -42,6 +42,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 15;
 	config.supports_gl_core_version = 31;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -115,11 +116,7 @@ test_format_errors(GLenum format_class)
 		GL_RG32UI,
 		GL_RGBA16I,
 		GL_RG32I,
-		GL_RGBA16,
-		GL_RGBA16_SNORM,
 		/* 48 bit */
-		GL_RGB16,
-		GL_RGB16_SNORM,
 		GL_RGB16F,
 		GL_RGB16UI,
 		GL_RGB16I,
@@ -136,9 +133,7 @@ test_format_errors(GLenum format_class)
 		GL_R32I,
 		GL_RGB10_A2,
 		GL_RGBA8,
-		GL_RG16,
 		GL_RGBA8_SNORM,
-		GL_RG16_SNORM,
 		GL_SRGB8_ALPHA8,
 		GL_RGB9_E5,
 		/* 24 bits */
@@ -154,9 +149,7 @@ test_format_errors(GLenum format_class)
 		GL_RG8I,
 		GL_R16I,
 		GL_RG8,
-		GL_R16,
 		GL_RG8_SNORM,
-		GL_R16_SNORM,
 		/* 8 bits */
 		GL_R8UI,
 		GL_R8I,
@@ -182,8 +175,22 @@ test_format_errors(GLenum format_class)
 		GL_COMPRESSED_SLUMINANCE,
 		GL_COMPRESSED_SLUMINANCE_ALPHA,
 		/* format that is legal for TexStorage but not in table */
-		GL_RGB12
+		GL_RGBA4,
+		/* 16-bit norm formats */
+		GL_RGBA16,
+		GL_RGBA16_SNORM,
+		GL_RGB16,
+		GL_RGB16_SNORM,
+		GL_RG16,
+		GL_RG16_SNORM,
+		GL_R16,
+		GL_R16_SNORM,
 	};
+	int totalFormats = ARRAY_SIZE(illegalFormats);
+
+	if (piglit_is_gles() &&
+	    !piglit_is_extension_supported("GL_EXT_texture_norm16"))
+		totalFormats -= 8;
 
 	glGenTextures(1, &tex);   /* orig tex */
 	glBindTexture(target, tex);
@@ -192,67 +199,96 @@ test_format_errors(GLenum format_class)
 	case GL_VIEW_CLASS_128_BITS:
 		glTexStorage2D(target, levels, GL_RGBA32F, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
+				    totalFormats,
 				    GL_RGBA32F, GL_RGBA32UI, GL_RGBA32I, 0);
 		break;
 	case GL_VIEW_CLASS_96_BITS:
 		glTexStorage2D(target, levels, GL_RGB32F, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
+				    totalFormats,
 				    GL_RGB32F, GL_RGB32UI, GL_RGB32I, 0);
 		break;
 	case GL_VIEW_CLASS_64_BITS:
 		glTexStorage2D(target, levels, GL_RGBA16F, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
+				    totalFormats,
 				    GL_RGBA16F, GL_RG32F, GL_RGBA16UI,
-				    GL_RG32UI, GL_RGBA16I, GL_RG32I, GL_RGBA16,
-				    GL_RGBA16_SNORM, 0);
+				    GL_RG32UI, GL_RGBA16I, GL_RG32I, 0);
+		if (!piglit_is_gles() ||
+		    piglit_is_extension_supported("GL_EXT_texture_norm16")) {
+			numFormats +=
+				update_valid_arrays(&legalFormats[numFormats],
+						    illegalFormats,
+						    totalFormats,
+						    GL_RGBA16, GL_RGBA16_SNORM, 0);
+		}
 		break;
 	case GL_VIEW_CLASS_48_BITS:
-		glTexStorage2D(target, levels, GL_RGB16, width, height);
+		glTexStorage2D(target, levels, GL_RGB16F, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
-				    GL_RGB16, GL_RGB16_SNORM, GL_RGB16F,
-				    GL_RGB16UI, GL_RGB16I, 0);
+				    totalFormats,
+				    GL_RGB16F, GL_RGB16UI, GL_RGB16I, 0);
+		if (!piglit_is_gles() ||
+		    piglit_is_extension_supported("GL_EXT_texture_norm16")) {
+			numFormats +=
+				update_valid_arrays(&legalFormats[numFormats],
+						    illegalFormats,
+						    totalFormats,
+						    GL_RGB16, GL_RGB16_SNORM, 0);
+		}
 		break;
 	case GL_VIEW_CLASS_32_BITS:
 		glTexStorage2D(target, levels, GL_RG16F, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
+				    totalFormats,
 				    GL_RG16F, GL_R11F_G11F_B10F, GL_R32F,
 				    GL_RGB10_A2UI, GL_RGBA8UI, GL_RG16UI,
 				    GL_R32UI, GL_RGBA8I, GL_RG16I,
-				    GL_R32I, GL_RGB10_A2, GL_RGBA8, GL_RG16,
-				    GL_RGBA8_SNORM, GL_RG16_SNORM,
+				    GL_R32I, GL_RGB10_A2, GL_RGBA8,
+				    GL_RGBA8_SNORM,
 				    GL_SRGB8_ALPHA8, GL_RGB9_E5, 0);
+		if (!piglit_is_gles() ||
+		    piglit_is_extension_supported("GL_EXT_texture_norm16")) {
+			numFormats +=
+				update_valid_arrays(&legalFormats[numFormats],
+						    illegalFormats,
+						    totalFormats,
+						    GL_RG16, GL_RG16_SNORM, 0);
+		}
 		break;
 	case GL_VIEW_CLASS_24_BITS:
 		glTexStorage2D(target, levels, GL_RGB8, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
+				    totalFormats,
 				    GL_RGB8, GL_RGB8_SNORM, GL_SRGB8,
 				    GL_RGB8UI, GL_RGB8I, 0);
 		break;
 	case GL_VIEW_CLASS_16_BITS:
 		glTexStorage2D(target, levels, GL_R16F, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
+				    totalFormats,
 				    GL_R16F, GL_RG8UI, GL_R16UI, GL_RG8I,
-				    GL_R16I, GL_RG8, GL_R16, GL_RG8_SNORM,
-				    GL_R16_SNORM, 0);
+				    GL_R16I, GL_RG8, GL_RG8_SNORM, 0);
+		if (!piglit_is_gles() ||
+		    piglit_is_extension_supported("GL_EXT_texture_norm16")) {
+			numFormats +=
+				update_valid_arrays(&legalFormats[numFormats],
+						    illegalFormats,
+						    totalFormats,
+						    GL_R16, GL_R16_SNORM, 0);
+		}
 		break;
 	case GL_VIEW_CLASS_8_BITS:
 		glTexStorage2D(target, levels, GL_R8I, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
+				    totalFormats,
 				    GL_R8UI, GL_R8I, GL_R8, GL_R8_SNORM, 0);
 		break;
 	case VIEW_CLASS_NOT_IN_TABLE:
-		glTexStorage2D(target, levels, GL_RGB12, width, height);
+		glTexStorage2D(target, levels, GL_RGBA4, width, height);
 		numFormats = update_valid_arrays(legalFormats, illegalFormats,
-				    ARRAY_SIZE(illegalFormats),
-				    GL_RGB12, 0);
+				    totalFormats,
+				    GL_RGBA4, 0);
 		break;
 	default:
 	    assert(!"Invalid format_class\n");
@@ -272,7 +308,7 @@ test_format_errors(GLenum format_class)
 
 	/* ensure TextureView  of illegal formats returns an error */
 	pass = check_format_array(GL_INVALID_OPERATION,
-				  ARRAY_SIZE(illegalFormats), illegalFormats,
+				  totalFormats, illegalFormats,
 				  target, tex, levels, layers) && pass;
 err_out:
 	glDeleteTextures(1, &tex);
@@ -301,12 +337,16 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_extension("GL_ARB_texture_view");
 	piglit_require_extension("GL_EXT_texture_integer");
 	piglit_require_extension("GL_ARB_texture_float");
 	if (piglit_get_gl_version() < 31)
 	    piglit_require_extension("GL_ARB_texture_cube_map");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
 
 	X(test_format_errors(GL_VIEW_CLASS_128_BITS), "Format 128 bits validity");
 	X(test_format_errors(GL_VIEW_CLASS_96_BITS), "Format 96 bits validity");

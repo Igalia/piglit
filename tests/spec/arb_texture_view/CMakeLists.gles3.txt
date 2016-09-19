@@ -7,3 +7,7 @@ piglit_add_executable(arb_texture_view-rendering-target_gles3 rendering_target.c
 piglit_add_executable(arb_texture_view-sampling-2d-array-as-2d-layer_gles3 sampling-2d-array-as-2d-layer.c)
 piglit_add_executable(arb_texture_view-sampling-2d-array-as-cubemap_gles3 sampling-2d-array-as-cubemap.c)
 piglit_add_executable(arb_texture_view-sampling-2d-array-as-cubemap-array_gles3 sampling-2d-array-as-cubemap-array.c)
+piglit_add_executable(arb_texture_view-formats_gles3 formats.c common.c)
+piglit_add_executable(arb_texture_view-queries_gles3 queries.c)
+piglit_add_executable(arb_texture_view-targets_gles3 targets.c common.c)
+piglit_add_executable(arb_texture_view-texture-immutable-levels_gles3 texture-immutable-levels.c)

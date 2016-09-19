@@ -41,6 +41,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 12;
 	config.supports_gl_core_version = 31;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -233,6 +234,7 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_extension("GL_ARB_texture_view");
 	piglit_require_extension("GL_ARB_texture_cube_map_array");
@@ -241,21 +243,30 @@ piglit_init(int argc, char **argv)
 
 	if (piglit_get_gl_version() < 31)
 	    piglit_require_extension("GL_ARB_texture_cube_map");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+	piglit_require_extension("GL_OES_texture_cube_map_array");
+#endif
 
+#ifdef PIGLIT_USE_OPENGL
 	X(test_target_errors(GL_TEXTURE_1D), "1D tex target validity");
+#endif
 	X(test_target_errors(GL_TEXTURE_2D), "2D tex target validity");
 	X(test_target_errors(GL_TEXTURE_3D), "3D tex target validity");
 	X(test_target_errors(GL_TEXTURE_CUBE_MAP),
 		"Cubemap tex target validity");
+#ifdef PIGLIT_USE_OPENGL
 	X(test_target_errors(GL_TEXTURE_RECTANGLE),
 		"Rectangle tex target validity");
 	X(test_target_errors(GL_TEXTURE_1D_ARRAY),
 		"1D Array tex target validity");
+#endif
 	X(test_target_errors(GL_TEXTURE_2D_ARRAY),
 		"2D Array tex target validity");
 	X(test_target_errors(GL_TEXTURE_CUBE_MAP_ARRAY),
 		"Cubemap Array tex target validity");
-	if (piglit_is_extension_supported("GL_ARB_texture_storage_multisample")) {
+	if (piglit_is_extension_supported("GL_ARB_texture_storage_multisample") ||
+	    piglit_is_extension_supported("GL_OES_texture_storage_multisample_2d_array")) {
 		X(test_target_errors(GL_TEXTURE_2D_MULTISAMPLE),
 		  "Multisample 2D tex target validity");
 		X(test_target_errors(GL_TEXTURE_2D_MULTISAMPLE_ARRAY),

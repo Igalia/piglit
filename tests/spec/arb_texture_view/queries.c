@@ -34,6 +34,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 15;
 	config.supports_gl_core_version = 31;
+	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -295,8 +296,12 @@ void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_extension("GL_ARB_texture_view");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
 
 	pass = query_levels_test();
 	pass = query_layers_state() && pass;

@@ -41,6 +41,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 12;
+	config.supports_gl_es_version = 31;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -67,6 +68,7 @@ piglit_display(void)
 
 	glGenTextures(ARRAY_SIZE(tex), tex);
 
+#ifdef PIGLIT_USE_OPENGL
 	glBindTexture(GL_TEXTURE_1D, tex[0]);
 	glTexStorage1D(GL_TEXTURE_1D, 3, GL_RGBA8, 32);
 	glGetTexParameteriv(GL_TEXTURE_1D, GL_TEXTURE_IMMUTABLE_LEVELS, &level);
@@ -80,6 +82,7 @@ piglit_display(void)
 		       "TEXTURE_VIEW_NUM_LEVELS to return identical results.");
 		piglit_report_result(PIGLIT_FAIL);
 	}
+#endif
 
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
 	glTexStorage2D(GL_TEXTURE_2D, 3, GL_RGBA8, 32, 32);
@@ -136,5 +139,9 @@ piglit_display(void)
 void
 piglit_init(int argc, char *argv[])
 {
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_extension("GL_ARB_texture_view");
+#else
+	piglit_require_extension("GL_OES_texture_view");
+#endif
 }
