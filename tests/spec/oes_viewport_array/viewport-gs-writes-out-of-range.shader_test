@@ -1,0 +1,71 @@
+[require]
+GL ES >= 3.1
+GLSL ES >= 3.10
+GL_OES_geometry_shader
+GL_OES_viewport_array
+
+#
+# Ensure that the fragment stage reads the same value for gl_ViewportIndex  as was
+# written by the geometry stage.
+#
+# This test covers the case where the value written is out of range.
+#
+
+[vertex shader passthrough]
+
+[geometry shader]
+#version 310 es
+#extension GL_OES_geometry_shader: require
+#extension GL_OES_viewport_array: require
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices=9) out;
+
+const int vps[] = int[]( -1, 16, 2048 );
+flat out int vp_written;
+
+void main()
+{
+	for (int vp = 0; vp < vps.length(); vp++) {
+
+		for (int i = 0; i < 3; i++) {
+			gl_Position = gl_in[i].gl_Position;
+			vp_written = vps[vp];
+			gl_ViewportIndex = vps[vp];
+			EmitVertex();
+		}
+
+		EndPrimitive();
+	}
+}
+
+[fragment shader]
+#version 310 es
+#extension GL_OES_viewport_array: require
+precision highp int;
+precision highp float;
+
+flat in int vp_written;
+
+layout(binding = 0) uniform atomic_uint mismatches;
+
+out vec4 color;
+
+void main()
+{
+	if (vp_written != gl_ViewportIndex)
+		atomicCounterIncrement(mismatches);
+
+	color = vec4(0);
+}
+
+[test]
+texture junk 2DArray 0 ( 64 , 64 , 1 )
+fb tex layered 2DArray 0
+
+atomic counters 1
+
+
+draw rect -1 -1 2 2
+
+probe atomic counter 0 == 0

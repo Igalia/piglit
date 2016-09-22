@@ -1,0 +1,59 @@
+[require]
+GL ES >= 3.1
+GLSL ES >= 3.10
+GL_OES_geometry_shader
+GL_OES_viewport_array
+
+[vertex shader passthrough]
+
+[geometry shader]
+#version 310 es
+#extension GL_OES_geometry_shader: require
+#extension GL_OES_viewport_array: require
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices=3) out;
+uniform int viewport;
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gl_ViewportIndex = viewport;
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 310 es
+#extension GL_OES_viewport_array: require
+precision highp int;
+precision highp float;
+uniform int viewport;
+out vec4 color;
+
+void main()
+{
+	if (gl_ViewportIndex == viewport)
+		color = vec4(0,1,0,0);
+	else
+		color = vec4(1,0,0,0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int viewport 0
+draw rect -1 -1 1 1
+
+uniform int viewport 1
+draw rect 0 -1 1 1
+
+uniform int viewport 14
+draw rect -1 0 1 1
+
+uniform int viewport 15
+draw rect 0 0 1 1
+
+probe all rgb 0.0 1.0 0.0
