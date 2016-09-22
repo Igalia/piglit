@@ -3259,7 +3259,7 @@ piglit_display(void)
 			glGenTextures(1, &texobj);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, texobj);
 			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
-				     w, h, l, 0, GL_RGBA, GL_FLOAT, 0);
+				     w, h, l, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 		} else if (sscanf(line,
 				  "texture rgbw 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
