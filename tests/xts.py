@@ -72,21 +72,34 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
     """
     RESULTS_PATH = None
 
-    def __init__(self, name, testname, testnum):
+    def __init__(self, name, testname, testdir, testnum):
         super(XTSTest, self).__init__(
             ['./' + os.path.basename(name), '-i', str(testnum)])
+        # Path relative to XTSTest.RESULTS_PATH (which is not
+        # initialized at init time) to store any test-specific files.
+        # We need to store into the results directory to protect
+        # against races when multiple piglit-run.py -t xts commands
+        # are running (as in the X Server's make check).
+        self.testdir = testdir
         self.testname = '{0}-{1}'.format(testname, testnum)
         self.cwd = os.path.dirname(os.path.realpath(name))
-        self.test_results_file = os.path.join(self.cwd, self.testname)
         self.env.update(
-            {"TET_RESFILE": self.test_results_file,
-             "XT_RESET_DELAY": '0',
+            {"XT_RESET_DELAY": '0',
              "XT_FONTPATH_GOOD": '/usr/share/fonts/X11/misc',
              "XT_FONTPATH": os.path.join(X_TEST_SUITE, 'xts5', 'fonts'),
              # XXX: Are the next 3 necissary?
              "XT_LOCAL": 'Yes',
              "XT_TCP": 'No',
              "XT_DISPLAYHOST": ''})
+
+    def run(self):
+        # We only get the RESULTS_PATH after the profile has been set
+        # up, so we can't do it in init.
+        self.test_results_file = os.path.join(XTSTest.RESULTS_PATH,
+                                              self.testdir,
+                                              self.testname)
+        self.env.update({"TET_RESFILE": self.test_results_file})
+        super(XTSTest, self).run()
 
     def _process_log_for_images(self, log):
         """ Parse the image logfile """
@@ -104,7 +117,9 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
                 # and depth, then run-length-encoded pixel values (in
                 # hexadecimal).  Use xtsttopng to convert the error log to a
                 # pair of PNGs so we can put them in the summary.
-                command = ['xtsttopng', os.path.join(self.cwd, match.group(1))]
+                command = ['xtsttopng', os.path.join(XTSTest.RESULTS_PATH,
+                                                     self.testdir,
+                                                     match.group(1))]
                 try:
                     out = subprocess.check_output(command, cwd=self.cwd)
                 except OSError:
@@ -205,6 +220,7 @@ def _populate_profile_xts(profile):
                         profile.test_list[group] = XTSTest(
                             os.path.join(dirpath, testname),
                             testname,
+                            os.path.relpath(dirpath, X_TEST_SUITE),
                             num)
 
 
