@@ -40,6 +40,21 @@
 #include <drm.h>
 #include <unistd.h>
 
+/* These definitions were added in libdrm 2.4.68, since that's still pretty
+ * recent defined these to allow older libdrm to continue working.
+ */
+#ifndef DRM_FORMAT_R8
+#define DRM_FORMAT_R8 fourcc_code('R', '8', ' ', ' ')
+#endif
+
+#ifndef DRM_FORMAT_RG88
+#define DRM_FORMAT_RG88 fourcc_code('R', 'G', '8', '8')
+#endif
+
+#ifndef DRM_FORMAT_GR88
+#define DRM_FORMAT_GR88 fourcc_code('G', 'R', '8', '8')
+#endif
+
 #define ALIGN(value, alignment) (((value) + alignment - 1) & ~(alignment - 1))
 
 struct piglit_drm_driver {

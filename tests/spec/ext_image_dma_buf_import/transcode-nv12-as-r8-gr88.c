@@ -48,18 +48,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-/* The kernel header drm_fourcc.h defines the DRM formats below. We duplicate
- * some of the definitions so that building Piglit won't require bleeding-edge
- * kernel headers.
- */
-#ifndef DRM_FORMAT_R8
-#define DRM_FORMAT_R8 fourcc_code('R', '8', ' ', ' ')
-#endif
-
-#ifndef DRM_FORMAT_GR88
-#define DRM_FORMAT_GR88 fourcc_code('G', 'R', '8', '8')
-#endif
-
 /* Fake data for a 4x4 pixel image in NV12 format. */
 static const uint8_t y_data[] = {
 	0x00, 0x11, 0x22, 0x33,
