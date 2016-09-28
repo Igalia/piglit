@@ -10,8 +10,10 @@ uniform int loop_count;
 void main()
 {
   gl_Position = gl_Vertex;
+  /* Make sure that loop_count uniform live */
+  float one = float(loop_count == 0 || loop_count == 1);
 
-  vec4 colour = vec4(1.0, 0.0, 0.0, 1.0);
+  vec4 colour = vec4(1.0, 0.0, 0.0, one);
 
   for (int i = 0; i < 0; i++) {
      colour = vec4(0.0, 1.0, 0.0, 1.0);
