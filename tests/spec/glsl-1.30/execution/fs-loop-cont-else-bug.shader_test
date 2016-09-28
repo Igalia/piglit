@@ -1,0 +1,44 @@
+# This test used to create bad LLVM IR in radeonsi.
+#
+# Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=97887
+
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+
+uniform int initial;
+
+void main() {
+	int idx = 0;
+	int x = initial;
+
+	for (;;) {
+		idx++;
+		if (idx >= 3)
+			break;
+
+		if (x % 2 == 0) {
+			x = x / 2;
+			if (x == 18)
+				break;
+			continue;
+		} else {
+			x = x * 3;
+		}
+		x++;
+	}
+
+	gl_FragColor = vec4(0.0, (x % 4) * 0.25, 0.0, 1.0);
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+
+uniform int initial 7
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.75 0.0 1.0
