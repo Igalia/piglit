@@ -16,5 +16,6 @@ piglit_add_executable (gl-3.1-link-empty-prog-core glsl-link-empty-prog.c)
 piglit_add_executable (gl-3.1-minmax minmax.c)
 piglit_add_executable (gl-3.1-primitive-restart-xfb primitive-restart-xfb.c)
 piglit_add_executable (gl-3.1-vao-broken-attrib vao-broken-attrib.c)
+piglit_add_executable (gl-3.1-mixed-int-float-fbo mixed-int-float-fbo.c)
 
 # vim: ft=cmake:

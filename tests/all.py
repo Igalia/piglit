@@ -1208,6 +1208,8 @@ with profile.group_manager(
     g(['gl-3.1-genned-names'], 'genned-names')
     g(['gl-3.1-link-empty-prog-core'])
     g(['gl-3.1-minmax'], 'minmax')
+    g(['gl-3-1-mixed-int-float-fbo'])
+    g(['gl-3-1-mixed-int-float-fbo', 'int_second'])
     g(['gl-3.1-vao-broken-attrib'], 'vao-broken-attrib')
     g(['gl-3.0-required-renderbuffer-attachment-formats', '31'],
       'required-renderbuffer-attachment-formats')
