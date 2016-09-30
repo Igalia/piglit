@@ -56,7 +56,6 @@ piglit_display(void)
 		0xff, 0x00, 0x00, 0xff,
 		0xff, 0xff, 0xff, 0xff
 	};
-	int cpp = 4;
 	enum piglit_result res;
 	struct piglit_dma_buf *buf;
 	EGLImageKHR img1, img2;
