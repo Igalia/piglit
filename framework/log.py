@@ -122,10 +122,12 @@ class QuietLog(BaseLog):
             self._endcode = '\n'
 
         self.__counter = next(self._test_counter)
-        self._state['running'].append(self.__counter)
 
     def start(self, name):
-        pass
+        # This cannot be done in the constructor, since the constructor gets
+        # called for the final summary too.
+        with self._LOCK:
+            self._state['running'].append(self.__counter)
 
     def _log(self, status):
         """ non-locked helper for logging
