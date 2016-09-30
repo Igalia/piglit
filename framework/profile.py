@@ -350,19 +350,27 @@ class TestProfile(object):
         single = multiprocessing.dummy.Pool(1)
         multi = multiprocessing.dummy.Pool()
 
-        if options.OPTIONS.concurrent == "all":
-            run_threads(multi, six.iteritems(self.test_list))
-        elif options.OPTIONS.concurrent == "none":
-            run_threads(single, six.iteritems(self.test_list))
-        else:
-            # Filter and return only thread safe tests to the threaded pool
-            run_threads(multi, (x for x in six.iteritems(self.test_list)
-                                if x[1].run_concurrent))
-            # Filter and return the non thread safe tests to the single pool
-            run_threads(single, (x for x in six.iteritems(self.test_list)
-                                 if not x[1].run_concurrent))
+        try:
+            if options.OPTIONS.concurrent == "all":
+                run_threads(multi, six.iteritems(self.test_list))
+            elif options.OPTIONS.concurrent == "none":
+                run_threads(single, six.iteritems(self.test_list))
+            else:
+                # Filter and return only thread safe tests to the threaded pool
+                run_threads(multi, (x for x in six.iteritems(self.test_list)
+                                    if x[1].run_concurrent))
+                # Filter and return the non thread safe tests to the single
+                # pool
+                run_threads(single, (x for x in six.iteritems(self.test_list)
+                                     if not x[1].run_concurrent))
 
-        log.get().summary()
+            log.get().summary()
+        except (KeyboardInterrupt, Exception):
+            # In the event that C-c is pressed, or any sort of exception would
+            # generate a stacktrace, print the status line so that it's clear,
+            # then die. Pressing C-c again will kill immediately.
+            log.get().summary()
+            raise
 
         self._post_run_hook()
 
