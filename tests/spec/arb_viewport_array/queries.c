@@ -55,7 +55,9 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	GLint maxVP;
 	GLboolean scEnabled;
+#ifdef PIGLIT_USE_OPENGL
 	GLdouble vald[4] = {0.0, 0.0, 0.0, 0.0};
+#endif
 	GLfloat valf[4] = {0.0, 0.0, 0.0, 0.0};
 	GLint vali[4] = {0, 0, 0, 0};
 	int i;
