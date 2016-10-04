@@ -247,6 +247,7 @@ get_shadertype_from_program_interface(const GLenum programInterface)
                 return GL_COMPUTE_SHADER;
         default:
                 assert(!"unexpected programInterface value");
+                return GL_INVALID_ENUM;
         }
 }
 
