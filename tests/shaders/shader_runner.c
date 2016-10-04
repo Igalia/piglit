@@ -2691,6 +2691,12 @@ handle_texparameter(const char *line)
 		{ "linear",                 GL_LINEAR                 },
 		{ NULL, 0 }
 	};
+	static const struct string_to_enum wrap_modes[] = {
+		{ "repeat",                 GL_REPEAT                },
+		{ "clamp_to_edge",          GL_CLAMP_TO_EDGE         },
+		{ "clamp_to_border",        GL_CLAMP_TO_BORDER       },
+		{ NULL, 0 }
+	};
 	static const struct string_to_enum swizzle_modes[] = {
 		{ "red", GL_RED },
 		{ "green", GL_GREEN },
@@ -2726,6 +2732,21 @@ handle_texparameter(const char *line)
 		parameter_name = "mag";
 		line += strlen("mag ");
 		strings = mag_filter_modes;
+	} else if (string_match("wrap_s ", line)) {
+		parameter = GL_TEXTURE_WRAP_S;
+		parameter_name = "wrap_s";
+		line += strlen("wrap_s ");
+		strings = wrap_modes;
+	} else if (string_match("wrap_t ", line)) {
+		parameter = GL_TEXTURE_WRAP_T;
+		parameter_name = "wrap_t";
+		line += strlen("wrap_t ");
+		strings = wrap_modes;
+	} else if (string_match("wrap_r ", line)) {
+		parameter = GL_TEXTURE_WRAP_R;
+		parameter_name = "wrap_r";
+		line += strlen("wrap_r ");
+		strings = wrap_modes;
 	} else if (string_match("lod_bias ", line)) {
 #ifdef PIGLIT_USE_OPENGL
 		line += strlen("lod_bias ");
@@ -2745,6 +2766,12 @@ handle_texparameter(const char *line)
 		line += strlen("base_level ");
 		glTexParameteri(target, GL_TEXTURE_BASE_LEVEL,
 				strtol(line, NULL, 10));
+		return;
+	} else if (string_match("border_color ", line)) {
+		float bc[4];
+		line += strlen("border_color ");
+		sscanf(line, "%f %f %f %f", &bc[0], &bc[1], &bc[2], &bc[3]);
+		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, bc);
 		return;
 	} else if (string_match("swizzle_r ", line)) {
 		parameter = GL_TEXTURE_SWIZZLE_R;
