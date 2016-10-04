@@ -1,0 +1,34 @@
+# Even columns fetch from tex0 (black), while odd columns fetch from tex1 (white).
+# The shader inverts the color of even collumns to get make them white,
+# so the final image should be completely white.
+#
+# At the moment, radeonsi miscompiles this shader and only fetches from tex0
+# in both cases.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform sampler2D tex0, tex1;
+
+void main()
+{
+    bool pat = fract(gl_FragCoord.x / 2.0) < 0.5;
+    gl_FragColor = pat ?
+             texture2D(tex0, gl_TexCoord[0].xy) :
+             texture2D(tex1, gl_TexCoord[0].xy);
+
+    if (pat)
+        gl_FragColor = vec4(1.0) - gl_FragColor;
+}
+
+[test]
+texture checkerboard 0 0 (8, 8) (0, 0, 0, 0) (0, 0, 0, 0)
+texture checkerboard 1 0 (8, 8) (1, 1, 1, 1) (1, 1, 1, 1)
+
+uniform int tex0 0
+uniform int tex1 1
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0
