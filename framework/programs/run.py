@@ -336,7 +336,7 @@ def run(input_):
     if args.monitored:
         profile.monitoring = args.monitored
 
-    profile.run(args.log_level, backend)
+    framework.profile.run(profile, args.log_level, backend)
 
     results.time_elapsed.end = time.time()
     backend.finalize({'time_elapsed': results.time_elapsed.to_json()})
@@ -404,7 +404,7 @@ def resume(input_):
         profile.monitoring = options.OPTIONS.monitored
 
     # This is resumed, don't bother with time since it won't be accurate anyway
-    profile.run(results.options['log_level'], backend)
+    framework.profile.run(profile, results.options['log_level'], backend)
 
     backend.finalize()
 

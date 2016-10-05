@@ -244,7 +244,7 @@ class TestProfile(object):
         """
         self._monitoring = Monitoring(monitored)
 
-    def _prepare_test_list(self):
+    def prepare_test_list(self):
         """ Prepare tests for running
 
         Flattens the nested group hierarchy into a flat dictionary using '/'
@@ -286,72 +286,6 @@ class TestProfile(object):
         if not self.test_list:
             raise exceptions.PiglitFatalError(
                 'There are no tests scheduled to run. Aborting run.')
-
-    def run(self, logger, backend):
-        """ Runs all tests using Thread pool
-
-        When called this method will flatten out self.tests into
-        self.test_list, then will prepare a logger, and begin executing tests
-        through it's Thread pools.
-
-        Based on the value of options.OPTIONS.concurrent it will either run all
-        the tests concurrently, all serially, or first the thread safe tests
-        then the serial tests.
-
-        Finally it will print a final summary of the tests
-
-        Arguments:
-        backend -- a results.Backend derived instance
-
-        """
-
-        chunksize = 1
-
-        self._prepare_test_list()
-        log = LogManager(logger, len(self.test_list))
-
-        def test(pair, this_pool=None):
-            """Function to call test.execute from map"""
-            name, test = pair
-            with backend.write_test(name) as w:
-                test.execute(name, log.get(), self.dmesg, self.monitoring)
-                w(test.result)
-            if self._monitoring.abort_needed:
-                this_pool.terminate()
-
-        def run_threads(pool, testlist):
-            """ Open a pool, close it, and join it """
-            pool.imap(lambda pair: test(pair, pool), testlist, chunksize)
-            pool.close()
-            pool.join()
-
-        # Multiprocessing.dummy is a wrapper around Threading that provides a
-        # multiprocessing compatible API
-        #
-        # The default value of pool is the number of virtual processor cores
-        single = multiprocessing.dummy.Pool(1)
-        multi = multiprocessing.dummy.Pool()
-
-        self.setup()
-        try:
-            if options.OPTIONS.concurrent == "all":
-                run_threads(multi, six.iteritems(self.test_list))
-            elif options.OPTIONS.concurrent == "none":
-                run_threads(single, six.iteritems(self.test_list))
-            else:
-                # Filter and return only thread safe tests to the threaded pool
-                run_threads(multi, (x for x in six.iteritems(self.test_list)
-                                    if x[1].run_concurrent))
-                # Filter and return the non thread safe tests to the single
-                # pool
-                run_threads(single, (x for x in six.iteritems(self.test_list)
-                                     if not x[1].run_concurrent))
-        finally:
-            log.get().summary()
-        self.teardown()
-
-        if self._monitoring.abort_needed:
-            raise exceptions.PiglitAbort(self._monitoring.error_message)
 
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function
@@ -512,3 +446,70 @@ def merge_test_profiles(profiles):
         for p in profiles:
             profile.update(load_test_profile(p))
     return profile
+
+
+def run(profile, logger, backend):
+    """Runs all tests using Thread pool.
+
+    When called this method will flatten out self.tests into self.test_list,
+    then will prepare a logger, and begin executing tests through it's Thread
+    pools.
+
+    Based on the value of options.OPTIONS.concurrent it will either run all the
+    tests concurrently, all serially, or first the thread safe tests then the
+    serial tests.
+
+    Finally it will print a final summary of the tests.
+
+    Arguments:
+    profile -- a Profile ojbect.
+    logger  -- a log.LogManager instance.
+    backend -- a results.Backend derived instance.
+    """
+    chunksize = 1
+
+    profile.prepare_test_list()
+    log = LogManager(logger, len(profile.test_list))
+
+    def test(pair, this_pool=None):
+        """Function to call test.execute from map"""
+        name, test = pair
+        with backend.write_test(name) as w:
+            test.execute(name, log.get(), profile.dmesg, profile.monitoring)
+            w(test.result)
+        if profile.monitoring.abort_needed:
+            this_pool.terminate()
+
+    def run_threads(pool, testlist):
+        """ Open a pool, close it, and join it """
+        pool.imap(lambda pair: test(pair, pool), testlist, chunksize)
+        pool.close()
+        pool.join()
+
+    # Multiprocessing.dummy is a wrapper around Threading that provides a
+    # multiprocessing compatible API
+    #
+    # The default value of pool is the number of virtual processor cores
+    single = multiprocessing.dummy.Pool(1)
+    multi = multiprocessing.dummy.Pool()
+
+    profile.setup()
+    try:
+        if options.OPTIONS.concurrent == "all":
+            run_threads(multi, six.iteritems(profile.test_list))
+        elif options.OPTIONS.concurrent == "none":
+            run_threads(single, six.iteritems(profile.test_list))
+        else:
+            # Filter and return only thread safe tests to the threaded pool
+            run_threads(multi, (x for x in six.iteritems(profile.test_list)
+                                if x[1].run_concurrent))
+            # Filter and return the non thread safe tests to the single
+            # pool
+            run_threads(single, (x for x in six.iteritems(profile.test_list)
+                                 if not x[1].run_concurrent))
+    finally:
+        log.get().summary()
+    profile.teardown()
+
+    if profile.monitoring.abort_needed:
+        raise exceptions.PiglitAbort(profile.monitoring.error_message)

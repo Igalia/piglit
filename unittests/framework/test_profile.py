@@ -152,7 +152,7 @@ class TestTestProfile(object):
             """
             profile_ = profile.TestProfile()
             profile_.test_list = self.data
-            profile_._prepare_test_list()
+            profile_.prepare_test_list()
 
             assert dict(profile_.test_list) == dict(self.data)
 
@@ -164,7 +164,7 @@ class TestTestProfile(object):
 
             profile_ = profile.TestProfile()
             profile_.test_list = self.data
-            profile_._prepare_test_list()
+            profile_.prepare_test_list()
 
             baseline = {
                 grouptools.join('group3', 'test5'): utils.Test(['other'])}
@@ -184,7 +184,7 @@ class TestTestProfile(object):
 
             profile_ = profile.TestProfile()
             profile_.test_list = self.data
-            profile_._prepare_test_list()
+            profile_.prepare_test_list()
 
             assert dict(profile_.test_list) == dict(baseline)
 
@@ -199,7 +199,7 @@ class TestTestProfile(object):
 
             profile_ = profile.TestProfile()
             profile_.test_list = self.data
-            profile_._prepare_test_list()
+            profile_.prepare_test_list()
 
             assert dict(profile_.test_list) == dict(baseline)
 
@@ -211,7 +211,7 @@ class TestTestProfile(object):
 
             profile_ = profile.TestProfile()
             profile_.test_list = self.data
-            profile_._prepare_test_list()
+            profile_.prepare_test_list()
 
             assert grouptools.join('group4', 'Test9') not in profile_.test_list
 

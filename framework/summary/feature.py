@@ -72,7 +72,7 @@ class FeatResults(object):  # pylint: disable=too-few-public-methods
             # An empty list will raise PiglitFatalError exception
             # But for reporting we need to handle this situation
             try:
-                profiles[feature]._prepare_test_list()
+                profiles[feature].prepare_test_list()
             except exceptions.PiglitFatalError:
                 pass
 
