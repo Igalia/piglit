@@ -58,6 +58,7 @@ class TestLogFactory(object):
         """log.BaseLog.log updates shared state managed by LogManager"""
         logger = log.LogManager('quiet', 100)
         log_inst = logger.get()
+        log_inst.start(None)
         log_inst.log('pass')
 
         assert logger._state['total'] == 100
@@ -78,6 +79,7 @@ class TestQuietLog(object):
         def test_log(self, log_state):  # pylint: disable=redefined-outer-name
             """Test the output of the log method."""
             quiet = log.QuietLog(log_state, threading.Lock())
+            quiet.start(None)
             quiet.log('pass')
             sys.stdout.seek(0)
 
@@ -89,6 +91,7 @@ class TestQuietLog(object):
             quiet = log.QuietLog(log_state, threading.Lock())
             # Call log to set the total correctly, then truncate and remove the
             # values, so the we can test
+            quiet.start(None)
             quiet.log('pass')
             sys.stdout.seek(0)
             sys.stdout.truncate()
@@ -104,6 +107,7 @@ class TestQuietLog(object):
         def test_start(self, log_state):  # pylint: disable=redefined-outer-name
             """Test that the start method doesn't have output."""
             quiet = log.QuietLog(log_state, threading.Lock())
+            quiet.start(None)
             quiet.start('foo')
             sys.stdout.seek(0)
 
@@ -137,6 +141,7 @@ class TestVerboseLog(object):
         def test_summary(self, log_state):  # pylint: disable=redefined-outer-name
             """Test the output of the summary method."""
             l = log.VerboseLog(log_state, threading.Lock())
+            l.start('foo')
             l.log('pass')
             sys.stdout.seek(0)
             sys.stdout.truncate()
@@ -168,6 +173,7 @@ class TestDummyLog(object):
         def test_log(self, log_state):  # pylint: disable=redefined-outer-name
             """Test the output of the log method."""
             quiet = log.DummyLog(log_state, threading.Lock())
+            quiet.start(None)
             quiet.log('pass')
             sys.stdout.seek(0)
 

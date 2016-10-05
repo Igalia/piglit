@@ -231,6 +231,7 @@ class VerboseLog(QuietLog):
         starts.
 
         """
+        super(VerboseLog, self).start(name)
         with self._LOCK:
             self._print('running: {}'.format(name), newline=True)
             self.__name = name
