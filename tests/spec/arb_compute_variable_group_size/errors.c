@@ -131,6 +131,32 @@ use_fixed_work_group_size()
 }
 
 static enum piglit_result
+use_invalid_work_group_count_values()
+{
+	GLint prog, v[3];
+
+	/* The ARB_compute_variable_group_size spec says:
+	 *
+	 *     An INVALID_VALUE error is generated if any of num_groups_x,
+	 *     num_groups_y and num_groups_z are greater than or equal to the
+	 *     maximum work group count for the corresponding dimension.
+	 */
+	prog = piglit_build_simple_program_multiple_shaders(
+		GL_COMPUTE_SHADER, variable_work_group_size_shader, 0);
+	glUseProgram(prog);
+
+	/* Use values greater than the maximum work group count. */
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &v[0]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &v[1]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &v[2]);
+
+	glDispatchComputeGroupSizeARB(v[0] + 1, v[1] + 1, v[2] + 1, 1, 1, 1);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		return PIGLIT_FAIL;
+	return PIGLIT_PASS;
+}
+
+static enum piglit_result
 use_invalid_variable_work_group_size_values()
 {
 	/* The ARB_compute_variable_group_size spec says:
@@ -207,6 +233,12 @@ static const struct piglit_subtest subtests[] = {
 		"Use a fixed work group size with DispatchComputeGroupSizeARB",
 		"use_fixed_work_group_size",
 		use_fixed_work_group_size,
+		NULL
+	},
+	{
+		"Use invalid work group count values",
+		"use_invalid_work_group_count_values",
+		use_invalid_work_group_count_values,
 		NULL
 	},
 	{
