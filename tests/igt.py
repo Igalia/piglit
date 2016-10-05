@@ -91,7 +91,8 @@ else:
 
 class IGTTestProfile(TestProfile):
     """Test profile for intel-gpu-tools tests."""
-    def _pre_run_hook(self):
+
+    def setup(self):
         if options.OPTIONS.execute:
             try:
                 check_environment()
