@@ -222,6 +222,7 @@ def _create_metadata(args, name):
     opts = dict(options.OPTIONS)
     opts['profile'] = args.test_profile
     opts['log_level'] = args.log_level
+    opts['concurrent'] = args.concurrency
     if args.platform:
         opts['platform'] = args.platform
 
@@ -276,7 +277,6 @@ def run(input_):
         args.concurrency = "none"
 
     # Pass arguments into Options
-    options.OPTIONS.concurrent = args.concurrency
     options.OPTIONS.exclude_filter = args.exclude_tests
     options.OPTIONS.include_filter = args.include_tests
     options.OPTIONS.execute = args.execute
@@ -336,7 +336,7 @@ def run(input_):
     if args.monitored:
         profile.monitoring = args.monitored
 
-    framework.profile.run(profile, args.log_level, backend)
+    framework.profile.run(profile, args.log_level, backend, args.concurrency)
 
     results.time_elapsed.end = time.time()
     backend.finalize({'time_elapsed': results.time_elapsed.to_json()})
@@ -365,7 +365,6 @@ def resume(input_):
     _disable_windows_exception_messages()
 
     results = backends.load(args.results_path)
-    options.OPTIONS.concurrent = results.options['concurrent']
     options.OPTIONS.exclude_filter = results.options['exclude_filter']
     options.OPTIONS.include_filter = results.options['include_filter']
     options.OPTIONS.execute = results.options['execute']
@@ -404,7 +403,11 @@ def resume(input_):
         profile.monitoring = options.OPTIONS.monitored
 
     # This is resumed, don't bother with time since it won't be accurate anyway
-    framework.profile.run(profile, results.options['log_level'], backend)
+    framework.profile.run(
+        profile,
+        results.options['log_level'],
+        backend,
+        results.options['concurrent'])
 
     backend.finalize()
 

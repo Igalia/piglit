@@ -171,7 +171,6 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     the configuration file.
 
     Options are as follows:
-    concurrent -- one of: ["all", "some", "none"]. Default: "some"
     execute -- False for dry run
     include_filter -- list of compiled regex which include exclusively tests
                       that match
@@ -187,7 +186,6 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     exclude_filter = _ReListDescriptor('_exclude_filter', type_=_FilterReList)
 
     def __init__(self):
-        self.concurrent = "some"
         self.execute = True
         self._include_filter = _ReList()
         self._exclude_filter = _ReList()

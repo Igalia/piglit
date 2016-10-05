@@ -448,7 +448,7 @@ def merge_test_profiles(profiles):
     return profile
 
 
-def run(profile, logger, backend):
+def run(profile, logger, backend, concurrency):
     """Runs all tests using Thread pool.
 
     When called this method will flatten out self.tests into self.test_list,
@@ -495,11 +495,13 @@ def run(profile, logger, backend):
 
     profile.setup()
     try:
-        if options.OPTIONS.concurrent == "all":
+        if concurrency == "all":
             run_threads(multi, six.iteritems(profile.test_list))
-        elif options.OPTIONS.concurrent == "none":
+        elif concurrency == "none":
             run_threads(single, six.iteritems(profile.test_list))
         else:
+            assert concurrency == "some"
+
             # Filter and return only thread safe tests to the threaded pool
             run_threads(multi, (x for x in six.iteritems(profile.test_list)
                                 if x[1].run_concurrent))
