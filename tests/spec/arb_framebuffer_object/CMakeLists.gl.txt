@@ -19,5 +19,6 @@ piglit_add_executable (fbo-blit-scaled-linear blit-scaled-linear.cpp)
 piglit_add_executable (fbo-attachments-blit-scaled-linear attachments-blit-scaled-linear.cpp)
 piglit_add_executable(fbo-drawbuffers-none fbo-drawbuffers-none.c)
 piglit_add_executable(fbo-generatemipmap-versus-READ_FRAMEBUFFER GenerateMipmap-versus-READ_FRAMEBUFFER.c)
+piglit_add_executable(arb_framebuffer_object-depth-stencil-blit depth-stencil-blit.c)
 
 # vim: ft=cmake:
