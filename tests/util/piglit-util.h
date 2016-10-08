@@ -186,6 +186,32 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 #define ALIGN(value, alignment) (((value) + alignment - 1) & ~(alignment - 1))
 
 
+static inline unsigned
+log2u(unsigned v)
+{
+#ifdef __GCC__
+	return v == 0 ? 0 : 31 - __builtin_clz(v);
+#else
+	unsigned res = 0;
+
+	while (v >>= 1)
+		res++;
+
+	return res;
+#endif
+}
+
+/**
+ * Returns the smallest power-of-two integer greater than or equal to v
+ */
+static inline unsigned
+next_power_of_two(unsigned v)
+{
+	/* Special case zero because 1U << 32 is undefined. */
+	return v == 0 ? 1 : 1U << (log2u(v - 1) + 1);
+}
+
+
 /**
  * Return true if and only if two string are equal according to strcmp().
  */

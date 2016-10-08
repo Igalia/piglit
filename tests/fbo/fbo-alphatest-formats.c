@@ -34,6 +34,12 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
+	/* Drivers that do not support GL_ARB_texture_non_power_of_two require
+	 * window dimensions that are powers of two for this test.
+	 */
+	config.window_width = next_power_of_two(config.window_width);
+	config.window_height = next_power_of_two(config.window_height);
+
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
