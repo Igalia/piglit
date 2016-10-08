@@ -162,6 +162,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_draw_buffers");
+	piglit_require_extension("GL_ARB_texture_non_power_of_two");
 
 	glGetIntegerv(GL_MAX_DRAW_BUFFERS_ARB, &num);
 	if (num < 2)

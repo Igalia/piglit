@@ -249,6 +249,7 @@ render_and_check_textures(GLenum internal_format)
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_rg");
+	piglit_require_extension("GL_ARB_texture_non_power_of_two");
 
 	has_green = GL_FALSE;
 	scale = 1.0;
