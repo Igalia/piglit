@@ -95,7 +95,18 @@ piglit_init(int argc, char **argv)
 
 	pass = test_drawpixels() && pass;
 	pass = test_readpixels() && pass;
-	pass = test_texture() && pass;
+
+	/* The EXT_packed_depth_stencil spec says:
+	 *
+	 *    If ARB_depth_texture or SGIX_depth_texture is supported,
+	 *    GL_DEPTH_STENCIL_EXT/GL_UNSIGNED_INT_24_8_EXT data can also be
+	 *    used for textures;
+	 *
+	 * So, if ARB_depth_texture is not supported, don't try the texture
+	 * tests.
+	 */
+	if (piglit_is_extension_supported("GL_ARB_depth_texture"))
+		pass = test_texture() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
