@@ -153,16 +153,6 @@ int64_t iround(float v)
 	return (int64_t)v;
 }
 
-/* Calculate log2 for integers */
-int log2i(int x)
-{
-	int res = 0 ;
-	while (x >>= 1)
-		++res;
-	return res ;
-}
-
-
 /* Based on http://devmaster.net/forums/topic/1145-advanced-rasterization */
 void rast_triangle(uint8_t* buffer, uint32_t stride, const Triangle& tri)
 {
@@ -408,7 +398,7 @@ GLboolean test_triangle(const Triangle& tri)
 /* Generate a random triangle */
 void random_triangle(Triangle& tri)
 {
-	int size = 1 << (mersenne.value() % (log2i(fbo_width) + 1));
+	int size = 1 << (mersenne.value() % (log2u(fbo_width) + 1));
 
 	for (int i = 0; i < 3; ++i) {
 		tri[i].x = (mersenne.value() % (size * FIXED_ONE)) * (1.0f / FIXED_ONE);
