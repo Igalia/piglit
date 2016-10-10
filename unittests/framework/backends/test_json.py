@@ -234,15 +234,6 @@ class TestResume(object):
 class TestLoadResults(object):
     """Tests for the load_results function."""
 
-    def test_folder_with_main(self, tmpdir):
-        """backends.json.load_results: takes a folder with a file named main in
-        it.
-        """
-        p = tmpdir.join('main')
-        with p.open('w') as f:
-            f.write(json.dumps(shared.JSON))
-        backends.json.load_results(six.text_type(tmpdir), 'none')
-
     def test_folder_with_results_json(self, tmpdir):
         """backends.json.load_results: takes a folder with a file named
         results.json.

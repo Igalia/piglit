@@ -55,6 +55,9 @@ __all__ = [
 # The current version of the JSON results
 CURRENT_JSON_VERSION = 9
 
+# The minimum JSON format supported
+MINIMUM_SUPPORTED_VERSION = 7
+
 # The level to indent a final file
 INDENT = 4
 
@@ -242,9 +245,7 @@ def load_results(filename, compression_):
     else:
         # Look for a compressed result first, then a bare result, finally for
         # an old main file
-        for name in ['results.json.{}'.format(compression_),
-                     'results.json',
-                     'main']:
+        for name in ['results.json.{}'.format(compression_), 'results.json']:
             if os.path.exists(os.path.join(filename, name)):
                 filepath = os.path.join(filename, name)
                 break
@@ -331,13 +332,6 @@ def _update_results(results, filepath):
         # Python lacks a switch statement, the workaround is to use a
         # dictionary
         updates = {
-            0: _update_zero_to_one,
-            1: _update_one_to_two,
-            2: _update_two_to_three,
-            3: _update_three_to_four,
-            4: _update_four_to_five,
-            5: _update_five_to_six,
-            6: _update_six_to_seven,
             7: _update_seven_to_eight,
             8: _update_eight_to_nine,
         }
@@ -347,10 +341,11 @@ def _update_results(results, filepath):
 
         return results
 
-    # If there is no version, then set it to 0, this will trigger a full
-    # update.
-    if not hasattr(results, 'results_version'):
-        results.results_version = 0
+    if results.results_version < MINIMUM_SUPPORTED_VERSION:
+        raise exceptions.PiglitFatalError(
+            'Unsupported version "{}", '
+            'minimum supported version is "{}"'.format(
+                results.results_version, MINIMUM_SUPPORTED_VERSION))
 
     # If the results version is the current version there is no need to
     # update, just return the results
@@ -374,247 +369,6 @@ def _write(results, file_):
     """WRite the values of the results out to a file."""
     with write_compressed(file_) as f:
         json.dump(results, f, default=piglit_encoder, indent=INDENT)
-
-
-def _update_zero_to_one(result):
-    """ Update version zero results to version 1 results
-
-    Changes from version 0 to version 1
-
-    - dmesg is sometimes stored as a list, sometimes stored as a string. In
-      version 1 it is always stored as a string
-    - in version 0 subtests are sometimes stored as duplicates, sometimes stored
-      only with a single entry, in version 1 tests with subtests are only
-      recorded once, always.
-    - Version 0 can have an info entry, or returncode, out, and err entries,
-      Version 1 will only have the latter
-    - version 0 results are called 'main', while version 1 results are called
-      'results.json' (This is not handled internally, it's either handled by
-      update_results() which will write the file back to disk, or needs to be
-      handled manually by the user)
-
-    """
-    updated_results = {}
-    remove = set()
-
-    for name, test in six.iteritems(result.tests):
-        assert not isinstance(test, results.TestResult), \
-            'Test was erroniaously turned into a TestResult'
-
-        # fix dmesg errors if any
-        if isinstance(test.get('dmesg'), list):
-            test['dmesg'] = '\n'.join(test['dmesg'])
-
-        # If a test as an info attribute, we want to remove it, if it doesn't
-        # have a returncode, out, or attribute we'll want to get those out of
-        # info first
-        #
-        # This expects that the order of info is roughly returncode, errors,
-        # output, *extra it can handle having extra information in the middle,
-        if (None in [test.get('out'), test.get('err'),
-                     test.get('returncode')] and test.get('info')):
-
-            # This attempts to split everything before Errors: as a returncode,
-            # and everything before Output: as Errors, and everything else as
-            # output. This may result in extra info being put in out, this is
-            # actually fine since out is only parsed by humans.
-            returncode, split = test['info'].split('\n\nErrors:')
-            err, out = split.split('\n\nOutput:')
-
-            # returncode can be 0, and 0 is falsy, so ensure it is actually
-            # None
-            if test.get('returncode') is None:
-                # In some cases the returncode might not be set (like the test
-                # skipped), in that case it will be None, so set it
-                # appropriately
-                try:
-                    test['returncode'] = int(
-                        returncode[len('returncode: '):].strip())
-                except ValueError:
-                    test['returncode'] = None
-            if not test.get('err'):
-                test['err'] = err.strip()
-            if not test.get('out'):
-                test['out'] = out.strip()
-
-        # Remove the unused info key
-        if test.get('info'):
-            del test['info']
-
-        # If there is more than one subtest written in version 0 results that
-        # entry will be a complete copy of the original entry with '/{name}'
-        # appended. This loop looks for tests with subtests, removes the
-        # duplicate entries, and creates a new entry in update_results for the
-        # single full tests.
-        #
-        # this must be the last thing done in this loop, or there will be pain
-        if test.get('subtest'):
-            for sub in six.iterkeys(test['subtest']):
-                # adding the leading / ensures that we get exactly what we
-                # expect, since endswith does a character by character match, if
-                # the subtest name is duplicated it won't match, and if there
-                # are more trailing characters it will not match
-                #
-                # We expect duplicate names like this:
-                #  "group1/groupA/test1/subtest 1": <thing>,
-                #  "group1/groupA/test1/subtest 2": <thing>,
-                #  "group1/groupA/test1/subtest 3": <thing>,
-                #  "group1/groupA/test1/subtest 4": <thing>,
-                #  "group1/groupA/test1/subtest 5": <thing>,
-                #  "group1/groupA/test1/subtest 6": <thing>,
-                #  "group1/groupA/test1/subtest 7": <thing>,
-                # but what we want is groupg1/groupA/test1 and none of the
-                # subtest as keys in the dictionary at all
-                if name.endswith('/{0}'.format(sub)):
-                    testname = name[:-(len(sub) + 1)]  # remove leading /
-                    assert testname[-1] != '/'
-
-                    remove.add(name)
-                    break
-            else:
-                # This handles two cases, first that the results have only
-                # single entries for each test, regardless of subtests (new
-                # style), or that the test onhly as a single subtest and thus
-                # was recorded correctly
-                testname = name
-
-            if testname not in updated_results:
-                updated_results[testname] = test
-
-    for name in remove:
-        del result.tests[name]
-    result.tests.update(updated_results)
-
-    # set the results version
-    result.results_version = 1
-
-    return result
-
-
-def _update_one_to_two(results):
-    """Update version 1 results to version 2.
-
-    Version two results are actually identical to version one results, however,
-    there was an error in version 1 at the end causing metadata in the options
-    dictionary to be incorrect. Version 2 corrects that.
-
-    Namely uname, glxinfo, wglinfo, and lspci were put in the options['env']
-    instead of in the root.
-
-    """
-    if 'env' in results.options:
-        env = results.options['env']
-        if env.get('glxinfo'):
-            results.glxinfo = env['glxinfo']
-        if env.get('lspci'):
-            results.lspci = env['lspci']
-        if env.get('uname'):
-            results.uname = env['uname']
-        if env.get('wglinfo'):
-            results.wglinfo = env['wglinfo']
-        del results.options['env']
-
-    results.results_version = 2
-
-    return results
-
-
-def _update_two_to_three(results):
-    """Lower key names."""
-    for key, value in results.tests.items():
-        lowered = key.lower()
-        if not key == lowered:
-            results.tests[lowered] = value
-            del results.tests[key]
-
-    results.results_version = 3
-
-    return results
-
-
-def _update_three_to_four(results):
-    """Update results v3 to v4.
-
-    This update requires renaming a few tests. The complete lists can be found
-    in framework/data/results_v3_to_v4.json, a json file containing a list of
-    lists (They would be tuples if json has tuples), the first element being
-    the original name, and the second being a new name to update to
-
-    """
-    mapped_updates = [
-        ("spec/arb_texture_rg/fs-shadow2d-red-01",
-         "spec/arb_texture_rg/execution/fs-shadow2d-red-01"),
-        ("spec/arb_texture_rg/fs-shadow2d-red-02",
-         "spec/arb_texture_rg/execution/fs-shadow2d-red-02"),
-        ("spec/arb_texture_rg/fs-shadow2d-red-03",
-         "spec/arb_texture_rg/execution/fs-shadow2d-red-03"),
-        ("spec/arb_draw_instanced/draw-non-instanced",
-         "spec/arb_draw_instanced/execution/draw-non-instanced"),
-        ("spec/arb_draw_instanced/instance-array-dereference",
-         "spec/arb_draw_instanced/execution/instance-array-dereference"),
-    ]
-
-    for original, new in mapped_updates:
-        if original in results.tests:
-            results.tests[new] = results.tests[original]
-            del results.tests[original]
-
-    # This needs to use posixpath rather than grouptools because version 4 uses
-    # / as a separator, but grouptools isn't guaranteed to do so
-    for test, result in results.tests.items():
-        if posixpath.dirname(test) == 'glslparsertest':
-            group = posixpath.join('glslparsertest/shaders',
-                                   posixpath.basename(test))
-            results.tests[group] = result
-            del results.tests[test]
-
-    results.results_version = 4
-
-    return results
-
-
-def _update_four_to_five(results):
-    """Updates json results from version 4 to version 5."""
-    new_tests = {}
-
-    for name, test in six.iteritems(results.tests):
-        new_tests[name.replace('/', '@').replace('\\', '@')] = test
-
-    results.tests = new_tests
-    results.results_version = 5
-
-    return results
-
-
-def _update_five_to_six(result):
-    """Updates json results from version 5 to 6.
-
-    This uses a special field to for marking TestResult instances, rather than
-    just checking for fields we expect.
-
-    """
-    new_tests = {}
-
-    for name, test in six.iteritems(result.tests):
-        new_tests[name] = results.TestResult.from_dict(test)
-
-    result.tests = new_tests
-    result.results_version = 6
-
-    return result
-
-
-def _update_six_to_seven(result):
-    """Update json results from version 6 to 7.
-
-    Version 7 results always contain the totals member.
-
-    """
-    if not result.totals:
-        result.calculate_group_totals()
-    result.results_version = 7
-
-    return result
 
 
 def _update_seven_to_eight(result):
@@ -653,7 +407,7 @@ def _update_eight_to_nine(result):
 
 
 REGISTRY = Registry(
-    extensions=['', '.json'],
+    extensions=['.json'],
     backend=JSONBackend,
     load=load_results,
     meta=set_meta,
