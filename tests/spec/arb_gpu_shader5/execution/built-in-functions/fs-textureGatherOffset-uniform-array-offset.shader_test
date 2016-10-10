@@ -1,0 +1,49 @@
+# Test that the offset can be taken from a uniform array with an index that
+# itself comes from a uniform.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+uniform sampler2D s2D;
+uniform ivec2 offset[4];
+uniform int oidx;
+
+void main()
+{
+	gl_FragColor = textureGatherOffset(s2D, vec2(0.25, 0.25), offset[oidx]);
+}
+
+[test]
+texture quads 0 0 (4, 4) (1, 1) (0, 0.5, 0.1, 0.15) (0.2, 0.25, 0.3, 0.35) (0.4, 0.45, 0.5, 0.55) (0.6, 0.65, 0.7, 0.75)
+
+uniform int s2D 0
+uniform ivec2 offset[0] 0 0
+uniform ivec2 offset[1] 1 0
+uniform ivec2 offset[2] 0 1
+uniform ivec2 offset[3] 1 1
+
+uniform int oidx 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.4 0.6 0.2 0
+
+uniform int oidx 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.6 0.4 0 0.2
+
+uniform int oidx 2
+
+draw rect -1 -1 2 2
+probe all rgba 0 0.2 0.6 0.4
+
+uniform int oidx 3
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0 0.4 0.6
