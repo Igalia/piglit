@@ -3355,6 +3355,22 @@ piglit_display(void)
 			if (!piglit_is_core_profile)
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
+				  "texture quads %d %d ( %d , %d ) ( %d , %d ) "
+				  "( %f , %f , %f , %f ) "
+				  "( %f , %f , %f , %f ) "
+				  "( %f , %f , %f , %f ) "
+				  "( %f , %f , %f , %f )",
+				  &tex, &level, &w, &h, &x, &y,
+				  c + 0, c + 1, c + 2, c + 3,
+				  c + 4, c + 5, c + 6, c + 7,
+				  c + 8, c + 9, c + 10, c + 11,
+				  c + 12, c + 13, c + 14, c + 15) == 22) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_quads_texture(0, level, w, h, x, y,
+					     c + 0, c + 4, c + 8, c + 12);
+			if (!piglit_is_core_profile)
+				glEnable(GL_TEXTURE_2D);
+		} else if (sscanf(line,
 				  "texture junk 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
 			GLuint texobj;
