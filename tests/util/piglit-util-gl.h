@@ -284,6 +284,13 @@ void piglit_gen_ortho_uniform(GLint location, double left, double right,
 			      double far_val);
 void piglit_ortho_uniform(GLint location, int w, int h);
 
+GLuint
+piglit_quads_texture(GLuint tex, unsigned level,
+		     unsigned width, unsigned height,
+		     unsigned horiz_square_size,
+		     unsigned vert_square_size,
+		     const float *bl, const float *br,
+		     const float *tl, const float *tr);
 GLuint piglit_checkerboard_texture(GLuint tex, unsigned level,
     unsigned width, unsigned height,
     unsigned horiz_square_size, unsigned vert_square_size,
