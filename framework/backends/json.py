@@ -279,7 +279,7 @@ def _load(results_file):
         raise exceptions.PiglitFatalError(
             'While loading json results file: "{}",\n'
             'the following error occurred:\n{}'.format(results_file.name,
-                                                      str(e)))
+                                                       six.text_type(e)))
 
     if isinstance(result, results.TestrunResult):
         return result
