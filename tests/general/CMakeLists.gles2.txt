@@ -1,0 +1,4 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable(draw-vertices-half-float_gles2 draw-vertices-half-float.c)
+

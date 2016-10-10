@@ -4180,6 +4180,12 @@ with profile.group_manager(
       run_concurrent=False)
 
 with profile.group_manager(
+        PiglitGLTest, grouptools.join('spec', 'oes_vertex_half_float')) as g:
+    g(['draw-vertices-half-float_gles2'], run_concurrent=False)
+    g(['draw-vertices-half-float_gles2', 'user'], 'draw-vertices-half-float-user_gles2',
+      run_concurrent=False)
+
+with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_type_2_10_10_10_rev')) as g:
     g(['draw-vertices-2101010'], run_concurrent=False)
