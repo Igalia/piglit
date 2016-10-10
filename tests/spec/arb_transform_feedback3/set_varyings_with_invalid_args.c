@@ -34,6 +34,14 @@
  *  <program> is not the name of a program object, or if <bufferMode> is
  *  SEPARATE_ATTRIBS and <count> is greater than the limit
  *  MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS."
+ *
+ * Additionally accept following common rule with shader object API, specified
+ * by the 'Shader Objects' section of OpenGL spec:
+ *
+ * "Commands that accept shader or program object names will generate the error
+ * INVALID VALUE if the provided name is not the name of either a shader or pro-
+ * gram object and INVALID OPERATION if the provided name identifies an object
+ * that is not the expected type."
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -80,7 +88,7 @@ try_max_varyings(GLuint prog, unsigned n)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint prog;
+	GLuint vs, gs, prog;
 	GLint max_attrib_n;
 
 	piglit_require_extension("GL_ARB_transform_feedback3");
@@ -92,14 +100,30 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	prog = piglit_build_simple_program_multiple_shaders(
-			GL_VERTEX_SHADER, vs_pass_thru_text,
-			GL_GEOMETRY_SHADER, gs_simple_text, 0);
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_pass_thru_text);
+	gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, gs_simple_text);
+
+	if (!vs || !gs)
+		piglit_report_result(PIGLIT_FAIL);
+
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, gs);
+	glLinkProgram(prog);
+
+	if(!piglit_link_check_status(prog))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Try invalid program */
-	glTransformFeedbackVaryings(prog + 1, ARRAY_SIZE(varyings), varyings,
+	glTransformFeedbackVaryings(42, ARRAY_SIZE(varyings), varyings,
 				GL_INTERLEAVED_ATTRIBS);
 	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
+
+	/* Try shader in place of program. */
+	glTransformFeedbackVaryings(vs, ARRAY_SIZE(varyings), varyings,
+				GL_INTERLEAVED_ATTRIBS);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
 
 	/* Try too many attributes */
