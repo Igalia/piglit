@@ -14,13 +14,9 @@
 #version 140
 #extension GL_ARB_enhanced_layouts: require
 
-layout(xfb_stride = 20, xfb_buffer = 0) out;
-
-layout(xfb_buffer = 0) out vec4 var;
-layout(xfb_stride = 32) out vec4 var2;
+layout(xfb_stride = 20) out;
+layout(xfb_buffer = 0, xfb_stride = 32) out;
 
 void main()
 {
-  var = vec4(1.0);
-  var2 = vec4(0.0);
 }
