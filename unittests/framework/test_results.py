@@ -113,7 +113,7 @@ class TestTestResult(object):
                     'result': 'crash',
                     'exception': 'an exception',
                     'dmesg': 'this is dmesg',
-                    'pid': 1934,
+                    'pid': [1934],
                 }
 
                 cls.test = results.TestResult.from_dict(cls.dict)
@@ -142,8 +142,8 @@ class TestTestResult(object):
 
                 """
                 # pylint: disable=unsubscriptable-object
-                assert self.test.time['start'] == self.dict['time']['start']
-                assert self.test.time['end'] == self.dict['time']['end']
+                assert self.test.time.start == self.dict['time']['start']
+                assert self.test.time.end == self.dict['time']['end']
 
             def test_environment(self):
                 """sets environment properly."""
@@ -234,13 +234,6 @@ class TestTestResult(object):
             cls.test = test
             cls.json = test.to_json()
 
-            # the TimeAttribute needs to be dict-ified as well. There isn't
-            # really a good way to do this that doesn't introduce a lot of
-            # complexity, such as:
-            # json.loads(json.dumps(test, default=piglit_encoder),
-            #            object_hook=piglit_decoder)
-            cls.json['time'] = cls.json['time'].to_json()
-
         def test_returncode(self):
             """results.TestResult.to_json: sets the returncode correctly"""
             assert self.test.returncode == self.json['returncode']
@@ -269,7 +262,9 @@ class TestTestResult(object):
 
         def test_subtests(self):
             """results.TestResult.to_json: sets the subtests correctly"""
-            assert self.test.subtests == self.json['subtests']
+            assert self.test.subtests['a'] == self.json['subtests']['a']
+            assert self.test.subtests['b'] == self.json['subtests']['b']
+            assert self.json['subtests']['__type__']
 
         def test_type(self):
             """results.TestResult.to_json: adds the __type__ hint"""
@@ -515,7 +510,7 @@ class TestTestrunResult(object):
 
         def test_tests(self):
             """tests is properly encoded."""
-            assert self.test['tests']['a test'].result == 'pass'
+            assert self.test['tests']['a test']['result'] == 'pass'
 
         def test_type(self):
             """__type__ is added."""

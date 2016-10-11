@@ -37,7 +37,6 @@ import jsonschema
 import pytest
 
 from framework import backends
-from framework import results
 
 # pylint: disable=protected-access,no-self-use
 
@@ -67,13 +66,13 @@ class TestV7toV8(object):
             "test_count": 0,
             "exclude_tests": [],
             "exclude_filter": [],
-            "env": {
-                "lspci": "stuff",
-                "uname": "more stuff",
-                "glxinfo": "and stuff",
-                "wglinfo": "stuff"
-            }
+            "env": {},
         },
+        "lspci": "stuff",
+        "uname": "more stuff",
+        "glxinfo": "and stuff",
+        "wglinfo": "stuff",
+        "clinfo": "stuff",
         "tests": {
             'a@test': {
                 'time': 1.2,
@@ -94,6 +93,7 @@ class TestV7toV8(object):
             }
         },
         "time_elapsed": 1.2,
+        '__type__': 'TestrunResult',
     }
 
     @pytest.fixture
@@ -107,27 +107,15 @@ class TestV7toV8(object):
         """backends.json.update_results (7 -> 8): test time is stored as start
         and end.
         """
-        assert result.tests['a@test'].time.start == 0.0
-        assert result.tests['a@test'].time.end == 1.2
-
-    def test_time_inst(self, result):
-        """backends.json.update_results (7 -> 8): test time is a TimeAttribute
-        instance.
-        """
-        assert isinstance(result.tests['a@test'].time, results.TimeAttribute)
-
-    def test_time_elapsed_inst(self, result):
-        """backends.json.update_results (7 -> 8): total time is stored as
-        TimeAttribute.
-        """
-        assert isinstance(result.time_elapsed, results.TimeAttribute)
+        assert result['tests']['a@test']['time']['start'] == 0.0
+        assert result['tests']['a@test']['time']['end'] == 1.2
 
     def test_time_elapsed(self, result):
         """backends.json.update_results (7 -> 8): total time is stored as start
         and end.
         """
-        assert result.time_elapsed.start == 0.0
-        assert result.time_elapsed.end == 1.2
+        assert result['time_elapsed']['start'] == 0.0
+        assert result['time_elapsed']['end'] == 1.2
 
     def test_valid(self, result):
         with open(os.path.join(os.path.dirname(__file__), 'schema',
@@ -143,7 +131,7 @@ class TestV8toV9(object):
     """Tests for Version 8 to version 9."""
 
     data = {
-        "results_version": 9,
+        "results_version": 8,
         "name": "test",
         "options": {
             "profile": ['quick'],
@@ -157,16 +145,16 @@ class TestV8toV9(object):
             "test_count": 0,
             "exclude_tests": [],
             "exclude_filter": [],
-            "env": {
-                "lspci": "stuff",
-                "uname": "more stuff",
-                "glxinfo": "and stuff",
-                "wglinfo": "stuff"
-            }
+            "env": {},
         },
+        "lspci": "stuff",
+        "uname": "more stuff",
+        "glxinfo": "and stuff",
+        "wglinfo": "stuff",
+        "clinfo": "stuff",
         "tests": {
             'a@test': {
-                "time_elapsed": {
+                "time": {
                     'start': 1.2,
                     'end': 1.8,
                     '__type__': 'TimeAttribute'
@@ -191,7 +179,8 @@ class TestV8toV9(object):
             'start': 1.2,
             'end': 1.8,
             '__type__': 'TimeAttribute'
-        }
+        },
+        '__type__': 'TestrunResult',
     }
 
     @pytest.fixture
@@ -202,7 +191,7 @@ class TestV8toV9(object):
             return backends.json._update_eight_to_nine(backends.json._load(f))
 
     def test_pid(self, result):
-        assert result.tests['a@test'].pid == [5]
+        assert result['tests']['a@test']['pid'] == [5]
 
     def test_valid(self, result):
         with open(os.path.join(os.path.dirname(__file__), 'schema',

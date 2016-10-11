@@ -200,8 +200,8 @@ class TestResult(object):
             'out': self.out,
             'result': self.result,
             'returncode': self.returncode,
-            'subtests': self.subtests,
-            'time': self.time,
+            'subtests': self.subtests.to_json(),
+            'time': self.time.to_json(),
             'exception': self.exception,
             'traceback': self.traceback,
             'dmesg': self.dmesg,
@@ -225,18 +225,19 @@ class TestResult(object):
         inst = cls()
 
         for each in ['returncode', 'command', 'exception', 'environment',
-                     'time', 'traceback', 'result', 'dmesg', 'pid']:
+                     'traceback', 'dmesg', 'pid', 'result']:
             if each in dict_:
                 setattr(inst, each, dict_[each])
 
+        # Set special instances
         if 'subtests' in dict_:
-            for name, value in six.iteritems(dict_['subtests']):
-                inst.subtests[name] = value
+            inst.subtests = Subtests.from_dict(dict_['subtests'])
+        if 'time' in dict_:
+            inst.time = TimeAttribute.from_dict(dict_['time'])
 
         # out and err must be set manually to avoid replacing the setter
         if 'out' in dict_:
             inst.out = dict_['out']
-
         if 'err' in dict_:
             inst.err = dict_['err']
 
@@ -344,6 +345,7 @@ class TestrunResult(object):
         if not self.totals:
             self.calculate_group_totals()
         rep = copy.copy(self.__dict__)
+        rep['tests'] = {k: t.to_json() for k, t in six.iteritems(self.tests)}
         rep['__type__'] = 'TestrunResult'
         return rep
 
@@ -360,11 +362,14 @@ class TestrunResult(object):
         """
         res = cls()
         for name in ['name', 'uname', 'options', 'glxinfo', 'wglinfo', 'lspci',
-                     'time_elapsed', 'tests', 'totals', 'results_version',
+                     'time_elapsed', 'totals', 'results_version',
                      'clinfo']:
             value = dict_.get(name)
             if value:
                 setattr(res, name, value)
+
+        res.tests = {n: TestResult.from_dict(t)
+                     for n, t in six.iteritems(dict_['tests'])}
 
         if not res.totals and not _no_totals:
             res.calculate_group_totals()

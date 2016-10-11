@@ -61,14 +61,6 @@ MINIMUM_SUPPORTED_VERSION = 7
 # The level to indent a final file
 INDENT = 4
 
-_DECODER_TABLE = {
-    'Subtests': results.Subtests,
-    'TestResult': results.TestResult,
-    'TestrunResult': results.TestrunResult,
-    'TimeAttribute': results.TimeAttribute,
-    'Totals': results.Totals,
-}
-
 
 def piglit_encoder(obj):
     """ Encoder for piglit that can transform additional classes into json
@@ -82,16 +74,6 @@ def piglit_encoder(obj):
         return list(obj)
     elif hasattr(obj, 'to_json'):
         return obj.to_json()
-    return obj
-
-
-def piglit_decoder(obj):
-    """Json decoder for piglit that can load TestResult objects."""
-    if isinstance(obj, dict):
-        try:
-            return _DECODER_TABLE[obj['__type__']].from_dict(obj)
-        except KeyError:
-            pass
     return obj
 
 
@@ -167,8 +149,7 @@ class JSONBackend(FileBackend):
                     # work.
                     try:
                         with open(test, 'r') as f:
-                            data['tests'].update(
-                                json.load(f, object_hook=piglit_decoder))
+                            data['tests'].update(json.load(f))
                     except ValueError:
                         pass
             assert data['tests']
@@ -204,8 +185,7 @@ class JSONBackend(FileBackend):
                             if os.path.isfile(test):
                                 try:
                                     with open(test, 'r') as f:
-                                        a = json.load(
-                                            f, object_hook=piglit_decoder)
+                                        a = json.load(f)
                                 except ValueError:
                                     continue
 
@@ -260,7 +240,7 @@ def load_results(filename, compression_):
     with compression.DECOMPRESSORS[compression_](filepath) as f:
         testrun = _load(f)
 
-    return _update_results(testrun, filepath)
+    return results.TestrunResult.from_dict(_update_results(testrun, filepath))
 
 
 def set_meta(results):
@@ -275,16 +255,14 @@ def _load(results_file):
 
     """
     try:
-        result = json.load(results_file, object_hook=piglit_decoder)
+        result = json.load(results_file)
     except ValueError as e:
         raise exceptions.PiglitFatalError(
             'While loading json results file: "{}",\n'
             'the following error occurred:\n{}'.format(results_file.name,
                                                        six.text_type(e)))
 
-    if isinstance(result, results.TestrunResult):
-        return result
-    return results.TestrunResult.from_dict(result, _no_totals=True)
+    return result
 
 
 def _resume(results_dir):
@@ -307,7 +285,7 @@ def _resume(results_dir):
     for file_ in os.listdir(os.path.join(results_dir, 'tests')):
         with open(os.path.join(results_dir, 'tests', file_), 'r') as f:
             try:
-                meta['tests'].update(json.load(f, object_hook=piglit_decoder))
+                meta['tests'].update(json.load(f))
             except ValueError:
                 continue
 
@@ -336,20 +314,20 @@ def _update_results(results, filepath):
             8: _update_eight_to_nine,
         }
 
-        while results.results_version < CURRENT_JSON_VERSION:
-            results = updates[results.results_version](results)
+        while results['results_version'] < CURRENT_JSON_VERSION:
+            results = updates[results['results_version']](results)
 
         return results
 
-    if results.results_version < MINIMUM_SUPPORTED_VERSION:
+    if results['results_version'] < MINIMUM_SUPPORTED_VERSION:
         raise exceptions.PiglitFatalError(
             'Unsupported version "{}", '
             'minimum supported version is "{}"'.format(
-                results.results_version, MINIMUM_SUPPORTED_VERSION))
+                results['results_version'], MINIMUM_SUPPORTED_VERSION))
 
     # If the results version is the current version there is no need to
     # update, just return the results
-    if results.results_version == CURRENT_JSON_VERSION:
+    if results['results_version'] == CURRENT_JSON_VERSION:
         return results
 
     results = loop_updates(results)
@@ -381,12 +359,15 @@ def _update_seven_to_eight(result):
     This value is used for both TestResult.time and TestrunResult.time_elapsed.
 
     """
-    for test in compat.viewvalues(result.tests):
-        test.time = results.TimeAttribute(end=test.time)
+    for test in compat.viewvalues(result['tests']):
+        test['time'] = {'start': 0.0, 'end': float(test['time']),
+                        '__type__': 'TimeAttribute'}
 
-    result.time_elapsed = results.TimeAttribute(end=result.time_elapsed)
+    result['time_elapsed'] = {'start': 0.0, 'end':
+                              float(result['time_elapsed']),
+                              '__type__': 'TimeAttribute'}
 
-    result.results_version = 8
+    result['results_version'] = 8
 
     return result
 
@@ -398,10 +379,10 @@ def _update_eight_to_nine(result):
     null rather than a single integer or null.
 
     """
-    for test in compat.viewvalues(result.tests):
-        test.pid = [test.pid]
+    for test in compat.viewvalues(result['tests']):
+        test['pid'] = [test['pid']]
 
-    result.results_version = 9
+    result['results_version'] = 9
 
     return result
 

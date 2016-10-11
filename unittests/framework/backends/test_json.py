@@ -250,6 +250,13 @@ class TestLoadResults(object):
             f.write(json.dumps(shared.JSON))
         backends.json.load_results(six.text_type(p), 'none')
 
+    def test_inst(self, tmpdir):
+        p = tmpdir.join('my file')
+        with p.open('w') as f:
+            f.write(json.dumps(shared.JSON))
+        assert isinstance(backends.json.load_results(six.text_type(p), 'none'),
+                          results.TestrunResult)
+
 
 class TestLoad(object):
     """Tests for the _load function."""
@@ -261,22 +268,3 @@ class TestLoad(object):
         with p.open('r') as f:
             with pytest.raises(exceptions.PiglitFatalError):
                 backends.json._load(f)
-
-
-class TestPiglitDecooder(object):
-    """Tests for the piglit_decoder function."""
-
-    def test_result(self):
-        """backends.json.piglit_decoder: turns results into TestResults."""
-        test = json.loads(
-            '{"foo": {"result": "pass", "__type__": "TestResult"}}',
-            object_hook=backends.json.piglit_decoder)
-        assert isinstance(test['foo'], results.TestResult)
-
-    def test_old_result(self):
-        """backends.json.piglit_decoder: does not turn old results into
-        TestResults.
-        """
-        test = json.loads('{"foo": {"result": "pass"}}',
-                          object_hook=backends.json.piglit_decoder)
-        assert isinstance(test['foo'], dict)
