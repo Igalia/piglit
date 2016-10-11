@@ -1,5 +1,5 @@
 // [config]
-// expect_result: fail
+// expect_result: pass
 // glsl_version: 1.40
 // check_link: true
 // require_extensions: GL_ARB_enhanced_layouts
@@ -17,7 +17,7 @@
 layout(xfb_stride = 20, xfb_buffer = 0) out;
 
 layout(xfb_buffer = 0) out vec4 var;
-layout(xfb_stride = 32) out vec4 var2;
+layout(xfb_stride = 20) out vec4 var2;
 
 void main()
 {
