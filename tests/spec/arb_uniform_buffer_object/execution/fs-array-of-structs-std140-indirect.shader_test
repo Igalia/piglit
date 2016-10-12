@@ -1,0 +1,46 @@
+# Test indirect access of an array of structs, where struct members are not
+# vec4-aligned.
+
+[require]
+GLSL >= 1.30
+GL_ARB_uniform_buffer_object
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_uniform_buffer_object: require
+
+struct S {
+    float x;
+    float y;
+    vec2 zw;
+};
+
+layout(std140) uniform Block {
+    S s[2];
+};
+
+uniform int idx;
+
+out vec4 outcolor;
+
+void main()
+{
+    outcolor = vec4(s[idx].x, s[idx].y, s[idx].zw.x, s[idx].zw.y);
+}
+
+[test]
+uniform vec2 s[0].x 0.1
+uniform vec2 s[0].y 0.2
+uniform vec2 s[0].zw 0.3 0.4
+uniform vec2 s[1].x 0.5
+uniform vec2 s[1].y 0.6
+uniform vec2 s[1].zw 0.7 0.8
+
+uniform int idx 0
+draw rect -1 -1 2 2
+probe all rgba 0.1 0.2 0.3 0.4
+
+uniform int idx 1
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.6 0.7 0.8
