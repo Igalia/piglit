@@ -125,7 +125,7 @@ static GLuint *uniform_block_bos;
 static GLenum geometry_layout_input_type = GL_TRIANGLES;
 static GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
 static GLint geometry_layout_vertices_out = 0;
-static GLuint atomics_bo = 0;
+static GLuint atomics_bos[8];
 static GLuint ssbo[32];
 
 #define SHADER_TYPES 6
@@ -2836,6 +2836,15 @@ teardown_ubos(void)
 	num_uniform_blocks = 0;
 }
 
+static void
+teardown_atomics(void)
+{
+	for (unsigned i = 0; i < ARRAY_SIZE(atomics_bos); ++i) {
+		if (atomics_bos[i])
+			glDeleteBuffers(1, &atomics_bos[i]);
+	}
+}
+
 static enum piglit_result
 program_must_be_in_use(void)
 {
@@ -2859,7 +2868,7 @@ bind_vao_if_supported()
 }
 
 static bool
-probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
+probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uint32_t value)
 {
         uint32_t *p;
 	uint32_t observed;
@@ -2868,8 +2877,7 @@ probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
 
 	process_comparison(op, &cmp);
 
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
-	p = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, counter_num * sizeof(uint32_t),
+	p = glMapNamedBufferRange(atomics_bos[buffer_num], counter_num * sizeof(uint32_t),
 			     sizeof(uint32_t), GL_MAP_READ_BIT);
 
         if (!p) {
@@ -2885,11 +2893,11 @@ probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
 		       counter_num, comparison_string(cmp));
 		printf("  Reference: %u\n", value);
 		printf("  Observed:  %u\n", observed);
-		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+		glUnmapNamedBuffer(atomics_bos[buffer_num]);
 		return false;
         }
 
-        glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+        glUnmapNamedBuffer(atomics_bos[buffer_num]);
         return true;
 }
 
@@ -2984,14 +2992,26 @@ piglit_display(void)
 				glActiveShaderProgram(pipeline, sso_compute_prog);
 			break;
 			}
+		} else if (sscanf(line, "atomic counter buffer %u %u", &x, &y) == 2) {
+			GLuint *atomics_buf = calloc(y, sizeof(GLuint));
+			glGenBuffers(1, &atomics_bos[x]);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, x, atomics_bos[x]);
+			glBufferData(GL_ATOMIC_COUNTER_BUFFER,
+				     sizeof(GLuint) * y, atomics_buf,
+				     GL_STATIC_DRAW);
+			free(atomics_buf);
 		} else if (sscanf(line, "atomic counters %d", &x) == 1) {
 			GLuint *atomics_buf = calloc(x, sizeof(GLuint));
-			glGenBuffers(1, &atomics_bo);
-			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
+			glGenBuffers(1, &atomics_bos[0]);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bos[0]);
 			glBufferData(GL_ATOMIC_COUNTER_BUFFER,
 				     sizeof(GLuint) * x,
 				     atomics_buf, GL_STATIC_DRAW);
 			free(atomics_buf);
+		} else if (sscanf(line, "atomic counter %u %u %u", &x, &y, &z) == 3) {
+			glNamedBufferSubData(atomics_bos[x],
+					     sizeof(GLuint) * y, sizeof(GLuint),
+					     &z);
 		} else if (string_match("clear color", line)) {
 			get_floats(line + 11, c, 4);
 			glClearColor(c[0], c[1], c[2], c[3]);
@@ -3192,7 +3212,7 @@ piglit_display(void)
 		} else if (sscanf(line,
 				  "probe atomic counter %u %s %u",
 				  &ux, s, &uy) == 3) {
-			if (!probe_atomic_counter(ux, s, uy)) {
+			if (!probe_atomic_counter(0, ux, s, uy)) {
 				piglit_report_result(PIGLIT_FAIL);
 			}
 		} else if (sscanf(line, "probe ssbo uint %d %d %s 0x%x",
@@ -3721,7 +3741,7 @@ piglit_init(int argc, char **argv)
 			geometry_layout_input_type = GL_TRIANGLES;
 			geometry_layout_output_type = GL_TRIANGLE_STRIP;
 			geometry_layout_vertices_out = 0;
-			atomics_bo = 0;
+			memset(atomics_bos, 0, sizeof(atomics_bos));
 			memset(ssbo, 0, sizeof(ssbo));
 			for (j = 0; j < ARRAY_SIZE(subuniform_locations); j++)
 				assert(subuniform_locations[j] == NULL);
@@ -3865,6 +3885,7 @@ piglit_init(int argc, char **argv)
 
 			/* destroy GL objects? */
 			teardown_ubos();
+			teardown_atomics();
 		}
 		exit(0);
 	}
