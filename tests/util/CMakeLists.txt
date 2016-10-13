@@ -81,6 +81,9 @@ if(PIGLIT_USE_WAFFLE)
 		list(APPEND UTIL_GL_SOURCES
 			piglit-framework-gl/piglit_gbm_framework.c
 		)
+		list(APPEND UTIL_GL_LIBS
+			${GBM_LDFLAGS}
+		)
 	endif()
 	if(PIGLIT_HAS_WAYLAND)
 		list(APPEND UTIL_GL_SOURCES
