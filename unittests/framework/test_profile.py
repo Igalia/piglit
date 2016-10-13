@@ -285,6 +285,58 @@ class TestTestProfile(object):
 
             assert grouptools.join('foo', 'abc') in self.profile.test_list
 
+    class TestCopy(object):
+        """Tests for the copy method."""
+
+        @pytest.fixture
+        def fixture(self):
+            orig = profile.TestProfile()
+            orig.test_list['foo'] = utils.Test(['foo'])
+            orig.test_list['bar'] = utils.Test(['bar'])
+            orig.filters = [lambda name, _: name != 'bar']
+            orig.forced_test_list = ['foo']
+            return orig
+
+        def test_filters(self, fixture):
+            """The filters attribute is copied correctly."""
+            new = fixture.copy()
+
+            # Assert that the fixtures are equivalent, but not the same
+            assert fixture.filters == new.filters
+            assert fixture.filters is not new.filters
+
+            # And double check by modifying one of them and asserting that the
+            # other has not changed.
+            new.filters.append(lambda name, _: name != 'oink')
+            assert len(fixture.filters) == 1
+
+        def test_forced_test_list(self, fixture):
+            """The forced_test_list attribute is copied correctly."""
+            new = fixture.copy()
+
+            # Assert that the fixtures are equivalent, but not the same
+            assert fixture.forced_test_list == new.forced_test_list
+            assert fixture.forced_test_list is not new.forced_test_list
+
+            # And double check by modifying one of them and asserting that the
+            # other has not changed.
+            del new.forced_test_list[0]
+            assert fixture.forced_test_list[0] == 'foo'
+
+        def test_test_list(self, fixture):
+            """The test_list attribute is copied correctly."""
+            new = fixture.copy()
+
+            # Assert that the fixtures are equivalent, but not the same
+            assert fixture.test_list == new.test_list
+            assert fixture.test_list is not new.test_list
+
+        def test_prepare_test_list(self, fixture):
+            """The prepare_test_list method doesn't affect both."""
+            new = fixture.copy()
+            new.prepare_test_list()
+            assert new.test_list != fixture.test_list
+
 
 class TestTestDict(object):
     """Tests for the TestDict object."""

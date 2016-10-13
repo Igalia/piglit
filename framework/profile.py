@@ -31,6 +31,7 @@ from __future__ import (
 )
 import collections
 import contextlib
+import copy
 import importlib
 import itertools
 import multiprocessing
@@ -397,6 +398,21 @@ class TestProfile(object):
 
     def teardown(self):
         """Method to od post-run teardown."""
+
+    def copy(self):
+        """Create a copy of the TestProfile.
+
+        This method creates a copy with references to the original instance
+        (using copy.copy), except for the test_list attribute, which is copied
+        using copy.deepcopy, which is necessary to ensure that filter_tests
+        only affects the right instance. This allows profiles to be
+        "subclassed" by other profiles, without modifying the original.
+        """
+        new = copy.copy(self)
+        new.test_list = copy.deepcopy(self.test_list)
+        new.forced_test_list = copy.copy(self.forced_test_list)
+        new.filters = copy.copy(self.filters)
+        return new
 
 
 def load_test_profile(filename):

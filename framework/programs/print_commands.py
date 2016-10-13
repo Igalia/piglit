@@ -95,7 +95,7 @@ def main(input_):
 
     profile_ = profile.load_test_profile(args.testProfile)
 
-    profile_._prepare_test_list()
+    profile_.prepare_test_list()
     for name, test in six.iteritems(profile_.test_list):
         assert isinstance(test, Test)
         print(args.format_string.format(
