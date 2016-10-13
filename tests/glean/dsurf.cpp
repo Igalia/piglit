@@ -150,8 +150,8 @@ legacyMethod:
 		GetModuleHandle(NULL),
 		NULL);
 
-    if (!hWindow)
-        return;
+	if (!hWindow)
+		return;
 
 	hDC = GetDC(hWindow);
 
