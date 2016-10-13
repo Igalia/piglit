@@ -316,6 +316,10 @@ def run(input_):
     profile.results_dir = args.results_path
     # If a test list is provided then set the forced_test_list value.
     if args.test_list:
+        if len(args.test_profiles) != 1:
+            raise exceptions.PiglitFatalError(
+                'Unable to force a test list with more than one profile')
+
         with open(args.test_list) as test_list:
             # Strip newlines
             profile.forced_test_list = list([t.strip() for t in test_list])
