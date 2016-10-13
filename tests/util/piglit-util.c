@@ -650,8 +650,26 @@ piglit_parse_subtest_args(int *argc, char *argv[],
 	const char **selected_subtests = NULL;
 	size_t num_selected_subtests = 0;
 
+	const char *usage =
+		"usage:\n"
+		"  %1$s\n"
+		"      Run all subtests.\n"
+		"\n"
+		"  %1$s -list-subtests\n"
+		"      List all subtests.\n"
+		"\n"
+		"  %1$s -subtest SUBTEST [-subtest SUBTEST [...]]\n"
+		"      Run only the given subtests.\n"
+		"\n"
+		"  %1$s -h|--help\n"
+		"      Print this help message.\n"
+		;
+
 	for (j = 1; j < *argc; j++) {
-		if (streq(argv[j], "-subtest")) {
+		if (streq(argv[j], "-h") || streq(argv[j], "--help")) {
+			printf(usage, basename(argv[0]));
+			exit(EXIT_SUCCESS);
+		} else if (streq(argv[j], "-subtest")) {
 			int i;
 
 			++j;
