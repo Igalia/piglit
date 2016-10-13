@@ -324,7 +324,7 @@ def run(input_):
 
         with open(args.test_list) as test_list:
             # Strip newlines
-            profiles[0].forced_test_list = list([t.strip() for t in test_list])
+            profiles[0].forced_test_list = [t.strip() for t in test_list]
 
     # Set the dmesg type
     if args.dmesg:
