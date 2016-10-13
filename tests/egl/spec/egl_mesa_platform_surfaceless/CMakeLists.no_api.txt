@@ -1,0 +1,7 @@
+link_libraries(
+	piglitutil
+)
+
+piglit_add_executable(egl_mesa_platform_surfaceless egl_mesa_platform_surfaceless.c)
+
+# vim: ft=cmake:
