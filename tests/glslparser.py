@@ -11,4 +11,4 @@ __all__ = ['profile']
 
 profile = _profile.copy()  # pylint: disable=invalid-name
 
-profile.filter_tests(lambda _, t: isinstance(t, GLSLParserTest))
+profile.filters.append(lambda _, t: isinstance(t, GLSLParserTest))

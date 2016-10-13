@@ -28,4 +28,4 @@ def filter_gpu(name, test):
     return False
 
 
-profile.filter_tests(filter_gpu)
+profile.filters.append(filter_gpu)

@@ -287,16 +287,6 @@ class TestProfile(object):
             raise exceptions.PiglitFatalError(
                 'There are no tests scheduled to run. Aborting run.')
 
-    def filter_tests(self, function):
-        """Filter out tests that return false from the supplied function
-
-        Arguments:
-        function -- a callable that takes two parameters: path, test and
-                    returns whether the test should be included in the test
-                    run or not.
-        """
-        self.filters.append(function)
-
     @contextlib.contextmanager
     def group_manager(self, test_class, group, prefix=None, **default_args):
         """A context manager to make working with flat groups simple.
@@ -388,9 +378,9 @@ class TestProfile(object):
 
         This method creates a copy with references to the original instance
         (using copy.copy), except for the test_list attribute, which is copied
-        using copy.deepcopy, which is necessary to ensure that filter_tests
-        only affects the right instance. This allows profiles to be
-        "subclassed" by other profiles, without modifying the original.
+        using copy.deepcopy, which is necessary to ensure that
+        prepare_test_list only affects the right instance. This allows profiles
+        to be "subclassed" by other profiles, without modifying the original.
         """
         new = copy.copy(self)
         new.test_list = copy.deepcopy(self.test_list)

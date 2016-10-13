@@ -39,4 +39,4 @@ def xts_render_filter(path, test):
     return 'xlib9' in path
 
 
-profile.filter_tests(xts_render_filter)
+profile.filters.append(xts_render_filter)

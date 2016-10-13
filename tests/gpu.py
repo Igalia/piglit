@@ -14,5 +14,5 @@ __all__ = ['profile']
 profile = _profile.copy()  # pylint: disable=invalid-name
 
 # Remove all parser tests, as they are compiler test
-profile.filter_tests(lambda p, t: not isinstance(t, GLSLParserTest))
-profile.filter_tests(lambda n, _: not n.startswith('asmparsertest'))
+profile.filters.append(lambda p, t: not isinstance(t, GLSLParserTest))
+profile.filters.append(lambda n, _: not n.startswith('asmparsertest'))

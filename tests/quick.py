@@ -64,5 +64,5 @@ with profile.group_manager(
         g(['arb_shader_image_size-builtin', '--quick'], 'builtin')
 
 # These take too long
-profile.filter_tests(lambda n, _: '-explosion' not in n)
-profile.filter_tests(FilterVsIn())
+profile.filters.append(lambda n, _: '-explosion' not in n)
+profile.filters.append(FilterVsIn())

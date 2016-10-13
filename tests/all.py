@@ -4914,4 +4914,4 @@ with profile.group_manager(
     g(['arb_compute_variable_group_size-minmax'], 'minmax')
 
 if platform.system() is 'Windows':
-    profile.filter_tests(lambda p, _: not p.startswith('glx'))
+    profile.filters.append(lambda p, _: not p.startswith('glx'))
