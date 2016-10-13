@@ -312,8 +312,10 @@ def run(input_):
     backend.initialize(_create_metadata(
         args, args.name or path.basename(args.results_path)))
 
-    profile = framework.profile.merge_test_profiles(args.test_profile)
-    profile.results_dir = args.results_path
+    profiles = [framework.profile.load_test_profile(p) for p in args.test_profile]
+    for p in profiles:
+        p.results_dir = args.results_path
+
     # If a test list is provided then set the forced_test_list value.
     if args.test_list:
         if len(args.test_profiles) != 1:
@@ -322,18 +324,20 @@ def run(input_):
 
         with open(args.test_list) as test_list:
             # Strip newlines
-            profile.forced_test_list = list([t.strip() for t in test_list])
+            profiles[0].forced_test_list = list([t.strip() for t in test_list])
 
     # Set the dmesg type
     if args.dmesg:
-        profile.dmesg = args.dmesg
+        for p in profiles:
+            p.dmesg = args.dmesg
 
     if args.monitored:
-        profile.monitoring = args.monitored
+        for p in profiles:
+            p.monitoring = args.monitored
 
     time_elapsed = framework.results.TimeAttribute(start=time.time())
 
-    framework.profile.run(profile, args.log_level, backend, args.concurrency)
+    framework.profile.run(profiles, args.log_level, backend, args.concurrency)
 
     time_elapsed.end = time.time()
     backend.finalize({'time_elapsed': time_elapsed.to_json()})
@@ -391,17 +395,20 @@ def resume(input_):
         if args.no_retry or result.result != 'incomplete':
             options.OPTIONS.exclude_tests.add(name)
 
-    profile = framework.profile.merge_test_profiles(results.options['profile'])
-    profile.results_dir = args.results_path
-    if options.OPTIONS.dmesg:
-        profile.dmesg = options.OPTIONS.dmesg
+    profiles = [framework.profile.load_test_profile(p)
+                for p in results.options['profile']]
+    for p in profiles:
+        p.results_dir = args.results_path
 
-    if options.OPTIONS.monitored:
-        profile.monitoring = options.OPTIONS.monitored
+        if options.OPTIONS.dmesg:
+            p.dmesg = options.OPTIONS.dmesg
+
+        if options.OPTIONS.monitored:
+            p.monitoring = options.OPTIONS.monitored
 
     # This is resumed, don't bother with time since it won't be accurate anyway
     framework.profile.run(
-        profile,
+        profiles,
         results.options['log_level'],
         backend,
         results.options['concurrent'])

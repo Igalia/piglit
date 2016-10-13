@@ -101,23 +101,6 @@ class TestTestProfile(object):
         profile_.dmesg = False
         assert isinstance(profile_.dmesg, dmesg.DummyDmesg)
 
-    def test_update_test_list(self):
-        """profile.TestProfile.update(): updates TestProfile.test_list"""
-        profile1 = profile.TestProfile()
-        group1 = grouptools.join('group1', 'test1')
-        group2 = grouptools.join('group1', 'test2')
-
-        profile1.test_list[group1] = utils.Test(['test1'])
-
-        profile2 = profile.TestProfile()
-        profile2.test_list[group1] = utils.Test(['test3'])
-        profile2.test_list[group2] = utils.Test(['test2'])
-
-        with profile1.allow_reassignment:
-            profile1.update(profile2)
-
-        assert dict(profile1.test_list) == dict(profile2.test_list)
-
     class TestPrepareTestList(object):
         """Create tests for TestProfile.prepare_test_list filtering."""
 

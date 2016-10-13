@@ -66,8 +66,7 @@ class FeatResults(object):  # pylint: disable=too-few-public-methods
             options.OPTIONS.exclude_filter = exclude_filter
             options.OPTIONS.include_filter = include_filter
 
-            profiles[feature] = profile.TestProfile()
-            profiles[feature].update(profile_orig)
+            profiles[feature] = profile_orig.copy()
 
             # An empty list will raise PiglitFatalError exception
             # But for reporting we need to handle this situation

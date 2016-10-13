@@ -65,16 +65,15 @@ def _maketest(res):
 
 
 PROFILE = profile.TestProfile()
-PROFILE.test_list = {
-    'spec@gl-1.0@a': _maketest('pass'),
-    'spec@gl-1.0@b': _maketest('warn'),
-    'spec@gl-1.0@c': _maketest('pass'),
-    'spec@gl-1.0@d': _maketest('fail'),
-    'spec@gl-2.0@a': _maketest('fail'),
-    'spec@gl-2.0@b': _maketest('crash'),
-    'spec@gl-2.0@c': _maketest('pass'),
-    'spec@gl-2.0@d': _maketest('fail'),
-}
+PROFILE.test_list = profile.TestDict()
+PROFILE.test_list['spec@gl-1.0@a'] = _maketest('pass')
+PROFILE.test_list['spec@gl-1.0@b'] = _maketest('warn')
+PROFILE.test_list['spec@gl-1.0@c'] = _maketest('pass')
+PROFILE.test_list['spec@gl-1.0@d'] = _maketest('fail')
+PROFILE.test_list['spec@gl-2.0@a'] = _maketest('fail')
+PROFILE.test_list['spec@gl-2.0@b'] = _maketest('crash')
+PROFILE.test_list['spec@gl-2.0@c'] = _maketest('pass')
+PROFILE.test_list['spec@gl-2.0@d'] = _maketest('fail')
 
 
 class TestFeatResult(object):
