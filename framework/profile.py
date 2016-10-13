@@ -346,14 +346,8 @@ class TestProfile(object):
                 # pool
                 run_threads(single, (x for x in six.iteritems(self.test_list)
                                      if not x[1].run_concurrent))
-
+        finally:
             log.get().summary()
-        except (KeyboardInterrupt, Exception):
-            # In the event that C-c is pressed, or any sort of exception would
-            # generate a stacktrace, print the status line so that it's clear,
-            # then die. Pressing C-c again will kill immediately.
-            log.get().summary()
-            raise
         self.teardown()
 
         if self._monitoring.abort_needed:
