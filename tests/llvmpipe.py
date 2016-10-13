@@ -8,9 +8,11 @@ import platform
 import sys
 
 from framework.grouptools import join
-from tests.gpu import profile
+from tests.gpu import profile as _profile
 
 __all__ = ['profile']
+
+profile = _profile.copy()  # pylint: disable=invalid-name
 
 
 def remove(key):

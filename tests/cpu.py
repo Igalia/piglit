@@ -13,10 +13,12 @@ hardware.
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
-from tests.quick import profile
+from tests.quick import profile as _profile
 from framework.test import GLSLParserTest
 
 __all__ = ['profile']
+
+profile = _profile.copy()  # pylint: disable=invalid-name
 
 
 def filter_gpu(name, test):

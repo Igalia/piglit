@@ -5,8 +5,10 @@ from __future__ import (
 )
 
 from framework.test import GLSLParserTest
-from tests.all import profile
+from tests.all import profile as _profile
 
 __all__ = ['profile']
+
+profile = _profile.copy()  # pylint: disable=invalid-name
 
 profile.filter_tests(lambda _, t: isinstance(t, GLSLParserTest))

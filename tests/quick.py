@@ -17,7 +17,7 @@ import random
 
 from framework import grouptools
 from framework.test import (GleanTest, PiglitGLTest)
-from tests.all import profile
+from tests.all import profile as _profile
 
 __all__ = ['profile']
 
@@ -38,6 +38,8 @@ class FilterVsIn(object):
             return self.random.random() <= .2
         return True
 
+
+profile = _profile.copy()  # pylint: disable=invalid-name
 
 GleanTest.GLOBAL_PARAMS += ["--quick"]
 

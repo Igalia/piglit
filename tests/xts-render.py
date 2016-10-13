@@ -22,10 +22,12 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
-from framework import core
-from framework.profile import load_test_profile
+
+from tests.xts import profile as _profile
 
 __all__ = ['profile']
+
+profile = _profile.copy()  # pylint: disable=invalid-name
 
 
 def xts_render_filter(path, test):
@@ -37,5 +39,4 @@ def xts_render_filter(path, test):
     return 'xlib9' in path
 
 
-profile = load_test_profile("xts")
 profile.filter_tests(xts_render_filter)
