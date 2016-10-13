@@ -66,40 +66,9 @@ EGLint (*peglClientWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, E
 EGLint (*peglWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
 EGLBoolean (*peglGetSyncAttribKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint attribute, EGLint *value);
 
-static const char *prog_name;
-
 static const EGLint canary = 0x31415926;
 static EGLDisplay g_dpy = 0;
 static EGLContext g_ctx = 0;
-
-static void
-print_usage(void)
-{
-	const char *usage =
-		"usage:\n"
-		"  %1$s\n"
-		"      Run all subtests.\n"
-		"\n"
-		"  %1$s -list-subtests\n"
-		"      List all subtests.\n"
-		"\n"
-		"  %1$s -subtest SUBTEST [-subtest SUBTEST [...]]\n"
-		"      Run only the given subtests.\n"
-		"\n"
-		"  %1$s -h|--help\n"
-		"      Print this help message.\n"
-		;
-
-	printf(usage, prog_name);
-}
-
-static void
-usage_error(void)
-{
-	printf("\n");
-	print_usage();
-	piglit_report_result(PIGLIT_FAIL);
-}
 
 static enum piglit_result
 init_display(EGLenum platform, EGLDisplay *out_dpy)
@@ -1385,38 +1354,6 @@ init_egl_extension_funcs(void)
 	peglGetSyncAttribKHR = (void*) eglGetProcAddress("eglGetSyncAttribKHR");
 }
 
-static void
-parse_args(int *argc, char **argv,
-	   const struct piglit_subtest *subtests,
-	   const char ***selected_subtests,
-	   size_t *num_selected_subtests)
-{
-	*selected_subtests = NULL;
-	*num_selected_subtests = 0;
-
-	prog_name = basename(argv[0]);
-	if (*argc == 1) {
-		return;
-	}
-
-	if (streq(argv[1], "-h") || streq(argv[1], "--help")) {
-		print_usage();
-		exit(0);
-	}
-
-	/* Strip common piglit args. */
-	piglit_strip_arg(argc, argv, "-fbo");
-	piglit_strip_arg(argc, argv, "-auto");
-
-	piglit_parse_subtest_args(argc, argv, subtests, selected_subtests,
-				  num_selected_subtests);
-
-	if (*argc > 1) {
-		piglit_loge("unrecognized option: %s", argv[1]);
-		usage_error();
-	}
-}
-
 int
 main(int argc, char **argv)
 {
@@ -1430,7 +1367,18 @@ main(int argc, char **argv)
 	else
 		subtests = fence_sync_subtests;
 
-	parse_args(&argc, argv, subtests, &selected_subtests, &num_selected_subtests);
+	/* Strip common piglit args. */
+	piglit_strip_arg(&argc, argv, "-fbo");
+	piglit_strip_arg(&argc, argv, "-auto");
+
+	piglit_parse_subtest_args(&argc, argv, subtests, &selected_subtests,
+				  &num_selected_subtests);
+
+	if (argc > 1) {
+		fprintf(stderr, "usage error\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
 	init_egl_extension_funcs();
 	result = piglit_run_selected_subtests(subtests, selected_subtests,
 					      num_selected_subtests, result);
