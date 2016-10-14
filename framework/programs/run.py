@@ -33,8 +33,8 @@ import shutil
 import six
 
 from framework import core, backends, exceptions, options
-import framework.results
-import framework.profile
+from framework import profile
+from framework.results import TimeAttribute
 from . import parsers
 
 __all__ = ['run',
@@ -312,7 +312,7 @@ def run(input_):
     backend.initialize(_create_metadata(
         args, args.name or path.basename(args.results_path)))
 
-    profiles = [framework.profile.load_test_profile(p) for p in args.test_profile]
+    profiles = [profile.load_test_profile(p) for p in args.test_profile]
     for p in profiles:
         p.results_dir = args.results_path
 
@@ -335,9 +335,9 @@ def run(input_):
         for p in profiles:
             p.monitoring = args.monitored
 
-    time_elapsed = framework.results.TimeAttribute(start=time.time())
+    time_elapsed = TimeAttribute(start=time.time())
 
-    framework.profile.run(profiles, args.log_level, backend, args.concurrency)
+    profile.run(profiles, args.log_level, backend, args.concurrency)
 
     time_elapsed.end = time.time()
     backend.finalize({'time_elapsed': time_elapsed.to_json()})
@@ -395,7 +395,7 @@ def resume(input_):
         if args.no_retry or result.result != 'incomplete':
             options.OPTIONS.exclude_tests.add(name)
 
-    profiles = [framework.profile.load_test_profile(p)
+    profiles = [profile.load_test_profile(p)
                 for p in results.options['profile']]
     for p in profiles:
         p.results_dir = args.results_path
@@ -407,7 +407,7 @@ def resume(input_):
             p.monitoring = options.OPTIONS.monitored
 
     # This is resumed, don't bother with time since it won't be accurate anyway
-    framework.profile.run(
+    profile.run(
         profiles,
         results.options['log_level'],
         backend,
