@@ -97,8 +97,7 @@ def main(input_):
     piglit_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
 
-    profile_.prepare_test_list()
-    for name, test in six.iteritems(profile_.test_list):
+    for name, test in profile_.itertests():
         assert isinstance(test, Test)
         print(args.format_string.format(
             name=name,

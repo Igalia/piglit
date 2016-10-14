@@ -211,12 +211,6 @@ class TestTestProfile(object):
             assert fixture.test_list == new.test_list
             assert fixture.test_list is not new.test_list
 
-        def test_prepare_test_list(self, fixture):
-            """The prepare_test_list method doesn't affect both."""
-            new = fixture.copy()
-            new.prepare_test_list()
-            assert new.test_list != fixture.test_list
-
 
 class TestTestDict(object):
     """Tests for the TestDict object."""

@@ -191,35 +191,6 @@ class TestDict(collections.MutableMapping):
         yield
         self.__allow_reassignment -= 1
 
-    def filter(self, callable):
-        """Filter tests out of the testdict before running.
-
-        This method destructively filters results out of the test test
-        dictionary list using the callable provided.
-
-        Arguments:
-        callable -- a callable object that returns truthy if the item remains,
-                    falsy if it should be removed
-
-        """
-        for k, v in list(six.iteritems(self)):
-            if not callable(k, v):
-                del self[k]
-
-    def reorder(self, order):
-        """Reorder the TestDict to match the order of the provided list."""
-        new = collections.OrderedDict()
-        try:
-            for k in order:
-                new[k] = self.__container[k]
-        except KeyError:
-            # If there is a name in order that isn't available in self there
-            # will be a KeyError, this is expected. In this case fail
-            # gracefully and report the error to the user.
-            raise exceptions.PiglitFatalError(
-                'Cannot reorder test: "{}", it is not in the profile.'.format(k))
-        self.__container = new
-
 
 class TestProfile(object):
     """ Class that holds a list of tests for execution
@@ -281,28 +252,6 @@ class TestProfile(object):
 
         """
         self._monitoring = Monitoring(monitored)
-
-    def prepare_test_list(self):
-        """ Prepare tests for running
-
-        Flattens the nested group hierarchy into a flat dictionary using '/'
-        delimited groups by calling self.flatten_group_hierarchy(), then
-        runs it's own filters plus the filters in the self.filters name
-
-        """
-        if self.forced_test_list:
-            # Remove all tests not in the test list, then reorder the tests to
-            # match the testlist. This still allows additional filters to be
-            # run afterwards.
-            self.test_list.filter(lambda n, _: n in self.forced_test_list)
-            self.test_list.reorder(self.forced_test_list)
-
-        # Filter out unwanted tests
-        self.test_list.filter(lambda n, t: all(f(n, t) for f in self.filters))
-
-        if not self.test_list:
-            raise exceptions.PiglitFatalError(
-                'There are no tests scheduled to run. Aborting run.')
 
     @contextlib.contextmanager
     def group_manager(self, test_class, group, prefix=None, **default_args):
@@ -395,15 +344,30 @@ class TestProfile(object):
 
         This method creates a copy with references to the original instance
         (using copy.copy), except for the test_list attribute, which is copied
-        using copy.deepcopy, which is necessary to ensure that
-        prepare_test_list only affects the right instance. This allows profiles
-        to be "subclassed" by other profiles, without modifying the original.
+        using copy.deepcopy. This allows profiles to be "subclassed" by other
+        profiles, without modifying the original.
         """
         new = copy.copy(self)
         new.test_list = copy.deepcopy(self.test_list)
         new.forced_test_list = copy.copy(self.forced_test_list)
         new.filters = copy.copy(self.filters)
         return new
+
+    def itertests(self):
+        """Iterate over tests while filtering.
+
+        This iterator is non-destructive.
+        """
+        if self.forced_test_list:
+            opts = collections.OrderedDict()
+            for n in self.forced_test_list:
+                opts[n] = self.test_list[n]
+        else:
+            opts = self.test_list  # pylint: disable=redefined-variable-type
+
+        for k, v in six.iteritems(opts):
+            if all(f(k, v) for f in self.filters):
+                yield k, v
 
 
 def load_test_profile(filename):
@@ -458,9 +422,11 @@ def run(profiles, logger, backend, concurrency):
     """
     chunksize = 1
 
-    for p in profiles:
-        p.prepare_test_list()
-    log = LogManager(logger, sum(len(p.test_list) for p in profiles))
+    # The logger needs to know how many tests are running. Because of filters
+    # there's no way to do that without making a concrete list out of the
+    # filters profiles.
+    profiles = [(p, list(p.itertests())) for p in profiles]
+    log = LogManager(logger, sum(len(l) for _, l in profiles))
 
     def test(name, test, profile, this_pool=None):
         """Function to call test.execute from map"""
@@ -470,32 +436,34 @@ def run(profiles, logger, backend, concurrency):
         if profile.monitoring.abort_needed:
             this_pool.terminate()
 
-    def run_threads(pool, profile, filterby=None):
+    def run_threads(pool, profile, test_list, filterby=None):
         """ Open a pool, close it, and join it """
-        iterable = six.iteritems(profile.test_list)
         if filterby:
-            iterable = (x for x in iterable if filterby(x))
+            # Although filterby could be attached to TestProfile as a filter,
+            # it would have to be removed when run_threads exits, requiring
+            # more code, and adding side-effects
+            test_list = (x for x in test_list if filterby(x))
 
         pool.imap(lambda pair: test(pair[0], pair[1], profile, pool),
-                  iterable, chunksize)
-        pool.close()
-        pool.join()
+                  test_list, chunksize)
 
-    def run_profile(profile):
+    def run_profile(profile, test_list):
         """Run an individual profile."""
         profile.setup()
         if concurrency == "all":
-            run_threads(multi, profile)
+            run_threads(multi, profile, test_list)
         elif concurrency == "none":
-            run_threads(single, profile)
+            run_threads(single, profile, test_list)
         else:
             assert concurrency == "some"
             # Filter and return only thread safe tests to the threaded pool
-            run_threads(multi, profile, lambda x: x[1].run_concurrent)
+            run_threads(multi, profile, test_list,
+                        lambda x: x[1].run_concurrent)
 
             # Filter and return the non thread safe tests to the single
             # pool
-            run_threads(single, profile, lambda x: not x[1].run_concurrent)
+            run_threads(single, profile, test_list,
+                        lambda x: not x[1].run_concurrent)
         profile.teardown()
 
     # Multiprocessing.dummy is a wrapper around Threading that provides a
@@ -507,10 +475,14 @@ def run(profiles, logger, backend, concurrency):
 
     try:
         for p in profiles:
-            run_profile(p)
+            run_profile(*p)
+
+        for pool in [single, multi]:
+            pool.close()
+            pool.join()
     finally:
         log.get().summary()
 
-    for p in profiles:
+    for p, _ in profiles:
         if p.monitoring.abort_needed:
             raise exceptions.PiglitAbort(p.monitoring.error_message)

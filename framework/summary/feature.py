@@ -30,7 +30,7 @@ try:
 except ImportError:
     import json
 
-from framework import exceptions, profile, status
+from framework import profile, status
 
 
 class FeatResults(object):  # pylint: disable=too-few-public-methods
@@ -70,20 +70,13 @@ class FeatResults(object):  # pylint: disable=too-few-public-methods
                     [excl_str] if excl_str and not excl_str.isspace() else [],
                     inverse=True))
 
-            # An empty list will raise PiglitFatalError exception
-            # But for reporting we need to handle this situation
-            try:
-                profiles[feature].prepare_test_list()
-            except exceptions.PiglitFatalError:
-                pass
-
         for results in self.results:
             self.feat_fractions[results.name] = {}
             self.feat_status[results.name] = {}
 
             for feature in feature_data:
                 result_set = set(results.tests)
-                profile_set = set(profiles[feature].test_list)
+                profile_set = set(a for a, _ in profiles[feature].itertests())
 
                 common_set = profile_set & result_set
                 passed_list = [x for x in common_set if results.tests[x].result == status.PASS]
