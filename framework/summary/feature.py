@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2016-2016 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -30,7 +30,7 @@ try:
 except ImportError:
     import json
 
-from framework import options, exceptions, profile, status
+from framework import exceptions, profile, status
 
 
 class FeatResults(object):  # pylint: disable=too-few-public-methods
@@ -57,16 +57,18 @@ class FeatResults(object):  # pylint: disable=too-few-public-methods
         for feature in feature_data:
             self.features.add(feature)
 
+            profiles[feature] = profile_orig.copy()
+
             incl_str = feature_data[feature]["include_tests"]
             excl_str = feature_data[feature]["exclude_tests"]
 
-            include_filter = [incl_str] if incl_str and not incl_str.isspace() else []
-            exclude_filter = [excl_str] if excl_str and not excl_str.isspace() else []
-
-            options.OPTIONS.exclude_filter = exclude_filter
-            options.OPTIONS.include_filter = include_filter
-
-            profiles[feature] = profile_orig.copy()
+            profiles[feature].filters.append(
+                profile.RegexFilter(
+                    [incl_str] if incl_str and not incl_str.isspace() else []))
+            profiles[feature].filters.append(
+                profile.RegexFilter(
+                    [excl_str] if excl_str and not excl_str.isspace() else [],
+                    inverse=True))
 
             # An empty list will raise PiglitFatalError exception
             # But for reporting we need to handle this situation

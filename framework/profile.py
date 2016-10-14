@@ -37,19 +37,57 @@ import itertools
 import multiprocessing
 import multiprocessing.dummy
 import os
+import re
 
 import six
 
-from framework import grouptools, exceptions, options
+from framework import grouptools, exceptions
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
 from framework.monitoring import Monitoring
 from framework.test.base import Test
 
 __all__ = [
+    'RegexFilter',
     'TestProfile',
     'load_test_profile',
 ]
+
+
+class RegexFilter(object):
+    """An object to be passed to TestProfile.filter.
+
+    This object takes a list (or list-like object) of strings which it converts
+    to re.compiled objects (so use raw strings for escape sequences), and acts
+    as a callable for filtering tests. If a test matches any of the regex then
+    it will be scheduled to run. When the inverse keyword argument is True then
+    a test that matches any regex will not be scheduled. Regardless of the
+    value of the inverse flag if filters is empty then the test will be run.
+
+    Arguments:
+    filters -- a list of regex compiled objects.
+
+    Keyword Arguments:
+    inverse -- Inverse the sense of the match.
+    """
+
+    def __init__(self, filters, inverse=False):
+        self.filters = [re.compile(f) for f in filters]
+        self.inverse = inverse
+
+    def __call__(self, name, _):  # pylint: disable=invalid-name
+        # This needs to match the signature (name, test), since it doesn't need
+        # the test instance use _.
+
+        # If self.filters is empty then return True, we don't want to remove
+        # any tests from the run.
+        if not self.filters:
+            return True
+
+        if not self.inverse:
+            return any(r.search(name) for r in self.filters)
+        else:
+            return not any(r.search(name) for r in self.filters)
 
 
 class TestDict(collections.MutableMapping):
@@ -252,22 +290,10 @@ class TestProfile(object):
         runs it's own filters plus the filters in the self.filters name
 
         """
-        def matches_any_regexp(x, re_list):
-            return any(r.search(x) for r in re_list)
-
-        # The extra argument is needed to match check_all's API
-        def test_matches(path, test):
-            """Filter for user-specified restrictions"""
-            return ((not options.OPTIONS.include_filter or
-                     matches_any_regexp(path, options.OPTIONS.include_filter))
-                    and not matches_any_regexp(path, options.OPTIONS.exclude_filter))
-
-        filters = self.filters + [test_matches]
-
         def check_all(item):
             """ Checks group and test name against all filters """
             path, test = item
-            for f in filters:
+            for f in self.filters:
                 if not f(path, test):
                     return False
             return True

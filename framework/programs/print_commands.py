@@ -86,14 +86,16 @@ def main(input_):
                         help="Path to results folder")
     args = parser.parse_args(input_)
 
-    options.OPTIONS.exclude_filter = args.exclude_tests
-    options.OPTIONS.include_filter = args.include_tests
+    profile_ = profile.load_test_profile(args.testProfile)
+
+    if args.exclude_tests:
+        profile_.filters.append(profile.RegexFilter(args.exclude_tests))
+    if args.include_tests:
+        profile_.filters.append(profile.RegexFilter(args.include_tests))
 
     # Change to the piglit's path
     piglit_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
-
-    profile_ = profile.load_test_profile(args.testProfile)
 
     profile_.prepare_test_list()
     for name, test in six.iteritems(profile_.test_list):
