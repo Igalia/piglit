@@ -189,7 +189,6 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.execute = True
         self._include_filter = _ReList()
         self._exclude_filter = _ReList()
-        self.exclude_tests = set()
         self.valgrind = False
         self.dmesg = False
         self.monitored = False

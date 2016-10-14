@@ -154,23 +154,6 @@ class TestTestProfile(object):
 
             assert dict(profile_.test_list) == baseline
 
-        def test_matches_env_exclude(self):
-            """profile.TestProfile.prepare_test_list: 'not path in
-            env.exclude_tests'.
-            """
-            # Pylint can't figure out that self.opts isn't a dict, but an
-            # options._Option object.
-            self.opts.exclude_tests.add(grouptools.join('group3', 'test5'))  # pylint: disable=no-member
-
-            baseline = copy.deepcopy(self.data)
-            del baseline[grouptools.join('group3', 'test5')]
-
-            profile_ = profile.TestProfile()
-            profile_.test_list = self.data
-            profile_.prepare_test_list()
-
-            assert dict(profile_.test_list) == dict(baseline)
-
         def test_matches_exclude_mar(self):
             """profile.TestProfile.prepare_test_list: 'not
             matches_any_regexp()'.

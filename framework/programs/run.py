@@ -391,9 +391,10 @@ def resume(input_):
 
     # Don't re-run tests that have already completed, incomplete status tests
     # have obviously not completed.
+    exclude_tests = set()
     for name, result in six.iteritems(results.tests):
         if args.no_retry or result.result != 'incomplete':
-            options.OPTIONS.exclude_tests.add(name)
+            exclude_tests.add(name)
 
     profiles = [profile.load_test_profile(p)
                 for p in results.options['profile']]
@@ -405,6 +406,8 @@ def resume(input_):
 
         if options.OPTIONS.monitored:
             p.monitoring = options.OPTIONS.monitored
+
+        p.filters.append(lambda n, _: n not in exclude_tests)
 
     # This is resumed, don't bother with time since it won't be accurate anyway
     profile.run(

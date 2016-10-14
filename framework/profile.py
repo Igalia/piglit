@@ -260,7 +260,6 @@ class TestProfile(object):
             """Filter for user-specified restrictions"""
             return ((not options.OPTIONS.include_filter or
                      matches_any_regexp(path, options.OPTIONS.include_filter))
-                    and path not in options.OPTIONS.exclude_tests
                     and not matches_any_regexp(path, options.OPTIONS.exclude_filter))
 
         filters = self.filters + [test_matches]
