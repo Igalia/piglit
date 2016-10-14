@@ -102,12 +102,14 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 		return true;
 	}
 
-	glEnable(GL_SCISSOR_TEST);
-
-	glScissor(0, 0, size / 2, size / 2);
+	/* Do the first clear unscissored, to give a bit of exposure
+	 * to hardware fast-clearing paths on tiled renderers that
+	 * require unscissored clears.
+	 */
 	glClearColor(red[0], red[1], red[2], red[3]);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glEnable(GL_SCISSOR_TEST);
 	glScissor(size / 2, 0, size / 2, size / 2);
 	glClearColor(green[0], green[1], green[2], green[3]);
 	glClear(GL_COLOR_BUFFER_BIT);
