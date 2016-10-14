@@ -203,7 +203,7 @@ class TestDict(collections.MutableMapping):
 
         """
         for k, v in list(six.iteritems(self)):
-            if not callable((k, v)):
+            if not callable(k, v):
                 del self[k]
 
     def reorder(self, order):
@@ -290,23 +290,15 @@ class TestProfile(object):
         runs it's own filters plus the filters in the self.filters name
 
         """
-        def check_all(item):
-            """ Checks group and test name against all filters """
-            path, test = item
-            for f in self.filters:
-                if not f(path, test):
-                    return False
-            return True
-
         if self.forced_test_list:
             # Remove all tests not in the test list, then reorder the tests to
             # match the testlist. This still allows additional filters to be
             # run afterwards.
-            self.test_list.filter(lambda i: i[0] in self.forced_test_list)
+            self.test_list.filter(lambda n, _: n in self.forced_test_list)
             self.test_list.reorder(self.forced_test_list)
 
         # Filter out unwanted tests
-        self.test_list.filter(check_all)
+        self.test_list.filter(lambda n, t: all(f(n, t) for f in self.filters))
 
         if not self.test_list:
             raise exceptions.PiglitFatalError(
