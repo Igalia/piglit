@@ -96,6 +96,7 @@ with profile.group_manager(PiglitCLTest, 'program') as g:
     g(['cl-program-max-work-item-sizes'],
       'Run kernel with max work item sizes')
     g(['cl-program-bitcoin-phatk'], 'Bitcoin: phatk kernel')
+    g(['cl-program-predefined-macros'], 'Check predefined preprocessor macros')
 
 with profile.group_manager(PiglitCLTest, 'interop') as g:
     g(['cl-interop-egl_khr_cl_event2'], 'EGL_KHR_cl_event2')
