@@ -388,15 +388,18 @@ def load_test_profile(filename):
     try:
         mod = importlib.import_module('tests.{0}'.format(
             os.path.splitext(os.path.basename(filename))[0]))
+    except ImportError:
+        raise exceptions.PiglitFatalError(
+            'Failed to import "{}", there is either something wrong with the '
+            'module or it doesn\'t exist. Check your spelling?'.format(
+                filename))
+
+    try:
         return mod.profile
     except AttributeError:
         raise exceptions.PiglitFatalError(
-            'There is not profile attribute in module {}.\n'
+            'There is no "profile" attribute in module {}.\n'
             'Did you specify the right file?'.format(filename))
-    except ImportError:
-        raise exceptions.PiglitFatalError(
-            'There is no test profile called "{}".\n'
-            'Check your spelling?'.format(filename))
 
 
 def run(profiles, logger, backend, concurrency):
