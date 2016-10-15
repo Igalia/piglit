@@ -19,11 +19,12 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-""" Provides Profiles for test groups
+"""Classes dealing with groups of Tests.
 
-Each set of tests, both native Piglit profiles and external suite integration,
-are represented by a TestProfile or a TestProfile derived object.
-
+In piglit tests are grouped into "profiles", which are equivalent to "suites"
+in some other testing nomenclature. A profile is a way to tell the framework
+that you have a group of tests you want to run, here are the names of those
+tests, and the Test instance.
 """
 
 from __future__ import (
@@ -95,18 +96,15 @@ class RegexFilter(object):
 class TestDict(collections.MutableMapping):
     """A special kind of dict for tests.
 
-    This dict lowers the names of keys by default.
+    This mapping lowers the names of keys by default, and enforces that keys be
+    strings (not bytes) and that values are Test derived objects. It is also a
+    wrapper around collections.OrderedDict.
 
-    This class intentionally doesn't accept keyword arguments. This is
-    intentional to avoid breakages.
-
+    This class doesn't accept keyword arguments, this is intentional. This is
+    because the TestDict class is ordered, and keyword arguments are unordered,
+    which is a design mismatch.
     """
     def __init__(self):
-        # This is because it had special __setitem__ and __getitem__ protocol
-        # methods, and simply passing *args and **kwargs into self.__container
-        # will bypass these methods. It will also break the ordering, since a
-        # regular dictionary or keyword arguments are inherintly unordered
-        #
         # This counter is incremented once when the allow_reassignment context
         # manager is opened, and decremented each time it is closed. This
         # allows stacking of the context manager
@@ -116,15 +114,13 @@ class TestDict(collections.MutableMapping):
     def __setitem__(self, key, value):
         """Enforce types on set operations.
 
-        Keys should only be strings, and values should only be more Trees
-        or Tests.
+        Keys should only be strings, and values should only be Tests.
 
         This method makes one additional requirement, it lowers the key before
         adding it. This solves a couple of problems, namely that we want to be
-        able to use filesystem heirarchies as groups in some cases, and those
+        able to use file-system hierarchies as groups in some cases, and those
         are assumed to be all lowercase to avoid problems on case insensitive
-        filesystems.
-
+        file-systems.
         """
         # keys should be strings
         if not isinstance(key, six.text_type):
@@ -182,12 +178,11 @@ class TestDict(collections.MutableMapping):
         Normally reassignment happens in error, but sometimes one actually
         wants to do reassignment, say to add extra options in a reduced
         profile. This method allows reassignment, but only within its context,
-        making it an explict choice to do so.
+        making it an explicit choice to do so.
 
         It is safe to nest this contextmanager.
 
-        It is not safe to use this context manager in a threaded application
-
+        This is not thread safe, or even co-routine safe.
         """
         self.__allow_reassignment += 1
         yield
@@ -195,22 +190,22 @@ class TestDict(collections.MutableMapping):
 
 
 class TestProfile(object):
-    """ Class that holds a list of tests for execution
+    """Class that holds a list of tests for execution.
 
-    This class provides a container for storing tests in either a nested
-    dictionary structure (deprecated), or a flat dictionary structure with '/'
-    delimited groups.
+    This class represents a single testsuite, it has a mapping (dictionary-like
+    object) of tests attached (TestDict). This is a mapping of <str>:<Test>
+    (python 3 str, python 2 unicode), and the key is delimited by
+    grouptools.SEPARATOR.
 
-    Once a TestProfile object is created tests can be added to the test_list
-    name as a key/value pair, the key should be a fully qualified name for the
-    test, including it's group hierarchy and should be '/' delimited, with no
-    leading or trailing '/', the value should be an exectest.Test derived
-    object.
+    The group_manager method provides a context_manager to make adding test to
+    the test_list easier, by doing more validation and enforcement.
+    >>> t = TestProfile()
+    >>> with t.group_manager(Test, 'foo@bar') as g:
+    ...     g(['foo'])
 
-    When the test list is filled calling TestProfile.run() will set the
-    execution of these tests off, and will flatten the nested group hierarchy
-    of self.tests and merge it with self.test_list
-
+    This class does not provide a way to execute itself, instead that is
+    handled by the run function in this module, which is able to process and
+    run multiple TestProfile objects at once.
     """
     def __init__(self):
         self.test_list = TestDict()
@@ -230,12 +225,11 @@ class TestProfile(object):
 
     @dmesg.setter
     def dmesg(self, not_dummy):
-        """ Set dmesg
+        """Use dmesg.
 
         Arguments:
-        not_dummy -- if Truthy dmesg will try to get a PosixDmesg, if Falsy it
-                     will get a DummyDmesg
-
+        not_dummy -- Get a platform dependent Dmesg class if True, otherwise
+                     get a DummyDmesg.
         """
         self._dmesg = get_dmesg(not_dummy)
 
@@ -246,12 +240,11 @@ class TestProfile(object):
 
     @monitoring.setter
     def monitoring(self, monitored):
-        """ Set monitoring
+        """Set monitoring.
 
         Arguments:
         monitored -- if Truthy Monitoring will enable monitoring according the
                      defined rules
-
         """
         self._monitoring = Monitoring(monitored)
 
@@ -268,26 +261,25 @@ class TestProfile(object):
            set instance.env, for example, you will need to do so manually. It
            is recommended to not use this function for that case, but to
            manually assign the test and set env together, for code clearness.
-        2) When you need to use a function that modifies profile.
+        2) When you need to use a function that modifies the TestProfile.
 
         Arguments:
         test_class -- a Test derived class that. Instances of this class will
                       be added to the profile.
-        group -- a string or unicode that will be used as the key for the test
-                 in profile.
+        group      -- a string or unicode that will be used as the key for the
+                      test in profile.
 
         Keyword Arguments:
-        **default_args -- any additional keyword arguments will be considered
-                          default arguments to all tests added by the adder.
-                          They will always be overwritten by **kwargs passed to
-                          the adder function
+        **         -- any additional keyword arguments will be considered
+                      default arguments to all tests added by the adder. They
+                      will always be overwritten by **kwargs passed to the
+                      adder function
 
         >>> from framework.test import PiglitGLTest
         >>> p = TestProfile()
         >>> with p.group_manager(PiglitGLTest, 'a') as g:
         ...     g(['test'])
         ...     g(['power', 'test'], 'powertest')
-
         """
         assert isinstance(group, six.string_types), type(group)
 
@@ -381,14 +373,17 @@ def load_test_profile(filename):
 
     This method doesn't care about file extensions as a way to be backwards
     compatible with script wrapping piglit. 'tests/quick', 'tests/quick.tests',
-    and 'tests/quick.py' are all equally valid for filename.
+    'tests/quick.py', and 'quick' are all equally valid for filename.
 
     This will raise a FatalError if the module doesn't exist, or if the module
     doesn't have a profile attribute.
 
+    Raises:
+    PiglitFatalError -- if the module cannot be imported for any reason, or if
+                        the module lacks a "profile" attribute.
+
     Arguments:
     filename -- the name of a python module to get a 'profile' from
-
     """
     try:
         mod = importlib.import_module('tests.{0}'.format(
