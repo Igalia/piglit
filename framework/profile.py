@@ -49,8 +49,10 @@ from framework.test.base import Test
 
 __all__ = [
     'RegexFilter',
+    'TestDict',
     'TestProfile',
     'load_test_profile',
+    'run',
 ]
 
 
