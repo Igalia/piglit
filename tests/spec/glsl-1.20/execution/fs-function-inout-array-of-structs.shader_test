@@ -1,0 +1,55 @@
+# Test inout arrays of structs passed to functions.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 120
+
+struct S {
+	ivec4 v;
+};
+
+void multiply(inout S array[4])
+{
+	for (int i = 0; i < 4; ++i) {
+		array[i].v *= i;
+	}
+}
+
+void main()
+{
+	S array[4];
+
+	for (int i = 0; i < 4; ++i)
+		array[i].v = ivec4(0, 1, 2, 3);
+
+	multiply(array);
+
+	for (int i = 0; i < 4; ++i) {
+		if (array[i].v.x != 0) {
+			gl_FragColor = vec4(1.0, 0.0, float(i) / 255.0, float(array[i].v.x) / 255.0);
+			return;
+		}
+		if (array[i].v.y != 1 * i) {
+			gl_FragColor = vec4(1.0, 0.1, float(i) / 255.0, float(array[i].v.y) / 255.0);
+			return;
+		}
+		if (array[i].v.z != 2 * i) {
+			gl_FragColor = vec4(1.0, 0.2, float(i) / 255.0, float(array[i].v.z) / 255.0);
+			return;
+		}
+		if (array[i].v.w != 3 * i) {
+			gl_FragColor = vec4(1.0, 0.3, float(i) / 255.0, float(array[i].v.w) / 255.0);
+			return;
+		}
+	}
+
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
