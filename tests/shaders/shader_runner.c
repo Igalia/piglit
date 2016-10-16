@@ -2961,10 +2961,6 @@ piglit_display(void)
 			glDepthFunc(piglit_get_gl_enum_from_name(s));
 		} else if (sscanf(line, "fb tex 2d %d", &tex) == 1) {
 			GLenum status;
-			GLint tex_num;
-
-			glActiveTexture(GL_TEXTURE0 + tex);
-			glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex_num);
 
 			if (fbo == 0) {
 				glGenFramebuffers(1, &fbo);
@@ -2973,7 +2969,8 @@ piglit_display(void)
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER,
 					       GL_COLOR_ATTACHMENT0,
-					       GL_TEXTURE_2D, tex_num, 0);
+					       GL_TEXTURE_2D,
+					       get_texture_binding(tex)->obj, 0);
 			if (!piglit_check_gl_error(GL_NO_ERROR)) {
 				fprintf(stderr, "glFramebufferTexture2D error\n");
 				piglit_report_result(PIGLIT_FAIL);
@@ -2985,14 +2982,10 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
-			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &render_width);
-			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &render_height);
+			render_width = get_texture_binding(tex)->width;
+			render_height = get_texture_binding(tex)->height;
 		} else if (sscanf(line, "fb tex layered %d", &tex) == 1) {
 			GLenum status;
-			GLint tex_num;
-
-			glActiveTexture(GL_TEXTURE0 + tex);
-			glGetIntegerv(GL_TEXTURE_BINDING_2D_ARRAY, &tex_num);
 
 			if (fbo == 0) {
 				glGenFramebuffers(1, &fbo);
@@ -3001,7 +2994,7 @@ piglit_display(void)
 
 			glFramebufferTexture(GL_FRAMEBUFFER,
 					     GL_COLOR_ATTACHMENT0,
-					     tex_num, 0);
+					     get_texture_binding(tex)->obj, 0);
 			if (!piglit_check_gl_error(GL_NO_ERROR)) {
 				fprintf(stderr, "glFramebufferTexture error\n");
 				piglit_report_result(PIGLIT_FAIL);
