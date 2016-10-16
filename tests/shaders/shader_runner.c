@@ -3367,7 +3367,8 @@ piglit_display(void)
 			glActiveTexture(GL_TEXTURE0 + tex);
 			int handle = piglit_rgbw_texture(
 				int_fmt, w, h, GL_FALSE, GL_FALSE,
-				GL_UNSIGNED_NORMALIZED);
+				(piglit_is_gles() ? GL_UNSIGNED_BYTE :
+				 GL_UNSIGNED_NORMALIZED));
 			set_texture_binding(tex, handle, w, h, 1);
 
 			if (!piglit_is_core_profile &&
