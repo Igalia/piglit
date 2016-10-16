@@ -184,6 +184,12 @@ bool
 parse_enum_tab(const struct string_to_enum *tab,
 	       const char *s, unsigned *e, const char **rest);
 
+/**
+ * Parse a texture target symbolic constant.
+ */
+bool
+parse_tex_target(const char *s, GLenum *t, const char **rest);
+
 const char *eat_whitespace(const char *src);
 const char *eat_text(const char *src);
 bool string_match(const char *string, const char *line);

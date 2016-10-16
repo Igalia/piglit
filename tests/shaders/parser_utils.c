@@ -222,6 +222,23 @@ parse_enum_tab(const struct string_to_enum *tab,
 }
 
 bool
+parse_tex_target(const char *s, unsigned *t, const char **rest)
+{
+	static const struct string_to_enum tab[] = {
+		{ "1D", GL_TEXTURE_1D },
+		{ "2D", GL_TEXTURE_2D },
+		{ "3D", GL_TEXTURE_3D },
+		{ "Rect", GL_TEXTURE_RECTANGLE },
+		{ "Cube", GL_TEXTURE_CUBE_MAP },
+		{ "1DArray", GL_TEXTURE_1D_ARRAY },
+		{ "2DArray", GL_TEXTURE_2D_ARRAY },
+		{ "CubeArray", GL_TEXTURE_CUBE_MAP_ARRAY },
+		{ NULL, 0 }
+	};
+	return parse_enum_tab(tab, s, t, rest);
+}
+
+bool
 parse_comparison_op(const char *s, enum comparison *t, const char **rest)
 {
 	if (parse_str(s, "==", rest)) {

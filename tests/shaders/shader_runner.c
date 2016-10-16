@@ -2469,18 +2469,6 @@ decode_drawing_mode(const char *mode_str)
 static void
 handle_texparameter(const char *line)
 {
-	static const struct string_to_enum texture_target[] = {
-		{ "1D",        GL_TEXTURE_1D             },
-		{ "2D",        GL_TEXTURE_2D             },
-		{ "3D",        GL_TEXTURE_3D             },
-		{ "Rect",      GL_TEXTURE_RECTANGLE      },
-		{ "Cube",      GL_TEXTURE_CUBE_MAP       },
-		{ "1DArray",   GL_TEXTURE_1D_ARRAY       },
-		{ "2DArray",   GL_TEXTURE_2D_ARRAY       },
-		{ "CubeArray", GL_TEXTURE_CUBE_MAP_ARRAY },
-		{ NULL, 0 }
-	};
-
 	static const struct string_to_enum compare_funcs[] = {
 		{ "greater", GL_GREATER },
 		{ "gequal", GL_GEQUAL },
@@ -2532,7 +2520,7 @@ handle_texparameter(const char *line)
 	const struct string_to_enum *strings = NULL;
 	unsigned value;
 
-	REQUIRE(parse_enum_tab(texture_target, line, &value, NULL),
+	REQUIRE(parse_tex_target(line, &target, &line),
 		"Bad texture target at: %s\n", line);
 
 	if (parse_str(line, "compare_func ", &line)) {
