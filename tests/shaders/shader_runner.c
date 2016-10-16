@@ -3300,6 +3300,20 @@ piglit_display(void)
 			if (!piglit_probe_rect_rgb(x, y, w, h, &c[4])) {
 				result = PIGLIT_FAIL;
 			}
+
+		} else if (sscanf(line, "relative probe rect rgba int "
+				  "( %f , %f , %f , %f ) "
+				  "( %d , %d , %d , %d )",
+				  c + 0, c + 1, c + 2, c + 3,
+				  &x, &y, &z, &w) == 8) {
+			const int expected[] = { x, y, z, w };
+			if (!piglit_probe_rect_rgba_int(c[0] * read_width,
+							c[1] * read_height,
+							c[2] * read_width,
+							c[3] * read_height,
+							expected))
+				result = PIGLIT_FAIL;
+
 		} else if (parse_str(line, "probe all rgba ", &rest)) {
 			parse_floats(rest, c, 4, NULL);
 			if (result != PIGLIT_FAIL &&
