@@ -3137,7 +3137,8 @@ piglit_display(void)
 				GL_UNSIGNED_NORMALIZED);
 			textures[num_textures] = handle;
 			num_textures++;
-			if (!piglit_is_core_profile)
+			if (!piglit_is_core_profile &&
+			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
 
 		} else if (parse_str(line, "texture integer ", &rest)) {
@@ -3159,7 +3160,8 @@ piglit_display(void)
 		} else if (sscanf(line, "texture miptree %d", &tex) == 1) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_miptree_texture();
-			if (!piglit_is_core_profile)
+			if (!piglit_is_core_profile &&
+			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture checkerboard %d %d ( %d , %d ) "
@@ -3173,7 +3175,8 @@ piglit_display(void)
 						    w, h,
 						    w / 2, h / 2,
 						    c + 0, c + 4);
-			if (!piglit_is_core_profile)
+			if (!piglit_is_core_profile &&
+			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture quads %d %d ( %d , %d ) ( %d , %d ) "
@@ -3189,7 +3192,8 @@ piglit_display(void)
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_quads_texture(0, level, w, h, x, y,
 					     c + 0, c + 4, c + 8, c + 12);
-			if (!piglit_is_core_profile)
+			if (!piglit_is_core_profile &&
+			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture junk 2DArray %d ( %d , %d , %d )",
@@ -3228,7 +3232,8 @@ piglit_display(void)
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
 
-			if (!piglit_is_core_profile)
+			if (!piglit_is_core_profile &&
+			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture shadowRect %d ( %d , %d )",
