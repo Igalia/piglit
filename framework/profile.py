@@ -217,7 +217,7 @@ class TestProfile(object):
         }
 
     @contextlib.contextmanager
-    def group_manager(self, test_class, group, prefix=None, **default_args):
+    def group_manager(self, test_class, group, **default_args):
         """A context manager to make working with flat groups simple.
 
         This provides a simple way to replace add_plain_test,
