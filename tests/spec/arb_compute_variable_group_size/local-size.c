@@ -51,6 +51,7 @@ static uint32_t sizes[] = {
 
 static const char *compute_shader_source =
 	"#version 330\n"
+	"#extension GL_ARB_compute_shader: enable\n"
 	"#extension GL_ARB_compute_variable_group_size: enable\n"
 	"#extension GL_ARB_shader_atomic_counters: require\n"
 	"\n"

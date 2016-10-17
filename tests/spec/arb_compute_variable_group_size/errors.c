@@ -42,6 +42,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const char *variable_work_group_size_shader =
 	"#version 330\n"
+	"#extension GL_ARB_compute_shader: enable\n"
 	"#extension GL_ARB_compute_variable_group_size: enable\n"
 	"\n"
 	"layout(local_size_variable) in;\n"
