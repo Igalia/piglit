@@ -163,11 +163,11 @@ def main():
     # to that executable
     parsed, args = parser.parse_known_args(input_)
     try:
-        returncode = parsed.func(args)
+        runner = parsed.func
     except AttributeError:
         parser.print_help()
         sys.exit(1)
-    sys.exit(returncode)
+    sys.exit(runner(args))
 
 
 if __name__ == '__main__':
