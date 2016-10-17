@@ -8,6 +8,7 @@
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_compute_shader
+GL_ARB_compute_variable_group_size
 
 [compute shader]
 #version 330
