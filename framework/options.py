@@ -48,8 +48,6 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     Options are as follows:
     execute -- False for dry run
     valgrind -- True if valgrind is to be used
-    dmesg -- True if dmesg checking is desired. This forces concurrency off
-    monitored -- True if monitoring is desired. This forces concurrency off
     env -- environment variables set for each test before run
     deqp_mustpass -- True to enable the use of the deqp mustpass list feature.
     """
@@ -57,8 +55,6 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         self.execute = True
         self.valgrind = False
-        self.dmesg = False
-        self.monitored = False
         self.sync = False
         self.deqp_mustpass = False
         self.process_isolation = True

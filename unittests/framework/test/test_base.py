@@ -209,8 +209,8 @@ class TestTest(object):
 
             test.execute(mocker.Mock(spec=six.text_type),
                          mocker.Mock(spec=log.BaseLog),
-                         mocker.Mock(spec=dmesg.BaseDmesg),
-                         mocker.Mock(spec=monitoring.Monitoring))
+                         {'dmesg': mocker.Mock(spec=dmesg.BaseDmesg),
+                          'monitor': mocker.Mock(spec=monitoring.Monitoring)})
             return test.result
 
         def test_result(self, shared_test):
@@ -321,7 +321,7 @@ class TestValgrindMixin(object):
 
     def test_command(self, mocker):
         """test.base.ValgrindMixin.command: overrides self.command."""
-        opts = mocker.patch('framework.test.base.options.OPTIONS',
+        opts = mocker.patch('framework.test.base.OPTIONS',
                             new_callable=Options)
 
         class Test(base.ValgrindMixin, _Test):
@@ -358,7 +358,7 @@ class TestValgrindMixin(object):
             binary itself, so any status other than pass is irrelavent, and
             should be marked as skip.
             """
-            mock_opts = mocker.patch('framework.test.base.options.OPTIONS',
+            mock_opts = mocker.patch('framework.test.base.OPTIONS',
                                      new_callable=Options)
             mock_opts.valgrind = True
 
@@ -372,7 +372,7 @@ class TestValgrindMixin(object):
         def test_problems_with_valgrind_disabled(self, starting, mocker):
             """When valgrind is disabled nothign shoud change
             """
-            mock_opts = mocker.patch('framework.test.base.options.OPTIONS',
+            mock_opts = mocker.patch('framework.test.base.OPTIONS',
                                      new_callable=Options)
             mock_opts.valgrind = False
 
@@ -386,7 +386,7 @@ class TestValgrindMixin(object):
             """test.base.ValgrindMixin.run: when test is 'pass' and returncode
             is '0' result is pass.
             """
-            mock_opts = mocker.patch('framework.test.base.options.OPTIONS',
+            mock_opts = mocker.patch('framework.test.base.OPTIONS',
                                      new_callable=Options)
             test = self.test(['foo'])
             mock_opts.valgrind = True
@@ -399,7 +399,7 @@ class TestValgrindMixin(object):
             """test.base.ValgrindMixin.run: when a test is 'pass' but
             returncode is not 0 it's 'fail'.
             """
-            mock_opts = mocker.patch('framework.test.base.options.OPTIONS',
+            mock_opts = mocker.patch('framework.test.base.OPTIONS',
                                      new_callable=Options)
             mock_opts.valgrind = True
             test = self.test(['foo'])

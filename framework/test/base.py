@@ -39,8 +39,9 @@ import warnings
 import six
 from six.moves import range
 
-from framework import exceptions, options
+from framework import exceptions
 from framework import status
+from framework.options import OPTIONS
 from framework.results import TestResult
 
 # We're doing some special crazy here to make timeouts work on python 2. pylint
@@ -186,30 +187,28 @@ class Test(object):
             assert isinstance(timeout, int)
             self.timeout = timeout
 
-    def execute(self, path, log, dmesg, monitoring):
+    def execute(self, path, log, options):
         """ Run a test
 
         Run a test, but with features. This times the test, uses dmesg checking
         (if requested), and runs the logger.
 
         Arguments:
-        path -- the name of the test
-        log -- a log.Log instance
-        dmesg -- a dmesg.BaseDmesg derived class
-        monitoring -- a monitoring.Monitoring instance
-
+        path    -- the name of the test
+        log     -- a log.Log instance
+        options -- a dictionary containing dmesg and monitoring objects
         """
         log.start(path)
         # Run the test
-        if options.OPTIONS.execute:
+        if OPTIONS.execute:
             try:
                 self.result.time.start = time.time()
-                dmesg.update_dmesg()
-                monitoring.update_monitoring()
+                options['dmesg'].update_dmesg()
+                options['monitor'].update_monitoring()
                 self.run()
                 self.result.time.end = time.time()
-                self.result = dmesg.update_result(self.result)
-                monitoring.check_monitoring()
+                self.result = options['dmesg'].update_result(self.result)
+                options['monitor'].check_monitoring()
             # This is a rare case where a bare exception is okay, since we're
             # using it to log exceptions
             except:
@@ -254,7 +253,7 @@ class Test(object):
         self.result.command = ' '.join(self.command)
         self.result.environment = " ".join(
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
-                six.iteritems(options.OPTIONS.env), six.iteritems(self.env)))
+                six.iteritems(OPTIONS.env), six.iteritems(self.env)))
 
         try:
             self.is_skip()
@@ -319,7 +318,7 @@ class Test(object):
         else:
             f = six.text_type
         _base = itertools.chain(six.iteritems(os.environ),
-                                six.iteritems(options.OPTIONS.env),
+                                six.iteritems(OPTIONS.env),
                                 six.iteritems(self.env))
         fullenv = {f(k): f(v) for k, v in _base}
 
@@ -419,7 +418,7 @@ class ValgrindMixin(object):
     @Test.command.getter
     def command(self):
         command = super(ValgrindMixin, self).command
-        if options.OPTIONS.valgrind:
+        if OPTIONS.valgrind:
             return ['valgrind', '--quiet', '--error-exitcode=1',
                     '--tool=memcheck'] + command
         else:
@@ -436,7 +435,7 @@ class ValgrindMixin(object):
         """
         super(ValgrindMixin, self).interpret_result()
 
-        if options.OPTIONS.valgrind:
+        if OPTIONS.valgrind:
             # If the underlying test failed, simply report
             # 'skip' for this valgrind test.
             if self.result.result != 'pass' and (

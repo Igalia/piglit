@@ -34,6 +34,8 @@ import time
 import six
 
 from framework import core, backends, exceptions, options
+from framework import dmesg
+from framework import monitoring
 from framework import profile
 from framework.results import TimeAttribute
 from . import parsers
@@ -226,6 +228,8 @@ def _create_metadata(args, name):
     opts['concurrent'] = args.concurrency
     opts['include_filter'] = args.include_tests
     opts['exclude_filter'] = args.exclude_tests
+    opts['dmesg'] = args.dmesg
+    opts['monitoring'] = args.monitored
     if args.platform:
         opts['platform'] = args.platform
 
@@ -282,8 +286,6 @@ def run(input_):
     # Pass arguments into Options
     options.OPTIONS.execute = args.execute
     options.OPTIONS.valgrind = args.valgrind
-    options.OPTIONS.dmesg = args.dmesg
-    options.OPTIONS.monitored = args.monitored
     options.OPTIONS.sync = args.sync
     options.OPTIONS.deqp_mustpass = args.deqp_mustpass
     options.OPTIONS.process_isolation = args.process_isolation
@@ -330,11 +332,11 @@ def run(input_):
     # Set the dmesg type
     if args.dmesg:
         for p in profiles:
-            p.dmesg = args.dmesg
+            p.options['dmesg'] = dmesg.get_dmesg(args.dmesg)
 
     if args.monitored:
         for p in profiles:
-            p.monitoring = args.monitored
+            p.options['monitor'] = monitoring.Monitoring(args.monitored)
 
     for p in profiles:
         if args.exclude_tests:
@@ -376,8 +378,6 @@ def resume(input_):
     results = backends.load(args.results_path)
     options.OPTIONS.execute = results.options['execute']
     options.OPTIONS.valgrind = results.options['valgrind']
-    options.OPTIONS.dmesg = results.options['dmesg']
-    options.OPTIONS.monitored = results.options['monitored']
     options.OPTIONS.sync = results.options['sync']
     options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
     options.OPTIONS.proces_isolation = results.options['process_isolation']
@@ -407,11 +407,12 @@ def resume(input_):
     for p in profiles:
         p.results_dir = args.results_path
 
-        if options.OPTIONS.dmesg:
-            p.dmesg = options.OPTIONS.dmesg
+        if results.options['dmesg']:
+            p.dmesg = dmesg.get_dmesg(results.options['dmesg'])
 
-        if options.OPTIONS.monitored:
-            p.monitoring = options.OPTIONS.monitored
+        if results.options['monitoring']:
+            p.options['monitor'] = monitoring.Monitoring(
+                results.options['monitoring'])
 
         if exclude_tests:
             p.filters.append(lambda n, _: n not in exclude_tests)

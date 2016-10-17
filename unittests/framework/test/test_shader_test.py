@@ -42,7 +42,7 @@ class _Setup(object):
     def __init__(self):
         self.__patchers = []
         self.__patchers.append(mock.patch.dict(
-            'framework.test.base.options.OPTIONS.env',
+            'framework.test.base.OPTIONS.env',
             {'PIGLIT_PLATFORM': 'foo'}))
 
     def setup(self, _):

@@ -211,42 +211,10 @@ class TestProfile(object):
         self.test_list = TestDict()
         self.forced_test_list = []
         self.filters = []
-        # Sets a default of a Dummy
-        self._dmesg = None
-        self.dmesg = False
-        self.results_dir = None
-        self._monitoring = None
-        self.monitoring = False
-
-    @property
-    def dmesg(self):
-        """ Return dmesg """
-        return self._dmesg
-
-    @dmesg.setter
-    def dmesg(self, not_dummy):
-        """Use dmesg.
-
-        Arguments:
-        not_dummy -- Get a platform dependent Dmesg class if True, otherwise
-                     get a DummyDmesg.
-        """
-        self._dmesg = get_dmesg(not_dummy)
-
-    @property
-    def monitoring(self):
-        """ Return monitoring """
-        return self._monitoring
-
-    @monitoring.setter
-    def monitoring(self, monitored):
-        """Set monitoring.
-
-        Arguments:
-        monitored -- if Truthy Monitoring will enable monitoring according the
-                     defined rules
-        """
-        self._monitoring = Monitoring(monitored)
+        self.options = {
+            'dmesg': get_dmesg(False),
+            'monitor': Monitoring(False),
+        }
 
     @contextlib.contextmanager
     def group_manager(self, test_class, group, prefix=None, **default_args):
@@ -431,9 +399,9 @@ def run(profiles, logger, backend, concurrency):
     def test(name, test, profile, this_pool=None):
         """Function to call test.execute from map"""
         with backend.write_test(name) as w:
-            test.execute(name, log.get(), profile.dmesg, profile.monitoring)
+            test.execute(name, log.get(), profile.options)
             w(test.result)
-        if profile.monitoring.abort_needed:
+        if profile.options['monitor'].abort_needed:
             this_pool.terminate()
 
     def run_threads(pool, profile, test_list, filterby=None):
@@ -484,5 +452,5 @@ def run(profiles, logger, backend, concurrency):
         log.get().summary()
 
     for p, _ in profiles:
-        if p.monitoring.abort_needed:
-            raise exceptions.PiglitAbort(p.monitoring.error_message)
+        if p.options['monitor'].abort_needed:
+            raise exceptions.PiglitAbort(p.options['monitor'].error_message)

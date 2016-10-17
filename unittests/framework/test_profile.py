@@ -27,13 +27,11 @@ from __future__ import (
 import pytest
 import six
 
-from framework import dmesg
 from framework import exceptions
 from framework import grouptools
 from framework import profile
 from framework.test.gleantest import GleanTest
 from . import utils
-from . import skip
 
 # pylint: disable=invalid-name,no-self-use,protected-access
 
@@ -72,28 +70,6 @@ class TestLoadTestProfile(object):
 
 class TestTestProfile(object):
     """Tests for profile.TestProfile."""
-
-    def test_default_dmesg(self):
-        """profile.TestProfile: Dmesg is dummy by default."""
-        profile_ = profile.TestProfile()
-        assert isinstance(profile_.dmesg, dmesg.DummyDmesg)
-
-    @skip.linux
-    def test_set_dmesg_true(self):
-        """profile.TestProfile: Dmesg returns an appropriate dmesg is set to
-        True.
-        """
-        profile_ = profile.TestProfile()
-        profile_.dmesg = True
-        assert isinstance(profile_.dmesg, dmesg.LinuxDmesg)
-
-    @skip.linux
-    def test_set_dmesg_false(self):
-        """profile.TestProfile: Dmesg returns a DummyDmesg if set to False."""
-        profile_ = profile.TestProfile()
-        profile_.dmesg = True
-        profile_.dmesg = False
-        assert isinstance(profile_.dmesg, dmesg.DummyDmesg)
 
     class TestGroupManager(object):
         """Tests for TestProfile.group_manager."""
