@@ -1,0 +1,50 @@
+# It checks that a float to double conversion works correctly when it is
+# under non-uniform control flow.
+
+[require]
+GLSL >= 3.30
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 330
+#extension GL_ARB_gpu_shader_fp64 : require
+
+flat out vec4 color;
+
+layout(location = 0) in vec3 inVertexPosition;
+
+void main() {
+        gl_Position = vec4(inVertexPosition, 1);
+        dvec2 rg;
+        vec2 value;
+        if (gl_VertexID % 2 == 1)
+                value = vec2(1.0f, 0.0f);
+        else
+                value = vec2(0.0f, 1.0f);
+        rg = dvec2(value);
+        if (rg == dvec2(0, 1))
+            color = vec4(0, rg, 1);
+        else
+            color = vec4(rg, 0, 1);
+}
+
+[fragment shader]
+#version 130
+
+flat in vec4 color;
+out vec4 frag_color;
+
+void main() {
+        frag_color = color;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 0.0 1.0 1.0
+probe rgba 249 249 1.0 0.0 0.0 1.0
+probe rgba 64 184 0.0 0.0 1.0 1.0
+probe rgba 64 185 1.0 0.0 0.0 1.0
+probe rgba 125 125 1.0 0.0 0.0 1.0
+
