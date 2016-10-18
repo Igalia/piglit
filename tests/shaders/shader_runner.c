@@ -110,8 +110,6 @@ static GLuint fragment_shaders[256];
 static unsigned num_fragment_shaders = 0;
 static GLuint compute_shaders[256];
 static unsigned num_compute_shaders = 0;
-static GLuint textures[256];
-static unsigned num_textures = 0;
 static int num_uniform_blocks;
 static GLuint *uniform_block_bos;
 static GLenum geometry_layout_input_type = GL_TRIANGLES;
@@ -146,6 +144,48 @@ static GLuint fbo = 0;
 static GLint render_width, render_height;
 
 static bool report_subtests = false;
+
+static struct texture_binding {
+	GLuint obj;
+	unsigned width;
+	unsigned height;
+	unsigned layers;
+} texture_bindings[32];
+
+static void
+clear_texture_binding(unsigned idx)
+{
+	REQUIRE(idx < ARRAY_SIZE(texture_bindings),
+		"Invalid texture index %d\n", idx);
+
+	if (texture_bindings[idx].obj) {
+		glDeleteTextures(1, &texture_bindings[idx].obj);
+		texture_bindings[idx].obj = 0;
+	}
+}
+
+static void
+set_texture_binding(unsigned idx, GLuint obj, unsigned w, unsigned h, unsigned l)
+{
+	clear_texture_binding(idx);
+
+	REQUIRE(idx < ARRAY_SIZE(texture_bindings),
+		"Invalid texture index %d\n", idx);
+	texture_bindings[idx].obj = obj;
+	texture_bindings[idx].width = w;
+	texture_bindings[idx].height = h;
+	texture_bindings[idx].layers = l;
+}
+
+static const struct texture_binding *
+get_texture_binding(unsigned idx)
+{
+	REQUIRE(idx < ARRAY_SIZE(texture_bindings),
+		"Invalid texture index %d\n", idx);
+	REQUIRE(texture_bindings[idx].obj,
+		"No texture bound at %d\n", idx);
+	return &texture_bindings[idx];
+}
 
 enum states {
 	none = 0,
@@ -3135,8 +3175,8 @@ piglit_display(void)
 			int handle = piglit_rgbw_texture(
 				int_fmt, w, h, GL_FALSE, GL_FALSE,
 				GL_UNSIGNED_NORMALIZED);
-			textures[num_textures] = handle;
-			num_textures++;
+			set_texture_binding(tex, handle, w, h, 1);
+
 			if (!piglit_is_core_profile &&
 			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
@@ -3156,10 +3196,15 @@ piglit_display(void)
 			int_fmt = piglit_get_gl_enum_from_name(s);
 
 			glActiveTexture(GL_TEXTURE0 + tex);
-			(void)piglit_integer_texture(int_fmt, w, h, b, a);
+			const GLuint handle =
+				piglit_integer_texture(int_fmt, w, h, b, a);
+			set_texture_binding(tex, handle, w, h, 1);
+
 		} else if (sscanf(line, "texture miptree %d", &tex) == 1) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_miptree_texture();
+			const GLuint handle = piglit_miptree_texture();
+			set_texture_binding(tex, handle, 8, 8, 1);
+
 			if (!piglit_is_core_profile &&
 			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
@@ -3171,10 +3216,10 @@ piglit_display(void)
 				  c + 0, c + 1, c + 2, c + 3,
 				  c + 4, c + 5, c + 6, c + 7) == 12) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_checkerboard_texture(0, level,
-						    w, h,
-						    w / 2, h / 2,
-						    c + 0, c + 4);
+			const GLuint handle = piglit_checkerboard_texture(
+				0, level, w, h, w / 2, h / 2, c + 0, c + 4);
+			set_texture_binding(tex, handle, w, h, 1);
+
 			if (!piglit_is_core_profile &&
 			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
@@ -3190,8 +3235,10 @@ piglit_display(void)
 				  c + 8, c + 9, c + 10, c + 11,
 				  c + 12, c + 13, c + 14, c + 15) == 22) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_quads_texture(0, level, w, h, x, y,
-					     c + 0, c + 4, c + 8, c + 12);
+			const GLuint handle = piglit_quads_texture(
+				0, level, w, h, x, y, c + 0, c + 4, c + 8, c + 12);
+			set_texture_binding(tex, handle, w, h, 1);
+
 			if (!piglit_is_core_profile &&
 			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
@@ -3204,33 +3251,39 @@ piglit_display(void)
 			glBindTexture(GL_TEXTURE_2D_ARRAY, texobj);
 			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
 				     w, h, l, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-			textures[num_textures] = texobj;
-			num_textures++;
+			set_texture_binding(tex, texobj, w, h, l);
+
 		} else if (sscanf(line,
 				  "texture rgbw 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_array_texture(GL_TEXTURE_2D_ARRAY, GL_RGBA,
-                                             w, h, l, GL_FALSE);
+			const GLuint handle = piglit_array_texture(
+				GL_TEXTURE_2D_ARRAY, GL_RGBA, w, h, l, GL_FALSE);
+			set_texture_binding(tex, handle, w, h, l);
+
 		} else if (sscanf(line,
 				  "texture rgbw 1DArray %d ( %d , %d )",
 				  &tex, &w, &l) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
                         h = 1;
-			piglit_array_texture(GL_TEXTURE_1D_ARRAY, GL_RGBA,
-                                             w, h, l, GL_FALSE);
+			const GLuint handle = piglit_array_texture(
+				GL_TEXTURE_1D_ARRAY, GL_RGBA, w, h, l, GL_FALSE);
+			set_texture_binding(tex, handle, w, 1, l);
+
 		} else if (sscanf(line,
 				  "texture shadow2D %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_depth_texture(GL_TEXTURE_2D, GL_DEPTH_COMPONENT,
-					     w, h, 1, GL_FALSE);
+			const GLuint handle = piglit_depth_texture(
+				GL_TEXTURE_2D, GL_DEPTH_COMPONENT,
+				w, h, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_MODE,
 					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
+			set_texture_binding(tex, handle, w, h, 1);
 
 			if (!piglit_is_core_profile &&
 			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
@@ -3239,50 +3292,58 @@ piglit_display(void)
 				  "texture shadowRect %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_depth_texture(GL_TEXTURE_RECTANGLE, GL_DEPTH_COMPONENT,
-					     w, h, 1, GL_FALSE);
+			const GLuint handle = piglit_depth_texture(
+				GL_TEXTURE_RECTANGLE, GL_DEPTH_COMPONENT,
+				w, h, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_RECTANGLE,
 					GL_TEXTURE_COMPARE_MODE,
 					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_RECTANGLE,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
+			set_texture_binding(tex, handle, w, h, 1);
 		} else if (sscanf(line,
 				  "texture shadow1D %d ( %d )",
 				  &tex, &w) == 2) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_depth_texture(GL_TEXTURE_1D, GL_DEPTH_COMPONENT,
-					     w, 1, 1, GL_FALSE);
+			const GLuint handle = piglit_depth_texture(
+				GL_TEXTURE_1D, GL_DEPTH_COMPONENT,
+				w, 1, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_1D,
 					GL_TEXTURE_COMPARE_MODE,
 					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_1D,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
+			set_texture_binding(tex, handle, w, 1, 1);
 		} else if (sscanf(line,
 				  "texture shadow1DArray %d ( %d , %d )",
 				  &tex, &w, &l) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_depth_texture(GL_TEXTURE_1D_ARRAY, GL_DEPTH_COMPONENT,
-					     w, l, 1, GL_FALSE);
+			const GLuint handle = piglit_depth_texture(
+				GL_TEXTURE_1D_ARRAY, GL_DEPTH_COMPONENT,
+				w, l, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_1D_ARRAY,
 					GL_TEXTURE_COMPARE_MODE,
 					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_1D_ARRAY,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
+			set_texture_binding(tex, handle, w, 1, l);
 		} else if (sscanf(line,
 				  "texture shadow2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_depth_texture(GL_TEXTURE_2D_ARRAY, GL_DEPTH_COMPONENT,
-					     w, h, l, GL_FALSE);
+			const GLuint handle = piglit_depth_texture(
+				GL_TEXTURE_2D_ARRAY, GL_DEPTH_COMPONENT,
+				w, h, l, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
 					GL_TEXTURE_COMPARE_MODE,
 					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
+			set_texture_binding(tex, handle, w, h, l);
 		} else if (sscanf(line, "texcoord %d ( %f , %f , %f , %f )",
 		                  &x, c + 0, c + 1, c + 2, c + 3) == 5) {
 			glMultiTexCoord4fv(GL_TEXTURE0 + x, c);
@@ -3340,10 +3401,13 @@ piglit_display(void)
 	piglit_present_results();
 
 	if (piglit_automatic) {
+		unsigned i;
+
 		/* Free our resources, useful for valgrinding. */
 	        free_subroutine_uniforms();
-		glDeleteTextures(num_textures, (const GLuint *) &textures);
-		num_textures = 0;
+
+		for (i = 0; i < ARRAY_SIZE(texture_bindings); i++)
+			clear_texture_binding(i);
 
 		if (prog != 0) {
 			glDeleteProgram(prog);
@@ -3541,7 +3605,6 @@ piglit_init(int argc, char **argv)
 			assert(num_geometry_shaders == 0);
 			assert(num_fragment_shaders == 0);
 			assert(num_compute_shaders == 0);
-			assert(num_textures == 0);
 			assert(num_uniform_blocks == 0);
 			assert(uniform_block_bos == NULL);
 			geometry_layout_input_type = GL_TRIANGLES;
