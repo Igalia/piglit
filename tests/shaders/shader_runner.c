@@ -3528,7 +3528,7 @@ piglit_display(void)
 	}
 
 	if (!link_ok && !link_error_expected) {
-		program_must_be_in_use();
+		full_result = program_must_be_in_use();
 	}
 
 	piglit_present_results();
