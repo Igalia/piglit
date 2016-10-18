@@ -1,0 +1,25 @@
+[require]
+GLSL >= 1.20
+
+# This test exercises a Mesa GLSL regression where declaring a pre-defined
+# VS input as 'invariant' caused a linker failure.
+
+[vertex shader]
+#version 120
+invariant gl_Position;
+void main()
+{
+  gl_Position = ftransform();
+}
+
+
+[fragment shader]
+#version 120
+void main()
+{
+  gl_FragColor = vec4(1.0);
+}
+
+
+[test]
+link success
