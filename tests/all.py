@@ -26,9 +26,9 @@ __all__ = ['profile']
 PROCESS_ISOLATION = options.OPTIONS.process_isolation
 
 # Disable bad hanging indent errors in pylint
-# There is a bug in pyling which causes the profile.group_manager to be tagged
-# as bad hanging indent, even though it seems to be correct (and similar syntax
-# doesn't trigger an error)
+# There is a bug in pylint which causes the profile.test_list.group_manager to
+# be tagged as bad hanging indent, even though it seems to be correct (and
+# similar syntax doesn't trigger an error)
 # pylint: disable=bad-continuation
 
 # Shadowing variables is a bad practice. It's just nearly impossible with the
@@ -303,7 +303,7 @@ for basedir in [os.path.join(TESTS_DIR, 'apitrace', 'traces')]:
 # List of all of the MSAA sample counts we wish to test
 MSAA_SAMPLE_COUNTS = ['2', '4', '6', '8', '16', '32']
 
-with profile.group_manager(GleanTest, 'glean') as g:
+with profile.test_list.group_manager(GleanTest, 'glean') as g:
     g('basic')
     g('api2')
     g('makeCurrent')
@@ -522,12 +522,12 @@ for pairs in [(['glsl1'], glean_glsl_tests),
         profile.test_list[groupname] = GleanTest(prefix)
         profile.test_list[groupname].env['PIGLIT_TEST'] = name
 
-with profile.group_manager(PiglitGLTest, 'security') as g:
+with profile.test_list.group_manager(PiglitGLTest, 'security') as g:
     g(['initialized-texmemory'], run_concurrent=False)
     g(['initialized-fbo'], run_concurrent=False)
     g(['initialized-vbo'], run_concurrent=False)
 
-with profile.group_manager(PiglitGLTest, 'shaders') as g:
+with profile.test_list.group_manager(PiglitGLTest, 'shaders') as g:
     g(['activeprogram-bad-program'])
     g(['activeprogram-get'])
     g(['attribute0'])
@@ -662,7 +662,7 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
                     'textureGather'):
         g(['zero-tex-coord', subtest])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, 'glx',
         require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-destroycontext-1'], run_concurrent=False)
@@ -744,7 +744,7 @@ profile.test_list[grouptools.join('glx', 'glx-buffer-age vblank_mode=0')] = \
 profile.test_list[grouptools.join(
     'glx', 'glx-buffer-age vblank_mode=0')].env['vblank_mode'] = '0'
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('glx', 'glx_ext_import_context'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
@@ -766,7 +766,7 @@ with profile.group_manager(
     g(['glx-query-context-info-ext'], 'query context info',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('glx', 'GLX_ARB_create_context'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
@@ -787,7 +787,7 @@ with profile.group_manager(
     g(['glx-create-context-valid-flag-forward-compatible'],
       'forward-compatible flag with 3.0')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('glx', 'GLX_ARB_create_context_profile'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
@@ -795,7 +795,7 @@ with profile.group_manager(
     g(['glx-create-context-invalid-profile'], 'invalid profile')
     g(['glx-create-context-pre-GL32-profile'], 'pre-GL3.2 profile')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('glx', 'GLX_ARB_create_context_robustness'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
@@ -803,7 +803,7 @@ with profile.group_manager(
       'invalid reset notification strategy')
     g(['glx-create-context-require-robustness'], 'require GL_ARB_robustness')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('glx', 'GLX_ARB_create_context_es2_profile'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
@@ -811,7 +811,7 @@ with profile.group_manager(
       'indirect rendering ES2 profile')
     g(['glx-create-context-invalid-es-version'], 'invalid OpenGL ES version')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('glx', 'GLX_ARB_sync_control'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
@@ -838,13 +838,13 @@ for args in oml_sync_control_nonzeros:
         ['glx-oml-sync-control-timing'] + args,
         require_platforms=['glx', 'mixed_glx_egl'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('glx', 'GLX_MESA_query_renderer'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-query-renderer-coverage'], 'coverage')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!OpenGL 1.1')) as g:
     g(['copyteximage', '1D'], run_concurrent=False)
@@ -981,7 +981,7 @@ with profile.group_manager(
         add_fbo_depthstencil_tests(
             grouptools.join('spec', '!opengl 1.1'), 'default_fb', num_samples)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.0')) as g:
     g(['gl-1.0-beginend-coverage'])
@@ -1018,7 +1018,7 @@ with profile.group_manager(
     g(['gl-1.0-scissor-polygon'])
     g(['gl-1.0-scissor-stencil-clear'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.2')) as g:
     g(['crash-texparameter-before-teximage'], run_concurrent=False)
@@ -1039,14 +1039,14 @@ with profile.group_manager(
                                 run_concurrent=False)
     add_texwrap_target_tests(g, '3D')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.3')) as g:
     g(['texunits'], run_concurrent=False)
     g(['tex-border-1'], run_concurrent=False)
     g(['tex3d-depth1'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.4')) as g:
     g(['fdo25614-genmipmap'], run_concurrent=False)
@@ -1066,12 +1066,12 @@ with profile.group_manager(
     g(['tex-miplevel-selection', '-nobias'], 'tex-miplevel-selection-lod')
     g(['tex-miplevel-selection'], 'tex-miplevel-selection-lod-bias')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.4')) as g:
     add_msaa_visual_plain_tests(g, ['copy-pixels'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.5')) as g:
     g(['draw-elements'], run_concurrent=False)
@@ -1086,7 +1086,7 @@ with profile.group_manager(
       'normal3b3s-invariance-short', run_concurrent=False)
     g(['gl-1.5-vertex-buffer-offsets'], 'vertex-buffer-offsets')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 2.0')) as g:
     g(['attribs'])
@@ -1149,7 +1149,7 @@ with profile.group_manager(
     g(['incomplete-cubemap', 'size'], 'incomplete-cubemap-size')
     g(['incomplete-cubemap', 'format'], 'incomplete-cubemap-format')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 2.1')) as g:
     g(['gl-2.1-minmax'], 'minmax')
@@ -1157,7 +1157,7 @@ with profile.group_manager(
     g(['gl-2.1-polygon-stipple-fs'], 'polygon-stipple-fs')
     g(['gl-2.1-fbo-mrt-alphatest-no-buffer-zero-write'], 'fbo-mrt-alphatest-no-buffer-zero-write')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 3.0')) as g:
     g(['attribs', 'GL3'], 'attribs')
@@ -1200,7 +1200,7 @@ with profile.group_manager(
     g(['generatemipmap-base-change', 'format'])
     g(['generatemipmap-cubemap'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 3.1')) as g:
     g(['gl-3.1-default-vao'], 'default-vao')
@@ -1222,7 +1222,7 @@ with profile.group_manager(
         g(['gl-3.1-primitive-restart-xfb', subtest],
           'primitive-restart-xfb {0}'.format(subtest))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 3.2')) as g:
     g(['glsl-resource-not-bound', '1D'])
@@ -1261,7 +1261,7 @@ with profile.group_manager(
       'get-active-attrib-returns-all-inputs')
     g(['gl-3.2-texture-border-deprecated'], 'texture-border-deprecated')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 3.2', 'layered-rendering')) as g:
     g(['gl-3.2-layered-rendering-blit'], 'blit')
@@ -1301,7 +1301,7 @@ with profile.group_manager(
                test_type],
               'clear-color-all-types {} {}'.format(texture_type, test_type))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 3.3')) as g:
     g(['gl-3.3-minmax'], 'minmax')
@@ -1312,7 +1312,7 @@ with profile.group_manager(
     g(['gl-3.0-required-texture-attachment-formats', '33'],
       'required-texture-attachment-formats')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 4.2')) as g:
     g(['gl-3.0-required-renderbuffer-attachment-formats', '42'],
@@ -1323,13 +1323,13 @@ with profile.group_manager(
       'required-texture-attachment-formats')
     g(['gl-4.4-max_vertex_attrib_stride'], 'gl-max-vertex-attrib-stride')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 4.4')) as g:
     g(['tex-errors'])
 
 # Group spec/glsl-es-1.00
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-es-1.00')) as g:
     g(['built-in-constants_gles2',
@@ -1338,20 +1338,20 @@ with profile.group_manager(
       'built-in constants')
 
 # Group spec/glsl-1.10
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.10', 'execution')) as g:
     g(['glsl-render-after-bad-attach'])
     g(['glsl-1.10-fragdepth'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.10', 'execution', 'clipping')) as g:
     for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
         g(['clip-plane-transformation', mode],
           'clip-plane-transformation {}'.format(mode))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.10', 'execution',
                         'varying-packing')) as g:
@@ -1363,20 +1363,20 @@ with profile.group_manager(
             g(['varying-packing-simple', type_, arrayspec],
               'simple {} {}'.format(type_, arrayspec))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.10')) as g:
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.10', 'minimum-maximums.txt')],
       'built-in constants')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.10', 'api')) as g:
     g(['getactiveattrib', '110'], 'getactiveattrib 110')
 
 # Group spec/glsl-1.20
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.20')) as g:
     g(['glsl-1.20-getactiveuniform-constant'])
@@ -1384,12 +1384,12 @@ with profile.group_manager(
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.20', 'minimum-maximums.txt')],
       'built-in constants')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.20', 'api')) as g:
     g(['getactiveattrib', '120'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.20', 'recursion')) as g:
     g(['recursion', '-rlmit', '268435456', 'simple'], 'simple',
@@ -1407,7 +1407,7 @@ with profile.group_manager(
     g(['recursion', '-rlmit', '268435456', 'indirect-complex-separate'],
       'indirect-complex-separate', run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.20', 'execution')) as g:
     for test in ['1D', '2D', '3D', 'Cube', '1DShadow', '2DShadow']:
@@ -1477,7 +1477,7 @@ for stage in ['vs', 'gs', 'fs']:
                 ] = PiglitGLTest([
                     'textureSamples', stage, stype, sample_count])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30')) as g:
     g(['glsl-1.30-texel-offset-limits'], 'texel-offset-limits')
@@ -1485,7 +1485,7 @@ with profile.group_manager(
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.30', 'minimum-maximums.txt')],
       'built-in constants')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'execution')) as g:
     g(['texelFetch', 'fs', 'sampler1D', '1-513'])
@@ -1576,38 +1576,38 @@ with profile.group_manager(
         g(['tex-miplevel-selection', 'textureProjGrad', stage])
         g(['tex-miplevel-selection', 'textureProjGradOffset', stage])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'linker', 'clipping')) as g:
     g(['mixing-clip-distance-and-clip-vertex-disallowed'],
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'execution')) as g:
     for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
         g(['isinf-and-isnan', arg], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'execution', 'clipping')) as g:
     g(['max-clip-distances'], run_concurrent=False)
     g(['clip-plane-transformation', 'pos'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'api')) as g:
     g(['getactiveattrib', '130'], 'getactiveattrib 130', run_concurrent=False)
 
 # Group spec/glsl-1.40
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.40')) as g:
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.40', 'minimum-maximums.txt')],
       'built-in constants')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.40', 'execution')) as g:
     g(['glsl-1.40-tf-no-position'], 'tf-no-position')
@@ -1637,7 +1637,7 @@ for stage in ['vs', 'gs', 'fs']:
             '{}-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['texelFetch', 'offset', '140', stage, sampler])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.50')) as g:
     g(['built-in-constants',
@@ -1672,7 +1672,7 @@ with profile.group_manager(
         g(['glsl-1.50-gs-input-layout-qualifiers', layout])
         g(['glsl-1.50-gs-output-layout-qualifiers', layout])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.50', 'execution')) as g:
     g(['glsl-1.50-get-active-attrib-array'], 'get-active-attrib-array')
@@ -1686,7 +1686,7 @@ with profile.group_manager(
 # respectively), so test around there.  Also test 0, which means the
 # maximum number of geometry shader output vertices supported by the
 # hardware.
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.50', 'execution', 'geometry')) as g:
     for i in [31, 32, 33, 34, 127, 128, 129, 130, 0]:
@@ -1712,25 +1712,25 @@ with profile.group_manager(
               'tri-strip-ordering-with-prim-restart {0} {1}'.format(
                   prim_type, restart_index))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'glsl-3.30')) as g:
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-3.30', 'minimum-maximums.txt')],
       'built-in constants')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'glsl-es-3.00')) as g:
     g(['built-in-constants_gles3',
        os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00',
                     'minimum-maximums.txt')],
       'built-in constants')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-es-3.00', 'execution')) as g:
     g(['varying-struct-centroid_gles3'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'glsl-es-3.10')) as g:
     g(['built-in-constants_gles3',
        os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.10',
@@ -1738,24 +1738,24 @@ with profile.group_manager(
       'built-in constants')
 
 # AMD_performance_monitor
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'AMD_performance_monitor')) as g:
     g(['amd_performance_monitor_api'], 'api', run_concurrent=False)
     g(['amd_performance_monitor_measure'], 'measure', run_concurrent=False)
 
 # Group ARB_arrays_of_arrays
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_arrays_of_arrays')) as g:
     g(['arb_arrays_of_arrays-max-binding'], run_concurrent=False)
 
 # Group ARB_point_sprite
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_point_sprite')) as g:
     g(['point-sprite'], run_concurrent=False)
 
 # Group ARB_tessellation_shader
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_tessellation_shader')) as g:
     g(['arb_tessellation_shader-get-tcs-params'])
     g(['arb_tessellation_shader-get-tes-params'])
@@ -1771,7 +1771,7 @@ with profile.group_manager(
     g(['arb_tessellation_shader-layout-mismatch'])
 
 # Group ARB_texture_multisample
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_texture_multisample')) as g:
     g(['arb_texture_multisample-minmax'])
     g(['texelFetch', 'fs', 'sampler2DMS', '4', '1x71-501x71'])
@@ -1798,7 +1798,7 @@ with profile.group_manager(
 
 samplers_atm = ['sampler2DMS', 'isampler2DMS', 'usampler2DMS',
                 'sampler2DMSArray', 'isampler2DMSArray', 'usampler2DMSArray']
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_multisample',
                         'fb-completeness')) as g:
@@ -1808,7 +1808,7 @@ with profile.group_manager(
         g(['arb_texture_multisample-fb-completeness', sample_count],
           sample_count)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_multisample', 'texelFetch')) as g:
 
@@ -1818,7 +1818,7 @@ with profile.group_manager(
         g(['texelFetch', stage, sampler, sample_count],
           '{}-{}-{}'.format(sample_count, stage, sampler))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_multisample',
                         'sample-position')) as g:
@@ -1828,7 +1828,7 @@ with profile.group_manager(
           sample_count)
 
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_multisample',
                         'textureSize')) as g:
@@ -1839,7 +1839,7 @@ with profile.group_manager(
           '{}-textureSize-{}'.format(stage, sampler))
 
 # Group ARB_texture_gather
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_gather')) as g:
     stages = ['vs', 'fs']
@@ -1859,12 +1859,12 @@ with profile.group_manager(
                    'offset' if func == 'textureGatherOffset' else '',
                    comp, swiz, type_, sampler], testname)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_stencil_texturing')) as g:
     g(['arb_stencil_texturing-draw'], 'draw')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_stencil_texturing', 'glBlitFramebuffer corrupts state')) as g:
     for t in ['1D', '2D', 'CUBE_MAP', '1D_ARRAY', '2D_ARRAY', 'CUBE_MAP_ARRAY', '2D_MULTISAMPLE', '2D_MULTISAMPLE_ARRAY', 'RECTANGLE']:
@@ -1872,7 +1872,7 @@ with profile.group_manager(
         g(['arb_stencil_texturing-blit_corrupts_state', target], target)
 
 # Group ARB_sync
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_sync')) as g:
     g(['arb_sync-client-wait-errors'], 'ClientWaitSync-errors')
     g(['arb_sync-delete'], 'DeleteSync')
@@ -1887,7 +1887,7 @@ with profile.group_manager(
     g(['sync_api'], run_concurrent=False)
 
 # Group ARB_ES2_compatibility
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_ES2_compatibility')) as g:
     g(['arb_es2_compatibility-depthrangef'], run_concurrent=False)
     g(['arb_es2_compatibility-drawbuffers'], run_concurrent=False)
@@ -1908,7 +1908,7 @@ with profile.group_manager(
 
 
 # Group ARB_get_program_binary
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_get_program_binary')) as g:
     g(['arb_get_program_binary-api-errors'],
       'misc. API error checks')
@@ -1917,18 +1917,18 @@ with profile.group_manager(
     g(['arb_get_program_binary-retrievable_hint'],
       'PROGRAM_BINARY_RETRIEVABLE_HINT')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'EXT_depth_bounds_test')) as g:
     g(['depth_bounds'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_depth_clamp')) as g:
     g(['depth_clamp'], run_concurrent=False)
     g(['depth-clamp-range'], run_concurrent=False)
     g(['depth-clamp-status'], run_concurrent=False)
 
 # Group ARB_draw_elements_base_vertex
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_draw_elements_base_vertex')) as g:
     g(['arb_draw_elements_base_vertex-dlist'], 'dlist')
@@ -1949,7 +1949,7 @@ with profile.group_manager(
       run_concurrent=False)
 
 # Group ARB_draw_instanced
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_draw_instanced')) as g:
     g(['arb_draw_instanced-dlist'], 'dlist')
@@ -1961,7 +1961,7 @@ with profile.group_manager(
     g(['arb_draw_instanced-drawarrays'], run_concurrent=False)
 
 # Group ARB_draw_indirect
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_draw_indirect')) as g:
     g(['arb_draw_indirect-api-errors'])
@@ -1980,7 +1980,7 @@ with profile.group_manager(
       'gl_VertexID used with glDrawElementsIndirect')
 
 # Group ARB_fragment_program
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_fragment_program')) as g:
     g(['arb_fragment_program-minmax'], 'minmax')
@@ -2000,7 +2000,7 @@ with profile.group_manager(
     g(['arb_fragment_program-sparse-samplers'], 'sparse-samplers')
     g(['incomplete-texture', 'arb_fp'], 'incomplete-texture-arb_fp')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'NV_fragment_program_option')) as g:
     g(['fp-abs-02'], run_concurrent=False)
@@ -2009,13 +2009,13 @@ with profile.group_manager(
     g(['fp-set-02'], run_concurrent=False)
     g(['fp-unpack-01'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ATI_fragment_shader')) as g:
     g(['ati-fs-bad-delete'])
 
 # Group ARB_framebuffer_object
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_framebuffer_object')) as g:
     g(['same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT'])
@@ -2083,7 +2083,7 @@ with profile.group_manager(
               'framebuffer-blit-levels {} {}'.format(test_mode, format))
 
 # Group ARB_framebuffer_sRGB
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_framebuffer_sRGB')) as g:
     for backing_type in ('texture', 'renderbuffer'):
@@ -2114,7 +2114,7 @@ with profile.group_manager(
     g(['arb_framebuffer_srgb-srgb_conformance'])
     g(['arb_framebuffer_srgb-srgb_pbo'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_gpu_shader5')) as g:
     stages = ['vs', 'fs']
@@ -2178,7 +2178,7 @@ with profile.group_manager(
     g(['arb_gpu_shader5-interpolateAtOffset-nonconst'])
 
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_gpu_shader_fp64',
                         'varying-packing')) as g:
@@ -2189,7 +2189,7 @@ with profile.group_manager(
             g(['varying-packing-simple', type, arrayspec],
               'simple {0} {1}'.format(type, arrayspec))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_gpu_shader_fp64', 'execution')) as g:
     g(['arb_gpu_shader_fp64-tf-separate'])
@@ -2213,7 +2213,7 @@ with profile.group_manager(
     g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-packing'])
     g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-packing'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_gpu_shader_fp64', 'shader_storage')) as g:
     g(['arb_gpu_shader_fp64-layout-std140-fp64-shader'], 'layout-std140-fp64-shader')
@@ -2221,13 +2221,13 @@ with profile.group_manager(
     g(['arb_gpu_shader_fp64-layout-std430-fp64-shader'], 'layout-std430-fp64-shader')
     g(['arb_gpu_shader_fp64-layout-std430-fp64-mixed-shader'], 'layout-std430-fp64-mixed-shader')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_shader_subroutine')) as g:
     g(['arb_shader_subroutine-minmax'])
     g(['arb_shader_subroutine-uniformsubroutinesuiv'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_occlusion_query')) as g:
     g(['occlusion_query'])
@@ -2240,7 +2240,7 @@ with profile.group_manager(
     g(['gen_delete_while_active'])
 
 # Group ARB_separate_shader_objects
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_separate_shader_objects')) as g:
     g(['arb_separate_shader_object-ActiveShaderProgram-invalid-program'],
@@ -2286,7 +2286,7 @@ with profile.group_manager(
        'Transform feedback with rendezvous by location')
 
 # Group ARB_sampler_objects
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_sampler_objects')) as g:
     g(['arb_sampler_objects-sampler-objects'], 'sampler-objects',)
@@ -2296,7 +2296,7 @@ with profile.group_manager(
       run_concurrent=False)
 
 # Group ARB_sample_shading
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_sample_shading')) as g:
     g(['arb_sample_shading-api'], run_concurrent=False)
@@ -2330,13 +2330,13 @@ with profile.group_manager(
     g(['arb_sample_shading-builtin-gl-sample-mask-mrt-alpha'])
 
 # Group ARB_debug_output
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_debug_output')) as g:
     g(['arb_debug_output-api_error'], run_concurrent=False)
 
 # Group KHR_debug
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'KHR_debug')) as g:
     g(['khr_debug-object-label_gl'], 'object-label_gl')
@@ -2347,19 +2347,19 @@ with profile.group_manager(
     g(['khr_debug-push-pop-group_gles3'], 'push-pop-group_gles3')
 
 # Group ARB_occlusion_query2
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_occlusion_query2')) as g:
     g(['arb_occlusion_query2-api'], 'api')
     g(['arb_occlusion_query2-render'], 'render')
 
 # Group EXT_texture_format_BGRA8888 tests
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'EXT_texture_format_BGRA8888')) as g:
     g(['ext_texture_format_bgra8888-api-errors'], 'api-errors')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_pixel_buffer_object')) as g:
     g(['cubemap', 'pbo'])
@@ -2380,7 +2380,7 @@ with profile.group_manager(
     g(['texsubimage-unpack', 'pbo'])
 
 # Group ARB_provoking_vertex
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_provoking_vertex')) as g:
     g(['arb-provoking-vertex-control'], run_concurrent=False)
@@ -2390,13 +2390,13 @@ with profile.group_manager(
     g(['arb-xfb-before-flatshading'], run_concurrent=False)
 
 # Group ARB_robustness
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_robustness')) as g:
     g(['arb_robustness_client-mem-bounds'], run_concurrent=False)
 
 # Group ARB_shader_texture_lod
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_shader_texture_lod', 'execution')) as g:
     g(['arb_shader_texture_lod-texgrad'])
@@ -2435,7 +2435,7 @@ with profile.group_manager(
 
 
 # Group ARB_shader_objects
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_shader_objects')) as g:
     g(['arb_shader_objects-getuniform'], 'getuniform')
@@ -2448,7 +2448,7 @@ with profile.group_manager(
     g(['arb_shader_objects-clear-with-deleted'], 'clear-with-deleted')
     g(['arb_shader_objects-delete-repeat'], 'delete-repeat')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_shading_language_420pack')) as g:
     g(['built-in-constants',
@@ -2460,7 +2460,7 @@ with profile.group_manager(
     g(['arb_shading_language_420pack-binding-layout'], 'binding layout')
 
 # Group ARB_enhanced_layouts
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_enhanced_layouts')) as g:
     g(['arb_enhanced_layouts-explicit-offset-bufferstorage'],
@@ -2487,7 +2487,7 @@ with profile.group_manager(
        'transform-feedback-layout-query-api')
 
 # Group ARB_explicit_attrib_location
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_explicit_attrib_location')) as g:
     g(['glsl-explicit-location-01'], run_concurrent=False)
@@ -2499,7 +2499,7 @@ with profile.group_manager(
         g(['overlapping-locations-input-attribs', test_type],
           run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_program_interface_query')) as g:
     g(['arb_program_interface_query-resource-location'], run_concurrent=False)
@@ -2510,7 +2510,7 @@ with profile.group_manager(
     g(['arb_program_interface_query-getprogramresourceiv'], run_concurrent=False)
     g(['arb_program_interface_query-compare-with-shader-subroutine'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_framebuffer_no_attachments')) as g:
     g(['arb_framebuffer_no_attachments-minmax'])
@@ -2520,7 +2520,7 @@ with profile.group_manager(
     g(['arb_framebuffer_no_attachments-roundup-samples'])
 
 # Group ARB_explicit_uniform_location
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_explicit_uniform_location')) as g:
     g(['arb_explicit_uniform_location-minmax'], run_concurrent=False)
@@ -2530,7 +2530,7 @@ with profile.group_manager(
     g(['arb_explicit_uniform_location-use-of-unused-loc'],
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_buffer_object')) as g:
     g(['arb_texture_buffer_object-bufferstorage'], 'bufferstorage')
@@ -2556,7 +2556,7 @@ with profile.group_manager(
     g(['arb_texture_buffer_object-unused-name'], 'unused-name')
     g(['arb_texture_buffer_object-render-no-bo'], 'render-no-bo')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_buffer_range')) as g:
     g(['arb_texture_buffer_range-dlist'], 'dlist')
@@ -2564,7 +2564,7 @@ with profile.group_manager(
     g(['arb_texture_buffer_range-ranges'], 'ranges')
     g(['arb_texture_buffer_range-ranges-2'], 'ranges-2')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_rectangle')) as g:
     g(['1-1-linear-texture'])
@@ -2582,20 +2582,20 @@ with profile.group_manager(
                                 run_concurrent=False)
     add_texwrap_target_tests(g, 'RECT')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_texture_storage')) as g:
     g(['arb_texture_storage-texture-storage'], 'texture-storage',
       run_concurrent=False)
     g(['arb_texture_storage-texture-storage-attach-before'], 'attach-before',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_storage_multisample')) as g:
     g(['arb_texture_storage_multisample-tex-storage'], 'tex-storage')
     g(['arb_texture_storage_multisample-tex-param'], 'tex-param')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_view')) as g:
     g(['arb_texture_view-cubemap-view'], 'cubemap-view')
@@ -2628,7 +2628,7 @@ with profile.group_manager(
     g(['arb_texture_view-sampling-2d-array-as-2d-layer'],
       'sampling-2d-array-as-2d-layer')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'OES_texture_view')) as g:
     g(['arb_texture_view-rendering-formats_gles3'], 'rendering-formats')
@@ -2646,7 +2646,7 @@ with profile.group_manager(
     g(['arb_texture_view-queries_gles3'], 'queries')
     g(['arb_texture_view-targets_gles3'], 'targets')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '3DFX_texture_compression_FXT1')) as g:
     g(['compressedteximage', 'GL_COMPRESSED_RGB_FXT1_3DFX'])
@@ -2657,13 +2657,13 @@ with profile.group_manager(
     g(['fbo-generatemipmap-formats', 'GL_3DFX_texture_compression_FXT1'],
       'fbo-generatemipmap-formats')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_clip_control')) as g:
     g(['arb_clip_control-clip-control'])
     g(['arb_clip_control-depth-precision'])
     g(['arb_clip_control-viewport'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_color_buffer_float')) as g:
 
     def f(name, format, p1=None, p2=None):
@@ -2716,7 +2716,7 @@ with profile.group_manager(
     f('render', 'GL_RGBA32F', 'sanity')
     f('render', 'GL_RGBA32F', 'sanity', 'fog')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_depth_texture')) as g:
     g(['depth-level-clamp'], run_concurrent=False)
     g(['depth-tex-modes'], run_concurrent=False)
@@ -2728,7 +2728,7 @@ with profile.group_manager(
     add_fbo_depth_tests(g, 'GL_DEPTH_COMPONENT32')
     add_fbo_formats_tests(g, 'GL_ARB_depth_texture')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_depth_buffer_float')) as g:
     g(['fbo-clear-formats', 'GL_ARB_depth_buffer_float', 'stencil'],
       'fbo-clear-formats stencil')
@@ -2746,19 +2746,19 @@ with profile.group_manager(
         grouptools.join('spec', 'arb_depth_buffer_float'),
         'GL_DEPTH32F_STENCIL8', 0)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_get_texture_sub_image')) as g:
     g(['arb_get_texture_sub_image-cubemap'])
     g(['arb_get_texture_sub_image-errors'])
     g(['arb_get_texture_sub_image-get'])
     g(['arb_get_texture_sub_image-getcompressed'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_env_crossbar')) as g:
     g(['crossbar'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_texture_compression')) as g:
     g(['arb_texture_compression-internal-format-query'],
       'GL_TEXTURE_INTERNAL_FORMAT query')
@@ -2768,7 +2768,7 @@ with profile.group_manager(
       'fbo-generatemipmap-formats')
     add_texwrap_format_tests(g, 'GL_ARB_texture_compression')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_compression_bptc')) as g:
     g(['arb_texture_compression-invalid-formats', 'bptc'], 'invalid formats')
@@ -2784,32 +2784,32 @@ with profile.group_manager(
       'fbo-generatemipmap-formats float')
     add_texwrap_format_tests(g, 'GL_ARB_texture_compression_bptc')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_vertex_array_bgra')) as g:
     g(['bgra-sec-color-pointer'], run_concurrent=False)
     g(['bgra-vert-attrib-pointer'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'apple_vertex_array_object')) as g:
     g(['vao-01'], run_concurrent=False)
     g(['vao-02'], run_concurrent=False)
     g(['arb_vertex_array-isvertexarray', 'apple'], 'isvertexarray')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_array_bgra')) as g:
     g(['arb_vertex_array_bgra-api-errors'], 'api-errors', run_concurrent=False)
     g(['arb_vertex_array_bgra-get'], 'get', run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_array_object')) as g:
     g(['vao-element-array-buffer'])
     g(['arb_vertex_array-isvertexarray'], 'isvertexarray')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_buffer_object')) as g:
     g(['arb_vertex_buffer_object-elements-negative-offset'],
@@ -2834,7 +2834,7 @@ with profile.group_manager(
     g(['vbo-subdata-sync'], run_concurrent=False)
     g(['vbo-subdata-zero'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_program')) as g:
     g(['arb_vertex_program-getenv4d-with-error'], 'getenv4d-with-error',
@@ -2853,7 +2853,7 @@ with profile.group_manager(
     g(['vp-bad-program'], run_concurrent=False)
     g(['vp-max-array'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_viewport_array')) as g:
     g(['arb_viewport_array-viewport-indices'], 'viewport-indices')
@@ -2869,7 +2869,7 @@ with profile.group_manager(
     g(['arb_viewport_array-render-scissor'], 'render-scissor')
     g(['arb_viewport_array-clear'], 'clear')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_viewport_array')) as g:
     g(['arb_viewport_array-viewport-indices_gles3'], 'viewport-indices')
@@ -2885,7 +2885,7 @@ with profile.group_manager(
     g(['arb_viewport_array-render-scissor_gles3'], 'render-scissor')
     g(['arb_viewport_array-clear_gles3'], 'clear')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'nv_vertex_program2_option')) as g:
     g(['vp-address-03'], run_concurrent=False)
@@ -2896,7 +2896,7 @@ with profile.group_manager(
     g(['vp-clipdistance-03'], run_concurrent=False)
     g(['vp-clipdistance-04'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_framebuffer_blit')) as g:
     g(['fbo-blit'], run_concurrent=False)
     g(['fbo-copypix'], run_concurrent=False)
@@ -2905,7 +2905,7 @@ with profile.group_manager(
     g(['fbo-sys-sub-blit'], run_concurrent=False)
     g(['fbo-generatemipmap-versus-READ_FRAMEBUFFER'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec',
                         'ext_framebuffer_multisample_blit_scaled')) as g:
@@ -2922,7 +2922,7 @@ with profile.group_manager(
            sample_count, 'array'],
           'blit-scaled samples={} with GL_TEXTURE_2D_MULTISAMPLE_ARRAY'.format(sample_count))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_framebuffer_multisample')) as g:
     g(['ext_framebuffer_multisample-blit-mismatched-samples'],
@@ -3064,7 +3064,7 @@ with profile.group_manager(
                   'no-color {} {} {}'.format(
                       sample_count, test_type, buffer_config))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_framebuffer_object')) as g:
     g(['fbo-generatemipmap-noimage'])
@@ -3120,7 +3120,7 @@ with profile.group_manager(
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX8')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX16')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_image_dma_buf_import')) as \
         g:
     g(['ext_image_dma_buf_import-invalid_hints'], run_concurrent=False)
@@ -3148,7 +3148,7 @@ with profile.group_manager(
       'ext_image_dma_buf_import-transcode-nv12-as-r8-gr88',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_packed_depth_stencil')) as g:
     g(['fbo-blit-d24s8'], run_concurrent=False)
@@ -3175,7 +3175,7 @@ with profile.group_manager(
         grouptools.join('spec', 'ext_packed_depth_stencil'),
         'GL_DEPTH24_STENCIL8', 0)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_packed_depth_stencil')) as g:
     g(['oes_packed_depth_stencil-depth-stencil-texture_gles2'],
@@ -3183,7 +3183,7 @@ with profile.group_manager(
     g(['oes_packed_depth_stencil-depth-stencil-texture_gles1'],
       'DEPTH_STENCIL texture GLES1')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_array')) as g:
     g(['fbo-generatemipmap-array'])
@@ -3213,7 +3213,7 @@ with profile.group_manager(
           'compressed {0} pbo'.format(test_mode),
           run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_cube_map')) as g:
     g(['crash-cubemap-order'], run_concurrent=False)
@@ -3228,7 +3228,7 @@ with profile.group_manager(
     add_msaa_visual_plain_tests(g, ['copyteximage', 'CUBE'],
                                 run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_cube_map_array')) as g:
     g(['arb_texture_cube_map_array-get'], run_concurrent=False)
@@ -3254,14 +3254,14 @@ with profile.group_manager(
               grouptools.join('textureSize', '{}-textureSize-{}'.format(
                   stage, sampler)))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_swizzle')) as g:
     g(['ext_texture_swizzle-api'])
     g(['ext_texture_swizzle-swizzle'])
     g(['depth_texture_mode_and_swizzle'], 'depth_texture_mode_and_swizzle')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_compression_latc')) as g:
     g(['arb_texture_compression-invalid-formats', 'latc'], 'invalid formats')
@@ -3271,7 +3271,7 @@ with profile.group_manager(
       'fbo-generatemipmap-formats-signed')
     add_texwrap_format_tests(g, 'GL_EXT_texture_compression_latc')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_compression_rgtc')) as g:
     g(['compressedteximage', 'GL_COMPRESSED_RED_RGTC1_EXT'])
@@ -3287,7 +3287,7 @@ with profile.group_manager(
       'fbo-generatemipmap-formats-signed')
     add_texwrap_format_tests(g, 'GL_EXT_texture_compression_rgtc')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_compression_s3tc')) as g:
     g(['compressedteximage', 'GL_COMPRESSED_RGB_S3TC_DXT1_EXT'])
@@ -3311,7 +3311,7 @@ with profile.group_manager(
       'fbo-generatemipmap-formats')
     add_texwrap_format_tests(g, 'GL_EXT_texture_compression_s3tc')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ati_texture_compression_3dc')) as g:
     g(['arb_texture_compression-invalid-formats', '3dc'], 'invalid formats')
@@ -3319,7 +3319,7 @@ with profile.group_manager(
       'fbo-generatemipmap-formats')
     add_texwrap_format_tests(g, 'GL_ATI_texture_compression_3dc')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_packed_float')) as g:
     g(['ext_packed_float-pack'], 'pack')
@@ -3329,7 +3329,7 @@ with profile.group_manager(
     add_texwrap_format_tests(g, 'GL_EXT_packed_float')
     add_fbo_formats_tests(g, 'GL_EXT_packed_float')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_float')) as g:
     g(['arb_texture_float-texture-float-formats'], run_concurrent=False)
@@ -3338,7 +3338,7 @@ with profile.group_manager(
     add_texwrap_format_tests(g, 'GL_ARB_texture_float')
     add_fbo_formats_tests(g, 'GL_ARB_texture_float')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_texture_float')) as g:
     g(['oes_texture_float'])
@@ -3347,7 +3347,7 @@ with profile.group_manager(
     g(['oes_texture_float', 'half', 'linear'])
 
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_integer')) as g:
     g(['ext_texture_integer-api-drawpixels'], 'api-drawpixels')
@@ -3372,7 +3372,7 @@ with profile.group_manager(
     add_msaa_formats_tests(g, 'GL_EXT_texture_integer')
     add_texwrap_format_tests(g, 'GL_EXT_texture_integer')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_rg')) as g:
     g(['depth-tex-modes-rg'], run_concurrent=False)
@@ -3395,28 +3395,28 @@ with profile.group_manager(
     add_fbo_formats_tests(g, 'GL_ARB_texture_rg')
     add_fbo_formats_tests(g, 'GL_ARB_texture_rg-float', '-float')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_rgb10_a2ui')) as g:
     g(['ext_texture_integer-fbo-blending', 'GL_ARB_texture_rgb10_a2ui'],
       'fbo-blending')
     add_texwrap_format_tests(g, 'GL_ARB_texture_rgb10_a2ui')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_shared_exponent')) as g:
     g(['fbo-generatemipmap-formats', 'GL_EXT_texture_shared_exponent'],
       'fbo-generatemipmap-formats')
     add_texwrap_format_tests(g, 'GL_EXT_texture_shared_exponent')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_snorm')) as g:
     add_msaa_formats_tests(g, 'GL_EXT_texture_snorm')
     add_texwrap_format_tests(g, 'GL_EXT_texture_snorm')
     add_fbo_formats_tests(g, 'GL_EXT_texture_snorm')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_texture_srgb')) as g:
     g(['fbo-srgb'], run_concurrent=False)
     g(['tex-srgb'], run_concurrent=False)
@@ -3438,18 +3438,18 @@ with profile.group_manager(
     add_texwrap_format_tests(g, 'GL_EXT_texture_sRGB')
     add_texwrap_format_tests(g, 'GL_EXT_texture_sRGB-s3tc', '-s3tc')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_timer_query')) as g:
     g(['ext_timer_query-time-elapsed'], 'time-elapsed', run_concurrent=False)
     g(['timer_query'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_timer_query')) as g:
     g(['ext_timer_query-time-elapsed', 'timestamp'], 'query GL_TIMESTAMP', run_concurrent=False)
     g(['ext_timer_query-lifetime'], 'query-lifetime')
     g(['arb_timer_query-timestamp-get'], 'timestamp-get', run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_transform_feedback')) as g:
     for mode in ['interleaved_ok_base', 'interleaved_ok_range',
                  'interleaved_ok_offset', 'interleaved_unbound',
@@ -3630,14 +3630,14 @@ with profile.group_manager(
     g(['ext_transform_feedback-geometry-shaders-basic'],
       'geometry-shaders-basic')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_transform_feedback2')) as g:
     g(['arb_transform_feedback2-change-objects-while-paused'],
       'Change objects while paused', run_concurrent=False)
     g(['arb_transform_feedback2-change-objects-while-paused_gles3'],
       'Change objects while paused (GLES3)', run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_transform_feedback2')) as g:
     g(['arb_transform_feedback2-draw-auto'], 'draw-auto', run_concurrent=False)
     g(['arb_transform_feedback2-istransformfeedback'], 'istranformfeedback',
@@ -3649,12 +3649,12 @@ with profile.group_manager(
     g(['arb_transform_feedback2-api-queries'], 'misc. API queries')
     g(['arb_transform_feedback2-pause-counting'], 'counting with pause')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_transform_instanced')) as g:
     g(['arb_transform_feedback2-draw-auto', 'instanced'],
       'draw-auto instanced', run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_transform_feedback3')) as g:
     g(['arb_transform_feedback3-bind_buffer_invalid_index'],
       'arb_transform_feedback3-bind_buffer_invalid_index',
@@ -3690,7 +3690,7 @@ with profile.group_manager(
                   'gl_NextBuffer-gl_NextBuffer', 'gl_SkipComponents1234', 'gl_SkipComponents1-gl_NextBuffer']:
         g(['ext_transform_feedback-output-type', param], param)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_uniform_buffer_object')) as g:
     g(['arb_uniform_buffer_object-bindbuffer-general-point'],
@@ -3747,7 +3747,7 @@ with profile.group_manager(
     g(['arb_uniform_buffer_object-row-major'], 'row-major')
     g(['arb_uniform_buffer_object-uniformblockbinding'], 'uniformblockbinding')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_uniform_buffer_object',
                         'maxuniformblocksize')) as g:
@@ -3758,7 +3758,7 @@ with profile.group_manager(
     g(['arb_uniform_buffer_object-maxuniformblocksize', 'fsexceed'],
       'fsexceed')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ati_draw_buffers')) as g:
     g(['ati_draw_buffers-arbfp'], run_concurrent=False)
     g(['ati_draw_buffers-arbfp-no-index'], 'arbfp-no-index',
@@ -3766,11 +3766,11 @@ with profile.group_manager(
     g(['ati_draw_buffers-arbfp-no-option'], 'arbfp-no-option',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ati_envmap_bumpmap')) as g:
     g(['ati_envmap_bumpmap-bump'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_instanced_arrays')) as g:
     g(['arb_instanced_arrays-vertex-attrib-divisor-index-error'],
       run_concurrent=False)
@@ -3779,14 +3779,14 @@ with profile.group_manager(
     add_single_param_test_set(g, 'arb_instanced_arrays-instanced_arrays',
                               'vbo')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_internalformat_query')) as g:
     g(['arb_internalformat_query-api-errors'], 'misc. API error checks')
     g(['arb_internalformat_query-overrun'], 'buffer over-run checks')
     g(['arb_internalformat_query-minmax'], 'minmax')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_internalformat_query2')) as g:
     g(['arb_internalformat_query2-api-errors'], 'API error checks')
@@ -3803,7 +3803,7 @@ with profile.group_manager(
     g(['arb_internalformat_query2-filter'], 'FILTER pname checks.')
     g(['arb_internalformat_query2-format-components'], '{COLOR,DEPTH,STENCIL}_COMPONENTS pname checks')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_map_buffer_range')) as g:
     g(['map_buffer_range_error_check'], run_concurrent=False)
     g(['map_buffer_range_test'], run_concurrent=False)
@@ -3826,18 +3826,18 @@ with profile.group_manager(
     g(['map_buffer_range-invalidate', 'CopyBufferSubData', 'decrement-offset'],
       'CopyBufferSubData decrement-offset')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_multisample')) as g:
     g(['arb_multisample-beginend'], 'beginend')
     g(['arb_multisample-pushpop'], 'pushpop')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_seamless_cube_map')) as g:
     g(['arb_seamless_cubemap'], run_concurrent=False)
     g(['arb_seamless_cubemap-initially-disabled'], run_concurrent=False)
     g(['arb_seamless_cubemap-three-faces-average'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'AMD_pinned_memory')) as g:
     g(['amd_pinned_memory', 'offset=0'], 'offset=0')
     g(['amd_pinned_memory', 'increment-offset'], 'increment-offset')
@@ -3848,12 +3848,12 @@ with profile.group_manager(
     g(['amd_pinned_memory', 'decrement-offset', 'map-buffer'],
       'map-buffer decrement-offset')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'amd_seamless_cubemap_per_texture')) as g:
     g(['amd_seamless_cubemap_per_texture'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'amd_vertex_shader_layer')) as g:
     g(['amd_vertex_shader_layer-layered-2d-texture-render'],
@@ -3861,22 +3861,22 @@ with profile.group_manager(
     g(['amd_vertex_shader_layer-layered-depth-texture-render'],
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'amd_vertex_shader_viewport_index')) as g:
     g(['amd_vertex_shader_viewport_index-render'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_fog_coord')) as g:
     g(['ext_fog_coord-modes'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'nv_texture_barrier')) as g:
     g(['blending-in-shader'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'nv_conditional_render')) as g:
     g(['nv_conditional_render-begin-while-active'], 'begin-while-active')
@@ -3898,17 +3898,17 @@ with profile.group_manager(
     g(['nv_conditional_render-vertex_array'], 'vertex_array',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_matrix_get')) as g:
     g(['oes_matrix_get-api'], 'All queries')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_fixed_point')) as g:
     g(['oes_fixed_point-attribute-arrays'], 'attribute-arrays')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_clear_buffer_object')) as g:
     g(['arb_clear_buffer_object-formats'])
@@ -3924,7 +3924,7 @@ with profile.group_manager(
     g(['arb_clear_buffer_object-unaligned'])
     g(['arb_clear_buffer_object-zero-size'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_clear_texture')) as g:
     g(['arb_clear_texture-clear-max-level'])
@@ -3943,7 +3943,7 @@ with profile.group_manager(
     g(['arb_clear_texture-stencil'])
     g(['arb_clear_texture-texview'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_copy_buffer')) as g:
     g(['copy_buffer_coherency'], run_concurrent=False)
@@ -3959,7 +3959,7 @@ with profile.group_manager(
     g(['arb_copy_buffer-targets'], 'targets')
     g(['arb_copy_buffer-subdata-sync'], 'subdata-sync')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_copy_image')) as g:
     g(['arb_copy_image-simple', '--tex-to-tex'])
@@ -4166,59 +4166,59 @@ with profile.group_manager(
     g(['arb_copy_image-format-swizzle'])
     g(['arb_copy_image-texview'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_cull_distance')) as g:
     g(['arb_cull_distance-max-distances'])
     g(['arb_cull_distance-exceed-limits', 'cull'])
     g(['arb_cull_distance-exceed-limits', 'clip'])
     g(['arb_cull_distance-exceed-limits', 'total'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_half_float_vertex')) as g:
     g(['draw-vertices-half-float'], run_concurrent=False)
     g(['draw-vertices-half-float', 'user'], 'draw-vertices-half-float-user',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'oes_vertex_half_float')) as g:
     g(['draw-vertices-half-float_gles2'], run_concurrent=False)
     g(['draw-vertices-half-float_gles2', 'user'], 'draw-vertices-half-float-user_gles2',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_type_2_10_10_10_rev')) as g:
     g(['draw-vertices-2101010'], run_concurrent=False)
     g(['attribs', 'GL_ARB_vertex_type_2_10_10_10_rev'], 'attribs')
     g(['arb_vertex_type_2_10_10_10_rev-array_types'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_type_10f_11f_11f_rev')) as g:
     g(['arb_vertex_type_10f_11f_11f_rev-api-errors'], run_concurrent=False)
     g(['arb_vertex_type_10f_11f_11f_rev-draw-vertices'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_draw_buffers')) as g:
     g(['arb_draw_buffers-state_change'], run_concurrent=False)
     g(['fbo-mrt-alphatest'], run_concurrent=False)
     g(['fbo-mrt-new-bind'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_draw_buffers2')) as g:
     g(['fbo-drawbuffers2-blend'], run_concurrent=False)
     g(['fbo-drawbuffers2-colormask'], run_concurrent=False)
     g(['fbo-drawbuffers2-colormask', 'clear'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_draw_buffers_blend')) as g:
     g(['arb_draw_buffers_blend-state_set_get'])
     g(['fbo-draw-buffers-blend'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_blend_func_extended')) as g:
     g(['arb_blend_func_extended-bindfragdataindexed-invalid-parameters'],
@@ -4246,21 +4246,21 @@ with profile.group_manager(
     g(['arb_blend_func_extended-fbo-extended-blend-explicit_gles3'],
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_base_instance')) as g:
     g(['arb_base_instance-baseinstance-doesnt-affect-gl-instance-id'],
       run_concurrent=False)
     g(['arb_base_instance-drawarrays'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_base_instance')) as g:
     g(['arb_base_instance-baseinstance-doesnt-affect-gl-instance-id_gles3'],
       run_concurrent=False)
     g(['arb_base_instance-drawarrays_gles3'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_buffer_storage')) as g:
     for mode in ['read', 'draw']:
@@ -4273,24 +4273,24 @@ with profile.group_manager(
         g(['bufferstorage-persistent_gles3', mode, 'client-storage'])
         g(['bufferstorage-persistent_gles3', mode, 'coherent', 'client-storage'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'apple_object_purgeable')) as g:
     g(['object_purgeable-api-pbo'], run_concurrent=False)
     g(['object_purgeable-api-texture'], run_concurrent=False)
     g(['object_purgeable-api-vbo'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'mesa_pack_invert')) as g:
     g(['mesa_pack_invert-readpixels'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_read_format')) as g:
     g(['oes-read-format'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'nv_primitive_restart')) as g:
     add_single_param_test_set(
@@ -4305,30 +4305,30 @@ with profile.group_manager(
         'points', 'lines', 'line_loop', 'line_strip', 'triangles',
         'triangle_strip', 'triangle_fan', 'quads', 'quad_strip', 'polygon')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_provoking_vertex')) as g:
     g(['provoking-vertex'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_texture_lod_bias')) as g:
     g(['lodbias'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'sgis_generate_mipmap')) as g:
     g(['gen-nonzero-unit'], run_concurrent=False)
     g(['gen-teximage'], run_concurrent=False)
     g(['gen-texsubimage'], run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_map_buffer_alignment')) as g:
     g(['arb_map_buffer_alignment-sanity_test'], run_concurrent=False)
     g(['arb_map_buffer_alignment-map-invalidate-range'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_geometry_shader4')) as g:
     g(['arb_geometry_shader4-program-parameter-input-type'])
@@ -4344,7 +4344,7 @@ with profile.group_manager(
     for mode in ['1', 'tf 1', 'max', 'tf max']:
         g(['arb_geometry_shader4-program-parameter-vertices-out', mode])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_compute_shader')) as g:
     g(['arb_compute_shader-api_errors'], 'api_errors')
@@ -4360,7 +4360,7 @@ with profile.group_manager(
     g(['arb_compute_shader-render-and-compute'], 'render-and-compute')
     g(['arb_compute_shader-zero-dispatch-size'], 'zero-dispatch-size')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_shader_storage_buffer_object')) as g:
     g(['arb_shader_storage_buffer_object-minmax'], 'minmax')
@@ -4374,7 +4374,7 @@ with profile.group_manager(
     g(['arb_shader_storage_buffer_object-layout-std140-write-shader'], 'layout-std140-write-shader')
     g(['arb_shader_storage_buffer_object-program_interface_query'], 'program-interface-query')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_shader_storage_buffer_object',
                         'max-ssbo-size')) as g:
@@ -4385,14 +4385,14 @@ with profile.group_manager(
     g(['arb_shader_storage_buffer_object-max-ssbo-size', 'fsexceed'],
       'fsexceed')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_polygon_offset_clamp')) as g:
     g(['ext_polygon_offset_clamp-draw'])
     g(['ext_polygon_offset_clamp-draw_gles2'])
     g(['ext_polygon_offset_clamp-dlist'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_pipeline_statistics_query')) as g:
     g(['arb_pipeline_statistics_query-vert'])
@@ -4402,7 +4402,7 @@ with profile.group_manager(
     g(['arb_pipeline_statistics_query-frag'])
     g(['arb_pipeline_statistics_query-comp'])
 
-with profile.group_manager(PiglitGLTest, 'hiz') as g:
+with profile.test_list.group_manager(PiglitGLTest, 'hiz') as g:
     g(['hiz-depth-stencil-test-fbo-d0-s8'], run_concurrent=False)
     g(['hiz-depth-stencil-test-fbo-d24-s0'], run_concurrent=False)
     g(['hiz-depth-stencil-test-fbo-d24-s8'], run_concurrent=False)
@@ -4428,7 +4428,7 @@ with profile.group_manager(PiglitGLTest, 'hiz') as g:
     g(['hiz-stencil-test-window-depth0'], run_concurrent=False)
     g(['hiz-stencil-test-window-depth1'], run_concurrent=False)
 
-with profile.group_manager(PiglitGLTest, 'fast_color_clear') as g:
+with profile.test_list.group_manager(PiglitGLTest, 'fast_color_clear') as g:
     g(['fcc-blit-between-clears'])
     g(['fcc-read-to-pbo-after-clear'], run_concurrent=False)
     g(['fcc-front-buffer-distraction'], run_concurrent=False)
@@ -4439,21 +4439,21 @@ with profile.group_manager(PiglitGLTest, 'fast_color_clear') as g:
                 continue
             g(['fcc-read-after-clear', subtest, buffer_type])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_unpack_subimage')) as g:
     g(['ext_unpack_subimage'], 'basic')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'oes_draw_texture')) as g:
     g(['oes_draw_texture'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_compressed_etc1_rgb8_texture')) as g:
     g(['oes_compressed_etc1_rgb8_texture-basic'], 'basic')
     g(['oes_compressed_etc1_rgb8_texture-miptree'], 'miptree')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
          PiglitGLTest,
          grouptools.join('spec', 'khr_texture_compression_astc')) as g:
     g(['arb_texture_compression-invalid-formats', 'astc'], 'invalid formats')
@@ -4473,7 +4473,7 @@ with profile.group_manager(
         g(['khr_compressed_astc-sliced-3d-miptree_gles3', '-subtest', subtest],
            'sliced-3d-miptree-gles {}'.format(subtest))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
          PiglitGLTest,
          grouptools.join('spec', 'oes_texture_compression_astc')) as g:
     for subtest in ('hdr', 'ldr', 'srgb'):
@@ -4482,19 +4482,19 @@ with profile.group_manager(
         g(['oes_compressed_astc-miptree-3d_gles3', '-subtest', subtest],
            'miptree-3d-gles {}'.format(subtest))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
          PiglitGLTest,
          grouptools.join('spec', 'nv_read_depth')) as g:
     g(['read_depth_gles3'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_compressed_paletted_texture')) as g:
     g(['oes_compressed_paletted_texture-api'], 'basic API')
     g(['arb_texture_compression-invalid-formats', 'paletted'],
       'invalid formats')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl 1.4'),
         exclude_platforms=['glx']) as g:
@@ -4521,19 +4521,19 @@ with profile.group_manager(
       'largest possible eglCreatePbufferSurface and then glClear',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_nok_swap_region'),
         exclude_platforms=['glx']) as g:
     g(['egl-nok-swap-region'], 'basic', run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_nok_texture_from_pixmap'),
         exclude_platforms=['glx']) as g:
     g(['egl-nok-texture-from-pixmap'], 'basic', run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_khr_create_context'),
         exclude_platforms=['glx']) as g:
@@ -4580,20 +4580,20 @@ with profile.group_manager(
         g(['egl-create-context-valid-flag-debug-gles', api],
           'valid debug flag {}'.format(api), run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_khr_surfaceless_context'),
         exclude_platforms=['glx']) as g:
     g(['egl-surfaceless-context-viewport'], 'viewport',
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_mesa_configless_context'),
         exclude_platforms=['glx']) as g:
     g(['egl-configless-context'], 'basic')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_ext_client_extensions'),
         exclude_platforms=['glx']) as g:
@@ -4601,56 +4601,56 @@ with profile.group_manager(
         g(['egl_ext_client_extensions', str(i)],
           'conformance test {0}'.format(i))
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_khr_fence_sync'),
         exclude_platforms=['glx']) as g:
     g(['egl_khr_fence_sync'], 'conformance')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_khr_gl_colorspace'),
         exclude_platforms=['glx']) as g:
     g(['egl-gl-colorspace'], 'linear')
     g(['egl-gl-colorspace', 'srgb'], 'srgb')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_khr_wait_sync'),
         exclude_platforms=['glx']) as g:
     g(['egl_khr_fence_sync', 'wait_sync'], 'conformance')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_khr_get_all_proc_addresses'),
         exclude_platforms=['glx']) as g:
     g(['egl_khr_get_all_proc_addresses'], 'conformance')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_chromium_sync_control'),
         exclude_platforms=['glx']) as g:
     g(['egl_chromium_sync_control'], 'conformance')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_ext_device_query'),
         exclude_platforms=['glx']) as g:
     g(['egl_ext_device_query'], 'conformance')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_ext_device_enumeration'),
         exclude_platforms=['glx']) as g:
     g(['egl_ext_device_enumeration'], 'conformance')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'egl_mesa_platform_surfaceless'),
         exclude_platforms=['glx']) as g:
     g(['egl_mesa_platform_surfaceless'], 'conformance')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', '!opengl ES 2.0')) as g:
     g(['glsl-fs-pointcoord_gles2'], 'glsl-fs-pointcoord')
     g(['invalid-es3-queries_gles2'])
@@ -4660,7 +4660,7 @@ with profile.group_manager(
     g(['fbo_discard_gles2'])
     g(['draw_buffers_gles2'])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', '!opengl ES 3.0')) as g:
     g(['minmax_gles3'], 'minmax')
     g(['texture-immutable-levels_gles3'], 'texture-immutable-levels')
@@ -4676,7 +4676,7 @@ with profile.group_manager(
                        'srgb8-punchthrough-alpha1']:
         g(['oes_compressed_etc2_texture-miptree_gles3', tex_format])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_es3_compatibility')) as g:
     g(['es3-primrestart-fixedindex'])
     g(['es3-drawarrays-primrestart-fixedindex'])
@@ -4687,7 +4687,7 @@ with profile.group_manager(
         for context in ['core', 'compat']:
             g(['oes_compressed_etc2_texture-miptree', tex_format, context])
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_shader_atomic_counters')) as g:
     g(['arb_shader_atomic_counters-active-counters'], 'active-counters')
@@ -4704,7 +4704,7 @@ with profile.group_manager(
     g(['arb_shader_atomic_counters-unused-result'], 'unused-result')
     g(['arb_shader_atomic_counters-respecify-buffer'], 'respecify-buffer')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_direct_state_access')) as g:
     g(['arb_direct_state_access-create-transformfeedbacks'],
@@ -4748,7 +4748,7 @@ with profile.group_manager(
     g(['arb_direct_state_access-create-queries'], 'create-queries')
     g(['arb_direct_state_access-generatetexturemipmap'], 'generatetexturemipmap')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_shader_image_load_store')) as g:
     g(['arb_shader_image_load_store-atomicity'], 'atomicity')
@@ -4771,17 +4771,17 @@ with profile.group_manager(
     g(['arb_shader_image_load_store-state'], 'state')
     g(['arb_shader_image_load_store-unused'], 'unused')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
     PiglitGLTest,
     grouptools.join('spec', 'arb_shader_image_size')) as g:
     g(['arb_shader_image_size-builtin'], 'builtin')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
     PiglitGLTest,
     grouptools.join('spec', 'arb_shader_texture_image_samples')) as g:
     g(['arb_shader_texture_image_samples-builtin-image'], 'builtin-image')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_stencil8')) as g:
     g(['arb_texture_stencil8-draw'], 'draw')
@@ -4793,7 +4793,7 @@ with profile.group_manager(
     add_fbo_formats_tests(g, 'GL_ARB_texture_stencil8')
     add_texwrap_format_tests(g, 'GL_ARB_texture_stencil8')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_attrib_64bit')) as g:
     g(['arb_vertex_attrib_64bit-double_attribs'], 'double_attribs')
@@ -4804,18 +4804,18 @@ with profile.group_manager(
         g(['arb_vertex_attrib_64bit-overlapping-locations', test_type],
           run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_query_buffer_object')) as g:
     g(['arb_query_buffer_object-qbo'], 'qbo')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_framebuffer_blit')) as g:
     g(['ext_framebuffer_blit-blit-early'], 'blit-early')
 
 # Group OES_draw_elements_base_vertex
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'OES_draw_elements_base_vertex')) as g:
     g(['oes_draw_elements_base_vertex-drawelements'], run_concurrent=False)
@@ -4826,7 +4826,7 @@ with profile.group_manager(
     g(['oes_draw_elements_base_vertex-multidrawelements'],
       run_concurrent=False)
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'oes_geometry_shader')) as g:
     g(['built-in-constants_gles3',
@@ -4835,7 +4835,7 @@ with profile.group_manager(
       'built-in constants')
 
 # Group EXT_shader_samples_identical
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'EXT_shader_samples_identical')) as g:
     for sample_count in MSAA_SAMPLE_COUNTS:
@@ -4843,7 +4843,7 @@ with profile.group_manager(
     g(['ext_shader_samples_identical-simple-fs'], 'simple-fs')
 
 # Group ARB_shader_draw_parameters
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_shader_draw_parameters')) as g:
     g(['arb_shader_draw_parameters-drawid', 'drawid'], 'drawid')
@@ -4858,13 +4858,13 @@ with profile.group_manager(
     g(['arb_shader_draw_parameters-drawid-indirect', 'vertexid'], 'drawid-indirect-vertexid')
 
 # Group ARB_indirect_parameters
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_indirect_parameters')) as g:
     g(['arb_indirect_parameters-tf-count-arrays'], 'tf-count-arrays')
     g(['arb_indirect_parameters-tf-count-elements'], 'tf-count-elements')
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('object namespace pollution')) as g:
     for object_type in ("buffer", "framebuffer", "program", "renderbuffer", "texture", "vertex-array"):
@@ -4879,7 +4879,7 @@ num_textures_set = ['1', '8']
 granularity_set = ['8', '64', '128']
 draw_passes_set = ['1', '2', '3', '4', '7', '8']
 
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_barrier')) as g:
     for resolution, blend_passes, num_textures, granularity, draw_passes in itertools.product(
@@ -4889,13 +4889,13 @@ with profile.group_manager(
 
 
 # Group ARB_invalidate_subdata
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_invalidate_subdata')) as g:
     g(['arb_invalidate_subdata-buffer'], 'buffer')
 
 # Group EXT_window_rectangles
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'EXT_window_rectangles')) as g:
     g(['ext_window_rectangles-dlist'], 'dlist')
@@ -4906,7 +4906,7 @@ with profile.group_manager(
     g(['ext_window_rectangles-render_gles3'], 'render_gles3')
 
 # Group ARB_compute_variable_group_size
-with profile.group_manager(
+with profile.test_list.group_manager(
 	PiglitGLTest,
 	grouptools.join('spec', 'ARB_compute_variable_group_size')) as g:
     g(['arb_compute_variable_group_size-errors'], 'errors')

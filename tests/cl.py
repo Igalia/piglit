@@ -23,14 +23,14 @@ __all__ = ['profile']
 profile = TestProfile()
 
 # Custom
-with profile.group_manager(PiglitCLTest, 'custom') as g:
+with profile.test_list.group_manager(PiglitCLTest, 'custom') as g:
     g(['cl-custom-run-simple-kernel'], 'Run simple kernel')
     g(['cl-custom-flush-after-enqueue-kernel'], 'Flush after enqueue kernel')
     g(['cl-custom-r600-create-release-buffer-bug'],
       'r600 create release buffer bug')
     g(['cl-custom-buffer-flags'], 'Buffer flags')
 
-with profile.group_manager(PiglitCLTest, 'api') as g:
+with profile.test_list.group_manager(PiglitCLTest, 'api') as g:
     # Platform
     g(['cl-api-get-platform-ids'], 'clGetPlatformIDs')
     g(['cl-api-get-platform-info'], 'clGetPlatformInfo')
@@ -92,13 +92,13 @@ with profile.group_manager(PiglitCLTest, 'api') as g:
     g(['cl-api-get-event-info'], 'clGetEventInfo')
     g(['cl-api-retain_release-event'], 'clRetainEvent and clReleaseEvent')
 
-with profile.group_manager(PiglitCLTest, 'program') as g:
+with profile.test_list.group_manager(PiglitCLTest, 'program') as g:
     g(['cl-program-max-work-item-sizes'],
       'Run kernel with max work item sizes')
     g(['cl-program-bitcoin-phatk'], 'Bitcoin: phatk kernel')
     g(['cl-program-predefined-macros'], 'Check predefined preprocessor macros')
 
-with profile.group_manager(PiglitCLTest, 'interop') as g:
+with profile.test_list.group_manager(PiglitCLTest, 'interop') as g:
     g(['cl-interop-egl_khr_cl_event2'], 'EGL_KHR_cl_event2')
 
 

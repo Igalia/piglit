@@ -44,10 +44,10 @@ profile = _profile.copy()  # pylint: disable=invalid-name
 GleanTest.GLOBAL_PARAMS += ["--quick"]
 
 # Set the --quick flag on a few image_load_store_tests
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_shader_image_load_store')) as g:
-    with profile.allow_reassignment:
+    with profile.test_list.allow_reassignment:
         g(['arb_shader_image_load_store-coherency', '--quick'], 'coherency')
         g(['arb_shader_image_load_store-host-mem-barrier', '--quick'],
           'host-mem-barrier')
@@ -57,10 +57,10 @@ with profile.group_manager(
           'shader-mem-barrier')
 
 # Set the --quick flag on the image_size test
-with profile.group_manager(
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_shader_image_size')) as g:
-    with profile.allow_reassignment:
+    with profile.test_list.allow_reassignment:
         g(['arb_shader_image_size-builtin', '--quick'], 'builtin')
 
 # These take too long

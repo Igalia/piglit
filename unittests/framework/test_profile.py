@@ -71,76 +71,6 @@ class TestLoadTestProfile(object):
 class TestTestProfile(object):
     """Tests for profile.TestProfile."""
 
-    class TestGroupManager(object):
-        """Tests for TestProfile.group_manager."""
-
-        profile = None
-
-        def setup(self):
-            self.profile = profile.TestProfile()
-
-        def test_no_name_args_eq_one(self):
-            """no name and len(args) == 1 is valid."""
-            with self.profile.group_manager(utils.Test, 'foo') as g:
-                g(['a'])
-
-            assert grouptools.join('foo', 'a') in self.profile.test_list
-
-        def test_no_name_args_gt_one(self):
-            """no name and len(args) > 1 is valid."""
-            with self.profile.group_manager(utils.Test, 'foo') as g:
-                g(['a', 'b'])
-
-            assert grouptools.join('foo', 'a b') in self.profile.test_list
-
-        def test_name(self):
-            """name plus len(args) > 1 is valid."""
-            with self.profile.group_manager(utils.Test, 'foo') as g:
-                g(['a', 'b'], 'a')
-
-            assert grouptools.join('foo', 'a') in self.profile.test_list
-
-        def test_adder_kwargs_passed(self):
-            """Extra kwargs passed to the adder function are passed to the
-            Test.
-            """
-            with self.profile.group_manager(utils.Test, 'foo') as g:
-                g(['a'], run_concurrent=True)
-            test = self.profile.test_list[grouptools.join('foo', 'a')]
-
-            assert test.run_concurrent is True
-
-        def test_context_manager_keyword_args_passed(self):
-            """kwargs passed to the context_manager are passed to the Test."""
-            with self.profile.group_manager(
-                    utils.Test, 'foo', run_concurrent=True) as g:  # pylint: disable=bad-continuation
-                    # This is a pylint bug, there's an upstream report
-                g(['a'])
-            test = self.profile.test_list[grouptools.join('foo', 'a')]
-
-            assert test.run_concurrent is True
-
-        def test_adder_kwargs_overwrite_context_manager_kwargs(self):
-            """default_args are overwritten by kwargs."""
-            with self.profile.group_manager(
-                    utils.Test, 'foo', run_concurrent=True) as g:  # pylint: disable=bad-continuation
-                    # This is a pylint bug, there's an upstream report
-                g(['a'], run_concurrent=False)
-
-            test = self.profile.test_list[grouptools.join('foo', 'a')]
-            assert test.run_concurrent is False
-
-        def test_name_as_str(self):
-            """if args is a string it is not joined.
-
-            This is a "feature" of glean, and no longer needs to be protected
-            whenever glean dies.
-            """
-            with self.profile.group_manager(GleanTest, 'foo') as g:
-                g('abc')
-
-            assert grouptools.join('foo', 'abc') in self.profile.test_list
-
     class TestCopy(object):
         """Tests for the copy method."""
 
@@ -223,10 +153,6 @@ class TestTestDict(object):
         def test(self):
             return profile.TestDict()
 
-        @pytest.fixture
-        def prof(self):
-            return profile.TestProfile()
-
         def test_case_insensitve(self, test):
             """reassigning a key raises an exception (capitalization is
             ignored)."""
@@ -242,17 +168,17 @@ class TestTestDict(object):
 
             assert test['a'].command == ['bar']
 
-        def test_with_groupmanager(self, prof):
+        def test_with_groupmanager(self, test):
             """profile.TestProfile: allow_reassignment wrapper works with
             groupmanager.
             """
             testname = grouptools.join('a', 'b')
-            prof.test_list[testname] = utils.Test(['foo'])
-            with prof.allow_reassignment:
-                with prof.group_manager(utils.Test, 'a') as g:
+            test[testname] = utils.Test(['foo'])
+            with test.allow_reassignment:
+                with test.group_manager(utils.Test, 'a') as g:
                     g(['bar'], 'b')
 
-            assert prof.test_list[testname].command == ['bar']
+            assert test[testname].command == ['bar']
 
         def test_stacked(self, test):
             """profile.profile.TestDict.allow_reassignment: check stacking
@@ -270,6 +196,75 @@ class TestTestDict(object):
                 test['a'] = utils.Test(['bar'])
 
             assert test['a'].command == ['bar']
+
+    class TestGroupManager(object):
+        """Test the group_manager method."""
+
+        @pytest.fixture
+        def inst(self):
+            return profile.TestDict()
+
+        def test_no_name_args_eq_one(self, inst):
+            """no name and len(args) == 1 is valid."""
+            with inst.group_manager(utils.Test, 'foo') as g:
+                g(['a'])
+
+            assert grouptools.join('foo', 'a') in inst
+
+        def test_no_name_args_gt_one(self, inst):
+            """no name and len(args) > 1 is valid."""
+            with inst.group_manager(utils.Test, 'foo') as g:
+                g(['a', 'b'])
+
+            assert grouptools.join('foo', 'a b') in inst
+
+        def test_name(self, inst):
+            """name plus len(args) > 1 is valid."""
+            with inst.group_manager(utils.Test, 'foo') as g:
+                g(['a', 'b'], 'a')
+
+            assert grouptools.join('foo', 'a') in inst
+
+        def test_adder_kwargs_passed(self, inst):
+            """Extra kwargs passed to the adder function are passed to the
+            Test.
+            """
+            with inst.group_manager(utils.Test, 'foo') as g:
+                g(['a'], run_concurrent=True)
+            test = inst[grouptools.join('foo', 'a')]
+
+            assert test.run_concurrent is True
+
+        def test_context_manager_keyword_args_passed(self, inst):
+            """kwargs passed to the context_manager are passed to the Test."""
+            with inst.group_manager(
+                    utils.Test, 'foo', run_concurrent=True) as g:  # pylint: disable=bad-continuation
+                    # This is a pylint bug, there's an upstream report
+                g(['a'])
+            test = inst[grouptools.join('foo', 'a')]
+
+            assert test.run_concurrent is True
+
+        def test_adder_kwargs_overwrite_context_manager_kwargs(self, inst):
+            """default_args are overwritten by kwargs."""
+            with inst.group_manager(
+                    utils.Test, 'foo', run_concurrent=True) as g:  # pylint: disable=bad-continuation
+                    # This is a pylint bug, there's an upstream report
+                g(['a'], run_concurrent=False)
+
+            test = inst[grouptools.join('foo', 'a')]
+            assert test.run_concurrent is False
+
+        def test_name_as_str(self, inst):
+            """if args is a string it is not joined.
+
+            This is a "feature" of glean, and no longer needs to be protected
+            whenever glean dies.
+            """
+            with inst.group_manager(GleanTest, 'foo') as g:
+                g('abc')
+
+            assert grouptools.join('foo', 'abc') in inst
 
 
 class TestRegexFilter(object):

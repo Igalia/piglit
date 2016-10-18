@@ -170,6 +170,77 @@ class TestDict(collections.MutableMapping):
     def __iter__(self):
         return iter(self.__container)
 
+    @contextlib.contextmanager
+    def group_manager(self, test_class, group, **default_args):
+        """A context manager to make working with flat groups simple.
+
+        This provides a simple way to replace add_plain_test,
+        add_concurrent_test, etc. Basic usage would be to use the with
+        statement to yield and adder instance, and then add tests.
+
+        This does not provide for a couple of cases.
+        1) When you need to alter the test after initialization. If you need to
+           set instance.env, for example, you will need to do so manually. It
+           is recommended to not use this function for that case, but to
+           manually assign the test and set env together, for code clearness.
+        2) When you need to use a function that modifies the TestProfile.
+
+        Arguments:
+        test_class -- a Test derived class that. Instances of this class will
+                      be added to the profile.
+        group      -- a string or unicode that will be used as the key for the
+                      test in profile.
+
+        Keyword Arguments:
+        **         -- any additional keyword arguments will be considered
+                      default arguments to all tests added by the adder. They
+                      will always be overwritten by **kwargs passed to the
+                      adder function
+
+        >>> from framework.test import PiglitGLTest
+        >>> p = TestProfile()
+        >>> with p.group_manager(PiglitGLTest, 'a') as g:
+        ...     g(['test'])
+        ...     g(['power', 'test'], 'powertest')
+        """
+        assert isinstance(group, six.string_types), type(group)
+
+        def adder(args, name=None, **kwargs):
+            """Helper function that actually adds the tests.
+
+            Arguments:
+            args   -- arguments to be passed to the test_class constructor.
+                      This must be appropriate for the underlying class
+
+            Keyword Arguments:
+            name   -- If this is a a truthy value that value will be used as
+                      the key for the test. If name is falsy then args will be
+                      ' '.join'd and used as name. Default: None
+            kwargs -- Any additional args will be passed directly to the test
+                      constructor as keyword args.
+            """
+            # If there is no name, then either
+            # a) join the arguments list together to make the name
+            # b) use the argument string as the name
+            # The former is used by the Piglit{G,C}LTest classes, the latter by
+            # GleanTest
+            if not name:
+                if isinstance(args, list):
+                    name = ' '.join(args)
+                else:
+                    assert isinstance(args, six.string_types)
+                    name = args
+
+            assert isinstance(name, six.string_types)
+            lgroup = grouptools.join(group, name)
+
+            self[lgroup] = test_class(
+                args,
+                **dict(itertools.chain(six.iteritems(default_args),
+                                       six.iteritems(kwargs))))
+
+        yield adder
+
     @property
     @contextlib.contextmanager
     def allow_reassignment(self):
@@ -215,85 +286,6 @@ class TestProfile(object):
             'dmesg': get_dmesg(False),
             'monitor': Monitoring(False),
         }
-
-    @contextlib.contextmanager
-    def group_manager(self, test_class, group, **default_args):
-        """A context manager to make working with flat groups simple.
-
-        This provides a simple way to replace add_plain_test,
-        add_concurrent_test, etc. Basic usage would be to use the with
-        statement to yield and adder instance, and then add tests.
-
-        This does not provide for a couple of cases.
-        1) When you need to alter the test after initialization. If you need to
-           set instance.env, for example, you will need to do so manually. It
-           is recommended to not use this function for that case, but to
-           manually assign the test and set env together, for code clearness.
-        2) When you need to use a function that modifies the TestProfile.
-
-        Arguments:
-        test_class -- a Test derived class that. Instances of this class will
-                      be added to the profile.
-        group      -- a string or unicode that will be used as the key for the
-                      test in profile.
-
-        Keyword Arguments:
-        **         -- any additional keyword arguments will be considered
-                      default arguments to all tests added by the adder. They
-                      will always be overwritten by **kwargs passed to the
-                      adder function
-
-        >>> from framework.test import PiglitGLTest
-        >>> p = TestProfile()
-        >>> with p.group_manager(PiglitGLTest, 'a') as g:
-        ...     g(['test'])
-        ...     g(['power', 'test'], 'powertest')
-        """
-        assert isinstance(group, six.string_types), type(group)
-
-        def adder(args, name=None, **kwargs):
-            """Helper function that actually adds the tests.
-
-            Arguments:
-            args -- arguments to be passed to the test_class constructor.
-                    This must be appropriate for the underlying class
-
-            Keyword Arguments:
-            name -- If this is a a truthy value that value will be used as the
-                    key for the test. If name is falsy then args will be
-                    ' '.join'd and used as name. Default: None
-            kwargs -- Any additional args will be passed directly to the test
-                      constructor as keyword args.
-
-            """
-            # If there is no name, then either
-            # a) join the arguments list together to make the name
-            # b) use the argument string as the name
-            # The former is used by the Piglit{G,C}LTest classes, the latter by
-            # GleanTest
-            if not name:
-                if isinstance(args, list):
-                    name = ' '.join(args)
-                else:
-                    assert isinstance(args, six.string_types)
-                    name = args
-
-            assert isinstance(name, six.string_types)
-            lgroup = grouptools.join(group, name)
-
-            self.test_list[lgroup] = test_class(
-                args,
-                **dict(itertools.chain(six.iteritems(default_args),
-                                       six.iteritems(kwargs))))
-
-        yield adder
-
-    @property
-    @contextlib.contextmanager
-    def allow_reassignment(self):
-        """A convenience wrapper around self.test_list.allow_reassignment."""
-        with self.test_list.allow_reassignment:
-            yield
 
     def setup(self):
         """Method to do pre-run setup."""
