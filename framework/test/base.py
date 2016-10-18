@@ -175,7 +175,7 @@ class Test(object):
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command']
     timeout = None
 
-    def __init__(self, command, run_concurrent=False, timeout=None):
+    def __init__(self, command, run_concurrent=False):
         assert isinstance(command, list), command
 
         self.run_concurrent = run_concurrent
@@ -183,9 +183,6 @@ class Test(object):
         self.env = {}
         self.result = TestResult()
         self.cwd = None
-        if timeout is not None:
-            assert isinstance(timeout, int)
-            self.timeout = timeout
 
     def execute(self, path, log, options):
         """ Run a test
