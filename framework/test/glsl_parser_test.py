@@ -73,56 +73,45 @@ class GLSLParserInternalError(exceptions.PiglitInternalError):
     pass
 
 
-class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
-    """ Read the options in a glsl parser test and create a Test object
+class Parser(object):
+    """Find and parse the config block of a GLSLParserTest.
 
     Specifically it is necessary to parse a glsl_parser_test to get information
     about it before actually creating a PiglitTest. Even though this could
     be done with a function wrapper, making it a distinct class makes it easier
     to sort in the profile.
-
-    Arguments:
-    filepath -- the path to a glsl_parser_test which must end in .vert,
-                .tesc, .tese, .geom or .frag
-
     """
     _CONFIG_KEYS = frozenset(['expect_result', 'glsl_version',
                               'require_extensions', 'check_link'])
 
     def __init__(self, filepath):
-        os.stat(filepath)
-
         # a set that stores a list of keys that have been found already
         self.__found_keys = set()
+        self.gl_required = set()
+        self.glsl_es_version = None
+        self.glsl_version = None
 
-        # Parse the config file and get the config section, then write this
-        # section to a StringIO and pass that to ConfigParser
         try:
             with io.open(filepath, mode='r', encoding='utf-8') as testfile:
                 testfile = testfile.read()
-                config = self.__parser(testfile, filepath)
-            command = self.__get_command(config, filepath)
+                self.config = self.parse(testfile, filepath)
+            self.command = self.get_command(filepath)
         except GLSLParserInternalError as e:
             raise exceptions.PiglitFatalError(
                 'In file "{}":\n{}'.format(filepath, six.text_type(e)))
 
-        super(GLSLParserTest, self).__init__(command, run_concurrent=True)
+        self.set_skip_conditions()
 
-        self.__set_skip_conditions(config)
-
-    def __set_skip_conditions(self, config):
+    def set_skip_conditions(self):
         """Set OpenGL and OpenGL ES fast skipping conditions."""
-        glsl = config.get('glsl_version')
-        if glsl:
-            if _is_gles_version(glsl):
-                self.glsl_es_version = float(glsl[:3])
-            else:
-                self.glsl_version = float(glsl)
+        glsl = self.config['glsl_version']
+        if _is_gles_version(glsl):
+            self.glsl_es_version = float(glsl[:3])
+        else:
+            self.glsl_version = float(glsl)
 
-        req = config.get('require_extensions')
-        if req:
-            self.gl_required = set(
-                r for r in req.split() if not r.startswith('!'))
+        req = self.config['require_extensions']
+        self.gl_required = set(r for r in req.split() if not r.startswith('!'))
 
         # If GLES is requested, but piglit was not built with a gles version,
         # then ARB_ES3<ver>_compatibility is required. Add it to
@@ -138,10 +127,10 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
                 ver = '3_2'
             ext = 'ARB_ES{}_compatibility'.format(ver)
             self.gl_required.add(ext)
-            self._command.append(ext)
+            self.command.append(ext)
 
     @staticmethod
-    def __pick_binary(version):
+    def pick_binary(version):
         """Pick the correct version of glslparsertest to use.
 
         This will try to select glslparsertest_gles2 for OpenGL ES tests, and
@@ -162,7 +151,7 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         else:
             return 'None'
 
-    def __get_command(self, config, filepath):
+    def get_command(self, filepath):
         """ Create the command argument to pass to super()
 
         This private helper creates a configparser object, then reads in the
@@ -173,26 +162,26 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
 
         """
         for opt in ['expect_result', 'glsl_version']:
-            if not config.get(opt):
+            if not self.config.get(opt):
                 raise GLSLParserInternalError("Missing required section {} "
                                               "from config".format(opt))
 
         # Create the command and pass it into a PiglitTest()
-        glsl = config['glsl_version']
+        glsl = self.config['glsl_version']
         command = [
-            self.__pick_binary(glsl),
+            self.pick_binary(glsl),
             filepath,
-            config['expect_result'],
-            config['glsl_version']
+            self.config['expect_result'],
+            self.config['glsl_version']
         ]
 
-        if config['check_link'].lower() == 'true':
+        if self.config['check_link'].lower() == 'true':
             command.append('--check-link')
-        command.extend(config['require_extensions'].split())
+        command.extend(self.config['require_extensions'].split())
 
         return command
 
-    def __parser(self, testfile, filepath):
+    def parse(self, testfile, filepath):
         """ Private helper that parses the config file
 
         This method parses the lines of text file, and then returns a
@@ -234,7 +223,7 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
 
             match = is_metadata.match(line)
             if match:
-                if match.group('key') not in GLSLParserTest._CONFIG_KEYS:
+                if match.group('key') not in self._CONFIG_KEYS:
                     raise GLSLParserInternalError(
                         "Key {} is not a valid key for a "
                         "glslparser test config block".format(
@@ -268,6 +257,24 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
             raise GLSLParserInternalError("No [end config] section found!")
 
         return keys
+
+
+class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
+    """A Test derived class specifically for glslparser.
+
+    Arguments:
+    filepath -- the path to a glsl_parser_test which must end in .vert,
+                .tesc, .tese, .geom or .frag
+    """
+
+    def __init__(self, filepath):
+        parsed = Parser(filepath)
+        super(GLSLParserTest, self).__init__(
+            parsed.command,
+            run_concurrent=True,
+            gl_required=parsed.gl_required,
+            glsl_version=parsed.glsl_version,
+            glsl_es_version=parsed.glsl_es_version)
 
     def is_skip(self):
         if os.path.basename(self.command[0]) == 'None':
