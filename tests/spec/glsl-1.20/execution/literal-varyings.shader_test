@@ -1,0 +1,43 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+
+void
+main()
+{
+	gl_Position = gl_Vertex;
+	gl_TexCoord[0] = vec4(0.0, 0.0, 0.0, 1.0);
+	gl_TexCoord[1] = gl_Vertex;
+	gl_TexCoord[2] = vec4(0.0, 0.0, 0.0, 0.0);
+	gl_TexCoord[3] = gl_Vertex * 2.0;
+	gl_TexCoord[4] = vec4(1.0, 1.0, 1.0, 1.0);
+	gl_TexCoord[5] = gl_Vertex * 4.0;
+	gl_TexCoord[6] = vec4(1.0, 1.0, 1.0, 0.0);
+	gl_TexCoord[7] = gl_Vertex * 8.0;
+}
+
+
+[fragment shader]
+#version 120
+
+void
+main()
+{
+	if (gl_TexCoord[0] == vec4(0.0, 0.0, 0.0, 1.0) &&
+	    gl_TexCoord[2] == vec4(0.0, 0.0, 0.0, 0.0) &&
+	    gl_TexCoord[3] == gl_TexCoord[1] * 2.0 &&
+	    gl_TexCoord[4] == vec4(1.0, 1.0, 1.0, 1.0) &&
+	    gl_TexCoord[5] == gl_TexCoord[1] * 4.0 &&
+	    gl_TexCoord[6] == vec4(1.0, 1.0, 1.0, 0.0) &&
+	    gl_TexCoord[7] == gl_TexCoord[1] * 8.0)
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
