@@ -38,6 +38,16 @@ extern "C" {
 #define EGL_PLATFORM_X11_EXT              0x31D5
 #define EGL_PLATFORM_GBM_MESA             0x31D7
 
+#ifndef EGL_KHR_no_config_context
+#define EGL_KHR_no_config_context 1
+#define EGL_NO_CONFIG_KHR                 ((EGLConfig)0)
+#endif /* EGL_KHR_no_config_context */
+
+#ifndef EGL_MESA_platform_surfaceless
+#define EGL_MESA_platform_surfaceless 1
+#define EGL_PLATFORM_SURFACELESS_MESA           0x31DD
+#endif /* EGL_MESA_platform_surfaceless */
+
 /**
  * \brief Convert an EGL error to a string.
  *
