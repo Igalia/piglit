@@ -1,0 +1,34 @@
+#
+# Test that vertex shader defaults to highp (only fragment shader
+# needs to specify float precision) and that later fragment shader
+# highp precision declaration overrides earlier mediump declaration.
+#
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader]
+
+uniform float a;
+
+void main(void)
+{
+        gl_Position = vec4(a);
+}
+
+[fragment shader]
+#ifdef GL_ES
+precision mediump float;
+#endif
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform float a;
+
+void main(void)
+{
+    gl_FragColor = vec4(a);
+}
+[test]
+link success
