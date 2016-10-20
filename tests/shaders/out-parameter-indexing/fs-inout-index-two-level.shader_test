@@ -1,0 +1,49 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform int u = 1;
+varying vec4 color;
+
+void func(inout int i, inout int w[4], inout int x)
+{
+  i = 0;
+  for (int j = 0; j < 4; ++j)
+    w[j] += j;
+  x = 1;
+}
+
+void main()
+{
+  int v[4] = int[](0, 0, 0, 0);
+  int w[4] = int[](0, 1, 0, 0);
+  int v_expected[4] = int[](0, 1, 0, 0);
+  int w_expected[4] = int[](0, 2, 2, 3);
+  int i = u;
+
+  func(i, w, v[w[i]]);
+
+  if (i != 0) {
+    gl_FragColor = vec4(1.0, 0.0, i * 0.1, 0.0);
+    return;
+  }
+
+  for (i = 0; i < 4; ++i) {
+    if (v[i] != v_expected[i]) {
+      gl_FragColor = vec4(1.0, 0.1 * (1 + i), v[i] * 0.1, 0.0);
+      return;
+    }
+    if (w[i] != w_expected[i]) {
+      gl_FragColor = vec4(1.0, 0.1 * (5 + i), w[i] * 0.1, 0.0);
+      return;
+    }
+  }
+
+  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
