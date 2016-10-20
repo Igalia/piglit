@@ -63,16 +63,16 @@ def add_fbo_stencil_tests(adder, format):
           'fbo-stencil-{}-blit'.format(format))
 
 
-def add_fbo_depthstencil_tests(group, format, num_samples):
+def add_fbo_depthstencil_tests(adder, format, num_samples):
     assert format, \
         'add_fbo_depthstencil_tests argument "format" cannot be empty'
 
     if format == 'default_fb':
         prefix = ''
-        create_test = lambda a: PiglitGLTest(a, run_concurrent=False)
+        concurrent = False
     else:
         prefix = 'fbo-'
-        create_test = PiglitGLTest
+        concurrent = True
 
     if int(num_samples) > 1:
         suffix = ' samples=' + num_samples
@@ -81,51 +81,39 @@ def add_fbo_depthstencil_tests(group, format, num_samples):
         suffix = ''
         psamples = ''
 
-    profile.test_list[grouptools.join(
-        group, '{}depthstencil-{}-clear{}'.format(prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'clear', format, psamples])
-    profile.test_list[grouptools.join(
-        group, '{}depthstencil-{}-readpixels-FLOAT-and-USHORT{}'.format(
-            prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'readpixels', format,
-                    'FLOAT-and-USHORT', psamples])
-    profile.test_list[grouptools.join(
-        group,
-        '{}depthstencil-{}-readpixels-24_8{}'.format(
-            prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'readpixels', format, '24_8',
-                    psamples])
-    profile.test_list[grouptools.join(
-        group,
-        '{}depthstencil-{}-readpixels-32F_24_8_REV{}'.format(
-            prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'readpixels', format,
-                    '32F_24_8_REV', psamples])
-    profile.test_list[grouptools.join(
-        group,
-        '{}depthstencil-{}-drawpixels-FLOAT-and-USHORT{}'.format(
-            prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'drawpixels', format,
-                     'FLOAT-and-USHORT', psamples])
-    profile.test_list[grouptools.join(
-        group,
-        '{}depthstencil-{}-drawpixels-24_8{}'.format(
-            prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'drawpixels', format, '24_8',
-                    psamples])
-    profile.test_list[grouptools.join(
-        group,
-        '{}depthstencil-{}-drawpixels-32F_24_8_REV{}'.format(
-            prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'drawpixels', format,
-                    '32F_24_8_REV', psamples])
-    profile.test_list[grouptools.join(
-        group,
-        '{}depthstencil-{}-copypixels{}'.format(prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'copypixels', format, psamples])
-    profile.test_list[grouptools.join(
-        group, '{}depthstencil-{}-blit{}'.format(prefix, format, suffix))] = \
-        create_test(['fbo-depthstencil', 'blit', format, psamples])
+    adder(['fbo-depthstencil', 'clear', format, psamples],
+          '{}depthstencil-{}-clear{}'.format(prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'readpixels', format, 'FLOAT-and-USHORT',
+           psamples],
+          '{}depthstencil-{}-readpixels-FLOAT-and-USHORT{}'.format(
+              prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'readpixels', format, '24_8', psamples],
+          '{}depthstencil-{}-readpixels-24_8{}'.format(prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'readpixels', format, '32F_24_8_REV', psamples],
+          '{}depthstencil-{}-readpixels-32F_24_8_REV{}'.format(
+              prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'drawpixels', format, 'FLOAT-and-USHORT',
+           psamples],
+          '{}depthstencil-{}-drawpixels-FLOAT-and-USHORT{}'.format(
+              prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'drawpixels', format, '24_8', psamples],
+          '{}depthstencil-{}-drawpixels-24_8{}'.format(prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'drawpixels', format, '32F_24_8_REV', psamples],
+          '{}depthstencil-{}-drawpixels-32F_24_8_REV{}'.format(
+              prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'copypixels', format, psamples],
+          '{}depthstencil-{}-copypixels{}'.format(prefix, format, suffix),
+          run_concurrent=concurrent)
+    adder(['fbo-depthstencil', 'blit', format, psamples],
+          '{}depthstencil-{}-blit{}'.format(prefix, format, suffix),
+          run_concurrent=concurrent)
 
 
 def add_msaa_visual_plain_tests(adder, args, **kwargs):
@@ -978,8 +966,7 @@ with profile.test_list.group_manager(
         g(['teximage-colors', format], run_concurrent=False)
 
     for num_samples in ['0'] + MSAA_SAMPLE_COUNTS:
-        add_fbo_depthstencil_tests(
-            grouptools.join('spec', '!opengl 1.1'), 'default_fb', num_samples)
+        add_fbo_depthstencil_tests(g, 'default_fb', num_samples)
 
 with profile.test_list.group_manager(
         PiglitGLTest,
@@ -2742,9 +2729,7 @@ with profile.test_list.group_manager(
     add_fbo_depth_tests(g, 'GL_DEPTH_COMPONENT32F')
     add_fbo_depth_tests(g, 'GL_DEPTH32F_STENCIL8')
     add_fbo_formats_tests(g, 'GL_ARB_depth_buffer_float')
-    add_fbo_depthstencil_tests(
-        grouptools.join('spec', 'arb_depth_buffer_float'),
-        'GL_DEPTH32F_STENCIL8', 0)
+    add_fbo_depthstencil_tests(g, 'GL_DEPTH32F_STENCIL8', 0)
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_get_texture_sub_image')) as g:
@@ -3171,9 +3156,7 @@ with profile.test_list.group_manager(
     add_texwrap_format_tests(g, 'GL_EXT_packed_depth_stencil')
     add_fbo_depth_tests(g, 'GL_DEPTH24_STENCIL8')
     add_fbo_formats_tests(g, 'GL_EXT_packed_depth_stencil')
-    add_fbo_depthstencil_tests(
-        grouptools.join('spec', 'ext_packed_depth_stencil'),
-        'GL_DEPTH24_STENCIL8', 0)
+    add_fbo_depthstencil_tests(g, 'GL_DEPTH24_STENCIL8', 0)
 
 with profile.test_list.group_manager(
         PiglitGLTest,
