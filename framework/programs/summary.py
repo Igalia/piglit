@@ -145,6 +145,11 @@ def console(input_):
                            const="incomplete",
                            dest='mode',
                            help="Only display tests that are incomplete.")
+    excGroup1.add_argument("-r", "--regressions",
+			   action="store_const",
+			   const="regressions",
+			   dest='mode',
+			   help="One display tests that regressed.")
     parser.add_argument("-l", "--list",
                         action="store",
                         help="Use test results from a list file")
