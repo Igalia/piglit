@@ -30,6 +30,7 @@ import operator
 
 import six
 from six.moves import zip
+from itertools import repeat
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
@@ -76,14 +77,15 @@ class Names(object):
     def __init__(self, tests):
         self.__results = tests.results
 
-    def __diff(self, comparator, handler=None):
+    def __diff(self, comparator, handler=None, lhs=None, rhs=None):
         """Helper for simplifying comparators using find_diffs."""
         ret = ['']
         if handler is None:
-            ret.extend(find_diffs(self.__results, self.all, comparator))
+            ret.extend(find_diffs(self.__results, self.all, comparator,
+                                  lhs=lhs, rhs=rhs))
         else:
             ret.extend(find_diffs(self.__results, self.all, comparator,
-                                  handler=handler))
+                                  handler=handler, lhs=lhs, rhs=rhs))
         return ret
 
     def __single(self, comparator):
@@ -140,7 +142,8 @@ class Names(object):
     def regressions(self):
         # By ensureing tha min(x, y) is >= so.PASS we eleminate NOTRUN and SKIP
         # from these pages
-        return self.__diff(lambda x, y: x < y and min(x, y) >= so.PASS)
+        return self.__diff(lambda x, y: x < y and min(x, y) >= so.PASS,
+                           rhs=self.__results[-1])
 
     @lazy_property
     def fixes(self):
@@ -292,7 +295,7 @@ def _result_in(name, result):
         return False
 
 
-def find_diffs(results, tests, comparator, handler=lambda *a: None):
+def find_diffs(results, tests, comparator, handler=lambda *a: None, lhs=None, rhs=None):
     """Generate diffs between two or more sets of results.
 
     Arguments:
@@ -300,6 +303,11 @@ def find_diffs(results, tests, comparator, handler=lambda *a: None):
     tests -- an iterable of test names. Must be iterable more than once
     comparator -- a function with the signautre f(x, y), that returns True when
                   the test should be added to the set of diffs
+    lhs -- the left-hand-side result for calls to comparator.
+           If not specified, results from the range results[:-1] will be used.
+    rhs -- the right-hand-side result for calls to comparator.
+           If not specified, results from the range results[1:] will be used.
+           Note that at least one of lhs and rhs must be unspecified.
 
     Keyword Arguemnts:
     handler -- a function with the signature f(names, name, prev, cur). in the
@@ -311,8 +319,17 @@ def find_diffs(results, tests, comparator, handler=lambda *a: None):
                Default: pass
 
     """
+    assert (lhs is None) or (rhs is None)
     diffs = [] # There can't be changes from nil -> 0
-    for prev, cur in zip(results[:-1], results[1:]):
+    if lhs is None:
+        lhs = results[:-1]
+    else:
+        lhs = repeat(lhs)
+    if rhs is None:
+        rhs = results[1:]
+    else:
+        rhs = repeat(rhs)
+    for prev, cur in zip(lhs, rhs):
         names = set()
         for name in tests:
             try:
