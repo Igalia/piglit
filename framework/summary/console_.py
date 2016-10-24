@@ -99,7 +99,7 @@ def _print_result(results, list_):
 
 def console(results, mode):
     """ Write summary information to the console """
-    assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
+    assert mode in ['summary', 'diff', 'incomplete', 'regressions', 'all'], mode
     results = Results([backends.load(r) for r in results])
 
     # Print the name of the test and the status from each test run
@@ -111,5 +111,7 @@ def console(results, mode):
         _print_summary(results)
     elif mode == 'incomplete':
         _print_result(results, results.names.all_incomplete)
+    elif mode == 'regressions':
+        _print_result(results, results.names.all_regressions)
     elif mode == 'summary':
         _print_summary(results)
