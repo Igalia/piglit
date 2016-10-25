@@ -56,7 +56,7 @@ _XML = """\
         <system-out>this/is/a/command\nThis is stdout</system-out>
         <system-err>this is stderr
 
-pid: 1934
+pid: [1934]
 time start: 1.0
 time end: 4.5
         </system-err>
@@ -152,7 +152,7 @@ class TestProtectedLoad(object):
             expected = textwrap.dedent("""\
                 this is stderr
 
-                pid: 1934
+                pid: [1934]
                 time start: 1.0
                 time end: 4.5""")
             assert result.tests[self.testname].err.strip() == expected
@@ -163,7 +163,7 @@ class TestProtectedLoad(object):
 
         def test_pid(self, result):
             """backends.junit._load: pid is loaded correctly."""
-            assert result.tests[self.testname].pid == 1934
+            assert result.tests[self.testname].pid == [1934]
 
 
 class TestJUnitBackend(object):

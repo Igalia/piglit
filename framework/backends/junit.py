@@ -29,6 +29,10 @@ try:
     from lxml import etree
 except ImportError:
     import xml.etree.cElementTree as etree
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 import six
 
@@ -396,7 +400,7 @@ def _load(results_file):
                 result.time.end = float(line[len('time end: '):])
                 continue
             elif line.startswith('pid:'):
-                result.pid = int(line[len('pid: '):])
+                result.pid = json.loads(line[len('pid: '):])
                 continue
 
 
