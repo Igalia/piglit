@@ -12,3 +12,4 @@ link_libraries (
 piglit_add_executable (gl-2.1-minmax minmax.c)
 piglit_add_executable (gl-2.1-pbo pbo.c)
 piglit_add_executable (gl-2.1-polygon-stipple-fs polygon-stipple-fs.c)
+piglit_add_executable (gl-2.1-fbo-mrt-alphatest-no-buffer-zero-write fbo-mrt-alphatest-no-buffer-zero-write.c)

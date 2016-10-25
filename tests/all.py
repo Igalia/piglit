@@ -1155,6 +1155,7 @@ with profile.group_manager(
     g(['gl-2.1-minmax'], 'minmax')
     g(['gl-2.1-pbo'], 'pbo')
     g(['gl-2.1-polygon-stipple-fs'], 'polygon-stipple-fs')
+    g(['gl-2.1-fbo-mrt-alphatest-no-buffer-zero-write'], 'fbo-mrt-alphatest-no-buffer-zero-write')
 
 with profile.group_manager(
         PiglitGLTest,
