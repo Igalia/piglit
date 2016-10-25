@@ -339,7 +339,7 @@ def run(input_):
     profile.run(args.log_level, backend)
 
     results.time_elapsed.end = time.time()
-    backend.finalize({'time_elapsed': results.time_elapsed})
+    backend.finalize({'time_elapsed': results.time_elapsed.to_json()})
 
     print('Thank you for running Piglit!\n'
           'Results have been written to ' + args.results_path)

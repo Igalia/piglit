@@ -262,7 +262,9 @@ class Totals(dict):
     def __init__(self, *args, **kwargs):
         super(Totals, self).__init__(*args, **kwargs)
         for each in status.ALL:
-            self[str(each)] = 0
+            each = six.text_type(each)
+            if each not in self:
+                self[each] = 0
 
     def __bool__(self):
         # Since totals are prepopulated, calling 'if not <Totals instance>'
@@ -282,7 +284,10 @@ class Totals(dict):
     @classmethod
     def from_dict(cls, dict_):
         """Convert a dictionary into a Totals object."""
-        return cls(dict_)
+        tots = cls(dict_)
+        if '__type__' in tots:
+            del tots['__type__']
+        return tots
 
 
 class TestrunResult(object):
@@ -362,16 +367,24 @@ class TestrunResult(object):
         """
         res = cls()
         for name in ['name', 'uname', 'options', 'glxinfo', 'wglinfo', 'lspci',
-                     'time_elapsed', 'totals', 'results_version',
-                     'clinfo']:
+                     'results_version', 'clinfo']:
             value = dict_.get(name)
             if value:
                 setattr(res, name, value)
 
+        # Since this is used to load partial metadata when writing final test
+        # results there is no guarantee that this will have a "time_elapsed"
+        # key
+        if 'time_elapsed' in dict_:
+            setattr(res, 'time_elapsed',
+                    TimeAttribute.from_dict(dict_['time_elapsed']))
         res.tests = {n: TestResult.from_dict(t)
                      for n, t in six.iteritems(dict_['tests'])}
 
-        if not res.totals and not _no_totals:
+        if not 'totals' in dict_ and not _no_totals:
             res.calculate_group_totals()
+        else:
+            res.totals = {n: Totals.from_dict(t) for n, t in
+                          six.iteritems(dict_['totals'])}
 
         return res

@@ -105,6 +105,7 @@ JSON = {
     "glxinfo": None,
     "totals": {
         "spec": {
+            '__type__': 'Totals',
             "warn": 0,
             "timeout": 0,
             "skip": 0,
@@ -117,6 +118,7 @@ JSON = {
             "dmesg-fail": 0
         },
         "": {
+            '__type__': 'Totals',
             "warn": 0,
             "timeout": 0,
             "skip": 0,
@@ -129,6 +131,7 @@ JSON = {
             "dmesg-fail": 0
         },
         "spec@!opengl 1.0": {
+            '__type__': 'Totals',
             "warn": 0,
             "timeout": 0,
             "skip": 0,
@@ -141,6 +144,7 @@ JSON = {
             "dmesg-fail": 0
         },
         "root": {
+            '__type__': 'Totals',
             "warn": 0,
             "timeout": 0,
             "skip": 0,

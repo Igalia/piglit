@@ -33,6 +33,8 @@ from framework import grouptools
 from framework import results
 from framework import status
 
+from .backends import shared
+
 # pylint: disable=no-self-use
 
 
@@ -169,6 +171,7 @@ class TestTestResult(object):
             def test_pid(self):
                 """sets pid properly."""
                 assert self.test.pid == self.dict['pid']
+
         class TestResult(object):
             """Tests for TestResult.result getter and setter methods."""
 
@@ -519,71 +522,43 @@ class TestTestrunResult(object):
     class TestFromDict(object):
         """Tests for TestrunResult.from_dict."""
 
-        @classmethod
-        def setup_class(cls):
-            """Setup values used by all tests."""
-            subtest = results.TestResult('fail')
-            subtest.subtests['foo'] = 'pass'
-
-            test = results.TestrunResult()
-            test.name = 'name'
-            test.uname = 'this is uname'
-            test.options = {'some': 'option'}
-            test.glxinfo = 'glxinfo'
-            test.wglinfo = 'wglinfo'
-            test.clinfo = 'clinfo'
-            test.lspci = 'this is lspci'
-            test.time_elapsed.end = 1.23
-            test.tests = {
-                'a test': results.TestResult('pass'),
-                'subtest': subtest,
-            }
-            # This will (hopefully) never be less than current
-            test.results_version = 100000
-
-            cls.baseline = test
-            cls.test = results.TestrunResult.from_dict(test.to_json())
+        @pytest.fixture(scope="module")
+        def inst(self):
+            return results.TestrunResult.from_dict(shared.JSON)
 
         @pytest.mark.parametrize("attrib", [
             'name', 'uname', 'glxinfo', 'wglinfo', 'lspci', 'results_version',
-            'clinfo'
+            'clinfo', 'options',
         ])
-        def test_attribs_restored(self, attrib):
+        def test_attribs_restored(self, attrib, inst):
             """tests for basic attributes."""
-            assert getattr(self.baseline, attrib) == getattr(self.test, attrib)
+            assert shared.JSON[attrib] == getattr(inst, attrib)
 
-        def test_tests(self):
+        def test_tests(self, inst):
             """tests is restored correctly."""
-            assert self.test.tests['a test'].result == \
-                self.baseline.tests['a test'].result
+            assert inst.tests.keys() == shared.JSON['tests'].keys()
 
-        def test_test_type(self):
+        def test_test_type(self, inst):
             """tests is restored correctly."""
-            assert isinstance(self.test.tests['a test'].result, status.Status)
+            assert isinstance(
+                inst.tests['spec@!opengl 1.0@gl-1.0-readpixsanity'],
+                results.TestResult)
 
-        def test_totals(self):
+        def test_totals(self, inst):
             """totals is restored correctly."""
-            assert dict(self.baseline.totals) == dict(self.test.totals)
+            baseline = shared.JSON['totals'].copy()
+            for s in six.itervalues(baseline):
+                del s['__type__']
+            assert baseline == dict(inst.totals)
 
-        def test_subtests(self):
-            """subtests are restored correctly."""
-            assert self.test.tests['subtest'].subtests['foo'] == \
-                self.baseline.tests['subtest'].subtests['foo']
-
-        def test_subtest_type(self):
-            """subtests are Status instances."""
-            assert isinstance(self.test.tests['subtest'].subtests['foo'],
-                              status.Status)
-
-        def test_time_elapsed(self):
+        def test_time_elapsed(self, inst):
             """time_elapsed is restored correctly."""
-            assert self.baseline.time_elapsed.end == self.test.time_elapsed.end
+            assert inst.time_elapsed.start == \
+                shared.JSON['time_elapsed']['start']
+            assert inst.time_elapsed.end == \
+                shared.JSON['time_elapsed']['end']
 
-        def test_time(self):
-            """time_elapsed is TimeAttribute instance."""
-            assert isinstance(self.test.time_elapsed, results.TimeAttribute)
-
-    class TestGetResul(object):
+    class TestGetResult(object):
         """Tests for TestrunResult.get_result."""
 
         @classmethod
