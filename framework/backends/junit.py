@@ -365,14 +365,19 @@ def _load(results_file):
     else:
         run_result.name = 'junit result'
 
-    tree = etree.parse(results_file).getroot().find('.//testsuite[@name="piglit"]')
+    tree = etree.parse(results_file).getroot().find('.//testsuite')
     for test in tree.iterfind('testcase'):
         result = results.TestResult()
         # Take the class name minus the 'piglit.' element, replace junit's '.'
         # separator with piglit's separator, and join the group and test names
-        name = test.attrib['classname'].split('.', 1)[1]
+        name = test.attrib['name']
+        if 'classname' in test.attrib:
+            name = grouptools.join(test.attrib['classname'], name)
         name = name.replace('.', grouptools.SEPARATOR)
-        name = grouptools.join(name, test.attrib['name'])
+        is_piglit = False
+        if name.startswith("piglit"):
+            is_piglit = True
+            name = name.split(grouptools.SEPARATOR, 1)[1]
 
         # Remove the trailing _ if they were added (such as to api and search)
         if name.endswith('_'):
@@ -382,14 +387,23 @@ def _load(results_file):
 
         # This is the fallback path, we'll try to overwrite this with the value
         # in stderr
-        result.time = results.TimeAttribute(end=float(test.attrib['time']))
-        result.err = test.find('system-err').text
+        result.time = results.TimeAttribute()
+        if 'time' in test.attrib:
+            result.time = results.TimeAttribute(end=float(test.attrib['time']))
+        syserr = test.find('system-err')
+        if syserr is not None:
+            result.err = syserr.text
 
         # The command is prepended to system-out, so we need to separate those
         # into two separate elements
-        out = test.find('system-out').text.split('\n')
-        result.command = out[0]
-        result.out = '\n'.join(out[1:])
+        out_tag = test.find('system-out')
+        if out_tag is not None:
+            if is_piglit:
+                out = out_tag.text.split('\n')
+                result.command = out[0]
+                result.out = '\n'.join(out[1:])
+            else:
+                result.out = out_tag.text
 
         # Try to get the values in stderr for time and pid
         for line in result.err.split('\n'):
