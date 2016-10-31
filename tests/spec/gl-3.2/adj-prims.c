@@ -174,9 +174,12 @@ provoking_vertex_index(GLenum prim_mode, GLenum pv_mode, unsigned prim_index)
 		else
 			return prim_index * 6 + 4;
 	case GL_TRIANGLE_STRIP_ADJACENCY:
-		if (pv_mode == GL_FIRST_VERTEX_CONVENTION)
-			return prim_index * 2;
-		else
+		if (pv_mode == GL_FIRST_VERTEX_CONVENTION) {
+			if (prim_index & 1)
+				return prim_index * 2 + 2;
+			else
+				return prim_index * 2;
+		} else
 			return prim_index * 2 + 4;
 	default:
 		assert(!"Unexpected prim_mode");
@@ -213,8 +216,13 @@ compute_probe_location(GLenum prim_mode, unsigned prim_index,
 			i2 = prim_index * 6 + 4;
 		break;
 	case GL_TRIANGLE_STRIP_ADJACENCY:
-		i0 = prim_index * 2;
-		i1 = prim_index * 2 + 2;
+		if (prim_index & 1) {
+			i0 = prim_index * 2;
+			i1 = prim_index * 2 + 2;
+		} else {
+			i0 = prim_index * 2 + 2;
+			i1 = prim_index * 2;
+		}
 		if (polygon_mode != GL_LINE)
 			i2 = prim_index * 2 + 4;
 		break;
