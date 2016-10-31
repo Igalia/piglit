@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 
+"""A quicker profile than all.
+
+This profile filters out a number of very slow tests, and tests that are very
+exhaustively tested, since they add a good deal of runtime to piglit.
+
+There are 18000+ auto-generated tests that are exhaustive, but for quick.py we
+don't want that level of exhaustiveness, so this filter removes 80% in a random
+(but deterministic) way.
+"""
+
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import random
 
 from framework import grouptools
 from framework.test import (GleanTest, PiglitGLTest)
@@ -12,6 +23,21 @@ __all__ = ['profile']
 
 # See the note in all.py about this warning
 # pylint: disable=bad-continuation
+
+
+class FilterVsIn(object):
+    """Filter out 80% of the Vertex Attrib 64 vs_in tests."""
+
+    def __init__(self):
+        self.random = random.Random()
+        self.random.seed(42)
+
+    def __call__(self, name, _):
+        if 'vs_in' in name:
+            # 20%
+            return self.random.random() <= .2
+        return True
+
 
 GleanTest.GLOBAL_PARAMS += ["--quick"]
 
@@ -37,3 +63,4 @@ with profile.group_manager(
 
 # These take too long
 profile.filter_tests(lambda n, _: '-explosion' not in n)
+profile.filter_tests(FilterVsIn())
