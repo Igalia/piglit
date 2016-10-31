@@ -1,0 +1,30 @@
+# Test access to a uniform buffer object via dereferencing the block name,
+# where the first member has an explicit, non-zero offset.
+
+[require]
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+GL_ARB_uniform_buffer_object
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_enhanced_layouts : require
+#extension GL_ARB_uniform_buffer_object : require
+
+layout(std140) uniform Block {
+    layout(offset = 16) vec4 a;
+} block_name;
+
+out vec4 outcolor;
+
+void main()
+{
+    outcolor = block_name.a;
+}
+
+[test]
+uniform vec4 Block.a 0.25 1.0 0.33 1.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 1.0 0.33 1.0
