@@ -128,6 +128,7 @@ static const char *frag_template =
 	"#define DUAL_SRC_BLEND %d\n"
 	"#define ALPHA_TO_COVERAGE %d\n"
 	"#define OUT_TYPE %s\n"
+	"#define FRAG_OUT_ZERO_WRITE %d\n"
 	"#if __VERSION__ == 130\n"
 	"out OUT_TYPE frag_out_0;\n"
 	"#if DUAL_SRC_BLEND\n"
@@ -147,7 +148,9 @@ static const char *frag_template =
 	"uniform vec4 color;\n"
 	"void main()\n"
 	"{\n"
-	"  frag_out_0 = frag_0_color;\n"
+	"  #if FRAG_OUT_ZERO_WRITE\n"
+	"    frag_out_0 = frag_0_color;\n"
+	"  #endif\n"
 	"  #if DUAL_SRC_BLEND\n"
 	"    frag_out_1 = vec4(color.rgb, 1.0 - color.a / 2.0);\n"
 	"  #elif ALPHA_TO_COVERAGE && NUM_ATTACHMENTS > 1\n"
@@ -167,7 +170,9 @@ get_out_type_glsl(void)
 		return "vec4";
 }
 void
-shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend)
+shader_compile(bool sample_alpha_to_coverage,
+	       bool dual_src_blend,
+	       bool frag_out_zero_write)
 {
 	bool need_glsl130 = is_buffer_zero_integer_format || dual_src_blend;
 
@@ -192,7 +197,9 @@ shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend)
 	sprintf(frag, frag_template, need_glsl130 ? "130" : "120",
 		num_draw_buffers,
 		is_dual_src_blending,
-		sample_alpha_to_coverage, out_type_glsl);
+		sample_alpha_to_coverage,
+		out_type_glsl,
+		frag_out_zero_write);
 
 	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
 	prog = piglit_link_simple_program(vs, fs);

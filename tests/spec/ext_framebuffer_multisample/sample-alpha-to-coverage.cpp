@@ -114,7 +114,8 @@ piglit_init(int argc, char **argv)
 				      buffer_to_test,
 				      GL_RGBA);
 	shader_compile(true /* sample_alpha_to_coverage */,
-		       false /* dual_src_blend */);
+		       false /* dual_src_blend */,
+		       true /* frag_out_zero_write */);
 }
 
 enum piglit_result

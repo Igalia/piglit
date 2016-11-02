@@ -93,7 +93,8 @@ piglit_init(int argc, char **argv)
 				      GL_RGBA);
 
 	shader_compile(true /* sample_alpha_to_coverage */,
-		       true /* dual_src_blend */);
+		       true /* dual_src_blend */,
+		       true /* frag_out_zero_write */);
 }
 
 enum piglit_result
