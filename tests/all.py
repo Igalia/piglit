@@ -3030,7 +3030,6 @@ with profile.group_manager(
                      'sample-alpha-to-one',
                      'draw-buffers-alpha-to-one',
                      'draw-buffers-alpha-to-coverage',
-                     'alpha-coverage-no-draw-buffer-zero',
                      'alpha-to-coverage-dual-src-blend',
                      'alpha-to-coverage-no-draw-buffer-zero',
                      'alpha-to-coverage-no-draw-buffer-zero-write',
