@@ -151,6 +151,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	if (WAYLAND_FOUND)
 		set(PIGLIT_HAS_WAYLAND True)
 		add_definitions(-DPIGLIT_HAS_WAYLAND)
+
+		FIND_LIBRARY(HAVE_XKBCOMMON NAMES xkbcommon)
+		if(NOT HAVE_XKBCOMMON)
+			message(FATAL_ERROR "Wayland support requires xkbcommon. "
+				"Failed to find xkbcommon library.")
+		endif()
+		pkg_check_modules(XKBCOMMON QUIET xkbcommon)
 	endif()
 
 	pkg_check_modules(LIBDRM QUIET libdrm)

@@ -17,6 +17,11 @@ if(HAVE_LIBCACA)
     link_libraries(caca)
 endif()
 
+if(HAVE_XKBCOMMON)
+	link_libraries(${XKBCOMMON_LIBRARIES})
+	include_directories(${XKBCOMMON_INCLUDE_DIRS})
+endif()
+
 if(PNG_FOUND)
 	link_libraries(${PNG_LIBRARIES})
 	include_directories(${PNG_INCLUDE_DIRS})
