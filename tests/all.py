@@ -3033,6 +3033,7 @@ with profile.group_manager(
                      'alpha-coverage-no-draw-buffer-zero',
                      'alpha-to-coverage-dual-src-blend',
                      'alpha-to-coverage-no-draw-buffer-zero',
+                     'alpha-to-coverage-no-draw-buffer-zero-write',
                      'alpha-to-one-dual-src-blend',
                      'int-draw-buffers-alpha-to-one',
                      'int-draw-buffers-alpha-to-coverage',
