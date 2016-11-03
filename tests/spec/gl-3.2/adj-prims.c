@@ -142,11 +142,14 @@ static GLuint gs_lines_program;
 static GLuint gs_line_strip_program;
 static GLuint gs_triangles_program;
 static GLuint gs_triangle_strip_program;
+static GLuint xfb_buf;
+static GLuint element_buf;
 static GLuint ref_program;
 static GLint colorUniform, modelViewProjUniform;
 
 // if false, draw without GS, also draw the 'extra' lines/tris.  For debugging.
 static bool draw_with_gs = true;
+static bool draw_elements = false;
 
 
 /**
@@ -311,8 +314,8 @@ probe_prims(GLenum prim_mode, const float verts[][2], unsigned num_verts,
 
 	for (prim = 0; prim < num_prims; prim++) {
 		bool pass = false;
-		const float *expected_color = NULL;
-		float bad_color[4];
+		float expected_color[4];
+		float bad_color[4] = { -1 };
 		bool bad_color_found = false;
 		int x, y, i;
 
@@ -332,7 +335,12 @@ probe_prims(GLenum prim_mode, const float verts[][2], unsigned num_verts,
 			GLfloat buf[9][4];
 			unsigned pvi = provoking_vertex_index(prim_mode,
 						     provoking_vertex, prim);
-			expected_color = colors[pvi];
+			memcpy(&expected_color, colors[pvi], sizeof(expected_color));
+			if (prim_mode == GL_TRIANGLES_ADJACENCY ||
+			    prim_mode == GL_TRIANGLE_STRIP_ADJACENCY) {
+				expected_color[2] = pvi * (1.0 / 255);
+				expected_color[3] = provoking_vertex == GL_FIRST_VERTEX_CONVENTION ? 0.0 : 1.0;
+			}
 
 			// Read a 3x3 region for line probing
 			glReadPixels(x-1, y-1, 3, 3, GL_RGBA, GL_FLOAT, buf);
@@ -359,13 +367,13 @@ probe_prims(GLenum prim_mode, const float verts[][2], unsigned num_verts,
 			printf("Failure for %s, "
 			       "prim %u wrong color at (%d,%d)\n",
 			       piglit_get_prim_name(prim_mode), prim, x, y);
-			if (expected_color && bad_color_found) {
-				printf("Expected %.1g, %.1g, %.1g, %.1g\n",
+			if (bad_color_found) {
+				printf("Expected %g, %g, %g, %g\n",
 				       expected_color[0],
 				       expected_color[1],
 				       expected_color[2],
 				       expected_color[3]);
-				printf("Found %.1g, %.1g, %.1g, %.1g\n",
+				printf("Found %g, %g, %g, %g\n",
 				       bad_color[0],
 				       bad_color[1],
 				       bad_color[2],
@@ -379,6 +387,47 @@ probe_prims(GLenum prim_mode, const float verts[][2], unsigned num_verts,
 	return true;
 }
 
+static bool
+probe_xfb(GLenum prim_mode, unsigned num_verts)
+{
+	bool pass = true;
+	const unsigned num_prims = num_gs_prims(prim_mode, num_verts);
+	const float *xfb_data = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
+
+	for (unsigned prim = 0; prim < num_prims; prim++) {
+		const float *found_color;
+		float expected_color[4];
+		unsigned pvi = provoking_vertex_index(prim_mode,
+						provoking_vertex, prim);
+
+		memcpy(&expected_color, colors[pvi], sizeof(expected_color));
+		expected_color[2] = pvi * (1.0 / 255);
+		expected_color[3] = provoking_vertex == GL_FIRST_VERTEX_CONVENTION ? 0.0 : 1.0;
+
+		found_color = xfb_data + 4 * (3 * prim + (provoking_vertex == GL_FIRST_VERTEX_CONVENTION ? 0 : 2));
+
+		if (!colors_match(expected_color, found_color)) {
+			printf("Transform Feedback Failure for %s, prim %u wrong color\n",
+			       piglit_get_prim_name(prim_mode), prim);
+			printf("Expected %g, %g, %g, %g\n",
+			       expected_color[0],
+			       expected_color[1],
+			       expected_color[2],
+			       expected_color[3]);
+			printf("Found %g, %g, %g, %g\n",
+			       found_color[0],
+			       found_color[1],
+			       found_color[2],
+			       found_color[3]);
+
+			pass = false;
+		}
+	}
+
+	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
+
+	return pass;
+}
 
 
 static GLuint
@@ -391,11 +440,13 @@ make_gs_program(GLenum input_prim)
 		"uniform mat4 modelViewProj; \n"
 		"out vec4 pos;\n"
 		"out vec4 vs_gs_color; \n"
+		"out int vs_gs_vertex_id; \n"
 		"void main() \n"
 		"{ \n"
 		"   gl_Position = vertex * modelViewProj; \n"
 		"   pos = vertex * modelViewProj; \n"
 		"   vs_gs_color = color; \n"
+		"   vs_gs_vertex_id = gl_VertexID; \n"
 		"} \n";
 	static const char *gs_text_lines =
 		"#version 150 \n"
@@ -420,16 +471,23 @@ make_gs_program(GLenum input_prim)
 		"layout(triangle_strip, max_vertices = 3) out;\n"
 		"in vec4 pos[]; \n"
 		"in vec4 vs_gs_color[6]; \n"
+		"in int vs_gs_vertex_id[6]; \n"
 		"flat out vec4 gs_fs_color; \n"
 		"void main() \n"
 		"{ \n"
 		"   gs_fs_color = vs_gs_color[0]; \n"
+		"   gs_fs_color.b = vs_gs_vertex_id[0] * (1. / 255.); \n"
+		"   gs_fs_color.a = 0.0; \n"
 		"   gl_Position = pos[0]; \n"
 		"   EmitVertex(); \n"
 		"   gs_fs_color = vs_gs_color[2]; \n"
+		"   gs_fs_color.b = vs_gs_vertex_id[2] * (1. / 255.); \n"
+		"   gs_fs_color.a = 0.5; \n"
 		"   gl_Position = pos[2]; \n"
 		"   EmitVertex(); \n"
 		"   gs_fs_color = vs_gs_color[4]; \n"
+		"   gs_fs_color.b = vs_gs_vertex_id[4] * (1. / 255.); \n"
+		"   gs_fs_color.a = 1.0; \n"
 		"   gl_Position = pos[4]; \n"
 		"   EmitVertex(); \n"
 		"   //EndPrimitive(); \n"
@@ -441,6 +499,7 @@ make_gs_program(GLenum input_prim)
 		"{ \n"
 		"   gl_FragColor = gs_fs_color; \n"
 		"} \n";
+	static const char *gs_xfb_varyings[] = { "gs_fs_color" };
 	const char *gs_text;
 	GLuint program;
 
@@ -468,6 +527,9 @@ make_gs_program(GLenum input_prim)
 
 	glBindAttribLocation(program, 0, "vertex");
 	glBindAttribLocation(program, 1, "color");
+
+	glTransformFeedbackVaryings(program, 1, &gs_xfb_varyings[0],
+				    GL_INTERLEAVED_ATTRIBS);
 
 	glLinkProgram(program);
 
@@ -668,6 +730,51 @@ set_viewport(unsigned pos)
 }
 
 
+static void
+draw_gs_triangles(GLenum prim_mode, GLuint vao, unsigned num_verts,
+		  unsigned vp_pos)
+{
+	size_t buffer_size;
+	void *zeros;
+
+	use_program(gs_triangles_program);
+	set_viewport(vp_pos);
+	glBindVertexArray(vao);
+
+	buffer_size =
+		12 * sizeof(float) *
+		num_gs_prims(prim_mode, num_verts);
+	zeros = calloc(1, buffer_size);
+
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, buffer_size,
+			zeros, GL_STREAM_READ);
+
+	free(zeros);
+
+	glBeginTransformFeedback(GL_TRIANGLES);
+
+	if (draw_elements) {
+		GLushort* elements;
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buf);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+			sizeof(GLushort) * num_verts, NULL,
+			GL_STATIC_DRAW);
+		elements = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+		for (unsigned i = 0; i < num_verts; i++) {
+			elements[i] = i;
+		}
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+
+		glDrawElements(prim_mode, num_verts, GL_UNSIGNED_SHORT, NULL);
+	} else {
+		glDrawArrays(prim_mode, 0, num_verts);
+	}
+
+	glEndTransformFeedback();
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -688,17 +795,17 @@ piglit_display(void)
 		glDrawArrays(GL_LINE_STRIP_ADJACENCY, 0,
 			     NUM_VERTS(line_strip_adj_verts));
 
-		use_program(gs_triangles_program);
-		set_viewport(2);
-		glBindVertexArray(triangles_adj_vao);
-		glDrawArrays(GL_TRIANGLES_ADJACENCY, 0,
-			     NUM_VERTS(triangles_adj_verts));
+		draw_gs_triangles(GL_TRIANGLES_ADJACENCY, triangles_adj_vao,
+				  NUM_VERTS(triangles_adj_verts), 2);
 
-		use_program(gs_triangle_strip_program);
-		set_viewport(3);
-		glBindVertexArray(triangle_strip_adj_vao);
-		glDrawArrays(GL_TRIANGLE_STRIP_ADJACENCY, 0,
-			     NUM_VERTS(triangle_strip_adj_verts));
+		pass = probe_xfb(GL_TRIANGLES_ADJACENCY,
+				 NUM_VERTS(triangles_adj_verts)) && pass;
+
+		draw_gs_triangles(GL_TRIANGLE_STRIP_ADJACENCY, triangle_strip_adj_vao,
+				  NUM_VERTS(triangle_strip_adj_verts), 3);
+
+		pass = probe_xfb(GL_TRIANGLE_STRIP_ADJACENCY,
+				 NUM_VERTS(triangle_strip_adj_verts)) && pass;
 	}
 	else {
 		/* This path is basically for debugging and visualizing the
@@ -787,6 +894,8 @@ piglit_init(int argc, char **argv)
 			provoking_vertex = GL_LAST_VERTEX_CONVENTION;
 		else if (strcmp(argv[i], "pv-first") == 0)
 			provoking_vertex = GL_FIRST_VERTEX_CONVENTION;
+		else if (strcmp(argv[i], "elements") == 0)
+			draw_elements = true;
 		else
 			printf("Unexpected %s argument\n", argv[i]);
 	}
@@ -798,6 +907,9 @@ piglit_init(int argc, char **argv)
 		glFrontFace(GL_CW);
 	}
 	glProvokingVertex(provoking_vertex);
+
+	glGenBuffers(1, &xfb_buf);
+	glGenBuffers(1, &element_buf);
 
 	lines_adj_vao = create_vao(lines_adj_verts,
 				   NUM_VERTS(lines_adj_verts));
