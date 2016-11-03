@@ -32,7 +32,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
-#include <time.h>
 #endif
 
 #include <assert.h>
@@ -42,6 +41,7 @@
 #include <string.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <time.h>
 
 #if defined(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC) && defined(PIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD)
 #include <pthread.h>
