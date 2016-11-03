@@ -1634,6 +1634,7 @@ with profile.test_list.group_manager(
     g(['glsl-1.50-gs-emits-too-few-verts'], 'gs-emits-too-few-verts')
     g(['glsl-1.50-geometry-end-primitive-optional-with-points-out'],
       'gs-end-primitive-optional-with-points-out')
+    g(['glsl-1.50-gs-max-output-components'], 'gs-max-output-components')
     g(['glsl-1.50-getshaderiv-may-return-GS'], 'getshaderiv-may-return-GS')
     g(['glsl-1.50-query-gs-prim-types'], 'query-gs-prim-types')
     g(['glsl-1.50-transform-feedback-type-and-size'],
