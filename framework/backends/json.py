@@ -380,7 +380,10 @@ def _update_eight_to_nine(result):
 
     """
     for test in compat.viewvalues(result['tests']):
-        test['pid'] = [test['pid']]
+        if 'pid' in test:
+            test['pid'] = [test['pid']]
+        else:
+            test['pid'] = []
 
     result['results_version'] = 9
 

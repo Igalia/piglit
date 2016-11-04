@@ -173,6 +173,26 @@ class TestV8toV9(object):
                     '__type__': 'Subtests',
                 },
                 'exception': None,
+            },
+            'b@test': {
+                "time": {
+                    'start': 1.2,
+                    'end': 1.8,
+                    '__type__': 'TimeAttribute'
+                },
+                'dmesg': '',
+                'result': 'fail',
+                '__type__': 'TestResult',
+                'command': '/a/command',
+                'traceback': None,
+                'out': '',
+                'environment': 'A=variable',
+                'returncode': 0,
+                'err': '',
+                'subtests': {
+                    '__type__': 'Subtests',
+                },
+                'exception': None,
             }
         },
         "time_elapsed": {
@@ -192,6 +212,9 @@ class TestV8toV9(object):
 
     def test_pid(self, result):
         assert result['tests']['a@test']['pid'] == [5]
+
+    def test_no_pid(self, result):
+        assert result['tests']['b@test']['pid'] == []
 
     def test_valid(self, result):
         with open(os.path.join(os.path.dirname(__file__), 'schema',
