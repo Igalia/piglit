@@ -619,7 +619,7 @@ piglit_time_get_nano(void)
 int64_t
 piglit_delay_ns(int64_t time_ns)
 {
-	int64_t start = start = piglit_time_get_nano();
+	int64_t start = piglit_time_get_nano();
 	int64_t end;
 
 #ifdef __linux__
