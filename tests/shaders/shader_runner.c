@@ -2611,7 +2611,12 @@ handle_texparameter(const char *line)
 		return;
 	} else if (parse_str(line, "border_color ", &line)) {
 		float bc[4];
-		sscanf(line, "%f %f %f %f", &bc[0], &bc[1], &bc[2], &bc[3]);
+		int count;
+		count = sscanf(line, "%f %f %f %f", &bc[0], &bc[1], &bc[2], &bc[3]);
+		if (count != 4) {
+			fprintf(stderr, "Could not parse border_color texture parameter.\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
 		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, bc);
 		return;
 	} else if (parse_str(line, "swizzle_r ", &line)) {
