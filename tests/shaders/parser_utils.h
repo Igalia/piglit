@@ -65,6 +65,86 @@ bool
 parse_str(const char *s, const char *lit, const char **rest);
 
 /**
+ * Parse up to \p n whitespace-separated signed integer values.  The
+ * number of values actually parsed is returned as result.
+ */
+unsigned
+parse_ints(const char *s, int *i, unsigned n, const char **rest);
+
+static inline bool
+parse_int(const char *s, int *i, const char **rest)
+{
+	return parse_ints(s, i, 1, rest);
+}
+
+/**
+ * Parse up to \p n whitespace-separated unsigned integer values.  The
+ * number of values actually parsed is returned as result.
+ */
+unsigned
+parse_uints(const char *s, unsigned *u, unsigned n, const char **rest);
+
+static inline bool
+parse_uint(const char *s, unsigned *u, const char **rest)
+{
+	return parse_uints(s, u, 1, rest);
+}
+
+/**
+ * Parse up to \p n whitespace-separated signed 64-bit integer values.
+ * The number of values actually parsed is returned as result.
+ */
+unsigned
+parse_int64s(const char *s, int64_t *i, unsigned n, const char **rest);
+
+static inline bool
+parse_int64(const char *s, int64_t *i, const char **rest)
+{
+	return parse_int64s(s, i, 1, rest);
+}
+
+/**
+ * Parse up to \p n whitespace-separated unsigned 64-bit integer
+ * values.  The number of values actually parsed is returned as
+ * result.
+ */
+unsigned
+parse_uint64s(const char *s, uint64_t *u, unsigned n, const char **rest);
+
+static inline bool
+parse_uint64(const char *s, uint64_t *u, const char **rest)
+{
+	return parse_uint64s(s, u, 1, rest);
+}
+
+/**
+ * Parse up to \p n whitespace-separated floating point values.  The
+ * number of values actually parsed is returned as result.
+ */
+unsigned
+parse_floats(const char *s, float *f, unsigned n, const char **rest);
+
+static inline bool
+parse_float(const char *s, float *f, const char **rest)
+{
+	return parse_floats(s, f, 1, rest);
+}
+
+/**
+ * Parse up to \p n whitespace-separated double-precision floating
+ * point values.  The number of values actually parsed is returned as
+ * result.
+ */
+unsigned
+parse_doubles(const char *s, double *d, unsigned n, const char **rest);
+
+static inline bool
+parse_double(const char *s, double *d, const char **rest)
+{
+	return parse_doubles(s, d, 1, rest);
+}
+
+/**
  * Parse a single non-empty whitespace-separated token.  On success \p
  * t and \p rest will respectively point at the first and one past the
  * last character of the result.

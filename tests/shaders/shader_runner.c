@@ -44,9 +44,6 @@ get_required_config(const char *script_name,
 static GLenum
 decode_drawing_mode(const char *mode_str);
 
-static void
-get_uints(const char *line, unsigned *uints, unsigned count);
-
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = DEFAULT_WINDOW_WIDTH;
@@ -701,9 +698,10 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	line = eat_whitespace(line);
 	line = process_comparison(line, cmp);
 
-	line = eat_whitespace(line);
-	sscanf(line, "%u.%u", &major, &minor);
-	line = eat_text(line);
+	REQUIRE(parse_uint(line, &major, &line) &&
+		parse_str(line, ".", &line) &&
+		parse_uint(line, &minor, &line),
+		"Invalid version string: %s\n", line);
 
 	parse_whitespace(line, &line);
 	if (*line != '\n') {
@@ -778,7 +776,9 @@ process_requirement(const char *line)
 			"Invalid comparison enum at: %s\n", line);
 
 		line = process_comparison(eat_whitespace(line), &cmp);
-		comparison_value = atoi(line);
+
+		REQUIRE(parse_int(line, &comparison_value, &line),
+			"Invalid comparison value at: %s\n", line);
 
 		glGetIntegerv(int_enum, &gl_int_value);
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
@@ -884,14 +884,9 @@ process_requirement(const char *line)
 		}
 	} else if (parse_str(line, "rlimit", &line)) {
 		unsigned lim;
-		char *ptr;
 
-		line = eat_whitespace(line);
-		lim = strtoul(line, &ptr, 0);
-		if (ptr == line) {
-			printf("rlimit requires numeric argument\n");
-			return PIGLIT_FAIL;
-		}
+		REQUIRE(parse_uint(line, &lim, &line),
+			"Invalid rlimit argument at: %s\n", line);
 
 		piglit_set_rlimit(lim);
 	}  else if (parse_str(line, "SSO", &line) &&
@@ -1343,7 +1338,7 @@ parse_required_config(struct requirement_parse_results *results,
 				}
 			} else if (parse_str(line, "SIZE", &line)) {
 				results->found_size = true;
-				get_uints(line, results->size, 2);
+				parse_uints(line, results->size, 2, NULL);
 			} else if (parse_str(line, "depthbuffer", NULL)) {
 				results->found_depthbuffer = true;
 			}
@@ -1433,62 +1428,6 @@ get_required_config(const char *script_name,
 	if (parse_results.found_depthbuffer) {
 		config->window_visual |= PIGLIT_GL_VISUAL_DEPTH;
 	}
-}
-
-static void
-get_floats(const char *line, float *f, unsigned count)
-{
-	unsigned i;
-
-	for (i = 0; i < count; i++)
-		f[i] = strtof_hex(line, (char **) &line);
-}
-
-static void
-get_doubles(const char *line, double *d, unsigned count)
-{
-	unsigned i;
-
-	for (i = 0; i < count; i++)
-		d[i] = strtod_hex(line, (char **) &line);
-}
-
-
-static void
-get_ints(const char *line, int *ints, unsigned count)
-{
-	unsigned i;
-
-	for (i = 0; i < count; i++)
-		ints[i] = strtol_hex(line, (char **) &line);
-}
-
-
-static void
-get_uints(const char *line, unsigned *uints, unsigned count)
-{
-	unsigned i;
-
-	for (i = 0; i < count; i++)
-		uints[i] = strtoul(line, (char **) &line, 0);
-}
-
-static void
-get_int64s(const char *line, int64_t *ints, unsigned count)
-{
-	int i;
-
-	for (i = 0; i < count; i++)
-		ints[i] = strtoll(line, (char **) &line, 0);
-}
-
-static void
-get_uint64s(const char *line, uint64_t *ints, unsigned count)
-{
-	int i;
-
-	for (i = 0; i < count; i++)
-		ints[i] = strtoull(line, (char **) &line, 0);
 }
 
 /**
@@ -1618,46 +1557,46 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 	data += offset;
 
 	if (parse_str(type, "float", NULL)) {
-		get_floats(line, f, 1);
+		parse_floats(line, f, 1, NULL);
 		memcpy(data, f, sizeof(float));
 	} else if (parse_str(type, "int64_t", NULL)) {
-		get_int64s(line, int64s, 1);
+		parse_int64s(line, int64s, 1, NULL);
 		memcpy(data, int64s, sizeof(int64_t));
 	} else if (parse_str(type, "uint64_t", NULL)) {
-		get_uint64s(line, uint64s, 1);
+		parse_uint64s(line, uint64s, 1, NULL);
 		memcpy(data, uint64s, sizeof(uint64_t));
 	} else if (parse_str(type, "int", NULL)) {
-		get_ints(line, ints, 1);
+		parse_ints(line, ints, 1, NULL);
 		memcpy(data, ints, sizeof(int));
 	} else if (parse_str(type, "uint", NULL)) {
-		get_uints(line, uints, 1);
+		parse_uints(line, uints, 1, NULL);
 		memcpy(data, uints, sizeof(int));
 	} else if (parse_str(type, "double", NULL)) {
-		get_doubles(line, d, 1);
+		parse_doubles(line, d, 1, NULL);
 		memcpy(data, d, sizeof(double));
 	} else if (parse_str(type, "vec", NULL)) {
 		int elements = type[3] - '0';
-		get_floats(line, f, elements);
+		parse_floats(line, f, elements, NULL);
 		memcpy(data, f, elements * sizeof(float));
 	} else if (parse_str(type, "ivec", NULL)) {
 		int elements = type[4] - '0';
-		get_ints(line, ints, elements);
+		parse_ints(line, ints, elements, NULL);
 		memcpy(data, ints, elements * sizeof(int));
 	} else if (parse_str(type, "uvec", NULL)) {
 		int elements = type[4] - '0';
-		get_uints(line, uints, elements);
+		parse_uints(line, uints, elements, NULL);
 		memcpy(data, uints, elements * sizeof(unsigned));
 	} else if (parse_str(type, "i64vec", NULL)) {
 		int elements = type[6] - '0';
-		get_int64s(line, int64s, elements);
+		parse_int64s(line, int64s, elements, NULL);
 		memcpy(data, int64s, elements * sizeof(int64_t));
 	} else if (parse_str(type, "u64vec", NULL)) {
 		int elements = type[6] - '0';
-		get_uint64s(line, uint64s, elements);
+		parse_uint64s(line, uint64s, elements, NULL);
 		memcpy(data, uint64s, elements * sizeof(uint64_t));
 	} else if (parse_str(type, "dvec", NULL)) {
 		int elements = type[4] - '0';
-		get_doubles(line, d, elements);
+		parse_doubles(line, d, elements, NULL);
 		memcpy(data, d, elements * sizeof(double));
 	} else if (parse_str(type, "mat", NULL)) {
 		GLint matrix_stride, row_major;
@@ -1669,7 +1608,7 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 		assert(cols >= 2 && cols <= 4);
 		assert(rows >= 2 && rows <= 4);
 
-		get_floats(line, f, rows * cols);
+		parse_floats(line, f, rows * cols, NULL);
 
 		glGetActiveUniformsiv(prog, 1, &uniform_index,
 				      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
@@ -1703,7 +1642,7 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 		assert(cols >= 2 && cols <= 4);
 		assert(rows >= 2 && rows <= 4);
 
-		get_doubles(line, d, rows * cols);
+		parse_doubles(line, d, rows * cols, NULL);
 
 		glGetActiveUniformsiv(prog, 1, &uniform_index,
 				      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
@@ -1771,60 +1710,60 @@ set_uniform(const char *line, int ubo_array_index)
         }
 
 	if (parse_str(type, "float", NULL)) {
-		get_floats(line, f, 1);
+		parse_floats(line, f, 1, NULL);
 		glUniform1fv(loc, 1, f);
 		return;
 	} else if (parse_str(type, "int64_t", NULL)) {
 		check_int64_support();
-		get_int64s(line, int64s, 1);
+		parse_int64s(line, int64s, 1, NULL);
 		glUniform1i64vARB(loc, 1, int64s);
 		return;
 	} else if (parse_str(type, "uint64_t", NULL)) {
 		check_int64_support();
-		get_uint64s(line, uint64s, 1);
+		parse_uint64s(line, uint64s, 1, NULL);
 		glUniform1ui64vARB(loc, 1, uint64s);
 		return;
 	} else if (parse_str(type, "int", NULL)) {
-		get_ints(line, ints, 1);
+		parse_ints(line, ints, 1, NULL);
 		glUniform1iv(loc, 1, ints);
 		return;
 	} else if (parse_str(type, "uint", NULL)) {
 		check_unsigned_support();
-		get_uints(line, uints, 1);
+		parse_uints(line, uints, 1, NULL);
 		glUniform1uiv(loc, 1, uints);
 		return;
 	} else if (parse_str(type, "double", NULL)) {
 		check_double_support();
-		get_doubles(line, d, 1);
+		parse_doubles(line, d, 1, NULL);
 		glUniform1dv(loc, 1, d);
 		return;
 	} else if (parse_str(type, "vec", NULL)) {
 		switch (type[3]) {
 		case '2':
-			get_floats(line, f, 2);
+			parse_floats(line, f, 2, NULL);
 			glUniform2fv(loc, 1, f);
 			return;
 		case '3':
-			get_floats(line, f, 3);
+			parse_floats(line, f, 3, NULL);
 			glUniform3fv(loc, 1, f);
 			return;
 		case '4':
-			get_floats(line, f, 4);
+			parse_floats(line, f, 4, NULL);
 			glUniform4fv(loc, 1, f);
 			return;
 		}
 	} else if (parse_str(type, "ivec", NULL)) {
 		switch (type[4]) {
 		case '2':
-			get_ints(line, ints, 2);
+			parse_ints(line, ints, 2, NULL);
 			glUniform2iv(loc, 1, ints);
 			return;
 		case '3':
-			get_ints(line, ints, 3);
+			parse_ints(line, ints, 3, NULL);
 			glUniform3iv(loc, 1, ints);
 			return;
 		case '4':
-			get_ints(line, ints, 4);
+			parse_ints(line, ints, 4, NULL);
 			glUniform4iv(loc, 1, ints);
 			return;
 		}
@@ -1832,15 +1771,15 @@ set_uniform(const char *line, int ubo_array_index)
 		check_unsigned_support();
 		switch (type[4]) {
 		case '2':
-			get_uints(line, uints, 2);
+			parse_uints(line, uints, 2, NULL);
 			glUniform2uiv(loc, 1, uints);
 			return;
 		case '3':
-			get_uints(line, uints, 3);
+			parse_uints(line, uints, 3, NULL);
 			glUniform3uiv(loc, 1, uints);
 			return;
 		case '4':
-			get_uints(line, uints, 4);
+			parse_uints(line, uints, 4, NULL);
 			glUniform4uiv(loc, 1, uints);
 			return;
 		}
@@ -1848,15 +1787,15 @@ set_uniform(const char *line, int ubo_array_index)
 		check_double_support();
 		switch (type[4]) {
 		case '2':
-			get_doubles(line, d, 2);
+			parse_doubles(line, d, 2, NULL);
 			glUniform2dv(loc, 1, d);
 			return;
 		case '3':
-			get_doubles(line, d, 3);
+			parse_doubles(line, d, 3, NULL);
 			glUniform3dv(loc, 1, d);
 			return;
 		case '4':
-			get_doubles(line, d, 4);
+			parse_doubles(line, d, 4, NULL);
 			glUniform4dv(loc, 1, d);
 			return;
 		}
@@ -1864,15 +1803,15 @@ set_uniform(const char *line, int ubo_array_index)
 		check_int64_support();
 		switch (type[6]) {
 		case '2':
-			get_int64s(line, int64s, 2);
+			parse_int64s(line, int64s, 2, NULL);
 			glUniform2i64vARB(loc, 1, int64s);
 			return;
 		case '3':
-			get_int64s(line, int64s, 3);
+			parse_int64s(line, int64s, 3, NULL);
 			glUniform3i64vARB(loc, 1, int64s);
 			return;
 		case '4':
-			get_int64s(line, int64s, 4);
+			parse_int64s(line, int64s, 4, NULL);
 			glUniform4i64vARB(loc, 1, int64s);
 			return;
 		}
@@ -1880,15 +1819,15 @@ set_uniform(const char *line, int ubo_array_index)
 		check_int64_support();
 		switch (type[6]) {
 		case '2':
-			get_uint64s(line, uint64s, 2);
+			parse_uint64s(line, uint64s, 2, NULL);
 			glUniform2ui64vARB(loc, 1, uint64s);
 			return;
 		case '3':
-			get_uint64s(line, uint64s, 3);
+			parse_uint64s(line, uint64s, 3, NULL);
 			glUniform3ui64vARB(loc, 1, uint64s);
 			return;
 		case '4':
-			get_uint64s(line, uint64s, 4);
+			parse_uint64s(line, uint64s, 4, NULL);
 			glUniform4ui64vARB(loc, 1, uint64s);
 			return;
 		}
@@ -1899,45 +1838,45 @@ set_uniform(const char *line, int ubo_array_index)
 		case '2':
 			switch (rows) {
 			case '2':
-				get_floats(line, f, 4);
+				parse_floats(line, f, 4, NULL);
 				glUniformMatrix2fv(loc, 1, GL_FALSE, f);
 				return;
 			case '3':
-				get_floats(line, f, 6);
+				parse_floats(line, f, 6, NULL);
 				glUniformMatrix2x3fv(loc, 1, GL_FALSE, f);
 				return;
 			case '4':
-				get_floats(line, f, 8);
+				parse_floats(line, f, 8, NULL);
 				glUniformMatrix2x4fv(loc, 1, GL_FALSE, f);
 				return;
 			}
 		case '3':
 			switch (rows) {
 			case '2':
-				get_floats(line, f, 6);
+				parse_floats(line, f, 6, NULL);
 				glUniformMatrix3x2fv(loc, 1, GL_FALSE, f);
 				return;
 			case '3':
-				get_floats(line, f, 9);
+				parse_floats(line, f, 9, NULL);
 				glUniformMatrix3fv(loc, 1, GL_FALSE, f);
 				return;
 			case '4':
-				get_floats(line, f, 12);
+				parse_floats(line, f, 12, NULL);
 				glUniformMatrix3x4fv(loc, 1, GL_FALSE, f);
 				return;
 			}
 		case '4':
 			switch (rows) {
 			case '2':
-				get_floats(line, f, 8);
+				parse_floats(line, f, 8, NULL);
 				glUniformMatrix4x2fv(loc, 1, GL_FALSE, f);
 				return;
 			case '3':
-				get_floats(line, f, 12);
+				parse_floats(line, f, 12, NULL);
 				glUniformMatrix4x3fv(loc, 1, GL_FALSE, f);
 				return;
 			case '4':
-				get_floats(line, f, 16);
+				parse_floats(line, f, 16, NULL);
 				glUniformMatrix4fv(loc, 1, GL_FALSE, f);
 				return;
 			}
@@ -1949,45 +1888,45 @@ set_uniform(const char *line, int ubo_array_index)
 		case '2':
 			switch (rows) {
 			case '2':
-				get_doubles(line, d, 4);
+				parse_doubles(line, d, 4, NULL);
 				glUniformMatrix2dv(loc, 1, GL_FALSE, d);
 				return;
 			case '3':
-				get_doubles(line, d, 6);
+				parse_doubles(line, d, 6, NULL);
 				glUniformMatrix2x3dv(loc, 1, GL_FALSE, d);
 				return;
 			case '4':
-				get_doubles(line, d, 8);
+				parse_doubles(line, d, 8, NULL);
 				glUniformMatrix2x4dv(loc, 1, GL_FALSE, d);
 				return;
 			}
 		case '3':
 			switch (rows) {
 			case '2':
-				get_doubles(line, d, 6);
+				parse_doubles(line, d, 6, NULL);
 				glUniformMatrix3x2dv(loc, 1, GL_FALSE, d);
 				return;
 			case '3':
-				get_doubles(line, d, 9);
+				parse_doubles(line, d, 9, NULL);
 				glUniformMatrix3dv(loc, 1, GL_FALSE, d);
 				return;
 			case '4':
-				get_doubles(line, d, 12);
+				parse_doubles(line, d, 12, NULL);
 				glUniformMatrix3x4dv(loc, 1, GL_FALSE, d);
 				return;
 			}
 		case '4':
 			switch (rows) {
 			case '2':
-				get_doubles(line, d, 8);
+				parse_doubles(line, d, 8, NULL);
 				glUniformMatrix4x2dv(loc, 1, GL_FALSE, d);
 				return;
 			case '3':
-				get_doubles(line, d, 12);
+				parse_doubles(line, d, 12, NULL);
 				glUniformMatrix4x3dv(loc, 1, GL_FALSE, d);
 				return;
 			case '4':
-				get_doubles(line, d, 16);
+				parse_doubles(line, d, 16, NULL);
 				glUniformMatrix4dv(loc, 1, GL_FALSE, d);
 				return;
 			}
@@ -2162,6 +2101,7 @@ active_uniform(const char *line)
 		{ NULL, 0 }
 	};
 
+	const char *rest = line;
 	char name[512];
 	char name_buf[512];
 	char pname_string[512];
@@ -2170,17 +2110,15 @@ active_uniform(const char *line)
 	int i;
 	int num_active_uniforms;
 
-	REQUIRE(parse_word_copy(line, name, sizeof(name), &line),
+	REQUIRE(parse_word_copy(rest, name, sizeof(name), &rest),
 		"Bad uniform name at: %s\n", line);
 
-	strcpy_to_space(pname_string, eat_whitespace(line));
-	pname = lookup_enum_string(all_pnames, &line, "glGetUniformsiv pname");
+	strcpy_to_space(pname_string, eat_whitespace(rest));
+	pname = lookup_enum_string(all_pnames, &rest, "glGetUniformsiv pname");
 
-	line = eat_whitespace(line);
-	if (isdigit(line[0])) {
-		expected = strtol(line, NULL, 0);
-	} else {
-		expected = lookup_enum_string(all_types, &line, "type enum");
+	if (!parse_int(rest, &expected, &rest)) {
+		rest = eat_whitespace(rest);
+		expected = lookup_enum_string(all_types, &rest, "type enum");
 	}
 
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num_active_uniforms);
@@ -2362,10 +2300,8 @@ active_program_interface(const char *line)
 	prop = lookup_enum_string(all_props, &line,
 				  "glGetProgramResourceiv pname");
 
-	line = eat_whitespace(line);
-	if (isdigit(line[0])) {
-		expected = strtol(line, NULL, 0);
-	} else {
+	if (!parse_int(line, &expected, &line)) {
+		line = eat_whitespace(line);
 		expected = lookup_enum_string(all_types, &line, "type enum");
 	}
 
@@ -2974,11 +2910,11 @@ piglit_display(void)
 					     sizeof(GLuint) * y, sizeof(GLuint),
 					     &z);
 		} else if (parse_str(line, "clear color ", &rest)) {
-			get_floats(rest, c, 4);
+			parse_floats(rest, c, 4, NULL);
 			glClearColor(c[0], c[1], c[2], c[3]);
 			clear_bits |= GL_COLOR_BUFFER_BIT;
 		} else if (parse_str(line, "clear depth ", &rest)) {
-			get_floats(rest, c, 1);
+			parse_floats(rest, c, 1, NULL);
 			glClearDepth(c[0]);
 			clear_bits |= GL_DEPTH_BUFFER_BIT;
 		} else if (parse_str(line, "clear", NULL)) {
@@ -3008,13 +2944,13 @@ piglit_display(void)
 		} else if (parse_str(line, "draw rect tex ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(rest, c, 8);
+			parse_floats(rest, c, 8, NULL);
 			piglit_draw_rect_tex(c[0], c[1], c[2], c[3],
 					     c[4], c[5], c[6], c[7]);
 		} else if (parse_str(line, "draw rect ortho patch ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(rest, c, 4);
+			parse_floats(rest, c, 4, NULL);
 
 			piglit_draw_rect_custom(-1.0 + 2.0 * (c[0] / piglit_width),
 						-1.0 + 2.0 * (c[1] / piglit_height),
@@ -3023,7 +2959,7 @@ piglit_display(void)
 		} else if (parse_str(line, "draw rect ortho ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(rest, c, 4);
+			parse_floats(rest, c, 4, NULL);
 
 			piglit_draw_rect(-1.0 + 2.0 * (c[0] / piglit_width),
 					 -1.0 + 2.0 * (c[1] / piglit_height),
@@ -3031,12 +2967,12 @@ piglit_display(void)
 					 2.0 * (c[3] / piglit_height));
 		} else if (parse_str(line, "draw rect patch ", &rest)) {
 			result = program_must_be_in_use();
-			get_floats(rest, c, 4);
+			parse_floats(rest, c, 4, NULL);
 			piglit_draw_rect_custom(c[0], c[1], c[2], c[3], true);
 		} else if (parse_str(line, "draw rect ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(rest, c, 4);
+			parse_floats(rest, c, 4, NULL);
 			piglit_draw_rect(c[0], c[1], c[2], c[3]);
 		} else if (parse_str(line, "draw instanced rect ", &rest)) {
 			int primcount;
@@ -3132,7 +3068,7 @@ piglit_display(void)
 			}
 
 		} else if (parse_str(line, "frustum", &rest)) {
-			get_floats(rest, c, 6);
+			parse_floats(rest, c, 6, NULL);
 			piglit_frustum_projection(false, c[0], c[1], c[2],
 						  c[3], c[4], c[5]);
 		} else if (parse_str(line, "hint", &rest)) {
@@ -3157,13 +3093,13 @@ piglit_display(void)
 			piglit_ortho_projection(render_width, render_height,
 						GL_FALSE);
 		} else if (parse_str(line, "probe rgba ", &rest)) {
-			get_floats(rest, c, 6);
+			parse_floats(rest, c, 6, NULL);
 			if (!piglit_probe_pixel_rgba((int) c[0], (int) c[1],
 						    & c[2])) {
 				result = PIGLIT_FAIL;
 			}
 		} else if (parse_str(line, "probe depth ", &rest)) {
-			get_floats(rest, c, 3);
+			parse_floats(rest, c, 3, NULL);
 			if (!piglit_probe_pixel_depth((int) c[0], (int) c[1],
 						      c[2])) {
 				result = PIGLIT_FAIL;
@@ -3198,7 +3134,7 @@ piglit_display(void)
 				result = PIGLIT_FAIL;
 			}
 		} else if (parse_str(line, "probe rgb ", &rest)) {
-			get_floats(rest, c, 5);
+			parse_floats(rest, c, 5, NULL);
 			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
 						    & c[2])) {
 				result = PIGLIT_FAIL;
@@ -3240,25 +3176,25 @@ piglit_display(void)
 				result = PIGLIT_FAIL;
 			}
 		} else if (parse_str(line, "probe all rgba ", &rest)) {
-			get_floats(rest, c, 4);
+			parse_floats(rest, c, 4, NULL);
 			if (result != PIGLIT_FAIL &&
 			    !piglit_probe_rect_rgba(0, 0, render_width,
 						    render_height, c))
 				result = PIGLIT_FAIL;
 		} else if (parse_str(line, "probe warn all rgba ", &rest)) {
-			get_floats(rest, c, 4);
+			parse_floats(rest, c, 4, NULL);
 			if (result == PIGLIT_PASS &&
 			    !piglit_probe_rect_rgba(0, 0, render_width,
 						    render_height, c))
 				result = PIGLIT_WARN;
 		} else if (parse_str(line, "probe all rgb", &rest)) {
-			get_floats(rest, c, 3);
+			parse_floats(rest, c, 3, NULL);
 			if (result != PIGLIT_FAIL &&
 			    !piglit_probe_rect_rgb(0, 0, render_width,
 						   render_height, c))
 				result = PIGLIT_FAIL;
 		} else if (parse_str(line, "tolerance", &rest)) {
-			get_floats(rest, piglit_tolerance, 4);
+			parse_floats(rest, piglit_tolerance, 4, NULL);
 		} else if (parse_str(line, "shade model smooth", NULL)) {
 			glShadeModel(GL_SMOOTH);
 		} else if (parse_str(line, "shade model flat", NULL)) {
@@ -3465,7 +3401,7 @@ piglit_display(void)
 		} else if (parse_str(line, "link success", &rest)) {
 			result = program_must_be_in_use();
 		} else if (parse_str(line, "ubo array index ", &rest)) {
-			get_ints(rest, &ubo_array_index, 1);
+			parse_ints(rest, &ubo_array_index, 1, NULL);
 		} else if (parse_str(line, "active uniform ", &rest)) {
 			active_uniform(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {

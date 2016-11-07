@@ -49,6 +49,114 @@ parse_str(const char *s, const char *lit, const char **rest)
 	return ret;
 }
 
+unsigned
+parse_ints(const char *s, int *i, unsigned n, const char **rest)
+{
+	const char *end = s;
+	unsigned j;
+
+	for (j = 0; j < n; j++) {
+		i[j] = strtoll(s = end, (char **)&end, 0);
+		if (s == end)
+			break;
+	}
+
+	if (rest)
+		*rest = end;
+
+	return j;
+}
+
+unsigned
+parse_uints(const char *s, unsigned *u, unsigned n, const char **rest)
+{
+	const char *end = s;
+	unsigned j;
+
+	for (j = 0; j < n; j++) {
+		u[j] = strtoul(s = end, (char **)&end, 0);
+		if (s == end)
+			break;
+	}
+
+	if (rest)
+		*rest = end;
+
+	return j;
+}
+
+unsigned
+parse_int64s(const char *s, int64_t *i, unsigned n, const char **rest)
+{
+	const char *end = s;
+	unsigned j;
+
+	for (j = 0; j < n; j++) {
+		i[j] = strtoll(s = end, (char **)&end, 0);
+		if (s == end)
+			break;
+	}
+
+	if (rest)
+		*rest = end;
+
+	return j;
+}
+
+unsigned
+parse_uint64s(const char *s, uint64_t *u, unsigned n, const char **rest)
+{
+	const char *end = s;
+	unsigned j;
+
+	for (j = 0; j < n; j++) {
+		u[j] = strtoull(s = end, (char **)&end, 0);
+		if (s == end)
+			break;
+	}
+
+	if (rest)
+		*rest = end;
+
+	return j;
+}
+
+unsigned
+parse_floats(const char *s, float *f, unsigned n, const char **rest)
+{
+	const char *end = s;
+	unsigned j;
+
+	for (j = 0; j < n; j++) {
+		f[j] = strtof_hex(s = end, (char **)&end);
+		if (s == end)
+			break;
+	}
+
+	if (rest)
+		*rest = end;
+
+	return j;
+}
+
+unsigned
+parse_doubles(const char *s, double *d, unsigned n, const char **rest)
+{
+	const char *end = s;
+	unsigned j;
+
+	for (j = 0; j < n; j++) {
+		d[j] = strtod_hex(s = end, (char **)&end);
+		if (s == end)
+			break;
+	}
+
+	if (rest)
+		*rest = end;
+
+	return j;
+}
+
 bool
 parse_word(const char *s, const char **t, const char **rest)
 {
