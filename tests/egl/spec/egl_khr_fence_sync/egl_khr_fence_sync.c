@@ -48,6 +48,7 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #ifdef PIGLIT_HAS_PTHREADS
 #include <pthread.h>
@@ -66,6 +67,7 @@ EGLBoolean (*peglDestroySyncKHR)(EGLDisplay dpy, EGLSyncKHR sync);
 EGLint (*peglClientWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout);
 EGLint (*peglWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
 EGLBoolean (*peglGetSyncAttribKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint attribute, EGLint *value);
+EGLint (*peglDupNativeFenceFDANDROID)(EGLDisplay dpy, EGLSyncKHR sync);
 
 static const EGLint canary = 0x31415926;
 static EGLDisplay g_dpy = 0;
@@ -1486,6 +1488,44 @@ cleanup:
 	return result;
 }
 
+static enum piglit_result
+test_eglCreateSyncKHR_native_dup_fence(void *test_data)
+{
+	enum piglit_result result = PIGLIT_PASS;
+	EGLSyncKHR sync = 0;
+	int sync_fd = canary;
+	struct test_profile *profile = test_data;
+
+	result = test_setup(profile);
+	if (result != PIGLIT_PASS) {
+		return result;
+	}
+
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
+	if (sync == EGL_NO_SYNC_KHR) {
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
+		result = PIGLIT_FAIL;
+		goto cleanup;
+	}
+
+	glFlush();
+
+	/* Verify that we can get an fd back from eglDupFenceFD(). */
+	sync_fd = peglDupNativeFenceFDANDROID(g_dpy, sync);
+	if (sync_fd == -1) {
+		piglit_loge("eglDupNativeFenceFDANDROID() failed"
+			    "returned %d but expected >= 0", sync_fd);
+		result = PIGLIT_FAIL;
+		goto cleanup;
+	}
+
+	close(sync_fd);
+
+cleanup:
+	test_cleanup(sync, &result);
+	return result;
+}
+
 static const struct piglit_subtest fence_android_native_subtests[] = {
 	{
 		"eglCreateSyncKHR_default_attributes",
@@ -1533,6 +1573,12 @@ static const struct piglit_subtest fence_android_native_subtests[] = {
 		"eglCreateSyncKHR_native_from_fd",
 		"eglCreateSyncKHR_native_from_fd",
 		test_eglCreateSyncKHR_native_from_fd,
+		&fence_android_native,
+	},
+	{
+		"eglCreateSyncKHR_native_dup_fence",
+		"eglCreateSyncKHR_native_dup_fence",
+		test_eglCreateSyncKHR_native_dup_fence,
 		&fence_android_native,
 	},
 	{0},
@@ -1591,6 +1637,7 @@ init_egl_extension_funcs(void)
 	peglClientWaitSyncKHR = (void*) eglGetProcAddress("eglClientWaitSyncKHR");
 	peglWaitSyncKHR = (void*) eglGetProcAddress("eglWaitSyncKHR");
 	peglGetSyncAttribKHR = (void*) eglGetProcAddress("eglGetSyncAttribKHR");
+	peglDupNativeFenceFDANDROID = (void*) eglGetProcAddress("eglDupNativeFenceFDANDROID");
 }
 
 int
