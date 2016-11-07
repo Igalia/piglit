@@ -1526,6 +1526,51 @@ cleanup:
 	return result;
 }
 
+/**
+ * Verify that eglDupNativeFenceFDANDROID emits correct error when given an
+ * invalid sync .
+ *
+ * From the EGL_ANDROID_native_fence_sync spec:
+ *
+ *	If <sync> is not a valid sync object for <dpy>,
+ *	EGL_NO_NATIVE_FENCE_FD_ANDROID is returned and an EGL_BAD_PARAMETER
+ *	error is generated.
+ */
+static enum piglit_result
+test_eglCreateSyncKHR_native_dup_invalid(void *test_data)
+{
+	enum piglit_result result = PIGLIT_PASS;
+	EGLSyncKHR invalid_sync = (EGLSyncKHR) &canary;
+	EGLint sync_fd = canary;
+
+	result = test_setup(test_data);
+	if (result != PIGLIT_PASS) {
+		return result;
+	}
+
+	sync_fd = peglDupNativeFenceFDANDROID(g_dpy, invalid_sync);
+	if (sync_fd != EGL_NO_NATIVE_FENCE_FD_ANDROID) {
+		piglit_loge("Given an invalid sync object, "
+			    "eglDupNativeFenceFDANDROID() should return "
+			    "EGL_NO_NATIVE_FENCE_FD_ANDROID, "
+			    "but returned %d", sync_fd);
+		close(sync_fd);
+		result = PIGLIT_FAIL;
+		goto cleanup;
+	}
+
+	if (!piglit_check_egl_error(EGL_BAD_PARAMETER)) {
+		piglit_loge("Given an invalid sync object, "
+			    "eglDupNativeFenceFDANDROID() "
+			    "did not emit EGL_BAD_PARAMETER");
+		result = PIGLIT_FAIL;
+	}
+
+cleanup:
+	test_cleanup(EGL_NO_SYNC_KHR, &result);
+	return result;
+}
+
 static const struct piglit_subtest fence_android_native_subtests[] = {
 	{
 		"eglCreateSyncKHR_default_attributes",
@@ -1579,6 +1624,12 @@ static const struct piglit_subtest fence_android_native_subtests[] = {
 		"eglCreateSyncKHR_native_dup_fence",
 		"eglCreateSyncKHR_native_dup_fence",
 		test_eglCreateSyncKHR_native_dup_fence,
+		&fence_android_native,
+	},
+	{
+		"eglCreateSyncKHR_native_dup_invalid",
+		"eglCreateSyncKHR_native_dup_invalid",
+		test_eglCreateSyncKHR_native_dup_invalid,
 		&fence_android_native,
 	},
 	{0},
