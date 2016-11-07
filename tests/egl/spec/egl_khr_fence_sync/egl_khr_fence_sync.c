@@ -1571,6 +1571,97 @@ cleanup:
 	return result;
 }
 
+/**
+ * Verify that eglClientWaitSyncKHR() correctly handles zero timeout before and
+ * after sw_sync_timeline_inc().
+ *
+ * From the EGL_KHR_fence_sync:
+ *
+ *     If the value of <timeout> is zero, then eglClientWaitSyncKHR simply
+ *     tests the current status of <sync>.
+ *
+ *     [...]
+ *
+ *     eglClientWaitSyncKHR returns one of three status values describing
+ *     the reason for returning. A return value of EGL_TIMEOUT_EXPIRED_KHR
+ *     indicates that the specified timeout period expired before <sync>
+ *     was signaled. A return value of EGL_CONDITION_SATISFIED_KHR
+ *     indicates that <sync> was signaled before the timeout expired, which
+ *     includes the case when <sync> was already signaled when
+ *     eglClientWaitSyncKHR was called. If an error occurs then an error is
+ *     generated and EGL_FALSE is returned.
+ */
+static enum piglit_result
+test_eglClientWaitSyncKHR_native_zero_timeout(void *test_data)
+{
+	enum piglit_result result = PIGLIT_PASS;
+	EGLSyncKHR sync = 0;
+	int wait_status1 = 0, wait_status2 = 0;
+	int sync_fd = canary;
+	int timeline = canary;
+	struct test_profile *profile = test_data;
+
+	result = test_setup(profile);
+	if (result != PIGLIT_PASS) {
+		return result;
+	}
+
+	if (!sw_sync_is_supported()) {
+		result = PIGLIT_SKIP;
+		goto cleanup;
+	}
+
+	/* Create timeline and sw_sync */
+	timeline = sw_sync_timeline_create();
+	if (timeline < 0) {
+		piglit_loge("sw_sync_timeline_create() failed");
+		result = PIGLIT_FAIL;
+		goto cleanup;
+	}
+
+	sync_fd = sw_sync_fence_create(timeline, 1);
+	if (sync_fd < 0) {
+		piglit_loge("sw_sync_fence_create() failed");
+		result = PIGLIT_FAIL;
+		goto cleanup_timeline;
+	}
+
+	sync = test_create_fence_from_fd(sync_fd);
+	if (sync == EGL_NO_SYNC_KHR) {
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
+		result = PIGLIT_FAIL;
+		sw_sync_fence_destroy(sync_fd);
+		goto cleanup_timeline;
+	}
+
+	glFlush();
+
+	wait_status1 = peglClientWaitSyncKHR(g_dpy, sync, 0, 0);
+	sw_sync_timeline_inc(timeline, 1);
+	wait_status2 = peglClientWaitSyncKHR(g_dpy, sync, 0, 0);
+
+	if (wait_status1 != EGL_TIMEOUT_EXPIRED_KHR) {
+		piglit_loge("eglClientWaitSyncKHR() before sw_sync_timeline_inc:\n"
+			    "  Expected status: EGL_TIMEOUT_EXPIRED_KHR (0x%x)\n"
+			    "  Actual status:  0x%x\n",
+			    EGL_TIMEOUT_EXPIRED_KHR, wait_status1);
+		result = PIGLIT_FAIL;
+	}
+	if (wait_status2 != EGL_CONDITION_SATISFIED_KHR) {
+		piglit_loge("eglClientWaitSyncKHR() after sw_sync_timeline_inc:\n"
+			    "  Expected status: EGL_CONDITION_SATISFIED_KHR\n"
+			    "  Actual status:  0x%x\n", wait_status2);
+		result = PIGLIT_FAIL;
+	}
+
+cleanup_timeline:
+	sw_sync_timeline_destroy(timeline);
+
+cleanup:
+	test_cleanup(sync, &result);
+	return result;
+}
+
 static const struct piglit_subtest fence_android_native_subtests[] = {
 	{
 		"eglCreateSyncKHR_default_attributes",
@@ -1630,6 +1721,12 @@ static const struct piglit_subtest fence_android_native_subtests[] = {
 		"eglCreateSyncKHR_native_dup_invalid",
 		"eglCreateSyncKHR_native_dup_invalid",
 		test_eglCreateSyncKHR_native_dup_invalid,
+		&fence_android_native,
+	},
+	{
+		"eglClientWaitSyncKHR_native_zero_timeout",
+		"eglClientWaitSyncKHR_native_zero_timeout",
+		test_eglClientWaitSyncKHR_native_zero_timeout,
 		&fence_android_native,
 	},
 	{0},
