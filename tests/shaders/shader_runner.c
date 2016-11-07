@@ -695,17 +695,9 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	unsigned major;
 	unsigned minor;
 	unsigned full_num;
-	bool es = false;
-	bool core = false;
+	const bool core = parse_str(line, "CORE", &line);
+	const bool es = parse_str(line, "ES", &line);
 
-	if (string_match(" CORE", line)) {
-		core = true;
-		line += 5;
-	}
-	if (string_match(" ES", line)) {
-		es = true;
-		line += 3;
-	}
 	line = eat_whitespace(line);
 	line = process_comparison(line, cmp);
 
@@ -713,7 +705,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	sscanf(line, "%u.%u", &major, &minor);
 	line = eat_text(line);
 
-	line = eat_whitespace(line);
+	parse_whitespace(line, &line);
 	if (*line != '\n') {
 		printf("Unexpected characters following version comparison\n");
 		piglit_report_result(PIGLIT_FAIL);
@@ -777,30 +769,28 @@ process_requirement(const char *line)
 	 * shader_runner to read the specified integer value and
 	 * processes the given requirement.
 	 */
-	if (string_match("INT ", line)) {
+	if (parse_str(line, "INT ", &line)) {
 		enum comparison cmp;
-		const char *enum_name = eat_whitespace(line+3);
-		const char *int_string;
 		int comparison_value, gl_int_value;
-		GLenum int_enum;
+		unsigned int_enum;
 
-		strcpy_to_space(buffer, enum_name);
+		REQUIRE(parse_enum_gl(line, &int_enum, &line),
+			"Invalid comparison enum at: %s\n", line);
 
-		int_enum = piglit_get_gl_enum_from_name(buffer);
-
-		int_string = process_comparison(eat_whitespace(enum_name + strlen(buffer)), &cmp);
-		comparison_value = atoi(int_string);
+		line = process_comparison(eat_whitespace(line), &cmp);
+		comparison_value = atoi(line);
 
 		glGetIntegerv(int_enum, &gl_int_value);
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			fprintf(stderr, "Error reading %s\n", buffer);
+			fprintf(stderr, "Error reading %s\n",
+				piglit_get_gl_enum_name(int_enum));
 			return PIGLIT_FAIL;
 		}
 
 		if (!compare(comparison_value, gl_int_value, cmp)) {
 			printf("Test requires %s %s %i.  "
 			       "The driver supports %i.\n",
-			       buffer,
+			       piglit_get_gl_enum_name(int_enum),
 			       comparison_string(cmp),
 			       comparison_value,
 			       gl_int_value);
@@ -828,11 +818,10 @@ process_requirement(const char *line)
 		enum comparison cmp;
 		int maxcomp;
 
-		if (!string_match(getint_limits[i].name, line))
+		if (!parse_str(line, getint_limits[i].name, &line))
 			continue;
 
-		line = eat_whitespace(line + strlen(getint_limits[i].name));
-
+		line = eat_whitespace(line);
 		line = process_comparison(line, &cmp);
 
 		maxcomp = atoi(line);
@@ -848,23 +837,19 @@ process_requirement(const char *line)
 		return PIGLIT_PASS;
 	}
 
-	/* Consume any leading whitespace before requirements. This is
-	 * important for generated test files that may have odd whitespace
-	 */
-	line = eat_whitespace(line);
-
-	if (string_match("GL_", line)) {
-		strcpy_to_space(buffer, line);
+	if (parse_str(line, "GL_", NULL) &&
+	    parse_word_copy(line, buffer, sizeof(buffer), &line)) {
 		if (!piglit_is_extension_supported(buffer))
 			return PIGLIT_SKIP;
-	} else if (string_match("!GL_", line)) {
-		strcpy_to_space(buffer, line + 1);
+	} else if (parse_str(line, "!", &line) &&
+		   parse_str(line, "GL_", NULL) &&
+		   parse_word_copy(line, buffer, sizeof(buffer), &line)) {
 		if (piglit_is_extension_supported(buffer))
 			return PIGLIT_SKIP;
-	} else if (string_match("GLSL", line)) {
+	} else if (parse_str(line, "GLSL", &line)) {
 		enum comparison cmp;
 
-		parse_version_comparison(line + 4, &cmp, &glsl_req_version,
+		parse_version_comparison(line, &cmp, &glsl_req_version,
 		                         VERSION_GLSL);
 
 		/* We only allow >= because we potentially use the
@@ -882,11 +867,11 @@ process_requirement(const char *line)
 			       version_string(&glsl_version));
 			return PIGLIT_SKIP;
 		}
-	} else if (string_match("GL", line)) {
+	} else if (parse_str(line, "GL", &line)) {
 		enum comparison cmp;
 		struct component_version gl_req_version;
 
-		parse_version_comparison(line + 2, &cmp, &gl_req_version,
+		parse_version_comparison(line, &cmp, &gl_req_version,
 		                         VERSION_GL);
 
 		if (!version_compare(&gl_req_version, &gl_version, cmp)) {
@@ -897,12 +882,11 @@ process_requirement(const char *line)
 			       version_string(&gl_version));
 			return PIGLIT_SKIP;
 		}
-	} else if (string_match("rlimit", line)) {
-		unsigned long lim;
+	} else if (parse_str(line, "rlimit", &line)) {
+		unsigned lim;
 		char *ptr;
 
-		line = eat_whitespace(line + 6);
-
+		line = eat_whitespace(line);
 		lim = strtoul(line, &ptr, 0);
 		if (ptr == line) {
 			printf("rlimit requires numeric argument\n");
@@ -910,21 +894,19 @@ process_requirement(const char *line)
 		}
 
 		piglit_set_rlimit(lim);
-	}  else if (string_match("SSO", line)) {
+	}  else if (parse_str(line, "SSO", &line) &&
+		    parse_str(line, "ENABLED", NULL)) {
 		const char *const ext_name = gl_version.es
 			? "GL_EXT_separate_shader_objects"
 			: "GL_ARB_separate_shader_objects";
 		const unsigned min_version = gl_version.es
 			? 31 : 41;
 
-		line = eat_whitespace(line + 3);
-		if (string_match("ENABLED", line)) {
-			if (gl_version.num < min_version)
-				piglit_require_extension(ext_name);
+		if (gl_version.num < min_version)
+			piglit_require_extension(ext_name);
 
-			sso_in_use = true;
-			glGenProgramPipelines(1, &pipeline);
-		}
+		sso_in_use = true;
+		glGenProgramPipelines(1, &pipeline);
 	}
 	return PIGLIT_PASS;
 }
@@ -939,7 +921,7 @@ process_geometry_layout(const char *line)
 	char s[32];
 	int x;
 
-	line = eat_whitespace(line);
+	parse_whitespace(line, &line);
 
 	if (line[0] == '\0' || line[0] == '\n') {
 		return;
@@ -1195,44 +1177,44 @@ process_test_script(const char *script_name)
 			if (result != PIGLIT_PASS)
 				return result;
 
-			if (string_match("[require]", line)) {
+			if (parse_str(line, "[require]", NULL)) {
 				state = requirements;
-			} else if (string_match("[vertex shader]", line)) {
+			} else if (parse_str(line, "[vertex shader]", NULL)) {
 				state = vertex_shader;
 				shader_string = NULL;
-			} else if (string_match("[vertex program]", line)) {
+			} else if (parse_str(line, "[vertex program]", NULL)) {
 				state = vertex_program;
 				shader_string = NULL;
-			} else if (string_match("[vertex shader passthrough]", line)) {
+			} else if (parse_str(line, "[vertex shader passthrough]", NULL)) {
 				state = vertex_shader_passthrough;
 				shader_string =
 					(char *) passthrough_vertex_shader_source;
 				shader_string_size = strlen(shader_string);
-			} else if (string_match("[tessellation control shader]", line)) {
+			} else if (parse_str(line, "[tessellation control shader]", NULL)) {
 				state = tess_ctrl_shader;
 				shader_string = NULL;
-			} else if (string_match("[tessellation evaluation shader]", line)) {
+			} else if (parse_str(line, "[tessellation evaluation shader]", NULL)) {
 				state = tess_eval_shader;
 				shader_string = NULL;
-			} else if (string_match("[geometry shader]", line)) {
+			} else if (parse_str(line, "[geometry shader]", NULL)) {
 				state = geometry_shader;
 				shader_string = NULL;
-			} else if (string_match("[geometry layout]", line)) {
+			} else if (parse_str(line, "[geometry layout]", NULL)) {
 				state = geometry_layout;
 				shader_string = NULL;
-			} else if (string_match("[fragment shader]", line)) {
+			} else if (parse_str(line, "[fragment shader]", NULL)) {
 				state = fragment_shader;
 				shader_string = NULL;
-			} else if (string_match("[fragment program]", line)) {
+			} else if (parse_str(line, "[fragment program]", NULL)) {
 				state = fragment_program;
 				shader_string = NULL;
-			} else if (string_match("[compute shader]", line)) {
+			} else if (parse_str(line, "[compute shader]", NULL)) {
 				state = compute_shader;
 				shader_string = NULL;
-			} else if (string_match("[vertex data]", line)) {
+			} else if (parse_str(line, "[vertex data]", NULL)) {
 				state = vertex_data;
 				vertex_data_start = NULL;
-			} else if (string_match("[test]", line)) {
+			} else if (parse_str(line, "[test]", NULL)) {
 				test_start = strchrnul(line, '\n');
 				test_start_line_num = line_num + 1;
 				if (test_start[0] != '\0')
@@ -1330,28 +1312,28 @@ parse_required_config(struct requirement_parse_results *results,
 		}
 
 		if (!in_requirement_section) {
-			if (string_match("[require]", line)) {
+			if (parse_str(line, "[require]", NULL)) {
 				in_requirement_section = true;
 			}
 		} else {
-			if (string_match("GL_", line)
-			    || string_match("!GL_", line)) {
+			if (parse_str(line, "GL_", NULL)
+			    || parse_str(line, "!GL_", NULL)) {
 				/* empty */
-			} else if (string_match("GLSL", line)) {
+			} else if (parse_str(line, "GLSL", &line)) {
 				enum comparison cmp;
 				struct component_version version;
 
-				parse_version_comparison(line + 4, &cmp,
+				parse_version_comparison(line, &cmp,
 							 &version, VERSION_GLSL);
 				if (cmp == greater_equal) {
 					results->found_glsl = true;
 					version_copy(&results->glsl_version, &version);
 				}
-			} else if (string_match("GL", line)) {
+			} else if (parse_str(line, "GL", &line)) {
 				enum comparison cmp;
 				struct component_version version;
 
-				parse_version_comparison(line + 2, &cmp,
+				parse_version_comparison(line, &cmp,
 							 &version, VERSION_GL);
 				if (cmp == greater_equal
 				    || cmp == greater
@@ -1359,10 +1341,10 @@ parse_required_config(struct requirement_parse_results *results,
 					results->found_gl = true;
 					version_copy(&results->gl_version, &version);
 				}
-			} else if (string_match("SIZE", line)) {
+			} else if (parse_str(line, "SIZE", &line)) {
 				results->found_size = true;
-				get_uints(line+4, results->size, 2);
-			} else if (string_match("depthbuffer", line)) {
+				get_uints(line, results->size, 2);
+			} else if (parse_str(line, "depthbuffer", NULL)) {
 				results->found_depthbuffer = true;
 			}
 		}
@@ -1635,49 +1617,49 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 	data = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
 	data += offset;
 
-	if (string_match("float", type)) {
+	if (parse_str(type, "float", NULL)) {
 		get_floats(line, f, 1);
 		memcpy(data, f, sizeof(float));
-	} else if (string_match("int64_t", type)) {
+	} else if (parse_str(type, "int64_t", NULL)) {
 		get_int64s(line, int64s, 1);
 		memcpy(data, int64s, sizeof(int64_t));
-	} else if (string_match("uint64_t", type)) {
+	} else if (parse_str(type, "uint64_t", NULL)) {
 		get_uint64s(line, uint64s, 1);
 		memcpy(data, uint64s, sizeof(uint64_t));
-	} else if (string_match("int", type)) {
+	} else if (parse_str(type, "int", NULL)) {
 		get_ints(line, ints, 1);
 		memcpy(data, ints, sizeof(int));
-	} else if (string_match("uint", type)) {
+	} else if (parse_str(type, "uint", NULL)) {
 		get_uints(line, uints, 1);
 		memcpy(data, uints, sizeof(int));
-	} else if (string_match("double", type)) {
+	} else if (parse_str(type, "double", NULL)) {
 		get_doubles(line, d, 1);
 		memcpy(data, d, sizeof(double));
-	} else if (string_match("vec", type)) {
+	} else if (parse_str(type, "vec", NULL)) {
 		int elements = type[3] - '0';
 		get_floats(line, f, elements);
 		memcpy(data, f, elements * sizeof(float));
-	} else if (string_match("ivec", type)) {
+	} else if (parse_str(type, "ivec", NULL)) {
 		int elements = type[4] - '0';
 		get_ints(line, ints, elements);
 		memcpy(data, ints, elements * sizeof(int));
-	} else if (string_match("uvec", type)) {
+	} else if (parse_str(type, "uvec", NULL)) {
 		int elements = type[4] - '0';
 		get_uints(line, uints, elements);
 		memcpy(data, uints, elements * sizeof(unsigned));
-	} else if (string_match("i64vec", type)) {
+	} else if (parse_str(type, "i64vec", NULL)) {
 		int elements = type[6] - '0';
 		get_int64s(line, int64s, elements);
 		memcpy(data, int64s, elements * sizeof(int64_t));
-	} else if (string_match("u64vec", type)) {
+	} else if (parse_str(type, "u64vec", NULL)) {
 		int elements = type[6] - '0';
 		get_uint64s(line, uint64s, elements);
 		memcpy(data, uint64s, elements * sizeof(uint64_t));
-	} else if (string_match("dvec", type)) {
+	} else if (parse_str(type, "dvec", NULL)) {
 		int elements = type[4] - '0';
 		get_doubles(line, d, elements);
 		memcpy(data, d, elements * sizeof(double));
-	} else if (string_match("mat", type)) {
+	} else if (parse_str(type, "mat", NULL)) {
 		GLint matrix_stride, row_major;
 		int cols = type[3] - '0';
 		int rows = type[4] == 'x' ? type[5] - '0' : cols;
@@ -1711,7 +1693,7 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 				}
 			}
 		}
-	} else if (string_match("dmat", type)) {
+	} else if (parse_str(type, "dmat", NULL)) {
 		GLint matrix_stride, row_major;
 		int cols = type[4] - '0';
 		int rows = type[5] == 'x' ? type[6] - '0' : cols;
@@ -1758,7 +1740,7 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 static void
 set_uniform(const char *line, int ubo_array_index)
 {
-	char name[512];
+	char name[512], type[512];
 	float f[16];
 	double d[16];
 	int ints[16];
@@ -1766,12 +1748,10 @@ set_uniform(const char *line, int ubo_array_index)
 	int64_t int64s[16];
 	uint64_t uint64s[16];
 	GLint loc;
-	const char *type;
 
-	type = eat_whitespace(line);
-	line = eat_text(type);
-
-	line = strcpy_to_space(name, eat_whitespace(line));
+	REQUIRE(parse_word_copy(line, type, sizeof(type), &line) &&
+		parse_word_copy(line, name, sizeof(name), &line),
+		"Invalid set uniform command at: %s\n", line);
 
 	if (isdigit(name[0])) {
 		loc = strtol(name, NULL, 0);
@@ -1790,35 +1770,35 @@ set_uniform(const char *line, int ubo_array_index)
 		}
         }
 
-	if (string_match("float", type)) {
+	if (parse_str(type, "float", NULL)) {
 		get_floats(line, f, 1);
 		glUniform1fv(loc, 1, f);
 		return;
-	} else if (string_match("int64_t", type)) {
+	} else if (parse_str(type, "int64_t", NULL)) {
 		check_int64_support();
 		get_int64s(line, int64s, 1);
 		glUniform1i64vARB(loc, 1, int64s);
 		return;
-	} else if (string_match("uint64_t", type)) {
+	} else if (parse_str(type, "uint64_t", NULL)) {
 		check_int64_support();
 		get_uint64s(line, uint64s, 1);
 		glUniform1ui64vARB(loc, 1, uint64s);
 		return;
-	} else if (string_match("int", type)) {
+	} else if (parse_str(type, "int", NULL)) {
 		get_ints(line, ints, 1);
 		glUniform1iv(loc, 1, ints);
 		return;
-	} else if (string_match("uint", type)) {
+	} else if (parse_str(type, "uint", NULL)) {
 		check_unsigned_support();
 		get_uints(line, uints, 1);
 		glUniform1uiv(loc, 1, uints);
 		return;
-	} else if (string_match("double", type)) {
+	} else if (parse_str(type, "double", NULL)) {
 		check_double_support();
 		get_doubles(line, d, 1);
 		glUniform1dv(loc, 1, d);
 		return;
-	} else if (string_match("vec", type)) {
+	} else if (parse_str(type, "vec", NULL)) {
 		switch (type[3]) {
 		case '2':
 			get_floats(line, f, 2);
@@ -1833,7 +1813,7 @@ set_uniform(const char *line, int ubo_array_index)
 			glUniform4fv(loc, 1, f);
 			return;
 		}
-	} else if (string_match("ivec", type)) {
+	} else if (parse_str(type, "ivec", NULL)) {
 		switch (type[4]) {
 		case '2':
 			get_ints(line, ints, 2);
@@ -1848,7 +1828,7 @@ set_uniform(const char *line, int ubo_array_index)
 			glUniform4iv(loc, 1, ints);
 			return;
 		}
-	} else if (string_match("uvec", type)) {
+	} else if (parse_str(type, "uvec", NULL)) {
 		check_unsigned_support();
 		switch (type[4]) {
 		case '2':
@@ -1864,7 +1844,7 @@ set_uniform(const char *line, int ubo_array_index)
 			glUniform4uiv(loc, 1, uints);
 			return;
 		}
-	} else if (string_match("dvec", type)) {
+	} else if (parse_str(type, "dvec", NULL)) {
 		check_double_support();
 		switch (type[4]) {
 		case '2':
@@ -1880,7 +1860,7 @@ set_uniform(const char *line, int ubo_array_index)
 			glUniform4dv(loc, 1, d);
 			return;
 		}
-	} else if (string_match("i64vec", type)) {
+	} else if (parse_str(type, "i64vec", NULL)) {
 		check_int64_support();
 		switch (type[6]) {
 		case '2':
@@ -1896,7 +1876,7 @@ set_uniform(const char *line, int ubo_array_index)
 			glUniform4i64vARB(loc, 1, int64s);
 			return;
 		}
-	} else if (string_match("u64vec", type)) {
+	} else if (parse_str(type, "u64vec", NULL)) {
 		check_int64_support();
 		switch (type[6]) {
 		case '2':
@@ -1912,7 +1892,7 @@ set_uniform(const char *line, int ubo_array_index)
 			glUniform4ui64vARB(loc, 1, uint64s);
 			return;
 		}
-	} else if (string_match("mat", type) && type[3] != '\0') {
+	} else if (parse_str(type, "mat", NULL) && type[3] != '\0') {
 		char cols = type[3];
 		char rows = type[4] == 'x' ? type[5] : cols;
 		switch (cols) {
@@ -1962,7 +1942,7 @@ set_uniform(const char *line, int ubo_array_index)
 				return;
 			}
 		}
-	} else if (string_match("dmat", type) && type[4] != '\0') {
+	} else if (parse_str(type, "dmat", NULL) && type[4] != '\0') {
 		char cols = type[4];
 		char rows = type[5] == 'x' ? type[6] : cols;
 		switch (cols) {
@@ -2014,8 +1994,7 @@ set_uniform(const char *line, int ubo_array_index)
 		}
 	}
 
-	strcpy_to_space(name, type);
-	printf("unknown uniform type \"%s\"\n", name);
+	printf("unknown uniform type \"%s\"\n", type);
 	piglit_report_result(PIGLIT_FAIL);
 
 	return;
@@ -2043,27 +2022,27 @@ static GLenum lookup_shader_type(GLuint idx)
 
 static GLenum get_shader_from_string(const char *name, int *idx)
 {
-	if (string_match("GL_VERTEX_SHADER", name)) {
+	if (parse_str(name, "GL_VERTEX_SHADER", NULL)) {
 		*idx = 0;
 		return GL_VERTEX_SHADER;
 	}
-	if (string_match("GL_FRAGMENT_SHADER", name)) {
+	if (parse_str(name, "GL_FRAGMENT_SHADER", NULL)) {
 		*idx = 1;
 		return GL_FRAGMENT_SHADER;
 	}
-	if (string_match("GL_GEOMETRY_SHADER", name)) {
+	if (parse_str(name, "GL_GEOMETRY_SHADER", NULL)) {
 		*idx = 2;
 		return GL_GEOMETRY_SHADER;
 	}
-	if (string_match("GL_TESS_CONTROL_SHADER", name)) {
+	if (parse_str(name, "GL_TESS_CONTROL_SHADER", NULL)) {
 		*idx = 3;
 		return GL_TESS_CONTROL_SHADER;
 	}
-	if (string_match("GL_TESS_EVALUATION_SHADER", name)) {
+	if (parse_str(name, "GL_TESS_EVALUATION_SHADER", NULL)) {
 		*idx = 4;
 		return GL_TESS_EVALUATION_SHADER;
 	}
-	if (string_match("GL_COMPUTE_SHADER", name)) {
+	if (parse_str(name, "GL_COMPUTE_SHADER", NULL)) {
 		*idx = 5;
 		return GL_COMPUTE_SHADER;
 	}
@@ -2103,19 +2082,18 @@ static void
 set_subroutine_uniform(const char *line)
 {
 	GLuint prog;
+	char type[512];
 	char name[512];
 	char subname[512];
-	const char *type;
 	GLint loc;
 	GLuint idx;
 	GLenum ptype = 0;
 	int sidx = 0;
 
-	type = eat_whitespace(line);
-	line = eat_text(type);
-
-	line = strcpy_to_space(name, eat_whitespace(line));
-	line = strcpy_to_space(subname, eat_whitespace(line));
+	REQUIRE(parse_word_copy(line, type, sizeof(type), &line) &&
+		parse_word_copy(line, name, sizeof(name), &line) &&
+		parse_word_copy(line, subname, sizeof(subname), &line),
+		"Invalid set subroutine uniform command at: %s\n", line);
 
 	ptype = get_shader_from_string(type, &sidx);
 	if (ptype == 0) {
@@ -2188,11 +2166,12 @@ active_uniform(const char *line)
 	char name_buf[512];
 	char pname_string[512];
 	GLenum pname;
-	GLint expected;
+	int expected;
 	int i;
 	int num_active_uniforms;
 
-	line = strcpy_to_space(name, eat_whitespace(line));
+	REQUIRE(parse_word_copy(line, name, sizeof(name), &line),
+		"Bad uniform name at: %s\n", line);
 
 	strcpy_to_space(pname_string, eat_whitespace(line));
 	pname = lookup_enum_string(all_pnames, &line, "glGetUniformsiv pname");
@@ -2253,7 +2232,7 @@ active_uniform(const char *line)
 			fprintf(stderr,
 				"glGetActiveUniform(%s, %s): "
 				"expected %d (0x%04x), got %d (0x%04x)\n",
-				name, pname_string,
+				name, piglit_get_gl_enum_name(pname),
 				expected, expected, got, got);
 			pass = false;
 		}
@@ -2275,7 +2254,7 @@ active_uniform(const char *line)
 			fprintf(stderr,
 				"glGetActiveUniformsiv(%s, %s): "
 				"expected %d, got %d\n",
-				name, pname_string,
+				name, piglit_get_gl_enum_name(pname),
 				expected, got);
 			pass = false;
 		}
@@ -2285,7 +2264,6 @@ active_uniform(const char *line)
 
 		return;
 	}
-
 
 	fprintf(stderr, "No active uniform named \"%s\"\n", name);
 	piglit_report_result(PIGLIT_FAIL);
@@ -2362,10 +2340,8 @@ active_program_interface(const char *line)
 
 	char name[512];
 	char name_buf[512];
-	char prop_string[512];
-	char interface_type_string[512];
-	GLenum prop, interface_type;
-	GLint expected;
+	unsigned prop, interface_type;
+	int expected;
 	int i;
 	int num_active_buffers;
 
@@ -2377,13 +2353,12 @@ active_program_interface(const char *line)
 		return;
 	}
 
-	strcpy_to_space(interface_type_string, eat_whitespace(line));
 	interface_type = lookup_enum_string(all_program_interface, &line,
 					    "glGetProgramResourceiv "
 					    "programInterface");
-	line = strcpy_to_space(name, eat_whitespace(line));
+	REQUIRE(parse_word_copy(line, name, sizeof(name), &line),
+		"Bad program resource name at: %s\n", line);
 
-	strcpy_to_space(prop_string, eat_whitespace(line));
 	prop = lookup_enum_string(all_props, &line,
 				  "glGetProgramResourceiv pname");
 
@@ -2417,7 +2392,7 @@ active_program_interface(const char *line)
 			fprintf(stderr,
 				"glGetProgramResourceName(%s, %s): "
 				"expected %d (0x%04x), got %d (0x%04x)\n",
-				name, prop_string,
+				name, piglit_get_gl_enum_name(prop),
 				expected, expected, name_len, name_len);
 			pass = false;
 		}
@@ -2441,7 +2416,7 @@ active_program_interface(const char *line)
 			fprintf(stderr,
 				"glGetProgramResourceiv(%s, %s): "
 				"expected %d, got %d\n",
-				name, prop_string,
+				name, piglit_get_gl_enum_name(prop),
 				expected, got);
 			pass = false;
 		}
@@ -2471,13 +2446,13 @@ set_parameter(const char *line)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	if (string_match("env_vp", type)) {
+	if (parse_str(type, "env_vp", NULL)) {
 		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, index, f);
-	} else if (string_match("local_vp", type)) {
+	} else if (parse_str(type, "local_vp", NULL)) {
 		glProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, index, f);
-	} else if (string_match("env_fp", type)) {
+	} else if (parse_str(type, "env_fp", NULL)) {
 		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, index, f);
-	} else if (string_match("local_fp", type)) {
+	} else if (parse_str(type, "local_fp", NULL)) {
 		glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, index, f);
 	} else {
 		fprintf(stderr, "Unknown parameter type `%s'\n", type);
@@ -2496,24 +2471,21 @@ set_patch_parameter(const char *line)
 	if (gl_version.num < 40)
 		piglit_require_extension("GL_ARB_tessellation_shader");
 
-	if (string_match("vertices ", line)) {
-		line += strlen("vertices ");
+	if (parse_str(line, "vertices ", &line)) {
 		count = sscanf(line, "%d", &i);
 		if (count != 1) {
 			fprintf(stderr, "Couldn't parse patch parameter command:\n%s\n", line0);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 		glPatchParameteri(GL_PATCH_VERTICES, i);
-	} else if (string_match("default level outer ", line)) {
-		line += strlen("default level outer ");
+	} else if (parse_str(line, "default level outer ", &line)) {
 		count = sscanf(line, "%f %f %f %f", &f[0], &f[1], &f[2], &f[3]);
 		if (count != 4) {
 			fprintf(stderr, "Couldn't parse patch parameter command:\n%s\n", line0);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 		glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, f);
-	} else if (string_match("default level inner ", line)) {
-		line += strlen("default level inner ");
+	} else if (parse_str(line, "default level inner ", &line)) {
 		count = sscanf(line, "%f %f", &f[0], &f[1]);
 		if (count != 2) {
 			fprintf(stderr, "Couldn't parse patch parameter command:\n%s\n", line0);
@@ -2533,9 +2505,9 @@ set_patch_parameter(const char *line)
 static void
 set_provoking_vertex(const char *line)
 {
-	if (string_match("first", line)) {
+	if (parse_str(line, "first", NULL)) {
 		glProvokingVertexEXT(GL_FIRST_VERTEX_CONVENTION_EXT);
-	} else if (string_match("last", line)) {
+	} else if (parse_str(line, "last", NULL)) {
 		glProvokingVertexEXT(GL_LAST_VERTEX_CONVENTION_EXT);
 	} else {
 		fprintf(stderr, "Unknown provoking vertex parameter `%s'\n", line);
@@ -2563,6 +2535,7 @@ do_enable_disable(const char *line, bool enable_flag)
 {
 	GLenum value = lookup_enum_string(enable_table, &line,
 					  "enable/disable enum");
+
 	if (enable_flag)
 		glEnable(value);
 	else
@@ -2704,52 +2677,44 @@ handle_texparameter(const char *line)
 		{ "alpha", GL_ALPHA },
 		{ NULL, 0 }
 	};
-	GLenum target = 0;
+	unsigned target = 0;
 	GLenum parameter = GL_NONE;
 	const char *parameter_name = NULL;
 	const struct string_to_enum *strings = NULL;
-	GLenum value;
+	unsigned value;
 
 	target = lookup_enum_string(texture_target, &line, "texture target");
 
-	if (string_match("compare_func ", line)) {
+	if (parse_str(line, "compare_func ", &line)) {
 		parameter = GL_TEXTURE_COMPARE_FUNC;
 		parameter_name = "compare_func";
-		line += strlen("compare_func ");
 		strings = compare_funcs;
-	} else if (string_match("depth_mode ", line)) {
+	} else if (parse_str(line, "depth_mode ", &line)) {
 		parameter = GL_DEPTH_TEXTURE_MODE;
 		parameter_name = "depth_mode";
-		line += strlen("depth_mode ");
 		strings = depth_modes;
-	} else if (string_match("min ", line)) {
+	} else if (parse_str(line, "min ", &line)) {
 		parameter = GL_TEXTURE_MIN_FILTER;
 		parameter_name = "min";
-		line += strlen("min ");
 		strings = min_filter_modes;
-	} else if (string_match("mag ", line)) {
+	} else if (parse_str(line, "mag ", &line)) {
 		parameter = GL_TEXTURE_MAG_FILTER;
 		parameter_name = "mag";
-		line += strlen("mag ");
 		strings = mag_filter_modes;
-	} else if (string_match("wrap_s ", line)) {
+	} else if (parse_str(line, "wrap_s ", &line)) {
 		parameter = GL_TEXTURE_WRAP_S;
 		parameter_name = "wrap_s";
-		line += strlen("wrap_s ");
 		strings = wrap_modes;
-	} else if (string_match("wrap_t ", line)) {
+	} else if (parse_str(line, "wrap_t ", &line)) {
 		parameter = GL_TEXTURE_WRAP_T;
 		parameter_name = "wrap_t";
-		line += strlen("wrap_t ");
 		strings = wrap_modes;
-	} else if (string_match("wrap_r ", line)) {
+	} else if (parse_str(line, "wrap_r ", &line)) {
 		parameter = GL_TEXTURE_WRAP_R;
 		parameter_name = "wrap_r";
-		line += strlen("wrap_r ");
 		strings = wrap_modes;
-	} else if (string_match("lod_bias ", line)) {
+	} else if (parse_str(line, "lod_bias ", &line)) {
 #ifdef PIGLIT_USE_OPENGL
-		line += strlen("lod_bias ");
 		glTexParameterf(target, GL_TEXTURE_LOD_BIAS,
 				strtod(line, NULL));
 		return;
@@ -2757,26 +2722,22 @@ handle_texparameter(const char *line)
 		printf("lod_bias feature is only available in desktop GL\n");
 		piglit_report_result(PIGLIT_SKIP);
 #endif
-	} else if (string_match("max_level ", line)) {
-		line += strlen("max_level ");
+	} else if (parse_str(line, "max_level ", &line)) {
 		glTexParameteri(target, GL_TEXTURE_MAX_LEVEL,
 				strtol(line, NULL, 10));
 		return;
-	} else if (string_match("base_level ", line)) {
-		line += strlen("base_level ");
+	} else if (parse_str(line, "base_level ", &line)) {
 		glTexParameteri(target, GL_TEXTURE_BASE_LEVEL,
 				strtol(line, NULL, 10));
 		return;
-	} else if (string_match("border_color ", line)) {
+	} else if (parse_str(line, "border_color ", &line)) {
 		float bc[4];
-		line += strlen("border_color ");
 		sscanf(line, "%f %f %f %f", &bc[0], &bc[1], &bc[2], &bc[3]);
 		glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, bc);
 		return;
-	} else if (string_match("swizzle_r ", line)) {
+	} else if (parse_str(line, "swizzle_r ", &line)) {
 		parameter = GL_TEXTURE_SWIZZLE_R;
 		parameter_name = "swizzle_r";
-		line += strlen("swizzle_r ");
 		strings = swizzle_modes;
 	} else {
 		fprintf(stderr, "unknown texture parameter in `%s'\n", line);
@@ -2939,7 +2900,7 @@ probe_ssbo_uint(GLint ssbo_index, GLint ssbo_offset, const char *op, uint32_t va
 enum piglit_result
 piglit_display(void)
 {
-	const char *line, *next_line;
+	const char *line, *next_line, *rest;
 	unsigned line_num;
 	enum piglit_result full_result = PIGLIT_PASS;
 	GLbitfield clear_bits = 0;
@@ -2959,7 +2920,7 @@ piglit_display(void)
 		char s[32];
 		enum piglit_result result = PIGLIT_PASS;
 
-		line = eat_whitespace(next_line);
+		parse_whitespace(next_line, &line);
 
 		next_line = strchrnul(next_line, '\n');
 
@@ -3012,15 +2973,15 @@ piglit_display(void)
 			glNamedBufferSubData(atomics_bos[x],
 					     sizeof(GLuint) * y, sizeof(GLuint),
 					     &z);
-		} else if (string_match("clear color", line)) {
-			get_floats(line + 11, c, 4);
+		} else if (parse_str(line, "clear color ", &rest)) {
+			get_floats(rest, c, 4);
 			glClearColor(c[0], c[1], c[2], c[3]);
 			clear_bits |= GL_COLOR_BUFFER_BIT;
-		} else if (string_match("clear depth", line)) {
-			get_floats(line + 11, c, 1);
+		} else if (parse_str(line, "clear depth ", &rest)) {
+			get_floats(rest, c, 1);
 			glClearDepth(c[0]);
 			clear_bits |= GL_DEPTH_BUFFER_BIT;
-		} else if (string_match("clear", line)) {
+		} else if (parse_str(line, "clear", NULL)) {
 			glClear(clear_bits);
 		} else if (sscanf(line,
 				  "clip plane %d %lf %lf %lf %lf",
@@ -3044,44 +3005,44 @@ piglit_display(void)
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
 			glDispatchComputeGroupSizeARB(x, y, z, w, h, l);
 			glMemoryBarrier(GL_ALL_BARRIER_BITS);
-		} else if (string_match("draw rect tex", line)) {
+		} else if (parse_str(line, "draw rect tex ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(line + 13, c, 8);
+			get_floats(rest, c, 8);
 			piglit_draw_rect_tex(c[0], c[1], c[2], c[3],
 					     c[4], c[5], c[6], c[7]);
-		} else if (string_match("draw rect ortho patch", line)) {
+		} else if (parse_str(line, "draw rect ortho patch ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(line + 21, c, 4);
+			get_floats(rest, c, 4);
 
 			piglit_draw_rect_custom(-1.0 + 2.0 * (c[0] / piglit_width),
 						-1.0 + 2.0 * (c[1] / piglit_height),
 						2.0 * (c[2] / piglit_width),
 						2.0 * (c[3] / piglit_height), true);
-		} else if (string_match("draw rect ortho", line)) {
+		} else if (parse_str(line, "draw rect ortho ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(line + 15, c, 4);
+			get_floats(rest, c, 4);
 
 			piglit_draw_rect(-1.0 + 2.0 * (c[0] / piglit_width),
 					 -1.0 + 2.0 * (c[1] / piglit_height),
 					 2.0 * (c[2] / piglit_width),
 					 2.0 * (c[3] / piglit_height));
-		} else if (string_match("draw rect patch", line)) {
+		} else if (parse_str(line, "draw rect patch ", &rest)) {
 			result = program_must_be_in_use();
-			get_floats(line + 15, c, 4);
+			get_floats(rest, c, 4);
 			piglit_draw_rect_custom(c[0], c[1], c[2], c[3], true);
-		} else if (string_match("draw rect", line)) {
+		} else if (parse_str(line, "draw rect ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
-			get_floats(line + 9, c, 4);
+			get_floats(rest, c, 4);
 			piglit_draw_rect(c[0], c[1], c[2], c[3]);
-		} else if (string_match("draw instanced rect", line)) {
+		} else if (parse_str(line, "draw instanced rect ", &rest)) {
 			int primcount;
 
 			result = program_must_be_in_use();
-			sscanf(line + 19, "%d %f %f %f %f",
+			sscanf(rest, "%d %f %f %f %f",
 			       &primcount,
 			       c + 0, c + 1, c + 2, c + 3);
 			draw_instanced_rect(primcount, c[0], c[1], c[2], c[3]);
@@ -3110,10 +3071,10 @@ piglit_display(void)
 			}
 			bind_vao_if_supported();
 			glDrawArrays(mode, first, count);
-		} else if (string_match("disable", line)) {
-			do_enable_disable(line + 7, false);
-		} else if (string_match("enable", line)) {
-			do_enable_disable(line + 6, true);
+		} else if (parse_str(line, "disable ", &rest)) {
+			do_enable_disable(rest, false);
+		} else if (parse_str(line, "enable ", &rest)) {
+			do_enable_disable(rest, true);
 		} else if (sscanf(line, "depthfunc %31s", s) == 1) {
 			glDepthFunc(piglit_get_gl_enum_from_name(s));
 		} else if (sscanf(line, "fb tex 2d %d", &tex) == 1) {
@@ -3170,14 +3131,12 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
-			glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_WIDTH, &render_width);
-			glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_HEIGHT, &render_height);
-		} else if (string_match("frustum", line)) {
-			get_floats(line + 7, c, 6);
+		} else if (parse_str(line, "frustum", &rest)) {
+			get_floats(rest, c, 6);
 			piglit_frustum_projection(false, c[0], c[1], c[2],
 						  c[3], c[4], c[5]);
-		} else if (string_match("hint", line)) {
-			do_hint(line + 4);
+		} else if (parse_str(line, "hint", &rest)) {
+			do_hint(rest);
 		} else if (sscanf(line,
 				  "image texture %d %31s",
 				  &tex, s) == 2) {
@@ -3194,17 +3153,17 @@ piglit_display(void)
 				  c + 0, c + 1, c + 2, c + 3) == 4) {
 			piglit_gen_ortho_projection(c[0], c[1], c[2], c[3],
 						    -1, 1, GL_FALSE);
-		} else if (string_match("ortho", line)) {
+		} else if (parse_str(line, "ortho", NULL)) {
 			piglit_ortho_projection(render_width, render_height,
 						GL_FALSE);
-		} else if (string_match("probe rgba", line)) {
-			get_floats(line + 10, c, 6);
+		} else if (parse_str(line, "probe rgba ", &rest)) {
+			get_floats(rest, c, 6);
 			if (!piglit_probe_pixel_rgba((int) c[0], (int) c[1],
 						    & c[2])) {
 				result = PIGLIT_FAIL;
 			}
-		} else if (string_match("probe depth", line)) {
-			get_floats(line + 11, c, 3);
+		} else if (parse_str(line, "probe depth ", &rest)) {
+			get_floats(rest, c, 3);
 			if (!piglit_probe_pixel_depth((int) c[0], (int) c[1],
 						      c[2])) {
 				result = PIGLIT_FAIL;
@@ -3238,8 +3197,8 @@ piglit_display(void)
 			if (!piglit_probe_pixel_rgba(x, y, &c[2])) {
 				result = PIGLIT_FAIL;
 			}
-		} else if (string_match("probe rgb", line)) {
-			get_floats(line + 9, c, 5);
+		} else if (parse_str(line, "probe rgb ", &rest)) {
+			get_floats(rest, c, 5);
 			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
 						    & c[2])) {
 				result = PIGLIT_FAIL;
@@ -3280,29 +3239,29 @@ piglit_display(void)
 			if (!piglit_probe_rect_rgb(x, y, w, h, &c[4])) {
 				result = PIGLIT_FAIL;
 			}
-		} else if (string_match("probe all rgba", line)) {
-			get_floats(line + 14, c, 4);
+		} else if (parse_str(line, "probe all rgba ", &rest)) {
+			get_floats(rest, c, 4);
 			if (result != PIGLIT_FAIL &&
 			    !piglit_probe_rect_rgba(0, 0, render_width,
 						    render_height, c))
 				result = PIGLIT_FAIL;
-		} else if (string_match("probe warn all rgba", line)) {
-			get_floats(line + 19, c, 4);
+		} else if (parse_str(line, "probe warn all rgba ", &rest)) {
+			get_floats(rest, c, 4);
 			if (result == PIGLIT_PASS &&
 			    !piglit_probe_rect_rgba(0, 0, render_width,
 						    render_height, c))
 				result = PIGLIT_WARN;
-		} else if (string_match("probe all rgb", line)) {
-			get_floats(line + 13, c, 3);
+		} else if (parse_str(line, "probe all rgb", &rest)) {
+			get_floats(rest, c, 3);
 			if (result != PIGLIT_FAIL &&
 			    !piglit_probe_rect_rgb(0, 0, render_width,
 						   render_height, c))
 				result = PIGLIT_FAIL;
-		} else if (string_match("tolerance", line)) {
-			get_floats(line + strlen("tolerance"), piglit_tolerance, 4);
-		} else if (string_match("shade model smooth", line)) {
+		} else if (parse_str(line, "tolerance", &rest)) {
+			get_floats(rest, piglit_tolerance, 4);
+		} else if (parse_str(line, "shade model smooth", NULL)) {
 			glShadeModel(GL_SMOOTH);
-		} else if (string_match("shade model flat", line)) {
+		} else if (parse_str(line, "shade model flat", NULL)) {
 			glShadeModel(GL_FLAT);
 		} else if (sscanf(line, "ssbo %d %d", &x, &y) == 2) {
 			GLuint *ssbo_init = calloc(y, 1);
@@ -3338,12 +3297,12 @@ piglit_display(void)
 			num_textures++;
 			if (!piglit_is_core_profile)
 				glEnable(GL_TEXTURE_2D);
-		} else if (sscanf(line, "texture integer %d ( %d", &tex, &w) == 2) {
+
+		} else if (parse_str(line, "texture integer ", &rest)) {
 			GLenum int_fmt;
 			int b, a;
 			int num_scanned =
-				sscanf(line,
-				       "texture integer %d ( %d , %d ) ( %d, %d ) %31s",
+				sscanf(rest, "%d ( %d , %d ) ( %d, %d ) %31s",
 				       &tex, &w, &h, &b, &a, s);
 			if (num_scanned < 6) {
 				fprintf(stderr,
@@ -3480,22 +3439,22 @@ piglit_display(void)
 		} else if (sscanf(line, "texcoord %d ( %f , %f , %f , %f )",
 		                  &x, c + 0, c + 1, c + 2, c + 3) == 5) {
 			glMultiTexCoord4fv(GL_TEXTURE0 + x, c);
-		} else if (string_match("texparameter ", line)) {
-			handle_texparameter(line + strlen("texparameter "));
-		} else if (string_match("uniform", line)) {
+		} else if (parse_str(line, "texparameter ", &rest)) {
+			handle_texparameter(rest);
+		} else if (parse_str(line, "uniform ", &rest)) {
 			result = program_must_be_in_use();
-			set_uniform(line + 7, ubo_array_index);
-		} else if (string_match("subuniform", line)) {
+			set_uniform(rest, ubo_array_index);
+		} else if (parse_str(line, "subuniform ", &rest)) {
 			result = program_must_be_in_use();
 			check_shader_subroutine_support();
-			set_subroutine_uniform(line + 10);
-		} else if (string_match("parameter ", line)) {
-			set_parameter(line + strlen("parameter "));
-		} else if (string_match("patch parameter ", line)) {
-			set_patch_parameter(line + strlen("patch parameter "));
-		} else if (string_match("provoking vertex ", line)) {
-			set_provoking_vertex(line + strlen("provoking vertex "));
-		} else if (string_match("link error", line)) {
+			set_subroutine_uniform(rest);
+		} else if (parse_str(line, "parameter ", &rest)) {
+			set_parameter(rest);
+		} else if (parse_str(line, "patch parameter ", &rest)) {
+			set_patch_parameter(rest);
+		} else if (parse_str(line, "provoking vertex ", &rest)) {
+			set_provoking_vertex(rest);
+		} else if (parse_str(line, "link error", &rest)) {
 			link_error_expected = true;
 			if (link_ok) {
 				printf("shader link error expected, but it was successful!\n");
@@ -3503,14 +3462,14 @@ piglit_display(void)
 			} else {
 				fprintf(stderr, "Failed to link:\n%s\n", prog_err_info);
 			}
-		} else if (string_match("link success", line)) {
+		} else if (parse_str(line, "link success", &rest)) {
 			result = program_must_be_in_use();
-		} else if (string_match("ubo array index ", line)) {
-			get_ints(line + strlen("ubo array index "), &ubo_array_index, 1);
-		} else if (string_match("active uniform ", line)) {
-			active_uniform(line + strlen("active uniform "));
-		} else if (string_match("verify program_interface_query ", line)) {
-			active_program_interface(line + strlen("verify program_interface_query "));
+		} else if (parse_str(line, "ubo array index ", &rest)) {
+			get_ints(rest, &ubo_array_index, 1);
+		} else if (parse_str(line, "active uniform ", &rest)) {
+			active_uniform(rest);
+		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
+			active_program_interface(rest);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
