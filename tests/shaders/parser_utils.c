@@ -197,6 +197,31 @@ parse_enum_gl(const char *s, GLenum *e, const char **rest)
 }
 
 bool
+parse_enum_tab(const struct string_to_enum *tab,
+	       const char *s, unsigned *e, const char **rest)
+{
+	const char *end = s;
+	bool ret = parse_word(s, &s, &end);
+	unsigned i = 0;
+
+	if (ret) {
+		for (i = 0; tab[i].name; i++) {
+			if (!strncmp(tab[i].name, s, end - s) &&
+			    !tab[i].name[end - s])
+				break;
+		}
+
+		*e = tab[i].value;
+		ret = tab[i].name;
+	}
+
+	if (rest)
+		*rest = (ret ? end : s);
+
+	return ret;
+}
+
+bool
 parse_comparison_op(const char *s, enum comparison *t, const char **rest)
 {
 	if (parse_str(s, "==", rest)) {

@@ -82,11 +82,6 @@ struct component_version {
 
 #define ENUM_STRING(e) { #e, e }
 
-struct string_to_enum {
-	const char *name;
-	GLenum token;
-};
-
 extern float piglit_tolerance[4];
 
 static int test_num = 1;
@@ -254,25 +249,6 @@ static const struct string_to_enum all_types[] = {
 	ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_RECT),
 	{ NULL, 0 }
 };
-
-static GLenum
-lookup_enum_string(const struct string_to_enum *table, const char **line,
-		   const char *error_desc)
-{
-	int i;
-	*line = eat_whitespace(*line);
-	for (i = 0; table[i].name; i++) {
-		size_t len = strlen(table[i].name);
-		if (strncmp(table[i].name, *line, len) == 0 &&
-		    ((*line)[len] == '\0' || isspace((*line)[len]))) {
-			*line = eat_whitespace(*line + len);
-			return table[i].token;
-		}
-	}
-	fprintf(stderr, "Bad %s at: %s\n", error_desc, *line);
-	piglit_report_result(PIGLIT_FAIL);
-	return 0;
-}
 
 static bool
 compare(float ref, float value, enum comparison cmp);
@@ -2043,8 +2019,7 @@ active_uniform(const char *line)
 	const char *rest = line;
 	char name[512];
 	char name_buf[512];
-	char pname_string[512];
-	GLenum pname;
+	unsigned pname;
 	int expected;
 	int i;
 	int num_active_uniforms;
@@ -2052,13 +2027,12 @@ active_uniform(const char *line)
 	REQUIRE(parse_word_copy(rest, name, sizeof(name), &rest),
 		"Bad uniform name at: %s\n", line);
 
-	strcpy_to_space(pname_string, eat_whitespace(rest));
-	pname = lookup_enum_string(all_pnames, &rest, "glGetUniformsiv pname");
+	REQUIRE(parse_enum_tab(all_pnames, rest, &pname, &rest),
+		"Bad glGetUniformsiv pname at: %s\n", line);
 
-	if (!parse_int(rest, &expected, &rest)) {
-		rest = eat_whitespace(rest);
-		expected = lookup_enum_string(all_types, &rest, "type enum");
-	}
+	REQUIRE(parse_enum_tab(all_types, rest, (unsigned *)&expected, &rest) ||
+		parse_int(rest, &expected, &rest),
+		"Bad expected value at: %s\n", line);
 
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num_active_uniforms);
 	for (i = 0; i < num_active_uniforms; i++) {
@@ -2230,19 +2204,16 @@ active_program_interface(const char *line)
 		return;
 	}
 
-	interface_type = lookup_enum_string(all_program_interface, &line,
-					    "glGetProgramResourceiv "
-					    "programInterface");
+	REQUIRE(parse_enum_tab(all_program_interface, line,
+			       &interface_type, &line),
+		"Bad program interface at: %s\n", line);
 	REQUIRE(parse_word_copy(line, name, sizeof(name), &line),
 		"Bad program resource name at: %s\n", line);
-
-	prop = lookup_enum_string(all_props, &line,
-				  "glGetProgramResourceiv pname");
-
-	if (!parse_int(line, &expected, &line)) {
-		line = eat_whitespace(line);
-		expected = lookup_enum_string(all_types, &line, "type enum");
-	}
+	REQUIRE(parse_enum_tab(all_props, line, &prop, &line),
+		"Bad glGetProgramResourceiv pname at: %s\n", line);
+	REQUIRE(parse_enum_tab(all_types, line, (unsigned *)&expected, &line) ||
+		parse_int(line, &expected, &line),
+		"Bad expected value at: %s\n", line);
 
 	glGetProgramInterfaceiv(prog, interface_type,
 				GL_ACTIVE_RESOURCES, &num_active_buffers);
@@ -2408,8 +2379,9 @@ static const struct string_to_enum enable_table[] = {
 static void
 do_enable_disable(const char *line, bool enable_flag)
 {
-	GLenum value = lookup_enum_string(enable_table, &line,
-					  "enable/disable enum");
+	GLenum value;
+	REQUIRE(parse_enum_tab(enable_table, line, &value, NULL),
+		"Bad enable/disable enum at: %s\n", line);
 
 	if (enable_flag)
 		glEnable(value);
@@ -2434,10 +2406,12 @@ static const struct string_to_enum hint_param_table[] = {
 
 static void do_hint(const char *line)
 {
-	GLenum target = lookup_enum_string(hint_target_table, &line,
-					   "hint target");
-	GLenum param = lookup_enum_string(hint_param_table, &line,
-					  "hint param");
+	unsigned target, param;
+	REQUIRE(parse_enum_tab(hint_target_table, line, &target, &line),
+		"Bad hint target at: %s\n", line);
+	REQUIRE(parse_enum_tab(hint_param_table, line, &param, &line),
+		"Bad hint param at: %s\n", line);
+
 	glHint(target, param);
 }
 
@@ -2558,7 +2532,8 @@ handle_texparameter(const char *line)
 	const struct string_to_enum *strings = NULL;
 	unsigned value;
 
-	target = lookup_enum_string(texture_target, &line, "texture target");
+	REQUIRE(parse_enum_tab(texture_target, line, &value, NULL),
+		"Bad texture target at: %s\n", line);
 
 	if (parse_str(line, "compare_func ", &line)) {
 		parameter = GL_TEXTURE_COMPARE_FUNC;
@@ -2619,7 +2594,9 @@ handle_texparameter(const char *line)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	value = lookup_enum_string(strings, &line, parameter_name);
+	REQUIRE(parse_enum_tab(strings, line, &value, &line),
+		"Bad %s at: %s\n", parameter_name, line);
+
 	glTexParameteri(target, parameter, value);
 }
 

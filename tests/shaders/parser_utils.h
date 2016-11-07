@@ -170,6 +170,20 @@ parse_word_copy(const char *s, char *t, unsigned n, const char **rest);
 bool
 parse_enum_gl(const char *s, GLenum *e, const char **rest);
 
+struct string_to_enum {
+	const char *name;
+	unsigned value;
+};
+
+/**
+ * Parse a whitespace-delimited symbolic constant from the set
+ * specified in the \p tab argument pointing to a zero-terminated
+ * array of string-value pairs.
+ */
+bool
+parse_enum_tab(const struct string_to_enum *tab,
+	       const char *s, unsigned *e, const char **rest);
+
 const char *eat_whitespace(const char *src);
 const char *eat_text(const char *src);
 bool string_match(const char *string, const char *line);
