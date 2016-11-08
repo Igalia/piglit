@@ -127,6 +127,7 @@ EXTENSIONS = [
     ("GL_EXT_texture_buffer", "310 es"),
     ("GL_OES_texture_buffer", "310 es"),
     ("GL_EXT_clip_cull_distance", "300 es"),
+    ("GL_NV_image_formats", "310 es"),
 ]
 EXTENSIONS = [(n, glsl.Version(v)) for n, v in EXTENSIONS]
 
