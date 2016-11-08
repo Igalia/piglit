@@ -163,6 +163,9 @@ piglit_make_generated_tests(
 	shader_image_load_store_tests.list
 	gen_shader_image_load_store_tests.py)
 piglit_make_generated_tests(
+	shader_image_nv_image_formats_tests.list
+	gen_shader_image_nv_image_formats_tests.py)
+piglit_make_generated_tests(
 	variable_index_read_tests.list
 	gen_variable_index_read_tests.py
 	templates/gen_variable_index_read_tests/vs.shader_test.mako
@@ -246,6 +249,7 @@ add_custom_target(gen-gl-tests
 			shader_precision_tests.list
 			shader_framebuffer_fetch_tests.list
 			shader_image_load_store_tests.list
+			shader_image_nv_image_formats_tests.list
 			variable_index_read_tests.list
 			gen_extensions_defined.list
 			vp-tex.list
