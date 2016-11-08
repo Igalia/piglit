@@ -200,7 +200,21 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
             subtest = os.path.basename(os.path.splitext(each)[0]).lower()
 
             if prog is not None:
-                assert parser.prog == prog
+                # This allows mixing GLES2 and GLES3 shader test files
+                # together. Since GLES2 profiles can be promoted to GLES3, this
+                # is fine.
+                if parser.prog != prog:
+                    # Pylint can't figure out that prog is not None.
+                    if 'gles' in parser.prog and 'gles' in prog:  # pylint: disable=unsupported-membership-test
+                        prog = max(parser.prog, prog)
+                    else:
+                        # The only way we can get here is if one is GLES and
+                        # one is not, since there is only one desktop runner
+                        # thus it will never fail the is parser.prog != prog
+                        # check
+                        raise exceptions.PiglitInternalError(
+                            'GLES and GL shaders in the same command!\n'
+                            'Cannot pick a shader_runner binary!')
             else:
                 prog = parser.prog
 
