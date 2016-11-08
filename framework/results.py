@@ -295,7 +295,7 @@ class TestrunResult(object):
     def __init__(self):
         self.name = None
         self.uname = None
-        self.options = None
+        self.options = {}
         self.glxinfo = None
         self.wglinfo = None
         self.clinfo = None
