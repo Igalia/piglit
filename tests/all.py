@@ -1083,6 +1083,7 @@ with profile.test_list.group_manager(
     g(['gl-2.0-link-empty-prog'])
     g(['gl-2.0-two-sided-stencil'])
     g(['gl-2.0-vertexattribpointer'])
+    g(['gl-2.0-vertexattribpointer-size-3'])
     g(['gl-2.0-vertex-const-attr'])
     g(['gl-2.0-reuse_fragment_shader'])
     g(['attrib-assignments'], run_concurrent=False)
