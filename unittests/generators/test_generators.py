@@ -57,6 +57,7 @@ import pytest
     'gen_outerproduct_invalid_params',
     'gen_outerproduct_tests',
     'gen_shader_bit_encoding_tests',
+    'gen_shader_framebuffer_fetch_tests',
     'gen_shader_image_load_store_tests',
     'gen_shader_precision_tests',
     'gen_tcs_input_tests',
