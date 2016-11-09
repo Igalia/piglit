@@ -284,9 +284,10 @@ generate_GLSL(enum shader_target test_stage)
 			 "#define ivec1 int\n"
 			 "#define vec1 float\n"
 			 "flat in ivec%d size;\n"
+			 "out vec4 fragColor;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
+			 "    fragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
 			 shader_version, size, zeroes[3 - size]);
 		break;
@@ -325,9 +326,10 @@ generate_GLSL(enum shader_target test_stage)
 			 "#define ivec1 int\n"
 			 "#define vec1 float\n"
 			 "flat in ivec%d size;\n"
+			 "out vec4 fragColor;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
+			 "    fragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
 			 shader_version, size, zeroes[3 - size]);
 		break;
@@ -345,10 +347,11 @@ generate_GLSL(enum shader_target test_stage)
 			 "#define ivec1 int\n"
 			 "uniform int lod;\n"
 			 "uniform %s tex;\n"
+			 "out vec4 fragColor;\n"
 			 "void main()\n"
 			 "{\n"
 			 "    ivec%d size = textureSize(tex%s);\n"
-			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
+			 "    fragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
 			 shader_version, extension, sampler.name, size, lod_arg,
 			 zeroes[3 - size]);

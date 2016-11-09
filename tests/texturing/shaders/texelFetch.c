@@ -627,9 +627,10 @@ generate_GLSL(enum shader_target test_stage)
 			 "#version %d\n"
 			 "flat in %s color;\n"
 			 "uniform vec4 divisor;\n"
+			 "out vec4 fragColor;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    gl_FragColor = vec4(color)/divisor;\n"
+			 "    fragColor = vec4(color)/divisor;\n"
 			 "}\n",
 			 shader_version,
 			 sampler.return_type);
@@ -676,9 +677,10 @@ generate_GLSL(enum shader_target test_stage)
 			 "#version %d\n"
 			 "flat in %s color;\n"
 			 "uniform vec4 divisor;\n"
+			 "out vec4 fragColor;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    gl_FragColor = vec4(color)/divisor;\n"
+			 "    fragColor = vec4(color)/divisor;\n"
 			 "}\n",
 			 shader_version,
 			 sampler.return_type);
@@ -703,10 +705,11 @@ generate_GLSL(enum shader_target test_stage)
 			 "flat in ivec4 tc;\n"
 			 "uniform vec4 divisor;\n"
 			 "uniform %s tex;\n"
+			 "out vec4 fragColor;\n"
 			 "void main()\n"
 			 "{\n"
 			 "    vec4 color = texelFetch%s(tex, ivec%d(tc)%s%s);\n"
-			 "    gl_FragColor = color/divisor;\n"
+			 "    fragColor = color/divisor;\n"
 			 "}\n",
 			 shader_version,
 			 has_samples() ? "#extension GL_ARB_texture_multisample: require" : "",
