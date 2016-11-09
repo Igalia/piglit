@@ -2666,6 +2666,22 @@ setup_ubos(void)
 }
 
 static void
+teardown_fbos(void)
+{
+	if (draw_fbo != 0 &&
+	    draw_fbo != piglit_winsys_fbo)
+		glDeleteFramebuffers(1, &draw_fbo);
+
+	if (read_fbo != 0 &&
+	    read_fbo != piglit_winsys_fbo &&
+	    read_fbo != draw_fbo)
+		glDeleteFramebuffers(1, &read_fbo);
+
+	draw_fbo = 0;
+	read_fbo = 0;
+}
+
+static void
 teardown_ubos(void)
 {
 	if (num_uniform_blocks == 0) {
@@ -3983,6 +3999,7 @@ piglit_init(int argc, char **argv)
 			/* destroy GL objects? */
 			teardown_ubos();
 			teardown_atomics();
+			teardown_fbos();
 		}
 		exit(0);
 	}
