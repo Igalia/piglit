@@ -497,6 +497,8 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 			aa->angle, aa->axis[0], aa->axis[1], aa->axis[2]);
 		printf("\tFailing offset was %.16f\n", offset);
 		printf("\tAllowable range is (%f, %f)\n", mmin, mmax);
+		printf("\tglPolygonOffset(-1.0, 0.0);\n");
+		printf("\tglReadPixels returned %f\n", offset_depth);
 		return false;
 	}
 
@@ -516,6 +518,8 @@ check_slope_offset(const struct angle_axis *aa, GLdouble *ideal_mrd_near)
 		printf("\tFailing offset was %.16f\n", offset);
 		printf("\tAllowable range is (%f, %f)\n", 2.0 * mmin,
 			2.0 * mmax);
+		printf("\tglPolygonOffset(-2.0, 0.0);\n");
+		printf("\tglReadPixels returned %f\n", offset_depth);
 		return false;
 	}
 
