@@ -34,6 +34,8 @@ with profile.test_list.group_manager(PiglitCLTest, 'api') as g:
     # Platform
     g(['cl-api-get-platform-ids'], 'clGetPlatformIDs')
     g(['cl-api-get-platform-info'], 'clGetPlatformInfo')
+    g(['cl-api-get-extension-function-address-for-platform'],
+        'clGetExtensionFunctionAddressForPlatform')
 
     # Device
     g(['cl-api-get-device-ids'], 'clGetDeviceIDs')

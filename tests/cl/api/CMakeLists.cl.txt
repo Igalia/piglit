@@ -7,6 +7,7 @@ piglit_cl_add_api_test (create-context create-context.c)
 piglit_cl_add_api_test (create-context-from-type create-context-from-type.c)
 piglit_cl_add_api_test (get-context-info get-context-info.c)
 piglit_cl_add_api_test (retain_release-context retain_release-context.c)
+piglit_cl_add_api_test (get-extension-function-address-for-platform get-extension-function-address-for-platform.c)
 
 # Command queues
 piglit_cl_add_api_test (create-command-queue create-command-queue.c)
