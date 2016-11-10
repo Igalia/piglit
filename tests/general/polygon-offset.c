@@ -30,8 +30,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = 400;
-	config.window_height = 300;
+	config.window_width = 600;
+	config.window_height = 150;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -50,7 +50,7 @@ float red[3] = {1.0, 0.0, 0.0};
 float blue[3] = {0.0, 0.0, 1.0};
 
 #define SIZE	40
-#define SPACE	50
+#define SPACE	60
 
 #define X(x)	((x) * SPACE + SIZE/2)
 #define Y(y)	((y) * SPACE + SIZE/2)
@@ -102,16 +102,21 @@ piglit_display(void)
 	glEnable(GL_POLYGON_OFFSET_POINT);
 	glEnable(GL_POLYGON_OFFSET_LINE);
 
-	for (first_mode = 0; first_mode < 3; first_mode++) {
-		for (second_mode = 0; second_mode < 3; second_mode++) {
-			for (over = 0; over < 2; over++) {
+	/* loop: draw blue behind, draw blue in front */
+	for (over = 0; over < 2; over++) {
+		/* loop over GL_FILL, GL_LINE, GL_POINT fill mode for red quad */
+		for (first_mode = 0; first_mode < 3; first_mode++) {
+			/* loop over GL_FILL, GL_LINE, GL_POINT for blue quad */
+			for (second_mode = 0; second_mode < 3; second_mode++) {
+				/* draw red quad without an offset */
 				glPolygonOffset(0.0, 0.0);
 				do_rect(x, y, red, poly_mode[first_mode]);
+				/* draw blue quad with offset */
 				glPolygonOffset(0.0, over ? -1.0 : 1.0);
 				do_rect(x, y, blue, poly_mode[second_mode]);
 				pass = pass && check(x, y, over ? blue : red);
 
-				if (++x == 4) {
+				if (++x == 9) {
 					x = 0;
 					y++;
 				}
