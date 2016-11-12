@@ -321,7 +321,7 @@ def run(input_):
 
     # If a test list is provided then set the forced_test_list value.
     if args.test_list:
-        if len(args.test_profiles) != 1:
+        if len(args.test_profile) != 1:
             raise exceptions.PiglitFatalError(
                 'Unable to force a test list with more than one profile')
 
