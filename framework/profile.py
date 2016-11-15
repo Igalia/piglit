@@ -297,12 +297,11 @@ class TestProfile(object):
         """Create a copy of the TestProfile.
 
         This method creates a copy with references to the original instance
-        (using copy.copy), except for the test_list attribute, which is copied
-        using copy.deepcopy. This allows profiles to be "subclassed" by other
+        using copy.copy. This allows profiles to be "subclassed" by other
         profiles, without modifying the original.
         """
         new = copy.copy(self)
-        new.test_list = copy.deepcopy(self.test_list)
+        new.test_list = copy.copy(self.test_list)
         new.forced_test_list = copy.copy(self.forced_test_list)
         new.filters = copy.copy(self.filters)
         return new
