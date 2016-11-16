@@ -43,6 +43,20 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 const char*
+get_cube_map_face_string(GLenum face)
+{
+	switch (face) {
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y: return "GL_TEXTURE_CUBE_MAP_POSITIVE_Y";
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_X: return "GL_TEXTURE_CUBE_MAP_POSITIVE_X";
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z: return "GL_TEXTURE_CUBE_MAP_POSITIVE_Z";
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y: return "GL_TEXTURE_CUBE_MAP_NEGATIVE_Y";
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X: return "GL_TEXTURE_CUBE_MAP_NEGATIVE_X";
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z: return "GL_TEXTURE_CUBE_MAP_NEGATIVE_Z";
+	default: return NULL;
+	}
+}
+
+const char*
 get_attachment_string(GLint attach)
 {
 	switch (attach) {
@@ -54,10 +68,11 @@ get_attachment_string(GLint attach)
 }
 
 bool
-check_attachment(GLenum attach, GLint expect_name)
+check_attachment(GLenum attach, GLint expect_name, GLenum expect_cube_map_face)
 {
 	GLint actual_type;
 	GLint actual_name;
+	GLint actual_cube_map_face;
 
 	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
 					      attach,
@@ -95,6 +110,20 @@ check_attachment(GLenum attach, GLint expect_name)
 		return false;
 	}
 
+	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
+					      attach,
+				              GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE,
+				              &actual_cube_map_face);
+
+	if (actual_cube_map_face != expect_cube_map_face) {
+		fprintf(stderr,
+			"error: expected %s for %s attachment cube map face, but found %s\n",
+			get_cube_map_face_string(expect_cube_map_face),
+			get_attachment_string(attach),
+			get_cube_map_face_string(actual_cube_map_face));
+		return false;
+	}
+
 	return true;
 }
 
@@ -108,6 +137,7 @@ void piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 
+	GLenum cube_map_face = GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
 	GLuint fb;
 	GLuint tex;
 
@@ -115,10 +145,10 @@ void piglit_init(int argc, char **argv)
 
 	glGenTextures(1, &tex);
 	glGenFramebuffers(1, &fb);
-	glBindTexture(GL_TEXTURE_2D, tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 	glBindFramebuffer(GL_FRAMEBUFFER, fb);
 
-	glTexImage2D(GL_TEXTURE_2D,
+	glTexImage2D(cube_map_face,
 		     0, /*level*/
 		     GL_DEPTH_STENCIL,
 		     200, 200, /*width, height*/
@@ -128,15 +158,15 @@ void piglit_init(int argc, char **argv)
 		     NULL);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
 			       GL_DEPTH_STENCIL_ATTACHMENT,
-			       GL_TEXTURE_2D,
+			       cube_map_face,
 			       tex,
 			       0); /*level*/
 
 	pass = piglit_check_gl_error(0) && pass;
 
-	pass = check_attachment(GL_DEPTH_ATTACHMENT, tex) && pass;
-	pass = check_attachment(GL_STENCIL_ATTACHMENT, tex) && pass;
-	pass = check_attachment(GL_DEPTH_STENCIL_ATTACHMENT, tex) && pass;
+	pass = check_attachment(GL_DEPTH_ATTACHMENT, tex, cube_map_face) && pass;
+	pass = check_attachment(GL_STENCIL_ATTACHMENT, tex, cube_map_face) && pass;
+	pass = check_attachment(GL_DEPTH_STENCIL_ATTACHMENT, tex, cube_map_face) && pass;
 
 	pass = piglit_check_gl_error(0) && pass;
 
