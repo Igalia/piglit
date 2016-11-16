@@ -75,7 +75,7 @@ class RegexFilter(object):
     """
 
     def __init__(self, filters, inverse=False):
-        self.filters = [re.compile(f) for f in filters]
+        self.filters = [re.compile(f, flags=re.IGNORECASE) for f in filters]
         self.inverse = inverse
 
     def __call__(self, name, _):  # pylint: disable=invalid-name
