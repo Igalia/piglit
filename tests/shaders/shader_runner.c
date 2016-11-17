@@ -3670,6 +3670,16 @@ piglit_display(void)
 				set_texture_binding(tex, tex_obj, w, h, d);
 
 		} else if (sscanf(line,
+				  "texture junkf 2D %d ( %d , %d )",
+				  &tex, &w, &h) == 3) {
+			GLuint texobj;
+			glActiveTexture(GL_TEXTURE0 + tex);
+			glGenTextures(1, &texobj);
+			glBindTexture(GL_TEXTURE_2D, texobj);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,
+				     w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			set_texture_binding(tex, texobj, w, h, 1);
+		} else if (sscanf(line,
 				  "texture rgbw 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
 			glActiveTexture(GL_TEXTURE0 + tex);
