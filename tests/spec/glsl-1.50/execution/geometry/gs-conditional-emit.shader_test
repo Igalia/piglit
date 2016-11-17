@@ -1,0 +1,82 @@
+# The contents of out variables is undefined after EmitVertex(), but this
+# should only apply when the EmitVertex() is actually executed.
+#
+# This test triggered a bug in st_glsl_to_tgsi, where the contents of
+# gs_fs_color were not preserved for the first emit in the else-block.
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader passthrough]
+
+[geometry shader]
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+flat out vec4 gs_fs_color;
+
+uniform int choice;
+uniform vec4 u_color;
+
+void emit(float x, float y)
+{
+	gl_Position.x = x;
+	gl_Position.y = y * gs_fs_color.y;
+	gl_Position.z = 0.0;
+	gl_Position.w = 1.0;
+	EmitVertex();
+}
+
+void main()
+{
+	gs_fs_color = 2 * u_color;
+
+	if (choice >= 2) {
+		emit(-1, -1);
+		gs_fs_color = vec4(0, 1, 0, 1);
+		emit(-1, 1);
+		gs_fs_color = vec4(0, 1, 0, 1);
+		emit(1, -1);
+		gs_fs_color = vec4(0, 1, 0, 1);
+		emit(1, 1);
+		EndPrimitive();
+	} else {
+		emit(-1, -1);
+		gs_fs_color = vec4(0, 1, 0, 1);
+		emit(-1, 1);
+		gs_fs_color = vec4(0, 1, 0, 1);
+		emit(1, -1);
+		gs_fs_color = vec4(0, 1, 0, 1);
+		emit(1, 1);
+		EndPrimitive();
+	}
+}
+
+[fragment shader]
+
+flat in vec4 gs_fs_color;
+out vec4 color;
+
+void main()
+{
+	color = gs_fs_color;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform vec4 u_color 0.0 0.5 0.0 0.5
+
+uniform int choice 4
+draw arrays GL_POINTS 0 1
+probe all rgba 0.0 1.0 0.0 1.0
+
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform int choice 1
+draw arrays GL_POINTS 0 1
+probe all rgba 0.0 1.0 0.0 1.0
