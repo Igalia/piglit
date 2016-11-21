@@ -457,8 +457,9 @@ do_shader_setup(void)
 				"\n"
 				"in vec4 c;\n"
 				"\n"
+				"out vec4 fragColor;\n"
 				"void main() {\n"
-				"	gl_FragColor = c;\n"
+				"	fragColor = c;\n"
 				"}\n",
 				need_shader5 ? "150" : "130");
 	}
@@ -481,8 +482,9 @@ do_shader_setup(void)
 				"uniform %ssampler%s%s s;\n"
 				"%s"
 				"\n"
+				"out vec4 fragColor;\n"
 				"void main() {\n"
-				"	gl_FragColor = %s * textureGather%s(s, %s %s %s %s);\n"
+				"	fragColor = %s * textureGather%s(s, %s %s %s %s);\n"
 				"}\n",
 				need_shader5 ? "150" : "130",
 				sampler == SAMPLER_CUBEARRAY ? "#extension GL_ARB_texture_cube_map_array: require\n" : "",
