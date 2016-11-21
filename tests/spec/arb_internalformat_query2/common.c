@@ -706,7 +706,8 @@ check_query2_target_dependencies(const GLenum target)
                 break;
 
         case GL_TEXTURE_BUFFER:
-                if (!piglit_is_extension_supported("GL_ARB_texture_buffer_object"))
+                if (!piglit_is_extension_supported("GL_ARB_texture_buffer_object") &&
+                     piglit_get_gl_version() < 31)
                         return false;
                 break;
 
