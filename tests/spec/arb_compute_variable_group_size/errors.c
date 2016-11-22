@@ -62,7 +62,7 @@ static const char *fixed_work_group_size_shader =
 	"}\n";
 
 static enum piglit_result
-use_variable_work_group_size_normal()
+use_variable_work_group_size_normal(void *data)
 {
 	/* The ARB_compute_variable_group_size spec says:
 	 *
@@ -80,7 +80,7 @@ use_variable_work_group_size_normal()
 }
 
 static enum piglit_result
-use_variable_work_group_size_indirect()
+use_variable_work_group_size_indirect(void *data)
 {
 	/* The ARB_compute_variable_group_size spec says:
 	 *
@@ -114,7 +114,7 @@ use_variable_work_group_size_indirect()
 }
 
 static enum piglit_result
-use_fixed_work_group_size()
+use_fixed_work_group_size(void *data)
 {
 	/* The ARB_compute_variable_group_size spec says:
 	 *
@@ -132,7 +132,7 @@ use_fixed_work_group_size()
 }
 
 static enum piglit_result
-use_invalid_work_group_count_values()
+use_invalid_work_group_count_values(void *data)
 {
 	GLint prog, v[3];
 
@@ -158,7 +158,7 @@ use_invalid_work_group_count_values()
 }
 
 static enum piglit_result
-use_invalid_variable_work_group_size_values()
+use_invalid_variable_work_group_size_values(void *data)
 {
 	/* The ARB_compute_variable_group_size spec says:
 	 *
@@ -192,7 +192,7 @@ use_invalid_variable_work_group_size_values()
 }
 
 static enum piglit_result
-use_invalid_variable_group_invocations_values()
+use_invalid_variable_group_invocations_values(void *data)
 {
 	/* The ARB_compute_variable_group_size spec says:
 	 *
