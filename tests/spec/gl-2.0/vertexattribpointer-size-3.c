@@ -76,10 +76,10 @@ static GLint ToleranceUniform, ExpectedUniform, AttrAttrib;
 
 
 /*
- * Test glVertexAttribArray(type, size, normalized)
+ * Test glVertexAttribArray(type, normalized)
  */
 static bool
-test_array(GLenum type, GLuint size, GLboolean normalized)
+test_array(GLenum type, GLboolean normalized)
 {
 	static const GLfloat verts[4][2] = {
 		{ -1.0, -1.0 },
@@ -236,11 +236,11 @@ piglit_display(void)
 		GL_FLOAT,
 	};
 	bool pass = true;
-	int t, size, normalized;
+	int t, normalized;
 
 	for (t = 0; t < ARRAY_SIZE(types); t++) {
 		for (normalized = 0; normalized < (types[t] == GL_FLOAT ? 1 : 2); normalized++) {
-			pass = test_array(types[t], size, normalized)
+			pass = test_array(types[t], normalized)
 				&& pass;
 		}
 	}
