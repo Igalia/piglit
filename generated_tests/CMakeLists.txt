@@ -153,6 +153,9 @@ piglit_make_generated_tests(
 	templates/gen_conversion_fp64/shader_base.mako
 	)
 piglit_make_generated_tests(
+	shader_intel_conservative_rasterization.list
+	gen_shader_intel_conservative_rasterization.py)
+piglit_make_generated_tests(
 	shader_precision_tests.list
 	gen_shader_precision_tests.py
 	builtin_function.py
@@ -250,6 +253,7 @@ add_custom_target(gen-gl-tests
 			shader_framebuffer_fetch_tests.list
 			shader_image_load_store_tests.list
 			shader_image_nv_image_formats_tests.list
+			shader_intel_conservative_rasterization.list
 			variable_index_read_tests.list
 			gen_extensions_defined.list
 			vp-tex.list
