@@ -1,0 +1,16 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+)
+
+piglit_add_executable (intel_conservative_rasterization-depthcoverage depthcoverage.c)
+piglit_add_executable (intel_conservative_rasterization-innercoverage innercoverage.c)
+piglit_add_executable (intel_conservative_rasterization-invalid invalid.c)
+piglit_add_executable (intel_conservative_rasterization-tri tri.c)
+
+# vim: ft=cmake:
