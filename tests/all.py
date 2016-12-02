@@ -2464,6 +2464,8 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'arb_enhanced_layouts')) as g:
     g(['arb_enhanced_layouts-explicit-offset-bufferstorage'],
        'explicit-offset-bufferstorage')
+    g(['arb_enhanced_layouts-gs-stream-location-aliasing'],
+       'gs-stream-location-aliasing')
     g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs'],
       'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs',
       run_concurrent=False)

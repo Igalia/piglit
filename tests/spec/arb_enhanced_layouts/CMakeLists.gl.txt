@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_enhanced_layouts-explicit-offset-bufferstorage explicit-offset-bufferstorage.c)
+piglit_add_executable (arb_enhanced_layouts-gs-stream-location-aliasing gs-stream-location-aliasing.c)
 piglit_add_executable (arb_enhanced_layouts-transform-feedback-layout-qualifiers transform-feedback-layout-qualifiers.c)
 piglit_add_executable (arb_enhanced_layouts-transform-feedback-layout-query-api transform-feedback-layout-query-api.c)
 
