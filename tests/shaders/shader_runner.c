@@ -2499,6 +2499,23 @@ do_enable_disable(const char *line, bool enable_flag)
 		glDisable(value);
 }
 
+static const struct string_to_enum polygon_mode_table[] = {
+	{ "GL_POINT", GL_POINT },
+	{ "GL_LINE",  GL_LINE },
+	{ "GL_FILL",  GL_FILL },
+	{ NULL, 0 }
+};
+
+static void
+do_polygon_mode(const char *line)
+{
+	GLenum value;
+	REQUIRE(parse_enum_tab(polygon_mode_table, line, &value, NULL),
+		"Bad enable/disable enum at: %s\n", line);
+
+	glPolygonMode(GL_FRONT_AND_BACK, value);
+}
+
 static const struct string_to_enum hint_target_table[] = {
 	ENUM_STRING(GL_LINE_SMOOTH_HINT),
 	ENUM_STRING(GL_POLYGON_SMOOTH_HINT),
@@ -3786,6 +3803,8 @@ piglit_display(void)
 			set_parameter(rest);
 		} else if (parse_str(line, "patch parameter ", &rest)) {
 			set_patch_parameter(rest);
+		} else if (parse_str(line, "polygon mode ", &rest)) {
+			do_polygon_mode(rest);
 		} else if (parse_str(line, "provoking vertex ", &rest)) {
 			set_provoking_vertex(rest);
 		} else if (parse_str(line, "link error", &rest)) {
@@ -4075,6 +4094,7 @@ piglit_init(int argc, char **argv)
 			glUseProgram(0);
 			glDisable(GL_DEPTH_TEST);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			for (int k = 0; k < gl_max_clip_planes; k++) {
 				glDisable(GL_CLIP_PLANE0 + k);
