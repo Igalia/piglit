@@ -61,11 +61,12 @@ piglit_init(int argc, char **argv)
 	list = glGenLists(1);
 	glNewList(list, GL_COMPILE);
 
-	glDrawArraysInstancedARB(GL_TRIANGLES, 0, 2, 3);
+	glDrawArraysInstancedARB(GL_TRIANGLES, 0, 3, 2);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		pass = false;
 
-	glDrawElementsInstancedARB(GL_TRIANGLES, 2, GL_UNSIGNED_INT, NULL, 3);
+	unsigned int dummy_buf[] = { 0, 0, 0 };
+	glDrawElementsInstancedARB(GL_TRIANGLES, 3, GL_UNSIGNED_INT, dummy_buf, 2);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		pass = false;
 
