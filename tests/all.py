@@ -4732,6 +4732,8 @@ with profile.test_list.group_manager(
       'create-programpipelines')
     g(['arb_direct_state_access-create-queries'], 'create-queries')
     g(['arb_direct_state_access-generatetexturemipmap'], 'generatetexturemipmap')
+    g(['arb_direct_state_access-namedframebufferdrawbuffers'],
+      'namedframebufferdrawbuffers')
 
 with profile.test_list.group_manager(
         PiglitGLTest,

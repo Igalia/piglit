@@ -35,4 +35,5 @@ piglit_add_executable (arb_direct_state_access-texunits texunits.c)
 piglit_add_executable (arb_direct_state_access-transformfeedback-bufferbase transformfeedback-bufferbase.c)
 piglit_add_executable (arb_direct_state_access-transformfeedback-bufferrange transformfeedback-bufferrange.c)
 piglit_add_executable (arb_direct_state_access-texture-errors texture-errors.c)
+piglit_add_executable (arb_direct_state_access-namedframebufferdrawbuffers namedframebufferdrawbuffers.c)
 # vim: ft=cmake:
