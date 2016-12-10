@@ -107,6 +107,11 @@ static int create_fbo(void)
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
+	/* Turn off mipmap filtering as a hint to the driver that we don't
+	 * need multiple mipmap levels (as those can increase the memory
+	 * requirements by 50%, and we don't need them in this test.
+	 */
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, maxsize, maxsize,
 		     0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
