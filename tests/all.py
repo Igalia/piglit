@@ -3692,6 +3692,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'arb_transform_feedback_overflow_query')) as g:
+    g(['arb_transform_feedback_overflow_query-basic'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'arb_uniform_buffer_object')) as g:
     g(['arb_uniform_buffer_object-bindbuffer-general-point'],
       'bindbuffer-general-point')
