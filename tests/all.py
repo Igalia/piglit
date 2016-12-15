@@ -3694,6 +3694,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_transform_feedback_overflow_query')) as g:
     g(['arb_transform_feedback_overflow_query-basic'])
+    g(['arb_transform_feedback_overflow_query-errors'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,

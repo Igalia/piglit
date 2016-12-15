@@ -9,4 +9,5 @@ link_libraries (
 )
 
 piglit_add_executable (arb_transform_feedback_overflow_query-basic basic.c)
+piglit_add_executable (arb_transform_feedback_overflow_query-errors errors.c)
 # vim: ft=cmake:
