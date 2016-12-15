@@ -1,0 +1,68 @@
+# Verify that gl_ClipDistance affects different primitive types correctly.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+uniform vec2 u_offset;
+uniform float u_clipdist;
+
+out float gl_ClipDistance[1];
+
+void main(void)
+{
+	gl_Position =
+		gl_ModelViewProjectionMatrix *
+		vec4(u_offset.x + (gl_VertexID % 2) * 10,
+		     u_offset.y + (gl_VertexID / 2) * 10,
+		     0, 1);
+
+	gl_ClipDistance[0] = u_clipdist;
+}
+
+[fragment shader]
+#version 130
+
+void main(void)
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+enable GL_CLIP_PLANE0
+clear color 0.0 0.0 0.0 0.0
+clear
+
+ortho
+
+# Test that primitives are clipped with a negative distance
+uniform float u_clipdist -1
+
+uniform vec2 u_offset 0.5 0.5
+draw arrays GL_POINTS 0 1
+probe rect rgba ( 0, 0, 20, 20) (0, 0, 0, 0)
+
+uniform vec2 u_offset 20 0.5
+draw arrays GL_LINES 0 2
+probe rect rgba (20, 0, 20, 20) (0, 0, 0, 0)
+
+uniform vec2 u_offset 40 0
+draw arrays GL_TRIANGLE_STRIP 0 4
+probe rect rgba (40, 0, 20, 20) (0, 0, 0, 0)
+
+# Test that primitives are not clipped with zero distance
+uniform float u_clipdist 0
+
+uniform vec2 u_offset 0.5 20.5
+draw arrays GL_POINTS 0 1
+probe rect rgba ( 0, 20, 1, 1) (1, 0, 0, 1)
+
+uniform vec2 u_offset 20 20.5
+draw arrays GL_LINES 0 2
+probe rect rgba (20, 20, 10, 1) (1, 0, 0, 1)
+
+uniform vec2 u_offset 40 20
+draw arrays GL_TRIANGLE_STRIP 0 4
+probe rect rgba (40, 20, 10, 10) (1, 0, 0, 1)
