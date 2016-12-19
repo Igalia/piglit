@@ -1,0 +1,22 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+/* Test for FDO bug 99154. builtin_builder::binop creates variables
+ * named x and y. Because of a bug these variables had mode ir_var_auto
+ * instead of ir_var_temporary. In this case, the variable names can
+ * collide when the function is inlined later on.
+ * Linking will fail in this test if this is the case.
+ */
+uniform float t;
+uniform vec3 v1;
+uniform vec3 v2;
+float tc = clamp(t, 1.0, 2.0);
+float d = dot(v1, v2);
+
+void main() {
+}
+
+[test]
+link success
+
