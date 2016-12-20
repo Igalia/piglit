@@ -1,0 +1,53 @@
+# This is designed to test return lowering and check if we handle
+# things correctly when an if contains a nested return as well as a sibling
+# if without a return.
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform int a;
+uniform int b;
+uniform int c;
+
+void main()
+{
+  gl_Position = gl_Vertex;
+
+  vec4 colour = vec4(1.0, 0.0, 0.0, 1.0);
+
+  if (a == 1) {
+    if (b == 1) {
+       colour = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+
+    if (c == 1) {
+      gl_FrontColor = vec4(1.0, 1.0, 0.0, 1.0);
+      return;
+    }
+  }
+
+  gl_FrontColor = colour;
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+
+uniform int a 1
+uniform int b 1
+uniform int c 1
+
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 0.0 1.0
+
+uniform int a 1
+uniform int b 1
+uniform int c 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
