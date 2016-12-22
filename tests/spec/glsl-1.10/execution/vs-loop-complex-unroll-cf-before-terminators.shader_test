@@ -1,0 +1,56 @@
+# This tests unrolling of a loop with two exit point where the trip count
+# of one of the exits is known and the other unknown (conditional on uniform).
+#
+# Here we test that control flow that comes before the terminators is properly
+# inserted into the unrolled loop.
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform int a;
+
+void main()
+{
+  gl_Position = gl_Vertex;
+
+  vec4 colour = vec4(1.0, 0.0, 0.0, 1.0);
+
+  int i = 0;
+  int j = 0;
+  do {
+    if (i == 2) {
+      colour = vec4(0.0, 0.0, 1.0, 1.0);
+      j++; // we use this so the if doesn't get reduced to a series of bcsel
+    } else {
+      colour = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+
+    i++;
+    j++;
+
+    if (i >= 3) {
+      if (j != 4)
+         colour = vec4(1.0, 0.0, 0.0, 1.0);
+      break;
+    }
+  } while (a == 1);
+
+  gl_FrontColor = colour;
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+
+uniform int a 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int a 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 1.0 1.0
