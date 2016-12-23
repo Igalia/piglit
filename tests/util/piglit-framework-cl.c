@@ -194,7 +194,7 @@ int piglit_cl_framework_run(int argc, char** argv)
 
 		bool platform_defined;
 		unsigned int num_platforms;
-		cl_platform_id* platform_ids;
+		cl_platform_id* platform_ids = NULL;
 
 		/* Create regexes */
 		if(   config->platform_regex != NULL
