@@ -31,8 +31,8 @@
  * locations until an inconsistency is observed or the test runs to
  * completion.
  *
- * The test is repeated for the "volatile" qualifier with no barriers,
- * for all execution stages and for different relative arrangements of
+ * The test is repeated for the "volatile" qualifier, for all
+ * execution stages and for different relative arrangements of
  * producer and monitor threads to account for implementations with
  * varying levels of parallelism and with caches of different sizes.
  *
@@ -84,7 +84,7 @@ struct image_test_info {
 const struct image_test_info image_tests[] = {
         { "control", "", "", true },
         { "'coherent' qualifier", "coherent", "memoryBarrier()", false },
-        { "'volatile' qualifier", "volatile", "", false },
+        { "'volatile' qualifier", "volatile", "memoryBarrier()", false },
         { 0 }
 };
 
