@@ -4567,6 +4567,14 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'egl_khr_gl_image'),
+        exclude_platforms=['glx']) as g:
+    for internal_format in ('GL_RGBA', 'GL_DEPTH_COMPONENT24'):
+        g(['egl_khr_gl_renderbuffer_image-clear-shared-image', internal_format],
+           run_concurrent=False)
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'egl_khr_surfaceless_context'),
         exclude_platforms=['glx']) as g:
     g(['egl-surfaceless-context-viewport'], 'viewport',

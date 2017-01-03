@@ -1,0 +1,9 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+if(PIGLIT_HAS_PTHREADS)
+	link_libraries(${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+piglit_add_executable(egl_khr_gl_renderbuffer_image-clear-shared-image egl_khr_gl_renderbuffer_image-clear-shared-image.c)
+
+# vim: ft=cmake:
