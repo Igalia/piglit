@@ -1,0 +1,54 @@
+# SSBOs
+
+[require]
+GL >= 3.3
+GLSL >= 4.00
+GL_ARB_shader_storage_buffer_object
+
+[vertex shader]
+#version 400
+#extension GL_ARB_shader_storage_buffer_object: require
+
+layout (binding = 0) buffer vs_Block {
+	vec4 color;
+};
+
+in vec4 piglit_vertex;
+out vec4 vs_fs;
+
+void main()
+{
+	vs_fs = color;
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 400
+#extension GL_ARB_shader_storage_buffer_object: require
+
+layout (binding = 1) buffer fs_Block {
+	float color_scale;
+};
+
+in  vec4 vs_fs;
+out vec4 fs_out;
+
+void main()
+{
+    fs_out = vs_fs * color_scale;
+}
+
+[test]
+ssbo 0 16
+ssbo 0 subdata float 0 1.0
+ssbo 0 subdata float 4 2.0
+ssbo 0 subdata float 12 2.0
+
+ssbo 1 16
+ssbo 1 subdata float 0 0.25
+
+clear color 1.0 0.0 0.0 1.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.5 0.0 0.5
