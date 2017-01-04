@@ -1,0 +1,69 @@
+[require]
+GLSL >= 1.50
+GL_MAX_VERTEX_ATTRIBS >= 3
+
+[vertex shader]
+#version 150
+
+uniform int expected0;
+uniform float expected1;
+
+in int value0;
+in float value1;
+
+in vec3 piglit_vertex;
+out vec4 fs_color;
+
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+    gl_Position = vec4(piglit_vertex, 1.0);
+    if (value0 != expected0) {
+        fs_color = RED;
+	return;
+    }
+    if (value1 != expected1) {
+        fs_color = RED;
+	return;
+    }
+    fs_color = GREEN;
+}
+
+[fragment shader]
+#version 150
+
+in vec4 fs_color;
+out vec4 color;
+
+void main()
+{
+    color = fs_color;
+}
+
+[vertex data]
+piglit_vertex/float/vec3 value0/byte/int value1/float/float
+-1.0 -1.0  0.0   -5   0xc21620c5
+ 1.0 -1.0  0.0   -5   0xc21620c5
+ 1.0  1.0  0.0   -5   0xc21620c5
+-1.0  1.0  0.0   -5   0xc21620c5
+-1.0 -1.0  0.0   13   0x75bc289b
+ 1.0 -1.0  0.0   13   0x75bc289b
+ 1.0  1.0  0.0   13   0x75bc289b
+-1.0  1.0  0.0   13   0x75bc289b
+
+[test]
+uniform int expected0 -5
+uniform float expected1 0xc21620c5
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int expected0 13
+uniform float expected1 0x75bc289b
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 4 4
+probe all rgba 0.0 1.0 0.0 1.0

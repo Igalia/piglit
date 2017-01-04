@@ -1,0 +1,221 @@
+[require]
+GLSL >= 1.50
+GL_MAX_VERTEX_ATTRIBS >= 3
+
+[vertex shader]
+#version 150
+
+uniform mat2 expected0;
+
+in mat2 value0;
+
+in vec3 piglit_vertex;
+out vec4 fs_color;
+
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+    gl_Position = vec4(piglit_vertex, 1.0);
+    if (value0 != expected0) {
+        fs_color = RED;
+	return;
+    }
+    fs_color = GREEN;
+}
+
+[fragment shader]
+#version 150
+
+in vec4 fs_color;
+out vec4 color;
+
+void main()
+{
+    color = fs_color;
+}
+
+[vertex data]
+piglit_vertex/float/vec3 value0/float/mat2/0 value0/float/mat2/1 
+-1.0 -1.0  0.0   0xc21620c5  0x75bc289b   0x54c1c081  0x878218f8   
+ 1.0 -1.0  0.0   0xc21620c5  0x75bc289b   0x54c1c081  0x878218f8   
+ 1.0  1.0  0.0   0xc21620c5  0x75bc289b   0x54c1c081  0x878218f8   
+-1.0  1.0  0.0   0xc21620c5  0x75bc289b   0x54c1c081  0x878218f8   
+-1.0 -1.0  0.0   0x75bc289b  0x54c1c081   0x878218f8  0x7e0857ed   
+ 1.0 -1.0  0.0   0x75bc289b  0x54c1c081   0x878218f8  0x7e0857ed   
+ 1.0  1.0  0.0   0x75bc289b  0x54c1c081   0x878218f8  0x7e0857ed   
+-1.0  1.0  0.0   0x75bc289b  0x54c1c081   0x878218f8  0x7e0857ed   
+-1.0 -1.0  0.0   0x54c1c081  0x878218f8   0x7e0857ed  0x2bb561bf   
+ 1.0 -1.0  0.0   0x54c1c081  0x878218f8   0x7e0857ed  0x2bb561bf   
+ 1.0  1.0  0.0   0x54c1c081  0x878218f8   0x7e0857ed  0x2bb561bf   
+-1.0  1.0  0.0   0x54c1c081  0x878218f8   0x7e0857ed  0x2bb561bf   
+-1.0 -1.0  0.0   0x878218f8  0x7e0857ed   0x2bb561bf  0xff7fffff   
+ 1.0 -1.0  0.0   0x878218f8  0x7e0857ed   0x2bb561bf  0xff7fffff   
+ 1.0  1.0  0.0   0x878218f8  0x7e0857ed   0x2bb561bf  0xff7fffff   
+-1.0  1.0  0.0   0x878218f8  0x7e0857ed   0x2bb561bf  0xff7fffff   
+-1.0 -1.0  0.0   0x7e0857ed  0x2bb561bf   0xff7fffff  0xcb800000   
+ 1.0 -1.0  0.0   0x7e0857ed  0x2bb561bf   0xff7fffff  0xcb800000   
+ 1.0  1.0  0.0   0x7e0857ed  0x2bb561bf   0xff7fffff  0xcb800000   
+-1.0  1.0  0.0   0x7e0857ed  0x2bb561bf   0xff7fffff  0xcb800000   
+-1.0 -1.0  0.0   0x2bb561bf  0xff7fffff   0xcb800000  0xc0a00000   
+ 1.0 -1.0  0.0   0x2bb561bf  0xff7fffff   0xcb800000  0xc0a00000   
+ 1.0  1.0  0.0   0x2bb561bf  0xff7fffff   0xcb800000  0xc0a00000   
+-1.0  1.0  0.0   0x2bb561bf  0xff7fffff   0xcb800000  0xc0a00000   
+-1.0 -1.0  0.0   0xff7fffff  0xcb800000   0xc0a00000  0xbff92e73   
+ 1.0 -1.0  0.0   0xff7fffff  0xcb800000   0xc0a00000  0xbff92e73   
+ 1.0  1.0  0.0   0xff7fffff  0xcb800000   0xc0a00000  0xbff92e73   
+-1.0  1.0  0.0   0xff7fffff  0xcb800000   0xc0a00000  0xbff92e73   
+-1.0 -1.0  0.0   0xcb800000  0xc0a00000   0xbff92e73  0x80800000   
+ 1.0 -1.0  0.0   0xcb800000  0xc0a00000   0xbff92e73  0x80800000   
+ 1.0  1.0  0.0   0xcb800000  0xc0a00000   0xbff92e73  0x80800000   
+-1.0  1.0  0.0   0xcb800000  0xc0a00000   0xbff92e73  0x80800000   
+-1.0 -1.0  0.0   0xc0a00000  0xbff92e73   0x80800000  0x00000000   
+ 1.0 -1.0  0.0   0xc0a00000  0xbff92e73   0x80800000  0x00000000   
+ 1.0  1.0  0.0   0xc0a00000  0xbff92e73   0x80800000  0x00000000   
+-1.0  1.0  0.0   0xc0a00000  0xbff92e73   0x80800000  0x00000000   
+-1.0 -1.0  0.0   0xbff92e73  0x80800000   0x00000000  0x00800000   
+ 1.0 -1.0  0.0   0xbff92e73  0x80800000   0x00000000  0x00800000   
+ 1.0  1.0  0.0   0xbff92e73  0x80800000   0x00000000  0x00800000   
+-1.0  1.0  0.0   0xbff92e73  0x80800000   0x00000000  0x00800000   
+-1.0 -1.0  0.0   0x80800000  0x00000000   0x00800000  0x3ff92e73   
+ 1.0 -1.0  0.0   0x80800000  0x00000000   0x00800000  0x3ff92e73   
+ 1.0  1.0  0.0   0x80800000  0x00000000   0x00800000  0x3ff92e73   
+-1.0  1.0  0.0   0x80800000  0x00000000   0x00800000  0x3ff92e73   
+-1.0 -1.0  0.0   0x00000000  0x00800000   0x3ff92e73  0x40a00000   
+ 1.0 -1.0  0.0   0x00000000  0x00800000   0x3ff92e73  0x40a00000   
+ 1.0  1.0  0.0   0x00000000  0x00800000   0x3ff92e73  0x40a00000   
+-1.0  1.0  0.0   0x00000000  0x00800000   0x3ff92e73  0x40a00000   
+-1.0 -1.0  0.0   0x00800000  0x3ff92e73   0x40a00000  0x4b800000   
+ 1.0 -1.0  0.0   0x00800000  0x3ff92e73   0x40a00000  0x4b800000   
+ 1.0  1.0  0.0   0x00800000  0x3ff92e73   0x40a00000  0x4b800000   
+-1.0  1.0  0.0   0x00800000  0x3ff92e73   0x40a00000  0x4b800000   
+-1.0 -1.0  0.0   0x3ff92e73  0x40a00000   0x4b800000  0x7f7fffff   
+ 1.0 -1.0  0.0   0x3ff92e73  0x40a00000   0x4b800000  0x7f7fffff   
+ 1.0  1.0  0.0   0x3ff92e73  0x40a00000   0x4b800000  0x7f7fffff   
+-1.0  1.0  0.0   0x3ff92e73  0x40a00000   0x4b800000  0x7f7fffff   
+-1.0 -1.0  0.0   0x40a00000  0x4b800000   0x7f7fffff  0x00000000   
+ 1.0 -1.0  0.0   0x40a00000  0x4b800000   0x7f7fffff  0x00000000   
+ 1.0  1.0  0.0   0x40a00000  0x4b800000   0x7f7fffff  0x00000000   
+-1.0  1.0  0.0   0x40a00000  0x4b800000   0x7f7fffff  0x00000000   
+-1.0 -1.0  0.0   0x4b800000  0x7f7fffff   0x00000000  0xc21620c5   
+ 1.0 -1.0  0.0   0x4b800000  0x7f7fffff   0x00000000  0xc21620c5   
+ 1.0  1.0  0.0   0x4b800000  0x7f7fffff   0x00000000  0xc21620c5   
+-1.0  1.0  0.0   0x4b800000  0x7f7fffff   0x00000000  0xc21620c5   
+-1.0 -1.0  0.0   0x7f7fffff  0x00000000   0xc21620c5  0x75bc289b   
+ 1.0 -1.0  0.0   0x7f7fffff  0x00000000   0xc21620c5  0x75bc289b   
+ 1.0  1.0  0.0   0x7f7fffff  0x00000000   0xc21620c5  0x75bc289b   
+-1.0  1.0  0.0   0x7f7fffff  0x00000000   0xc21620c5  0x75bc289b   
+-1.0 -1.0  0.0   0x00000000  0xc21620c5   0x75bc289b  0x54c1c081   
+ 1.0 -1.0  0.0   0x00000000  0xc21620c5   0x75bc289b  0x54c1c081   
+ 1.0  1.0  0.0   0x00000000  0xc21620c5   0x75bc289b  0x54c1c081   
+-1.0  1.0  0.0   0x00000000  0xc21620c5   0x75bc289b  0x54c1c081   
+
+[test]
+uniform mat2 expected0 0xc21620c5 0x75bc289b 0x54c1c081 0x878218f8
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x75bc289b 0x54c1c081 0x878218f8 0x7e0857ed
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 4 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x54c1c081 0x878218f8 0x7e0857ed 0x2bb561bf
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 8 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x878218f8 0x7e0857ed 0x2bb561bf 0xff7fffff
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 12 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x7e0857ed 0x2bb561bf 0xff7fffff 0xcb800000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 16 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x2bb561bf 0xff7fffff 0xcb800000 0xc0a00000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 20 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0xff7fffff 0xcb800000 0xc0a00000 0xbff92e73
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 24 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0xcb800000 0xc0a00000 0xbff92e73 0x80800000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 28 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0xc0a00000 0xbff92e73 0x80800000 0x00000000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 32 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0xbff92e73 0x80800000 0x00000000 0x00800000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 36 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x80800000 0x00000000 0x00800000 0x3ff92e73
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 40 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x00000000 0x00800000 0x3ff92e73 0x40a00000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 44 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x00800000 0x3ff92e73 0x40a00000 0x4b800000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 48 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x3ff92e73 0x40a00000 0x4b800000 0x7f7fffff
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 52 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x40a00000 0x4b800000 0x7f7fffff 0x00000000
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 56 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x4b800000 0x7f7fffff 0x00000000 0xc21620c5
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 60 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x7f7fffff 0x00000000 0xc21620c5 0x75bc289b
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 64 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform mat2 expected0 0x00000000 0xc21620c5 0x75bc289b 0x54c1c081
+clear color 0.0 0.0 1.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 68 4
+probe all rgba 0.0 1.0 0.0 1.0
