@@ -220,7 +220,9 @@ class DEQPBaseTest(Test):
         """Rerun the command if X11 connection failure happens."""
         for _ in range(5):
             super(DEQPBaseTest, self)._run_command(*args, **kwargs)
-            if "FATAL ERROR: Failed to open display" not in self.result.err:
-                return
+            x_err_msg = "FATAL ERROR: Failed to open display"
+            if x_err_msg in self.result.err or x_err_msg in self.result.out:
+                continue
+            return
 
         raise TestRunError('Failed to connect to X server 5 times', 'fail')
