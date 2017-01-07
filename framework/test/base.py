@@ -376,6 +376,9 @@ class Test(object):
                 'Test run time exceeded timeout value ({} seconds)\n'.format(
                     self.timeout),
                 'timeout')
+        # LLVM prints colored text into stdout/stderr on error, which raises:
+        except UnicodeDecodeError as e:
+            raise TestRunError("UnicodeDecodeError.\n", 'crash')
 
         # The setter handles the bytes/unicode conversion
         self.result.out = out
