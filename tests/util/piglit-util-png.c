@@ -87,7 +87,7 @@ piglit_write_png(const char *filename,
 		break;
 	}
 
-	fp = fopen(filename, "w");
+	fp = fopen(filename, "wb");
 	if (!fp)
 		abortf("failed to open `%s'", filename);
 
