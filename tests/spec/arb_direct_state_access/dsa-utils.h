@@ -39,22 +39,6 @@ extern "C" {
 
 #include "piglit-util-gl.h"
 
-#define SUBTEST(error, global, ...) \
-do { \
-	bool local = piglit_check_gl_error((error)); \
-	global = global && local; \
-	piglit_report_subtest_result(local ? PIGLIT_PASS : PIGLIT_FAIL, \
-	                             __VA_ARGS__); \
-} while (0)
-
-#define SUBTESTCONDITION(condition, global, ...) \
-do { \
-	bool cond = (condition); \
-	global = global && cond; \
-	piglit_report_subtest_result(cond ? PIGLIT_PASS : PIGLIT_FAIL, \
-	                             __VA_ARGS__); \
-} while (0)
-
 GLuint dsa_create_program(GLenum target);
 
 void dsa_texture_with_unit(GLuint prog, GLuint unit);

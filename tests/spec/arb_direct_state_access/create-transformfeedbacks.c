@@ -64,19 +64,19 @@ piglit_display(void)
 
 	/* n is negative */
 	glCreateTransformFeedbacks(-1, ids);
-	SUBTEST(GL_INVALID_VALUE, pass, "n < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "n < 0");
 
 	/* Throw some valid inputs at glCreateTransformFeedbacks. */
 
 	/* n is zero */
 	glCreateTransformFeedbacks(0, NULL);
-	SUBTEST(GL_NO_ERROR, pass, "n == 0");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n == 0");
 
 	/* n is more than 1 */
 	glCreateTransformFeedbacks(10, ids);
-	SUBTEST(GL_NO_ERROR, pass, "n > 1");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n > 1");
 
-	SUBTESTCONDITION(glIsTransformFeedback(ids[2]), pass,
+	PIGLIT_SUBTEST_CONDITION(glIsTransformFeedback(ids[2]), pass,
 			"IsTransformFeedback()");
 
 	/* the default state is tested in the following piglit test:

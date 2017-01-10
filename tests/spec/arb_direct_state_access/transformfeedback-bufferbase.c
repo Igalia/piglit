@@ -146,25 +146,27 @@ piglit_display(void)
 
 	/* Fetch the number of bind points */
 	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &max_bind_points);
-	SUBTEST(GL_NO_ERROR, pass, "fetch maximum number of bind points");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "fetch maximum number of bind "
+			     "points");
 
 	/* bind a non-existing transform feedback BO */
 	glTransformFeedbackBufferBase(1337, 0, 0);
-	SUBTEST(GL_INVALID_OPERATION, pass,
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_OPERATION, pass,
 			"bind non-existing transform feedback BO");
 
 	/* bind a non-existing output BO */
 	glTransformFeedbackBufferBase(0, 0, 1337);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind a non-existing output BO");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "bind a non-existing "
+			     "output BO");
 
 	/* bind to a negative index */
 	glTransformFeedbackBufferBase(0, -1, xfb_buf[2]);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind negative index");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "bind negative index");
 
 	/* bind to an index == max */
 	glTransformFeedbackBufferBase(0, max_bind_points, xfb_buf[2]);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind to index == max_bind_points (%i)",
-			max_bind_points);
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "bind to index == "
+			     "max_bind_points (%i)", max_bind_points);
 
 	/* Set up the transform feedback buffer */
 	for (i = 0; i < 2; i++) {
@@ -216,7 +218,7 @@ piglit_display(void)
 		} else
 			printf("OK\n");
 	}
-	SUBTESTCONDITION(test, pass, "general test");
+	PIGLIT_SUBTEST_CONDITION(test, pass, "general test");
 
 	piglit_present_results();
 

@@ -71,46 +71,46 @@ piglit_display(void)
 
 	/* n is negative */
 	glCreateProgramPipelines(-1, ids);
-	SUBTEST(GL_INVALID_VALUE, pass, "n < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "n < 0");
 
 	/* Throw some valid inputs at glCreateProgramPipelines. */
 
 	/* n is zero */
 	glCreateProgramPipelines(0, NULL);
-	SUBTEST(GL_NO_ERROR, pass, "n == 0");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n == 0");
 
 	/* n is more than 1 */
 	glCreateProgramPipelines(10, ids);
-	SUBTEST(GL_NO_ERROR, pass, "n > 1");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n > 1");
 
 	/* test the default state of dsa-created program pipeline objects */
-	SUBTESTCONDITION(glIsProgramPipeline(ids[2]), pass,
+	PIGLIT_SUBTEST_CONDITION(glIsProgramPipeline(ids[2]), pass,
 			 "IsProgramPipeline()");
 
 	glGetProgramPipelineiv(ids[2], GL_ACTIVE_PROGRAM, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default active program(%d) == 0", param);
 
 	glGetProgramPipelineiv(ids[2], GL_VERTEX_SHADER, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default vertex shader program(%d) == 0", param);
 
 	glGetProgramPipelineiv(ids[2], GL_GEOMETRY_SHADER, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default geometry shader program(%d) == 0", param);
 
 	glGetProgramPipelineiv(ids[2], GL_FRAGMENT_SHADER, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default fragment shader program(%d) == 0", param);
 
 	if (piglit_is_extension_supported("GL_ARB_compute_shader")) {
 		glGetProgramPipelineiv(ids[2], GL_COMPUTE_SHADER, &param);
 		piglit_check_gl_error(GL_NO_ERROR);
-		SUBTESTCONDITION(param == 0, pass,
+		PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 				 "default compute shader program(%d) == 0",
 				 param);
 	} else {
@@ -121,13 +121,13 @@ piglit_display(void)
 	if (piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
 		glGetProgramPipelineiv(ids[2], GL_TESS_CONTROL_SHADER, &param);
 		piglit_check_gl_error(GL_NO_ERROR);
-		SUBTESTCONDITION(param == 0, pass,
+		PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 				 "default TCS(%d) == 0", param);
 
 		glGetProgramPipelineiv(ids[2], GL_TESS_EVALUATION_SHADER,
 				       &param);
 		piglit_check_gl_error(GL_NO_ERROR);
-		SUBTESTCONDITION(param == 0, pass,
+		PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 				 "default TES(%d) == 0", param);
 	} else {
 		piglit_report_subtest_result(PIGLIT_SKIP,
@@ -139,17 +139,17 @@ piglit_display(void)
 
 	glGetProgramPipelineiv(ids[2], GL_VALIDATE_STATUS, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_FALSE, pass,
+	PIGLIT_SUBTEST_CONDITION(param == GL_FALSE, pass,
 			 "default validate status(%d) == FALSE", param);
 
 	glGetProgramPipelineiv(ids[2], GL_INFO_LOG_LENGTH, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "startup log length(%d) == 0", param);
 
 	glGetObjectLabel(GL_PROGRAM_PIPELINE, ids[2], 11, &length, label);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(length == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(length == 0, pass,
 			 "default label size(%d) == 0", length);
 
 	glDeleteProgramPipelines(10, ids);

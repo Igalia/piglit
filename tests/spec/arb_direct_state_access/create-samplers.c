@@ -71,52 +71,52 @@ piglit_display(void)
 
 	/* n is negative */
 	glCreateSamplers(-1, ids);
-	SUBTEST(GL_INVALID_VALUE, pass, "n < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "n < 0");
 
 	/* Throw some valid inputs at glCreateSamplers. */
 
 	/* n is zero */
 	glCreateSamplers(0, NULL);
-	SUBTEST(GL_NO_ERROR, pass, "n == 0");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n == 0");
 
 	/* n is more than 1 */
 	glCreateSamplers(10, ids);
-	SUBTEST(GL_NO_ERROR, pass, "n > 1");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n > 1");
 
 	/* test the default state of dsa-created program pipeline objects */
-	SUBTESTCONDITION(glIsSampler(ids[2]), pass,
+	PIGLIT_SUBTEST_CONDITION(glIsSampler(ids[2]), pass,
 			 "IsSampler()");
 
 	glGetSamplerParameterfv(ids[2], GL_TEXTURE_BORDER_COLOR, bc);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(bc[0] == 0.0 && bc[1] == 0.0 && bc[2] == 0.0 &&
+	PIGLIT_SUBTEST_CONDITION(bc[0] == 0.0 && bc[1] == 0.0 && bc[2] == 0.0 &&
 			bc[3] == 0.0, pass,
 			 "default border color(%.02f, %.02f, %.02f, %.02f) "
 			 "== 0.0, 0.0, 0.0, 0.0", bc[0], bc[1], bc[2], bc[3]);
 
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_COMPARE_FUNC, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_LEQUAL, pass,
+	PIGLIT_SUBTEST_CONDITION(param == GL_LEQUAL, pass,
 			 "default compare function == LEQUAL");
 
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_COMPARE_MODE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_NONE, pass,
+	PIGLIT_SUBTEST_CONDITION(param == GL_NONE, pass,
 			 "default compare function == NONE");
 
 	glGetSamplerParameterfv(ids[2], GL_TEXTURE_LOD_BIAS, &paramf);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(paramf == 0.0, pass,
+	PIGLIT_SUBTEST_CONDITION(paramf == 0.0, pass,
 			 "default LOD bias(%f) == 0.0", paramf);
 
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_MAX_LOD, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 1000, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 1000, pass,
 			 "default maximum LOD(%d) == 1000", param);
 
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_MAG_FILTER, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_LINEAR, pass,
+	PIGLIT_SUBTEST_CONDITION(param == GL_LINEAR, pass,
 			 "default mag filter == LINEAR");
 
 	/* OpenGL core 4.5 specs says it depends if the texture is rectangular
@@ -125,17 +125,17 @@ piglit_display(void)
 	 */
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_MIN_FILTER, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_NEAREST_MIPMAP_LINEAR, pass,
+	PIGLIT_SUBTEST_CONDITION(param == GL_NEAREST_MIPMAP_LINEAR, pass,
 			 "default minimum filter == NEAREST");
 
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_MIN_LOD, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == -1000, pass,
+	PIGLIT_SUBTEST_CONDITION(param == -1000, pass,
 			 "default minimum LOD(%d) == -1000", param);
 
 	glGetObjectLabel(GL_SAMPLER, ids[2], 11, &length, label);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(length == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(length == 0, pass,
 			 "default label size(%d) == 0", length);
 
 	/* OpenGL core 4.5 specs says the following tests depend if the texture
@@ -145,13 +145,16 @@ piglit_display(void)
 	 */
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_WRAP_S, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_REPEAT, pass, "default wrap s == REPEAT");
+	PIGLIT_SUBTEST_CONDITION(param == GL_REPEAT, pass,
+				 "default wrap s == REPEAT");
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_WRAP_T, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_REPEAT, pass, "default wrap t == REPEAT");
+	PIGLIT_SUBTEST_CONDITION(param == GL_REPEAT, pass,
+				 "default wrap t == REPEAT");
 	glGetSamplerParameteriv(ids[2], GL_TEXTURE_WRAP_T, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_REPEAT, pass, "default wrap r == REPEAT");
+	PIGLIT_SUBTEST_CONDITION(param == GL_REPEAT, pass,
+				 "default wrap r == REPEAT");
 
 	/* clean up */
 	glDeleteSamplers(10, ids);

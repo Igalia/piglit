@@ -99,13 +99,13 @@ check_active_paused_state(const char *test_name)
 
 	glGetTransformFeedbackiv(0, GL_TRANSFORM_FEEDBACK_PAUSED, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == ctx.paused, pass, "%s: paused state valid",
-					 test_name);
+	PIGLIT_SUBTEST_CONDITION(param == ctx.paused, pass, "%s: paused state "
+				 "valid", test_name);
 
 	glGetTransformFeedbackiv(0, GL_TRANSFORM_FEEDBACK_ACTIVE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == ctx.active, pass, "%s: active state valid",
-					 test_name);
+	PIGLIT_SUBTEST_CONDITION(param == ctx.active, pass, "%s: active state "
+				 "valid", test_name);
 }
 
 void
@@ -120,14 +120,14 @@ check_binding_state(const char *test_name)
 					  GL_TRANSFORM_FEEDBACK_BUFFER_BINDING,
 					  i, &param);
 		piglit_check_gl_error(GL_NO_ERROR);
-		SUBTESTCONDITION(param == ctx.bo_state[i].binding, pass,
+		PIGLIT_SUBTEST_CONDITION(param == ctx.bo_state[i].binding, pass,
 				 "%s: bound buffer %i valid", test_name, i);
 
 		glGetTransformFeedbacki64_v(0,
 					    GL_TRANSFORM_FEEDBACK_BUFFER_START,
 					    i, &param64);
 		piglit_check_gl_error(GL_NO_ERROR);
-		SUBTESTCONDITION(param64 ==  ctx.bo_state[i].start, pass,
+		PIGLIT_SUBTEST_CONDITION(param64 ==  ctx.bo_state[i].start, pass,
 				"%s: bound buffer %i start valid", test_name,
 				 i);
 
@@ -135,7 +135,7 @@ check_binding_state(const char *test_name)
 					    GL_TRANSFORM_FEEDBACK_BUFFER_SIZE,
 					    i, &param64);
 		piglit_check_gl_error(GL_NO_ERROR);
-		SUBTESTCONDITION(param64 ==  ctx.bo_state[i].size, pass,
+		PIGLIT_SUBTEST_CONDITION(param64 ==  ctx.bo_state[i].size, pass,
 				 "%s: bound buffer %i size valid", test_name,
 				 i);
 	}
@@ -148,16 +148,16 @@ check_invalid_queries()
 	GLint param;
 
 	glGetTransformFeedbackiv(0, GL_TRANSFORM_FEEDBACK_BINDING, &param);
-	SUBTEST(GL_INVALID_ENUM, pass,
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass,
 		"glGetTransformFeedbackiv: fetch invalid attribute");
 
 	glGetTransformFeedbacki_v(0, GL_TRANSFORM_FEEDBACK_ACTIVE, 0, &param);
-	SUBTEST(GL_INVALID_ENUM, pass,
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass,
 		"glGetTransformFeedbacki_v: fetch invalid attribute");
 
 	glGetTransformFeedbacki64_v(0, GL_TRANSFORM_FEEDBACK_BUFFER_BINDING,
 				    0, &param64);
-	SUBTEST(GL_INVALID_ENUM, pass,
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass,
 		"glGetTransformFeedbacki64_v: fetch invalid attribute");
 }
 

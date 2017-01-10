@@ -73,20 +73,21 @@ piglit_display(void)
 
 	/* n is negative */
 	glCreateRenderbuffers(-1, ids);
-	SUBTEST(GL_INVALID_VALUE, pass, "n < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "n < 0");
 
 	/* Throw some valid inputs at glCreateRenderbuffers. */
 
 	/* n is zero */
 	glCreateRenderbuffers(0, NULL);
-	SUBTEST(GL_NO_ERROR, pass, "n == 0");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n == 0");
 
 	/* n is more than 1 */
 	glCreateRenderbuffers(10, ids);
-	SUBTEST(GL_NO_ERROR, pass, "n > 1");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n > 1");
 
 	/* test the default state of dsa-created render buffer objects */
-	SUBTESTCONDITION(glIsRenderbuffer(ids[2]), pass, "IsRenderbuffer()");
+	PIGLIT_SUBTEST_CONDITION(glIsRenderbuffer(ids[2]), pass,
+				 "IsRenderbuffer()");
 
 	glBindRenderbuffer(GL_RENDERBUFFER, ids[2]);
 	piglit_check_gl_error(GL_NO_ERROR);
@@ -94,66 +95,66 @@ piglit_display(void)
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_WIDTH, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default width(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_HEIGHT, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default height(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_INTERNAL_FORMAT, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_RGBA, pass,
+	PIGLIT_SUBTEST_CONDITION(param == GL_RGBA, pass,
 			 "default internal format == RGBA");
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_RED_SIZE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default red size(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_GREEN_SIZE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default green size(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_BLUE_SIZE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default blue size(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_ALPHA_SIZE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default alpha size(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_DEPTH_SIZE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default depth size(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_STENCIL_SIZE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default stencil size(%d) == 0", param);
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_SAMPLES, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass,
 			 "default no. of samples(%d) == 0", param);
 
 	glGetObjectLabel(GL_RENDERBUFFER, ids[2], 11, &length, label);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(length == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(length == 0, pass,
 			 "default label size(%d) == 0", length);
 
 	/* clean up */

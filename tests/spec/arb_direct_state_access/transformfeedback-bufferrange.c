@@ -148,34 +148,38 @@ piglit_display(void)
 
 	/* Fetch the number of bind points */
 	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &max_bind_points);
-	SUBTEST(GL_NO_ERROR, pass, "fetch maximum number of bind points");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass,
+			     "fetch maximum number of bind points");
 
 	/* bind a non-existing transform feedback BO */
 	glTransformFeedbackBufferRange(1337, 0, 0, 0, 4096);
-	SUBTEST(GL_INVALID_OPERATION, pass, "bind non-existing transform "
-					    "feedback BO");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_OPERATION, pass,
+			     "bind non-existing transform feedback BO");
 
 	/* bind a non-existing output BO */
 	glTransformFeedbackBufferRange(0, 0, 1337, 0, 4096);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind a non-existing output BO");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass,
+			     "bind a non-existing output BO");
 
 	/* bind to a negative index */
 	glTransformFeedbackBufferRange(0, -1, xfb_buf[2], 0, 4096);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind negative index");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "bind negative index");
 
 	/* bind to an index == max */
 	glTransformFeedbackBufferRange(0, max_bind_points, xfb_buf[2], 0,
 			4096);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind to index == max_bind_points "
-		"(%i)", max_bind_points);
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "bind to index == "
+			     "max_bind_points (%i)", max_bind_points);
 
 	/* bind at a non-aligned offset */
 	glTransformFeedbackBufferRange(0, 0, xfb_buf[2], 3, 4096);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind at a non-aligned offset");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass,
+			     "bind at a non-aligned offset");
 
 	/* bind with a non-aligned size */
 	glTransformFeedbackBufferRange(0, 0, xfb_buf[2], 0, 4095);
-	SUBTEST(GL_INVALID_VALUE, pass, "bind with a non-aligned size");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass,
+			     "bind with a non-aligned size");
 
 	/* Set up the transform feedback buffer */
 	for (i = 0; i < 2; i++) {
@@ -228,7 +232,7 @@ piglit_display(void)
 		} else
 			printf("OK\n");
 	}
-	SUBTESTCONDITION(test, pass, "general test");
+	PIGLIT_SUBTEST_CONDITION(test, pass, "general test");
 
 	piglit_present_results();
 

@@ -76,36 +76,37 @@ piglit_display(void)
 
 	/* n is negative */
 	glCreateQueries(GL_SAMPLES_PASSED, -1, ids);
-	SUBTEST(GL_INVALID_VALUE, pass, "n < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "n < 0");
 
 	/* invalid target */
 	glCreateQueries(GL_RGBA, 0, ids);
-	SUBTEST(GL_INVALID_ENUM, pass, "invalid target");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass, "invalid target");
 
 	/* Throw some valid inputs at glCreateQueries. */
 
 	/* n is zero */
 	glCreateQueries(GL_SAMPLES_PASSED, 0, NULL);
-	SUBTEST(GL_NO_ERROR, pass, "n == 0");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n == 0");
 
 	/* n is more than 1 */
 	glCreateQueries(GL_SAMPLES_PASSED, 10, ids);
-	SUBTEST(GL_NO_ERROR, pass, "n > 1");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "n > 1");
 
 	/* test the default state of dsa-created query objects */
-	SUBTESTCONDITION(glIsQuery(ids[2]), pass, "IsQuery()");
+	PIGLIT_SUBTEST_CONDITION(glIsQuery(ids[2]), pass, "IsQuery()");
 	glGetQueryObjectiv(ids[2], GL_QUERY_RESULT_AVAILABLE, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_TRUE, pass,
+	PIGLIT_SUBTEST_CONDITION(param == GL_TRUE, pass,
 			 "default AVAILABLE state(%d) == TRUE", param);
 	glGetQueryObjectiv(ids[2], GL_QUERY_RESULT, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == 0, pass, "default RESULT(%d) == 0", param);
+	PIGLIT_SUBTEST_CONDITION(param == 0, pass, "default RESULT(%d) == 0",
+				 param);
 
 	/* test the target */
 	glGetQueryObjectiv(ids[2], GL_QUERY_TARGET, &param);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(param == GL_SAMPLES_PASSED, pass, "TARGET(%s) == "
+	PIGLIT_SUBTEST_CONDITION(param == GL_SAMPLES_PASSED, pass, "TARGET(%s) == "
 			 "GL_SAMPLES_PASSED", piglit_get_gl_enum_name(param));
 
 	/* clean up */

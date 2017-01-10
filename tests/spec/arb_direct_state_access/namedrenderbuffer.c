@@ -108,54 +108,57 @@ piglit_display(void)
 
 	/* Check some various cases of errors */
 	glNamedRenderbufferStorageMultisample(1337, 0, GL_RGBA, 1024, 768);
-	SUBTEST(GL_INVALID_OPERATION, pass, "set unexisting renderbuffer");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_OPERATION, pass, "set unexisting "
+			     "renderbuffer");
 
 	glGetNamedRenderbufferParameteriv(1337, GL_RENDERBUFFER_WIDTH, &width);
-	SUBTEST(GL_INVALID_OPERATION, pass, "get unexisting renderbuffer");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_OPERATION, pass, "get unexisting "
+			     "renderbuffer");
 
 	glGetNamedRenderbufferParameteriv(ids[0], GL_TRUE, &width);
-	SUBTEST(GL_INVALID_ENUM, pass, "get unexisting parameter");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass, "get unexisting parameter");
 
 	/* Test retrieving information on an un-initialized buffer */
 	glGenRenderbuffers(1, &genID);
 	piglit_check_gl_error(GL_NO_ERROR);
 
 	glGetNamedRenderbufferParameteriv(1337, GL_RENDERBUFFER_WIDTH, &width);
-	SUBTEST(GL_INVALID_OPERATION, pass, "get uninitialized renderbuffer");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_OPERATION, pass, "get uninitialized "
+			     "renderbuffer");
 
 	/* Test the width/heights limits */
 	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &size);
 
 	glNamedRenderbufferStorageMultisample(ids[0], 0, GL_RGBA, -1, 768);
-	SUBTEST(GL_INVALID_VALUE, pass, "width < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "width < 0");
 
 	glNamedRenderbufferStorageMultisample(ids[0], 0, GL_RGBA, size + 1,
 					      768);
-	SUBTEST(GL_INVALID_VALUE, pass, "width == MAX_RENDER_SIZE(%d) + 1",
-		size);
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass,
+			     "width == MAX_RENDER_SIZE(%d) + 1", size);
 
 	glNamedRenderbufferStorageMultisample(ids[0], 0, GL_RGBA, 1024, -1);
-	SUBTEST(GL_INVALID_VALUE, pass, "height < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "height < 0");
 
 	glNamedRenderbufferStorageMultisample(ids[0], 0, GL_RGBA, 1024,
 					      size + 1);
-	SUBTEST(GL_INVALID_VALUE, pass, "height == MAX_RENDER_SIZE(%d) + 1",
-		size);
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass,
+			     "height == MAX_RENDER_SIZE(%d) + 1", size);
 
 	/* Test the samples limits */
 	glGetIntegerv(GL_MAX_SAMPLES, &size);
 
 	glNamedRenderbufferStorageMultisample(ids[0], -1, GL_RGBA, 1024, 768);
-	SUBTEST(GL_INVALID_VALUE, pass, "samples < 0");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "samples < 0");
 
 	glNamedRenderbufferStorageMultisample(ids[0], size + 1, GL_RGBA, 1024,
 					      768);
-	SUBTEST(GL_INVALID_OPERATION, pass, "samples == MAX_SAMPLES(%d) + 1",
-		size);
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_OPERATION, pass,
+			     "samples == MAX_SAMPLES(%d) + 1", size);
 
 	/* Misc tests */
 	glNamedRenderbufferStorageMultisample(ids[0], 0, GL_TRUE, 1024, 768);
-	SUBTEST(GL_INVALID_ENUM, pass, "invalid internalformat");
+	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass, "invalid internalformat");
 
 	/* bind one buffer so as we can check we never change its state */
 	glBindRenderbuffer(GL_RENDERBUFFER, ids[1]);
@@ -164,18 +167,18 @@ piglit_display(void)
 	/* Test to change the parameters of an unbound renderbuffer */
 	glNamedRenderbufferStorageMultisample(ids[0], 0, GL_RGBA, 1024,
 					      768);
-	SUBTEST(GL_NO_ERROR, pass, "update unbound buffer");
+	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass, "update unbound buffer");
 
 	glGetNamedRenderbufferParameteriv(ids[0], GL_RENDERBUFFER_WIDTH,
 			&width);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(width == 1024, pass,
+	PIGLIT_SUBTEST_CONDITION(width == 1024, pass,
 			 "width of the unbound buffer updated");
 
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH,
 			&width);
 	piglit_check_gl_error(GL_NO_ERROR);
-	SUBTESTCONDITION(width == 0, pass,
+	PIGLIT_SUBTEST_CONDITION(width == 0, pass,
 			 "width of the bound buffer unchanged");
 
 	/* clean up */

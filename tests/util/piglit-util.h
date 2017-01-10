@@ -185,6 +185,29 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define ALIGN(value, alignment) (((value) + alignment - 1) & ~(alignment - 1))
 
+/**
+ * Utility macro that checks for a given opengl error, and report a
+ * subtest result.
+ */
+#define PIGLIT_SUBTEST_ERROR(error, global, ...) \
+do { \
+	bool local = piglit_check_gl_error((error)); \
+	global = global && local; \
+	piglit_report_subtest_result(local ? PIGLIT_PASS : PIGLIT_FAIL, \
+				     __VA_ARGS__);			\
+} while (0)
+
+/**
+ * Utility macro that checks for a given condition, and report a
+ * subtest result.
+ */
+#define PIGLIT_SUBTEST_CONDITION(condition, global, ...) \
+do { \
+	bool cond = (condition); \
+	global = global && cond; \
+	piglit_report_subtest_result(cond ? PIGLIT_PASS : PIGLIT_FAIL, \
+				     __VA_ARGS__);		       \
+} while (0)
 
 static inline unsigned
 log2u(unsigned v)
