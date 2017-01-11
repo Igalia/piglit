@@ -1315,6 +1315,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 4.5')) as g:
     g(['gl-4.5-named-framebuffer-draw-buffers-errors'], 'named-framebuffer-draw-buffers-errors')
+    g(['gl-4.5-named-framebuffer-read-buffer-errors'], 'named-framebuffer-read-buffer-errors')
 
 with profile.test_list.group_manager(
         PiglitGLTest,

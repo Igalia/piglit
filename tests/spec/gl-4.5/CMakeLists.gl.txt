@@ -9,5 +9,6 @@ link_libraries (
 )
 
 piglit_add_executable (gl-4.5-named-framebuffer-draw-buffers-errors named-framebuffer-draw-buffers-errors.c)
+piglit_add_executable (gl-4.5-named-framebuffer-read-buffer-errors named-framebuffer-read-buffer-errors.c)
 
 # vim: ft=cmake:
