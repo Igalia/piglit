@@ -84,6 +84,8 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
+	/* Selecting the default framebuffer */
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	for (i = 0; i < ARRAY_SIZE(valids); i++) {
 		GLenum err = 0;
 		glDrawBuffers(1, &valids[i]);
