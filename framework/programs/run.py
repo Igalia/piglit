@@ -220,7 +220,7 @@ def _run_parser(input_):
     return parser.parse_args(unparsed)
 
 
-def _create_metadata(args, name):
+def _create_metadata(args, name, forced_test_list):
     """Create and return a metadata dict for Backend.initialize()."""
     opts = dict(options.OPTIONS)
     opts['profile'] = args.test_profile
@@ -232,6 +232,7 @@ def _create_metadata(args, name):
     opts['monitoring'] = args.monitored
     if args.platform:
         opts['platform'] = args.platform
+    opts['forced_test_list'] = forced_test_list
 
     metadata = {'options': opts}
     metadata['name'] = name
@@ -308,18 +309,8 @@ def run(input_):
             'Cannot overwrite existing folder without the -o/--overwrite '
             'option being set.')
 
-    backend = backends.get_backend(args.backend)(
-        args.results_path,
-        junit_suffix=args.junit_suffix,
-        junit_subtests=args.junit_subtests)
-    backend.initialize(_create_metadata(
-        args, args.name or path.basename(args.results_path)))
-
-    profiles = [profile.load_test_profile(p) for p in args.test_profile]
-    for p in profiles:
-        p.results_dir = args.results_path
-
     # If a test list is provided then set the forced_test_list value.
+    forced_test_list = None
     if args.test_list:
         if len(args.test_profile) != 1:
             raise exceptions.PiglitFatalError(
@@ -327,7 +318,22 @@ def run(input_):
 
         with open(args.test_list) as test_list:
             # Strip newlines
-            profiles[0].forced_test_list = [t.strip() for t in test_list]
+            forced_test_list = [t.strip() for t in test_list]
+
+    backend = backends.get_backend(args.backend)(
+        args.results_path,
+        junit_suffix=args.junit_suffix,
+        junit_subtests=args.junit_subtests)
+    backend.initialize(_create_metadata(
+        args, args.name or path.basename(args.results_path), forced_test_list))
+
+    profiles = [profile.load_test_profile(p) for p in args.test_profile]
+    for p in profiles:
+        p.results_dir = args.results_path
+
+    # Set the forced_test_list, if applicable
+    if forced_test_list:
+        profiles[0].forced_test_list = forced_test_list
 
     # Set the dmesg type
     if args.dmesg:
@@ -423,6 +429,9 @@ def resume(input_):
         if results.options['include_filter']:
             p.filters.append(
                 profile.RegexFilter(results.options['include_filter']))
+
+        if results.options['forced_test_list']:
+            p.forced_test_list = results.options['forced_test_list']
 
     # This is resumed, don't bother with time since it won't be accurate anyway
     profile.run(
