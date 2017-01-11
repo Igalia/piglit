@@ -4505,6 +4505,7 @@ with profile.test_list.group_manager(
     g(['egl-create-largest-pbuffer-surface'],
       'largest possible eglCreatePbufferSurface and then glClear',
       run_concurrent=False)
+    g(['egl-invalid-attr'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
