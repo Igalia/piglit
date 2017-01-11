@@ -77,6 +77,13 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	unsigned i;
 
+	if (piglit_get_gl_version() >= 40) {
+		/* Behaviour/error list changed on OpenGL 4.0, so we
+		 * let the equivalent 4.x test to test it.
+		 */
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	for (i = 0; i < ARRAY_SIZE(valids); i++) {
 		GLenum err = 0;
 		glDrawBuffers(1, &valids[i]);
