@@ -3732,7 +3732,7 @@ recreate_gl_context(char *exec_arg, int param_argc, char **param_argv)
 static bool
 validate_current_gl_context(const char *filename)
 {
-	struct piglit_gl_test_config config = {};
+	struct piglit_gl_test_config config = { 0 };
 
 	config.window_width = DEFAULT_WINDOW_WIDTH;
 	config.window_height = DEFAULT_WINDOW_HEIGHT;
