@@ -1453,7 +1453,7 @@ create_test_clear_program(const struct format_info *base,
 	GLuint prog;
 	const char *sampler = "";
 	const char *conv = "";
-	unsigned expected[4] = {};
+	unsigned expected[4] = { 0 };
 	unsigned i;
 	unsigned base_num_components = get_num_components(base);
 	bool test_nan = false;
