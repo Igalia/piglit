@@ -1,0 +1,35 @@
+# Uniforms
+
+[require]
+GL >= 4.4
+GLSL >= 4.40
+
+[vertex shader]
+#version 440
+precision highp float;
+layout(location=0) in vec2 inPosition;
+layout(binding=1, std140) uniform uniform0_block {float uniform0_a; float uniform0_b; } sub;
+
+flat out vec4 fragColor;
+
+void main(void)
+{
+  fragColor = vec4(0.0, sub.uniform0_a, 0.0, 1.0) + vec4(0.0, sub.uniform0_b, 0.0, 1.0);
+
+  gl_Position = vec4(inPosition, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 440
+precision highp float;
+layout(location=0) out vec4 outColor;
+flat in vec4 fragColor;
+layout(binding=3, std140) uniform uniform0_block {float uniform0_a; float uniform0_b; } fub;
+
+void main(void)
+{
+  outColor = fragColor + vec4(0.0, fub.uniform0_a, 0.0, 1.0) + vec4(0.0, fub.uniform0_b, 0.0, 1.0);
+}
+
+[test]
+link success
