@@ -59,6 +59,7 @@ import pytest
     'gen_shader_bit_encoding_tests',
     'gen_shader_framebuffer_fetch_tests',
     'gen_shader_image_load_store_tests',
+    'gen_shader_intel_conservative_rasterization',
     'gen_shader_precision_tests',
     'gen_tcs_input_tests',
     'gen_tes_input_tests',
