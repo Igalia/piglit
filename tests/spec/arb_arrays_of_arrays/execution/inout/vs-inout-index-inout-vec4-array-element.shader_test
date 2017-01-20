@@ -1,7 +1,9 @@
 [require]
 GLSL >= 1.20
+GL_ARB_arrays_of_arrays
 
 [vertex shader]
+#extension GL_ARB_arrays_of_arrays : enable
 
 uniform int u = 1;
 varying vec4 color;
@@ -14,11 +16,12 @@ void func(inout int i, inout float f)
 
 void main()
 {
-  vec4 v[] = vec4[](vec4(0.), vec4(0.));
+  vec4 v[2][2] = vec4[2][2](vec4[2](vec4(0.), vec4(0.)),
+                            vec4[2](vec4(0.), vec4(0.)));
   int i = u;
 
-  func(i, v[1][i]);
-  color = v[1];
+  func(i, v[1][i][1]);
+  color = v[1][1];
   gl_Position = gl_Vertex;
 }
 
