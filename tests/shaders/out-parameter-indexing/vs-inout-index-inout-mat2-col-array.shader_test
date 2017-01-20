@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+uniform int u = 1;
+varying vec4 color;
+
+void func(inout int i, inout float f)
+{
+  i = 0;
+  f = 1.;
+}
+
+void main()
+{
+  mat2 m = mat2(0.);
+  ivec4[] n = ivec4[](ivec4(0, 1, 1, 1), ivec4(1, 0, 0, 0));
+  int i = u;
+
+  func(i, m[n[i].x][1]);
+  color = vec4(m[1].x, m[1].y, m[0].x, m[0].y);
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0. 1. 0. 0.
