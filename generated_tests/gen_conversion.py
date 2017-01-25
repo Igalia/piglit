@@ -265,7 +265,7 @@ class TestTuple(object):
 
     def __init__(self, ver, stage,
                  first_dimension, second_dimension,
-                 basic_type, names_only):
+                 basic_type, target_type, names_only):
         assert stage in ('vert', 'geom', 'frag')
         assert first_dimension in ('1', '2', '3', '4')
         assert second_dimension in ('1', '2', '3', '4')
@@ -274,6 +274,7 @@ class TestTuple(object):
         self._ver = ver
         self._stage = stage
         self._basic_type = basic_type
+        self._target_type = target_type
         self._names_only = names_only
         self._double_type = ''
         self._conversion_type = ''
@@ -350,6 +351,7 @@ class RegularTestTuple(TestTuple):
         stages = ['vert', 'geom', 'frag']
         dimensions = ['1', '2', '3', '4']
         basic_types = ['b', 'u', 'i', 'f']
+        target_types = ['d']
         glsl_ver = ['GL_ARB_gpu_shader_fp64', '400']
 
         if not names_only:
@@ -357,26 +359,29 @@ class RegularTestTuple(TestTuple):
             for ver, test_type in itertools.product(glsl_ver, test_types):
                 utils.safe_makedirs(get_dir_name(ver, test_type))
 
-        for ver, stage, first_dimension, second_dimension, basic_type in itertools.product(
+        for ver, stage, first_dimension, second_dimension, basic_type, target_type in itertools.product(
                 glsl_ver,
                 stages,
                 dimensions,
                 dimensions,
-                basic_types):
-            if not (first_dimension != '1' and (second_dimension == '1' or basic_type != 'f')):
+                basic_types,
+                target_types):
+            if (not (first_dimension != '1' and (second_dimension == '1' or basic_type != 'f')) and
+                (basic_type not in target_types or basic_type < target_type)):
                 yield RegularTestTuple(ver, stage,
                                        first_dimension, second_dimension,
-                                       basic_type, names_only)
+                                       basic_type, target_type, names_only)
 
     def __init__(self, ver, stage,
                  first_dimension, second_dimension,
-                 basic_type, names_only):
+                 basic_type, target_type, names_only):
         assert ver in ('GL_ARB_gpu_shader_fp64', '400')
         assert basic_type in ('b', 'u', 'i', 'f')
+        assert target_type in ('d')
         assert not (first_dimension != '1' and (second_dimension == '1' or basic_type != 'f'))
         super(RegularTestTuple, self).__init__(ver, stage,
                                                first_dimension, second_dimension,
-                                               basic_type, names_only)
+                                               basic_type, target_type, names_only)
 
     def _gen_comp_test(self, from_type, to_type, converted_from):
         filename = os.path.join(
@@ -519,7 +524,7 @@ class ZeroSignTestTuple(TestTuple):
         assert not (first_dimension != '1' and second_dimension == '1')
         super(ZeroSignTestTuple, self).__init__(ver, stage,
                                                 first_dimension, second_dimension,
-                                                basic_type, names_only)
+                                                basic_type, 'd', names_only)
 
     def __gen_zero_sign_exec_test(self, from_type, to_type,
                                   uniform_from_type, uniform_to_type,
