@@ -1,6 +1,6 @@
 ## coding=utf-8
 <%def name="versioning()"><%
-    if ver == 'GL_ARB_gpu_shader_fp64':
+    if ver == 'GL_ARB_gpu_shader_fp64' or ver == 'GL_ARB_gpu_shader_int64':
         glsl_version_int = '150'
     else:
         glsl_version_int = ver

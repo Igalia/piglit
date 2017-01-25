@@ -21,7 +21,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-"""Generate fp64 types conversion tests."""
+"""Generate fp64 and int64 types conversion tests."""
 
 from __future__ import print_function, division, absolute_import
 import abc
@@ -122,6 +122,53 @@ FLOAT_VALUES                = ['0xff7fffff', # Negative maximum normalized
                                '0x4b800000', # +16777216.0
                                '0x7f7fffff'] # Positive maximum normalized
 
+FLOAT_INT64_VALUES          = ['0xcf800000', # -4294967296.0
+                               '0xcb800000', # -16777216.0
+                               '0xc0a00000', # -5.0
+                               '0xbff92e73', # -1.9467300176620483
+                               '0x80800000', # Negative minimum normalized
+                               '0x807fffff', # Negative maximum denormalized
+                               '0x80000001', # Negative minimum denormalized
+                               '0x00000001', # Positive minimum denormalized
+                               '0x007fffff', # Positive maximum denormalized
+                               '0x00800000', # Positive minimum normalized
+                               '0x3ff92e73', # +1.9467300176620483
+                               '0x40a00000', # +5.0
+                               '0x4b800000', # +16777216.0
+                               '0x4f800000'] # +4294967296.0
+
+FLOAT_UINT64_VALUES         = ['0x00000001', # Positive minimum denormalized
+                               '0x007fffff', # Positive maximum denormalized
+                               '0x00800000', # Positive minimum normalized
+                               '0x3ff92e73', # +1.9467300176620483
+                               '0x40a00000', # +5.0
+                               '0x4b800000', # +16777216.0
+                               '0x4f800000'] # +4294967296.0
+
+UINT64_VALUES               = ['0', # Minimum
+                               '5',
+                               '2147483647', # Signed int32 low frontier
+                               '2147483648', # Signed int32 up frontier
+                               '4294967295', # Maximum unsigned int32
+                               '4294967296',
+                               '9223372036854775807', # Signed int64 low frontier
+                               '9223372036854775808', # Signed int64 up frontier
+                               '18446744073709551615'] # Maximum
+
+INT64_VALUES                = ['-9223372036854775808', # Minimum
+                               '-2147483649',
+                               '-2147483648',
+                               '-5',
+                               '-1',
+                               '0',
+                               '1',
+                               '5',
+                               '2147483647', # Signed int32 low frontier
+                               '2147483648', # Signed int32 up frontier
+                               '4294967295', # Maximum unsigned int32
+                               '4294967296',
+                               '9223372036854775807'] # Maximum
+
 UINT_VALUES                 = ['0', # Minimum
                                '5',
                                '2147483647', # Signed int low frontier
@@ -206,10 +253,93 @@ class TestTuple(object):
         return TestTuple.double_to_hex(double_value)
 
     @staticmethod
+    def float_hex_to_int64_str(hstr):
+        """Returns the int64 string representation from a float32
+           hexadecimal representation.
+        """
+        assert isinstance(hstr, str)
+        x = TestTuple.hex_to_float(hstr)
+        if x > np.iinfo(np.dtype('int64')).max:
+            return str(np.iinfo(np.dtype('int64')).max)
+        if x < np.iinfo(np.dtype('int64')).min:
+            return str(np.iinfo(np.dtype('int64')).min)
+        return str(int(x))
+
+    @staticmethod
+    def float_hex_to_uint64_str(hstr):
+        """Returns the uint64 string representation from a float32
+           hexadecimal representation.
+        """
+        assert isinstance(hstr, str)
+        x = TestTuple.hex_to_float(hstr)
+        if x > np.iinfo(np.dtype('uint64')).max:
+            return str(np.iinfo(np.dtype('uint64')).max)
+        if x < np.iinfo(np.dtype('uint64')).min:
+            return str(np.iinfo(np.dtype('uint64')).min)
+        return str(int(x))
+
+    @staticmethod
+    def int_str_to_bool_str(istr):
+        """Returns a bool/integer string from an (arbitrary size) integet string."""
+        assert isinstance(istr, str)
+        return str(int(bool(int(istr))))
+
+    @staticmethod
+    def int_str_to_float_hex(istr):
+        """Returns a float32 hexadecimal representation from an (arbitrary size) integer string."""
+        assert isinstance(istr, str)
+        return TestTuple.float_to_hex(np.float32(int(istr)))
+
+    @staticmethod
+    def int_str_to_double_hex(istr):
+        """Returns a float64 hexadecimal representation from an (arbitrary size) integer string."""
+        assert isinstance(istr, str)
+        return TestTuple.double_to_hex(float(istr))
+
+    @staticmethod
     def int_str_to_double_str(istr):
-        """Returns a float64 string from an int32 string."""
+        """Returns a float64 string from an (arbitrary size) integer string."""
         assert isinstance(istr, str)
         return str(float(istr))
+
+    @staticmethod
+    def int_str_to_int32_str(istr):
+        """Returns an int32 string from an (arbitrary size) integer string."""
+        x = int(istr) & (2**32 - 1)
+        if x >= 2**31:
+            x -= 2**32
+        return str(x)
+
+    @staticmethod
+    def int_str_to_uint32_str(istr):
+        """Returns an uint32 string from an (arbitrary size) integer string."""
+        x = int(istr) & (2**32 - 1)
+        return str(x)
+
+    @staticmethod
+    def int_str_to_int64_str(istr):
+        """Returns an int64 string from an (arbitrary size) integer string."""
+        x = int(istr) & (2**64 - 1)
+        if x >= 2**63:
+            x -= 2**64
+        return str(x)
+
+    @staticmethod
+    def int_str_to_uint64_str(istr):
+        """Returns an uint64 string from an (arbitrary size) integer string."""
+        x = int(istr) & (2**64 - 1)
+        return str(x)
+
+    @staticmethod
+    def int_str_to_type_str(target_type):
+        """Returns a function for converting an int string to a string for the given type."""
+        assert target_type in ('d', 'i64', 'u64')
+        if target_type == 'd':
+            return TestTuple.int_str_to_double_str
+        elif target_type == 'i64':
+            return TestTuple.int_str_to_int64_str
+        elif target_type == 'u64':
+            return TestTuple.int_str_to_uint64_str
 
     @staticmethod
     def double_hex_to_bool_str(hstr):
@@ -263,6 +393,32 @@ class TestTuple(object):
         float_double = np.float32(temp)
         return TestTuple.float_to_hex(float_double)
 
+    @staticmethod
+    def double_hex_to_int64_str(hstr):
+        """Returns the int64 string representation from a float64
+           hexadecimal representation.
+        """
+        assert isinstance(hstr, str)
+        x = TestTuple.hex_to_double(hstr)
+        if x > np.iinfo(np.dtype('int64')).max:
+            return str(np.iinfo(np.dtype('int64')).max)
+        if x < np.iinfo(np.dtype('int64')).min:
+            return str(np.iinfo(np.dtype('int64')).min)
+        return str(int(x))
+
+    @staticmethod
+    def double_hex_to_uint64_str(hstr):
+        """Returns the uint64 string representation from a float64
+           hexadecimal representation.
+        """
+        assert isinstance(hstr, str)
+        x = TestTuple.hex_to_double(hstr)
+        if x > np.iinfo(np.dtype('uint64')).max:
+            return str(np.iinfo(np.dtype('uint64')).max)
+        if x < np.iinfo(np.dtype('uint64')).min:
+            return str(np.iinfo(np.dtype('uint64')).min)
+        return str(int(x))
+
     def __init__(self, ver, stage,
                  first_dimension, second_dimension,
                  basic_type, target_type, names_only):
@@ -286,6 +442,8 @@ class TestTuple(object):
         if ver.startswith('GL_'):
             if basic_type == 'd' or target_type == 'd':
                 self._extensions.append('GL_ARB_gpu_shader_fp64')
+            if basic_type in ('i64', 'u64') or target_type in ('i64', 'u64'):
+                self._extensions.append('GL_ARB_gpu_shader_int64')
 
         if first_dimension != '1':
             dimensional_type = 'mat' + first_dimension
@@ -306,16 +464,27 @@ class TestTuple(object):
                 self._conversion_type = 'uint'
             elif basic_type == 'f':
                 self._conversion_type = 'float'
-            self._target_full_type = 'double'
+            elif basic_type == 'd':
+                self._conversion_type = 'double'
+            elif basic_type == 'i64':
+                self._conversion_type = 'int64_t'
+            elif basic_type == 'u64':
+                self._conversion_type = 'uint64_t'
             if self._uniform_type == '':
                 self._uniform_type = self._conversion_type
+            if target_type == 'd':
+                self._target_full_type = 'double'
+            elif target_type == 'i64':
+                self._target_full_type = 'int64_t'
+            elif target_type == 'u64':
+                self._target_full_type = 'uint64_t'
         else:
             self._conversion_type = (basic_type if basic_type != 'f' else '') + dimensional_type
             if basic_type == 'b':
                 self._uniform_type = 'i' + dimensional_type
             else:
                 self._uniform_type = self._conversion_type
-            self._target_full_type = 'd' + dimensional_type
+            self._target_full_type = target_type + dimensional_type
 
     @abc.abstractmethod
     def _gen_to_target(self):
@@ -355,9 +524,9 @@ class RegularTestTuple(TestTuple):
         assert isinstance(names_only, bool)
         stages = ['vert', 'geom', 'frag']
         dimensions = ['1', '2', '3', '4']
-        basic_types = ['b', 'u', 'i', 'f']
-        target_types = ['d']
-        glsl_ver = ['GL_ARB_gpu_shader_fp64', '400']
+        basic_types = ['b', 'u', 'i', 'f', 'd', 'i64', 'u64']
+        target_types = ['d', 'i64', 'u64']
+        glsl_ver = ['GL_ARB_gpu_shader_int64', 'GL_ARB_gpu_shader_fp64', '400']
 
         if not names_only:
             test_types = ['compiler', 'execution']
@@ -371,8 +540,11 @@ class RegularTestTuple(TestTuple):
                 dimensions,
                 basic_types,
                 target_types):
-            if (not (first_dimension != '1' and (second_dimension == '1' or basic_type != 'f')) and
-                (basic_type not in target_types or basic_type < target_type)):
+            has_int64 = basic_type in ('i64', 'u64') or target_type in ('i64', 'u64')
+            if (not (first_dimension != '1' and
+                     (second_dimension == '1' or basic_type not in ('f', 'd') or target_type != 'd')) and
+                (basic_type not in target_types or basic_type < target_type) and
+                ((ver == 'GL_ARB_gpu_shader_int64') == has_int64)):
                 yield RegularTestTuple(ver, stage,
                                        first_dimension, second_dimension,
                                        basic_type, target_type, names_only)
@@ -380,10 +552,11 @@ class RegularTestTuple(TestTuple):
     def __init__(self, ver, stage,
                  first_dimension, second_dimension,
                  basic_type, target_type, names_only):
-        assert ver in ('GL_ARB_gpu_shader_fp64', '400')
-        assert basic_type in ('b', 'u', 'i', 'f')
-        assert target_type in ('d')
-        assert not (first_dimension != '1' and (second_dimension == '1' or basic_type != 'f'))
+        assert ver in ('GL_ARB_gpu_shader_int64', 'GL_ARB_gpu_shader_fp64', '400')
+        assert basic_type in ('b', 'u', 'i', 'f', 'd', 'i64', 'u64')
+        assert target_type in ('d', 'i64', 'u64')
+        assert not (first_dimension != '1' and
+                    (second_dimension == '1' or basic_type not in ('f', 'd') or target_type != 'd'))
         super(RegularTestTuple, self).__init__(ver, stage,
                                                first_dimension, second_dimension,
                                                basic_type, target_type, names_only)
@@ -435,21 +608,45 @@ class RegularTestTuple(TestTuple):
         explicit = 'implicit'
 
         if self._basic_type == 'b':
+            conversion_values = BOOL_VALUES
+            conversion_function = TestTuple.int_str_to_type_str(self._target_type)
+        elif self._basic_type == 'i':
+            conversion_values = INT_VALUES
+            conversion_function = TestTuple.int_str_to_type_str(self._target_type)
+        elif self._basic_type == 'u':
+            conversion_values = UINT_VALUES
+            conversion_function = TestTuple.int_str_to_type_str(self._target_type)
+        elif self._basic_type == 'f':
+            if self._target_type == 'd':
+                conversion_values = FLOAT_INFS + FLOAT_NEG_ZERO + FLOAT_POS_ZERO + FLOAT_VALUES
+                conversion_function = TestTuple.float_hex_to_double_hex
+            elif self._target_type == 'i64':
+                conversion_values = FLOAT_POS_ZERO + FLOAT_INT64_VALUES
+                conversion_function = TestTuple.float_hex_to_int64_str
+            elif self._target_type == 'u64':
+                conversion_values = FLOAT_POS_ZERO + FLOAT_UINT64_VALUES
+                conversion_function = TestTuple.float_hex_to_uint64_str
+        elif self._basic_type == 'd':
+            if self._target_type == 'i64':
+                conversion_values = DOUBLE_DENORMAL_VALUES + DOUBLE_NORMAL_VALUES + DOUBLE_INT_VALUES
+                conversion_function = TestTuple.double_hex_to_int64_str
+            elif self._target_type == 'u64':
+                conversion_values = DOUBLE_DENORMAL_VALUES + DOUBLE_NORMAL_VALUES + DOUBLE_UINT_VALUES
+                conversion_function = TestTuple.double_hex_to_uint64_str
+        elif self._basic_type in ('i64', 'u64'):
+            if self._basic_type == 'i64':
+                conversion_values = INT64_VALUES
+            else:
+                conversion_values = UINT64_VALUES
+            conversion_function = TestTuple.int_str_to_type_str(self._target_type)
+
+        if (self._basic_type == 'b' or
+            (self._basic_type in ('f', 'd') and self._target_type in ('i64', 'u64')) or
+            (self._basic_type == 'u' and self._target_type == 'i64')):
             explicit = 'explicit'
             self._gen_comp_test(self._conversion_type, self._target_full_type,
                                 converted_from)
             converted_from = self._target_full_type + '(from)'
-            conversion_values = BOOL_VALUES
-            conversion_function = TestTuple.int_str_to_double_str
-        elif self._basic_type == 'i':
-            conversion_values = INT_VALUES
-            conversion_function = TestTuple.int_str_to_double_str
-        elif self._basic_type == 'u':
-            conversion_values = UINT_VALUES
-            conversion_function = TestTuple.int_str_to_double_str
-        elif self._basic_type == 'f':
-            conversion_values = FLOAT_INFS + FLOAT_NEG_ZERO + FLOAT_POS_ZERO + FLOAT_VALUES
-            conversion_function = TestTuple.float_hex_to_double_hex
 
         conversions = []
         for value in conversion_values:
@@ -463,27 +660,54 @@ class RegularTestTuple(TestTuple):
 
     def _gen_from_target(self):
         converted_from = 'from'
-        self._gen_comp_test(self._target_full_type, self._conversion_type,
-                            converted_from)
+        explicit = 'implicit'
 
-        converted_from = self._conversion_type + '(from)'
-        explicit = 'explicit'
+        if self._target_type == 'd':
+            if self._basic_type == 'b':
+                conversion_values = DOUBLE_INFS + DOUBLE_NORMAL_VALUES + DOUBLE_BOOL_VALUES
+                conversion_function = TestTuple.double_hex_to_bool_str
+            elif self._basic_type == 'i':
+                conversion_values = DOUBLE_DENORMAL_VALUES + DOUBLE_NORMAL_VALUES + DOUBLE_INT_VALUES
+                conversion_function = TestTuple.double_hex_to_int_str
+            elif self._basic_type == 'u':
+                conversion_values = DOUBLE_DENORMAL_VALUES + DOUBLE_NORMAL_VALUES + DOUBLE_UINT_VALUES
+                conversion_function = TestTuple.double_hex_to_uint_str
+            elif self._basic_type == 'f':
+                conversion_values = DOUBLE_INFS + DOUBLE_FLOAT_INFS + DOUBLE_FLOAT_VALUES
+                conversion_function = TestTuple.double_hex_to_float_hex
+            conversion_values = DOUBLE_NEG_ZERO + DOUBLE_POS_ZERO + conversion_values
+        elif self._target_type in ('i64', 'u64'):
+            if self._target_type == 'i64':
+                conversion_values = INT64_VALUES
+            elif self._target_type == 'u64':
+                conversion_values = UINT64_VALUES
 
-        if self._basic_type == 'b':
-            conversion_values = DOUBLE_INFS + DOUBLE_NORMAL_VALUES + DOUBLE_BOOL_VALUES
-            conversion_function = TestTuple.double_hex_to_bool_str
-        elif self._basic_type == 'i':
-            conversion_values = DOUBLE_DENORMAL_VALUES + DOUBLE_NORMAL_VALUES + DOUBLE_INT_VALUES
-            conversion_function = TestTuple.double_hex_to_int_str
-        elif self._basic_type == 'u':
-            conversion_values = DOUBLE_DENORMAL_VALUES + DOUBLE_NORMAL_VALUES + DOUBLE_UINT_VALUES
-            conversion_function = TestTuple.double_hex_to_uint_str
-        elif self._basic_type == 'f':
-            conversion_values = DOUBLE_INFS + DOUBLE_FLOAT_INFS + DOUBLE_FLOAT_VALUES
-            conversion_function = TestTuple.double_hex_to_float_hex
+            if self._basic_type == 'b':
+                conversion_function = TestTuple.int_str_to_bool_str
+            elif self._basic_type == 'i':
+                conversion_function = TestTuple.int_str_to_int32_str
+            elif self._basic_type == 'u':
+                conversion_function = TestTuple.int_str_to_uint32_str
+            elif self._basic_type == 'f':
+                conversion_function = TestTuple.int_str_to_float_hex
+            elif self._basic_type == 'd':
+                conversion_function = TestTuple.int_str_to_double_hex
+            elif self._basic_type == 'i64':
+                conversion_function = TestTuple.int_str_to_int64_str
+            elif self._basic_type == 'i':
+                conversion_function = TestTuple.int_str_to_uint64_str
+
+        if self._basic_type != 'd':
+            self._gen_comp_test(self._target_full_type, self._conversion_type,
+                                converted_from)
+
+            converted_from = self._conversion_type + '(from)'
+            explicit = 'explicit'
+        else:
+            assert self._target_type in ('i64', 'u64')
 
         conversions = []
-        for value in DOUBLE_NEG_ZERO + DOUBLE_POS_ZERO + conversion_values:
+        for value in conversion_values:
             to_value = conversion_function(value)
             item = {'from': value, 'to': to_value}
             conversions.append(item)
