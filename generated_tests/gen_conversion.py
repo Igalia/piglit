@@ -276,7 +276,7 @@ class TestTuple(object):
         self._basic_type = basic_type
         self._target_type = target_type
         self._names_only = names_only
-        self._double_type = ''
+        self._target_full_type = ''
         self._conversion_type = ''
         self._uniform_type = ''
         self._amount = int(first_dimension) * int(second_dimension)
@@ -301,7 +301,7 @@ class TestTuple(object):
                 self._conversion_type = 'uint'
             elif basic_type == 'f':
                 self._conversion_type = 'float'
-            self._double_type = 'double'
+            self._target_full_type = 'double'
             if self._uniform_type == '':
                 self._uniform_type = self._conversion_type
         else:
@@ -310,14 +310,14 @@ class TestTuple(object):
                 self._uniform_type = 'i' + dimensional_type
             else:
                 self._uniform_type = self._conversion_type
-            self._double_type = 'd' + dimensional_type
+            self._target_full_type = 'd' + dimensional_type
 
     @abc.abstractmethod
-    def _gen_to_double(self):
+    def _gen_to_target(self):
         """Generates the test files for conversions to float64."""
 
     @abc.abstractmethod
-    def _gen_from_double(self):
+    def _gen_from_target(self):
         """Generates the test files for conversions from float64."""
 
     @property
@@ -334,8 +334,8 @@ class TestTuple(object):
         """Generate the GLSL parser tests."""
         self._filenames = []
 
-        self._gen_to_double()
-        self._gen_from_double()
+        self._gen_to_target()
+        self._gen_from_target()
 
 
 class RegularTestTuple(TestTuple):
@@ -423,15 +423,15 @@ class RegularTestTuple(TestTuple):
                         uniform_to_type=uniform_to_type,
                         conversions=conversions))
 
-    def _gen_to_double(self):
+    def _gen_to_target(self):
         converted_from = 'from'
         explicit = 'implicit'
 
         if self._basic_type == 'b':
             explicit = 'explicit'
-            self._gen_comp_test(self._conversion_type, self._double_type,
+            self._gen_comp_test(self._conversion_type, self._target_full_type,
                                 converted_from)
-            converted_from = self._double_type + '(from)'
+            converted_from = self._target_full_type + '(from)'
             conversion_values = BOOL_VALUES
             conversion_function = TestTuple.int_str_to_double_str
         elif self._basic_type == 'i':
@@ -450,13 +450,13 @@ class RegularTestTuple(TestTuple):
             item = {'from': value, 'to': to_value}
             conversions.append(item)
 
-        self._gen_exec_test(self._conversion_type, self._double_type,
-                            self._uniform_type, self._double_type,
+        self._gen_exec_test(self._conversion_type, self._target_full_type,
+                            self._uniform_type, self._target_full_type,
                             explicit, converted_from, conversions)
 
-    def _gen_from_double(self):
+    def _gen_from_target(self):
         converted_from = 'from'
-        self._gen_comp_test(self._double_type, self._conversion_type,
+        self._gen_comp_test(self._target_full_type, self._conversion_type,
                             converted_from)
 
         converted_from = self._conversion_type + '(from)'
@@ -481,8 +481,8 @@ class RegularTestTuple(TestTuple):
             item = {'from': value, 'to': to_value}
             conversions.append(item)
 
-        self._gen_exec_test(self._double_type, self._conversion_type,
-                            self._double_type, self._uniform_type,
+        self._gen_exec_test(self._target_full_type, self._conversion_type,
+                            self._target_full_type, self._uniform_type,
                             explicit, converted_from, conversions)
 
 
@@ -550,7 +550,7 @@ class ZeroSignTestTuple(TestTuple):
                             uniform_to_type=uniform_to_type,
                             conversions=conversions))
 
-    def _gen_to_double(self):
+    def _gen_to_target(self):
         if self._ver == '410':
             conversion_values = FLOAT_POS_ZERO
         elif self._ver == '420':
@@ -562,11 +562,11 @@ class ZeroSignTestTuple(TestTuple):
             item = {'from': value, 'to': to_value}
             conversions.append(item)
 
-        self.__gen_zero_sign_exec_test(self._conversion_type, self._double_type,
-                                       self._uniform_type, self._double_type,
+        self.__gen_zero_sign_exec_test(self._conversion_type, self._target_full_type,
+                                       self._uniform_type, self._target_full_type,
                                        'implicit', 'from', conversions)
 
-    def _gen_from_double(self):
+    def _gen_from_target(self):
         if self._ver == '410':
             conversion_values = DOUBLE_POS_ZERO
         elif self._ver == '420':
@@ -578,8 +578,8 @@ class ZeroSignTestTuple(TestTuple):
             item = {'from': value, 'to': to_value}
             conversions.append(item)
 
-        self.__gen_zero_sign_exec_test(self._double_type, self._conversion_type,
-                                       self._double_type, self._uniform_type,
+        self.__gen_zero_sign_exec_test(self._target_full_type, self._conversion_type,
+                                       self._target_full_type, self._uniform_type,
                                        'explicit', self._conversion_type + '(from)', conversions)
 
 
