@@ -6,8 +6,12 @@
 /* [config]
  * expect_result: fail
  * glsl_version: ${glsl_version}
-% if ver == 'GL_ARB_gpu_shader_fp64':
- * require_extensions: ${ver}
+% if extensions:
+ * require_extensions:\
+% for extension in extensions:
+ ${extension}\
+% endfor
+
  * [end config]
  *
  * ${ver} spec states:

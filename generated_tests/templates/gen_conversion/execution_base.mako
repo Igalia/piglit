@@ -6,9 +6,9 @@
 <%! from six.moves import range %>\
 [require]
 GLSL >= ${glsl_version}
-% if ver == 'GL_ARB_gpu_shader_fp64':
-${ver}
-% endif
+% for extension in extensions:
+${extension}
+% endfor
 ${next.body()}\
 [test]
 clear color 0.0 0.0 0.0 0.0

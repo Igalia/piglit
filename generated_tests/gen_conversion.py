@@ -281,6 +281,11 @@ class TestTuple(object):
         self._uniform_type = ''
         self._amount = int(first_dimension) * int(second_dimension)
         self._filenames = []
+        self._extensions = []
+
+        if ver.startswith('GL_'):
+            if basic_type == 'd' or target_type == 'd':
+                self._extensions.append('GL_ARB_gpu_shader_fp64')
 
         if first_dimension != '1':
             dimensional_type = 'mat' + first_dimension
@@ -396,6 +401,7 @@ class RegularTestTuple(TestTuple):
                 test_file.write(TEMPLATES.get_template(
                     'compiler.{}.mako'.format(self._stage)).render_unicode(
                         ver=self._ver,
+                        extensions=self._extensions,
                         from_type=from_type,
                         to_type=to_type,
                         converted_from=converted_from))
@@ -415,6 +421,7 @@ class RegularTestTuple(TestTuple):
                 test_file.write(TEMPLATES.get_template(
                     'execution.{}.shader_test.mako'.format(self._stage)).render_unicode(
                         ver=self._ver,
+                        extensions=self._extensions,
                         amount=self._amount,
                         from_type=from_type,
                         to_type=to_type,
@@ -542,6 +549,7 @@ class ZeroSignTestTuple(TestTuple):
                     'execution-zero-sign.{}.shader_test.mako'.format(
                         self._stage)).render_unicode(
                             ver=self._ver,
+                            extensions=self._extensions,
                             amount=self._amount,
                             from_type=from_type,
                             to_type=to_type,
