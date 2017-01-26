@@ -293,28 +293,23 @@ arg_out: 0 buffer float[1] -inf
 ## Unary minus ##
 
 [test]
-name: -pos
+name: minus
 kernel_name: minus
-arg_in:  1 float 345.25
-arg_out: 0 buffer float[1] -345.25
+global_size: 20 0 0
 
-[test]
-name: -neg
-kernel_name: minus
-arg_in:  1 float -455.125
-arg_out: 0 buffer float[1] 455.125
+arg_out: 0 buffer float[20]        \
+   -0.0      0.0    -0.5    0.5    \
+   -1.0      1.0    -2.0    2.0    \
+   -4.0      4.0   -10.0    10.0   \
+   -inf      inf     nan   -345.25 \
+ 345.25 -455.125  455.125  0.12345
 
-[test]
-name: -inf
-kernel_name: minus
-arg_in:  1 float inf
-arg_out: 0 buffer float[1] -inf
-
-[test]
-name: --inf
-kernel_name: minus
-arg_in:  1 float -inf
-arg_out: 0 buffer float[1] inf
+arg_in: 1 buffer float[20]            \
+  0.0     -0.0           0.5     -0.5 \
+  1.0     -1.0           2.0     -2.0 \
+  4.0     -4.0          10.0    -10.0 \
+  inf     -inf           nan   345.25 \
+ -345.25   455.125  -455.125 -0.12345
 
 !*/
 
@@ -338,6 +333,7 @@ kernel void plus(global float* out, float in) {
 	out[0] = +in;
 }
 
-kernel void minus(global float* out, float in) {
-	out[0] = -in;
+kernel void minus(global float* out, global float* in) {
+    int id = get_global_id(0);
+    out[id] = -in[id];
 }
