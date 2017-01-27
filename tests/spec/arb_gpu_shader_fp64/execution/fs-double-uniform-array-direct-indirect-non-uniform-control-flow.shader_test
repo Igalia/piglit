@@ -1,0 +1,51 @@
+[require]
+GLSL >= 4.00
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+uniform double arg0;
+uniform double tolerance;
+uniform dvec4 expected;
+
+uniform double arg[7];
+out vec4 color;
+
+void main()
+{
+        int index;
+        double tol = tolerance;
+	vec4 color2 = vec4(0.0, 1.0, 0.0, 1.0);
+        float cx = gl_FragCoord.x ;
+        float cy = gl_FragCoord.y;
+	if (cx == cy) {
+	   index = int(arg[6]);
+        } else {
+           index = int(arg[5]);
+           tol = 0.35;
+	   color2 = vec4(0.0, 0.0, 1.0, 1.0);
+	}
+	dvec4 result = dvec4(arg[index] + arg0);
+	color = distance(result, expected) <= tol
+		? color2 : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+
+clear
+uniform double arg0 0.25
+uniform double tolerance 0.0
+uniform dvec4 expected 0.65 0.65 0.65 0.65
+uniform double arg[0] 0.1
+uniform double arg[1] 0.2
+uniform double arg[2] 0.3
+uniform double arg[3] 0.4
+uniform double arg[4] 0.5
+uniform double arg[5] 2.0
+uniform double arg[6] 3.0
+draw rect -1 -1 2 2
+probe rgba 1 1 0.0 1.0 0.0 1.0
