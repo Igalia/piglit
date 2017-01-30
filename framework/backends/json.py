@@ -108,6 +108,10 @@ class JSONBackend(FileBackend):
         with open(os.path.join(self._dest, 'metadata.json'), 'w') as f:
             json.dump(metadata, f, default=piglit_encoder)
 
+            # Flush the metadata to the disk, always
+            f.flush()
+            os.fsync(f.fileno())
+
         # make the directory for the tests
         try:
             os.mkdir(os.path.join(self._dest, 'tests'))
