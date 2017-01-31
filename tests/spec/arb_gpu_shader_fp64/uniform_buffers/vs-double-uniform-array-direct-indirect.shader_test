@@ -37,7 +37,7 @@ void main()
 clear color 0.0 0.0 0.0 0.0
 
 clear
-uniform double arg0 0.25
+uniform double arg0 0.0
 uniform double tolerance 0.0
 uniform dvec4 expected 0.4 0.4 0.4 0.4
 uniform double arg[0] 0.1
