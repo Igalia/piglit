@@ -89,7 +89,7 @@ piglit_init(int argc, char **argv)
 		}
 
 		if (use_pbo) {
-			glBufferData(GL_PIXEL_UNPACK_BUFFER, TEX_SIZE * TEX_SIZE * 4,
+			glBufferData(GL_PIXEL_UNPACK_BUFFER, dim * dim * 4,
 				     pixels, GL_STREAM_DRAW);
 		}
 		glTexSubImage2D(GL_TEXTURE_2D,
@@ -118,7 +118,7 @@ piglit_init(int argc, char **argv)
 		}
 
 		if (use_pbo) {
-			glBufferData(GL_PIXEL_UNPACK_BUFFER, TEX_SIZE * TEX_SIZE * 4,
+			glBufferData(GL_PIXEL_UNPACK_BUFFER, dim * dim * 4,
 				     pixels, GL_STREAM_DRAW);
 		}
 		glTexSubImage2D(GL_TEXTURE_2D, i, 0, 0, dim, dim,
