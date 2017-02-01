@@ -317,8 +317,9 @@ def run(input_):
                 'Unable to force a test list with more than one profile')
 
         with open(args.test_list) as test_list:
-            # Strip newlines
-            forced_test_list = [t.strip() for t in test_list]
+            # Strip newlines and comments, ignore empty lines
+            stripped = (t.split('#')[0].strip() for t in test_list)
+            forced_test_list = [t for t in stripped if t]
 
     backend = backends.get_backend(args.backend)(
         args.results_path,
