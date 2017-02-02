@@ -9,3 +9,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_post_depth_coverage-basic basic.c)
+piglit_add_executable (arb_post_depth_coverage-multisampling multisampling.c)
