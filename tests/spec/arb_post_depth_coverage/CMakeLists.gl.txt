@@ -10,3 +10,4 @@ link_libraries (
 
 piglit_add_executable (arb_post_depth_coverage-basic basic.c)
 piglit_add_executable (arb_post_depth_coverage-multisampling multisampling.c)
+piglit_add_executable (arb_post_depth_coverage-sample-shading sample-shading.c)

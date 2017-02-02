@@ -4796,6 +4796,7 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'arb_post_depth_coverage')) as g:
     g(['arb_post_depth_coverage-basic'])
     g(['arb_post_depth_coverage-multisampling'])
+    g(['arb_post_depth_coverage-sample-shading'])
 
 with profile.test_list.group_manager(
     PiglitGLTest,
