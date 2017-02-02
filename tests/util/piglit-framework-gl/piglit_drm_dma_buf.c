@@ -262,13 +262,17 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 
 	switch (fourcc) {
 	case DRM_FORMAT_R8:
-		format = GBM_FORMAT_R8;
+		fprintf(stderr, "HACK!\n");
+		abort();
+// 		format = GBM_FORMAT_R8;
 		cpp = 1;
 		src_stride = cpp * w;
 		break;
 	case DRM_FORMAT_GR88:
 	case DRM_FORMAT_RG88:
-		format = GBM_FORMAT_GR88;
+		fprintf(stderr, "HACK!\n");
+		abort();
+// 		format = GBM_FORMAT_GR88;
 		cpp = 2;
 		src_stride = cpp * w;
 		break;
@@ -296,7 +300,9 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 	 * for U/V.
 	 */
 	case DRM_FORMAT_NV12:
-		format = GBM_FORMAT_GR88;
+		fprintf(stderr, "HACK!\n");
+		abort();
+// 		format = GBM_FORMAT_GR88;
 		buf_w = w / 2;
 		buf_h = h * 3 / 2;
 		src_stride = w;
@@ -304,7 +310,9 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		break;
 	case DRM_FORMAT_YUV420:
 	case DRM_FORMAT_YVU420:
-		format = GBM_FORMAT_GR88;
+		fprintf(stderr, "HACK!\n");
+		abort();
+// 		format = GBM_FORMAT_GR88;
 		buf_w = w / 2;
 		buf_h = h * 2;    /* U/V not interleaved */
 		src_stride = w;
