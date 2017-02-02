@@ -4792,6 +4792,11 @@ with profile.test_list.group_manager(
     g(['arb_shader_image_load_store-unused'], 'unused')
 
 with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_post_depth_coverage')) as g:
+    g(['arb_post_depth_coverage-basic'])
+
+with profile.test_list.group_manager(
     PiglitGLTest,
     grouptools.join('spec', 'arb_shader_image_size')) as g:
     g(['arb_shader_image_size-builtin'], 'builtin')
