@@ -406,7 +406,14 @@ def _modulus(x, y):
 
 
 def _lshift(x, y):
-    if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
+    base = glsl_type_of(x).base_type
+    if base in (glsl_int64_t, glsl_uint64_t):
+        bits = 64
+        shift_type = glsl_int if base == glsl_int64_t else glsl_uint
+    else:
+        bits = 32
+        shift_type = base
+    if not all(0 <= y_element < bits for y_element in column_major_values(y)):
         # Shifts by less than 0 or more than the number of bits in the
         # type being shifted are undefined.
         return None
@@ -414,7 +421,7 @@ def _lshift(x, y):
     # likes to promote them to int64.  To avoid this, convert y to be
     # the same type as x.
     y_orig = y
-    if glsl_type_of(x).base_type != glsl_type_of(y).base_type:
+    if glsl_type_of(y).base_type != shift_type:
         y = _change_signedness(y)
     result = x << y
 
@@ -426,7 +433,14 @@ def _lshift(x, y):
 
 
 def _rshift(x, y):
-    if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
+    base = glsl_type_of(x).base_type
+    if base in (glsl_int64_t, glsl_uint64_t):
+        bits = 64
+        shift_type = glsl_int if base == glsl_int64_t else glsl_uint
+    else:
+        bits = 32
+        shift_type = base
+    if not all(0 <= y_element < bits for y_element in column_major_values(y)):
         # Shifts by less than 0 or more than the number of bits in the
         # type being shifted are undefined.
         return None
@@ -434,7 +448,7 @@ def _rshift(x, y):
     # likes to promote them to int64.  To avoid this, convert y to be
     # the same type as x.
     y_orig = y
-    if glsl_type_of(x).base_type != glsl_type_of(y).base_type:
+    if glsl_type_of(y).base_type != shift_type:
         y = _change_signedness(y)
     result = x >> y
 
@@ -1111,7 +1125,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
         """
         x_type = glsl_type_of(x)
         y_type = glsl_type_of(y)
-        if x_type.base_type not in (glsl_int, glsl_uint):
+        if x_type.base_type not in (glsl_int, glsl_uint, glsl_int64_t, glsl_uint64_t):
             return False
         if y_type.base_type not in (glsl_int, glsl_uint):
             return False
