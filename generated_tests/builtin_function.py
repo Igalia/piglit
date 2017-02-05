@@ -1598,13 +1598,13 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
       template='({0} * {1})',
       extension="ARB_gpu_shader_int64")
     f('op-div', 2, 150, _divide, match_simple_binop,
-      [int64s+int64vecs,
-       int64s+int64vecs],
+      [int64s+int64vecs+uint64s+uint64vecs,
+       int64s+int64vecs+uint64s+uint64vecs],
       template='({0} / {1})',
       extension="ARB_gpu_shader_int64")
     f('op-mod', 2, 150, _modulus, match_simple_binop,
-      [int64s+int64vecs,
-       int64s+int64vecs],
+      [int64s+int64vecs+uint64s+uint64vecs,
+       int64s+int64vecs+uint64s+uint64vecs],
       template='({0} % {1})',
       extension="ARB_gpu_shader_int64")
     f('op-gt', 2, 150, lambda x, y: x > y, match_args(0, 1),
