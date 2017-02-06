@@ -2810,17 +2810,17 @@ with profile.test_list.group_manager(
     g(['arb_vertex_buffer_object-combined-vertex-index'],
       'combined-vertex-index')
     g(['arb_vertex_buffer_object-elements-negative-offset'],
-      'elements-negative-offset', run_concurrent=False)
+      'elements-negative-offset')
     g(['arb_vertex_buffer_object-mixed-immediate-and-vbo'],
-      'mixed-immediate-and-vbo', run_concurrent=False)
-    g(['fdo14575'], run_concurrent=False)
-    g(['fdo22540'], run_concurrent=False)
-    g(['fdo31934'], run_concurrent=False)
+      'mixed-immediate-and-vbo')
+    g(['fdo14575'])
+    g(['fdo22540'])
+    g(['fdo31934'])
     g(['arb_vertex_buffer_object-ib-data-sync'], 'ib-data-sync')
     g(['arb_vertex_buffer_object-ib-subdata-sync'], 'ib-subdata-sync')
-    g(['pos-array'], run_concurrent=False)
-    g(['vbo-bufferdata'], run_concurrent=False)
-    g(['vbo-map-remap'], run_concurrent=False)
+    g(['pos-array'])
+    g(['vbo-bufferdata'])
+    g(['vbo-map-remap'])
     g(['vbo-map-unsync'])
     g(['arb_vertex_buffer_object-vbo-subdata-many', 'drawarrays'],
       'vbo-subdata-many drawarrays')
@@ -2828,8 +2828,8 @@ with profile.test_list.group_manager(
       'vbo-subdata-many drawelements')
     g(['arb_vertex_buffer_object-vbo-subdata-many', 'drawrangeelements'],
       'vbo-subdata-many drawrangeelements')
-    g(['vbo-subdata-sync'], run_concurrent=False)
-    g(['vbo-subdata-zero'], run_concurrent=False)
+    g(['vbo-subdata-sync'])
+    g(['vbo-subdata-zero'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
