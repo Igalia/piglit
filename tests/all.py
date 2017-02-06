@@ -2806,6 +2806,8 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_buffer_object')) as g:
+    g(['arb_vertex_buffer_object-combined-vertex-index'],
+      'combined-vertex-index')
     g(['arb_vertex_buffer_object-elements-negative-offset'],
       'elements-negative-offset', run_concurrent=False)
     g(['arb_vertex_buffer_object-mixed-immediate-and-vbo'],
