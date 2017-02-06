@@ -25,6 +25,7 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import os
+import sys
 import re
 import io
 import six
@@ -40,8 +41,12 @@ __all__ = [
 ]
 
 # In different configurations piglit may have one or both of these.
-_HAS_GL_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest'))
-_HAS_GLES_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest_gles2'))
+if sys.platform == 'win32':
+    _HAS_GL_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest.exe'))
+    _HAS_GLES_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest_gles2.exe'))
+else:
+    _HAS_GL_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest'))
+    _HAS_GLES_BIN = os.path.exists(os.path.join(TEST_BIN_DIR, 'glslparsertest_gles2'))
 
 # This forces testing with compatibility extensions, even when GLES support is
 # built
