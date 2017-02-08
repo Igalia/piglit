@@ -4404,6 +4404,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'arb_sparse_buffer')) as g:
+    g(['arb_sparse_buffer-minmax'], 'minmax')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_polygon_offset_clamp')) as g:
     g(['ext_polygon_offset_clamp-draw'])
     g(['ext_polygon_offset_clamp-draw_gles2'])
