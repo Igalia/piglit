@@ -1,4 +1,4 @@
-# Copyright (c) 2014,2016 Intel Corporation
+# Copyright (c) 2014, 2016-2017 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -125,6 +125,10 @@ class JSONBackend(FileBackend):
         containers that are still open and closes the file
 
         """
+        tests_dir = os.path.join(self._dest, 'tests')
+        file_list = sorted(os.listdir(tests_dir),
+                           key=lambda p: int(os.path.splitext(p)[0]))
+
         # If jsonstreams is not present then build a complete tree of all of
         # the data and write it with json.dump
         if not _STREAMS:
@@ -143,9 +147,8 @@ class JSONBackend(FileBackend):
             # Add the tests to the dictionary
             data['tests'] = collections.OrderedDict()
 
-            test_dir = os.path.join(self._dest, 'tests')
-            for test in os.listdir(test_dir):
-                test = os.path.join(test_dir, test)
+            for test in file_list:
+                test = os.path.join(tests_dir, test)
                 if os.path.isfile(test):
                     # Try to open the json snippets. If we fail to open a test
                     # then throw the whole thing out. This gives us atomic
@@ -177,15 +180,14 @@ class JSONBackend(FileBackend):
                     s.write('__type__', 'TestrunResult')
                     with open(os.path.join(self._dest, 'metadata.json'),
                               'r') as n:
-                        s.iterwrite(six.iteritems(json.load(n)))
+                        s.iterwrite(six.iteritems(json.load(n, object_pairs_hook=collections.OrderedDict)))
 
                     if metadata:
                         s.iterwrite(six.iteritems(metadata))
 
-                    test_dir = os.path.join(self._dest, 'tests')
                     with s.subobject('tests') as t:
-                        for test in os.listdir(test_dir):
-                            test = os.path.join(test_dir, test)
+                        for test in file_list:
+                            test = os.path.join(tests_dir, test)
                             if os.path.isfile(test):
                                 try:
                                     with open(test, 'r') as f:
@@ -259,7 +261,7 @@ def _load(results_file):
 
     """
     try:
-        result = json.load(results_file)
+        result = json.load(results_file, object_pairs_hook=collections.OrderedDict)
     except ValueError as e:
         raise exceptions.PiglitFatalError(
             'While loading json results file: "{}",\n'
@@ -283,11 +285,15 @@ def _resume(results_dir):
     assert meta['results_version'] == CURRENT_JSON_VERSION, \
         "Old results version, resume impossible"
 
-    meta['tests'] = {}
+    meta['tests'] = collections.OrderedDict()
 
     # Load all of the test names and added them to the test list
-    for file_ in os.listdir(os.path.join(results_dir, 'tests')):
-        with open(os.path.join(results_dir, 'tests', file_), 'r') as f:
+    tests_dir = os.path.join(results_dir, 'tests')
+    file_list = sorted(os.listdir(tests_dir),
+                       key=lambda p: int(os.path.splitext(p)[0]))
+
+    for file_ in file_list:
+        with open(os.path.join(tests_dir, file_), 'r') as f:
             try:
                 meta['tests'].update(json.load(f))
             except ValueError:
