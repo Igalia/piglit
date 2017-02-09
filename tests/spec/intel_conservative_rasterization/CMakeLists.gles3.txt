@@ -1,0 +1,10 @@
+link_libraries(
+	piglitutil_${piglit_target_api}
+	)
+
+piglit_add_executable (intel_conservative_rasterization-depthcoverage_gles3 depthcoverage.c)
+piglit_add_executable (intel_conservative_rasterization-innercoverage_gles3 innercoverage.c)
+piglit_add_executable (intel_conservative_rasterization-invalid_gles3 invalid.c)
+piglit_add_executable (intel_conservative_rasterization-tri_gles3 tri.c)
+
+# vim: ft=cmake:
