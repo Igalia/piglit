@@ -350,7 +350,8 @@ class TestrunResult(object):
         if not self.totals:
             self.calculate_group_totals()
         rep = copy.copy(self.__dict__)
-        rep['tests'] = {k: t.to_json() for k, t in six.iteritems(self.tests)}
+        rep['tests'] = collections.OrderedDict((k, t.to_json())
+                       for k, t in six.iteritems(self.tests))
         rep['__type__'] = 'TestrunResult'
         return rep
 
@@ -378,8 +379,8 @@ class TestrunResult(object):
         if 'time_elapsed' in dict_:
             setattr(res, 'time_elapsed',
                     TimeAttribute.from_dict(dict_['time_elapsed']))
-        res.tests = {n: TestResult.from_dict(t)
-                     for n, t in six.iteritems(dict_['tests'])}
+        res.tests = collections.OrderedDict((n, TestResult.from_dict(t))
+                    for n, t in six.iteritems(dict_['tests']))
 
         if not 'totals' in dict_ and not _no_totals:
             res.calculate_group_totals()
