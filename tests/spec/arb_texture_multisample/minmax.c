@@ -40,7 +40,8 @@ piglit_init(int argc, char **argv)
 	piglit_test_min_int(GL_MAX_SAMPLE_MASK_WORDS, 1);
 	piglit_test_min_int(GL_MAX_COLOR_TEXTURE_SAMPLES, 1);
 	piglit_test_min_int(GL_MAX_DEPTH_TEXTURE_SAMPLES, 1);
-	piglit_test_min_int(GL_MAX_INTEGER_SAMPLES, 1);
+	if (piglit_is_extension_supported("GL_EXT_texture_integer"))
+		piglit_test_min_int(GL_MAX_INTEGER_SAMPLES, 1);
 
 	piglit_report_result(piglit_minmax_pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
