@@ -3179,6 +3179,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_frag_depth')) as g:
+    g(['fragdepth_gles2'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_texture_array')) as g:
     g(['fbo-generatemipmap-array'])
     g(['fbo-generatemipmap-array', 'RGB9_E5'])
