@@ -4406,6 +4406,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_sparse_buffer')) as g:
     g(['arb_sparse_buffer-basic'], 'basic')
+    g(['arb_sparse_buffer-commit'], 'commit')
     g(['arb_sparse_buffer-minmax'], 'minmax')
 
 with profile.test_list.group_manager(
