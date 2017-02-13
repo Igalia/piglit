@@ -536,6 +536,7 @@ with profile.test_list.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-novertexdata'])
     g(['glsl-preprocessor-comments'])
     g(['glsl-reload-source'])
+    g(['glsl-cache-fallback-shader-source'])
     g(['glsl-uniform-out-of-bounds'])
     g(['glsl-uniform-out-of-bounds-2'])
     g(['glsl-uniform-update'])
