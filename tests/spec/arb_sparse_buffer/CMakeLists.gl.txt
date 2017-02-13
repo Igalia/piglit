@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_sparse_buffer-basic basic.c)
+piglit_add_executable (arb_sparse_buffer-buffer-data buffer-data.c)
 piglit_add_executable (arb_sparse_buffer-commit commit.c)
 piglit_add_executable (arb_sparse_buffer-minmax minmax.c)
