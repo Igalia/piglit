@@ -204,6 +204,7 @@ get_framebuffer_name(int index)
 		return "complete framebuffer";
 	default:
 		assert(!"unknown framebuffer");
+		return "unknown framebuffer";
 	}
 }
 
