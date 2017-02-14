@@ -94,7 +94,7 @@ GLuint framebuffers[3];
 bool filter_pname = false;
 GLenum global_pname;
 bool filter_framebuffer = false;
-GLuint global_framebuffer;
+int global_framebuffer;
 
 /*
  * Returns if any of the table_23_73 enums is a boolean or not
