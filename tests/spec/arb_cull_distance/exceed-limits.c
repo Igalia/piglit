@@ -74,9 +74,11 @@ piglit_init(int argc, char **argv)
 
 	if (strcmp(argv[1], "cull") == 0) {
 		use_clip = "// ";
+		clip_distances = 0;
 		cull_distances = max_cull_distances + 2;
 	} else if (strcmp(argv[1], "clip") == 0) {
 		clip_distances = max_clip_distances + 2;
+		cull_distances = 0;
 		use_cull = "// ";
 	} else if (strcmp(argv[1], "total") == 0) {
 		clip_distances = max_combined_clip_and_cull_distances / 2 + 1;
