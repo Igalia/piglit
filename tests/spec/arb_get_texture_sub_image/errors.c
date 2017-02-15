@@ -46,7 +46,7 @@ test_texture_id(void)
 			     8, 8, 1, /* size */
 			     GL_RGBA, GL_UNSIGNED_BYTE,
 			     sizeof(buffer), buffer);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
 		pass = false;
 
 	/* Test compressed get with bad texture ID */
@@ -54,7 +54,7 @@ test_texture_id(void)
 				       0, 0, 0, /* offset */
 				       8, 8, 1, /* size */
 				       sizeof(buffer), buffer);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
 		pass = false;
 
 	/* Test get with undefined texture */
