@@ -127,7 +127,7 @@ static void
 parse_args(int argc, char **argv)
 {
 	int i;
-	bool found;
+	bool found = false;
 
 	if (argc > 3) {
 		printf("Only two possible params supported\n");
