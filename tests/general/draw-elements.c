@@ -62,8 +62,10 @@ void piglit_init(int argc, char **argv)
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 }
 
-static void test_ubyte_indices(float x1, float y1, float x2, float y2, int index)
+static void test_ubyte_indices(float x1, float y1, float x2, float y2, int test)
 {
+	bool use_multi = test / 4;
+	int index = test % 4;
 	float v[] = {
 		x1, y1,
 		x1, y2,
@@ -100,11 +102,32 @@ static void test_ubyte_indices(float x1, float y1, float x2, float y2, int index
 		glGenBuffers(1, &buf);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indx), indx, GL_STATIC_DRAW);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, (void*)(intptr_t)(index*9));
+		if (use_multi) {
+			GLsizei count[] = {3, 3};
+			/* We need 2 draws in order to get non-zero in
+			 * pipe_draw_info::start, so make the second draw
+			 * a zero-area triangle. */
+			const void *offset[] = {(void*)(intptr_t)(index*9),
+						(void*)(intptr_t)1};
+			glMultiDrawElements(GL_TRIANGLES, count,
+					    GL_UNSIGNED_BYTE, offset, 2);
+		} else {
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE,
+				       (void*)(intptr_t)(index*9));
+		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glDeleteBuffers(1, &buf);
 	} else {
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, indx + index*9);
+		if (use_multi) {
+			GLsizei count[] = {3, 3};
+			/* The second draw is a zero-area triangle. */
+			const void *indices[] = {indx + index*9, indx + 1};
+			glMultiDrawElements(GL_TRIANGLES, count,
+					    GL_UNSIGNED_BYTE, indices, 2);
+		} else {
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE,
+				       indx + index*9);
+		}
 	}
 }
 
@@ -214,6 +237,11 @@ struct test tests[] = {
 	{test_ubyte_indices, 1, {1, 1, 1}, BOTH, "Ubyte indices - offset: 1"},
 	{test_ubyte_indices, 2, {1, 1, 1}, BOTH, "Ubyte indices - offset: 2"},
 	{test_ubyte_indices, 3, {1, 1, 1}, BOTH, "Ubyte indices - offset: 3"},
+
+	{test_ubyte_indices, 4, {1, 1, 1}, BOTH, "Ubyte indices - offset: 0 (glMultiDraw)"},
+	{test_ubyte_indices, 5, {1, 1, 1}, BOTH, "Ubyte indices - offset: 1 (glMultiDraw)"},
+	{test_ubyte_indices, 6, {1, 1, 1}, BOTH, "Ubyte indices - offset: 2 (glMultiDraw)"},
+	{test_ubyte_indices, 7, {1, 1, 1}, BOTH, "Ubyte indices - offset: 3 (glMultiDraw)"},
 
 	{test_ushort_indices, 0, {1, 1, 1}, BOTH, "Ushort indices - offset: 0"},
 	{test_ushort_indices, 1, {1, 1, 1}, BOTH, "Ushort indices - offset: 2"},
