@@ -1,0 +1,21 @@
+// [config]
+// expect_result: fail
+// glsl_version: 3.10 es
+// [end config]
+
+#version 310 es
+
+/* From GLSL ES 3.10 spec, section 4.1.9 "Arrays":
+ *
+ * "If an array is declared as the last member of a shader storage block
+ *  and the size is not specified at compile-time, it is sized at run-time.
+ *  In all other cases, arrays are sized only at compile-time."
+ */
+
+buffer ssbo {
+	int c[];
+	vec4 d;
+};
+
+void main(void) {
+}
