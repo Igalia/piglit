@@ -4945,5 +4945,19 @@ with profile.test_list.group_manager(
     g(['intel_conservative_rasterization-innercoverage_gles3'])
     g(['intel_conservative_rasterization-tri_gles3'])
 
+# Group ARB_bindless_texture
+with profile.test_list.group_manager(
+	PiglitGLTest,
+	grouptools.join('spec', 'ARB_bindless_texture')) as g:
+    g(['arb_bindless_texture-border-color'], 'border-color')
+    g(['arb_bindless_texture-conversions'], 'conversions')
+    g(['arb_bindless_texture-errors'], 'errors')
+    g(['arb_bindless_texture-handles'], 'handles')
+    g(['arb_bindless_texture-illegal'], 'illegal')
+    g(['arb_bindless_texture-legal'], 'legal')
+    g(['arb_bindless_texture-limit'], 'limit')
+    g(['arb_bindless_texture-uint64_attribs'], 'uint64_attribs')
+    g(['arb_bindless_texture-uniform'], 'uniform')
+
 if platform.system() is 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))

@@ -1,0 +1,23 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+)
+
+set(depends common.c)
+
+piglit_add_executable (arb_bindless_texture-border-color border-color.c ${depends})
+piglit_add_executable (arb_bindless_texture-conversions conversions.c ${depends})
+piglit_add_executable (arb_bindless_texture-errors errors.c ${depends})
+piglit_add_executable (arb_bindless_texture-handles handles.c ${depends})
+piglit_add_executable (arb_bindless_texture-illegal illegal.c ${depends})
+piglit_add_executable (arb_bindless_texture-legal legal.c ${depends})
+piglit_add_executable (arb_bindless_texture-limit limit.c ${depends})
+piglit_add_executable (arb_bindless_texture-uint64_attribs uint64_attribs.c ${depends})
+piglit_add_executable (arb_bindless_texture-uniform uniform.c ${depends})
+
+# vim: ft=cmake:
