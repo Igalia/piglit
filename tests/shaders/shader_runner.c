@@ -153,6 +153,11 @@ static struct texture_binding {
 	unsigned layers;
 } texture_bindings[32];
 
+static struct resident_handle {
+	GLuint64 handle;
+	bool is_tex;
+} resident_handles[32];
+
 static void
 clear_texture_binding(unsigned idx)
 {
@@ -186,6 +191,43 @@ get_texture_binding(unsigned idx)
 	REQUIRE(texture_bindings[idx].obj,
 		"No texture bound at %d\n", idx);
 	return &texture_bindings[idx];
+}
+
+static void
+clear_resident_handle(unsigned idx)
+{
+	REQUIRE(idx < ARRAY_SIZE(resident_handles),
+		"Invalid resident handle index %d\n", idx);
+
+	if (resident_handles[idx].handle) {
+		GLuint64 handle = resident_handles[idx].handle;
+		if (resident_handles[idx].is_tex)
+			glMakeTextureHandleNonResidentARB(handle);
+		else
+			glMakeImageHandleNonResidentARB(handle);
+		resident_handles[idx].handle = 0;
+	}
+}
+
+static void
+set_resident_handle(unsigned idx, GLuint64 handle, bool is_tex)
+{
+	clear_resident_handle(idx);
+
+	REQUIRE(idx < ARRAY_SIZE(resident_handles),
+		"Invalid resident handle index %d\n", idx);
+	resident_handles[idx].handle = handle;
+	resident_handles[idx].is_tex = is_tex;
+}
+
+static const struct resident_handle *
+get_resident_handle(unsigned idx)
+{
+	REQUIRE(idx < ARRAY_SIZE(resident_handles),
+		"Invalid resident handle index %d\n", idx);
+	REQUIRE(resident_handles[idx].handle,
+		"No resident handle at %d\n", idx);
+	return &resident_handles[idx];
 }
 
 enum states {
@@ -1434,6 +1476,17 @@ check_shader_subroutine_support(void)
 }
 
 /**
+ * Check that the GL implementation supports texture handles.
+ * If not, terminate the test with a SKIP.
+ */
+static void
+check_texture_handle_support(void)
+{
+	if (!piglit_is_extension_supported("GL_ARB_bindless_texture"))
+		piglit_report_result(PIGLIT_SKIP);
+}
+
+/**
  * Handles uploads of UBO uniforms by mapping the buffer and storing
  * the data.  If the uniform is not in a uniform block, returns false.
  */
@@ -1887,6 +1940,12 @@ set_uniform(const char *line, int ubo_array_index)
 				return;
 			}
 		}
+	} else if (parse_str(type, "handle", NULL)) {
+		check_unsigned_support();
+		check_texture_handle_support();
+		parse_uints(line, uints, 1, NULL);
+		glUniformHandleui64ARB(loc, get_resident_handle(uints[0])->handle);
+		return;
 	}
 
 	printf("unknown uniform type \"%s\"\n", type);
@@ -3410,6 +3469,39 @@ piglit_display(void)
 			    !(piglit_is_gles() && piglit_get_gl_version() >= 20))
 				glEnable(GL_TEXTURE_2D);
 
+		} else if (sscanf(line, "resident texture %d", &tex) == 1) {
+			GLuint64 handle;
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			handle = glGetTextureHandleARB(get_texture_binding(tex)->obj);
+			glMakeTextureHandleResidentARB(handle);
+
+			set_resident_handle(tex, handle, true);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr,
+					"glMakeTextureHandleResidentARB error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+		} else if (sscanf(line, "resident image texture %d %31s",
+				  &tex, s) == 2) {
+			const GLenum img_fmt = piglit_get_gl_enum_from_name(s);
+			GLuint64 handle;
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			handle = glGetImageHandleARB(get_texture_binding(tex)->obj,
+						     0, GL_FALSE, 0, img_fmt);
+			glMakeImageHandleResidentARB(handle, GL_READ_WRITE);
+
+			set_resident_handle(tex, handle, false);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr,
+					"glMakeImageHandleResidentARB error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
 		} else if (parse_str(line, "texture integer ", &rest)) {
 			GLenum int_fmt;
 			int b, a;
