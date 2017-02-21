@@ -1,0 +1,84 @@
+# Verify reading from multiple resident images.
+# Based on arb_compute_shader/execution/multiple-texture-reading.shader_test.
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_shader_image_load_store
+GL_ARB_bindless_texture
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_image_load_store: enable
+#extension GL_ARB_bindless_texture: enable
+
+layout (bindless_image) uniform;
+
+uniform int select_textures;
+layout(rgba8) readonly uniform image2D src0;
+layout(rgba8) readonly uniform image2D src1;
+writeonly uniform image2D dst;
+
+layout(local_size_x = 16, local_size_y = 16) in;
+
+void main()
+{
+	ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+	vec4 color = vec4(0, 0, 0, 0);
+	if ((select_textures & 1) == 1) {
+		color += imageLoad(src0, coord);
+	}
+	if ((select_textures & 2) == 2) {
+		color += imageLoad(src1, coord);
+	}
+	imageStore(dst, coord, color);
+}
+
+[test]
+# Setup src0 image
+texture rgbw 0 (16, 16) GL_RGBA8
+resident image texture 0 GL_RGBA8
+uniform handle src0 0
+fb tex 2d 0
+clear color 1.0 0.0 1.0 0.0
+clear
+
+# Setup src1 image
+texture rgbw 1 (16, 16) GL_RGBA8
+resident image texture 1 GL_RGBA8
+uniform handle src1 1
+fb tex 2d 1
+clear color 0.0 1.0 0.0 1.0
+clear
+
+# Setup dst image
+texture rgbw 2 (16, 16) GL_RGBA8
+resident image texture 2 GL_RGBA8
+uniform handle dst 2
+fb tex 2d 2
+
+# Clear dst image to not have the same color as the first test case
+clear color 0.5 0.5 0.5 0.5
+clear
+probe all rgba 0.5 0.5 0.5 0.5
+
+# Use neither source image
+uniform int select_textures 0
+compute 1 1 1
+probe all rgba 0.0 0.0 0.0 0.0
+
+# Use src0 image only
+uniform int select_textures 1
+compute 1 1 1
+probe all rgba 1.0 0.0 1.0 0.0
+
+# Use src1 image only
+uniform int select_textures 2
+compute 1 1 1
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Use both src0 and src1 images
+uniform int select_textures 3
+compute 1 1 1
+probe all rgba 1.0 1.0 1.0 1.0
