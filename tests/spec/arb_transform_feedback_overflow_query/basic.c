@@ -244,6 +244,12 @@ run_subtest(int n_streams, int array_sizes[], int stream, GLuint query_type,
 	const char *gs_text;
 	const char **gs_varyings;
 
+	if (!strcmp(test_type, "buffer_object") &&
+	    !piglit_is_extension_supported("GL_ARB_query_buffer_object")) {
+		piglit_loge("context does not support "
+			    "GL_ARB_query_buffer_object; skipping test");
+	    return PIGLIT_SKIP;
+	}
 
 	if (n_streams > 1) {
 		if (!check_multistream_extensions())
