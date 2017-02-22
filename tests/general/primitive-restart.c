@@ -502,125 +502,6 @@ test_array_element(VBO_CFG vbo_cfg, GLenum primMode, GLenum indexType)
 }
 
 
-/**
- * Test glDrawArrayss() with glPrimitiveRestartIndexNV().
- * We only test a line strip.
- */
-static bool
-test_draw_arrays(VBO_CFG vbo_cfg)
-{
-#define NUM_VERTS 12
-   GLfloat verts[NUM_VERTS+2][2];
-   const GLfloat dx = 20.0;
-   GLfloat x;
-   GLuint restart_index;
-   bool pass = true;
-   const char *primStr = "GL_LINE_STRIP";
-   GLuint test;
-   const GLenum primMode = GL_LINE_STRIP;
-   GLuint vbo = 0;
-
-   x = 0.0;
-
-   /* setup vertices */
-   {
-      GLuint i;
-      const GLfloat y = 0.5 * piglit_height;
-
-      glLineWidth(5.0);
-
-      for (i = 0; i < NUM_VERTS; i++) {
-         verts[i][0] = x;
-         verts[i][1] = y;
-         x += dx;
-      }
-   }
-
-   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
-   glColor4fv(green);
-
-   if ((vbo_cfg != DISABLE_VBO) && (vbo_cfg != VBO_INDEX_ONLY)) {
-      glGenBuffers(1, &vbo);
-      glBindBuffer(GL_ARRAY_BUFFER, vbo);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-      glVertexPointer(2, GL_FLOAT, 0, (void *)0);
-   } else {
-      glVertexPointer(2, GL_FLOAT, 2*sizeof(GLfloat), verts);
-   }
-
-   glEnableClientState(GL_VERTEX_ARRAY);
-   if (!piglit_check_gl_error(GL_NO_ERROR))
-      return false;
-
-   /*
-    * Render and do checks.
-    * Try three different restart indexes at start, end, middle.
-    */
-   for (test = 0; test < 3 && pass; test++) {
-      /* choose the restart index */
-      if (test == 0)
-         restart_index = 0;
-      else if (test == 1)
-         restart_index = NUM_VERTS - 1;
-      else
-         restart_index = NUM_VERTS / 2;
-
-      /* draw */
-      glClear(GL_COLOR_BUFFER_BIT);
-      enable_restart(restart_index);
-      glDrawArrays(primMode, 0, NUM_VERTS);
-      disable_restart();
-
-      /* check */
-      {
-         const GLfloat x0 = 0.0;
-         const GLint iy = piglit_height / 2;
-         GLint i;
-
-         /* probe at midpoint of each line segment */
-         for (i = 0; i < NUM_VERTS - 1 && pass; i++) {
-            /* test midpoint of line to see if it was drawn */
-            const float fx = x0 + 0.5 * dx + i * dx;
-            const int ix = (int) fx;
-
-            /* read pixel */
-            if (restart_index == i || restart_index == i + 1) {
-               /* pixel should NOT be drawn here */
-               if (!piglit_probe_pixel_rgb(ix, iy, black)) {
-                  if (0)
-                     fprintf(stderr, "bad pixel drawn\n");
-                  pass = false;
-               }
-            }
-            else {
-               /* pixel should be drawn here */
-               if (!piglit_probe_pixel_rgb(ix, iy, green)) {
-                  if (0)
-                     fprintf(stderr, "bad pixel drawn\n");
-                  pass = false;
-               }
-            }
-         }
-      }
-   }
-
-   piglit_present_results();
-
-   if (vbo != 0) {
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
-   }
-
-   if (!pass) {
-      fprintf(stderr, "%s: failure drawing with glDrawArrays(%s), "
-              "restart index = %u\n",
-              TestName, primStr, restart_index);
-   }
-
-   return pass;
-}
-
-
 bool
 primitive_restart_test(VBO_CFG vbo_cfg)
 {
@@ -642,7 +523,6 @@ primitive_restart_test(VBO_CFG vbo_cfg)
       pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
       pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
       pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_arrays(vbo_cfg);
    }
 
    if (Have_31) {
