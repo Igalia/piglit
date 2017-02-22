@@ -219,16 +219,19 @@ piglit_cl_test(const int argc,
 	/*
 	 * CL_INVALID_MEM_OBJECT for an argument declared to be a memory object when
 	 * the specified arg_value is not a valid memory object.
+	 * OpenCL 1.1+ allows pointer to NULL to act as NULL argument.
 	 */
-	test_str = "Trigger CL_INVALID_MEM_OBJECT for an argument declared to be a memory object when the specified arg_value is not a valid memory object.";
-	errNo = clSetKernelArg(kernel, 0, sizeof(cl_mem), &invalid_buffer);
-	if(   errNo != CL_INVALID_MEM_OBJECT
-	   && errNo != CL_INVALID_ARG_VALUE) { // two possible values
-		piglit_cl_check_error(errNo, CL_INVALID_MEM_OBJECT);
-		fprintf(stderr,
-		        "Failed (error code: %s): %s\n",
-		        piglit_cl_get_error_name(errNo), test_str);
-		piglit_merge_result(&input_check_result, PIGLIT_FAIL);
+	if (env->version == 100) {
+		test_str = "Trigger CL_INVALID_MEM_OBJECT for an argument declared to be a memory object when the specified arg_value is not a valid memory object.";
+		errNo = clSetKernelArg(kernel, 0, sizeof(cl_mem), &invalid_buffer);
+		if(   errNo != CL_INVALID_MEM_OBJECT
+		   && errNo != CL_INVALID_ARG_VALUE) { // two possible values
+			piglit_cl_check_error(errNo, CL_INVALID_MEM_OBJECT);
+			fprintf(stderr,
+			        "Failed (error code: %s): %s\n",
+			        piglit_cl_get_error_name(errNo), test_str);
+			piglit_merge_result(&input_check_result, PIGLIT_FAIL);
+		}
 	}
 
 	/*
