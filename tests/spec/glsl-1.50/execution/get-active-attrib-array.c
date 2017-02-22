@@ -78,7 +78,7 @@ getAttribLocTest(GLint program, int active_attribs, int max_name_length,
 	bool pass = true;
 	int size = -1;
 	GLenum type = GL_NONE;
-	char *name = malloc(max_name_length-1);
+	char *name = malloc(max_name_length);
 
 	int i;
 	for(i = 0; i < active_attribs; i++) {
