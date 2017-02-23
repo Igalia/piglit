@@ -234,8 +234,8 @@ class _MinVersion(object):
     __gl_stage_min_ext = {
         # geometry_shader4 is not included here intentionally. It is
         # significantly different than the geometry shaders in OpenGL 3.2
-        'tesc': (Version('140'), 'GL_ARB_tesselation_shader'),
-        'tese': (Version('140'), 'GL_ARB_tesselation_shader'),
+        'tesc': (Version('140'), 'GL_ARB_tessellation_shader'),
+        'tese': (Version('140'), 'GL_ARB_tessellation_shader'),
         'comp': (Version('140'), 'GL_ARB_compute_shader'),
     }
     __gles_stage_min = {
@@ -250,8 +250,8 @@ class _MinVersion(object):
     # values from __gles_stage_min if they're not here
     __gles_stage_min_ext = {
         'geom': (Version('310 es'), 'GL_OES_geometry_shader'),
-        'tesc': (Version('310 es'), 'GL_OES_tesselation_shader'),
-        'tese': (Version('310 es'), 'GL_OES_tesselation_shader'),
+        'tesc': (Version('310 es'), 'GL_OES_tessellation_shader'),
+        'tese': (Version('310 es'), 'GL_OES_tessellation_shader'),
     }
 
     def for_stage(self, stage, version):
@@ -260,7 +260,7 @@ class _MinVersion(object):
         When provided a stage and a version, it will return the greater of the
         provided version and the minimum version of that stage without an
         extension. For example, in OpenGL teselation is available in GLSL
-        4.00+, or in 1.40+ with ARB_tesselation_shader. Given Version('150')
+        4.00+, or in 1.40+ with ARB_tessellation_shader. Given Version('150')
         and 'tesc' this method returns Version('400').
 
         Arguments:
@@ -291,8 +291,8 @@ class _MinVersion(object):
         provided version and the minimum version of that stage with an
         extension, and if necissary the extension as a string. For example, in
         OpenGL teselation is available in GLSL 4.00+, or in 1.40+ with
-        ARB_tesselation_shader. Given Version('150') and 'tesc' this method
-        returns (Version('150'), 'GL_ARB_tesselation_shader'); but given
+        ARB_tessellation_shader. Given Version('150') and 'tesc' this method
+        returns (Version('150'), 'GL_ARB_tessellation_shader'); but given
         Version('400') and 'tesc' it returns (Version('400'), None)
 
         If there is no extension (like with fragment and vertex) then None will
