@@ -51,3 +51,6 @@ void main()
 {
     fs_out = vs_fs;
 }
+
+[test]
+link success
