@@ -1,20 +1,20 @@
-/* Tests that no link error occurs when two different but equally
- * instanced interface blocks differ only in its binding
- * qualification between the vertex and fragment shaders.
- *
- * GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
- * "The block name (block-name) is used to match interfaces: an output
- *  block of one pipeline stage will be matched to an input block with
- *  the same name in the subsequent pipeline stage. For uniform blocks,
- *  the application uses the block name to identify the block.
- *
- *  ...
- *
- *  Outside the shading language (i.e., in the API), members are
- *  similarly identified except the block name is always used in place
- *  of the instance name (API accesses are to interfaces, not to
- *  shaders)."
- */
+# Tests that no link error occurs when two different but equally
+# instanced interface blocks differ only in its binding
+# qualification between the vertex and fragment shaders.
+#
+# GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
+# "The block name (block-name) is used to match interfaces: an output
+#  block of one pipeline stage will be matched to an input block with
+#  the same name in the subsequent pipeline stage. For uniform blocks,
+#  the application uses the block name to identify the block.
+#
+#  ...
+#
+#  Outside the shading language (i.e., in the API), members are
+#  similarly identified except the block name is always used in place
+#  of the instance name (API accesses are to interfaces, not to
+#  shaders)."
+#
 
 [require]
 GLSL >= 1.50
@@ -25,11 +25,12 @@ GL_ARB_enhanced_layouts
 #extension GL_ARB_enhanced_layouts : require
 
 layout(std140) uniform blockA {
-       layout(align = 32) vec4 a;
+	layout(align = 32) vec4 a;
 } inst;
 
 void main()
 {
+	gl_Position = inst.a;
 }
 
 [fragment shader]
@@ -37,11 +38,14 @@ void main()
 #extension GL_ARB_enhanced_layouts : require
 
 layout(std140) uniform blockB {
-       layout(align = 64) vec4 a;
+	layout(align = 64) vec4 a;
 } inst;
+
+out vec4 color;
 
 void main()
 {
+	color = inst.a;
 }
 
 [test]

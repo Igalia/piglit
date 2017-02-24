@@ -26,7 +26,7 @@ uniform blockA {
 
 void main()
 {
-    gl_Position = vec4(0.0);
+	gl_Position = inst.m[0];
 }
 
 [fragment shader]
@@ -36,8 +36,11 @@ uniform blockB {
 	layout(row_major) mat4 m;
 } inst;
 
+out vec4 color;
+
 void main()
 {
+	color = inst.m[0];
 }
 
 [test]

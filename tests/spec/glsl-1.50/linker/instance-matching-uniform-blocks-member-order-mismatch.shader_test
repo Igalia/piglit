@@ -18,24 +18,31 @@
 GLSL >= 1.50
 
 [vertex shader]
+#version 150
+
 uniform blockA {
-    vec4 a;
-    vec4 b;
+	vec4 a;
+	vec4 b;
 } inst;
 
 void main()
 {
-    gl_Position = vec4(0.0);
+	gl_Position = inst.a;
 }
 
 [fragment shader]
+#version 150
+
 uniform blockB {
-    vec4 b;
-    vec4 a;
+	vec4 b;
+	vec4 a;
 } inst;
+
+out vec4 color;
 
 void main()
 {
+	color = inst.a;
 }
 
 [test]
