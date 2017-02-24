@@ -1,0 +1,52 @@
+# Tests that no link error occurs for interfaces blocks with matching
+# instances names but mismatching array size and block names.
+#
+# instanced interface blocks differ on the array dimension of the
+# interface.
+#
+# GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
+# "The block name (block-name) is used to match interfaces: an output
+#  block of one pipeline stage will be matched to an input block with
+#  the same name in the subsequent pipeline stage. For uniform blocks,
+#  the application uses the block name to identify the block.
+#
+#  ...
+#
+#  Outside the shading language (i.e., in the API), members are
+#  similarly identified except the block name is always used in place
+#  of the instance name (API accesses are to interfaces, not to
+#  shaders)."
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+uniform blockA {
+	vec4 a;
+	vec4 b;
+} inst[3];
+
+void main()
+{
+	gl_Position = inst[0].a;
+}
+
+[fragment shader]
+#version 150
+
+uniform blockB {
+	vec4 a;
+	vec4 b;
+} inst[2];
+
+out vec4 color;
+
+void main()
+{
+	color = inst[0].a;
+}
+
+[test]
+link success
