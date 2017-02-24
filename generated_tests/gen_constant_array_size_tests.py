@@ -191,8 +191,8 @@ class ParserTest(object):
             float(self.glsl_version()) / 100)
         req_extensions = list(self.additional_extensions())
         if req_extensions:
-            parser_test += ' * require_extensions: {0}\n'.format(
-                ' '.join(req_extensions))
+            parser_test += ' * require_extensions: {}\n'.format(
+                ' '.join('GL_{}'.format(r) for r in req_extensions))
         parser_test += ' * [end config]\n'
         parser_test += ' *\n'
         parser_test += ' * Check that the following test vectors are constant'\
