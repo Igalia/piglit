@@ -1,0 +1,53 @@
+# Tests that no link error occurs when two different but equally
+# instanced interface blocks differ only in its binding
+# qualification between the vertex and fragment shaders.
+#
+# GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
+# "The block name (block-name) is used to match interfaces: an output
+#  block of one pipeline stage will be matched to an input block with
+#  the same name in the subsequent pipeline stage. For uniform blocks,
+#  the application uses the block name to identify the block.
+#
+#  ...
+#
+#  Outside the shading language (i.e., in the API), members are
+#  similarly identified except the block name is always used in place
+#  of the instance name (API accesses are to interfaces, not to
+#  shaders)."
+
+[require]
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+
+[vertex shader]
+#version 430 core
+#extension GL_ARB_enhanced_layouts : require
+
+layout (std140) uniform Block {
+    layout (offset = 65440) dmat4x3 member;
+} block;
+
+in  vec4 in_vs;
+out vec4 vs_fs;
+
+void main()
+{
+    if (dmat4x3(1) == block.member)
+    {
+        vs_fs = vec4(1, 1, 1, 1);
+    }
+
+    vs_fs += in_vs;
+}
+
+[fragment shader]
+#version 430 core
+#extension GL_ARB_enhanced_layouts : require
+
+in  vec4 vs_fs;
+out vec4 fs_out;
+
+void main()
+{
+    fs_out = vs_fs;
+}
