@@ -1,6 +1,6 @@
 # Tests that no link error occurs when two different but equally
-# instanced interface blocks differ only in its memory qualification
-# between the vertex and fragment shaders.
+# instanced interface blocks differ only in its binding
+# qualification between the vertex and fragment shaders.
 #
 # GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
 # "The block name (block-name) is used to match interfaces: an output
@@ -14,33 +14,41 @@
 #  similarly identified except the block name is always used in place
 #  of the instance name (API accesses are to interfaces, not to
 #  shaders)."
+#
+
 [require]
 GLSL >= 1.50
+GL_ARB_enhanced_layouts
+GL_ARB_shader_storage_buffer_object
 
 [vertex shader]
 #version 150
+#extension GL_ARB_enhanced_layouts : require
+#extension GL_ARB_shader_storage_buffer_object: require
 
-layout(column_major) uniform blockA {
-	mat4 m;
+layout(std140) buffer blockA {
+	layout(offset = 32) vec4 a;
 } inst;
 
 void main()
 {
-	gl_Position = inst.m[0];
+	gl_Position = inst.a;
 }
 
 [fragment shader]
 #version 150
+#extension GL_ARB_enhanced_layouts : require
+#extension GL_ARB_shader_storage_buffer_object: require
 
-layout(row_major) uniform blockB {
-	mat4 m;
+layout(std140) buffer blockB {
+	layout(offset = 64) vec4 a;
 } inst;
 
 out vec4 color;
 
 void main()
 {
-	color = inst.m[0];
+	color = inst.a;
 }
 
 [test]

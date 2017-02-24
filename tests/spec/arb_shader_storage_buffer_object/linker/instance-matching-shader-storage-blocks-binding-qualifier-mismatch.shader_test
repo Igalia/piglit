@@ -19,12 +19,14 @@
 [require]
 GLSL >= 1.50
 GL_ARB_shading_language_420pack
+GL_ARB_shader_storage_buffer_object
 
 [vertex shader]
 #version 150
 #extension GL_ARB_shading_language_420pack: require
+#extension GL_ARB_shader_storage_buffer_object: require
 
-layout(binding = 0) uniform blockA {
+layout(binding = 0) buffer blockA {
 	vec4 a;
 } inst;
 
@@ -36,8 +38,9 @@ void main()
 [fragment shader]
 #version 150
 #extension GL_ARB_shading_language_420pack: require
+#extension GL_ARB_shader_storage_buffer_object: require
 
-layout(binding = 1) uniform blockB {
+layout(binding = 1) buffer blockB {
 	vec4 a;
 } inst;
 
