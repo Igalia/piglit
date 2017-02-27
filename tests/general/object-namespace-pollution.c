@@ -1132,10 +1132,12 @@ do_CopyImageSubData(void)
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
