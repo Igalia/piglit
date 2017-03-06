@@ -1,0 +1,27 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform uint i;
+void main()
+{
+	vec3 A[130];
+	A[20].g = 0;
+	A[i].g = 37;
+	gl_FragColor.rba = vec3(0.0, 0.0, 1.0);
+	gl_FragColor.g = float(A[20].g == 37);
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+uniform uint i 19
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 0.0 1.0
+
+clear
+uniform uint i 20
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
