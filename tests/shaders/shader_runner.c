@@ -2821,7 +2821,7 @@ piglit_display(void)
 		double d[4];
 		int x, y, z, w, h, l, tex, level;
 		unsigned ux, uy;
-		char s[32];
+		char s[300]; // 300 for safety
 		enum piglit_result result = PIGLIT_PASS;
 
 		parse_whitespace(next_line, &line);
