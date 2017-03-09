@@ -1,0 +1,57 @@
+# Test that storing and reading from a large local array returns expected results
+#
+# If a local array is large enough most GPUs will not be able to fit
+# it into the fastest memory type (typically general purpose registers)
+# and have to store/load the elements into a slower memory, such as VRAM.
+#
+# One hardware example is R600 where arrays larger than 124*vec4 cannot
+# fit into its GPR register file and have to be spilled to scratch memory.
+# As of 2017-03-06 this is the largest known register file of any GPU, so
+# the test uses that as a size to guarantee some form of spilling on any GPU.
+#
+# As for limits on the size allowed for local arrays the GLSL 1.10
+# specification loosely implies a minimum limit of 64k elements
+# for an array due to 16 bit minimum precision for integer indexes. This
+# is higher than R600 scratch supports and likely more than many other gpus
+# support in practice, so this test restricts itself to testing "large enough"
+# array size.
+#
+# Later specifications leave this undefined but allow 32 bit integers for indexing.
+#
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform uint i;
+void main()
+{
+	uint A[130]; // Large enough to require spilling on all known GPUs
+	A[20] = 0u; // First store a known value to the element we will be reading back
+
+	// Store to a compile-time unknown location, which may alias the above
+	// value, forcing the compiler to emit the previous store as-is
+	//
+	// The non-constant indirection also inhibits possible splitting or
+	// lowering of the array to scalar values by the compiler
+	//
+	// 37 is a arbitrarily chosen value highly unlikely to be found at random
+	// in uninitialized scratch space memory
+	A[i] = 37u;
+
+	gl_FragColor.rba = vec3(0.0, 0.0, 1.0);
+	gl_FragColor.g = float(A[20] == 37u); // Read back the value and verify
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+uniform uint i 19
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 0.0 1.0
+
+clear
+uniform uint i 20
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
