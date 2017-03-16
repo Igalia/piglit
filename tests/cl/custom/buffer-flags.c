@@ -173,6 +173,11 @@ buffer_test(piglit_cl_context *ctx,
 
 	/* cleanup */
 cleanup:
+	/* result = out_data is set at the beginning. It's modified only if
+	 * 'result' is used to store clEnqueueMapBuffer pointer. */
+	if (result != out_data)
+		clEnqueueUnmapMemObject(context->command_queues[0], out_buffer,
+		                        result, 0, NULL, NULL);
 	clReleaseMemObject(in_buffer);
 	clReleaseMemObject(out_buffer);
 	clReleaseKernel(kernel);
