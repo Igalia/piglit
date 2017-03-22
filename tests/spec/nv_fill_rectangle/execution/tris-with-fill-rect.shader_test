@@ -1,0 +1,30 @@
+# Tests whether or not we can properly rasterize triangles as rectangles using
+# the GL_NV_fill_rectangle extension, and whether or not the rectangles obey the
+# vertex data we use
+[require]
+GLSL >= 1.10
+GL_NV_fill_rectangle
+
+[vertex shader passthrough]
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[vertex data]
+piglit_vertex/float/3
+ 0.0  0.5  0.0
+ 0.5 -0.5  0.0
+-0.5 -0.5  0.0
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_TRIANGLES 0 3
+
+relative probe rect rgb (0.26, 0.26, 0.48, 0.48) (0.0, 1.0, 0.0, 1.0)
+probe rgb 0 0 0.2 0.2 0.2

@@ -1,0 +1,38 @@
+# Tests that triangles output from the geometry shader are correctly rasterized
+# as rectangles when GL_NV_fill_rectangle is used
+[require]
+GLSL >= 1.50
+GL_NV_fill_rectangle
+
+[vertex shader passthrough]
+
+[geometry shader]
+layout(points) in;
+layout(triangle_strip, max_vertices=3) out;
+
+void main()
+{
+	gl_Position = vec4( 0.0,  0.5, 0.0, 1.0);
+	EmitVertex();
+	gl_Position = vec4( 0.5, -0.5, 0.0, 1.0);
+	EmitVertex();
+	gl_Position = vec4(-0.5, -0.5, 0.0, 1.0);
+	EmitVertex();
+	EndPrimitive();
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_POINTS 0 1
+
+relative probe rect rgb (0.26, 0.26, 0.48, 0.48) (0.0, 1.0, 0.0, 1.0)
+probe rgb 0 0 0.2 0.2 0.2

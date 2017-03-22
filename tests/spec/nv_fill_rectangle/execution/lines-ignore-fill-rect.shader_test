@@ -1,0 +1,29 @@
+# Tests that setting the glPolygonMode to GL_FILL_RECTANGLE_NV has no effect on
+# rasterization when the primitive to be rasterized is of type GL_LINES.
+[require]
+GLSL >= 1.10
+GL_NV_fill_rectangle
+
+[vertex shader passthrough]
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[vertex data]
+piglit_vertex/float/3
+-1.0 -1.0  0.0
+ 1.0  1.0  0.0
+ 1.0 -1.0  0.0
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_LINE_LOOP 0 3
+
+probe rgb  0  0 0.0 1.0 0.0
+probe rgb 10 20 0.2 0.2 0.2

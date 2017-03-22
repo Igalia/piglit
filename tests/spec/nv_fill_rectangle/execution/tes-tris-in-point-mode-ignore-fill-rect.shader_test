@@ -1,0 +1,43 @@
+# Tests that triangles coming out of the TES in point_mode don't get rasterized
+# as triangles when drawing in GL_NV_fill_rectangle mode
+[require]
+GLSL >= 1.50
+GL_NV_fill_rectangle
+GL_ARB_tessellation_shader
+
+[vertex shader passthrough]
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+layout(triangles, point_mode) in;
+
+void main()
+{
+	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
+	            + gl_in[1].gl_Position * gl_TessCoord[1]
+	            + gl_in[2].gl_Position * gl_TessCoord[2];
+	gl_PointSize = 5.0;
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[vertex data]
+piglit_vertex/float/3
+ 0.0  1.0  0.0
+ 1.0 -1.0  0.0
+-1.0 -1.0  0.0
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+enable GL_PROGRAM_POINT_SIZE
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_PATCHES 0 3
+
+probe rgb  0  0 0.0 1.0 0.0
+probe rgb 15 15 0.2 0.2 0.2

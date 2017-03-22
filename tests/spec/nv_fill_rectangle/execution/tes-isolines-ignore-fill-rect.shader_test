@@ -1,0 +1,37 @@
+# Tests that isolines are not effected by GL_NV_fill_rectangle
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+GL_NV_fill_rectangle
+
+[vertex shader]
+void main()
+{
+}
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+layout(isolines, equal_spacing) in;
+
+void main()
+{
+	gl_Position = vec4(gl_TessCoord.xx * 2.0 - 1.0, 0.0, 1.0);
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+patch parameter vertices 2
+patch parameter default level outer 1 1 0 0
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_PATCHES 0 2
+
+probe rgb 0 0 0.0 1.0 0.0
+probe rgb 0 5 0.2 0.2 0.2

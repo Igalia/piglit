@@ -1,0 +1,42 @@
+# Tests that lines output from the geometry shader are not affected by
+# GL_NV_fill_rectangle
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+GL_NV_fill_rectangle
+
+[vertex shader]
+void main()
+{
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(line_strip, max_vertices=3) out;
+
+void main()
+{
+	gl_Position = vec4( 0.0,  1.0, 0.0, 1.0);
+	EmitVertex();
+	gl_Position = vec4( 1.0, -1.0, 0.0, 1.0);
+	EmitVertex();
+	gl_Position = vec4(-1.0, -1.0, 0.0, 1.0);
+	EmitVertex();
+	EndPrimitive();
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_TRIANGLES 0 3
+
+probe rgb  0 0 0.0 1.0 0.0
+probe rgb 10 5 0.2 0.2 0.2

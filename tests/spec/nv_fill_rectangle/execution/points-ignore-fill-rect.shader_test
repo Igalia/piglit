@@ -1,0 +1,35 @@
+# Tests that GL_NV_fill_rectangle has no effect when drawing in GL_POINTS mode
+[require]
+GLSL >= 1.30
+GL_NV_fill_rectangle
+
+[vertex shader]
+in vec4 vertex;
+void main()
+{
+	gl_Position = vertex;
+	gl_PointSize = 5.0; /* so the points are always inside the window */
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[vertex data]
+vertex/float/3
+ 0.0  1.0  0.0
+ 1.0 -1.0  0.0
+-1.0 -1.0  0.0
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+enable GL_PROGRAM_POINT_SIZE
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_POINTS 0 3
+
+probe rgb  0 0 0.0 1.0 0.0
+probe rgb 10 0 0.2 0.2 0.2

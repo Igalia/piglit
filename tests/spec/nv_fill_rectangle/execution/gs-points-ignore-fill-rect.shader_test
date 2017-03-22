@@ -1,0 +1,46 @@
+# Tests that points output from the geometry shader are not affected by
+# GL_NV_fill_rectangle
+[require]
+GLSL >= 1.50
+GL_NV_fill_rectangle
+
+[vertex shader]
+void main()
+{
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(points, max_vertices=3) out;
+
+void emit_point(float x, float y)
+{
+	gl_Position = vec4(x, y, 0.0, 1.0);
+	gl_PointSize = 5.0;
+	EmitVertex();
+}
+
+void main()
+{
+	emit_point( 0.0,  1.0);
+	emit_point( 1.0, -1.0);
+	emit_point(-1.0, -1.0);
+	EndPrimitive();
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+enable GL_PROGRAM_POINT_SIZE
+polygon mode GL_FRONT_AND_BACK GL_FILL_RECTANGLE_NV
+draw arrays GL_TRIANGLES 0 3
+
+probe rgb  0 0 0.0 1.0 0.0
+probe rgb 10 0 0.2 0.2 0.2

@@ -3906,6 +3906,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'nv_fill_rectangle')) as g:
+    g(['nv_fill_rectangle-invalid-draw-mode'], 'invalid-draw-mode')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'oes_matrix_get')) as g:
     g(['oes_matrix_get-api'], 'All queries')
 
