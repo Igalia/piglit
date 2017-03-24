@@ -236,6 +236,9 @@ test_compressed_alignment_errors()
 		       GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 128, 128);
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16UI, 32, 32);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_NEAREST_MIPMAP_NEAREST);
 
 	/* Check for alignment constaints */
 	/* bad width = 21 */
@@ -264,6 +267,9 @@ test_compressed_alignment_errors()
 	 */
 	glBindTexture(GL_TEXTURE_2D, tex[2]);
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16UI, 32, 32);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_NEAREST_MIPMAP_NEAREST);
 	glCopyImageSubData(tex[0], GL_TEXTURE_2D, 0, 0, 0, 0,
 			   tex[2], GL_TEXTURE_2D, 0, 0, 0, 0, 20, 20, 1);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
