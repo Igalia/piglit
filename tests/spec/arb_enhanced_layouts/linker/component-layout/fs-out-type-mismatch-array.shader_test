@@ -6,7 +6,7 @@
 //   members is allowed."
 
 [require]
-GLSL >= 1.40
+GLSL >= 1.50
 GL_ARB_enhanced_layouts
 GL_ARB_separate_shader_objects
 GL_ARB_explicit_attrib_location
