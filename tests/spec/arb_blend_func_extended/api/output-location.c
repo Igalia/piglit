@@ -89,6 +89,7 @@ void piglit_init(int argc, char **argv)
 
 
 #ifdef PIGLIT_USE_OPENGL
+	piglit_require_GLSL_version(150);
 	piglit_require_extension("GL_ARB_blend_func_extended");
 #else // PIGLIT_USE_OPENGLES3
 	piglit_require_extension("GL_EXT_blend_func_extended");
