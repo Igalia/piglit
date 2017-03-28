@@ -92,7 +92,7 @@ EGL_KHR_create_context_setup(EGLint renderable_type_mask)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAIL);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	egl_dpy = eglGetDisplay(dpy);

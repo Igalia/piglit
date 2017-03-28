@@ -152,7 +152,7 @@ test_3(void)
 	}
 	if (!eglInitialize(dpy, &major_version, &minor_version)) {
 		printf("Failed to initialize default display\n");
-		piglit_report_result(PIGLIT_FAIL);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	display_ext_string = eglQueryString(dpy, EGL_EXTENSIONS);

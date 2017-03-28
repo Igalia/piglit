@@ -340,7 +340,7 @@ main(int argc, char **argv)
 	state.dpy = XOpenDisplay(NULL);
 	if (state.dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAIL);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	eglBindAPI(EGL_OPENGL_API);

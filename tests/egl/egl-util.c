@@ -207,8 +207,7 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	state.dpy = XOpenDisplay(NULL);
 	if (state.dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		result = PIGLIT_FAIL;
-		goto fail;
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	/* read api_bit if EGL_RENDERABLE_TYPE set in the attribs */
