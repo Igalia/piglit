@@ -81,7 +81,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_require_GLSL_version(130);
+	piglit_require_GLSL_version(330);
 
 	piglit_require_extension("GL_ARB_shader_draw_parameters");
 	piglit_require_extension("GL_ARB_base_instance");
