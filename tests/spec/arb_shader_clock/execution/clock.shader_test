@@ -1,0 +1,54 @@
+[require]
+GL >= 4.3
+GLSL >= 4.30
+GL_ARB_gpu_shader_int64
+GL_ARB_shader_clock
+
+[compute shader]
+#version 430
+#extension GL_ARB_gpu_shader_int64: require
+#extension GL_ARB_shader_clock: require
+
+layout(local_size_x = 1) in;
+
+layout(binding = 0) uniform atomic_uint good;
+layout(binding = 1) uniform atomic_uint bad;
+
+layout(std430, binding = 0) buffer ssbo_data {
+	uint64_t ssbo_time[];
+};
+
+uniform uint phase;
+
+void main() {
+	uint64_t start_time = clockARB();
+
+	if (phase == 0u) {
+		ssbo_time[gl_WorkGroupID.x] = start_time;
+	} else {
+		int64_t diff = int64_t(start_time - ssbo_time[gl_WorkGroupID.x]);
+		if (diff > 0l)
+			atomicCounterIncrement(good);
+	}
+
+	uint64_t late_time = clockARB();
+	int64_t diff = int64_t(late_time - start_time);
+
+	if (diff <= 0l)
+		atomicCounterIncrement(bad);
+}
+
+[test]
+atomic counters 2
+ssbo 0 64
+
+uniform uint phase 0
+compute 8 1 1
+
+memory barrier GL_SHADER_STORAGE_BARRIER_BIT
+
+uniform uint phase 1
+compute 8 1 1
+
+probe atomic counter 0 == 8
+probe atomic counter 1 == 0
