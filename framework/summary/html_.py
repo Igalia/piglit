@@ -31,6 +31,7 @@ import os
 import shutil
 import sys
 import tempfile
+import traceback
 
 import mako
 from mako.lookup import TemplateLookup
@@ -113,13 +114,16 @@ def _make_testrun_info(results, destination, exclude=None):
             if value.result not in exclude:
                 core.check_dir(temp_path)
 
-                with open(html_path, 'wb') as out:
-                    out.write(_TEMPLATES.get_template(
-                        'test_result.mako').render(
-                            testname=key,
-                            value=value,
-                            css=os.path.relpath(result_css, temp_path),
-                            index=os.path.relpath(index, temp_path)))
+                try:
+                    with open(html_path, 'wb') as out:
+                        out.write(_TEMPLATES.get_template(
+                            'test_result.mako').render(
+                                testname=key,
+                                value=value,
+                                css=os.path.relpath(result_css, temp_path),
+                                index=os.path.relpath(index, temp_path)))
+                except OSError as e:
+                    traceback.print_exc()
 
 
 def _make_comparison_pages(results, destination, exclude):
