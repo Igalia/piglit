@@ -320,8 +320,6 @@ piglit_init(int argc, char **argv)
    int ret = PIGLIT_PASS;
    piglit_require_extension("GL_ARB_vertex_attrib_64bit");
 
-   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
    if (!test_attrib_funcs())
       ret = PIGLIT_FAIL;
 
