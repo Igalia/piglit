@@ -1,0 +1,78 @@
+[require]
+GL >= 4.0
+GLSL >= 4.00
+GL_ARB_gpu_shader_int64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 400
+#extension GL_ARB_gpu_shader_int64 : require
+
+uniform int64_t ival;
+uniform uint64_t uval;
+uniform int shl, shr;
+
+uniform int64_t iexpected_shl;
+uniform int64_t iexpected_shr;
+uniform uint64_t uexpected_shl;
+uniform uint64_t uexpected_shr;
+
+out vec4 color;
+
+void main()
+{
+	int64_t iresult_shl = ival << shl;
+	uint64_t uresult_shl = uval << shl;
+	int64_t iresult_shr = ival >> shr;
+	uint64_t uresult_shr = uval >> shr;
+
+	if (iresult_shl != iexpected_shl)
+		color = vec4(1.0, 0.0, float(iresult_shl) / 255.0, 0.0);
+	else if (iresult_shr != iexpected_shr)
+		color = vec4(1.0, 0.1, float(iresult_shr) / 255.0, 0.0);
+	else if (uresult_shl != uexpected_shl)
+		color = vec4(1.0, 0.2, float(uresult_shl) / 255.0, 0.0);
+	else if (uresult_shr != uexpected_shr)
+		color = vec4(1.0, 0.3, float(uresult_shr) / 255.0, 0.0);
+	else
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int64_t ival 3
+uniform uint64_t uval 3
+uniform int shl 1
+uniform int shr 1
+uniform int64_t iexpected_shl 6
+uniform int64_t iexpected_shr 1
+uniform uint64_t uexpected_shl 6
+uniform uint64_t uexpected_shr 1
+draw rect ortho 0 0 4 4
+
+uniform int64_t ival 0x7848302090a0b0c6
+uniform uint64_t uval 0xc01020308090a0b5
+uniform int shl 4
+uniform int shr 4
+uniform int64_t iexpected_shl -0x7b7cfdf6f5f4f3a0 # bit pattern: 0x848302090a0b0c60
+uniform int64_t iexpected_shr 0x07848302090a0b0c
+uniform uint64_t uexpected_shl 0x01020308090a0b50
+uniform uint64_t uexpected_shr 0x0c01020308090a0b
+draw rect ortho 4 0 4 4
+
+uniform int64_t ival -0x7dfcfefbdf6536ff # bit pattern: 0x82030104209ac901
+uniform uint64_t uval 0x1400000085010203
+uniform int shl 8
+uniform int shr 8
+uniform int64_t iexpected_shl 0x030104209ac90100
+uniform int64_t iexpected_shr -0x7dfcfefbdf6537 # bit pattern: 0xff82030104209ac9
+uniform uint64_t uexpected_shl 0x0000008501020300
+uniform uint64_t uexpected_shr 0x0014000000850102
+draw rect ortho 8 0 4 4
+
+probe rect rgba (0, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (4, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (8, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)

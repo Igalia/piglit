@@ -1,0 +1,77 @@
+[require]
+GL >= 4.0
+GLSL >= 4.00
+GL_ARB_gpu_shader_int64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 400
+#extension GL_ARB_gpu_shader_int64 : require
+
+uniform i64vec4 ival;
+uniform u64vec4 uval;
+uniform int shl, shr;
+
+uniform i64vec4 iexpected_shl;
+uniform i64vec4 iexpected_shr;
+uniform u64vec4 uexpected_shl;
+uniform u64vec4 uexpected_shr;
+
+out vec4 color;
+
+void main()
+{
+	i64vec4 iresult_shl = ival << shl;
+	u64vec4 uresult_shl = uval << shl;
+	i64vec4 iresult_shr = ival >> shr;
+	u64vec4 uresult_shr = uval >> shr;
+
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	for (int i = 0; i < 4; ++i) {
+		if (iresult_shl[i] != iexpected_shl[i]) {
+			color = vec4(1.0, 0.0, i / 255.0, float(iresult_shl[i]) / 255.0);
+			break;
+		}
+		if (iresult_shr[i] != iexpected_shr[i]) {
+			color = vec4(1.0, 0.1, i / 255.0, float(iresult_shr[i]) / 255.0);
+			break;
+		}
+		if (uresult_shl[i] != uexpected_shl[i]) {
+			color = vec4(1.0, 0.2, i / 255.0, float(uresult_shl[i]) / 255.0);
+			break;
+		}
+		if (uresult_shr[i] != uexpected_shr[i]) {
+			color = vec4(1.0, 0.3, i / 255.0, float(uresult_shr[i]) / 255.0);
+			break;
+		}
+	}
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform i64vec4 ival 0x12 0x13 0x14 0x15
+uniform u64vec4 uval 0x23 0x24 0x25 0x26
+uniform int shl 2
+uniform int shr 2
+uniform i64vec4 iexpected_shl 0x48 0x4c 0x50 0x54
+uniform i64vec4 iexpected_shr 0x4 0x4 0x5 0x5
+uniform u64vec4 uexpected_shl 0x8c 0x90 0x94 0x98
+uniform u64vec4 uexpected_shr 0x8 0x9 0x9 0x9
+draw rect ortho 0 0 4 4
+
+uniform i64vec4 ival 0x7848302090a0b0c6 0x15 -0x15 0x123456789a
+uniform u64vec4 uval 0xc01020308090a0b5 0x15 0x4832 0x123456789a
+uniform int shl 4
+uniform int shr 4
+uniform i64vec4 iexpected_shl -0x7b7cfdf6f5f4f3a0 0x150 -0x150 0x123456789a0
+uniform i64vec4 iexpected_shr 0x07848302090a0b0c 0x1 -0x2 0x123456789
+uniform u64vec4 uexpected_shl 0x01020308090a0b50 0x150 0x48320 0x123456789a0
+uniform u64vec4 uexpected_shr 0x0c01020308090a0b 0x1 0x483 0x123456789
+draw rect ortho 4 0 4 4
+
+probe rect rgba (0, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (4, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
