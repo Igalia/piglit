@@ -1,0 +1,52 @@
+[require]
+GL >= 3.2
+GLSL >= 1.50
+GL_ARB_gpu_shader_int64
+GL_ARB_gpu_shader5
+GL_ARB_shader_ballot
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shader_ballot : require
+#extension GL_ARB_gpu_shader_int64 : require
+#extension GL_ARB_gpu_shader5 : require
+
+out vec4 outcolor;
+
+int findLSB64(uint64_t v)
+{
+	uvec2 split = unpackUint2x32(v);
+	int lsb = findLSB(split.x);
+	if (lsb >= 0)
+		return lsb;
+
+	lsb = findLSB(split.y);
+	if (lsb >= 0)
+		return 32 + lsb;
+
+	return -1;
+}
+
+void main() {
+	uint64_t active_set = ballotARB(true);
+	int first_invocation = findLSB64(active_set);
+
+	outcolor = vec4(0.0, 1.0, 0.0, 1.0);
+
+	uint expected = uint(42 + first_invocation);
+	uint read = readFirstInvocationARB(gl_SubGroupInvocationARB + 42u);
+
+	if (read == expected)
+		outcolor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		outcolor = vec4(1.0, read / 255.0, expected / 255.0, gl_SubGroupInvocationARB / 255.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
