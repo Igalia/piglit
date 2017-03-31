@@ -1,0 +1,32 @@
+[require]
+GL >= 3.2
+GLSL >= 1.50
+GL_ARB_shader_ballot
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shader_ballot : require
+
+out vec4 outcolor;
+
+void main() {
+	uint first_invocation = readFirstInvocationARB(gl_SubGroupInvocationARB);
+
+	outcolor = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (first_invocation != gl_SubGroupInvocationARB) {
+		uint new_first_invocation = readFirstInvocationARB(gl_SubGroupInvocationARB);
+
+		if (first_invocation == new_first_invocation)
+			outcolor = vec4(1.0, 0.0, first_invocation / 255.0, gl_SubGroupInvocationARB / 255.0);
+	}
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
