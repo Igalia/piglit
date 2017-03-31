@@ -1,0 +1,83 @@
+[require]
+GL >= 3.2
+GLSL >= 1.50
+GL_ARB_shader_ballot
+GL_ARB_gpu_shader_int64
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shader_ballot : require
+#extension GL_ARB_gpu_shader_int64 : require
+#extension GL_ARB_gpu_shader5 : require
+
+out vec4 outcolor;
+
+int findLSB64(uint64_t v)
+{
+	uvec2 split = unpackUint2x32(v);
+	int lsb = findLSB(split.x);
+	if (lsb >= 0)
+		return lsb;
+
+	lsb = findLSB(split.y);
+	if (lsb >= 0)
+		return 32 + lsb;
+
+	return -1;
+}
+
+
+void main() {
+	uint64_t active_set = ballotARB(true);
+	bool ok = true;
+
+	uint64_t even_set = active_set & 0x5555555555555555ul;
+	uint64_t odd_set = active_set & 0xaaaaaaaaaaaaaaaaul;
+	uint64_t even_inner = 0ul;
+	uint64_t odd_inner = 0ul;
+
+	outcolor = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (gl_SubGroupInvocationARB % 2u == 0u) {
+		even_inner = ballotARB(true);
+		if (ok && even_inner != even_set) {
+			outcolor = vec4(1.0, 0.1, 0.0, gl_SubGroupInvocationARB / 255.0);
+			ok = false;
+		}
+	} else {
+		odd_inner = ballotARB(true);
+		if (ok && odd_inner != odd_set) {
+			outcolor = vec4(1.0, 0.2, 0.0, gl_SubGroupInvocationARB / 255.0);
+			ok = false;
+		}
+	}
+
+	int first_even = findLSB64(even_set);
+	int first_odd = findLSB64(odd_set);
+
+	if (first_even >= 0) {
+		even_inner = packUint2x32(readInvocationARB(unpackUint2x32(even_inner), first_even));
+	}
+	if (first_odd >= 0) {
+		odd_inner = packUint2x32(readInvocationARB(unpackUint2x32(odd_inner), first_odd));
+	}
+
+	if (ok && even_inner != even_set) {
+		outcolor = vec4(1.0, 0.3, first_even / 255.0, gl_SubGroupInvocationARB / 255.0);
+		ok = false;
+	}
+	if (ok && odd_inner != odd_set) {
+		outcolor = vec4(1.0, 0.4, first_odd / 255.0, gl_SubGroupInvocationARB / 255.0);
+		ok = false;
+	}
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
