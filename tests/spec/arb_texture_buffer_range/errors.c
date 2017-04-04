@@ -69,6 +69,15 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	/* From OpenGL 4.5 spec, section 8.9 Buffer Textures:
+	 *
+	 * "An INVALID_ENUM error is generated if the effective target is not
+	 *  TEXTURE_BUFFER."
+	 */
+	glTexBufferRange(GL_TEXTURE_2D, GL_RGBA8, bo, 0, 4);
+	if (!piglit_check_gl_error(GL_INVALID_ENUM))
+		piglit_report_result(PIGLIT_FAIL);
+
 	/* If <offset> is negative or if <size> is
 	 * less than or equal to zero or if <offset> + <size> is greater than
 	 * the value of BUFFER_SIZE for the buffer bound to <target>, of if
