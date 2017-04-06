@@ -1,0 +1,33 @@
+# Test return lowering when nested in a loop thats nested in an if.
+#
+# Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=100303
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform int a;
+
+vec4 func1()
+{
+   if(a >= 1) {
+      for(int i = 0; i < a; i++) {
+         return vec4(0.0, 1.0, 0.0, 1.0);
+      }
+   }
+   return vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+void main(void)
+{
+    gl_FragColor = func1();
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+
+uniform int a 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
