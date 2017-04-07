@@ -1042,6 +1042,7 @@ with profile.test_list.group_manager(
     g(['blendminmax'], run_concurrent=False)
     g(['blendsquare'], run_concurrent=False)
     g(['gl-1.4-dlist-multidrawarrays'])
+    g(['gl-1.4-multidrawarrays-errors'])
     g(['gl-1.4-polygon-offset'])
     g(['draw-batch'], run_concurrent=False)
     g(['stencil-wrap'], run_concurrent=False)
