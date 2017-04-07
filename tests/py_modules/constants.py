@@ -28,8 +28,13 @@ import sys
 import subprocess
 
 TESTS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-GENERATED_TESTS_DIR = os.path.abspath(
-    os.path.join(TESTS_DIR, '..', 'generated_tests'))
+
+# If the PIGLIT_BUILD_DIR env var is set, we want to look for the
+# generated tests in $PIGLIT_BUILD_DIR/generated_tests/.  Otherwise,
+# look in TESTS_DIR/../generated_tests.
+GENERATED_TESTS_DIR = os.path.abspath(os.path.join(
+    os.environ.get('PIGLIT_BUILD_DIR', os.path.join(TESTS_DIR, '..')),
+    'generated_tests'))
 
 # If on cygwin convert to a dos style path
 if sys.platform == 'cygwin':
