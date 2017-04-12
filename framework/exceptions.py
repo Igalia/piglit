@@ -56,6 +56,9 @@ def handler(func):
             print('Aborting Piglit execution: {}'.format(str(e)),
                   file=sys.stderr)
             sys.exit(3)
+        except PiglitUserError as e:
+            print('User error: {}'.format(str(e)), file=sys.stderr)
+            sys.exit(1)
 
     return _inner
 
@@ -91,6 +94,14 @@ class PiglitFatalError(Exception):
     When this class (or a subclass) is raised it should be raised all the way
     to the top of the program where it exits.
 
+    """
+
+
+class PiglitUserError(Exception):
+    """Class for user configuration errors.
+
+    When this class (or a subclass) is raised it should be raised all the way
+    to the top of the program where it exits.
     """
 
 
