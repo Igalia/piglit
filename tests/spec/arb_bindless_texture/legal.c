@@ -48,8 +48,10 @@ call_TexSubImage_when_texture_is_referenced(void *data)
 	tex = piglit_integer_texture(GL_RGBA32I, 16, 16, 0, 0);
 
 	glGetTextureHandleARB(tex);
-	if (!piglit_check_gl_error(GL_NO_ERROR))
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		free(img);
 		return PIGLIT_FAIL;
+	}
 
 	/* The ARB_bindless_texture spec says:
 	 *
@@ -61,10 +63,10 @@ call_TexSubImage_when_texture_is_referenced(void *data)
 	 */
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 16, 16, GL_RGBA_INTEGER,
 			GL_INT, img);
+	free(img);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		return PIGLIT_FAIL;
 
-	free(img);
 	return PIGLIT_PASS;
 }
 
@@ -126,10 +128,10 @@ call_CompressedTexSubImage_when_texture_is_referenced(void *data)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 16, 16,
 				  GL_COMPRESSED_RGBA_BPTC_UNORM, size,
 				  compressed);
+	free(compressed);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		return PIGLIT_FAIL;
 
-	free(compressed);
 	return PIGLIT_PASS;
 }
 
