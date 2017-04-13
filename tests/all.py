@@ -2456,6 +2456,7 @@ with profile.test_list.group_manager(
       'built-in constants')
     g(['arb_shading_language_420pack-multiple-layout-qualifiers'],
       'multiple layout qualifiers')
+    g(['arb_shading_language_420pack-active-sampler-conflict'], 'active sampler conflict')
     g(['arb_shading_language_420pack-binding-layout'], 'binding layout')
 
 # Group ARB_enhanced_layouts
