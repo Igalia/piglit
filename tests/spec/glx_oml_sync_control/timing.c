@@ -139,7 +139,7 @@ draw(Display *dpy)
 					      msc_remainder, &new_ust,
 					      &new_msc, &new_sbc))
 			{
-				fprintf(stderr, "glXWaitForSbcOML failed\n");
+				fprintf(stderr, "glXWaitForMscOML failed\n");
 				result = PIGLIT_FAIL;
 			}
 		}
