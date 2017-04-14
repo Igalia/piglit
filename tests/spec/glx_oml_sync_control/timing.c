@@ -139,6 +139,21 @@ draw(Display *dpy)
 
 	piglit_set_timeout(5, PIGLIT_FAIL);
 
+	/* Perform a swap / wait once before the loop. Without this, the first
+	 * loop iteration can start at any point of the display refresh cycle.
+	 * If we called glXGetSyncValuesOML shortly before a vertical blank
+	 * period, it may be too late for the first iteration swap / wait to
+	 * hit the target MSC, which would result in at least a warning.
+	 */
+	if (use_swapbuffers) {
+		if (!swap_buffers_msc(dpy, last_sbc, &last_sbc, last_msc + 1,
+				      0, 0, &last_ust, &last_msc, &last_sbc,
+				      &result))
+			return PIGLIT_FAIL;
+	} else {
+		wait_for_msc(dpy, last_msc + 1, 0, 0, &last_ust, &last_msc,
+			     &last_sbc, &result);
+	}
 
 	for (i = 0; i < loops; i++) {
 		int64_t new_ust = 0xd0, new_msc = 0xd0, new_sbc = 0xd0;
