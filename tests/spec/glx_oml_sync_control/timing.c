@@ -59,6 +59,51 @@ static double get_stddev(struct stats *stats) {
 	return sqrt(stats->M2 / (stats->n - 1));
 }
 
+static bool
+swap_buffers_msc(Display *dpy, int64_t last_sbc, int64_t *target_sbc,
+		 int64_t target_msc, int64_t divisor, int64_t remainder,
+		 int64_t *new_ust, int64_t *new_msc, int64_t *new_sbc,
+		 enum piglit_result *result)
+{
+	glClearColor(0.0, 1.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	*target_sbc = glXSwapBuffersMscOML(dpy, win, target_msc, divisor,
+					   remainder);
+	if (*target_sbc <= 0) {
+		fprintf(stderr, "SwapBuffersMscOML failed\n");
+		return false;
+	}
+
+	if (*target_sbc != last_sbc + 1) {
+		fprintf(stderr,
+			"glXSwapBuffersMscOML calculated the wrong target sbc: "
+			"expected %"PRId64" but got %"PRId64"\n", last_sbc + 1,
+			*target_sbc);
+		*result = PIGLIT_FAIL;
+	}
+
+	if (!glXWaitForSbcOML(dpy, win, *target_sbc, new_ust, new_msc,
+			      new_sbc)) {
+		fprintf(stderr, "glXWaitForSbcOML failed\n");
+		*result = PIGLIT_FAIL;
+	}
+
+	return true;
+}
+
+static void
+wait_for_msc(Display *dpy, int64_t target_msc, int64_t divisor,
+	     int64_t remainder, int64_t *new_ust, int64_t *new_msc,
+	     int64_t *new_sbc, enum piglit_result *result)
+{
+	if (!glXWaitForMscOML(dpy, win, target_msc, divisor, remainder,
+			      new_ust, new_msc, new_sbc)) {
+		fprintf(stderr, "glXWaitForMscOML failed\n");
+		*result = PIGLIT_FAIL;
+	}
+}
+
 static enum piglit_result
 draw(Display *dpy)
 {
@@ -107,41 +152,15 @@ draw(Display *dpy)
 		}
 
 		if (use_swapbuffers) {
-			glClearColor(0.0, 1.0, 0.0, 0.0);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			target_sbc = glXSwapBuffersMscOML(dpy, win,
-							  target_msc, divisor,
-							  msc_remainder);
-			if (target_sbc <= 0) {
-				fprintf(stderr, "SwapBuffersMscOML failed\n");
+			if (!swap_buffers_msc(dpy, last_sbc, &target_sbc,
+					      target_msc, divisor,
+					      msc_remainder, &new_ust, &new_msc,
+					      &new_sbc, &result))
 				return PIGLIT_FAIL;
-			}
-			if (target_sbc != last_sbc + 1) {
-				fprintf(stderr,
-					"glXSwapBuffersMscOML calculated the"
-					" wrong target sbc: expected %"PRId64
-					" but got %"PRId64"\n",
-					last_sbc + 1, target_sbc);
-				result = PIGLIT_FAIL;
-			}
-
-			if (!glXWaitForSbcOML(dpy, win, target_sbc,
-					      &new_ust, &new_msc, &new_sbc))
-			{
-				fprintf(stderr, "glXWaitForSbcOML failed\n");
-				result = PIGLIT_FAIL;
-			}
 		} else {
 			target_sbc = last_sbc;
-
-			if (!glXWaitForMscOML(dpy, win, target_msc, divisor,
-					      msc_remainder, &new_ust,
-					      &new_msc, &new_sbc))
-			{
-				fprintf(stderr, "glXWaitForMscOML failed\n");
-				result = PIGLIT_FAIL;
-			}
+			wait_for_msc(dpy, target_msc, divisor, msc_remainder,
+				     &new_ust, &new_msc, &new_sbc, &result);
 		}
 		new_timestamp = piglit_time_get_nano();
 
