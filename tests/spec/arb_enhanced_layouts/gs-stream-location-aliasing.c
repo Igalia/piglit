@@ -71,7 +71,6 @@ static const char gs_text[] =
 
 static const int num_in_vertices = 2;
 static const int num_xfb_results_per_stream = 2 * 2;
-static const int num_total_xfb_results = 2 * 2 * 2;
 
 static void
 build_and_use_program()
