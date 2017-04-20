@@ -63,7 +63,6 @@ void piglit_init(int argc, char **argv)
 	GLuint vs;
 	GLuint *readback;
 	GLuint buffer[BUFFER_SIZE];
-	GLuint expected[BUFFER_SIZE];
 	int i;
 	bool pass = true;
 	GLint input_index;
@@ -124,8 +123,8 @@ void piglit_init(int argc, char **argv)
 	/* Check output */
 	for (i = 0; i < BUFFER_SIZE; ++i) {
 		if (verts[i] != readback[i]) {
-			printf("readback[%u]: %u, expected: %u\n", i,
-			       readback[i], expected[i]);
+			printf("readback[%u]: %u, verts[%u]: %u\n", i,
+			       readback[i], i, verts[i]);
 			pass = false;
 		}
 	}
