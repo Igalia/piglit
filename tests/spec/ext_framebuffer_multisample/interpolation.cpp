@@ -72,7 +72,8 @@
  *   shader that sets the blue channel to 1.0 (so that the triangles
  *   can be seen) and the red and green channels to 1.0 if any of the
  *   centroid-interpolated barycentric coordinates is outside the
- *   range [0, 1].
+ *   range [0, 1]; except when num_samples == 0, in which case
+ *   it behaves like centroid-disabled.
  *
  * - non-centroid-deriv: verify that the numeric derivative of a
  *   varying using non-centroid interpolation is correct, even at
@@ -338,8 +339,13 @@ piglit_init(int argc, char **argv)
 		ref_frag = frag_non_centroid_barycentric;
 		disable_msaa_during_test_image = true;
 	} else if (strcmp(argv[2], "centroid-edges") == 0) {
-		frag = frag_centroid_range_check;
-		ref_frag = frag_blue;
+		if (num_samples == 0) {
+			frag = frag_centroid_barycentric;
+			ref_frag = frag_non_centroid_barycentric;
+		} else {
+			frag = frag_centroid_range_check;
+			ref_frag = frag_blue;
+		}
 	} else if (strcmp(argv[2], "non-centroid-deriv") == 0) {
 		frag = frag_non_centroid_deriv;
 	        ref_frag = frag_rg_0_5;
