@@ -1,0 +1,52 @@
+[require]
+GLSL >= 4.00
+
+[vertex shader]
+#version 400
+
+uniform vec4 instance_colors[] = vec4[](vec4(0.0, 1.0, 0.0, 1.0),
+					vec4(0.0, 0.5, 0.5, 1.0),
+					vec4(0.0, 0.0, 1.0, 1.0));
+in vec4 piglit_vertex;
+out vec4 color, pos;
+
+void main()
+{
+  color = instance_colors[gl_InstanceID];
+
+  vec4 v = piglit_vertex;
+  v.x += 20.0 * float(gl_InstanceID) / 125.0;
+
+  pos = v;
+}
+
+[tessellation evaluation shader]
+#version 400
+layout(quads) in;
+
+in vec4 color[], pos[];
+out vec4 fs_color;
+
+void main()
+{
+  gl_Position = mix(mix(pos[0], pos[1], gl_TessCoord[0]),
+                    mix(pos[2], pos[3], gl_TessCoord[0]), gl_TessCoord[1]);
+  fs_color = color[0];
+}
+
+[fragment shader]
+#version 400
+in vec4 fs_color;
+
+void main()
+{
+  gl_FragColor = fs_color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+draw instanced rect ortho patch 3 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
+probe rgb 35 15 0.0 0.5 0.5
+probe rgb 55 15 0.0 0.0 1.0
