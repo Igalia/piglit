@@ -3001,6 +3001,30 @@ piglit_display(void)
 			program_subroutine_uniforms();
 			parse_floats(rest, c, 4, NULL);
 			piglit_draw_rect(c[0], c[1], c[2], c[3]);
+		} else if (parse_str(line, "draw instanced rect ortho patch ", &rest)) {
+			int instance_count;
+
+			result = program_must_be_in_use();
+			sscanf(rest, "%d %f %f %f %f",
+			       &instance_count,
+			       c + 0, c + 1, c + 2, c + 3);
+			piglit_draw_rect_custom(-1.0 + 2.0 * (c[0] / piglit_width),
+						-1.0 + 2.0 * (c[1] / piglit_height),
+						2.0 * (c[2] / piglit_width),
+						2.0 * (c[3] / piglit_height), true,
+						instance_count);
+		} else if (parse_str(line, "draw instanced rect ortho ", &rest)) {
+			int instance_count;
+
+			result = program_must_be_in_use();
+			sscanf(rest, "%d %f %f %f %f",
+			       &instance_count,
+			       c + 0, c + 1, c + 2, c + 3);
+			piglit_draw_rect_custom(-1.0 + 2.0 * (c[0] / piglit_width),
+						-1.0 + 2.0 * (c[1] / piglit_height),
+						2.0 * (c[2] / piglit_width),
+						2.0 * (c[3] / piglit_height), false,
+						instance_count);
 		} else if (parse_str(line, "draw instanced rect ", &rest)) {
 			int primcount;
 
