@@ -144,7 +144,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(draw_prog);
-	piglit_draw_rect_from_arrays(quad_verts, NULL, false);
+	piglit_draw_rect_from_arrays(quad_verts, NULL, false, 1);
 
 	/* Scan the previous render.  Draw green if the samples are all
 	 * (verifiably) the same, blue if there may be differences, and red if

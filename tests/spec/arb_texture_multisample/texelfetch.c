@@ -127,7 +127,7 @@ piglit_display(void)
 	piglit_check_gl_error(GL_NO_ERROR);
 
 	glUseProgram(draw_prog);
-	piglit_draw_rect_from_arrays(quad_verts, NULL, false);
+	piglit_draw_rect_from_arrays(quad_verts, NULL, false, 1);
 
 	piglit_check_gl_error(GL_NO_ERROR);
 

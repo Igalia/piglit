@@ -113,5 +113,5 @@ draw_3d_depth(float x, float y, float w, float h, int depth)
 				 1.0, 1.0,
 				 0.0, 1.0};
 
-	piglit_draw_rect_from_arrays(vertices, texcoords, false);
+	piglit_draw_rect_from_arrays(vertices, texcoords, false, 1);
 }

@@ -2982,7 +2982,7 @@ piglit_display(void)
 			piglit_draw_rect_custom(-1.0 + 2.0 * (c[0] / piglit_width),
 						-1.0 + 2.0 * (c[1] / piglit_height),
 						2.0 * (c[2] / piglit_width),
-						2.0 * (c[3] / piglit_height), true);
+						2.0 * (c[3] / piglit_height), true, 1);
 		} else if (parse_str(line, "draw rect ortho ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();
@@ -2995,7 +2995,7 @@ piglit_display(void)
 		} else if (parse_str(line, "draw rect patch ", &rest)) {
 			result = program_must_be_in_use();
 			parse_floats(rest, c, 4, NULL);
-			piglit_draw_rect_custom(c[0], c[1], c[2], c[3], true);
+			piglit_draw_rect_custom(c[0], c[1], c[2], c[3], true, 1);
 		} else if (parse_str(line, "draw rect ", &rest)) {
 			result = program_must_be_in_use();
 			program_subroutine_uniforms();

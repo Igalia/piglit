@@ -663,7 +663,7 @@ required_gl_version_from_glsl_version(unsigned glsl_version)
  */
 void
 piglit_draw_rect_from_arrays(const void *verts, const void *tex,
-			     bool use_patches)
+			     bool use_patches, unsigned instance_count)
 {
 	bool use_fixed_function_attributes;
 
@@ -712,7 +712,10 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex,
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		}
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		if (instance_count > 1)
+			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, instance_count);
+		else
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		if (verts)
 			glDisableClientState(GL_VERTEX_ARRAY);
@@ -779,11 +782,18 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex,
 
 			glGetIntegerv(GL_PATCH_VERTICES, &old_patch_vertices);
 			glPatchParameteri(GL_PATCH_VERTICES, 4);
-			glDrawArrays(GL_PATCHES, 0, 4);
+			if (instance_count > 1)
+				glDrawArraysInstanced(GL_PATCHES, 0, 4, instance_count);
+			else
+				glDrawArrays(GL_PATCHES, 0, 4);
 			glPatchParameteri(GL_PATCH_VERTICES, old_patch_vertices);
 		}
-		else
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		else {
+			if (instance_count > 1)
+				glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, instance_count);
+			else
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
 
 		if (verts)
 			glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
@@ -804,7 +814,8 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex,
  * Convenience function to draw an axis-aligned rectangle.
  */
 GLvoid
-piglit_draw_rect_custom(float x, float y, float w, float h, bool use_patches)
+piglit_draw_rect_custom(float x, float y, float w, float h, bool use_patches,
+			unsigned instance_count)
 {
 	float verts[4][4];
 
@@ -825,7 +836,7 @@ piglit_draw_rect_custom(float x, float y, float w, float h, bool use_patches)
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
 
-	piglit_draw_rect_from_arrays(verts, NULL, use_patches);
+	piglit_draw_rect_from_arrays(verts, NULL, use_patches, instance_count);
 }
 
 /**
@@ -834,7 +845,7 @@ piglit_draw_rect_custom(float x, float y, float w, float h, bool use_patches)
 GLvoid
 piglit_draw_rect(float x, float y, float w, float h)
 {
-	piglit_draw_rect_custom(x, y, w, h, false);
+	piglit_draw_rect_custom(x, y, w, h, false, 1);
 }
 
 /**
@@ -862,7 +873,7 @@ piglit_draw_rect_z(float z, float x, float y, float w, float h)
 	verts[3][2] = z;
 	verts[3][3] = 1.0;
 
-	piglit_draw_rect_from_arrays(verts, NULL, false);
+	piglit_draw_rect_from_arrays(verts, NULL, false, 1);
 }
 
 /**
@@ -901,7 +912,7 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
 	tex[3][0] = tx + tw;
 	tex[3][1] = ty + th;
 
-	piglit_draw_rect_from_arrays(verts, tex, false);
+	piglit_draw_rect_from_arrays(verts, tex, false, 1);
 }
 
 unsigned

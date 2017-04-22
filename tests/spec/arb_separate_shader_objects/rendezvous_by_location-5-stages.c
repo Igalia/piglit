@@ -167,7 +167,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBindProgramPipeline(pipeline);
-	piglit_draw_rect_custom(-1, -1, 2, 2, true);
+	piglit_draw_rect_custom(-1, -1, 2, 2, true, 1);
 
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
 				      expected);
