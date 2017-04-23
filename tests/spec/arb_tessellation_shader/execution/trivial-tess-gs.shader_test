@@ -1,0 +1,56 @@
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader passthrough]
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader : require
+layout(triangles) in;
+out vec2 pos;
+
+void main() {
+	pos =	gl_in[0].gl_Position.xy * gl_TessCoord[0] +
+		gl_in[1].gl_Position.xy * gl_TessCoord[1] +
+		gl_in[2].gl_Position.xy * gl_TessCoord[2];
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+in vec2 pos[3];
+
+void main() {
+	gl_Position = vec4(pos[0], 0, 1);
+	EmitVertex();
+	gl_Position = vec4(pos[1], 0, 1);
+	EmitVertex();
+	gl_Position = vec4(pos[2], 0, 1);
+	EmitVertex();
+}
+
+[fragment shader]
+
+void main()
+{
+	gl_FragColor = vec4(0, 1, 0, 0);
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+
+[test]
+patch parameter default level outer 1 1 1 1
+patch parameter default level inner 1 1
+
+clear color 0.5 0.5 0.5 1.0
+clear
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+probe all rgba 0 1 0 0
