@@ -3418,7 +3418,19 @@ piglit_display(void)
 			if (!piglit_probe_rect_rgb(x, y, w, h, &c[4])) {
 				result = PIGLIT_FAIL;
 			}
+		} else if (sscanf(line, "relative probe rect rgba "
+				  "( %f , %f , %f , %f ) "
+				  "( %f , %f , %f , %f )",
+				  c + 0, c + 1, c + 2, c + 3,
+				  c + 4, c + 5, c + 6, c + 7) == 8) {
+			x = c[0] * read_width;
+			y = c[1] * read_height;
+			w = c[2] * read_width;
+			h = c[3] * read_height;
 
+			if (!piglit_probe_rect_rgba(x, y, w, h, &c[4])) {
+				result = PIGLIT_FAIL;
+			}
 		} else if (sscanf(line, "relative probe rect rgba int "
 				  "( %f , %f , %f , %f ) "
 				  "( %d , %d , %d , %d )",
