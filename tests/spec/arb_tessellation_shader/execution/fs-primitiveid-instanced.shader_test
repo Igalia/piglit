@@ -1,0 +1,79 @@
+# Test that the gl_PrimitiveID input in the FS is correctly set up and starts
+# at 0 for each instance in instanced draws.
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader]
+#version 150
+
+out int vs_tcs_id;
+out int vs_tcs_instance;
+
+void main()
+{
+	vs_tcs_id = gl_VertexID;
+	vs_tcs_instance = gl_InstanceID;
+}
+
+[tessellation control shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+layout(vertices = 1) out;
+in int vs_tcs_id[];
+in int vs_tcs_instance[];
+out vec2 tcs_tes_position[];
+
+void main()
+{
+	tcs_tes_position[gl_InvocationID].x = -1.0 + vs_tcs_id[gl_InvocationID];
+	tcs_tes_position[gl_InvocationID].y = -1.0 + vs_tcs_instance[gl_InvocationID];
+
+	gl_TessLevelInner[0] = 1.0;
+	gl_TessLevelInner[1] = 1.0;
+
+	gl_TessLevelOuter[0] = 1.0;
+	gl_TessLevelOuter[1] = 1.0;
+	gl_TessLevelOuter[2] = 1.0;
+	gl_TessLevelOuter[3] = 1.0;
+}
+
+[tessellation evaluation shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+layout(quads, equal_spacing) in;
+
+in vec2 tcs_tes_position[];
+
+void main()
+{
+	gl_Position = vec4(tcs_tes_position[0].x + gl_TessCoord.x,
+			   tcs_tes_position[0].y + gl_TessCoord.y,
+			   0.0, 1.0);
+}
+
+[fragment shader]
+#version 150
+
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, gl_PrimitiveID * 0.1, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+patch parameter vertices 1
+draw arrays instanced GL_PATCHES 0 2 2
+
+# First instance
+relative probe rect rgba (0.0, 0.0, 0.5, 0.5) (0.0, 1.0, 0.0, 1.0)
+relative probe rect rgba (0.5, 0.0, 0.5, 0.5) (0.0, 1.0, 0.1, 1.0)
+
+# Second instance
+relative probe rect rgba (0.0, 0.5, 0.5, 0.5) (0.0, 1.0, 0.0, 1.0)
+relative probe rect rgba (0.5, 0.5, 0.5, 0.5) (0.0, 1.0, 0.1, 1.0)
