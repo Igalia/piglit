@@ -2789,6 +2789,32 @@ bind_vao_if_supported()
 	}
 }
 
+static enum piglit_result
+draw_arrays_common(int first, size_t count)
+{
+	enum piglit_result result = program_must_be_in_use();
+	if (first < 0) {
+		printf("draw arrays 'first' must be >= 0\n");
+		piglit_report_result(PIGLIT_FAIL);
+	} else if (vbo_present &&
+			(size_t) first >= num_vbo_rows) {
+		printf("draw arrays 'first' must be < %lu\n",
+			(unsigned long) num_vbo_rows);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	if (count <= 0) {
+		printf("draw arrays 'count' must be > 0\n");
+		piglit_report_result(PIGLIT_FAIL);
+	} else if (vbo_present &&
+			count > num_vbo_rows - (size_t) first) {
+		printf("draw arrays cannot draw beyond %lu\n",
+			(unsigned long) num_vbo_rows);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	bind_vao_if_supported();
+	return result;
+}
+
 static bool
 probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uint32_t value)
 {
@@ -3033,30 +3059,18 @@ piglit_display(void)
 			       &primcount,
 			       c + 0, c + 1, c + 2, c + 3);
 			draw_instanced_rect(primcount, c[0], c[1], c[2], c[3]);
+		} else if (sscanf(line, "draw arrays instanced %31s %d %d %d", s, &x, &y, &z) == 4) {
+			GLenum mode = decode_drawing_mode(s);
+			int first = x;
+			size_t count = (size_t) y;
+			size_t primcount = (size_t) z;
+			draw_arrays_common(first, count);
+			glDrawArraysInstanced(mode, first, count, primcount);
 		} else if (sscanf(line, "draw arrays %31s %d %d", s, &x, &y) == 3) {
 			GLenum mode = decode_drawing_mode(s);
 			int first = x;
 			size_t count = (size_t) y;
-			result = program_must_be_in_use();
-			if (first < 0) {
-				printf("draw arrays 'first' must be >= 0\n");
-				piglit_report_result(PIGLIT_FAIL);
-			} else if (vbo_present &&
-				   (size_t) first >= num_vbo_rows) {
-				printf("draw arrays 'first' must be < %lu\n",
-				       (unsigned long) num_vbo_rows);
-				piglit_report_result(PIGLIT_FAIL);
-			}
-			if (count <= 0) {
-				printf("draw arrays 'count' must be > 0\n");
-				piglit_report_result(PIGLIT_FAIL);
-			} else if (vbo_present &&
-				   count > num_vbo_rows - (size_t) first) {
-				printf("draw arrays cannot draw beyond %lu\n",
-				       (unsigned long) num_vbo_rows);
-				piglit_report_result(PIGLIT_FAIL);
-			}
-			bind_vao_if_supported();
+			result = draw_arrays_common(first, count);
 			glDrawArrays(mode, first, count);
 		} else if (parse_str(line, "disable ", &rest)) {
 			do_enable_disable(rest, false);
