@@ -1,0 +1,31 @@
+# In this test, perform a simple lookup with a bound texture, then create a
+# resident texture and pass the handle through the OpenGL API.
+[require]
+GL >= 4.2
+GLSL >= 4.20
+GL_ARB_bindless_texture
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 420
+#extension GL_ARB_bindless_texture: require
+
+layout (bindless_sampler, binding = 5) uniform sampler2D tex;
+out vec4 finalColor;
+
+void main()
+{
+	finalColor = texture2D(tex, vec2(0, 0));
+}
+
+[test]
+texture rgbw 5 (16, 16)
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0)
+
+texture rgbw 5 (16, 16)
+resident texture 5
+uniform handle tex 5
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0)
