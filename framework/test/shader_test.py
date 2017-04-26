@@ -169,8 +169,8 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
 
     @PiglitBaseTest.command.getter
     def command(self):
-        """ Add -auto to the test command """
-        return self._command + ['-auto']
+        """ Add -auto and -fbo to the test command """
+        return self._command + ['-auto', '-fbo']
 
 
 class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
