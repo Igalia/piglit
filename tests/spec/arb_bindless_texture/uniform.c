@@ -61,6 +61,18 @@ static const char *fs_explicit_bound_sampler =
 	"	color = texture(tex, vec2(0, 0));\n"
 	"}\n";
 
+static const char *fs_explicit_bindless_sampler =
+	"#version 330\n"
+	"#extension GL_ARB_bindless_texture: require\n"
+	"\n"
+	"layout (bindless_sampler) uniform sampler2D tex;\n"
+	"out vec4 color;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"	color = texture(tex, vec2(0, 0));\n"
+	"}\n";
+
 static const char *fs_implicit_bound_sampler =
 	"#version 330\n"
 	"#extension GL_ARB_bindless_texture: require\n"
@@ -79,6 +91,19 @@ static const char *fs_explicit_bound_image =
 	"#extension GL_ARB_shader_image_load_store: enable\n"
 	"\n"
 	"layout (bound_image) writeonly uniform image2D img;\n"
+	"out vec4 color;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"	imageStore(img, ivec2(0, 0), color);\n"
+	"}\n";
+
+static const char *fs_explicit_bindless_image =
+	"#version 330\n"
+	"#extension GL_ARB_bindless_texture: require\n"
+	"#extension GL_ARB_shader_image_load_store: enable\n"
+	"\n"
+	"layout (bindless_image) writeonly uniform image2D img;\n"
 	"out vec4 color;\n"
 	"\n"
 	"void main()\n"
@@ -134,7 +159,40 @@ check_UniformHandleui64_with_explicit_bound_sampler(void *data)
 }
 
 static enum piglit_result
-check_UniformHandleui64_with_implicit_bound_sampler(void *data)
+check_Uniform_with_explicit_bindless_sampler(void *data)
+{
+	GLuint vs, fs, prog;
+	GLuint64 handle = 0;
+	GLint loc;
+
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, passthrough_vs_src);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
+					fs_explicit_bindless_sampler);
+	prog = piglit_link_simple_program(vs, fs);
+	glUseProgram(prog);
+
+	loc = glGetUniformLocation(prog, "tex");
+	if (loc == -1)
+		return PIGLIT_FAIL;
+
+	/* The ARB_bindless_texture spec says:
+	 *
+	 * "These modifiers control whether default-block uniforms of the
+	 *  corresponding types may have their values set via both
+	 *  UniformHandle* and Uniform1i (bindless_sampler and bindless_image)
+	 *  or only via Uniform1i (bound_sampler and bound_image)."
+	 */
+	glUniform1i(loc, 5);
+	glUniformHandleui64ARB(loc, handle);
+	glProgramUniformHandleui64vARB(prog, loc, 1, &handle);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+
+	return PIGLIT_PASS;
+}
+
+static enum piglit_result
+check_Uniform_with_implicit_bound_sampler(void *data)
 {
 	GLuint vs, fs, prog;
 	GLuint64 handle = 0;
@@ -152,13 +210,24 @@ check_UniformHandleui64_with_implicit_bound_sampler(void *data)
 
 	/* The ARB_bindless_texture spec says:
 	 *
-	 * "When used as uniforms in the default block, the value of sampler
-	 *  variables may be specified with either Uniform1i{v} or
-	 *  UniformHandleui64{v}ARB."
+	 * "These modifiers control whether default-block uniforms of the
+	 *  corresponding types may have their values set via both
+	 *  UniformHandle* and Uniform1i (bindless_sampler and bindless_image)
+	 *  or only via Uniform1i (bound_sampler and bound_image)."
+	 *
+	 * "In the absence of these qualifiers, sampler and image uniforms are
+	 *  considered "bound"."
 	 */
-	glUniformHandleui64ARB(loc, handle);
-	glProgramUniformHandleui64vARB(prog, loc, 1, &handle);
+	glUniform1i(loc, 5);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+
+	glUniformHandleui64ARB(loc, handle);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		return PIGLIT_FAIL;
+
+	glProgramUniformHandleui64vARB(prog, loc, 1, &handle);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		return PIGLIT_FAIL;
 
 	return PIGLIT_PASS;
@@ -199,7 +268,40 @@ check_UniformHandleui64_with_explicit_bound_image(void *data)
 }
 
 static enum piglit_result
-check_UniformHandleui64_with_implicit_bound_image(void *data)
+check_Uniform_with_explicit_bindless_image(void *data)
+{
+	GLuint vs, fs, prog;
+	GLuint64 handle = 0;
+	GLint loc;
+
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, passthrough_vs_src);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
+					fs_explicit_bindless_image);
+	prog = piglit_link_simple_program(vs, fs);
+	glUseProgram(prog);
+
+	loc = glGetUniformLocation(prog, "img");
+	if (loc == -1)
+		return PIGLIT_FAIL;
+
+	/* The ARB_bindless_texture spec says:
+	 *
+	 * "These modifiers control whether default-block uniforms of the
+	 *  corresponding types may have their values set via both
+	 *  UniformHandle* and Uniform1i (bindless_sampler and bindless_image)
+	 *  or only via Uniform1i (bound_sampler and bound_image)."
+	 */
+	glUniform1i(loc, 5);
+	glUniformHandleui64ARB(loc, handle);
+	glProgramUniformHandleui64vARB(prog, loc, 1, &handle);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+
+	return PIGLIT_PASS;
+}
+
+static enum piglit_result
+check_Uniform_with_implicit_bound_image(void *data)
 {
 	GLuint vs, fs, prog;
 	GLuint64 handle = 0;
@@ -217,13 +319,24 @@ check_UniformHandleui64_with_implicit_bound_image(void *data)
 
 	/* The ARB_bindless_texture spec says:
 	 *
-	 * "When used as uniforms in the default block, the value of sampler
-	 *  variables may be specified with either Uniform1i{v} or
-	 *  UniformHandleui64{v}ARB."
+	 * "These modifiers control whether default-block uniforms of the
+	 *  corresponding types may have their values set via both
+	 *  UniformHandle* and Uniform1i (bindless_sampler and bindless_image)
+	 *  or only via Uniform1i (bound_sampler and bound_image)."
+	 *
+	 * "In the absence of these qualifiers, sampler and image uniforms are
+	 *  considered "bound"."
 	 */
-	glUniformHandleui64ARB(loc, handle);
-	glProgramUniformHandleui64vARB(prog, loc, 1, &handle);
+	glUniform1i(loc, 5);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+
+	glUniformHandleui64ARB(loc, handle);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		return PIGLIT_FAIL;
+
+	glProgramUniformHandleui64vARB(prog, loc, 1, &handle);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		return PIGLIT_FAIL;
 
 	return PIGLIT_PASS;
@@ -308,9 +421,15 @@ static const struct piglit_subtest subtests[] = {
 		NULL
 	},
 	{
-		"Check glUniformHandleui64*ARB() with implicit bound_sampler",
-		"check_UniformHandleui64_with_implicit_bound_sampler",
-		check_UniformHandleui64_with_implicit_bound_sampler,
+		"Check glUniform*() with explicit bindless_sampler",
+		"check_Uniform_with_explicit_bindless_sampler",
+		check_Uniform_with_explicit_bindless_sampler,
+		NULL
+	},
+	{
+		"Check glUniform*() with implicit bound_sampler",
+		"check_Uniform_with_implicit_bound_sampler",
+		check_Uniform_with_implicit_bound_sampler,
 		NULL
 	},
 	{
@@ -320,9 +439,15 @@ static const struct piglit_subtest subtests[] = {
 		NULL
 	},
 	{
-		"Check glUniformHandleui64*ARB() with implicit bound_image",
-		"check_UniformHandleui64_with_implicit_bound_image",
-		check_UniformHandleui64_with_implicit_bound_image,
+		"Check glUniform*() with explicit bindless_image",
+		"check_Uniform_with_explicit_bindless_image",
+		check_Uniform_with_explicit_bindless_image,
+		NULL
+	},
+	{
+		"Check glUniform*() with implicit bound_image",
+		"check_Uniform_with_implicit_bound_image",
+		check_Uniform_with_implicit_bound_image,
 		NULL
 	},
 	{
