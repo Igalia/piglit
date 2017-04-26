@@ -20,4 +20,6 @@ void f(inout sampler2D p)
 
 void main()
 {
+	sampler2D u;
+	f(u);
 }

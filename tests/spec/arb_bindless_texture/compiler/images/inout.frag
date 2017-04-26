@@ -21,4 +21,6 @@ void f(inout image2D p)
 
 void main()
 {
+	writeonly image2D u;
+	f(u);
 }

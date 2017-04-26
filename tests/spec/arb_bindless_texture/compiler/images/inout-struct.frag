@@ -24,6 +24,13 @@ void f(inout foo p)
 {
 }
 
+void g(inout image2D p)
+{
+}
+
 void main()
 {
+	foo u;
+	f(u);
+	g(u.img);
 }

@@ -23,6 +23,13 @@ void f(inout foo p)
 {
 }
 
+void g(inout sampler2D p)
+{
+}
+
 void main()
 {
+	foo u;
+	f(u);
+	g(u.tex);
 }
