@@ -4804,6 +4804,11 @@ with profile.test_list.group_manager(
     g(['arb_post_depth_coverage-sample-shading'])
 
 with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_fragment_shader_interlock')) as g:
+    g(['arb_fragment_shader_interlock-image-load-store'])
+
+with profile.test_list.group_manager(
     PiglitGLTest,
     grouptools.join('spec', 'arb_shader_image_size')) as g:
     g(['arb_shader_image_size-builtin'], 'builtin')
