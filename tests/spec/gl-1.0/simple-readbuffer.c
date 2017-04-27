@@ -45,10 +45,10 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-    if (!piglit_use_fbo)
-        glReadBuffer(GL_FRONT);
-    else
-        glReadBuffer(GL_COLOR_ATTACHMENT0);
+	if (!piglit_use_fbo)
+		glReadBuffer(GL_FRONT);
+	else
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		piglit_report_result(PIGLIT_FAIL);
