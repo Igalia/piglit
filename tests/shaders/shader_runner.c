@@ -3765,6 +3765,9 @@ piglit_display(void)
 		for (i = 0; i < ARRAY_SIZE(texture_bindings); i++)
 			clear_texture_binding(i);
 
+		for (i = 0; i < ARRAY_SIZE(resident_handles); i++)
+			clear_resident_handle(i);
+
 		if (prog != 0) {
 			glDeleteProgram(prog);
 			glUseProgram(0);
