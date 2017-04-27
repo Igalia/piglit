@@ -836,7 +836,7 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', '!OpenGL 1.1')) as g:
+        grouptools.join('spec', '!opengl 1.1')) as g:
     g(['copyteximage', '1D'], run_concurrent=False)
     g(['copyteximage', '2D'], run_concurrent=False)
     g(['drawbuffer-modes'], run_concurrent=False)
