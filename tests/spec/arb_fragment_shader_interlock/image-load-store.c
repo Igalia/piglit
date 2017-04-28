@@ -218,9 +218,9 @@ piglit_display(void)
 {
 	int samples[4] = { 2, 4, 8, 16 };
 	bool pass = true;
-	uint i, j, k;
-	uint result1[4] = { 47, 35, 63, 255 };
-	uint result2[4] = { 47, 0, 63, 255 };
+	unsigned i, j, k;
+	const unsigned result1[4] = { 47, 35, 63, 255 };
+	const unsigned result2[4] = { 47, 0, 63, 255 };
 	int max_samples;
 
 	glViewport(0, 0, piglit_width, piglit_height);
@@ -256,12 +256,12 @@ piglit_display(void)
 		glGetTexImage(GL_TEXTURE_3D, 0, GL_RGBA, GL_FLOAT, tex_data);
 		for (j = 0; j < piglit_height; j++) {
 			for (k = 0; k < piglit_width; k++) {
-				uint l = ((piglit_width * piglit_height * samples[i]) +
+				unsigned l = ((piglit_width * piglit_height * samples[i]) +
 					(j * piglit_width) + k) * 4;
-				uint r = fabs(tex_data[l]) * 255;
-				uint g = fabs(tex_data[l + 1]) * 255;
-				uint b = fabs(tex_data[l + 2]) * 255;
-				uint a = fabs(tex_data[l + 3]) * 255;
+				unsigned r = fabs(tex_data[l]) * 255;
+				unsigned g = fabs(tex_data[l + 1]) * 255;
+				unsigned b = fabs(tex_data[l + 2]) * 255;
+				unsigned a = fabs(tex_data[l + 3]) * 255;
 
 				if ((k < piglit_width / 2) && (r != result1[0] ||
 					  g != result1[1] || b != result1[2] || a != result1[3])) {
