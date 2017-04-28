@@ -1,0 +1,56 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_atomic_counters: require
+
+layout(binding = 0) uniform atomic_uint a0;
+layout(binding = 0) uniform atomic_uint a1;
+layout(binding = 0) uniform atomic_uint a2;
+layout(binding = 0) uniform atomic_uint a3;
+layout(binding = 0) uniform atomic_uint a4;
+layout(binding = 0) uniform atomic_uint a5;
+layout(binding = 0) uniform atomic_uint a6;
+layout(binding = 0) uniform atomic_uint a7;
+
+layout(local_size_x = 1) in;
+
+void main()
+{
+    int n = int(gl_WorkGroupID.z);
+
+    if (n == 0)
+        atomicCounterIncrement(a0);
+    if (n == 1)
+        atomicCounterIncrement(a1);
+    if (n == 2)
+        atomicCounterIncrement(a2);
+    if (n == 3)
+        atomicCounterIncrement(a3);
+    if (n == 4)
+        atomicCounterIncrement(a4);
+    if (n == 5)
+        atomicCounterIncrement(a5);
+    if (n == 6)
+        atomicCounterIncrement(a6);
+    if (n == 7)
+        atomicCounterIncrement(a7);
+}
+
+[test]
+atomic counters 8
+
+compute 1 1 8
+probe atomic counter 0 == 1
+probe atomic counter 1 == 1
+probe atomic counter 2 == 1
+probe atomic counter 3 == 1
+probe atomic counter 4 == 1
+probe atomic counter 5 == 1
+probe atomic counter 6 == 1
+probe atomic counter 7 == 1
