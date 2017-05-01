@@ -1676,6 +1676,12 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 				}
 			}
 		}
+	} else if (parse_str(type, "handle", NULL)) {
+		check_unsigned_support();
+		check_texture_handle_support();
+		parse_uints(line, uints, 1, NULL);
+		GLuint64 handle = get_resident_handle(uints[0])->handle;
+		memcpy(data, &handle, sizeof(uint64_t));
 	} else {
 		printf("unknown uniform type \"%s\" for \"%s\"\n", type, name);
 		piglit_report_result(PIGLIT_FAIL);
