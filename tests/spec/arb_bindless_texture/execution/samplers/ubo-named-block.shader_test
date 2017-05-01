@@ -1,0 +1,37 @@
+# Test access to a uniform buffer object via dereferencing the block name,
+# where it has a structure which contains a bindless sampler.
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_bindless_texture
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 330
+#extension GL_ARB_bindless_texture: require
+#extension GL_ARB_uniform_buffer_object: enable
+
+struct Struct {
+	uvec2 coord;
+	sampler2D tex;
+};
+
+layout (std140) uniform Block {
+	Struct s;
+} block;
+
+out vec4 color;
+
+void main()
+{
+	color = texture2D(block.s.tex, block.s.coord);
+}
+
+[test]
+texture rgbw 0 (16, 16)
+resident texture 0
+uniform uvec2 Block.s.coord 0 0
+uniform handle Block.s.tex 0
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0)
