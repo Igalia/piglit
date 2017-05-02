@@ -3201,6 +3201,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'oes_required_internalformat')) as g:
+    g(['oes_required_internalformat-renderbuffer'], 'renderbuffer')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_frag_depth')) as g:
     g(['fragdepth_gles2'])
 
