@@ -85,6 +85,7 @@ piglit_init(int argc, char **argv)
 	EGLContext ctx;
 	EGLint expect;
 	EGLint attr[] = { EGL_NONE, EGL_NONE, EGL_NONE };
+	bool ok;
 
 	/* Supported priority levels from extension spec. */
 	EGLenum levels[] = {
@@ -101,7 +102,10 @@ piglit_init(int argc, char **argv)
 	dpy = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA,
 				    EGL_DEFAULT_DISPLAY, NULL);
 
-	eglInitialize(dpy, &major, &minor);
+	ok = eglInitialize(dpy, &major, &minor);
+	if (!ok) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	piglit_require_egl_extension(dpy, "EGL_IMG_context_priority");
 	piglit_require_egl_extension(dpy, "EGL_MESA_configless_context");
