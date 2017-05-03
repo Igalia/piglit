@@ -15,7 +15,7 @@
 //  "Images can be used as l-values, so can be assigned into and used as
 //   "out" and "inout" function parameters."
 
-void f(inout image2D p)
+void f(inout writeonly image2D p)
 {
 }
 
