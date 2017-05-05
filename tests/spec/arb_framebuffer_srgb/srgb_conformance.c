@@ -55,7 +55,8 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static enum piglit_result test_format(void)
 {
-	GLboolean pass = GL_TRUE;
+	bool pass1 = true;
+	bool pass2 = true;
 	GLuint texsrgb, texfb, fb;
 	GLenum status;
 	int i;
@@ -131,7 +132,7 @@ static enum piglit_result test_format(void)
 	glReadPixels(0, 0, 16, 16, GL_RGBA, GL_FLOAT, &readf[0][0]);
 
 	for (i = 0; i < 256; i++) {
-		float err = fabs(piglit_linear_to_srgb(readf[i][0]) - (float)i);
+		float err = fabs(piglit_linear_to_srgb(readf[i][0])*255 - (float)i);
 		if (0)
 			printf("readback: %f observed: %f expected: %f\n", readf[i][0],
 				piglit_linear_to_srgb(readf[i][0]), (float)i);
@@ -140,7 +141,7 @@ static enum piglit_result test_format(void)
 		}
 		if (err > tolerance) {
 			printf("  failed when testing srgb->float result\n");
-			pass = GL_FALSE;
+			pass1 = false;
 			break;
 		}
 	}
@@ -148,7 +149,7 @@ static enum piglit_result test_format(void)
 
 	piglit_present_results();
 
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+	piglit_report_subtest_result(pass1 ? PIGLIT_PASS : PIGLIT_FAIL,
 				     "srgb->linear");
 
 	/* draw into srgb framebuffer and verify results */
@@ -195,21 +196,21 @@ static enum piglit_result test_format(void)
 			printf("observed: %d expected: %d\n", readb[i][0], i);
 		if (readb[i][0] != i) {
 			printf("  failed when testing srgb->float->srgb result\n");
-			pass = GL_FALSE;
+			pass2 = GL_FALSE;
 			break;
 		}
 	}
 
 	piglit_present_results();
 
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+	piglit_report_subtest_result(pass2 ? PIGLIT_PASS : PIGLIT_FAIL,
 				     "srgb->linear->srgb");
 
 	glDeleteTextures(1, &texfb);
 	glDeleteTextures(1, &texsrgb);
 	glDeleteFramebuffersEXT(1, &fb);
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return (pass1 && pass2) ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result piglit_display(void)
