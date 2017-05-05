@@ -509,30 +509,30 @@ primitive_restart_test(VBO_CFG vbo_cfg)
 
    if (Have_NV) {
       TestGL31 = false;
-      pass = pass && test_begin_end(GL_TRIANGLE_STRIP);
-      pass = pass && test_begin_end(GL_LINE_STRIP);
-      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = test_begin_end(GL_TRIANGLE_STRIP) && pass;
+      pass = test_begin_end(GL_LINE_STRIP) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT) && pass;
+      pass = test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE) && pass;
+      pass = test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT) && pass;
+      pass = test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT) && pass;
+      pass = test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE) && pass;
+      pass = test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT) && pass;
+      pass = test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT) && pass;
    }
 
    if (Have_31) {
       TestGL31 = true;
-      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT) && pass;
+      pass = test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT) && pass;
    }
 
    return pass;
