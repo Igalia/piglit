@@ -42,6 +42,12 @@ enum piglit_gl_visual {
 	PIGLIT_GL_VISUAL_STENCIL 	= 1 << 5
 };
 
+enum piglit_khr_no_error_support {
+	PIGLIT_HAS_ERRORS,
+	PIGLIT_NO_ERRORS,
+	PIGLIT_UNKNOWN_ERROR_STATUS
+};
+
 /**
  * @brief Configuration for running an OpenGL test.
  *
@@ -202,6 +208,11 @@ struct piglit_gl_test_config {
 	 */
 	const char **selected_subtests;
 	size_t num_selected_subtests;
+
+	/**
+	 * enum used for markin test as supporting KHR_no_error or not.
+	 */
+	enum piglit_khr_no_error_support khr_no_error_support;
 };
 
 /**

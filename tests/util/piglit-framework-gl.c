@@ -81,6 +81,8 @@ piglit_gl_test_config_init(struct piglit_gl_test_config *config)
 		config->window_width = 160;
 		config->window_height = 160;
 	}
+
+	config->khr_no_error_support = PIGLIT_UNKNOWN_ERROR_STATUS;
 }
 
 static void
