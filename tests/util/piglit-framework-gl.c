@@ -159,6 +159,22 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			*force_samples = atoi(argv[j]+9);
 			delete_arg(argv, *argc, j--);
 			*argc -= 1;
+		} else if (!strcmp(argv[j], "-khr_no_error")) {
+			delete_arg(argv, *argc, j--);
+			*argc -= 1;
+			if (config->khr_no_error_support ==
+			    PIGLIT_UNKNOWN_ERROR_STATUS) {
+				fprintf(stderr,
+					"khr_no_error_support unknown "
+					"skipping test!\n");
+				piglit_report_result(PIGLIT_SKIP);
+			} else if (config->khr_no_error_support ==
+				   PIGLIT_HAS_ERRORS) {
+				piglit_report_result(PIGLIT_SKIP);
+			} else {
+				assert(config->khr_no_error_support ==
+				       PIGLIT_NO_ERRORS);
+			}
 		}
 	}
 }
