@@ -56,6 +56,10 @@ class GleanTest(Test):
     def command(self):
         return super(GleanTest, self).command + self.GLOBAL_PARAMS
 
+    @Test.command.setter
+    def command(self, new):
+        self._command = [n for n in new if not n in self.GLOBAL_PARAMS]
+
     def interpret_result(self):
         if self.result.returncode != 0 or 'FAIL' in self.result.out:
             self.result.result = 'fail'

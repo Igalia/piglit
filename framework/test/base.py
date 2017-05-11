@@ -225,6 +225,11 @@ class Test(object):
         assert self._command
         return self._command
 
+    @command.setter
+    def command(self, new):
+        assert isinstance(new, list), 'Test.command must be a list'
+        self._command = new
+
     @abc.abstractmethod
     def interpret_result(self):
         """Convert the raw output of the test into a form piglit understands.

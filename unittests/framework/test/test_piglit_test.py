@@ -38,6 +38,7 @@ from framework.test.base import TestIsSkip as _TestIsSkip
 from framework.test.piglit_test import PiglitBaseTest, PiglitGLTest
 
 # pylint: disable=no-self-use
+# pylint: disable=protected-access
 
 
 class TestPiglitBaseTest(object):
@@ -118,6 +119,13 @@ class TestPiglitGLTest(object):
             test = PiglitGLTest(['foo'], run_concurrent=True)
             assert '-auto' in test.command
             assert '-fbo' in test.command
+
+        def test_setter_no_add_auto(self):
+            """Doesn't add -fbo or -auto when setting."""
+            test = PiglitGLTest(['foo'], run_concurrent=True)
+            test.command += ['bar']
+            assert '-auto' not in test._command
+            assert '-fbo' not in test._command
 
     class TestIsSkip(object):
         """Tests for the is_skip method and the constructor logic to make it

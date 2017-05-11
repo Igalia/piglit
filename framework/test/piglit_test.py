@@ -154,6 +154,10 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
         else:
             return super(PiglitGLTest, self).command + ['-auto', '-fbo']
 
+    @command.setter
+    def command(self, new):
+        self._command = [n for n in new if n not in ['-auto', '-fbo']]
+
 
 class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
     """ OpenCL specific Test class.

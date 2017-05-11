@@ -35,7 +35,7 @@ import six
 
 from framework.test import shader_test
 
-# pylint: disable=invalid-name,no-self-use
+# pylint: disable=invalid-name,no-self-use,protected-access
 
 
 class _Setup(object):
@@ -192,17 +192,32 @@ class TestConfigParsing(object):
         assert test.gl_required == {'GL_ARB_foobar'}
 
 
-def test_command_add_auto(tmpdir):
-    """test.shader_test.ShaderTest: -auto is added to the command."""
-    p = tmpdir.join('test.shader_test')
-    p.write(textwrap.dedent("""\
-        [require]
-        GL ES >= 3.0
-        GLSL ES >= 3.00 es
-        """))
-    test = shader_test.ShaderTest(six.text_type(p))
+class TestCommand(object):
+    """Tests for the command property."""
 
-    assert '-auto' in test.command
+    @pytest.fixture(scope='class')
+    def test_file(self, tmpdir_factory):
+        p = tmpdir_factory.mktemp('shader-test-command').join('test.shader_test')
+        p.write(textwrap.dedent("""\
+            [require]
+            GL ES >= 3.0
+            GLSL ES >= 3.00 es
+            """))
+        return six.text_type(p)
+
+    def test_getter_adds_auto_and_fbo(self, test_file):
+        """test.shader_test.ShaderTest: -auto and -fbo is added to the command.
+        """
+        test = shader_test.ShaderTest(test_file)
+        assert '-auto' in test.command
+        assert '-fbo' in test.command
+
+    def test_setter_doesnt_add_auto_and_fbo(self, test_file):
+        """Don't add -fbo or -auto to self._command when using the setter."""
+        test = shader_test.ShaderTest(test_file)
+        test.command += ['-newarg']
+        assert '-auto' not in test._command
+        assert '-fbo' not in test._command
 
 
 class TestMultiShaderTest(object):
@@ -264,4 +279,3 @@ class TestMultiShaderTest(object):
         assert os.path.basename(actual[0]) == 'shader_runner'
         assert os.path.basename(actual[1]) == 'bar.shader_test'
         assert os.path.basename(actual[2]) == '-auto'
-

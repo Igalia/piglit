@@ -172,6 +172,10 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         """ Add -auto and -fbo to the test command """
         return self._command + ['-auto', '-fbo']
 
+    @command.setter
+    def command(self, new):
+        self._command = [n for n in new if n not in ['-auto', '-fbo']]
+
 
 class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
     """A Shader class that can run more than one test at a time.

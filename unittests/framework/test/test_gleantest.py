@@ -32,6 +32,7 @@ from framework.test import GleanTest
 from framework.test.base import TestIsSkip as _TestIsSkip  # make py.test happy
 
 # pylint: disable=invalid-name
+# pylint: disable=protected-access
 
 
 def test_GLOBAL_PARAMS_assignment():
@@ -52,6 +53,17 @@ def test_GLOBAL_PARAMS_assignment():
     GleanTest.GLOBAL_PARAMS = ['--quick']
     test2 = GleanTest('basic')
     assert test1.command == test2.command
+
+
+def test_global_params_setter():
+    """Values from self.GLOBAL_ARGS are not pushed into self._command by a
+    setter.
+    """
+    test = GleanTest('basic')
+    GleanTest.GLOBAL_PARAMS = ['--quick']
+    test.command += '-foo'
+    assert '--quick' not in test._command
+
 
 
 def test_bad_returncode():
