@@ -105,6 +105,7 @@ static const int outer_dim_size = 2;
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 	parse_args(argc, argv, &config);
 
 PIGLIT_GL_TEST_CONFIG_END

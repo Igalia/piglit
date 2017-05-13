@@ -54,6 +54,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = WIDTH;
 	config.window_height = HEIGHT;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 	slow_color_clear = PIGLIT_STRIP_ARG("slow_cc");
 
 PIGLIT_GL_TEST_CONFIG_END
