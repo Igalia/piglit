@@ -36,6 +36,7 @@ struct piglit_gl_framework *gl_fw;
 const char *piglit_binary_name;
 bool piglit_dump_png = false;
 bool piglit_use_fbo = false;
+bool piglit_khr_no_error = false;
 int piglit_automatic = 0;
 unsigned piglit_winsys_fbo = 0;
 
@@ -160,6 +161,7 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			delete_arg(argv, *argc, j--);
 			*argc -= 1;
 		} else if (!strcmp(argv[j], "-khr_no_error")) {
+			piglit_khr_no_error = true;
 			delete_arg(argv, *argc, j--);
 			*argc -= 1;
 			if (config->khr_no_error_support ==
