@@ -151,6 +151,9 @@ piglit_display(void)
 	PIGLIT_SUBTEST_ERROR(GL_NO_ERROR, pass,
 			     "fetch maximum number of bind points");
 
+	if (piglit_khr_no_error)
+		goto valid_calls;
+
 	/* bind a non-existing transform feedback BO */
 	glTransformFeedbackBufferRange(1337, 0, 0, 0, 4096);
 	PIGLIT_SUBTEST_ERROR(GL_INVALID_OPERATION, pass,
@@ -181,6 +184,7 @@ piglit_display(void)
 	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass,
 			     "bind with a non-aligned size");
 
+valid_calls:
 	/* Set up the transform feedback buffer */
 	for (i = 0; i < 2; i++) {
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf[i]);

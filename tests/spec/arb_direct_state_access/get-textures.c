@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | 
 		PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -53,6 +54,9 @@ piglit_display(void)
 	GLuint name;
 	GLubyte *data = malloc(50 * 50 * 6 * 4 * sizeof(GLubyte));
 	GLubyte *image = malloc(50 * 50 * 4 * sizeof(GLubyte));
+
+	if (piglit_khr_no_error)
+		goto valid_call;
 
 	/* Throw some invalid inputs at glGetTextureImage. */
 
@@ -104,6 +108,7 @@ piglit_display(void)
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 	glDeleteTextures(1, &name);
 
+valid_call:
 	/* Trivial, but should work. */
 	glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &name);
 	glTextureStorage2D(name, 1, GL_RGBA8, 50, 50);

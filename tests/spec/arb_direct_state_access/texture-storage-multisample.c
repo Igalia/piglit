@@ -38,6 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 			       PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -448,10 +449,13 @@ piglit_display(void)
 {
 	bool pass = true;
 
-	pass = check_non_generated_texture() && pass;
-	pass = check_immutable() && pass;
-	pass = check_unsized_format() && pass;
-	pass = check_improper_effective_target() && pass;
+	if (!piglit_khr_no_error) {
+		pass = check_non_generated_texture() && pass;
+		pass = check_immutable() && pass;
+		pass = check_unsized_format() && pass;
+		pass = check_improper_effective_target() && pass;
+	}
+
 	pass = trivial_but_should_work() && pass;
 	pass = draw_multisampled() && pass;
 

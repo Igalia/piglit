@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -118,7 +119,7 @@ test_one_level_errors(GLenum target)
 	 *         - CopyTexImage*
 	 *         - TexStorage*"
 	 */
-	if (target == GL_TEXTURE_2D) {
+	if (!piglit_khr_no_error && target == GL_TEXTURE_2D) {
 		glTexImage2D(target, 0, GL_RGBA, width, height, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		if (glGetError() != GL_INVALID_OPERATION) {
@@ -248,11 +249,13 @@ test_cube_texture(void)
 	glDeleteTextures(1, &tex);
 
 	/* Test invalid cube dimensions */
-	glCreateTextures(target, 1, &tex);
-	glBindTextureUnit(0, tex);
-	glTextureStorage2D(tex, 1, GL_RGBA8, width, height+2);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	glDeleteTextures(1, &tex);
+	if (!piglit_khr_no_error) {
+		glCreateTextures(target, 1, &tex);
+		glBindTextureUnit(0, tex);
+		glTextureStorage2D(tex, 1, GL_RGBA8, width, height+2);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		glDeleteTextures(1, &tex);
+	}
 
 	return pass;
 }
@@ -273,19 +276,21 @@ test_cube_array_texture(void)
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	glDeleteTextures(1, &tex);
 
-	/* Test invalid cube array width, height dimensions */
-	glCreateTextures(target, 1, &tex);
-	glBindTextureUnit(0, tex);
-	glTextureStorage3D(tex, 1, GL_RGBA8, width, height+3, 12);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	glDeleteTextures(1, &tex);
+	if (!piglit_khr_no_error) {
+		/* Test invalid cube array width, height dimensions */
+		glCreateTextures(target, 1, &tex);
+		glBindTextureUnit(0, tex);
+		glTextureStorage3D(tex, 1, GL_RGBA8, width, height+3, 12);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		glDeleteTextures(1, &tex);
 
-	/* Test invalid cube array depth */
-	glCreateTextures(target, 1, &tex);
-	glBindTextureUnit(0, tex);
-	glTextureStorage3D(tex, 1, GL_RGBA8, width, height, 12+2);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	glDeleteTextures(1, &tex);
+		/* Test invalid cube array depth */
+		glCreateTextures(target, 1, &tex);
+		glBindTextureUnit(0, tex);
+		glTextureStorage3D(tex, 1, GL_RGBA8, width, height, 12+2);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		glDeleteTextures(1, &tex);
+	}
 
 	return pass;
 }
@@ -381,7 +386,7 @@ test_2d_mipmap_rendering(void)
 	}
 
 	/* This should generate and error (bad level) */
-	{
+	if (!piglit_khr_no_error) {
 		GLubyte *buf = create_image(width, height, Colors[l]);
 		GLenum err;
 
@@ -507,6 +512,10 @@ test_internal_formats(void)
 
 		glDeleteTextures(1, &tex);
 	}
+
+	/* Return early if KHR_no_error is enabled */
+	if (piglit_khr_no_error)
+		return pass;
 
 	for (i = 0; i < ARRAY_SIZE(illegal_formats); i++) {
 		glCreateTextures(target, 1, &tex);

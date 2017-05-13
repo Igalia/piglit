@@ -85,6 +85,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -105,6 +106,9 @@ piglit_display(void)
 	/* Test retrieving information about an unexisting buffer */
 	glCreateRenderbuffers(10, ids);
 	piglit_check_gl_error(GL_NO_ERROR);
+
+	if (piglit_khr_no_error)
+		goto valid_calls;
 
 	/* Check some various cases of errors */
 	glNamedRenderbufferStorageMultisample(1337, 0, GL_RGBA, 1024, 768);
@@ -160,6 +164,7 @@ piglit_display(void)
 	glNamedRenderbufferStorageMultisample(ids[0], 0, GL_TRUE, 1024, 768);
 	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass, "invalid internalformat");
 
+valid_calls:
 	/* bind one buffer so as we can check we never change its state */
 	glBindRenderbuffer(GL_RENDERBUFFER, ids[1]);
 	piglit_check_gl_error(GL_NO_ERROR);

@@ -35,6 +35,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 			       PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -130,12 +131,15 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 		num_faces = 6;
 		glCreateTextures(target, 1, &name);
 		/* This is invalid. You must use 2D storage call for cube. */
-		glTextureStorage3D(name, 1, internalformat,
-				   IMAGE_WIDTH, IMAGE_HEIGHT, num_faces);
-		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+		if (!piglit_khr_no_error) {
+			glTextureStorage3D(name, 1, internalformat,
+					   IMAGE_WIDTH, IMAGE_HEIGHT,
+					   num_faces);
+			pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+		}
+		/* This is legal. */
 		glTextureStorage2D(name, 1, internalformat,
 				   IMAGE_WIDTH, IMAGE_HEIGHT);
-		/* This is legal. */
 		glTextureSubImage3D(name, 0, 0, 0, 0, IMAGE_WIDTH,
 				    IMAGE_HEIGHT, num_faces, GL_RGBA,
 				    GL_UNSIGNED_BYTE, data);

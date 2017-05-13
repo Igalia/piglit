@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | 
 		PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -53,22 +54,23 @@ piglit_display(void)
 	GLuint name;
 
 	/* Throw some invalid inputs at glCreateTextures. */
+	if (!piglit_khr_no_error) {
+		/* Invalid (not a target) */
+		glCreateTextures(GL_INVALID_ENUM, 1, &name);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
-	/* Invalid (not a target) */
-	glCreateTextures(GL_INVALID_ENUM, 1, &name);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+		/* Invalid (not supported) target */
+		glCreateTextures(GL_PROXY_TEXTURE_2D, 1, &name);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
-	/* Invalid (not supported) target */
-	glCreateTextures(GL_PROXY_TEXTURE_2D, 1, &name);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+		/* Invalid zero target */
+		glCreateTextures(0, 1, &name);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
-	/* Invalid zero target */
-	glCreateTextures(0, 1, &name);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
-
-	/* n is negative */
-	glCreateTextures(GL_TEXTURE_2D, -1, &name);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		/* n is negative */
+		glCreateTextures(GL_TEXTURE_2D, -1, &name);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	/* Trivial, but should work. */
 	glCreateTextures(GL_TEXTURE_2D, 1, &name);

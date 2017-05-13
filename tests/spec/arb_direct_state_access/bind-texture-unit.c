@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | 
 		PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -52,6 +53,12 @@ piglit_display(void)
 	bool pass = true;
 	GLuint name = 3;
 	GLint nunits;
+
+	if (piglit_khr_no_error) {
+		glGenTextures(1, &name);
+		glCreateTextures(GL_TEXTURE_2D, 1, &name);
+		goto valid_call;
+	}
 
 	/* Throw some invalid inputs at BindTextureUnit. */
 
@@ -90,6 +97,7 @@ piglit_display(void)
 	glBindTextureUnit(nunits, name); /* Too High */
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
+valid_call:
 	/* Trivial, but should work. */
 	glBindTextureUnit(1, name);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;

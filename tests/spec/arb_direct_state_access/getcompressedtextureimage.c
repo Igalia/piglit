@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 			       PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -167,10 +168,15 @@ getTexImage(bool doPBO, GLenum target, GLubyte *data,
 	case GL_TEXTURE_CUBE_MAP:
 		num_faces = 6;
 		glCreateTextures(target, 1, &name);
-		/* This is invalid. You must use 2D storage call for cube. */
-		glTextureStorage3D(name, 1, internalformat,
-				   IMAGE_WIDTH, IMAGE_HEIGHT, num_faces);
-		pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+		if (!piglit_khr_no_error) {
+			/* This is invalid. You must use 2D storage call for
+			 * cube.
+			 */
+			glTextureStorage3D(name, 1, internalformat,
+					   IMAGE_WIDTH, IMAGE_HEIGHT,
+					   num_faces);
+			pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+		}
 		glTextureStorage2D(name, 1, internalformat,
 				   IMAGE_WIDTH, IMAGE_HEIGHT);
 		/* This is legal. */
@@ -420,14 +426,17 @@ piglit_display(void)
 				      internalformat, 60*4*8,
 				      NULL);
 
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) /* Bad texture */
-		subtest = PIGLIT_FAIL;
-	else
-		subtest = PIGLIT_PASS;
-	piglit_report_subtest_result(subtest, "Compressed Texture"
-				     " Sub Image 1D");
-	if (subtest == PIGLIT_FAIL)
-		result = PIGLIT_FAIL;
+	if (!piglit_khr_no_error) {
+		 /* Bad texture */
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			subtest = PIGLIT_FAIL;
+		else
+			subtest = PIGLIT_PASS;
+		piglit_report_subtest_result(subtest, "Compressed Texture"
+					     " Sub Image 1D");
+		if (subtest == PIGLIT_FAIL)
+			result = PIGLIT_FAIL;
+	}
 
 	free(data);
 

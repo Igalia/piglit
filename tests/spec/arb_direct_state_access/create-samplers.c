@@ -47,6 +47,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -68,10 +69,11 @@ piglit_display(void)
 	GLint param;
 
 	/* Throw some invalid inputs at glCreateSamplers */
-
-	/* n is negative */
-	glCreateSamplers(-1, ids);
-	PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "n < 0");
+	if (!piglit_khr_no_error) {
+		/* n is negative */
+		glCreateSamplers(-1, ids);
+		PIGLIT_SUBTEST_ERROR(GL_INVALID_VALUE, pass, "n < 0");
+	}
 
 	/* Throw some valid inputs at glCreateSamplers. */
 

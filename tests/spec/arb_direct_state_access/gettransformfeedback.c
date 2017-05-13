@@ -61,6 +61,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 31;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 
@@ -146,6 +147,9 @@ check_invalid_queries()
 {
 	GLint64 param64;
 	GLint param;
+
+	if (piglit_khr_no_error)
+		return;
 
 	glGetTransformFeedbackiv(0, GL_TRANSFORM_FEEDBACK_BINDING, &param);
 	PIGLIT_SUBTEST_ERROR(GL_INVALID_ENUM, pass,

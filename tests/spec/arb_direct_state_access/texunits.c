@@ -34,6 +34,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -122,9 +123,11 @@ test_texture_params(void)
     * error for a out-of-range int/uint is GL_INVALID_VALUE.  That's what
     * NVIDIA's driver does.
     */
-   glBindTextureUnit(maxUnit, tex[0]);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-      return false;
+   if (!piglit_khr_no_error) {
+      glBindTextureUnit(maxUnit, tex[0]);
+      if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+         return false;
+      }
    }
 
    return true;
