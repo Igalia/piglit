@@ -237,7 +237,7 @@ generate_GLSL(enum shader_target test_stage)
 void
 fail_and_show_usage()
 {
-	printf("Usage: textureSize <vs|gs|fs> <sampler type> <sample_count> [piglit args...]\n");
+	printf("Usage: textureSamples <vs|gs|fs> <sampler type> <sample_count> [piglit args...]\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
