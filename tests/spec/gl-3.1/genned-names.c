@@ -157,7 +157,7 @@ test_bindbuffer_tfb()
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 600);
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
-	glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 601, 0, 1);
+	glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 601, 0, 4);
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	return pass;
