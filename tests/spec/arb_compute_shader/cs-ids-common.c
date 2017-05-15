@@ -21,12 +21,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/** \file
- *
- * Test cases in which the ARB_compute_shader API is expected to
- * generate an error.
- */
-
 #include "piglit-util-gl.h"
 #include "piglit-shader.h"
 #include "common.h"

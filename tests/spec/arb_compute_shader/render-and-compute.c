@@ -21,12 +21,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/** \file
- *
- * Test cases in which the ARB_compute_shader API is expected to
- * generate an error.
- */
-
 #include "cs-ids-common.h"
 
 static struct piglit_gl_test_config *piglit_config;
