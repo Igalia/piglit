@@ -28,6 +28,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_core_version = 44;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -145,11 +146,13 @@ void piglit_init(int argc, char **argv)
 	pass = test_stride_vertex_attribl(stride_max, true) && pass;
 
 	/* Try passing a stride value that is to large */
-	pass = test_stride_bind_buffer(stride_max_plus_one, false) && pass;
-	pass = test_stride_bind_buffers(stride_max_plus_one, false) && pass;
-	pass = test_stride_vertex_attrib(stride_max_plus_one, false) && pass;
-	pass = test_stride_vertex_attribi(stride_max_plus_one, false) && pass;
-	pass = test_stride_vertex_attribl(stride_max_plus_one, false) && pass;
+	if (!piglit_khr_no_error) {
+		pass = test_stride_bind_buffer(stride_max_plus_one, false) && pass;
+		pass = test_stride_bind_buffers(stride_max_plus_one, false) && pass;
+		pass = test_stride_vertex_attrib(stride_max_plus_one, false) && pass;
+		pass = test_stride_vertex_attribi(stride_max_plus_one, false) && pass;
+		pass = test_stride_vertex_attribl(stride_max_plus_one, false) && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
