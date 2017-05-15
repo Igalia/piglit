@@ -3303,6 +3303,7 @@ with profile.test_list.group_manager(
     g(['arb_texture_compression-invalid-formats', 's3tc'], 'invalid formats')
     g(['gen-compressed-teximage'], run_concurrent=False)
     g(['s3tc-errors'])
+    g(['s3tc-targeted'])
     g(['s3tc-teximage'], run_concurrent=False)
     g(['s3tc-texsubimage'], run_concurrent=False)
     g(['getteximage-targets', '2D', 'S3TC'])
