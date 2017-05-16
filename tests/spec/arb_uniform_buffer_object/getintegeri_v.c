@@ -41,6 +41,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -120,10 +121,12 @@ piglit_init(int argc, char **argv)
 	test_range(__LINE__, 0, 0, 0, 0);
 
 	/* Test the error condition. */
-	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_bindings);
-	glGetIntegeri_v(GL_UNIFORM_BUFFER_BINDING, max_bindings, &junk);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE))
-		pass = false;
+	if (!piglit_khr_no_error) {
+		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_bindings);
+		glGetIntegeri_v(GL_UNIFORM_BUFFER_BINDING, max_bindings, &junk);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			pass = false;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

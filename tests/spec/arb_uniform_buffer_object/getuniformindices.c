@@ -34,6 +34,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 10;
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -82,24 +83,26 @@ piglit_init(int argc, char **argv)
 	 *
 	 *     "If an error occurs, nothing is written to <uniformIndices>."
 	 */
-	index = save_index;
-	glGetUniformIndices(prog, -1, &one_uniform, &index);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		pass = false;
-	} else if (index != save_index) {
-		printf("Bad program uniform index: 0x%08x\n", index);
-		printf("  Expected 0x%08x\n", save_index);
-		pass = false;
-	}
+	if (!piglit_khr_no_error) {
+		index = save_index;
+		glGetUniformIndices(prog, -1, &one_uniform, &index);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+			pass = false;
+		} else if (index != save_index) {
+			printf("Bad program uniform index: 0x%08x\n", index);
+			printf("  Expected 0x%08x\n", save_index);
+			pass = false;
+		}
 
-	index = save_index;
-	glGetUniformIndices(0xd0d0, 1, &one_uniform, &index);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		pass = false;
-	} else if (index != save_index) {
-		printf("Bad program uniform index: 0x%08x\n", index);
-		printf("  Expected 0x%08x\n", save_index);
-		pass = false;
+		index = save_index;
+		glGetUniformIndices(0xd0d0, 1, &one_uniform, &index);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+			pass = false;
+		} else if (index != save_index) {
+			printf("Bad program uniform index: 0x%08x\n", index);
+			printf("  Expected 0x%08x\n", save_index);
+			pass = false;
+		}
 	}
 
 	glGetUniformIndices(prog, 3, uniform_names, indices);
@@ -120,13 +123,16 @@ piglit_init(int argc, char **argv)
 	 *      written to the corresponding element of
 	 *      <uniformIndices>."
 	 */
-	glGetUniformIndices(prog, 1, &bad_uniform, &index);
-	if (!piglit_check_gl_error(0)) {
-		pass = false;
-	} else if (index != GL_INVALID_INDEX) {
-		printf("Bad uniform index for %s: 0x%08x\n", bad_uniform, index);
-		printf("  Expected 0x%08x\n", GL_INVALID_INDEX);
-		pass = false;
+	if (!piglit_khr_no_error) {
+		glGetUniformIndices(prog, 1, &bad_uniform, &index);
+		if (!piglit_check_gl_error(0)) {
+			pass = false;
+		} else if (index != GL_INVALID_INDEX) {
+			printf("Bad uniform index for %s: 0x%08x\n",
+			       bad_uniform, index);
+			printf("  Expected 0x%08x\n", GL_INVALID_INDEX);
+			pass = false;
+		}
 	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);

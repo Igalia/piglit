@@ -65,6 +65,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = 10;
 	config.window_height = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -135,15 +136,17 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	glUniformBlockBinding(prog, blocks, 0);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	if (!piglit_khr_no_error) {
+		glUniformBlockBinding(prog, blocks, 0);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
-	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_bindings);
-	glUniformBlockBinding(prog, 0, max_bindings);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_bindings);
+		glUniformBlockBinding(prog, 0, max_bindings);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
-	glUniformBlockBinding(0xd0d0, 0, 0);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		glUniformBlockBinding(0xd0d0, 0, 0);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	glDeleteProgram(prog);
 

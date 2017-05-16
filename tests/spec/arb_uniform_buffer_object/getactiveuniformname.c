@@ -70,6 +70,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -175,23 +176,25 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	no_write = fill_char;
-	glGetActiveUniformName(0xd0d0, 0, 1, NULL, &no_write);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	if (no_write != fill_char)
-		pass = false;
+	if (!piglit_khr_no_error) {
+		no_write = fill_char;
+		glGetActiveUniformName(0xd0d0, 0, 1, NULL, &no_write);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		if (no_write != fill_char)
+			pass = false;
 
-	no_write = fill_char;
-	glGetActiveUniformName(prog, 0, -1, NULL, &no_write);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	if (no_write != fill_char)
-		pass = false;
+		no_write = fill_char;
+		glGetActiveUniformName(prog, 0, -1, NULL, &no_write);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		if (no_write != fill_char)
+			pass = false;
 
-	no_write = fill_char;
-	glGetActiveUniformName(prog, uniforms, 1, NULL, &no_write);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	if (no_write != fill_char)
-		pass = false;
+		no_write = fill_char;
+		glGetActiveUniformName(prog, uniforms, 1, NULL, &no_write);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		if (no_write != fill_char)
+			pass = false;
+	}
 
 	glDeleteProgram(prog);
 
