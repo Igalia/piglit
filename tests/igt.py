@@ -122,6 +122,8 @@ class IGTTest(Test):
             self.result.result = 'skip'
         elif self.result.returncode == 78:
             self.result.result = 'timeout'
+        elif self.result.returncode == 139:
+            self.result.result = 'crash'
         else:
             self.result.result = 'fail'
 
