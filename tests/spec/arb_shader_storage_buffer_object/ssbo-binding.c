@@ -47,6 +47,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -96,24 +97,26 @@ piglit_init(int argc, char **argv)
 		pass = false;
 	}
 
-	/* The error INVALID_VALUE is generated if <storageBlockIndex> is not
-	 * an active shader storage block index in <program>, or if
-	 * <storageBlockBinding> is greater than or equal to the value of
-	 * MAX_SHADER_STORAGE_BUFFER_BINDINGS.
-	 */
-	printf("Test binding value: %d\n", max_binding);
-	glShaderStorageBlockBinding(prog, index, max_binding);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		pass = false;
-	}
+	if (!piglit_khr_no_error) {
+		/* The error INVALID_VALUE is generated if <storageBlockIndex>
+		 * is not an active shader storage block index in <program>,
+		 * or if <storageBlockBinding> is greater than or equal to the
+		 * value of MAX_SHADER_STORAGE_BUFFER_BINDINGS.
+		 */
+		printf("Test binding value: %d\n", max_binding);
+		glShaderStorageBlockBinding(prog, index, max_binding);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+			pass = false;
+		}
 
-	/* The error INVALID_VALUE is generated if <storageBlockIndex> is not
-	 * an active shader storage block index in <program>
-	 */
-	printf("Test invalid index: %d\n", index + 1);
-	glShaderStorageBlockBinding(prog, index + 1, 0);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		pass = false;
+		/* The error INVALID_VALUE is generated if <storageBlockIndex>
+		 * is not an active shader storage block index in <program>
+		 */
+		printf("Test invalid index: %d\n", index + 1);
+		glShaderStorageBlockBinding(prog, index + 1, 0);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+			pass = false;
+		}
 	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
