@@ -24,6 +24,24 @@
 #include "piglit-util.h"
 #include "piglit-util-egl.h"
 
+/* Extension function pointers.
+ *
+ * Use prefix 'pegl' (piglit egl) instead of 'egl' to avoid collisions with
+ * prototypes in eglext.h. */
+EGLSurface (*peglCreatePlatformPixmapSurfaceEXT)(EGLDisplay display, EGLConfig config,
+	    NativePixmapType native_pixmap, const EGLint *attrib_list);
+EGLSurface (*peglCreatePlatformWindowSurfaceEXT)(EGLDisplay display, EGLConfig config,
+	    NativeWindowType native_window, const EGLint *attrib_list);
+
+static void
+init_egl_extension_funcs(void)
+{
+	peglCreatePlatformPixmapSurfaceEXT = (void*)
+		eglGetProcAddress("eglCreatePlatformPixmapSurfaceEXT");
+	peglCreatePlatformWindowSurfaceEXT = (void*)
+		eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
+}
+
 static void
 test_setup(EGLDisplay *dpy)
 {
@@ -72,7 +90,7 @@ test_create_window(void *test_data)
 
 	test_setup(&dpy);
 
-	surf = eglCreatePlatformWindowSurface(dpy, EGL_NO_CONFIG_KHR,
+	surf = peglCreatePlatformWindowSurfaceEXT(dpy, EGL_NO_CONFIG_KHR,
 					      /*native_window*/ NULL,
 					      /*attrib_list*/ NULL);
 	if (surf) {
@@ -103,7 +121,7 @@ test_create_pixmap(void *test_data)
 
 	test_setup(&dpy);
 
-	surf = eglCreatePlatformPixmapSurface(dpy, EGL_NO_CONFIG_KHR,
+	surf = peglCreatePlatformPixmapSurfaceEXT(dpy, EGL_NO_CONFIG_KHR,
 					      /*native_window*/ NULL,
 					      /*attrib_list*/ NULL);
 	if (surf) {
@@ -205,6 +223,7 @@ main(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	init_egl_extension_funcs();
 	result = piglit_run_selected_subtests(subtests, selected_names,
 					      num_selected, result);
 	piglit_report_result(result);
