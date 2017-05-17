@@ -85,6 +85,7 @@ piglit_egl_get_default_display(EGLenum platform)
 	static bool has_x11 = false;
 	static bool has_wayland = false;
 	static bool has_gbm = false;
+	static bool has_surfaceless_mesa = false;
 
 	static EGLDisplay (*peglGetPlatformDisplayEXT)(EGLenum platform, void *native_display, const EGLint *attrib_list);
 
@@ -99,6 +100,7 @@ piglit_egl_get_default_display(EGLenum platform)
 		has_x11 = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_x11");
 		has_wayland = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_wayland");
 		has_gbm = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_gbm");
+		has_surfaceless_mesa = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_MESA_platform_surfaceless");
 
 		peglGetPlatformDisplayEXT = (void*) eglGetProcAddress("eglGetPlatformDisplayEXT");
 	}
@@ -120,6 +122,11 @@ piglit_egl_get_default_display(EGLenum platform)
 		break;
 	case EGL_PLATFORM_GBM_MESA:
 		if (!has_gbm) {
+			return EGL_NO_DISPLAY;
+		}
+		break;
+	case EGL_PLATFORM_SURFACELESS_MESA:
+		if (!has_surfaceless_mesa) {
 			return EGL_NO_DISPLAY;
 		}
 		break;
