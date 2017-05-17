@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
         config.window_width = 1;
         config.window_height = 1;
         config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -74,11 +75,13 @@ run_test_bind_range(unsigned i)
 
         glBufferData(GL_ATOMIC_COUNTER_BUFFER, 16, NULL, GL_STATIC_DRAW);
 
-        glBindBufferRange(GL_ATOMIC_COUNTER_BUFFER, i, buffer, 6, 5);
-        if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-                printf("Misaligned buffer range binding didn't generate a"
-                       " GL_INVALID_VALUE error.\n");
-                return false;
+        if (!piglit_khr_no_error) {
+                glBindBufferRange(GL_ATOMIC_COUNTER_BUFFER, i, buffer, 6, 5);
+                if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+                        printf("Misaligned buffer range binding didn't "
+                               "generate a GL_INVALID_VALUE error.\n");
+                        return false;
+                }
         }
 
         glBindBufferRange(GL_ATOMIC_COUNTER_BUFFER, i, buffer, 8, 5);

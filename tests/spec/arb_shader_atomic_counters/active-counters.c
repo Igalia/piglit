@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
         config.window_width = 1;
         config.window_height = 1;
         config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -162,20 +163,24 @@ piglit_init(int argc, char **argv)
                 piglit_report_result(PIGLIT_FAIL);
         }
 
-        ret = 0xdeadbeef;
-        glGetActiveAtomicCounterBufferiv(
-                prog, n, GL_ATOMIC_COUNTER_BUFFER_BINDING, &ret);
+        if (!piglit_khr_no_error) {
+                ret = 0xdeadbeef;
+                glGetActiveAtomicCounterBufferiv(
+                        prog, n, GL_ATOMIC_COUNTER_BUFFER_BINDING, &ret);
 
-        if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-                fprintf(stderr, "glGetActiveAtomicCounterBufferiv should have "
-                        "failed when trying to query a non-existent buffer.\n");
-                piglit_report_result(PIGLIT_FAIL);
-        }
+                if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+                        fprintf(stderr, "glGetActiveAtomicCounterBufferiv "
+                                "should have failed when trying to query a "
+                                "non-existent buffer.\n");
+                        piglit_report_result(PIGLIT_FAIL);
+                }
 
-        if (ret != 0xdeadbeef) {
-                fprintf(stderr, "Failed call to glGetActiveAtomicCounterBufferiv"
-                        "didn't preserve the output parameter contents.\n");
-                piglit_report_result(PIGLIT_FAIL);
+                if (ret != 0xdeadbeef) {
+                        fprintf(stderr, "Failed call to "
+                                "glGetActiveAtomicCounterBufferiv didn't "
+                                "preserve the output parameter contents.\n");
+                        piglit_report_result(PIGLIT_FAIL);
+                }
         }
 
         for (i = 0; i < n; ++i) {
