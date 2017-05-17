@@ -31,7 +31,7 @@ test_setup(EGLDisplay *dpy)
 
 	piglit_require_egl_extension(EGL_NO_DISPLAY, "EGL_MESA_platform_surfaceless");
 
-	*dpy = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA, NULL, NULL);
+	*dpy = piglit_egl_get_default_display(EGL_PLATFORM_SURFACELESS_MESA);
 	if (*dpy == EGL_NO_DISPLAY) {
 		printf("failed to get EGLDisplay\n");
 		piglit_report_result(PIGLIT_SKIP);
