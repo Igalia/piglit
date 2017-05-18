@@ -116,6 +116,9 @@ valid_call:
 			  50 * 50 * 6 * 4, data);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
+	free(data);
+	free(image);
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
