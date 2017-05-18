@@ -481,7 +481,7 @@ run_stress(unsigned num_iterations)
 	unsigned log_num_pages = 10;
 	bool pass = true;
 
-	buf = create_buffers((1 << log_num_pages) * sparse_buffer_page_size);
+	buf = create_buffers((1ull << log_num_pages) * sparse_buffer_page_size);
 
 	/* Initialize a fairly dense random commitment. */
 	for (unsigned page = 0; page < (1 << log_num_pages);) {
