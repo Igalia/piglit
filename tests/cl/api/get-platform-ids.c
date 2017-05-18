@@ -60,7 +60,6 @@ piglit_cl_test(const int argc,
 	/* get number of platforms */
 	errNo = clGetPlatformIDs(0, NULL, &num_platforms);
 	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
-		piglit_cl_check_error(errNo, CL_SUCCESS);
 		fprintf(stderr,
 		        "Failed (error code: %s): Get size of platform list.\n",
 		        piglit_cl_get_error_name(errNo));
