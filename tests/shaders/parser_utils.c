@@ -56,9 +56,10 @@ parse_ints(const char *s, int *i, unsigned n, const char **rest)
 	unsigned j;
 
 	for (j = 0; j < n; j++) {
-		i[j] = strtoll(s = end, (char **)&end, 0);
+		int v = strtoll(s = end, (char **)&end, 0);
 		if (s == end)
 			break;
+		i[j] = v;
 	}
 
 	if (rest)
@@ -74,9 +75,10 @@ parse_uints(const char *s, unsigned *u, unsigned n, const char **rest)
 	unsigned j;
 
 	for (j = 0; j < n; j++) {
-		u[j] = strtoul(s = end, (char **)&end, 0);
+		unsigned v = strtoul(s = end, (char **)&end, 0);
 		if (s == end)
 			break;
+		u[j] = v;
 	}
 
 	if (rest)
@@ -92,9 +94,10 @@ parse_int64s(const char *s, int64_t *i, unsigned n, const char **rest)
 	unsigned j;
 
 	for (j = 0; j < n; j++) {
-		i[j] = strtoll(s = end, (char **)&end, 0);
+		int64_t v = strtoll(s = end, (char **)&end, 0);
 		if (s == end)
 			break;
+		i[j] = v;
 	}
 
 	if (rest)
@@ -110,9 +113,10 @@ parse_uint64s(const char *s, uint64_t *u, unsigned n, const char **rest)
 	unsigned j;
 
 	for (j = 0; j < n; j++) {
-		u[j] = strtoull(s = end, (char **)&end, 0);
+		uint64_t v = strtoull(s = end, (char **)&end, 0);
 		if (s == end)
 			break;
+		u[j] = v;
 	}
 
 	if (rest)
@@ -128,9 +132,10 @@ parse_floats(const char *s, float *f, unsigned n, const char **rest)
 	unsigned j;
 
 	for (j = 0; j < n; j++) {
-		f[j] = strtof_hex(s = end, (char **)&end);
+		float v = strtof_hex(s = end, (char **)&end);
 		if (s == end)
 			break;
+		f[j] = v;
 	}
 
 	if (rest)
@@ -146,9 +151,10 @@ parse_doubles(const char *s, double *d, unsigned n, const char **rest)
 	unsigned j;
 
 	for (j = 0; j < n; j++) {
-		d[j] = strtod_hex(s = end, (char **)&end);
+		double v = strtod_hex(s = end, (char **)&end);
 		if (s == end)
 			break;
+		d[j] = v;
 	}
 
 	if (rest)
