@@ -3819,11 +3819,11 @@ piglit_display(void)
 		/* Free our resources, useful for valgrinding. */
 	        free_subroutine_uniforms();
 
-		for (i = 0; i < ARRAY_SIZE(texture_bindings); i++)
-			clear_texture_binding(i);
-
 		for (i = 0; i < ARRAY_SIZE(resident_handles); i++)
 			clear_resident_handle(i);
+
+		for (i = 0; i < ARRAY_SIZE(texture_bindings); i++)
+			clear_texture_binding(i);
 
 		if (prog != 0) {
 			glDeleteProgram(prog);
