@@ -376,23 +376,6 @@ ShaderAPITest::test_uniform_bool_conversion(void)
 
 
 void
-ShaderAPITest::test_uniform_multiple_samplers(void)
-{
-   GLuint program;
-   GLint location;
-   GLint values[2] = {0, 1};
-
-   assert_no_error();
-   program = make_program(NULL, "uniform sampler2D s[2];\nvoid main() { gl_FragColor = texture2D(s[1], vec2(0.0, 0.0)); }\n");
-   location = glGetUniformLocation(program, "s[0]");
-   assert(location != -1);
-   assert_no_error();
-   glUniform1iv(location, 2, values);
-   assert_no_error();
-}
-
-
-void
 ShaderAPITest::run_tests(void)
 {
 	test_uniform_size_type();
@@ -402,7 +385,6 @@ ShaderAPITest::run_tests(void)
 	test_uniform_query_matrix();
 	test_uniform_neg_location();
 	test_uniform_bool_conversion();
-	test_uniform_multiple_samplers();
 }
 
 
