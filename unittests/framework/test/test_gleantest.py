@@ -53,6 +53,7 @@ def test_GLOBAL_PARAMS_assignment():
     GleanTest.GLOBAL_PARAMS = ['--quick']
     test2 = GleanTest('basic')
     assert test1.command == test2.command
+    assert '--quick' in test1.command
 
 
 def test_global_params_setter():
