@@ -56,7 +56,7 @@ class GleanTest(Test):
     def command(self):
         return super(GleanTest, self).command + self.GLOBAL_PARAMS
 
-    @Test.command.setter
+    @command.setter
     def command(self, new):
         self._command = [n for n in new if not n in self.GLOBAL_PARAMS]
 
