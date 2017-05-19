@@ -202,10 +202,13 @@ clear_resident_handle(unsigned idx)
 
 	if (resident_handles[idx].handle) {
 		GLuint64 handle = resident_handles[idx].handle;
-		if (resident_handles[idx].is_tex)
-			glMakeTextureHandleNonResidentARB(handle);
-		else
-			glMakeImageHandleNonResidentARB(handle);
+		if (resident_handles[idx].is_tex) {
+			if (glIsTextureHandleResidentARB(handle))
+				glMakeTextureHandleNonResidentARB(handle);
+		} else {
+			if (glIsImageHandleResidentARB(handle))
+				glMakeImageHandleNonResidentARB(handle);
+		}
 		resident_handles[idx].handle = 0;
 	}
 }
