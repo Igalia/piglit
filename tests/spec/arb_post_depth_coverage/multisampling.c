@@ -236,12 +236,14 @@ enum piglit_result
 piglit_display(void)
 {
 	int samples[4] = { 2, 4, 8, 16 };
+	int max_samples;
 	bool pass = true;
 	int i, j, k;
 
 	glViewport(0, 0, piglit_width, piglit_height);
+	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
 
-	for (j = 0; j < 4; j++) {
+	for (j = 0; j < 4 && samples[j] <= max_samples; j++) {
 		sample_mask = (GLint*) calloc (piglit_width * piglit_height,
 			sizeof(GLint));
 		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(GLint) * piglit_width *
