@@ -19,4 +19,4 @@ void main()
 
 [test]
 draw rect -1 -1 2 2
-probe all rgb 0.73087868591526 0.73087868591526
+probe all rgb 0.73087868591526 0.73087868591526 0.0
