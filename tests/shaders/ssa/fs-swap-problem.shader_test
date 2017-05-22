@@ -13,7 +13,7 @@ void main()
 }
 
 [test]
-uniform int f = 0
+uniform int f 0
 
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
