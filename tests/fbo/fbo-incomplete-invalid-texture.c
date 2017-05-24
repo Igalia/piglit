@@ -61,7 +61,7 @@ piglit_init(int argc, char **argv)
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
-	/* The format of the pixel data is invalide for the specified
+	/* The format of the pixel data is invalid for the specified
 	 * internalFormat.  This should fail and generate
 	 * GL_INVALID_OPERATION.  This leaves the texture in a weird, broken
 	 * state.
