@@ -321,22 +321,22 @@ run_test(const TestCase &test)
 
 	GLboolean pass;
 
-	GLuint tex;
+	GLuint rbo;
 	GLuint fbo;
 	GLenum status;
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	tex = piglit_rgbw_texture(GL_RGBA, test.srcW, test.srcH, GL_FALSE, GL_TRUE, GL_UNSIGNED_NORMALIZED);
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, test.srcW, test.srcH);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-	glBindTexture(GL_TEXTURE_2D, tex);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER,
-			       GL_COLOR_ATTACHMENT0,
-			       GL_TEXTURE_2D,
-			       tex,
-			       0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+				  GL_COLOR_ATTACHMENT0,
+				  GL_RENDERBUFFER,
+				  rbo);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
@@ -344,6 +344,12 @@ run_test(const TestCase &test)
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		pass = GL_TRUE;
 	} else {
+		GLubyte *image = piglit_rgbw_image_ubyte(test.srcW, test.srcH,
+							 GL_TRUE);
+		glDrawPixels(test.srcW, test.srcH, GL_RGBA, GL_UNSIGNED_BYTE,
+			     image);
+		free(image);
+
 		glViewport(0, 0, piglit_width, piglit_height);
 		piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -364,7 +370,7 @@ run_test(const TestCase &test)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &fbo);
-	glDeleteTextures(1, &tex);
+	glDeleteRenderbuffers(1, &rbo);
 
 	return pass;
 }
