@@ -52,7 +52,7 @@ piglit_init(int argc, char **argv)
 	GLenum status;
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
-
+	piglit_require_extension("GL_ARB_depth_texture");
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);

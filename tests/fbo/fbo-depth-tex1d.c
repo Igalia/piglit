@@ -211,6 +211,7 @@ void piglit_init(int argc, char **argv)
 	unsigned i, p;
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_extension("GL_ARB_depth_texture");
 
 	for (p = 1; p < argc; p++) {
 		for (i = 0; i < sizeof(formats)/sizeof(*formats); i++) {

@@ -143,6 +143,7 @@ void piglit_init(int argc, char **argv)
 	GLuint tex;
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_depth_texture");
 
 	glGenTextures(1, &tex);
 	glGenFramebuffers(1, &fb);
