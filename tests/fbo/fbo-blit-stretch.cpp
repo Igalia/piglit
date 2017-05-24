@@ -41,13 +41,6 @@
 #include "piglit-util-gl.h"
 
 
-/*
- * XXX: Checkerboard is not a good test pattern, because OpenGL spec allows the
- * implementation to clamp against source rectangle edge, as oposed to clamp
- * against the source edges, causing different results along the edge.
- */
-#define CHECKERBOARD 0
-
 #define DSTW 200
 #define DSTH 150
 
@@ -193,11 +186,7 @@ lerp2d(float xy00, float xy01, float xy10, float xy11, float wx, float wy)
 }
 
 static float clearColor[4] = {
-#if CHECKERBOARD
-	0.0, 0.0, 1.0, 1.0
-#else
 	0.5, 0.5, 0.5, 0.5
-#endif
 };
 
 static GLboolean
@@ -339,13 +328,8 @@ run_test(const TestCase &test)
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-#if CHECKERBOARD
-	const float color1[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-	const float color2[4] = {0.0f, 1.0f, 0.0f, 1.0f};
-	tex = piglit_checkerboard_texture(0, 0, test.srcW, test.srcH, 1, 1,  color1, color2);
-#else
 	tex = piglit_rgbw_texture(GL_RGBA, test.srcW, test.srcH, GL_FALSE, GL_TRUE, GL_UNSIGNED_NORMALIZED);
-#endif
+
 	glBindTexture(GL_TEXTURE_2D, tex);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER,
