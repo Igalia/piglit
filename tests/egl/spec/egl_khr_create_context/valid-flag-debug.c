@@ -69,6 +69,7 @@ try_debug_flag(EGLenum context_api, EGLenum context_bit)
 
 	EGLint attribs[64];
 	int i = 0;
+	GLboolean debug_output;
 
 	if (!EGL_KHR_create_context_setup(context_bit))
 		piglit_report_result(PIGLIT_SKIP);
@@ -158,19 +159,64 @@ try_debug_flag(EGLenum context_api, EGLenum context_bit)
 		break;
 	}
 
-	glGetIntegerv(GL_CONTEXT_FLAGS, &actual_flags);
+	/* The "Interactions with OpenGL ES" section of the GL_KHR_debug spec
+	 * says:
+	 *
+	 *    In OpenGL ES versions prior to and including ES 3.1 there is no
+	 *    CONTEXT_FLAGS state and therefore the CONTEXT_FLAG_DEBUG_BIT
+	 *    cannot be queried. GLES contexts must act as if this state
+	 *    existed as described in this specification even if the state
+	 *    itself is not visible to applications. For example, DEBUG_OUTPUT
+	 *    must still be enabled by default if the context was created with
+	 *    debug enabled.
+	 *
+	 * Nothing is explicitly said about versions of desktop OpenGL before
+	 * 3.0 which also lack the ability to query GL_CONTEXT_FLAGS.  We will
+	 * assume that the behavior should be the same.  It is likely that
+	 * Mesa is the only existent such implementation.
+	 */
+	if ((context_bit == EGL_OPENGL_BIT && piglit_get_gl_version() < 30) ||
+	    (context_bit != EGL_OPENGL_BIT && piglit_get_gl_version() < 32)) {
+		glGetIntegerv(GL_CONTEXT_FLAGS, &actual_flags);
+
+		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+			fprintf(stderr,
+				"glGetIntegerv(GL_CONTEXT_FLAGS) should not "
+				"be possible in this context\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	} else {
+		glGetIntegerv(GL_CONTEXT_FLAGS, &actual_flags);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr,
+				"glGetIntegerv(GL_CONTEXT_FLAGS) failed\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		/* Verify that this is actually a debug context. */
+		if (!(actual_flags & GL_CONTEXT_FLAG_DEBUG_BIT)) {
+			fprintf(stderr,
+				"GL_CONTEXT_FLAGS=0x%x does not contain "
+				"GL_CONTEXT_FLAG_DEBUG_BIT=0x%x\n",
+				actual_flags, GL_CONTEXT_FLAG_DEBUG_BIT);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+
+	/* Since we may not have been able to query GL_CONTEXT_FLAGS above,
+	 * query GL_DEBUG_OUTPUT just so that we can check something.
+	 */
+	debug_output = glIsEnabled(GL_DEBUG_OUTPUT);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
-		fprintf(stderr, "glGetIntegerv(GL_CONTEXT_FLAGS) failed\n");
+		fprintf(stderr, "glIsEnabled(GL_DEBUG_OUTPUT) failed\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	/* Verify that this is actually a debug context. */
-	if (!(actual_flags & GL_CONTEXT_FLAG_DEBUG_BIT)) {
-		fprintf(stderr,
-			"GL_CONTEXT_FLAGS=0x%x does not contain "
-			"GL_CONTEXT_FLAG_DEBUG_BIT=0x%x\n",
-			actual_flags, GL_CONTEXT_FLAG_DEBUG_BIT);
+	if (!debug_output) {
+		fprintf(stderr, "GL_DEBUG_OUTPUT should be enabled by "
+			"default, but it was not.\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
