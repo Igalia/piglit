@@ -238,13 +238,16 @@ piglit_display(void)
 
    if (piglit_get_gl_version() >= 14
        || piglit_is_extension_supported("GL_ARB_depth_texture")) {
-	   /*  From OpenGL 3.3 spec, page 141:
-	    *    "Textures with a base internal format of DEPTH_COMPONENT or
-	    *     DEPTH_STENCIL require either depth component data or depth/stencil
-	    *     component data. Textures with other base internal formats require
-	    *     RGBA component data. The error INVALID_OPERATION is generated if
-	    *     one of the base internal format and format is DEPTH_COMPONENT or
-	    *     DEPTH_STENCIL, and the other is neither of these values."
+	   /* Section 3.8.3 (Texture Image Specification) of the OpenGL 3.3
+	    * Core Profile spec says:
+	    *
+	    *    Textures with a base internal format of DEPTH_COMPONENT or
+	    *    DEPTH_STENCIL require either depth component data or
+	    *    depth/stencil component data. Textures with other base
+	    *    internal formats require RGBA component data. The error
+	    *    INVALID_OPERATION is generated if one of the base internal
+	    *    format and format is DEPTH_COMPONENT or DEPTH_STENCIL, and
+	    *    the other is neither of these values.
 	    */
 	   pass = test_depth_formats(formats_allowed, GL_NO_ERROR,
 				     ARRAY_SIZE(formats_allowed))
