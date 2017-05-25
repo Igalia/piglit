@@ -53,6 +53,7 @@ config.supports_gl_core_version = 32;
 config.window_width = W;
 config.window_height = H;
 config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
