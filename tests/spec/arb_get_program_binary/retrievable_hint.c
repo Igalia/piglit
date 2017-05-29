@@ -79,7 +79,7 @@ piglit_init(int argc, char **argv)
 	 */
 	value = 0xDEADBEEF;
 	glGetProgramiv(prog, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, &value);
-	got_error = piglit_check_gl_error(0);
+	got_error = !piglit_check_gl_error(0);
 
 	if (!got_error) {
 		if (value == 0xDEADBEEF) {
