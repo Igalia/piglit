@@ -1,0 +1,38 @@
+# Exercises a Mesa GLSL linker bug.
+#
+# Note that the output block is not used and it is not declared in the main
+# shader object.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+out blk {
+  vec4 foo;
+} inst;
+
+void set_output(vec4 v)
+{
+  gl_Position = v;
+}
+
+[vertex shader]
+void set_output(vec4 v);
+
+void main()
+{
+  set_output(vec4(1.0));
+}
+
+[fragment shader]
+in blk {
+  vec4 foo;
+} inst;
+
+void main()
+{
+  gl_FragColor = vec4(1.0);
+}
+
+[test]
+link success
