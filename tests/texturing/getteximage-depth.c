@@ -592,6 +592,8 @@ piglit_init(int argc, char **argv)
 	enum piglit_result status = PIGLIT_PASS;
 	bool ret;
 
+	piglit_require_extension("GL_ARB_depth_texture");
+
 	for (i = 0; i < ARRAY_SIZE(target_list); i++) {
 
 		switch (target_list[i]) {
