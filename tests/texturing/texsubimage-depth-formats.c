@@ -170,6 +170,8 @@ load_texture(int formats_idx, int tex_size_idx)
 void
 piglit_init(int argc, char **argv)
 {
+	piglit_require_extension("GL_ARB_depth_texture");
+
 	for (int i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "pbo")) {
 			piglit_require_extension("GL_ARB_pixel_buffer_object");
