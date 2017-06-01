@@ -77,7 +77,7 @@ void GLX_EXT_import_context_setup(void)
 	dpy = piglit_get_glx_display();
 
 	/* NVIDIA incorrectly only list the extension in the client
-	 * extenstions list.  If the extension is available for applications
+	 * extensions list.  If the extension is available for applications
 	 * to use, it is supposed to be included in the list returned by
 	 * glXQueryExtensionsString.
 	 *
