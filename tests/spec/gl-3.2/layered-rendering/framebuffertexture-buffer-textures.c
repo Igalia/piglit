@@ -35,6 +35,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -57,10 +58,13 @@ piglit_init(int argc, char **argv)
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	/* Try to attach the buffer texture to the framebuffer */
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex, 0);
+	if (!piglit_khr_no_error) {
+		/* Try to attach the buffer texture to the framebuffer */
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				     tex, 0);
 
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
