@@ -152,6 +152,7 @@ piglit_init(int argc, char **argv)
 	};
 	bool pass = true;
 	GLuint bo;
+	GLint alignment;
 
 	piglit_require_extension("GL_ARB_shading_language_420pack");
 	piglit_require_extension("GL_ARB_explicit_attrib_location");
@@ -167,14 +168,21 @@ piglit_init(int argc, char **argv)
 	if (!pass)
 		piglit_report_result(PIGLIT_FAIL);
 
+	/* Pad out to the alignment or the size of a vec4. */
+	glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment);
+	alignment = MAX2(alignment, 4 * sizeof(float));
+
 	glGenBuffers(1, &bo);
 	glBindBuffer(GL_UNIFORM_BUFFER, bo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, 3 * alignment, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0 * alignment, 16, &data[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 1 * alignment, 16, &data[4]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * alignment, 16, &data[8]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	glBindBufferRange(GL_UNIFORM_BUFFER, 2, bo,  0, 16);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 3, bo, 16, 16);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 4, bo, 32, 16);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 2, bo, 0 * alignment, 16);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 3, bo, 1 * alignment, 16);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 4, bo, 2 * alignment, 16);
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 }
