@@ -63,6 +63,6 @@ class DEQPCTSTest(deqp.DEQPBaseTest):
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     itertools.chain(
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL45-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL45-CTS-cases.txt', _EXTRA_ARGS)),
     ),
     DEQPCTSTest)
