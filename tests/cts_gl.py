@@ -69,24 +69,24 @@ class DEQPCTSTest(deqp.DEQPBaseTest):
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     itertools.chain(
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL30-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL30-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL31-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL31-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL32-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL32-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL33-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL33-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL40-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL40-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL41-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL41-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL42-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL42-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL43-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL43-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL44-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL44-CTS-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GL45-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'GL45-CTS-cases.txt', _EXTRA_ARGS)),
     ),
     DEQPCTSTest)
