@@ -60,6 +60,7 @@ piglit_init(int argc, char **argv)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_texture_cube_map");
 
 	/* This texture will be incomplete because one of the cubemap faces
 	 * has not been specified.
