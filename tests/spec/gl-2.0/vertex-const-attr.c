@@ -25,7 +25,7 @@
  */
 
 /**
- * Test glVertexAtribNfv changes and redraws without changing any other state
+ * Test glVertexAttribNfv changes and redraws without changing any other state
  */
 
 #include "piglit-util-gl.h"
