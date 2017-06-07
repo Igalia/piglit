@@ -124,6 +124,16 @@ testB
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
 
+[khr_gl]
+; path to the Khronos CTS OpenGL executable
+; can be overwritten by PIGLIT_KHR_GL_BIN environment variable
+;bin=/home/knuth/vk-gl-cts/build/external/openglcts/modules/glcts
+
+; Space-separated list of extra command line arguments for cts. The
+; option is not required. The environment variable PIGLIT_KHR_GL_EXTRA_ARGS
+; overrides the value set here.
+;extra_args=--deqp-visibility hidden
+
 ; Section for specific oclconform test.  One of these sections is required for
 ; each test list in the oclconform section and must be called:
 ; oclconform-$testname
