@@ -96,7 +96,7 @@
  *
  * Functions also accepts the following flags:
  *
- * - "small": Causes the MSAA image to be renedered in extremely tiny
+ * - "small": Causes the MSAA image to be rendered in extremely tiny
  *   (16x16) tiles that are then stitched together.  This verifies
  *   that MSAA works properly on very small buffers (a critical corner
  *   case on i965).
