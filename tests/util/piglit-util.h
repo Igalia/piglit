@@ -414,7 +414,7 @@ void piglit_set_timeout(double seconds, enum piglit_result timeout_result);
 void piglit_report_subtest_result(enum piglit_result result,
 				  const char *format, ...) PRINTFLIKE(2, 3);
 
-void piglit_disable_error_message_boxes(void);
+void piglit_general_init(void);
 
 extern void piglit_set_rlimit(unsigned long lim);
 

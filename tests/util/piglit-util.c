@@ -317,7 +317,7 @@ piglit_report_subtest_result(enum piglit_result result, const char *format, ...)
 }
 
 
-void
+static void
 piglit_disable_error_message_boxes(void)
 {
 	/* When Windows' error message boxes are disabled for this process (as
@@ -351,6 +351,28 @@ piglit_disable_error_message_boxes(void)
 #endif
 	}
 #endif /* _WIN32 */
+}
+
+
+static void
+piglit_set_line_buffering(void)
+{
+	/* Windows doesn't immediately flush stdout/stderr after printf
+	 * calls as we see on Linux.  To get immediate flushing, we disable
+	 * buffering here.
+	 */
+#ifdef _WIN32
+	setbuf(stdout, NULL);
+	setbuf(stderr, NULL);
+#endif
+}
+
+
+void
+piglit_general_init(void)
+{
+	piglit_disable_error_message_boxes();
+	piglit_set_line_buffering();
 }
 
 
