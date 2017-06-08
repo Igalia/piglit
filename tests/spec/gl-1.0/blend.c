@@ -701,7 +701,7 @@ run_all_factor_sets(void)
 	int sf, sfa, df, dfa;
 
 	unsigned num_src_factors_sep, num_dst_factors_sep;
-	unsigned num_operators_rgb, num_operators_a;
+	unsigned num_operators;
 
 	/* Find out what kind of GL blending capability we have. */
 	if (gl_version >= 14) {
@@ -742,24 +742,23 @@ run_all_factor_sets(void)
 		num_dst_factors_sep = 1;
 	}
 
-	num_operators_rgb = 1;
+	num_operators = 1;
 	operators[0] = GL_FUNC_ADD;
 
 	if (piglit_is_extension_supported("GL_EXT_blend_subtract")) {
-		operators[num_operators_rgb++] = GL_FUNC_SUBTRACT;
-		operators[num_operators_rgb++] = GL_FUNC_REVERSE_SUBTRACT;
+		operators[num_operators++] = GL_FUNC_SUBTRACT;
+		operators[num_operators++] = GL_FUNC_REVERSE_SUBTRACT;
 	}
 
 	if (piglit_is_extension_supported("GL_EXT_blend_minmax")) {
-		operators[num_operators_rgb++] = GL_MIN;
-		operators[num_operators_rgb++] = GL_MAX;
+		operators[num_operators++] = GL_MIN;
+		operators[num_operators++] = GL_MAX;
 	}
 
-	assert(num_operators_rgb <= ARRAY_SIZE(operators));
-	num_operators_a = num_operators_rgb;
+	assert(num_operators <= ARRAY_SIZE(operators));
 
-	for (op = 0; op < num_operators_rgb; ++op) {
-		for (opa = 0; opa < num_operators_a; ++opa) {
+	for (op = 0; op < num_operators; ++op) {
+		for (opa = 0; opa < num_operators; ++opa) {
 			if (operators[op] == GL_FUNC_ADD && 
 			    operators[opa] == GL_FUNC_ADD) {
 				/* test _all_ blend term combinations */
