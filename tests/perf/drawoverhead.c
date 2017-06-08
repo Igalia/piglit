@@ -203,10 +203,10 @@ draw(unsigned count)
 	unsigned i;
 	if (indexed) {
 		for (i = 0; i < count; i++)
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 	} else {
 		for (i = 0; i < count; i++)
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 }
 
@@ -217,12 +217,12 @@ draw_shader_change(unsigned count)
 	if (indexed) {
 		for (i = 0; i < count; i++) {
 			glUseProgram(prog[i & 1]);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
 			glUseProgram(prog[i & 1]);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 	glUseProgram(prog[0]);
@@ -235,12 +235,12 @@ draw_uniform_change(unsigned count)
 	if (indexed) {
 		for (i = 0; i < count; i++) {
 			glUniform4f(uniform_loc, i & 1, 0, 0, 0);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
 			glUniform4f(uniform_loc, i & 1, 0, 0, 0);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 }
@@ -252,12 +252,12 @@ draw_one_texture_change(unsigned count)
 	if (indexed) {
 		for (i = 0; i < count; i++) {
 			glBindTexture(GL_TEXTURE_2D, tex[i & 1]);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
 			glBindTexture(GL_TEXTURE_2D, tex[i & 1]);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 }
@@ -273,7 +273,7 @@ draw_many_texture_change(unsigned count)
 				glBindTexture(GL_TEXTURE_2D, tex[(i + j) % 8]);
 			}
 			glActiveTexture(GL_TEXTURE0);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
@@ -282,7 +282,7 @@ draw_many_texture_change(unsigned count)
 				glBindTexture(GL_TEXTURE_2D, tex[(i + j) % 8]);
 			}
 			glActiveTexture(GL_TEXTURE0);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 }
@@ -294,12 +294,12 @@ draw_one_ubo_change(unsigned count)
 	if (indexed) {
 		for (i = 0; i < count; i++) {
 			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo[i & 1]);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
 			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo[i & 1]);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 }
@@ -312,13 +312,13 @@ draw_many_ubo_change(unsigned count)
 		for (i = 0; i < count; i++) {
 			for (j = 0; j < 4; j++)
 				glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo[(i + j) % 4]);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
 			for (j = 0; j < 4; j++)
 				glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo[(i + j) % 4]);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 }
@@ -333,7 +333,7 @@ draw_state_change(unsigned count)
 				glEnable(enable_enum);
 			else
 				glDisable(enable_enum);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
@@ -341,7 +341,7 @@ draw_state_change(unsigned count)
 				glEnable(enable_enum);
 			else
 				glDisable(enable_enum);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 	glDisable(enable_enum);
@@ -359,7 +359,7 @@ draw_vertex_attrib_change(unsigned count)
 			else
 				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
 						      3 * sizeof(float), NULL);
-			glDrawElements(GL_POINTS, 4, GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
@@ -369,7 +369,7 @@ draw_vertex_attrib_change(unsigned count)
 			else
 				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
 						      3 * sizeof(float), NULL);
-			glDrawArrays(GL_POINTS, 0, 4);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
 }
