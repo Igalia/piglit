@@ -27,6 +27,8 @@
  * glUniformHandleui*64ARB(), glGetActiveUniform(), etc.
  */
 
+#include <inttypes.h>
+
 #include "common.h"
 
 static struct piglit_gl_test_config *piglit_config;
@@ -355,6 +357,87 @@ check_Uniform_with_implicit_bound_image(void *data)
 	return PIGLIT_PASS;
 }
 
+static bool
+check_uniform_int(GLuint prog, int loc, int expect)
+{
+        int v = 0xdeadcafe;
+
+        glGetUniformiv(prog, loc, &v);
+        if (v != expect) {
+                fprintf(stderr, "Invalid value for uniform %d\n"
+                        "   Expected: %d\n"
+                        "   Observed: %d\n",
+                        loc, expect, v);
+                return false;
+        }
+        return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
+check_uniform_handle(GLuint prog, int loc, GLuint64 expect)
+{
+        GLuint64 v = 0xdeadcafedeadcafe;
+
+        glGetUniformui64vARB(prog, loc, &v);
+        if (v != expect) {
+                fprintf(stderr, "Invalid value for uniform %d\n"
+                        "   Expected: %"PRIx64"\n"
+                        "   Observed: %"PRIx64"\n",
+                        loc, expect, v);
+                return false;
+        }
+        return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static enum piglit_result
+check_Uniform_with_texture_units_and_handles(void *data)
+{
+	const char *fs_src =
+		"#version 330\n"
+		"#extension GL_ARB_bindless_texture: require\n"
+		"\n"
+		"layout (bindless_sampler) uniform sampler2D texs[5];\n"
+		"uniform int i;\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	color = texture(texs[i], vec2(0, 0));\n"
+		"}\n";
+	int units[5] = { 4, 7, 8, 1, 5 };
+	GLuint64 handle = 0x1004002010040020;
+	GLuint vs, fs, prog;
+	bool pass = true;
+	GLint loc;
+
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, passthrough_vs_src);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_src);
+	prog = piglit_link_simple_program(vs, fs);
+	glUseProgram(prog);
+
+	loc = glGetUniformLocation(prog, "texs");
+	if (loc == -1)
+		return PIGLIT_FAIL;
+
+	/* Check setting an array of texture units. */
+	glUniform1iv(loc, 5, units);
+
+	for (int i = 0; i < 5; i++) {
+		pass &= check_uniform_int(prog, loc + i, units[i]);
+	}
+
+	/* Check setting a texture handle. */
+	glUniformHandleui64ARB(loc, handle);
+	pass &= check_uniform_handle(prog, loc, handle);
+
+	/* Make sure setting the handle didn't overwrite other values. */
+	for (int i = 1; i < 5; i++) {
+		pass &= check_uniform_int(prog, loc + i, units[i]);
+	}
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
 static enum piglit_result
 use_glGetActiveUniform_with_sampler(void *data)
 {
@@ -461,6 +544,12 @@ static const struct piglit_subtest subtests[] = {
 		"Check glUniform*() with implicit bound_image",
 		"check_Uniform_with_implicit_bound_image",
 		check_Uniform_with_implicit_bound_image,
+		NULL
+	},
+	{
+		"Check glUniform*() with mixed texture units/handles",
+		"check_Uniform_with_texture_units_and_handles",
+		check_Uniform_with_texture_units_and_handles,
 		NULL
 	},
 	{
