@@ -1,8 +1,8 @@
 /*  BEGIN_COPYRIGHT -*- glean -*-
- * 
+ *
  *  Copyright (C) 1999  Allen Akin   All Rights Reserved.
  *  Copyright (C) 2014  Intel Corporation.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
@@ -19,16 +19,16 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  *
  *  END_COPYRIGHT
  */
 
-/** @file blend.c  
- * 
+/** @file blend.c
+ *
  *  Test blending functions.
- *  
+ *
  *	This test checks all combinations of source and destination
  *	blend factors for the GL_FUNC_ADD blend equation.  It operates
  *	on all RGB or RGBA drawing surface configurations that support
@@ -43,7 +43,7 @@
  *	converting from floating-point colors to integer form, the result
  *	must be rounded to the nearest integer, not truncated.
  *	[1.2.1, 2.13.9]
- *	
+ *
  *	The test reports two error measurements.  The first (readback) is
  *	the error detected when reading back raw values that were written
  *	to the framebuffer.  The error in this case should be very close
@@ -80,7 +80,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | 
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
@@ -134,8 +134,8 @@ static bool have_blend_equation_sep, have_blend_color;
 static const GLfloat constant_color[4] = {0.25, 0.0, 1.0, 0.75};
 
 /* Our random image data factory. */
-GLfloat* 
-random_image_data(void) 
+GLfloat *
+random_image_data(void)
 {
 	int i;
 	GLfloat *img = malloc(4*img_width*img_height*sizeof(GLfloat));
@@ -146,14 +146,14 @@ random_image_data(void)
 } /* random_image_data */
 
 /* Our solid color fill data factory. */
-GLfloat* 
-color_fill_data(GLfloat r, GLfloat g, GLfloat b, GLfloat a) 
+GLfloat *
+color_fill_data(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 {
 	int i, j;
 	GLfloat *img = malloc(4*img_width*img_height*sizeof(GLfloat));
 	for (j = 0; j < img_height; ++j) { /* j = vertical, i = horizontal */
 		for (i = 0; i < img_width; ++i) {
-			img[4*(img_width*j + i) + 0] = r; 
+			img[4*(img_width*j + i) + 0] = r;
 			img[4*(img_width*j + i) + 1] = g;
 			img[4*(img_width*j + i) + 2] = b;
 			img[4*(img_width*j + i) + 3] = a;
@@ -163,12 +163,12 @@ color_fill_data(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 } /* color_fill_data */
 
 static void
-image_init(struct image *image) 
+image_init(struct image *image)
 {
 	glGenTextures(1, &image->name);
 	glBindTexture(GL_TEXTURE_2D, image->name);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-		     img_width, img_height, 0, 
+		     img_width, img_height, 0,
 		     GL_RGBA, GL_FLOAT, image->data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -191,8 +191,7 @@ piglit_init(int argc, char **argv)
 		test_stride = 20;
 	}
 
-	/* 
-	 * Hack: Make driver tests on incorrect hardware feasible
+	/* Hack: Make driver tests on incorrect hardware feasible
 	 * We want to be able to perform meaningful tests
 	 * even when the blend unit of a GPU simply doesn't have
 	 * sufficient precision.
@@ -213,14 +212,14 @@ piglit_init(int argc, char **argv)
 	piglit_set_tolerance_for_bits(rgb_tol, rgb_tol, rgb_tol, alpha_tol);
 
 	/* Initialize random images. */
-	srand(0); 
+	srand(0);
 
 	/* Fill src and dst with randomness. */
 	dst_img.data = random_image_data();
 	src_img.data = random_image_data();
 
-	/* Fill exp_img with constant_color. */
-	/* 
+	/* Fill exp_img with constant_color.
+	 *
 	 * You can use this as a check to make sure the test is working
 	 * properly.
 	 */
@@ -236,7 +235,7 @@ piglit_init(int argc, char **argv)
 } /* piglit_init */
 
 bool
-needs_blend_color(const GLenum func) 
+needs_blend_color(const GLenum func)
 {
 	switch (func) {
 	case GL_CONSTANT_COLOR:
@@ -500,9 +499,9 @@ apply_blend(GLenum src_factor_rgb, GLenum src_factor_a,
 		dst[1] = MAX2(src[1], dst[1]);
 		dst[2] = MAX2(src[2], dst[2]);
 		break;
-        default:
-		abort();
-        }
+	default:
+		assert(!"Invalid RGB function");
+	}
 
 	switch (op_a) {
 	case GL_FUNC_ADD:
@@ -520,10 +519,9 @@ apply_blend(GLenum src_factor_rgb, GLenum src_factor_a,
 	case GL_MAX:
 		dst[3] = MAX2(src[3], dst[3]);
 		break;
-        default:
-		abort();
-        }
-
+	default:
+		assert(!"Invalid alpha function");
+	}
 } /* apply_blend */
 
 
@@ -548,13 +546,12 @@ run_factor_set(GLenum src_factor_rgb, GLenum src_factor_a,
 	piglit_draw_rect_tex(0, 0, img_width, img_height, 0, 0, 1, 1);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
 
-	/*
-	 * Read back the contents of the framebuffer, and measure any
+	/* Read back the contents of the framebuffer, and measure any
 	 * difference from what was actually written.  We can't tell
 	 * whether errors occurred when writing or when reading back,
 	 * but at least we can report anything unusual.
 	 */
-	pass &= piglit_probe_image_rgba(0, 0, img_width, 
+	pass &= piglit_probe_image_rgba(0, 0, img_width,
 		img_height, dst_img.data);
 
 	/*
@@ -571,7 +568,7 @@ run_factor_set(GLenum src_factor_rgb, GLenum src_factor_a,
 	/* Configure the appropriate blending settings */
 	if (have_sep_func)
 		glBlendFuncSeparate(src_factor_rgb, dst_factor_rgb,
-                                    src_factor_a, dst_factor_a);
+				    src_factor_a, dst_factor_a);
 	else
 		glBlendFunc(src_factor_rgb, dst_factor_rgb);
 
@@ -594,9 +591,9 @@ run_factor_set(GLenum src_factor_rgb, GLenum src_factor_a,
 		for (i = 0; i < img_width; ++i) {
 
 			int idx = 4*(img_width*j + i);
-			
+
 			/* Initialize expected with dst data. */
-			exp_img.data[idx + 0] = dst_img.data[idx + 0]; 
+			exp_img.data[idx + 0] = dst_img.data[idx + 0];
 			exp_img.data[idx + 1] = dst_img.data[idx + 1];
 			exp_img.data[idx + 2] = dst_img.data[idx + 2];
 			exp_img.data[idx + 3] = dst_img.data[idx + 3];
@@ -605,15 +602,14 @@ run_factor_set(GLenum src_factor_rgb, GLenum src_factor_a,
 			apply_blend(src_factor_rgb, src_factor_a,
 				    dst_factor_rgb, dst_factor_a,
 				    op_rgb, op_a,
-				    &exp_img.data[idx], &src_img.data[idx], 
+				    &exp_img.data[idx], &src_img.data[idx],
 				    constant_color);
 		}
 	}
 
-	/*
-	 * Compare the image in the framebuffer to the
-	 * computed image (``expected'') to see if any pixels are
-	 * outside the expected tolerance range. 
+	/* Compare the image in the framebuffer to the computed image
+	 * (``expected'') to see if any pixels are outside the expected
+	 * tolerance range.
 	 */
 	p = piglit_probe_image_rgba(0, 0, img_width, img_height,
 		exp_img.data);
@@ -639,8 +635,8 @@ run_factor_set(GLenum src_factor_rgb, GLenum src_factor_a,
 } /* run_factor_set */
 
 bool
-proc_factors(int sf, int sfa, int df, int dfa, int* counter, 
-	int op, int opa)
+proc_factors(int sf, int sfa, int df, int dfa, int *counter,
+	     int op, int opa)
 {
 	GLenum src_rgb, src_a, dst_rgb, dst_a;
 
@@ -649,37 +645,37 @@ proc_factors(int sf, int sfa, int df, int dfa, int* counter,
 		src_a = src_factors[sfa];
 		dst_rgb = dst_factors[df];
 		dst_a = dst_factors[dfa];
-	}
-	else {
+	} else {
 		src_rgb = src_a = src_factors[sf];
 		dst_rgb = dst_a = dst_factors[df];
 	}
 
 	/* skip test if blend color used, but not supported. */
 	if (!have_blend_color
-		&& (needs_blend_color(src_rgb) ||
-			needs_blend_color(src_a) ||
-			needs_blend_color(dst_rgb) ||
-			needs_blend_color(dst_a)))
+	    && (needs_blend_color(src_rgb) ||
+		needs_blend_color(src_a) ||
+		needs_blend_color(dst_rgb) ||
+		needs_blend_color(dst_a)))
 		return true;
 
 	/* Increment counter so that tests are numbered starting from 1. */
-	(*counter)++; 
+	(*counter)++;
 
-	/* For verification purposes, this prints every test
-	 * configuration as it runs.*/
-	/*
-	 * printf("%i: %s, %s, %s, %s, %s, %s\n", *counter,
-	 * 			piglit_get_gl_enum_name(src_rgb), 
-	 * 			piglit_get_gl_enum_name(src_a), 
-	 * 			piglit_get_gl_enum_name(dst_rgb), 
-	 * 			piglit_get_gl_enum_name(dst_a), 
-	 * 			piglit_get_gl_enum_name(operators[op]), 
-	 * 			piglit_get_gl_enum_name(operators[opa]));
+#if 0
+	/* For verification purposes, this prints every test configuration as
+	 * it runs.
 	 */
-	
-	return run_factor_set(src_rgb, src_a, dst_rgb, dst_a, 
-		operators[op], operators[opa], constant_color);
+	printf("%i: %s, %s, %s, %s, %s, %s\n", *counter,
+	       piglit_get_gl_enum_name(src_rgb),
+	       piglit_get_gl_enum_name(src_a),
+	       piglit_get_gl_enum_name(dst_rgb),
+	       piglit_get_gl_enum_name(dst_a),
+	       piglit_get_gl_enum_name(operators[op]),
+	       piglit_get_gl_enum_name(operators[opa]));
+#endif
+
+	return run_factor_set(src_rgb, src_a, dst_rgb, dst_a,
+			      operators[op], operators[opa], constant_color);
 } /* proc_factors */
 
 /**
@@ -729,7 +725,7 @@ run_all_factor_sets(void)
 		/* Just one blend color setting for all tests */
 		/* A bright, semi-transparent blue */
 		glBlendColor(constant_color[0], constant_color[1],
-			     constant_color[2], 
+			     constant_color[2],
 			     constant_color[3]);
 	}
 
@@ -759,14 +755,14 @@ run_all_factor_sets(void)
 
 	for (op = 0; op < num_operators; ++op) {
 		for (opa = 0; opa < num_operators; ++opa) {
-			if (operators[op] == GL_FUNC_ADD && 
+			if (operators[op] == GL_FUNC_ADD &&
 			    operators[opa] == GL_FUNC_ADD) {
 				/* test _all_ blend term combinations */
 				step = 1;
 			}
-			else if (operators[op] == GL_MIN || 
+			else if (operators[op] == GL_MIN ||
 				 operators[op] == GL_MAX ||
-				 operators[opa] == GL_MIN || 
+				 operators[opa] == GL_MIN ||
 				 operators[opa] == GL_MAX) {
 				/* blend terms are N/A so only */
 				/* do one iteration of loops */
@@ -778,17 +774,17 @@ run_all_factor_sets(void)
 				step = 3;
 			}
 
-			for (sf = 0; 
-			     sf < ARRAY_SIZE(src_factors); 
+			for (sf = 0;
+			     sf < ARRAY_SIZE(src_factors);
 			     sf += step) {
-				for (sfa = 0; 
-				     sfa < num_src_factors_sep; 
+				for (sfa = 0;
+				     sfa < num_src_factors_sep;
 				     sfa += step) {
-					for (df = 0; 
-					     df < ARRAY_SIZE(dst_factors); 
+					for (df = 0;
+					     df < ARRAY_SIZE(dst_factors);
 					     df += step) {
-						for (dfa = 0; dfa < 
-						     num_dst_factors_sep;
+						for (dfa = 0;
+						     dfa < num_dst_factors_sep;
 						     dfa += step) {
 							if (test_number % test_stride == 0) {
 								pass &= proc_factors(
@@ -815,11 +811,10 @@ piglit_display(void)
 	bool pass = true;
 
 	pass &= run_all_factor_sets();
-	
+
 	if (!piglit_automatic) {
-		/* 
-		 * Draw our three images, separated by some space. 
-		 * This will show only the results of the last test.
+		/* Draw our three images, separated by some space.  This will
+		 * show only the results of the last test.
 		 */
 
 		/* Draw dst */
@@ -829,22 +824,21 @@ piglit_display(void)
 
 		/* Draw src */
 		glBindTexture(GL_TEXTURE_2D, src_img.name);
-		piglit_draw_rect_tex(img_width + 2, 0, 
-			img_width, img_height, 0, 0, 1, 1);
+		piglit_draw_rect_tex(img_width + 2, 0,
+				     img_width, img_height, 0, 0, 1, 1);
 
 		/* Draw exp */
 		glBindTexture(GL_TEXTURE_2D, exp_img.name);
 		/* Have to resend the texture to GL to update GL's copy */
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-			     img_width, img_height, 0, 
+			     img_width, img_height, 0,
 			     GL_RGBA, GL_FLOAT, exp_img.data);
-		piglit_draw_rect_tex(2*(img_width + 2), 0, 
+		piglit_draw_rect_tex(2*(img_width + 2), 0,
 			img_width, img_height, 0, 0, 1, 1);
 		glDisable(GL_TEXTURE_2D);
-		
+
 		piglit_present_results();
 	}
-
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 } /* piglit_display */
