@@ -709,34 +709,31 @@ run_all_factor_sets(void)
 	unsigned num_operators_rgb, num_operators_a;
 
 	/* Find out what kind of GL blending capability we have. */
-	have_sep_func = false;
-	have_blend_equation = false;
-	have_blend_equation_sep = false;
-	have_blend_color = false;
-	if (gl_version >= 14)
-	{
+	if (gl_version >= 14) {
 		have_blend_equation = true;
-			
-		if (piglit_is_extension_supported(
-			"GL_EXT_blend_func_separate")) {
-			have_sep_func = true;
-		}
-
-		if (piglit_is_extension_supported("GL_EXT_blend_color")) {
-			have_blend_color = true;
-		}
-	}
-	else if (piglit_is_extension_supported("GL_EXT_blend_subtract") &&
-		 piglit_is_extension_supported("GL_EXT_blend_min_max")) {
-		have_blend_equation = true;
+		have_blend_color = true;
+		have_sep_func = true;
+	} else {
+		/* glBlendEquation is added by either extension.
+		 * However, there is only one table of operators to
+		 * test, and it includes the operators from both
+		 * extensions.  In Mesa, only R100 supports
+		 * GL_EXT_blend_subtract but not GL_EXT_blend_minmax.
+		 */
+		have_blend_equation =
+			piglit_is_extension_supported("GL_EXT_blend_subtract") &&
+			piglit_is_extension_supported("GL_EXT_blend_minmax");
+		have_blend_color =
+			piglit_is_extension_supported("GL_EXT_blend_color");
+		have_sep_func =
+			piglit_is_extension_supported("GL_EXT_blend_func_separate");
 	}
 
 	if (gl_version >= 20) {
 		have_blend_equation_sep = true;
-	}
-	else if (piglit_is_extension_supported(
-		"GL_EXT_blend_equation_separate")) {
-		have_blend_equation_sep = true;
+	} else {
+		have_blend_equation_sep =
+			piglit_is_extension_supported("GL_EXT_blend_equation_separate");
 	}
 
 	if (have_blend_color) {
