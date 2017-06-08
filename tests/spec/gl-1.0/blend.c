@@ -115,13 +115,8 @@ static const GLenum dst_factors[] = {
 	GL_CONSTANT_ALPHA,
 	GL_ONE_MINUS_CONSTANT_ALPHA
 };
-static const GLenum operators[] = {
-	GL_FUNC_ADD,
-	GL_FUNC_SUBTRACT,
-	GL_FUNC_REVERSE_SUBTRACT,
-	GL_MIN,
-	GL_MAX
-};
+
+GLenum operators[5];
 
 struct image {
 	GLuint name;
@@ -714,14 +709,8 @@ run_all_factor_sets(void)
 		have_blend_color = true;
 		have_sep_func = true;
 	} else {
-		/* glBlendEquation is added by either extension.
-		 * However, there is only one table of operators to
-		 * test, and it includes the operators from both
-		 * extensions.  In Mesa, only R100 supports
-		 * GL_EXT_blend_subtract but not GL_EXT_blend_minmax.
-		 */
 		have_blend_equation =
-			piglit_is_extension_supported("GL_EXT_blend_subtract") &&
+			piglit_is_extension_supported("GL_EXT_blend_subtract") ||
 			piglit_is_extension_supported("GL_EXT_blend_minmax");
 		have_blend_color =
 			piglit_is_extension_supported("GL_EXT_blend_color");
@@ -753,14 +742,21 @@ run_all_factor_sets(void)
 		num_dst_factors_sep = 1;
 	}
 
-	if (have_blend_equation) {
-		num_operators_rgb = ARRAY_SIZE(operators);
-		num_operators_a = ARRAY_SIZE(operators);
+	num_operators_rgb = 1;
+	operators[0] = GL_FUNC_ADD;
+
+	if (piglit_is_extension_supported("GL_EXT_blend_subtract")) {
+		operators[num_operators_rgb++] = GL_FUNC_SUBTRACT;
+		operators[num_operators_rgb++] = GL_FUNC_REVERSE_SUBTRACT;
 	}
-	else {
-		num_operators_rgb = 1; /* just ADD */
-		num_operators_a = 1; /* just ADD */
+
+	if (piglit_is_extension_supported("GL_EXT_blend_minmax")) {
+		operators[num_operators_rgb++] = GL_MIN;
+		operators[num_operators_rgb++] = GL_MAX;
 	}
+
+	assert(num_operators_rgb <= ARRAY_SIZE(operators));
+	num_operators_a = num_operators_rgb;
 
 	for (op = 0; op < num_operators_rgb; ++op) {
 		for (opa = 0; opa < num_operators_a; ++opa) {
