@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	piglit_config = &config;
 	config.supports_gl_compat_version = 33;
 	config.supports_gl_core_version = 33;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -131,6 +132,9 @@ check_UniformHandleui64_with_explicit_bound_sampler(void *data)
 	GLuint64 handle = 0;
 	GLint loc;
 
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
+
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, passthrough_vs_src);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
 					fs_explicit_bound_sampler);
@@ -198,6 +202,9 @@ check_Uniform_with_implicit_bound_sampler(void *data)
 	GLuint64 handle = 0;
 	GLint loc;
 
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
+
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, passthrough_vs_src);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
 					fs_implicit_bound_sampler);
@@ -239,6 +246,9 @@ check_UniformHandleui64_with_explicit_bound_image(void *data)
 	GLuint vs, fs, prog;
 	GLuint64 handle = 0;
 	GLint loc;
+
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, passthrough_vs_src);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
@@ -306,6 +316,9 @@ check_Uniform_with_implicit_bound_image(void *data)
 	GLuint vs, fs, prog;
 	GLuint64 handle = 0;
 	GLint loc;
+
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, passthrough_vs_src);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,

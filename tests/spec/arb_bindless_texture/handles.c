@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	piglit_config = &config;
 	config.supports_gl_compat_version = 33;
 	config.supports_gl_core_version = 33;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -44,6 +45,9 @@ check_GetTextureHandle_zero_handle(void *data)
 {
 	bool pass = true;
 	GLuint64 handle;
+
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
 
 	/* The ARB_bindless_texture spec says:
 	 *
@@ -173,6 +177,9 @@ delete_texture_sampler_while_handle_is_allocated(void *data)
 	GLuint texture, sampler;
 	GLuint64 handle;
 
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
+
 	/* The ARB_bindless_texture spec says:
 	 *
 	 * "(5) Is there a way to release a texture or image handle after it
@@ -221,6 +228,9 @@ delete_texture_sampler_while_handle_is_resident(void *data)
 	GLuint texture, sampler;
 	GLuint64 handle;
 	GLboolean ret;
+
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
 
 	/* The ARB_bindless_texture_spec says:
 	 *
@@ -286,6 +296,9 @@ check_GetImageHandle_zero_handle(void *data)
 	GLuint64 handle;
 
 	if (!piglit_is_extension_supported("GL_ARB_shader_image_load_store"))
+		return PIGLIT_SKIP;
+
+	if (piglit_khr_no_error)
 		return PIGLIT_SKIP;
 
 	/* The ARB_bindless_texture spec says:
@@ -409,6 +422,9 @@ delete_texture_while_image_handle_resident(void *data)
 	GLuint tex;
 
 	if (!piglit_is_extension_supported("GL_ARB_shader_image_load_store"))
+		return PIGLIT_SKIP;
+
+	if (piglit_khr_no_error)
 		return PIGLIT_SKIP;
 
 	tex = piglit_rgbw_texture(GL_RGBA32F, 16, 16, GL_TRUE, GL_FALSE,

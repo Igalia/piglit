@@ -48,6 +48,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	piglit_config = &config;
 	config.supports_gl_compat_version = 33;
 	config.supports_gl_core_version = 33;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -90,6 +91,9 @@ check_invalid_integer_border_colors(void *data)
 	};
 	GLuint sampler, texture;
 	GLint i;
+
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
 
 	texture = piglit_integer_texture(GL_RGBA32I, 16, 16, 0, 0);
 	sampler = new_sampler();
@@ -146,6 +150,9 @@ check_invalid_float_border_colors(void *data)
 	};
 	GLuint sampler, texture;
 	GLint i;
+
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
 
 	texture = piglit_rgbw_texture(GL_RGBA32F, 16, 16, GL_FALSE, GL_FALSE, 
 				      GL_UNSIGNED_NORMALIZED);
