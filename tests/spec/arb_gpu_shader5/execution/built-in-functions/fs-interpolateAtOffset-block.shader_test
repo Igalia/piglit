@@ -1,0 +1,66 @@
+# From Section 8.13.2 (Interpolation Functions) of the GLSL 4.50 spec:
+#
+#   "For all of the interpolation functions, interpolant must be an input
+#    variable or an element of an input variable declared as an array."
+#
+# From Section 4.3.9 (Interface Blocks) of the GLSL 4.50 spec:
+#
+#   "Input, output, uniform, and buffer variable declarations can be grouped
+#    into named interface blocks to provide coarser granularity backing than
+#    is achievable with individual declarations."
+#
+# So the members of an input interface block should still be considered as
+# input variables and therefore acceptable as interpolants.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 piglit_vertex;
+
+out VS2PS {
+   vec3 a;
+   vec2 b; /* second variable to test that varying packing doesn't break anything */
+} vs2ps;
+
+void main()
+{
+   gl_Position = piglit_vertex;
+
+   vs2ps.a = piglit_vertex.xyz;
+   vs2ps.b = vec2(0.0, 1.0);
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+in VS2PS {
+   vec3 a;
+   vec2 b;
+} vs2ps;
+
+uniform vec2 u_offset;
+
+out vec4 color;
+
+void main()
+{
+   /* u_offset is always 0, so these should be the same. */
+   vec3 delta = vs2ps.a - interpolateAtOffset(vs2ps.a, u_offset);
+
+   if (delta != vec3(0.0)) {
+      color = vec4(1.0, delta.x + 0.5, delta.y + 0.5, delta.z + 0.5);
+   } else {
+      color = vec4(vs2ps.b.x, vs2ps.b.y, 0.0, 1.0);
+   }
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform vec2 u_offset 0 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
