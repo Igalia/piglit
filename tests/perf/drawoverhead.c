@@ -348,6 +348,55 @@ draw_state_change(unsigned count)
 }
 
 static void
+draw_scissor_change(unsigned count)
+{
+	unsigned i;
+	glEnable(GL_SCISSOR_TEST);
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			if (i & 1)
+				glScissor(0, 0, piglit_width / 2, piglit_height / 2);
+			else
+				glScissor(0, 0, piglit_width, piglit_height);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			if (i & 1)
+				glScissor(0, 0, piglit_width / 2, piglit_height / 2);
+			else
+				glScissor(0, 0, piglit_width, piglit_height);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+	glDisable(GL_SCISSOR_TEST);
+}
+
+static void
+draw_viewport_change(unsigned count)
+{
+	unsigned i;
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			if (i & 1)
+				glViewport(0, 0, piglit_width / 2, piglit_height / 2);
+			else
+				glViewport(0, 0, piglit_width, piglit_height);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			if (i & 1)
+				glViewport(0, 0, piglit_width / 2, piglit_height / 2);
+			else
+				glViewport(0, 0, piglit_width, piglit_height);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+	glViewport(0, 0, piglit_width, piglit_height);
+}
+
+static void
 draw_vertex_attrib_change(unsigned count)
 {
 	unsigned i;
@@ -391,7 +440,7 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	printf("   %s (%2u VBOs, %u UBOs, %2u Tex) w/ %s change:%*s"
 	       COLOR_CYAN "%s" COLOR_RESET " %s(%.1f%%)" COLOR_RESET "\n",
 	       call, num_vbos, num_ubos, num_textures, change,
-	       MAX2(18 - (int)strlen(change), 0), "",
+	       MAX2(24 - (int)strlen(change), 0), "",
 	       perf_human_float(rate),
 	       base_rate == 0 ? COLOR_RESET :
 				ratio > 0.7 ? COLOR_GREEN :
@@ -406,13 +455,18 @@ struct enable_state_t {
 };
 
 static struct enable_state_t enable_states[] = {
+	{GL_PRIMITIVE_RESTART, "primitive restart enable"},
 	{GL_BLEND,	"blend enable"},
 	{GL_DEPTH_TEST, "depth enable"},
+	{GL_DEPTH_CLAMP, "depth clamp enable"},
 	{GL_STENCIL_TEST, "stencil enable"},
 	{GL_SCISSOR_TEST, "scissor enable"},
 	{GL_MULTISAMPLE, "MSAA enable"},
+	{GL_SAMPLE_MASK, "sample mask enable"},
+	{GL_SAMPLE_ALPHA_TO_COVERAGE, "alpha-to-coverage enable"},
+	{GL_SAMPLE_SHADING, "sample shading enable"},
 	{GL_CULL_FACE,	"cull face enable"},
-	{GL_FRAMEBUFFER_SRGB, "FB sRGB enable"},
+	{GL_CLIP_DISTANCE0, "clip distance enable"},
 };
 
 static void
@@ -473,6 +527,11 @@ perf_draw_variant(const char *call, bool is_indexed)
 		perf_run(call, num_vbos, num_ubos, num_textures, "many uniforms / 1",
 			 draw_uniform_change, base_rate);
 		glUseProgram(prog[0]);
+
+		perf_run(call, num_vbos, num_ubos, num_textures, "scissor",
+			 draw_scissor_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, "viewport",
+			 draw_viewport_change, base_rate);
 
 		for (int state = 0; state < ARRAY_SIZE(enable_states); state++) {
 			enable_enum = enable_states[state].enable;
