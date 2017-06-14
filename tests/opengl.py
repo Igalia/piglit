@@ -3771,6 +3771,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'nv_fog_distance')) as g:
+    g(['nv_fog_distance-coverage'], 'coverage')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'oes_matrix_get')) as g:
     g(['oes_matrix_get-api'], 'All queries')
 
