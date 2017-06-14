@@ -117,7 +117,10 @@ class IGTTest(Test):
         super(IGTTest, self).interpret_result()
 
         if self.result.returncode == 0:
-            self.result.result = 'pass'
+            if not self.result.err:
+                self.result.result = 'pass'
+            else:
+                self.result.result = 'warn'
         elif self.result.returncode == 77:
             self.result.result = 'skip'
         elif self.result.returncode == 78:
