@@ -434,13 +434,16 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	 unsigned num_textures, const char *change, perf_rate_func f,
 	 double base_rate)
 {
+	static unsigned test_index;
+	test_index++;
+
 	double rate = perf_measure_rate(f);
 	double ratio = base_rate ? rate / base_rate : 1;
 
-	printf("   %s (%2u VBOs, %u UBOs, %2u Tex) w/ %s change:%*s"
+	printf(" %3u: %s (%2u VBOs, %u UBOs, %2u Tex) w/ %s change:%*s"
 	       COLOR_CYAN "%s" COLOR_RESET " %s(%.1f%%)" COLOR_RESET "\n",
-	       call, num_vbos, num_ubos, num_textures, change,
-	       MAX2(24 - (int)strlen(change), 0), "",
+	       test_index, call, num_vbos, num_ubos, num_textures, change,
+	       MAX2(36 - (int)strlen(change) - (int)strlen(call), 0), "",
 	       perf_human_float(rate),
 	       base_rate == 0 ? COLOR_RESET :
 				ratio > 0.7 ? COLOR_GREEN :
