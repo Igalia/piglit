@@ -1,0 +1,76 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#extension GL_ARB_arrays_of_arrays : enable
+
+in vec4 piglit_vertex;
+
+out vec3 a[2][2];
+
+void main()
+{
+   gl_Position = piglit_vertex;
+
+   a[0][0] = piglit_vertex.xyz;
+   a[0][1] = piglit_vertex.zxy;
+   a[1][0] = piglit_vertex.xzy;
+   a[1][1] = piglit_vertex.zyx;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+#extension GL_ARB_arrays_of_arrays : enable
+
+in vec3 a[2][2];
+
+uniform int u_idx;
+
+out vec4 color;
+
+void main()
+{
+   /* There is no multi-sampling, so these should be the same. */
+   vec3 delta = a[u_idx / 2][u_idx % 2] - interpolateAtSample(a[u_idx / 2][u_idx % 2], 0);
+
+   if (delta != vec3(0.0)) {
+      color = vec4(1.0, delta.x + 0.5, delta.y + 0.5, delta.z + 0.5);
+   } else {
+      color = vec4(0.0, 1.0, 0.0, 1.0);
+   }
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int u_idx 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int u_idx 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int u_idx 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int u_idx 3
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

@@ -1,0 +1,59 @@
+# From Section 8.13.2 (Interpolation Functions) of the GLSL 4.50 spec:
+#
+#   "Arrayed inputs can be indexed with general (nonuniform) integer
+#    expressions."
+#
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 piglit_vertex;
+
+out vec3 a[2];
+
+void main()
+{
+   gl_Position = piglit_vertex;
+
+   a[0] = piglit_vertex.xyz;
+   a[1] = piglit_vertex.zxy;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+in vec3 a[2];
+
+out vec4 color;
+
+void main()
+{
+   ivec2 coord = ivec2(gl_FragCoord.xy);
+   int index =
+      /* Generate a pattern where some quads have alternating index on the X-axis,
+       * some on the Y-axis, and some on both or none. */
+      ((coord.x >> 1) & (coord.x)) ^
+      ((coord.y >> 1) & (coord.y)) ^
+      /* Flip the overall orientation of the alternating index within quads. */
+      (coord.x >> 2) ^ (coord.y >> 2);
+
+   index = index & 1;
+
+   /* There is no multi-sampling, so these should be the same. */
+   vec3 delta = a[index] - interpolateAtSample(a[index], 0);
+
+   if (delta != vec3(0.0)) {
+      color = vec4(1.0, delta.x + 0.5, delta.y + 0.5, delta.z + 0.5);
+   } else {
+      color = vec4(0.0, 1.0, 0.0, 1.0);
+   }
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
