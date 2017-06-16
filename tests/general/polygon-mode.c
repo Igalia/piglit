@@ -48,25 +48,25 @@ static const char *TestName = "polygon-mode";
 #define VERTS 16
 
 static const GLfloat Positions[VERTS][2] = {
-   /* clockwise */
+   /* counter-clockwise, front facing */
    { 0, -1 },
    { 1, -1 },
    { 1,  1 },
    { 0,  1 },
 
-   /* counter-clockwise */
+   /* clockwise, back facing */
    { 2, -1 },
    { 2,  1 },
    { 3,  1 },
    { 3, -1 },
 
-   /* clockwise */
+   /* counter-clockwise, front facing */
    { 4, -1 },
    { 5, -1 },
    { 5,  1 },
    { 4,  1 },
 
-   /* counter-clockwise */
+   /* clockwise, back facing */
    { 6, -1 },
    { 6,  1 },
    { 7,  1 },
@@ -250,23 +250,17 @@ test_combo(GLenum frontMode, GLenum backMode)
 
    /* determine what kind of primitives were drawn */
    for (i = 0; i < 4; i++) {
-      bool err = false;
+      GLenum testMode = (i & 1) ? backMode : frontMode;
+
       expectedPrims[i] = identify_primitive(&Positions[4 * i], Colors[4 * i]);
-      if (i & 1) {
-         if (expectedPrims[i] != backMode) {
-            err = true;
-         }
-      }
-      else {
-         if (expectedPrims[i] != frontMode) {
-            err = true;
-         }
-      }
-      if (err) {
+
+      if (expectedPrims[i] != testMode) {
          /* we didn't get the expected reference primitive */
          fprintf(stderr,
                  "%s: reference drawing failed for frontPrim=%s, backPrim=%s\n",
                  TestName, get_mode_str(frontMode), get_mode_str(backMode));
+	 fprintf(stderr, "At position %d, found prim %s instead of %s\n",
+		 i, get_mode_str(expectedPrims[i]), get_mode_str(testMode));
          return GL_FALSE;
       }
    }
@@ -283,6 +277,8 @@ test_combo(GLenum frontMode, GLenum backMode)
       if (prim != expectedPrims[i]) {
          fprintf(stderr, "%s: glPolygonMode(front=%s, back=%s) failed\n",
                  TestName, get_mode_str(frontMode), get_mode_str(backMode));
+	 fprintf(stderr, "At position %d, found prim %s instead of %s\n",
+		 i, get_mode_str(prim), get_mode_str(expectedPrims[i]));
          pass = GL_FALSE;
       }
    }
