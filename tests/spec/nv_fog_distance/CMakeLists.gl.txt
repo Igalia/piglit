@@ -10,3 +10,4 @@ link_libraries (
 
 piglit_add_executable (nv_fog_distance-coverage coverage.c)
 piglit_add_executable (nv_fog_distance-simple-draw simple-draw.c)
+piglit_add_executable (nv_fog_distance-fog-coord fog-coord.c)

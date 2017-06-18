@@ -3776,6 +3776,7 @@ with profile.test_list.group_manager(
     g(['nv_fog_distance-simple-draw', 'radial'], 'simple draw - GL_EYE_RADIAL_NV')
     g(['nv_fog_distance-simple-draw', 'eye-plane'], 'simple draw - GL_EYE_PLANE')
     g(['nv_fog_distance-simple-draw', 'eye-plane-absolute'], 'simple draw - GL_EYE_PLANE_ABSOLUTE_NV')
+    g(['nv_fog_distance-fog-coord'], 'GL_FOG_COORDINATE interaction')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
