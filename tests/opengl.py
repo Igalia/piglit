@@ -3773,6 +3773,9 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'nv_fog_distance')) as g:
     g(['nv_fog_distance-coverage'], 'coverage')
+    g(['nv_fog_distance-simple-draw', 'radial'], 'simple draw - GL_EYE_RADIAL_NV')
+    g(['nv_fog_distance-simple-draw', 'eye-plane'], 'simple draw - GL_EYE_PLANE')
+    g(['nv_fog_distance-simple-draw', 'eye-plane-absolute'], 'simple draw - GL_EYE_PLANE_ABSOLUTE_NV')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
