@@ -368,6 +368,7 @@ void piglit_general_init(void);
 
 extern void piglit_set_rlimit(unsigned long lim);
 
+char *piglit_load_raw_file(const char *file_name, unsigned *size);
 char *piglit_load_text_file(const char *file_name, unsigned *size);
 
 /**
