@@ -29,6 +29,7 @@
 #include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 #include "piglit-framework-gl/piglit_gl_framework.h"
+#include "piglit-subprocess.h"
 
 #include "shader_runner_gles_workarounds.h"
 #include "parser_utils.h"
@@ -39,7 +40,7 @@
 static struct piglit_gl_test_config current_config;
 
 static void
-get_required_config(const char *script_name,
+get_required_config(const char *script_name, bool spirv,
 		    struct piglit_gl_test_config *config);
 static GLenum
 decode_drawing_mode(const char *mode_str);
@@ -51,10 +52,20 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
-	if (argc > 1)
-		get_required_config(argv[1], &config);
-	else
+	if (argc > 1) {
+		bool spirv = false;
+
+		for (int i = 1; i < argc; ++i) {
+			if (!strcmp(argv[i], "-spirv")) {
+				spirv = true;
+				break;
+			}
+		}
+
+		get_required_config(argv[1], spirv, &config);
+	} else {
 		config.supports_gl_compat_version = 10;
+	}
 
 	current_config = config;
 
@@ -139,6 +150,10 @@ static bool vbo_present = false;
 static bool link_ok = false;
 static bool prog_in_use = false;
 static bool sso_in_use = false;
+static bool glsl_in_use = false;
+static bool spirv_in_use = false;
+static bool spirv_replaces_glsl = false;
+static bool test_contains_spirv = false;
 static GLchar *prog_err_info = NULL;
 static GLuint vao = 0;
 static GLuint draw_fbo, read_fbo;
@@ -239,14 +254,20 @@ enum states {
 	requirements,
 	vertex_shader,
 	vertex_shader_passthrough,
+	vertex_shader_spirv,
 	vertex_program,
 	tess_ctrl_shader,
+	tess_ctrl_shader_spirv,
 	tess_eval_shader,
+	tess_eval_shader_spirv,
 	geometry_shader,
+	geometry_shader_spirv,
 	geometry_layout,
 	fragment_shader,
+	fragment_shader_spirv,
 	fragment_program,
 	compute_shader,
+	compute_shader_spirv,
 	vertex_data,
 	test,
 };
@@ -429,6 +450,13 @@ compile_glsl(GLenum target)
 	GLuint shader = glCreateShader(target);
 	GLint ok;
 
+	if (spirv_in_use) {
+		printf("Cannot mix SPIRV and non-SPIRV shaders\n");
+		return PIGLIT_FAIL;
+	}
+
+	glsl_in_use = true;
+
 	switch (target) {
 	case GL_VERTEX_SHADER:
 		if (piglit_get_gl_version() < 20 &&
@@ -545,6 +573,7 @@ compile_glsl(GLenum target)
 	return PIGLIT_PASS;
 }
 
+
 static enum piglit_result
 compile_and_bind_program(GLenum target, const char *start, int len)
 {
@@ -573,6 +602,135 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 	prog_in_use = true;
 
 	return PIGLIT_PASS;
+}
+
+static enum piglit_result
+load_and_specialize_spirv(GLenum target,
+			  const char *binary, unsigned size)
+{
+	if (glsl_in_use) {
+		printf("Cannot mix SPIR-V and non-SPIR-V shaders\n");
+		return PIGLIT_FAIL;
+	}
+
+	spirv_in_use = true;
+
+	GLuint shader = glCreateShader(target);
+
+	glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+		       binary, size);
+
+	glSpecializeShaderARB(shader, "main", 0, NULL, NULL);
+
+	GLint ok;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+
+	if (!ok) {
+		GLchar *info;
+		GLint size;
+
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
+		info = malloc(size);
+
+		glGetShaderInfoLog(shader, size, NULL, info);
+
+		printf("Failed to specialize %s: %s\n",
+		       target_to_short_name(target), info);
+
+		free(info);
+		return PIGLIT_FAIL;
+	}
+
+	switch (target) {
+	case GL_VERTEX_SHADER:
+		vertex_shaders[num_vertex_shaders] = shader;
+		num_vertex_shaders++;
+		break;
+	case GL_TESS_CONTROL_SHADER:
+		tess_ctrl_shaders[num_tess_ctrl_shaders] = shader;
+		num_tess_ctrl_shaders++;
+		break;
+	case GL_TESS_EVALUATION_SHADER:
+		tess_eval_shaders[num_tess_eval_shaders] = shader;
+		num_tess_eval_shaders++;
+		break;
+	case GL_GEOMETRY_SHADER:
+		geometry_shaders[num_geometry_shaders] = shader;
+		num_geometry_shaders++;
+		break;
+	case GL_FRAGMENT_SHADER:
+		fragment_shaders[num_fragment_shaders] = shader;
+		num_fragment_shaders++;
+		break;
+	case GL_COMPUTE_SHADER:
+		compute_shaders[num_compute_shaders] = shader;
+		num_compute_shaders++;
+		break;
+	}
+
+	return PIGLIT_PASS;
+}
+
+static enum piglit_result
+assemble_spirv(GLenum target)
+{
+	char *arguments[] = {
+		getenv("PIGLIT_SPIRV_AS_BINARY"),
+		"-o", "-",
+		NULL
+	};
+
+	if (arguments[0] == NULL)
+		arguments[0] = "spirv-as";
+
+	/* Strip comments from the source */
+	char *stripped_source = malloc(shader_string_size);
+	char *p = stripped_source;
+	bool at_start_of_line = true;
+
+	for (const char *in = shader_string;
+	     in < shader_string + shader_string_size;
+	     in++) {
+		if (*in == '#' && at_start_of_line) {
+			const char *end;
+			end = memchr(in,
+				     '\n',
+				     shader_string + shader_string_size - in);
+			if (end == NULL)
+				break;
+			in = end;
+		} else {
+			at_start_of_line = *in == '\n';
+			*(p++) = *in;
+		}
+	}
+
+	uint8_t *binary_source;
+	size_t binary_source_length;
+	bool res = piglit_subprocess(arguments,
+				     p - stripped_source,
+				     (const uint8_t *)
+				     stripped_source,
+				     &binary_source_length,
+				     &binary_source);
+
+	free(stripped_source);
+
+	if (!res) {
+		fprintf(stderr, "spirv-as failed\n");
+		return PIGLIT_FAIL;
+	}
+
+	enum piglit_result ret;
+
+	ret = load_and_specialize_spirv(target,
+					(const char *)
+					binary_source,
+					binary_source_length);
+
+	free(binary_source);
+
+	return ret;
 }
 
 static enum piglit_result
@@ -904,6 +1062,21 @@ process_requirement(const char *line)
 
 		sso_in_use = true;
 		glGenProgramPipelines(1, &pipeline);
+	} else if (parse_str(line, "SPIRV", &line)) {
+		if (parse_str(line, "ONLY", NULL)) {
+			spirv_replaces_glsl = true;
+			test_contains_spirv = true;
+		} else if (parse_str(line, "YES", NULL)) {
+			test_contains_spirv = true;
+		} else if (parse_str(line, "NO", &line)) {
+			if (spirv_replaces_glsl) {
+				printf("Not compatible with SPIRV\n");
+				return PIGLIT_SKIP;
+			}
+		} else {
+			printf("Unknown SPIRV line in [require]\n");
+			return PIGLIT_FAIL;
+		}
 	}
 	return PIGLIT_PASS;
 }
@@ -934,9 +1107,8 @@ process_geometry_layout(const char *line)
 	}
 }
 
-
 static enum piglit_result
-leave_state(enum states state, const char *line)
+leave_state(enum states state, const char *line, const char *script_name)
 {
 	switch (state) {
 	case none:
@@ -946,6 +1118,8 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case vertex_shader:
+		if (spirv_replaces_glsl)
+			break;
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_VERTEX_SHADER);
 
@@ -957,22 +1131,54 @@ leave_state(enum states state, const char *line)
 						shader_string,
 						line - shader_string);
 
+	case vertex_shader_spirv:
+		if (!spirv_replaces_glsl)
+			break;
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_VERTEX_SHADER);
+
 	case tess_ctrl_shader:
+		if (spirv_replaces_glsl)
+			break;
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_TESS_CONTROL_SHADER);
 
+	case tess_ctrl_shader_spirv:
+		if (!spirv_replaces_glsl)
+			break;
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_TESS_CONTROL_SHADER);
+
 	case tess_eval_shader:
+		if (spirv_replaces_glsl)
+			break;
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_TESS_EVALUATION_SHADER);
 
+	case tess_eval_shader_spirv:
+		if (!spirv_replaces_glsl)
+			break;
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_TESS_EVALUATION_SHADER);
+
 	case geometry_shader:
+		if (spirv_replaces_glsl)
+			break;
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_GEOMETRY_SHADER);
+
+	case geometry_shader_spirv:
+		if (!spirv_replaces_glsl)
+			break;
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_GEOMETRY_SHADER);
 
 	case geometry_layout:
 		break;
 
 	case fragment_shader:
+		if (spirv_replaces_glsl)
+			break;
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_FRAGMENT_SHADER);
 
@@ -982,9 +1188,23 @@ leave_state(enum states state, const char *line)
 						line - shader_string);
 		break;
 
+	case fragment_shader_spirv:
+		if (!spirv_replaces_glsl)
+			break;
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_FRAGMENT_SHADER);
+
 	case compute_shader:
+		if (spirv_replaces_glsl)
+			break;
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_COMPUTE_SHADER);
+
+	case compute_shader_spirv:
+		if (!spirv_replaces_glsl)
+			break;
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_COMPUTE_SHADER);
 
 	case vertex_data:
 		vertex_data_end = line;
@@ -1150,6 +1370,25 @@ cleanup:
 	return result;
 }
 
+static char *
+spirv_replacement_script(const char *script_name)
+{
+	int len = strlen(script_name);
+	char *buf = malloc(len + 5);
+	memcpy(buf, script_name, len);
+	strcpy(buf + len, ".spv");
+
+	if (piglit_is_file_older_than(buf, script_name)) {
+		printf("SPIR-V shader_test %s is older than "
+		       "corresponding GLSL shader_test"
+		       "or does not exist.\n",
+		       buf);
+		free(buf);
+		return NULL;
+	}
+
+	return buf;
+}
 
 static enum piglit_result
 process_test_script(const char *script_name)
@@ -1170,7 +1409,20 @@ process_test_script(const char *script_name)
 
 	while (line[0] != '\0') {
 		if (line[0] == '[') {
-			result = leave_state(state, line);
+			if (state == requirements &&
+			    spirv_replaces_glsl &&
+			    !test_contains_spirv) {
+				free(text);
+				char *replacement =
+					spirv_replacement_script(script_name);
+				if (replacement == NULL)
+					return PIGLIT_FAIL;
+				enum piglit_result res =
+					process_test_script(replacement);
+				free(replacement);
+				return res;
+			}
+			result = leave_state(state, line, script_name);
 			if (result != PIGLIT_PASS)
 				return result;
 
@@ -1187,14 +1439,26 @@ process_test_script(const char *script_name)
 				shader_string =
 					(char *) passthrough_vertex_shader_source;
 				shader_string_size = strlen(shader_string);
+			} else if (parse_str(line, "[vertex shader spirv]", NULL)) {
+				state = vertex_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation control shader]", NULL)) {
 				state = tess_ctrl_shader;
+				shader_string = NULL;
+			} else if (parse_str(line, "[tessellation control shader spirv]", NULL)) {
+				state = tess_ctrl_shader_spirv;
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation evaluation shader]", NULL)) {
 				state = tess_eval_shader;
 				shader_string = NULL;
+			} else if (parse_str(line, "[tessellation evaluation shader spirv]", NULL)) {
+				state = tess_eval_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[geometry shader]", NULL)) {
 				state = geometry_shader;
+				shader_string = NULL;
+			} else if (parse_str(line, "[geometry shader spirv]", NULL)) {
+				state = geometry_shader_spirv;
 				shader_string = NULL;
 			} else if (parse_str(line, "[geometry layout]", NULL)) {
 				state = geometry_layout;
@@ -1205,8 +1469,14 @@ process_test_script(const char *script_name)
 			} else if (parse_str(line, "[fragment program]", NULL)) {
 				state = fragment_program;
 				shader_string = NULL;
+			} else if (parse_str(line, "[fragment shader spirv]", NULL)) {
+				state = fragment_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[compute shader]", NULL)) {
 				state = compute_shader;
+				shader_string = NULL;
+			} else if (parse_str(line, "[compute shader spirv]", NULL)) {
+				state = compute_shader_spirv;
 				shader_string = NULL;
 			} else if (parse_str(line, "[vertex data]", NULL)) {
 				state = vertex_data;
@@ -1247,6 +1517,12 @@ process_test_script(const char *script_name)
 			case fragment_shader:
 			case fragment_program:
 			case compute_shader:
+			case vertex_shader_spirv:
+			case tess_ctrl_shader_spirv:
+			case tess_eval_shader_spirv:
+			case geometry_shader_spirv:
+			case fragment_shader_spirv:
+			case compute_shader_spirv:
 				if (shader_string == NULL)
 					shader_string = (char *) line;
 				break;
@@ -1268,7 +1544,7 @@ process_test_script(const char *script_name)
 		line_num++;
 	}
 
-	return leave_state(state, line);
+	return leave_state(state, line, script_name);
 }
 
 struct requirement_parse_results {
@@ -1403,7 +1679,7 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
  * the GL and GLSL version requirements.  Use these to guide context creation.
  */
 static void
-get_required_config(const char *script_name,
+get_required_config(const char *script_name, bool spirv,
 		    struct piglit_gl_test_config *config)
 {
 	struct requirement_parse_results parse_results;
@@ -1411,6 +1687,12 @@ get_required_config(const char *script_name,
 
 	parse_required_config(&parse_results, script_name);
 	choose_required_gl_version(&parse_results, &required_gl_version);
+
+	if (spirv) {
+		required_gl_version.es = false;
+		required_gl_version.core = true;
+		required_gl_version.num = MAX2(required_gl_version.num, 33);
+	}
 
 	if (parse_results.found_size) {
 		config->window_width = parse_results.size[0];
@@ -3929,7 +4211,7 @@ validate_current_gl_context(const char *filename)
 	config.window_width = DEFAULT_WINDOW_WIDTH;
 	config.window_height = DEFAULT_WINDOW_HEIGHT;
 
-	get_required_config(filename, &config);
+	get_required_config(filename, spirv_replaces_glsl, &config);
 
 	if (!current_config.supports_gl_compat_version !=
 	    !config.supports_gl_compat_version)
@@ -3965,6 +4247,7 @@ piglit_init(int argc, char **argv)
 	float default_piglit_tolerance[4];
 
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
+	spirv_replaces_glsl = piglit_strip_arg(&argc, argv, "-spirv");
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
