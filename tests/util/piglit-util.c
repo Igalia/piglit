@@ -396,7 +396,8 @@ piglit_merge_result(enum piglit_result *all, enum piglit_result subtest)
 	}
 }
 
-char *piglit_load_text_file(const char *file_name, unsigned *size)
+static char *
+load_file(const char *file_name, unsigned *size, const char *mode)
 {
 	char *text = NULL;
 
@@ -410,13 +411,13 @@ char *piglit_load_text_file(const char *file_name, unsigned *size)
 		return NULL;
 	}
 
-	err = fopen_s(&fp, file_name, "r");
+	err = fopen_s(&fp, file_name, mode);
 
 	if (err || (fp == NULL)) {
 		return NULL;
 	}
 # else
-	fp = fopen(file_name, "r");
+	fp = fopen(file_name, mode);
 	if (fp == NULL) {
 		return NULL;
 	}
@@ -505,6 +506,16 @@ char *piglit_load_text_file(const char *file_name, unsigned *size)
 
 	return text;
 #endif
+}
+
+char *piglit_load_raw_file(const char *file_name, unsigned *size)
+{
+	return load_file(file_name, size, "rb");
+}
+
+char *piglit_load_text_file(const char *file_name, unsigned *size)
+{
+	return load_file(file_name, size, "r");
 }
 
 const char*
