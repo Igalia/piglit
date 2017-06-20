@@ -1341,6 +1341,58 @@ static const struct piglit_subtest fence_sync_subtests[] = {
 	{0},
 };
 
+static struct test_profile fence_android_native = {
+	.sync_type = EGL_SYNC_NATIVE_FENCE_ANDROID,
+	.sync_str = "EGL_SYNC_NATIVE_FENCE_ANDROID",
+	.extension = "EGL_ANDROID_native_fence_sync",
+};
+
+static const struct piglit_subtest fence_android_native_subtests[] = {
+	{
+		"eglCreateSyncKHR_default_attributes",
+		"eglCreateSyncKHR_default_attributes",
+		test_eglCreateSyncKHR_default_attributes,
+		&fence_android_native,
+	},
+	{
+		"eglCreateSyncKHR_invalid_display",
+		"eglCreateSyncKHR_invalid_display",
+		test_eglCreateSyncKHR_invalid_display,
+		&fence_android_native,
+	},
+	{
+		"eglCreateSyncKHR_invalid_attrib_list",
+		"eglCreateSyncKHR_invalid_attrib_list",
+		test_eglCreateSyncKHR_invalid_attrib_list,
+		&fence_android_native,
+	},
+	{
+		"eglCreateSyncKHR_wrong_display_same_thread",
+		"eglCreateSyncKHR_wrong_display_same_thread",
+		test_eglCreateSyncKHR_wrong_display_same_thread,
+		&fence_android_native,
+	},
+	{
+		"eglCreateSyncKHR_no_current_context",
+		"eglCreateSyncKHR_no_current_context",
+		test_eglCreateSyncKHR_no_current_context,
+		&fence_android_native,
+	},
+	{
+		"eglGetSyncAttribKHR_invalid_attrib",
+		"eglGetSyncAttribKHR_invalid_attrib",
+		test_eglGetSyncAttribKHR_invalid_attrib,
+		&fence_android_native,
+	},
+	{
+		"eglClientWaitSyncKHR_nonzero_timeout",
+		"eglClientWaitSyncKHR_nonzero_timeout",
+		test_eglClientWaitSyncKHR_nonzero_timeout,
+		&fence_android_native,
+	},
+	{0},
+};
+
 /**
  * Verify that eglWaitSyncKHR() emits correct error when given an invalid
  * sync object.
@@ -1406,6 +1458,8 @@ main(int argc, char **argv)
 
 	if (piglit_strip_arg(&argc, argv, "wait_sync"))
 		subtests = wait_sync_subtests;
+	else if (piglit_strip_arg(&argc, argv, "android_native"))
+		subtests = fence_android_native_subtests;
 	else
 		subtests = fence_sync_subtests;
 
