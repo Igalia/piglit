@@ -91,12 +91,15 @@ get_vs_text(char *s, unsigned num_vbos, unsigned num_tbos, bool is_second)
 
 static void
 get_fs_text(char *s, unsigned num_ubos, unsigned num_textures,
-	    unsigned num_tbos, bool is_second)
+	    unsigned num_tbos, unsigned num_images, unsigned num_imgbos,
+	    bool is_second)
 {
 	unsigned i;
 
 	sprintf(s, "#version %u\n", num_tbos ? 140 : 130);
 	strcat(s, "#extension GL_ARB_uniform_buffer_object : require\n");
+	if (num_images || num_imgbos)
+		strcat(s, "#extension GL_ARB_shader_image_load_store : require\n");
 	sprintf(s + strlen(s),
 		"uniform int index = 0;\n"
 		"uniform vec4 u[%u];\n", is_second ? 240 : 1);
@@ -105,6 +108,10 @@ get_fs_text(char *s, unsigned num_ubos, unsigned num_textures,
 		sprintf(s + strlen(s), "uniform sampler2D s%u;\n", i);
 	for (i = 0; i < num_tbos; i++)
 		sprintf(s + strlen(s), "uniform samplerBuffer sb%u;\n", i);
+	for (i = 0; i < num_images; i++)
+		sprintf(s + strlen(s), "layout(rgba8) readonly uniform image2D i%u;\n", i);
+	for (i = 0; i < num_imgbos; i++)
+		sprintf(s + strlen(s), "layout(rgba8) readonly uniform imageBuffer ib%u;\n", i);
 	for (i = 0; i < num_ubos; i++)
 		sprintf(s + strlen(s), "uniform ub%u { vec4 ubu%u[10]; };\n", i, i);
 	strcat(s, "void main() {\n");
@@ -113,6 +120,10 @@ get_fs_text(char *s, unsigned num_ubos, unsigned num_textures,
 		sprintf(s + strlen(s), " + texture(s%u, u[0].xy)", i);
 	for (i = 0; i < num_tbos; i++)
 		sprintf(s + strlen(s), " + texelFetch(sb%u, int(u[0].x))", i);
+	for (i = 0; i < num_images; i++)
+		sprintf(s + strlen(s), " + imageLoad(i%u, ivec2(u[0].xy))", i);
+	for (i = 0; i < num_imgbos; i++)
+		sprintf(s + strlen(s), " + imageLoad(ib%u, int(u[0].x))", i);
 	for (i = 0; i < num_ubos; i++)
 		sprintf(s + strlen(s), " + ubu%u[index]", i);
 	if (is_second)
@@ -124,7 +135,9 @@ static void
 setup_shaders_and_resources(unsigned num_vbos,
 			    unsigned num_ubos,
 			    unsigned num_textures,
-			    unsigned num_tbos)
+			    unsigned num_tbos,
+			    unsigned num_images,
+			    unsigned num_imgbos)
 {
 	const unsigned max = 16;
 	char vs[4096], fs[4096];
@@ -141,7 +154,8 @@ setup_shaders_and_resources(unsigned num_vbos,
 	/* Create two programs in case we want to test program changes. */
 	for (p = 0; p < 2; p++) {
 		get_vs_text(vs, num_vbos, num_tbos, p);
-		get_fs_text(fs, num_ubos, num_textures, num_tbos, p);
+		get_fs_text(fs, num_ubos, num_textures, num_tbos, num_images,
+			    num_imgbos, p);
 		prog[p] = piglit_build_simple_program(vs, fs);
 
 		/* Assign texture units to samplers. */
@@ -164,6 +178,24 @@ setup_shaders_and_resources(unsigned num_vbos,
 			loc = glGetUniformLocation(prog[p], sampler);
 			assert(loc >= 0);
 			glUniform1i(loc, num_textures + i);
+		}
+		for (i = 0; i < num_images; i++) {
+			char name[20];
+			int loc;
+
+			snprintf(name, sizeof(name), "i%u", i);
+			loc = glGetUniformLocation(prog[p], name);
+			assert(loc >= 0);
+			glUniform1i(loc, i);
+		}
+		for (i = 0; i < num_imgbos; i++) {
+			char name[20];
+			int loc;
+
+			snprintf(name, sizeof(name), "ib%u", i);
+			loc = glGetUniformLocation(prog[p], name);
+			assert(loc >= 0);
+			glUniform1i(loc, num_images + i);
 		}
 		/* Assign UBO slots to uniform blocks. */
 		for (i = 0; i < num_ubos; i++) {
@@ -208,13 +240,13 @@ setup_shaders_and_resources(unsigned num_vbos,
 				      3 * sizeof(float), NULL);
 		glEnableVertexAttribArray(i);
 	}
-	for (i = 0; i < num_textures; i++) {
+	for (i = 0; i < MAX2(num_textures, num_images); i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		/* Save the last texture IDs for testing texture changes. */
 		tex[i % 8] = piglit_rgbw_texture(GL_RGBA8, 4, 4, false, true,
 						 GL_UNSIGNED_BYTE);
 	}
-	for (i = 0; i < num_tbos; i++) {
+	for (i = 0; i < MAX2(num_tbos, num_imgbos); i++) {
 		static const float data[10*4];
 		GLuint buf, tb;
 
@@ -360,6 +392,89 @@ draw_many_tbo_change(unsigned count)
 				glActiveTexture(GL_TEXTURE0 + j);
 				glBindTexture(GL_TEXTURE_BUFFER, tbo[(i + j) % 8]);
 			}
+			glActiveTexture(GL_TEXTURE0);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+}
+
+static void
+draw_one_img_change(unsigned count)
+{
+	unsigned i;
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			glBindImageTexture(0, tex[i & 1], 0, false, 0,
+					   GL_READ_ONLY, GL_RGBA8);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			glBindImageTexture(0, tex[i & 1], 0, false, 0,
+					   GL_READ_ONLY, GL_RGBA8);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+}
+
+static void
+draw_many_img_change(unsigned count)
+{
+	unsigned i,j;
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			for (j = 0; j < 8; j++)
+				glBindImageTexture(0, tex[(i + j) % 8], 0, false,
+						   0, GL_READ_ONLY, GL_RGBA8);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			for (j = 0; j < 8; j++)
+				glBindImageTexture(0, tex[(i + j) % 8], 0, false,
+						   0, GL_READ_ONLY, GL_RGBA8);
+			glActiveTexture(GL_TEXTURE0);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+}
+
+static void
+draw_one_imgbo_change(unsigned count)
+{
+	unsigned i;
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			glBindImageTexture(0, tbo[i & 1], 0, false, 0,
+					   GL_READ_ONLY, GL_RGBA8);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			glBindImageTexture(0, tbo[i & 1], 0, false, 0,
+					   GL_READ_ONLY, GL_RGBA8);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+}
+
+static void
+draw_many_imgbo_change(unsigned count)
+{
+	unsigned i,j;
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			for (j = 0; j < 8; j++)
+				glBindImageTexture(0, tbo[(i + j) % 8], 0, false,
+						   0, GL_READ_ONLY, GL_RGBA8);
+			glActiveTexture(GL_TEXTURE0);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			for (j = 0; j < 8; j++)
+				glBindImageTexture(0, tbo[(i + j) % 8], 0, false,
+						   0, GL_READ_ONLY, GL_RGBA8);
 			glActiveTexture(GL_TEXTURE0);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
@@ -520,7 +635,8 @@ draw_vertex_attrib_change(unsigned count)
 
 static double
 perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
-	 unsigned num_textures, unsigned num_tbos,
+	 unsigned num_textures, unsigned num_tbos, unsigned num_images,
+	 unsigned num_imgbos,
 	 const char *change, perf_rate_func f, double base_rate)
 {
 	static unsigned test_index;
@@ -532,8 +648,13 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	printf(" %3u: %s (%2u VBO, %u UBO, %2u %s) w/ %s change:%*s"
 	       COLOR_CYAN "%s" COLOR_RESET " %s(%.1f%%)" COLOR_RESET "\n",
 	       test_index, call, num_vbos, num_ubos,
-	       num_textures ? num_textures : num_tbos,
-	       num_textures ? "Tex" : num_tbos ? "TBO" : "   ",
+	       num_textures ? num_textures :
+	         num_tbos ? num_tbos :
+	         num_images ? num_images : num_imgbos,
+	       num_textures ? "Tex" :
+	         num_tbos ? "TBO" :
+	         num_images ? "Img" :
+	         num_imgbos ? "ImB" : "   ",
 	       change,
 	       MAX2(36 - (int)strlen(change) - (int)strlen(call), 0), "",
 	       perf_human_float(rate),
@@ -568,20 +689,24 @@ static void
 perf_draw_variant(const char *call, bool is_indexed)
 {
 	double base_rate = 0;
-	unsigned num_vbos, num_ubos, num_textures, num_tbos;
 
 	indexed = is_indexed;
 
 	/* Test different shader resource usage without state changes. */
-	num_ubos = 0;
-	num_textures = 0;
-	num_tbos = 0;
+	unsigned num_ubos = 0;
+	unsigned num_textures = 0;
+	unsigned num_tbos = 0;
+	unsigned num_images = 0;
+	unsigned num_imgbos = 0;
+	unsigned num_vbos;
+
 	for (num_vbos = 1; num_vbos <= 16; num_vbos *= 4) {
 		setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
-					    num_tbos);
+					    num_tbos, num_images, num_imgbos);
 
 		double rate = perf_run(call, num_vbos, num_ubos, num_textures,
-				       num_tbos, "no state", draw, base_rate);
+				       num_tbos, num_images, num_imgbos,
+				       "no state", draw, base_rate);
 		if (num_vbos == 1)
 			base_rate = rate;
 	}
@@ -589,68 +714,107 @@ perf_draw_variant(const char *call, bool is_indexed)
 	num_vbos = 1;
 	num_ubos = 0;
 	num_textures = 16;
-	setup_shaders_and_resources(num_vbos, num_ubos, num_textures, num_tbos);
-	perf_run(call, num_vbos, num_ubos, num_textures, num_tbos, "no state",
-		 draw, base_rate);
+	setup_shaders_and_resources(num_vbos, num_ubos, num_textures, num_tbos,
+				    num_images, num_imgbos);
+	perf_run(call, num_vbos, num_ubos, num_textures, num_tbos, num_images,
+		 num_imgbos, "no state", draw, base_rate);
 
 	/* Test state changes. */
 	num_ubos = 4;
 	num_textures = 8;
 	for (num_vbos = 1; num_vbos <= 16; num_vbos *= 16) {
 		setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
-					    num_tbos);
+					    num_tbos, num_images, num_imgbos);
 
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "no state", draw, base_rate);
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "shader program", draw_shader_change, base_rate);
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "vertex attrib", draw_vertex_attrib_change, base_rate);
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "1 texture", draw_one_texture_change, base_rate);
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "8 textures", draw_many_texture_change, base_rate);
 
 		if (!is_compat) {
 			num_textures = 0;
+
 			num_tbos = 8;
 			setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
-						    num_tbos);
+						    num_tbos, num_images, num_imgbos);
 			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 num_images, num_imgbos,
 				 "1 TBO", draw_one_tbo_change, base_rate);
 			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 num_images, num_imgbos,
 				 "8 TBOs", draw_many_tbo_change, base_rate);
+			num_tbos = 0;
+
+			num_images = 8;
+			setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
+						    num_tbos, num_images, num_imgbos);
+			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 num_images, num_imgbos,
+				 "1 image", draw_one_img_change, base_rate);
+			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 num_images, num_imgbos,
+				 "8 images", draw_many_img_change, base_rate);
+			num_images = 0;
+
+			num_imgbos = 8;
+			setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
+						    num_tbos, num_images, num_imgbos);
+			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 num_images, num_imgbos,
+				 "1 image buffer", draw_one_imgbo_change, base_rate);
+			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 num_images, num_imgbos,
+				 "8 image buffers", draw_many_imgbo_change, base_rate);
+			num_imgbos = 0;
+
 			num_textures = 8;
 			num_tbos = 0;
 			setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
-						    num_tbos);
+						    num_tbos, num_images, num_imgbos);
 		}
 
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "1 UBO", draw_one_ubo_change, base_rate);
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "4 UBOs", draw_many_ubo_change, base_rate);
 
 		glUseProgram(prog[0]);
 		uniform_loc = glGetUniformLocation(prog[0], "u");
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "few uniforms / 1", draw_uniform_change, base_rate);
 
 		glUseProgram(prog[1]);
 		uniform_loc = glGetUniformLocation(prog[1], "u");
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "many uniforms / 1", draw_uniform_change, base_rate);
 		glUseProgram(prog[0]);
 
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "scissor", draw_scissor_change, base_rate);
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 num_images, num_imgbos,
 			 "viewport", draw_viewport_change, base_rate);
 
 		for (int state = 0; state < ARRAY_SIZE(enable_states); state++) {
 			enable_enum = enable_states[state].enable;
 			perf_run(call, num_vbos, num_ubos, num_textures,
-				 num_tbos,
+				 num_tbos, num_images, num_imgbos,
 				 enable_states[state].name,
 				 draw_state_change, base_rate);
 		}
