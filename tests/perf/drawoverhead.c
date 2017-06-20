@@ -720,7 +720,7 @@ perf_draw_variant(const char *call, bool is_indexed)
 		 num_imgbos, "no state", draw, base_rate);
 
 	/* Test state changes. */
-	num_ubos = 4;
+	num_ubos = 8;
 	num_textures = 8;
 	for (num_vbos = 1; num_vbos <= 16; num_vbos *= 16) {
 		setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
@@ -789,7 +789,7 @@ perf_draw_variant(const char *call, bool is_indexed)
 			 "1 UBO", draw_one_ubo_change, base_rate);
 		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
 			 num_images, num_imgbos,
-			 "4 UBOs", draw_many_ubo_change, base_rate);
+			 "8 UBOs", draw_many_ubo_change, base_rate);
 
 		glUseProgram(prog[0]);
 		uniform_loc = glGetUniformLocation(prog[0], "u");
