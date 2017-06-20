@@ -4646,6 +4646,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'egl_android_native_fence_sync'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_khr_fence_sync', 'android_native'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'egl_khr_gl_colorspace'),
         exclude_platforms=['glx']) as g:
     g(['egl-gl-colorspace'], 'linear')
