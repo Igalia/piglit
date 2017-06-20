@@ -70,8 +70,15 @@ static const EGLint canary = 0x31415926;
 static EGLDisplay g_dpy = 0;
 static EGLContext g_ctx = 0;
 
+struct test_profile {
+	EGLint sync_type;
+	const char *sync_str;
+	const char *extension;
+};
+
 static enum piglit_result
-init_display(EGLenum platform, EGLDisplay *out_dpy)
+init_display(EGLenum platform, EGLDisplay *out_dpy,
+	     struct test_profile *profile)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	EGLDisplay dpy;
@@ -90,8 +97,8 @@ init_display(EGLenum platform, EGLDisplay *out_dpy)
 		goto error;
 	}
 
-	if (!piglit_is_egl_extension_supported(dpy, "EGL_KHR_fence_sync")) {
-		piglit_loge("display does not support EGL_KHR_fence_sync");
+	if (!piglit_is_egl_extension_supported(dpy, profile->extension)) {
+		piglit_loge("display does not support %s", profile->extension);
 		result = PIGLIT_SKIP;
 		goto error;
 
@@ -252,7 +259,7 @@ test_cleanup(EGLSyncKHR sync, enum piglit_result *inout_result)
  * Setup state before each subtest begins.
  */
 static enum piglit_result
-test_setup(void)
+test_setup(struct test_profile *profile)
 {
 	enum piglit_result result = PIGLIT_PASS;
 
@@ -260,7 +267,7 @@ test_setup(void)
 	g_dpy = EGL_NO_DISPLAY;
 	g_ctx = EGL_NO_CONTEXT;
 
-	result = init_display(EGL_NONE, &g_dpy);
+	result = init_display(EGL_NONE, &g_dpy, profile);
 	if (result != PIGLIT_PASS) {
 		goto cleanup;
 	}
@@ -307,15 +314,16 @@ test_eglCreateSyncKHR_default_attributes(void *test_data)
 	       sync_status = canary,
 	       sync_condition = canary;
 	bool ok = false;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
 	if (sync == EGL_NO_SYNC_KHR) {
-		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
 		result = PIGLIT_FAIL;
 		goto cleanup;
 	}
@@ -330,10 +338,10 @@ test_eglCreateSyncKHR_default_attributes(void *test_data)
 			  "an error");
 		result = PIGLIT_FAIL;
 	}
-	if (sync_type != EGL_SYNC_FENCE_KHR) {
+	if (sync_type != profile->sync_type) {
 		piglit_loge("eglGetSyncAttribKHR(EGL_SYNC_TYPE_KHR) returned "
-			  "0x%x but expected EGL_SYNC_FENCE_KHR(0x%x)",
-			  sync_type, EGL_SYNC_FENCE_KHR);
+			  "0x%x but expected %s(0x%x)",
+			  sync_type, profile->sync_str, profile->sync_type);
 		result = PIGLIT_FAIL;
 	}
 
@@ -386,13 +394,14 @@ test_eglCreateSyncKHR_invalid_display(void *test_data)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	EGLSyncKHR sync = 0;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 
-	sync = peglCreateSyncKHR(EGL_NO_DISPLAY, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(EGL_NO_DISPLAY, profile->sync_type, NULL);
 	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_NO_DISPLAY) succeeded");
 		result = PIGLIT_FAIL;
@@ -425,13 +434,14 @@ test_eglCreateSyncKHR_invalid_attrib_list(void *test_data)
 		EGL_CONTEXT_CLIENT_VERSION, 2,
 		EGL_NONE,
 	};
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, attrib_list);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, attrib_list);
 	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() succeeded with invalid "
 			  "attrib list");
@@ -467,7 +477,7 @@ test_eglCreateSyncKHR_invalid_sync_type(void *test_data)
 	EGLSyncKHR sync = 0;
 	EGLenum bad_sync_type = EGL_SYNC_TYPE_KHR;
 
-	result = test_setup();
+	result = test_setup(test_data);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
@@ -502,14 +512,15 @@ test_eglCreateSyncKHR_no_current_context(void *test_data)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	EGLSyncKHR sync = 0;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 	eglMakeCurrent(g_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
 	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() succeeded when no context was "
 			  "current");
@@ -546,7 +557,7 @@ test_eglGetSyncAttribKHR_invalid_sync(void *test_data)
 	EGLint sync_type = canary;
 	EGLSyncKHR invalid_sync = (EGLSyncKHR) &canary;
 
-	result = test_setup();
+	result = test_setup(test_data);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
@@ -606,15 +617,16 @@ test_eglGetSyncAttribKHR_invalid_attrib(void *test_data)
 	bool ok = false;
 	EGLSyncKHR sync = 0;
 	EGLint attrib_value = canary;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
 	if (sync == EGL_NO_SYNC_KHR) {
-		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
 		result = PIGLIT_FAIL;
 		goto cleanup;
 	}
@@ -666,16 +678,17 @@ test_eglClientWaitSyncKHR_zero_timeout(void *test_data)
 	enum piglit_result result = PIGLIT_PASS;
 	EGLSyncKHR sync = 0;
 	EGLint wait_status1 = 0, wait_status2 = 0;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
 	if (sync == EGL_NO_SYNC_KHR) {
-		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
 		result = PIGLIT_FAIL;
 		goto cleanup;
 	}
@@ -719,16 +732,17 @@ test_eglClientWaitSyncKHR_flag_sync_flush(void *test_data)
 	enum piglit_result result = PIGLIT_PASS;
 	EGLSyncKHR sync = 0;
 	EGLint wait_status = 0;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
 	if (sync == EGL_NO_SYNC_KHR) {
-		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
 		result = PIGLIT_FAIL;
 		goto cleanup;
 	}
@@ -760,16 +774,17 @@ test_eglGetSyncAttribKHR_sync_status(void *test_data)
 	EGLSyncKHR sync = 0;
 	EGLint sync_status = 0;
 	bool ok = false;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
 	if (sync == EGL_NO_SYNC_KHR) {
-		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
 		result = PIGLIT_FAIL;
 		goto cleanup;
 	}
@@ -836,7 +851,7 @@ test_eglClientWaitSyncKHR_invalid_sync(void *test_data)
 	EGLint wait_status = 0;
 	EGLSyncKHR invalid_sync = (EGLSyncKHR) &canary;
 
-	result = test_setup();
+	result = test_setup(test_data);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
@@ -868,15 +883,16 @@ test_eglClientWaitSyncKHR_nonzero_timeout(void *test_data)
 	enum piglit_result result = PIGLIT_PASS;
 	EGLSyncKHR sync = 0;
 	EGLint wait_status = 0;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, profile->sync_type, NULL);
 	if (sync == EGL_NO_SYNC_KHR) {
-		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
+		piglit_loge("eglCreateSyncKHR(%s) failed", profile->sync_str);
 		result = PIGLIT_FAIL;
 		goto cleanup;
 	}
@@ -908,7 +924,8 @@ cleanup:
 }
 
 static enum piglit_result
-init_other_display(EGLDisplay *out_other_dpy, EGLDisplay orig_dpy)
+init_other_display(EGLDisplay *out_other_dpy, EGLDisplay orig_dpy,
+		   struct test_profile *profile)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	EGLDisplay other_dpy = 0;
@@ -922,7 +939,7 @@ init_other_display(EGLDisplay *out_other_dpy, EGLDisplay orig_dpy)
 	};
 
 	for (i = 0; platforms[i] != 0; ++i) {
-		result = init_display(platforms[i], &other_dpy);
+		result = init_display(platforms[i], &other_dpy, profile);
 		switch (result) {
 		case PIGLIT_SKIP:
 			break;
@@ -965,14 +982,15 @@ test_eglCreateSyncKHR_wrong_display_same_thread(void *test_data)
 	enum piglit_result result = PIGLIT_PASS;
 	EGLDisplay wrong_dpy = 0;
 	EGLSyncKHR sync = 0;
+	struct test_profile *profile = test_data;
 
-	result = test_setup();
+	result = test_setup(profile);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
 
 	piglit_logi("create second EGLDisplay");
-	result = init_other_display(&wrong_dpy, g_dpy);
+	result = init_other_display(&wrong_dpy, g_dpy, profile);
 	if (result != PIGLIT_PASS) {
 		goto cleanup;
 	}
@@ -980,7 +998,7 @@ test_eglCreateSyncKHR_wrong_display_same_thread(void *test_data)
 	piglit_require_egl_extension(wrong_dpy, "EGL_KHR_fence_sync");
 
 	piglit_logi("try to create sync with second display");
-	sync = peglCreateSyncKHR(wrong_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(wrong_dpy, profile->sync_type, NULL);
 	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() incorrectly succeeded");
 		result = PIGLIT_FAIL;
@@ -1005,12 +1023,13 @@ cleanup:
  * Check that EGL can create and wait on sync fences in the current context.
  */
 static enum piglit_result
-check_sync_in_current_context(void)
+check_sync_in_current_context(void *test_data)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	EGLDisplay dpy = eglGetCurrentDisplay();
 	EGLSyncKHR sync = 0;
 	EGLint wait_status = 0;
+	struct test_profile *profile = test_data;
 	
 	if (!eglGetCurrentContext()) {
 		piglit_loge("no context is bound");
@@ -1020,7 +1039,7 @@ check_sync_in_current_context(void)
 
 	piglit_logi("verify that syncs can be created and waited on in "
 		 "this thread");
-	sync = peglCreateSyncKHR(dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(dpy, profile->sync_type, NULL);
 	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR failed");
 		result = PIGLIT_FAIL;
@@ -1042,18 +1061,19 @@ cleanup:
 }
 
 static void*
-thread2_create_sync_with_display_bound_in_other_thread(void *arg)
+thread2_create_sync_with_display_bound_in_other_thread(void *test_data)
 {
 	enum piglit_result *result;
 	EGLDisplay t2_dpy = 0;
 	EGLContext t2_ctx = 0;
 	EGLSyncKHR t2_sync = 0;
+	struct test_profile *profile = test_data;
 
 	result = malloc(sizeof(*result));
 	*result = PIGLIT_FAIL;
 
 	piglit_logi("create second EGLDisplay");
-	*result = init_other_display(&t2_dpy, g_dpy);
+	*result = init_other_display(&t2_dpy, g_dpy, profile);
 	if (*result != PIGLIT_PASS) {
 		piglit_loge("failed to initialize a second EGLDisplay");
 		goto cleanup;
@@ -1071,14 +1091,14 @@ thread2_create_sync_with_display_bound_in_other_thread(void *arg)
 		goto cleanup;
 	}
 
-	*result = check_sync_in_current_context();
+	*result = check_sync_in_current_context(profile);
 	if (*result != PIGLIT_PASS) {
 		goto cleanup;
 	}
 
 	piglit_logi("try to create sync on first display, which is "
 		 "bound on thread1");
-	t2_sync = peglCreateSyncKHR(t2_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	t2_sync = peglCreateSyncKHR(t2_dpy, profile->sync_type, NULL);
 	if (t2_sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR incorrectly succeeded");
 		*result = PIGLIT_FAIL;
@@ -1131,12 +1151,12 @@ test_eglCreateSyncKHR_with_display_bound_in_other_thread(void *test_data)
 	orig_print_tid = piglit_log_get_opt(PIGLIT_LOG_PRINT_TID);
 	piglit_log_set_opt(PIGLIT_LOG_PRINT_TID, true);
 
-	result = test_setup();
+	result = test_setup(test_data);
 	if (result != PIGLIT_PASS) {
 		goto cleanup;
 	}
 
-	result = check_sync_in_current_context();
+	result = check_sync_in_current_context(test_data);
 	if (result != PIGLIT_PASS) {
 		goto cleanup;
 	}
@@ -1144,7 +1164,7 @@ test_eglCreateSyncKHR_with_display_bound_in_other_thread(void *test_data)
 	err = pthread_create(
 		&thread2, NULL,
 		thread2_create_sync_with_display_bound_in_other_thread,
-		NULL);
+		test_data);
 	if (err) {
 		piglit_loge("failed to create second thread");
 		result = PIGLIT_FAIL;
@@ -1198,7 +1218,7 @@ test_eglDestroySyncKHR_invalid_sync(void *test_data)
 	bool ok = false;
 	EGLSyncKHR invalid_sync = (EGLSyncKHR) &canary;
 
-	result = test_setup();
+	result = test_setup(test_data);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
@@ -1219,83 +1239,104 @@ test_eglDestroySyncKHR_invalid_sync(void *test_data)
 	return result;
 }
 
+static struct test_profile fence_khr = {
+	.sync_type = EGL_SYNC_FENCE_KHR,
+	.sync_str = "EGL_SYNC_FENCE_KHR",
+	.extension = "EGL_KHR_fence_sync",
+};
+
 static const struct piglit_subtest fence_sync_subtests[] = {
 	{
 		"eglCreateSyncKHR_default_attributes",
 		"eglCreateSyncKHR_default_attributes",
 		test_eglCreateSyncKHR_default_attributes,
+		&fence_khr,
 	},
 	{
 		"eglCreateSyncKHR_invalid_display",
 		"eglCreateSyncKHR_invalid_display",
 		test_eglCreateSyncKHR_invalid_display,
+		&fence_khr,
 	},
 	{
 		"eglCreateSyncKHR_invalid_attrib_list",
 		"eglCreateSyncKHR_invalid_attrib_list",
 		test_eglCreateSyncKHR_invalid_attrib_list,
+		&fence_khr,
 	},
 	{
 		"eglCreateSyncKHR_wrong_display_same_thread",
 		"eglCreateSyncKHR_wrong_display_same_thread",
 		test_eglCreateSyncKHR_wrong_display_same_thread,
+		&fence_khr,
 	},
 #ifdef PIGLIT_HAS_PTHREADS
 	{
 		"eglCreateSyncKHR_with_display_bound_in_other_thread",
 		"eglCreateSyncKHR_with_display_bound_in_other_thread",
 		test_eglCreateSyncKHR_with_display_bound_in_other_thread,
+		&fence_khr,
 	},
 #endif
 	{
 		"eglCreateSyncKHR_invalid_sync_type",
 		"eglCreateSyncKHR_invalid_sync_type",
 		test_eglCreateSyncKHR_invalid_sync_type,
+		&fence_khr,
 	},
 	{
 		"eglCreateSyncKHR_no_current_context",
 		"eglCreateSyncKHR_no_current_context",
 		test_eglCreateSyncKHR_no_current_context,
+		&fence_khr,
 	},
 	{
 		"eglGetSyncAttribKHR_invalid_sync",
 		"eglGetSyncAttribKHR_invalid_sync",
 		test_eglGetSyncAttribKHR_invalid_sync,
+		&fence_khr,
 	},
 	{
 		"eglGetSyncAttribKHR_invalid_attrib",
 		"eglGetSyncAttribKHR_invalid_attrib",
 		test_eglGetSyncAttribKHR_invalid_attrib,
+		&fence_khr,
 	},
 	{
 		"eglGetSyncAttribKHR_sync_status",
 		"eglGetSyncAttribKHR_sync_status",
 		test_eglGetSyncAttribKHR_sync_status,
+		&fence_khr,
 	},
 	{
 		"eglClientWaitSyncKHR_zero_timeout",
 		"eglClientWaitSyncKHR_zero_timeout",
 		test_eglClientWaitSyncKHR_zero_timeout,
+		&fence_khr,
 	},
 	{
 		"eglClientWaitSyncKHR_flag_sync_flush",
 		"eglClientWaitSyncKHR_flag_sync_flush",
 		test_eglClientWaitSyncKHR_flag_sync_flush,
+		&fence_khr,
 	},
 	{
 		"eglClientWaitSyncKHR_invalid_sync",
 		"eglClientWaitSyncKHR_invalid_sync",
 		test_eglClientWaitSyncKHR_invalid_sync,
+		&fence_khr,
 	},
 	{
 		"eglClientWaitSyncKHR_nonzero_timeout",
 		"eglClientWaitSyncKHR_nonzero_timeout",
 		test_eglClientWaitSyncKHR_nonzero_timeout,
+		&fence_khr,
 	},
 	{
 		"eglDestroySyncKHR_invalid_sync",
 		"eglDestroySyncKHR_invalid_sync",
 		test_eglDestroySyncKHR_invalid_sync,
+		&fence_khr,
 	},
 	{0},
 };
@@ -1311,7 +1352,7 @@ test_eglWaitSyncKHR_invalid_sync(void *test_data)
 	EGLint wait_status = 0;
 	EGLSyncKHR invalid_sync = (EGLSyncKHR) &canary;
 
-	result = test_setup();
+	result = test_setup(test_data);
 	if (result != PIGLIT_PASS) {
 		return result;
 	}
@@ -1340,6 +1381,7 @@ static const struct piglit_subtest wait_sync_subtests[] = {
 		"eglWaitSyncKHR_invalid_sync",
 		"eglWaitSyncKHR_invalid_sync",
 		test_eglWaitSyncKHR_invalid_sync,
+		&fence_khr,
 	},
 	{0},
 };
