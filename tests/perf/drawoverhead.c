@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include "piglit-util-gl.h"
 
+static bool is_compat;
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 0;
@@ -33,6 +35,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		if (!strcmp(argv[i], "-compat")) {
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_core_version = 0;
+			is_compat = true;
 			break;
 		}
 	}
@@ -45,7 +48,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static GLuint prog[2], uniform_loc, tex[8], ubo[4];
+static GLuint prog[2], uniform_loc, tex[8], ubo[4], tbo[8];
 static bool indexed;
 static GLenum enable_enum;
 
@@ -67,12 +70,12 @@ piglit_init(int argc, char **argv)
 }
 
 static void
-get_vs_text(char *s, unsigned num_vbos, bool is_second)
+get_vs_text(char *s, unsigned num_vbos, unsigned num_tbos, bool is_second)
 {
 	unsigned i;
 
-	strcpy(s, "#version 130\n"
-		  "#extension GL_ARB_explicit_attrib_location : require\n");
+	sprintf(s, "#version %u\n", num_tbos ? 140 : 130);
+	strcat(s, "#extension GL_ARB_explicit_attrib_location : require\n");
 	for (i = 0; i < num_vbos; i++) {
 		sprintf(s + strlen(s),
 			"layout (location = %u) in vec4 v%u;\n", i, i);
@@ -87,24 +90,29 @@ get_vs_text(char *s, unsigned num_vbos, bool is_second)
 }
 
 static void
-get_fs_text(char *s, unsigned num_ubos, unsigned num_textures, bool is_second)
+get_fs_text(char *s, unsigned num_ubos, unsigned num_textures,
+	    unsigned num_tbos, bool is_second)
 {
 	unsigned i;
 
-	strcpy(s, "#version 130\n"
-		  "#extension GL_ARB_uniform_buffer_object : require\n"
-		  "uniform int index = 0;");
-	sprintf(s + strlen(s), "uniform vec4 u[%u];\n", is_second ? 240 : 1);
+	sprintf(s, "#version %u\n", num_tbos ? 140 : 130);
+	strcat(s, "#extension GL_ARB_uniform_buffer_object : require\n");
+	sprintf(s + strlen(s),
+		"uniform int index = 0;\n"
+		"uniform vec4 u[%u];\n", is_second ? 240 : 1);
 
 	for (i = 0; i < num_textures; i++)
 		sprintf(s + strlen(s), "uniform sampler2D s%u;\n", i);
+	for (i = 0; i < num_tbos; i++)
+		sprintf(s + strlen(s), "uniform samplerBuffer sb%u;\n", i);
 	for (i = 0; i < num_ubos; i++)
 		sprintf(s + strlen(s), "uniform ub%u { vec4 ubu%u[10]; };\n", i, i);
-
 	strcat(s, "void main() {\n");
 	strcat(s, "	gl_FragData[0] = u[index]");
 	for (i = 0; i < num_textures; i++)
 		sprintf(s + strlen(s), " + texture(s%u, u[0].xy)", i);
+	for (i = 0; i < num_tbos; i++)
+		sprintf(s + strlen(s), " + texelFetch(sb%u, int(u[0].x))", i);
 	for (i = 0; i < num_ubos; i++)
 		sprintf(s + strlen(s), " + ubu%u[index]", i);
 	if (is_second)
@@ -115,7 +123,8 @@ get_fs_text(char *s, unsigned num_ubos, unsigned num_textures, bool is_second)
 static void
 setup_shaders_and_resources(unsigned num_vbos,
 			    unsigned num_ubos,
-			    unsigned num_textures)
+			    unsigned num_textures,
+			    unsigned num_tbos)
 {
 	const unsigned max = 16;
 	char vs[4096], fs[4096];
@@ -124,14 +133,15 @@ setup_shaders_and_resources(unsigned num_vbos,
 	assert(num_vbos <= max);
 	assert(num_ubos <= max);
 	assert(num_textures <= max);
+	assert(num_tbos <= max);
 
 	for (i = 0; i < max; i++)
 		glDisableVertexAttribArray(i);
 
 	/* Create two programs in case we want to test program changes. */
 	for (p = 0; p < 2; p++) {
-		get_vs_text(vs, num_vbos, p);
-		get_fs_text(fs, num_ubos, num_textures, p);
+		get_vs_text(vs, num_vbos, num_tbos, p);
+		get_fs_text(fs, num_ubos, num_textures, num_tbos, p);
 		prog[p] = piglit_build_simple_program(vs, fs);
 
 		/* Assign texture units to samplers. */
@@ -144,6 +154,16 @@ setup_shaders_and_resources(unsigned num_vbos,
 			loc = glGetUniformLocation(prog[p], sampler);
 			assert(loc >= 0);
 			glUniform1i(loc, i);
+		}
+		/* Assign texture units to samplers. */
+		for (i = 0; i < num_tbos; i++) {
+			char sampler[20];
+			int loc;
+
+			snprintf(sampler, sizeof(sampler), "sb%u", i);
+			loc = glGetUniformLocation(prog[p], sampler);
+			assert(loc >= 0);
+			glUniform1i(loc, num_textures + i);
 		}
 		/* Assign UBO slots to uniform blocks. */
 		for (i = 0; i < num_ubos; i++) {
@@ -193,6 +213,23 @@ setup_shaders_and_resources(unsigned num_vbos,
 		/* Save the last texture IDs for testing texture changes. */
 		tex[i % 8] = piglit_rgbw_texture(GL_RGBA8, 4, 4, false, true,
 						 GL_UNSIGNED_BYTE);
+	}
+	for (i = 0; i < num_tbos; i++) {
+		static const float data[10*4];
+		GLuint buf, tb;
+
+		glGenBuffers(1, &buf);
+		glBindBuffer(GL_TEXTURE_BUFFER, buf);
+		glBufferData(GL_TEXTURE_BUFFER, sizeof(data), data,
+			     GL_STATIC_DRAW);
+
+		glActiveTexture(GL_TEXTURE0 + num_textures + i);
+		glGenTextures(1, &tb);
+		glBindTexture(GL_TEXTURE_BUFFER, tb);
+		glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA8, buf);
+
+		/* Save the last TBOs for testing UBO changes. */
+		tbo[i % 8] = tb;
 	}
 	glActiveTexture(GL_TEXTURE0);
 }
@@ -280,6 +317,48 @@ draw_many_texture_change(unsigned count)
 			for (j = 0; j < 8; j++) {
 				glActiveTexture(GL_TEXTURE0 + j);
 				glBindTexture(GL_TEXTURE_2D, tex[(i + j) % 8]);
+			}
+			glActiveTexture(GL_TEXTURE0);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+}
+
+static void
+draw_one_tbo_change(unsigned count)
+{
+	unsigned i;
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			glBindTexture(GL_TEXTURE_BUFFER, tbo[i & 1]);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			glBindTexture(GL_TEXTURE_BUFFER, tbo[i & 1]);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+	}
+}
+
+static void
+draw_many_tbo_change(unsigned count)
+{
+	unsigned i,j;
+	if (indexed) {
+		for (i = 0; i < count; i++) {
+			for (j = 0; j < 8; j++) {
+				glActiveTexture(GL_TEXTURE0 + j);
+				glBindTexture(GL_TEXTURE_BUFFER, tbo[(i + j) % 8]);
+			}
+			glActiveTexture(GL_TEXTURE0);
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+		}
+	} else {
+		for (i = 0; i < count; i++) {
+			for (j = 0; j < 8; j++) {
+				glActiveTexture(GL_TEXTURE0 + j);
+				glBindTexture(GL_TEXTURE_BUFFER, tbo[(i + j) % 8]);
 			}
 			glActiveTexture(GL_TEXTURE0);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -431,8 +510,8 @@ draw_vertex_attrib_change(unsigned count)
 
 static double
 perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
-	 unsigned num_textures, const char *change, perf_rate_func f,
-	 double base_rate)
+	 unsigned num_textures, unsigned num_tbos,
+	 const char *change, perf_rate_func f, double base_rate)
 {
 	static unsigned test_index;
 	test_index++;
@@ -440,9 +519,12 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	double rate = perf_measure_rate(f);
 	double ratio = base_rate ? rate / base_rate : 1;
 
-	printf(" %3u: %s (%2u VBOs, %u UBOs, %2u Tex) w/ %s change:%*s"
+	printf(" %3u: %s (%2u VBO, %u UBO, %2u %s) w/ %s change:%*s"
 	       COLOR_CYAN "%s" COLOR_RESET " %s(%.1f%%)" COLOR_RESET "\n",
-	       test_index, call, num_vbos, num_ubos, num_textures, change,
+	       test_index, call, num_vbos, num_ubos,
+	       num_textures ? num_textures : num_tbos,
+	       num_textures ? "Tex" : num_tbos ? "TBO" : "   ",
+	       change,
 	       MAX2(36 - (int)strlen(change) - (int)strlen(call), 0), "",
 	       perf_human_float(rate),
 	       base_rate == 0 ? COLOR_RESET :
@@ -476,18 +558,20 @@ static void
 perf_draw_variant(const char *call, bool is_indexed)
 {
 	double base_rate = 0;
-	unsigned num_vbos, num_ubos, num_textures;
+	unsigned num_vbos, num_ubos, num_textures, num_tbos;
 
 	indexed = is_indexed;
 
 	/* Test different shader resource usage without state changes. */
 	num_ubos = 0;
 	num_textures = 0;
+	num_tbos = 0;
 	for (num_vbos = 1; num_vbos <= 16; num_vbos *= 4) {
-		setup_shaders_and_resources(num_vbos, num_ubos, num_textures);
+		setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
+					    num_tbos);
 
-		double rate = perf_run(call, num_vbos, num_ubos, num_textures, "no state",
-				       draw, base_rate);
+		double rate = perf_run(call, num_vbos, num_ubos, num_textures,
+				       num_tbos, "no state", draw, base_rate);
 		if (num_vbos == 1)
 			base_rate = rate;
 	}
@@ -495,50 +579,68 @@ perf_draw_variant(const char *call, bool is_indexed)
 	num_vbos = 1;
 	num_ubos = 0;
 	num_textures = 16;
-	setup_shaders_and_resources(num_vbos, num_ubos, num_textures);
-	perf_run(call, num_vbos, num_ubos, num_textures, "no state",
+	setup_shaders_and_resources(num_vbos, num_ubos, num_textures, num_tbos);
+	perf_run(call, num_vbos, num_ubos, num_textures, num_tbos, "no state",
 		 draw, base_rate);
 
 	/* Test state changes. */
 	num_ubos = 4;
 	num_textures = 8;
 	for (num_vbos = 1; num_vbos <= 16; num_vbos *= 16) {
-		setup_shaders_and_resources(num_vbos, num_ubos, num_textures);
+		setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
+					    num_tbos);
 
-		perf_run(call, num_vbos, num_ubos, num_textures, "no state",
-			 draw, base_rate);
-		perf_run(call, num_vbos, num_ubos, num_textures, "shader program",
-			 draw_shader_change, base_rate);
-		perf_run(call, num_vbos, num_ubos, num_textures, "vertex attrib",
-			 draw_vertex_attrib_change, base_rate);
-		perf_run(call, num_vbos, num_ubos, num_textures, "1 texture",
-			 draw_one_texture_change, base_rate);
-		perf_run(call, num_vbos, num_ubos, num_textures, "8 textures",
-			 draw_many_texture_change, base_rate);
-		perf_run(call, num_vbos, num_ubos, num_textures, "1 UBO",
-			 draw_one_ubo_change, base_rate);
-		perf_run(call, num_vbos, num_ubos, num_textures, "4 UBOs",
-			 draw_many_ubo_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "no state", draw, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "shader program", draw_shader_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "vertex attrib", draw_vertex_attrib_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "1 texture", draw_one_texture_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "8 textures", draw_many_texture_change, base_rate);
+
+		if (!is_compat) {
+			num_textures = 0;
+			num_tbos = 8;
+			setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
+						    num_tbos);
+			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 "1 TBO", draw_one_tbo_change, base_rate);
+			perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+				 "8 TBOs", draw_many_tbo_change, base_rate);
+			num_textures = 8;
+			num_tbos = 0;
+			setup_shaders_and_resources(num_vbos, num_ubos, num_textures,
+						    num_tbos);
+		}
+
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "1 UBO", draw_one_ubo_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "4 UBOs", draw_many_ubo_change, base_rate);
 
 		glUseProgram(prog[0]);
 		uniform_loc = glGetUniformLocation(prog[0], "u");
-		perf_run(call, num_vbos, num_ubos, num_textures, "few uniforms / 1",
-			 draw_uniform_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "few uniforms / 1", draw_uniform_change, base_rate);
 
 		glUseProgram(prog[1]);
 		uniform_loc = glGetUniformLocation(prog[1], "u");
-		perf_run(call, num_vbos, num_ubos, num_textures, "many uniforms / 1",
-			 draw_uniform_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "many uniforms / 1", draw_uniform_change, base_rate);
 		glUseProgram(prog[0]);
 
-		perf_run(call, num_vbos, num_ubos, num_textures, "scissor",
-			 draw_scissor_change, base_rate);
-		perf_run(call, num_vbos, num_ubos, num_textures, "viewport",
-			 draw_viewport_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "scissor", draw_scissor_change, base_rate);
+		perf_run(call, num_vbos, num_ubos, num_textures, num_tbos,
+			 "viewport", draw_viewport_change, base_rate);
 
 		for (int state = 0; state < ARRAY_SIZE(enable_states); state++) {
 			enable_enum = enable_states[state].enable;
 			perf_run(call, num_vbos, num_ubos, num_textures,
+				 num_tbos,
 				 enable_states[state].name,
 				 draw_state_change, base_rate);
 		}
