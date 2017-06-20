@@ -406,24 +406,34 @@ static void
 draw_state_change(unsigned count)
 {
 	unsigned i;
+	void (*enable)(GLenum) = glEnable;
+	void (*disable)(GLenum) = glDisable;
+	GLenum glenum = enable_enum;
+
+	if (is_compat && enable_enum == GL_PRIMITIVE_RESTART) {
+		enable = glEnableClientState;
+		disable = glDisableClientState;
+		glenum = GL_PRIMITIVE_RESTART_NV;
+	}
+
 	if (indexed) {
 		for (i = 0; i < count; i++) {
 			if (i & 1)
-				glEnable(enable_enum);
+				enable(glenum);
 			else
-				glDisable(enable_enum);
+				disable(glenum);
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 		}
 	} else {
 		for (i = 0; i < count; i++) {
 			if (i & 1)
-				glEnable(enable_enum);
+				enable(glenum);
 			else
-				glDisable(enable_enum);
+				disable(glenum);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 		}
 	}
-	glDisable(enable_enum);
+	disable(glenum);
 }
 
 static void
