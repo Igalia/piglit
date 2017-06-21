@@ -300,7 +300,6 @@ with profile.test_list.group_manager(GleanTest, 'glean') as g:
     g('fbo')
     g('getString')
     g('pixelFormats')
-    g('pointAtten')
     g('pointSprite')
     # exactRGBA is not included intentionally, because it's too strict and
     # the equivalent functionality is covered by other tests
@@ -2238,6 +2237,11 @@ with profile.test_list.group_manager(
     g(['occlusion_query_meta_save'])
     g(['occlusion_query_order'])
     g(['gen_delete_while_active'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_point_parameters')) as g:
+    g(['arb_point_parameters-point-attenuation'])
 
 # Group ARB_separate_shader_objects
 with profile.test_list.group_manager(
