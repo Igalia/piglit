@@ -41,7 +41,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const float blue[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
 static const float green[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
-
+static const float red[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
 
 static bool
 match(const float c1[4], const float c2[4])
@@ -64,6 +64,17 @@ piglit_display(void)
 	glDrawBuffer(GL_BACK);
 	glClearColor(green[0], green[1], green[2], green[3]);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	/* Clear front buffer to red. This is done to trigger the creation
+	 * of a fake front buffer on GLX/dri3.
+	 * Without this we'll be effectively probing the real front buffer
+	 * later on, and its contents may have been modified by reparenting.
+	 */
+	glDrawBuffer(GL_FRONT);
+	glClearColor(red[0], red[1], red[2], red[3]);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFlush();
+	glDrawBuffer(GL_BACK);
 
         /* First swap */
 	piglit_swap_buffers();
