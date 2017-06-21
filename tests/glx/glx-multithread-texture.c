@@ -107,7 +107,7 @@ load_func(void *arg)
 	glEnable(GL_TEXTURE_2D);
 
 	while (!quit && count <= num_test) {
-		int color = count & 0xff;
+		int color = (3 * count) & 0xff;
 
 		assert(tex->user == LOAD);
 		if (tex->color != color) {
