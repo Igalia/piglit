@@ -113,10 +113,12 @@ load_func(void *arg)
 		if (tex->color != color) {
 			memset(tex_data, color, tex_bytes);
 			tex->color = color;
+			glBindTexture(GL_TEXTURE_2D, tex->id);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width,
+				     tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+				     tex_data);
+			glFlush();
 		}
-		glBindTexture(GL_TEXTURE_2D, tex->id);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height,
-			     0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
 
 		tex = advance(&count, LOAD);
 	}
