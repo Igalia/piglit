@@ -151,6 +151,7 @@ draw_func(void *arg)
 
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glReadBuffer(GL_FRONT);
 
 	while (!quit && count < num_test) {
 		struct texture *tex = advance(&count, DRAW);
