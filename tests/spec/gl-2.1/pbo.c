@@ -353,7 +353,7 @@ test_pixel_map(void)
 			}
 
 			for (i = 0; i < max; i++) {
-				if (pbo_mem[i] != (255 - i)) {
+				if (pbo_mem[i] != max - i - 1) {
 					REPORT_FAILURE("get PixelMap failed");
 					return PIGLIT_FAIL;
 				}
