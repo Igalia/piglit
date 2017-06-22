@@ -126,8 +126,9 @@ class JSONBackend(FileBackend):
 
         """
         tests_dir = os.path.join(self._dest, 'tests')
-        file_list = sorted(os.listdir(tests_dir),
-                           key=lambda p: int(os.path.splitext(p)[0]))
+        file_list = sorted(
+            (f for f in os.listdir(tests_dir) if f.endswith('.json')),
+            key=lambda p: int(os.path.splitext(p)[0]))
 
         # If jsonstreams is not present then build a complete tree of all of
         # the data and write it with json.dump

@@ -146,7 +146,6 @@ class TestJSONBackend(object):
 
             jsonschema.validate(json_, schema)
 
-        @pytest.mark.xfail
         def test_ignores_invalid(self, tmpdir):
             test = backends.json.JSONBackend(six.text_type(tmpdir))
             test.initialize(shared.INITIAL_METADATA)
