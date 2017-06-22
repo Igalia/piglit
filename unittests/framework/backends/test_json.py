@@ -202,13 +202,11 @@ class TestResume(object):
         assert set(test.tests.keys()) == \
             {'group1/test1', 'group1/test2', 'group2/test3'}
 
-    @pytest.mark.xfail
-    def test_load_invalid_folder(self, tmpdir):
-        """backends.json._resume: ignores invalid results"""
-        # XXX: I'm not sure if this test is worth fixing or not, it would
-        # involve a lot of code, and for this case to actually be tripped a
-        # user would have to write a file into the tests directory that isn't a
-        # number
+    def test_load_invalid_ext(self, tmpdir):
+        """backends.json._resume: ignores invalid results extensions.
+
+        This gets triggered by an incomplete atomic write
+        """
         f = six.text_type(tmpdir)
         backend = backends.json.JSONBackend(f)
         backend.initialize(shared.INITIAL_METADATA)
@@ -218,12 +216,13 @@ class TestResume(object):
             t(results.TestResult('pass'))
         with backend.write_test("group2/test3") as t:
             t(results.TestResult('fail'))
-        with open(os.path.join(f, 'tests', 'x.json'), 'w') as w:
+        with open(os.path.join(f, 'tests', '3.json.tmp'), 'w') as w:
             w.write('foo')
         test = backends.json._resume(f)
 
         assert set(test.tests.keys()) == \
             {'group1/test1', 'group1/test2', 'group2/test3'}
+
 
     def test_load_incomplete(self, tmpdir):
         """backends.json._resume: loads incomplete results.

@@ -290,8 +290,9 @@ def _resume(results_dir):
 
     # Load all of the test names and added them to the test list
     tests_dir = os.path.join(results_dir, 'tests')
-    file_list = sorted(os.listdir(tests_dir),
-                       key=lambda p: int(os.path.splitext(p)[0]))
+    file_list = sorted(
+        (l for l in os.listdir(tests_dir) if l.endswith('.json')),
+        key=lambda p: int(os.path.splitext(p)[0]))
 
     for file_ in file_list:
         with open(os.path.join(tests_dir, file_), 'r') as f:
