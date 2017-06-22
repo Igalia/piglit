@@ -106,9 +106,10 @@ class TestJSONBackend(object):
         name = grouptools.join('a', 'test', 'group', 'test1')
         result = results.TestResult('pass')
 
-        @pytest.fixture(autouse=True)
-        def setup(self, tmpdir):
-            test = backends.json.JSONBackend(six.text_type(tmpdir))
+        @pytest.fixture(scope='class')
+        def result_dir(self, tmpdir_factory):
+            directory = tmpdir_factory.mktemp('main')
+            test = backends.json.JSONBackend(six.text_type(directory))
             test.initialize(shared.INITIAL_METADATA)
             with test.write_test(self.name) as t:
                 t(self.result)
@@ -116,26 +117,28 @@ class TestJSONBackend(object):
                 {'time_elapsed':
                     results.TimeAttribute(start=0.0, end=1.0).to_json()})
 
-        def test_metadata_removed(self, tmpdir):
-            assert not tmpdir.join('metadata.json').check()
+            return directory
 
-        def test_tests_directory_removed(self, tmpdir):
-            assert not tmpdir.join('tests').check()
+        def test_metadata_removed(self, result_dir):
+            assert not result_dir.join('metadata.json').check()
 
-        def test_results_file_created(self, tmpdir):
+        def test_tests_directory_removed(self, result_dir):
+            assert not result_dir.join('tests').check()
+
+        def test_results_file_created(self, result_dir):
             # Normally this would also have a compression extension, but this
             # module has a setup fixture that forces the compression to None.
-            assert tmpdir.join('results.json').check()
+            assert result_dir.join('results.json').check()
 
-        def test_results_are_json(self, tmpdir):
+        def test_results_are_json(self, result_dir):
             # This only checks that the output is valid JSON, not that the
             # schema is correct
-            with tmpdir.join('results.json').open('r') as f:
+            with result_dir.join('results.json').open('r') as f:
                 json.load(f)
 
-        def test_results_are_valid(self, tmpdir):
+        def test_results_are_valid(self, result_dir):
             """Test that the values produced are valid."""
-            with tmpdir.join('results.json').open('r') as f:
+            with result_dir.join('results.json').open('r') as f:
                 json_ = json.load(f)
 
             with open(SCHEMA, 'r') as f:
