@@ -146,6 +146,17 @@ class TestJSONBackend(object):
 
             jsonschema.validate(json_, schema)
 
+        @pytest.mark.xfail
+        def test_ignores_invalid(self, tmpdir):
+            test = backends.json.JSONBackend(six.text_type(tmpdir))
+            test.initialize(shared.INITIAL_METADATA)
+            with test.write_test(self.name) as t:
+                t(self.result)
+            tmpdir.join('tests/2.json.tmp').write('{}')
+            test.finalize(
+                {'time_elapsed':
+                    results.TimeAttribute(start=0.0, end=1.0).to_json()})
+
 
 class TestUpdateResults(object):
     """Test for the _update_results function."""
