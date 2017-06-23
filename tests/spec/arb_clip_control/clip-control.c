@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -86,17 +87,18 @@ state_test(void)
 	glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 	pass = test_clip_control(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE) && pass;
 
-	/* Check bailing out on invalid input */
-	glClipControl(GL_RGB, GL_NEGATIVE_ONE_TO_ONE);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
-	piglit_reset_gl_error();
-	pass = test_clip_control(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE) && pass;
+	if (!piglit_khr_no_error) {
+		/* Check bailing out on invalid input */
+		glClipControl(GL_RGB, GL_NEGATIVE_ONE_TO_ONE);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+		piglit_reset_gl_error();
+		pass = test_clip_control(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE) && pass;
 
-	glClipControl(GL_LOWER_LEFT, GL_RGB);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
-	piglit_reset_gl_error();
-	pass = test_clip_control(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE) && pass;
-
+		glClipControl(GL_LOWER_LEFT, GL_RGB);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+		piglit_reset_gl_error();
+		pass = test_clip_control(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE) && pass;
+	}
 
 	/* Check push/pop */
 	glClipControl(GL_LOWER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
