@@ -41,6 +41,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -118,30 +119,32 @@ test_dr_indices(GLint maxVP)
 		pass = false;
 	}
 
-	/**
-	 * invalid count + first index for DepthRange
-	 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
-	 *     "An INVALID_VALUE error is generated if first + count
-	 *     is greater than the valuue of MAX_VIEWPORTS."
-	 */
-	if (!check_dr_index(maxVP - 2, 3, GL_INVALID_VALUE)) {
-		printf("Wrong error for invalid DepthRange index range\n");
-		pass = false;
-	}
+	if (!piglit_khr_no_error) {
+		/**
+		 * invalid count + first index for DepthRange
+		 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
+		 *     "An INVALID_VALUE error is generated if first + count
+		 *     is greater than the valuue of MAX_VIEWPORTS."
+		 */
+		if (!check_dr_index(maxVP - 2, 3, GL_INVALID_VALUE)) {
+			printf("Wrong error for invalid DepthRange index range\n");
+			pass = false;
+		}
 
-	/**
-	 * invalid count for DepthRange
-	 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
-	 *    "An INVALID_VALUE error is generated if count is negative."
-	 */
+		/**
+		 * invalid count for DepthRange
+		 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
+		 *    "An INVALID_VALUE error is generated if count is negative."
+		 */
 #ifdef PIGLIT_USE_OPENGL
-	glDepthRangeArrayv(0, -1, NULL);
+		glDepthRangeArrayv(0, -1, NULL);
 #else
-	glDepthRangeArrayfvOES(0, -1, NULL);
+		glDepthRangeArrayfvOES(0, -1, NULL);
 #endif
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		printf("Wrong error for invalid DepthRange count\n");
-		pass = false;
+		if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
+			printf("Wrong error for invalid DepthRange count\n");
+			pass = false;
+		}
 	}
 
 	return pass;

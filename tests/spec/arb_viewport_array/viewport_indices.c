@@ -45,6 +45,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -111,23 +112,26 @@ test_vp_indices(GLint maxVP)
 		       maxVP);
 		pass = false;
 	}
-	/**
-	 *  invalid count + first index for viewport
-	 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
-	 *     "An INVALID_VALUE error is generated if first + count
-	 *     is greater than the value of MAX_VIEWPORTS."
-	 */
-	if (!check_vp_index(maxVP - 1, 2, GL_INVALID_VALUE)) {
-		printf("Wrong error for invalid viewport range\n");
-		pass = false;
+
+	if (!piglit_khr_no_error) {
+		/**
+		 *  invalid count + first index for viewport
+		 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
+		 *     "An INVALID_VALUE error is generated if first + count
+		 *     is greater than the value of MAX_VIEWPORTS."
+		 */
+		if (!check_vp_index(maxVP - 1, 2, GL_INVALID_VALUE)) {
+			printf("Wrong error for invalid viewport range\n");
+			pass = false;
+		}
+		/**
+		 * invalid count for viewport
+		 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
+		 *    "An INVALID_VALUE error is generated if count is negative."
+		 */
+		glViewportArrayv(0, -1, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 	}
-	/**
-	 * invalid count for viewport
-	 * OpenGL Spec Core 4.3 Spec, section 13.6.1 ref:
-	 *    "An INVALID_VALUE error is generated if count is negative."
-	 */
-	glViewportArrayv(0, -1, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
 	return pass;
 }
@@ -170,17 +174,19 @@ test_preserve_invalid_index(GLint maxVP)
 	}
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	/* set an illegal index and then test that no indices changed*/
-	glViewportIndexedf(maxVP, 0.0, 0.0, 1.0, 1.0);
-	glScissorIndexed(maxVP, 0, 0, 1, 1);
+	if (!piglit_khr_no_error) {
+		/* set an illegal index and then test that no indices changed*/
+		glViewportIndexedf(maxVP, 0.0, 0.0, 1.0, 1.0);
+		glScissorIndexed(maxVP, 0, 0, 1, 1);
 #ifdef PIGLIT_USE_OPENGL
-	glDepthRangeIndexed(maxVP, 0.0, 0.0);
+		glDepthRangeIndexed(maxVP, 0.0, 0.0);
 #else
-	glDepthRangeIndexedfOES(maxVP, 0.0, 0.0);
+		glDepthRangeIndexedfOES(maxVP, 0.0, 0.0);
 #endif
-	glDisablei(GL_SCISSOR_TEST, maxVP);
+		glDisablei(GL_SCISSOR_TEST, maxVP);
 
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	for (i = 0; i < maxVP; i++) {
 		glGetFloati_v(GL_VIEWPORT, i, vpGet);

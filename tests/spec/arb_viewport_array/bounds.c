@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -116,18 +117,20 @@ viewport_bounds(GLint maxVP)
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	/* negative width, height gives gl error */
-	vp[2] = -10.3;
-	vp[3] = 0.0;
-	for (i = 0; i < 2; i++) {
-		glViewportArrayv(0, 1, vp);
-		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-		glViewportIndexedf(1, vp[0], vp[1], vp[2], vp[3]);
-		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-		glViewportIndexedfv(2, vp);
-		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-		vp[2] = 5.0;
-		vp[3] = -12345.7;
+	if (!piglit_khr_no_error) {
+		/* negative width, height gives gl error */
+		vp[2] = -10.3;
+		vp[3] = 0.0;
+		for (i = 0; i < 2; i++) {
+			glViewportArrayv(0, 1, vp);
+			pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+			glViewportIndexedf(1, vp[0], vp[1], vp[2], vp[3]);
+			pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+			glViewportIndexedfv(2, vp);
+			pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+			vp[2] = 5.0;
+			vp[3] = -12345.7;
+		}
 	}
 
 	return pass;
@@ -232,18 +235,20 @@ scissor_bounds(GLint maxVP)
 	glScissorIndexed(0, 0x8000, 0x80000000, 0x7ffff, 0x7fffffff);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	/* negative width, height gives gl error */
-	sc[2] = -10;
-	sc[3] = 0;
-	for (i = 0; i < 2; i++) {
-		glScissorArrayv(0, 1, sc);
-		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-		glScissorIndexed(1, sc[0], sc[1], sc[2], sc[3]);
-		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-		glScissorIndexedv(2, sc);
-		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-		sc[2] = 5;
-		sc[3] = -12345;
+	if (!piglit_khr_no_error) {
+		/* negative width, height gives gl error */
+		sc[2] = -10;
+		sc[3] = 0;
+		for (i = 0; i < 2; i++) {
+			glScissorArrayv(0, 1, sc);
+			pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+			glScissorIndexed(1, sc[0], sc[1], sc[2], sc[3]);
+			pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+			glScissorIndexedv(2, sc);
+			pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+			sc[2] = 5;
+			sc[3] = -12345;
+		}
 	}
 
 	return pass;

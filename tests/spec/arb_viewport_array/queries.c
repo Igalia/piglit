@@ -40,6 +40,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -74,23 +75,25 @@ piglit_init(int argc, char **argv)
 #endif
 
 	glGetIntegerv(GL_MAX_VIEWPORTS, &maxVP);
-	/**
-	 * Test for invalid (non-indexed "pname") parameters with GetFloati_v
-	 * and GetDoublei_v
-	 * NOTE: "index" parameter validity is tested in the depthrange-indices
-	 * and viewport-indices tests.
-	 * OpenGL 4.3 Core section 22.1 ref:
-	 *     "An INVALID_ENUM error is generated if target is not indexed
-	 *     state queriable with these commands."
-	 */
 
-	for (i = 0; i < ARRAY_SIZE(tokens); i++) {
-		glGetFloati_v(tokens[i], 1, valf);
-		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	if (!piglit_khr_no_error) {
+		/**
+		 * Test for invalid (non-indexed "pname") parameters with
+		 * GetFloati_v and GetDoublei_v
+		 * NOTE: "index" parameter validity is tested in the
+		 * depthrange-indices and viewport-indices tests.
+		 * OpenGL 4.3 Core section 22.1 ref:
+		 *     "An INVALID_ENUM error is generated if target is not
+		 *     indexed state queriable with these commands."
+		 */
+		for (i = 0; i < ARRAY_SIZE(tokens); i++) {
+			glGetFloati_v(tokens[i], 1, valf);
+			pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 #ifdef PIGLIT_USE_OPENGL
-		glGetDoublei_v(tokens[i], 1, vald);
-		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+			glGetDoublei_v(tokens[i], 1, vald);
+			pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 #endif
+		}
 	}
 
 	/**
