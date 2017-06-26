@@ -44,6 +44,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 10;
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -83,9 +84,11 @@ piglit_display(void)
       return PIGLIT_FAIL;
    }
 
-   if (test_binding(GL_FALSE) != GL_INVALID_OPERATION) {
-      printf("fbo-bind-renderbuffer: failed to generate expected error\n");
-      return PIGLIT_FAIL;
+   if (!piglit_khr_no_error) {
+      if (test_binding(GL_FALSE) != GL_INVALID_OPERATION) {
+         printf("fbo-bind-renderbuffer: failed to generate expected error\n");
+         return PIGLIT_FAIL;
+      }
    }
 
    return PIGLIT_PASS;

@@ -34,9 +34,10 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 10;
 
-config.window_visual = PIGLIT_GL_VISUAL_RGB;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -208,17 +209,19 @@ test(void)
 	}
 
 	/* test formats that should fail */
-	for (i = 0; i < ARRAY_SIZE(invalid_formats); i++) {
-		const char *name = piglit_get_gl_enum_name(invalid_formats[i]);
+	if (!piglit_khr_no_error) {
+		for (i = 0; i < ARRAY_SIZE(invalid_formats); i++) {
+			const char *name = piglit_get_gl_enum_name(invalid_formats[i]);
 
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
-					 invalid_formats[i],
-					 piglit_width, piglit_height);
-		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-			piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
-			pass = GL_FALSE;
-		} else {
-			piglit_report_subtest_result(PIGLIT_PASS, "%s", name);
+			glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
+						 invalid_formats[i],
+						 piglit_width, piglit_height);
+			if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+				piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
+				pass = GL_FALSE;
+			} else {
+				piglit_report_subtest_result(PIGLIT_PASS, "%s", name);
+			}
 		}
 	}
 

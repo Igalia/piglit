@@ -35,6 +35,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 10;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -56,21 +57,26 @@ try_GetAttachmentParam(GLenum attachment, GLenum pname, GLint expected,
 	while (glGetError() != 0)
 		/* empty */ ;
 
-	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER_EXT, attachment,
-					      pname, &value);
-	err = glGetError();
-	if (err != expected_err) {
-		printf("Unexpected GL error state 0x%04x querying "
-		       "attachment=0x%04x, pname=0x%04x.  Expected 0x%04x.\n",
-		       err, attachment, pname, expected_err);
-		return GL_FALSE;
-	}
+	if (!piglit_khr_no_error || expected_err == GL_NO_ERROR) {
 
-	/* Only check the return value if the command was expected to succeed.
-	 */
-	if ((expected_err == 0) && (value != expected)) {
-		printf(fmt, expected, value);
-		return GL_FALSE;
+		glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER_EXT,
+						      attachment,
+						      pname, &value);
+		err = glGetError();
+		if (err != expected_err) {
+			printf("Unexpected GL error state 0x%04x querying "
+			       "attachment=0x%04x, pname=0x%04x.  Expected 0x%04x.\n",
+			       err, attachment, pname, expected_err);
+			return GL_FALSE;
+		}
+
+		/* Only check the return value if the command was expected to
+		 * succeed.
+		 */
+		if ((expected_err == 0) && (value != expected)) {
+			printf(fmt, expected, value);
+			return GL_FALSE;
+		}
 	}
 
 	return GL_TRUE;
