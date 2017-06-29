@@ -48,13 +48,18 @@
 
 #include "piglit-util-gl.h"
 
-PIGLIT_GL_TEST_CONFIG_BEGIN config.supports_gl_compat_version = 10;
+PIGLIT_GL_TEST_CONFIG_BEGIN
 
-config.window_visual = PIGLIT_GL_VISUAL_RGBA |
-	PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH |
-	PIGLIT_GL_VISUAL_STENCIL;
+	config.supports_gl_compat_version = 10;
 
-PIGLIT_GL_TEST_CONFIG_END enum path
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
+		PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH |
+		PIGLIT_GL_VISUAL_STENCIL;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
+PIGLIT_GL_TEST_CONFIG_END
+
+enum path
 {
 	ALPHA,
 	BLEND,
