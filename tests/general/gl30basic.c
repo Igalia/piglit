@@ -92,13 +92,15 @@ test_extension_list(void)
 
    /* check that extension strings are reasonable */
    for (k = 0; k < num_ext; k++) {
-      const GLubyte *ext = glGetStringi(GL_EXTENSIONS, k);
+      const char *ext = (const char *) glGetStringi(GL_EXTENSIONS, k);
       if (0)
-         printf("Ext[%d] = %s\n", k, (char *) ext);
-      if (!ext ||
-          ext[0] != 'G' ||
-          ext[1] != 'L' ||
-          ext[2] != '_') {
+         printf("Ext[%d] = %s\n", k, ext);
+
+      /* In some drivers WGL_EXT_swap_control is in the extension string
+       * for historical reasons.
+       */
+      if (!ext || (strncmp(ext, "GL_", 3) != 0 &&
+		   strcmp(ext, "WGL_EXT_swap_control") != 0)){
          printf("%s: bad extension string [%d]: %s\n", Prog, k, ext);
          return PIGLIT_FAIL;
       }
