@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_es_version = 30;
 #endif
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -132,18 +133,20 @@ void piglit_init(int argc, char **argv)
 	 *     OPERATION is generated. If name is not a varying out variable,
 	 *     or if an error occurs, -1 will be returned."
 	 */
-	printf("Querying index before linking...\n");
+	if (!piglit_khr_no_error) {
+		printf("Querying index before linking...\n");
 #ifdef PIGLIT_USE_OPENGL
-	idx = glGetFragDataIndex(prog, "v");
+		idx = glGetFragDataIndex(prog, "v");
 #else // PIGLIT_USE_OPENGLES3
-	idx = glGetFragDataIndexEXT(prog, "v");
+		idx = glGetFragDataIndexEXT(prog, "v");
 #endif
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-		piglit_report_result(PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			piglit_report_result(PIGLIT_FAIL);
 
-	if (idx != -1) {
-		fprintf(stderr, "Expected index = -1, got %d\n", idx);
-		piglit_report_result(PIGLIT_FAIL);
+		if (idx != -1) {
+			fprintf(stderr, "Expected index = -1, got %d\n", idx);
+			piglit_report_result(PIGLIT_FAIL);
+		}
 	}
 
 	glLinkProgram(prog);
