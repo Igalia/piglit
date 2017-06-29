@@ -470,6 +470,7 @@ check_include_file(sys/resource.h  HAVE_SYS_RESOURCE_H)
 check_include_file(sys/stat.h  HAVE_SYS_STAT_H)
 check_include_file(unistd.h    HAVE_UNISTD_H)
 check_include_file(fcntl.h     HAVE_FCNTL_H)
+check_include_file(linux/sync_file.h HAVE_LINUX_SYNC_FILE_H)
 
 if(DEFINED PIGLIT_INSTALL_VERSION)
 	set(PIGLIT_INSTALL_VERSION_SUFFIX

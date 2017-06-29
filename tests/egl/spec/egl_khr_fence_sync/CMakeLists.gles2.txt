@@ -4,6 +4,8 @@ if(PIGLIT_HAS_PTHREADS)
 	link_libraries(${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+if(HAVE_LINUX_SYNC_FILE_H)
 piglit_add_executable(egl_khr_fence_sync egl_khr_fence_sync.c sw_sync.c)
+endif()
 
 # vim: ft=cmake:
