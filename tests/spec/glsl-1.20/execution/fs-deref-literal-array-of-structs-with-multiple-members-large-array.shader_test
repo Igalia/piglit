@@ -1,0 +1,57 @@
+# Verify that an array of structs appearing in the shader as a literal
+# can be successfully dereferenced to access the values inside the
+# structs.
+#
+# This test has a slightly larger array to better check that we calculate
+# offsets correctly. This exposed a bug in the glsl to tgsi pass in gallium
+# based drivers.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+struct Foo {
+  int value;
+
+  /* A second member of a differnt size ensures we calculate member offsets
+   * correctly.
+   */
+  ivec2 value2;
+};
+
+uniform int i;
+uniform ivec2 expected_value;
+
+void main()
+{
+  ivec2 actual_value = Foo[4](Foo(100, ivec2(200, 300)),
+                              Foo(400, ivec2(500, 600)),
+                              Foo(700, ivec2(800, 900)),
+                              Foo(1000, ivec2(1100, 1200)))[i].value2;
+  if (actual_value == expected_value)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform int i 0
+uniform ivec2 expected_value 200 300
+draw rect -1 -1 1 1
+uniform int i 1
+uniform ivec2 expected_value 500 600
+draw rect 0 -1 1 1
+probe all rgba 0.0 1.0 0.0 1.0
+uniform int i 0
+uniform ivec2 expected_value 800 900
+draw rect -1 0 1 1
+uniform int i 1
+uniform ivec2 expected_value 1100 1200
+draw rect 0 0 1 1
+probe all rgba 0.0 1.0 0.0 1.0

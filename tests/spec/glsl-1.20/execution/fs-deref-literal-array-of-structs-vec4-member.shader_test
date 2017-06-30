@@ -1,0 +1,39 @@
+# Verify that an array of structs appearing in the shader as a literal
+# can be successfully dereferenced to access the values inside the
+# structs.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+struct Foo {
+  ivec4 value;
+};
+
+uniform int i;
+uniform ivec4 expected_value;
+
+void main()
+{
+  ivec4 actual_value = Foo[2](Foo(ivec4(100, 200, 300, 400)),
+                              Foo(ivec4(500, 600, 700, 800)))[i].value;
+  if (actual_value == expected_value)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform int i 0
+uniform ivec4 expected_value 100 200 300 400
+draw rect -1 -1 2 1
+uniform int i 1
+uniform ivec4 expected_value 500 600 700 800
+draw rect -1 0 2 1
+probe all rgba 0.0 1.0 0.0 1.0
