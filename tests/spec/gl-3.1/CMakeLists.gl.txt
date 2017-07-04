@@ -8,6 +8,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (gl-3.1-buffer-bindings buffer-bindings.c)
 piglit_add_executable (gl-3.1-default-vao default-vao.c)
 piglit_add_executable (gl-3.1-draw-buffers-errors draw-buffers-errors.c)
 piglit_add_executable (gl-3.1-enable-vertex-array enable-vertex-array.c)
