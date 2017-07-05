@@ -53,8 +53,25 @@ test_sub_clear(void)
 		     GL_RGBA,
 		     GL_UNSIGNED_BYTE,
 		     NULL);
+	glTexImage2D(GL_TEXTURE_2D,
+		     1, /* level */
+		     GL_RGBA,
+		     2, 2, /* width/height */
+		     0, /* border */
+		     GL_RGBA,
+		     GL_UNSIGNED_BYTE,
+		     NULL);
+	glTexImage2D(GL_TEXTURE_2D,
+		     2, /* level */
+		     GL_RGBA,
+		     1, 1, /* width/height */
+		     0, /* border */
+		     GL_RGBA,
+		     GL_UNSIGNED_BYTE,
+		     NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	/* test invalid x */
 	glClearTexSubImage(tex,
 			   0, /* level */
 			   -1, 0, 0, /* x/y/z */
@@ -63,6 +80,7 @@ test_sub_clear(void)
 			   NULL /* data */);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
+	/* test invalid y */
 	glClearTexSubImage(tex,
 			   0, /* level */
 			   0, -1, 0, /* x/y/z */
@@ -71,6 +89,7 @@ test_sub_clear(void)
 			   NULL /* data */);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
+	/* test invalid z */
 	glClearTexSubImage(tex,
 			   0, /* level */
 			   0, 0, -1, /* x/y/z */
@@ -79,6 +98,7 @@ test_sub_clear(void)
 			   NULL /* data */);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
+	/* test invalid width */
 	glClearTexSubImage(tex,
 			   0, /* level */
 			   1, 1, 0, /* x/y/z */
@@ -87,6 +107,7 @@ test_sub_clear(void)
 			   NULL /* data */);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
+	/* Test invalid height */
 	glClearTexSubImage(tex,
 			   0, /* level */
 			   1, 1, 0, /* x/y/z */
@@ -95,6 +116,7 @@ test_sub_clear(void)
 			   NULL /* data */);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
+	/* Test invalid depth */
 	glClearTexSubImage(tex,
 			   0, /* level */
 			   1, 1, 0, /* x/y/z */
@@ -103,6 +125,16 @@ test_sub_clear(void)
 			   NULL /* data */);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
+	/* test clearing invalid region of level 1 */
+	glClearTexSubImage(tex,
+			   1, /* level */
+			   1, 1, 0, /* x/y/z */
+			   2, 3, 1, /* width/height/depth */
+			   GL_RGBA, GL_UNSIGNED_BYTE,
+			   NULL /* data */);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	/* Test no error */
 	glClearTexSubImage(tex,
 			   0, /* level */
 			   1, 1, 0, /* x/y/z */
@@ -115,6 +147,58 @@ test_sub_clear(void)
 
 	return pass;
 }
+
+
+static bool
+test_texture_view(void)
+{
+	GLuint tex, view;
+	bool pass = true;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glTexStorage2D(GL_TEXTURE_2D, 3, GL_RGBA8, 4, 4);
+
+	/* create view of levels 1..2 as 0..1 */
+	glGenTextures(1, &view);
+	glTextureView(view, GL_TEXTURE_2D, tex,
+		      GL_RGBA8, 1, 2, 0, 1);
+
+	glBindTexture(GL_TEXTURE_2D, view);
+
+	pass &= piglit_check_gl_error(GL_NO_ERROR);
+
+	/* try to clear invalid level */
+	glClearTexSubImage(view,
+			   2, /* level */
+			   0, 0, 0, /* x/y/z */
+			   1, 1, 1, /* width/height/depth */
+			   GL_RGBA, GL_UNSIGNED_BYTE,
+			   NULL /* data */);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	/* clearing all of level 0 should work */
+	glClearTexSubImage(view,
+			   0, /* level */
+			   0, 0, 0, /* x/y/z */
+			   2, 2, 1, /* width/height/depth */
+			   GL_RGBA, GL_UNSIGNED_BYTE,
+			   NULL /* data */);
+	pass &= piglit_check_gl_error(GL_NO_ERROR);
+
+	/* try to clear invalid region of level 0 */
+	glClearTexSubImage(view,
+			   0, /* level */
+			   0, 0, 0, /* x/y/z */
+			   4, 4, 1, /* width/height/depth */
+			   GL_RGBA, GL_UNSIGNED_BYTE,
+			   NULL /* data */);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	return pass;
+}
+
 
 void
 piglit_init(int argc, char **argv)
@@ -194,6 +278,10 @@ piglit_init(int argc, char **argv)
 				    GL_UNSIGNED_BYTE,
 				    GL_DEPTH_COMPONENT,
 				    GL_UNSIGNED_INT);
+
+	if (piglit_is_extension_supported("GL_ARB_texture_view")) {
+		pass &= test_texture_view();
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
