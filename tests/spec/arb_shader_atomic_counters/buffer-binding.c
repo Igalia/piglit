@@ -141,10 +141,12 @@ piglit_init(int argc, char **argv)
                                 "implementation limit",
                                 run_test_bind_at, ls.bindings - 1);
 
-        atomic_counters_subtest(&status, GL_NONE,
-                                "Atomic buffer binding above the "
-                                "implementation limit",
-                                !run_test_bind_at, ls.bindings);
+        if (!piglit_khr_no_error) {
+                atomic_counters_subtest(&status, GL_NONE,
+                                        "Atomic buffer binding above the "
+                                        "implementation limit",
+                                        !run_test_bind_at, ls.bindings);
+        }
 
         atomic_counters_subtest(&status, GL_NONE,
                                 "Atomic buffer range binding",
