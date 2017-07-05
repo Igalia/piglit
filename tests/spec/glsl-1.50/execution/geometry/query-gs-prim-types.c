@@ -58,6 +58,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
         config.supports_gl_core_version = 32;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -148,30 +149,34 @@ piglit_init(int argc, char **argv)
 	glAttachShader(prog_no_gs, fs);
 
 	/* program not linked successfully yet should emit INVALID_OPERATION */
-	glGetProgramiv(prog_no_gs, GL_GEOMETRY_INPUT_TYPE, &type);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
+	if (!piglit_khr_no_error) {
+		glGetProgramiv(prog_no_gs, GL_GEOMETRY_INPUT_TYPE, &type);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
 
-	glGetProgramiv(prog_no_gs, GL_GEOMETRY_OUTPUT_TYPE, &type);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
+		glGetProgramiv(prog_no_gs, GL_GEOMETRY_OUTPUT_TYPE, &type);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
 
-	glGetProgramiv(prog_no_gs, GL_GEOMETRY_VERTICES_OUT, &type);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
+		glGetProgramiv(prog_no_gs, GL_GEOMETRY_VERTICES_OUT, &type);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
 
-	glLinkProgram(prog_no_gs);
-	if(!piglit_link_check_status(prog_no_gs)){
-		glDeleteProgram(prog_no_gs);
-		piglit_report_result(PIGLIT_FAIL);
+		glLinkProgram(prog_no_gs);
+		if(!piglit_link_check_status(prog_no_gs)){
+			glDeleteProgram(prog_no_gs);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		/* program without a geometry shader should emit
+		 * INVALID_OPERATION
+		 */
+		glGetProgramiv(prog_no_gs, GL_GEOMETRY_INPUT_TYPE, &type);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
+
+		glGetProgramiv(prog_no_gs, GL_GEOMETRY_OUTPUT_TYPE, &type);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
+
+		glGetProgramiv(prog_no_gs, GL_GEOMETRY_VERTICES_OUT, &type);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
 	}
-
-	/* program without a geometry shader should emit INVALID_OPERATION */
-	glGetProgramiv(prog_no_gs, GL_GEOMETRY_INPUT_TYPE, &type);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
-
-	glGetProgramiv(prog_no_gs, GL_GEOMETRY_OUTPUT_TYPE, &type);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
-
-	glGetProgramiv(prog_no_gs, GL_GEOMETRY_VERTICES_OUT, &type);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) & pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
