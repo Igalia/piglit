@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (fs-discard-exit-2 fs-discard-exit-2.c)
+piglit_add_executable (fs-execution-ordering fs-execution-ordering.c)
 piglit_add_executable (fs-texelFetch-2D fs-texelFetch-2D.c)
 piglit_add_executable (fs-texelFetchOffset-2D fs-texelFetchOffset-2D.c)
 piglit_add_executable (fs-textureOffset-2D fs-textureOffset-2D.c)
@@ -17,4 +18,3 @@ piglit_add_executable (isinf-and-isnan isinf-and-isnan.c)
 piglit_add_executable (vertexid-beginend vertexid-beginend.c)
 piglit_add_executable (vertexid-drawarrays vertexid-drawarrays.c)
 piglit_add_executable (vertexid-drawelements vertexid-drawelements.c)
-piglit_add_executable (fs-execution-ordering fs-execution-ordering.c)
