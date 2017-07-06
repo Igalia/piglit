@@ -1,6 +1,7 @@
 /* Test struct inout parameter. */
 
 [require]
+SPIRV NO (ftransform)
 GLSL >= 1.10
 
 [vertex shader]

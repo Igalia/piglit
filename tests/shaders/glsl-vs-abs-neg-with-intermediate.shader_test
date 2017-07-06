@@ -6,6 +6,7 @@
 # shader.
 
 [require]
+SPIRV NO (gl_FrontColor, gl_Color)
 GLSL >= 1.10
 
 [vertex shader]
