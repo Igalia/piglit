@@ -87,6 +87,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = 900;
 	config.window_height = 600;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 	piglit_gl_process_args(&argc, argv, &config);
 
