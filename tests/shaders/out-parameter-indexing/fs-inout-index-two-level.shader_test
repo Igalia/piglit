@@ -5,7 +5,6 @@ GLSL >= 1.20
 
 [fragment shader]
 uniform int u = 1;
-varying vec4 color;
 
 void func(inout int i, inout int w[4], inout int x)
 {
