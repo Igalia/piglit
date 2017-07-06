@@ -4,12 +4,12 @@ GLSL >= 1.10
 [vertex shader]
 uniform float a[3];
 
+varying vec4 color;
+
 float func(float array[3])
 {
 	return array[2];
 }
-
-varying vec4 color;
 
 void main()
 {
