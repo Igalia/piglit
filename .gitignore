@@ -3,6 +3,7 @@
 *.tar.bz2
 *.zip
 *~
+*.spv
 
 .ninja_log
 build.ninja
