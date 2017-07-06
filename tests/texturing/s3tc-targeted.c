@@ -38,6 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	/* We need OpenGL 1.3 for the *TexImage* functions used in this file. */
 	config.supports_gl_compat_version = 13;
 	config.requires_displayed_window = false;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 

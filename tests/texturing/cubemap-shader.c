@@ -46,6 +46,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = (64*6+PAD*9)*2;
 	config.window_height = 200;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 

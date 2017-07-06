@@ -43,6 +43,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 10;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 enum piglit_result
@@ -84,31 +85,33 @@ piglit_init(int argc, char **argv)
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-        /*
-         * For level 1, maxSize by 1 (and vice versa) should fail.
-	 */
-	glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA,
-		     maxSize, 1, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
+	if (!piglit_khr_no_error) {
+		/*
+		 * For level 1, maxSize by 1 (and vice versa) should fail.
+		 */
+		glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA,
+			     maxSize, 1, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
 
-	glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA,
-		     1, maxSize, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
+		glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA,
+			     1, maxSize, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
 
-        /*
-         * For level 2, maxSize/2 by 1 (and vice versa) should fail.
-         */
-	glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA,
-		     maxSize/2, 1, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
+		/*
+		 * For level 2, maxSize/2 by 1 (and vice versa) should fail.
+		 */
+		glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA,
+			     maxSize/2, 1, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
 
-	glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA,
-		     1, maxSize/2, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
+		glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA,
+			     1, maxSize/2, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

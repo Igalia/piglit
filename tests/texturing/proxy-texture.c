@@ -34,6 +34,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 10;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -92,29 +93,31 @@ do_proxy_tests(void)
 
 	init_proxy_texture();
 
-	/* bad level => GL_INVALID_VALUE */
-	glTexImage2D(GL_PROXY_TEXTURE_2D, 5555, GL_RGBA, 8, 8, 0,
-		     GL_RGBA, GL_FLOAT, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	pass = check_no_proxy_change() && pass;
+	if (!piglit_khr_no_error) {
+		/* bad level => GL_INVALID_VALUE */
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 5555, GL_RGBA, 8, 8, 0,
+			     GL_RGBA, GL_FLOAT, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		pass = check_no_proxy_change() && pass;
 
-	/* bad width => GL_INVALID_VALUE */
-	glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, -8, 8, 0,
-		     GL_RGBA, GL_FLOAT, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	pass = check_no_proxy_change() && pass;
+		/* bad width => GL_INVALID_VALUE */
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, -8, 8, 0,
+			     GL_RGBA, GL_FLOAT, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		pass = check_no_proxy_change() && pass;
 
-	/* bad border => GL_INVALID_VALUE */
-	glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, 8, 8, 2,
-		     GL_RGBA, GL_FLOAT, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
-	pass = check_no_proxy_change() && pass;
+		/* bad border => GL_INVALID_VALUE */
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, 8, 8, 2,
+			     GL_RGBA, GL_FLOAT, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+		pass = check_no_proxy_change() && pass;
 
-	/* bad format+type => GL_INVALID_OPERATION */
-	glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0,
-		     GL_DEPTH_COMPONENT, GL_UNSIGNED_INT_8_8_8_8, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
-	pass = check_no_proxy_change() && pass;
+		/* bad format+type => GL_INVALID_OPERATION */
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0,
+			     GL_DEPTH_COMPONENT, GL_UNSIGNED_INT_8_8_8_8, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		pass = check_no_proxy_change() && pass;
+	}
 
 	/* Test real proxy behaviour here.  Use too big width, height.
 	 * This should not generate a GL error but it should zero-out the
