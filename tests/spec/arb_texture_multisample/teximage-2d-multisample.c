@@ -36,6 +36,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.supports_gl_core_version = 31;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -64,10 +65,12 @@ piglit_init(int argc, char **argv)
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Pass an Invalid Enum */
-	glBindTexture(GL_TEXTURE_2D, textures[2]);
-	glTexImage2DMultisample(GL_TEXTURE_2D, 4, GL_RGB,
-				1024, 1024, GL_FALSE);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	if (!piglit_khr_no_error) {
+		glBindTexture(GL_TEXTURE_2D, textures[2]);
+		glTexImage2DMultisample(GL_TEXTURE_2D, 4, GL_RGB,
+					1024, 1024, GL_FALSE);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

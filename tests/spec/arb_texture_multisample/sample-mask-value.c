@@ -26,6 +26,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
     config.supports_gl_compat_version = 30;
     config.window_visual = PIGLIT_GL_VISUAL_RGB;
+    config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -59,11 +60,13 @@ piglit_init(int argc, char **argv)
         }
     }
 
-    printf("Checking that correct errors are generated for out of bounds\n");
-    glGetIntegeri_v(GL_SAMPLE_MASK_VALUE, maxMaskWords, &result);
+    if (!piglit_khr_no_error) {
+        printf("Checking that correct errors are generated for out of bounds\n");
+        glGetIntegeri_v(GL_SAMPLE_MASK_VALUE, maxMaskWords, &result);
 
-    if (!piglit_check_gl_error(GL_INVALID_VALUE))
-        piglit_report_result(PIGLIT_FAIL);
+        if (!piglit_check_gl_error(GL_INVALID_VALUE))
+            piglit_report_result(PIGLIT_FAIL);
+    }
 
     piglit_report_result(PIGLIT_PASS);
 }
