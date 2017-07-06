@@ -5,6 +5,7 @@
  */
 
 [require]
+SPIRV NO (ftransform)
 GLSL >= 1.10
 
 

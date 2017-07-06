@@ -1,4 +1,5 @@
 [require]
+SPIRV NO (gl_ModelViewProjectionMatrix)
 GLSL >= 1.30
 
 [vertex shader]

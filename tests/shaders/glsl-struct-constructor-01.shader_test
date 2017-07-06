@@ -1,6 +1,7 @@
 /* Test an unary struct constructor. */
 
 [require]
+SPIRV NO (ftransform)
 GLSL >= 1.10
 
 
