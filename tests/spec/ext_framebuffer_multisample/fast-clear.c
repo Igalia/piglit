@@ -50,6 +50,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 21;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -383,6 +384,9 @@ test_format(const struct format_desc *format)
 			     GL_RGBA, GL_UNSIGNED_BYTE,
 			     NULL);
 	} else {
+		if (piglit_khr_no_error)
+			return PIGLIT_SKIP;
+
 		piglit_reset_gl_error();
 
 		/* The size doesn't matter on the i965 driver for
