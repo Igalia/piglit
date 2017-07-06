@@ -1,5 +1,6 @@
 # Bug #30415
 [require]
+SPIRV NO (gl_TexCoord)
 GLSL >= 1.10
 
 [vertex shader]
