@@ -39,6 +39,13 @@
 
 #include "piglit-util-gl.h"
 
+PIGLIT_GL_TEST_CONFIG_BEGIN
+	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+PIGLIT_GL_TEST_CONFIG_END
+
 enum piglit_result
 piglit_display(void)
 {
@@ -113,9 +120,3 @@ piglit_init(int argc, char **argv)
 	if (piglit_get_gl_version() < 31)
 		piglit_require_extension("GL_ARB_texture_buffer_object");
 }
-
-PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_compat_version = 10;
-	config.supports_gl_core_version = 31;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-PIGLIT_GL_TEST_CONFIG_END

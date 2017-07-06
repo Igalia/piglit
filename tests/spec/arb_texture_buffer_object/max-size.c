@@ -27,6 +27,12 @@
 
 #include "piglit-util-gl.h"
 
+PIGLIT_GL_TEST_CONFIG_BEGIN
+	config.supports_gl_core_version = 31;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+PIGLIT_GL_TEST_CONFIG_END
+
 enum piglit_result
 piglit_display(void)
 {
@@ -100,8 +106,3 @@ piglit_init(int argc, char **argv)
 
 	glUniform1i(glGetUniformLocation(prog, "offset"), max - 1);
 }
-
-PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_core_version = 31;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-PIGLIT_GL_TEST_CONFIG_END
