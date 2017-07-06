@@ -1,5 +1,6 @@
 // if you inline all functions indiscriminately, you won't pass this
 [require]
+SPIRV NO (gl_TexCoord)
 GLSL >= 1.10
 rlimit 268435456
 

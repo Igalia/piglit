@@ -46,6 +46,7 @@
 # inside a switch statement which is itself inside a do-while loop.
 
 [require]
+SPIRV NO (gl_FrontColor, gl_Color)
 GLSL >= 1.30
 
 [vertex shader]

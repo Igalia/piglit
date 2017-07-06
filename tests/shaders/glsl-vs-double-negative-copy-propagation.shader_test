@@ -3,6 +3,7 @@
 # double negation of a value should restore the original value.
 
 [require]
+SPIRV NO (gl_FrontColor, gl_Color)
 GLSL >= 1.10
 
 [vertex shader]
