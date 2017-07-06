@@ -1,5 +1,6 @@
 [require]
 GLSL >= 1.10
+SPIRV NO OTHER (lowp is a keyword)
 
 [vertex shader]
 void main()
