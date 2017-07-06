@@ -1,4 +1,5 @@
 [require]
+SPIRV NO (gl_FrontColor, ftransform, gl_FrontSecondaryColor, gl_Color, gl_SecondaryColor)
 GLSL >= 1.10
 
 # GL_ARB_color_buffer_float provides a way to disable vertex color clamping,

@@ -1,4 +1,5 @@
 [require]
+SPIRV NO (gl_LightSourceParameters, gl_LightSource)
 GLSL >= 1.10
 
 [vertex shader]
