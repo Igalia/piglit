@@ -141,6 +141,7 @@ static bool prog_in_use = false;
 static bool sso_in_use = false;
 static bool glsl_in_use = false;
 static bool spirv_in_use = false;
+static bool spirv_replaces_glsl = false;
 static GLchar *prog_err_info = NULL;
 static GLuint vao = 0;
 static GLuint draw_fbo, read_fbo;
@@ -593,6 +594,7 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 static enum piglit_result
 load_and_specialize_spirv(GLenum target, const char *script_name)
 {
+	enum piglit_result result = PIGLIT_FAIL;
 	const char *extension = NULL;
 
 	if (glsl_in_use) {
@@ -618,22 +620,24 @@ load_and_specialize_spirv(GLenum target, const char *script_name)
 		return PIGLIT_FAIL;
 	}
 
-	//TODO check age in comparison to shader_test file
+	if (piglit_is_file_older_than(binary_name, script_name)) {
+		printf("SPIR-V binary %s is older than corresponding shader_test\n"
+		       "script or does not exist.\n",
+		       binary_name);
+		goto out_binary_name;
+	}
 
 	unsigned size;
 	char *binary = piglit_load_raw_file(binary_name, &size);
 	if (!binary) {
 		printf("Failed to load %s\n", binary_name);
-		return PIGLIT_FAIL;
+		goto out_binary_name;
 	}
 
 	GLuint shader = glCreateShader(target);
 
 	glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
 		       binary, size);
-
-	free(binary);
-	free(binary_name);
 
 	glSpecializeShaderARB(shader, "main", 0, NULL, NULL);
 
@@ -653,7 +657,7 @@ load_and_specialize_spirv(GLenum target, const char *script_name)
 		       target_to_short_name(target), info);
 
 		free(info);
-		return PIGLIT_FAIL;
+		goto out_binary;
 	}
 
 	switch (target) {
@@ -682,7 +686,14 @@ load_and_specialize_spirv(GLenum target, const char *script_name)
 		num_compute_shaders++;
 		break;
 	}
-	return PIGLIT_PASS;
+
+	result = PIGLIT_PASS;
+
+out_binary:
+	free(binary);
+out_binary_name:
+	free(binary_name);
+	return result;
 }
 
 static enum piglit_result
@@ -1014,6 +1025,13 @@ process_requirement(const char *line)
 
 		sso_in_use = true;
 		glGenProgramPipelines(1, &pipeline);
+	} else if (parse_str(line, "SPIRV", &line)) {
+		if (parse_str(line, "ONLY", NULL)) {
+			spirv_replaces_glsl = true;
+		} else {
+			printf("Unknown SPIRV line in [require]\n");
+			return PIGLIT_FAIL;
+		}
 	}
 	return PIGLIT_PASS;
 }
@@ -1056,10 +1074,16 @@ leave_state(enum states state, const char *line, const char *script_name)
 		break;
 
 	case vertex_shader:
+		if (spirv_replaces_glsl)
+			return load_and_specialize_spirv(GL_VERTEX_SHADER, script_name);
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_VERTEX_SHADER);
 
 	case vertex_shader_passthrough:
+		if (spirv_replaces_glsl) {
+			printf("SPIR-V vertex shader passthrough not implemented\n");
+			abort(); /* TODO */
+		}
 		return compile_glsl(GL_VERTEX_SHADER);
 
 	case vertex_program:
@@ -1071,6 +1095,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return load_and_specialize_spirv(GL_VERTEX_SHADER, script_name);
 
 	case tess_ctrl_shader:
+		if (spirv_replaces_glsl)
+			return load_and_specialize_spirv(GL_TESS_CONTROL_SHADER, script_name);
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_TESS_CONTROL_SHADER);
 
@@ -1079,6 +1105,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 						 script_name);
 
 	case tess_eval_shader:
+		if (spirv_replaces_glsl)
+			return load_and_specialize_spirv(GL_TESS_EVALUATION_SHADER, script_name);
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_TESS_EVALUATION_SHADER);
 
@@ -1087,6 +1115,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 						 script_name);
 
 	case geometry_shader:
+		if (spirv_replaces_glsl)
+			return load_and_specialize_spirv(GL_GEOMETRY_SHADER, script_name);
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_GEOMETRY_SHADER);
 
@@ -1098,6 +1128,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 		break;
 
 	case fragment_shader:
+		if (spirv_replaces_glsl)
+			return load_and_specialize_spirv(GL_FRAGMENT_SHADER, script_name);
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_FRAGMENT_SHADER);
 
@@ -1112,6 +1144,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 						 script_name);
 
 	case compute_shader:
+		if (spirv_replaces_glsl)
+			return load_and_specialize_spirv(GL_COMPUTE_SHADER, script_name);
 		shader_string_size = line - shader_string;
 		return compile_glsl(GL_COMPUTE_SHADER);
 
@@ -4122,6 +4156,7 @@ piglit_init(int argc, char **argv)
 	float default_piglit_tolerance[4];
 
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
+	spirv_replaces_glsl = piglit_strip_arg(&argc, argv, "-spirv");
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
