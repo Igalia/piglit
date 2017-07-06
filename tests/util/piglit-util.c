@@ -518,6 +518,40 @@ char *piglit_load_text_file(const char *file_name, unsigned *size)
 	return load_file(file_name, size, "r");
 }
 
+/**
+ * Return true if file A is older than file B. A file that does not exist is
+ * considered "infinitely old".
+ */
+bool piglit_is_file_older_than(const char *file_name_a, const char *file_name_b)
+{
+#ifdef USE_STDIO
+	return false;
+#else
+	struct stat stat_a;
+	struct stat stat_b;
+	int ret;
+
+	ret = stat(file_name_b, &stat_b);
+	if (ret < 0) {
+		printf("Failed to stat %s\n", file_name_b);
+		return false;
+	}
+
+	ret = stat(file_name_a, &stat_a);
+	if (ret < 0) {
+		printf("Failed to stat %s\n", file_name_a);
+		return true;
+	}
+
+	if (stat_a.st_mtim.tv_sec < stat_b.st_mtim.tv_sec ||
+	    (stat_a.st_mtim.tv_sec == stat_b.st_mtim.tv_sec &&
+	     stat_a.st_mtim.tv_nsec < stat_b.st_mtim.tv_nsec))
+		return true;
+
+	return false;
+#endif
+}
+
 const char*
 piglit_source_dir(void)
 {
