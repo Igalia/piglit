@@ -1,5 +1,6 @@
 # This test reproduces Mesa bug 34370.
 [require]
+SPIRV NO (gl_ModelViewProjectionMatrix)
 GLSL >= 1.10
 
 [vertex shader]
