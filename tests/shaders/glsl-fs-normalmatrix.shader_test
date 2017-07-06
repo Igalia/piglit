@@ -1,4 +1,5 @@
 [require]
+SPIRV NO (gl_NormalMatrix)
 GLSL >= 1.10
 
 [vertex shader]
