@@ -1,0 +1,8 @@
+# glslang limitations:
+tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/const-fma-double.shader_test
+tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-ldexp-double.shader_test
+tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-packDouble2x32.shader_test
+tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-unpackDouble2x32.shader_test
+tests/spec/arb_shader_atomic_counter_ops/
+tests/spec/glsl-1.20/linker/link-order-a-b.shader_test
+tests/spec/glsl-1.20/linker/link-order-b-a.shader_test
