@@ -5,7 +5,7 @@ GL_ARB_texture_query_levels
 [vertex shader]
 #extension GL_ARB_texture_query_levels: require
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 out vec4 color;
 
 uniform sampler2D s;
@@ -14,7 +14,7 @@ uniform sampler2D s;
 //   "If the texture is complete, a non-zero value must be returned."
 
 void main() {
-    gl_Position = vertex;
+    gl_Position = piglit_vertex;
    if (textureQueryLevels(s) != 0)
        color = vec4(0,1,0,0);
    else
