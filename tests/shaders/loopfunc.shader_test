@@ -1,4 +1,5 @@
 [require]
+SPIRV NO (gl_FrontColor)
 GL >= 2.0
 GLSL >= 1.10
 
