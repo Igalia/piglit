@@ -38,6 +38,7 @@
 # Borrows heavily from glsl-fs-ceil.shader_test.
 
 [require]
+SPIRV NO (gl_ModelViewProjectionMatrix)
 GLSL >= 1.10
 
 [vertex shader]
