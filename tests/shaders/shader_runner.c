@@ -39,7 +39,7 @@
 static struct piglit_gl_test_config current_config;
 
 static void
-get_required_config(const char *script_name,
+get_required_config(const char *script_name, bool spirv,
 		    struct piglit_gl_test_config *config);
 static GLenum
 decode_drawing_mode(const char *mode_str);
@@ -51,10 +51,20 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
-	if (argc > 1)
-		get_required_config(argv[1], &config);
-	else
+	if (argc > 1) {
+		bool spirv = false;
+
+		for (int i = 1; i < argc; ++i) {
+			if (!strcmp(argv[i], "-spirv")) {
+				spirv = true;
+				break;
+			}
+		}
+
+		get_required_config(argv[1], spirv, &config);
+	} else {
 		config.supports_gl_compat_version = 10;
+	}
 
 	current_config = config;
 
@@ -1588,7 +1598,7 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
  * the GL and GLSL version requirements.  Use these to guide context creation.
  */
 static void
-get_required_config(const char *script_name,
+get_required_config(const char *script_name, bool spirv,
 		    struct piglit_gl_test_config *config)
 {
 	struct requirement_parse_results parse_results;
@@ -1596,6 +1606,12 @@ get_required_config(const char *script_name,
 
 	parse_required_config(&parse_results, script_name);
 	choose_required_gl_version(&parse_results, &required_gl_version);
+
+	if (spirv) {
+		required_gl_version.es = false;
+		required_gl_version.core = true;
+		required_gl_version.num = MAX2(required_gl_version.num, 33);
+	}
 
 	if (parse_results.found_size) {
 		config->window_width = parse_results.size[0];
@@ -4120,7 +4136,7 @@ validate_current_gl_context(const char *filename)
 	config.window_width = DEFAULT_WINDOW_WIDTH;
 	config.window_height = DEFAULT_WINDOW_HEIGHT;
 
-	get_required_config(filename, &config);
+	get_required_config(filename, spirv_replaces_glsl, &config);
 
 	if (!current_config.supports_gl_compat_version !=
 	    !config.supports_gl_compat_version)
