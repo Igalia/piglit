@@ -369,6 +369,7 @@ void piglit_general_init(void);
 extern void piglit_set_rlimit(unsigned long lim);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);
+bool piglit_is_file_older_than(const char *file_name_a, const char *file_name_b);
 
 /**
  * \brief Read environment variable PIGLIT_SOURCE_DIR.
