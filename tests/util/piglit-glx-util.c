@@ -58,6 +58,8 @@ piglit_get_glx_visual(Display *dpy)
 		GLX_RED_SIZE, 1,
 		GLX_GREEN_SIZE, 1,
 		GLX_BLUE_SIZE, 1,
+		GLX_DEPTH_SIZE, 1,
+		GLX_STENCIL_SIZE, 1,
 		GLX_DOUBLEBUFFER,
 		None
 	};
