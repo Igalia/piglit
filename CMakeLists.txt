@@ -179,6 +179,13 @@ ELSE()
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" OFF)
 ENDIF()
 
+IF(PIGLIT_HAS_WGL)
+	option(PIGLIT_BUILD_WGL_TESTS "Build tests that require WGL" ON)
+ELSE()
+	option(PIGLIT_BUILD_WGL_TESTS "Build tests that require WGL" OFF)
+ENDIF()
+
+
 # Choose to build tests that use dma_buf.
 #
 # Piglit's dma_buf utilities require xcb-dri2 to gain DRM authentication.

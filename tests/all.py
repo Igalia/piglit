@@ -836,6 +836,11 @@ with profile.test_list.group_manager(
     g(['glx-query-renderer-coverage'], 'coverage')
 
 with profile.test_list.group_manager(
+        PiglitGLTest, 'wgl',
+        require_platforms=['wgl']) as g:
+    g(['wgl-sanity'])
+
+with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.1')) as g:
     g(['copyteximage', '1D'], run_concurrent=False)

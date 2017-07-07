@@ -1,0 +1,27 @@
+
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+if(PIGLIT_BUILD_WGL_TESTS)
+	link_libraries (
+		piglitwglutil
+	)
+endif(PIGLIT_BUILD_WGL_TESTS)
+
+link_libraries (
+	${OPENGL_gl_LIBRARY}
+)
+
+IF(PIGLIT_BUILD_WGL_TESTS)
+	include_directories(
+		${GLPROTO_INCLUDE_DIRS}
+	)
+	link_libraries (
+		${X11_X11_LIB}
+	)
+	piglit_add_executable (wgl-sanity wgl-sanity.c)
+ENDIF(PIGLIT_BUILD_WGL_TESTS)
+
+# vim: ft=cmake:
