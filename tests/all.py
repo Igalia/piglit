@@ -663,6 +663,7 @@ with profile.test_list.group_manager(
     g(['glx-fbo-binding'], run_concurrent=False)
     g(['glx-multi-context-front'], run_concurrent=False)
     g(['glx-multi-context-ib-1'], run_concurrent=False)
+    g(['glx-multi-context-single-window'], run_concurrent=False)
     g(['glx-multithread'], run_concurrent=False)
     g(['glx-multithread-texture'], run_concurrent=False)
     g(['glx-multithread-makecurrent-1'], run_concurrent=False)
