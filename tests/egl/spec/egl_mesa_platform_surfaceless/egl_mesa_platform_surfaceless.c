@@ -29,9 +29,9 @@
  * Use prefix 'pegl' (piglit egl) instead of 'egl' to avoid collisions with
  * prototypes in eglext.h. */
 EGLSurface (*peglCreatePlatformPixmapSurfaceEXT)(EGLDisplay display, EGLConfig config,
-	    NativePixmapType native_pixmap, const EGLint *attrib_list);
+	    void *native_pixmap, const EGLint *attrib_list);
 EGLSurface (*peglCreatePlatformWindowSurfaceEXT)(EGLDisplay display, EGLConfig config,
-	    NativeWindowType native_window, const EGLint *attrib_list);
+	    void *native_window, const EGLint *attrib_list);
 
 static void
 init_egl_extension_funcs(void)
@@ -122,7 +122,7 @@ test_create_pixmap(void *test_data)
 	test_setup(&dpy);
 
 	surf = peglCreatePlatformPixmapSurfaceEXT(dpy, EGL_NO_CONFIG_KHR,
-					      /*native_window*/ NULL,
+					      /*native_pixmap*/ NULL,
 					      /*attrib_list*/ NULL);
 	if (surf) {
 		printf("eglCreatePlatformPixmapSurface incorrectly succeeded\n");
