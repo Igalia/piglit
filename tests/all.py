@@ -666,6 +666,7 @@ with profile.test_list.group_manager(
     g(['glx-multi-context-single-window'], run_concurrent=False)
     g(['glx-multi-window-single-context'], run_concurrent=False)
     g(['glx-multithread'], run_concurrent=False)
+    g(['glx-multithread-clearbuffer'], run_concurrent=False)
     g(['glx-multithread-texture'], run_concurrent=False)
     g(['glx-multithread-makecurrent-1'], run_concurrent=False)
     g(['glx-multithread-makecurrent-2'], run_concurrent=False)
