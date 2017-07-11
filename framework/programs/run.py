@@ -35,6 +35,7 @@ import six
 
 from framework import core, backends, exceptions, options
 from framework import dmesg
+from framework import exceptions
 from framework import monitoring
 from framework import profile
 from framework.results import TimeAttribute
@@ -435,11 +436,15 @@ def resume(input_):
             p.forced_test_list = results.options['forced_test_list']
 
     # This is resumed, don't bother with time since it won't be accurate anyway
-    profile.run(
-        profiles,
-        results.options['log_level'],
-        backend,
-        results.options['concurrent'])
+    try:
+        profile.run(
+            profiles,
+            results.options['log_level'],
+            backend,
+            results.options['concurrent'])
+    except exceptions.PiglitUserError as e:
+        if str(e) != 'no matching tests':
+            raise
 
     backend.finalize()
 
