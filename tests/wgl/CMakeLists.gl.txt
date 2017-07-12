@@ -22,6 +22,8 @@ IF(PIGLIT_BUILD_WGL_TESTS)
 		${X11_X11_LIB}
 	)
 	piglit_add_executable (wgl-sanity wgl-sanity.c)
+	piglit_add_executable (wgl-multi-context-single-window wgl-multi-context-single-window.c)
+	piglit_add_executable (wgl-multi-window-single-context wgl-multi-window-single-context.c)
 ENDIF(PIGLIT_BUILD_WGL_TESTS)
 
 # vim: ft=cmake:
