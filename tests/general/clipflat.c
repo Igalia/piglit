@@ -209,10 +209,16 @@ piglit_init(int argc, char **argv)
 		provoking_vertex_first = true;
 	}
 
+	printf("Have GL_ARB/EXT_provoking_vertex: %s\n",
+	       provoking_vertex_first ? "yes" : "no");
+
 	if (provoking_vertex_first) {
 		GLboolean k;
 		glGetBooleanv(GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION_EXT, &k);
 		quads_follows_pv_convention = k;
+
+		printf("Quads follow provoking vertex convention: %s\n",
+		       k ? "yes" : "no");
 	}
 }
 
@@ -443,11 +449,72 @@ reportSubtest(GLenum mode, int drawMode, GLuint facing,
 }
 
 
-// Test a particular primitive mode
+// Test a particular primitive mode for one drawing mode, filled/unfilled
+// state and CW/CCW winding.
+static bool
+testPrimCombo(GLenum mode, const GLfloat *verts, GLuint count,
+			  bool fill, enum draw_mode drawMode, GLuint facing)
+{
+	GLfloat x, y;
+	bool pass = true;
+
+	glPolygonMode(GL_FRONT_AND_BACK, fill ? GL_LINE : GL_FILL);
+
+	if (facing == 0) {
+		glFrontFace(GL_CCW);
+		glCullFace(GL_BACK);
+	}
+	else {
+		glFrontFace(GL_CW);
+		glCullFace(GL_FRONT);
+	}
+
+	// Position the geometry at 9 different locations to test
+	// clipping against the left, right, bottom and top edges of
+	// the window.
+	// Only the center location will be unclipped.
+	for (y = -1.0; y <= 1.0; y += 1.0) {
+		for (x = -1.0; x <= 1.0; x += 1.0) {
+			bool quad_pass;
+			GLfloat badColor[3];
+
+			glPushMatrix();
+			glTranslatef(x, y, 0.0);
+
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			switch (drawMode) {
+			case BEGIN_END:
+				drawBeginEnd(mode, verts, count);
+				break;
+			case DRAW_ARRAYS:
+				drawArrays(mode, verts, count);
+				break;
+			case DRAW_ELEMENTS:
+				drawElements(mode, verts, count);
+				break;
+			default:
+				assert(0);
+			}
+
+			glPopMatrix();
+
+			quad_pass = checkResult(badColor);
+			pass = pass && quad_pass;
+			reportSubtest(mode, drawMode, facing, fill,
+						  badColor, x, y, quad_pass);
+		}
+	}
+
+	return pass;
+}
+
+
+// Test a particular primitive mode for all drawing modes, filled/unfilled
+// and CW/CCW winding.
 static bool
 testPrim(GLenum mode, const GLfloat *verts, GLuint count)
 {
-	GLfloat x, y;
 	GLuint facing, fill;
 	int drawMode;
 	bool pass = true;
@@ -455,59 +522,13 @@ testPrim(GLenum mode, const GLfloat *verts, GLuint count)
 	// Loop over polygon mode: filled vs. outline
 	for (fill = 0; fill < 2; fill++) {
 
-		glPolygonMode(GL_FRONT_AND_BACK, fill ? GL_LINE : GL_FILL);
-
 		// Loop over drawing mode: glBegin/End vs glDrawArrays vs glDrawElements
 		for (drawMode = 0; drawMode < NUM_DRAW_MODES; drawMode++) {
 
 			// Loop over CW vs. CCW winding (should make no difference)
 			for (facing = 0; facing < 2; facing++) {
-
-				if (facing == 0) {
-					glFrontFace(GL_CCW);
-					glCullFace(GL_BACK);
-				}
-				else {
-					glFrontFace(GL_CW);
-					glCullFace(GL_FRONT);
-				}
-
-				// Position the geometry at 9 different locations to test
-				// clipping against the left, right, bottom and top edges of
-				// the window.
-				// Only the center location will be unclipped.
-				for (y = -1.0; y <= 1.0; y += 1.0) {
-					for (x = -1.0; x <= 1.0; x += 1.0) {
-						bool quad_pass;
-						GLfloat badColor[3];
-
-						glPushMatrix();
-						glTranslatef(x, y, 0.0);
-
-						glClear(GL_COLOR_BUFFER_BIT);
-
-						switch (drawMode) {
-						case BEGIN_END:
-							drawBeginEnd(mode, verts, count);
-							break;
-						case DRAW_ARRAYS:
-							drawArrays(mode, verts, count);
-							break;
-						case DRAW_ELEMENTS:
-							drawElements(mode, verts, count);
-							break;
-						default:
-							assert(0);
-						}
-
-						glPopMatrix();
-
-						quad_pass = checkResult(badColor);
-						pass = pass && quad_pass;
-						reportSubtest(mode, drawMode, facing, fill,
-							      badColor, x, y, quad_pass);
-					}
-				}
+				pass = testPrimCombo(mode, verts, count,
+									 fill, drawMode, facing) && pass;
 			}
 		}
 	}
