@@ -6,7 +6,6 @@ include_directories(
 link_libraries (
        piglitutil_${piglit_target_api}
        ${OPENGL_gl_LIBRARY}
-       ${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable (arb_gpu_shader_fp64-layout-std140-fp64-shader layout-std140-fp64-shader.c)
