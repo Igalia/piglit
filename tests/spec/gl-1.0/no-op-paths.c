@@ -250,10 +250,10 @@ piglit_display(void)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glDisable(GL_DITHER);
-	glClear(GL_COLOR_BUFFER_BIT);
 	
 	/* test always-pass paths */
 	for (i = 0; i < NUM_PATHS; i++) {
+		glClear(GL_COLOR_BUFFER_BIT);
 		set_path_state(i, ALWAYS_PASS);
 
 		/* draw polygon */
@@ -272,6 +272,7 @@ piglit_display(void)
 
 	/* enable all always-pass paths */
 	{
+		glClear(GL_COLOR_BUFFER_BIT);
 		for (i = 0; i < NUM_PATHS; i++) {
 			set_path_state(i, ALWAYS_PASS);
 		}
@@ -292,6 +293,7 @@ piglit_display(void)
 
 	/* test never-pass paths */
 	for (i = 0; i < NUM_PATHS; i++) {
+		glClear(GL_COLOR_BUFFER_BIT);
 		set_path_state(i, ALWAYS_FAIL);
 
 		/* draw polygon */
