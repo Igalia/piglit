@@ -45,15 +45,22 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	GLboolean followsProvoking = false;
-	GLint major, minor;
+	GLint major, minor, profile;
 	GLenum expected_error;
 
 	glGetIntegerv(GL_MAJOR_VERSION, &major);
 	glGetIntegerv(GL_MINOR_VERSION, &minor);
 	printf("GL version: %d.%d\n", major, minor);
 
-	expected_error =
-		(major * 10 + minor > 32) ? GL_INVALID_ENUM : GL_NO_ERROR;
+	glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
+	printf("GL profile: 0x%x\n", profile);
+
+	if ((profile & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT) ||
+	    major * 10 + minor == 32) {
+		expected_error = GL_NO_ERROR;
+	} else {
+		expected_error = GL_INVALID_ENUM;
+	}
 
 	glGetBooleanv(GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION,
 		      &followsProvoking);
