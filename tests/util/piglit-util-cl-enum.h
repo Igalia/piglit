@@ -64,6 +64,8 @@ const char* piglit_cl_get_error_name(cl_int error);
             piglit_##name##_num_1_1 :       \
         version == 12 ?                     \
             piglit_##name##_num_1_2 :       \
+        version == 20 ?                     \
+            piglit_##name##_num_2_0 :       \
             0
 
 #define PIGLIT_CL_ENUM_ARRAY(name)          \
@@ -74,6 +76,7 @@ const char* piglit_cl_get_error_name(cl_int error);
         extern const unsigned int piglit_##name##_num_1_0;    \
         extern const unsigned int piglit_##name##_num_1_1;    \
         extern const unsigned int piglit_##name##_num_1_2;    \
+        extern const unsigned int piglit_##name##_num_2_0;    \
         extern const type* piglit_##name;
 
 #define PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(name)        \
@@ -99,6 +102,7 @@ PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_device_info);
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2(cl_command_queue_properties);
 
 PIGLIT_CL_DEFINE_ENUM_PROTOTYPE(cl_mem_flags, cl_mem_flags_mutexes);
+PIGLIT_CL_DEFINE_ENUM_PROTOTYPE(cl_command_queue_properties, cl_command_queue_properties_mutexes);
 
 #undef PIGLIT_CL_DEFINE_ENUM_PROTOTYPE
 #undef PIGLIT_CL_DEFINE_ENUM_PROTOTYPE_2

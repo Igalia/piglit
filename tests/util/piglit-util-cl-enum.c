@@ -182,7 +182,11 @@ piglit_cl_get_enum_name(cl_uint param)
 	CASE(CL_DEVICE_AVAILABLE)                         // 0x1027
 	CASE(CL_DEVICE_COMPILER_AVAILABLE)                // 0x1028
 	CASE(CL_DEVICE_EXECUTION_CAPABILITIES)            // 0x1029
+#ifdef CL_VERSION_2_0
+	CASE(CL_DEVICE_QUEUE_ON_HOST_PROPERTIES)          // 0x102A
+#else //CL_VERSION_2_0
 	CASE(CL_DEVICE_QUEUE_PROPERTIES)                  // 0x102A
+#endif //CL_VERSION_2_0
 	CASE(CL_DEVICE_NAME)                              // 0x102B
 	CASE(CL_DEVICE_VENDOR)                            // 0x102C
 	CASE(CL_DRIVER_VERSION)                           // 0x102D
@@ -256,6 +260,8 @@ piglit_cl_get_enum_name(cl_uint param)
 	/*
 	CASE(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE)      // (1 << 0)
 	CASE(CL_QUEUE_PROFILING_ENABLE)                   // (1 << 1)
+	CASE(CL_QUEUE_ON_DEVICE)                          // (1 << 2)
+	CASE(CL_QUEUE_ON_DEVICE_DEFAULT)                  // (1 << 3)
 	*/
 
 /* cl_context_info  */
@@ -295,6 +301,9 @@ piglit_cl_get_enum_name(cl_uint param)
 	CASE(CL_QUEUE_DEVICE)                             // 0x1091
 	CASE(CL_QUEUE_REFERENCE_COUNT)                    // 0x1092
 	CASE(CL_QUEUE_PROPERTIES)                         // 0x1093
+#ifdef CL_VERSION_2_0
+	CASE(CL_QUEUE_SIZE)                               // 0x1094
+#endif //CL_VERSION_2_0
 
 /* cl_mem_flags - bitfield */
 	/*
@@ -373,6 +382,9 @@ piglit_cl_get_enum_name(cl_uint param)
 	CASE(CL_MEM_ASSOCIATED_MEMOBJECT)                 // 0x1107
 	CASE(CL_MEM_OFFSET)                               // 0x1108
 #endif //CL_VERSION_1_1
+#ifdef CL_VERSION_2_0
+	CASE(CL_MEM_USES_SVM_POINTER)                     // 0x1109
+#endif //CL_VERSION_2_0
 
 /* cl_image_info */
 	CASE(CL_IMAGE_FORMAT)                             // 0x1110
@@ -436,6 +448,9 @@ piglit_cl_get_enum_name(cl_uint param)
 #ifdef CL_VERSION_1_2
 	CASE(CL_PROGRAM_BINARY_TYPE)                      // 0x1184
 #endif //CL_VERSION_1_2
+#ifdef CL_VERSION_2_0
+	CASE(CL_PROGRAM_BUILD_GLOBAL_VARIABLE_TOTAL_SIZE) // 0x1185
+#endif //CL_VERSION_2_0
 
 /* cl_program_binary_type */
 	/*
@@ -655,14 +670,15 @@ const char* piglit_cl_get_error_name(cl_int error) {
 }
 
 
-#define PIGLIT_CL_DEFINE_ENUM(type, name, count10, count11, count12)  \
+#define PIGLIT_CL_DEFINE_ENUM(type, name, count10, count11, count12, count20)  \
         const unsigned int piglit_##name##_num_1_0 = count10;         \
         const unsigned int piglit_##name##_num_1_1 = count11;         \
         const unsigned int piglit_##name##_num_1_2 = count12;         \
+        const unsigned int piglit_##name##_num_2_0 = count20;         \
         const type _piglit_##name[]
 
-#define PIGLIT_CL_DEFINE_ENUM_2(name, count10, count11, count12)      \
-        PIGLIT_CL_DEFINE_ENUM(name, name, count10, count11, count12)
+#define PIGLIT_CL_DEFINE_ENUM_2(name, count10, count11, count12, count20)      \
+        PIGLIT_CL_DEFINE_ENUM(name, name, count10, count11, count12, count20)
 
 #define PIGLIT_CL_DEFINE_ENUM_PTR(type, name)                         \
         const type* piglit_##name = _piglit_##name;
@@ -671,7 +687,7 @@ const char* piglit_cl_get_error_name(cl_int error) {
         PIGLIT_CL_DEFINE_ENUM_PTR(name, name)
 
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_mem_flags, 6, 6, 9) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_mem_flags, 6, 6, 9, 9) = {
 	CL_MEM_READ_WRITE,
 	CL_MEM_READ_ONLY,
 	CL_MEM_WRITE_ONLY,
@@ -686,7 +702,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_mem_flags, 6, 6, 9) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_mem_flags);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_device_type, 5, 5, 6) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_device_type, 5, 5, 6, 6) = {
 	CL_DEVICE_TYPE_CPU,
 	CL_DEVICE_TYPE_GPU,
 	CL_DEVICE_TYPE_ACCELERATOR,
@@ -698,7 +714,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_device_type, 5, 5, 6) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_device_type);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_program_info, 7, 7, 9) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_program_info, 7, 7, 9, 9) = {
 	CL_PROGRAM_REFERENCE_COUNT,
 	CL_PROGRAM_CONTEXT,
 	CL_PROGRAM_NUM_DEVICES,
@@ -713,17 +729,20 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_program_info, 7, 7, 9) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_program_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_program_build_info, 3, 3, 4) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_program_build_info, 3, 3, 4, 5) = {
 	CL_PROGRAM_BUILD_STATUS,
 	CL_PROGRAM_BUILD_OPTIONS,
 	CL_PROGRAM_BUILD_LOG,
 #ifdef CL_VERSION_1_2
 	CL_PROGRAM_BINARY_TYPE,
 #endif //CL_VERSION_1_2
+#ifdef CL_VERSION_2_0
+	CL_PROGRAM_BUILD_GLOBAL_VARIABLE_TOTAL_SIZE,
+#endif //CL_VERSION_2_0
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_program_build_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_mem_info, 7, 9, 9) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_mem_info, 7, 9, 9, 10) = {
 	CL_MEM_TYPE,
 	CL_MEM_FLAGS,
 	CL_MEM_SIZE,
@@ -735,10 +754,13 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_mem_info, 7, 9, 9) = {
 	CL_MEM_ASSOCIATED_MEMOBJECT,
 	CL_MEM_OFFSET,
 #endif //CL_VERSION_1_1
+#ifdef CL_VERSION_2_0
+	CL_MEM_USES_SVM_POINTER,
+#endif //CL_VERSION_2_0
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_mem_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_info, 5, 5, 6) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_info, 5, 5, 6, 6) = {
 	CL_KERNEL_FUNCTION_NAME,
 	CL_KERNEL_NUM_ARGS,
 	CL_KERNEL_REFERENCE_COUNT,
@@ -751,7 +773,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_info, 5, 5, 6) = {
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_kernel_info);
 
 #ifdef CL_VERSION_1_2
-PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_arg_info, 0, 0, 5) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_arg_info, 0, 0, 5, 5) = {
        CL_KERNEL_ARG_ADDRESS_QUALIFIER,
        CL_KERNEL_ARG_ACCESS_QUALIFIER,
        CL_KERNEL_ARG_TYPE_NAME,
@@ -761,7 +783,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_arg_info, 0, 0, 5) = {
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_kernel_arg_info);
 #endif //CL_VERSION_1_2
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_work_group_info, 3, 5, 6) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_work_group_info, 3, 5, 6, 6) = {
 	CL_KERNEL_WORK_GROUP_SIZE,
 	CL_KERNEL_COMPILE_WORK_GROUP_SIZE,
 	CL_KERNEL_LOCAL_MEM_SIZE,
@@ -775,7 +797,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_kernel_work_group_info, 3, 5, 6) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_kernel_work_group_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_event_info, 4, 5, 5) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_event_info, 4, 5, 5, 5) = {
 	CL_EVENT_COMMAND_QUEUE,
 	CL_EVENT_COMMAND_TYPE,
 	CL_EVENT_REFERENCE_COUNT,
@@ -786,7 +808,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_event_info, 4, 5, 5) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_event_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_image_info, 7, 7, 11) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_image_info, 7, 7, 11, 11) = {
 	CL_IMAGE_FORMAT,
 	CL_IMAGE_ELEMENT_SIZE,
 	CL_IMAGE_ROW_PITCH,
@@ -796,22 +818,25 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_image_info, 7, 7, 11) = {
 	CL_IMAGE_DEPTH,
 #ifdef CL_VERSION_1_2
 	CL_IMAGE_ARRAY_SIZE,
-	CL_IMAGE_BUFFER,
-	CL_IMAGE_NUM_MIP_LEVELS, // 10
 	CL_IMAGE_NUM_SAMPLES,
+	CL_IMAGE_NUM_MIP_LEVELS, // 10
+	CL_IMAGE_BUFFER, // Deprecated in 2.0
 #endif //CL_VERSION_1_2
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_image_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_command_queue_info, 4, 4, 4) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_command_queue_info, 4, 4, 4, 5) = {
 	CL_QUEUE_CONTEXT,
 	CL_QUEUE_DEVICE,
 	CL_QUEUE_REFERENCE_COUNT,
 	CL_QUEUE_PROPERTIES,
+#ifdef CL_VERSION_2_0
+	CL_QUEUE_SIZE,
+#endif //CL_VERSION_2_0
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_command_queue_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_context_info, 3, 4, 4) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_context_info, 3, 4, 4, 4) = {
 	CL_CONTEXT_REFERENCE_COUNT,
 	CL_CONTEXT_DEVICES,
 	CL_CONTEXT_PROPERTIES,
@@ -821,7 +846,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_context_info, 3, 4, 4) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_context_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_platform_info, 5, 5, 5) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_platform_info, 5, 5, 5, 5) = {
 	CL_PLATFORM_PROFILE,
 	CL_PLATFORM_VERSION,
 	CL_PLATFORM_NAME,
@@ -830,7 +855,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_platform_info, 5, 5, 5) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_platform_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_device_info, 50, 60, 73) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_device_info, 50, 60, 73, 74) = {
 	CL_DEVICE_TYPE,
 	CL_DEVICE_VENDOR_ID,
 	CL_DEVICE_MAX_COMPUTE_UNITS,
@@ -873,7 +898,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_device_info, 50, 60, 73) = {
 	CL_DEVICE_AVAILABLE, // 40
 	CL_DEVICE_COMPILER_AVAILABLE,
 	CL_DEVICE_EXECUTION_CAPABILITIES,
-	CL_DEVICE_QUEUE_PROPERTIES,
+	CL_DEVICE_QUEUE_PROPERTIES, // Deprecated in 2.0
 	CL_DEVICE_NAME,
 	CL_DEVICE_VENDOR, // 45
 	CL_DRIVER_VERSION,
@@ -883,7 +908,7 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_device_info, 50, 60, 73) = {
 	CL_DEVICE_PLATFORM, // 50
 #if defined(CL_VERSION_1_1)
 	CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF,
-	CL_DEVICE_HOST_UNIFIED_MEMORY,
+	CL_DEVICE_HOST_UNIFIED_MEMORY, // Deprecated in 2.0
 	CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR,
 	CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT,
 	CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, // 55
@@ -908,17 +933,24 @@ PIGLIT_CL_DEFINE_ENUM_2(cl_device_info, 50, 60, 73) = {
 	CL_DEVICE_PREFERRED_INTEROP_USER_SYNC,
 	CL_DEVICE_PRINTF_BUFFER_SIZE, // 73
 #endif //CL_VERSION_1_2
+#if defined(CL_VERSION_2_0)
+	CL_DEVICE_QUEUE_ON_HOST_PROPERTIES,
+#endif //CL_VERSION_2_0
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_device_info);
 
-PIGLIT_CL_DEFINE_ENUM_2(cl_command_queue_properties, 2, 2, 2) = {
+PIGLIT_CL_DEFINE_ENUM_2(cl_command_queue_properties, 2, 2, 2, 4) = {
 	CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
-	CL_QUEUE_PROFILING_ENABLE
+	CL_QUEUE_PROFILING_ENABLE,
+#if defined(CL_VERSION_2_0)
+	CL_QUEUE_ON_DEVICE,
+	CL_QUEUE_ON_DEVICE_DEFAULT,
+#endif //CL_VERSION_2_0
 };
 PIGLIT_CL_DEFINE_ENUM_PTR_2(cl_command_queue_properties);
 
 
-PIGLIT_CL_DEFINE_ENUM(cl_mem_flags, cl_mem_flags_mutexes, 5, 5, 8) = {
+PIGLIT_CL_DEFINE_ENUM(cl_mem_flags, cl_mem_flags_mutexes, 5, 5, 8, 8) = {
 	CL_MEM_READ_WRITE | CL_MEM_READ_ONLY,
 	CL_MEM_READ_WRITE | CL_MEM_WRITE_ONLY,
 	CL_MEM_READ_ONLY | CL_MEM_WRITE_ONLY,
@@ -932,6 +964,21 @@ PIGLIT_CL_DEFINE_ENUM(cl_mem_flags, cl_mem_flags_mutexes, 5, 5, 8) = {
 };
 PIGLIT_CL_DEFINE_ENUM_PTR(cl_mem_flags, cl_mem_flags_mutexes);
 
+PIGLIT_CL_DEFINE_ENUM(cl_command_queue_properties, cl_command_queue_properties_mutexes, 0, 0, 0, 8) = {
+#if defined(CL_VERSION_2_0)
+	// CL_QUEUE_ON_DEVICE requires CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE
+	CL_QUEUE_ON_DEVICE,
+	CL_QUEUE_ON_DEVICE | CL_QUEUE_PROFILING_ENABLE,
+	// CL_QUEUE_ON_DEVICE_DEFAULT requires CL_QUEUE_ON_DEVICE
+	CL_QUEUE_ON_DEVICE_DEFAULT,
+	CL_QUEUE_ON_DEVICE_DEFAULT | CL_QUEUE_ON_DEVICE,
+	CL_QUEUE_ON_DEVICE_DEFAULT | CL_QUEUE_PROFILING_ENABLE,
+	CL_QUEUE_ON_DEVICE_DEFAULT | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+	CL_QUEUE_ON_DEVICE_DEFAULT | CL_QUEUE_PROFILING_ENABLE | CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE,
+	CL_QUEUE_ON_DEVICE_DEFAULT | CL_QUEUE_ON_DEVICE | CL_QUEUE_PROFILING_ENABLE,
+#endif //CL_VERSION_2_0
+};
+PIGLIT_CL_DEFINE_ENUM_PTR(cl_command_queue_properties, cl_command_queue_properties_mutexes);
 
 
 #undef PIGLIT_CL_DEFINE_ENUM

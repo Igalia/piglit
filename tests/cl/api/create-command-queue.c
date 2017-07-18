@@ -52,7 +52,7 @@ get_mixed_command_queue_properties(int mask,
                                    const cl_command_queue_properties properties[]) {
 	int i = 0;
 	cl_command_queue_properties mixed_properties = 0;
-	
+
 	while(mask > 0) {
 		if(mask%2 == 1) {
 			mixed_properties |= properties[i];
@@ -62,6 +62,21 @@ get_mixed_command_queue_properties(int mask,
 	}
 
 	return mixed_properties;
+}
+
+static bool
+properties_forbidden(const cl_command_queue_properties properties,
+                     const struct piglit_cl_api_test_env* env)
+{
+	int num_command_queue_properties_mutexes =
+		PIGLIT_CL_ENUM_NUM(cl_command_queue_properties_mutexes, env->version);
+	const cl_command_queue_properties* command_queue_properties_mutexes =
+		PIGLIT_CL_ENUM_ARRAY(cl_command_queue_properties_mutexes);
+	int i = 0;
+	for (; i < num_command_queue_properties_mutexes; ++i)
+		if (properties == command_queue_properties_mutexes[i])
+			return true;
+	return false;
 }
 
 enum piglit_result
@@ -79,7 +94,8 @@ piglit_cl_test(const int argc,
 	cl_command_queue command_queue;
 	cl_uint num_devices;
 	cl_device_id* devices;
-	cl_command_queue_properties mixed_command_queue_properties;
+	cl_command_queue_properties mixed_command_queue_properties[4] =
+		{CL_QUEUE_PROPERTIES, 0, 0, 0};
 
 	cl_context_properties context_properties[] = {
 		CL_CONTEXT_PLATFORM, (cl_context_properties)env->platform_id,
@@ -116,12 +132,25 @@ piglit_cl_test(const int argc,
 	 * There are 2^(num_command_queue_properties)-1 possible options.
 	 */
 	for(mask = 0; mask < (1 << num_command_queue_properties); mask++) {
-		mixed_command_queue_properties =
+		mixed_command_queue_properties[1] =
 			get_mixed_command_queue_properties(mask, command_queue_properties);
-		command_queue = clCreateCommandQueue(cl_ctx,
+		if (properties_forbidden(mixed_command_queue_properties[1], env))
+			continue;
+#if defined CL_VERSION_2_0
+		if (env->version >= 20) {
+			command_queue = clCreateCommandQueueWithProperties(
+			                             cl_ctx,
 		                                     env->device_id,
 		                                     mixed_command_queue_properties,
 		                                     &errNo);
+		} else
+#endif //CL_VERSION_2_0
+		{
+			command_queue = clCreateCommandQueue(cl_ctx,
+		                                     env->device_id,
+		                                     mixed_command_queue_properties[1],
+		                                     &errNo);
+		}
 		if(errNo != CL_SUCCESS && errNo != CL_INVALID_QUEUE_PROPERTIES) {
 			piglit_cl_check_error(errNo, CL_SUCCESS);
 			fprintf(stderr,

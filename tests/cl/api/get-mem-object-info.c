@@ -170,6 +170,14 @@ test(int n,
 			}
 			break;
 #endif
+#if defined(CL_VERSION_2_0)
+		case CL_MEM_USES_SVM_POINTER:
+			if (env->version >= 20) {
+				CHECK_SIZE(cl_bool)
+				CHECK_VALUE(cl_bool, CL_FALSE)
+			}
+			break;
+#endif
 		default:
 			fprintf(stderr, "Warn: untested parameter %s\n",
 			        piglit_cl_get_enum_name(param_name));
