@@ -34,12 +34,6 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 ENDIF(PIGLIT_BUILD_GLX_TESTS)
 
 IF(PIGLIT_BUILD_WGL_TESTS)
-	# XXX: This is currently duplicated wherever tests
-	# include "piglit-wgl-util.h". Is it possible to refactor it?
-	include_directories(
-		${GLPROTO_INCLUDE_DIRS}
-	)
-
 	add_definitions ( -DPIGLIT_USE_WGL )
 	piglit_add_library (piglitwglutil
 		    piglit-shader.c
