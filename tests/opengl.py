@@ -4537,6 +4537,8 @@ with profile.test_list.group_manager(
       run_concurrent=False)
     g(['egl-create-context-valid-flag-debug-gl', 'gl'], 'valid debug flag GL',
       run_concurrent=False)
+    g(['egl-create-context-no-error', 'gl'], 'no-error context GL',
+      run_concurrent=False)
 
     for api in ('gles1', 'gles2', 'gles3'):
         g(['egl-create-context-valid-flag-debug-gles', api],
