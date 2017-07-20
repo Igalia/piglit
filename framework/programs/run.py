@@ -33,7 +33,7 @@ import time
 
 import six
 
-from framework import core, backends, exceptions, options
+from framework import core, backends, options
 from framework import dmesg
 from framework import exceptions
 from framework import monitoring
