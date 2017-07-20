@@ -1,0 +1,40 @@
+# From the ARB_shader_group_vote spec:
+#
+#    "The function allInvocationsEqualARB() returns true if <value> is
+#     the same for all active invocations in the group."
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+GL_ARB_shader_group_vote
+
+[vertex shader]
+#extension GL_ARB_shader_group_vote: enable
+
+uniform bool val;
+in vec4 piglit_vertex;
+out vec4 color;
+
+void main()
+{
+  gl_Position = piglit_vertex;
+
+  if (allInvocationsEqualARB(val) && allInvocationsEqualARB(!val))
+    color = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    color = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+  frag_color = color;
+}
+
+[test]
+uniform int val 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
