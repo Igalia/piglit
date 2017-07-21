@@ -26,6 +26,7 @@ ${helpers.license()}
 
 [require]
 GLSL >= ${params.version.print_float()}
+SPIRV NO OTHER (generated test uses gl_ModelViewProjectionMatrix)
 
 [vertex shader]
 void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }
