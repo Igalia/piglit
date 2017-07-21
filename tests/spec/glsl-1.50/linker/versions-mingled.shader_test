@@ -13,11 +13,11 @@ GLSL >= 1.50
  */
 #version 140
 
-in vec4 a;
+in vec4 piglit_vertex;
 
 void main()
 {
-	gl_Position = a;
+	gl_Position = piglit_vertex;
 }
 
 [fragment shader]
