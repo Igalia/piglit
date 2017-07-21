@@ -1,6 +1,7 @@
 [require]
 GLSL >= 1.50
 SSO ENABLED
+SPIRV NO OTHER (no explicit locations, and cannot assign automatically)
 
 [vertex shader]
 #version 150
