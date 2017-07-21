@@ -23,17 +23,17 @@ GL_ARB_shading_language_420pack
 [vertex shader]
 #extension GL_ARB_shading_language_420pack: enable
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 out vec4 color;
 
 void main()
 {
     vec4 a[12] = vec4 [] (vec4(1.2), vec4(0.0), vec4(0.0), vec4(0.0),
                           vec4(0.0), vec4(0.0), vec4(0.0), vec4(2.4),
-                          vec4(vertex.x), vec4(0.0), vec4(0.0), vec4(0.0));
+                          vec4(piglit_vertex.x), vec4(0.0), vec4(0.0), vec4(0.0));
     vec4 b[12] =        { vec4(1.2), vec4(0.0), vec4(0.0), vec4(0.0),
                           vec4(0.0), vec4(0.0), vec4(0.0), vec4(2.4),
-                          vec4(vertex.x), vec4(0.0), vec4(0.0), vec4(0.0) };
+                          vec4(piglit_vertex.x), vec4(0.0), vec4(0.0), vec4(0.0) };
 
     color = vec4(0.0, 1.0, 0.0, 1.0);
 
@@ -46,7 +46,7 @@ void main()
             }
         }
     }
-    gl_Position = vertex;
+    gl_Position = piglit_vertex;
 }
 
 [fragment shader]
