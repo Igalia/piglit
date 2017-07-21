@@ -19,14 +19,14 @@ GL_ARB_shading_language_420pack
 [vertex shader]
 #extension GL_ARB_shading_language_420pack: enable
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 out vec4 color;
 
 void main()
 {
-    mat2x2 a = mat2(  vec2( 1.0, vertex.x ), vec2( 0.0, 1.0 ) );
-    mat2x2 b =      { vec2( 1.0, vertex.x ), vec2( 0.0, 1.0 ) };
-    mat2x2 c =      {     { 1.0, vertex.x },     { 0.0, 1.0 } };
+    mat2x2 a = mat2(  vec2( 1.0, piglit_vertex.x ), vec2( 0.0, 1.0 ) );
+    mat2x2 b =      { vec2( 1.0, piglit_vertex.x ), vec2( 0.0, 1.0 ) };
+    mat2x2 c =      {     { 1.0, piglit_vertex.x },     { 0.0, 1.0 } };
 
     color = vec4(0.0, 1.0, 0.0, 1.0);
 
@@ -39,7 +39,7 @@ void main()
             }
         }
     }
-    gl_Position = vertex;
+    gl_Position = piglit_vertex;
 }
 
 [fragment shader]
