@@ -83,10 +83,10 @@ piglit_display(void)
 	const uint8_t black_block[8]     = { 0xFF, 0xFF, 0xFF, 0xFF, 0x03, };
 	const uint8_t one_third_block[8] = { 0xFF, 0xFF,    0,    0, 0x03, };
 
-	const bool pass = TEST(RGB , black_block, 0x000F) &&
-	                  TEST(RGBA, black_block, 0x0000) &&
-	                  TEST(RGB , one_third_block, 0x555F) &&
-	                  TEST(RGBA, one_third_block, 0x555F);
+	bool pass = TEST(RGB , black_block, 0x000F);
+	pass = TEST(RGBA, black_block, 0x0000) && pass;
+	pass = TEST(RGB , one_third_block, 0x555F) && pass;
+	pass = TEST(RGBA, one_third_block, 0x555F) && pass;
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
