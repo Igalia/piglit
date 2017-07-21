@@ -48,5 +48,4 @@ void do_stuff(float b)
 }
 
 [test]
-
-
+link success
