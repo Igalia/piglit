@@ -2,15 +2,7 @@
 GLSL >= 1.50
 GL_ARB_tessellation_shader
 
-
-[vertex shader]
-in vec4 vertex;
-
-void main()
-{
-	gl_Position = vertex;
-}
-
+[vertex shader passthrough]
 
 [tessellation control shader]
 #extension GL_ARB_tessellation_shader: require
