@@ -137,6 +137,7 @@ piglit_init(int argc, char **argv)
 
 	glBindAttribLocation(prog1, 0, "position");
 	glBindAttribLocation(prog1, 1, "texture_coord");
+	glLinkProgram(prog1);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("Setup for test failed.\n");
