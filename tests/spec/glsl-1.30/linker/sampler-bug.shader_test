@@ -7,11 +7,11 @@ GLSL >= 1.30
 [vertex shader]
 #version 130
 
-in vec4 pos;
+in vec4 piglit_vertex;
 
 void main()
 {
-	gl_Position = pos;
+	gl_Position = piglit_vertex;
 }
 
 [fragment shader]
