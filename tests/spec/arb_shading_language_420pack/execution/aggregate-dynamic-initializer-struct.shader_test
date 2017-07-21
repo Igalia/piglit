@@ -12,7 +12,7 @@ GL_ARB_shading_language_420pack
 [vertex shader]
 #extension GL_ARB_shading_language_420pack: enable
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 out vec4 color;
 
 void main()
@@ -27,30 +27,30 @@ void main()
     }
     s1 = T(
           S[2](
-               S(vec4[2](vec4(vertex.x, 2.0, 3.0, 4.0), vec4(5.0, 6.0, 7.0, 8.0))),
-               S(vec4[2](vec4(vertex.x, 2.0, 3.0, 4.0), vec4(5.0, 6.0, 7.0, 8.0)))
+               S(vec4[2](vec4(piglit_vertex.x, 2.0, 3.0, 4.0), vec4(5.0, 6.0, 7.0, 8.0))),
+               S(vec4[2](vec4(piglit_vertex.x, 2.0, 3.0, 4.0), vec4(5.0, 6.0, 7.0, 8.0)))
           ), // a
-          S(vec4[2](vec4(vertex.x, 2.0, 3.0, 4.0), vec4(5.0, 6.0, 7.0, 8.0))), // b
+          S(vec4[2](vec4(piglit_vertex.x, 2.0, 3.0, 4.0), vec4(5.0, 6.0, 7.0, 8.0))), // b
           4 // c
     ),
     s2 = {
         {
             {
                 {
-                    {vertex.x, 2.0, 3.0, 4.0}, // a[0].v[0]
+                    {piglit_vertex.x, 2.0, 3.0, 4.0}, // a[0].v[0]
                     {5.0, 6.0, 7.0, 8.0}  // a[0].v[1]
                 } // a[0].v
             }, // a[0]
             {
                 {
-                    {vertex.x, 2.0, 3.0, 4.0}, // a[1].v[0]
+                    {piglit_vertex.x, 2.0, 3.0, 4.0}, // a[1].v[0]
                     {5.0, 6.0, 7.0, 8.0}  // a[1].v[1]
                 } // a[1].v
             } // a[1]
         }, // a
         {
             {
-                {vertex.x, 2.0, 3.0, 4.0}, // b.v[0]
+                {piglit_vertex.x, 2.0, 3.0, 4.0}, // b.v[0]
                 {5.0, 6.0, 7.0, 8.0}  // b.v[1]
             } // b.v
         }, // b
@@ -68,7 +68,7 @@ void main()
         s1.c != s2.c) {
         color = vec4(1.0, 0.0, 0.0, 1.0);
     }
-    gl_Position = vertex;
+    gl_Position = piglit_vertex;
 }
 
 [fragment shader]
