@@ -51,6 +51,7 @@
   ## Generated test, do not edit
   [require]
   GLSL >= ${params.formated_version}
+  SPIRV NO OTHER (generated test uses gl_ModelViewProjectionMatrix)
   % if params.mode == 'varying':
     GL_MAX_VARYING_COMPONENTS >= ${params.varying_comps}
   % endif
