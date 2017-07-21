@@ -35,8 +35,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	/* We need OpenGL 1.3 for the *TexImage* functions used in this file. */
-	config.supports_gl_compat_version = 13;
+	/* We need OpenGL 1.1 for GL_EXT_texture_compression_s3tc */
+	config.supports_gl_compat_version = 11;
 	config.requires_displayed_window = false;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
@@ -47,8 +47,8 @@ test_block(GLenum internal_fmt, const char * base_fmt_str,
 	   const uint8_t * dxt1_block, uint16_t expected_result)
 {
 	/* Upload the DXT1 block. */
-	glCompressedTexImage2D(GL_TEXTURE_2D, 0, internal_fmt, 1, 1, 0,
-			       8 /* 64 bits */, dxt1_block);
+	glCompressedTexImage2DARB(GL_TEXTURE_2D, 0, internal_fmt, 1, 1, 0,
+			          8 /* 64 bits */, dxt1_block);
 
 	/* Decompress the only defined pixel in the DXT1 block. */
 	uint16_t actual_pixel = 0xBEEF;
