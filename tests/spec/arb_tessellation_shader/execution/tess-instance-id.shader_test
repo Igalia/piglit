@@ -8,7 +8,8 @@ uniform vec4 instance_colors[] = vec4[](vec4(0.0, 1.0, 0.0, 1.0),
 					vec4(0.0, 0.5, 0.5, 1.0),
 					vec4(0.0, 0.0, 1.0, 1.0));
 in vec4 piglit_vertex;
-out vec4 color, pos;
+out vec4 color;
+out vec4 pos;
 
 void main()
 {
@@ -24,7 +25,8 @@ void main()
 #version 400
 layout(quads) in;
 
-in vec4 color[], pos[];
+in vec4 color[];
+in vec4 pos[];
 out vec4 fs_color;
 
 void main()
