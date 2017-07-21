@@ -59,6 +59,7 @@ uniform ${params.matrix} expected;
 
 [require]
 GLSL >= 1.20
+SPIRV NO OTHER (generated test uses gl_ModelViewProjectionMatrix)
 %if params.rows != params.columns:
 # glUniformMatrix${params.rows}x${params.columns}fv only exists in OpenGL 2.1 or later.
 GL >= 2.1
