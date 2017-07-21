@@ -19,6 +19,7 @@
 
 [require]
 GLSL >= ${args.glsl_version}
+SPIRV NO OTHER (generated test uses gl_ModelViewProjectionMatrix)
 
 [vertex shader]
 ${args.vs_input} vec4 vertex;
