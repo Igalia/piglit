@@ -114,7 +114,7 @@ static const char *vert_template =
 	"uniform float depth;\n"
 	"void main()\n"
 	"{\n"
-        "  vec4 eye_pos = gl_ModelViewProjectionMatrix * vec4(pos, 0.0, 1.0);\n"
+	"  vec4 eye_pos = gl_ModelViewProjectionMatrix * vec4(pos, 0.0, 1.0);\n"
 	"  gl_Position = vec4(eye_pos.xy, 2 * depth - 1.0, 1.0);\n"
 	"}\n";
 
@@ -164,7 +164,7 @@ static const char *frag_template =
 const char *
 get_out_type_glsl(void)
 {
-	if(is_buffer_zero_integer_format)
+	if (is_buffer_zero_integer_format)
 		return "ivec4";
 	else
 		return "vec4";
@@ -191,7 +191,7 @@ shader_compile(bool sample_alpha_to_coverage,
 
 	/* Generate appropriate fragment shader program */
 	const char *out_type_glsl = get_out_type_glsl();
-        unsigned frag_alloc_len = strlen(frag_template) +
+	unsigned frag_alloc_len = strlen(frag_template) +
 				  strlen(out_type_glsl) + 4;
 	char *frag = (char *) malloc(frag_alloc_len);
 	sprintf(frag, frag_template, need_glsl130 ? "130" : "120",
@@ -245,7 +245,7 @@ allocate_data_arrays(void)
 	/* Draw 2N + 1 rectangles for N samples, each with a unique color
 	 * and coverage value
 	 */
-	if(num_samples) {
+	if (num_samples) {
 		num_rects = 2 * num_samples + 1;
 		alpha_scale = (1.0 / (2.0 * num_samples));
 	}
@@ -268,9 +268,9 @@ allocate_data_arrays(void)
 					  sizeof(float));
 	coverage = (float *) malloc(num_rects * sizeof(float));
 
-	for(int i = 0; i < num_rects; i++) {
+	for (int i = 0; i < num_rects; i++) {
 		unsigned rect_idx = i * num_components;
-		for(int j = 0; j < num_components - 1; j++) {
+		for (int j = 0; j < num_components - 1; j++) {
 			color[rect_idx + j] =
 			(sin((float)(rect_idx + j)) + 1) / 2;
 		}
@@ -324,18 +324,18 @@ draw_pattern(bool sample_alpha_to_coverage,
 	     float *float_color)
 {
 	glUseProgram(prog);
-	if(buffer_to_test == GL_COLOR_BUFFER_BIT)
+	if (buffer_to_test == GL_COLOR_BUFFER_BIT)
 		glClearColor(bg_color[0], bg_color[1],
 			     bg_color[2], bg_color[3]);
 	else if (buffer_to_test == GL_DEPTH_BUFFER_BIT)
 		glClearDepth(bg_depth);
 	glClear(buffer_to_test);
 
-	if(!is_reference_image) {
-		if(sample_alpha_to_coverage)
-			glEnable (GL_SAMPLE_ALPHA_TO_COVERAGE);
-		if(sample_alpha_to_one)
-			glEnable (GL_SAMPLE_ALPHA_TO_ONE);
+	if (!is_reference_image) {
+		if (sample_alpha_to_coverage)
+			glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+		if (sample_alpha_to_one)
+			glEnable(GL_SAMPLE_ALPHA_TO_ONE);
 	}
 	glUniform1i(alpha_to_coverage_loc, sample_alpha_to_coverage);
 
@@ -345,7 +345,7 @@ draw_pattern(bool sample_alpha_to_coverage,
 					    sizeof(int));
 
 	/* For integer color buffers convert the color data to integer format */
-        if(is_buffer_zero_integer_format) {
+	if (is_buffer_zero_integer_format) {
 		float_color_to_int_color(integer_color, float_color);
 	}
 
@@ -361,7 +361,7 @@ draw_pattern(bool sample_alpha_to_coverage,
 				      (void *) vertices);
 
 		glUniform4fv(color_loc, 1, (float_color + i * num_components));
-		if(is_buffer_zero_integer_format) {
+		if (is_buffer_zero_integer_format) {
 			glUniform4iv(frag_0_color_loc, 1,
 				     integer_color + i * num_components);
 		}
@@ -373,8 +373,8 @@ draw_pattern(bool sample_alpha_to_coverage,
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,
 			       (void *) indices);
 	}
-	glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
-	glDisable (GL_SAMPLE_ALPHA_TO_ONE);
+	glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+	glDisable(GL_SAMPLE_ALPHA_TO_ONE);
 	free(integer_color);
 }
 
@@ -383,7 +383,7 @@ get_alpha_blend_factor(float src0_alpha, float src1_alpha,
 		       bool compute_src)
 {
 	GLint blend_func;
-	if(compute_src)
+	if (compute_src)
 		glGetIntegerv(GL_BLEND_SRC_RGB, &blend_func);
 	else
 		glGetIntegerv(GL_BLEND_DST_RGB, &blend_func);
@@ -419,7 +419,7 @@ compute_blend_color(float *frag_color, int rect_count,
 	float src0_alpha = color[rect_count * num_components + 3];
 	float src1_alpha =  1.0 - src0_alpha / 2.0;
 
-	if(sample_alpha_to_one && num_samples) {
+	if (sample_alpha_to_one && num_samples) {
 		/* Set fragment src0_alpha, src1_alpha to 1.0 and use them
 		 * to compute blending factors.
 		 */
@@ -464,7 +464,7 @@ compute_expected_color(bool sample_alpha_to_coverage,
 		 * number of samples_used. Non-integer values may result
 		 * in dithering effect.
 		 */
-		if(samples_used == (int) samples_used) {
+		if (samples_used == (int) samples_used) {
 			int rect_idx_offset = buffer_idx_offset +
 					      i * num_components;
 			frag_color = (float *) malloc(num_rects *
@@ -472,7 +472,7 @@ compute_expected_color(bool sample_alpha_to_coverage,
 						      sizeof(float));
 
 			/* Do dual source blending computations */
-			if(is_dual_src_blending) {
+			if (is_dual_src_blending) {
 				compute_blend_color(frag_color,
 						    i /* rect_count */,
 						    sample_alpha_to_one);
@@ -522,7 +522,7 @@ compute_expected_color(bool sample_alpha_to_coverage,
 				 * fragment shader.
 				 */
 				frag_alpha /= (1 << draw_buffer_count);
-				if(sample_alpha_to_one) {
+				if (sample_alpha_to_one) {
 					expected_color[alpha_idx] =
 					1.0 * coverage[i] +
 					bg_color[3] * (1 - coverage[i]);
@@ -585,7 +585,7 @@ compute_expected(bool sample_alpha_to_coverage,
 		/* Don't compute expected color for color buffer zero
 		 * if no renderbuffer is attached to it.
 		 */
-		if(draw_buffer_count == 0 && draw_buffer_zero_format == GL_NONE)
+		if (draw_buffer_count == 0 && draw_buffer_zero_format == GL_NONE)
 			return;
 		compute_expected_color(sample_alpha_to_coverage,
 				       sample_alpha_to_one,
@@ -611,11 +611,11 @@ probe_framebuffer_color(void)
 		/* Don't probe color buffer zero if no renderbuffer is
 		 * attached to it.
 		 */
-		if( i == 0 && draw_buffer_zero_format == GL_NONE)
+		if (i == 0 && draw_buffer_zero_format == GL_NONE)
 			continue;
 		bool is_integer_operation = is_buffer_zero_integer_format && !i;
 
-		if(is_integer_operation) {
+		if (is_integer_operation) {
 			glBindFramebuffer(GL_READ_FRAMEBUFFER,
 					  resolve_int_fbo.handle);
 			expected_int_color = (int*) malloc(num_rects *
@@ -638,8 +638,8 @@ probe_framebuffer_color(void)
 			/* Only probe rectangles with coverage value which is a
 			 * strict  multiple of 1 / num_samples.
 			 */
-			if(samples_used == (int)samples_used) {
-				if(is_integer_operation) {
+			if (samples_used == (int)samples_used) {
+				if (is_integer_operation) {
 					float_color_to_int_color(expected_int_color,
 								 expected_color);
 					result = piglit_probe_rect_rgba_int(
@@ -663,7 +663,7 @@ probe_framebuffer_color(void)
 			}
 		}
 	}
-	if(expected_int_color)
+	if (expected_int_color)
 		free(expected_int_color);
 	return result;
 }
@@ -677,7 +677,7 @@ probe_framebuffer_depth(void)
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, resolve_fbo.handle);
 	for (int i = 0; i < num_rects; i++) {
-		if(coverage[i] == 0.0 || coverage[i] == 1.0) {
+		if (coverage[i] == 0.0 || coverage[i] == 1.0) {
 			int rect_x = 0;
 			int rect_y = i * rect_height;
 			int rect_idx = i;
@@ -707,7 +707,7 @@ draw_image_to_window_system_fb(int draw_buffer_count, bool rhs)
 	unsigned array_size = num_components * pattern_width * pattern_height;
 	float *image = (float *) malloc(sizeof(float) * array_size);
 
-	if(is_buffer_zero_integer_format && draw_buffer_count == 0) {
+	if (is_buffer_zero_integer_format && draw_buffer_count == 0) {
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, resolve_int_fbo.handle);
 		int *tmp = (int *) malloc(sizeof(int) * array_size);
 		glReadPixels(rect_x, rect_y,
@@ -741,12 +741,12 @@ draw_image_to_window_system_fb(int draw_buffer_count, bool rhs)
 	 * piglit_visualize_image function to avoid undefined behavior.
 	 */
 	GLboolean isBlending;
-        glGetBooleanv(GL_BLEND, &isBlending);
+	glGetBooleanv(GL_BLEND, &isBlending);
 	glDisable(GL_BLEND);
 	piglit_visualize_image(image, GL_RGBA,
 			       pattern_width, pattern_height,
 			       draw_buffer_count + 1, rhs);
-	if(isBlending)
+	if (isBlending)
 		glEnable(GL_BLEND);
 	free(image);
 }
@@ -766,16 +766,16 @@ draw_test_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 		     false /* is_reference_image */,
 		     color);
 
-	for(int i = 0; i < num_draw_buffers; i++) {
+	for (int i = 0; i < num_draw_buffers; i++) {
 
 		/* Blit ms_fbo to singlesample FBO to resolve multisample
 		 * buffer.
 		 */
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo.handle);
-		if(buffer_to_test == GL_COLOR_BUFFER_BIT)
+		if (buffer_to_test == GL_COLOR_BUFFER_BIT)
 			glReadBuffer(GL_COLOR_ATTACHMENT0_EXT + i);
 
-		if ( is_buffer_zero_integer_format && !i)
+		if (is_buffer_zero_integer_format && !i)
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
 					  resolve_int_fbo.handle);
 		else
@@ -792,7 +792,7 @@ draw_test_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 				  pattern_width, pattern_height + y_offset,
 				  buffer_to_test, GL_NEAREST);
 
-		if(buffer_to_test == GL_COLOR_BUFFER_BIT) {
+		if (buffer_to_test == GL_COLOR_BUFFER_BIT) {
 			draw_image_to_window_system_fb(i /* draw_buffer_count */,
 						       false /* rhs */);
 		}
@@ -801,7 +801,7 @@ draw_test_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 		 * to aid probe_framebuffer_color() and probe_framebuffer_depth()
 		 * in verification.
 		 */
-		if(sample_alpha_to_coverage || is_dual_src_blending) {
+		if (sample_alpha_to_coverage || is_dual_src_blending) {
 			/* Expected color is different for different draw
 			 * buffers
 			 */
@@ -822,7 +822,7 @@ draw_reference_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 	glDrawBuffers(num_draw_buffers, draw_buffers);
 	ms_fbo.set_viewport();
 
-	if(sample_alpha_to_coverage) {
+	if (sample_alpha_to_coverage) {
 		draw_pattern(sample_alpha_to_coverage,
 			     sample_alpha_to_one,
 			     true /* is_reference_image */,
@@ -839,7 +839,7 @@ draw_reference_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 			     expected_color);
 	}
 
-	for(int i = 0; i < num_draw_buffers; i++) {
+	for (int i = 0; i < num_draw_buffers; i++) {
 
 		/* Blit ms_fbo to resolve_fbo to resolve multisample buffer */
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo.handle);
@@ -864,7 +864,7 @@ draw_reference_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 				  pattern_width, pattern_height + y_offset,
 				  buffer_to_test, GL_NEAREST);
 
-		if(buffer_to_test == GL_COLOR_BUFFER_BIT) {
+		if (buffer_to_test == GL_COLOR_BUFFER_BIT) {
 			draw_image_to_window_system_fb(i /* draw_buffer_count */,
 						       true /* rhs */);
 		}
@@ -925,10 +925,10 @@ ms_fbo_and_draw_buffers_setup(int samples,
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("Error setting up frame buffer objects\n");
 		piglit_report_result(PIGLIT_FAIL);
-        }
+	}
 
 	/* Query the number of samples used in ms_fbo. OpenGL implementation
 	 * may create FBO with more samples per pixel than what is requested.
@@ -943,7 +943,7 @@ ms_fbo_and_draw_buffers_setup(int samples,
 					    sizeof(GLuint));
 	glGenRenderbuffers(num_draw_buffers - 1, color_rb);
 
-	for(int i = 0; i < num_draw_buffers - 1; i++) {
+	for (int i = 0; i < num_draw_buffers - 1; i++) {
 		glBindRenderbuffer(GL_RENDERBUFFER, color_rb[i]);
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 					ms_fbo.config.num_samples,
@@ -958,7 +958,7 @@ ms_fbo_and_draw_buffers_setup(int samples,
 	}
 
 	GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-        if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		printf("Error attaching additional color buffers\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
