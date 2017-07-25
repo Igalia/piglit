@@ -103,8 +103,18 @@ void
 piglit_init(int argc, char **argv)
 {
     bool use_multisample_texture = false;
+    GLint max_samples;
 
     piglit_require_extension("GL_ARB_texture_multisample");
+
+    glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+    if (max_samples < 4) {
+       /* We need 4x msaa for this test.  Note that GL requires support
+	* for at least 4x msaa when msaa is supported.
+	*/
+       printf("GL_MAX_SAMPLES = %d, need 4\n", max_samples);
+       piglit_report_result(PIGLIT_SKIP);
+    }
 
     while (++argv,--argc) {
         if (!strcmp(*argv, "-tex"))
