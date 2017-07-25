@@ -82,6 +82,7 @@ main(int argc, char **argv)
 {
 	/* Need at least 16 contexts to congest the thread queue. */
 	pthread_t thread[16];
+	bool pass = true;
 
 	XInitThreads();
 
@@ -90,11 +91,13 @@ main(int argc, char **argv)
 	for (int i = 0; i < ARRAY_SIZE(thread); i++)
 		pthread_create(&thread[i], NULL, thread_func, NULL);
 
-	for (int i = 0; i < ARRAY_SIZE(thread); i++)
-		pthread_join(thread[i], NULL);
+	for (int i = 0; i < ARRAY_SIZE(thread); i++) {
+		if (pthread_join(thread[i], NULL) != 0)
+			pass = false;
+	}
 
 	pthread_mutex_destroy(&mutex);
 
-	piglit_report_result(PIGLIT_PASS);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 	return 0;
 }
