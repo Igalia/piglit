@@ -382,13 +382,13 @@ deqp_egl.py
 	Support for running dEQP's EGL profile with piglit.
 
 deqp_gles2.py
-	Support for running deQP's gles2 profile with piglit.
+	Support for running dEQP's gles2 profile with piglit.
 
 deqp_gles3.py
-	Support for running deQP's gles3 profile with piglit.
+	Support for running dEQP's gles3 profile with piglit.
 
 deqp_gles31.py
-	Support for running deQP's gles3.1 profile with piglit.
+	Support for running dEQP's gles3.1 profile with piglit.
 
 deqp_vk.py
 	Support for running the official Khronos Vulkan CTS profile with piglit.
