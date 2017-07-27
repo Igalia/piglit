@@ -25,6 +25,17 @@
  *  This test verifies that using gl_SampleID in fragment shader program
  *  works as per ARB_sample_shading specification.
  *
+ *  Note that we do not have to enable GL_SAMPLE_SHADING_ARB.
+ *  The GL_ARB_sample_shading spec (and the GLSL 4.0 spec) say:
+ *
+ *      9) Is per-sample shading ever triggered by properties of the fragment
+ *      shader?
+ *
+ *      RESOLVED:  Yes.  The variables "gl_SampleID" and "gl_SamplePosition"
+ *      can be used to read properties of the current sample, which wouldn't
+ *      make much sense if the fragment shader were run at a lower frequency
+ *      than per-sample.
+ *
  **/
 
 #include "piglit-fbo.h"
