@@ -521,8 +521,8 @@ static void
 draw_state_change(unsigned count)
 {
 	unsigned i;
-	void (*enable)(GLenum) = glEnable;
-	void (*disable)(GLenum) = glDisable;
+	PFNGLENABLEPROC enable = glEnable;
+	PFNGLDISABLEPROC disable = glDisable;
 	GLenum glenum = enable_enum;
 
 	if (is_compat && enable_enum == GL_PRIMITIVE_RESTART) {
