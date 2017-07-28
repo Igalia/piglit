@@ -605,13 +605,6 @@ FBOTest::testRender2SingleTexture(void)
                                         glDepthFunc(GL_ALWAYS);
                                         switch (textureModes[mode]) {
                                         case GL_TEXTURE_1D:
-                                                glBegin(GL_LINES);
-                                                glVertex3f(TEXSIZE / 4, 0.5, 0.3);
-						/* + 0.25 pixels because the last line pixel
-						 * isn't drawn according to the GL spec */
-                                                glVertex3f(TEXSIZE * 5 / 8 + 0.25, 0.5, 0.3);
-                                                glEnd();
-                                                break;
                                         case GL_TEXTURE_2D:
                                         case GL_TEXTURE_3D:
                                         case GL_TEXTURE_CUBE_MAP:
@@ -637,13 +630,6 @@ FBOTest::testRender2SingleTexture(void)
                                                     GL_KEEP, GL_REPLACE);
                                         switch (textureModes[mode]) {
                                         case GL_TEXTURE_1D:
-                                                glBegin(GL_LINES);
-                                                glVertex3f(TEXSIZE / 2, 0.5, 0.3);
-						/* + 0.25 pixels because the last line pixel
-						 * isn't drawn according to the GL spec */
-                                                glVertex3f(TEXSIZE * 7 / 8 + 0.25, 0.5, 0.3);
-                                                glEnd();
-                                                break;
                                         case GL_TEXTURE_2D:
                                         case GL_TEXTURE_3D:
                                         case GL_TEXTURE_CUBE_MAP:
@@ -670,13 +656,6 @@ FBOTest::testRender2SingleTexture(void)
 
                                 switch (textureModes[mode]) {
                                 case GL_TEXTURE_1D:
-                                        glBegin(GL_LINES);
-                                        glVertex3f(0, 0.5, 0.2);
-					/* + 0.25 pixels because the last line pixel
-					 * isn't drawn according to the GL spec */
-                                        glVertex3f(TEXSIZE + 0.25, 0.5, 0.2);
-                                        glEnd();
-                                        break;
                                 case GL_TEXTURE_2D:
                                 case GL_TEXTURE_3D:
                                 case GL_TEXTURE_CUBE_MAP:
