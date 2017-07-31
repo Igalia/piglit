@@ -34,10 +34,13 @@
 
 #define BUFFER_OFFSET(i) ((void *)((char *)NULL + i))
 
+const struct piglit_subtest overflow_query_subtests[];
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.subtests = overflow_query_subtests;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -576,8 +579,7 @@ piglit_init(int argc, char **argv)
 	/* Strip common piglit args. */
 	piglit_strip_arg(&argc, argv, "-fbo");
 	piglit_strip_arg(&argc, argv, "-auto");
-	piglit_parse_subtest_args(&argc, argv, subtests, &selected_subtests,
-				  &num_selected_subtests);
+	num_selected_subtests = piglit_get_selected_tests(&selected_subtests);
 
 	if (argc > 1) {
 		fprintf(stderr, "usage error\n");
