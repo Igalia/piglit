@@ -421,6 +421,20 @@ test_overflow_stream_any(void *test_data)
 }
 
 /**
+ * Overflow on stream 1.
+ * Query for overflow on any stream.
+ * inverted = true, expected overflow: true.
+ */
+static enum piglit_result
+test_overflow_stream_any_inverted(void *test_data)
+{
+	GLuint query_type = GL_TRANSFORM_FEEDBACK_OVERFLOW_ARB;
+	int array_sizes[] = { 6, 5 };
+
+	return run_subtest(2, array_sizes, 0, query_type, true, true, test_data);
+}
+
+/**
  * No overflow.
  * Query for overflow on any stream.
  * inverted = false, expected overflow: false.
@@ -525,6 +539,12 @@ const struct piglit_subtest overflow_query_subtests[] = {
 		"arb_transform_feedback_overflow_query-conditional_render_any",
 		"arb_transform_feedback_overflow_query-conditional_render_any",
 		test_overflow_stream_any,
+		"conditional_render"
+	},
+	{
+		"arb_transform_feedback_overflow_query-conditional_render_any_inverted",
+		"arb_transform_feedback_overflow_query-conditional_render_any_inverted",
+		test_overflow_stream_any_inverted,
 		"conditional_render"
 	},
 	{
