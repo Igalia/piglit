@@ -17,9 +17,9 @@ endif()
 
 project (piglit)
 
-# Require MSVC 2013 U4
-if (MSVC AND CMAKE_C_COMPILER_VERSION VERSION_LESS 18.00.31101.0)
-	message (FATAL_ERROR "Visual Studio 2013 Update 4 or later required")
+# Require MinGW
+if (MSVC)
+	message (FATAL_ERROR "Windows builds require MinGW")
 endif ()
 
 find_package(Threads)

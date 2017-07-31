@@ -29,7 +29,6 @@
 #endif
 
 #ifdef __linux__
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
 #endif
@@ -62,6 +61,10 @@
 # include <unistd.h>
 #else
 # define USE_STDIO
+#endif
+
+#if defined(HAVE_UNISTD_H)
+#include <unistd.h>  // for usleep
 #endif
 
 #include "piglit-util.h"
@@ -115,35 +118,6 @@ int asprintf(char **strp, const char *fmt, ...)
 }
 
 #endif /* HAVE_ASPRINTF */
-
-#ifdef _MSC_VER
-
-char *
-basename(char *path)
-{
-	char *res;
-
-	// Skip drive letter
-	if (path[0] != '\0' && path[1] == ':') {
-		path += 2;
-	}
-
-	// Return pointer to the char after the last directory separator
-	res = path;
-	while (true) {
-		char c = *path++;
-		switch (c) {
-		case '\0':
-			return res;
-		case '\\':
-		case '/':
-			res = ++path;
-			break;
-		}
-	}
-}
-
-#endif /* _MSC_VER */
 
 /**
  * \brief Split \a string into an array of strings.
@@ -343,12 +317,6 @@ piglit_disable_error_message_boxes(void)
 		 * http://msdn.microsoft.com/en-us/library/sas1dkb2.aspx
 		 */
 		_set_error_mode(_OUT_TO_STDERR);
-#ifdef _MSC_VER
-		/* Disable abort message box.
-		 * http://msdn.microsoft.com/en-us/library/e631wekh.aspx
-		 */
-		_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-#endif
 	}
 #endif /* _WIN32 */
 }

@@ -150,83 +150,51 @@ Configure and build.
 2.5 Windows
 -----------
 
-Install Python.
+Install Python 3.
 http://www.python.org/download
-
-Install NumPy.
-http://sourceforge.net/projects/numpy/files/NumPy
 
 Install CMake.
 http://cmake.org/cmake/resources/software.html
 Download and install 'Windows' platform.
 
-Install Microsoft Visual Studio 2013 or later.
-Install 'Visual C++' feature.
+Download and install Ninja
+https://github.com/ninja-build/ninja/releases
+
+Install MinGW-w64
+https://mingw-w64.org/
 
 Download OpenGL Core API and Extension Header Files.
 http://www.opengl.org/registry/#headers
-Copy header files to MSVC.
-C:\Program Files\Microsoft Visual Studio 12.0\VC\include\GL
-
-Install pip.
-http://www.pip-installer.org/en/latest/installing.html
+Pass -DGLEXT_INCLUDE_DIR=/path/to/headers
 
 Install python mako.
-  > c:\Python27\Scripts\pip.exe install mako
+> pip install mako
+
+Install NumPy.
+> pip install numpy
 
 
 2.5.1 GLUT
 ----------
 
-Download freeglut for MSVC.
-http://www.transmissionzero.co.uk/software/freeglut-devel
+Download freeglut for Mingw.
+http://www.transmissionzero.co.uk/software/freeglut-devel/
 
-Open Visual Studio Command Prompt.
-Start Menu->All Programs->Visual Studio 2013->Visual Studio Tools->VS2013 x86 Native Tools Command Prompt
-CD to piglit directory.
+> cmake -H. -Bbuild -G "Ninja" -DGLEXT_INCLUDE_DIR=\path\to\glext -DGLUT_INCLUDE_DIR=\path\to\freeglut\include -DGLUT_glut_LIBRARY=\path\to\freeglut\lib\x64\libfreeglut.a -DGLEXT_INCLUDE_DIR=\path\to\glext
+> ninja -C build
 
-Run CMake GUI.
-  > C:\Program Files\CMake 2.8\bin\cmake-gui.exe .
-Configure
-  - NMake Makefiles
-  - Use default native compilers
-Set these variables in the Advanced view.
-  - GLUT_INCLUDE_DIR
-  - GLUT_glut_LIBRARY
-Configure
-Generate
-File->Exit
-
-Build from the Visual Studio Command Prompt.
-  > nmake
 
 2.5.2 Waffle
 ------------
 
-Download waffle for MSVC.
+Download and build waffle for MinGW.
 http://www.waffle-gl.org/
 
 Open the Command Prompt.
 CD to piglit directory.
 
-Run CMake GUI.
-  > C:\Program Files\CMake 2.8\bin\cmake-gui.exe .
-Configure
-  - 'Visual Studio 12 2013', or
-  - 'Visual Studio 12 2013 Win64'
-  - Use default native compilers
-Set these variables in the Advanced view.
-Note that the values provided are for reference purposed and may differ on your system.
-  - PIGLIT_USE_WAFFLE, BOOL, TRUE
-  - WAFFLE_INCLUDE_DIRS, PATH, ${waffle_root}\include\waffle
-  - WAFFLE_LDFLAGS, FILEPATH, ${waffle_root}\lib\waffle-1.lib
-  - GLEXT_INCLUDE_DIR, PATH, C:\Program Files\Microsoft Visual Studio 12.0\VC\include\GL
-Configure
-Generate
-File->Exit
+> cmake -H. -Bbuild -G "Ninja" -DGLEXT_INCLUDE_DIR=\path\to\glext -DPIGLIT_USE_WAFFLE=TRUE -DWAFFLE_INCLUDE_DIRS=\path\to\waffle\include\waffle WAFFLE_LDFLAGS=\path\to\waffle\lib\libwaffle-1.a
 
-Build from the Command Prompt.
-  > cmake --build .
 
 3. How to run tests
 -------------------

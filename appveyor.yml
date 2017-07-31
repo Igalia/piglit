@@ -49,12 +49,6 @@ environment:
   - MINGW_HOME: C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64
     FREEGLUT_ARCHIVE: freeglut-MinGW-3.0.0-1.mp.zip
     FREEGLUT_LIB: lib\x64\libfreeglut.a
-# - MSVC_ARCH: x86
-#   FREEGLUT_ARCHIVE: freeglut-MSVC-3.0.0-2.mp.zip
-#   FREEGLUT_LIB: lib\freeglut.lib
-# - MSVC_ARCH: x86_amd64
-#   FREEGLUT_ARCHIVE: freeglut-MSVC-3.0.0-2.mp.zip
-#   FREEGLUT_LIB: lib\x64\freeglut.lib
 
 matrix:
   fast_finish: true
@@ -76,8 +70,6 @@ install:
 - ninja --version
 # Setup MinGW
 - if not "%MINGW_HOME%"=="" set Path=%MINGW_HOME%\bin;%Path%
-# Setup MSVC
-- if not "%MSVC_ARCH%"=="" call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" %MSVC_ARCH%
 # Install FreeGlut
 - if not exist "%FREEGLUT_ARCHIVE%" appveyor DownloadFile "http://files.transmissionzero.co.uk/software/development/GLUT/%FREEGLUT_ARCHIVE%"
 - 7z x -y "%FREEGLUT_ARCHIVE%" > nul

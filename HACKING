@@ -101,14 +101,8 @@ Code conventions:
   e.g. libpiglitutil_gles2
 * Test names are '<lowercasegroupname>-<testname>.'  e.g. glsl-novertexdata
 * Use int, float, bool except when GL types (GLint, GLfloat) are really needed
-* Don't put declarations after code.  For example:
-      if (x < 3)
-         x = 0;
-      int y = x * x;
-  This will not compile with MSVC.  The 'int y' declaration must be at the
-  top of the brace-block.
-* Don't use named/designated initializers.  They don't compile with MSVC.
-
+* Always declare GL entrypoint pointer type with APIENTRY, or use piglit
+  dispatch typedef
 
 Test conventions:
 

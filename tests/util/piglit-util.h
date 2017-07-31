@@ -61,31 +61,6 @@ extern "C" {
 #define __has_attribute(x) 0
 #endif
 
-#if defined(_MSC_VER)
-
-/* windows.h won't define min/max macros if NOMINMAX is defined, however
- * stdlib.h will still define them for C files regardless... */
-#undef max
-#undef min
-
-#if !defined(__cplusplus) && !defined(inline)
-#define inline __inline
-#endif
-
-#if !defined(__func__)
-#define __func__ __FUNCTION__
-#endif
-
-#define snprintf _snprintf
-
-#define alloca _alloca
-
-#define usleep(__usec) Sleep(((__usec) + 999)/1000)
-
-char *basename(char *path);
-
-#endif /* defined(_MSC_VER) */
-
 #if (__GNUC__ >= 3)
 #define PRINTFLIKE(f, a) __attribute__ ((format(__printf__, f, a)))
 #else
@@ -94,8 +69,6 @@ char *basename(char *path);
 
 #if defined(__GNUC__) || __has_attribute(noreturn)
 #define NORETURN __attribute__((noreturn))
-#elif defined(_MSC_VER)
-#define NORETURN __declspec(noreturn)
 #else
 #define NORETURN
 #endif
@@ -253,28 +226,6 @@ streq(const char *a, const char *b)
 static inline double
 strtod_inf(const char *nptr, char **endptr)
 {
-#if defined(_MSC_VER)
-	/* skip spaces and tabs */
-	while (*nptr == ' ' || *nptr == '\t')
-		nptr++;
-
-#pragma warning( push )
-#pragma warning( disable : 4056 ) // overflow in floating-point constant arithmetic
-#pragma warning( disable : 4756 ) // overflow in constant arithmetic
-	if (nptr[0] == 'i' && nptr[1] == 'n' && nptr[2] == 'f') {
-		/* +infinity */
-		*endptr = (char *) (nptr + 3);
-		return INFINITY;
-	}
-	else if (nptr[0] == '-' && nptr[1] == 'i' && nptr[2] == 'n' && nptr[3] == 'f') {
-		/* -infinity */
-		*endptr = (char *) (nptr + 4);
-		return -INFINITY;
-	}
-#pragma warning( pop )
-
-	/* fall-through */
-#endif
 	return strtod(nptr, endptr);
 }
 
@@ -354,11 +305,7 @@ strtol_hex(const char *nptr, char **endptr)
 static inline char *
 strchrnul(const char *s, int c)
 {
-#if defined(_MSC_VER) && defined(__cplusplus)
-	char *t = strchr((char *)s, c);
-#else
 	char *t = strchr(s, c);
-#endif
 
 	return (t == NULL) ? ((char *) s + strlen(s)) : t;
 }
