@@ -530,6 +530,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('glx', 'GLX_ARB_create_context_no_error'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
+    g(['glx-create-context-no-error'], 'no error')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('glx', 'GLX_ARB_sync_control'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-oml-sync-control-getmscrate'], 'glXGetMscRateOML')

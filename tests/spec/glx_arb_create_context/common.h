@@ -30,6 +30,7 @@ extern GLXFBConfig fbconfig;
 extern XVisualInfo *visinfo;
 extern Window win;
 extern GLXWindow glxWin;
+extern int glx_error_code;
 
 extern bool parse_version_string(const char *string, int *major, int *minor);
 
