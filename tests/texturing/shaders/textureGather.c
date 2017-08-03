@@ -25,6 +25,7 @@ int max_offset = 0;
 
 int texture_width = 32;
 int texture_height = 32;
+int max_components;
 
 GLenum internalformat_for_components[][4] = {
 	{ GL_R16, GL_RG16, GL_RGB16, GL_RGBA16, },
@@ -144,6 +145,15 @@ norm_value(int x)
 	return (float)x / 255.0f;
 }
 
+static float
+normalized_value(int component, int x)
+{
+	if (swizzle >= 0 && max_components < 4 && component > 0)
+		return 0;
+	else
+		return (float)x / 255.0f;
+}
+
 static void
 make_image(int num_channels, int use_channel)
 {
@@ -156,9 +166,12 @@ make_image(int num_channels, int use_channel)
 				*pp++ = (ch == use_channel) ? (i+j*texture_width) : 128;
 }
 
-static float shadow_compare(float x)
+static float shadow_compare(int component, float x)
 {
-	return x > 0.5f ? 1.0f : 0.0f;
+	if (swizzle >= 0 && max_components < 4 && component > 0)
+		return 0;
+        else
+		return x > 0.5f ? 1.0f : 0.0f;
 }
 
 static void
@@ -171,28 +184,28 @@ make_expected(void)
 		for (i = 0; i < texture_width; i++) {
 			if (comptype == SHADOW_T) {
 				if (use_offsets) {
-					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 0)));
-					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 1)));
-					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 2)));
-					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 3)));
+					*pe++ = shadow_compare(0, norm_value(pixel_value(i, j, 0)));
+					*pe++ = shadow_compare(1, norm_value(pixel_value(i, j, 1)));
+					*pe++ = shadow_compare(2, norm_value(pixel_value(i, j, 2)));
+					*pe++ = shadow_compare(3, norm_value(pixel_value(i, j, 3)));
 				} else {
-					*pe++ = shadow_compare(norm_value(pixel_value(i, j + 1, 0)));
-					*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j + 1, 0)));
-					*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j, 0)));
-					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 0)));
+					*pe++ = shadow_compare(0, norm_value(pixel_value(i, j + 1, 0)));
+					*pe++ = shadow_compare(1, norm_value(pixel_value(i + 1, j + 1, 0)));
+					*pe++ = shadow_compare(2, norm_value(pixel_value(i + 1, j, 0)));
+					*pe++ = shadow_compare(3, norm_value(pixel_value(i, j, 0)));
 				}
 			}
 			else {
 				if (use_offsets) {
-					*pe++ = norm_value(pixel_value(i, j, 0));
-					*pe++ = norm_value(pixel_value(i, j, 1));
-					*pe++ = norm_value(pixel_value(i, j, 2));
-					*pe++ = norm_value(pixel_value(i, j, 3));
+					*pe++ = normalized_value(0, pixel_value(i, j, 0));
+					*pe++ = normalized_value(1, pixel_value(i, j, 1));
+					*pe++ = normalized_value(2, pixel_value(i, j, 2));
+					*pe++ = normalized_value(3, pixel_value(i, j, 3));
 				} else {
-					*pe++ = norm_value(pixel_value(i, j + 1, 0));
-					*pe++ = norm_value(pixel_value(i + 1, j + 1, 0));
-					*pe++ = norm_value(pixel_value(i + 1, j, 0));
-					*pe++ = norm_value(pixel_value(i, j, 0));
+					*pe++ = normalized_value(0, pixel_value(i, j + 1, 0));
+					*pe++ = normalized_value(1, pixel_value(i + 1, j + 1, 0));
+					*pe++ = normalized_value(2, pixel_value(i + 1, j, 0));
+					*pe++ = normalized_value(3, pixel_value(i, j, 0));
 				}
 			}
 		}
@@ -232,7 +245,6 @@ upload_verts(void)
 void
 do_requires(void)
 {
-	int max_components;
 	piglit_require_GLSL_version(130);
 	piglit_require_extension("GL_ARB_texture_gather");
 
