@@ -132,6 +132,8 @@ typedef void (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severit
 
 typedef void (APIENTRY *GLDEBUGPROCKHR)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
 
+typedef void (APIENTRY *GLVULKANPROCNV)(void);
+
 typedef void (APIENTRY *piglit_dispatch_function_ptr)(void);
 
 typedef piglit_dispatch_function_ptr (*piglit_get_core_proc_address_function_ptr)(const char *, int);
