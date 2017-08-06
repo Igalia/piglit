@@ -354,6 +354,9 @@ glslparser.py
 shader.py
 	A subset of all.py which runs only shader tests
 
+no_error.py
+	A modified version of the test list run as khr_no_error variants
+
 
 4.2 OpenCL Tests
 ----------------
@@ -375,6 +378,9 @@ xts.py
 igt.py
 	Support for running Intel-gpu-tools test suite using piglit.
 
+deqp_egl.py
+	Support for running dEQP's EGL profile with piglit.
+
 deqp_gles2.py
 	Support for running deQP's gles2 profile with piglit.
 
@@ -383,6 +389,27 @@ deqp_gles3.py
 
 deqp_gles31.py
 	Support for running deQP's gles3.1 profile with piglit.
+
+deqp_vk.py
+	Support for running the official Khronos Vulkan CTS profile with piglit.
+
+khr_gl.py
+	Support for running the open source Khronos OpenGL CTS tests with piglit.
+
+khr_gl45.py
+	Support for running the open source Khronos OpenGL 4.5 CTS tests with piglit.
+
+cts_gl.py
+	Support for running the closed source Khronos OpenGL CTS tests with piglit.
+
+cts_gl45.py
+	Support for running the closed source Khronos OpenGL 4.5 CTS tests with piglit.
+
+cts_gles.py
+	Support for running the closed source Khronos GLES CTS tests with piglit.
+
+oglconform.py
+	Support for running sub-test of the Intel oglconform test suite with piglit.
 
 
 5. How to write tests
