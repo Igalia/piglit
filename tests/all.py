@@ -2368,6 +2368,12 @@ with profile.test_list.group_manager(
     g(['arb_occlusion_query2-api'], 'api')
     g(['arb_occlusion_query2-render'], 'render')
 
+# Group EXT_memory_object tests
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'EXT_memory_object')) as g:
+    g(['ext_memory_object-api-errors'], 'api-errors')
+
 # Group EXT_texture_format_BGRA8888 tests
 with profile.test_list.group_manager(
         PiglitGLTest,
