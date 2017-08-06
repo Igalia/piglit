@@ -123,6 +123,7 @@ typedef GLintptr GLvdpauSurfaceNV;
 typedef unsigned short GLhalfNV;
 
 typedef void *GLeglImageOES;
+typedef void *GLeglClientBufferEXT;
 
 typedef void (APIENTRY *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
 
