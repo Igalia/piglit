@@ -1,5 +1,6 @@
 /*
  * Copyright © 2010 Intel Corporation
+ * Copyright © 2017 VMWare Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,6 +23,7 @@
  *
  * Authors:
  *    Eric Anholt <eric@anholt.net>
+ *    Thomas Hellstrom <thellstrom@vmware.com>
  *
  */
 
@@ -36,60 +38,62 @@
 
 int piglit_width = 50, piglit_height = 50;
 static Display *dpy;
-static Window win;
-static XVisualInfo *visinfo;
+static GLXFBConfig *config;
+static GLXContext ctx;
+static GLXWindow gwin;
 
 enum piglit_result
 draw(Display *dpy)
 {
 	GLboolean pass = GL_TRUE;
-	float green[] = {0.0, 1.0, 0.0, 0.0};
-	GLXContext ctx;
+	static const float green[] = {0.0, 1.0, 0.0, 0.3};
+	static const float red[] = {1.0, 0.0, 0.0, 0.5};
 
-	ctx = piglit_get_glx_context(dpy, visinfo);
-	glXMakeCurrent(dpy, win, ctx);
-
-	/* Clear background to gray */
-	glClearColor(0.0, 1.0, 0.0, 0.0);
+	glXMakeContextCurrent(dpy, gwin, gwin, ctx);
+	glClearColor(0.0, 1.0, 0.0, 0.3);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glXSwapBuffers(dpy, win);
-	glClearColor(1.0, 0.0, 0.0, 0.0);
+	glXSwapBuffers(dpy, gwin);
+	glClearColor(1.0, 0.0, 0.0, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glXSwapBuffers(dpy, win);
-
+	glXSwapBuffers(dpy, gwin);
+	glReadBuffer(GL_BACK);
 	pass = piglit_probe_pixel_rgba(0, 0, green);
-
-	glXSwapBuffers(dpy, win);
+	if (pass) {
+		glReadBuffer(GL_FRONT);
+		pass = piglit_probe_pixel_rgba(0, 0, red);
+	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
-XVisualInfo *
-piglit_get_swap_exchange_visual(Display *dpy)
+static GLXFBConfig *
+piglit_get_swap_exchange_config(Display *dpy)
 {
-	XVisualInfo *visinfo;
+	GLXFBConfig *fbc;
+	int nele;
 	int attrib[] = {
-		GLX_RGBA,
-		GLX_RED_SIZE, 1,
-		GLX_GREEN_SIZE, 1,
-		GLX_BLUE_SIZE, 1,
-		GLX_DOUBLEBUFFER,
+		GLX_RENDER_TYPE, GLX_RGBA_BIT,
+		GLX_RED_SIZE, 8,
+		GLX_GREEN_SIZE, 8,
+		GLX_BLUE_SIZE, 8,
+		GLX_ALPHA_SIZE, 8,
 		GLX_SWAP_METHOD_OML, GLX_SWAP_EXCHANGE_OML,
+		GLX_DOUBLEBUFFER, True,
 		None
 	};
 	int screen = DefaultScreen(dpy);
 
-	visinfo = glXChooseVisual(dpy, screen, attrib);
-	if (visinfo == NULL) {
+	fbc = glXChooseFBConfig(dpy, screen, attrib, &nele);
+	if (fbc == NULL) {
 		fprintf(stderr,
 			"Couldn't get a GLX_SWAP_EXCHANGE_OML, RGBA, "
-			"double-buffered visual\n");
+			"double-buffered fbconfig\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}
 
-	return visinfo;
+	return fbc;
 }
 
 int
@@ -97,8 +101,10 @@ main(int argc, char **argv)
 {
 	int i;
 	const char *glx_extension_list;
+	Window win;
+	XVisualInfo *visinfo;
 
-	for(i = 1; i < argc; ++i) {
+	for (i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "-auto"))
 			piglit_automatic = 1;
 		else
@@ -117,10 +123,21 @@ main(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	visinfo = piglit_get_swap_exchange_visual(dpy);
+	config = piglit_get_swap_exchange_config(dpy);
+	visinfo = glXGetVisualFromFBConfig(dpy, config[0]);
+	if (!visinfo) {
+		printf("Error: couldn't create a visual from fbconfig.\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
 	win = piglit_get_glx_window(dpy, visinfo);
+	XFree(visinfo);
 
 	XMapWindow(dpy, win);
+	gwin = glXCreateWindow(dpy, config[0], win, NULL);
+	ctx = glXCreateNewContext(dpy, config[0], GLX_RGBA_TYPE, 0, GL_TRUE);
+	glXMakeContextCurrent(dpy, gwin, gwin, ctx);
+	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	piglit_glx_event_loop(dpy, draw);
 
