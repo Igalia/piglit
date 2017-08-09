@@ -33,6 +33,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 12;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 
@@ -61,11 +62,12 @@ test_api(void)
 	static const GLint swz[4] = { GL_BLUE, GL_GREEN, GL_ALPHA, GL_ZERO };
 	GLint swzOut[4];
 
-	/* test bad param value */
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R_EXT, GL_RGBA);
-
-	if (!piglit_check_gl_error(GL_INVALID_ENUM))
-		return false;
+	if (!piglit_khr_no_error) {
+		/* test bad param value */
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R_EXT, GL_RGBA);
+		if (!piglit_check_gl_error(GL_INVALID_ENUM))
+			return false;
+	}
 
 	/* test good param values */
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R_EXT, GL_ONE);
