@@ -39,6 +39,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 32;
 	config.supports_gl_core_version = 32;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -81,8 +82,11 @@ piglit_init(int argc, char **argv)
 		pass = false;
 	}
 
-	glBeginQueryIndexed(GL_PRIMITIVES_GENERATED, max_streams, queries[1]);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	if (!piglit_khr_no_error) {
+		glBeginQueryIndexed(GL_PRIMITIVES_GENERATED, max_streams,
+				    queries[1]);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	glBeginQueryIndexed(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
 			max_streams - 1, queries[2]);
@@ -92,9 +96,11 @@ piglit_init(int argc, char **argv)
 		pass = false;
 	}
 
-	glBeginQueryIndexed(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
-			max_streams, queries[3]);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	if (!piglit_khr_no_error) {
+		glBeginQueryIndexed(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
+				    max_streams, queries[3]);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	glDeleteQueries(ARRAY_SIZE(queries), queries);
 
