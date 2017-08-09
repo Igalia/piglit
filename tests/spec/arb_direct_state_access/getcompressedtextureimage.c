@@ -175,7 +175,7 @@ getTexImage(bool doPBO, GLenum target, GLubyte *data,
 			glTextureStorage3D(name, 1, internalformat,
 					   IMAGE_WIDTH, IMAGE_HEIGHT,
 					   num_faces);
-			pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+			pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 		}
 		glTextureStorage2D(name, 1, internalformat,
 				   IMAGE_WIDTH, IMAGE_HEIGHT);
