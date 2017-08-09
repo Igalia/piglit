@@ -38,6 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -60,15 +61,20 @@ void piglit_init(int argc, char **argv)
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 	pass = piglit_check_gl_error(0) && pass;
 
-	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, id + 1);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	if (!piglit_khr_no_error) {
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, id + 1);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, id);
 	pass = piglit_check_gl_error(0) && pass;
 
 	glDeleteTransformFeedbacks(1, &id);
-	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, id);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
+	if (!piglit_khr_no_error) {
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, id);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

@@ -38,6 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -101,8 +102,10 @@ void piglit_init(int argc, char **argv)
 
 	pass = piglit_check_gl_error(0) && pass;
 
-	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, ids[1]);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	if (!piglit_khr_no_error) {
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, ids[1]);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	/* Make the transform feedback object inactive by calling
 	 * EndTransformFeedback.  Then try (again) to bind the other object.
@@ -130,8 +133,10 @@ void piglit_init(int argc, char **argv)
 	glResumeTransformFeedback();
 	pass = piglit_check_gl_error(0) && pass;
 
-	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, ids[0]);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	if (!piglit_khr_no_error) {
+		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, ids[0]);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	/* Make the second object non-active, and restore the default object.
 	 * This should work.
