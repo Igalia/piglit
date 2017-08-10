@@ -36,6 +36,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 31;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 
@@ -133,13 +134,16 @@ piglit_display(void)
 
 	glBindVertexArray(triangle_fan_vao);
 
-	// This call should be illegal and raise an error with core profile.
-	// If it actually works, it may trigger a failed assertion in Mesa.
-	glEnable(GL_VERTEX_ARRAY);
+	if (!piglit_khr_no_error) {
+		// This call should be illegal and raise an error with core
+		// profile.  If it actually works, it may trigger a failed
+		// assertion in Mesa.
+		glEnable(GL_VERTEX_ARRAY);
 
-	if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-		printf("Failed to detect invalid glEnable(GL_VERTEX_ARRAY)\n");
-		pass = false;
+		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+			printf("Failed to detect invalid glEnable(GL_VERTEX_ARRAY)\n");
+			pass = false;
+		}
 	}
 
 	// This is the correct call to use:
