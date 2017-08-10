@@ -31,6 +31,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -88,20 +89,23 @@ void piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	/* Page 237 (page 253 of the PDF) of the OpenGL 3.0 spec says:
-	 *
-	 *     "If program has not been successfully linked, the error INVALID
-	 *     OPERATION is generated. If name is not a varying out variable,
-	 *     or if an error occurs, -1 will be returned."
-	 */
-	printf("Querying location before linking...\n");
-	loc = glGetFragDataLocation(prog, "v");
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-		piglit_report_result(PIGLIT_FAIL);
+	if (!piglit_khr_no_error) {
+		/* Page 237 (page 253 of the PDF) of the OpenGL 3.0 spec says:
+		 *
+		 *     "If program has not been successfully linked, the error
+		 *     INVALID OPERATION is generated. If name is not a varying
+		 *     out variable, or if an error occurs, -1 will be
+		 *     returned."
+		 */
+		printf("Querying location before linking...\n");
+		loc = glGetFragDataLocation(prog, "v");
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			piglit_report_result(PIGLIT_FAIL);
 
-	if (loc != -1) {
-		fprintf(stderr, "Expected location = -1, got %d\n", loc);
-		piglit_report_result(PIGLIT_FAIL);
+		if (loc != -1) {
+			fprintf(stderr, "Expected location = -1, got %d\n", loc);
+			piglit_report_result(PIGLIT_FAIL);
+		}
 	}
 
 	glLinkProgram(prog);
