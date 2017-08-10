@@ -38,6 +38,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vs_source =
@@ -111,8 +113,10 @@ piglit_display(void)
 	/* Now, disable the program and it should be finally deleted. */
 	glUseProgram(0);
 
-	glGetProgramiv(prog, GL_DELETE_STATUS, &status);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	if (!piglit_khr_no_error) {
+		glGetProgramiv(prog, GL_DELETE_STATUS, &status);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	piglit_present_results();
 
