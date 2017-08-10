@@ -37,6 +37,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char vs_text[] =
