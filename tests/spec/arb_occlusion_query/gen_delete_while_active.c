@@ -41,6 +41,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
@@ -87,14 +89,16 @@ piglit_display(void)
 			return PIGLIT_FAIL;
 	}
 
-	printf ("Testing that glEndQuery on deleted query (expecting error).\n");
-	{
-		/* And ensure that we get an error if we try to end a deleted
-		 * query. */
-		glEndQuery(GL_SAMPLES_PASSED);
+	if (!piglit_khr_no_error) {
+		printf ("Testing that glEndQuery on deleted query (expecting error).\n");
+		{
+			/* And ensure that we get an error if we try to end a deleted
+			 * query. */
+			glEndQuery(GL_SAMPLES_PASSED);
 
-		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-			return PIGLIT_FAIL;
+			if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+				return PIGLIT_FAIL;
+		}
 	}
 
 	return PIGLIT_PASS;
