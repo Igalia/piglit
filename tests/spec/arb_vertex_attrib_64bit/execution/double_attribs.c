@@ -36,6 +36,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *TestName = "double_attribs";
@@ -217,15 +219,17 @@ test_attrib_array(void)
       }
    }
 
-   for (i = 0; i < ARRAY_SIZE(badTypes); i++) {
-      glVertexAttribLPointer(index, size, badTypes[i], stride, data);
-      err = glGetError();
-      if (err != GL_INVALID_ENUM) {
-         fprintf(stderr,
-                 "%s: glVertexAttribLPointer(type=0x%x) failed to generate "
-                 "GL_INVALID_ENUM\n",
-                 TestName, badTypes[i]);
-         return GL_FALSE;
+   if (!piglit_khr_no_error) {
+      for (i = 0; i < ARRAY_SIZE(badTypes); i++) {
+         glVertexAttribLPointer(index, size, badTypes[i], stride, data);
+         err = glGetError();
+         if (err != GL_INVALID_ENUM) {
+            fprintf(stderr,
+                    "%s: glVertexAttribLPointer(type=0x%x) failed to generate "
+                    "GL_INVALID_ENUM\n",
+                    TestName, badTypes[i]);
+            return GL_FALSE;
+         }
       }
    }
 
