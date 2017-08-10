@@ -35,6 +35,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -64,12 +65,14 @@ try_TexImage(GLenum internalFormat)
 		     GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, NULL);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	/* 3D texture is not in the list of supported STENCIL_INDEX */
-	glBindTexture(GL_TEXTURE_3D, tex[2]);
-	glTexImage3D(GL_TEXTURE_3D, 0, internalFormat,
-		     8, 8, 8, 0,
-		     GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	if (!piglit_khr_no_error) {
+		/* 3D texture is not in the list of supported STENCIL_INDEX */
+		glBindTexture(GL_TEXTURE_3D, tex[2]);
+		glTexImage3D(GL_TEXTURE_3D, 0, internalFormat,
+			     8, 8, 8, 0,
+			     GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex[3]);
 
@@ -137,9 +140,11 @@ try_TexStorage(GLenum internalFormat)
 	glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, 16, 16);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	glBindTexture(GL_TEXTURE_3D, tex[2]);
-	glTexStorage3D(GL_TEXTURE_3D, 1, internalFormat, 8, 8, 8);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	if (!piglit_khr_no_error) {
+		glBindTexture(GL_TEXTURE_3D, tex[2]);
+		glTexStorage3D(GL_TEXTURE_3D, 1, internalFormat, 8, 8, 8);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex[3]);
 	glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, internalFormat, 16, 16);

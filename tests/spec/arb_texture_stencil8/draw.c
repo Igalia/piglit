@@ -55,6 +55,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 	config.window_width = 256 + 3;
 	config.window_height = 256 * 2 + 3;
 
