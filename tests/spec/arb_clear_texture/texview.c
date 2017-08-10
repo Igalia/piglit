@@ -31,6 +31,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
         config.supports_gl_compat_version = 13;
         config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 static const float green[4] = {0.0, 1.0, 0.0, 1.0};
