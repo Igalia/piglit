@@ -646,6 +646,7 @@ required_gl_version_from_glsl_version(unsigned glsl_version)
 	case 430: return 43;
 	case 440: return 44;
 	case 450: return 45;
+	case 460: return 46;
 	default: return 0;
 	}
 }
