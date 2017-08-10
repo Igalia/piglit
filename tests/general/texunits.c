@@ -36,6 +36,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 #define MAX_UNITS 256
@@ -144,8 +146,8 @@ test_rasterpos(void)
       return GL_FALSE;
    }
 
-   /* this should generate an error */
-   {
+   if (!piglit_khr_no_error) {
+      /* this should generate an error */
       GLfloat v[4];
       glActiveTexture(GL_TEXTURE0 + MaxTextureCoordUnits);
       if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
@@ -197,8 +199,8 @@ test_texture_matrix(void)
       return GL_FALSE;
    }
 
-   /* this should generate an error */
-   {
+   if (!piglit_khr_no_error) {
+      /* this should generate an error */
       GLfloat m[16];
       glActiveTexture(GL_TEXTURE0 + MaxTextureCoordUnits);
       if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
@@ -257,13 +259,15 @@ test_texture_params(void)
       return GL_FALSE;
    }
 
-   maxUnit = MAX2(MaxTextureCombinedUnits, MaxTextureCoordUnits);
+   if (!piglit_khr_no_error) {
+      maxUnit = MAX2(MaxTextureCombinedUnits, MaxTextureCoordUnits);
 
-   /* this should generate an error */
-   glActiveTexture(GL_TEXTURE0 + maxUnit);
-   /* INVALID_ENUM is expected */
-   if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-      return GL_FALSE;
+      /* this should generate an error */
+      glActiveTexture(GL_TEXTURE0 + maxUnit);
+      /* INVALID_ENUM is expected */
+      if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+         return GL_FALSE;
+      }
    }
 
    return GL_TRUE;

@@ -40,6 +40,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 				PIGLIT_GL_VISUAL_STENCIL |
 				PIGLIT_GL_VISUAL_DOUBLE);
 	config.requires_displayed_window = true;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 

@@ -57,6 +57,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 const GLuint idx0 = 0, idx1 = 1, idx2 = 2, idx3 = 3;
@@ -735,7 +737,8 @@ piglit_display(void)
 				format = pixel_formats[j];
 				type = data_types[i];
 
-				if (is_format_type_mismatch(format, type)) {
+				if (!piglit_khr_no_error &&
+				    is_format_type_mismatch(format, type)) {
 					glDrawPixels(piglit_width, piglit_height,
 						     format, type, pixels);
 					/* Here GL_INVALID_OPERATION is an

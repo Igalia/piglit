@@ -46,6 +46,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
@@ -90,9 +92,11 @@ piglit_init(int argc, char **argv)
 	pass = test(-0.1, 0) && pass;
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	printf("Setting row length -0.9, and expecting error\n");
-	glPixelStoref(GL_UNPACK_ROW_LENGTH, -0.9);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	if (!piglit_khr_no_error) {
+		printf("Setting row length -0.9, and expecting error\n");
+		glPixelStoref(GL_UNPACK_ROW_LENGTH, -0.9);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
