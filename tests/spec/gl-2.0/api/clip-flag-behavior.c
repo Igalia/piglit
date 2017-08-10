@@ -42,6 +42,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -146,25 +147,27 @@ piglit_init(int argc, char **argv)
 		pass = check_enable_state(enum_name, enum_value, false) && pass;
 	}
 
-	/* Check behavior of GL_CLIP_PLANE0 + n where n == max_clip_planes */
-	enum_value = GL_CLIP_PLANE0 + max_clip_planes;
-	sprintf(enum_name, "GL_CLIP_PLANE0 + %d", max_clip_planes);
+	if (!piglit_khr_no_error) {
+		/* Check behavior of GL_CLIP_PLANE0 + n where n == max_clip_planes */
+		enum_value = GL_CLIP_PLANE0 + max_clip_planes;
+		sprintf(enum_name, "GL_CLIP_PLANE0 + %d", max_clip_planes);
 
-	printf("Trying glIsEnabled(%s): ", enum_name);
-	b = glIsEnabled(enum_value);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
+		printf("Trying glIsEnabled(%s): ", enum_name);
+		b = glIsEnabled(enum_value);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
 
-	printf("Trying glGetBooleanv(%s): ", enum_name);
-	glGetBooleanv(enum_value, &b);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
+		printf("Trying glGetBooleanv(%s): ", enum_name);
+		glGetBooleanv(enum_value, &b);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
 
-	printf("Trying glEnable(%s): ", enum_name);
-	glEnable(enum_value);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
+		printf("Trying glEnable(%s): ", enum_name);
+		glEnable(enum_value);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
 
-	printf("Trying glDisable(%s): ", enum_name);
-	glDisable(enum_value);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
+		printf("Trying glDisable(%s): ", enum_name);
+		glDisable(enum_value);
+		pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
