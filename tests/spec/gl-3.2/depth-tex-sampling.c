@@ -39,6 +39,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 
@@ -77,10 +78,12 @@ make_depth_texture(void)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	/* this call should generate an error in the core profile */
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-	if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-		piglit_report_result(PIGLIT_FAIL);
+	if (!piglit_khr_no_error) {
+		/* this call should generate an error in the core profile */
+		glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+			piglit_report_result(PIGLIT_FAIL);
+		}
 	}
 
 	return tex;
