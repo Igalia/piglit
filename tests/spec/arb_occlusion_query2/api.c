@@ -35,6 +35,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = (PIGLIT_GL_VISUAL_RGB |
 				PIGLIT_GL_VISUAL_DOUBLE |
 				PIGLIT_GL_VISUAL_DEPTH);
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -269,9 +270,12 @@ piglit_display(void)
 
 	pass = test_counter_bits() && pass;
 	pass = test_current_query() && pass;
-	pass = test_error_begin_wrong_target() && pass;
-	pass = test_error_end_wrong_target() && pass;
-	pass = test_error_begin_while_other_active() && pass;
+
+	if (!piglit_khr_no_error) {
+		pass = test_error_begin_wrong_target() && pass;
+		pass = test_error_end_wrong_target() && pass;
+		pass = test_error_begin_while_other_active() && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 
