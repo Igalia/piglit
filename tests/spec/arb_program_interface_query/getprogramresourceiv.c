@@ -278,6 +278,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_core_version = 32;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -1189,7 +1190,8 @@ piglit_display(void)
 	bool pass = true;
 	int i;
 
-	test_error_cases(&pass);
+	if (!piglit_khr_no_error)
+		test_error_cases(&pass);
 
 	/* run all the getprogramresourceiv tests */
 	for (i = 0; i < sizeof(subtests) / sizeof(struct subtest_t); i++) {
