@@ -38,6 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 	config.supports_gl_core_version = 31;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -71,9 +72,11 @@ piglit_init(int argc, char **argv)
 	/* Check if sync was deleted */
 	pass = !glIsSync(sync) && pass;
 
-	/* Test for unsuccessful function calls */
-	glDeleteSync(invalid);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	if (!piglit_khr_no_error) {
+		/* Test for unsuccessful function calls */
+		glDeleteSync(invalid);
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
