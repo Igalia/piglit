@@ -30,6 +30,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 			       PIGLIT_GL_VISUAL_DOUBLE;
 
+	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 /* Exercises GetTexParameter/TexParameter with multisample textures */
