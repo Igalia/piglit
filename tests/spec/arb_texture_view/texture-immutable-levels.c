@@ -42,6 +42,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 12;
 	config.supports_gl_es_version = 31;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 

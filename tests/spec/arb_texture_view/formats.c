@@ -45,6 +45,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -306,10 +307,13 @@ test_format_errors(GLenum format_class)
 	pass = check_format_array(GL_NO_ERROR, numFormats, legalFormats,
 			   target, tex, levels, layers) && pass;
 
-	/* ensure TextureView  of illegal formats returns an error */
-	pass = check_format_array(GL_INVALID_OPERATION,
-				  totalFormats, illegalFormats,
-				  target, tex, levels, layers) && pass;
+	if (!piglit_khr_no_error) {
+		/* ensure TextureView  of illegal formats returns an error */
+		pass = check_format_array(GL_INVALID_OPERATION,
+					  totalFormats, illegalFormats,
+					  target, tex, levels, layers) && pass;
+	}
+
 err_out:
 	glDeleteTextures(1, &tex);
 

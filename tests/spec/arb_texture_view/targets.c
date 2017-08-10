@@ -44,6 +44,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_es_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -203,11 +204,15 @@ test_target_errors(GLenum target)
 	/* ensure TextureView of legal targets  works without gl errors */
 	pass = pass && check_target_array(GL_NO_ERROR, numTargets, legalTargets,
 					  GL_RG16, tex, levels);
-	/* ensure TextureView  of illegal targets returns an error */
-	pass = pass && check_target_array(GL_INVALID_OPERATION,
-					  numIllegalTargets,
-					  illegalTargets,
-					  GL_RG16, tex, levels);
+
+	if (!piglit_khr_no_error) {
+		/* ensure TextureView  of illegal targets returns an error */
+		pass = pass && check_target_array(GL_INVALID_OPERATION,
+						  numIllegalTargets,
+						  illegalTargets,
+						  GL_RG16, tex, levels);
+	}
+
 err_out:
 	glDeleteTextures(1, &tex);
 

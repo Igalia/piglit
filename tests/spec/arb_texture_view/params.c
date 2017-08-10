@@ -43,6 +43,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -326,12 +327,15 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_texture_float");
 	piglit_require_extension("GL_EXT_texture_array");
 
-	X(invalid_texture_param(), "Invalid texture or origtexture");
-	X(invalid_layer_param(GL_TEXTURE_1D_ARRAY), "Invalid layer param 1D");
-	X(invalid_layer_param(GL_TEXTURE_2D_ARRAY), "Invalid layer param 2D");
-	X(invalid_level_param(), "Invalid level param");
-	X(levels_clamping(), "Minlevel range and numlevel clamp");
-	X(layers_clamping(), "Minlayer range and numlayer clamp");
+	if (!piglit_khr_no_error) {
+		X(invalid_texture_param(), "Invalid texture or origtexture");
+		X(invalid_layer_param(GL_TEXTURE_1D_ARRAY), "Invalid layer param 1D");
+		X(invalid_layer_param(GL_TEXTURE_2D_ARRAY), "Invalid layer param 2D");
+		X(invalid_level_param(), "Invalid level param");
+	} else {
+		X(levels_clamping(), "Minlevel range and numlevel clamp");
+		X(layers_clamping(), "Minlayer range and numlayer clamp");
+	}
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
