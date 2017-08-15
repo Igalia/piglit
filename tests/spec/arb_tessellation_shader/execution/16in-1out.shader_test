@@ -1,0 +1,76 @@
+# Number of input CP = 16
+# Number of output CP = 1
+# Draw 256 patches. (4K vertices)
+#
+# Each patch is tessellated like a quad with a 4x4 vertex pattern.
+# (which is 3x3 sub-quads = 18 triangles)
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader]
+#version 150
+
+out vec2 inpos;
+
+void main()
+{
+  const int num = 16; // number of patches in one direction, num*num patches in total
+  int patch_id = gl_VertexID / 16;
+  int vertex_id = gl_VertexID % 16;
+
+  inpos = vec2(patch_id % num, patch_id / num) / num +
+          vec2(vertex_id % 4, vertex_id / 4) / (3 * num);
+}
+
+[tessellation control shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+#extension GL_ARB_arrays_of_arrays : require
+
+layout(vertices = 1) out;
+in vec2 inpos[];
+out vec2 outpos[][16];
+
+void main()
+{
+  gl_TessLevelInner[0] =
+  gl_TessLevelInner[1] =
+  gl_TessLevelOuter[0] =
+  gl_TessLevelOuter[1] =
+  gl_TessLevelOuter[2] =
+  gl_TessLevelOuter[3] = 3.0;
+
+  for (int i = 0; i < 16; i++)
+    outpos[gl_InvocationID][i] = inpos[i];
+}
+
+[tessellation evaluation shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+#extension GL_ARB_arrays_of_arrays : require
+
+layout(quads, equal_spacing) in;
+in vec2 outpos[][16];
+
+void main()
+{
+  ivec2 coord = ivec2(round(gl_TessCoord.xy * 3));
+  gl_Position = vec4(outpos[0][coord.y * 4 + coord.x] * 2 - 1, 0, 1);
+}
+
+[fragment shader]
+#version 150
+
+void main()
+{
+  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+patch parameter vertices 16
+draw arrays GL_PATCHES 0 4096
+probe all rgba 0.0 1.0 0.0 1.0
