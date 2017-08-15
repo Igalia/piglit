@@ -603,21 +603,12 @@ FBOTest::testRender2SingleTexture(void)
                                         // Init depth buffer
                                         glEnable(GL_DEPTH_TEST);
                                         glDepthFunc(GL_ALWAYS);
-                                        switch (textureModes[mode]) {
-                                        case GL_TEXTURE_1D:
-                                        case GL_TEXTURE_2D:
-                                        case GL_TEXTURE_3D:
-                                        case GL_TEXTURE_CUBE_MAP:
-                                                glBegin(GL_POLYGON);
-                                                glVertex3f(TEXSIZE / 4, 0, 0.3);
-                                                glVertex3f(TEXSIZE * 5 / 8, 0, 0.3);
-                                                glVertex3f(TEXSIZE * 5 / 8, TEXSIZE, 0.3);
-                                                glVertex3f(TEXSIZE / 4, TEXSIZE, 0.3);
-                                                glEnd();
-                                                break;
-                                        default:
-                                                break;
-                                        }
+					glBegin(GL_POLYGON);
+					glVertex3f(TEXSIZE / 4, 0, 0.3);
+					glVertex3f(TEXSIZE * 5 / 8, 0, 0.3);
+					glVertex3f(TEXSIZE * 5 / 8, TEXSIZE, 0.3);
+					glVertex3f(TEXSIZE / 4, TEXSIZE, 0.3);
+					glEnd();
                                         glDepthFunc(GL_LESS);
                                 }
 
@@ -628,22 +619,12 @@ FBOTest::testRender2SingleTexture(void)
                                         glStencilFunc(GL_ALWAYS, 0x1, 0x1);
                                         glStencilOp(GL_KEEP,
                                                     GL_KEEP, GL_REPLACE);
-                                        switch (textureModes[mode]) {
-                                        case GL_TEXTURE_1D:
-                                        case GL_TEXTURE_2D:
-                                        case GL_TEXTURE_3D:
-                                        case GL_TEXTURE_CUBE_MAP:
-                                                glBegin(GL_POLYGON);
-                                                glVertex3f(TEXSIZE / 2, 0, 0.3);
-                                                glVertex3f(TEXSIZE * 7 / 8, 0, 0.3);
-                                                glVertex3f(TEXSIZE * 7 / 8, TEXSIZE, 0.3);
-                                                glVertex3f(TEXSIZE / 2, TEXSIZE, 0.3);
-                                                glEnd();
-                                                break;
-                                        default:
-                                                break;
-                                        }
-
+ 					glBegin(GL_POLYGON);
+					glVertex3f(TEXSIZE / 2, 0, 0.3);
+					glVertex3f(TEXSIZE * 7 / 8, 0, 0.3);
+					glVertex3f(TEXSIZE * 7 / 8, TEXSIZE, 0.3);
+					glVertex3f(TEXSIZE / 2, TEXSIZE, 0.3);
+					glEnd();
                                         glStencilFunc(GL_NOTEQUAL, 0x1, 0x1);
                                 }
 
@@ -654,19 +635,12 @@ FBOTest::testRender2SingleTexture(void)
                                 glClearColor(0.0, 0.0, 0.0, 0.0);
                                 glClear(GL_COLOR_BUFFER_BIT);
 
-                                switch (textureModes[mode]) {
-                                case GL_TEXTURE_1D:
-                                case GL_TEXTURE_2D:
-                                case GL_TEXTURE_3D:
-                                case GL_TEXTURE_CUBE_MAP:
-                                        glBegin(GL_POLYGON);
-                                        glVertex3f(0, 0, 0.2);
-                                        glVertex3f(TEXSIZE, 0, 0.2);
-                                        glVertex3f(TEXSIZE, TEXSIZE, 0.2);
-                                        glVertex3f(0, TEXSIZE, 0.2);
-                                        glEnd();
-                                        break;
-                                }
+				glBegin(GL_POLYGON);
+				glVertex3f(0, 0, 0.2);
+ 				glVertex3f(TEXSIZE, 0, 0.2);
+				glVertex3f(TEXSIZE, TEXSIZE, 0.2);
+				glVertex3f(0, TEXSIZE, 0.2);
+				glEnd();
 
                                 // Render to the window
                                 glEnable(textureModes[mode]);
