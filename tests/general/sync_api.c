@@ -45,8 +45,8 @@ PIGLIT_GL_TEST_CONFIG_END
 	do {								\
 		const GLenum err = glGetError();			\
 		if (err != GL_NO_ERROR) {				\
-			fprintf(stderr, "%s generated error 0x%04x\n", 	\
-				string, err);				\
+			fprintf(stderr, "%s generated error %s\n", 	\
+				string, piglit_get_gl_error_name(err));	\
 			pass = GL_FALSE;				\
 			goto done;					\
 		}							\
@@ -71,12 +71,13 @@ test_GetSynciv(GLsync sync, GLenum pname, GLint expect)
 	glGetSynciv(sync, pname, 1, & len, & val);
 	FAIL_ON_ERROR("glGetSynciv");
 	if (len != 1) {
-		fprintf(stderr, "glGetSynciv length of 0x%04x was %d\n",
-			pname, len);
+		fprintf(stderr, "glGetSynciv length of %s was %d\n",
+			piglit_get_gl_enum_name(pname), len);
 		pass = GL_FALSE;
 	} else if (val != expect) {
-		fprintf(stderr, "glGetSynciv of 0x%04x expected 0x%08x, "
-			"got 0x%08x\n", pname, expect, val);
+		fprintf(stderr,
+			"glGetSynciv of %s expected 0x%08x got 0x%08x\n",
+			piglit_get_gl_enum_name(pname), expect, val);
 		pass = GL_FALSE;
 	}
 
@@ -142,8 +143,9 @@ piglit_display(void)
 	FAIL_ON_ERROR("glClientWaitSync");
 
 	if (wait_val != GL_ALREADY_SIGNALED) {
-		fprintf(stderr, "glClientWaitSync expected 0x%08x, "
-			"got 0x%08x\n", GL_ALREADY_SIGNALED, wait_val);
+		fprintf(stderr,
+			"glClientWaitSync expected GL_ALREADY_SIGNALED, "
+			"got %s\n", piglit_get_gl_enum_name(wait_val));
 		pass = GL_FALSE;
 	}
 
