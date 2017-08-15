@@ -381,6 +381,18 @@ class Test(object):
         return not self == other
 
 
+class DummyTest(Test):
+    def __init__(self, name, result):
+        super(DummyTest, self).__init__([name])
+        self.result.result = result
+
+    def execute(self, path, log, options):
+        pass
+
+    def interpret_result(self):
+        pass
+
+
 class WindowResizeMixin(object):
     """ Mixin class that deals with spurious window resizes
 

@@ -208,6 +208,10 @@ def _run_parser(input_):
                              'isolation. This allows, but does not require, '
                              'tests to run multiple tests per process. '
                              'This value can also be set in piglit.conf.')
+    parser.add_argument("--ignore-missing",
+                        dest="ignore_missing",
+                        action="store_true",
+                        help="missing tests are considered as 'notrun'")
     parser.add_argument("test_profile",
                         metavar="<Profile path(s)>",
                         nargs='+',
@@ -234,6 +238,7 @@ def _create_metadata(args, name, forced_test_list):
     if args.platform:
         opts['platform'] = args.platform
     opts['forced_test_list'] = forced_test_list
+    opts['ignore_missing'] = args.ignore_missing
 
     metadata = {'options': opts}
     metadata['name'] = name
@@ -346,6 +351,10 @@ def run(input_):
         for p in profiles:
             p.options['monitor'] = monitoring.Monitoring(args.monitored)
 
+    if args.ignore_missing:
+        for p in profiles:
+            p.options['ignore_missing'] = args.ignore_missing
+
     for p in profiles:
         if args.exclude_tests:
             p.filters.append(profile.RegexFilter(args.exclude_tests,
@@ -421,6 +430,9 @@ def resume(input_):
         if results.options['monitoring']:
             p.options['monitor'] = monitoring.Monitoring(
                 results.options['monitoring'])
+
+        if results.options['ignore_missing']:
+            p.options['ignore_missing'] = results.options['ignore_missing']
 
         if exclude_tests:
             p.filters.append(lambda n, _: n not in exclude_tests)

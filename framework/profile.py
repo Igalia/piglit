@@ -42,11 +42,11 @@ import re
 
 import six
 
-from framework import grouptools, exceptions
+from framework import grouptools, exceptions, status
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
 from framework.monitoring import Monitoring
-from framework.test.base import Test
+from framework.test.base import Test, DummyTest
 
 __all__ = [
     'RegexFilter',
@@ -285,6 +285,7 @@ class TestProfile(object):
         self.options = {
             'dmesg': get_dmesg(False),
             'monitor': Monitoring(False),
+            'ignore_missing': False,
         }
 
     def setup(self):
@@ -314,7 +315,10 @@ class TestProfile(object):
         if self.forced_test_list:
             opts = collections.OrderedDict()
             for n in self.forced_test_list:
-                opts[n] = self.test_list[n]
+                if self.options['ignore_missing'] and n not in self.test_list:
+                    opts[n] = DummyTest(n, status.NOTRUN)
+                else:
+                    opts[n] = self.test_list[n]
         else:
             opts = self.test_list  # pylint: disable=redefined-variable-type
 
