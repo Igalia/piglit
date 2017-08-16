@@ -205,6 +205,18 @@ test_framebuffertexture(GLenum textureType)
 
 	float expected[] = { 0, 1, 0 };
 
+	if (textureType == GL_TEXTURE_2D_MULTISAMPLE ||
+	    textureType == GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
+		GLint maxSamples;
+		glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
+		if (maxSamples == 0) {
+			/* skip */
+			printf("Skipping %s because GL_MAX_SAMPLES=0\n",
+			       piglit_get_gl_enum_name(textureType));
+			return true;
+		}
+	}
+
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
