@@ -214,6 +214,9 @@ piglit_make_generated_tests(
 	cl_vstore_tests.list
 	gen_cl_vstore_tests.py)
 piglit_make_generated_tests(
+	cl_vload_tests.list
+	gen_cl_vload_tests.py)
+piglit_make_generated_tests(
 	builtin_cl_math_tests.list
 	gen_cl_math_builtins.py)
 piglit_make_generated_tests(
@@ -271,6 +274,7 @@ add_custom_target(gen-cl-tests
 			builtin_cl_common_tests.list
 			cl_store_tests.list
 			cl_vstore_tests.list
+			cl_vload_tests.list
 )
 
 # Add a "gen-tests" target that can be used to generate all the

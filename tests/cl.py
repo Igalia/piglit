@@ -143,3 +143,5 @@ add_program_test_dir(grouptools.join('program', 'execute', 'store'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'store'))
 add_program_test_dir(grouptools.join('program', 'execute', 'vstore'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'vstore'))
+add_program_test_dir(grouptools.join('program', 'execute', 'vload'),
+                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'vload'))
