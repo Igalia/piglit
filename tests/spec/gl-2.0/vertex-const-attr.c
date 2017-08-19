@@ -36,9 +36,19 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
-static const char *vs =
+static const char *vs1 =
 	"attribute vec2 vertex; \n"
 	"attribute vec4 attr; \n"
+	"varying vec4 color; \n"
+	"void main() { \n"
+	"  gl_Position = vec4(vertex, 0, 1); \n"
+	"  color = attr; \n"
+	"}\n";
+
+/* same as above, but with vertex/attr declared in opposite order */
+static const char *vs2 =
+	"attribute vec4 attr; \n"
+	"attribute vec2 vertex; \n"
 	"varying vec4 color; \n"
 	"void main() { \n"
 	"  gl_Position = vec4(vertex, 0, 1); \n"
@@ -49,18 +59,42 @@ static const char *fs =
 	"varying vec4 color; \n"
 	"void main() { gl_FragColor = color; } \n";
 
-static GLint prog, attr;
+static GLint prog1, prog2;
 
-enum piglit_result
-piglit_display(void)
+
+static bool
+test(GLuint prog)
 {
-	float color[4][4] = {
+	static const float color[4][4] = {
 		{1, 0, 0, 1},
 		{0, 1, 0, 1},
 		{0, 0, 1, 1},
 		{1, 1, 1, 1},
 	};
+	static const float verts[4][2] = {
+		{-1, -1},
+		{ 1, -1},
+		{-1,  1},
+		{ 1,  1},
+	};
+	GLuint buf;
+	GLint vertex, attr;
 	bool pass = true;
+
+	glUseProgram(prog);
+
+	attr = glGetAttribLocation(prog, "attr");
+	vertex = glGetAttribLocation(prog, "vertex");
+
+	printf("Testing 'vertex' at %d, 'attr' at %d\n",  vertex, attr);
+
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glVertexAttribPointer(vertex,
+			      2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(vertex);
 
 	glViewport(0, 0, piglit_width, piglit_height);
 	glClearColor(0.5, 0.5, 0.5, 0.5);
@@ -98,40 +132,38 @@ piglit_display(void)
 
 	piglit_present_results();
 
+	glDisableVertexAttribArray(vertex);
+
+	glDeleteBuffers(1, &buf);
+
+	return pass;
+}
+
+
+enum piglit_result
+piglit_display(void)
+{
+	bool pass = test(prog1);
+	pass &= test(prog2);
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-static const float verts[4][2] = {
-	{-1, -1},
-	{ 1, -1},
-	{-1,  1},
-	{ 1,  1},
-	};
 
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint buf;
-	GLint vertex;
-
 	piglit_require_gl_version(20);
 
-	prog = piglit_build_simple_program(vs, fs);
-	if (!prog) {
+	prog1 = piglit_build_simple_program(vs1, fs);
+	if (!prog1) {
 		printf("Failed to compile/link program\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	glUseProgram(prog);
-
-	attr = glGetAttribLocation(prog, "attr");
-	vertex = glGetAttribLocation(prog, "vertex");
-
-	glGenBuffers(1, &buf);
-	glBindBuffer(GL_ARRAY_BUFFER, buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-	glVertexAttribPointer(vertex,
-			      2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(vertex);
+	prog2 = piglit_build_simple_program(vs2, fs);
+	if (!prog2) {
+		printf("Failed to compile/link program\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
 }
