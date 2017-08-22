@@ -50,6 +50,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = WINDOW_WIDTH;
 	config.window_height = WINDOW_HEIGHT;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 #define BLUE 0.45

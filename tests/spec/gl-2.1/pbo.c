@@ -49,6 +49,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE;
 
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 void
@@ -988,6 +990,9 @@ test_error_handling(void)
 	bool pass = true;
 	GLuint fbs[1];
 	GLuint tex;
+
+	if (piglit_khr_no_error)
+		return PIGLIT_SKIP;
 
 	glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 	glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
