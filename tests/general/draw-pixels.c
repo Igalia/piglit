@@ -737,8 +737,10 @@ piglit_display(void)
 				format = pixel_formats[j];
 				type = data_types[i];
 
-				if (!piglit_khr_no_error &&
-				    is_format_type_mismatch(format, type)) {
+				if (is_format_type_mismatch(format, type)) {
+					if (piglit_khr_no_error)
+						continue;
+
 					glDrawPixels(piglit_width, piglit_height,
 						     format, type, pixels);
 					/* Here GL_INVALID_OPERATION is an
