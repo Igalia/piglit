@@ -4887,6 +4887,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_query_buffer_object')) as g:
     g(['arb_query_buffer_object-qbo'], 'qbo')
+    g(['arb_query_buffer_object-coherency'], 'coherency')
 
 with profile.test_list.group_manager(
         PiglitGLTest,

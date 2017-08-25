@@ -9,5 +9,6 @@ link_libraries(
 	)
 
 piglit_add_executable(arb_query_buffer_object-qbo qbo.c common.c)
+piglit_add_executable(arb_query_buffer_object-coherency coherency.c common.c)
 
 # vim: ft=cmake:
