@@ -63,7 +63,8 @@ static const char vs_pass_thru_text[] =
 	"       f = 4.0;\n"
 	"       s.a2[0] = vec2(6.0, 7.0); \n"
 	"       int index = int(v.x); // index should be zero\n"
-	"       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
+	"       if ((index + gl_VertexID) < 4)\n"
+	"              unsized_array[index + gl_VertexID] = unsized_array.length();\n"
         "}\n";
 
 static const char fs_source[] =
@@ -91,7 +92,8 @@ static const char fs_source[] =
 	"       s.a2[1] = vec2(8.0, 9.0);\n"
 	"       s.a4 = mat2(10.0, 11.0, 12.0, 13.0);\n"
 	"       int index = int(v.z + gl_FragCoord.x);\n"
-	"       unsized_array[index] = unsized_array.length() * 2.0;\n"
+	"       if (index >= 0 && index < 4)\n"
+	"              unsized_array[index] = unsized_array.length() * 2.0;\n"
 	"}\n";
 
 GLuint prog;

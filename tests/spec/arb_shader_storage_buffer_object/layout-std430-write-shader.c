@@ -86,7 +86,8 @@ static const char vs_pass_thru_text[] =
 	"       v3a[0].xz = vec2(39.0, 41.0);\n"
 	"       v3a[1].y = 43.0;\n"
 	"       int index = int(v.x); // index should be zero\n"
-	"       unsized_array[index + gl_VertexID] = unsized_array.length();\n"
+	"       if ((index + gl_VertexID) < 4)\n"
+	"              unsized_array[index + gl_VertexID] = unsized_array.length();\n"
 	"}\n";
 
 static const char fs_source[] =
@@ -126,7 +127,8 @@ static const char fs_source[] =
 	"       v3a[0].y = 40.0;\n"
 	"       v3a[1].xz = vec2(42.0, 44.0);\n"
 	"       int index = int(v.z + gl_FragCoord.x);\n"
-	"       unsized_array[index] = unsized_array.length() * 2.0;\n"
+	"       if (index >= 0 && index < 4)\n"
+	"              unsized_array[index] = unsized_array.length() * 2.0;\n"
 	"}\n";
 
 GLuint prog;
