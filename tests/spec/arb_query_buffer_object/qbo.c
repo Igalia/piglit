@@ -31,7 +31,7 @@
  * - asynchrounous result, retrieve result to client memory before & after
  */
 
-#include "piglit-util-gl.h"
+#include "common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 32;
@@ -48,7 +48,6 @@ static const float green[] = {0, 1, 0, 1};
 static unsigned query;
 static unsigned qbo;
 
-static int prog;
 static int qbo_prog;
 static int sync_mode_loc;
 static int expect_exact_loc;
@@ -73,96 +72,9 @@ static const char * const sync_mode_names[] = {
 	"ASYNC_CPU_READ_AFTER",
 };
 
-static GLenum query_type;
+static const struct query_type_desc *query_desc;
 static enum sync_mode sync_mode;
 static GLenum result_type;
-
-struct query_type_desc {
-	GLenum type;
-	const char *extensions[2];
-};
-
-/* Note: meaningful test cases (with non-zero values) for the following are
- * missing:
- *  - GL_COMPUTE_SHADER_INVOCATIONS_ARB
- *  - GL_GEOMETRY_SHADER_INVOCATIONS
- *  - GL_GEOMETRY_SHADER_PRIMITIVES_EMITTED_ARB
- *  - GL_TESS_CONTROL_SHADER_PATCHES_ARB
- *  - GL_TESS_EVALUATION_SHADER_INVOCATIONS_ARB
- *  - GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN
- */
-static const struct query_type_desc query_types[] = {
-	{ GL_ANY_SAMPLES_PASSED,			{ "GL_ARB_occlusion_query2", NULL } },
-	{ GL_ANY_SAMPLES_PASSED_CONSERVATIVE,		{ "GL_ARB_ES3_compatibility", NULL } },
-	{ GL_CLIPPING_INPUT_PRIMITIVES_ARB,		{ "GL_ARB_pipeline_statistics_query", NULL } },
-	{ GL_CLIPPING_OUTPUT_PRIMITIVES_ARB,		{ "GL_ARB_pipeline_statistics_query", NULL } },
-	{ GL_COMPUTE_SHADER_INVOCATIONS_ARB,		{ "GL_ARB_pipeline_statistics_query", "GL_ARB_compute_shader" } },
-	{ GL_FRAGMENT_SHADER_INVOCATIONS_ARB,		{ "GL_ARB_pipeline_statistics_query", NULL } },
-	{ GL_GEOMETRY_SHADER_INVOCATIONS,		{ "GL_ARB_pipeline_statistics_query", NULL } },
-	{ GL_GEOMETRY_SHADER_PRIMITIVES_EMITTED_ARB,	{ "GL_ARB_pipeline_statistics_query", NULL } },
-	{ GL_PRIMITIVES_GENERATED,			{ NULL, } },
-	{ GL_PRIMITIVES_SUBMITTED_ARB,			{ "GL_ARB_pipeline_statistics_query", NULL } },
-	{ GL_SAMPLES_PASSED_ARB,			{ NULL, } },
-	{ GL_TESS_CONTROL_SHADER_PATCHES_ARB,		{ "GL_ARB_pipeline_statistics_query", "GL_ARB_tessellation_shader" } },
-	{ GL_TESS_EVALUATION_SHADER_INVOCATIONS_ARB,	{ "GL_ARB_pipeline_statistics_query", "GL_ARB_tessellation_shader" } },
-	{ GL_TIMESTAMP,					{ "GL_ARB_timer_query", NULL } },
-	{ GL_TIME_ELAPSED,				{ "GL_ARB_timer_query", NULL } },
-	{ GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,	{ NULL, } },
-	{ GL_VERTEX_SHADER_INVOCATIONS_ARB,		{ "GL_ARB_pipeline_statistics_query", NULL } },
-	{ GL_VERTICES_SUBMITTED_ARB,			{ "GL_ARB_pipeline_statistics_query", NULL } },
-};
-
-static void
-get_query_values(GLenum query_type, bool *exact, uint32_t *expected)
-{
-	*exact = true;
-
-	switch (query_type) {
-	case GL_ANY_SAMPLES_PASSED:
-	case GL_ANY_SAMPLES_PASSED_CONSERVATIVE:
-		*expected = 1;
-		break;
-	case GL_CLIPPING_INPUT_PRIMITIVES_ARB:
-	case GL_CLIPPING_OUTPUT_PRIMITIVES_ARB:
-		*exact = false;
-		*expected = 1;
-		break;
-	case GL_FRAGMENT_SHADER_INVOCATIONS_ARB:
-		*exact = false;
-		*expected = 1;
-		break;
-	case GL_PRIMITIVES_GENERATED:
-	case GL_PRIMITIVES_SUBMITTED_ARB:
-		*exact = false;
-		*expected = 1;
-		break;
-	case GL_SAMPLES_PASSED_ARB:
-		*expected = piglit_width * piglit_height;
-		break;
-	case GL_TIMESTAMP:
-	case GL_TIME_ELAPSED:
-		*exact = false;
-		*expected = 1;
-		break;
-	case GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN:
-		*expected = 0;
-		break;
-	case GL_VERTEX_SHADER_INVOCATIONS_ARB:
-	case GL_VERTICES_SUBMITTED_ARB:
-		*exact = false;
-		*expected = 1;
-		break;
-	case GL_COMPUTE_SHADER_INVOCATIONS_ARB:
-	case GL_GEOMETRY_SHADER_INVOCATIONS:
-	case GL_GEOMETRY_SHADER_PRIMITIVES_EMITTED_ARB:
-	case GL_TESS_CONTROL_SHADER_PATCHES_ARB:
-	case GL_TESS_EVALUATION_SHADER_INVOCATIONS_ARB:
-		*expected = 0;
-		break;
-	default:
-		abort();
-	}
-}
 
 static enum piglit_result
 cpu_gather_query(bool exact, uint32_t expected, uint64_t *cpu_result)
@@ -196,26 +108,14 @@ run_subtest(void)
 		sync_mode == QBO_SYNC ||
 		sync_mode == QBO_SYNC_CPU_READ_AFTER_CACHE_TEST;
 
-	get_query_values(query_type, &exact, &expected);
+	get_query_values(query_desc, &exact, &expected);
 
-	glClearColor(0.5, 0.5, 0.5, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glGenQueries(1, &query);
+	run_query(query, query_desc);
 
 	/* Load default value into buffer */
 	glBindBuffer(GL_QUERY_BUFFER, qbo);
 	glBufferData(GL_QUERY_BUFFER, 16, default_value, GL_DYNAMIC_COPY);
-
-	/* Enable query, draw something that should pass */
-	glEnable(GL_DEPTH_TEST);
-	glUseProgram(prog);
-	glGenQueries(1, &query);
-	if (query_type != GL_TIMESTAMP)
-		glBeginQuery(query_type, query);
-	piglit_draw_rect_z(0.5, -1, -1, 2, 2);
-	if (query_type != GL_TIMESTAMP)
-		glEndQuery(query_type);
-	else
-		glQueryCounter(query, query_type);
 
 	if (sync_mode == QBO_ASYNC_CPU_READ_BEFORE) {
 		if (cpu_gather_query(exact, expected, &cpu_result))
@@ -302,21 +202,10 @@ piglit_display(void)
 	};
 	enum piglit_result r = PIGLIT_PASS;
 
-	for (unsigned qnum = 0; qnum < ARRAY_SIZE(query_types); qnum++) {
-		const struct query_type_desc *desc = &query_types[qnum];
-		bool supported = true;
+	for (unsigned qnum = 0; qnum < num_query_types(); qnum++) {
+		query_desc = &query_types[qnum];
 
-		query_type = desc->type;
-
-		for (unsigned i = 0; i < ARRAY_SIZE(desc->extensions); ++i) {
-			if (!desc->extensions[i])
-				break;
-
-			if (!piglit_is_extension_supported(desc->extensions[i])) {
-				supported = false;
-				break;
-			}
-		}
+		bool supported = is_query_supported(query_desc);
 
 		for (sync_mode = QBO_SYNC;
 		     sync_mode < NUM_QBO_SYNC_MODES;
@@ -333,7 +222,7 @@ piglit_display(void)
 				}
 
 				piglit_report_subtest_result(subtest_result, "query-%s-%s-%s",
-						piglit_get_gl_enum_name(query_type),
+						piglit_get_gl_enum_name(query_desc->type),
 						sync_mode_names[sync_mode],
 						piglit_get_gl_enum_name(result_type));
 			}
@@ -347,10 +236,12 @@ void
 piglit_init(int argc, char **argv)
 {
 	char *vsCode;
-	char *fsCode, *qboFsCode;
+	char *qboFsCode;
 
 	piglit_require_extension("GL_ARB_query_buffer_object");
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
+
+	query_common_init();
 
 	glGenBuffers(1, &qbo);
 	glBindBuffer(GL_QUERY_BUFFER, qbo);
@@ -361,12 +252,6 @@ piglit_init(int argc, char **argv)
 		"in vec4 pos_in;\n"
 		"void main() {\n"
 		"	gl_Position = pos_in;\n"
-		"}\n";
-	fsCode =
-		"#version 150\n"
-		"out vec4 color;\n"
-		"void main() {\n"
-		"	color = vec4(0.0, 0.0, 1.0, 1.0);\n"
 		"}\n";
 	qboFsCode =
 		"#version 150\n"
@@ -416,7 +301,6 @@ piglit_init(int argc, char **argv)
 		"	}\n"
 		"}\n";
 
-	prog = piglit_build_simple_program(vsCode, fsCode);
 	qbo_prog = piglit_build_simple_program(vsCode, qboFsCode);
 	sync_mode_loc = glGetUniformLocation(qbo_prog, "sync_mode");
 	expect_exact_loc = glGetUniformLocation(qbo_prog, "expect_exact");
