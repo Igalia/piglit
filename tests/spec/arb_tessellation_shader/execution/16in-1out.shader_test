@@ -12,7 +12,7 @@ GL_ARB_tessellation_shader
 [vertex shader]
 #version 150
 
-out vec2 inpos;
+out vec3 inpos;
 
 void main()
 {
@@ -20,8 +20,9 @@ void main()
   int patch_id = gl_VertexID / 16;
   int vertex_id = gl_VertexID % 16;
 
-  inpos = vec2(patch_id % num, patch_id / num) / num +
-          vec2(vertex_id % 4, vertex_id / 4) / (3 * num);
+  inpos.xy = vec2(patch_id % num, patch_id / num) / num +
+             vec2(vertex_id % 4, vertex_id / 4) / (3 * num);
+  inpos.z = float(patch_id / 64);
 }
 
 [tessellation control shader]
@@ -30,8 +31,8 @@ void main()
 #extension GL_ARB_arrays_of_arrays : require
 
 layout(vertices = 1) out;
-in vec2 inpos[];
-out vec2 outpos[][16];
+in vec3 inpos[];
+out vec3 outpos[][16];
 
 void main()
 {
@@ -52,20 +53,25 @@ void main()
 #extension GL_ARB_arrays_of_arrays : require
 
 layout(quads, equal_spacing) in;
-in vec2 outpos[][16];
+in vec3 outpos[][16];
+out vec3 color;
 
 void main()
 {
   ivec2 coord = ivec2(round(gl_TessCoord.xy * 3));
-  gl_Position = vec4(outpos[0][coord.y * 4 + coord.x] * 2 - 1, 0, 1);
+  vec3 v = outpos[0][coord.y * 4 + coord.x];
+  gl_Position = vec4(v.xy * 2 - 1, 0, 1);
+  color = v.zzz - vec3(0, 1, 2);
 }
 
 [fragment shader]
 #version 150
 
+in vec3 color;
+
 void main()
 {
-  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  gl_FragColor = vec4(color, 1);
 }
 
 [test]
@@ -73,4 +79,7 @@ clear color 0.1 0.1 0.1 0.1
 clear
 patch parameter vertices 16
 draw arrays GL_PATCHES 0 4096
-probe all rgba 0.0 1.0 0.0 1.0
+relative probe rect rgba (0, 0,    1, 0.24) (0, 0, 0, 1)
+relative probe rect rgba (0, 0.26, 1, 0.24) (1, 0, 0, 1)
+relative probe rect rgba (0, 0.5,  1, 0.24) (1, 1, 0, 1)
+relative probe rect rgba (0, 0.76, 1, 0.24) (1, 1, 1, 1)
