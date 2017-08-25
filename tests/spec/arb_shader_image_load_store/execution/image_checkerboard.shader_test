@@ -1,0 +1,67 @@
+# This is a port of one of the Vulkan CTS tests to piglit GL
+# to test a bug seen developing radv for vega.
+#
+# dEQP-VK.binding_model.shader_access.primary_cmd_buf.storage_image.fragment.single_descriptor.2d 
+# it isn't a direct port but it shows the same bug.
+#
+# This just copies 4 squares from the image into the final image and probes them.
+# On vega some bits are corrupted.
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_image_load_store
+SIZE 256 256
+
+[vertex shader]
+#version 330
+flat out highp int frag_quadrant_id;
+void main (void)
+{
+	highp vec4 result_position;
+	highp int quadrant_id;
+	highp int quadPhase = gl_VertexID % 6;
+	highp int quadXcoord = int(quadPhase == 1 || quadPhase == 4 || quadPhase == 5);
+	highp int quadYcoord = int(quadPhase == 2 || quadPhase == 3 || quadPhase == 5);
+	highp int quadOriginX = (gl_VertexID / 6) % 2;
+	highp int quadOriginY = (gl_VertexID / 6) / 2;
+	quadrant_id = gl_VertexID / 6;
+	result_position = vec4(float(quadOriginX + quadXcoord - 1), float(quadOriginY + quadYcoord - 1), 0.0, 1.0);
+	gl_Position = result_position;
+	frag_quadrant_id = quadrant_id;
+}
+					
+
+[fragment shader]
+#version 330
+#extension GL_ARB_shader_image_load_store: enable
+
+layout(rgba8) readonly uniform highp image2D u_image;
+flat in highp int frag_quadrant_id;
+out mediump vec4 o_color;
+void main (void)
+{
+	highp int quadrant_id = frag_quadrant_id;
+	highp vec4 result_color;
+	if (quadrant_id == 0)
+		result_color = imageLoad(u_image, ivec2(6, 13));
+	else if (quadrant_id == 1)
+		result_color = imageLoad(u_image, ivec2(51, 40));
+	else if (quadrant_id == 2)
+		result_color = imageLoad(u_image, ivec2(42, 26));
+	else
+		result_color = imageLoad(u_image, ivec2(25, 35));
+	o_color.xyzw = result_color.xyzw;
+}
+					
+[test]
+# Use textures that are large enough to actually trigger the use
+# of compression.
+texture rgbw 0 (64, 64) GL_RGBA8
+image texture 0 GL_RGBA8
+
+draw arrays GL_TRIANGLES 0 24
+probe rect rgba (0, 0, 128, 128) (1.0, 0.0, 0.0, 1.0)
+probe rect rgba (128, 0, 128, 128) (1.0, 1.0, 1.0, 1.0)
+probe rect rgba (0, 128, 128, 128) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (128, 128, 128, 128) (0.0, 0.0, 1.0, 1.0)
+
