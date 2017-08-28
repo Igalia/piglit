@@ -156,7 +156,7 @@ piglit_cl_test(const int argc,
 			fprintf(stderr,
 			        "Failed (error code: %s): Create command queue using 0x%X as command queue properties.\n",
 			        piglit_cl_get_error_name(errNo),
-			        (unsigned int)mixed_command_queue_properties);
+			        (unsigned int)mixed_command_queue_properties[1]);
 			piglit_merge_result(&result, PIGLIT_FAIL);
 		}
 		clReleaseCommandQueue(command_queue);
