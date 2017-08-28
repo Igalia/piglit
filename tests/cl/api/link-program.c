@@ -51,10 +51,10 @@ PIGLIT_CL_API_TEST_CONFIG_END
 
 
 const char* strings[] = {
-	"int get_number() { return 42; }\n",
-	"int get_number();\n",
-	"kernel void test_kernel() { int i = get_number(); }\n",
-	"int get_number() { return 0; }\n"
+	"int get_number(void) { return 42; }\n",
+	"int get_number(void);\n",
+	"kernel void test_kernel(void) { int i = get_number(); }\n",
+	"int get_number(void) { return 0; }\n"
 };
 
 #if defined(CL_VERSION_1_2)
@@ -388,8 +388,8 @@ piglit_cl_test(const int argc,
 	                                "2nd function program");
 	kernel_prog = compile_program(env->context->cl_ctx,
 	                              env->context->num_devices, env->context->device_ids,
-	                              2, &strings[2],
-                                 "2nd kernel program");
+	                              3, &strings[1],
+	                              "2nd kernel program");
 
 	if (!function_prog || !kernel_prog) {
 		result = PIGLIT_FAIL;
