@@ -142,6 +142,7 @@ void piglit_init(int argc, char **argv)
 	GLuint fs_prog_same_declaration_order;
 	GLuint fs_prog_same_location_order;
 	char *source;
+	bool pass = true;
 
 	piglit_require_vertex_shader();
 	piglit_require_fragment_shader();
@@ -153,21 +154,21 @@ void piglit_init(int argc, char **argv)
 	(void)!asprintf(&source, vs_code_template, glsl_version);
 	vs_prog = glCreateShaderProgramv(GL_VERTEX_SHADER, 1,
 					 (const GLchar *const *) &source);
-	piglit_link_check_status(vs_prog);
+	pass = piglit_link_check_status(vs_prog) && pass;
 	free(source);
 
 	(void)!asprintf(&source, fs_code_same_declaration_order_template, glsl_version);
 	fs_prog_same_declaration_order =
 		glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
 				       (const GLchar *const *) &source);
-	piglit_link_check_status(fs_prog_same_declaration_order);
+	pass = piglit_link_check_status(fs_prog_same_declaration_order) && pass;
 	free(source);
 
 	(void)!asprintf(&source, fs_code_same_location_order_template, glsl_version);
 	fs_prog_same_location_order =
 		glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
 				       (const GLchar *const *) &source);
-	piglit_link_check_status(fs_prog_same_location_order);
+	pass = piglit_link_check_status(fs_prog_same_location_order) && pass;
 	free(source);
 
 	glGenProgramPipelines(1, &pipeline_same_declaration_order);
@@ -188,6 +189,7 @@ void piglit_init(int argc, char **argv)
 			   fs_prog_same_location_order);
 	piglit_program_pipeline_check_status(pipeline_same_location_order);
 
-	if (!piglit_check_gl_error(0))
+	pass = piglit_check_gl_error(0) && pass;
+	if (!pass)
 		piglit_report_result(PIGLIT_FAIL);
 }
