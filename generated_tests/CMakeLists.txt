@@ -225,6 +225,9 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	builtin_cl_common_tests.list
 	gen_cl_common_builtins.py)
+piglit_make_generated_tests(
+	builtin_cl_shuffle_tests.list
+	gen_cl_shuffle_builtins.py)
 
 # Create a custom target for generating OpenGL tests
 # This is not added to the default target, instead it is added
@@ -272,6 +275,7 @@ add_custom_target(gen-cl-tests
 			builtin_cl_math_tests.list
 			builtin_cl_relational_tests.list
 			builtin_cl_common_tests.list
+			builtin_cl_shuffle_tests.list
 			cl_store_tests.list
 			cl_vstore_tests.list
 			cl_vload_tests.list
