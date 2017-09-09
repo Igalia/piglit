@@ -2337,11 +2337,15 @@ with profile.test_list.group_manager(
         g(['arb_sample_shading-ignore-centroid-qualifier', sample_count],
           'ignore-centroid-qualifier {}'.format(sample_count),
           run_concurrent=False)
+        g(['arb_sample_shading-samplemask', sample_count, 'all', 'all'],
+          'samplemask {}'.format(sample_count))
 
     for num_samples in ['0'] + MSAA_SAMPLE_COUNTS:
         g(['arb_sample_shading-builtin-gl-sample-mask-simple',
            num_samples],
           'builtin-gl-sample-mask-simple {}'.format(num_samples))
+        g(['arb_sample_shading-samplemask', num_samples, 'all'],
+          'samplemask {} all'.format(num_samples))
 
     g(['arb_sample_shading-builtin-gl-sample-mask-mrt-alpha'])
 
