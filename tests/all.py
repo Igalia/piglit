@@ -2332,11 +2332,9 @@ with profile.test_list.group_manager(
 
     for sample_count in MSAA_SAMPLE_COUNTS:
         g(['arb_sample_shading-interpolate-at-sample-position', sample_count],
-          'interpolate-at-sample-position {}'.format(sample_count),
-          run_concurrent=False)
+          'interpolate-at-sample-position {}'.format(sample_count))
         g(['arb_sample_shading-ignore-centroid-qualifier', sample_count],
-          'ignore-centroid-qualifier {}'.format(sample_count),
-          run_concurrent=False)
+          'ignore-centroid-qualifier {}'.format(sample_count))
         g(['arb_sample_shading-samplemask', sample_count, 'all', 'all'],
           'samplemask {}'.format(sample_count))
 
