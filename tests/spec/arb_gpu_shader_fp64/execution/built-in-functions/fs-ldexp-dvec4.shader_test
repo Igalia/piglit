@@ -92,17 +92,13 @@ probe rgba 5 0 0.0 0.0 0.0 0.0
 # Test underflow generates zero with sign of x.
 uniform dvec4 expected_double 0.0 -0.0 0.0 -0.0
 uniform dvec4 given_double 0.0 -0.0 0.5 -0.5
-uniform ivec4 given_exponent -1028 -1028 -1028 -1028
+uniform ivec4 given_exponent -1028 -1028 -1078 -1078
 draw arrays GL_TRIANGLE_FAN 0 4
 probe rgba 6 0 0.0 0.0 0.0 0.0
 
 uniform dvec4 expected_double 0.0 -0.0 0.0 -0.0
 uniform dvec4 given_double 2.2250738585072014E-308 -2.2250738585072014E-308 1.7976931348623157E+308 -1.7976931348623157E+308
-# For the FLT_MAX case -255 comes from (-127 + -127 + -1).
-#   ldexp(FLT_MAX, -127)           = 0x1.fffffep+0 (1.999999881)
-#   ldexp(FLT_MAX, -127 - 127)     = 0x1p-126 (epsilon above FLT_MIN)
-#   ldexp(FLT_MAX, -127 - 127 - 1) = 0.0
-uniform ivec4 given_exponent -1 -1 -2048 -2048
+uniform ivec4 given_exponent -53 -53 -2100 -2100
 draw arrays GL_TRIANGLE_FAN 0 4
 probe rgba 7 0 0.0 0.0 0.0 0.0
 
