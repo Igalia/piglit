@@ -89,5 +89,7 @@ profile = deqp.make_profile(  # pylint: disable=invalid-name
             deqp.gen_caselist_txt(_KHR_BIN, 'KHR-GL44-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
             deqp.gen_caselist_txt(_KHR_BIN, 'KHR-GL45-cases.txt', _EXTRA_ARGS)),
+        deqp.iter_deqp_test_cases(
+            deqp.gen_caselist_txt(_KHR_BIN, 'KHR-GL46-cases.txt', _EXTRA_ARGS)),
     ),
     DEQPKHRTest)
