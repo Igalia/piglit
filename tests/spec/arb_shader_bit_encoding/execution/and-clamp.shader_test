@@ -37,7 +37,7 @@ void main()
 clear color 0.0 0.0 0.0 0.0
 clear
 ortho
-uniform vec4 x 0.0 .25 .50. .75
-uniform vec4 y 0.0 .25 .50. .75
+uniform vec4 x 0.0 0.25 0.50 0.75
+uniform vec4 y 0.0 0.25 0.50 0.75
 draw rect -1 -1 2 2
-probe rgba  2 2  0.0 .25 .50. .75
+probe rgba  2 2  0.0 0.25 0.50 0.75
