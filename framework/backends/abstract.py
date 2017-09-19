@@ -199,7 +199,7 @@ class FileBackend(Backend):
         When this context manager is opened it will first write a placeholder
         file with the status incomplete.
 
-        When it is called to write the finall result it will create a temporary
+        When it is called to write the final result it will create a temporary
         file, write to that file, then move that file over the original,
         incomplete status file. This helps to make the operation atomic, as
         long as the filesystem continues running and the result was valid in

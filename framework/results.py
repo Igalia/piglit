@@ -325,7 +325,7 @@ class TestrunResult(object):
                 raise e
 
     def calculate_group_totals(self):
-        """Calculate the number of pases, fails, etc at each level."""
+        """Calculate the number of passes, fails, etc at each level."""
         for name, result in six.iteritems(self.tests):
             # If there are subtests treat the test as if it is a group instead
             # of a test.

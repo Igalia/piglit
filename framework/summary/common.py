@@ -52,7 +52,7 @@ class Results(object):  # pylint: disable=too-few-public-methods
     def get_result(self, name):
         """Get all results for a single test.
 
-        Replace any missing vaules with status.NOTRUN, correclty handles
+        Replace any missing vaules with status.NOTRUN, correctly handles
         subtests.
 
         """

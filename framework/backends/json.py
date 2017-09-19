@@ -83,7 +83,7 @@ class JSONBackend(FileBackend):
     This writes out to piglit's native json backend. This class uses the python
     json module or the simplejson.
 
-    This class is atomic, writes either completely fail or completley succeed.
+    This class is atomic, writes either completely fail or completely succeed.
     To achieve this it writes individual files for each test and for the
     metadata, and composes them at the end into a single file and removes the
     intermediate files. When it tries to compose these files if it cannot read
@@ -305,9 +305,9 @@ def _resume(results_dir):
 
 
 def _update_results(results, filepath):
-    """ Update results to the lastest version
+    """ Update results to the latest version
 
-    This function is a wraper for other update_* functions, providing
+    This function is a wrapper for other update_* functions, providing
     incremental updates from one version to another.
 
     Arguments:
@@ -356,7 +356,7 @@ def _update_results(results, filepath):
 
 
 def _write(results, file_):
-    """WRite the values of the results out to a file."""
+    """Write the values of the results out to a file."""
     with write_compressed(file_) as f:
         json.dump(results, f, default=piglit_encoder, indent=INDENT)
 

@@ -220,7 +220,7 @@ class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-meth
 
     This works by very cleverly shadowing itself with the calculated value. It
     adds the value to the instance, which pushes itself up the MRO and will
-    never be quired again.
+    never be queried again.
 
     """
     def __init__(self, func):

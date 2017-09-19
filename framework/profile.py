@@ -292,7 +292,7 @@ class TestProfile(object):
         """Method to do pre-run setup."""
 
     def teardown(self):
-        """Method to od post-run teardown."""
+        """Method to do post-run teardown."""
 
     def copy(self):
         """Create a copy of the TestProfile.
