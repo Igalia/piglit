@@ -230,8 +230,7 @@ def load_results(filename, compression_):
         # regenerate values that we don't need to.
         return _resume(filename)
     else:
-        # Look for a compressed result first, then a bare result, finally for
-        # an old main file
+        # Look for a compressed result first, then a bare result.
         for name in ['results.json.{}'.format(compression_), 'results.json']:
             if os.path.exists(os.path.join(filename, name)):
                 filepath = os.path.join(filename, name)
