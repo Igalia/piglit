@@ -1703,7 +1703,7 @@ parse_config(const char* config_str,
 				} else if(regex_match(key, "^platform_regex$")) {
 					config->platform_regex = add_dynamic_str_copy(value);
 				} else if(regex_match(key, "^device_regex$")) {
-					config->platform_regex = add_dynamic_str_copy(value);
+					config->device_regex = add_dynamic_str_copy(value);
 				} else if(regex_match(key, "^require_platform_extensions$")) {
 					config->require_platform_extensions =
 						add_dynamic_str_copy(value);
