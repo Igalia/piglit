@@ -559,7 +559,7 @@ class ReducedProcessMixin(object):
     def _is_cherry(self):
         """Method used to determine if rerunning is required.
 
-        If this returns True then the rerun path will be entered, otherwise
+        If this returns False then the rerun path will be entered, otherwise
         _run_command is effectively a bare call to super().
 
         Classes using this mixin may need to overwrite this if the binary
