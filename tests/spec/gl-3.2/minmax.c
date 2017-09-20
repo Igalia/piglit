@@ -163,7 +163,7 @@ piglit_init(int argc, char **argv)
 	piglit_test_min_int(GL_MAX_COLOR_TEXTURE_SAMPLES, 1);
 	piglit_test_min_int(GL_MAX_DEPTH_TEXTURE_SAMPLES, 1);
 	piglit_test_min_int(GL_MAX_INTEGER_SAMPLES, 1);
-	piglit_test_min_int(GL_MAX_SERVER_WAIT_TIMEOUT, 0);
+	piglit_test_min_uint64(GL_MAX_SERVER_WAIT_TIMEOUT, 0);
 
 	piglit_test_min_int(GL_MAX_DRAW_BUFFERS, 8);
 	piglit_test_min_int(GL_SAMPLE_BUFFERS, 0);
