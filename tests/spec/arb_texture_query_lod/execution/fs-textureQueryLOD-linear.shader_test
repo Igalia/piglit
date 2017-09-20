@@ -60,7 +60,7 @@ void main()
     }
 
     vec2 queried_lod = textureQueryLOD(tex, gl_TexCoord[0].st);
-    if (queried_lod.x != queried_lod.y) {
+    if (!equal(queried_lod.x, queried_lod.y)) {
 	discard;
     }
     if (!equal(queried_lod.x, lod)) {

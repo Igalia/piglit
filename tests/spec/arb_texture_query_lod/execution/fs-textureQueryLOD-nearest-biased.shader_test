@@ -51,6 +51,10 @@ GL_ARB_texture_query_lod
 #define MAX_MIPMAP_LEVEL 3
 uniform sampler2D tex;
 uniform float lod;
+
+#define tolerance (1.0/255.0)
+#define equal(x,y) (abs((x) - (y)) <= tolerance)
+
 void main()
 {
     /* The ARB_texture_query_lod spec says that if TEXTURE_MIN_FILTER is set
@@ -69,7 +73,7 @@ void main()
     }
 
     vec2 queried_lod = textureQueryLOD(tex, gl_TexCoord[0].st);
-    if (queried_lod.x != min(queried_lod.y, MAX_MIPMAP_LEVEL)) {
+    if (!equal(queried_lod.x, min(queried_lod.y, MAX_MIPMAP_LEVEL))) {
 	discard;
     }
     if (queried_lod.x != min(nearest_lod + 1, MAX_MIPMAP_LEVEL)) {
