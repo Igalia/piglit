@@ -89,7 +89,7 @@ def splitname(group):
 def commonprefix(args):
     """Given a list of groups, returns the longest common leading component."""
     if len(args) == 1:
-        return args
+        return args[0]
     elif any(e == '' for e in args):
         return ''
 
