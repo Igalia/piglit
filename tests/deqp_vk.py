@@ -55,9 +55,6 @@ class DEQPVKTest(deqp.DEQPBaseTest):
         return super(DEQPVKTest, self).extra_args + \
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
-    def __init__(self, *args, **kwargs):
-        super(DEQPVKTest, self).__init__(*args, **kwargs)
-
     def interpret_result(self):
         if 'Failed to compile shader at vkGlslToSpirV' in self.result.out:
             self.result.result = 'skip'

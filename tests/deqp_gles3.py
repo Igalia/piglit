@@ -88,10 +88,6 @@ class DEQPGLES3Test(deqp.DEQPBaseTest):
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
 
-    def __init__(self, *args, **kwargs):
-        super(DEQPGLES3Test, self).__init__(*args, **kwargs)
-
-
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     deqp.select_source(_DEQP_GLES3_BIN, 'dEQP-GLES3-cases.txt', _DEQP_MUSTPASS,
                        _EXTRA_ARGS),
