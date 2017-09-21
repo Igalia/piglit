@@ -909,8 +909,8 @@ def main():
     config = parse_args()
     success = True
 
-    config.spirv_as = '/home/nha/amd/khronos/SPIRV-Tools/build/tools/spirv-as'
-    config.glslang = '/home/nha/amd/khronos/glslang/build/StandAlone/glslangValidator'
+    config.spirv_as = './generated_spv/spirv-as'
+    config.glslang = './generated_spv/glslangValidator'
 
     config.excludes = []
 
