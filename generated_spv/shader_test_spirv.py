@@ -905,12 +905,24 @@ def expand_shader_tests(config):
             yield name
 
 
+def get_option(env_varname, default=None):
+    """Query the given environment variable for the option.
+
+    Return the value of the default argument if opt is None.
+
+    """
+    opt = os.environ.get(env_varname, None)
+    if opt is not None:
+        return opt
+
+    return opt or default
+
 def main():
     config = parse_args()
     success = True
 
-    config.spirv_as = '/home/nha/amd/khronos/SPIRV-Tools/build/tools/spirv-as'
-    config.glslang = '/home/nha/amd/khronos/glslang/build/StandAlone/glslangValidator'
+    config.spirv_as = get_option('PIGLIT_SPIRV_AS_BINARY', './generated_spv/spirv-as')
+    config.glslang = get_option('PIGLIT_GLSLANG_VALIDATOR_BINARY', './generated_spv/glslangValidator')
 
     config.excludes = []
 
