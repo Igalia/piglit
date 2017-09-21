@@ -193,7 +193,7 @@ piglit_cl_test(const int argc,
 	compiled_programs[0] = function_prog;
 	compiled_programs[1] = kernel_prog;
 
-/*** Normal usage ***/
+	/*** Normal usage ***/
 	test(env->context->cl_ctx,
 	     env->context->num_devices, env->context->device_ids,
 	     "-create-library",
@@ -237,7 +237,7 @@ piglit_cl_test(const int argc,
 	}
 
 
-/*** Errors ***/
+	/*** Errors ***/
 
 	/*
 	 * CL_INVALID_VALUE if device_list is NULL and num_devices is greater than
@@ -359,21 +359,21 @@ piglit_cl_test(const int argc,
 		cl_bool* dev_linker =
 			piglit_cl_get_device_info(env->context->device_ids[i],
 			                          CL_DEVICE_LINKER_AVAILABLE);
-			if(!(*dev_linker)) {
-				test(env->context->cl_ctx,
-				     1, &env->context->device_ids[i],
-				     "",
-				     2, compiled_programs,
-				     NULL, NULL,
-				     NULL,
-				     CL_LINKER_NOT_AVAILABLE, &result,
-				     "Trigger CL_LINKER_NOT_AVAILABLE if a linker is not available");
+		if(!(*dev_linker)) {
+			test(env->context->cl_ctx,
+			     1, &env->context->device_ids[i],
+			     "",
+			     2, compiled_programs,
+			     NULL, NULL,
+			     NULL,
+			     CL_LINKER_NOT_AVAILABLE, &result,
+			     "Trigger CL_LINKER_NOT_AVAILABLE if a linker is not available");
 		}
 		free(dev_linker);
 	}
 
 
-/* Release programs */
+	/* Release programs */
 	clReleaseProgram(function_prog);
 	clReleaseProgram(kernel_prog);
 	clReleaseProgram(linked_prog);
@@ -407,7 +407,7 @@ piglit_cl_test(const int argc,
 		     "Trigger CL_LINK_PROGRAM_FAILURE if there is a failure to link the compiled binaries and/or libraries");
 	}
 
-/* Release programs */
+	/* Release programs */
 	clReleaseProgram(function_prog);
 	clReleaseProgram(kernel_prog);
 
