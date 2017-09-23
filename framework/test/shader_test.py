@@ -193,6 +193,8 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
 
         if options.OPTIONS.force_glsl:
             return [command[0]] + [shaderfile, '-auto', '-fbo', '-glsl']
+        elif options.OPTIONS.spirv:
+            return [command[0]] + [shaderfile, '-auto', '-fbo', '-spirv']
         else:
             return [command[0]] + [shaderfile, '-auto', '-fbo']
 
