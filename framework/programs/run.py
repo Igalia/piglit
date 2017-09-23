@@ -222,9 +222,14 @@ def _run_parser(input_):
                         type=path.realpath,
                         metavar="<Results Path>",
                         help="Path to results folder")
+
     parser.add_argument("--glsl",
                         action="store_true",
                         help="Run shader runner tests with the -glsl (force GLSL) option")
+
+    parser.add_argument("--spirv",
+                        action="store_true",
+                        help="Run shader runner tests with the -spirv (try SPIR-V) option")
 
     return parser.parse_args(unparsed)
 
@@ -301,6 +306,7 @@ def run(input_):
     options.OPTIONS.deqp_mustpass = args.deqp_mustpass
     options.OPTIONS.process_isolation = args.process_isolation
     options.OPTIONS.force_glsl = args.glsl
+    options.OPTIONS.spirv = args.spirv
 
     # Set the platform to pass to waffle
     options.OPTIONS.env['PIGLIT_PLATFORM'] = args.platform
@@ -404,6 +410,7 @@ def resume(input_):
     options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
     options.OPTIONS.process_isolation = results.options['process_isolation']
     options.OPTIONS.force_glsl = results.options['glsl']
+    options.OPTIONS.spirv = results.options['spirv']
 
     core.get_config(args.config_file)
 

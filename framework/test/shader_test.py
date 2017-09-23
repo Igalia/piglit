@@ -179,8 +179,11 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
     @PiglitBaseTest.command.getter
     def command(self):
         """ Add -auto and -fbo to the test command """
+
         if options.OPTIONS.force_glsl:
             return self._command + ['-auto', '-fbo', '-glsl']
+        elif options.OPTIONS.spirv:
+            return self._command + ['-auto', '-fbo', '-spirv']
         else:
             return self._command + ['-auto', '-fbo']
 
