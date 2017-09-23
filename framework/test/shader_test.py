@@ -32,6 +32,7 @@ import re
 
 from framework import exceptions
 from framework import status
+from framework import options
 from .base import ReducedProcessMixin, TestIsSkip
 from .opengl import FastSkipMixin, FastSkip
 from .piglit_test import PiglitBaseTest, ROOT_DIR
@@ -186,10 +187,15 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
 
     @PiglitBaseTest.command.getter
     def command(self):
-        """ Add -auto and -fbo to the test command """
+        """ Add -auto, -fbo and -glsl (if needed) to the test command """
+
         command = super(ShaderTest, self).command
         shaderfile = os.path.join(ROOT_DIR, command[1])
-        return [command[0]] + [shaderfile, '-auto', '-fbo']
+
+        if options.OPTIONS.force_glsl:
+            return [command[0]] + [shaderfile, '-auto', '-fbo', '-glsl']
+        else:
+            return [command[0]] + [shaderfile, '-auto', '-fbo']
 
     @command.setter
     def command(self, new):
