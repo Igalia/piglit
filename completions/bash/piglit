@@ -50,10 +50,11 @@ __piglit_run() {
     local with_args=("-f" "--config" "-b" "--backend" "--junit_suffix"
                      "-l" "--log-level" "--test-list" "-n" "--name"
                      "-p" "--platform")
-    local profiles=("all" "cl" "cpu" "cts" "deqp_gles2" "deqp_gles3"
-                    "deqp_gles31" "glslparser" "gpu" "igt" "llvmpipe"
-                    "oglconform" "quick_cl" "quick" "sanity" "shader"
-                    "xts" "xts-render")
+    local profiles=("all" "cl" "cpu" "cts_gl" "cts_gl45" "cts_gles" "deqp_egl"
+                    "deqp_gles2" "deqp_gles3" "deqp_gles31" "deqp_vk"
+                    "es3conform" "glslparser" "gpu" "igt" "khr_gl" "khr_gl45"
+                    "llvmpipe" "no_error" "oglconform" "quick" "quick_cl"
+                    "sanity" "shader" "xts" "xts-render")
 
     # If the argument begins with - then just show the -* options
     if [[ "$cur" == -* ]]; then
