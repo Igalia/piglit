@@ -32,6 +32,7 @@ import re
 
 from framework import exceptions
 from framework import status
+from framework import options
 from .base import ReducedProcessMixin, TestIsSkip
 from .opengl import FastSkipMixin, FastSkip
 from .piglit_test import PiglitBaseTest
@@ -178,7 +179,10 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
     @PiglitBaseTest.command.getter
     def command(self):
         """ Add -auto and -fbo to the test command """
-        return self._command + ['-auto', '-fbo']
+        if options.OPTIONS.spirv:
+            return self._command + ['-auto', '-fbo', '-spirv']
+        else:
+            return self._command + ['-auto', '-fbo']
 
     @command.setter
     def command(self, new):
