@@ -23,7 +23,7 @@
 
 # This provides completions for piglit in bash
 #
-# It requires debian's bash_completions (which are avialable on most
+# It requires debian's bash_completions (which are available on most
 # linux and BSD OSes) for it's _filedir function.
 
 __piglit_results_extensions="@(json|json.xz|json.gz|json.bz2)"
@@ -33,10 +33,10 @@ __piglit_results_extensions="@(json|json.xz|json.gz|json.bz2)"
 # This is a *very* complex function. It handles *most*, but not all of the
 # functionality of 'piglit run'.
 #
-# This handles everything piglit run expects, with one small caviat, after the
+# This handles everything piglit run expects, with one small caveat, after the
 # first profile is provided, it mixes profiles and directories together, since
 # either additional profiles or a directory can be provided. After something
-# that isn't a profile is provided it wont auto complete any more positional
+# that isn't a profile is provided it won't auto complete any more positional
 # arguments.
 __piglit_run() {
     local cur=${COMP_WORDS[COMP_CWORD]}
@@ -107,8 +107,8 @@ __piglit_run() {
             if [[ ${positional} -eq 0 ]] && [[ "${list[$i]}" != "" ]]; then
                 [[ "${profiles[@]}" =~ "${list[$i]}" ]] && ((++positional))
 
-            # if the elemtn is not a profile, and it is a complete file or directory
-            # Then stop, there are no more positional arguments allow, only swithces
+            # If the element is not a profile, and it is a complete file or directory
+            # then stop, there are no more positional arguments allowed, only switches
             elif [[ ! "${profiles[@]}" =~ "${list[$i]}" ]]; then
                 [[ -a "${list[$i]}" ]] && [[ "${list[$i+1]}" == '' ]] && return 0
 
@@ -170,7 +170,7 @@ __piglit_resume() {
 
 # Handle 'piglit summary aggregate'
 #
-# This is a very simple fution, it takes only one positional argument, and only
+# This is a very simple function, it takes only one positional argument, and only
 # a single positional argument
 __piglit_summary_aggregate() {
     local cur=${COMP_WORDS[COMP_CWORD]}
@@ -314,7 +314,7 @@ __piglit_summary_feature() {
 #
 # This is another fairly complex function to complete. It provides two
 # different positional arugments, the first can be specified only once, the
-# second can be privded an infinite number of times.  It also provides a few
+# second can be provided an infinite number of times.  It also provides a few
 # switches that have positional arguments.
 __piglit_summary_html() {
     local cur=${COMP_WORDS[COMP_CWORD]}
