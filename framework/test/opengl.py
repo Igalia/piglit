@@ -302,8 +302,8 @@ class FastSkip(object):
     all the tests that could have, but also a few that should have run.
 
     Keyword Arguments:
-    gl_reqruied     -- This is a set of extensions that are required for
-                       running the extension.
+    gl_required     -- This is a set of extensions that are required for
+                       running the test.
     gl_version      -- A float that is the required version number for an
                        OpenGL test.
     gles_version    -- A float that is the required version number for an
@@ -390,8 +390,8 @@ class FastSkipMixin(object):
     has all of the same requirements as that class.
 
     It also provides new attributes:
-    gl_reqruied     -- This is a set of extensions that are required for
-                       running the extension.
+    gl_required     -- This is a set of extensions that are required for
+                       running the test.
     gl_version      -- A float that is the required version number for an
                        OpenGL test.
     gles_version    -- A float that is the required version number for an
