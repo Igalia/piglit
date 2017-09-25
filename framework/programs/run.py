@@ -397,7 +397,7 @@ def resume(input_):
     options.OPTIONS.valgrind = results.options['valgrind']
     options.OPTIONS.sync = results.options['sync']
     options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
-    options.OPTIONS.proces_isolation = results.options['process_isolation']
+    options.OPTIONS.process_isolation = results.options['process_isolation']
 
     core.get_config(args.config_file)
 
