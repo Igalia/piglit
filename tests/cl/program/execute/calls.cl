@@ -291,7 +291,7 @@ long i64_func_void(void)
 #if USE_ASM
     __asm("v_lshlrev_b64 %0, 44, 1" : "=v"(ret));
 #else
-    ret = 1ull << 44;
+    ret = 1ul << 44;
 #endif
     return ret;
 }
