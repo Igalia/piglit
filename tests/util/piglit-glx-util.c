@@ -212,6 +212,20 @@ piglit_glx_event_loop(Display *dpy, enum piglit_result (*draw)(Display *dpy))
 			enum piglit_result result = draw(dpy);
 
 			if (piglit_automatic) {
+				/*
+				 * Rerun if we have failed and have a
+				 * pending expose event, which might be an
+				 * indication of invalid front buffer
+				 * contents.
+				 */
+				if (result == PIGLIT_FAIL &&
+				    XCheckTypedEvent(dpy, Expose, &event)) {
+					fprintf(stderr,
+						"Pending expose event- "
+						"rerunning.\n");
+					XPutBackEvent(dpy, &event);
+					continue;
+				}
 				XCloseDisplay(dpy);
 				piglit_report_result(result);
 				break;
