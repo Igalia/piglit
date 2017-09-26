@@ -2836,7 +2836,8 @@ probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uin
 	REQUIRE(parse_comparison_op(op, &cmp, NULL),
 		"Invalid comparison operation at: %s\n", op);
 
-	p = glMapNamedBufferRange(atomics_bos[buffer_num], counter_num * sizeof(uint32_t),
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomics_bos[buffer_num]);
+	p = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, counter_num * sizeof(uint32_t),
 			     sizeof(uint32_t), GL_MAP_READ_BIT);
 
         if (!p) {
@@ -2852,12 +2853,12 @@ probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uin
 		       counter_num, comparison_string(cmp));
 		printf("  Reference: %u\n", value);
 		printf("  Observed:  %u\n", observed);
-		glUnmapNamedBuffer(atomics_bos[buffer_num]);
+		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
 		return false;
-        }
+	}
 
-        glUnmapNamedBuffer(atomics_bos[buffer_num]);
-        return true;
+	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+	return true;
 }
 
 static bool
