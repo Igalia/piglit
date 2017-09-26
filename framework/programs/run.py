@@ -208,6 +208,14 @@ def _run_parser(input_):
                              'isolation. This allows, but does not require, '
                              'tests to run multiple tests per process. '
                              'This value can also be set in piglit.conf.')
+    parser.add_argument('-j', '--jobs',
+                        dest='jobs',
+                        action='store',
+                        type=int,
+                        default=core.PIGLIT_CONFIG.safe_get(
+                            'core', 'jobs', None),
+                        help='Set the maximum number of jobs to run concurrently. '
+                             'By default, the reported number of CPUs is used.')
     parser.add_argument("--ignore-missing",
                         dest="ignore_missing",
                         action="store_true",
@@ -296,6 +304,7 @@ def run(input_):
     options.OPTIONS.sync = args.sync
     options.OPTIONS.deqp_mustpass = args.deqp_mustpass
     options.OPTIONS.process_isolation = args.process_isolation
+    options.OPTIONS.jobs = args.jobs
 
     # Set the platform to pass to waffle
     options.OPTIONS.env['PIGLIT_PLATFORM'] = args.platform
@@ -364,7 +373,7 @@ def run(input_):
         if args.include_tests:
             p.filters.append(profile.RegexFilter(args.include_tests))
 
-    profile.run(profiles, args.log_level, backend, args.concurrency)
+    profile.run(profiles, args.log_level, backend, args.concurrency, args.jobs)
 
     time_elapsed.end = time.time()
     backend.finalize({'time_elapsed': time_elapsed.to_json()})
@@ -389,6 +398,14 @@ def resume(input_):
                         dest="no_retry",
                         action="store_true",
                         help="Do not retry incomplete tests")
+    parser.add_argument('-j', '--jobs',
+                        dest='jobs',
+                        action='store',
+                        type=int,
+                        default=core.PIGLIT_CONFIG.safe_get(
+                            'core', 'jobs', None),
+                        help='Set the maximum number of jobs to run concurrently. '
+                             'By default, the reported number of CPUs is used.')
     args = parser.parse_args(input_)
     _disable_windows_exception_messages()
 
@@ -398,6 +415,7 @@ def resume(input_):
     options.OPTIONS.sync = results.options['sync']
     options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
     options.OPTIONS.process_isolation = results.options['process_isolation']
+    options.OPTIONS.jobs = args.jobs
 
     core.get_config(args.config_file)
 
@@ -453,7 +471,8 @@ def resume(input_):
             profiles,
             results.options['log_level'],
             backend,
-            results.options['concurrent'])
+            results.options['concurrent'],
+            args.jobs)
     except exceptions.PiglitUserError as e:
         if str(e) != 'no matching tests':
             raise

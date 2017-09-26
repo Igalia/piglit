@@ -597,7 +597,7 @@ def load_test_profile(filename, python=None):
             'Did you specify the right file?'.format(filename))
 
 
-def run(profiles, logger, backend, concurrency):
+def run(profiles, logger, backend, concurrency, jobs):
     """Runs all tests using Thread pool.
 
     When called this method will flatten out self.tests into self.test_list,
@@ -614,6 +614,7 @@ def run(profiles, logger, backend, concurrency):
     profiles -- a list of Profile instances.
     logger   -- a log.LogManager instance.
     backend  -- a results.Backend derived instance.
+    jobs     -- maximum number of concurrent jobs. Use os.cpu_count() by default
     """
     chunksize = 1
 
@@ -670,7 +671,7 @@ def run(profiles, logger, backend, concurrency):
     #
     # The default value of pool is the number of virtual processor cores
     single = multiprocessing.dummy.Pool(1)
-    multi = multiprocessing.dummy.Pool()
+    multi = multiprocessing.dummy.Pool(jobs)
 
     try:
         for p in profiles:
