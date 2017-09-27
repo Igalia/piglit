@@ -372,8 +372,8 @@ def run(profiles, logger, backend, concurrency):
     then will prepare a logger, and begin executing tests through it's Thread
     pools.
 
-    Based on the value of options.OPTIONS.concurrent it will either run all the
-    tests concurrently, all serially, or first the thread safe tests then the
+    Based on the value of concurrency it will either run all the tests
+    concurrently, all serially, or first the thread safe tests then the
     serial tests.
 
     Finally it will print a final summary of the tests.
