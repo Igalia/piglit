@@ -437,6 +437,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs):
     - Change gl_Vertex and gl_FragColor to generic in/outs
     - Change old-style texture built-ins to core profile built-ins
     - Automatically assign in/out locations
+    - Automatically assign uniform locations
 
     Bail out:
     - Use of compatibility profile-only state uniforms and ftransform
@@ -541,6 +542,27 @@ def fixup_glsl_shaders(shaders, vertex_attribs):
 
         return None
 
+    def assign_uniform_location(flat_declaration):
+        assert flat_declaration[-1] == ';'
+        var = VariableDeclaration.parse(nest_tokens(flat_declaration[:-1]), cur_stage)
+        if var is None:
+            return None
+
+        layout = var.layout()
+        loc = None
+        size = var.size(skip_reasons)
+
+        if size is None:
+            assert skip_reasons
+            return None
+
+        if layout == None and var.mode == 'uniform':
+            loc = cur_uniform_location[0]
+            cur_uniform_location[0] += var.size(skip_reasons)
+
+        if loc is not None:
+            return 'layout(location={}) '.format(loc) + ' '.join(flat_declaration)
+
     def assign_location(flat_declaration):
         assert flat_declaration[-1] == ';'
         var = VariableDeclaration.parse(nest_tokens(flat_declaration[:-1]), cur_stage)
@@ -608,6 +630,8 @@ def fixup_glsl_shaders(shaders, vertex_attribs):
             cur_stage = shader.stage
             cur_stage_out = {}
             cur_out_location = [0]
+            cur_uniform_location = [0]
+
 
         glsl = GLSLSource(shader.source())
 
@@ -620,6 +644,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs):
             glsl.insert_after_versions(compat_replacements[compat].declaration + '\n')
 
         glsl.transform_toplevel_declarations(assign_location)
+        glsl.transform_toplevel_declarations(assign_uniform_location)
 
         glsl.transform_tokens(scan_builtin)
 
