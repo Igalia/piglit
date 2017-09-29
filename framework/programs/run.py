@@ -384,6 +384,8 @@ def run(input_):
 
 @exceptions.handler
 def resume(input_):
+    unparsed = parsers.parse_config(input_)[1]
+
     parser = argparse.ArgumentParser()
     parser.add_argument("results_path",
                         type=path.realpath,
@@ -406,7 +408,7 @@ def resume(input_):
                             'core', 'jobs', None),
                         help='Set the maximum number of jobs to run concurrently. '
                              'By default, the reported number of CPUs is used.')
-    args = parser.parse_args(input_)
+    args = parser.parse_args(unparsed)
     _disable_windows_exception_messages()
 
     results = backends.load(args.results_path)
@@ -416,6 +418,7 @@ def resume(input_):
     options.OPTIONS.deqp_mustpass = results.options['deqp_mustpass']
     options.OPTIONS.process_isolation = results.options['process_isolation']
     options.OPTIONS.jobs = args.jobs
+    options.OPTIONS.no_retry = args.no_retry
 
     core.get_config(args.config_file)
 
