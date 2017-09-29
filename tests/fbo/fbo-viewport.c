@@ -43,7 +43,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 /**
- * Draw some simple quads in a bunch of viewports which tile the window.
+ * Draw full-viewport quads in a bunch of viewports which tile the window.
  * Note that viewports extend beyond the edges of the window too.
  */
 static void
@@ -53,56 +53,41 @@ draw_test_image(void)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glFrustum(-1, 1, -1, 1, 3, 9.5);
-
-	/* Draw some quads at an odd rotation.
-	 * Note that we want near/far frustum clipping.
-	 */
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glTranslatef(0, 1, -6.20);
-	glRotatef(-60, 1, 0, 0);
-	glRotatef(30, 0, 0, 1);
-	glScalef(3.5, 3.5, 3.5);
-
 	/* loop over viewports */
+	int i = 1;
 	for (vy = -50; vy < piglit_height; vy += vh+10) {
-		for (vx = -30; vx < piglit_width; vx += vw+10) {
+		for (vx = -30; vx < piglit_width; vx += vw+10, ++i) {
 			glViewport(vx, vy, vw, vh);
 
 			glBegin(GL_QUADS);
 
-			glColor3f(1, 0, 0);
+			glColor3f((i % 4) / 3.0, ((i / 4) % 4) / 3.0, 0.0);
 			glVertex2f(-1, -1);
 			glVertex2f( 0, -1);
 			glVertex2f( 0,  0);
 			glVertex2f(-1,  0);
 
-			glColor3f(0, 1, 0);
+			glColor3f((i % 4) / 3.0, ((i / 4) % 4) / 3.0, 0.333);
 			glVertex2f( 0, -1);
 			glVertex2f( 1, -1);
 			glVertex2f( 1,  0);
 			glVertex2f( 0,  0);
 
-			glColor3f(0, 0, 1);
-			glVertex2f(-1,  0);
-			glVertex2f( 0,  0);
-			glVertex2f( 0,  1);
-			glVertex2f(-1,  1);
-
-			glColor3f(1, 1, 1);
+			glColor3f((i % 4) / 3.0, ((i / 4) % 4) / 3.0, 0.666);
 			glVertex2f( 0,  0);
 			glVertex2f( 1,  0);
 			glVertex2f( 1,  1);
 			glVertex2f( 0,  1);
 
+			glColor3f((i % 4) / 3.0, ((i / 4) % 4) / 3.0, 1.0);
+			glVertex2f(-1,  0);
+			glVertex2f( 0,  0);
+			glVertex2f( 0,  1);
+			glVertex2f(-1,  1);
+
 			glEnd();
 		}
 	}
-
-	glPopMatrix();
 }
 
 
