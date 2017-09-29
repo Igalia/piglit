@@ -40,6 +40,7 @@ __all__ = [
     'csv',
     'html',
     'feature'
+    'formatted'
 ]
 
 
@@ -122,7 +123,7 @@ def console(input_):
     """Combine files in a tests/ directory into a single results file."""
     unparsed = parsers.parse_config(input_)[1]
 
-    # Adding the parent is necissary to get the help options
+    # Adding the parent is necessary to get the help options
     parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
 
     # Set the -d and -s options as exclusive, since it's silly to call for diff
@@ -193,6 +194,61 @@ def csv(input_):
             output.write("{},{},{},{}\n".format(name, result.time.total,
                                                 result.returncode,
                                                 result.result))
+
+    if args.output != "stdout":
+        with open(args.output, 'w') as output:
+            write_results(output)
+    else:
+        write_results(sys.stdout)
+
+@exceptions.handler
+def formatted(input_):
+    # Make a copy of the status text list and add all. This is used as the
+    # argument list for -e/--exclude
+    statuses = set(str(s) for s in status.ALL)
+
+    unparsed = parsers.parse_config(input_)[1]
+
+    # Adding the parent is necissary to get the help options
+    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
+    parser.add_argument("--format",
+                        dest="format_string",
+                        metavar="<format string>",
+                        default="{name} ::: {time} ::: "
+                                "{returncode} ::: {result}",
+                        action="store",
+                        help="A template string that defines the format. "
+                             "Replacement tokens are {name}, {time}, "
+                             "{returncode} and {result}")
+    parser.add_argument("-e", "--exclude-details",
+                        default=[],
+                        action="append",
+                        choices=statuses,
+                        help="Optionally exclude the listing of tests with "
+                             "the status(es) given as arguments. "
+                             "May be used multiple times")
+    parser.add_argument("-o", "--output",
+                        metavar="<Output File>",
+                        action="store",
+                        dest="output",
+                        default="stdout",
+                        help="Output filename")
+    parser.add_argument("test_results",
+                        metavar="<Input Files>",
+                        help="JSON results file to be converted")
+    args = parser.parse_args(unparsed)
+
+    testrun = backends.load(args.test_results)
+
+    def write_results(output):
+        for name, result in six.iteritems(testrun.tests):
+            if result.result in args.exclude_details:
+                continue
+            output.write((args.format_string + "\n").format(
+                name=name,
+                time=result.time.total,
+                returncode=result.returncode,
+                result=result.result))
 
     if args.output != "stdout":
         with open(args.output, 'w') as output:

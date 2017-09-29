@@ -149,6 +149,10 @@ def main():
                                     add_help=False,
                                     help='generate csv from results')
     csv.set_defaults(func=summary.csv)
+    formatted = summary_parser.add_parser('formatted',
+                                    add_help=False,
+                                    help='generate formatted output from results')
+    formatted.set_defaults(func=summary.formatted)
     aggregate = summary_parser.add_parser('aggregate',
                                           add_help=False,
                                           help="Aggregate incomplete piglit run.")
