@@ -592,7 +592,6 @@ piglit_wfl_framework_init(struct piglit_wfl_framework *wfl_fw,
 	static int32_t initialized_platform = 0;
 
 	(void)initialized_platform;
-	bool ok = true;
 
 	if (is_waffle_initialized) {
 		assert(platform == initialized_platform);
@@ -607,19 +606,16 @@ piglit_wfl_framework_init(struct piglit_wfl_framework *wfl_fw,
 		initialized_platform = platform;
 	}
 
-	ok = piglit_gl_framework_init(&wfl_fw->gl_fw, test_config);
-	if (!ok)
-		goto fail;
+	if (!piglit_gl_framework_init(&wfl_fw->gl_fw, test_config)) {
+		piglit_wfl_framework_teardown(wfl_fw);
+		return false;
+	}
 
 	wfl_fw->platform = platform;
 	wfl_fw->display = wfl_checked_display_connect(NULL);
 	make_context_current(wfl_fw, test_config, partial_config_attrib_list);
 
 	return true;
-
-fail:
-	piglit_wfl_framework_teardown(wfl_fw);
-	return false;
 }
 
 void
