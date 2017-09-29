@@ -43,6 +43,7 @@ __all__ = [
     'formatted'
 ]
 
+DEFAULT_FMT_STR="{name} ::: {time} ::: {returncode} ::: {result}"
 
 @exceptions.handler
 def html(input_):
@@ -172,37 +173,11 @@ def console(input_):
 
 @exceptions.handler
 def csv(input_):
-    unparsed = parsers.parse_config(input_)[1]
-
-    # Adding the parent is necissary to get the help options
-    parser = argparse.ArgumentParser(parents=[parsers.CONFIG])
-    parser.add_argument("-o", "--output",
-                        metavar="<Output File>",
-                        action="store",
-                        dest="output",
-                        default="stdout",
-                        help="Output filename")
-    parser.add_argument("testResults",
-                        metavar="<Input Files>",
-                        help="JSON results file to be converted")
-    args = parser.parse_args(unparsed)
-
-    testrun = backends.load(args.testResults)
-
-    def write_results(output):
-        for name, result in six.iteritems(testrun.tests):
-            output.write("{},{},{},{}\n".format(name, result.time.total,
-                                                result.returncode,
-                                                result.result))
-
-    if args.output != "stdout":
-        with open(args.output, 'w') as output:
-            write_results(output)
-    else:
-        write_results(sys.stdout)
+    format_string="{name},{time},{returncode},{result}"
+    return formatted(input_, default_format_string=format_string)
 
 @exceptions.handler
-def formatted(input_):
+def formatted(input_, default_format_string=DEFAULT_FMT_STR):
     # Make a copy of the status text list and add all. This is used as the
     # argument list for -e/--exclude
     statuses = set(str(s) for s in status.ALL)
@@ -214,8 +189,7 @@ def formatted(input_):
     parser.add_argument("--format",
                         dest="format_string",
                         metavar="<format string>",
-                        default="{name} ::: {time} ::: "
-                                "{returncode} ::: {result}",
+                        default=default_format_string,
                         action="store",
                         help="A template string that defines the format. "
                              "Replacement tokens are {name}, {time}, "
