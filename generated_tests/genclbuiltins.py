@@ -172,10 +172,10 @@ def gen_kernel_1_arg(f, fnName, inType, outTypes, loc = 'private'):
 
 
 #  2 argument kernel with input types that match their vector size
-def gen_kernel_2_arg_same_size(f, fnName, inTypes, outTypes):
+def gen_kernel_2_arg_same_size(f, fnName, inTypes, outTypes, loc = 'private'):
     for vecSize in ALL_WIDTHS:
         gen_kernel(f, fnName, inTypes, outTypes, [vecSize, vecSize],
-                   '')
+                   '', loc)
 
 
 #  2 argument kernel with 1 vector and one scalar input argument
@@ -238,8 +238,16 @@ def generate_kernels(f, dataType, fnName, fnDef):
         return
 
     if (len(argTypes) == 4):
-        gen_kernel_3_arg_same_type(f, fnName,
-                   [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
+        if (getNumOutArgs(fnDef) == 2):
+            gen_kernel_2_arg_same_size(f, fnName, [argTypes[2], argTypes[3]],
+                                       [argTypes[0], argTypes[1]], 'private')
+            gen_kernel_2_arg_same_size(f, fnName, [argTypes[2], argTypes[3]],
+                                       [argTypes[0], argTypes[1]], 'local')
+            gen_kernel_2_arg_same_size(f, fnName, [argTypes[2], argTypes[3]],
+                                       [argTypes[0], argTypes[1]], 'global')
+        else:
+            gen_kernel_3_arg_same_type(f, fnName,
+                       [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
         if (fnDef['function_type'] is 'tss'):
             gen_kernel_3_arg_mixed_size_tss(f, fnName,
                    [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
