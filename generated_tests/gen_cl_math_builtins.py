@@ -234,7 +234,7 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [1.0, cos(pi*pi/2), cos(pi*3*pi/2), cos(2*pi*pi), cos(pi*1.12345), cos(pi*pow(2,20)), cos(pi*pow(2,24)), cos(pi*pow(2,120)), float("nan")], # Result
+            [1.0, cos(pi*pi/2), cos(pi*3*pi/2), cos(2*pi*pi), cos(pi*1.12345), cos(pi*pow(2,20)), cos(pi*pow(2,24)), 1.0, float("nan")], # Result
             [0.0, pi / 2,       3 * pi / 2,     2 * pi,       1.12345        , pow(2,20),         pow(2,24),         pow(2,120),         float("nan")]  # Arg0
         ],
         'tolerance' : 4
