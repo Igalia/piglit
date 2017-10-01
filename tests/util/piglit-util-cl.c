@@ -81,57 +81,73 @@ bool piglit_cl_probe_half(cl_half value, cl_half expect, uint32_t ulp)
 	                                ulp * 8192);
 }
 
-/* TODO: Tolerance should be specified in terms of ULP. */
-bool
-piglit_cl_probe_floating(float value, float expect,  uint32_t ulp)
+bool piglit_cl_probe_floating(float value, float expect, uint32_t ulp)
 {
 	float diff;
 	union {
 		float f;
 		uint32_t u;
-	} v, e, t;
+	} v, e;
 
 	v.f = value;
 	e.f = expect;
-	t.u = ulp;
-	/* Treat infinity and nan seperately */
+
+	/* Treat infinity and nan separately */
 	if (probe_float_check_nan_inf(value, expect)) {
 		return true;
 	}
 
+	/* Check "any value" */
+	if (ulp >= (1u << 24)) {
+		return true;
+	}
+
+	/* expect is correctly rounded, 1 ULP is the distance to next
+	 * representable value */
+	float direction = signbit(expect) ?  -INFINITY : INFINITY;
+	float one_ulp = nextafterf(expect, direction) - expect;
+	float tolerance = fabsf(ulp * one_ulp);
+
 	diff = fabsf(value - expect);
 
-	if(diff > ulp || isnan(value)) {
+	if (diff > tolerance || isnan(value)) {
 		printf("Expecting %f (0x%x) with tolerance %f (%u ulps), but got %f (0x%x)\n",
-		       e.f, e.u, t.f, t.u, v.f, v.u);
+		       e.f, e.u, tolerance, ulp, v.f, v.u);
 		return false;
 	}
 
 	return true;
 }
 
-bool
-piglit_cl_probe_double(double value, double expect, uint64_t ulp)
+bool piglit_cl_probe_double(double value, double expect, uint64_t ulp)
 {
 	double diff;
 	union {
 		double f;
 		uint64_t u;
-	} v, e, t;
+	} v, e;
 
 	v.f = value;
 	e.f = expect;
-	t.u = ulp;
-	/* Treat infinity and nan seperately */
+
+	/* Treat infinity and nan separately */
 	if (probe_float_check_nan_inf(value, expect)) {
 		return true;
 	}
+	/* Check "any value" */
+	if (ulp >= (1ul << 53)) {
+		return true;
+	}
 
-	diff = fabsl(value - expect);
+	double direction = signbit(expect) ?  -INFINITY : INFINITY;
+	double one_ulp = nextafter(expect, direction) - expect;
+	double tolerance = fabs(ulp * one_ulp);
 
-	if(diff > ulp || isnan(value)) {
+	diff = fabs(value - expect);
+
+	if(diff > tolerance || isnan(value)) {
 		printf("Expecting %f (0x%" PRIx64") with tolerance %f (%lu ulps), but got %f (0x%" PRIx64")\n",
-		       e.f, e.u, t.f, t.u, v.f, v.u);
+		       e.f, e.u, tolerance, ulp, v.f, v.u);
 		return false;
 	}
 
