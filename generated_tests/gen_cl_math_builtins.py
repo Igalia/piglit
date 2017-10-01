@@ -64,6 +64,7 @@ CLC_VERSION_MIN = {
     'log10' : 10,
     'log1p' : 10,
     'nextafter' : 10,
+    'remainder' : 10,
     'round' : 10,
     'sin' : 10,
     'sinh' : 10,
@@ -386,6 +387,18 @@ tests = {
             [1.401298e-45, -1.401298e-45, 1.00000011920928955078125, 0.999999940395355224609375, float("nan"), float("nan"), 5.0 ], # Result
             [0.0,           0.0         , 1.0, 1.0, float("nan"), 2.5, 5.0], # Arg0
             [1.0,          -1.0         , 2.0, 0.0, 3.4, float("nan"), 5.0], # Arg1
+        ]
+    },
+    'remainder' : {
+        'arg_types': [F, F, F],
+        'function_type': 'ttt',
+        'values': [
+            [float.fromhex("-0x1.ccccdp-1"), float.fromhex("0x1.ccccdp-1"),
+             float.fromhex("-0x1.ccccdp-1"), float.fromhex("0x1.ccccdp-1"),
+             0.0, -0.0, 5.1, float("-nan")
+            ], # Result
+            [ 5.1, -5.1,  5.1, -5.1, 0.0, -0.0, 5.1,          5.1], # Arg0
+            [ 3.0,  3.0, -3.0, -3.0, 1.0,  1.0, float("inf"), 0.0], # Arg1
         ]
     },
     'round' : {
