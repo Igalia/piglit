@@ -27,13 +27,13 @@ This integration requires some configuration in piglit.conf, or the use of
 environment variables.
 
 In piglit.conf one should set the following:
-[khr_gl]:bin -- Path to the glcts binary
-[khr_gl]:extra_args -- any extra arguments to be passed to cts (optional)
+[khr_gl45]:bin -- Path to the glcts binary
+[khr_gl45]:extra_args -- any extra arguments to be passed to cts (optional)
 
 Alternatively (or in addition, since environment variables have precedence),
 one could set:
-PIGLIT_KHR_GL_BIN -- environment equivalent of [khr_gl]:bin
-PIGLIT_KHR_GL_EXTRA_ARGS -- environment equivalent of [khr_gl]:extra_args
+PIGLIT_KHR_GL_BIN -- environment equivalent of [khr_gl45]:bin
+PIGLIT_KHR_GL_EXTRA_ARGS -- environment equivalent of [khr_gl45]:extra_args
 
 """
 
@@ -43,13 +43,18 @@ from __future__ import (
 import itertools
 
 from framework.test import deqp
+from framework.options import OPTIONS
 
 __all__ = ['profile']
 
-_KHR_BIN = deqp.get_option('PIGLIT_KHR_GL_BIN', ('khr_gl', 'bin'),
+_KHR_BIN = deqp.get_option('PIGLIT_KHR_GL_BIN', ('khr_gl45', 'bin'),
                            required=True)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_KHR_GL_EXTRA_ARGS', ('khr_gl', 'extra_args'),
+_KHR_MUSTPASS = deqp.get_option('PIGLIT_KHRGL45_MUSTPASS',
+                                 ('khr_gl45', 'mustpasslist'),
+                                 required=OPTIONS.deqp_mustpass)
+
+_EXTRA_ARGS = deqp.get_option('PIGLIT_KHR_GL_EXTRA_ARGS', ('khr_gl45', 'extra_args'),
                               default='').split()
 
 
@@ -62,8 +67,6 @@ class DEQPKHRTest(deqp.DEQPBaseTest):
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
-    itertools.chain(
-        deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_KHR_BIN, 'KHR-GL45-cases.txt', _EXTRA_ARGS)),
-    ),
+    deqp.select_source(_KHR_BIN, 'KHR-GL45-cases.txt', _KHR_MUSTPASS,
+                       _EXTRA_ARGS),
     DEQPKHRTest)
