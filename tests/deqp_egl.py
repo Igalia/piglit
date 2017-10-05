@@ -26,12 +26,17 @@ from __future__ import (
 )
 
 from framework.test import deqp
+from framework.options import OPTIONS
 
 __all__ = ['profile']
 
 _EGL_BIN = deqp.get_option('PIGLIT_DEQP_EGL_BIN',
                            ('deqp-egl', 'bin'),
                            required=True)
+
+_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP_EGL_MUSTPASS',
+                                 ('deqp-egl', 'mustpasslist'),
+                                 required=OPTIONS.deqp_mustpass)
 
 _EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_EGL_EXTRA_ARGS',
                               ('deqp-egl', 'extra_args'),
@@ -48,7 +53,6 @@ class DEQPEGLTest(deqp.DEQPBaseTest):
 
 
 profile = deqp.make_profile(  # pylint: disable=invalid-name
-    deqp.iter_deqp_test_cases(
-        deqp.gen_caselist_txt(_EGL_BIN, 'dEQP-EGL-cases.txt',
-                              _EXTRA_ARGS)),
+    deqp.select_source(_EGL_BIN, 'dEQP-EGL-cases.txt', _DEQP_MUSTPASS,
+                       _EXTRA_ARGS),
     DEQPEGLTest)
