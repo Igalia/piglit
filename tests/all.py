@@ -213,9 +213,9 @@ shader_tests = collections.defaultdict(list)
 # Find and add all shader tests.
 for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
     for dirpath, _, filenames in os.walk(basedir):
+        groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
         for filename in filenames:
             testname, ext = os.path.splitext(filename)
-            groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
             if ext == '.shader_test':
                 if PROCESS_ISOLATION:
                     test = ShaderTest(os.path.join(dirpath, filename))
