@@ -1,0 +1,64 @@
+[require]
+GLSL >= 1.40
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+uniform dvec4 u_in[2];
+uniform dvec4 u_mantissa[2];
+uniform ivec4 u_exponent[2];
+uniform int u_xor_mantissa;
+uniform int u_xor_exponent;
+
+out vec4 outcolor;
+
+void main()
+{
+  outcolor = vec4(0, 1, 0, 1);
+
+  ivec4 exponent[2];
+  dvec4 mantissa[2];
+
+  for (int i = 0; i < 2; ++i)
+    mantissa[i ^ u_xor_mantissa] = frexp(u_in[i], exponent[i ^ u_xor_exponent]);
+
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      if (mantissa[i][j] != u_mantissa[i][j] ||
+          exponent[i][j] != u_exponent[i][j])
+        outcolor = vec4(1.0, float(i * 4 + j) / 255,
+                        float(exponent[i][j] + 127) / 255, float(mantissa[i][j]));
+    }
+  }
+}
+
+[test]
+clear color 0 0 0 1
+clear
+
+uniform dvec4 u_in[0] 1 2 3 4
+uniform dvec4 u_in[1] 5 6 7 8
+uniform int u_xor_mantissa 0
+uniform int u_xor_exponent 0
+uniform dvec4 u_mantissa[0] 0.5 0.5 0.75 0.5
+uniform dvec4 u_mantissa[1] 0.625 0.75 0.875 0.5
+uniform ivec4 u_exponent[0] 1 2 2 3
+uniform ivec4 u_exponent[1] 3 3 3 4
+
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
+
+uniform dvec4 u_in[0] 12 16 24 32
+uniform dvec4 u_in[1] 40 64 80 128
+uniform int u_xor_mantissa 0
+uniform int u_xor_exponent 1
+uniform dvec4 u_mantissa[0] 0.75 0.5 0.75 0.5
+uniform dvec4 u_mantissa[1] 0.625 0.5 0.625 0.5
+uniform ivec4 u_exponent[1] 4 5 5 6
+uniform ivec4 u_exponent[0] 6 7 7 8
+
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1

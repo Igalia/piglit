@@ -1,0 +1,38 @@
+[require]
+GLSL >= 1.40
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+uniform dvec4 u_in;
+uniform dvec4 u_mantissa;
+
+out vec4 outcolor;
+
+void main()
+{
+  outcolor = vec4(0, 1, 0, 1);
+
+  ivec4 exponent;
+  dvec4 mantissa;
+  mantissa = frexp(u_in, exponent);
+
+  for (int i = 0; i < 4; ++i) {
+    if (mantissa[i] != u_mantissa[i])
+      outcolor = vec4(1.0, float(i) / 255,
+                      float(mantissa[i]), float(u_mantissa[i]));
+  }
+}
+
+[test]
+clear color 0 0 0 1
+clear
+
+uniform dvec4 u_in 2 3 4 5
+uniform dvec4 u_mantissa 0.5 0.75 0.5 0.625
+
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
