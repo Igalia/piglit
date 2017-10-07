@@ -75,7 +75,7 @@ class Parser(object):
             # Find the config section
             for line in lines:
                 # We need to find the first line of the configuration file, as
-                # soon as we do then we can move on to geting the
+                # soon as we do then we can move on to getting the
                 # configuration. The first line needs to be parsed by the next
                 # block.
                 if line.startswith('[require]'):
@@ -197,7 +197,7 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
 
         # Walk each subtest, and either add it to the list of tests to run, or
         # determine it is skip, and set the result of that test in the subtests
-        # dictionary to skip without adding it ot the liest of tests to run
+        # dictionary to skip without adding it to the list of tests to run.
         for each in filenames:
             parser = Parser(each)
             parser.parse()
