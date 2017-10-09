@@ -875,10 +875,11 @@ def process_shader_test(shader_test, config):
         binary_name = shader_test + '.' + extension + '.spv'
 
         if config.verbose or config.transformed:
-            print('Writing {} shader binary to {}'.format(shader.stage, binary_name))
+            print('Writing {} shader binary to {}'.format(shader_group[0].stage, binary_name))
 
         if shader_group[0].spirv:
             assert len(shader_group) == 1
+            shader = shader_group[0]
             cmdline = [config.spirv_as, '-o', binary_name]
             proc = subprocess.run(cmdline, input=shader.source().encode(),
                                     stdout=subprocess.PIPE)
