@@ -65,7 +65,7 @@ class WflInfo(object):
     - Needs to evaluate only once
     - cannot evaluate until user sets OPTIONS.env['PIGLIT_PLATFORM']
 
-    This solves all of that, and is
+    This solves all of that.
 
     """
     __shared_state = {}
@@ -294,7 +294,7 @@ class FastSkip(object):
     This class provides a mechanism for testing OpenGL requirements, and
     skipping tests that have unmet requirements
 
-    This requires wflinfo to be installed and accessible to provide it's
+    This requires wflinfo to be installed and accessible to provide its
     functionality, however, it will no-op if wflinfo is not accessible.
 
     The design of this function is conservative. The design goal is that it
@@ -327,7 +327,7 @@ class FastSkip(object):
         self.glsl_es_version = glsl_es_version
 
     def test(self):
-        """Skip this test if any of it's feature requirements are unmet.
+        """Skip this test if any of its feature requirements are unmet.
 
         If no extensions were calculated (if wflinfo isn't installed) then run
         all tests.
@@ -382,7 +382,7 @@ class FastSkip(object):
 class FastSkipMixin(object):
     """Fast test skipping for OpenGL based suites.
 
-    This provides an is_skip() method which will skip the test if an of it's
+    This provides an is_skip() method which will skip the test if any of its
     requirements are not met.
 
     This is a wrapper around the FastSkip object which makes it easier to
@@ -453,7 +453,7 @@ class FastSkipMixin(object):
         self.__skiper.glsl_es_version = new
 
     def is_skip(self):
-        """Skip this test if any of it's feature requirements are unmet.
+        """Skip this test if any of its feature requirements are unmet.
 
         If no extensions were calculated (if wflinfo isn't installed) then run
         all tests.
