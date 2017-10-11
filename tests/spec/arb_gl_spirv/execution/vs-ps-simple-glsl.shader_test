@@ -1,5 +1,5 @@
-# Test a very simple VS-PS shader pipeline with two uniforms with
-# explicit location, using glsl as base.
+# Test a very simple VS-PS shader pipeline. It doesn't even have
+# uniforms. Use glsl as base.
 
 [require]
 GL >= 3.3
