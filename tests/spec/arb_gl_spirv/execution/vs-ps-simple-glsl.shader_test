@@ -1,0 +1,33 @@
+# Test a very simple VS-PS shader pipeline with two uniforms with
+# explicit location, using glsl as base.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+SPIRV ONLY
+
+[vertex shader]
+#version 430
+
+layout(location = 0) in vec4 piglit_vertex;
+
+void main() {
+   gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 430
+
+layout(location = 0) out vec4 outcolor;
+
+void main() {
+    outcolor = vec4(1.0, 0.0, 0.0, 0.0);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 1.0 0.0 0.0 0.0
