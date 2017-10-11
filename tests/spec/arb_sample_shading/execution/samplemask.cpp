@@ -415,7 +415,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 
 	/* Dummy vertex array */
-	uint empty_vao;
+	GLuint empty_vao;
 	glGenVertexArrays(1, &empty_vao);
 	glBindVertexArray(empty_vao);
 
