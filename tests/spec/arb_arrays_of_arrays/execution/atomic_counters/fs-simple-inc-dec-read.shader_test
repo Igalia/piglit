@@ -5,6 +5,7 @@
 GLSL >= 1.40
 GL_ARB_shader_atomic_counters
 GL_ARB_arrays_of_arrays
+INT GL_MAX_FRAGMENT_ATOMIC_COUNTERS >= 20
 
 [vertex shader passthrough]
 
