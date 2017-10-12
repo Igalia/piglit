@@ -141,8 +141,8 @@ piglit_fbo_framework_create(const struct piglit_gl_test_config *test_config)
 	platform = piglit_wfl_framework_choose_platform(test_config);
 
 	if (test_config->window_samples > 1) {
-		puts("The FBO mode doesn't support multisampling\n");
-		piglit_report_result(PIGLIT_FAIL);
+		puts("The FBO mode doesn't support multisampling");
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	wfl_fw = calloc(1, sizeof(*wfl_fw));
