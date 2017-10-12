@@ -131,7 +131,12 @@ piglit_add_executable (glsl-mat-attribute glsl-mat-attribute.c)
 piglit_add_executable (glsl-max-varyings glsl-max-varyings.c)
 piglit_add_executable (glsl-useprogram-displaylist glsl-useprogram-displaylist.c)
 piglit_add_executable (glsl-routing glsl-routing.c)
+
 piglit_add_executable (shader_runner shader_runner.c parser_utils.c)
+IF (MINGW)
+	set_target_properties(shader_runner PROPERTIES LINK_FLAGS  "-Wl,--stack,2097152")
+ENDIF ()
+
 piglit_add_executable (glsl-vs-point-size glsl-vs-point-size.c)
 piglit_add_executable (glsl-sin glsl-sin.c)
 IF (UNIX)
