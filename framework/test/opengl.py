@@ -41,9 +41,6 @@ __all__ = [
     'FastSkipMixin',
 ]
 
-# An environment variable that when set to true disables the FastSkipMixin by
-# stubbing it out
-_DISABLED = bool(os.environ.get('PIGLIT_NO_FAST_SKIP', False))
 
 
 class StopWflinfo(exceptions.PiglitException):
@@ -498,7 +495,7 @@ class FastSkipMixinDisabled(object):
 
 # Shadow the real FastSkipMixin with the Disabled version if
 # PIGLIT_NO_FAST_SKIP is truthy
-if _DISABLED:
+if bool(os.environ.get('PIGLIT_NO_FAST_SKIP', False)):
     warnings.warn('Fast Skipping Disabled')
     # TODO: we can probably get rid of the FastSkipMixinDisabled and just rely
     # on the FastSkipDisabled
