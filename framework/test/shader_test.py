@@ -155,17 +155,25 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
     """
 
     def __init__(self, filename):
-        parser = Parser(filename)
-        parser.parse()
+        if bool(os.environ.get('PIGLIT_NO_FAST_SKIP', False)):
+            # No need to parse the shader test file if we've disabled
+            # the FastSkip feature.
+            super(ShaderTest, self).__init__(
+                ['shader_runner', filename],
+                run_concurrent=True,)
+        else:
+            parser = Parser(filename)
+            parser.parse()
 
-        super(ShaderTest, self).__init__(
-            [parser.prog, parser.filename],
-            run_concurrent=True,
-            gl_required=parser.gl_required,
-            gl_version=parser.gl_version,
-            gles_version=parser.gles_version,
-            glsl_version=parser.glsl_version,
-            glsl_es_version=parser.glsl_es_version)
+            super(ShaderTest, self).__init__(
+                [parser.prog, parser.filename],
+                run_concurrent=True,
+                gl_required=parser.gl_required,
+                gl_version=parser.gl_version,
+                gles_version=parser.gles_version,
+                glsl_version=parser.glsl_version,
+                glsl_es_version=parser.glsl_es_version)
+
 
     @PiglitBaseTest.command.getter
     def command(self):
