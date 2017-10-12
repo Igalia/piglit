@@ -1919,25 +1919,29 @@ with profile.test_list.group_manager(
           '{}-textureSize-{}'.format(stage, sampler))
 
 # Group ARB_texture_gather
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'ARB_texture_gather')) as g:
-    stages = ['vs', 'fs']
-    comps = ['r', 'rg', 'rgb', 'rgba']
-    types = ['unorm', 'float', 'int', 'uint']
-    samplers = ['2D', '2DArray', 'Cube', 'CubeArray']
-    for stage, comp, type_, sampler in itertools.product(
-            stages, comps, types, samplers):
-        for swiz in ['red', 'green', 'blue', 'alpha'][:len(comp)] + ['', 'zero', 'one']:
-            for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
-                testname = grouptools.join(
-                    func, '{}-{}-{}-{}-{}'.format(
-                        stage, comp,
-                        swiz if swiz else 'none',
-                        type_, sampler))
-                g(['textureGather', stage,
-                   'offset' if func == 'textureGatherOffset' else '',
-                   comp, swiz, type_, sampler], testname)
+if gl_extension_supported("GL_ARB_texture_gather"):
+    with profile.test_list.group_manager(
+            PiglitGLTest,
+            grouptools.join('spec', 'ARB_texture_gather')) as g:
+        stages = ['vs', 'fs']
+        comps = ['r', 'rg', 'rgb', 'rgba']
+        types = ['unorm', 'float', 'int', 'uint']
+        samplers = ['2D', '2DArray', 'Cube', 'CubeArray']
+        for stage, comp, type_, sampler in itertools.product(
+                stages, comps, types, samplers):
+            for swiz in ['red', 'green', 'blue', 'alpha'][:len(comp)] + ['', 'zero', 'one']:
+                for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
+                    testname = grouptools.join(
+                        func, '{}-{}-{}-{}-{}'.format(
+                            stage, comp,
+                            swiz if swiz else 'none',
+                            type_, sampler))
+                    g(['textureGather', stage,
+                       'offset' if func == 'textureGatherOffset' else '',
+                       comp, swiz, type_, sampler], testname)
+else:
+    print("Skipping GL_ARB_texture_gather tests")
+
 
 with profile.test_list.group_manager(
         PiglitGLTest,
@@ -2190,112 +2194,119 @@ with profile.test_list.group_manager(
     g(['arb_framebuffer_srgb-srgb_conformance'])
     g(['arb_framebuffer_srgb-srgb_pbo'])
 
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'ARB_gpu_shader5')) as g:
-    stages = ['vs', 'fs']
-    types = ['unorm', 'float', 'int', 'uint']
-    comps = ['r', 'rg', 'rgb', 'rgba']
-    samplers = ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']
-    for stage, type_, comp, sampler in itertools.product(
-            stages, types, comps, samplers):
-        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets']:
-            for cs in range(len(comp)):
-                assert cs <= 3
-                address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
-                cmd = ['textureGather', stage,
-                       'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
-                       comp, str(cs), type_, sampler, address_mode]
-                testname = grouptools.join(func, '{}-{}-{}-{}-{}'.format(
-                    stage, comp, cs, type_, sampler))
-                g(cmd, testname)
 
-                if func == 'textureGatherOffset':
-                    # also add a constant offset version.
-                    testname = grouptools.join(
-                        func, '{}-{}-{}-{}-{}-const'.format(
-                            stage, comp, cs, type_, sampler))
-                    cmd = ['textureGather', stage, 'offset',
+if gl_extension_supported("GL_ARB_gpu_shader5"):
+    with profile.test_list.group_manager(
+            PiglitGLTest,
+            grouptools.join('spec', 'ARB_gpu_shader5')) as g:
+        stages = ['vs', 'fs']
+        types = ['unorm', 'float', 'int', 'uint']
+        comps = ['r', 'rg', 'rgb', 'rgba']
+        samplers = ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']
+        for stage, type_, comp, sampler in itertools.product(
+                stages, types, comps, samplers):
+            for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets']:
+                for cs in range(len(comp)):
+                    assert cs <= 3
+                    address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
+                    cmd = ['textureGather', stage,
+                           'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
                            comp, str(cs), type_, sampler, address_mode]
+                    testname = grouptools.join(func, '{}-{}-{}-{}-{}'.format(
+                        stage, comp, cs, type_, sampler))
                     g(cmd, testname)
 
-    # test shadow samplers
-    samplers = ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']
-    for stage, sampler in itertools.product(stages, samplers):
-        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets']:
-            testname = grouptools.join(func, '{}-r-none-shadow-{}'.format(
-                stage, sampler))
-            cmd = ['textureGather', stage, 'shadow', 'r',
-                   'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
-                   sampler,
-                   'clamp' if sampler == '2DRect' else 'repeat']
-            g(cmd, testname)
+                    if func == 'textureGatherOffset':
+                        # also add a constant offset version.
+                        testname = grouptools.join(
+                            func, '{}-{}-{}-{}-{}-const'.format(
+                                stage, comp, cs, type_, sampler))
+                        cmd = ['textureGather', stage, 'offset',
+                               comp, str(cs), type_, sampler, address_mode]
+                        g(cmd, testname)
 
-    g(['arb_gpu_shader5-minmax'])
-    g(['arb_gpu_shader5-invocation-id'])
-    g(['arb_gpu_shader5-invocations_count_too_large'])
-    g(['arb_gpu_shader5-xfb-streams'])
-    g(['arb_gpu_shader5-stream_value_too_large'])
-    g(['arb_gpu_shader5-emitstreamvertex_stream_too_large'])
-    g(['arb_gpu_shader5-tf-wrong-stream-value'])
-    g(['arb_gpu_shader5-xfb-streams-without-invocations'])
-    g(['arb_gpu_shader5-emitstreamvertex_nodraw'])
-    g(['arb_gpu_shader5-interpolateAtCentroid'])
-    g(['arb_gpu_shader5-interpolateAtCentroid-packing'])
-    g(['arb_gpu_shader5-interpolateAtCentroid-flat'])
-    g(['arb_gpu_shader5-interpolateAtCentroid-centroid'])
-    g(['arb_gpu_shader5-interpolateAtCentroid-noperspective'])
-    g(['arb_gpu_shader5-interpolateAtSample'])
-    g(['arb_gpu_shader5-interpolateAtSample-nonconst'])
-    g(['arb_gpu_shader5-interpolateAtSample-different'])
-    g(['arb_gpu_shader5-interpolateAtSample-different', 'uniform'])
-    g(['arb_gpu_shader5-interpolateAtSample-dynamically-nonuniform'])
-    g(['arb_gpu_shader5-interpolateAtOffset'])
-    g(['arb_gpu_shader5-interpolateAtOffset-nonconst'])
+        # test shadow samplers
+        samplers = ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']
+        for stage, sampler in itertools.product(stages, samplers):
+            for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets']:
+                testname = grouptools.join(func, '{}-r-none-shadow-{}'.format(
+                    stage, sampler))
+                cmd = ['textureGather', stage, 'shadow', 'r',
+                       'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
+                       sampler,
+                       'clamp' if sampler == '2DRect' else 'repeat']
+                g(cmd, testname)
+
+        g(['arb_gpu_shader5-minmax'])
+        g(['arb_gpu_shader5-invocation-id'])
+        g(['arb_gpu_shader5-invocations_count_too_large'])
+        g(['arb_gpu_shader5-xfb-streams'])
+        g(['arb_gpu_shader5-stream_value_too_large'])
+        g(['arb_gpu_shader5-emitstreamvertex_stream_too_large'])
+        g(['arb_gpu_shader5-tf-wrong-stream-value'])
+        g(['arb_gpu_shader5-xfb-streams-without-invocations'])
+        g(['arb_gpu_shader5-emitstreamvertex_nodraw'])
+        g(['arb_gpu_shader5-interpolateAtCentroid'])
+        g(['arb_gpu_shader5-interpolateAtCentroid-packing'])
+        g(['arb_gpu_shader5-interpolateAtCentroid-flat'])
+        g(['arb_gpu_shader5-interpolateAtCentroid-centroid'])
+        g(['arb_gpu_shader5-interpolateAtCentroid-noperspective'])
+        g(['arb_gpu_shader5-interpolateAtSample'])
+        g(['arb_gpu_shader5-interpolateAtSample-nonconst'])
+        g(['arb_gpu_shader5-interpolateAtSample-different'])
+        g(['arb_gpu_shader5-interpolateAtSample-different', 'uniform'])
+        g(['arb_gpu_shader5-interpolateAtSample-dynamically-nonuniform'])
+        g(['arb_gpu_shader5-interpolateAtOffset'])
+        g(['arb_gpu_shader5-interpolateAtOffset-nonconst'])
+else:
+    print("Skipping GL_ARB_gpu_shader5 tests")
 
 
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'ARB_gpu_shader_fp64',
-                        'varying-packing')) as g:
-    for type in ['double', 'dvec2', 'dvec3', 'dvec4', 'dmat2', 'dmat3',
-                 'dmat4', 'dmat2x3', 'dmat2x4', 'dmat3x2', 'dmat3x4',
-                 'dmat4x2', 'dmat4x3']:
-        for arrayspec in ['array', 'separate', 'arrays_of_arrays']:
-            g(['varying-packing-simple', type, arrayspec],
-              'simple {0} {1}'.format(type, arrayspec))
+if gl_extension_supported("GL_ARB_gpu_shader_fp64"):
+    with profile.test_list.group_manager(
+            PiglitGLTest,
+            grouptools.join('spec', 'ARB_gpu_shader_fp64',
+                            'varying-packing')) as g:
+        for type in ['double', 'dvec2', 'dvec3', 'dvec4', 'dmat2', 'dmat3',
+                     'dmat4', 'dmat2x3', 'dmat2x4', 'dmat3x2', 'dmat3x4',
+                     'dmat4x2', 'dmat4x3']:
+            for arrayspec in ['array', 'separate', 'arrays_of_arrays']:
+                g(['varying-packing-simple', type, arrayspec],
+                  'simple {0} {1}'.format(type, arrayspec))
 
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'ARB_gpu_shader_fp64', 'execution')) as g:
-    g(['arb_gpu_shader_fp64-tf-separate'])
-    g(['arb_gpu_shader_fp64-double-gettransformfeedbackvarying'])
-    g(['arb_gpu_shader_fp64-tf-interleaved'])
-    g(['arb_gpu_shader_fp64-tf-interleaved-aligned'])
-    g(['arb_gpu_shader_fp64-vs-getuniformdv'])
-    g(['arb_gpu_shader_fp64-fs-getuniformdv'])
-    g(['arb_gpu_shader_fp64-gs-getuniformdv'])
-    g(['arb_gpu_shader_fp64-wrong-type-setter'])
-    g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
-    g(['arb_gpu_shader_fp64-uniform-invalid-operation'])
-    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-const'])
-    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-const'])
-    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-ubo'])
-    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-ubo'])
-    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-ssbo'])
-    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-ssbo'])
-    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-alu'])
-    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-alu'])
-    g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-packing'])
-    g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-packing'])
+    with profile.test_list.group_manager(
+            PiglitGLTest,
+            grouptools.join('spec', 'ARB_gpu_shader_fp64', 'execution')) as g:
+        g(['arb_gpu_shader_fp64-tf-separate'])
+        g(['arb_gpu_shader_fp64-double-gettransformfeedbackvarying'])
+        g(['arb_gpu_shader_fp64-tf-interleaved'])
+        g(['arb_gpu_shader_fp64-tf-interleaved-aligned'])
+        g(['arb_gpu_shader_fp64-vs-getuniformdv'])
+        g(['arb_gpu_shader_fp64-fs-getuniformdv'])
+        g(['arb_gpu_shader_fp64-gs-getuniformdv'])
+        g(['arb_gpu_shader_fp64-wrong-type-setter'])
+        g(['arb_gpu_shader_fp64-double_in_bool_uniform'])
+        g(['arb_gpu_shader_fp64-uniform-invalid-operation'])
+        g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-const'])
+        g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-const'])
+        g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-ubo'])
+        g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-ubo'])
+        g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-ssbo'])
+        g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-ssbo'])
+        g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-alu'])
+        g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-alu'])
+        g(['arb_gpu_shader_fp64-vs-non-uniform-control-flow-packing'])
+        g(['arb_gpu_shader_fp64-fs-non-uniform-control-flow-packing'])
 
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'ARB_gpu_shader_fp64', 'shader_storage')) as g:
-    g(['arb_gpu_shader_fp64-layout-std140-fp64-shader'], 'layout-std140-fp64-shader')
-    g(['arb_gpu_shader_fp64-layout-std140-fp64-mixed-shader'], 'layout-std140-fp64-mixed-shader')
-    g(['arb_gpu_shader_fp64-layout-std430-fp64-shader'], 'layout-std430-fp64-shader')
-    g(['arb_gpu_shader_fp64-layout-std430-fp64-mixed-shader'], 'layout-std430-fp64-mixed-shader')
+    with profile.test_list.group_manager(
+            PiglitGLTest,
+            grouptools.join('spec', 'ARB_gpu_shader_fp64', 'shader_storage')) as g:
+        g(['arb_gpu_shader_fp64-layout-std140-fp64-shader'], 'layout-std140-fp64-shader')
+        g(['arb_gpu_shader_fp64-layout-std140-fp64-mixed-shader'], 'layout-std140-fp64-mixed-shader')
+        g(['arb_gpu_shader_fp64-layout-std430-fp64-shader'], 'layout-std430-fp64-shader')
+        g(['arb_gpu_shader_fp64-layout-std430-fp64-mixed-shader'], 'layout-std430-fp64-mixed-shader')
+else:
+    print("Skipping GL_ARB_gpu_shader_fp64 tests")
 
 with profile.test_list.group_manager(
         PiglitGLTest,
