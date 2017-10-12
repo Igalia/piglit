@@ -44,7 +44,7 @@ piglit_gl_framework_factory(const struct piglit_gl_test_config *test_config)
 #ifdef PIGLIT_USE_WAFFLE
 	struct piglit_gl_framework *gl_fw = NULL;
 
-	if (piglit_use_fbo) {
+	if (piglit_use_fbo && !test_config->requires_displayed_window) {
 		gl_fw = piglit_fbo_framework_create(test_config);
 	}
 
