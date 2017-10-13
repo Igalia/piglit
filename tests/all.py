@@ -1932,21 +1932,16 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_draw_elements_base_vertex')) as g:
     g(['arb_draw_elements_base_vertex-dlist'], 'dlist')
-    g(['arb_draw_elements_base_vertex-drawelements'], run_concurrent=False)
+    g(['arb_draw_elements_base_vertex-drawelements'])
     g(['arb_draw_elements_base_vertex-drawelements', 'user_varrays'],
-      'arb_draw_elements_base_vertex-drawelements-user_varrays',
-      run_concurrent=False)
-    g(['arb_draw_elements_base_vertex-negative-index'], run_concurrent=False)
-    g(['arb_draw_elements_base_vertex-bounds'], run_concurrent=False)
+      'arb_draw_elements_base_vertex-drawelements-user_varrays')
+    g(['arb_draw_elements_base_vertex-negative-index'])
+    g(['arb_draw_elements_base_vertex-bounds'])
     g(['arb_draw_elements_base_vertex-negative-index', 'user_varrays'],
-      'arb_draw_elements_base_vertex-negative-index-user_varrays',
-      run_concurrent=False)
-    g(['arb_draw_elements_base_vertex-drawelements-instanced'],
-      run_concurrent=False)
-    g(['arb_draw_elements_base_vertex-drawrangeelements'],
-      run_concurrent=False)
-    g(['arb_draw_elements_base_vertex-multidrawelements'],
-      run_concurrent=False)
+      'arb_draw_elements_base_vertex-negative-index-user_varrays')
+    g(['arb_draw_elements_base_vertex-drawelements-instanced'])
+    g(['arb_draw_elements_base_vertex-drawrangeelements'])
+    g(['arb_draw_elements_base_vertex-multidrawelements'])
 
 # Group ARB_draw_instanced
 with profile.test_list.group_manager(
