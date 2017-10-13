@@ -275,6 +275,7 @@ piglit_init(int argc, char **argv)
 	int i, x, y;
 	GLubyte rectangle[200][200][4];
 	GLubyte tex[256*256][4];
+	GLuint texobj[2];
 
 	/* Need GL 1.4 for GL_GENERATE_MIPMAP tex param */
 	piglit_require_gl_version(14);
@@ -304,7 +305,8 @@ piglit_init(int argc, char **argv)
 	}
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 1);
+	glGenTextures(2, texobj);
+	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texobj[0]);
 	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, 200, 200, 0,
 	             GL_RGBA, GL_UNSIGNED_BYTE, rectangle);
 
@@ -321,7 +323,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 2);
+	glBindTexture(GL_TEXTURE_2D, texobj[1]);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, tex);
