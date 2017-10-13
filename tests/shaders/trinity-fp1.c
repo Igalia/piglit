@@ -37,10 +37,10 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static GLuint TexDiffuse = 1;
-static GLuint TexNormal = 2;
-static GLuint TexSpecular = 3;
-static GLuint TexLookup = 4;
+static GLuint TexDiffuse;
+static GLuint TexNormal;
+static GLuint TexSpecular;
+static GLuint TexLookup;
 
 static GLuint FragProg;
 
@@ -239,6 +239,11 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_fragment_program();
 	FragProg = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, fragProgramText);
+
+	glGenTextures(1, &TexDiffuse);
+	glGenTextures(1, &TexNormal);
+	glGenTextures(1, &TexSpecular);
+	glGenTextures(1, &TexLookup);
 
 	/*
 	 * Initialize textures
