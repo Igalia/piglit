@@ -79,13 +79,16 @@ check_immutable(void)
 {
 	GLuint tex;
 	GLint param;
+	GLint max_samples;
+
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &max_samples);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
 
 	/* specify storage for the texture, and mark it immutable-format */
 	glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-				  4, GL_RGBA8, 64, 64, GL_TRUE);
+				  max_samples, GL_RGBA8, 64, 64, GL_TRUE);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		piglit_report_subtest_result(PIGLIT_FAIL, "immutable");
@@ -110,7 +113,7 @@ check_immutable(void)
 
 	/* calling TexStorage2DMultisample again on the same texture should fail */
 	glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-				  4, GL_RGBA8, 32, 32, GL_TRUE);
+				  max_samples, GL_RGBA8, 32, 32, GL_TRUE);
 
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
 		printf("expected respecifying an immutable-format texture (with TexStorage*Multisample) to fail\n");
@@ -120,7 +123,7 @@ check_immutable(void)
 
 	/* calling TexImage2DMultisample should fail too */
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-				4, GL_RGBA8, 32, 32, GL_TRUE);
+				max_samples, GL_RGBA8, 32, 32, GL_TRUE);
 
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
 		printf("expected respecifying an immutable-format texture (with TexImage*Multisample) to fail\n");
