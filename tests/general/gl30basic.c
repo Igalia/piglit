@@ -39,6 +39,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
 
+	config.requires_displayed_window = true;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *Prog = "gl30basic";
