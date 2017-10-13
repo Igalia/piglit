@@ -1924,9 +1924,9 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_depth_clamp')) as g:
-    g(['depth_clamp'], run_concurrent=False)
-    g(['depth-clamp-range'], run_concurrent=False)
-    g(['depth-clamp-status'], run_concurrent=False)
+    g(['depth_clamp'])
+    g(['depth-clamp-range'])
+    g(['depth-clamp-status'])
 
 # Group ARB_draw_elements_base_vertex
 with profile.test_list.group_manager(
