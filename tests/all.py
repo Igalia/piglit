@@ -845,6 +845,43 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', '!opengl 1.0')) as g:
+    g(['gl-1.0-beginend-coverage'])
+    g(['gl-1.0-dlist-beginend'])
+    g(['gl-1.0-dlist-bitmap'])
+    g(['gl-1.0-dlist-shademodel'])
+    g(['gl-1.0-drawpixels-color-index'])
+    g(['gl-1.0-edgeflag'])
+    g(['gl-1.0-edgeflag-const'])
+    g(['gl-1.0-edgeflag-quads'])
+    g(['gl-1.0-long-dlist'])
+    g(['gl-1.0-readpixels-oob'])
+    g(['gl-1.0-rendermode-feedback'])
+    g(['gl-1.0-front-invalidate-back'], run_concurrent=False)
+    g(['gl-1.0-swapbuffers-behavior'], run_concurrent=False)
+    g(['gl-1.0-polygon-line-aa'])
+    g(['gl-1.0-push-no-attribs'])
+    g(['gl-1.0-blend-func'])
+    g(['gl-1.0-fpexceptions'])
+    g(['gl-1.0-ortho-pos'])
+    g(['gl-1.0-rastercolor'])
+    g(['gl-1.0-readpixsanity'])
+    g(['gl-1.0-logicop'])
+    g(['gl-1.0-no-op-paths'])
+    g(['gl-1.0-simple-readbuffer'])
+    g(['gl-1.0-spot-light'])
+    g(['gl-1.0-scissor-bitmap'])
+    g(['gl-1.0-scissor-clear'])
+    g(['gl-1.0-scissor-copypixels'])
+    g(['gl-1.0-scissor-depth-clear'])
+    g(['gl-1.0-scissor-depth-clear-negative-xy'])
+    g(['gl-1.0-scissor-many'])
+    g(['gl-1.0-scissor-offscreen'])
+    g(['gl-1.0-scissor-polygon'])
+    g(['gl-1.0-scissor-stencil-clear'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', '!opengl 1.1')) as g:
     # putting slower tests first
     g(['streaming-texture-leak'])
@@ -975,43 +1012,6 @@ with profile.test_list.group_manager(
 
     for num_samples in ['0'] + MSAA_SAMPLE_COUNTS:
         add_fbo_depthstencil_tests(g, 'default_fb', num_samples)
-
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', '!opengl 1.0')) as g:
-    g(['gl-1.0-beginend-coverage'])
-    g(['gl-1.0-dlist-beginend'])
-    g(['gl-1.0-dlist-bitmap'])
-    g(['gl-1.0-dlist-shademodel'])
-    g(['gl-1.0-drawpixels-color-index'])
-    g(['gl-1.0-edgeflag'])
-    g(['gl-1.0-edgeflag-const'])
-    g(['gl-1.0-edgeflag-quads'])
-    g(['gl-1.0-long-dlist'])
-    g(['gl-1.0-readpixels-oob'])
-    g(['gl-1.0-rendermode-feedback'])
-    g(['gl-1.0-front-invalidate-back'], run_concurrent=False)
-    g(['gl-1.0-swapbuffers-behavior'], run_concurrent=False)
-    g(['gl-1.0-polygon-line-aa'])
-    g(['gl-1.0-push-no-attribs'])
-    g(['gl-1.0-blend-func'])
-    g(['gl-1.0-fpexceptions'])
-    g(['gl-1.0-ortho-pos'])
-    g(['gl-1.0-rastercolor'])
-    g(['gl-1.0-readpixsanity'])
-    g(['gl-1.0-logicop'])
-    g(['gl-1.0-no-op-paths'])
-    g(['gl-1.0-simple-readbuffer'])
-    g(['gl-1.0-spot-light'])
-    g(['gl-1.0-scissor-bitmap'])
-    g(['gl-1.0-scissor-clear'])
-    g(['gl-1.0-scissor-copypixels'])
-    g(['gl-1.0-scissor-depth-clear'])
-    g(['gl-1.0-scissor-depth-clear-negative-xy'])
-    g(['gl-1.0-scissor-many'])
-    g(['gl-1.0-scissor-offscreen'])
-    g(['gl-1.0-scissor-polygon'])
-    g(['gl-1.0-scissor-stencil-clear'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
