@@ -3789,11 +3789,9 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ati_draw_buffers')) as g:
-    g(['ati_draw_buffers-arbfp'], run_concurrent=False)
-    g(['ati_draw_buffers-arbfp-no-index'], 'arbfp-no-index',
-      run_concurrent=False)
-    g(['ati_draw_buffers-arbfp-no-option'], 'arbfp-no-option',
-      run_concurrent=False)
+    g(['ati_draw_buffers-arbfp'])
+    g(['ati_draw_buffers-arbfp-no-index'], 'arbfp-no-index')
+    g(['ati_draw_buffers-arbfp-no-option'], 'arbfp-no-option')
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ati_envmap_bumpmap')) as g:
