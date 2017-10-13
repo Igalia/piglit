@@ -199,6 +199,9 @@ piglit_init(int argc, char **argv)
 	GLuint rb;
 	GLuint vao;
 	GLuint array_buf;
+	GLint samples;
+
+	glGetIntegerv(GL_MAX_SAMPLES, &samples);
 
 	/* Parse params */
 	if (argc != 2)
@@ -222,7 +225,7 @@ piglit_init(int argc, char **argv)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rb);
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-					 4 /* samples */,
+					 samples,
 					 GL_RGBA8 /* internalformat */,
 					 piglit_width, piglit_height);
 	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
