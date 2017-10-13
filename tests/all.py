@@ -3859,9 +3859,9 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_seamless_cube_map')) as g:
-    g(['arb_seamless_cubemap'], run_concurrent=False)
-    g(['arb_seamless_cubemap-initially-disabled'], run_concurrent=False)
-    g(['arb_seamless_cubemap-three-faces-average'], run_concurrent=False)
+    g(['arb_seamless_cubemap'])
+    g(['arb_seamless_cubemap-initially-disabled'])
+    g(['arb_seamless_cubemap-three-faces-average'])
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'AMD_pinned_memory')) as g:
