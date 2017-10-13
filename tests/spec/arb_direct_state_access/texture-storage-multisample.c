@@ -263,10 +263,13 @@ check_immutable(void)
 	bool pass = true;
 	GLuint tex;
 	GLint param;
+	GLint samples;
+
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &samples);
 
 	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &tex);
 	/* specify storage for the texture, and mark it immutable-format */
-	glTextureStorage2DMultisample(tex, 4, GL_RGBA8, 64, 64, GL_TRUE);
+	glTextureStorage2DMultisample(tex, samples, GL_RGBA8, 64, 64, GL_TRUE);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* should now have TEXTURE_IMMUTABLE_FORMAT */
@@ -285,7 +288,7 @@ check_immutable(void)
 	}
 
 	/* calling Tex*Storage* again on the same texture should fail */
-	glTextureStorage2DMultisample(tex, 4, GL_RGBA8, 32, 32, GL_TRUE);
+	glTextureStorage2DMultisample(tex, samples, GL_RGBA8, 32, 32, GL_TRUE);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
 		pass = false;
 		printf("expected respecifying an immutable-format texture"
@@ -295,7 +298,7 @@ check_immutable(void)
 	/* calling TexImage2DMultisample should fail too */
 	glBindTextureUnit(0, tex);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-				4, GL_RGBA8, 32, 32, GL_TRUE);
+				samples, GL_RGBA8, 32, 32, GL_TRUE);
 
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
 		pass = false;
@@ -387,16 +390,19 @@ trivial_but_should_work(void)
 {
 	bool pass = true;
 	GLuint texture;
+	GLint samples;
+
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &samples);
 
 	/* 2D case */
 	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &texture);
-	glTextureStorage2DMultisample(texture, 4, GL_RGBA8, 64, 64, GL_TRUE);
+	glTextureStorage2DMultisample(texture, samples, GL_RGBA8, 64, 64, GL_TRUE);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* 3D case */
 	glDeleteTextures(1, &texture);
 	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 1, &texture);
-	glTextureStorage3DMultisample(texture, 4, GL_RGBA8, 64, 64, 3,
+	glTextureStorage3DMultisample(texture, samples, GL_RGBA8, 64, 64, 3,
 				      GL_TRUE);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
