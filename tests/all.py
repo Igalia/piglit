@@ -1043,28 +1043,23 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.4')) as g:
-    g(['fdo25614-genmipmap'], run_concurrent=False)
-    g(['tex1d-2dborder'], run_concurrent=False)
-    g(['blendminmax'], run_concurrent=False)
-    g(['blendsquare'], run_concurrent=False)
+    g(['fdo25614-genmipmap'])
+    g(['tex1d-2dborder'])
+    g(['blendminmax'])
+    g(['blendsquare'])
     g(['gl-1.4-dlist-multidrawarrays'])
     g(['gl-1.4-multidrawarrays-errors'])
     g(['gl-1.4-polygon-offset'])
-    g(['draw-batch'], run_concurrent=False)
-    g(['stencil-wrap'], run_concurrent=False)
-    g(['triangle-rasterization'], run_concurrent=False)
-    g(['triangle-rasterization', '-use_fbo'], 'triangle-rasterization-fbo',
-      run_concurrent=False)
-    g(['triangle-rasterization-overdraw'], run_concurrent=False)
+    g(['draw-batch'])
+    g(['stencil-wrap'])
+    g(['triangle-rasterization'])
+    g(['triangle-rasterization', '-use_fbo'], 'triangle-rasterization-fbo')
+    g(['triangle-rasterization-overdraw'])
     g(['tex-miplevel-selection', '-nobias', '-nolod'],
       'tex-miplevel-selection')
     g(['tex-miplevel-selection', '-nobias'], 'tex-miplevel-selection-lod')
     g(['tex-miplevel-selection'], 'tex-miplevel-selection-lod-bias')
-
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', '!opengl 1.4')) as g:
-    add_msaa_visual_plain_tests(g, ['copy-pixels'], run_concurrent=False)
+    add_msaa_visual_plain_tests(g, ['copy-pixels'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
