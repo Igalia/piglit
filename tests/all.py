@@ -4200,9 +4200,8 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_half_float_vertex')) as g:
-    g(['draw-vertices-half-float'], run_concurrent=False)
-    g(['draw-vertices-half-float', 'user'], 'draw-vertices-half-float-user',
-      run_concurrent=False)
+    g(['draw-vertices-half-float'])
+    g(['draw-vertices-half-float', 'user'], 'draw-vertices-half-float-user')
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'oes_vertex_half_float')) as g:
