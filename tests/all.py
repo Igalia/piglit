@@ -1953,7 +1953,7 @@ with profile.test_list.group_manager(
       'negative-arrays-first-negative')
     g(['arb_draw_instanced-negative-elements-type'],
       'negative-elements-type')
-    g(['arb_draw_instanced-drawarrays'], run_concurrent=False)
+    g(['arb_draw_instanced-drawarrays'])
 
 # Group ARB_draw_indirect
 with profile.test_list.group_manager(
