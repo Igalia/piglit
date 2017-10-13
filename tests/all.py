@@ -1016,22 +1016,21 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.2')) as g:
-    g(['crash-texparameter-before-teximage'], run_concurrent=False)
-    g(['draw-elements-vs-inputs'], run_concurrent=False)
-    g(['two-sided-lighting-separate-specular'], run_concurrent=False)
-    g(['levelclamp'], run_concurrent=False)
-    g(['lodclamp'], run_concurrent=False)
-    g(['lodclamp-between'], run_concurrent=False)
-    g(['lodclamp-between-max'], run_concurrent=False)
-    g(['mipmap-setup'], run_concurrent=False)
-    g(['tex-skipped-unit'], run_concurrent=False)
-    g(['tex3d'], run_concurrent=False)
+    g(['crash-texparameter-before-teximage'])
+    g(['draw-elements-vs-inputs'])
+    g(['two-sided-lighting-separate-specular'])
+    g(['levelclamp'])
+    g(['lodclamp'])
+    g(['lodclamp-between'])
+    g(['lodclamp-between-max'])
+    g(['mipmap-setup'])
+    g(['tex-skipped-unit'])
+    g(['tex3d'])
     g(['tex3d-maxsize'], run_concurrent=False)
-    g(['teximage-errors'], run_concurrent=False)
-    g(['texture-packed-formats'], run_concurrent=False)
+    g(['teximage-errors'])
+    g(['texture-packed-formats'])
     g(['getteximage-targets', '3D'])
-    add_msaa_visual_plain_tests(g, ['copyteximage', '3D'],
-                                run_concurrent=False)
+    add_msaa_visual_plain_tests(g, ['copyteximage', '3D'])
     add_texwrap_target_tests(g, '3D')
 
 with profile.test_list.group_manager(
