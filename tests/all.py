@@ -3799,10 +3799,9 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_instanced_arrays')) as g:
-    g(['arb_instanced_arrays-vertex-attrib-divisor-index-error'],
-      run_concurrent=False)
-    g(['arb_instanced_arrays-instanced_arrays'], run_concurrent=False)
-    g(['arb_instanced_arrays-drawarrays'], run_concurrent=False)
+    g(['arb_instanced_arrays-vertex-attrib-divisor-index-error'])
+    g(['arb_instanced_arrays-instanced_arrays'])
+    g(['arb_instanced_arrays-drawarrays'])
     add_single_param_test_set(g, 'arb_instanced_arrays-instanced_arrays',
                               'vbo')
 
