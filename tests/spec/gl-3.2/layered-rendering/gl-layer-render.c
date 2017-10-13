@@ -93,6 +93,8 @@ GLuint
 create_bind_texture(GLenum textureType) {
 	int i;
 	GLuint texture;
+	GLint samples;
+
 	glGenTextures(1, &texture);
 	glBindTexture(textureType, texture);
 
@@ -123,7 +125,8 @@ create_bind_texture(GLenum textureType) {
 		}
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
-		glTexImage3DMultisample(textureType, 4, GL_RGB,
+		glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &samples);
+		glTexImage3DMultisample(textureType, samples, GL_RGB,
 					6, 6, 6, GL_FALSE);
 		break;
 	}

@@ -92,6 +92,8 @@ static GLuint color_uniform;
 GLuint
 create_bind_texture(GLenum textureType) {
 	GLuint texture;
+	GLint samples;
+
 	glGenTextures(1, &texture);
 	glBindTexture(textureType, texture);
 
@@ -117,7 +119,8 @@ create_bind_texture(GLenum textureType) {
 		glTexStorage2D(textureType, 1, GL_RGB8, 6, 6);
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
-		glTexStorage3DMultisample(textureType, 4, GL_RGB8,
+		glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &samples);
+		glTexStorage3DMultisample(textureType, samples, GL_RGB8,
 					6, 6, 6, GL_FALSE);
 		break;
 	}
