@@ -1064,16 +1064,16 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.5')) as g:
-    g(['draw-elements'], run_concurrent=False)
-    g(['draw-elements', 'user'], 'draw-elements-user', run_concurrent=False)
-    g(['draw-vertices'], run_concurrent=False)
-    g(['draw-vertices', 'user'], 'draw-vertices-user', run_concurrent=False)
-    g(['isbufferobj'], run_concurrent=False)
-    g(['depth-tex-compare'], run_concurrent=False)
+    g(['draw-elements'])
+    g(['draw-elements', 'user'], 'draw-elements-user')
+    g(['draw-vertices'])
+    g(['draw-vertices', 'user'], 'draw-vertices-user')
+    g(['isbufferobj'])
+    g(['depth-tex-compare'])
     g(['gl-1.5-normal3b3s-invariance', 'GL_BYTE'],
-      'normal3b3s-invariance-byte', run_concurrent=False)
+      'normal3b3s-invariance-byte')
     g(['gl-1.5-normal3b3s-invariance', 'GL_SHORT'],
-      'normal3b3s-invariance-short', run_concurrent=False)
+      'normal3b3s-invariance-short')
     g(['gl-1.5-vertex-buffer-offsets'], 'vertex-buffer-offsets')
 
 with profile.test_list.group_manager(
