@@ -305,9 +305,9 @@ strtol_hex(const char *nptr, char **endptr)
 static inline char *
 strchrnul(const char *s, int c)
 {
-	char *t = strchr(s, c);
+       const char *t = strchr(s, c);
 
-	return (t == NULL) ? ((char *) s + strlen(s)) : t;
+       return (t == NULL) ? ((char *) s + strlen(s)) : (char *) t;
 }
 #endif
 
