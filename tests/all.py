@@ -1980,30 +1980,30 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_fragment_program')) as g:
     g(['arb_fragment_program-minmax'], 'minmax')
-    g(['fp-abs-01'], run_concurrent=False)
-    g(['fp-fog'], run_concurrent=False)
-    g(['fp-formats'], run_concurrent=False)
-    g(['fp-fragment-position'], run_concurrent=False)
-    g(['fp-incomplete-tex'], run_concurrent=False)
-    g(['fp-indirections'], run_concurrent=False)
-    g(['fp-indirections2'], run_concurrent=False)
-    g(['fp-kil'], run_concurrent=False)
-    g(['fp-lit-mask'], run_concurrent=False)
-    g(['fp-lit-src-equals-dst'], run_concurrent=False)
-    g(['fp-long-alu'], run_concurrent=False)
-    g(['fp-set-01'], run_concurrent=False)
-    g(['trinity-fp1'], run_concurrent=False)
+    g(['fp-abs-01'])
+    g(['fp-fog'])
+    g(['fp-formats'])
+    g(['fp-fragment-position'])
+    g(['fp-incomplete-tex'])
+    g(['fp-indirections'])
+    g(['fp-indirections2'])
+    g(['fp-kil'])
+    g(['fp-lit-mask'])
+    g(['fp-lit-src-equals-dst'])
+    g(['fp-long-alu'])
+    g(['fp-set-01'])
+    g(['trinity-fp1'])
     g(['arb_fragment_program-sparse-samplers'], 'sparse-samplers')
     g(['incomplete-texture', 'arb_fp'], 'incomplete-texture-arb_fp')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'NV_fragment_program_option')) as g:
-    g(['fp-abs-02'], run_concurrent=False)
-    g(['fp-condition_codes-01'], run_concurrent=False)
-    g(['fp-rfl'], run_concurrent=False)
-    g(['fp-set-02'], run_concurrent=False)
-    g(['fp-unpack-01'], run_concurrent=False)
+    g(['fp-abs-02'])
+    g(['fp-condition_codes-01'])
+    g(['fp-rfl'])
+    g(['fp-set-02'])
+    g(['fp-unpack-01'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
