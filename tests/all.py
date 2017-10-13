@@ -3907,22 +3907,16 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'nv_conditional_render')) as g:
     g(['nv_conditional_render-begin-while-active'], 'begin-while-active')
     g(['nv_conditional_render-begin-zero'], 'begin-zero')
-    g(['nv_conditional_render-bitmap'], 'bitmap', run_concurrent=False)
-    g(['nv_conditional_render-blitframebuffer'], 'blitframebuffer',
-      run_concurrent=False)
-    g(['nv_conditional_render-clear'], 'clear', run_concurrent=False)
-    g(['nv_conditional_render-copypixels'], 'copypixels',
-      run_concurrent=False)
-    g(['nv_conditional_render-copyteximage'], 'copyteximage',
-      run_concurrent=False)
-    g(['nv_conditional_render-copytexsubimage'], 'copytexsubimage',
-      run_concurrent=False)
-    g(['nv_conditional_render-dlist'], 'dlist', run_concurrent=False)
-    g(['nv_conditional_render-drawpixels'], 'drawpixels', run_concurrent=False)
-    g(['nv_conditional_render-generatemipmap'], 'generatemipmap',
-      run_concurrent=False)
-    g(['nv_conditional_render-vertex_array'], 'vertex_array',
-      run_concurrent=False)
+    g(['nv_conditional_render-bitmap'], 'bitmap')
+    g(['nv_conditional_render-blitframebuffer'], 'blitframebuffer')
+    g(['nv_conditional_render-clear'], 'clear')
+    g(['nv_conditional_render-copypixels'], 'copypixels')
+    g(['nv_conditional_render-copyteximage'], 'copyteximage')
+    g(['nv_conditional_render-copytexsubimage'], 'copytexsubimage')
+    g(['nv_conditional_render-dlist'], 'dlist')
+    g(['nv_conditional_render-drawpixels'], 'drawpixels')
+    g(['nv_conditional_render-generatemipmap'], 'generatemipmap')
+    g(['nv_conditional_render-vertex_array'], 'vertex_array')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
