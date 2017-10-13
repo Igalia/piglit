@@ -1036,8 +1036,8 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.3')) as g:
-    g(['texunits'], run_concurrent=False)
-    g(['tex-border-1'], run_concurrent=False)
+    g(['texunits'])
+    g(['tex-border-1'])
     g(['tex3d-depth1'])
 
 with profile.test_list.group_manager(
