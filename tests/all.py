@@ -2332,7 +2332,7 @@ with profile.test_list.group_manager(
         g(['arb_sample_shading-builtin-gl-sample-mask-simple',
            num_samples],
           'builtin-gl-sample-mask-simple {}'.format(num_samples))
-        g(['arb_sample_shading-samplemask', num_samples, 'all'],
+        g(['arb_sample_shading-samplemask', num_samples, 'all', 'all'],
           'samplemask {} all'.format(num_samples))
 
     g(['arb_sample_shading-builtin-gl-sample-mask-mrt-alpha'])
