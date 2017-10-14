@@ -4231,9 +4231,9 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_draw_buffers2')) as g:
-    g(['fbo-drawbuffers2-blend'], run_concurrent=False)
-    g(['fbo-drawbuffers2-colormask'], run_concurrent=False)
-    g(['fbo-drawbuffers2-colormask', 'clear'], run_concurrent=False)
+    g(['fbo-drawbuffers2-blend'])
+    g(['fbo-drawbuffers2-colormask'])
+    g(['fbo-drawbuffers2-colormask', 'clear'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
