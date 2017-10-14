@@ -4244,30 +4244,23 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_blend_func_extended')) as g:
-    g(['arb_blend_func_extended-bindfragdataindexed-invalid-parameters'],
-      run_concurrent=False)
-    g(['arb_blend_func_extended-blend-api'], run_concurrent=False)
-    g(['arb_blend_func_extended-error-at-begin'], run_concurrent=False)
-    g(['arb_blend_func_extended-getfragdataindex'], run_concurrent=False)
-    g(['arb_blend_func_extended-output-location'], run_concurrent=False)
-    g(['arb_blend_func_extended-fbo-extended-blend'], run_concurrent=False)
-    g(['arb_blend_func_extended-fbo-extended-blend-explicit'],
-      run_concurrent=False)
-    g(['arb_blend_func_extended-fbo-extended-blend-pattern'],
-      run_concurrent=False)
-    g(['arb_blend_func_extended-blend-api_gles2'], run_concurrent=False)
-    g(['arb_blend_func_extended-builtins_gles2'], run_concurrent=False)
-    g(['arb_blend_func_extended-bindfragdataindexed-invalid-parameters_gles3'],
-      run_concurrent=False)
-    g(['arb_blend_func_extended-output-location_gles3'], run_concurrent=False)
-    g(['arb_blend_func_extended-getfragdataindex_gles3'], run_concurrent=False)
-    g(['arb_blend_func_extended-fbo-extended-blend-pattern_gles2'],
-      run_concurrent=False)
-    g(['arb_blend_func_extended-fbo-extended-blend-pattern_gles3'],
-      run_concurrent=False)
-    g(['arb_blend_func_extended-fbo-extended-blend_gles3'], run_concurrent=False)
-    g(['arb_blend_func_extended-fbo-extended-blend-explicit_gles3'],
-      run_concurrent=False)
+    g(['arb_blend_func_extended-bindfragdataindexed-invalid-parameters'])
+    g(['arb_blend_func_extended-blend-api'])
+    g(['arb_blend_func_extended-error-at-begin'])
+    g(['arb_blend_func_extended-getfragdataindex'])
+    g(['arb_blend_func_extended-output-location'])
+    g(['arb_blend_func_extended-fbo-extended-blend'])
+    g(['arb_blend_func_extended-fbo-extended-blend-explicit'])
+    g(['arb_blend_func_extended-fbo-extended-blend-pattern'])
+    g(['arb_blend_func_extended-blend-api_gles2'])
+    g(['arb_blend_func_extended-builtins_gles2'])
+    g(['arb_blend_func_extended-bindfragdataindexed-invalid-parameters_gles3'])
+    g(['arb_blend_func_extended-output-location_gles3'])
+    g(['arb_blend_func_extended-getfragdataindex_gles3'])
+    g(['arb_blend_func_extended-fbo-extended-blend-pattern_gles2'])
+    g(['arb_blend_func_extended-fbo-extended-blend-pattern_gles3'])
+    g(['arb_blend_func_extended-fbo-extended-blend_gles3'])
+    g(['arb_blend_func_extended-fbo-extended-blend-explicit_gles3'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
