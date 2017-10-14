@@ -1579,25 +1579,24 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'linker', 'clipping')) as g:
-    g(['mixing-clip-distance-and-clip-vertex-disallowed'],
-      run_concurrent=False)
+    g(['mixing-clip-distance-and-clip-vertex-disallowed'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'execution')) as g:
     for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
-        g(['isinf-and-isnan', arg], run_concurrent=False)
+        g(['isinf-and-isnan', arg])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'execution', 'clipping')) as g:
-    g(['max-clip-distances'], run_concurrent=False)
+    g(['max-clip-distances'])
     g(['clip-plane-transformation', 'pos'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.30', 'api')) as g:
-    g(['getactiveattrib', '130'], 'getactiveattrib 130', run_concurrent=False)
+    g(['getactiveattrib', '130'], 'getactiveattrib 130')
 
 # Group spec/glsl-1.40
 with profile.test_list.group_manager(
