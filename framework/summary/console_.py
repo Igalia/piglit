@@ -26,7 +26,7 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 import textwrap
-
+import time
 import six
 
 from framework import grouptools, backends
@@ -52,19 +52,25 @@ _SUMMARY_TEMPLATE = textwrap.dedent("""\
         changes: {changes}
           fixes: {fixes}
     regressions: {regressions}
-          total: {total}""")
+          total: {total}
+           time: {time}""")
 
 
 def _print_summary(results):
     """print a summary."""
 
-    lens = [max(min(len(x.name), 20), 6) for x in results.results]
+    lens = [max(min(len(x.name), 20), 8) for x in results.results]
     print_template = ' '.join(
         (lambda x: '{: >' + '{0}.{0}'.format(x) + '}')(y) for y in lens)
 
     def status_printer(stat):
         totals = [str(x.totals['root'][stat]) for x in results.results]
         return print_template.format(*totals)
+
+    def elapsed_time(time_elapsed):
+        """Return elapsed time (in seconds) as a string in HH:MM:SS format."""
+        diff = time_elapsed.end - time_elapsed.start
+        return time.strftime("%H:%M:%S", time.gmtime(diff))
 
     print(_SUMMARY_TEMPLATE.format(
         names=print_template.format(*[r.name for r in results.results]),
@@ -86,8 +92,10 @@ def _print_summary(results):
             *[str(s) for s in results.counts.regressions]),
         total=print_template.format(*[
             str(sum(six.itervalues(x.totals['root'])))
-            for x in results.results])))
-
+            for x in results.results]),
+        time=print_template.format(
+            *[elapsed_time(r.time_elapsed) for r in results.results]),
+    ))
 
 def _print_result(results, list_):
     """Takes a list of test names to print and prints the name and result."""
