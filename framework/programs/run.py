@@ -327,6 +327,8 @@ def run(input_):
             stripped = (t.split('#')[0].strip() for t in test_list)
             forced_test_list = [t for t in stripped if t]
 
+    time_elapsed = TimeAttribute(start=time.time())
+
     backend = backends.get_backend(args.backend)(
         args.results_path,
         junit_suffix=args.junit_suffix,
@@ -361,8 +363,6 @@ def run(input_):
                                                  inverse=True))
         if args.include_tests:
             p.filters.append(profile.RegexFilter(args.include_tests))
-
-    time_elapsed = TimeAttribute(start=time.time())
 
     profile.run(profiles, args.log_level, backend, args.concurrency)
 
