@@ -105,10 +105,11 @@ def _print_result(results, list_):
             statuses=' '.join(str(r) for r in results.get_result(test))))
 
 
-def console(results, mode):
-    """ Write summary information to the console """
+def console(resultsFiles, mode):
+    """ Write summary information to the console for the given list of
+    results files in the given mode."""
     assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
-    results = Results([backends.load(r) for r in results])
+    results = Results([backends.load(r) for r in resultsFiles])
 
     # Print the name of the test and the status from each test run
     if mode == 'all':
