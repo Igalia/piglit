@@ -1,0 +1,20 @@
+# Test a very simple VS-PS shader pipeline with two uniforms with
+# explicit location, using glsl as base.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+void main()
+{
+    vec2 n2 = noise2(1.0);
+}
+
+[test]
+link success
