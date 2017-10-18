@@ -1,0 +1,36 @@
+# Test a very simple VS-PS shader pipeline with two uniforms with
+# explicit location, using glsl as base.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (location = 1, rgba8ui) uniform readonly uimage2D rimg2D;
+layout (location = 2, rgba8ui) uniform readonly uimage2DMS rimg2DMS;
+layout (location = 3, rgba8ui) uniform writeonly uimage2D wimg2D;
+layout (location = 4, r32ui) uniform uimage2D aimg2D;
+
+void main()
+{
+    ivec2 size = imageSize(rimg2D);
+    int samp = imageSamples(rimg2DMS);
+    uvec4 v4pix = imageLoad(rimg2D, ivec2(0));
+    imageStore(wimg2D, ivec2(0), uvec4(255));
+    uint uivalRet = imageAtomicAdd(aimg2D, ivec2(0), 1) +
+                    imageAtomicMin(aimg2D, ivec2(0), 1) +
+                    imageAtomicMax(aimg2D, ivec2(0), 1) +
+                    imageAtomicAnd(aimg2D, ivec2(0), 1) +
+                    imageAtomicOr(aimg2D, ivec2(0), 1) +
+                    imageAtomicXor(aimg2D, ivec2(0), 1) +
+                    imageAtomicExchange(aimg2D, ivec2(0), 1) +
+                    imageAtomicCompSwap(aimg2D, ivec2(0), 1, 2);
+}
+
+[test]
+link success
