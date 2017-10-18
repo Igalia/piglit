@@ -1,0 +1,69 @@
+# Test for SpvCapabilityImageMSArray
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[compute shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 23
+; Schema: 0
+               OpCapability Shader
+               OpCapability StorageImageMultisample
+               OpCapability ImageMSArray
+               OpCapability ImageQuery
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main"
+               OpExecutionMode %main LocalSize 1 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %samp "samp"
+               OpName %rimg2DMSArray "rimg2DMSArray"
+               OpDecorate %rimg2DMSArray Location 2
+               OpDecorate %rimg2DMSArray DescriptorSet 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+       %uint = OpTypeInt 32 0
+         %10 = OpTypeImage %uint 2D 0 1 1 2 Rgba8ui
+%_ptr_UniformConstant_10 = OpTypePointer UniformConstant %10
+%rimg2DMSArray = OpVariable %_ptr_UniformConstant_10 UniformConstant
+      %v3int = OpTypeVector %int 3
+      %int_0 = OpConstant %int 0
+         %18 = OpConstantComposite %v3int %int_0 %int_0 %int_0
+      %int_2 = OpConstant %int 2
+     %v4uint = OpTypeVector %uint 4
+   %uint_255 = OpConstant %uint 255
+         %22 = OpConstantComposite %v4uint %uint_255 %uint_255 %uint_255 %uint_255
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+       %samp = OpVariable %_ptr_Function_int Function
+         %13 = OpLoad %10 %rimg2DMSArray
+         %14 = OpImageQuerySamples %int %13
+               OpStore %samp %14
+         %15 = OpLoad %10 %rimg2DMSArray
+               OpImageWrite %15 %18 %22 Sample %int_2
+               OpReturn
+               OpFunctionEnd
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (location = 2, rgba8ui) uniform uimage2DMSArray rimg2DMSArray;
+
+void main()
+{
+    int samp = imageSamples(rimg2DMSArray);
+    imageStore(rimg2DMSArray, ivec3(0), 2, uvec4(255));
+}
+
+[test]
+link success
