@@ -1,0 +1,22 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (location = 2, rgba8ui) uniform uimage2DMS rimg2DMS;
+
+void main()
+{
+    int samp = imageSamples(rimg2DMS);
+
+    // The following throws a warning, but success to link.
+    // imageStore(rimg2DMS, ivec2(0), 2, uvec4(255));
+}
+
+[test]
+link success
