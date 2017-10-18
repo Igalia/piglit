@@ -817,17 +817,6 @@ def process_shader_test(shader_test, config):
                     return True
                 continue
 
-            if groupname == 'test':
-                if line.startswith('link '):
-                    # Many link error tests will already fail during compilation
-                    # Just skip them entirely for now.
-                    # Needs no SPIRV line, since shader_runner can also skip
-                    # automatically
-                    if config.verbose:
-                        print('{}: skip linker test'.format(shader_test))
-                    return True
-                continue
-
             if groupname == 'vertex data':
                 if vertex_attribs is None:
                     attribs = [attrib.split('/') for attrib in line.strip().split()]
