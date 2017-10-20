@@ -177,6 +177,15 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 				assert(config->khr_no_error_support ==
 				       PIGLIT_NO_ERRORS);
 			}
+		} else if (!strcmp(argv[j], "-compat")) {
+			if (config->supports_gl_es_version) {
+				fprintf(stderr,
+					"-compat isn't allowed with ES tests!\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			config->supports_gl_compat_version = 10;
+			config->supports_gl_core_version = 0;
+			puts("The compatibility profile forced.");
 		}
 	}
 }

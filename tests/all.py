@@ -2575,6 +2575,7 @@ with profile.test_list.group_manager(
     g(['arb_texture_buffer_range-errors'], 'errors')
     g(['arb_texture_buffer_range-ranges'], 'ranges')
     g(['arb_texture_buffer_range-ranges-2'], 'ranges-2')
+    g(['arb_texture_buffer_range-ranges-2', '-compat'], 'ranges-2 compat')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
