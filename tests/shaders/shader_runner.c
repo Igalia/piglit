@@ -2793,7 +2793,7 @@ program_must_be_in_use(void)
 static void
 bind_vao_if_supported()
 {
-	if (vao == 0 && gl_version.num >= 31) {
+	if (vao == 0 && piglit_is_core_profile) {
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 	}

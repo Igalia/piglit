@@ -540,7 +540,12 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		                                     CONTEXT_GL_CORE,
 		                                     partial_config_attrib_list);
 		if (ok) {
-			piglit_is_core_profile = true;
+			/* OpenGL 3.1 is special. It doesn't have
+			 * a compatibility profile, but it can have
+			 * ARB_compatibility.
+			 */
+			piglit_is_core_profile =
+				!piglit_is_extension_supported("GL_ARB_compatibility");
 			return;
 		}
 	}
