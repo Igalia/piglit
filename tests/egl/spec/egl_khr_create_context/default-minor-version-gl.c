@@ -77,8 +77,9 @@ int main(int argc, char **argv)
 	}
 
 	if ((major == 2 && (minor < 0 || minor > 1)) ||
-	    (major == 3 && (minor != 0)) ||
-	    (major < 2 || major > 3)) {
+	    (major == 3 && (minor < 0 || minor > 3)) ||
+	    (major == 4 && (minor < 0 || minor > 6)) ||
+	    (major < 2 || major > 4)) {
 		fprintf(stderr,
 			"Unexpected GL version: %s\n"
 			"Expected GL 2.0, 2.1, or 3.0.\n",
