@@ -253,7 +253,7 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [1.0, 0.95, 0.009995, 1.994999, 0.0, 0.0, 2.0], # Result
+            [1.0, float.fromhex('0x1.9990c6p-5'), float.fromhex('0x1.4784aep-7'), 1.994999, 0.0, 0.0, 2.0], # Result
             [0.0, 1.960/sqrt(2.0), 2.576/sqrt(2.0), -2.807/sqrt(2.0), 11.1, float("inf"), float("-inf")]  # Arg0
         ],
         'tolerance' : 16
