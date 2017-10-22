@@ -1,0 +1,49 @@
+# Simple test that verifies gl_GlobalInvocationID derived values are
+# computed properly.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_compute_variable_group_size
+GL_ARB_shader_storage_buffer_object
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: require
+#extension GL_ARB_compute_variable_group_size: require
+
+layout(local_size_variable) in;
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: require
+#extension GL_ARB_shader_storage_buffer_object: require
+
+// no mention of variable group size in this shader
+
+layout(std430)
+buffer SSBO {
+       uvec2 id[4];
+};
+
+void main()
+{
+	uint g = gl_GlobalInvocationID.x;
+	uint l = gl_LocalInvocationID.x;
+	id[g] = uvec2(g, l);
+}
+
+[test]
+ssbo 0 32
+
+compute group size 2 1 1 2 1 1
+
+probe ssbo uint 0  0 == 0
+probe ssbo uint 0  4 == 0
+probe ssbo uint 0  8 == 1
+probe ssbo uint 0 12 == 1
+probe ssbo uint 0 16 == 2
+probe ssbo uint 0 20 == 0
+probe ssbo uint 0 24 == 3
+probe ssbo uint 0 28 == 1
