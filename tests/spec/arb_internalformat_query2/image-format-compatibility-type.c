@@ -38,6 +38,24 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+/*
+ * On this test we use GetTexParameteriv to check the correct
+ * value. We can't use texture_targets because TEXTURE_BUFFER is not a
+ * valid enum for GetTexParameteriv
+ */
+static const GLenum get_tex_parameter_targets[] = {
+        GL_TEXTURE_1D,
+        GL_TEXTURE_1D_ARRAY,
+        GL_TEXTURE_2D,
+        GL_TEXTURE_2D_ARRAY,
+        GL_TEXTURE_3D,
+        GL_TEXTURE_CUBE_MAP,
+        GL_TEXTURE_CUBE_MAP_ARRAY,
+        GL_TEXTURE_RECTANGLE,
+        GL_TEXTURE_2D_MULTISAMPLE,
+        GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+};
+
 enum piglit_result
 piglit_display(void)
 {
@@ -98,7 +116,7 @@ try_local(const GLenum *targets, unsigned num_targets,
                         bool error_test;
                         bool value_test;
                         bool supported;
-                        bool is_texture;
+                        bool is_valid_target;
 
                         supported = check_query2_dependencies(pname, targets[i])
                                 && test_data_check_supported(data, targets[i],
@@ -109,10 +127,11 @@ try_local(const GLenum *targets, unsigned num_targets,
                         error_test =
                                 piglit_check_gl_error(GL_NO_ERROR);
 
-                        is_texture = value_on_set((const GLint*)texture_targets, ARRAY_SIZE(texture_targets),
-                                                  (GLint) targets[i]);
+                        is_valid_target = value_on_set((const GLint*)get_tex_parameter_targets,
+                                                       ARRAY_SIZE(get_tex_parameter_targets),
+                                                       (GLint) targets[i]);
 
-                        if (is_texture && supported) {
+                        if (is_valid_target && supported) {
                                 param = get_tex_parameter_value(targets[i], internalformats[j]);
                                 error_test = error_test &&
                                         piglit_check_gl_error(GL_NO_ERROR);
