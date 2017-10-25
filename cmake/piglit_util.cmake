@@ -58,6 +58,8 @@ endfunction(piglit_include_target_api)
 #
 function(piglit_add_executable name)
 
+    piglit_create_manifest_file(${name})
+
     list(REMOVE_AT ARGV 0)
     add_executable(${name} ${ARGV})
     add_dependencies(${name} piglit_dispatch_gen)
@@ -89,3 +91,31 @@ function(piglit_add_library name)
     endif()
 
 endfunction(piglit_add_library)
+
+
+# This is lame, but Windows 10 (and maybe Win8) asks for confirmation
+# before running .exe files containing the strings "patch", "setup",
+# "update", etc.  In Cygwin, we simply get "Permission Denied".
+# This causes the Piglit test to fail.
+# The work-around is to create a "manifest" file for such executables.
+# This function examines the target name and creates the manifest file
+# if needed.  The file will be named "${target}.exe.manifest".
+# See https://answers.microsoft.com/en-us/windows/forum/windows_7-security/uac-prompts-on-any-program-with-the-word-patch-or/c5359497-d16e-43c6-99f2-db3d8eecc9c0?auth=1
+function(piglit_create_manifest_file target)
+   if (WIN32)
+      # look for known strings
+      string(FIND ${target} "patch" r1)
+      string(FIND ${target} "setup" r2)
+      string(FIND ${target} "update" r3)
+
+      # if any of those strings is in the target filename
+      if((${r1} GREATER -1) OR (${r2} GREATER -1) OR (${r3} GREATER -1))
+	    # XXX we should probably use add_custom_command() here to copy
+	    # the manifest file, but I've been unsuccessful in getting
+	    # that to work.
+	    file(GENERATE
+		 OUTPUT bin/${target}.exe.manifest
+		 INPUT ${CMAKE_SOURCE_DIR}/cmake/win10-manifest.txt)
+       endif()
+   endif()
+endfunction(piglit_create_manifest_file)
