@@ -649,7 +649,8 @@ check_query2_pname_dependencies(const GLenum pname)
                 break;
 
         case GL_GEOMETRY_TEXTURE:
-                if (!piglit_is_extension_supported("GL_ARB_geometry_shader4"))
+                if (!piglit_is_extension_supported("GL_ARB_geometry_shader4") &&
+                    !(piglit_get_gl_version() >= 32))
                         return false;
                 break;
 
