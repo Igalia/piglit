@@ -46,6 +46,10 @@ PIGLIT_GL_TEST_CONFIG_END
 
 /* These are all the formats that are required to be color-renderable
  * by the OpenGL 3.0 spec.
+ *
+ * But note that GL_ALPHA8 was removed on 3.1 and beyond on core, or
+ * if ARB_compatibility is missing, so we need to take that into
+ * account.
  */
 static const GLenum valid_formats[] = {
         GL_RGBA32F,
@@ -283,6 +287,7 @@ piglit_init(int argc, char **argv)
         const bool tms_supported =
                 piglit_is_extension_supported("GL_ARB_texture_multisample");
         GLint max_samples;
+        GLint valid_formats_size = ARRAY_SIZE(valid_formats);
 
         piglit_require_extension("GL_ARB_framebuffer_object");
         piglit_require_extension("GL_ARB_internalformat_query2");
@@ -293,8 +298,17 @@ piglit_init(int argc, char **argv)
                 piglit_require_extension("GL_ARB_texture_float");
         }
 
+        /* GL_ALPHA8 was removed on OpenGL 3.1 core, or if
+         * ARB_compatibility is missing, so on that case we skip that
+         * format
+         */
+        if (piglit_get_gl_version() >= 31 &&
+            (piglit_is_core_profile ||
+             !piglit_is_extension_supported("GL_ARB_compatibility")))
+                valid_formats_size = valid_formats_size - 1;
+
         glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
-        for (i = 0; i < ARRAY_SIZE(valid_formats); i++) {
+        for (i = 0; i < valid_formats_size; i++) {
                 pass = try(GL_RENDERBUFFER,
                            valid_formats[i],
                            max_samples,
@@ -345,7 +359,7 @@ piglit_init(int argc, char **argv)
                                 max_samples_name = "GL_MAX_COLOR_TEXTURE_SAMPLES";
                         }
 
-                        for (j = 0; j < ARRAY_SIZE(valid_formats); j++) {
+                        for (j = 0; j < valid_formats_size; j++) {
                                 pass = try(valid_targets_with_tms[i],
                                            valid_formats[j],
                                            max_samples,
