@@ -107,6 +107,58 @@ static const struct imagetexture imagetexture_table[] = {
         {GL_R8_SNORM, 8, GL_RED, GL_BYTE, GL_IMAGE_CLASS_1_X_8},
 };
 
+/*
+ * From OpenGL 4.5 spec, table 8.16, Internal formats for buffer
+ * textures
+ */
+static const GLenum table_8_16[] = {
+        GL_R8,
+        GL_R16,
+        GL_R16F,
+        GL_R32F,
+        GL_R8I,
+        GL_R16I,
+        GL_R32I,
+        GL_R8UI,
+        GL_R16UI,
+        GL_R32UI,
+        GL_RG8,
+        GL_RG16,
+        GL_RG16F,
+        GL_RG32F,
+        GL_RG8I,
+        GL_RG16I,
+        GL_RG32I,
+        GL_RG8UI,
+        GL_RG16UI,
+        GL_RG32UI,
+        GL_RGB32F,
+        GL_RGB32I,
+        GL_RGB32UI,
+        GL_RGBA8,
+        GL_RGBA16,
+        GL_RGBA16F,
+        GL_RGBA32F,
+        GL_RGBA8I,
+        GL_RGBA16I,
+        GL_RGBA32I,
+        GL_RGBA8UI,
+        GL_RGBA16UI,
+        GL_RGBA32UI
+};
+
+static bool
+check_tbo_compatible(const GLenum target,
+                     const GLenum format)
+{
+        if (target != GL_TEXTURE_BUFFER)
+                return true;
+
+        return value_on_set((const GLint*)table_8_16,
+                            ARRAY_SIZE(table_8_16),
+                            format);
+}
+
 static bool
 try(const GLenum *targets, unsigned num_targets,
     const GLenum pname, test_data *data)
@@ -124,7 +176,8 @@ try(const GLenum *targets, unsigned num_targets,
                         supported = check_query2_dependencies(pname, targets[i])
                                 && test_data_check_supported(data, targets[i],
                                                              imagetexture_table[j].format)
-                                && (targets[i] != GL_RENDERBUFFER);
+                                && (targets[i] != GL_RENDERBUFFER)
+                                && (check_tbo_compatible(targets[i], imagetexture_table[j].format));
 
                         test_data_execute(data, targets[i],
                                           imagetexture_table[j].format,
