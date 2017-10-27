@@ -92,7 +92,7 @@ kernel void store_hi16_global(volatile global ushort* out, volatile global uint*
 
 kernel void store_hi16_local(volatile global ushort* out, volatile global uint* in)
 {
-    volatile local short lds[64];
+    volatile local ushort lds[64];
     int lid = get_local_id(0);
     int gid = get_global_id(0);
 
@@ -104,7 +104,7 @@ kernel void store_hi16_local(volatile global ushort* out, volatile global uint* 
 kernel void store_hi16_private(volatile global ushort* out, volatile global uint* in)
 {
     int gid = get_global_id(0);
-    volatile private short stack = in[gid] >> 16;
+    volatile private ushort stack = in[gid] >> 16;
     out[gid] = stack;
 }
 
@@ -117,7 +117,7 @@ kernel void truncstorei8_hi16_global(volatile global uchar* out, volatile global
 
 kernel void truncstorei8_hi16_local(volatile global uchar* out, volatile global uint* in)
 {
-    volatile local short lds[64];
+    volatile local ushort lds[64];
     int lid = get_local_id(0);
     int gid = get_global_id(0);
 
@@ -129,6 +129,6 @@ kernel void truncstorei8_hi16_local(volatile global uchar* out, volatile global 
 kernel void truncstorei8_hi16_private(volatile global uchar* out, volatile global uint* in)
 {
     int gid = get_global_id(0);
-    volatile private short stack = in[gid] >> 16;
+    volatile private ushort stack = in[gid] >> 16;
     out[gid] = (uchar)stack;
 }
