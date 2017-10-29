@@ -583,7 +583,7 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 }
 
 static bool
-program_binary_save_restore()
+program_binary_save_restore(bool script_command)
 {
 	GLint binary_length;
 	void *binary;
@@ -591,12 +591,22 @@ program_binary_save_restore()
 	GLint ok;
 	GLuint new_prog;
 
-	if (!use_get_program_binary)
+	if (!script_command && !use_get_program_binary)
 		return true;
 
+	if (script_command && gl_num_program_binary_formats == 0)
+		piglit_report_result(PIGLIT_SKIP);
+
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
-	if (!ok)
-		return true;
+	if (!ok) {
+		if (script_command) {
+			fprintf(stderr, "Can't save/restore program that is "
+				"not linked!\n");
+			piglit_report_result(PIGLIT_FAIL);
+		} else {
+			return true;
+		}
+	}
 
 #ifdef PIGLIT_USE_OPENGL
 	glGetProgramiv(prog, GL_PROGRAM_BINARY_LENGTH, &binary_length);
@@ -693,7 +703,7 @@ link_sso(GLenum target)
 		return PIGLIT_FAIL;
 	}
 
-	if (!program_binary_save_restore())
+	if (!program_binary_save_restore(false))
 		return PIGLIT_FAIL;
 
 	switch (target) {
@@ -1187,7 +1197,7 @@ link_and_use_shaders(void)
 		glLinkProgram(prog);
 
 	if (!sso_in_use) {
-		if (!program_binary_save_restore())
+		if (!program_binary_save_restore(false))
 			return PIGLIT_FAIL;
 		glGetProgramiv(prog, GL_LINK_STATUS, &ok);
 		if (ok) {
@@ -3944,6 +3954,8 @@ piglit_display(void)
 			set_parameter(rest);
 		} else if (parse_str(line, "patch parameter ", &rest)) {
 			set_patch_parameter(rest);
+		} else if (parse_str(line, "program binary save restore", &rest)) {
+			program_binary_save_restore(true);
 		} else if (parse_str(line, "provoking vertex ", &rest)) {
 			set_provoking_vertex(rest);
 		} else if (parse_str(line, "link error", &rest)) {
