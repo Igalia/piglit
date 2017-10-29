@@ -1,0 +1,35 @@
+# From the ARB_get_program_binary extension spec:
+#
+# "A successful call to ProgramBinary will reset all uniform variables
+#  to their initial values. The initial value is either the value of
+#  the variable's initializer as specified in the original shader
+#  source, or 0 if no initializer was present."
+#
+
+[require]
+GLSL >= 1.20
+GL_NUM_PROGRAM_BINARY_FORMATS >= 1
+
+[vertex shader]
+void main()
+{
+    gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+
+uniform vec4 color = vec4(0.0, 1.0, 0.0, 1.0);
+void main()
+{
+    gl_FragColor = color;
+}
+
+[test]
+uniform vec4 color 1.0 0.0 1.0 0.0
+draw rect -1 -1 2 2
+probe all rgba 1.0 0.0 1.0 0.0
+uniform vec4 color 1.0 0.0 1.0 0.0
+program binary save restore
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
