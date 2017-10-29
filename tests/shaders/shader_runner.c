@@ -4129,7 +4129,10 @@ piglit_init(int argc, char **argv)
 	float default_piglit_tolerance[4];
 
 	use_get_program_binary =
-		piglit_strip_arg(&argc, argv, "-get-program-binary");
+		piglit_strip_arg(&argc, argv, "-get-program-binary") ||
+		piglit_env_var_as_boolean("SHADER_RUNNER_GET_PROGRAM_BINARY",
+		                          false);
+
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
