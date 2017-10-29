@@ -149,6 +149,8 @@ static GLuint draw_fbo, read_fbo;
 static GLint render_width, render_height;
 static GLint read_width, read_height;
 
+static bool use_get_program_binary = false;
+
 static bool report_subtests = false;
 
 static struct texture_binding {
@@ -580,6 +582,91 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 	return PIGLIT_PASS;
 }
 
+static bool
+program_binary_save_restore()
+{
+	GLint binary_length;
+	void *binary;
+	GLenum binary_format;
+	GLint ok;
+	GLuint new_prog;
+
+	if (!use_get_program_binary)
+		return true;
+
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+	if (!ok)
+		return true;
+
+#ifdef PIGLIT_USE_OPENGL
+	glGetProgramiv(prog, GL_PROGRAM_BINARY_LENGTH, &binary_length);
+#else
+	glGetProgramiv(prog, GL_PROGRAM_BINARY_LENGTH_OES, &binary_length);
+#endif
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		fprintf(stderr, "glGetProgramiv GL_PROGRAM_BINARY_LENGTH "
+		        "error\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	binary = malloc(binary_length);
+	if (!binary) {
+		fprintf(stderr, "Failed to allocate buffer for "
+		        "GetProgramBinary\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+#ifdef PIGLIT_USE_OPENGL
+	glGetProgramBinary(prog, binary_length, &binary_length, &binary_format,
+	                   binary);
+#else
+	glGetProgramBinaryOES(prog, binary_length, &binary_length,
+	                      &binary_format, binary);
+#endif
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		fprintf(stderr, "glGetProgramBinary error\n");
+		free(binary);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	new_prog = glCreateProgram();
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		free(binary);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+#ifdef PIGLIT_USE_OPENGL
+	glProgramBinary(new_prog, binary_format, binary, binary_length);
+#else
+	glProgramBinaryOES(new_prog, binary_format, binary, binary_length);
+#endif
+	free(binary);
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		fprintf(stderr, "glProgramBinary error "
+			"(should not happend according to spec.)\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+	if (!ok) {
+		fprintf(stderr, "link failure after glProgramBinary\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (prog_in_use) {
+		glUseProgram(new_prog);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
+	}
+
+	glDeleteProgram(prog);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
+	prog = new_prog;
+
+	return true;
+}
+
 static enum piglit_result
 link_sso(GLenum target)
 {
@@ -605,6 +692,9 @@ link_sso(GLenum target)
 		free(prog_err_info);
 		return PIGLIT_FAIL;
 	}
+
+	if (!program_binary_save_restore())
+		return PIGLIT_FAIL;
 
 	switch (target) {
 	case GL_VERTEX_SHADER:
@@ -1097,6 +1187,8 @@ link_and_use_shaders(void)
 		glLinkProgram(prog);
 
 	if (!sso_in_use) {
+		if (!program_binary_save_restore())
+			return PIGLIT_FAIL;
 		glGetProgramiv(prog, GL_LINK_STATUS, &ok);
 		if (ok) {
 			link_ok = true;
@@ -4036,6 +4128,8 @@ piglit_init(int argc, char **argv)
 	enum piglit_result result;
 	float default_piglit_tolerance[4];
 
+	use_get_program_binary =
+		piglit_strip_arg(&argc, argv, "-get-program-binary");
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
@@ -4105,6 +4199,11 @@ piglit_init(int argc, char **argv)
 		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES,
 		              &gl_num_program_binary_formats);
 #endif
+
+	if (use_get_program_binary) {
+		if (gl_num_program_binary_formats == 0)
+			piglit_report_result(PIGLIT_SKIP);
+	}
 
 	/* Automatic mode can run multiple tests per session. */
 	if (report_subtests) {
