@@ -393,6 +393,15 @@ size_t
 piglit_join_paths(char buf[], size_t buf_size, int n, ...);
 
 /**
+ * \brief Reads an environment variable and interprets its value as a boolean.
+ *
+ * Recognizes 0/false/no and 1/true/yes.  Other values result in the
+ * \a default_value.
+ */
+bool
+piglit_env_var_as_boolean(const char *var_name, bool default_value);
+
+/**
  * \brief Whether piglit_time_get* return monotonically increasing time.
  *
  * Can be used to determine how accurate/reliable the time returned by the

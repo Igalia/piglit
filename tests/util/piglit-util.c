@@ -867,3 +867,30 @@ piglit_free_aligned(void *p)
 	free(p);
 #endif
 }
+
+
+/**
+ * \brief Reads an environment variable and interprets its value as a boolean.
+ *
+ * Recognizes 0/false/no and 1/true/yes.  Other values result in the
+ * \a default_value.
+ */
+bool
+piglit_env_var_as_boolean(const char *var_name, bool default_value)
+{
+   const char *str = getenv(var_name);
+   if (str == NULL)
+      return default_value;
+
+   if (strcmp(str, "1") == 0 ||
+       strcasecmp(str, "true") == 0 ||
+       strcasecmp(str, "yes") == 0) {
+      return true;
+   } else if (strcmp(str, "0") == 0 ||
+              strcasecmp(str, "false") == 0 ||
+              strcasecmp(str, "no") == 0) {
+      return false;
+   } else {
+      return default_value;
+   }
+}
