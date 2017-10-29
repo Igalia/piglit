@@ -98,6 +98,7 @@ static int gl_max_vertex_uniform_components;
 static int gl_max_vertex_attribs;
 static int gl_max_varying_components;
 static int gl_max_clip_planes;
+static int gl_num_program_binary_formats = 0;
 
 static const char *test_start = NULL;
 static unsigned test_start_line_num = 0;
@@ -767,6 +768,11 @@ process_requirement(const char *line)
 			"GL_MAX_VARYING_COMPONENTS",
 			&gl_max_varying_components,
 			"varying components",
+		},
+		{
+			"GL_NUM_PROGRAM_BINARY_FORMATS",
+			&gl_num_program_binary_formats,
+			"num program binary formats",
 		},
 	};
 	unsigned i;
@@ -4089,6 +4095,16 @@ piglit_init(int argc, char **argv)
 
 	read_width = render_width = piglit_width;
 	read_height = render_height = piglit_height;
+
+#ifdef PIGLIT_USE_OPENGL
+	if (piglit_is_extension_supported("GL_ARB_get_program_binary"))
+		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS,
+		              &gl_num_program_binary_formats);
+#else
+	if (piglit_is_extension_supported("GL_OES_get_program_binary"))
+		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES,
+		              &gl_num_program_binary_formats);
+#endif
 
 	/* Automatic mode can run multiple tests per session. */
 	if (report_subtests) {
