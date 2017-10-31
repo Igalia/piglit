@@ -16,6 +16,7 @@ void main() {
 	uint64_t active_set = ballotARB(true);
 
 	uint id = gl_SubGroupInvocationARB;
+	uint64_t group_mask = ~0ul >> (64u - gl_SubGroupSizeARB);
 
 	if (id >= gl_SubGroupSizeARB) {
 		outcolor = vec4(1.0, 0 / 255.0, id / 255.0, gl_SubGroupSizeARB / 255.0);
@@ -27,12 +28,12 @@ void main() {
 		return;
 	}
 
-	if (gl_SubGroupGeMaskARB != (~0ul << id)) {
+	if (gl_SubGroupGeMaskARB != ((~0ul << id) & group_mask)) {
 		outcolor = vec4(1.0, 2 / 255.0, id / 255.0, 0.0);
 		return;
 	}
 
-	if (gl_SubGroupGtMaskARB != (~1ul << id)) {
+	if (gl_SubGroupGtMaskARB != ((~1ul << id) & group_mask)) {
 		outcolor = vec4(1.0, 2 / 255.0, id / 255.0, 0.0);
 		return;
 	}
