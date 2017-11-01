@@ -7,7 +7,7 @@
  * Check that the builtin functions defined by the extension
  * are present.
  */
-#version 150
+#version 140
 #extension GL_ARB_shader_atomic_counters: require
 #extension GL_ARB_shader_atomic_counter_ops: require
 
