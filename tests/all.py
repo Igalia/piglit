@@ -13,7 +13,9 @@ import six
 from six.moves import range
 
 from framework import grouptools
+from framework.test import opengl
 from framework import options
+from framework import wflinfo
 from framework.profile import TestProfile
 from framework.driver_classifier import DriverClassifier
 from framework.test import (PiglitGLTest, GleanTest, PiglitBaseTest,
@@ -210,9 +212,86 @@ profile = TestProfile()  # pylint: disable=invalid-name
 
 shader_tests = collections.defaultdict(list)
 
+wfl_info = wflinfo.WflInfo()
+
+
+def gl_extension_supported(ext_name):
+    """Is the named OpenGL extension supported?"""
+    return ext_name in wfl_info.gl_extensions
+
+
+def is_feature_directory_supported(dir_name):
+    """Determine if dir_name specifies an OpenGL feature (extension or GL
+    version) which is supported by the host.  If we return False, it means
+    the extension/version is definitely not supported.  If we return True,
+    it means the extension/version is possibly suppported.  We're a little
+    fuzzy because we don't yet parse all the directory name possibilities
+    (like ES tests).
+    """
+    if dir_name[:4] in {"amd_", "arb_", "ati_", "ext_", "khr_", "oes_"}:
+        # The directory is a GL extension name, but of the format "arb_foo_bar"
+        # instead of "GL_ARB_foo_bar".  We convert the former into the later
+        # and check if the extension is supported.
+        ext_name = "GL_" + dir_name[0:4].upper() + dir_name[4:]
+        return gl_extension_supported(ext_name)
+    elif dir_name[:5] == "gles-":
+        # OpenGL ES test
+        version = dir_name[5:]
+        return float(version) <= float(wfl_info.gles_version)
+    elif dir_name[:8] == "glsl-es-":
+        # OpenGL ES shader test
+        version = dir_name[8:]
+        return float(version) <= float(wfl_info.glsl_es_version)
+    elif dir_name[:3] == "gl-":
+        # The directory is a GL version
+        version = dir_name[3:]
+        return float(version) <= float(wfl_info.gl_version)
+    elif dir_name[:5] == "glsl-":
+        # The directory is a GLSL version
+        version = dir_name[5:]
+        return float(version) <= float(wfl_info.glsl_version)
+    else:
+        # The directory is something else.  Don't skip it.
+        return True
+
+
+def walk_filter_dir_tree(root):
+    """Recursively walk the directory tree rooted at 'root'.
+    If we find a directory path of the form ".../spec/foo/" we'll check if
+    'foo' is a supported extension/feature/version.  If not, we do not
+    traverse foo/.  Otherwise, we add continue traversing.
+    The return value is a list of (dirpath, filename) tuples.
+    """
+    curdir = os.path.split(root)[1]
+    files = []
+    retval = []
+
+    for entry in os.listdir(root):
+        full_path = os.path.join(root, entry)
+        if os.path.isdir(full_path):
+            # Check if we're in a "spec/" direcotry
+            if curdir == "spec" and not is_feature_directory_supported(entry):
+                # The directory's tests aren't supported by the driver.
+                print("Skipping spec/{}".format(entry))
+            else:
+                # recursively walk the subdirectory
+                retval += walk_filter_dir_tree(full_path)
+        elif os.path.isfile(full_path):
+            # Add the file to the files list
+            files += [entry]
+
+    retval += [(root, [], files)]
+
+    return retval
+
+
 # Find and add all shader tests.
 for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
-    for dirpath, _, filenames in os.walk(basedir):
+    if os.environ.get("PIGLIT_FILTER_DIRECTORIES"):
+        files = walk_filter_dir_tree(basedir)
+    else:
+        files = os.walk(basedir)
+    for dirpath, _, filenames in files:
         groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
         for filename in filenames:
             testname, ext = os.path.splitext(filename)
