@@ -624,6 +624,7 @@ with profile.test_list.group_manager(PiglitGLTest, 'shaders') as g:
     g(['point-vertex-id', 'gl_InstanceID', 'divisor'])
     g(['point-vertex-id', 'gl_VertexID', 'gl_InstanceID', 'divisor'])
     g(['glsl-vs-int-attrib'])
+    g(['unsuccessful-relink'])
     g(['glsl-link-initializer-03'],
       'GLSL link two programs, global initializer')
     g(['glsl-getactiveuniform-count',
