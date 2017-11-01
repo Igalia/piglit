@@ -24,11 +24,13 @@ from __future__ import (
 import errno
 import os
 import subprocess
+import sys
 
 import six
 
 from framework import exceptions, core
 from framework.options import OPTIONS
+from framework.test import piglit_test
 
 
 class StopWflinfo(exceptions.PiglitException):
@@ -77,16 +79,34 @@ class WflInfo(object):
         """
         with open(os.devnull, 'w') as d:
             try:
-                raw = subprocess.check_output(
-                    ['wflinfo',
-                     '--platform', OPTIONS.env['PIGLIT_PLATFORM']] + opts,
-                    stderr=d)
+                # Get the piglit platform string and, if needed, convert it
+                # to something that wflinfo understands.
+                platform = OPTIONS.env['PIGLIT_PLATFORM']
+                if platform == "mixed_glx_egl":
+                    platform = "glx"
+
+                if sys.platform in ['windows', 'cygwin']:
+                    bin = 'wflinfo.exe'
+                else:
+                    bin = 'wflinfo'
+
+                cmd = [bin, '--platform', platform] + opts
+
+                # setup execution environment where we extend the PATH env var
+                # to include the piglit TEST_BIN_DIR
+                new_env = os.environ
+                new_env['PATH'] = ':'.join([piglit_test.TEST_BIN_DIR,
+                                            os.environ['PATH']])
+
+                raw = subprocess.check_output(cmd, env=new_env, stderr=d)
+
             except subprocess.CalledProcessError:
                 # When we hit this error it usually going to be because we have
                 # an incompatible platform/profile combination
                 raise StopWflinfo('Called')
             except OSError as e:
                 # If we get a 'no wflinfo' warning then just return
+                print("wflinfo utility not found.", file=sys.stderr)
                 if e.errno == errno.ENOENT:
                     raise StopWflinfo('OSError')
                 raise
@@ -122,8 +142,7 @@ class WflInfo(object):
                 try:
                     ret = self.__call_wflinfo(const + [var])
                 except StopWflinfo as e:
-                    # This means tat the particular api or profile is
-                    # unsupported
+                    # This means the particular api or profile is unsupported
                     if e.reason == 'Called':
                         continue
                     else:
