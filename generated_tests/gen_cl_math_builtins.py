@@ -114,6 +114,8 @@ U = {
     'float' : 'uint'
 }
 
+M_PI_F = float.fromhex('0x1.921fb6p+1')
+
 def quo(x, y):
     return int(round(x/y))
 
@@ -249,8 +251,10 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [1.0, 0.0,    -1.0, 0.0,        1.0,    cos(1.12345), cos(7), cos(8), cos(pow(2,20)), cos(pow(2,24)), cos(pow(2,120)), float("nan")], # Result
-            [0.0, pi / 2, pi,   3 * pi / 2, 2 * pi, 1.12345, 7, 8, pow(2,20), pow(2,24), pow(2,120), float("nan")] # Arg0
+            # using libm cosf(3.0f * M_PI / 2.0f) == 0x1.99bc5cp-27
+            # this is different form what python gives us
+            [1.0, cos(M_PI_F / 2),    -1.0, float.fromhex('0x1.99bc5cp-27'),        1.0,    cos(1.12345), cos(7), cos(8), cos(pow(2,20)), cos(pow(2,24)), cos(pow(2,120)), float("nan")], # Result
+            [0.0, M_PI_F / 2, pi,   3 * M_PI_F / 2, 2 * pi, 1.12345, 7, 8, pow(2,20), pow(2,24), pow(2,120), float("nan")] # Arg0
         ],
         'tolerance' : 4
     },
