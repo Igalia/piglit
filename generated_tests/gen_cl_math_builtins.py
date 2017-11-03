@@ -734,8 +734,9 @@ tests = {
         'arg_types': [F, F],
         'function_type': 'ttt',
         'values': [
-            [0.0, 1.0,  0.0, sqrt(3), -1.0,   tan(pi * 2.234567), float("nan") ], # Result
-            [0.0, 1/4, 1,  1/3,    3/4, 2.234567 ,     float("nan") ], # Arg1
+            #fp32 representation of 2.234567 is 0x1.1e064ap+1
+            [0.0, 1.0,  0.0, sqrt(3), -1.0,   tan(M_PI_F * float.fromhex('0x1.1e064ap+1')), float("nan") ], # Result
+            [0.0, 1/4, 1,  1/3,    3/4, 2.234567,     float("nan") ], # Arg1
         ],
         'tolerance': 6
     },
