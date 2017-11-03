@@ -674,8 +674,10 @@ tests = {
         'arg_types' : [F, F, F],
         'function_type': 'ttt',
         'values' : [
-            [0.0, 1.0,   0.0, -1.0,       0.0,    sin(2.234567), sin(7), sin(8), sin(pow(2,20)), sin(pow(2,24)), sin(pow(2,120)), float("nan")], # Result0
-            [1.0, 0.0,    -1.0, 0.0,        1.0,    cos(1.12345), cos(7), cos(8), cos(pow(2,20)), cos(pow(2,24)), cos(pow(2,120)), float("nan")], # Result1
+            [0.0, 1.0,   sin(M_PI_F), -1.0,       sin(2 * M_PI_F),    sin(2.234567), sin(7), sin(8), sin(pow(2,20)), sin(pow(2,24)), sin(pow(2,120)), float("nan")], # Result0
+            # using libm cosf(3.0f * M_PI / 2.0f) == 0x1.99bc5cp-27
+            # this is different form what python gives us
+            [1.0, cos(M_PI_F / 2),    -1.0, float.fromhex('0x1.99bc5cp-27'),        1.0,    cos(2.234567), cos(7), cos(8), cos(pow(2,20)), cos(pow(2,24)), cos(pow(2,120)), float("nan")], # Result1
             [0.0, pi / 2, pi, 3 * pi / 2, 2 * pi, 2.234567, 7, 8, pow(2,20), pow(2,24), pow(2,120), float("nan")] # Arg0
         ],
         'tolerance': 4,
