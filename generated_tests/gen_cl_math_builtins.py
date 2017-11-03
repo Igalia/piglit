@@ -665,7 +665,7 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [0.0, 1.0,   0.0, -1.0,       0.0,    sin(2.234567), sin(7), sin(8), sin(pow(2,20)), sin(pow(2,24)), sin(pow(2,120)), float("nan")], # Result
+            [0.0, 1.0,   sin(M_PI_F), -1.0,       sin(2 * M_PI_F),    sin(2.234567), sin(7), sin(8), sin(pow(2,20)), sin(pow(2,24)), sin(pow(2,120)), float("nan")], # Result
             [0.0, pi / 2, pi, 3 * pi / 2, 2 * pi, 2.234567, 7, 8, pow(2,20), pow(2,24), pow(2,120), float("nan")] # Arg0
         ],
         'tolerance': 4
