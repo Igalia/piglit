@@ -716,8 +716,8 @@ tests = {
         'arg_types': [F, F],
         'function_type': 'ttt',
         'values': [
-            [0.0, 1.0,  0.0, sqrt(3), -1.0,   tan(2.234567), float("nan") ], # Result
-            [0.0, pi/4, pi,  pi/3,    3*pi/4, 2.234567 ,     float("nan") ], # Arg1
+            [0.0, 1.0,  tan(M_PI_F), sqrt(3), -1.0,   tan(2.234567), float("nan") ], # Result
+            [0.0, pi/4, M_PI_F,  pi/3,    3*pi/4, 2.234567 ,     float("nan") ], # Arg1
         ],
         'tolerance': 5
     },
