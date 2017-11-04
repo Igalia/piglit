@@ -53,6 +53,7 @@ _ENUMS = {
     13: 'fixes',
     14: 'regressions',
     15: 'total',
+    16: 'time',
 }
 
 class TestPrintSummary(object):
@@ -67,11 +68,11 @@ class TestPrintSummary(object):
         """
         names = [grouptools.join('foo', 'bar', 'oink', 'foobar', 'boink'),
                  'foo', 'bar']
-        template = '{: >20.20} {: >6.6}'
+        template = '{: >20.20} {: >12.12}'
 
         expected = console_._SUMMARY_TEMPLATE.format(
-            names=' '.join(['this is a really rea', 'a name']),
-            divider=' '.join(['--------------------', '------']),
+            names=' '.join(['this is a really rea', 'another name']),
+            divider=' '.join(['--------------------', '------------']),
             pass_=template.format('1', '2'),
             fail=template.format('2', '0'),
             crash=template.format('0', '0'),
@@ -84,7 +85,8 @@ class TestPrintSummary(object):
             changes=template.format('0', '2'),
             fixes=template.format('0', '1'),
             regressions=template.format('0', '0'),
-            total=template.format('3', '3')).split('\n')
+            total=template.format('3', '3'),
+            time=template.format('00:01:39', '02:14:05')).split('\n')
 
         res1 = results.TestrunResult()
         res1.name = 'this is a really really really really long name'
@@ -92,14 +94,16 @@ class TestPrintSummary(object):
         res1.tests[names[1]] = results.TestResult('fail')
         res1.tests[names[2]] = results.TestResult('notrun')
         res1.tests[names[2]].subtests['1'] = 'fail'
+        res1.time_elapsed = results.TimeAttribute(1509747121.4873962, 1509747220.544042)
         res1.calculate_group_totals()
 
         res2 = results.TestrunResult()
-        res2.name = 'a name'
+        res2.name = 'another name'
         res2.tests[names[0]] = results.TestResult('pass')
         res2.tests[names[1]] = results.TestResult('pass')
         res2.tests[names[2]] = results.TestResult('notrun')
         res2.tests[names[2]].subtests['1'] = 'skip'
+        res2.time_elapsed = results.TimeAttribute(1464820707.4581327, 1464828753.201948)
         res2.calculate_group_totals()
 
         reses = common.Results([res1, res2])
