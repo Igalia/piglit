@@ -97,4 +97,6 @@ piglit_add_executable (fbo-cubemap fbo-cubemap.c)
 piglit_add_executable (fbo-scissor-bitmap fbo-scissor-bitmap.c)
 piglit_add_executable (fbo-viewport fbo-viewport.c)
 
+piglit_add_executable (fbo-float-nan fbo-float-nan.c)
+
 # vim: ft=cmake:
