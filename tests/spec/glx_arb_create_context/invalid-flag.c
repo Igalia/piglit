@@ -23,6 +23,10 @@
 #include "piglit-glx-util.h"
 #include "common.h"
 
+#ifndef GLX_CONTEXT_RESET_ISOLATION_BIT_ARB
+#define GLX_CONTEXT_RESET_ISOLATION_BIT_ARB 0x8
+#endif
+
 static bool try_flag(uint32_t flag)
 {
 	const int attribs[] = {
@@ -68,14 +72,15 @@ int main(int argc, char **argv)
 
 	GLX_ARB_create_context_setup();
 
-	/* If GLX_ARB_create_context_robustness is supported, the first flag
-	 * that can be valid is GLX_CONTEXT_ROBUST_ACCESS_BIT_ARB.  Otherwise
-	 * the first valid flag is GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB.
-	 */
-	if (piglit_is_glx_extension_supported(dpy,
+        /* Check for extensions that define higher-numbered flags */
+        if (piglit_is_glx_extension_supported(dpy,
 					      "GLX_ARB_create_context_robustness")) {
 		first_valid_flag = GLX_CONTEXT_ROBUST_ACCESS_BIT_ARB;
 	}
+        if (piglit_is_glx_extension_supported(dpy,
+                                              "GLX_ARB_robustness_application_isolation")) {
+                first_valid_flag = GLX_CONTEXT_RESET_ISOLATION_BIT_ARB;
+        }
 
 	while (flag != first_valid_flag) {
 		pass = try_flag(flag) && pass;
