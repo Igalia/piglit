@@ -11,5 +11,6 @@ link_libraries (
 piglit_add_executable (arb_get_program_binary-api-errors api-errors.c)
 piglit_add_executable (arb_get_program_binary-overrun overrun.c)
 piglit_add_executable (arb_get_program_binary-retrievable_hint retrievable_hint.c)
+piglit_add_executable (arb_get_program_binary-reset-uniform reset-uniform.c gpb-common.c)
 
 # vim: ft=cmake:
