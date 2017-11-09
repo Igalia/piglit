@@ -855,6 +855,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('glx', 'GLX_EXT_no_config_context'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
+    g(['glx-create-context-ext-no-config-context'], 'no fbconfig')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('glx', 'GLX_ARB_create_context_profile'),
         require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-create-context-core-profile'], '3.2 core profile required')
