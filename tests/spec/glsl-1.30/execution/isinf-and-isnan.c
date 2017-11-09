@@ -340,6 +340,7 @@ enum behavior
 	B_FINITE = 1, /* Expected to evaluate to a finite value */
 	B_POSINF = 2, /* Expected to evaluate to +Infinity */
 	B_NEGINF = 3, /* Expected to evaluate to -Infinity */
+	B_FINITE_NAN_OK = 4, /* Expected finite value, but NaN ok */
 };
 
 struct expression_table_element
@@ -369,6 +370,10 @@ static struct expression_table_element expressions[] = {
 	{ "log(-1.0+z)", B_NAN },
 	{ "sqrt(-1.0)", B_NAN },
 	{ "sqrt(-1.0+z)", B_NAN },
+	{ "clamp(u_nan, 0.0, 1.0)", B_FINITE_NAN_OK },
+	{ "min(u_two, u_nan)", B_FINITE_NAN_OK },
+	{ "max(u_two, u_nan)", B_FINITE_NAN_OK },
+
 };
 
 /**
@@ -446,6 +451,7 @@ test_expr(char *expression, int expected_behavior)
 		"uniform float u_inf;\n" /* Always == +infinity */
 		"uniform float u_minus_inf;\n" /* Always == -infinity */
 		"uniform float u_nan;\n" /* Always == NaN */
+		"uniform float u_two = 2.0;\n" /* To defeat constant folding */
 		"float compute_value() {\n"
 		"  return %s;\n"
 		"}\n",
@@ -522,6 +528,9 @@ test_expr(char *expression, int expected_behavior)
 			/* Expected negative or NaN, got >= 0 */
 			pass = false;
 		}
+		break;
+	case B_FINITE_NAN_OK:
+		expected_behavior_string = "finite";
 		break;
 	default:
 		expected_behavior_string = "NaN";
