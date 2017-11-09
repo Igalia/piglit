@@ -77,6 +77,8 @@ init_gl(struct piglit_wfl_framework *wfl_fw)
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
 		     piglit_width, piglit_height, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -93,6 +95,8 @@ init_gl(struct piglit_wfl_framework *wfl_fw)
 		 */
 		glGenTextures(1, &depth);
 		glBindTexture(GL_TEXTURE_2D, depth);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL,
 			     piglit_width, piglit_height, 0,
 			     GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
