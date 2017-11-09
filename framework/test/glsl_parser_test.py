@@ -65,6 +65,9 @@ def _is_gles_version(version):
         if version.endswith('es'):
             return True
 
+        if version.endswith('compatibility'):
+            return False
+
         version = float(version)
 
     return version in [1.0, 3.0, 3.1, 3.2]
@@ -113,6 +116,8 @@ class Parser(object):
         glsl = self.config['glsl_version']
         if _is_gles_version(glsl):
             self.glsl_es_version = float(glsl[:3])
+        elif glsl.endswith('compatibility'):
+            self.glsl_version = float(glsl[:3])
         else:
             self.glsl_version = float(glsl)
 

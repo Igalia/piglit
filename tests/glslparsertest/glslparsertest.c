@@ -35,6 +35,8 @@
 
 #include "piglit-util-gl.h"
 
+#define COMPAT_FLAG (1u << 31)
+
 static unsigned parse_glsl_version_number(const char *str);
 static int process_options(int argc, char **argv);
 
@@ -42,8 +44,10 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	argc = process_options(argc, argv);
 	if (argc > 3) {
-		const unsigned int int_version
+		const unsigned int version
 			= parse_glsl_version_number(argv[3]);
+		const bool compat = !!(version & COMPAT_FLAG);
+		const unsigned int int_version = version & ~COMPAT_FLAG;
 		switch (int_version) {
 		/* This is a hack to support es
 		 *
@@ -71,7 +75,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 			const unsigned int gl_version
 				= required_gl_version_from_glsl_version(int_version);
 			config.supports_gl_compat_version = gl_version;
-			if (gl_version < 31)
+			if (gl_version < 31 || compat)
 				config.supports_gl_core_version = 0;
 			else
 				config.supports_gl_core_version = gl_version;
@@ -405,7 +409,7 @@ process_options(int argc, char **argv)
 	int i = 1;
 	int new_argc = 1;
 	while (i < argc) {
-		if (argv[i][0] == '-') {
+		if (argv[i][0] == '-' && strcmp(argv[i], "-compat") != 0) {
 			if (strcmp(argv[i], "--check-link") == 0)
 				check_link = 1;
 			else
@@ -425,6 +429,7 @@ parse_glsl_version_number(const char *str)
 {
 	unsigned major = 0;
 	unsigned minor = 0;
+	unsigned flags = 0;
 
 	/* Accept a return value of either 1 or 2 from sscanf(), so
 	 * that the version number may be supplied as either "<int>"
@@ -435,7 +440,10 @@ parse_glsl_version_number(const char *str)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	return (major * 100) + minor;
+	if (strstr(str, "compatibility"))
+		flags |= COMPAT_FLAG;
+
+	return ((major * 100) + minor) | flags;
 }
 
 
@@ -512,7 +520,7 @@ piglit_init(int argc, char**argv)
 		usage(argv[0]);
 
 	if (argc > 3)
-		requested_version = parse_glsl_version_number(argv[3]);
+		requested_version = parse_glsl_version_number(argv[3]) & ~COMPAT_FLAG;
 
 	gl_version_times_10 = piglit_get_gl_version();
 
