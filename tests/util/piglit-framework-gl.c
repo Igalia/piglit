@@ -186,6 +186,8 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			config->supports_gl_compat_version = 10;
 			config->supports_gl_core_version = 0;
 			puts("The compatibility profile forced.");
+			delete_arg(argv, *argc, j--);
+			*argc -= 1;
 		}
 	}
 }
