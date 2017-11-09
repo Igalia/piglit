@@ -46,7 +46,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 11;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE;
@@ -54,12 +54,28 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-void
-piglit_init(int argc, char **argv)
-{
-	srand(0);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-}
+
+static const GLenum logicop_modes[] = {
+	GL_CLEAR,
+	GL_SET,
+	GL_COPY,
+	GL_COPY_INVERTED,
+	GL_NOOP,
+	GL_INVERT,
+	GL_AND,
+	GL_NAND,
+	GL_OR,
+	GL_NOR,
+	GL_XOR,
+	GL_EQUIV,
+	GL_AND_REVERSE,
+	GL_AND_INVERTED,
+	GL_OR_REVERSE,
+	GL_OR_INVERTED
+};
+
+static GLenum test_single = 0;  /* 0 = test all logicop modes */
+
 
 static GLubyte*
 random_image_data(void)
@@ -284,32 +300,42 @@ piglit_display(void)
 	enum piglit_result subtest;
 	unsigned int op;
 
-	static GLenum logicop_modes[] = {
-		GL_CLEAR,
-		GL_SET,
-		GL_COPY,
-		GL_COPY_INVERTED,
-		GL_NOOP,
-		GL_INVERT,
-		GL_AND,
-		GL_NAND,
-		GL_OR,
-		GL_NOR,
-		GL_XOR,
-		GL_EQUIV,
-		GL_AND_REVERSE,
-		GL_AND_INVERTED,
-		GL_OR_REVERSE,
-		GL_OR_INVERTED
-	};
-
 	for (op = 0; op < ARRAY_SIZE(logicop_modes); ++op) {
-		subtest = test_logicop(logicop_modes[op]);
-		piglit_report_subtest_result(subtest, "%s",
-			piglit_get_gl_enum_name(logicop_modes[op]));
-		if (subtest == PIGLIT_FAIL)
-			result = PIGLIT_FAIL;
+		if (test_single == 0 || test_single == logicop_modes[op]) {
+			subtest = test_logicop(logicop_modes[op]);
+			piglit_report_subtest_result(subtest, "%s",
+				piglit_get_gl_enum_name(logicop_modes[op]));
+			if (subtest == PIGLIT_FAIL)
+				result = PIGLIT_FAIL;
+		}
 	}
 
 	return result;
+}
+
+
+void
+piglit_init(int argc, char **argv)
+{
+	srand(0);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	if (argc > 1) {
+		/* argv[1] may be one of the logic op modes, like "GL_XOR" */
+		int i;
+
+		for (i = 0; i < ARRAY_SIZE(logicop_modes); i++) {
+			const char * mode =
+				piglit_get_gl_enum_name(logicop_modes[i]);
+			if (strcmp(argv[1], mode) == 0) {
+				test_single = logicop_modes[i];
+				break;
+			}
+		}
+		if (test_single == 0) {
+			printf("Invalid glLogicOp mode %s\n", argv[1]);
+			piglit_report_result(PIGLIT_SKIP);
+		}
+	}
+
 }
