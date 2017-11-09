@@ -114,8 +114,11 @@ function(piglit_create_manifest_file target)
 	    # the manifest file, but I've been unsuccessful in getting
 	    # that to work.
 	    file(GENERATE
-		 OUTPUT bin/${target}.exe.manifest
+		 OUTPUT $<TARGET_FILE:${target}>.manifest
 		 INPUT ${CMAKE_SOURCE_DIR}/cmake/win10-manifest.txt)
+
+	    install(FILES $<TARGET_FILE:${target}>.manifest
+		    DESTINATION ${PIGLIT_INSTALL_LIBDIR}/bin)
        endif()
    endif()
 endfunction(piglit_create_manifest_file)
