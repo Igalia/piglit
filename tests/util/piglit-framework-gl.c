@@ -87,13 +87,14 @@ piglit_gl_test_config_init(struct piglit_gl_test_config *config)
 }
 
 static void
-delete_arg(char *argv[], int argc, int arg)
+delete_arg(char *argv[], int *argc, int arg)
 {
 	int i;
 
-	for (i = arg + 1; i < argc; i++) {
+	for (i = arg + 1; i < *argc; i++) {
 		argv[i - 1] = argv[i];
 	}
+	(*argc)--;
 }
 
 /**
@@ -117,16 +118,13 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 	for (j = 1; j < *argc; j++) {
 		if (!strcmp(argv[j], "-auto")) {
 			piglit_automatic = 1;
-			delete_arg(argv, *argc, j--);
-			*argc -= 1;
+			delete_arg(argv, argc, j--);
 		} else if (!strcmp(argv[j], "-fbo")) {
 			piglit_use_fbo = true;
-			delete_arg(argv, *argc, j--);
-			*argc -= 1;
+			delete_arg(argv, argc, j--);
 		} else if (!strcmp(argv[j], "-png")) {
 			piglit_dump_png = true;
-			delete_arg(argv, *argc, j--);
-			*argc -= 1;
+			delete_arg(argv, argc, j--);
 		} else if (!strcmp(argv[j], "-rlimit")) {
 			char *ptr;
 			unsigned long lim;
@@ -158,12 +156,10 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			j -= 2;
 		} else if (!strncmp(argv[j], "-samples=", 9)) {
 			*force_samples = atoi(argv[j]+9);
-			delete_arg(argv, *argc, j--);
-			*argc -= 1;
+			delete_arg(argv, argc, j--);
 		} else if (!strcmp(argv[j], "-khr_no_error")) {
 			piglit_khr_no_error = true;
-			delete_arg(argv, *argc, j--);
-			*argc -= 1;
+			delete_arg(argv, argc, j--);
 			if (config->khr_no_error_support ==
 			    PIGLIT_UNKNOWN_ERROR_STATUS) {
 				fprintf(stderr,
@@ -186,8 +182,7 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			config->supports_gl_compat_version = 10;
 			config->supports_gl_core_version = 0;
 			puts("The compatibility profile forced.");
-			delete_arg(argv, *argc, j--);
-			*argc -= 1;
+			delete_arg(argv, argc, j--);
 		}
 	}
 }
