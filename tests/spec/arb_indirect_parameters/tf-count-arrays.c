@@ -194,7 +194,7 @@ piglit_display(void)
 	/* Overdraw with the red quad, except count = 0 */
 	glMultiDrawArraysIndirectCountARB(
 			GL_TRIANGLE_FAN,
-			(2 * 4 * 4), 4, 1, 0);
+			(const void *) (2 * 4 * 4), 4, 1, 0);
 
 	pass &= piglit_probe_rect_rgba(0, 0, piglit_width / 2, piglit_height,
 				       g);

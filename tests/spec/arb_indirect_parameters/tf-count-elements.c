@@ -203,7 +203,7 @@ piglit_display(void)
 	/* Overdraw with the red quad, except count = 0 */
 	glMultiDrawElementsIndirectCountARB(
 			GL_TRIANGLES, GL_UNSIGNED_INT,
-			(2 * 5 * 4), 4, 1, 0);
+			(const void *) (2 * 5 * 4), 4, 1, 0);
 
 	pass &= piglit_probe_rect_rgba(0, 0, piglit_width / 2, piglit_height,
 				       g);
