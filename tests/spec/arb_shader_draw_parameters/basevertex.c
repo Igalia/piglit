@@ -24,10 +24,26 @@
 /**
  * \file basevertex.c
  *
- * Test that gl_BaseVertexARB has the correct values. Draw left side
- * of window with a non-base-vertex draw call to verify
- * gl_BaseVertexARB is 0 in that case, then draw other half with base
- * vertex 4 and verifies that that works.
+ * Test that gl_BaseVertexARB has the correct values.
+ *
+ * The framebuffer is filled with three quads like this:
+ *
+ * #########
+ * #   #   #
+ * #   # B #
+ * # A #####
+ * #   # C #
+ * #   #   #
+ * #########
+ *
+ * Quad A is rendered using a non-base-vertex draw call to verify that
+ * gl_BaseVertexARB is zero in that case.
+ *
+ * Quad B is rendered with baseVertex as 4.
+ *
+ * Quad C is rendered using a non-indexed draw call with a non-zero
+ * ‘first’ parameter. This shouldn’t affect gl_BaseVertex but it
+ * should affect gl_VertexID.
  */
 
 #include "piglit-util-gl.h"
@@ -104,19 +120,27 @@ piglit_display()
 {
 	bool pass;
 
-	static const float vertex_array[16] = {
+	static const float vertex_array[24] = {
+		/* Left half of the screen */
 		-1, -1,
 		0, -1,
 		0, 1,
 		-1, 1,
 
-		0, -1,
-		1, -1,
+		/* Top-right quarter of the screen */
+		0, 0,
+		1, 0,
 		1, 1,
 		0, 1,
+
+		/* Bottom-right quarter of the screen */
+		0, -1,
+		1, -1,
+		0, 0,
+		1, 0,
 	};
 
-	static const int reference_array[32] = {
+	static const int reference_array[48] = {
 		0, 0, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 2, 0,
@@ -125,6 +149,10 @@ piglit_display()
 		4, 7, 1, 0,
 		4, 7, 2, 0,
 		4, 7, 3, 0,
+		0, 0, 8, 0,
+		0, 0, 9, 0,
+		0, 0, 10, 0,
+		0, 0, 11, 0,
 	};
 
 	const int indices[6] = {
@@ -166,6 +194,14 @@ piglit_display()
 						      indices, 1,
 						      4, /* basevertex */
 						      7 /* baseinstance */);
+
+	/* Test using glDrawArrays with a non-zero ‘first’ parameter.
+	 * This value should be included in gl_VertexID but not in
+	 * gl_BaseVertex.
+	 */
+	glDrawArrays(GL_TRIANGLE_STRIP,
+		     8, /* first */
+		     4 /* count */);
 
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
 				      green);
