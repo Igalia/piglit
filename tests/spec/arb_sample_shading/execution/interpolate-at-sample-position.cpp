@@ -162,9 +162,10 @@ piglit_init(int argc, char**argv)
 		"#extension GL_ARB_sample_shading: require\n"
 		"in vec2 test_center;\n"
 		"centroid in vec2 test_centroid;\n"
+		"out vec4 fragdata[2];\n"
 		"void main() {\n"
-		"	gl_FragData[0] = vec4(abs(test_center), 0, 1);\n"
-		"	gl_FragData[1] = vec4(abs(test_centroid), 0, 1);\n"
+		"	fragdata[0] = vec4(abs(test_center), 0, 1);\n"
+		"	fragdata[1] = vec4(abs(test_centroid), 0, 1);\n"
 		"}\n");
 
 	draw_prog_right = piglit_build_simple_program(
@@ -185,9 +186,10 @@ piglit_init(int argc, char**argv)
 
 		"#version 130\n"
 		"in vec2 ref;\n"
+		"out vec4 fragdata[2];\n"
 		"void main() {\n"
-		"	gl_FragData[0] = vec4(abs(ref), 0, 1);\n"
-		"	gl_FragData[1] = vec4(abs(ref), 0, 1);\n"
+		"	fragdata[0] = vec4(abs(ref), 0, 1);\n"
+		"	fragdata[1] = vec4(abs(ref), 0, 1);\n"
 		"}\n");
 	sample_pos_loc = glGetUniformLocation(draw_prog_right, "sample_pos");
 
@@ -203,9 +205,10 @@ piglit_init(int argc, char**argv)
 		"uniform int sample_id;\n"
 		"uniform sampler2DMS tex_center;\n"
 		"uniform sampler2DMS tex_centroid;\n"
+		"out vec4 fragcolor;\n"
 		"void main() {\n"
 		"       ivec2 coord = ivec2(gl_FragCoord.xy);\n"
-		"	gl_FragColor = coord.y < 128 ? \n"
+		"	fragcolor = coord.y < 128 ? \n"
 		"		texelFetch(tex_center, coord, sample_id) :\n"
 		"		texelFetch(tex_centroid, coord - ivec2(0, 128), sample_id);\n"
 		"}\n");
