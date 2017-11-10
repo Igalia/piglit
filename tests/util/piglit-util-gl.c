@@ -2949,6 +2949,7 @@ static const char multisample_texture_fs_source[] =
  *
  * \param target         either GL_TEXTURE_2D_MULTISAMPLE or
  *                       GL_TEXTURE2D_MULTISAMPLE_ARRAY
+ * \param tex            texture ID for existing texture, or zero
  * \param internalformat a renderable color format accepted by
  *                       glTexImage2DMultisample
  * \param width          texture width
@@ -2963,7 +2964,7 @@ static const char multisample_texture_fs_source[] =
  * \return the new texture object id
  */
 GLuint
-piglit_multisample_texture(GLenum target, GLenum tex, GLenum internalFormat,
+piglit_multisample_texture(GLenum target, GLuint tex, GLenum internalFormat,
 			   unsigned width, unsigned height,
 			   unsigned depth, unsigned samples,
 			   GLenum format, GLenum type, void *data)

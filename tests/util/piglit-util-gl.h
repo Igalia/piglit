@@ -304,7 +304,7 @@ GLuint piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 GLuint piglit_integer_texture(GLenum internalFormat, int w, int h, int b, int a);
 GLuint piglit_depth_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);
 GLuint piglit_array_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);
-GLuint piglit_multisample_texture(GLenum target, GLenum tex,
+GLuint piglit_multisample_texture(GLenum target, GLuint tex,
 				  GLenum internalFormat,
 				  unsigned width, unsigned height,
 				  unsigned depth, unsigned samples,
