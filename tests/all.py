@@ -4882,14 +4882,16 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'ARB_shader_draw_parameters')) as g:
     g(['arb_shader_draw_parameters-drawid', 'drawid'], 'drawid')
     g(['arb_shader_draw_parameters-drawid', 'vertexid'], 'drawid-vertexid')
-    g(['arb_shader_draw_parameters-basevertex', 'basevertex'], 'basevertex')
-    g(['arb_shader_draw_parameters-basevertex', 'baseinstance'], 'baseinstance')
-    g(['arb_shader_draw_parameters-basevertex', 'basevertex-baseinstance'], 'basevertex-baseinstance')
-    g(['arb_shader_draw_parameters-basevertex', 'vertexid-zerobased'], 'vertexid-zerobased')
     g(['arb_shader_draw_parameters-drawid-indirect', 'drawid'], 'drawid-indirect')
     g(['arb_shader_draw_parameters-drawid-indirect', 'basevertex'], 'drawid-indirect-basevertex')
     g(['arb_shader_draw_parameters-drawid-indirect', 'baseinstance'], 'drawid-indirect-baseinstance')
     g(['arb_shader_draw_parameters-drawid-indirect', 'vertexid'], 'drawid-indirect-vertexid')
+
+    variables = ('basevertex', 'baseinstance', 'basevertex-baseinstance', 'vertexid-zerobased')
+    for v in variables:
+        g(['arb_shader_draw_parameters-basevertex', v], v)
+    for v in variables:
+        g(['arb_shader_draw_parameters-basevertex', v, 'indirect'], v + '-indirect')
 
 # Group ARB_indirect_parameters
 with profile.test_list.group_manager(

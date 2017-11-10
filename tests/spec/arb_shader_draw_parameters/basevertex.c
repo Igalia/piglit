@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 Intel Corporation
+ * Copyright © 2015, 2017 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -82,6 +82,8 @@ static const char fs_text[] =
 	"  gl_FragColor = color;\n"
 	"}\n";
 
+static bool opt_draw_indirect = false;
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -105,14 +107,100 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	if (argc > 2) {
+		if (strcmp(argv[2], "indirect") == 0) {
+			opt_draw_indirect = true;
+		} else {
+			printf("Unknown second argument: %s\n", argv[2]);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+
 	piglit_require_GLSL_version(330);
 
 	piglit_require_extension("GL_ARB_shader_draw_parameters");
 	piglit_require_extension("GL_ARB_base_instance");
+	if (opt_draw_indirect)
+		piglit_require_extension("GL_ARB_draw_indirect");
 
 	prog = piglit_build_simple_program(vs_text, fs_text);
 
 	glUseProgram(prog);
+}
+
+static void
+draw_direct(void)
+{
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+
+	/* We use this monster to draw the right half of the
+	 * window. Base vertex so that we can reuse the indices to
+	 * draw with vertices and colors 4-7, base instance so that we
+	 * can verify that the value presented in the shader is
+	 * correct. We only draw one instance so the only effect of
+	 * instancing is that gl_BaseInstanceARB is 7.
+	 */
+	glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, 6,
+						      GL_UNSIGNED_INT,
+						      NULL, 1,
+						      4, /* basevertex */
+						      7 /* baseinstance */);
+
+	/* Test using glDrawArrays with a non-zero ‘first’ parameter.
+	 * This value should be included in gl_VertexID but not in
+	 * gl_BaseVertex.
+	 */
+	glDrawArrays(GL_TRIANGLE_STRIP,
+		     8, /* first */
+		     4 /* count */);
+}
+
+static void
+draw_indirect(void)
+{
+	GLuint params_bo;
+
+	static const GLuint draw_params[] = {
+		6, /* count */
+		1, /* prim count */
+		0, /* firstIndex */
+		0, /* baseVertex */
+		0, /* baseInstance */
+
+		6, /* count */
+		1, /* prim count */
+		0, /* firstIndex */
+		4, /* baseVertex */
+		7, /* baseInstance */
+
+		4, /* count */
+		1, /* prim count */
+		8, /* first */
+		0, /* baseInstance */
+	};
+
+	glGenBuffers(1, &params_bo);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, params_bo);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER,
+		     sizeof draw_params,
+		     draw_params,
+		     GL_STATIC_DRAW);
+
+	/* The draw commands are all equivalent to those in draw_direct. */
+
+	glDrawElementsIndirect(GL_TRIANGLES,
+			       GL_UNSIGNED_INT,
+			       (void *) 0);
+
+	glDrawElementsIndirect(GL_TRIANGLES,
+			       GL_UNSIGNED_INT,
+			       (void *) (5 * sizeof draw_params[0]));
+
+	glDrawArraysIndirect(GL_TRIANGLE_STRIP,
+			       (void *) (10 * sizeof draw_params[0]));
+
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+	glDeleteBuffers(1, &params_bo);
 }
 
 enum piglit_result
@@ -162,13 +250,17 @@ piglit_display()
 
 	float green[] = { 0, 1, 0, 1 };
 
-	GLuint vao, vbo;
+	GLuint vao, vbo, ibo;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, 2048, NULL, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof indices, indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 	glVertexAttribIPointer(1, 4, GL_UNSIGNED_INT, 4 * sizeof(int), (void *) 1024);
@@ -180,28 +272,10 @@ piglit_display()
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_array), vertex_array);
 	glBufferSubData(GL_ARRAY_BUFFER, 1024, sizeof(reference_array), reference_array);
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
-
-	/* We use this monster to draw the right half of the
-	 * window. Base vertex so that we can reuse the indices to
-	 * draw with vertices and colors 4-7, base instance so that we
-	 * can verify that the value presented in the shader is
-	 * correct. We only draw one instance so the only effect of
-	 * instancing is that gl_BaseInstanceARB is 7.
-	 */
-	glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, 6,
-						      GL_UNSIGNED_INT,
-						      indices, 1,
-						      4, /* basevertex */
-						      7 /* baseinstance */);
-
-	/* Test using glDrawArrays with a non-zero ‘first’ parameter.
-	 * This value should be included in gl_VertexID but not in
-	 * gl_BaseVertex.
-	 */
-	glDrawArrays(GL_TRIANGLE_STRIP,
-		     8, /* first */
-		     4 /* count */);
+	if (opt_draw_indirect)
+		draw_indirect();
+	else
+		draw_direct();
 
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
 				      green);
