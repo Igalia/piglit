@@ -308,7 +308,7 @@ GLuint piglit_multisample_texture(GLenum target, GLuint tex,
 				  GLenum internalFormat,
 				  unsigned width, unsigned height,
 				  unsigned depth, unsigned samples,
-				  GLenum format, GLenum type, void *data);
+				  GLenum format, GLenum type, const void *data);
 extern float piglit_tolerance[4];
 void piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits);
 extern void piglit_require_transform_feedback(void);

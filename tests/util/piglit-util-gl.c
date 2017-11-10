@@ -2967,7 +2967,7 @@ GLuint
 piglit_multisample_texture(GLenum target, GLuint tex, GLenum internalFormat,
 			   unsigned width, unsigned height,
 			   unsigned depth, unsigned samples,
-			   GLenum format, GLenum type, void *data)
+			   GLenum format, GLenum type, const void *data)
 {
 	static GLuint prog = 0;
 	static GLint tex_loc, tex_depth_loc, z_loc;
