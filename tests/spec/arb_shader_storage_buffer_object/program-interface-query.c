@@ -59,6 +59,15 @@ static const char vs_pass_thru_text[] =
 	"       a_std140[0].s[0].b[0] = mat2(1.0, 2.0, 3.0, 4.0);\n"
         "}\n";
 
+static const char vs_no_ssbo_text[] =
+	"#version 330\n"
+	"\n"
+	"in vec4 piglit_vertex;\n"
+	"\n"
+	"void main() {\n"
+	"	gl_Position = piglit_vertex;\n"
+        "}\n";
+
 static const char fs_source[] =
 	"#version 330\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"
@@ -108,29 +117,38 @@ piglit_init(int argc, char **argv)
 					       "GL_REFERENCED_BY_FRAGMENT_SHADER" };
 	int query_std140[NUM_QUERIES] = {0};
 	int query_std430[NUM_QUERIES] = {0};
+	int num_vertex_ssbo;
 	const int expected_std140[NUM_QUERIES] =
 		{ 0, 112, GL_FLOAT_MAT2, 3, 0, 16, 32, 16, 1, 1, 0 };
-	const int expected_std430[NUM_QUERIES] =
+	int expected_std430[NUM_QUERIES] =
 		{ 2, 56, GL_FLOAT_MAT2, 3, 2, 16, 16, 8, 0, 0, 1 };
 	int i;
+	bool has_vertex_ssbo = true;
 
 	piglit_require_extension("GL_ARB_shader_storage_buffer_object");
 	piglit_require_extension("GL_ARB_program_interface_query");
 
-	prog = piglit_build_simple_program(vs_pass_thru_text, fs_source);
+	glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &num_vertex_ssbo);
+	if (num_vertex_ssbo == 0) {
+		has_vertex_ssbo = false;
+		/* modify GL_BLOCK_INDEX return */
+		expected_std430[4] = 0;
+	}
+	prog = piglit_build_simple_program(has_vertex_ssbo ? vs_pass_thru_text : vs_no_ssbo_text, fs_source);
 
 	glUseProgram(prog);
 
-	/* First ssbo_std140 */
-	index = glGetProgramResourceIndex(prog,
-					  GL_BUFFER_VARIABLE,
-					  "ssbo_std140.s[0].b[0]");
-	glGetProgramResourceiv(prog, GL_BUFFER_VARIABLE, index,
-                               NUM_QUERIES, prop, NUM_QUERIES, NULL,
-			       query_std140);
-	if (!piglit_check_gl_error(GL_NO_ERROR))
-	   pass = false;
-
+	if (has_vertex_ssbo) {
+		/* First ssbo_std140 */
+		index = glGetProgramResourceIndex(prog,
+						  GL_BUFFER_VARIABLE,
+						  "ssbo_std140.s[0].b[0]");
+		glGetProgramResourceiv(prog, GL_BUFFER_VARIABLE, index,
+				       NUM_QUERIES, prop, NUM_QUERIES, NULL,
+				       query_std140);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			pass = false;
+	}
 	/* Now ssbo_std430 */
 	index = glGetProgramResourceIndex(prog,
 					  GL_BUFFER_VARIABLE,
@@ -143,11 +161,13 @@ piglit_init(int argc, char **argv)
 	   pass = false;
 
 	for (i = 0 ; i < NUM_QUERIES; i++) {
-		if (query_std140[i] != expected_std140[i]) {
-			printf("std140 %s expected = %d. Value = %d.\n",
-			       prop_names[i], expected_std140[i],
-			       query_std140[i]);
-			pass = false;
+		if (has_vertex_ssbo) {
+			if (query_std140[i] != expected_std140[i]) {
+				printf("std140 %s expected = %d. Value = %d.\n",
+				       prop_names[i], expected_std140[i],
+				       query_std140[i]);
+				pass = false;
+			}
 		}
 		if (query_std430[i] != expected_std430[i]) {
 			printf("std430 %s expected = %d. Value = %d.\n",
