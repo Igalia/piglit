@@ -1,0 +1,54 @@
+[require]
+GL ES >= 3.0
+GLSL ES >= 3.00
+
+[vertex shader]
+#version 300 es
+
+in vec4 vertex;
+out vec2 texcoord;
+
+void main()
+{
+	gl_Position = vertex;
+	texcoord.x = (vertex.x + 1.0) / 2.0;
+	texcoord.y = (vertex.y + 1.0) / 2.0;
+}
+
+[fragment shader]
+#version 300 es
+precision mediump float;
+
+in vec2 texcoord;
+
+uniform lowp sampler2D tex_1;
+uniform lowp sampler2D tex_2;
+
+out vec4 color;
+
+void main()
+{
+        vec2 noise = texture2D(tex_1, vec2(texcoord.s, texcoord.t)).rg;
+
+        noise.s = noise.s * 2.0 - 1.0;
+        vec2 flameCoord;
+
+        flameCoord.s = texcoord.s + noise.s * (1.0 / 8.0);
+        flameCoord.t = texcoord.t + noise.t * (1.0 / 32.0);
+
+        color = texture2D(tex_2, flameCoord);
+}
+
+
+[test]
+uniform int tex_1 1
+uniform int tex_2 2
+texture rgbw 1 (8, 8)
+texture rgbw 2 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgba (0.25, 0.25) (1.0, 0.0, 0.0, 1.0)
+relative probe rgba (0.75, 0.25) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.25, 0.75) (0.0, 0.0, 1.0, 1.0)
+relative probe rgba (0.75, 0.75) (1.0, 1.0, 1.0, 1.0)
+
+
