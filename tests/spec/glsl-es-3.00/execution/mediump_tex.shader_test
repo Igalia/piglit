@@ -1,0 +1,43 @@
+[require]
+GL ES >= 3.0
+GLSL ES >= 3.00
+
+[vertex shader]
+#version 300 es
+
+in vec4 vertex;
+out vec4 texcoords;
+
+void main()
+{
+	gl_Position = vertex;
+	texcoords = (vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+#version 300 es
+precision mediump float;
+
+in vec4 texcoords;
+uniform float f;
+uniform sampler2D tex;
+out vec4 color;
+
+vec4 foo(float foo_f, in sampler2D foo_tex, vec4 foo_texcoords)
+{
+	return texture2D(foo_tex, foo_texcoords.xy);
+}
+
+void main()
+{
+	color = foo(f, tex, texcoords);
+}
+
+[test]
+uniform int tex 1
+texture rgbw 1 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgba (0.25, 0.25) (1.0, 0.0, 0.0, 1.0)
+relative probe rgba (0.75, 0.25) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.25, 0.75) (0.0, 0.0, 1.0, 1.0)
+relative probe rgba (0.75, 0.75) (1.0, 1.0, 1.0, 1.0)
