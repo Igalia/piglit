@@ -1,0 +1,30 @@
+# Fill the window with red, then green, then blue.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader]
+attribute vec4 vertex;
+
+void main() {
+    gl_Position = vertex;
+}
+
+[fragment shader]
+precision mediump float;
+
+void main() {
+    gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.1 0.2 0.3 1.0
