@@ -236,20 +236,20 @@ def is_feature_directory_supported(dir_name):
         return gl_extension_supported(ext_name)
     elif dir_name[:5] == "gles-":
         # OpenGL ES test
-        version = dir_name[5:]
-        return float(version) <= float(wfl_info.gles_version)
+        version = float(dir_name[5:])
+        return wfl_info.gles_version != None and version <= wfl_info.gles_version
     elif dir_name[:8] == "glsl-es-":
         # OpenGL ES shader test
-        version = dir_name[8:]
-        return float(version) <= float(wfl_info.glsl_es_version)
+        version = float(dir_name[8:])
+        return wfl_info.glsl_es_version != None and version <= wfl_info.glsl_es_version
     elif dir_name[:3] == "gl-":
         # The directory is a GL version
-        version = dir_name[3:]
-        return float(version) <= float(wfl_info.gl_version)
+        version = float(dir_name[3:])
+        return version <= wfl_info.gl_version
     elif dir_name[:5] == "glsl-":
         # The directory is a GLSL version
-        version = dir_name[5:]
-        return float(version) <= float(wfl_info.glsl_version)
+        version = float(dir_name[5:])
+        return version <= wfl_info.glsl_version
     else:
         # The directory is something else.  Don't skip it.
         return True
