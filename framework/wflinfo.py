@@ -255,9 +255,8 @@ class WflInfo(object):
             else:
                 try:
                     # GLSL versions are M.mm formatted
-                    ret = float(self.__getline(
-                        raw.split('\n'),
-                        'OpenGL shading language').split()[-1][:4])
+                    line = self.__getline(raw.split('\n'), 'OpenGL shading language')
+                    ret = float(line.split(":")[1][:5])
                 except (IndexError, ValueError):
                     # This is caused by wflinfo returning an error
                     pass
