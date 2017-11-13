@@ -462,6 +462,7 @@ piglit_init(int argc, char **argv)
 	 * before version 3.20.
 	 */
 	if (es_shader && required_glsl_version < 320 &&
+	    required_glsl_version >= 310 &&
 	    piglit_is_extension_supported("GL_OES_geometry_shader")) {
 		assert(num_required_extensions < ARRAY_SIZE(required_extensions));
 		required_extensions[num_required_extensions] =
@@ -473,7 +474,9 @@ piglit_init(int argc, char **argv)
 	const char *const tess_ext_name = es_shader
 		? "GL_OES_tessellation_shader"
 		: "GL_ARB_tessellation_shader";
-	if (piglit_is_extension_supported(tess_ext_name)) {
+	if (((es_shader && required_glsl_version >= 310) ||
+	    !es_shader) &&
+	    piglit_is_extension_supported(tess_ext_name)) {
 		assert(num_required_extensions < ARRAY_SIZE(required_extensions));
 		required_extensions[num_required_extensions] =
 			strdup(tess_ext_name);
