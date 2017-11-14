@@ -384,7 +384,6 @@ with profile.test_list.group_manager(GleanTest, 'glean') as g:
     g('shaderAPI')
     g('texCube')
     g('texture_srgb')
-    g('texUnits')
     g('vertArrayBGRA')
     g('vertattrib')
 
