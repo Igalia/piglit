@@ -24,7 +24,6 @@ def remove(key):
 
 
 # These take too long or too much memory
-remove(join('glean', 'texCombine'))
 remove(join('spec', '!OpenGL 1.0', 'gl-1.0-blend-func'))
 remove(join('spec', '!OpenGL 1.1', 'streaming-texture-leak'))
 remove(join('spec', '!OpenGL 1.1', 'max-texture-size'))
