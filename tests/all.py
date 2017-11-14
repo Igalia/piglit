@@ -3999,6 +3999,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'nv_texture_env_combine4')) as g:
+    g(['nv_texture_env_combine4-combine'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'nv_conditional_render')) as g:
     g(['nv_conditional_render-begin-while-active'], 'begin-while-active')
     g(['nv_conditional_render-begin-zero'], 'begin-zero')
