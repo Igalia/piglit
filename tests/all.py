@@ -955,6 +955,7 @@ with profile.test_list.group_manager(
     g(['gl-1.0-scissor-offscreen'])
     g(['gl-1.0-scissor-polygon'])
     g(['gl-1.0-scissor-stencil-clear'])
+    g(['gl-1.0-texgen'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
