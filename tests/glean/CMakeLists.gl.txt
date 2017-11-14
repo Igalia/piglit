@@ -37,7 +37,6 @@ piglit_add_executable (glean
 	tpixelformats.cpp
 	tshaderapi.cpp
 	ttexcube.cpp
-	ttexgen.cpp
 	ttexture_srgb.cpp
 	ttexunits.cpp
 	tvertarraybgra.cpp

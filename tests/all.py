@@ -383,7 +383,6 @@ with profile.test_list.group_manager(GleanTest, 'glean') as g:
     # the equivalent functionality is covered by other tests
     g('shaderAPI')
     g('texCube')
-    g('texgen')
     g('texture_srgb')
     g('texUnits')
     g('vertArrayBGRA')
