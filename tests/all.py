@@ -1833,6 +1833,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_point_sprite')) as g:
     g(['point-sprite'], run_concurrent=False)
+    g(['arb_point_sprite-mipmap'])
 
 # Group ARB_tessellation_shader
 with profile.test_list.group_manager(

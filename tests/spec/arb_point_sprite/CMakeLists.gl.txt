@@ -1,0 +1,14 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+	${piglit_SOURCE_DIR}/tests/util
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+)
+
+piglit_add_executable (arb_point_sprite-mipmap mipmap.c)
+
+# vim: ft=cmake:
