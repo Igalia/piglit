@@ -1217,6 +1217,7 @@ with profile.test_list.group_manager(
     g(['gl-2.0-active-sampler-conflict'])
     g(['incomplete-cubemap', 'size'], 'incomplete-cubemap-size')
     g(['incomplete-cubemap', 'format'], 'incomplete-cubemap-format')
+    g(['gl-2.0-texture-units'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
