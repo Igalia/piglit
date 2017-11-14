@@ -2858,6 +2858,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_texture_env_combine')) as g:
+    g(['ext_texture_env_combine-combine'], 'texture-env-combine')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'arb_texture_env_crossbar')) as g:
     g(['crossbar'], run_concurrent=False)
 

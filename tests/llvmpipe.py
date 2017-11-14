@@ -28,6 +28,7 @@ remove(join('glean', 'texCombine'))
 remove(join('spec', '!OpenGL 1.0', 'gl-1.0-blend-func'))
 remove(join('spec', '!OpenGL 1.1', 'streaming-texture-leak'))
 remove(join('spec', '!OpenGL 1.1', 'max-texture-size'))
+remove(join('spec', 'ext_texture_env_combine', 'ext_texture_env_combine-combine'))
 
 if platform.system() != 'Windows':
     remove(join('glx', 'glx-multithread-shader-compile'))

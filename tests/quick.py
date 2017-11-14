@@ -63,6 +63,13 @@ with profile.test_list.group_manager(
     with profile.test_list.allow_reassignment:
         g(['arb_shader_image_size-builtin', '--quick'], 'builtin')
 
+# Set the --quick flag on the texture env combine test
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ext_texture_env_combine')) as g:
+    with profile.test_list.allow_reassignment:
+        g(['ext_texture_env_combine-combine', '--quick'], 'texture-env-combine')
+
 # These take too long
 profile.filters.append(lambda n, _: '-explosion' not in n)
 profile.filters.append(FilterVsIn())
