@@ -55,7 +55,7 @@ class _Setup(object):
         self.patchers = [
             mock.patch('framework.test.glsl_parser_test._HAS_GL_BIN', True),
             mock.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', True),
-            mock.patch.dict('framework.test.opengl.OPTIONS.env',
+            mock.patch.dict('framework.wflinfo.OPTIONS.env',
                             {'PIGLIT_PLATFORM': 'foo'}),
         ]
 
