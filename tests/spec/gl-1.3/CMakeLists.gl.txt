@@ -9,5 +9,6 @@ link_libraries (
 )
 
 piglit_add_executable (gl-1.3-alpha_to_coverage_nop alpha_to_coverage_nop.c)
+piglit_add_executable (gl-1.3-texture-env texture-env.c)
 
 # vim: ft=cmake:

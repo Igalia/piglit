@@ -1116,6 +1116,7 @@ with profile.test_list.group_manager(
         grouptools.join('spec', '!opengl 1.3')) as g:
     g(['texunits'])
     g(['tex-border-1'])
+    g(['gl-1.3-texture-env'])
     g(['tex3d-depth1'])
 
 with profile.test_list.group_manager(
