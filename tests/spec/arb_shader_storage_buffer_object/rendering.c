@@ -58,6 +58,25 @@ static const char vert_shader_text[] =
 	"   gl_Position.zw = vec2(0, 1);\n"
 	"}\n";
 
+static const char vert_shader_no_ssbo_text[] =
+	"#version 130\n"
+	"#extension GL_ARB_uniform_buffer_object : require\n"
+	"\n"
+	"layout(std140) uniform;\n"
+	"uniform ub_pos_size { vec2 pos; float size; };\n"
+	"uniform ub_rot {float rotation; };\n"
+	"in vec4 piglit_vertex;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"   mat2 m;\n"
+	"   m[0][0] = m[1][1] = cos(rotation); \n"
+	"   m[0][1] = sin(rotation); \n"
+	"   m[1][0] = -m[0][1]; \n"
+	"   gl_Position.xy = m * piglit_vertex.xy * vec2(size) + pos;\n"
+	"   gl_Position.zw = vec2(0, 1);\n"
+	"}\n";
+
 static const char frag_shader_text[] =
 	"#version 130\n"
 	"#extension GL_ARB_shader_storage_buffer_object : require\n"
@@ -98,9 +117,9 @@ static const float rotation[NUM_SQUARES] = {
 
 static GLuint prog;
 static GLuint buffers[NUM_SSBOS];
-static GLint alignment;
+static GLint alignment, ubo_alignment;
 static bool test_buffer_offset = false;
-
+static bool vertex_ssbo = false;
 
 static void
 setup_ubos(void)
@@ -110,12 +129,23 @@ setup_ubos(void)
 		"ssbo_color",
 		"ssbo_rot"
 	};
+	static const char *ubo_names[NUM_SSBOS] = {
+		"ub_pos_size",
+		"ssbo_color",
+		"ub_rot"
+	};
+
+	bool vs_ubo[NUM_SSBOS] = {true, false, true};
 	static GLubyte zeros[1000] = {0};
 	int i;
 
 	glGetIntegerv(GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &alignment);
 	printf("GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT = %d\n", alignment);
 
+	if (!vertex_ssbo) {
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &ubo_alignment);
+		printf("GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT = %d\n", ubo_alignment);
+	}
 	if (test_buffer_offset) {
 		printf("Testing buffer offset %d\n", alignment);
 	}
@@ -129,29 +159,55 @@ setup_ubos(void)
 	for (i = 0; i < NUM_SSBOS; i++) {
 		GLint index, size;
 
-		/* query SSBO index */
-		index = glGetProgramResourceIndex(prog,
-						  GL_SHADER_STORAGE_BLOCK,
-						  names[i]);
+		if (!vertex_ssbo && vs_ubo[i]) {
+			/* query UBO index */
+			index = glGetUniformBlockIndex(prog, ubo_names[i]);
 
-		GLenum prop = GL_BUFFER_DATA_SIZE;
-		/* query SSBO size */
-		glGetProgramResourceiv(prog, GL_SHADER_STORAGE_BLOCK, index,
-				       1, &prop, 1, NULL, &size);
+			/* query UBO size */
+			glGetActiveUniformBlockiv(prog, index,
+						  GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+			printf("UBO %s: index = %d, size = %d\n",
+			       ubo_names[i], index, size);
 
-		printf("SSBO %s: index = %d, size = %d\n",
-		       names[i], index, size);
+			/* Allocate UBO */
+			/* XXX for some reason, this test doesn't work at all with
+			 * nvidia if we pass NULL instead of zeros here.  The UBO data
+			 * is set/overwritten in the piglit_display() function so this
+			 * really shouldn't matter.
+			 */
+			glBindBuffer(GL_UNIFORM_BUFFER, buffers[i]);
+			glBufferData(GL_UNIFORM_BUFFER, size + alignment,
+				     zeros, GL_DYNAMIC_DRAW);
 
-		/* Allocate SSBO */
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[i]);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, size + alignment,
-                             zeros, GL_DYNAMIC_DRAW);
+			/* Attach UBO */
+			glBindBufferRange(GL_UNIFORM_BUFFER, i, buffers[i],
+					  alignment,  /* offset */
+					  size);
+			glUniformBlockBinding(prog, index, i);
+		} else {
+			/* query SSBO index */
+			index = glGetProgramResourceIndex(prog,
+							  GL_SHADER_STORAGE_BLOCK,
+							  names[i]);
 
-		/* Attach SSBO */
-		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, i, buffers[i],
-				  alignment,  /* offset */
-				  size);
-		glShaderStorageBlockBinding(prog, index, i);
+			GLenum prop = GL_BUFFER_DATA_SIZE;
+			/* query SSBO size */
+			glGetProgramResourceiv(prog, GL_SHADER_STORAGE_BLOCK, index,
+					       1, &prop, 1, NULL, &size);
+			printf("SSBO %s: index = %d, size = %d\n",
+			       names[i], index, size);
+
+			/* Allocate SSBO */
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[i]);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, size + alignment,
+				     zeros, GL_DYNAMIC_DRAW);
+
+			/* Attach SSBO */
+			glBindBufferRange(GL_SHADER_STORAGE_BUFFER, i, buffers[i],
+					  alignment,  /* offset */
+					  size);
+			glShaderStorageBlockBinding(prog, index, i);
+		}
 
 		if (!piglit_check_gl_error(GL_NO_ERROR))
 			piglit_report_result(PIGLIT_FAIL);
@@ -162,6 +218,8 @@ setup_ubos(void)
 void
 piglit_init(int argc, char **argv)
 {
+	int num_vertex_ssbo = 0;
+
 	piglit_require_extension("GL_ARB_shader_storage_buffer_object");
 	piglit_require_extension("GL_ARB_program_interface_query");
 
@@ -169,7 +227,14 @@ piglit_init(int argc, char **argv)
 		test_buffer_offset = true;
 	}
 
-	prog = piglit_build_simple_program(vert_shader_text, frag_shader_text);
+	glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &num_vertex_ssbo);
+
+	if (num_vertex_ssbo == 0)
+		vertex_ssbo = false;
+
+	glViewport(0, 0, piglit_width, piglit_height);
+
+	prog = piglit_build_simple_program(vertex_ssbo ? vert_shader_text : vert_shader_no_ssbo_text, frag_shader_text);
 	assert(prog);
 	glUseProgram(prog);
 
@@ -210,15 +275,27 @@ piglit_display(void)
 
 	for (i = 0; i < NUM_SQUARES; i++) {
 		/* Load UBO data, at offset=alignment */
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[0]);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, alignment,
-				sizeof(pos_size[0]), pos_size[i]);
+		if (!vertex_ssbo) {
+			glBindBuffer(GL_UNIFORM_BUFFER, buffers[0]);
+			glBufferSubData(GL_UNIFORM_BUFFER, alignment, sizeof(pos_size[0]),
+					pos_size[i]);
+		} else {
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[0]);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, alignment,
+					sizeof(pos_size[0]), pos_size[i]);
+		}
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[1]);
 		glBufferSubData(GL_SHADER_STORAGE_BUFFER, alignment,
 				sizeof(color[0]), color[i]);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[2]);
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, alignment,
-				sizeof(rotation[0]), &rotation[i]);
+		if (!vertex_ssbo) {
+			glBindBuffer(GL_UNIFORM_BUFFER, buffers[2]);
+			glBufferSubData(GL_UNIFORM_BUFFER, alignment, sizeof(rotation[0]),
+					&rotation[i]);
+		} else {
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[2]);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, alignment,
+					sizeof(rotation[0]), &rotation[i]);
+		}
 
 		if (!piglit_check_gl_error(GL_NO_ERROR))
 			return PIGLIT_FAIL;
