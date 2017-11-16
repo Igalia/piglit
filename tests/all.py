@@ -3174,6 +3174,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_disjoint_timer_query')) as g:
+    g(['ext_disjoint_timer_query-simple'], 'simple')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_frag_depth')) as g:
     g(['fragdepth_gles2'])
 

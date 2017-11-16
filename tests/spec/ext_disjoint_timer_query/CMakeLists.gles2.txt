@@ -1,0 +1,7 @@
+link_libraries (
+	piglitutil_${piglit_target_api}
+)
+
+piglit_add_executable (ext_disjoint_timer_query-simple simple-query.c)
+
+# vim: ft=cmake:
