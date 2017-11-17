@@ -198,6 +198,11 @@ class TestParams(object):
             ret += ' '
         return ret
 
+    @utils.lazy_property
+    def formated_version(self):
+        # Note: GLSLVersion.float() does division by 100
+        return '{:.2f}'.format(float(self.version))
+
 
 class ParamsFactory(object):  # pylint: disable=too-few-public-methods
     """A factory class that provides TestParam objects.
@@ -220,7 +225,7 @@ class ParamsFactory(object):  # pylint: disable=too-few-public-methods
 
 def make_vs(name, params):
     """Create a vertex shader test."""
-    dirname = _DIRNAME.format(params.version)
+    dirname = _DIRNAME.format(params.formated_version)
     utils.safe_makedirs(dirname)
     with open(os.path.join(dirname, name), 'w') as f:
         f.write(_VS_TEMPLATE.render_unicode(params=params))
@@ -229,7 +234,7 @@ def make_vs(name, params):
 
 def make_fs(name, params):
     """Create a fragment shader test."""
-    dirname = _DIRNAME.format(params.version)
+    dirname = _DIRNAME.format(params.formated_version)
     utils.safe_makedirs(dirname)
     with open(os.path.join(dirname, name), 'w') as f:
         f.write(_FS_TEMPLATE.render_unicode(params=params))
