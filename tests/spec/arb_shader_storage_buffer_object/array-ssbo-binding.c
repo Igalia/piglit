@@ -83,9 +83,14 @@ piglit_init(int argc, char **argv)
 	float ssbo_values[SSBO_SIZE] = {0};
 	float *map;
 	int index;
+	GLint num_vertex_ssbo;
 
 	piglit_require_extension("GL_ARB_shader_storage_buffer_object");
 	piglit_require_extension("GL_ARB_program_interface_query");
+
+	glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &num_vertex_ssbo);
+	if (num_vertex_ssbo < 1)
+		piglit_report_result(PIGLIT_SKIP);
 
 	prog = piglit_build_simple_program(vs_pass_thru_text, fs_source);
 
