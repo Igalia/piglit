@@ -117,6 +117,7 @@ piglit_display(void)
 	size_t size;
 	bool pass = true;
 	bool link_should_fail;
+	GLint num_vertex_ssbo;
 	const float green[4] = { 0, 1, 0, 0 };
 	int test_index;
 
@@ -127,17 +128,23 @@ piglit_display(void)
 	printf("Max shader storage block size: %d\n", max_size);
 	vec4s = max_size / 4 / 4;
 
+	glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &num_vertex_ssbo);
+
 	switch (mode) {
 	case VS:
 		target = GL_VERTEX_SHADER;
 		link_should_fail = false;
 		test_index = vec4s - 1;
+		if (num_vertex_ssbo == 0)
+			piglit_report_result(PIGLIT_SKIP);
 		break;
 	case VS_EXCEED:
 		target = GL_VERTEX_SHADER;
 		link_should_fail = true;
 		vec4s++;
 		test_index = vec4s - 2;
+		if (num_vertex_ssbo == 0)
+			piglit_report_result(PIGLIT_SKIP);
 		break;
 	case FS:
 		target = GL_FRAGMENT_SHADER;
