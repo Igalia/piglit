@@ -1425,6 +1425,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.10', 'execution')) as g:
     g(['glsl-render-after-bad-attach'])
+    g(['glsl-1.10-built-in-uniform-state'])
     g(['glsl-1.10-fragdepth'])
 
 with profile.test_list.group_manager(
