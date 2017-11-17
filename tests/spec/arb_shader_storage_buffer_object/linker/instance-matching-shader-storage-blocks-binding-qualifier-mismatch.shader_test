@@ -19,6 +19,7 @@
 GLSL >= 1.50
 GL_ARB_shading_language_420pack
 GL_ARB_shader_storage_buffer_object
+INT GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS >= 1
 
 [vertex shader]
 #version 150
