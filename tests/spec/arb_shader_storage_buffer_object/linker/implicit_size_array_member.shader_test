@@ -12,7 +12,9 @@
 GLSL >= 1.50
 GL_ARB_shader_storage_buffer_object
 
-[vertex shader]
+[vertex shader passthrough]
+
+[fragment shader]
 #version 150
 #extension GL_ARB_shader_storage_buffer_object: require
 
@@ -21,13 +23,10 @@ buffer a {
 	vec4 a[];
 } b;
 
-in vec4 piglit_vertex;
 out vec4 c;
 
 void main(void) {
 	c = b.s[0] + b.s[1];
-
-	gl_Position = piglit_vertex;
 }
 
 [test]
