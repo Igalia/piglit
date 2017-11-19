@@ -83,6 +83,11 @@ piglit_project_to_window(float win[3],
 void
 piglit_print_matrix(const float mat[16]);
 
+void
+piglit_matrix_inverse(float inv[16], const float m[16]);
+
+void
+piglit_matrix_transpose(float out[16], const float m[16]);
 
 #ifdef __cplusplus
 } /* end extern "C" */
