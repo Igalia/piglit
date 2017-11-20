@@ -257,7 +257,7 @@ int main(int argc, char **argv)
 	win = piglit_get_glx_window_unmapped(dpy, visinfo);
 	glxWin = glXCreateWindow(dpy, fbconfig, win, NULL);
 
-	ctx = glXCreateNewContext(dpy, fbconfig, GLX_RGBA, NULL, True);
+	ctx = glXCreateNewContext(dpy, fbconfig, GLX_RGBA_TYPE, NULL, True);
 	if (ctx == NULL) {
 		fprintf(stderr,	"Unable to create OpenGL context!\n");
 		piglit_report_result(PIGLIT_FAIL);
