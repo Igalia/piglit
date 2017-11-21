@@ -1,0 +1,19 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+#define BAR(x) x
+#if 1
+#define FOO(x) BAR(x)
+#else
+#define FOO(x) (BAR(x) + BAR(x))
+#endif
+void main()
+{
+	gl_FragColor = vec4(FOO(0.25));
+}
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.25, 0.25, 0.25, 0.25)

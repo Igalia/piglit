@@ -1,0 +1,18 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+#if 1
+#define FOO(x) x
+#else
+#define FOO(x) (0.5 * (x))
+#endif
+void main()
+{
+	gl_FragColor = vec4(FOO(0.25));
+}
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.25, 0.25, 0.25, 0.25)

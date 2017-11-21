@@ -1,0 +1,22 @@
+# This test will only be run if we have the GL_ARB_draw_buffers
+# extension.  Note the FLAG_ARB_DRAW_BUFFERS flag.
+
+[require]
+GLSL >= 1.10
+GL_ARB_DRAW_BUFFERS
+
+[fragment shader]
+#extension GL_ARB_draw_buffers: enable
+void main()
+{
+#if GL_ARB_draw_buffers == 1
+	gl_FragData[0] = vec4(0.0, 1.0, 0.0, 0.0);
+#else
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+#endif
+}
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.0, 1.0, 0.0, 0.0)
