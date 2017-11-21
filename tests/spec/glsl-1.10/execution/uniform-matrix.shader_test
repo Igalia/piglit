@@ -1,0 +1,15 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+uniform mat4 uniformMat4;
+void main()
+{
+	gl_FragColor = uniformMat4[3];
+}
+
+
+[test]
+uniform mat4 uniformMat4 1.0 0.1 0.2 0.3  0.0 1.0 0.0 0.4  0.0 1.0 1.0 0.5  0.6 0.7 0.8 1.0
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.6, 0.7, 0.8, 1.0)
