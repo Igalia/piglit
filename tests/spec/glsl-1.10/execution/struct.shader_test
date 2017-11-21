@@ -1,0 +1,23 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+struct s1 {
+  float f1;
+  vec4 v4;
+};
+
+void main()
+{
+	vec4 scale = vec4(0.5);
+	vec4 bias = vec4(0.1);
+	s1 a;
+	a.v4 = vec4(0.25, 0.5, 0.75, 1.0);
+	a.f1 = 0.0;
+	gl_FragColor = a.v4 * scale + bias;
+}
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.225, 0.35, 0.475, 0.6)
