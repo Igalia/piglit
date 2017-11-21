@@ -14,3 +14,4 @@ piglit_add_executable (glsl-render-after-bad-attach glsl-render-after-bad-attach
 piglit_add_executable (glsl-1.10-built-in-matrix-state built-in-matrix-state.c)
 piglit_add_executable (glsl-1.10-built-in-uniform-state built-in-uniform-state.c)
 piglit_add_executable (glsl-1.10-fragdepth fragdepth.c)
+piglit_add_executable (glsl-1.10-linear-fog linear-fog.c)

@@ -1428,6 +1428,7 @@ with profile.test_list.group_manager(
     g(['glsl-1.10-built-in-matrix-state'])
     g(['glsl-1.10-built-in-uniform-state'])
     g(['glsl-1.10-fragdepth'])
+    g(['glsl-1.10-linear-fog'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
