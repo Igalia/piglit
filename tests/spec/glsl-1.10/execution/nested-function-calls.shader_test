@@ -1,0 +1,25 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+float Half(const in float x)
+{
+	return 0.5 * x;
+}
+
+float square(const in float x)
+{
+	return x * x;
+}
+
+void main()
+{
+	float a = 0.5;
+	float b = square(Half(1.0));
+	gl_FragColor = vec4(b);
+}
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.25, 0.25, 0.25, 0.25)
