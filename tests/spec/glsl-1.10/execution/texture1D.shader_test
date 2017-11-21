@@ -1,0 +1,19 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+uniform sampler1D tex1d;
+void main()
+{
+	gl_FragColor = texture1D(tex1d, gl_TexCoord[0].x);
+}
+
+
+[test]
+uniform int tex1d 0
+texture rgbw 1D 0
+draw rect tex -1 -1 2 2 0 0 1 1
+relative probe rgba (0.125, 0.5) (1.0, 0.0, 0.0, 1.0)
+relative probe rgba (0.375, 0.5) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.625, 0.5) (0.0, 0.0, 1.0, 1.0)
+relative probe rgba (0.875, 0.5) (1.0, 1.0, 1.0, 1.0)

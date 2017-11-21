@@ -1,0 +1,17 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+uniform sampler2D tex2d;
+void main()
+{
+	vec2 coord = gl_TexCoord[0].xy + vec2(0.5);
+	gl_FragColor = texture2D(tex2d, coord, 0.0);
+}
+
+
+[test]
+texture rgbw 0 (8, 8)
+uniform int tex2d 0
+draw rect tex -1 -1 2 2 0 0 1 1
+relative probe rgba (0.5, 0.5) (1.0, 1.0, 1.0, 1.0)
