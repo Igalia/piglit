@@ -1,0 +1,38 @@
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader]
+#version 100
+
+precision highp float;
+
+attribute vec4 piglit_vertex;
+
+void main()
+{
+    gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+uniform float val;
+uniform float min;
+uniform float max;
+
+void main()
+{
+    if (val < max && val > min)
+       gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    else
+       gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform float val 0.2
+uniform float min 0.1
+uniform float max 0.3
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
