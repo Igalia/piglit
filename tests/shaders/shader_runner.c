@@ -2991,6 +2991,12 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			}
 			glClipPlane(GL_CLIP_PLANE0 + x, d);
+#ifdef PIGLIT_USE_OPENGL
+		} else if (parse_str(line, "color ", &rest)) {
+			parse_floats(rest, c, 4, NULL);
+			assert(!piglit_is_core_profile);
+			glColor4fv(c);
+#endif
 		} else if (sscanf(line,
 				  "compute %d %d %d",
 				  &x, &y, &z) == 3) {
