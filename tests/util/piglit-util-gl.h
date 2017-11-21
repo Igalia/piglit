@@ -301,6 +301,8 @@ GLfloat *piglit_rgbw_image(GLenum internalFormat, int w, int h,
 GLubyte *piglit_rgbw_image_ubyte(int w, int h, GLboolean alpha);
 GLuint piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 		    GLboolean alpha, GLenum basetype);
+GLuint piglit_rgbw_texture_1d(void);
+GLuint piglit_rgbw_texture_3d(void);
 GLuint piglit_integer_texture(GLenum internalFormat, int w, int h, int b, int a);
 GLuint piglit_depth_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);
 GLuint piglit_array_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);

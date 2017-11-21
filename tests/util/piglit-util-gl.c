@@ -2677,6 +2677,52 @@ piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 }
 
 /**
+ * Generate a 4 texel RGBA 1D texture with texels red, green, blue, white,
+ * edge clamping and NEAREST filtering.
+ */
+GLuint
+piglit_rgbw_texture_1d(void)
+{
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_1D, tex);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	static const float img[] = {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1};
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 4, 0, GL_RGBA, GL_FLOAT, img);
+
+	return tex;
+}
+
+/**
+ * Generate a 2 by 2 by 2 texel RGBA 3D texture with texels red, green, blue,
+ * white, yellow, magenta, cyan, black, edge clamping and NEAREST filtering.
+ */
+GLuint
+piglit_rgbw_texture_3d(void)
+{
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_3D, tex);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	static const float img[] = {1, 0, 0, 1, 0, 1, 0, 1,
+				    0, 0, 1, 1, 1, 1, 1, 1,
+				    1, 1, 0, 1, 1, 0, 1, 1,
+				    0, 1, 1, 1, 0, 0, 0, 1};
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 2, 2, 2, 0, GL_RGBA, GL_FLOAT, img);
+
+	return tex;
+}
+
+/**
  * Generates a texture with the given integer internal format.
  * Pixel data will be filled as R = x, G = y, B = b, A = a.
  */
