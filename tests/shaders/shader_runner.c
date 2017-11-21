@@ -3670,6 +3670,22 @@ piglit_display(void)
 			else
 				set_texture_binding(tex, tex_obj, w, h, d);
 
+#ifdef PIGLIT_USE_OPENGL
+		} else if (sscanf(line,
+				  "texture rgbw 1D %d",
+				  &tex) == 1) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			const GLuint handle = piglit_rgbw_texture_1d();
+			set_texture_binding(tex, handle, 4, 1, 1);
+#endif
+
+		} else if (sscanf(line,
+				  "texture rgbw 3D %d",
+				  &tex) == 1) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			const GLuint handle = piglit_rgbw_texture_3d();
+			set_texture_binding(tex, handle, 2, 2, 2);
+
 		} else if (sscanf(line,
 				  "texture rgbw 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
