@@ -1,0 +1,24 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader]
+
+#version 450
+
+layout (location = 0) in vec4 position;
+layout (location = 20) uniform vec4 extPosition;
+uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+void main()
+{
+    gl_Position = position + extPosition + components.c1 + vec4(components.c2, 0.0, 0.0);
+}
+
+[test]
+link success
