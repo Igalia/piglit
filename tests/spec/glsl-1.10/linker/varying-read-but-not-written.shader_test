@@ -1,0 +1,21 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 foo;
+void main()
+{
+	gl_Position = ftransform();
+}
+
+
+[fragment shader]
+varying vec4 foo;
+void main()
+{
+	gl_FragColor = foo;
+}
+
+
+[test]
+link error

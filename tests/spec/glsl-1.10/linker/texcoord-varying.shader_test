@@ -1,0 +1,27 @@
+# Does the linker correctly recognize that texcoord[1] is
+# written by the vertex shader and read by the fragment shader?
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 gl_TexCoord[4];
+void main()
+{
+	int i = 1;
+	gl_TexCoord[i] = vec4(0.5, 0, 0, 0);
+	gl_Position = ftransform();
+}
+
+
+[fragment shader]
+varying vec4 gl_TexCoord[4];
+void main()
+{
+	gl_FragColor = gl_TexCoord[1];
+}
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.5, 0.0, 0.0, 0.0)
