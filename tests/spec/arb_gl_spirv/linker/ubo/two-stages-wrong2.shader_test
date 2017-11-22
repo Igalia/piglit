@@ -1,0 +1,43 @@
+# Using the same block on two different stages
+# Wrong: different amount of variables defined on each stage.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader]
+
+#version 450
+
+layout (location = 0) in vec4 position;
+layout (location = 20) uniform vec4 extPosition;
+layout (binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+void main()
+{
+    gl_Position = position + extPosition + components.c1 + vec4(components.c2, 0.0, 0.0);
+}
+
+
+[fragment shader]
+
+#version 450
+
+layout (location = 3) out vec4 outColor;
+layout (binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+ } components;
+
+void main()
+{
+	outColor = components.c1 + vec4(components.c1.xy, 0.0, 0.0);
+}
+
+[test]
+link error
