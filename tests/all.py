@@ -3183,6 +3183,7 @@ with profile.test_list.group_manager(
     g(['fbo-alphatest-nocolor'])
     g(['fbo-alphatest-nocolor-ff'])
     g(['fbo-blending-formats'])
+    g(['fbo-blending-snorm'])
     g(['fbo-bind-renderbuffer'])
     g(['fbo-clearmipmap'])
     g(['fbo-clear-formats'])
