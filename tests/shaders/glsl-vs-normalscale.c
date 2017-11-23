@@ -56,7 +56,7 @@ piglit_display(void)
 
 	/* Tweak the modelview and draw over it with another matrix. */
 	glMatrixMode(GL_MODELVIEW);
-	glScalef(1.0, 1.0, 2.0);
+	glScalef(1.0, 1.0, 0.5);
 	piglit_draw_rect(0, 0, 1, 1);
 
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
