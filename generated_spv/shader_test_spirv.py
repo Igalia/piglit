@@ -556,6 +556,9 @@ def fixup_glsl_shaders(shaders, vertex_attribs):
             assert skip_reasons
             return None
 
+        if size > 1:
+            return None
+
         if layout == None and var.mode == 'uniform':
             loc = cur_uniform_location[0]
             cur_uniform_location[0] += var.size(skip_reasons)
