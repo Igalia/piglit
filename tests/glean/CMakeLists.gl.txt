@@ -32,7 +32,6 @@ piglit_add_executable (glean
 	test.cpp
 	tfbo.cpp
 	tfragprog1.cpp
-	tglsl1.cpp
 	tmultitest.cpp
 	tpixelformats.cpp
 	tshaderapi.cpp
