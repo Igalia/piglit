@@ -99,8 +99,7 @@ piglit_init(int argc, char **argv)
 	if (!strstr(exts, "EGL_MESA_platform_surfaceless"))
 		piglit_report_result(PIGLIT_SKIP);
 
-	dpy = eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA,
-				    EGL_DEFAULT_DISPLAY, NULL);
+	dpy = piglit_egl_get_default_display(EGL_PLATFORM_SURFACELESS_MESA);
 
 	ok = eglInitialize(dpy, &major, &minor);
 	if (!ok) {
