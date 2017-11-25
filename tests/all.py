@@ -2872,6 +2872,7 @@ with profile.test_list.group_manager(
     g(['arb_vertex_program-getlocal4-errors'], 'getlocal4-errors')
     g(['clip-plane-transformation', 'arb'],
       'clip-plane-transformation arb')
+    g(['arb_vertex_program-matrix-property-bindings'])
     g(['arb_vertex_program-minmax'], 'minmax')
     g(['arb_vertex_program-property-bindings'])
     g(['fdo24066'], run_concurrent=False)

@@ -12,6 +12,7 @@ piglit_add_executable (arb_vertex_program-getenv4d-with-error getenv4d-with-erro
 piglit_add_executable (arb_vertex_program-getlocal4d-with-error getlocal4d-with-error.c)
 piglit_add_executable (arb_vertex_program-getlocal4f-max getlocal4f-max.c)
 piglit_add_executable (arb_vertex_program-getlocal4-errors getlocal4-errors.c)
+piglit_add_executable (arb_vertex_program-matrix-property-bindings matrix-property-bindings.c)
 piglit_add_executable (arb_vertex_program-minmax minmax.c)
 piglit_add_executable (arb_vertex_program-property-bindings property-bindings.c)
 
