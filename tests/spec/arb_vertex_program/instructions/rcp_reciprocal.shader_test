@@ -1,0 +1,18 @@
+[require]
+GL >= 1.3
+ARB_vertex_program
+
+[vertex program]
+!!ARBvp1.0
+PARAM values = {8, -10, 1, 12 };
+MOV result.position, vertex.position;
+RCP result.color.x, values.x;
+RCP result.color.y, values.y;
+RCP result.color.z, values.z;
+RCP result.color.w, values.w;
+END
+
+[test]
+ortho -4 4 -4 4
+draw rect -0.25 -0.25 0.5 0.5
+relative probe rgba (0.5, 0.5) (0.125, 0.0, 1, 0.08333333333333333)

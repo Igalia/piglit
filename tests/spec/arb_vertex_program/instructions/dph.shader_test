@@ -1,0 +1,18 @@
+[require]
+GL >= 1.3
+ARB_vertex_program
+
+[vertex program]
+!!ARBvp1.0
+PARAM p2 = program.local[2];
+TEMP t;
+MOV result.position, vertex.position;
+DPH result.color, p2, vertex.color;
+END
+
+[test]
+ortho -4 4 -4 4
+color 0.25 0.75 0.5 0.25
+parameter local_vp 2 (-1.0, 0.0, 0.25, -0.5)
+draw rect -0.25 -0.25 0.5 0.5
+relative probe rgba (0.5, 0.5) (0.125, 0.125, 0.125, 0.125)

@@ -1,0 +1,21 @@
+[require]
+GL >= 1.3
+ARB_vertex_program
+
+[vertex program]
+!!ARBvp1.0
+PARAM scale = {0.01, 0.01, 0.01, 0.01};
+PARAM values = {0.0, 1.0, 4.0, -2.0 };
+TEMP t;
+MOV result.position, vertex.position;
+EX2 t.x, values.x;
+EX2 t.y, values.y;
+EX2 t.z, values.z;
+EX2 t.w, values.w;
+MUL result.color, t, scale;
+END
+
+[test]
+ortho -4 4 -4 4
+draw rect -0.25 -0.25 0.5 0.5
+relative probe rgba (0.5, 0.5) (0.01, 0.02, 0.16, 0.0025)
