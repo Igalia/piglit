@@ -2873,6 +2873,7 @@ with profile.test_list.group_manager(
     g(['clip-plane-transformation', 'arb'],
       'clip-plane-transformation arb')
     g(['arb_vertex_program-minmax'], 'minmax')
+    g(['arb_vertex_program-property-bindings'])
     g(['fdo24066'], run_concurrent=False)
     g(['vp-address-01'], run_concurrent=False)
     g(['vp-address-02'], run_concurrent=False)
