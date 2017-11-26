@@ -1898,7 +1898,7 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'ARB_framebuffer_object')) as g:
     g(['same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT'])
     g(['same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT'])
-    g(['fdo28551'], run_concurrent=False)
+    g(['arb_framebuffer_object-get-attachment-parameter-default-framebuffer'], run_concurrent=False)
     g(['fbo-alpha'])
     g(['fbo-blit-stretch'], run_concurrent=False)
     g(['fbo-blit-scaled-linear'])

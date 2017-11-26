@@ -19,9 +19,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
- *
+ */
+/**
  * Authors:
  *    Kristian Høgsberg <krh@bitplanet.net>
+ *
+ * Test glGetFramebufferAttachmentParameter on onscreen (default) framebuffer.
+ *
+ * https://bugs.freedesktop.org/show_bug.cgi?id=28551
  */
 
 #include "piglit-util-gl.h"
@@ -30,7 +35,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE |
+			       PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH |
+			       PIGLIT_GL_VISUAL_STENCIL;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -41,27 +48,28 @@ piglit_display(void)
 	GLint red_bits, att_type;
 	GLenum err;
 
-	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
-					      GL_BACK_LEFT,
-					      GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
-					      &att_type);
+	glGetFramebufferAttachmentParameteriv(
+		GL_FRAMEBUFFER, GL_BACK_LEFT,
+		GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &att_type);
 
 	if (att_type != GL_FRAMEBUFFER_DEFAULT) {
-		printf("Default framebuffer's attachment type is not GL_FRAMEBUFFER_DEFAULT\n");
+		printf("Default framebuffer's attachment type is not "
+		       "GL_FRAMEBUFFER_DEFAULT\n");
 		while (glGetError());
 		return PIGLIT_FAIL;
 	}
 
-	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
-					      GL_BACK_LEFT,
-					      GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE,
-					      &red_bits);
+	glGetFramebufferAttachmentParameteriv(
+		GL_FRAMEBUFFER, GL_BACK_LEFT,
+		GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE, &red_bits);
 
 	printf("Red bits: %d\n", red_bits);
 
 	err = glGetError();
 	if (err) {
-		printf("glGetFramebufferAttachmentParameteriv GL error: 0x%x\n", err);
+		printf("glGetFramebufferAttachmentParameteriv GL error: "
+		       "0x%x\n",
+		       err);
 		return PIGLIT_FAIL;
 	}
 
