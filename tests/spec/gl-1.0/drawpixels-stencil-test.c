@@ -19,9 +19,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
- *
+ */
+
+/**
  * Authors:
  *    Shuang he <shuang.he@intel.com>
+ *
+ * Use glDrawPixels with GL_STENCIL_TEST.
+ *
+ * https://bugs.freedesktop.org/show_bug.cgi?id=23670
  */
 
 #include "piglit-util-gl.h"
@@ -30,7 +36,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE |
+			       PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH |
+			       PIGLIT_GL_VISUAL_STENCIL;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -65,12 +73,13 @@ piglit_display(void)
 		else
 			stencil_rect[i] = 0;
 
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+		GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_LESS, 0, (GLuint)~0);
 	glRasterPos2i(50, 50);
-	glDrawPixels(20, 20, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_rect);
+	glDrawPixels(20, 20, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE,
+		     stencil_rect);
 	glColor3f(1.0, 0.0, 0.0);
 	glRectf(50, 50, 50+20, 50+20);
 	glDisable(GL_STENCIL_TEST);
