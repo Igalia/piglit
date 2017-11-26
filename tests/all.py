@@ -765,7 +765,7 @@ with profile.test_list.group_manager(
     g(['copyteximage', '1D'])
     g(['copyteximage', '2D'])
     g(['gl-1.1-read-pixels-after-display-list'])
-    g(['vbo-buffer-unmap'])
+    g(['gl-1.1-set-vertex-color-after-draw'])
     g(['array-stride'])
     g(['clear-accum'])
     g(['clipflat'])

@@ -10,6 +10,4 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
-piglit_add_executable (vbo-buffer-unmap vbo-buffer-unmap.c)
-
 # vim: ft=cmake:

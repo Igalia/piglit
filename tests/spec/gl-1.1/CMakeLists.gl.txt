@@ -9,6 +9,7 @@ link_libraries (
 )
 
 piglit_add_executable (gl-1.1-read-pixels-after-display-list read-pixels-after-display-list.c)
+piglit_add_executable (gl-1.1-set-vertex-color-after-draw set-vertex-color-after-draw.c)
 piglit_add_executable (gl-1.1-xor xor.c)
 piglit_add_executable (gl-1.1-xor-copypixels xor-copypixels.c)
 
