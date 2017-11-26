@@ -2,9 +2,6 @@
 Piglit To-Do items
 
 
-Move/rename tests in the bugs/ directory to proper places under tests/spec/
-
-
 Quite a few tests have GL enum names encoded in tables.  For example, in
 tests/texturing/texture-rg.c:
 
