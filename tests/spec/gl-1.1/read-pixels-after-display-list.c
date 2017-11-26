@@ -1,4 +1,29 @@
 /*
+ * Copyright © 2007 Nicolai Hähnle
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/**
+ * Call glReadPixels after draw call from display list.
+ *
  * Test case from fdo bug #10370
  * http://bugs.freedesktop.org/show_bug.cgi?id=10370
  */
@@ -7,7 +32,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 11;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
@@ -67,7 +92,7 @@ piglit_display(void)
 	GLfloat expected[4];
 	float dmax = 0.0;
 
-	memset(read_buf, 0xff, sizeof(read_buf));	//reset
+	memset(read_buf, 0xff, sizeof(read_buf));	/* reset */
 
 	for (k = 0; k < (sizeof(data)/sizeof(GLubyte)); k ++) {
 
@@ -83,7 +108,8 @@ piglit_display(void)
 			glBegin(GL_POLYGON);
 			glTexCoord2f(0,0); glVertex2f(0, 0);
 			glTexCoord2f(1,0); glVertex2f(BITMAP_WIDTH, 0);
-			glTexCoord2f(1,1); glVertex2f(BITMAP_WIDTH, BITMAP_HEIGHT);
+			glTexCoord2f(1, 1);
+			glVertex2f(BITMAP_WIDTH, BITMAP_HEIGHT);
 			glTexCoord2f(0,1); glVertex2f(0, BITMAP_HEIGHT);
 			glEnd();
 			glDisable(GL_TEXTURE_2D);
@@ -95,15 +121,17 @@ piglit_display(void)
 
 		printf("data[0x%x], ", data[k]);
 		if (data[k] & 0x80) {
-			printf("foreground: expected RGBA (%1.1f, %1.1f %1.1f %1.1f)\n",
-				r_map[1], g_map[1], b_map[1], a_map[1]);
+			printf("foreground: expected RGBA (%1.1f, %1.1f "
+			       "%1.1f %1.1f)\n",
+			       r_map[1], g_map[1], b_map[1], a_map[1]);
 			expected[0] = r_map[1];
 			expected[1] = g_map[1];
 			expected[2] = b_map[1];
 			expected[3] = a_map[1];
 		} else {
-			printf("background: expected RGBA (%1.1f, %1.1f %1.1f %1.1f)\n",
-				r_map[0], g_map[0], b_map[0], a_map[0]);
+			printf("background: expected RGBA (%1.1f, %1.1f "
+			       "%1.1f %1.1f)\n",
+			       r_map[0], g_map[0], b_map[0], a_map[0]);
 			expected[0] = r_map[0];
 			expected[1] = g_map[0];
 			expected[2] = b_map[0];
@@ -114,12 +142,17 @@ piglit_display(void)
 		for (i = 0; i < BITMAP_HEIGHT; i ++) {
 			for (j = 0; j < BITMAP_WIDTH; j ++) {
 				pixel = j + i*BITMAP_WIDTH;
-				printf("pixel[%d, %d]: %1.1f %1.1f %1.1f %1.1f\n", j, i,
-					read_buf[pixel*4], read_buf[pixel*4+1],
-					read_buf[pixel*4+2], read_buf[pixel*4+3]);
+				printf("pixel[%d, %d]: %1.1f %1.1f %1.1f "
+				       "%1.1f\n",
+				       j, i, read_buf[pixel * 4],
+				       read_buf[pixel * 4 + 1],
+				       read_buf[pixel * 4 + 2],
+				       read_buf[pixel * 4 + 3]);
 
 				for(col = 0; col < 4; ++col) {
-					float delta = read_buf[pixel*4+col] - expected[col];
+					float delta =
+						read_buf[pixel * 4 + col] -
+						expected[col];
 					if (delta > dmax) dmax = delta;
 					else if (-delta > dmax) dmax = -delta;
 				}
@@ -130,7 +163,7 @@ piglit_display(void)
 		glCallList(1);
 		glDeleteLists(1,1);
 
-		memset(read_buf, 0xff, sizeof(read_buf));	//reset
+		memset(read_buf, 0xff, sizeof(read_buf));	/* reset */
 		glReadPixels(0, 0, BITMAP_WIDTH, BITMAP_HEIGHT,
 			GL_RGBA, GL_FLOAT, read_buf);
 
@@ -138,18 +171,25 @@ piglit_display(void)
 		for (i = 0; i < BITMAP_HEIGHT; i ++) {
 			for (j = 0; j < BITMAP_WIDTH; j ++) {
 				pixel = j + i*BITMAP_WIDTH;
-				printf("pixel[%d, %d]: %1.1f %1.1f %1.1f %1.1f\n", j, i,
-					read_buf[pixel*4], read_buf[pixel*4+1],
-					read_buf[pixel*4+2], read_buf[pixel*4+3]);
-				for(col = 0; col < 4; ++col) {
-					float delta = read_buf[pixel*4+col] - expected[col];
-					if (delta > dmax) dmax = delta;
-					else if (-delta > dmax) dmax = -delta;
+				printf("pixel[%d, %d]: %1.1f %1.1f %1.1f "
+				       "%1.1f\n",
+				       j, i, read_buf[pixel * 4],
+				       read_buf[pixel * 4 + 1],
+				       read_buf[pixel * 4 + 2],
+				       read_buf[pixel * 4 + 3]);
+				for (col = 0; col < 4; ++col) {
+					float delta =
+						read_buf[pixel * 4 + col] -
+						expected[col];
+					if (delta > dmax)
+						dmax = delta;
+					else if (-delta > dmax)
+						dmax = -delta;
 				}
 			}
 		}
 		printf("------------------------------------\n");
-	}	//end for(k)
+	}	/* end for(k) */
 
 	printf("max delta: %f\n", dmax);
 
