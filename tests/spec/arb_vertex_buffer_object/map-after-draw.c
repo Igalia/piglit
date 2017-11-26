@@ -21,7 +21,13 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-// author: Ben Holmes
+/*
+ * author: Ben Holmes
+ *
+ * Map vbo after drawing from it.
+ *
+ * https://bugs.freedesktop.org/show_bug.cgi?id=22540
+ */
 
 #include "piglit-util-gl.h"
 

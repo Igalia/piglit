@@ -10,7 +10,6 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
-piglit_add_executable (fdo22540 fdo22540.c)
 piglit_add_executable (fdo23489 fdo23489.c)
 piglit_add_executable (fdo23670-depth_test fdo23670-depth_test.c)
 piglit_add_executable (fdo23670-drawpix_stencil fdo23670-drawpix_stencil.c)
