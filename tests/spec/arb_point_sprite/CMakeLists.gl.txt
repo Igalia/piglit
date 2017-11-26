@@ -9,6 +9,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (arb_point_sprite-checkerboard checkerboard.c)
 piglit_add_executable (arb_point_sprite-mipmap mipmap.c)
 
 # vim: ft=cmake:

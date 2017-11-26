@@ -22,8 +22,8 @@
  */
 
 /**
- * This test draws a point sprite with a checkerboard texture and tests whether
- * the correct colors were drawn using piglit_probe_pixel_rgb.
+ * This test draws a point sprite with a checkerboard texture and tests
+ * whether the correct colors were drawn using piglit_probe_pixel_rgb.
  *
  * \author Ben Holmes
  */
