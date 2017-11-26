@@ -2978,7 +2978,6 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_framebuffer_object')) as g:
     g(['fbo-generatemipmap-noimage'])
-    g(['fdo20701'])
     g(['fbo-1d'])
     g(['fbo-3d'])
     g(['fbo-alphatest-formats'])
@@ -3028,6 +3027,7 @@ with profile.test_list.group_manager(
     g(['getteximage-formats', 'init-by-clear-and-render'])
     g(['ext_framebuffer_multisample-fast-clear', 'single-sample'],
       'fbo-fast-clear')
+    g(['ext_framebuffer_object-border-texture-finish'])
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX1')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX4')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX8')

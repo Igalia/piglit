@@ -26,7 +26,7 @@
  */
 
 /**
- * \file fdo20701.c
+ * \file border-texture-finish.c
  * Test case from fd.o bug #20701
  *
  * Configure an FBO for rendering to a color texture with border.  Call
