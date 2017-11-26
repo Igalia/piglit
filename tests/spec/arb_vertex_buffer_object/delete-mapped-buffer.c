@@ -26,9 +26,11 @@
  */
 
 /**
- * @file fdo14575.c
+ * @file delete-mapped-buffer.c
  *
  * Tests that the driver doesn't fail when deleting a mapped buffer object.
+ *
+ * https://bugs.freedesktop.org/show_bug.cgi?id=14575
  */
 #include "piglit-util-gl.h"
 
@@ -62,7 +64,7 @@ piglit_init(int argc, char**argv)
 	/* Then, another normal path: create, map, write, unmap, delete */
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, buf);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, 4, NULL, GL_STATIC_DRAW_ARB);
-	v = (GLfloat *) glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	v = (GLfloat *)glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	*v = data;
 	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 	glDeleteBuffersARB(1, &buf);
@@ -72,7 +74,7 @@ piglit_init(int argc, char**argv)
 	/* Then, do the failing path: create, map, delete */
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, buf);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, 4, NULL, GL_STATIC_DRAW_ARB);
-	v = (GLfloat *) glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	v = (GLfloat *)glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	*v = data;
 	glDeleteBuffersARB(1, &buf);
 	if (!piglit_check_gl_error(GL_NO_ERROR))

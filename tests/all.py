@@ -2724,7 +2724,7 @@ with profile.test_list.group_manager(
       'elements-negative-offset')
     g(['arb_vertex_buffer_object-mixed-immediate-and-vbo'],
       'mixed-immediate-and-vbo')
-    g(['fdo14575'])
+    g(['arb_vertex_buffer_object-delete-mapped-buffer'])
     g(['fdo22540'])
     g(['fdo31934'])
     g(['arb_vertex_buffer_object-ib-data-sync'], 'ib-data-sync')
