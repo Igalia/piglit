@@ -2726,7 +2726,7 @@ with profile.test_list.group_manager(
       'mixed-immediate-and-vbo')
     g(['arb_vertex_buffer_object-delete-mapped-buffer'])
     g(['arb_vertex_buffer_object-map-after-draw'])
-    g(['fdo31934'])
+    g(['arb_vertex_buffer_object-map-empty'])
     g(['arb_vertex_buffer_object-ib-data-sync'], 'ib-data-sync')
     g(['arb_vertex_buffer_object-ib-subdata-sync'], 'ib-subdata-sync')
     g(['pos-array'])

@@ -12,6 +12,7 @@ piglit_add_executable (arb_vertex_buffer_object-combined-vertex-index combined-v
 piglit_add_executable (arb_vertex_buffer_object-delete-mapped-buffer delete-mapped-buffer.c)
 piglit_add_executable (arb_vertex_buffer_object-elements-negative-offset elements-negative-offset.c)
 piglit_add_executable (arb_vertex_buffer_object-map-after-draw map-after-draw.c)
+piglit_add_executable (arb_vertex_buffer_object-map-empty map-empty.c)
 piglit_add_executable (arb_vertex_buffer_object-mixed-immediate-and-vbo mixed-immediate-and-vbo.c)
 piglit_add_executable (arb_vertex_buffer_object-ib-data-sync ib-data-sync.c)
 piglit_add_executable (arb_vertex_buffer_object-ib-subdata-sync ib-subdata-sync.c)
