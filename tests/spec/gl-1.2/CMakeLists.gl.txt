@@ -9,6 +9,7 @@ link_libraries (
 )
 
 piglit_add_executable (gl-1.2-rescale-normal rescale-normal.c)
+piglit_add_executable (gl-1.2-texparameter-before-teximage texparameter-before-teximage.c)
 piglit_add_executable (gl-1.2-texture-base-level texture-base-level.c)
 
 # vim: ft=cmake:

@@ -885,7 +885,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.2')) as g:
-    g(['crash-texparameter-before-teximage'])
+    g(['gl-1.2-texparameter-before-teximage'])
     g(['draw-elements-vs-inputs'])
     g(['two-sided-lighting-separate-specular'])
     g(['levelclamp'])
