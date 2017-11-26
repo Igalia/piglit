@@ -8,6 +8,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (arb_vertex_program-get-limits-without-fp get-limits-without-fp.c)
 piglit_add_executable (arb_vertex_program-getenv4d-with-error getenv4d-with-error.c)
 piglit_add_executable (arb_vertex_program-getlocal4d-with-error getlocal4d-with-error.c)
 piglit_add_executable (arb_vertex_program-getlocal4f-max getlocal4f-max.c)

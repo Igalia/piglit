@@ -26,7 +26,8 @@
  */
 
 /**
- * \file
+ * \file get-vp-limit-without-fp.c
+ *
  * Test for the crash reported in bugs.freedesktop.org bug #24066.
  * This occured when the native limits of a vertex program are queried
  * before a fragment program has been setup.
@@ -64,12 +65,14 @@ void piglit_init(int argc, char ** argv)
 
 	piglit_require_vertex_program();
 
-	program_object = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, program_text);
+	program_object =
+		piglit_compile_program(GL_VERTEX_PROGRAM_ARB, program_text);
 
 	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_object);
 
 	printf("Testing whether the following call crashes...\n");
-	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &result);
+	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,
+			  GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &result);
 
 	piglit_report_result(PIGLIT_PASS);
 }
