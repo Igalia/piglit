@@ -753,6 +753,7 @@ with profile.test_list.group_manager(
     g(['gl-1.0-scissor-polygon'])
     g(['gl-1.0-scissor-stencil-clear'])
     g(['gl-1.0-texgen'])
+    g(['gl-1.0-textured-triangle'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
@@ -764,7 +765,6 @@ with profile.test_list.group_manager(
     g(['copyteximage', '1D'])
     g(['copyteximage', '2D'])
     g(['gl-1.1-read-pixels-after-display-list'])
-    g(['tri-tex-crash'])
     g(['vbo-buffer-unmap'])
     g(['array-stride'])
     g(['clear-accum'])
