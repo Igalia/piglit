@@ -914,7 +914,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.4')) as g:
-    g(['fdo25614-genmipmap'])
+    g(['gl-1.4-rgba-mipmap-texture-with-rgb-visual'])
     g(['blendminmax'])
     g(['blendsquare'])
     g(['gl-1.4-dlist-multidrawarrays'])

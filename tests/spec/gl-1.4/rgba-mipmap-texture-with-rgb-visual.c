@@ -23,7 +23,7 @@
 
 
 /**
- * \file fdo25614-genmipmap.c
+ * \file rgba-mipmap-texture-with-rgb-visual.c
  * Verify generation of an RGBA mipmap stack with an RGB (no alpha) visual.
  * This tests part of the regression (related to piglit test glsl-lod-bias)
  * reported in bugzilla #25614.
@@ -42,7 +42,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 14;
 
 	config.window_width = (BOX_SIZE+2)*TEST_COLS+1;
 	config.window_height = (BOX_SIZE+1)+1;
@@ -56,8 +56,8 @@ static GLuint tex[1];
 static void loadTex(void);
 
 static const float clear_color[4] = {0.6, 0.6, 0.6, 1.0};
-static const float green[4]       = {0.0, 1.0, 0.0, 1.0};
-static const float pink[4]        = {1.0, 0.0, 1.0, 0.0}; /* Note: 0.0 alpha */
+static const float green[4] = {0.0, 1.0, 0.0, 1.0};
+static const float pink[4] = {1.0, 0.0, 1.0, 0.0}; /* Note: 0.0 alpha */
 
 void
 piglit_init(int argc, char **argv)

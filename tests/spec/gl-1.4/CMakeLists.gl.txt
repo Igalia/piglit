@@ -11,6 +11,7 @@ link_libraries (
 piglit_add_executable (gl-1.4-dlist-multidrawarrays dlist-multidrawarrays.c)
 piglit_add_executable (gl-1.4-multidrawarrays-errors multidrawarrays-errors.c)
 piglit_add_executable (gl-1.4-polygon-offset polygon-offset.c)
+piglit_add_executable (gl-1.4-rgba-mipmap-texture-with-rgb-visual rgba-mipmap-texture-with-rgb-visual.c)
 piglit_add_executable (gl-1.4-tex1d-2dborder tex1d-2dborder.c)
 
 # vim: ft=cmake:
