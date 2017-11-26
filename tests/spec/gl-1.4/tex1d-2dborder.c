@@ -1,5 +1,5 @@
 /*
- * Copyright (c) The Piglit project 2008
+ * Copyright © 2008 Nicolai Hähnle
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,7 +22,7 @@
  */
 
 /**
- * @file
+ * @file tex1d-2border.c
  * Test whether 1D textures correctly ignore the T coordinate wrap mode.
  *
  * Since 1D textures are genuine one-dimensional objects, the T coordinate
@@ -34,7 +34,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 14;
 
 	config.window_width = 256;
 	config.window_height = 128;

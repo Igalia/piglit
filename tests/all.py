@@ -915,12 +915,12 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.4')) as g:
     g(['fdo25614-genmipmap'])
-    g(['tex1d-2dborder'])
     g(['blendminmax'])
     g(['blendsquare'])
     g(['gl-1.4-dlist-multidrawarrays'])
     g(['gl-1.4-multidrawarrays-errors'])
     g(['gl-1.4-polygon-offset'])
+    g(['gl-1.4-tex1d-2dborder'])
     g(['draw-batch'])
     g(['stencil-wrap'])
     g(['triangle-rasterization'])
