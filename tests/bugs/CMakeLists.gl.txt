@@ -10,7 +10,6 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
-piglit_add_executable (drawbuffer-modes drawbuffer-modes.c)
 piglit_add_executable (fdo10370 fdo10370.c)
 piglit_add_executable (fdo14575 fdo14575.c)
 piglit_add_executable (r300-readcache r300-readcache.c)
