@@ -3147,7 +3147,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_texture_cube_map')) as g:
-    g(['crash-cubemap-order'], run_concurrent=False)
+    g(['arb_texture_cube_map-unusual-order'], run_concurrent=False)
     g(['cubemap'], run_concurrent=False)
     g(['cubemap-getteximage-pbo'])
     g(['cubemap-mismatch'], run_concurrent=False)
