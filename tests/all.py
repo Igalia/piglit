@@ -1013,6 +1013,7 @@ with profile.test_list.group_manager(
     g(['lodclamp-between'])
     g(['lodclamp-between-max'])
     g(['mipmap-setup'])
+    g(['gl-1.2-rescale_normal'])
     g(['tex-skipped-unit'])
     g(['tex3d'])
     g(['tex3d-maxsize'], run_concurrent=False)
