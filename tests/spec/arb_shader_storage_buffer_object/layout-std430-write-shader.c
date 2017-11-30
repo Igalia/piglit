@@ -159,7 +159,7 @@ piglit_init(int argc, char **argv)
 	unsigned int i;
 	float ssbo_values[SSBO_SIZE] = {0};
 	float *map;
-	GLuint num_vertex_ssbo;
+	GLint num_vertex_ssbo;
 
 	piglit_require_extension("GL_ARB_shader_storage_buffer_object");
         piglit_require_GLSL_version(130);
