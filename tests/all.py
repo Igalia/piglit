@@ -1905,6 +1905,13 @@ with profile.test_list.group_manager(
     g(['ati_fragment_shader-error12-invalidsrc'])
     g(['ati_fragment_shader-error13-invalidarg'])
     g(['ati_fragment_shader-error14-invalidmod'])
+    g(['ati_fragment_shader-render-constants'])
+    g(['ati_fragment_shader-render-default'])
+    g(['ati_fragment_shader-render-fog'])
+    g(['ati_fragment_shader-render-notexture'])
+    g(['ati_fragment_shader-render-precedence'])
+    g(['ati_fragment_shader-render-sources'])
+    g(['ati_fragment_shader-render-textargets'])
 
 # Group ARB_framebuffer_object
 with profile.test_list.group_manager(

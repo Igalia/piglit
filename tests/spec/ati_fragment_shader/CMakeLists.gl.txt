@@ -23,4 +23,12 @@ piglit_add_executable (ati_fragment_shader-error12-invalidsrc error12-invalidsrc
 piglit_add_executable (ati_fragment_shader-error13-invalidarg error13-invalidarg.c)
 piglit_add_executable (ati_fragment_shader-error14-invalidmod error14-invalidmod.c)
 
+piglit_add_executable (ati_fragment_shader-render-default     render-default.c)
+piglit_add_executable (ati_fragment_shader-render-sources     render-sources.c)
+piglit_add_executable (ati_fragment_shader-render-notexture   render-notexture.c)
+piglit_add_executable (ati_fragment_shader-render-constants   render-constants.c)
+piglit_add_executable (ati_fragment_shader-render-precedence  render-precedence.c)
+piglit_add_executable (ati_fragment_shader-render-fog         render-fog.c)
+piglit_add_executable (ati_fragment_shader-render-textargets  render-textargets.c)
+
 # vim: ft=cmake:
