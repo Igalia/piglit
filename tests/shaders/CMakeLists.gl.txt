@@ -13,7 +13,6 @@ link_libraries (
 piglit_add_executable (glsl-max-vertex-attrib glsl-max-vertex-attrib.c)
 piglit_add_executable (activeprogram-bad-program activeprogram-bad-program.c)
 piglit_add_executable (activeprogram-get activeprogram-get.c)
-piglit_add_executable (ati-fs-bad-delete ati-fs-bad-delete.c)
 piglit_add_executable (attribute0 attribute0.c)
 piglit_add_executable (built-in-constants built-in-constants.c parser_utils.c)
 piglit_add_executable (createshaderprogram-bad-type createshaderprogram-bad-type.c)

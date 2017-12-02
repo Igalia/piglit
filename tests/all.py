@@ -1892,7 +1892,6 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'ATI_fragment_shader')) as g:
     g(['ati_fragment_shader-api-alphafirst'])
     g(['ati_fragment_shader-api-gen'])
-    g(['ati-fs-bad-delete'])
     g(['ati_fragment_shader-error01-genzero'])
     g(['ati_fragment_shader-error02-inside'])
     g(['ati_fragment_shader-error03-outside'])
