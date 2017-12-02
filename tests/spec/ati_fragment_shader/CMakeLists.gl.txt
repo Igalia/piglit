@@ -1,0 +1,26 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+)
+
+piglit_add_executable (ati_fragment_shader-error01-genzero    error01-genzero.c)
+piglit_add_executable (ati_fragment_shader-error02-inside     error02-inside.c)
+piglit_add_executable (ati_fragment_shader-error03-outside    error03-outside.c)
+piglit_add_executable (ati_fragment_shader-error04-endshader  error04-endshader.c)
+piglit_add_executable (ati_fragment_shader-error05-passes     error05-passes.c)
+piglit_add_executable (ati_fragment_shader-error06-regswizzle error06-regswizzle.c)
+piglit_add_executable (ati_fragment_shader-error07-instcount  error07-instcount.c)
+piglit_add_executable (ati_fragment_shader-error08-secondary  error08-secondary.c)
+piglit_add_executable (ati_fragment_shader-error09-allconst   error09-allconst.c)
+piglit_add_executable (ati_fragment_shader-error10-dotx       error10-dotx.c)
+piglit_add_executable (ati_fragment_shader-error11-invaliddst error11-invaliddst.c)
+piglit_add_executable (ati_fragment_shader-error12-invalidsrc error12-invalidsrc.c)
+piglit_add_executable (ati_fragment_shader-error13-invalidarg error13-invalidarg.c)
+piglit_add_executable (ati_fragment_shader-error14-invalidmod error14-invalidmod.c)
+
+# vim: ft=cmake:

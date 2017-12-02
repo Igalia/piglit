@@ -1891,6 +1891,20 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ATI_fragment_shader')) as g:
     g(['ati-fs-bad-delete'])
+    g(['ati_fragment_shader-error01-genzero'])
+    g(['ati_fragment_shader-error02-inside'])
+    g(['ati_fragment_shader-error03-outside'])
+    g(['ati_fragment_shader-error04-endshader'])
+    g(['ati_fragment_shader-error05-passes'])
+    g(['ati_fragment_shader-error06-regswizzle'])
+    g(['ati_fragment_shader-error07-instcount'])
+    g(['ati_fragment_shader-error08-secondary'])
+    g(['ati_fragment_shader-error09-allconst'])
+    g(['ati_fragment_shader-error10-dotx'])
+    g(['ati_fragment_shader-error11-invaliddst'])
+    g(['ati_fragment_shader-error12-invalidsrc'])
+    g(['ati_fragment_shader-error13-invalidarg'])
+    g(['ati_fragment_shader-error14-invalidmod'])
 
 # Group ARB_framebuffer_object
 with profile.test_list.group_manager(
