@@ -19,12 +19,6 @@ add_subdirectory (fast_color_clear)
 add_subdirectory (perf)
 add_subdirectory (wgl)
 
-if (NOT APPLE)
-	# glean relies on AGL which is deprecated/broken on recent Mac OS X
-	# versions
-	add_subdirectory (glean)
-endif ()
-
 IF(EGL_FOUND)
 	add_subdirectory (egl)
 ENDIF(EGL_FOUND)
