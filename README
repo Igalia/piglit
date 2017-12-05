@@ -119,15 +119,6 @@ Configure and build.
   $ cmake .
   $ make
 
-glean
-
-glean will not build with MacOSX10.7.sdk. If you are trying to 
-build glean on Mac OS 10.7 (Lion), you will have to use MacOSX10.6.sdk.
-  $ ccmake .
-Set 'CMAKE_OSX_SYSROOT' to '/Developer/SDKs/MacOSX10.6.sdk'. Configure. 
-Generate and exit.
-  $ make
-
 
 2.4 Cygwin
 ----------
@@ -333,8 +324,6 @@ all.py
 quick.py
     Run all tests, but cut down significantly on their runtime
     (and thus on the number of problems they can find).
-    In particular, this runs Glean with the --quick option, which
-    reduces the number of visuals and state combinations tested.
 
 gpu.py
 	A further reduced set of tests from quick.py, this runs tests only
@@ -425,9 +414,6 @@ simple formats for test shaders and glsl parser input.
 All new tests must be added to the appropriate profile, all.py profile for
 OpenGL and cl.py for OpenCL. There are a few basic test classes supported by the
 python framework:
-
- GleanTest
-   This is a test that is only used to integrate Glean tests
 
  PiglitBaseTest
    A shared base class for all native piglit tests.

@@ -2,11 +2,6 @@
 Piglit To-Do items
 
 
-Port remaining Glean tests to Piglit (discard Glean tests which are
-already covered by Piglit).
-See https://bugs.freedesktop.org/show_bug.cgi?id=65676 for more details.
-
-
 Move/rename tests in the bugs/ directory to proper places under tests/spec/
 
 
