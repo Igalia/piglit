@@ -21,8 +21,7 @@ profile.test_list = TestDict()
 
 # Add a modified version of each PiglitGLTest as a khr_no_error variant.
 # Shader runner doesn't explitly test for expected errors so we add shader
-# tests as is. We actively filter GleanTest instances as well as GLSL parser
-# and any other type of tests.
+# tests as is. We actively filter GLSL parser and any other type of tests.
 for name, test in six.iteritems(old_test_list):
     if isinstance(test, (PiglitGLTest, ShaderTest, MultiShaderTest)):
         profile.test_list['{} khr_no_error'.format(name)] = test

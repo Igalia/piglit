@@ -18,7 +18,7 @@ from framework import options
 from framework import wflinfo
 from framework.profile import TestProfile
 from framework.driver_classifier import DriverClassifier
-from framework.test import (PiglitGLTest, GleanTest, PiglitBaseTest,
+from framework.test import (PiglitGLTest, PiglitBaseTest,
                             GLSLParserTest, GLSLParserNoConfigError)
 from framework.test.shader_test import ShaderTest, MultiShaderTest
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
@@ -369,82 +369,6 @@ for basedir in [os.path.join(TESTS_DIR, 'apitrace', 'traces')]:
 
 # List of all of the MSAA sample counts we wish to test
 MSAA_SAMPLE_COUNTS = ['2', '4', '6', '8', '16', '32']
-
-with profile.test_list.group_manager(GleanTest, 'glean') as g:
-    g('basic')
-    g('api2')
-    g('makeCurrent')
-    g('bufferObject')
-    g('depthStencil')
-    g('fbo')
-    g('getString')
-    g('pixelFormats')
-    # exactRGBA is not included intentionally, because it's too strict and
-    # the equivalent functionality is covered by other tests
-    g('shaderAPI')
-    g('texCube')
-    g('texture_srgb')
-    g('vertArrayBGRA')
-    g('vertattrib')
-
-glean_fp_tests = ['ABS test',
-                  'ADD test',
-                  'ADD with saturation',
-                  'ADD an immediate',
-                  'ADD negative immediate',
-                  'ADD negative immediate (2)',
-                  'CMP test',
-                  'COS test',
-                  'COS test 2',
-                  'DP3 test',
-                  'DP3 test (2)',
-                  'DP4 test',
-                  'DPH test',
-                  'DST test',
-                  'EX2 test',
-                  'FLR test',
-                  'FRC test',
-                  'LG2 test',
-                  'LIT test 1',
-                  'LIT test 2 (degenerate case: 0 ^ 0 -> 1)',
-                  'LIT test 3 (case x < 0)',
-                  'MAD test',
-                  'MAX test',
-                  'MIN test',
-                  'MOV test',
-                  'MUL test',
-                  'masked MUL test',
-                  'POW test (exponentiation)',
-                  'RCP test (reciprocal)',
-                  'RCP test 2 (reciprocal)',
-                  'RSQ test 1 (reciprocal square root)',
-                  'RSQ test 2 (reciprocal square root of negative value)',
-                  'SCS test',
-                  'SGE test',
-                  'SIN test',
-                  'SIN test 2',
-                  'SLT test',
-                  'SUB test (with swizzle)',
-                  'SUB with saturation',
-                  'SWZ test',
-                  'swizzled move test',
-                  'swizzled add test',
-                  'XPD test 1',
-                  'Z-write test',
-                  'Divide by zero test',
-                  'Infinity and nan test',
-                  'ARB_fog_linear test',
-                  'Computed fog linear test',
-                  'ARB_fog_exp test',
-                  'Computed fog exp test',
-                  'ARB_fog_exp2 test',
-                  'Computed fog exp2 test']
-
-for pairs in [(['fragProg1'], glean_fp_tests)]:
-    for prefix, name in itertools.product(*pairs):
-        groupname = grouptools.join('glean', '{0}-{1}'.format(prefix, name))
-        profile.test_list[groupname] = GleanTest(prefix)
-        profile.test_list[groupname].env['PIGLIT_TEST'] = name
 
 with profile.test_list.group_manager(PiglitGLTest, 'security') as g:
     g(['initialized-texmemory'], run_concurrent=False)

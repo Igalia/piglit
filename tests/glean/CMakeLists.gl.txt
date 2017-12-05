@@ -26,19 +26,8 @@ piglit_add_executable (glean
 	misc.cpp
 	options.cpp
 	rc.cpp
-	tapi2.cpp
-	tbasic.cpp
-	tbinding.cpp
 	test.cpp
-	tfbo.cpp
-	tfragprog1.cpp
 	tmultitest.cpp
-	tpixelformats.cpp
-	tshaderapi.cpp
-	ttexcube.cpp
-	ttexture_srgb.cpp
-	tvertarraybgra.cpp
-	tvertattrib.cpp
 	winsys.cpp
 	gl.cpp
 	image_misc.cpp

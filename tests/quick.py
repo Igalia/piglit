@@ -16,7 +16,7 @@ from __future__ import (
 import random
 
 from framework import grouptools
-from framework.test import (GleanTest, PiglitGLTest)
+from framework.test import PiglitGLTest
 from tests.all import profile as _profile
 
 __all__ = ['profile']
@@ -40,8 +40,6 @@ class FilterVsIn(object):
 
 
 profile = _profile.copy()  # pylint: disable=invalid-name
-
-GleanTest.GLOBAL_PARAMS += ["--quick"]
 
 # Set the --quick flag on a few image_load_store_tests
 with profile.test_list.group_manager(
