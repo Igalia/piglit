@@ -108,7 +108,7 @@ def _print_result(results, list_):
 def console(resultsFiles, mode):
     """ Write summary information to the console for the given list of
     results files in the given mode."""
-    assert mode in ['summary', 'diff', 'incomplete', 'all'], mode
+    assert mode in ['summary', 'diff', 'incomplete', 'problems', 'all'], mode
     results = Results([backends.load(r) for r in resultsFiles])
 
     # Print the name of the test and the status from each test run
@@ -120,5 +120,7 @@ def console(resultsFiles, mode):
         _print_summary(results)
     elif mode == 'incomplete':
         _print_result(results, results.names.all_incomplete)
+    elif mode == 'problems':
+        _print_result(results, results.names.all_problems)
     elif mode == 'summary':
         _print_summary(results)
