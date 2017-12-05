@@ -149,11 +149,15 @@ piglit_display(void)
 	struct subtest *t;
 	enum piglit_result result = PIGLIT_PASS;
 	enum piglit_result subtest_result;
+	GLint num_samples;
+
+	/* Use the max number of samples for testing */
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &num_samples);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-				4, GL_RGBA, 64, 64, GL_TRUE);
+				num_samples, GL_RGBA, 64, 64, GL_TRUE);
 
 	for (t = subtests; t->param; t++) {
 		subtest_result = check_subtest(t);
