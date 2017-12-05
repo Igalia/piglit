@@ -133,6 +133,7 @@ static GLuint prog_float, prog_int, prog_uint;
 static GLuint result_fbo;
 static bool enable_fb_srgb = false;
 static bool single_sample = false;
+static int num_samples = 2;
 
 static void
 convert_srgb_color(const struct format_desc *format,
@@ -395,7 +396,7 @@ test_format(const struct format_desc *format)
 		 * fast clears.
 		 */
 		glTexImage2DMultisample(tex_target,
-					2, /* samples */
+					num_samples,
 					format->internalformat,
 					1, 1, /* width/height */
 					GL_FALSE /* fixed sample locations */);
@@ -557,8 +558,13 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	if (!single_sample)
+	if (!single_sample) {
 		piglit_require_extension("GL_ARB_texture_multisample");
+		/* Use the max number of samples for testing */
+		glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &num_samples);
+		printf("Testing %d samples\n", num_samples);
+	}
+
 	piglit_require_extension("GL_ARB_texture_float");
 	piglit_require_GLSL_version(130);
 
