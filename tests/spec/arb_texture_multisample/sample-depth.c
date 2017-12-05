@@ -38,7 +38,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define NUM_SAMPLES 4
 #define TEX_WIDTH 64
 #define TEX_HEIGHT 64
 
@@ -93,16 +92,21 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint tex;
+	int num_samples;
+
 	piglit_require_extension("GL_ARB_texture_multisample");
+
+	/* Use the max number of samples for testing */
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &num_samples);
 
 	/* setup an fbo with multisample depth texture */
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-			NUM_SAMPLES, GL_DEPTH_COMPONENT24,
-			TEX_WIDTH, TEX_HEIGHT,
-			GL_TRUE);
+				num_samples, GL_DEPTH_COMPONENT24,
+				TEX_WIDTH, TEX_HEIGHT,
+				GL_TRUE);
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);

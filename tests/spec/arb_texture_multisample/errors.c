@@ -44,6 +44,14 @@ piglit_init(int argc, char **argv)
 
     GLuint fbo;
     GLuint tex[2];
+    GLint max_samples;
+
+    glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &max_samples);
+    if (max_samples < 1) {
+       printf("GL_MAX_COLOR_TEXTURE_SAMPLES must be at least one\n");
+       piglit_report_result(PIGLIT_FAIL);
+    }
+
     glGenFramebuffers(1, &fbo);
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -51,7 +59,7 @@ piglit_init(int argc, char **argv)
     glGenTextures(2, tex);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, tex[0]);
     glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
-            4, GL_RGBA, 64, 64, 2, GL_TRUE);
+            max_samples, GL_RGBA, 64, 64, 2, GL_TRUE);
 
     if (!piglit_check_gl_error(GL_NO_ERROR)) {
         printf("should be no error so far\n");

@@ -45,29 +45,34 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	GLuint textures[3];
+	GLint num_samples;
 
 	if(piglit_get_gl_version() < 32) {
 		piglit_require_extension("GL_ARB_texture_multisample");
 	}
 
+	/* Use the max number of samples for testing */
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &num_samples);
+
 	glGenTextures(3, textures);
 
 	/* Pass a Texture Multisample 3D Array */
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, textures[0]);
-	glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 4, GL_RGB,
-				1024, 1024, 4, GL_FALSE);
+	glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, num_samples,
+				GL_RGB, 1024, 1024, 4, GL_FALSE);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Pass a Proxy Texture 3D Multisample Array */
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, textures[1]);
-	glTexImage3DMultisample(GL_PROXY_TEXTURE_2D_MULTISAMPLE_ARRAY, 4, GL_RGB,
+	glTexImage3DMultisample(GL_PROXY_TEXTURE_2D_MULTISAMPLE_ARRAY,
+				num_samples, GL_RGB,
 				1024, 1024, 4, GL_FALSE);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Pass an Invalid Enum */
 	if (!piglit_khr_no_error) {
 		glBindTexture(GL_TEXTURE_2D, textures[2]);
-		glTexImage3DMultisample(GL_TEXTURE_2D, 4, GL_RGB,
+		glTexImage3DMultisample(GL_TEXTURE_2D, num_samples, GL_RGB,
 					1024, 1024, 4, GL_FALSE);
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 	}

@@ -108,7 +108,7 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-GLuint create_fbo(unsigned num_samples)
+GLuint create_fbo(unsigned num_color_samples, unsigned num_depth_samples)
 {
 	GLenum tex_target;
 	GLuint texColor;
@@ -119,17 +119,17 @@ GLuint create_fbo(unsigned num_samples)
 	glGenTextures(1, &texColor);
 	glGenTextures(1, &texZS);
 
-	if (num_samples != 0) {
+	if (num_color_samples != 0) {
 		tex_target = GL_TEXTURE_2D_MULTISAMPLE;
 
 		glBindTexture(tex_target, texZS);
 		glTexImage2DMultisample(
-			tex_target, num_samples, GL_DEPTH32F_STENCIL8,
+			tex_target, num_depth_samples, GL_DEPTH32F_STENCIL8,
 			TEX_WIDTH, TEX_HEIGHT, GL_TRUE);
 
 		glBindTexture(tex_target, texColor);
 		glTexImage2DMultisample(
-			tex_target, num_samples, GL_RGBA8,
+			tex_target, num_color_samples, GL_RGBA8,
 			TEX_WIDTH, TEX_HEIGHT, GL_TRUE);
 	} else {
 		tex_target = GL_TEXTURE_2D;
@@ -167,22 +167,27 @@ GLuint create_fbo(unsigned num_samples)
 void
 piglit_init(int argc, char **argv)
 {
-	unsigned num_samples = 4;
+	GLint num_color_samples, num_depth_samples;
 
 	piglit_require_extension("GL_ARB_texture_multisample");
+
+	/* By default, se the max number of samples for testing */
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &num_color_samples);
+	glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &num_depth_samples);
 
 	for (int i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "samples")) {
 			++i;
 			if (i >= argc)
 				usage();
-			num_samples = atoi(argv[i]);
+			num_color_samples = num_depth_samples = atoi(argv[i]);
 		} else
 			usage();
 	}
 
-	printf("Number of samples: %u\n", num_samples);
+	printf("Number of color samples: %u  depth samples: %d\n",
+	       num_color_samples, num_depth_samples);
 
-	fbo = create_fbo(num_samples);
-	fbo_copy = create_fbo(0);
+	fbo = create_fbo(num_color_samples, num_depth_samples);
+	fbo_copy = create_fbo(0, 0);
 }

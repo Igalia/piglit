@@ -40,28 +40,33 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+
 void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	GLuint textures[3];
+	GLint num_samples;
 
 	if(piglit_get_gl_version() < 32) {
 		piglit_require_extension("GL_ARB_texture_multisample");
 	}
 
+	/* Use the max number of samples for testing */
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &num_samples);
+
 	glGenTextures(3, textures);
 
 	/* Pass a Texture 2D Multisample */
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textures[0]);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB,
-				1024, 1024, GL_FALSE);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, num_samples,
+				GL_RGB, 1024, 1024, GL_FALSE);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Pass a Proxy Texture 2d Multisample */
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textures[1]);
-	glTexImage2DMultisample(GL_PROXY_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB,
-				1024, 1024, GL_FALSE);
+	glTexImage2DMultisample(GL_PROXY_TEXTURE_2D_MULTISAMPLE, num_samples,
+				GL_RGB, 1024, 1024, GL_FALSE);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Pass an Invalid Enum */
