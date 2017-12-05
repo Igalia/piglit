@@ -3090,6 +3090,7 @@ with profile.test_list.group_manager(
     g(['fbo-generatemipmap-npot'])
     g(['fbo-generatemipmap-viewport'])
     g(['fbo-maxsize'])
+    g(['ext_framebuffer_object-mipmap'])
     g(['fbo-nodepth-test'])
     g(['fbo-nostencil-test'])
     g(['fbo-readpixels'])
