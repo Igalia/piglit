@@ -36,21 +36,17 @@ import six
 
 from . import parsers
 from framework import options, profile, exceptions
-from framework.test import Test, GleanTest
+from framework.test import Test
 
 
 def get_command(test, piglit_dir):
     """Get just the name of the command with a path relative to bin."""
-    command = ''
-    if isinstance(test, GleanTest):
-        for var, val in test.env.items():
-            command += "{}='{}'".format(var, val)
 
     # Make the test command relative to the piglit_dir
     test_command = test.command[:]
     test_command[0] = os.path.relpath(test_command[0], piglit_dir)
 
-    command += ' '.join(test_command)
+    command = ' '.join(test_command)
     return command
 
 

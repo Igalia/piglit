@@ -30,7 +30,6 @@ import six
 from framework import exceptions
 from framework import grouptools
 from framework import profile
-from framework.test.gleantest import GleanTest
 from . import utils
 
 # pylint: disable=invalid-name,no-self-use,protected-access
@@ -254,17 +253,6 @@ class TestTestDict(object):
 
             test = inst[grouptools.join('foo', 'a')]
             assert test.run_concurrent is False
-
-        def test_name_as_str(self, inst):
-            """if args is a string it is not joined.
-
-            This is a "feature" of glean, and no longer needs to be protected
-            whenever glean dies.
-            """
-            with inst.group_manager(GleanTest, 'foo') as g:
-                g('abc')
-
-            assert grouptools.join('foo', 'abc') in inst
 
 
 class TestRegexFilter(object):

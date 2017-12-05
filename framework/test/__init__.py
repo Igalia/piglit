@@ -29,7 +29,6 @@ from __future__ import (
 )
 from .base import *
 from .piglit_test import *
-from .gleantest import *
 from .glsl_parser_test import *
 from .shader_test import *
 from .gtest import *

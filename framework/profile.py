@@ -219,17 +219,11 @@ class TestDict(collections.MutableMapping):
             kwargs -- Any additional args will be passed directly to the test
                       constructor as keyword args.
             """
-            # If there is no name, then either
-            # a) join the arguments list together to make the name
-            # b) use the argument string as the name
-            # The former is used by the Piglit{G,C}LTest classes, the latter by
-            # GleanTest
+            # If there is no name, join the arguments list together to make
+            # the name
             if not name:
-                if isinstance(args, list):
-                    name = ' '.join(args)
-                else:
-                    assert isinstance(args, six.string_types)
-                    name = args
+                assert isinstance(args, list) # //
+                name = ' '.join(args)
 
             assert isinstance(name, six.string_types)
             lgroup = grouptools.join(group, name)
