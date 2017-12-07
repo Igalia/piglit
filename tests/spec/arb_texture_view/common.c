@@ -105,13 +105,13 @@ void
 draw_3d_depth(float x, float y, float w, float h, int depth)
 {
 	const GLfloat vertices[16] =  {x, y, depth, 0.0,
-				 x+w, y, depth, 0.0,
-				 x+w, y+h, depth, 0.0,
-				 x, y+h, depth, 0.0};
+				       x+w, y, depth, 0.0,
+				       x, y+h, depth, 0.0,
+				       x+w, y+h, depth, 0.0};
 	const GLfloat texcoords[8] = {0.0, 0.0,
-				 1.0, 0.0,
-				 1.0, 1.0,
-				 0.0, 1.0};
+				      1.0, 0.0,
+				      0.0, 1.0,
+				      1.0, 1.0};
 
 	piglit_draw_rect_from_arrays(vertices, texcoords, false, 1);
 }
