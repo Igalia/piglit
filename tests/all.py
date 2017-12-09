@@ -3076,6 +3076,7 @@ with profile.test_list.group_manager(
     g(['fbo-drawbuffers-blend-add'])
     g(['fbo-drawbuffers-fragcolor'])
     g(['fbo-drawbuffers-maxtargets'])
+    g(['ext_framebuffer_object-error-handling'])
     g(['fbo-finish-deleted'])
     g(['fbo-flushing'])
     g(['fbo-flushing-2'])
