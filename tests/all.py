@@ -1088,6 +1088,7 @@ with profile.test_list.group_manager(
     g(['incomplete-cubemap', 'size'], 'incomplete-cubemap-size')
     g(['incomplete-cubemap', 'format'], 'incomplete-cubemap-format')
     g(['gl-2.0-texture-units'])
+    g(['gl-2.0-uniform-neg-location'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
