@@ -343,8 +343,6 @@ main(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	eglBindAPI(EGL_OPENGL_API);
-
 	state.egl_dpy = eglGetDisplay(state.dpy);
 	if (state.egl_dpy == EGL_NO_DISPLAY) {
 		fprintf(stderr, "eglGetDisplay() failed\n");
@@ -355,6 +353,8 @@ main(int argc, char **argv)
 		fprintf(stderr, "eglInitialize() failed\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
+	eglBindAPI(EGL_OPENGL_API);
 
 	if (!piglit_is_egl_extension_supported(state.egl_dpy,
 					       "EGL_MESA_configless_context")) {

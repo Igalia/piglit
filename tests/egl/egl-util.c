@@ -217,14 +217,6 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		}
 	}
 
-	/* bind chosen API and set ctxattribs if using ES */
-	if (api_bit == EGL_OPENGL_BIT)
-		eglBindAPI(EGL_OPENGL_API);
-	else {
-		eglBindAPI(EGL_OPENGL_ES_API);
-		ctxAttribs = ctxAttribsES;
-	}
-
 	/* choose dispatch_api and set ctx version to ctxAttribs if using ES */
 	switch (api_bit) {
 	case EGL_OPENGL_ES_BIT:
@@ -252,6 +244,14 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		fprintf(stderr, "eglInitialize() failed\n");
 		result = PIGLIT_FAIL;
 		goto fail;
+	}
+
+	/* bind chosen API and set ctxattribs if using ES */
+	if (api_bit == EGL_OPENGL_BIT)
+		eglBindAPI(EGL_OPENGL_API);
+	else {
+		eglBindAPI(EGL_OPENGL_ES_API);
+		ctxAttribs = ctxAttribsES;
 	}
 
 	check_extensions(&state, test);
