@@ -71,6 +71,15 @@ piglit_check_egl_error(EGLint expected_error);
 /**
  * \brief Get default display for given platform.
  *
+ * This function wraps piglit_egl_get_display, providing \c EGL_DEFAULT_DISPLAY
+ * for the native_display.
+ */
+EGLDisplay
+piglit_egl_get_default_display(EGLenum platform);
+
+/**
+ * \brief Get display for given platform with native_display.
+ *
  * If \a platform is EGL_NONE, the this function wraps eglGetDisplay().
  * Otherwise, it wraps eglGetPlatformDisplayEXT().
  *
@@ -80,7 +89,7 @@ piglit_check_egl_error(EGLint expected_error);
  * then return EGL_NO_DISPLAY.
  */
 EGLDisplay
-piglit_egl_get_default_display(EGLenum platform);
+piglit_egl_get_display(EGLenum platform, void *native_display);
 
 /**
  * \brief Checks whether an EGL extension is supported.

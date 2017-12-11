@@ -79,6 +79,12 @@ piglit_check_egl_error(EGLint expected_error)
 EGLDisplay
 piglit_egl_get_default_display(EGLenum platform)
 {
+	return piglit_egl_get_display(platform, EGL_DEFAULT_DISPLAY);
+}
+
+EGLDisplay
+piglit_egl_get_display(EGLenum platform, void *native_display)
+{
 	static bool once = true;
 
 	static bool has_base = false;
@@ -90,7 +96,7 @@ piglit_egl_get_default_display(EGLenum platform)
 	static EGLDisplay (*peglGetPlatformDisplayEXT)(EGLenum platform, void *native_display, const EGLint *attrib_list);
 
 	if (platform == EGL_NONE) {
-		return eglGetDisplay(EGL_DEFAULT_DISPLAY);
+		return eglGetDisplay(native_display);
 	}
 
 	if (once) {
@@ -135,7 +141,7 @@ piglit_egl_get_default_display(EGLenum platform)
 		return EGL_NO_DISPLAY;
 	}
 
-	return peglGetPlatformDisplayEXT(platform, EGL_DEFAULT_DISPLAY, NULL);
+	return peglGetPlatformDisplayEXT(platform, native_display, NULL);
 }
 
 bool
