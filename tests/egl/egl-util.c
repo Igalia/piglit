@@ -233,9 +233,9 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	}
 
 
-	state.egl_dpy = eglGetDisplay(state.dpy);
+	state.egl_dpy = piglit_egl_get_display(EGL_PLATFORM_X11_EXT, state.dpy);
 	if (state.egl_dpy == EGL_NO_DISPLAY) {
-		fprintf(stderr, "eglGetDisplay() failed\n");
+		fprintf(stderr, "piglit_egl_get_display() failed\n");
 		result = PIGLIT_FAIL;
 		goto fail;
 	}
