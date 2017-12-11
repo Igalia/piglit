@@ -3101,6 +3101,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_occlusion_query_boolean')) as g:
+    g(['ext_occlusion_query_boolean-any-samples'], 'any-samples')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_disjoint_timer_query')) as g:
     g(['ext_disjoint_timer_query-simple'], 'simple')
 
