@@ -84,15 +84,21 @@ egl_init_test(struct egl_test *test)
 	test->stop_on_failure = true;
 }
 
+EGLNativePixmapType
+egl_util_create_native_pixmap(struct egl_state *state, int width, int height)
+{
+	return XCreatePixmap(state->dpy, state->win,
+			     width, height, state->depth);
+}
+
 EGLSurface
 egl_util_create_pixmap(struct egl_state *state,
 		       int width, int height, const EGLint *attribs)
 {
-	Pixmap pixmap;
+	EGLNativePixmapType pixmap;
 	EGLSurface surf;
 
-	pixmap = XCreatePixmap(state->dpy, state->win,
-			       width, height, state->depth);
+	pixmap = egl_util_create_native_pixmap(state, width, height);
 
 	surf = eglCreatePixmapSurface(state->egl_dpy, state->cfg,
 				      pixmap, attribs);

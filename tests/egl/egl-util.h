@@ -64,6 +64,9 @@ static const EGLint egl_default_window_height = 300;
 void
 egl_init_test(struct egl_test *test);
 
+EGLNativePixmapType
+egl_util_create_native_pixmap(struct egl_state *state, int width, int height);
+
 EGLSurface
 egl_util_create_pixmap(struct egl_state *state,
 		       int width, int height, const EGLint *attribs);
