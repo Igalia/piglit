@@ -135,6 +135,31 @@ pixel_value(int i, int j, int offset_sel)
 		if (i > texture_width - 1) i = texture_width - 1;
 		if (j > texture_height - 1) j = texture_height - 1;
 	}
+	else if (address_mode == GL_MIRRORED_REPEAT) {
+		bool isOdd;
+		if (i < 0)
+			i = -i - 1;
+		isOdd = (i / texture_width) & 1;
+		i = i % texture_width;
+		if (isOdd)
+			i = texture_width - i - 1;
+		if (j < 0)
+			j = -j - 1;
+		isOdd = (j / texture_height) & 1;
+		j = j % texture_height;
+		if (isOdd)
+			j = texture_height - j - 1;
+	}
+	else if (address_mode == GL_MIRROR_CLAMP_TO_EDGE) {
+		if (i < 0)
+			i = -i - 1;
+		if (i > texture_width - 1)
+			i = texture_width - 1;
+		if (j < 0)
+			j = -j - 1;
+		if (j > texture_height - 1)
+			j = texture_height - 1;
+	}
 
 	return i + j * texture_width;
 }
@@ -555,7 +580,7 @@ fail_with_usage(void)
 	       "	comptype = unorm|float|uint|int|shadow\n"
 	       "	sampler = 2D|2DArray|Cube|CubeArray|2DRect\n"
 	       "	compselect = 0|1|2|3\n"
-	       "	addressmode = repeat|clamp\n");
+	       "	addressmode = repeat|clamp|mirror_repeat|mirror_clamp\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -596,6 +621,8 @@ piglit_init(int argc, char **argv)
 		else if (!strcmp(opt, "3")) comp_select = 3;
 		else if (!strcmp(opt, "repeat")) address_mode = GL_REPEAT;
 		else if (!strcmp(opt, "clamp")) address_mode = GL_CLAMP_TO_EDGE;
+		else if (!strcmp(opt, "mirror_repeat")) address_mode = GL_MIRRORED_REPEAT;
+		else if (!strcmp(opt, "mirror_clamp")) address_mode = GL_MIRROR_CLAMP_TO_EDGE;
 	}
 
 	if (stage == NOSTAGE) fail_with_usage();
