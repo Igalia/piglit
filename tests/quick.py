@@ -68,6 +68,23 @@ with profile.test_list.group_manager(
     with profile.test_list.allow_reassignment:
         g(['ext_texture_env_combine-combine', '--quick'], 'texture-env-combine')
 
+# Limit texture size to 512x512 for some texture_multisample tests.
+# The default (max supported size) can be pretty slow.
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_texture_multisample')) as g:
+    with profile.test_list.allow_reassignment:
+        size_arg = ['--texsize', '512']
+        g(['arb_texture_multisample-large-float-texture'] + size_arg,
+          'large-float-texture', run_concurrent=False)
+        g(['arb_texture_multisample-large-float-texture', '--array'] +
+          size_arg, 'large-float-texture-array', run_concurrent=False)
+        g(['arb_texture_multisample-large-float-texture', '--fp16'] +
+          size_arg, 'large-float-texture-fp16', run_concurrent=False)
+        g(['arb_texture_multisample-large-float-texture', '--array',
+           '--fp16'] + size_arg,
+          'large-float-texture-array-fp16', run_concurrent=False)
+
 # These take too long
 profile.filters.append(lambda n, _: '-explosion' not in n)
 profile.filters.append(FilterVsIn())

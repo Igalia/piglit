@@ -1656,6 +1656,14 @@ with profile.test_list.group_manager(
 # Group ARB_texture_multisample
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ARB_texture_multisample')) as g:
+    g(['arb_texture_multisample-large-float-texture'], 'large-float-texture',
+      run_concurrent=False)
+    g(['arb_texture_multisample-large-float-texture', '--array'],
+      'large-float-texture-array', run_concurrent=False)
+    g(['arb_texture_multisample-large-float-texture', '--fp16'],
+      'large-float-texture-fp16', run_concurrent=False)
+    g(['arb_texture_multisample-large-float-texture', '--array', '--fp16'],
+      'large-float-texture-array-fp16', run_concurrent=False)
     g(['arb_texture_multisample-minmax'])
     g(['texelFetch', 'fs', 'sampler2DMS', '4', '1x71-501x71'])
     g(['texelFetch', 'fs', 'sampler2DMS', '4', '1x130-501x130'])
