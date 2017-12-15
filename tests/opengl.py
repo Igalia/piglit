@@ -2282,18 +2282,16 @@ with profile.test_list.group_manager(
        'explicit-offset-bufferstorage')
     g(['arb_enhanced_layouts-gs-stream-location-aliasing'],
        'gs-stream-location-aliasing')
-    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs'],
-      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs',
-      run_concurrent=False)
-    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs_ifc'],
-      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs_interface',
-      run_concurrent=False)
-    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs_named_ifc'],
-      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs_named_interface',
-      run_concurrent=False)
-    g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'vs_struct'],
-      'arb_enhanced_layouts-transform-feedback-layout-qualifiers_vs_struct',
-      run_concurrent=False)
+    for test in ['vs', 'vs_ifc', 'vs_named_ifc', 'vs_struct']:
+        g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', test],
+          'arb_enhanced_layouts-transform-feedback-layout-qualifiers_' + test,
+          run_concurrent=False)
+        g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers',
+           test,
+           'spirv'],
+          'arb_enhanced_layouts-transform-feedback-layout-qualifiers_' +
+          test + '_spirv',
+          run_concurrent=False)
     g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', 'gs'],
       'arb_enhanced_layouts-transform-feedback-layout-qualifiers_gs',
       run_concurrent=False)
