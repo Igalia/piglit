@@ -167,13 +167,20 @@ static const char gs_text_two_sets_tmpl[] =
 	"  EndPrimitive();\n"
 	"}";
 
+struct test_config {
+	const char *glsl_source;
+	const char *spirv_filename;
+	bool spirv;
+	GLint gs_invocation_n;
+};
+
 #define BUF_1_FLOAT_N 6
 #define BUF_2_FLOAT_N 5
 
 static void
 print_usage_and_exit(const char *prog_name)
 {
-	printf("Usage: %s <subtest>\n"
+	printf("Usage: %s <subtest> [spirv]\n"
 	       "  where <subtest> is one of the following:\n"
 	       "    vs (vertex shader only)\n"
 	       "    vs_ifc (vertex shader only, with interface block)\n"
@@ -181,22 +188,78 @@ print_usage_and_exit(const char *prog_name)
 	       "    vs_struct (vertex shader only, with structs)\n"
 	       "    gs (with geometry shader invoked once per stage)\n"
 	       "    gs_max (with geometry shader invoked max times per "
-	       "stage)\n", prog_name);
+	       "stage)\n"
+	       "  add “spirv” to the command line to use SPIR-V shaders "
+	       "instead of GLSL\n",
+	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
+static GLuint
+compile_spirv_program(const char *filename)
+{
+	char filepath[4096];
+	unsigned size;
+	char *source;
+	GLuint shader, prog;
+
+	piglit_join_paths(filepath,
+			  sizeof(filepath),
+			  6, /* num parts */
+			  piglit_source_dir(),
+			  "tests",
+			  "spec",
+			  "arb_enhanced_layouts",
+			  "spirv",
+			  filename);
+
+	source = piglit_load_raw_file(filepath, &size);
+
+	if (source == NULL) {
+		printf("Failed to load %s\n", filepath);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+        shader = glCreateShader(GL_VERTEX_SHADER);
+
+        glShaderBinary(1, &shader,
+		       GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+		       source,
+		       size);
+
+	free(source);
+
+        glSpecializeShader(shader,
+			   "main",
+			   0, /* numSpecializationConstants */
+			   NULL /* pConstantIndex */,
+			   NULL /* pConstantValue */);
+
+	prog = glCreateProgram();
+	glAttachShader(prog, shader);
+	glDeleteShader(shader);
+
+	return prog;
+}
+
 static void
-build_and_use_program(unsigned gs_invocation_n, const char *vs_text)
+build_and_use_program(const struct test_config *config)
 {
 	GLuint prog;
 
-	if (gs_invocation_n == 0) {
-		prog = piglit_build_simple_program_multiple_shaders(
-				GL_VERTEX_SHADER, vs_text, 0);
+	if (config->gs_invocation_n == 0) {
+		if (config->spirv) {
+			prog = compile_spirv_program(config->spirv_filename);
+		} else {
+			prog = piglit_build_simple_program_multiple_shaders(
+				GL_VERTEX_SHADER, config->glsl_source, 0);
+		}
 	} else {
 		char *gs_text;
 
-		(void)!asprintf(&gs_text, gs_text_two_sets_tmpl, gs_invocation_n);
+		(void)!asprintf(&gs_text,
+				config->glsl_source,
+				config->gs_invocation_n);
 		prog = piglit_build_simple_program_multiple_shaders(
 				GL_VERTEX_SHADER, vs_pass_thru_text,
 				GL_GEOMETRY_SHADER, gs_text, 0);
@@ -268,72 +331,128 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 	return pass;
 }
 
-static unsigned
-parse_args(int argc, char **argv, const char **vs_text)
+static void
+parse_args(int argc, char **argv, struct test_config *config)
 {
-	GLint gs_invocation_n;
+	int i, j;
+	static const struct {
+		const char *name;
+		const char *glsl_source;
+		const char *spirv_filename;
+		unsigned gs_invocation_n;
+	} test_types[] = {
+		{
+			"vs",
+			vs_two_sets_text,
+			"vs_two_sets_text.spirv",
+			0
+		},
+		{
+			"vs_ifc",
+			vs_two_sets_ifc_text,
+			"vs_two_sets_ifc_text.spirv",
+			0
+		},
+		{
+			"vs_named_ifc",
+			vs_two_sets_named_ifc_text,
+			"vs_two_sets_named_ifc_text.spirv",
+			0
+		},
+		{
+			"vs_struct",
+			vs_two_sets_struct_text,
+			"vs_two_sets_struct_text.spirv",
+			0
+		},
+		{
+			"gs",
+			gs_text_two_sets_tmpl,
+			NULL,
+			1
+		},
+		{
+			"gs_max",
+			gs_text_two_sets_tmpl,
+			NULL,
+			INT_MAX
+		}
+	};
 
-	if (argc != 2)
+	memset(config, 0, sizeof *config);
+
+	for (i = 1; i < argc; i++) {
+		for (j = 0; j < ARRAY_SIZE(test_types); j++) {
+			if (!strcmp(argv[i], test_types[j].name)) {
+				if (config->glsl_source != NULL)
+					print_usage_and_exit(argv[0]);
+				config->glsl_source =
+					test_types[j].glsl_source;
+				config->spirv_filename =
+					test_types[j].spirv_filename;
+				config->gs_invocation_n =
+					test_types[j].gs_invocation_n;
+				goto option_handled;
+			}
+		}
+
+		if (!strcmp(argv[i], "spirv"))
+			config->spirv = true;
+
+	option_handled:
+		continue;
+	}
+
+	if (config->glsl_source == NULL)
 		print_usage_and_exit(argv[0]);
-
-	if (strcmp(argv[1], "vs") == 0) {
-		*vs_text = vs_two_sets_text;
-		return 0;
-	}
-
-	if (strcmp(argv[1], "vs_ifc") == 0) {
-		*vs_text = vs_two_sets_ifc_text;
-		return 0;
-	}
-
-	if (strcmp(argv[1], "vs_named_ifc") == 0) {
-		*vs_text = vs_two_sets_named_ifc_text;
-		return 0;
-	}
-
-	if (strcmp(argv[1], "vs_struct") == 0) {
-		*vs_text = vs_two_sets_struct_text;
-		return 0;
-	}
-
-	piglit_require_extension("GL_ARB_gpu_shader5");
-
-	if (strcmp(argv[1], "gs") == 0)
-		return 1;
-
-	if (strcmp(argv[1], "gs_max") != 0)
-		print_usage_and_exit(argv[0]);
-
-	glGetIntegerv(GL_MAX_GEOMETRY_SHADER_INVOCATIONS, &gs_invocation_n);
-	if (gs_invocation_n <= 0) {
-		printf("Maximum amount of geometry shader invocations "
-		       "needs to be positive (%u).\n", gs_invocation_n);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	return gs_invocation_n;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
 	bool pass;
-	unsigned primitive_n, gs_invocation_n;
-	const char *vs_text;
+	unsigned primitive_n;
 	GLuint queries[2];
 	GLuint xfb[2];
 	GLuint vao;
+	struct test_config config;
 
 	piglit_require_GLSL_version(150);
 	piglit_require_extension("GL_ARB_transform_feedback3");
 	piglit_require_extension("GL_ARB_enhanced_layouts");
 
-	gs_invocation_n = parse_args(argc, argv, &vs_text);
+	parse_args(argc, argv, &config);
+
+	if (config.gs_invocation_n > 0) {
+		piglit_require_extension("GL_ARB_gpu_shader5");
+
+		if (config.gs_invocation_n == INT_MAX) {
+			glGetIntegerv(GL_MAX_GEOMETRY_SHADER_INVOCATIONS,
+				      &config.gs_invocation_n);
+			if (config.gs_invocation_n <= 0) {
+				printf("Maximum amount of geometry shader "
+				       "invocations needs to be positive "
+				       "(%u).\n",
+				       config.gs_invocation_n);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+		}
+	}
+
+	if (config.spirv) {
+		piglit_require_extension("GL_ARB_gl_spirv");
+
+		if (config.gs_invocation_n > 0) {
+			printf("Geometry shader invocations is not supported "
+			       "with SPIR-V\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
 
 	/* Zero invocations means the feedback is produced by vertex shader */
-	primitive_n = gs_invocation_n ? gs_invocation_n : 1;
+	primitive_n = config.gs_invocation_n ? config.gs_invocation_n : 1;
 
-	build_and_use_program(gs_invocation_n, vs_text);
+	build_and_use_program(&config);
 
 	/* Set up the transform feedback buffers. */
 	glGenBuffers(ARRAY_SIZE(xfb), xfb);
