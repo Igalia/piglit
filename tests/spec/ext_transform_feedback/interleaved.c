@@ -189,7 +189,8 @@ enum piglit_result piglit_display(void)
 		if (fabs(ptr[i] - expected[i]) > 0.01) {
 			printf("Buffer[%i]: %f,  Expected: %f\n", i, ptr[i], expected[i]);
 			pass = GL_FALSE;
-		} else {
+		} else if (0) {
+			/* debug */
 			printf("Buffer[%i]: %f,  Expected: %f -- OK\n", i, ptr[i], expected[i]);
 		}
 	}
