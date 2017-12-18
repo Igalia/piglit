@@ -612,7 +612,7 @@ check_query2_pname_dependencies(const GLenum pname)
 
         case GL_TESS_CONTROL_TEXTURE:
         case GL_TESS_EVALUATION_TEXTURE:
-                if (!piglit_is_extension_supported("GL_ARB_tesselation_shader"))
+                if (!piglit_is_extension_supported("GL_ARB_tessellation_shader"))
                         return false;
                 break;
 
