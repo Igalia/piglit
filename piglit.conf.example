@@ -95,7 +95,7 @@ testB
 ;mustpasslist=/home/knuth/src/deqp/android/cts/com.drawelements.deqp.gles31.xml
 
 [deqp-vk]
-; Path to the deqp-ck executable
+; Path to the deqp-vk executable
 ; Can be overwritten by PIGLIT_DEQP_VK_BIN environment variable
 ;bin=/home/knuth/Vulkan-CTS/external/vulkancts/modules/vulkan/deqp-vk
 
