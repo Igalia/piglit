@@ -249,6 +249,7 @@ check_xfb_output(int max_varyings, int num_xfb_varyings,
 	int vertex, varying, i;
 	float (*buffer)[4] = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER,
 					 GL_READ_ONLY);
+	int numFail = 0;
 
 	for (vertex = 0; vertex < 6; ++vertex) {
 		for (varying = 0; varying < num_xfb_varyings; ++varying) {
@@ -273,10 +274,14 @@ check_xfb_output(int max_varyings, int num_xfb_varyings,
 				       actual[0], actual[1], actual[2],
 				       actual[3]);
 				pass = GL_FALSE;
+				if (++numFail >= 10) {
+					goto end;
+				}
 			}
 		}
 	}
 
+end:
 	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
 
 	return pass;
@@ -322,9 +327,12 @@ draw(GLuint vs, GLuint fs, int num_xfb_varyings,
 
 		glEndTransformFeedback();
 		pass = check_xfb_output(max_varyings, num_xfb_varyings,
-			  offset, xfb_varyings) && pass;
+			  offset, xfb_varyings);
 
 		glDeleteProgram(prog);
+		if (!pass) {
+			break;
+		}
 	}
 
 	return pass;
@@ -341,8 +349,10 @@ run_subtest(GLuint vs, GLuint fs, int max_xfb_varyings,
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	for (row = 0; row < max_xfb_varyings; row++) {
-		pass = draw(vs, fs, row + 1, max_varyings, xfb_varyings) &&
-		   pass;
+		pass = draw(vs, fs, row + 1, max_varyings, xfb_varyings);
+		if (!pass) {
+			goto end;
+		}
 	}
 
 	for (row = 0; row < max_xfb_varyings; row++) {
@@ -359,10 +369,11 @@ run_subtest(GLuint vs, GLuint fs, int max_xfb_varyings,
 				       " captured and offset %d\n",
 				       row + 1, col);
 				pass = GL_FALSE;
-				break;
+				goto end;
 			}
 		}
 	}
+end:
 	return pass;
 }
 
