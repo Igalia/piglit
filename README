@@ -49,7 +49,7 @@ Optionally, you can install the following:
 
 For Python 2.x you can install the following to add features, these are
 unnecessary for python3:
-  - backports.lzma. A packport of python3's lzma module to python2,
+  - backports.lzma. A backport of python3's lzma module to python2,
     this enables fast native xz (de)compression in piglit for results files
     (https://github.com/peterjc/backports.lzma)
   - subprocess32. A backport of the subprocess from python3.2, which includes
@@ -66,7 +66,7 @@ For testing the python framework using "py.test unittests/framework"
   - jsonschema. A JSON validator library for python
   - pytest-mock. A mock plugin for pytest
   - pytest-pythonpath. A plugin for pytest to do automagic with sys.path
-  - pytest-raises. A plugin for pytest that allows deocrating tests that expect
+  - pytest-raises. A plugin for pytest that allows decorating tests that expect
     failure
   - pytest-warnings. A plugin for pytest that handles python warnings
   - pytest-timeout. A plugin for pytest to timeout tests.
@@ -243,7 +243,7 @@ The summary shows the 'status' of a test:
 
  fail   The test failed.
 
- crash  The test binary exited with a non-zero exit code
+ crash  The test binary exited with a non-zero exit code.
 
  skip   The test was skipped.
 
