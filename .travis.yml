@@ -9,13 +9,13 @@ cache: pip
 matrix:
   include:
     - python: 2.7
-      env: TOX_ENV="py27-{noaccel,accel-nix,streams}"
+      env: TOX_ENV="py27-{generator,noaccel,accel-nix,streams}"
     - python: 3.4
-      env: TOX_ENV="py34-{noaccel,accel-nix,streams}"
+      env: TOX_ENV="py34-{generator,noaccel,accel-nix,streams}"
     - python: 3.5
-      env: TOX_ENV="py35-{noaccel,accel-nix,streams}"
+      env: TOX_ENV="py35-{generator,noaccel,accel-nix,streams}"
     - python: 3.6
-      env: TOX_ENV="py36-{noaccel,accel-nix,streams}"
+      env: TOX_ENV="py36-{generator,noaccel,accel-nix,streams}"
 install:
     pip install tox
 script:
