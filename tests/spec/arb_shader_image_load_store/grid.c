@@ -261,7 +261,7 @@ generate_program_v(const struct grid_info grid, const char **sources)
                                          GL_GEOMETRY_SHADER_BIT);
         const unsigned stages =
                 (grid.stages |
-                 /* Make a full pipeline if a tesselation shader was
+                 /* Make a full pipeline if a tessellation shader was
                   * requested. */
                  (grid.stages & tess_stages ? graphic_stages : 0) |
                  /* Make sure there is always a vertex and fragment
