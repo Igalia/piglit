@@ -495,13 +495,11 @@ either be located in the root of the piglit repo, or in $XDG_CONFIG_HOME
 bin=<deqp source dir>/modules/gles2/deqp-gles2
 
 [deqp-gles3]
-exe=<deqp source dir>/modules/gles3/deqp-gles3
+bin=<deqp source dir>/modules/gles3/deqp-gles3
 
 [deqp-gles31]
 bin=<deqp source dir>/modules/gles31/deqp-gles31
 """
-
-NOTE: for historical reasons gles3 uses 'exe' instead of 'bin'
 
 These platforms can be run using deqp_gles*.py as a suite in piglit.
 For example: ./piglit run deqp_gles31 my_results -c
