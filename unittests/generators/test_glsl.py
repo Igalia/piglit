@@ -300,18 +300,18 @@ class TestMinVersion_for_stage_with_ext(object):
         TCS (OpenGL)"""
         self._test('tesc', glsl.Version('410'), (glsl.Version('410'), None))
         self._test('tesc', glsl.Version('140'),
-                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+                   (glsl.Version('140'), 'GL_ARB_tessellation_shader'))
         self._test('tesc', glsl.Version('110'),
-                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+                   (glsl.Version('140'), 'GL_ARB_tessellation_shader'))
 
     def test_opengl_tese(self):
         """generated_tests.modules.glsl.MinVersion.for_stage_with_ext:
         TES (OpenGL)"""
         self._test('tese', glsl.Version('410'), (glsl.Version('410'), None))
         self._test('tese', glsl.Version('140'),
-                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+                   (glsl.Version('140'), 'GL_ARB_tessellation_shader'))
         self._test('tese', glsl.Version('110'),
-                   (glsl.Version('140'), 'GL_ARB_tesselation_shader'))
+                   (glsl.Version('140'), 'GL_ARB_tessellation_shader'))
 
     def test_opengl_comp(self):
         """generated_tests.modules.glsl.MinVersion.for_stage_with_ext:
@@ -352,9 +352,9 @@ class TestMinVersion_for_stage_with_ext(object):
         self._test('tesc', glsl.Version('320 es'),
                    (glsl.Version('320 es'), None))
         self._test('tesc', glsl.Version('310 es'),
-                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+                   (glsl.Version('310 es'), 'GL_OES_tessellation_shader'))
         self._test('tesc', glsl.Version('100'),
-                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+                   (glsl.Version('310 es'), 'GL_OES_tessellation_shader'))
 
     def test_opengles_tese(self):
         """generated_tests.modules.glsl.MinVersion.for_stage_with_ext:
@@ -362,9 +362,9 @@ class TestMinVersion_for_stage_with_ext(object):
         self._test('tese', glsl.Version('320 es'),
                    (glsl.Version('320 es'), None))
         self._test('tese', glsl.Version('310 es'),
-                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+                   (glsl.Version('310 es'), 'GL_OES_tessellation_shader'))
         self._test('tese', glsl.Version('100'),
-                   (glsl.Version('310 es'), 'GL_OES_tesselation_shader'))
+                   (glsl.Version('310 es'), 'GL_OES_tessellation_shader'))
 
     def test_opengles_comp(self):
         """generated_tests.modules.glsl.MinVersion.for_stage_with_ext:
