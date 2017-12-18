@@ -754,6 +754,7 @@ with profile.test_list.group_manager(
     g(['gl-1.0-scissor-stencil-clear'])
     g(['gl-1.0-texgen'])
     g(['gl-1.0-textured-triangle'])
+    g(['gl-1.0-user-clip-all-planes'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
