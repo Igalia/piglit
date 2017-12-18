@@ -5655,10 +5655,10 @@ typedef unsigned int GLhandleARB;
         <enum value="0x87ED" name="GL_LOCAL_CONSTANT_DATATYPE_EXT"/>
         <enum value="0x87EE" name="GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD"/>
         <enum value="0x87F0" name="GL_PN_TRIANGLES_ATI"/>
-        <enum value="0x87F1" name="GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI"/>
+        <enum value="0x87F1" name="GL_MAX_PN_TRIANGLES_TESSELLATION_LEVEL_ATI"/>
         <enum value="0x87F2" name="GL_PN_TRIANGLES_POINT_MODE_ATI"/>
         <enum value="0x87F3" name="GL_PN_TRIANGLES_NORMAL_MODE_ATI"/>
-        <enum value="0x87F4" name="GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI"/>
+        <enum value="0x87F4" name="GL_PN_TRIANGLES_TESSELLATION_LEVEL_ATI"/>
         <enum value="0x87F5" name="GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI"/>
         <enum value="0x87F6" name="GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI"/>
         <enum value="0x87F7" name="GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI"/>
@@ -41008,10 +41008,10 @@ typedef unsigned int GLhandleARB;
         <extension name="GL_ATI_pn_triangles" supported="gl">
             <require>
                 <enum name="GL_PN_TRIANGLES_ATI"/>
-                <enum name="GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI"/>
+                <enum name="GL_MAX_PN_TRIANGLES_TESSELLATION_LEVEL_ATI"/>
                 <enum name="GL_PN_TRIANGLES_POINT_MODE_ATI"/>
                 <enum name="GL_PN_TRIANGLES_NORMAL_MODE_ATI"/>
-                <enum name="GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI"/>
+                <enum name="GL_PN_TRIANGLES_TESSELLATION_LEVEL_ATI"/>
                 <enum name="GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI"/>
                 <enum name="GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI"/>
                 <enum name="GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI"/>
