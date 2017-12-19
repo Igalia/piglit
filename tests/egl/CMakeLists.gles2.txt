@@ -1,0 +1,18 @@
+
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${EGL_LDFLAGS}
+	${OPENGL_gl_LIBRARY}
+)
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	piglit_add_executable (egl-blob-cache egl-blob-cache.c)
+	target_link_libraries(egl-blob-cache pthread)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+# vim: ft=cmake:

@@ -4534,6 +4534,7 @@ with profile.test_list.group_manager(
       run_concurrent=False)
     g(['egl-invalid-attr'])
     g(['egl-context-priority'])
+    g(['egl-blob-cache'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
