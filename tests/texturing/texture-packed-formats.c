@@ -51,7 +51,6 @@ config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
 struct pixel_format {
-	const char *name;
 	GLenum format;
 	GLenum type;
 	GLint bytes;
@@ -60,71 +59,48 @@ struct pixel_format {
 
 static const struct pixel_format Formats[] = {
 
-	{ "GL_RGBA/GL_UNSIGNED_INT_8_8_8_8",
-	  GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, 4, 0xff000080, 0x00ff0080 },
-	{ "GL_RGBA/GL_UNSIGNED_INT_8_8_8_8_REV",
-	  GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, 4, 0x800000ff, 0x8000ff00 },
-	{ "GL_RGBA/GL_UNSIGNED_INT_10_10_10_2",
-	  GL_RGBA, GL_UNSIGNED_INT_10_10_10_2, 4, 0xffc00002, 0x3ff002 },
-	{ "GL_RGBA/GL_UNSIGNED_INT_2_10_10_10_REV",
-	  GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, 4, 0xc00003ff, 0xc00ffc00 },
-	{ "GL_RGBA/GL_UNSIGNED_SHORT_4_4_4_4",
-	  GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, 2, 0xf008, 0x0f08 },
-	{ "GL_RGBA/GL_UNSIGNED_SHORT_4_4_4_4_REV",
-	  GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4_REV, 2, 0x800f, 0x80f0 },
-	{ "GL_RGBA/GL_UNSIGNED_SHORT_5_5_5_1",
-	  GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 2, 0xf801, 0x7c1 },
-	{ "GL_RGBA/GL_UNSIGNED_SHORT_1_5_5_5_REV",
-	  GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, 2, 0x801f, 0x83e0 },
+	{ GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, 4, 0xff000080, 0x00ff0080 },
+	{ GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, 4, 0x800000ff, 0x8000ff00 },
+	{ GL_RGBA, GL_UNSIGNED_INT_10_10_10_2, 4, 0xffc00002, 0x3ff002 },
+	{ GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, 4, 0xc00003ff, 0xc00ffc00 },
+	{ GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, 2, 0xf008, 0x0f08 },
+	{ GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4_REV, 2, 0x800f, 0x80f0 },
+	{ GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, 2, 0xf801, 0x7c1 },
+	{ GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, 2, 0x801f, 0x83e0 },
 
-	{ "GL_BGRA/GL_UNSIGNED_INT_8_8_8_8",
-	  GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, 4, 0x0000ff80, 0x00ff0080 },
-	{ "GL_BGRA/GL_UNSIGNED_INT_8_8_8_8_REV",
-	  GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, 4, 0x80ff0000, 0x8000ff00 },
-	{ "GL_BGRA/GL_UNSIGNED_SHORT_4_4_4_4",
-	  GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4, 2, 0x00f8, 0x0f08 },
-	{ "GL_BGRA/GL_UNSIGNED_SHORT_4_4_4_4_REV",
-	  GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4_REV, 2, 0x8f00, 0x80f0 },
-	{ "GL_BGRA/GL_UNSIGNED_SHORT_5_5_5_1",
-	  GL_BGRA, GL_UNSIGNED_SHORT_5_5_5_1, 2, 0x3f, 0x7c1 },
-	{ "GL_BGRA/GL_UNSIGNED_SHORT_1_5_5_5_REV",
-	  GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, 2, 0xfc00, 0x83e0 },
+	{ GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, 4, 0x0000ff80, 0x00ff0080 },
+	{ GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, 4, 0x80ff0000, 0x8000ff00 },
+	{ GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4, 2, 0x00f8, 0x0f08 },
+	{ GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4_REV, 2, 0x8f00, 0x80f0 },
+	{ GL_BGRA, GL_UNSIGNED_SHORT_5_5_5_1, 2, 0x3f, 0x7c1 },
+	{ GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, 2, 0xfc00, 0x83e0 },
 
-	{ "GL_RGB/GL_UNSIGNED_SHORT_5_6_5",
-	  GL_RGB, GL_UNSIGNED_SHORT_5_6_5, 2, 0xf800, 0x7e0 },
-	{ "GL_RGB/GL_UNSIGNED_SHORT_5_6_5_REV",
-	  GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, 2, 0x1f, 0x7e0 },
-	{ "GL_RGB/GL_UNSIGNED_BYTE_3_3_2",
-	  GL_RGB, GL_UNSIGNED_BYTE_3_3_2, 1, 0xe0, 0x1c },
-	{ "GL_RGB/GL_UNSIGNED_BYTE_2_3_3_REV",
-	  GL_RGB, GL_UNSIGNED_BYTE_2_3_3_REV, 1, 0x7, 0x38 }
+	{ GL_RGB, GL_UNSIGNED_SHORT_5_6_5, 2, 0xf800, 0x7e0 },
+	{ GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV, 2, 0x1f, 0x7e0 },
+	{ GL_RGB, GL_UNSIGNED_BYTE_3_3_2, 1, 0xe0, 0x1c },
+	{ GL_RGB, GL_UNSIGNED_BYTE_2_3_3_REV, 1, 0x7, 0x38 }
 };
 
 #define NUM_FORMATS (sizeof(Formats) / sizeof(Formats[0]))
 
-struct name_format {
-	const char *name;
-	GLenum format;
-};
+static const GLenum IntFormats[] = {
+	GL_RGBA,
+	GL_RGBA2,
+	GL_RGBA4,
+	GL_RGB5_A1,
+	GL_RGBA8,
+	GL_RGBA12,
+	GL_RGBA16,
+	GL_RGB10_A2,
 
-static const struct name_format IntFormats[] = {
-	{ "GL_RGBA", GL_RGBA },
-	{ "GL_RGBA2", GL_RGBA2 },
-	{ "GL_RGBA4", GL_RGBA4 },
-	{ "GL_RGB5_A1", GL_RGB5_A1 },
-	{ "GL_RGBA8", GL_RGBA8 },
-	{ "GL_RGBA12", GL_RGBA12 },
-	{ "GL_RGBA16", GL_RGBA16 },
-	{ "GL_RGB10_A2", GL_RGB10_A2 },
-
-	{ "GL_RGB", GL_RGB },
-	{ "GL_R3_G3_B2", GL_R3_G3_B2 },
-	{ "GL_RGB4", GL_RGB4 },
-	{ "GL_RGB5", GL_RGB5 },
-	{ "GL_RGB8", GL_RGB8 },
-	{ "GL_RGB10", GL_RGB10 },
-	{ "GL_RGB12", GL_RGB12 },
-	{ "GL_RGB16", GL_RGB16 },
+	GL_RGB,
+	GL_R3_G3_B2,
+	GL_RGB4,
+	GL_RGB5,
+	GL_RGB8,
+	GL_RGB10,
+	GL_RGB12,
+	GL_RGB16,
 
 };
 
@@ -246,12 +222,13 @@ Test(GLuint intFmt, GLuint dims)
 			int x = 5 * swap;
 			int y = 5 * i;
 
-			MakeTexture(dims, Formats + i, IntFormats[intFmt].format,
+			MakeTexture(dims, Formats + i, IntFormats[intFmt],
 				    swap);
 
 			if (glGetError()) {
 				printf("Unexpected GL Error for %s\n",
-				       IntFormats[intFmt].name);
+				       piglit_get_gl_enum_name(
+							IntFormats[intFmt]));
 				return GL_FALSE;
 			}
 
@@ -275,20 +252,25 @@ Test(GLuint intFmt, GLuint dims)
 		for (i = 0; i < NUM_FORMATS; i++) {
 			int x = 5 * swap;
 			int y = 5 * i;
+			char *name;
+			asprintf(&name, "%s/%s",
+				 piglit_get_gl_enum_name(Formats[i].format),
+				 piglit_get_gl_enum_name(Formats[i].type));
 			/* test rendering */
 			if (!piglit_probe_rect_rgb(x, y, w, 2, red)) {
 				printf("Failure for format=%s, swap=%u, "
 				       "textureDims=%u\n",
-				       Formats[i].name, swap, dims);
+				       name, swap, dims);
 				pass = GL_FALSE;
 			}
 
 			if (!piglit_probe_rect_rgb(x, y + 2, w, 2, green)) {
 				printf("Failure for format=%s, swap=%u, "
 				       "textureDims=%u\n",
-				       Formats[i].name, swap, dims);
+				       name, swap, dims);
 				pass = GL_FALSE;
 			}
+			free(name);
 		}
 	}
 
