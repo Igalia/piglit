@@ -64,7 +64,6 @@ static const uint32_t color[4] = {
 };
 
 struct format_info {
-	const char *name;
 	GLenum internal_format, base_format;
 	int size;
 	bool sign;
@@ -73,76 +72,76 @@ struct format_info {
 
 /* Only test 32-bit formats - since you won't see precision problems on lower sizes */
 static const struct format_info formats[] = {
-	{ "GL_RGBA8I",   GL_RGBA8I,   GL_RGBA_INTEGER, 8,  true  },
-	{ "GL_RGBA8UI",  GL_RGBA8UI , GL_RGBA_INTEGER, 8,  false },
-	{ "GL_RGBA16I",  GL_RGBA16I,  GL_RGBA_INTEGER, 16, true  },
-	{ "GL_RGBA16UI", GL_RGBA16UI, GL_RGBA_INTEGER, 16, false },
-	{ "GL_RGBA32I",  GL_RGBA32I,  GL_RGBA_INTEGER, 32, true  },
-	{ "GL_RGBA32UI", GL_RGBA32UI, GL_RGBA_INTEGER, 32, false },
+	{ GL_RGBA8I,   GL_RGBA_INTEGER, 8,  true  },
+	{ GL_RGBA8UI , GL_RGBA_INTEGER, 8,  false },
+	{ GL_RGBA16I,  GL_RGBA_INTEGER, 16, true  },
+	{ GL_RGBA16UI, GL_RGBA_INTEGER, 16, false },
+	{ GL_RGBA32I,  GL_RGBA_INTEGER, 32, true  },
+	{ GL_RGBA32UI, GL_RGBA_INTEGER, 32, false },
 
-	{ "GL_RGBA8I (bgra)",   GL_RGBA8I,   GL_BGRA_INTEGER, 8,  true  },
-	{ "GL_RGBA8UI (bgra)",  GL_RGBA8UI , GL_BGRA_INTEGER, 8,  false },
-	{ "GL_RGBA16I (bgra)",  GL_RGBA16I,  GL_BGRA_INTEGER, 16, true  },
-	{ "GL_RGBA16UI (bgra)", GL_RGBA16UI, GL_BGRA_INTEGER, 16, false },
-	{ "GL_RGBA32I (bgra)",  GL_RGBA32I,  GL_BGRA_INTEGER, 32, true  },
-	{ "GL_RGBA32UI (bgra)", GL_RGBA32UI, GL_BGRA_INTEGER, 32, false },
+	{ GL_RGBA8I,   GL_BGRA_INTEGER, 8,  true  },
+	{ GL_RGBA8UI , GL_BGRA_INTEGER, 8,  false },
+	{ GL_RGBA16I,  GL_BGRA_INTEGER, 16, true  },
+	{ GL_RGBA16UI, GL_BGRA_INTEGER, 16, false },
+	{ GL_RGBA32I,  GL_BGRA_INTEGER, 32, true  },
+	{ GL_RGBA32UI, GL_BGRA_INTEGER, 32, false },
 
-	{ "GL_RGB8I",   GL_RGB8I,   GL_RGB_INTEGER, 8,  true  },
-	{ "GL_RGB8UI",  GL_RGB8UI , GL_RGB_INTEGER, 8,  false },
-	{ "GL_RGB16I",  GL_RGB16I,  GL_RGB_INTEGER, 16, true  },
-	{ "GL_RGB16UI", GL_RGB16UI, GL_RGB_INTEGER, 16, false },
-	{ "GL_RGB32I",  GL_RGB32I,  GL_RGB_INTEGER, 32, true  },
-	{ "GL_RGB32UI", GL_RGB32UI, GL_RGB_INTEGER, 32, false },
+	{ GL_RGB8I,   GL_RGB_INTEGER, 8,  true  },
+	{ GL_RGB8UI , GL_RGB_INTEGER, 8,  false },
+	{ GL_RGB16I,  GL_RGB_INTEGER, 16, true  },
+	{ GL_RGB16UI, GL_RGB_INTEGER, 16, false },
+	{ GL_RGB32I,  GL_RGB_INTEGER, 32, true  },
+	{ GL_RGB32UI, GL_RGB_INTEGER, 32, false },
 
-	{ "GL_ALPHA8I_EXT",   GL_ALPHA8I_EXT,   GL_ALPHA_INTEGER_EXT, 8,  true  },
-	{ "GL_ALPHA8UI_EXT",  GL_ALPHA8UI_EXT , GL_ALPHA_INTEGER_EXT, 8,  false },
-	{ "GL_ALPHA16I_EXT",  GL_ALPHA16I_EXT,  GL_ALPHA_INTEGER_EXT, 16, true  },
-	{ "GL_ALPHA16UI_EXT", GL_ALPHA16UI_EXT, GL_ALPHA_INTEGER_EXT, 16, false },
-	{ "GL_ALPHA32I_EXT",  GL_ALPHA32I_EXT,  GL_ALPHA_INTEGER_EXT, 32, true  },
-	{ "GL_ALPHA32UI_EXT", GL_ALPHA32UI_EXT, GL_ALPHA_INTEGER_EXT, 32, false },
+	{ GL_ALPHA8I_EXT,   GL_ALPHA_INTEGER_EXT, 8,  true  },
+	{ GL_ALPHA8UI_EXT , GL_ALPHA_INTEGER_EXT, 8,  false },
+	{ GL_ALPHA16I_EXT,  GL_ALPHA_INTEGER_EXT, 16, true  },
+	{ GL_ALPHA16UI_EXT, GL_ALPHA_INTEGER_EXT, 16, false },
+	{ GL_ALPHA32I_EXT,  GL_ALPHA_INTEGER_EXT, 32, true  },
+	{ GL_ALPHA32UI_EXT, GL_ALPHA_INTEGER_EXT, 32, false },
 
-	{ "GL_LUMINANCE8I_EXT",   GL_LUMINANCE8I_EXT,   GL_LUMINANCE_INTEGER_EXT, 8,  true  },
-	{ "GL_LUMINANCE8UI_EXT",  GL_LUMINANCE8UI_EXT , GL_LUMINANCE_INTEGER_EXT, 8,  false },
-	{ "GL_LUMINANCE16I_EXT",  GL_LUMINANCE16I_EXT,  GL_LUMINANCE_INTEGER_EXT, 16, true  },
-	{ "GL_LUMINANCE16UI_EXT", GL_LUMINANCE16UI_EXT, GL_LUMINANCE_INTEGER_EXT, 16, false },
-	{ "GL_LUMINANCE32I_EXT",  GL_LUMINANCE32I_EXT,  GL_LUMINANCE_INTEGER_EXT, 32, true  },
-	{ "GL_LUMINANCE32UI_EXT", GL_LUMINANCE32UI_EXT, GL_LUMINANCE_INTEGER_EXT, 32, false },
+	{ GL_LUMINANCE8I_EXT,   GL_LUMINANCE_INTEGER_EXT, 8,  true  },
+	{ GL_LUMINANCE8UI_EXT , GL_LUMINANCE_INTEGER_EXT, 8,  false },
+	{ GL_LUMINANCE16I_EXT,  GL_LUMINANCE_INTEGER_EXT, 16, true  },
+	{ GL_LUMINANCE16UI_EXT, GL_LUMINANCE_INTEGER_EXT, 16, false },
+	{ GL_LUMINANCE32I_EXT,  GL_LUMINANCE_INTEGER_EXT, 32, true  },
+	{ GL_LUMINANCE32UI_EXT, GL_LUMINANCE_INTEGER_EXT, 32, false },
 
-	{ "GL_LUMINANCE_ALPHA8I_EXT",   GL_LUMINANCE_ALPHA8I_EXT,   GL_LUMINANCE_ALPHA_INTEGER_EXT, 8,  true  },
-	{ "GL_LUMINANCE_ALPHA8UI_EXT",  GL_LUMINANCE_ALPHA8UI_EXT , GL_LUMINANCE_ALPHA_INTEGER_EXT, 8,  false },
-	{ "GL_LUMINANCE_ALPHA16I_EXT",  GL_LUMINANCE_ALPHA16I_EXT,  GL_LUMINANCE_ALPHA_INTEGER_EXT, 16, true  },
-	{ "GL_LUMINANCE_ALPHA16UI_EXT", GL_LUMINANCE_ALPHA16UI_EXT, GL_LUMINANCE_ALPHA_INTEGER_EXT, 16, false },
-	{ "GL_LUMINANCE_ALPHA32I_EXT",  GL_LUMINANCE_ALPHA32I_EXT,  GL_LUMINANCE_ALPHA_INTEGER_EXT, 32, true  },
-	{ "GL_LUMINANCE_ALPHA32UI_EXT", GL_LUMINANCE_ALPHA32UI_EXT, GL_LUMINANCE_ALPHA_INTEGER_EXT, 32, false },
+	{ GL_LUMINANCE_ALPHA8I_EXT,   GL_LUMINANCE_ALPHA_INTEGER_EXT, 8,  true  },
+	{ GL_LUMINANCE_ALPHA8UI_EXT , GL_LUMINANCE_ALPHA_INTEGER_EXT, 8,  false },
+	{ GL_LUMINANCE_ALPHA16I_EXT,  GL_LUMINANCE_ALPHA_INTEGER_EXT, 16, true  },
+	{ GL_LUMINANCE_ALPHA16UI_EXT, GL_LUMINANCE_ALPHA_INTEGER_EXT, 16, false },
+	{ GL_LUMINANCE_ALPHA32I_EXT,  GL_LUMINANCE_ALPHA_INTEGER_EXT, 32, true  },
+	{ GL_LUMINANCE_ALPHA32UI_EXT, GL_LUMINANCE_ALPHA_INTEGER_EXT, 32, false },
 
-	{ "GL_INTENSITY8I_EXT",   GL_INTENSITY8I_EXT,   GL_RED_INTEGER_EXT, 8,  true  },
-	{ "GL_INTENSITY8UI_EXT",  GL_INTENSITY8UI_EXT , GL_RED_INTEGER_EXT, 8,  false },
-	{ "GL_INTENSITY16I_EXT",  GL_INTENSITY16I_EXT,  GL_RED_INTEGER_EXT, 16, true  },
-	{ "GL_INTENSITY16UI_EXT", GL_INTENSITY16UI_EXT, GL_RED_INTEGER_EXT, 16, false },
-	{ "GL_INTENSITY32I_EXT",  GL_INTENSITY32I_EXT,  GL_RED_INTEGER_EXT, 32, true  },
-	{ "GL_INTENSITY32UI_EXT", GL_INTENSITY32UI_EXT, GL_RED_INTEGER_EXT, 32, false },
+	{ GL_INTENSITY8I_EXT,   GL_RED_INTEGER_EXT, 8,  true  },
+	{ GL_INTENSITY8UI_EXT , GL_RED_INTEGER_EXT, 8,  false },
+	{ GL_INTENSITY16I_EXT,  GL_RED_INTEGER_EXT, 16, true  },
+	{ GL_INTENSITY16UI_EXT, GL_RED_INTEGER_EXT, 16, false },
+	{ GL_INTENSITY32I_EXT,  GL_RED_INTEGER_EXT, 32, true  },
+	{ GL_INTENSITY32UI_EXT, GL_RED_INTEGER_EXT, 32, false },
 };
 
 static const struct format_info rg_formats[] = {
-	{ "GL_RG8I",   GL_RG8I,   GL_RG_INTEGER, 8,  true  },
-	{ "GL_RG8UI",  GL_RG8UI , GL_RG_INTEGER, 8,  false },
-	{ "GL_RG16I",  GL_RG16I,  GL_RG_INTEGER, 16, true  },
-	{ "GL_RG16UI", GL_RG16UI, GL_RG_INTEGER, 16, false },
-	{ "GL_RG32I",  GL_RG32I,  GL_RG_INTEGER, 32, true  },
-	{ "GL_RG32UI", GL_RG32UI, GL_RG_INTEGER, 32, false },
-	{ "GL_R8I",   GL_R8I,   GL_RED_INTEGER, 8,  true  },
-	{ "GL_R8UI",  GL_R8UI , GL_RED_INTEGER, 8,  false },
-	{ "GL_R16I",  GL_R16I,  GL_RED_INTEGER, 16, true  },
-	{ "GL_R16UI", GL_R16UI, GL_RED_INTEGER, 16, false },
-	{ "GL_R32I",  GL_R32I,  GL_RED_INTEGER, 32, true  },
-	{ "GL_R32UI", GL_R32UI, GL_RED_INTEGER, 32, false },
+	{ GL_RG8I,   GL_RG_INTEGER, 8,  true  },
+	{ GL_RG8UI , GL_RG_INTEGER, 8,  false },
+	{ GL_RG16I,  GL_RG_INTEGER, 16, true  },
+	{ GL_RG16UI, GL_RG_INTEGER, 16, false },
+	{ GL_RG32I,  GL_RG_INTEGER, 32, true  },
+	{ GL_RG32UI, GL_RG_INTEGER, 32, false },
+	{ GL_R8I,   GL_RED_INTEGER, 8,  true  },
+	{ GL_R8UI , GL_RED_INTEGER, 8,  false },
+	{ GL_R16I,  GL_RED_INTEGER, 16, true  },
+	{ GL_R16UI, GL_RED_INTEGER, 16, false },
+	{ GL_R32I,  GL_RED_INTEGER, 32, true  },
+	{ GL_R32UI, GL_RED_INTEGER, 32, false },
 };
 
 static const struct format_info rgb10_formats[] = {
-	{ "GL_RGB10_A2UI", GL_RGB10_A2UI, GL_RGBA_INTEGER, 10, false },
-	{ "GL_RGB10_A2UI (bgra)", GL_RGB10_A2UI, GL_BGRA_INTEGER, 10, false },
-	{ "GL_RGB10_A2UI (rev)", GL_RGB10_A2UI, GL_RGBA_INTEGER, 10, true },
-	{ "GL_RGB10_A2UI (rev bgra)", GL_RGB10_A2UI, GL_BGRA_INTEGER, 10, true },
+	{ GL_RGB10_A2UI, GL_RGBA_INTEGER, 10, false },
+	{ GL_RGB10_A2UI, GL_BGRA_INTEGER, 10, false },
+	{ GL_RGB10_A2UI, GL_RGBA_INTEGER, 10, true },
+	{ GL_RGB10_A2UI, GL_BGRA_INTEGER, 10, true },
 };
 
 static GLenum
@@ -180,7 +179,24 @@ test_format(const struct format_info *info)
 	GLenum status;
 	uint32_t expected_color[4];
 
-	printf("%s:\n", info->name);
+	const char *suffix;
+	if (info->internal_format == GL_RGB10_A2UI) {
+		if (info->base_format == GL_BGRA_INTEGER) {
+			if (info->sign)
+				suffix = " (rev bgra)";
+			else
+				suffix = " (bgra)";
+		} else {
+			if (info->sign)
+				suffix = " (rev)";
+			else
+				suffix = "";
+		}
+	} else if (info->base_format == GL_BGRA_INTEGER)
+		suffix = " (bgra)";
+	else
+		suffix = "";
+	printf("%s%s:\n", piglit_get_gl_enum_name(info->internal_format), suffix);
 
 	/* Create texture */
 	glTexImage2D(GL_TEXTURE_2D, 0, info->internal_format, 1, 1, 0,
