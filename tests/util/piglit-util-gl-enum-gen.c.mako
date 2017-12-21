@@ -38,7 +38,19 @@ piglit_get_gl_enum_name(GLenum param)
 >-------case ${enum.c_num_literal}: return "${enum.name}";
 % endif
 % endfor
->-------default: return "(unrecognized enum)";
+>-------default: {
+>------->-------static const char *format = "(unrecognized enum: 0x%X)";
+>------->-------static char buffer[4096];
+>------->-------static char *position = buffer;
+>------->-------const ptrdiff_t size_left = 4096 - (position - buffer);
+>------->-------const size_t size_needed = strlen(format) + 8 - 2 + 1;
+>------->-------if (size_left < size_needed)
+>------->------->-------position = buffer;
+>------->-------const int len = sprintf(position, format, param);
+>------->-------const char *old_position = position;
+>------->-------position += len + 1;
+>------->-------return old_position;
+>------->-------}
 >-------}
 }
 
