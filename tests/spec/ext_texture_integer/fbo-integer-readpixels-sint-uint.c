@@ -49,7 +49,6 @@ static GLint TexWidth = 256, TexHeight = 256;
 
 struct format_info
 {
-   const char *Name;
    GLenum IntFormat, BaseFormat;
    GLuint BitsPerChannel;
    GLboolean Signed;
@@ -57,8 +56,8 @@ struct format_info
 
 /* Only test 32-bit formats - since you won't see precision problems on lower sizes */
 static const struct format_info Formats[] = {
-   { "GL_RGBA32I_EXT",  GL_RGBA32I_EXT,  GL_RGBA_INTEGER_EXT, 32, GL_TRUE },
-   { "GL_RGBA32UI_EXT", GL_RGBA32UI_EXT, GL_RGBA_INTEGER_EXT, 32, GL_FALSE },
+   { GL_RGBA32I_EXT,  GL_RGBA_INTEGER_EXT, 32, GL_TRUE },
+   { GL_RGBA32UI_EXT, GL_RGBA_INTEGER_EXT, 32, GL_FALSE },
 };
 
 #define NUM_FORMATS  (sizeof(Formats) / sizeof(Formats[0]))
@@ -154,6 +153,7 @@ test_fbo(const struct format_info *info)
 {
    const int comps = num_components(info->BaseFormat);
    const GLenum type = get_datatype(info);
+   const char *name = piglit_get_gl_enum_name(info->IntFormat);
    GLint f;
    GLuint fbo, texObj;
    GLenum status;
@@ -162,7 +162,7 @@ test_fbo(const struct format_info *info)
    bool pass = true;
 
    if (0)
-      fprintf(stderr, "============ Testing format = %s ========\n", info->Name);
+      fprintf(stderr, "============ Testing format = %s ========\n", name);
 
    /* Create texture */
    glGenTextures(1, &texObj);
@@ -237,7 +237,7 @@ test_fbo(const struct format_info *info)
           for (i = 0; i < comps; i++) {
                if (pix_ui[i] != exp_ui[i]) {
                    fprintf(stderr, "%s: glClear failed\n", TestName);
-                   fprintf(stderr, "  Texture format = %s\n", info->Name);
+                   fprintf(stderr, "  Texture format = %s\n", name);
                    fprintf(stderr, "  Expected %u, %u, %u, %u\n",
                         exp_ui[0], exp_ui[1], exp_ui[2], exp_ui[3]);
                    fprintf(stderr, "  Found %u, %u, %u, %u\n",
@@ -250,7 +250,7 @@ test_fbo(const struct format_info *info)
           for (i = 0; i < comps; i++) {
                if (pix[i] != exp_i[i]) {
                    fprintf(stderr, "%s: glClear failed\n", TestName);
-                   fprintf(stderr, "  Texture format = %s\n", info->Name);
+                   fprintf(stderr, "  Texture format = %s\n", name);
                    fprintf(stderr, "  Expected %d, %d, %d, %d\n",
                         exp_i[0], exp_i[1], exp_i[2], exp_i[3]);
                    fprintf(stderr, "  Found %d, %d, %d, %d\n",

@@ -43,31 +43,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-const char*
-get_cube_map_face_string(GLenum face)
-{
-	switch (face) {
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y: return "GL_TEXTURE_CUBE_MAP_POSITIVE_Y";
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_X: return "GL_TEXTURE_CUBE_MAP_POSITIVE_X";
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z: return "GL_TEXTURE_CUBE_MAP_POSITIVE_Z";
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y: return "GL_TEXTURE_CUBE_MAP_NEGATIVE_Y";
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X: return "GL_TEXTURE_CUBE_MAP_NEGATIVE_X";
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z: return "GL_TEXTURE_CUBE_MAP_NEGATIVE_Z";
-	default: return NULL;
-	}
-}
-
-const char*
-get_attachment_string(GLint attach)
-{
-	switch (attach) {
-	case GL_DEPTH_ATTACHMENT: return "GL_DEPTH_ATTACHMENT";
-	case GL_STENCIL_ATTACHMENT: return "GL_STENCIL_ATTACHMENT";
-	case GL_DEPTH_STENCIL_ATTACHMENT: return "GL_DEPTH_STENICL";
-	default: return NULL;
-	}
-}
-
 bool
 check_attachment(GLenum attach, GLint expect_name, GLenum expect_cube_map_face)
 {
@@ -81,17 +56,10 @@ check_attachment(GLenum attach, GLint expect_name, GLenum expect_cube_map_face)
 				              &actual_type);
 
 	if (actual_type != GL_TEXTURE) {
-		char actual_type_str[16];
-
-		if (actual_type == GL_NONE) {
-			sprintf(actual_type_str, "GL_NONE");
-		} else {
-			snprintf(actual_type_str, 16, "0x%x", actual_type);
-		}
-
 		fprintf(stderr,
 			"error: expected GL_TEXTURE for %s attachment type, but found %s\n",
-			get_attachment_string(attach), actual_type_str);
+			piglit_get_gl_enum_name(attach),
+			piglit_get_gl_enum_name(actual_type));
 
 		/* Return now and don't query the attachment name, because
 		 * that would generate a GL error.
@@ -107,7 +75,7 @@ check_attachment(GLenum attach, GLint expect_name, GLenum expect_cube_map_face)
 	if (actual_name != expect_name) {
 		fprintf(stderr,
 			"error: expected %d for %s attachment name, but found %d\n",
-			expect_name, get_attachment_string(attach), actual_name);
+			expect_name, piglit_get_gl_enum_name(attach), actual_name);
 		return false;
 	}
 
@@ -119,9 +87,9 @@ check_attachment(GLenum attach, GLint expect_name, GLenum expect_cube_map_face)
 	if (actual_cube_map_face != expect_cube_map_face) {
 		fprintf(stderr,
 			"error: expected %s for %s attachment cube map face, but found %s\n",
-			get_cube_map_face_string(expect_cube_map_face),
-			get_attachment_string(attach),
-			get_cube_map_face_string(actual_cube_map_face));
+			piglit_get_gl_enum_name(expect_cube_map_face),
+			piglit_get_gl_enum_name(attach),
+			piglit_get_gl_enum_name(actual_cube_map_face));
 		return false;
 	}
 

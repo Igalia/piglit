@@ -87,24 +87,20 @@ static const float gl_4d_color_texture_values[] =
 
 struct type {
 	GLenum type;
-	char *name;
 	const float *values;
 	int count;
 } types[] = {
-	{ GL_2D, "GL_2D",
-	  gl_2d_values, ARRAY_SIZE(gl_2d_values) },
+	{ GL_2D, gl_2d_values, ARRAY_SIZE(gl_2d_values) },
 
-	{ GL_3D, "GL_3D",
-	  gl_3d_values, ARRAY_SIZE(gl_3d_values) },
+	{ GL_3D, gl_3d_values, ARRAY_SIZE(gl_3d_values) },
 
-	{ GL_3D_COLOR, "GL_3D_COLOR",
-	  gl_3d_color_values, ARRAY_SIZE(gl_3d_color_values) },
+	{ GL_3D_COLOR, gl_3d_color_values, ARRAY_SIZE(gl_3d_color_values) },
 
-	{ GL_3D_COLOR_TEXTURE, "GL_3D_COLOR_TEXTURE",
-	  gl_3d_color_texture_values, ARRAY_SIZE(gl_3d_color_texture_values) },
+	{ GL_3D_COLOR_TEXTURE, gl_3d_color_texture_values,
+	  ARRAY_SIZE(gl_3d_color_texture_values) },
 
-	{ GL_4D_COLOR_TEXTURE, "GL_4D_COLOR_TEXTURE",
-	  gl_4d_color_texture_values, ARRAY_SIZE(gl_4d_color_texture_values) },
+	{ GL_4D_COLOR_TEXTURE, gl_4d_color_texture_values,
+	  ARRAY_SIZE(gl_4d_color_texture_values) },
 };
 
 static void
@@ -112,7 +108,8 @@ report_failure(struct type *type, float *buffer, int count)
 {
 	int i;
 
-	fprintf(stderr, "Feeback failed for %s:\n", type->name);
+	fprintf(stderr, "Feeback failed for %s:\n",
+		piglit_get_gl_enum_name(type->type));
 
 	fprintf(stderr, "  Expected:    Observed: (%d/%d)\n",
 		count, type->count);
@@ -148,8 +145,9 @@ piglit_display(void)
 	for (i = 0; i < ARRAY_SIZE(types); i++) {
 		bool case_pass = true;
 		int returned_count;
+		const char *name = piglit_get_gl_enum_name(types[i].type);
 
-		printf("Testing %s\n", types[i].name);
+		printf("Testing %s\n", name);
 
 		for (j = 0; j < ARRAY_SIZE(buffer); j++)
 			buffer[j] = -1.0;
@@ -172,10 +170,10 @@ piglit_display(void)
 			pass = false;
 			report_failure(&types[i], buffer, returned_count);
 			piglit_report_subtest_result(PIGLIT_FAIL,
-						     "%s", types[i].name);
+						     "%s", name);
 		} else {
 			piglit_report_subtest_result(PIGLIT_PASS,
-						     "%s", types[i].name);
+						     "%s", name);
 		}
 	}
 

@@ -296,7 +296,7 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
    GLuint restart_index;
    GLuint num_elems;
    bool pass = true;
-   const char *typeStr = NULL, *primStr = NULL;
+   const char *primStr = NULL;
    GLuint vbo1, vbo2;
    bool create_vbo1 = false;
    bool create_vbo2 = false;
@@ -323,15 +323,12 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
    switch (indexType) {
    case GL_UNSIGNED_BYTE:
       restart_index = 255;
-      typeStr = "GL_UNSIGNED_BYTE";
       break;
    case GL_UNSIGNED_SHORT:
       restart_index = 1000;
-      typeStr = "GL_UNSIGNED_SHORT";
       break;
    case GL_UNSIGNED_INT:
       restart_index = 1000 * 1000;
-      typeStr = "GL_UNSIGNED_INT";
       break;
    default:
       assert(0);
@@ -471,7 +468,8 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
       fprintf(stderr, "%s: failure drawing with %s(%s, %s), %s\n",
               TestName,
               one_by_one ? "glArrayElement" : "glDrawElements",
-              primStr, typeStr,
+              primStr,
+              piglit_get_gl_enum_name(indexType),
               vbo_cfg_names[vbo_cfg]);
       pass = false;
    }

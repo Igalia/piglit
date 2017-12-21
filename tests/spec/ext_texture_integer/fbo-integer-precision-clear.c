@@ -49,7 +49,6 @@ static GLint TexWidth = 256, TexHeight = 256;
 
 struct format_info
 {
-	const char *Name;
 	GLenum IntFormat, BaseFormat;
 	GLuint BitsPerChannel;
 	GLboolean Signed;
@@ -57,11 +56,11 @@ struct format_info
 
 /* Only test 32-bit formats - since you won't see precision problems on lower sizes */
 static const struct format_info Formats[] = {
-	{ "GL_RGBA32I_EXT",  GL_RGBA32I_EXT,  GL_RGBA_INTEGER_EXT, 32, GL_TRUE  },
-	{ "GL_RGBA32UI_EXT", GL_RGBA32UI_EXT, GL_RGBA_INTEGER_EXT, 32, GL_FALSE },
+	{ GL_RGBA32I_EXT,  GL_RGBA_INTEGER_EXT, 32, GL_TRUE  },
+	{ GL_RGBA32UI_EXT, GL_RGBA_INTEGER_EXT, 32, GL_FALSE },
 
-	{ "GL_RGB32I_EXT",  GL_RGB32I_EXT,  GL_RGB_INTEGER_EXT, 32, GL_TRUE  },
-	{ "GL_RGB32UI_EXT", GL_RGB32UI_EXT, GL_RGB_INTEGER_EXT, 32, GL_FALSE },
+	{ GL_RGB32I_EXT,  GL_RGB_INTEGER_EXT, 32, GL_TRUE  },
+	{ GL_RGB32UI_EXT, GL_RGB_INTEGER_EXT, 32, GL_FALSE },
 };
 
 #define NUM_FORMATS  (sizeof(Formats) / sizeof(Formats[0]))
@@ -125,6 +124,7 @@ test_fbo(const struct format_info *info)
 {
 	const int comps = num_components(info->BaseFormat);
 	const GLenum type = get_datatype(info);
+	const char *name = piglit_get_gl_enum_name(info->IntFormat);
 	GLint f;
 	GLuint fbo, texObj;
 	GLenum status;
@@ -141,7 +141,7 @@ test_fbo(const struct format_info *info)
 
 	if (0)
 		fprintf(stderr, "============ Testing format = %s ========\n",
-			info->Name);
+			name);
 
 	/* Create texture */
 	glGenTextures(1, &texObj);
@@ -171,7 +171,7 @@ test_fbo(const struct format_info *info)
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		printf("%s: framebuffer incomplete.\n", info->Name);
+		printf("%s: framebuffer incomplete.\n", name);
 		return PIGLIT_SKIP;
 	}
 
@@ -201,7 +201,7 @@ test_fbo(const struct format_info *info)
 			fprintf(stderr, "%s: glClear failed\n",
 				TestName);
 			fprintf(stderr, "  Texture format = %s\n",
-				info->Name);
+				name);
 			fprintf(stderr, "  Expected %d, %d, %d, %d\n",
 				clr[0], clr[1], clr[2], clr[3]);
 			fprintf(stderr, "  Found %d, %d, %d, %d\n",

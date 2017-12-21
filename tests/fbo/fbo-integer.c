@@ -45,7 +45,6 @@ static GLint TexWidth = 256, TexHeight = 256;
 
 struct format_info
 {
-   const char *Name;
    GLenum IntFormat, BaseFormat;
    GLuint BitsPerChannel;
    GLboolean Signed;
@@ -54,19 +53,19 @@ struct format_info
 
 static const struct format_info Formats[] = {
    /*   { "GL_RGBA", GL_RGBA, GL_RGBA, 8, GL_FALSE },*/
-   { "GL_RGBA8I_EXT",   GL_RGBA8I_EXT,   GL_RGBA_INTEGER_EXT, 8,  GL_TRUE  },
-   { "GL_RGBA8UI_EXT",  GL_RGBA8UI_EXT , GL_RGBA_INTEGER_EXT, 8,  GL_FALSE },
-   { "GL_RGBA16I_EXT",  GL_RGBA16I_EXT,  GL_RGBA_INTEGER_EXT, 16, GL_TRUE  },
-   { "GL_RGBA16UI_EXT", GL_RGBA16UI_EXT, GL_RGBA_INTEGER_EXT, 16, GL_FALSE },
-   { "GL_RGBA32I_EXT",  GL_RGBA32I_EXT,  GL_RGBA_INTEGER_EXT, 32, GL_TRUE  },
-   { "GL_RGBA32UI_EXT", GL_RGBA32UI_EXT, GL_RGBA_INTEGER_EXT, 32, GL_FALSE },
+   { GL_RGBA8I_EXT,   GL_RGBA_INTEGER_EXT, 8,  GL_TRUE  },
+   { GL_RGBA8UI_EXT , GL_RGBA_INTEGER_EXT, 8,  GL_FALSE },
+   { GL_RGBA16I_EXT,  GL_RGBA_INTEGER_EXT, 16, GL_TRUE  },
+   { GL_RGBA16UI_EXT, GL_RGBA_INTEGER_EXT, 16, GL_FALSE },
+   { GL_RGBA32I_EXT,  GL_RGBA_INTEGER_EXT, 32, GL_TRUE  },
+   { GL_RGBA32UI_EXT, GL_RGBA_INTEGER_EXT, 32, GL_FALSE },
 
-   { "GL_RGB8I_EXT",   GL_RGB8I_EXT,   GL_RGB_INTEGER_EXT, 8,  GL_TRUE  },
-   { "GL_RGB8UI_EXT",  GL_RGB8UI_EXT , GL_RGB_INTEGER_EXT, 8,  GL_FALSE },
-   { "GL_RGB16I_EXT",  GL_RGB16I_EXT,  GL_RGB_INTEGER_EXT, 16, GL_TRUE  },
-   { "GL_RGB16UI_EXT", GL_RGB16UI_EXT, GL_RGB_INTEGER_EXT, 16, GL_FALSE },
-   { "GL_RGB32I_EXT",  GL_RGB32I_EXT,  GL_RGB_INTEGER_EXT, 32, GL_TRUE  },
-   { "GL_RGB32UI_EXT", GL_RGB32UI_EXT, GL_RGB_INTEGER_EXT, 32, GL_FALSE },
+   { GL_RGB8I_EXT,   GL_RGB_INTEGER_EXT, 8,  GL_TRUE  },
+   { GL_RGB8UI_EXT , GL_RGB_INTEGER_EXT, 8,  GL_FALSE },
+   { GL_RGB16I_EXT,  GL_RGB_INTEGER_EXT, 16, GL_TRUE  },
+   { GL_RGB16UI_EXT, GL_RGB_INTEGER_EXT, 16, GL_FALSE },
+   { GL_RGB32I_EXT,  GL_RGB_INTEGER_EXT, 32, GL_TRUE  },
+   { GL_RGB32UI_EXT, GL_RGB_INTEGER_EXT, 32, GL_FALSE },
 };
 
 #define NUM_FORMATS  (sizeof(Formats) / sizeof(Formats[0]))
@@ -191,6 +190,7 @@ test_fbo(const struct format_info *info)
    const int max = get_max_val(info);
    const int comps = num_components(info->BaseFormat);
    const GLenum type = get_datatype(info);
+   const char *name = piglit_get_gl_enum_name(info->IntFormat);
    GLint f;
    GLuint fbo, texObj;
    GLenum status;
@@ -198,7 +198,7 @@ test_fbo(const struct format_info *info)
    GLint buf;
 
    if (0)
-      fprintf(stderr, "============ Testing format = %s ========\n", info->Name);
+      fprintf(stderr, "============ Testing format = %s ========\n", name);
 
    /* Create texture */
    glGenTextures(1, &texObj);
@@ -260,7 +260,7 @@ test_fbo(const struct format_info *info)
       for (i = 0; i < comps; i++) {
          if (pix[i] != clr[i]) {
             fprintf(stderr, "%s: glClear failed\n", TestName);
-            fprintf(stderr, "  Texture format = %s\n", info->Name);
+            fprintf(stderr, "  Texture format = %s\n", name);
             fprintf(stderr, "  Expected %d, %d, %d, %d\n",
                     clr[0], clr[1], clr[2], clr[3]);
             fprintf(stderr, "  Found %d, %d, %d, %d\n",
@@ -313,7 +313,7 @@ test_fbo(const struct format_info *info)
             fprintf(stderr,
                  "%s: glDraw/ReadPixels failed at %d.  Expected %d, found %d\n",
                     TestName, i, image[i], readback[i]);
-            fprintf(stderr, "Texture format = %s\n", info->Name);
+            fprintf(stderr, "Texture format = %s\n", name);
             assert(0);
             return GL_FALSE;
          }
@@ -365,7 +365,7 @@ test_fbo(const struct format_info *info)
           abs(result[1] - value[1]) > error ||
           abs(result[2] - value[2]) > error ||
           abs(result[3] - value[3]) > error) {
-         fprintf(stderr, "%s: failure with format %s:\n", TestName, info->Name);
+         fprintf(stderr, "%s: failure with format %s:\n", TestName, name);
          fprintf(stderr, "  input value = %d, %d, %d, %d\n",
                  value[0], value[1], value[2], value[3]);
          fprintf(stderr, "  result color = %d, %d, %d, %d\n",

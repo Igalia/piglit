@@ -45,32 +45,31 @@ static GLboolean HaveRG;
 
 struct format_info
 {
-   const char *Name;
    GLenum IntFormat, BaseFormat;
    GLuint BitsPerChannel;
 };
 
 
 static const struct format_info Formats[] = {
-   { "GL_RGBA32F_ARB", GL_RGBA32F_ARB, GL_RGBA, 32 },
-   { "GL_RGB32F_ARB", GL_RGB32F_ARB, GL_RGB, 32 },
-   { "GL_ALPHA32F_ARB", GL_ALPHA32F_ARB, GL_ALPHA, 32 },
-   { "GL_INTENSITY32F_ARB", GL_INTENSITY32F_ARB, GL_INTENSITY, 32 },
-   { "GL_LUMINANCE32F_ARB", GL_LUMINANCE32F_ARB, GL_LUMINANCE, 32 },
-   { "GL_LUMINANCE_ALPHA32F_ARB", GL_LUMINANCE_ALPHA32F_ARB, GL_LUMINANCE, 32 },
+   { GL_RGBA32F_ARB, GL_RGBA, 32 },
+   { GL_RGB32F_ARB, GL_RGB, 32 },
+   { GL_ALPHA32F_ARB, GL_ALPHA, 32 },
+   { GL_INTENSITY32F_ARB, GL_INTENSITY, 32 },
+   { GL_LUMINANCE32F_ARB, GL_LUMINANCE, 32 },
+   { GL_LUMINANCE_ALPHA32F_ARB, GL_LUMINANCE, 32 },
 
-   { "GL_RGBA16F_ARB", GL_RGBA16F_ARB, GL_RGBA, 16 },
-   { "GL_RGB16F_ARB", GL_RGB16F_ARB, GL_RGB, 16 },
-   { "GL_ALPHA16F_ARB", GL_ALPHA16F_ARB, GL_ALPHA, 16 },
-   { "GL_INTENSITY16F_ARB", GL_INTENSITY16F_ARB, GL_INTENSITY, 16 },
-   { "GL_LUMINANCE16F_ARB", GL_LUMINANCE16F_ARB, GL_LUMINANCE, 16 },
-   { "GL_LUMINANCE_ALPHA16F_ARB", GL_LUMINANCE_ALPHA16F_ARB, GL_LUMINANCE, 16 },
+   { GL_RGBA16F_ARB, GL_RGBA, 16 },
+   { GL_RGB16F_ARB, GL_RGB, 16 },
+   { GL_ALPHA16F_ARB, GL_ALPHA, 16 },
+   { GL_INTENSITY16F_ARB, GL_INTENSITY, 16 },
+   { GL_LUMINANCE16F_ARB, GL_LUMINANCE, 16 },
+   { GL_LUMINANCE_ALPHA16F_ARB, GL_LUMINANCE, 16 },
 
    /* These require GL_ARB_texture_rg */
-   { "GL_R32F", GL_R32F, GL_RED, 32 },
-   { "GL_RG32F", GL_RG32F, GL_RG, 32 },
-   { "GL_R16F", GL_R16F, GL_RED, 16 },
-   { "GL_RG16F", GL_RG16F, GL_RG, 16 },
+   { GL_R32F, GL_RED, 32 },
+   { GL_RG32F, GL_RG, 32 },
+   { GL_R16F, GL_RED, 16 },
+   { GL_RG16F, GL_RG, 16 },
 };
 
 
@@ -193,6 +192,7 @@ test_format(const struct format_info *info)
    GLint f;
    GLenum userFormat;
    int p;
+   const char *name = piglit_get_gl_enum_name(info->IntFormat);
 
    if ((info->BaseFormat == GL_RED ||
         info->BaseFormat == GL_RG) && !HaveRG) {
@@ -200,7 +200,7 @@ test_format(const struct format_info *info)
       return GL_TRUE;
    }
 
-   /*printf("Testing %s\n", info->Name);*/
+   /*printf("Testing %s\n", name);*/
 
    get_texture_color(value);
 
@@ -238,15 +238,6 @@ test_format(const struct format_info *info)
          GL_TEXTURE_INTENSITY_TYPE_ARB,
          GL_TEXTURE_DEPTH_TYPE_ARB
       };
-      static const char *queryNames[] = {
-         "GL_TEXTURE_RED_TYPE_ARB",
-         "GL_TEXTURE_GREEN_TYPE_ARB",
-         "GL_TEXTURE_BLUE_TYPE_ARB",
-         "GL_TEXTURE_ALPHA_TYPE_ARB",
-         "GL_TEXTURE_LUMINANCE_TYPE_ARB",
-         "GL_TEXTURE_INTENSITY_TYPE_ARB",
-         "GL_TEXTURE_DEPTH_TYPE_ARB"
-      };
       int i;
       for (i = 0; i < ARRAY_SIZE(queries); i++) {
          GLint type = 1;
@@ -255,7 +246,7 @@ test_format(const struct format_info *info)
             return GL_FALSE;
          if (type != GL_NONE && type != GL_FLOAT) {
             printf("%s: %s query failed (returned 0x%x)\n",
-                   TestName, queryNames[i], type);
+                   TestName, piglit_get_gl_enum_name(queries[i]), type);
             return GL_FALSE;
          }
       }
@@ -330,7 +321,7 @@ test_format(const struct format_info *info)
    if (!p) {
       int i;
 
-      printf("  Failed with format %s:\n", info->Name);
+      printf("  Failed with format %s:\n", name);
       printf("  Texture color = ");
       for (i = 0; i < comps; i++) {
          printf("%f", value[i]);

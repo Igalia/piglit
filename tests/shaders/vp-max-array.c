@@ -79,13 +79,13 @@ piglit_display(void)
 
 
 bool
-query_and_require_limit(GLenum pname, GLint *param, const char *name,
-			GLint minimum_maximum)
+query_and_require_limit(GLenum pname, GLint *param, GLint minimum_maximum)
 {
 	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, pname, param);
 	if (*param < minimum_maximum) {
 		fprintf(stderr, "%s: Expected at least %d, got %d\n",
-			name, minimum_maximum, *param);
+			piglit_get_gl_enum_name(pname),
+			minimum_maximum, *param);
 		return false;
 	}
 
@@ -114,22 +114,18 @@ piglit_init(int argc, char **argv)
 	 */
 	pass = query_and_require_limit(GL_MAX_PROGRAM_PARAMETERS_ARB,
 				       & max_parameters,
-				       "GL_MAX_PROGRAM_PARAMETERS_ARB",
 				       96)
 		&& pass;
 	pass = query_and_require_limit(GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB,
 				       & max_native_parameters,
-				       "GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB",
 				       96)
 		&& pass;
 	pass = query_and_require_limit(GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB,
 				       & max_local_parameters,
-				       "GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB",
 				       96)
 		&& pass;
 	pass = query_and_require_limit(GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,
 				       & max_env_parameters,
-				       "GL_MAX_PROGRAM_ENV_PARAMETERS_ARB",
 				       96)
 		&& pass;
 	if (!pass) {

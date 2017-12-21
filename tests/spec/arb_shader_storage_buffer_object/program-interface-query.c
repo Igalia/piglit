@@ -104,17 +104,6 @@ piglit_init(int argc, char **argv)
 					  GL_IS_ROW_MAJOR,
 					  GL_REFERENCED_BY_VERTEX_SHADER,
 					  GL_REFERENCED_BY_FRAGMENT_SHADER };
-	const char *prop_names[NUM_QUERIES] = {"GL_TOP_LEVEL_ARRAY_SIZE",
-					       "GL_TOP_LEVEL_ARRAY_STRIDE",
-					       "GL_TYPE",
-					       "GL_ARRAY_SIZE",
-					       "GL_BLOCK_INDEX",
-					       "GL_OFFSET",
-					       "GL_ARRAY_STRIDE",
-					       "GL_MATRIX_STRIDE",
-					       "GL_IS_ROW_MAJOR",
-					       "GL_REFERENCED_BY_VERTEX_SHADER",
-					       "GL_REFERENCED_BY_FRAGMENT_SHADER" };
 	int query_std140[NUM_QUERIES] = {0};
 	int query_std430[NUM_QUERIES] = {0};
 	int num_vertex_ssbo;
@@ -161,17 +150,18 @@ piglit_init(int argc, char **argv)
 	   pass = false;
 
 	for (i = 0 ; i < NUM_QUERIES; i++) {
+		const char *prop_name = piglit_get_gl_enum_name(prop[i]);
 		if (has_vertex_ssbo) {
 			if (query_std140[i] != expected_std140[i]) {
 				printf("std140 %s expected = %d. Value = %d.\n",
-				       prop_names[i], expected_std140[i],
+				       prop_name, expected_std140[i],
 				       query_std140[i]);
 				pass = false;
 			}
 		}
 		if (query_std430[i] != expected_std430[i]) {
 			printf("std430 %s expected = %d. Value = %d.\n",
-			       prop_names[i], expected_std430[i],
+			       prop_name, expected_std430[i],
 			       query_std430[i]);
 			pass = false;
 		}

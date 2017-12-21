@@ -42,17 +42,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-const char*
-get_attachment_string(GLint attach)
-{
-	switch (attach) {
-	case GL_DEPTH_ATTACHMENT: return "GL_DEPTH_ATTACHMENT";
-	case GL_STENCIL_ATTACHMENT: return "GL_STENCIL_ATTACHMENT";
-	case GL_DEPTH_STENCIL_ATTACHMENT: return "GL_DEPTH_STENICL";
-	default: return NULL;
-	}
-}
-
 bool
 check_attachment(GLenum attach, GLint expect_name)
 {
@@ -65,17 +54,10 @@ check_attachment(GLenum attach, GLint expect_name)
 				              &actual_type);
 
 	if (actual_type != GL_RENDERBUFFER) {
-		char actual_type_str[16];
-
-		if (actual_type == GL_NONE) {
-			sprintf(actual_type_str, "GL_NONE");
-		} else {
-			snprintf(actual_type_str, 16, "0x%x", actual_type);
-		}
-
 		fprintf(stderr,
 			"error: expected GL_RENDERBUFFER for %s attachment type, but found %s\n",
-			get_attachment_string(attach), actual_type_str);
+			piglit_get_gl_enum_name(attach),
+			piglit_get_gl_enum_name(actual_type));
 
 		/* Return now and don't query the attachment name, because
 		 * that would generate a GL error.
@@ -91,7 +73,7 @@ check_attachment(GLenum attach, GLint expect_name)
 	if (actual_name != expect_name) {
 		fprintf(stderr,
 			"error: expected %d for %s attachment name, but found %d\n",
-			expect_name, get_attachment_string(attach), actual_name);
+			expect_name, piglit_get_gl_enum_name(attach), actual_name);
 		return false;
 	}
 

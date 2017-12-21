@@ -34,19 +34,15 @@ piglit_display(void)
 	return PIGLIT_FAIL;
 }
 
-struct enums {
-	const char *name;
-	GLenum val;
-};
-
-static bool try(const struct enums *list, unsigned len) {
+static bool try(const GLenum *list, unsigned len) {
 	GLint param;
 	int i;
 	for (i = 0; i < len; i++) {
-		glGetIntegerv(list[i].val, &param);
+		glGetIntegerv(list[i], &param);
 
 		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-			fprintf(stderr, "\t%s\n", list[i].name);
+			fprintf(stderr, "\t%s\n",
+				piglit_get_gl_enum_name(list[i]));
 			return false;
 		}
 	}
@@ -61,55 +57,55 @@ piglit_init(int argc, char **argv)
 	/* ES 3 adds many new queries over ES 2. This test confirms that ES 2
 	 * correctly rejects them with an INVALID_ENUM error.
 	 */
-	static const struct enums
+	static const GLenum
 	GL_ARB_ES3_compatibility_enums[] = {
-		{ "GL_MAX_ELEMENT_INDEX", 0x8D6B },
+		/*GL_MAX_ELEMENT_INDEX*/ 0x8D6B,
 	},
 	GL_ARB_fragment_shader_enums[] = {
-		{ "GL_MAX_FRAGMENT_UNIFORM_COMPONENTS", 0x8B49 },
+		/*GL_MAX_FRAGMENT_UNIFORM_COMPONENTS*/ 0x8B49,
 	},
 	GL_ARB_framebuffer_object_enums[] = {
-		{ "GL_MAX_SAMPLES", 0x8D57 },
+		/*GL_MAX_SAMPLES*/ 0x8D57,
 	},
 	GL_ARB_sync_enums[] = {
-		{ "GL_MAX_SERVER_WAIT_TIMEOUT", 0x9111 },
+		/*GL_MAX_SERVER_WAIT_TIMEOUT*/ 0x9111,
 	},
 	GL_ARB_transform_feedback2_enums[] = {
-		{ "GL_TRANSFORM_FEEDBACK_PAUSED", 0x8E23 },
-		{ "GL_TRANSFORM_FEEDBACK_ACTIVE", 0x8E24 },
-		{ "GL_TRANSFORM_FEEDBACK_BINDING", 0x8E25 },
+		/*GL_TRANSFORM_FEEDBACK_PAUSED*/ 0x8E23,
+		/*GL_TRANSFORM_FEEDBACK_ACTIVE*/ 0x8E24,
+		/*GL_TRANSFORM_FEEDBACK_BINDING*/ 0x8E25,
 	},
 	GL_ARB_uniform_buffer_object_enums[] = {
-		{ "GL_MAX_VERTEX_UNIFORM_BLOCKS", 0x8A2B },
-		{ "GL_MAX_FRAGMENT_UNIFORM_BLOCKS", 0x8A2D },
-		{ "GL_MAX_COMBINED_UNIFORM_BLOCKS", 0x8A2E },
-		{ "GL_MAX_UNIFORM_BLOCK_SIZE", 0x8A30 },
-		{ "GL_MAX_UNIFORM_BUFFER_BINDINGS", 0x8A2F },
-		{ "GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS", 0x8A31 },
-		{ "GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS", 0x8A33 },
-		{ "GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT", 0x8A34 },
-		{ "GL_UNIFORM_BUFFER_BINDING", 0x8A28 },
+		/*GL_MAX_VERTEX_UNIFORM_BLOCKS*/ 0x8A2B,
+		/*GL_MAX_FRAGMENT_UNIFORM_BLOCKS*/ 0x8A2D,
+		/*GL_MAX_COMBINED_UNIFORM_BLOCKS*/ 0x8A2E,
+		/*GL_MAX_UNIFORM_BLOCK_SIZE*/ 0x8A30,
+		/*GL_MAX_UNIFORM_BUFFER_BINDINGS*/ 0x8A2F,
+		/*GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS*/ 0x8A31,
+		/*GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS*/ 0x8A33,
+		/*GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT*/ 0x8A34,
+		/*GL_UNIFORM_BUFFER_BINDING*/ 0x8A28,
 	},
 	GL_ARB_vertex_shader_enums[] = {
-		{ "GL_MAX_VERTEX_UNIFORM_COMPONENTS", 0x8B4A },
-		{ "GL_MAX_VARYING_COMPONENTS", 0x8B4B },
+		/*GL_MAX_VERTEX_UNIFORM_COMPONENTS*/ 0x8B4A,
+		/*GL_MAX_VARYING_COMPONENTS*/ 0x8B4B,
 	},
 	GL_EXT_framebuffer_blit_enums[] = {
-		{ "GL_READ_FRAMEBUFFER_BINDING", 0x8CAA },
+		/*GL_READ_FRAMEBUFFER_BINDING*/ 0x8CAA,
 	},
 	GL_EXT_pixel_buffer_object_enums[] = {
-		{ "GL_PIXEL_PACK_BUFFER_BINDING", 0x88ED },
-		{ "GL_PIXEL_UNPACK_BUFFER_BINDING", 0x88EF },
+		/*GL_PIXEL_PACK_BUFFER_BINDING*/ 0x88ED,
+		/*GL_PIXEL_UNPACK_BUFFER_BINDING*/ 0x88EF,
 	},
 	GL_EXT_texture_lod_bias_enums[] = {
-		{ "GL_MAX_TEXTURE_LOD_BIAS", 0x84FD },
+		/*GL_MAX_TEXTURE_LOD_BIAS*/ 0x84FD,
 	},
 	GL_EXT_transform_feedback_enums[] = {
-		{ "GL_TRANSFORM_FEEDBACK_BUFFER_BINDING", 0x8C8F },
-		{ "GL_RASTERIZER_DISCARD", 0x8C89 },
-		{ "GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS", 0x8C8A },
-		{ "GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS", 0x8C8B },
-		{ "GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS", 0x8C80 },
+		/*GL_TRANSFORM_FEEDBACK_BUFFER_BINDING*/ 0x8C8F,
+		/*GL_RASTERIZER_DISCARD*/ 0x8C89,
+		/*GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS*/ 0x8C8A,
+		/*GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS*/ 0x8C8B,
+		/*GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS*/ 0x8C80,
 	};
 
 	if (piglit_get_gl_version() >= 30) {

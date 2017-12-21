@@ -615,28 +615,27 @@ process_shader(const char *func, const char *source, bool matrix)
 {
 	static const struct {
 		GLenum list_mode;
-		const char *list_mode_name;
 		enum mode setter_mode;
 		const char *setter_mode_name;
 		unsigned base_value;
 	} tests[] = {
 		{
-			GL_COMPILE, "GL_COMPILE",
+			GL_COMPILE,
 			set_scalar, "scalar",
 			5
 		},
 		{
-			GL_COMPILE, "GL_COMPILE",
+			GL_COMPILE,
 			set_vector, "vector",
 			7
 		},
 		{
-			GL_COMPILE_AND_EXECUTE, "GL_COMPILE_AND_EXECUTE",
+			GL_COMPILE_AND_EXECUTE,
 			set_scalar, "scalar",
 			11
 		},
 		{
-			GL_COMPILE_AND_EXECUTE, "GL_COMPILE_AND_EXECUTE",
+			GL_COMPILE_AND_EXECUTE,
 			set_vector, "vector",
 			13
 		}
@@ -662,7 +661,7 @@ process_shader(const char *func, const char *source, bool matrix)
 			continue;
 
 		printf("    %s: %s mode\n",
-		       tests[i].list_mode_name,
+		       piglit_get_gl_enum_name(tests[i].list_mode),
 		       tests[i].setter_mode_name);
 
 		printf("        pre-initialize\n");

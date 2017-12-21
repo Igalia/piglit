@@ -161,13 +161,12 @@ test_unsigned_byte(int x, int y, void *values)
 
 struct {
 	GLenum token;
-	char *name;
 	bool (*test)(int x, int y, void *values);
 } read_formats[] = {
-	{ GL_FLOAT, "GL_FLOAT", test_float },
-	{ GL_UNSIGNED_INT, "GL_UNSIGNED_INT", test_unsigned_int },
-	{ GL_UNSIGNED_SHORT, "GL_UNSIGNED_SHORT", test_unsigned_short },
-	{ GL_UNSIGNED_BYTE, "GL_UNSIGNED_BYTE", test_unsigned_byte },
+	{ GL_FLOAT, test_float },
+	{ GL_UNSIGNED_INT, test_unsigned_int },
+	{ GL_UNSIGNED_SHORT, test_unsigned_short },
+	{ GL_UNSIGNED_BYTE, test_unsigned_byte },
 };
 
 static bool
@@ -243,7 +242,8 @@ test_with_format(GLenum internal_format, const char *name)
 					      PIGLIT_PASS : PIGLIT_FAIL),
 					     "%s/%s",
 					     name,
-					     read_formats[i].name);
+					     piglit_get_gl_enum_name(
+						read_formats[i].token));
 		pass = format_passed && pass;
 	}
 

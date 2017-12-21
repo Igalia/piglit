@@ -44,7 +44,6 @@ static GLint TexWidth = 128, TexHeight = 128;
 
 struct format_info
 {
-   const char *Name;
    GLenum IntFormat, BaseFormat;
    GLboolean IsInteger;
    GLboolean IsFloat;
@@ -53,30 +52,30 @@ struct format_info
 
 
 static const struct format_info IntFormats[] = {
-   { "GL_R8", GL_R8, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_R16", GL_R16, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_RG8", GL_RG8, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_RG16", GL_RG16, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_R16F", GL_R16F, GL_RED, GL_FALSE, GL_TRUE, GL_FALSE },
-   { "GL_R32F", GL_R32F, GL_RED, GL_FALSE, GL_TRUE, GL_FALSE },
-   { "GL_RG16F", GL_RG16F, GL_RG, GL_FALSE, GL_TRUE, GL_FALSE },
-   { "GL_RG32F", GL_RG32F, GL_RG, GL_FALSE, GL_TRUE, GL_FALSE },
-   { "GL_R8I", GL_R8I, GL_R8, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_R8UI", GL_R8UI, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_R16I", GL_R16I, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_R16UI", GL_R16UI, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_R32I", GL_R32I, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_R32UI", GL_R32UI, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_RG8I", GL_RG8I, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_RG8UI", GL_RG8UI, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_RG16I", GL_RG16I, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_RG16UI", GL_RG16UI, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_RG32I", GL_RG32I, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_RG32UI", GL_RG32UI, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
-   { "GL_RED", GL_RED, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_RG", GL_RG, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_COMPRESSED_RED", GL_COMPRESSED_RED, GL_RED, GL_FALSE, GL_FALSE, GL_TRUE },
-   { "GL_COMPRESSED_R", GL_COMPRESSED_RG, GL_RG, GL_FALSE, GL_FALSE, GL_TRUE }
+   { GL_R8, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
+   { GL_R16, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
+   { GL_RG8, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
+   { GL_RG16, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
+   { GL_R16F, GL_RED, GL_FALSE, GL_TRUE, GL_FALSE },
+   { GL_R32F, GL_RED, GL_FALSE, GL_TRUE, GL_FALSE },
+   { GL_RG16F, GL_RG, GL_FALSE, GL_TRUE, GL_FALSE },
+   { GL_RG32F, GL_RG, GL_FALSE, GL_TRUE, GL_FALSE },
+   { GL_R8I, GL_R8, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_R8UI, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_R16I, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_R16UI, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_R32I, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_R32UI, GL_RED, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_RG8I, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_RG8UI, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_RG16I, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_RG16UI, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_RG32I, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_RG32UI, GL_RG, GL_TRUE, GL_FALSE, GL_FALSE },
+   { GL_RED, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
+   { GL_RG, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
+   { GL_COMPRESSED_RED, GL_RED, GL_FALSE, GL_FALSE, GL_TRUE },
+   { GL_COMPRESSED_RG, GL_RG, GL_FALSE, GL_FALSE, GL_TRUE }
 };
 
 #define NUM_INT_FORMATS  (sizeof(IntFormats) / sizeof(IntFormats[0]))
@@ -172,7 +171,8 @@ test_teximage_formats(void)
 
       if (check_error(__FILE__, __LINE__)) {
          fprintf(stderr, "%s: Error in glTexImage2D for "
-                 "internalFormat = %s\n", TestName, info->Name);
+                 "internalFormat = %s\n", TestName,
+                 piglit_get_gl_enum_name(info->IntFormat));
          return GL_FALSE;
       }
 
@@ -221,7 +221,7 @@ test_teximage_formats(void)
           fabsf(result[2] - expected[2]) > error ||
           fabsf(result[3] - expected[3]) > error) {
          fprintf(stderr, "%s: failure with format %s:\n", TestName,
-                 info->Name);
+                 piglit_get_gl_enum_name(info->IntFormat));
          fprintf(stderr, "  expected color = %g, %g, %g, %g\n",
                  expected[0], expected[1], expected[2], expected[3]);
          fprintf(stderr, "  result color = %g, %g, %g, %g\n",

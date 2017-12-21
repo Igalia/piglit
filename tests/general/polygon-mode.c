@@ -96,21 +96,6 @@ static const GLfloat Colors[VERTS][4] = {
 };
 
 
-static const char *
-get_mode_str(GLenum mode)
-{
-   switch (mode) {
-   case GL_POINT:
-      return "GL_POINT";
-   case GL_LINE:
-      return "GL_LINE";
-   case GL_FILL:
-      return "GL_FILL";
-   default:
-      return NULL;
-   }
-}
-
 
 static GLenum
 get_prim_mode(GLenum mode)
@@ -258,9 +243,11 @@ test_combo(GLenum frontMode, GLenum backMode)
          /* we didn't get the expected reference primitive */
          fprintf(stderr,
                  "%s: reference drawing failed for frontPrim=%s, backPrim=%s\n",
-                 TestName, get_mode_str(frontMode), get_mode_str(backMode));
+                 TestName, piglit_get_gl_enum_name(frontMode),
+		 piglit_get_gl_enum_name(backMode));
 	 fprintf(stderr, "At position %d, found prim %s instead of %s\n",
-		 i, get_mode_str(expectedPrims[i]), get_mode_str(testMode));
+		 i, piglit_get_gl_enum_name(expectedPrims[i]),
+		 piglit_get_gl_enum_name(testMode));
          return GL_FALSE;
       }
    }
@@ -276,9 +263,11 @@ test_combo(GLenum frontMode, GLenum backMode)
       GLenum prim = identify_primitive(&Positions[4 * i], Colors[4 * i]);
       if (prim != expectedPrims[i]) {
          fprintf(stderr, "%s: glPolygonMode(front=%s, back=%s) failed\n",
-                 TestName, get_mode_str(frontMode), get_mode_str(backMode));
+                 TestName, piglit_get_gl_enum_name(frontMode),
+		 piglit_get_gl_enum_name(backMode));
 	 fprintf(stderr, "At position %d, found prim %s instead of %s\n",
-		 i, get_mode_str(prim), get_mode_str(expectedPrims[i]));
+		 i, piglit_get_gl_enum_name(prim),
+		 piglit_get_gl_enum_name(expectedPrims[i]));
          pass = GL_FALSE;
       }
    }

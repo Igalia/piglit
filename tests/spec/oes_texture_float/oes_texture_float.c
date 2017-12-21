@@ -55,17 +55,16 @@ static const float Scale = 1.0 / 2000.0, Bias = 0.5;
 
 struct format_info
 {
-   const char *Name;
    GLenum Format;
    int NumComponents;
 };
 
 static const struct format_info Formats[] = {
-  { "GL_RGBA",            GL_RGBA,            4 },
-  { "GL_RGB",             GL_RGB,             3 },
-  { "GL_ALPHA",           GL_ALPHA,           1 },
-  { "GL_LUMINANCE",       GL_LUMINANCE,       1 },
-  { "GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA, 2 },
+  { GL_RGBA,            4 },
+  { GL_RGB,             3 },
+  { GL_ALPHA,           1 },
+  { GL_LUMINANCE,       1 },
+  { GL_LUMINANCE_ALPHA, 2 },
 };
 
 static const char *VertShaderText =
@@ -310,13 +309,14 @@ test_format(const struct format_info *info, const struct texture_float_info *tes
    void *image;
    float value[4];
    int p;
+   const char *name = piglit_get_gl_enum_name(info->Format);
    GLushort drawIndices[] =
      {
        0, 1, 2,
        0, 2, 3
      };
 
-   /** printf("Testing %s of %s\n", info->Name, test->TestName); **/
+   /** printf("Testing %s of %s\n", name, test->TestName); **/
 
    get_texture_color(value);
 
@@ -391,7 +391,7 @@ test_format(const struct format_info *info, const struct texture_float_info *tes
    if (!p) {
       int i;
 
-      printf("  Failed with format %s:\n", info->Name);
+      printf("  Failed with format %s:\n", name);
       printf("  Texture color = ");
       for (i = 0; i < comps; i++) {
          printf("%f", value[i]);

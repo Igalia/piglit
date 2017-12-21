@@ -156,7 +156,7 @@ static bool
 test_mipmap_errors(GLenum target)
 {
 	GLint width = 128, height = 64, depth = 4, levels = 8;
-	const char *targetString = "";
+	const char *targetString = piglit_get_gl_enum_name(target);
 	GLuint tex;
 	GLint v, l;
 
@@ -169,14 +169,11 @@ test_mipmap_errors(GLenum target)
 
 	if (target == GL_TEXTURE_1D) {
 		glTextureStorage1D(tex, levels, GL_RGBA8, width);
-		targetString = "GL_TEXTURE_1D";
 	} else if (target == GL_TEXTURE_2D) {
 		glTextureStorage2D(tex, levels, GL_RGBA8, width, height);
-		targetString = "GL_TEXTURE_2D";
 	} else if (target == GL_TEXTURE_3D) {
 		glTextureStorage3D(tex, levels, GL_RGBA8, width, 
 			height, depth);
-		targetString = "GL_TEXTURE_3D";
 	}
 
 	piglit_check_gl_error(GL_NO_ERROR);

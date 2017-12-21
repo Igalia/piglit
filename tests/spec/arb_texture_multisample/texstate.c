@@ -38,8 +38,9 @@ piglit_display(void)
 
 static bool
 check_texlevelparameter_int(GLuint target, GLuint level,
-        char const *name, GLuint pname, GLint expected_value)
+        GLuint pname, GLint expected_value)
 {
+    const char *name = piglit_get_gl_enum_name(pname);
     GLint actual_value;
     glGetTexLevelParameteriv(target, level, pname, &actual_value);
     if (!piglit_check_gl_error(GL_NO_ERROR))
@@ -69,9 +70,9 @@ piglit_init(int argc, char **argv)
     glBindTexture(GL_TEXTURE_2D, tex2d);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-    pass = check_texlevelparameter_int(GL_TEXTURE_2D, 0, "GL_TEXTURE_SAMPLES",
+    pass = check_texlevelparameter_int(GL_TEXTURE_2D, 0,
             GL_TEXTURE_SAMPLES, 0) && pass;
-    pass = check_texlevelparameter_int(GL_TEXTURE_2D, 0, "GL_TEXTURE_FIXED_SAMPLE_LOCATIONS",
+    pass = check_texlevelparameter_int(GL_TEXTURE_2D, 0,
             GL_TEXTURE_FIXED_SAMPLE_LOCATIONS, GL_TRUE) && pass;
 
     piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);

@@ -102,17 +102,18 @@ test_object_ptr_label()
  * excluding the null terminator, is returned in <length>.
  */
 static bool
-check_label_and_length(char *label, int length, char *object)
+check_label_and_length(char *label, int length, GLenum object)
 {
 	bool pass = true;
+	const char *name = piglit_get_gl_enum_name(object);
 
-	printf("Checking label and length of %s object\n", object);
+	printf("Checking label and length of %s object\n", name);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		pass = false;
 
 	if (length != TestLabelLen || (strcmp(TestLabel, label) != 0)) {
-		fprintf(stderr, "Label or length does not match in %s object\n", object);
+		fprintf(stderr, "Label or length does not match in %s object\n", name);
 		printf("  actual label: %s actual length: %i\n", label, length);
 		printf("  expected label: %s expected length: %i\n", TestLabel, TestLabelLen);
 		pass = false;
@@ -160,7 +161,7 @@ test_object_label_types()
 	GetObjectLabel(GL_BUFFER, buffer, TestLabelLen + 1, &length[BUFFER_IDX], label[BUFFER_IDX]);
 
 	pass = check_label_and_length(label[BUFFER_IDX], length[BUFFER_IDX],
-				      "GL_BUFFER") && pass;
+				      GL_BUFFER) && pass;
 
 	glDeleteBuffers(1, &buffer);
 
@@ -172,7 +173,7 @@ test_object_label_types()
 				 &length[SHADER_IDX], label[SHADER_IDX]);
 
 		pass = check_label_and_length(label[SHADER_IDX], length[SHADER_IDX],
-					      "GL_SHADER") && pass;
+					      GL_SHADER) && pass;
 
 		glDeleteShader(shader);
 
@@ -183,7 +184,7 @@ test_object_label_types()
 				 &length[PROGRAM_IDX], label[PROGRAM_IDX]);
 
 		pass = check_label_and_length(label[PROGRAM_IDX], length[PROGRAM_IDX],
-					      "GL_PROGRAM") && pass;
+					      GL_PROGRAM) && pass;
 
 		glDeleteProgram(program);
 	}
@@ -198,7 +199,7 @@ test_object_label_types()
 				 &length[VERTEX_ARRAY_IDX], label[VERTEX_ARRAY_IDX]);
 
 		pass = check_label_and_length(label[VERTEX_ARRAY_IDX], length[VERTEX_ARRAY_IDX],
-					      "GL_VERTEX_ARRAY") && pass;
+					      GL_VERTEX_ARRAY) && pass;
 
 		glDeleteVertexArrays(1, &vertexArray);
 	}
@@ -213,7 +214,7 @@ test_object_label_types()
 				 &length[RENDERBUFFER_IDX], label[RENDERBUFFER_IDX]);
 
 		pass = check_label_and_length(label[RENDERBUFFER_IDX], length[RENDERBUFFER_IDX],
-					      "GL_RENDERBUFFER") && pass;
+					      GL_RENDERBUFFER) && pass;
 
 		glDeleteRenderbuffers(1, &renderbuffer);
 
@@ -225,7 +226,7 @@ test_object_label_types()
 				 &length[FRAMEBUFFER_IDX], label[FRAMEBUFFER_IDX]);
 
 		pass = check_label_and_length(label[FRAMEBUFFER_IDX], length[FRAMEBUFFER_IDX],
-					      "GL_FRAMEBUFFER") && pass;
+					      GL_FRAMEBUFFER) && pass;
 
 		glDeleteFramebuffers(1, &framebuffer);
 	}
@@ -241,7 +242,7 @@ test_object_label_types()
 		GetObjectLabel(GL_QUERY, query, TestLabelLen + 1, &length[QUERY_IDX], label[QUERY_IDX]);
 
 		pass = check_label_and_length(label[QUERY_IDX], length[QUERY_IDX],
-					      "GL_TEST_QUERY") && pass;
+					      GL_QUERY) && pass;
 
 		glDeleteQueries(1, &query);
 	}
@@ -256,7 +257,7 @@ test_object_label_types()
 				 &length[PROGRAM_PIPELINE_IDX], label[PROGRAM_PIPELINE_IDX]);
 
 		pass = check_label_and_length(label[PROGRAM_PIPELINE_IDX], length[PROGRAM_PIPELINE_IDX],
-					      "GL_PROGRAM_PIPELINE")  && pass;
+					      GL_PROGRAM_PIPELINE)  && pass;
 
 		glDeleteProgramPipelines(1, &programPipeline);
 	}
@@ -272,7 +273,7 @@ test_object_label_types()
 				 &length[TRANSFORM_FEEDBACK_IDX], label[TRANSFORM_FEEDBACK_IDX]);
 
 		pass = check_label_and_length(label[TRANSFORM_FEEDBACK_IDX], length[TRANSFORM_FEEDBACK_IDX],
-					      "GL_TRANSFORM_FEEDBACK") && pass;
+					      GL_TRANSFORM_FEEDBACK) && pass;
 
 		glDeleteTransformFeedbacks(1, &transformFeedback);
 	}
@@ -286,7 +287,7 @@ test_object_label_types()
 		GetObjectLabel(GL_SAMPLER, sampler, TestLabelLen + 1, &length[SAMPLER_IDX], label[SAMPLER_IDX]);
 
 		pass = check_label_and_length(label[SAMPLER_IDX], length[SAMPLER_IDX],
-					      "GL_SAMPLER") && pass;
+					      GL_SAMPLER) && pass;
 
 		glDeleteSamplers(1, &sampler);
 	}
@@ -298,7 +299,7 @@ test_object_label_types()
 	GetObjectLabel(GL_TEXTURE, texture, TestLabelLen + 1, &length[TEXTURE_IDX], label[TEXTURE_IDX]);
 
 	pass = check_label_and_length(label[TEXTURE_IDX], length[TEXTURE_IDX],
-				      "GL_TEXTURE") && pass;
+				      GL_TEXTURE) && pass;
 
 	glDeleteTextures(1, &texture);
 
@@ -311,7 +312,7 @@ test_object_label_types()
 	GetObjectLabel(GL_DISPLAY_LIST, displayList, TestLabelLen + 1, &length[DISPLAY_LIST_IDX], label[DISPLAY_LIST_IDX]);
 
 	pass = check_label_and_length(label[DISPLAY_LIST_IDX], length[DISPLAY_LIST_IDX],
-				      "GL_DISPLAY_LIST") && pass;
+				      GL_DISPLAY_LIST) && pass;
 
 	glDeleteLists(displayList, 1);
 #endif /* PIGLIT_USE_OPENGL */
