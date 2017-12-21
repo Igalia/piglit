@@ -56,11 +56,20 @@ init_ObjectPurgeableAPI(void)
 }
 
 
-/**
- * Format for error messages when an unexpected value is received.
- */
-static const char expected_fmt[] =
-	"%s:%s: expected 0x%04x (%s), got 0x%04x\n";
+#define NO_ENUM 0xffffffff
+static void
+print_result(const char *fname, const GLenum option, const GLenum result,
+	     const GLenum expected_1, const GLenum expected_2)
+{
+	fprintf(stderr, "%s:%s: ", fname, piglit_get_gl_enum_name(option));
+	fprintf(stderr, "expected 0x%04x (%s)",
+		expected_1, piglit_get_gl_enum_name(expected_1));
+	if (expected_2 != NO_ENUM)
+		fprintf(stderr, " or 0x%04x (%s), ",
+			expected_2, piglit_get_gl_enum_name(expected_2));
+	fprintf(stderr, ", got 0x%04x (%s).",
+		result, piglit_get_gl_enum_name(result));
+}
 
 
 /**
@@ -114,10 +123,8 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		 *     return the value VOLATILE_APPLE."
 		 */
 		if (ret != GL_VOLATILE_APPLE) {
-			fprintf(stderr, expected_fmt,
-				"glObjectPurgeableAPPLE", "GL_VOLATILE_APPLE",
-				GL_VOLATILE_APPLE, "GL_VOLATILE_APPLE",
-				ret);
+			print_result("glObjectPurgeableAPPLE", option, ret,
+				     GL_VOLATILE_APPLE, NO_ENUM);
 			pass = GL_FALSE;
 		}
 		break;
@@ -131,11 +138,9 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		 *     VOLATILE_APPLE."
 		 */
 		if (ret != GL_VOLATILE_APPLE && ret != GL_RELEASED_APPLE) {
-			fprintf(stderr, expected_fmt,
-				"glObjectPurgeableAPPLE", "GL_RELEASED_APPLE",
-				GL_VOLATILE_APPLE,
-				"GL_VOLATILE_APPLE or GL_RELEASED_APPLE",
-				ret);
+			print_result("glObjectPurgeableAPPLE", option, ret,
+				     GL_RELEASED_APPLE,
+				     GL_VOLATILE_APPLE);
 			pass = GL_FALSE;
 		}
 		break;
@@ -183,11 +188,9 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		 *     UNDEFINED_APPLE."
 		 */
 		if (ret != GL_RETAINED_APPLE && ret != GL_UNDEFINED_APPLE) {
-			fprintf(stderr, expected_fmt,
-				"glObjectUnpurgeableAPPLE", "GL_RETAINED_APPLE",
-				GL_RETAINED_APPLE,
-				"GL_RETAINED_APPLE or GL_UNDEFINED_APPLE",
-				ret);
+			print_result("glObjectUnpurgeableAPPLE", option, ret,
+				     GL_RETAINED_APPLE,
+				     GL_UNDEFINED_APPLE);
 			pass = GL_FALSE;
 		}
 		break;
@@ -200,10 +203,8 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		 *     return the value UNDEFINED_APPLE."
 		 */
 		if (ret != GL_UNDEFINED_APPLE) {
-			fprintf(stderr, expected_fmt,
-				"glObjectUnpurgeableAPPLE", "GL_UNDEFINED_APPLE",
-				GL_UNDEFINED_APPLE, "GL_UNDEFINED_APPLE",
-				ret);
+			print_result("glObjectUnpurgeableAPPLE", option, ret,
+				     GL_UNDEFINED_APPLE, NO_ENUM);
 			pass = GL_FALSE;
 		}
 		break;
@@ -243,10 +244,8 @@ test_GetObjectParameterivAPPLE(GLenum objectType, GLuint name, GLenum expect)
 	FAIL_ON_ERROR("glGetObjectParameterivAPPLE");
 
 	if (param != expect) {
-		fprintf(stderr, expected_fmt,
-			"glGetObjectParameterivAPPLE", "GL_PURGEABLE_APPLE",
-			expect, expect ? "GL_TRUE" : "GL_FALSE",
-			param);
+		print_result("glObjectParameterivAPPLE", GL_PURGEABLE_APPLE,
+			     param, expect, NO_ENUM);
 		pass = GL_FALSE;
 	}
 
