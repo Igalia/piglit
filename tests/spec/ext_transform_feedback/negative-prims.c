@@ -55,24 +55,25 @@ PIGLIT_GL_TEST_CONFIG_END
 struct {
 	GLenum tf_prim;
 	GLenum prim;
-	const char *name;
 } prims[] = {
-	{ GL_POINTS, GL_POINTS, "GL_POINTS" },
-	{ GL_LINES, GL_LINES, "GL_LINES" },
-	{ GL_LINES, GL_LINE_STRIP, "GL_LINE_STRIP" },
-	{ GL_LINES, GL_LINE_LOOP, "GL_LINE_LOOP" },
-	{ GL_TRIANGLES, GL_TRIANGLES, "GL_TRIANGLES" },
-	{ GL_TRIANGLES, GL_TRIANGLE_STRIP, "GL_TRIANGLE_STRIP" },
-	{ GL_TRIANGLES, GL_TRIANGLE_FAN, "GL_TRIANGLE_FAN" },
-	{ GL_TRIANGLES, GL_QUADS, "GL_QUADS" },
-	{ GL_TRIANGLES, GL_QUAD_STRIP, "GL_QUAD_STRIP" },
-	{ GL_TRIANGLES, GL_POLYGON, "GL_POLYGON" },
+	{ GL_POINTS, GL_POINTS },
+	{ GL_LINES, GL_LINES },
+	{ GL_LINES, GL_LINE_STRIP },
+	{ GL_LINES, GL_LINE_LOOP },
+	{ GL_TRIANGLES, GL_TRIANGLES },
+	{ GL_TRIANGLES, GL_TRIANGLE_STRIP },
+	{ GL_TRIANGLES, GL_TRIANGLE_FAN },
+	{ GL_TRIANGLES, GL_QUADS },
+	{ GL_TRIANGLES, GL_QUAD_STRIP },
+	{ GL_TRIANGLES, GL_POLYGON },
 };
 
 static bool
-test_one_prim(GLenum tf_prim, const char *tf_name, int i)
+test_one_prim(GLenum tf_prim, int i)
 {
 	GLenum error;
+	const char *prim_name = piglit_get_prim_name(prims[i].prim);
+	const char *tf_name = piglit_get_prim_name(tf_prim);
 
 	glDrawArrays(prims[i].prim, 0, 4);
 
@@ -82,7 +83,7 @@ test_one_prim(GLenum tf_prim, const char *tf_name, int i)
 			printf("Expected GL error 0x%x, got 0x%x, when "
 			       "rendering %s during %s transform feedback\n",
 			       GL_INVALID_OPERATION, error,
-			       prims[i].name, tf_name);
+			       prim_name, tf_name);
 			return false;
 		}
 	} else {
@@ -90,7 +91,7 @@ test_one_prim(GLenum tf_prim, const char *tf_name, int i)
 			printf("Unxpected GL error 0x%x when "
 			       "rendering %s during %s transform feedback\n",
 			       error,
-			       prims[i].name, tf_name);
+			       prim_name, tf_name);
 			return false;
 		}
 	}
@@ -98,14 +99,14 @@ test_one_prim(GLenum tf_prim, const char *tf_name, int i)
 }
 
 static bool
-test_transform_feedback_prim(GLenum tf_prim, const char *tf_name)
+test_transform_feedback_prim(GLenum tf_prim)
 {
 	bool pass = true;
 	int i;
 
 	glBeginTransformFeedbackEXT(tf_prim);
 	for (i = 0; i < ARRAY_SIZE(prims); i++) {
-		pass = pass && test_one_prim(tf_prim, tf_name, i);
+		pass = pass && test_one_prim(tf_prim, i);
 	}
 	glEndTransformFeedbackEXT();
 
@@ -117,9 +118,9 @@ piglit_display(void)
 {
 	bool pass = true;
 
-	pass = pass && test_transform_feedback_prim(GL_POINTS, "GL_POINTS");
-	pass = pass && test_transform_feedback_prim(GL_LINES, "GL_LINES");
-	pass = pass && test_transform_feedback_prim(GL_TRIANGLES, "GL_TRIANGLES");
+	pass = pass && test_transform_feedback_prim(GL_POINTS);
+	pass = pass && test_transform_feedback_prim(GL_LINES);
+	pass = pass && test_transform_feedback_prim(GL_TRIANGLES);
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 

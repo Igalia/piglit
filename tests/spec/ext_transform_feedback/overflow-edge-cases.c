@@ -131,9 +131,6 @@ static GLuint query_prims_generated;
 static GLuint query_prims_written;
 
 static GLenum modes[] = { GL_POINTS, GL_LINES, GL_TRIANGLES };
-static const char *mode_names[] = {
-	"GL_POINTS", "GL_LINES", "GL_TRIANGLES"
-};
 static const char *mode_gs_out_primtypes[] = {
 	"points", "line_strip", "triangle_strip"
 };
@@ -213,7 +210,7 @@ test(int bind_size, int num_varyings, int num_primitives, int mode_index)
 
 	printf("size=%d, num_varyings=%d, num_primitives=%d, mode=%s: ",
 	       bind_size, num_varyings, num_primitives,
-	       mode_names[mode_index]);
+	       piglit_get_prim_name(modes[mode_index]));
 
 	/* Setup program and initial buffer contents */
 	prog = progs[mode_index][num_varyings - 1];

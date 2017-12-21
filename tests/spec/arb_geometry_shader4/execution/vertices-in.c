@@ -59,15 +59,14 @@ static const char *gs_text =
 static const char *varyings[] = { "vertices_in" };
 
 struct test_vector {
-	const char *name;
 	GLenum prim_type;
 	GLint vertices_in;
 } test_vectors[] = {
-	{ "GL_POINTS",              GL_POINTS,              1},
-	{ "GL_LINES",               GL_LINES,               2},
-	{ "GL_LINES_ADJACENCY",     GL_LINES_ADJACENCY,     4},
-	{ "GL_TRIANGLES",           GL_TRIANGLES,           3},
-	{ "GL_TRIANGLES_ADJACENCY", GL_TRIANGLES_ADJACENCY, 6}
+	{ GL_POINTS,              1},
+	{ GL_LINES,               2},
+	{ GL_LINES_ADJACENCY,     4},
+	{ GL_TRIANGLES,           3},
+	{ GL_TRIANGLES_ADJACENCY, 6}
 };
 
 void
@@ -112,7 +111,8 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 
 	for (i = 0; i < ARRAY_SIZE(test_vectors); i++) {
-		printf("Testing %s:\n", test_vectors[i].name);
+		printf("Testing %s:\n",
+		       piglit_get_prim_name(test_vectors[i].prim_type));
 		glProgramParameteriARB(prog, GL_GEOMETRY_INPUT_TYPE_ARB,
 				       test_vectors[i].prim_type);
 		glLinkProgram(prog);

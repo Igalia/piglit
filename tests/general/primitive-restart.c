@@ -176,9 +176,7 @@ test_begin_end(GLenum primMode)
    pass = check_rendering();
    if (!pass) {
       fprintf(stderr, "%s: failure drawing with glBegin(%s) / glEnd()\n",
-              TestName,
-              (primMode == GL_TRIANGLE_STRIP
-               ? "GL_TRIANGLE_STRIP" : "GL_LINE_STRIP"));
+              TestName, piglit_get_prim_name(primMode));
    }
 
    piglit_present_results();
@@ -296,7 +294,6 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
    GLuint restart_index;
    GLuint num_elems;
    bool pass = true;
-   const char *primStr = NULL;
    GLuint vbo1, vbo2;
    bool create_vbo1 = false;
    bool create_vbo2 = false;
@@ -359,7 +356,6 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
       }
 
       num_elems = j;
-      primStr = "GL_TRIANGLE_STRIP";
    }
    else {
       const GLfloat y = 0.5 * piglit_height;
@@ -385,7 +381,6 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
       }
 
       num_elems = j;
-      primStr = "GL_LINE_STRIP";
    }
 
    assert(num_elems <= NUM_ELEMS);
@@ -468,7 +463,7 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
       fprintf(stderr, "%s: failure drawing with %s(%s, %s), %s\n",
               TestName,
               one_by_one ? "glArrayElement" : "glDrawElements",
-              primStr,
+              piglit_get_prim_name(primMode),
               piglit_get_gl_enum_name(indexType),
               vbo_cfg_names[vbo_cfg]);
       pass = false;
