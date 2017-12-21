@@ -367,36 +367,15 @@ calcQuadrant(GLfloat x, GLfloat y)
 
 
 static void
-reportSubtest(GLenum mode, int drawMode, GLuint facing,
-              GLuint fill,
+reportSubtest(GLenum mode, int drawMode,
+              const GLenum order, const GLenum poly_mode,
               const GLfloat badColor[3], GLfloat x, GLfloat y,
               bool pass)
 {
 	const char *m, *d, *f, *p;
 	char *q;
 
-	switch (mode) {
-	case GL_TRIANGLES:
-		m = "GL_TRIANGLES";
-		break;
-	case GL_TRIANGLE_STRIP:
-		m = "GL_TRIANGLE_STRIP";
-		break;
-	case GL_TRIANGLE_FAN:
-		m = "GL_TRIANGLE_FAN";
-		break;
-	case GL_QUADS:
-		m = "GL_QUADS";
-		break;
-	case GL_QUAD_STRIP:
-		m = "GL_QUAD_STRIP";
-		break;
-	case GL_POLYGON:
-		m = "GL_POLYGON";
-		break;
-	default:
-		m = "???";
-	}
+	m = piglit_get_prim_name(mode);
 
 	switch (drawMode) {
 	case BEGIN_END:
@@ -413,15 +392,9 @@ reportSubtest(GLenum mode, int drawMode, GLuint facing,
 		d = "???";
 	}
 
-	if (facing == 0)
-		f = "GL_CCW";
-	else
-		f = "GL_CW";
+	f = piglit_get_gl_enum_name(order);
 
-	if (fill == 0)
-		p = "GL_FILL";
-	else
-		p = "GL_LINE";
+	p = piglit_get_gl_enum_name(poly_mode);
 
 	q = calcQuadrant(x, y);
 
@@ -457,17 +430,14 @@ testPrimCombo(GLenum mode, const GLfloat *verts, GLuint count,
 {
 	GLfloat x, y;
 	bool pass = true;
+	const GLenum poly_mode = fill ? GL_LINE : GL_FILL;
+	const GLenum order = facing ? GL_CW : GL_CCW;
+	const GLenum cull_face = facing ? GL_FRONT : GL_BACK;
 
-	glPolygonMode(GL_FRONT_AND_BACK, fill ? GL_LINE : GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, poly_mode);
 
-	if (facing == 0) {
-		glFrontFace(GL_CCW);
-		glCullFace(GL_BACK);
-	}
-	else {
-		glFrontFace(GL_CW);
-		glCullFace(GL_FRONT);
-	}
+	glFrontFace(order);
+	glCullFace(cull_face);
 
 	// Position the geometry at 9 different locations to test
 	// clipping against the left, right, bottom and top edges of
@@ -501,7 +471,7 @@ testPrimCombo(GLenum mode, const GLfloat *verts, GLuint count,
 
 			quad_pass = checkResult(badColor);
 			pass = pass && quad_pass;
-			reportSubtest(mode, drawMode, facing, fill,
+			reportSubtest(mode, drawMode, order, poly_mode,
 						  badColor, x, y, quad_pass);
 		}
 	}
