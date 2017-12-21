@@ -29,9 +29,14 @@
 const char*
 piglit_get_gl_enum_name(GLenum param)
 {
+<% gl_accum = gl_registry.enums['GL_ACCUM'] %>\
 >-------switch (param) {
+>-------case 0x0000: return "GL_NONE/GL_FALSE/GL_NO_ERROR";
+>-------case 0x0001: return "GL_TRUE";
 % for enum in sorted_unique_enums_in_default_namespace:
+% if enum.num_value >= gl_accum.num_value:
 >-------case ${enum.c_num_literal}: return "${enum.name}";
+% endif
 % endfor
 >-------default: return "(unrecognized enum)";
 >-------}
@@ -40,10 +45,9 @@ piglit_get_gl_enum_name(GLenum param)
 const char*
 piglit_get_prim_name(GLenum prim)
 {
-<% gl_patches = gl_registry.enums['GL_PATCHES'] %>\
 >-------switch (prim) {
 % for enum in sorted_unique_enums_in_default_namespace:
-% if enum.num_value <= gl_patches.num_value:
+% if enum.num_value < gl_accum.num_value:
 >-------case ${enum.c_num_literal}: return "${enum.name}";
 % endif
 % endfor
