@@ -2289,6 +2289,12 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'EXT_memory_object')) as g:
     g(['ext_memory_object-api-errors'], 'api-errors')
 
+# Group EXT_semaphore tests
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'EXT_semaphore')) as g:
+    g(['ext_semaphore-api-errors'], 'api-errors')
+
 # Group EXT_texture_format_BGRA8888 tests
 with profile.test_list.group_manager(
         PiglitGLTest,
