@@ -289,6 +289,7 @@ print_packed(const struct read_format_info *read_info, char *read,
 
 static void
 report_fail(const struct format_info *tex_info,
+	    const char *format_name,
 	    const struct read_format_info *read_info,
 	    uint32_t texels[][4],
 	    void *read, void *expected,
@@ -297,7 +298,7 @@ report_fail(const struct format_info *tex_info,
 	int i;
 
 	fprintf(stderr, "Failure reading from %s to %s/%s\n",
-		tex_info->name, read_info->format_name, read_info->type_name);
+		format_name, read_info->format_name, read_info->type_name);
 
 	/* 10/channel + 3 spaces. */
 	fprintf(stderr, "  %43s", "expected RGBA in texels");
@@ -388,6 +389,26 @@ read_format(const struct format_info *tex_info,
 	int chans = 0;
 	enum piglit_result result;
 
+	const char *suffix;
+	char *name;
+	if (tex_info->internal_format == GL_RGB10_A2UI) {
+		if (tex_info->base_format == GL_BGRA_INTEGER) {
+			if (tex_info->sign)
+				suffix = " (rev bgra)";
+			else
+				suffix = " (bgra)";
+		} else {
+			if (tex_info->sign)
+				suffix = " (rev)";
+			else
+				suffix = "";
+		}
+	} else if (tex_info->base_format == GL_BGRA_INTEGER)
+		suffix = " (bgra)";
+	else
+		suffix = "";
+	asprintf(&name, "%s%s:\n", piglit_get_gl_enum_name(tex_info->internal_format), suffix);
+
 	if (!test_rg && (read_info->format == GL_RED_INTEGER ||
 			 read_info->format == GL_RG_INTEGER)) {
 		return PIGLIT_SKIP;
@@ -415,7 +436,7 @@ read_format(const struct format_info *tex_info,
 		return PIGLIT_SKIP;
 
 
-	printf("Reading from %s to %s/%s\n", tex_info->name,
+	printf("Reading from %s to %s/%s\n", name,
 	       read_info->format_name, read_info->type_name);
 
 	expected = (char *)malloc(texels_size);
@@ -508,7 +529,7 @@ read_format(const struct format_info *tex_info,
 	}
 
 	if (memcmp(expected, read, num_texels * chans * read_info->size / 8)) {
-		report_fail(tex_info, read_info, texels, read, expected,
+		report_fail(tex_info, name, read_info, texels, read, expected,
 			    num_texels, chans);
 		result = PIGLIT_FAIL;
 	} else {
@@ -517,6 +538,7 @@ read_format(const struct format_info *tex_info,
 
 	free(read);
 	free(expected);
+	free(name);
 
 	return result;
 }
@@ -530,9 +552,10 @@ test_format(const struct format_info *info)
 	int lbits, abits, ibits, rbits, gbits, bbits;
 	int i, readf;
 	enum piglit_result result = PIGLIT_SKIP;
+	const char *name = piglit_get_gl_enum_name(info->internal_format);
 
 	if (!test_rg && ((info->base_format == GL_RED_INTEGER &&
-			  !strstr(info->name, "GL_INTENSITY")) ||
+			  !strstr(name, "GL_INTENSITY")) ||
 			 info->base_format == GL_RG_INTEGER)) {
 		return PIGLIT_SKIP;
 	}
@@ -547,7 +570,7 @@ test_format(const struct format_info *info)
 	 * extension occurs, and whether the clamping applies before
 	 * or after
 	 */
-	if (!strstr(info->name, "32"))
+	if (info->size != 32)
 		return PIGLIT_SKIP;
 
 	if (info->sign) {
