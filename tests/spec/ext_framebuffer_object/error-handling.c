@@ -1,5 +1,5 @@
 /*
- * Copyrigth (C) 2007  Intel Corporation
+ * Copyright (C) 2007  Intel Corporation
  * Copyright (C) 1999  Allen Akin   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
