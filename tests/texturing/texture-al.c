@@ -46,17 +46,16 @@ static GLint TexWidth = 128, TexHeight = 128;
 
 struct format_info
 {
-   const char *Name;
    GLenum IntFormat, BaseFormat;
   float expected0;
 };
 
 
 static const struct format_info IntFormats[] = {
-   { "GL_ALPHA", GL_ALPHA, GL_ALPHA, 1.0 },
-   { "GL_ALPHA_2", GL_ALPHA, GL_LUMINANCE_ALPHA, 1.0 },
-   { "GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, 1.0 },
-   { "GL_LUMINANCE_ALPHA_2", GL_LUMINANCE_ALPHA, GL_ALPHA, 0.0 },
+   { GL_ALPHA, GL_ALPHA, 1.0 },
+   { GL_ALPHA, GL_LUMINANCE_ALPHA, 1.0 },
+   { GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, 1.0 },
+   { GL_LUMINANCE_ALPHA, GL_ALPHA, 0.0 },
 };
 
 #define NUM_INT_FORMATS  (sizeof(IntFormats) / sizeof(IntFormats[0]))
@@ -128,7 +127,9 @@ test_teximage_formats(void)
 
       if (check_error(__FILE__, __LINE__)) {
          fprintf(stderr, "%s: Error in glTexImage2D for "
-                 "internalFormat = %s\n", TestName, info->Name);
+                 "internalFormat = %s, baseFormat = %s\n", TestName,
+                 piglit_get_gl_enum_name(info->IntFormat),
+                 piglit_get_gl_enum_name(info->BaseFormat));
          return GL_FALSE;
       }
 
@@ -168,8 +169,10 @@ test_teximage_formats(void)
           fabsf(result[1] - expected[1]) > error ||
           fabsf(result[2] - expected[2]) > error ||
           fabsf(result[3] - expected[3]) > error) {
-         fprintf(stderr, "%s: failure with format %s:\n", TestName,
-                 info->Name);
+         fprintf(stderr, "%s: failure with internalFormat %s, "
+                 "baseFormat %s:\n", TestName,
+                 piglit_get_gl_enum_name(info->IntFormat),
+                 piglit_get_gl_enum_name(info->BaseFormat));
          fprintf(stderr, "  expected color = %g, %g, %g, %g\n",
                  expected[0], expected[1], expected[2], expected[3]);
          fprintf(stderr, "  result color = %g, %g, %g, %g\n",
