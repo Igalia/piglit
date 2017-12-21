@@ -53,13 +53,17 @@ static const char vstext[] =
 	"}"
 	;
 
-static bool expect_bool(const char *name, bool expect, bool value)
+static bool check_bool(const GLenum param, bool expect)
 {
+	GLboolean value;
+
+	glGetBooleanv(param, &value);
+
 	if (expect != value) {
 		fprintf(stderr,
 			"%s has incorrect state.\n"
 			"Got %s, expected %s.\n",
-			name,
+			piglit_get_gl_enum_name(param),
 			value ? "true" : "false",
 			expect ? "true" : "false");
 		return false;
@@ -68,13 +72,17 @@ static bool expect_bool(const char *name, bool expect, bool value)
 	return true;
 }
 
-static bool expect_int(const char *name, int expect, int value)
+static bool check_int(const GLenum param, int expect)
 {
+	int value;
+
+	glGetIntegerv(param, &value);
+
 	if (expect != value) {
 		fprintf(stderr,
 			"%s has incorrect state.\n"
 			"Got %d, expected %d.\n",
-			name, value, expect);
+			piglit_get_gl_enum_name(param), value, expect);
 		return false;
 	}
 
@@ -89,17 +97,12 @@ void piglit_init(int argc, char **argv)
 	GLuint vs;
 	const char *varyings[] = {"x"};
 	bool pass = true;
-	GLboolean bool_value;
-	GLint int_value;
 
 	piglit_require_transform_feedback();
 	piglit_require_GLSL();
 	piglit_require_extension("GL_ARB_transform_feedback2");
 
-	glGetIntegerv(GL_TRANSFORM_FEEDBACK_BINDING, &int_value);
-	pass = expect_int("GL_TRANSFORM_FEEDBACK_BINDING",
-			   0, int_value)
-		&& pass;
+	pass = check_int(GL_TRANSFORM_FEEDBACK_BINDING, 0) && pass;
 
 	/* This is all just the boot-strap work for the test.
 	 */
@@ -128,60 +131,39 @@ void piglit_init(int argc, char **argv)
 
 	/* Verify the initial state of transform feedback object queires.
 	 */
-	glGetIntegerv(GL_TRANSFORM_FEEDBACK_BINDING, &int_value);
-	pass = expect_int("GL_TRANSFORM_FEEDBACK_BINDING",
-			   id, int_value)
-		&& pass;
+	pass = check_int(GL_TRANSFORM_FEEDBACK_BINDING, id) && pass;
 
-	glGetBooleanv(GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED, &bool_value);
-	pass = expect_bool("GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED",
-			   false, bool_value)
-		&& pass;
+	pass = check_bool(GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED, false) && pass;
 
-	glGetBooleanv(GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE, &bool_value);
-	pass = expect_bool("GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE",
-			   false, bool_value)
-		&& pass;
+	pass = check_bool(GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE, false) && pass;
 
 	/* Make active and verify.
 	 */
 	glBeginTransformFeedback(GL_TRIANGLES);
 	pass = piglit_check_gl_error(0) && pass;
 
-	glGetBooleanv(GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE, &bool_value);
-	pass = expect_bool("GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE",
-			   true, bool_value)
-		&& pass;
+	pass = check_bool(GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE, true) && pass;
 
 	/* Pause and verify.
 	 */
 	glPauseTransformFeedback();
 	pass = piglit_check_gl_error(0) && pass;
 
-	glGetBooleanv(GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED, &bool_value);
-	pass = expect_bool("GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED",
-			   true, bool_value)
-		&& pass;
+	pass = check_bool(GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED, true) && pass;
 
 	/* Resume and verify.
 	 */
 	glResumeTransformFeedback();
 	pass = piglit_check_gl_error(0) && pass;
 
-	glGetBooleanv(GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED, &bool_value);
-	pass = expect_bool("GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED",
-			   false, bool_value)
-		&& pass;
+	pass = check_bool(GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED, false) && pass;
 
 	/* End and verify.
 	 */
 	glEndTransformFeedback();
 	pass = piglit_check_gl_error(0) && pass;
 
-	glGetBooleanv(GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE, &bool_value);
-	pass = expect_bool("GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE",
-			   false, bool_value)
-		&& pass;
+	pass = check_bool(GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE, false) && pass;
 
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
