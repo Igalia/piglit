@@ -84,12 +84,7 @@ test_tex_storage_errors(GLenum target, bool dsa)
 	 *
 	 *    "An INVALID_VALUE error is generated if <memory> is 0 ..."
 	 */
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		printf("Fail: GL_INVALID_VALUE expected\n");
-		return false;
-	}
-
-	return true;
+	return piglit_check_gl_error(GL_INVALID_VALUE);
 }
 
 static bool
@@ -134,12 +129,7 @@ test_tex_storage_ms_errors(GLenum target, bool dsa)
 	 *
 	 *    "An INVALID_VALUE error is generated if <memory> is 0 ..."
 	 */
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		printf("Fail: GL_INVALID_VALUE expected\n");
-		return false;
-	}
-
-	return true;
+	return piglit_check_gl_error(GL_INVALID_VALUE);
 }
 
 #define BUF_SIZE (12 * 4 * sizeof(float))
@@ -163,12 +153,7 @@ test_buffer_storage_errors(bool dsa)
 	 *
 	 *    "An INVALID_VALUE error is generated if <memory> is 0 ..."
 	 */
-	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
-		printf("Fail: GL_INVALID_VALUE expected\n");
-		return false;
-	}
-
-	return true;
+	return piglit_check_gl_error(GL_INVALID_VALUE);
 }
 
 #define X(f, desc)					     	\
