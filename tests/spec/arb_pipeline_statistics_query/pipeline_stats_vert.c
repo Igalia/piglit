@@ -80,15 +80,12 @@ static const char *vs_src =
 static struct query queries[] = {
 	{
 	 .query = GL_PRIMITIVES_SUBMITTED_ARB,
-	 .name = "GL_PRIMITIVES_SUBMITTED_ARB",
 	 .min = NUM_PRIMS},
 	{
 	 .query = GL_VERTICES_SUBMITTED_ARB,
-	 .name = "GL_VERTICES_SUBMITTED_ARB",
 	 .min = NUM_VERTS},
 	{
 	 .query = GL_VERTEX_SHADER_INVOCATIONS_ARB,
-	 .name = "GL_VERTEX_SHADER_INVOCATIONS_ARB",
 	 .min = NUM_VERTS}
 };
 

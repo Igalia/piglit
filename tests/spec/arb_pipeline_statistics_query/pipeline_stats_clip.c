@@ -82,11 +82,9 @@ static const char *vs_src =
 static struct query queries[] = {
 	{
 	 .query = GL_CLIPPING_INPUT_PRIMITIVES_ARB,
-	 .name = "GL_CLIPPING_INPUT_PRIMITIVES_ARB",
 	 .min = NUM_PRIMS},
 	{
 	 .query = GL_CLIPPING_OUTPUT_PRIMITIVES_ARB,
-	 .name = "GL_CLIPPING_OUTPUT_PRIMITIVES_ARB",
 	 .min = NUM_PRIMS}
 };
 

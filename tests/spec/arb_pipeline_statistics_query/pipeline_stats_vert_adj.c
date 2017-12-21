@@ -69,17 +69,14 @@ static const char *fs_src =
 static struct query queries[] = {
 	{
 	 .query = GL_PRIMITIVES_SUBMITTED_ARB,
-	 .name = "GL_PRIMITIVES_SUBMITTED_ARB",
 	 .min = 1}, /* Going to emit a line */
 	{
 	 .query = GL_VERTICES_SUBMITTED_ARB,
-	 .name = "GL_VERTICES_SUBMITTED_ARB",
 	 .min = 2,
 	 .max = 4}, /*(26) Should VERTICES_SUBMITTED_ARB count adjacent
 			   vertices in case of primitives with adjacency? */
 	{
 	 .query = GL_VERTEX_SHADER_INVOCATIONS_ARB,
-	 .name = "GL_VERTEX_SHADER_INVOCATIONS_ARB",
 	 .min = 2,
 	 .max = 4}
 };

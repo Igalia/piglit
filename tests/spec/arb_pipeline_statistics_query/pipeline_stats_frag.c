@@ -76,7 +76,6 @@ static const char *fs_src =
 static struct query queries[] = {
 	{
 	 .query = GL_FRAGMENT_SHADER_INVOCATIONS_ARB,
-	 .name = "GL_FRAGMENT_SHADER_INVOCATIONS_ARB",
 	 .min = TEST_WIDTH * TEST_HEIGHT,
 	 .max = TEST_WIDTH * TEST_HEIGHT * 3 / 2},
 	/* XXX:

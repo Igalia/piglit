@@ -9,7 +9,6 @@
 struct query {
 	GLuint obj;
 	GLuint query;
-	const char *name;
 	GLuint64 min;
 	GLuint64 max;
 };

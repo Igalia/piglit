@@ -56,7 +56,6 @@ static int sizes[] = {
 static struct query queries[] = {
 	{
 	 .query = GL_COMPUTE_SHADER_INVOCATIONS_ARB,
-	 .name = "GL_COMPUTE_SHADER_INVOCATIONS_ARB",
 	 .min = 0 /* Adjusted by confirm_size */},
 };
 

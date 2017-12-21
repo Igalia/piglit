@@ -94,7 +94,6 @@ const char *fs_src =
 static struct query queries[] = {
 	{
 	 .query = GL_GEOMETRY_SHADER_INVOCATIONS,
-	 .name = "GL_GEOMETRY_SHADER_INVOCATIONS",
 	 .min = NUM_PRIMS,
 	 .max = NUM_PRIMS},
 
@@ -103,7 +102,6 @@ static struct query queries[] = {
 	 * So NUM_PRIMS * 4 is what we expect here */
 	{
 	 .query = GL_GEOMETRY_SHADER_PRIMITIVES_EMITTED_ARB,
-	 .name = "GL_GEOMETRY_SHADER_PRIMITIVES_EMITTED_ARB",
 	 .min = NUM_PRIMS * 4,
 	 .max = NUM_PRIMS * 4}
 };

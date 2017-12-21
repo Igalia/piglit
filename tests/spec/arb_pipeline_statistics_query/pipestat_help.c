@@ -45,7 +45,8 @@ do_query_init(struct query *queries, const int count)
 		GLint bits;
 		glGetQueryiv(queries[i].query, GL_QUERY_COUNTER_BITS, &bits);
 		if (bits == 0) {
-			printf("%s is unsupported.\n", queries[i].name);
+			printf("%s is unsupported.\n",
+			       piglit_get_gl_enum_name(queries[i].query));
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	}
@@ -87,7 +88,8 @@ do_query_func(const struct query *queries, const int count,
 		if (q->min > params || max < params) {
 			fprintf(stderr,
 					"%s value was invalid.\n  Expected: %" PRIu64 " - %" PRIu64 "\n  Observed: %" PRIu64 "\n",
-					q->name, q->min, max, params);
+					piglit_get_gl_enum_name(q->query),
+					q->min, max, params);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 	}
