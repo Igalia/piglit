@@ -187,20 +187,28 @@ static void test_int_vertices_abi(float x1, float y1, float x2, float y2, int in
 struct test {
     void (*test)(float x1, float y1, float x2, float y2, int index);
     int index;
-    float expected_color[4];
+    float expected_color_equation_22[4];
+    float expected_color_equation_23[4];
     const char *name;
 };
 
 struct test tests[] = {
-    {test_packed_int_vertices, 0, {1, 1, 1, 1}, "Int vertices - 2/10/10/10"},
-    {test_packed_int_vertices, 1, {1, 1, 1, 1}, "Unsigned Int vertices - 2/10/10/10"},
-    {test_packed_int_color_vertices, 0, {1, 0, 0, 0.333}, "Int Color - 2/10/10/10"},
-    {test_packed_int_color_vertices, 1, {1, 0, 0, 0}, "Unsigned Int Color - 2/10/10/10"},
-    {test_packed_int_color_vertices, 2, {0, 0, 1, 0.333}, "Int BGRA Color - 2/10/10/10"},
-    {test_packed_int_color_vertices, 3, {0, 0, 1, 0}, "Unsigned Int BGRA Color - 2/10/10/10"},
-
-    {test_int_vertices_abi, 0, {1, 0, 0, 1}, "Int 2/10/10/10 - test ABI" },
-    {test_int_vertices_abi, 1, {1, 0, 0, 1}, "Unsigned 2/10/10/10 - test ABI" },
+    {test_packed_int_vertices, 0, {1, 1, 1, 1}, {1, 1, 1, 1},
+     "Int vertices - 2/10/10/10"},
+    {test_packed_int_vertices, 1, {1, 1, 1, 1}, {1, 1, 1, 1},
+     "Unsigned Int vertices - 2/10/10/10"},
+    {test_packed_int_color_vertices, 0, {1, 0, 0, 0.333}, {1, 0, 0, 0},
+     "Int Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 1, {1, 0, 0, 0}, {1, 0, 0, 0},
+     "Unsigned Int Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 2, {0, 0, 1, 0.333}, {0, 0, 1, 0},
+     "Int BGRA Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 3, {0, 0, 1, 0}, {0, 0, 1, 0},
+     "Unsigned Int BGRA Color - 2/10/10/10"},
+    {test_int_vertices_abi, 0, {1, 0, 0, 1}, {1, 0, 0, 1},
+     "Int 2/10/10/10 - test ABI" },
+    {test_int_vertices_abi, 1, {1, 0, 0, 1}, {1, 0, 0, 1},
+     "Unsigned 2/10/10/10 - test ABI" },
     {0}
 };
 
@@ -213,7 +221,7 @@ piglit_display(void)
     /* To know what this is all about, see:
      * http://lists.freedesktop.org/archives/mesa-dev/2013-August/042680.html
      */
-    GLboolean snorm_equation_23 = piglit_get_gl_version() >= 42;
+    bool require_snorm_equation_23 = piglit_get_gl_version() >= 42;
 
     glClear(GL_COLOR_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -222,14 +230,22 @@ piglit_display(void)
     for (i = 0; tests[i].test; i++) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	if (snorm_equation_23 && fabs(tests[i].expected_color[3] - 0.333) < 0.0001)
-	    tests[i].expected_color[3] = 0;
-
-        printf("%s\n", tests[i].name);
         tests[i].test(x, y, x+20, y+20, tests[i].index);
         if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-        pass = piglit_probe_pixel_rgba(x+5, y+5, tests[i].expected_color) && pass;
+
+        printf("%s\n", tests[i].name);
+
+        if (require_snorm_equation_23) {
+            pass = piglit_probe_pixel_rgba(x+5, y+5, tests[i].expected_color_equation_23) && pass;
+        } else {
+            bool equation_22_pass = piglit_probe_pixel_rgba(x+5, y+5, tests[i].expected_color_equation_22);
+            bool equation_23_pass = piglit_probe_pixel_rgba(x+5, y+5, tests[i].expected_color_equation_23);
+            if (!equation_22_pass && equation_23_pass) {
+                printf("warning: driver uses GL 4.2+ rules for signed normalized to float conversions\n");
+            }
+            pass = (equation_22_pass || equation_23_pass) && pass;
+        }
 
         x += 20;
         if (x > 300) {
