@@ -94,8 +94,6 @@
 
 /* Formats. */
 
-#define FORMAT(f) #f, f
-
 enum {
 	FLOAT_TYPE,
 	INT_TYPE,
@@ -103,7 +101,6 @@ enum {
 };
 
 struct format_desc {
-	const char  *name;
 	GLenum      internalformat;
 	int         red, green, blue, alpha, luminance, intensity, depth, stencil;
 	GLboolean   compressed, srgb;
@@ -118,239 +115,239 @@ struct test_desc {
 };
 
 static const struct format_desc core[] = {
-	{FORMAT(GL_RGBA8),              8, 8, 8, 8, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGBA2),              2, 2, 2, 2, 0, 0, 0, 0,     0},
-	{FORMAT(GL_R3_G3_B2),           3, 3, 2, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGB4),               4, 4, 4, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGBA4),              4, 4, 4, 4, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGB5),               5, 5, 5, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGB5_A1),            5, 5, 5, 1, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGB8),               8, 8, 8, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGB10),              10, 10, 10, 0, 0, 0, 0, 0,  0},
-	{FORMAT(GL_RGB10_A2),           10, 10, 10, 2, 0, 0, 0, 0,  0},
-	{FORMAT(GL_RGB12),              12, 12, 12, 0, 0, 0, 0, 0,  0},
-	{FORMAT(GL_RGBA12),             12, 12, 12, 12, 0, 0, 0, 0, 0},
-	{FORMAT(GL_RGB16),              16, 16, 16, 0, 0, 0, 0, 0,  0},
-	{FORMAT(GL_RGBA16),             16, 16, 16, 16, 0, 0, 0, 0, 0},
-	{FORMAT(GL_ALPHA4),             0, 0, 0, 4, 0, 0, 0, 0,     0},
-	{FORMAT(GL_ALPHA8),             0, 0, 0, 8, 0, 0, 0, 0,     0},
-	{FORMAT(GL_ALPHA12),            0, 0, 0, 12, 0, 0, 0, 0,    0},
-	{FORMAT(GL_ALPHA16),            0, 0, 0, 16, 0, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE4),         0, 0, 0, 0, 4, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE8),         0, 0, 0, 0, 8, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE12),        0, 0, 0, 0, 12, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE16),        0, 0, 0, 0, 16, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE4_ALPHA4),  0, 0, 0, 4, 4, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE6_ALPHA2),  0, 0, 0, 2, 6, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE8_ALPHA8),  0, 0, 0, 8, 8, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE12_ALPHA4), 0, 0, 0, 4, 12, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE12_ALPHA12),0, 0, 0, 12, 12, 0, 0, 0,   0},
-	{FORMAT(GL_LUMINANCE16_ALPHA16),0, 0, 0, 16, 16, 0, 0, 0,   0},
-	{FORMAT(GL_INTENSITY4),         0, 0, 0, 0, 0, 4, 0, 0,     0},
-	{FORMAT(GL_INTENSITY8),         0, 0, 0, 0, 0, 8, 0, 0,     0},
-	{FORMAT(GL_INTENSITY12),        0, 0, 0, 0, 0, 12, 0, 0,    0},
-	{FORMAT(GL_INTENSITY16),        0, 0, 0, 0, 0, 16, 0, 0,    0},
+	{GL_RGBA8,              8, 8, 8, 8, 0, 0, 0, 0,     0},
+	{GL_RGBA2,              2, 2, 2, 2, 0, 0, 0, 0,     0},
+	{GL_R3_G3_B2,           3, 3, 2, 0, 0, 0, 0, 0,     0},
+	{GL_RGB4,               4, 4, 4, 0, 0, 0, 0, 0,     0},
+	{GL_RGBA4,              4, 4, 4, 4, 0, 0, 0, 0,     0},
+	{GL_RGB5,               5, 5, 5, 0, 0, 0, 0, 0,     0},
+	{GL_RGB5_A1,            5, 5, 5, 1, 0, 0, 0, 0,     0},
+	{GL_RGB8,               8, 8, 8, 0, 0, 0, 0, 0,     0},
+	{GL_RGB10,              10, 10, 10, 0, 0, 0, 0, 0,  0},
+	{GL_RGB10_A2,           10, 10, 10, 2, 0, 0, 0, 0,  0},
+	{GL_RGB12,              12, 12, 12, 0, 0, 0, 0, 0,  0},
+	{GL_RGBA12,             12, 12, 12, 12, 0, 0, 0, 0, 0},
+	{GL_RGB16,              16, 16, 16, 0, 0, 0, 0, 0,  0},
+	{GL_RGBA16,             16, 16, 16, 16, 0, 0, 0, 0, 0},
+	{GL_ALPHA4,             0, 0, 0, 4, 0, 0, 0, 0,     0},
+	{GL_ALPHA8,             0, 0, 0, 8, 0, 0, 0, 0,     0},
+	{GL_ALPHA12,            0, 0, 0, 12, 0, 0, 0, 0,    0},
+	{GL_ALPHA16,            0, 0, 0, 16, 0, 0, 0, 0,    0},
+	{GL_LUMINANCE4,         0, 0, 0, 0, 4, 0, 0, 0,     0},
+	{GL_LUMINANCE8,         0, 0, 0, 0, 8, 0, 0, 0,     0},
+	{GL_LUMINANCE12,        0, 0, 0, 0, 12, 0, 0, 0,    0},
+	{GL_LUMINANCE16,        0, 0, 0, 0, 16, 0, 0, 0,    0},
+	{GL_LUMINANCE4_ALPHA4,  0, 0, 0, 4, 4, 0, 0, 0,     0},
+	{GL_LUMINANCE6_ALPHA2,  0, 0, 0, 2, 6, 0, 0, 0,     0},
+	{GL_LUMINANCE8_ALPHA8,  0, 0, 0, 8, 8, 0, 0, 0,     0},
+	{GL_LUMINANCE12_ALPHA4, 0, 0, 0, 4, 12, 0, 0, 0,    0},
+	{GL_LUMINANCE12_ALPHA12,0, 0, 0, 12, 12, 0, 0, 0,   0},
+	{GL_LUMINANCE16_ALPHA16,0, 0, 0, 16, 16, 0, 0, 0,   0},
+	{GL_INTENSITY4,         0, 0, 0, 0, 0, 4, 0, 0,     0},
+	{GL_INTENSITY8,         0, 0, 0, 0, 0, 8, 0, 0,     0},
+	{GL_INTENSITY12,        0, 0, 0, 0, 0, 12, 0, 0,    0},
+	{GL_INTENSITY16,        0, 0, 0, 0, 0, 16, 0, 0,    0},
 };
 
 static const struct format_desc ext_texture_srgb[] = {
-	{FORMAT(GL_SRGB8_ALPHA8),       8, 8, 8, 8, 0, 0, 0, 0,     0, 1},
-	{FORMAT(GL_SRGB8),              8, 8, 8, 0, 0, 0, 0, 0,     0, 1},
-	{FORMAT(GL_SLUMINANCE8),        0, 0, 0, 0, 8, 0, 0, 0,     0, 1},
-	{FORMAT(GL_SLUMINANCE8_ALPHA8), 0, 0, 0, 8, 8, 0, 0, 0,     0, 1}
+	{GL_SRGB8_ALPHA8,       8, 8, 8, 8, 0, 0, 0, 0,     0, 1},
+	{GL_SRGB8,              8, 8, 8, 0, 0, 0, 0, 0,     0, 1},
+	{GL_SLUMINANCE8,        0, 0, 0, 0, 8, 0, 0, 0,     0, 1},
+	{GL_SLUMINANCE8_ALPHA8, 0, 0, 0, 8, 8, 0, 0, 0,     0, 1}
 };
 
 static const struct format_desc arb_depth_texture[] = {
-	{FORMAT(GL_DEPTH_COMPONENT16),  0, 0, 0, 0, 0, 0, 16, 0,    0},
-	{FORMAT(GL_DEPTH_COMPONENT24),  0, 0, 0, 0, 0, 0, 24, 0,    0},
-	{FORMAT(GL_DEPTH_COMPONENT32),  0, 0, 0, 0, 0, 0, 32, 0,    0},
+	{GL_DEPTH_COMPONENT16,  0, 0, 0, 0, 0, 0, 16, 0,    0},
+	{GL_DEPTH_COMPONENT24,  0, 0, 0, 0, 0, 0, 24, 0,    0},
+	{GL_DEPTH_COMPONENT32,  0, 0, 0, 0, 0, 0, 32, 0,    0},
 };
 
 static const struct format_desc ext_packed_depth_stencil[] = {
-	{FORMAT(GL_DEPTH24_STENCIL8),  0, 0, 0, 0, 0, 0, 24, 8,    0},
+	{GL_DEPTH24_STENCIL8,  0, 0, 0, 0, 0, 0, 24, 8,    0},
 };
 
 static const struct format_desc arb_depth_buffer_float[] = {
-	{FORMAT(GL_DEPTH32F_STENCIL8),  0, 0, 0, 0, 0, 0, 32, 8,    0},
-	{FORMAT(GL_DEPTH_COMPONENT32F),  0, 0, 0, 0, 0, 0, 32, 0,    0},
+	{GL_DEPTH32F_STENCIL8,  0, 0, 0, 0, 0, 0, 32, 8,    0},
+	{GL_DEPTH_COMPONENT32F,  0, 0, 0, 0, 0, 0, 32, 0,    0},
 };
 
 static const struct format_desc arb_texture_compression[] = {
-	{FORMAT(GL_COMPRESSED_ALPHA), 0, 0, 0, 4, 0, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_LUMINANCE), 0, 0, 0, 0, 4, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA), 0, 0, 0, 4, 4, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_INTENSITY), 0, 0, 0, 0, 0, 4, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_RGB), 4, 4, 4, 0, 0, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_RGBA), 4, 4, 4, 4, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_ALPHA, 0, 0, 0, 4, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_LUMINANCE, 0, 0, 0, 0, 4, 0, 0, 0, 1},
+	{GL_COMPRESSED_LUMINANCE_ALPHA, 0, 0, 0, 4, 4, 0, 0, 0, 1},
+	{GL_COMPRESSED_INTENSITY, 0, 0, 0, 0, 0, 4, 0, 0, 1},
+	{GL_COMPRESSED_RGB, 4, 4, 4, 0, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_RGBA, 4, 4, 4, 4, 0, 0, 0, 0, 1},
 };
 
 static const struct format_desc ext_texture_compression_s3tc[] = {
-	{FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1), 4, 4, 4, 0, 0, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1), 4, 4, 4, 1, 0, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT3), 4, 4, 4, 4, 0, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5), 4, 4, 4, 4, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_RGB_S3TC_DXT1, 4, 4, 4, 0, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_RGBA_S3TC_DXT1, 4, 4, 4, 1, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_RGBA_S3TC_DXT3, 4, 4, 4, 4, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_RGBA_S3TC_DXT5, 4, 4, 4, 4, 0, 0, 0, 0, 1},
 };
 
 static const struct format_desc arb_texture_compression_bptc[] = {
-	{FORMAT(GL_COMPRESSED_RGBA_BPTC_UNORM), 4, 4, 4, 4, 0, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM), 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT), 4, 4, 4, 0, 0, 0, 0, 0, 1, 0, FLOAT_TYPE},
-	{FORMAT(GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT), 4, 4, 4, 0, 0, 0, 0, 0, 1, 0, FLOAT_TYPE},
+	{GL_COMPRESSED_RGBA_BPTC_UNORM, 4, 4, 4, 4, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM, 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, 4, 4, 4, 0, 0, 0, 0, 0, 1, 0, FLOAT_TYPE},
+	{GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT, 4, 4, 4, 0, 0, 0, 0, 0, 1, 0, FLOAT_TYPE},
 };
 
 static const struct format_desc ext_texture_srgb_compressed[] = {
-	{FORMAT(GL_COMPRESSED_SRGB), 4, 4, 4, 0, 0, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_SRGB_ALPHA), 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_SLUMINANCE), 0, 0, 0, 0, 4, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_SLUMINANCE_ALPHA), 0, 0, 0, 4, 4, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_SRGB_S3TC_DXT1), 4, 4, 4, 0, 0, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1), 4, 4, 4, 1, 0, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3), 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
-	{FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5), 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SRGB, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SRGB_ALPHA, 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SLUMINANCE, 0, 0, 0, 0, 4, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SLUMINANCE_ALPHA, 0, 0, 0, 4, 4, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SRGB_S3TC_DXT1, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1, 4, 4, 4, 1, 0, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3, 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
+	{GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5, 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
 };
 
 static const struct format_desc ext_texture_compression_rgtc[] = {
-	{FORMAT(GL_COMPRESSED_RED_RGTC1), 4, 0, 0, 0, 0, 0, 0, 0,   1},
-	{FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1), 3, 0, 0, 0, 0, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_RG_RGTC2), 4, 4, 0, 0, 0, 0, 0, 0,    1},
-	{FORMAT(GL_COMPRESSED_SIGNED_RG_RGTC2), 4, 4, 0, 0, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_RED_RGTC1, 4, 0, 0, 0, 0, 0, 0, 0,   1},
+	{GL_COMPRESSED_SIGNED_RED_RGTC1, 3, 0, 0, 0, 0, 0, 0, 0, 1},
+	{GL_COMPRESSED_RG_RGTC2, 4, 4, 0, 0, 0, 0, 0, 0,    1},
+	{GL_COMPRESSED_SIGNED_RG_RGTC2, 4, 4, 0, 0, 0, 0, 0, 0, 1},
 };
 
 static const struct format_desc arb_texture_float[] = {
-	{FORMAT(GL_ALPHA16F),           0, 0, 0, 16, 0, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE16F),       0, 0, 0, 0, 16, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE_ALPHA16F), 0, 0, 0, 16, 16, 0, 0, 0,   0},
-	{FORMAT(GL_INTENSITY16F),       0, 0, 0, 0, 0, 16, 0, 0,    0},
-	{FORMAT(GL_RGB16F),             16, 16, 16, 0, 0, 0, 0, 0,  0},
-	{FORMAT(GL_RGBA16F),            16, 16, 16, 16, 0, 0, 0, 0, 0},
-	{FORMAT(GL_ALPHA32F),           0, 0, 0, 32, 0, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE32F),       0, 0, 0, 0, 32, 0, 0, 0,    0},
-	{FORMAT(GL_LUMINANCE_ALPHA32F), 0, 0, 0, 32, 32, 0, 0, 0,   0},
-	{FORMAT(GL_INTENSITY32F),       0, 0, 0, 0, 0, 32, 0, 0,    0},
-	{FORMAT(GL_RGB32F),             32, 32, 32, 0, 0, 0, 0, 0,  0},
-	{FORMAT(GL_RGBA32F),            32, 32, 32, 32, 0, 0, 0, 0, 0},
+	{GL_ALPHA16F,           0, 0, 0, 16, 0, 0, 0, 0,    0},
+	{GL_LUMINANCE16F,       0, 0, 0, 0, 16, 0, 0, 0,    0},
+	{GL_LUMINANCE_ALPHA16F, 0, 0, 0, 16, 16, 0, 0, 0,   0},
+	{GL_INTENSITY16F,       0, 0, 0, 0, 0, 16, 0, 0,    0},
+	{GL_RGB16F,             16, 16, 16, 0, 0, 0, 0, 0,  0},
+	{GL_RGBA16F,            16, 16, 16, 16, 0, 0, 0, 0, 0},
+	{GL_ALPHA32F,           0, 0, 0, 32, 0, 0, 0, 0,    0},
+	{GL_LUMINANCE32F,       0, 0, 0, 0, 32, 0, 0, 0,    0},
+	{GL_LUMINANCE_ALPHA32F, 0, 0, 0, 32, 32, 0, 0, 0,   0},
+	{GL_INTENSITY32F,       0, 0, 0, 0, 0, 32, 0, 0,    0},
+	{GL_RGB32F,             32, 32, 32, 0, 0, 0, 0, 0,  0},
+	{GL_RGBA32F,            32, 32, 32, 32, 0, 0, 0, 0, 0},
 };
 
 static const struct format_desc ext_texture_integer[] = {
-	{FORMAT(GL_RGB8I),              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_RGBA8I),             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_ALPHA8I_EXT),            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_LUMINANCE8I_EXT),        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_LUMINANCE_ALPHA8I_EXT),  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_INTENSITY8I_EXT),        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, INT_TYPE},
+	{GL_RGB8I,              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_RGBA8I,             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_ALPHA8I_EXT,            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_LUMINANCE8I_EXT,        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_LUMINANCE_ALPHA8I_EXT,  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_INTENSITY8I_EXT,        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, INT_TYPE},
 
-	{FORMAT(GL_RGB16I),             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, INT_TYPE},
-	{FORMAT(GL_RGBA16I),            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, INT_TYPE},
-	{FORMAT(GL_ALPHA16I_EXT),           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_LUMINANCE16I_EXT),       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_LUMINANCE_ALPHA16I_EXT), 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, INT_TYPE},
-	{FORMAT(GL_INTENSITY16I_EXT),       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, INT_TYPE},
+	{GL_RGB16I,             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, INT_TYPE},
+	{GL_RGBA16I,            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, INT_TYPE},
+	{GL_ALPHA16I_EXT,           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_LUMINANCE16I_EXT,       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_LUMINANCE_ALPHA16I_EXT, 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, INT_TYPE},
+	{GL_INTENSITY16I_EXT,       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, INT_TYPE},
 
-	{FORMAT(GL_RGB32I),             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, INT_TYPE},
-	{FORMAT(GL_RGBA32I),            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, INT_TYPE},
-	{FORMAT(GL_ALPHA32I_EXT),           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_LUMINANCE32I_EXT),       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_LUMINANCE_ALPHA32I_EXT), 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, INT_TYPE},
-	{FORMAT(GL_INTENSITY32I_EXT),       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, INT_TYPE},
+	{GL_RGB32I,             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, INT_TYPE},
+	{GL_RGBA32I,            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, INT_TYPE},
+	{GL_ALPHA32I_EXT,           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_LUMINANCE32I_EXT,       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_LUMINANCE_ALPHA32I_EXT, 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, INT_TYPE},
+	{GL_INTENSITY32I_EXT,       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, INT_TYPE},
 
-	{FORMAT(GL_RGB8UI),              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_RGBA8UI),             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_ALPHA8UI_EXT),            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_LUMINANCE8UI_EXT),        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_LUMINANCE_ALPHA8UI_EXT),  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_INTENSITY8UI_EXT),        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, UINT_TYPE},
+	{GL_RGB8UI,              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_RGBA8UI,             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_ALPHA8UI_EXT,            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_LUMINANCE8UI_EXT,        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_LUMINANCE_ALPHA8UI_EXT,  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_INTENSITY8UI_EXT,        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, UINT_TYPE},
 
-	{FORMAT(GL_RGB16UI),             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, UINT_TYPE},
-	{FORMAT(GL_RGBA16UI),            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, UINT_TYPE},
-	{FORMAT(GL_ALPHA16UI_EXT),           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_LUMINANCE16UI_EXT),       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_LUMINANCE_ALPHA16UI_EXT), 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, UINT_TYPE},
-	{FORMAT(GL_INTENSITY16UI_EXT),       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, UINT_TYPE},
+	{GL_RGB16UI,             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, UINT_TYPE},
+	{GL_RGBA16UI,            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, UINT_TYPE},
+	{GL_ALPHA16UI_EXT,           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_LUMINANCE16UI_EXT,       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_LUMINANCE_ALPHA16UI_EXT, 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, UINT_TYPE},
+	{GL_INTENSITY16UI_EXT,       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, UINT_TYPE},
 
-	{FORMAT(GL_RGB32UI),             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, UINT_TYPE},
-	{FORMAT(GL_RGBA32UI),            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, UINT_TYPE},
-	{FORMAT(GL_ALPHA32UI_EXT),           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_LUMINANCE32UI_EXT),       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_LUMINANCE_ALPHA32UI_EXT), 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, UINT_TYPE},
-	{FORMAT(GL_INTENSITY32UI_EXT),       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, UINT_TYPE},
+	{GL_RGB32UI,             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, UINT_TYPE},
+	{GL_RGBA32UI,            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, UINT_TYPE},
+	{GL_ALPHA32UI_EXT,           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_LUMINANCE32UI_EXT,       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_LUMINANCE_ALPHA32UI_EXT, 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, UINT_TYPE},
+	{GL_INTENSITY32UI_EXT,       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, UINT_TYPE},
 };
 
 static const struct format_desc arb_texture_rg[] = {
-	{FORMAT(GL_R8),                 8, 0, 0, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RG8),                8, 8, 0, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_R16),                16, 0, 0, 0, 0, 0, 0, 0,    0},
-	{FORMAT(GL_RG16),               16, 16, 0, 0, 0, 0, 0, 0,   0},
+	{GL_R8,                 8, 0, 0, 0, 0, 0, 0, 0,     0},
+	{GL_RG8,                8, 8, 0, 0, 0, 0, 0, 0,     0},
+	{GL_R16,                16, 0, 0, 0, 0, 0, 0, 0,    0},
+	{GL_RG16,               16, 16, 0, 0, 0, 0, 0, 0,   0},
 };
 
 static const struct format_desc arb_texture_rg_float[] = {
-	{FORMAT(GL_R16F),               16, 0, 0, 0, 0, 0, 0, 0,    0},
-	{FORMAT(GL_RG16F),              16, 16, 0, 0, 0, 0, 0, 0,   0},
-	{FORMAT(GL_R32F),               32, 0, 0, 0, 0, 0, 0, 0,    0},
-	{FORMAT(GL_RG32F),              32, 32, 0, 0, 0, 0, 0, 0,   0},
+	{GL_R16F,               16, 0, 0, 0, 0, 0, 0, 0,    0},
+	{GL_RG16F,              16, 16, 0, 0, 0, 0, 0, 0,   0},
+	{GL_R32F,               32, 0, 0, 0, 0, 0, 0, 0,    0},
+	{GL_RG32F,              32, 32, 0, 0, 0, 0, 0, 0,   0},
 };
 
 static const struct format_desc arb_texture_rg_int[] = {
-	{FORMAT(GL_R8I),                8, 0, 0, 0, 0, 0, 0, 0,     0, 0, INT_TYPE},
-	{FORMAT(GL_RG8I),               8, 8, 0, 0, 0, 0, 0, 0,     0, 0, INT_TYPE},
-	{FORMAT(GL_R16I),               16, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_RG16I),              16, 16, 0, 0, 0, 0, 0, 0,   0, 0, INT_TYPE},
-	{FORMAT(GL_R32I),               32, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
-	{FORMAT(GL_RG32I),              32, 32, 0, 0, 0, 0, 0, 0,   0, 0, INT_TYPE},
-	{FORMAT(GL_R8UI),               8, 0, 0, 0, 0, 0, 0, 0,     0, 0, UINT_TYPE},
-	{FORMAT(GL_RG8UI),              8, 8, 0, 0, 0, 0, 0, 0,     0, 0, UINT_TYPE},
-	{FORMAT(GL_R16UI),              16, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_RG16UI),             16, 16, 0, 0, 0, 0, 0, 0,   0, 0, UINT_TYPE},
-	{FORMAT(GL_R32UI),              32, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
-	{FORMAT(GL_RG32UI),             32, 32, 0, 0, 0, 0, 0, 0,   0, 0, UINT_TYPE},
+	{GL_R8I,                8, 0, 0, 0, 0, 0, 0, 0,     0, 0, INT_TYPE},
+	{GL_RG8I,               8, 8, 0, 0, 0, 0, 0, 0,     0, 0, INT_TYPE},
+	{GL_R16I,               16, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_RG16I,              16, 16, 0, 0, 0, 0, 0, 0,   0, 0, INT_TYPE},
+	{GL_R32I,               32, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{GL_RG32I,              32, 32, 0, 0, 0, 0, 0, 0,   0, 0, INT_TYPE},
+	{GL_R8UI,               8, 0, 0, 0, 0, 0, 0, 0,     0, 0, UINT_TYPE},
+	{GL_RG8UI,              8, 8, 0, 0, 0, 0, 0, 0,     0, 0, UINT_TYPE},
+	{GL_R16UI,              16, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_RG16UI,             16, 16, 0, 0, 0, 0, 0, 0,   0, 0, UINT_TYPE},
+	{GL_R32UI,              32, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{GL_RG32UI,             32, 32, 0, 0, 0, 0, 0, 0,   0, 0, UINT_TYPE},
 };
 
 static const struct format_desc ext_packed_float[] = {
-	{FORMAT(GL_R11F_G11F_B10F),     6, 6, 5, 0, 0, 0, 0, 0,  0},
+	{GL_R11F_G11F_B10F,     6, 6, 5, 0, 0, 0, 0, 0,  0},
 };
 
 static const struct format_desc ext_texture_compression_latc[] = {
-	{FORMAT(GL_COMPRESSED_LUMINANCE_LATC1), 0, 0, 0, 0, 4, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1), 0, 0, 0, 0, 3, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_LATC2), 0, 0, 0, 4, 4, 0, 0, 0, 1},
-	{FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2), 0, 0, 0, 4, 4, 0, 0, 0, 1},
+	{GL_COMPRESSED_LUMINANCE_LATC1, 0, 0, 0, 0, 4, 0, 0, 0, 1},
+	{GL_COMPRESSED_SIGNED_LUMINANCE_LATC1, 0, 0, 0, 0, 3, 0, 0, 0, 1},
+	{GL_COMPRESSED_LUMINANCE_ALPHA_LATC2, 0, 0, 0, 4, 4, 0, 0, 0, 1},
+	{GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2, 0, 0, 0, 4, 4, 0, 0, 0, 1},
 };
 
 static const struct format_desc ext_texture_shared_exponent[] = {
-	{FORMAT(GL_RGB9_E5),            9, 9, 9, 0, 0, 0, 0, 0,     0},
+	{GL_RGB9_E5,            9, 9, 9, 0, 0, 0, 0, 0,     0},
 };
 
 static const struct format_desc ati_texture_compression_3dc[] = {
-	{FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_3DC), 0, 0, 0, 4, 4, 0, 0, 0, 1},
+	{GL_COMPRESSED_LUMINANCE_ALPHA_3DC, 0, 0, 0, 4, 4, 0, 0, 0, 1},
 };
 
 static const struct format_desc ext_texture_snorm[] = {
-	{FORMAT(GL_R8_SNORM),                 7, 0, 0, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RG8_SNORM),                7, 7, 0, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGB8_SNORM),               7, 7, 7, 0, 0, 0, 0, 0,     0},
-	{FORMAT(GL_RGBA8_SNORM),              7, 7, 7, 7, 0, 0, 0, 0,     0},
-	{FORMAT(GL_R16_SNORM),                16, 0, 0, 0, 0, 0, 0, 0,    0},
-	{FORMAT(GL_RG16_SNORM),               16, 16, 0, 0, 0, 0, 0, 0,   0},
-	{FORMAT(GL_RGB16_SNORM),              16, 16, 16, 0, 0, 0, 0, 0,   0},
-	{FORMAT(GL_RGBA16_SNORM),             16, 16, 16, 16, 0, 0, 0, 0,   0},
-	{FORMAT(GL_ALPHA8_SNORM),             0, 0, 0, 7, 0, 0, 0, 0,     0},
-	{FORMAT(GL_ALPHA16_SNORM),            0, 0, 0, 16, 0, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE8_SNORM),         0, 0, 0, 0, 7, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE16_SNORM),        0, 0, 0, 0, 16, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE8_ALPHA8_SNORM),  0, 0, 0, 7, 7, 0, 0, 0,     0},
-	{FORMAT(GL_LUMINANCE16_ALPHA16_SNORM),0, 0, 0, 16, 16, 0, 0, 0,     0},
-	{FORMAT(GL_INTENSITY8_SNORM),         0, 0, 0, 0, 0, 8, 0, 0,     0},
-	{FORMAT(GL_INTENSITY16_SNORM),        0, 0, 0, 0, 0, 16, 0, 0,     0},
+	{GL_R8_SNORM,                 7, 0, 0, 0, 0, 0, 0, 0,     0},
+	{GL_RG8_SNORM,                7, 7, 0, 0, 0, 0, 0, 0,     0},
+	{GL_RGB8_SNORM,               7, 7, 7, 0, 0, 0, 0, 0,     0},
+	{GL_RGBA8_SNORM,              7, 7, 7, 7, 0, 0, 0, 0,     0},
+	{GL_R16_SNORM,                16, 0, 0, 0, 0, 0, 0, 0,    0},
+	{GL_RG16_SNORM,               16, 16, 0, 0, 0, 0, 0, 0,   0},
+	{GL_RGB16_SNORM,              16, 16, 16, 0, 0, 0, 0, 0,   0},
+	{GL_RGBA16_SNORM,             16, 16, 16, 16, 0, 0, 0, 0,   0},
+	{GL_ALPHA8_SNORM,             0, 0, 0, 7, 0, 0, 0, 0,     0},
+	{GL_ALPHA16_SNORM,            0, 0, 0, 16, 0, 0, 0, 0,     0},
+	{GL_LUMINANCE8_SNORM,         0, 0, 0, 0, 7, 0, 0, 0,     0},
+	{GL_LUMINANCE16_SNORM,        0, 0, 0, 0, 16, 0, 0, 0,     0},
+	{GL_LUMINANCE8_ALPHA8_SNORM,  0, 0, 0, 7, 7, 0, 0, 0,     0},
+	{GL_LUMINANCE16_ALPHA16_SNORM,0, 0, 0, 16, 16, 0, 0, 0,     0},
+	{GL_INTENSITY8_SNORM,         0, 0, 0, 0, 0, 8, 0, 0,     0},
+	{GL_INTENSITY16_SNORM,        0, 0, 0, 0, 0, 16, 0, 0,     0},
 };
 
 static const struct format_desc arb_es2_compatibility[] = {
-	{FORMAT(GL_RGB565),                   5, 6, 5, 0, 0, 0, 0, 0,     0}
+	{GL_RGB565,                   5, 6, 5, 0, 0, 0, 0, 0,     0}
 };
 
 static const struct format_desc arb_texture_rgb10_a2ui[] = {
-	{FORMAT(GL_RGB10_A2UI),           10, 10, 10, 2, 0, 0, 0, 0,  0, 0, UINT_TYPE},
+	{GL_RGB10_A2UI,           10, 10, 10, 2, 0, 0, 0, 0,  0, 0, UINT_TYPE},
 };
 
 static const struct format_desc arb_texture_stencil8[] = {
-	{FORMAT(GL_STENCIL_INDEX8),  0, 0, 0, 0, 0, 0, 0, 8, 0, 0,  UINT_TYPE},
+	{GL_STENCIL_INDEX8,  0, 0, 0, 0, 0, 0, 0, 8, 0, 0,  UINT_TYPE},
 };
 
 
@@ -522,31 +519,30 @@ static unsigned linear_deltamax[33] = {
 
 struct wrap_mode {
 	GLenum      mode;
-	const char  *name;
 	GLboolean   valid_for_rect;
 	const char  *extensions[3];
 	GLboolean   supported;
 } wrap_modes[] = {
-	{GL_REPEAT,                     "REPEAT",                     GL_FALSE},
-	{GL_CLAMP,                      "CLAMP",                      GL_TRUE},
+	{GL_REPEAT,                     GL_FALSE},
+	{GL_CLAMP,                      GL_TRUE},
 
-	{GL_CLAMP_TO_EDGE,              "CLAMP_TO_EDGE",              GL_TRUE,
+	{GL_CLAMP_TO_EDGE,              GL_TRUE,
 		{"GL_EXT_texture_edge_clamp", "GL_SGIS_texture_edge_clamp", NULL}},
 
-	{GL_CLAMP_TO_BORDER,            "CLAMP_TO_BORDER",            GL_TRUE,
+	{GL_CLAMP_TO_BORDER,            GL_TRUE,
 		{"GL_ARB_texture_border_clamp", "GL_SGIS_texture_border_clamp", NULL}},
 
-	{GL_MIRRORED_REPEAT,            "MIRRORED_REPEAT",            GL_FALSE,
+	{GL_MIRRORED_REPEAT,            GL_FALSE,
 		{"GL_ARB_texture_mirrored_repeat", "GL_IBM_texture_mirrored_repeat", NULL}},
 
-	{GL_MIRROR_CLAMP_EXT,           "MIRROR_CLAMP_EXT",           GL_FALSE,
+	{GL_MIRROR_CLAMP_EXT,           GL_FALSE,
 		{"GL_EXT_texture_mirror_clamp", "GL_ATI_texture_mirror_once", NULL}},
 
-	{GL_MIRROR_CLAMP_TO_EDGE_EXT,   "MIRROR_CLAMP_TO_EDGE_EXT",   GL_FALSE,
+	{GL_MIRROR_CLAMP_TO_EDGE_EXT,   GL_FALSE,
 		{"GL_EXT_texture_mirror_clamp", "GL_ATI_texture_mirror_once",
 		"GL_ARB_texture_mirror_clamp_to_edge"}},
 
-	{GL_MIRROR_CLAMP_TO_BORDER_EXT, "MIRROR_CLAMP_TO_BORDER_EXT", GL_FALSE,
+	{GL_MIRROR_CLAMP_TO_BORDER_EXT, GL_FALSE,
 		{"GL_EXT_texture_mirror_clamp", NULL, NULL}},
 
 	{0}
@@ -1084,9 +1080,12 @@ static GLboolean probe_pixels(const struct format_desc *format, GLboolean npot, 
 						       wrap_modes[j].mode, filter, expected,
 						       format, npot, texswizzle, bits);
 
+					const char *name =
+						piglit_get_gl_enum_name(
+							wrap_modes[j].mode);
 					if (!probe_pixel_rgba(pixels, piglit_width, deltamax_swizzled,
 							      x, y, expected, a, b,
-							      sfilter, wrap_modes[j].name)) {
+							      sfilter, name)) {
 						pass = GL_FALSE;
 						goto tile_done;
 					}
@@ -1111,9 +1110,9 @@ static GLboolean test_format_npot_swizzle(const struct format_desc *format,
 		update_swizzle(texswizzle);
 	}
 
-	printf("Testing %s%s%s%s%s\n", format->name,
-	       npot ? ", NPOT" : "",
-	       texswizzle ? ", swizzled" : "",
+	const char *name = piglit_get_gl_enum_name(format->internalformat);
+	printf("Testing %s%s%s%s%s\n", name,
+	       npot ? ", NPOT" : "", texswizzle ? ", swizzled" : "",
 	       texture_proj ? ", projected" : "",
 	       test_border_color ? ", border color only" : "");
 
@@ -1122,7 +1121,7 @@ static GLboolean test_format_npot_swizzle(const struct format_desc *format,
 	piglit_present_results();
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "%s%s%s%s%s", format->name,
+				     "%s%s%s%s%s", name,
 				     npot ? ", NPOT" : "",
 				     texswizzle ? ", swizzled" : "",
 				     texture_proj ? ", projected" : "",
@@ -1846,10 +1845,11 @@ void piglit_init(int argc, char **argv)
 		if (get_test_by_name(argv[p], &test))
 			continue;
 
+		const GLenum arg = piglit_get_gl_enum_from_name(argv[p]);
 		if (test) {
 			/* Formats. */
 			for (i = 0; i < test->num_formats; i++) {
-				if (strcmp(argv[p], test->format[i].name) == 0) {
+				if (test->format[i].internalformat == arg) {
 					init_format = &test->format[i];
 					goto outer_continue;
 				}
