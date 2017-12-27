@@ -60,10 +60,10 @@ static struct test_desc
 };
 
 static GLboolean
-check_integer(const struct test_desc *test, GLenum param,
-	      const char *param_string, GLint expected)
+check_integer(const struct test_desc *test, GLenum param, GLint expected)
 {
 	GLint get_result;
+	const char *param_string = piglit_get_gl_enum_name(param);
 
 	if (test->mode == MAIN && test->param == param) {
 		glGetIntegerv(param, &get_result);
@@ -76,14 +76,12 @@ check_integer(const struct test_desc *test, GLenum param,
 	return GL_TRUE;
 }
 
-#define CHECK_INTEGER(param, expected) \
-	pass = check_integer(test, param, #param, expected) && pass
-
 static GLboolean
-check_indexed(const struct test_desc *test, GLenum param,
-	      const char *param_string, GLuint index, GLint expected)
+check_indexed(const struct test_desc *test, GLenum param, GLuint index,
+	      GLint expected)
 {
 	GLint get_result;
+	const char *param_string = piglit_get_gl_enum_name(param);
 
 	if (test->mode == INDEXED && test->param == param) {
 		glGetIntegeri_v(param, index, &get_result);
@@ -95,9 +93,6 @@ check_indexed(const struct test_desc *test, GLenum param,
 	}
 	return GL_TRUE;
 }
-
-#define CHECK_INDEXED(param, index, expected) \
-	pass = check_indexed(test, param, #param, index, expected) && pass
 
 static GLboolean
 do_test(const struct test_desc *test)
@@ -121,13 +116,16 @@ do_test(const struct test_desc *test)
 	/* Main GL_TRANSFORM_FEEDBACK_BUFFER_BINDING should still be
 	 * set to its default value.
 	 */
-	CHECK_INTEGER(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, 0);
+	pass = check_integer(test, GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, 0) &&
+	       pass;
 
 	/* Set up buffers. */
 	for (i = 0; i < max_separate_attribs; ++i) {
 		printf("BindBuffer(TRANSFORM_FEEDBACK_BUFFER, %u)\n", bufs[i]);
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, bufs[i]);
-		CHECK_INTEGER(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, bufs[i]);
+		pass = check_integer(test,
+				     GL_TRANSFORM_FEEDBACK_BUFFER_BINDING,
+				     bufs[i]) && pass;
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
 			     sizeof(initial_xfb_buffer_contents),
 			     initial_xfb_buffer_contents, GL_STREAM_READ);
@@ -135,9 +133,13 @@ do_test(const struct test_desc *test)
 
 	/* Indexed bindings should still be set to their default values. */
 	for (i = 0; i < max_separate_attribs; ++i) {
-		CHECK_INDEXED(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, i, 0);
-		CHECK_INDEXED(GL_TRANSFORM_FEEDBACK_BUFFER_START, i, 0);
-		CHECK_INDEXED(GL_TRANSFORM_FEEDBACK_BUFFER_SIZE, i, 0);
+		pass = check_indexed(test,
+				     GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, i,
+				     0) && pass;
+		pass = check_indexed(test, GL_TRANSFORM_FEEDBACK_BUFFER_START,
+				     i, 0) && pass;
+		pass = check_indexed(test, GL_TRANSFORM_FEEDBACK_BUFFER_SIZE,
+				     i, 0) && pass;
 	}
 
 	/* Bind buffers, setting various offsets and sizes. */
@@ -148,16 +150,22 @@ do_test(const struct test_desc *test)
 		       i, bufs[i], offset, size);
 		glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, i,
 				  bufs[i], offset, size);
-		CHECK_INTEGER(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, bufs[i]);
+		pass = check_integer(test,
+				     GL_TRANSFORM_FEEDBACK_BUFFER_BINDING,
+				     bufs[i]) && pass;
 	}
 
 	/* Check indexed bindings. */
 	for (i = 0; i < max_separate_attribs; ++i) {
 		int offset = 4 * (i % 4);
 		int size = 4 * ((i % 3) + 1);
-		CHECK_INDEXED(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, i, bufs[i]);
-		CHECK_INDEXED(GL_TRANSFORM_FEEDBACK_BUFFER_START, i, offset);
-		CHECK_INDEXED(GL_TRANSFORM_FEEDBACK_BUFFER_SIZE, i, size);
+		pass = check_indexed(test,
+				     GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, i,
+				     bufs[i]) && pass;
+		pass = check_indexed(test, GL_TRANSFORM_FEEDBACK_BUFFER_START,
+				     i, offset) && pass;
+		pass = check_indexed(test, GL_TRANSFORM_FEEDBACK_BUFFER_SIZE,
+				     i, size) && pass;
 	}
 
 	return pass;
