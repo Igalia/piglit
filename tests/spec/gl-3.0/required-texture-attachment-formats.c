@@ -64,6 +64,7 @@ piglit_init(int argc, char **argv)
 			continue;
 
 		f = get_sized_internalformat(required_formats[i].token);
+		const char *name = piglit_get_gl_enum_name(f->token);
 
 		if (f->token == GL_DEPTH24_STENCIL8 ||
 		    f->token == GL_DEPTH32F_STENCIL8) {
@@ -96,7 +97,7 @@ piglit_init(int argc, char **argv)
 
 		if (glGetError() != 0) {
 			printf("Unexpected error creating %s texture\n",
-			       f->name);
+			       name);
 			pass = false;
 			continue;
 		}
@@ -115,7 +116,7 @@ piglit_init(int argc, char **argv)
 
 		if (glGetError() != 0) {
 			printf("Unexpected error binding %s texture\n",
-			       f->name);
+			       name);
 			pass = false;
 			continue;
 		}
@@ -129,10 +130,10 @@ piglit_init(int argc, char **argv)
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
 			fprintf(stderr, "%s fbo incomplete (status = 0x%04x)\n",
-				f->name, status);
+				name, status);
 			pass = false;
 		} else {
-			printf("%s: fbo complete\n", f->name);
+			printf("%s: fbo complete\n", name);
 		}
 
 		glDeleteFramebuffers(1, &fbo);

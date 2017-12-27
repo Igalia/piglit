@@ -162,7 +162,7 @@ piglit_init(int argc, char **argv)
 
 		if (glGetError() != 0) {
 			printf("Unexpected error creating %s texture\n",
-			       f->name);
+			       piglit_get_gl_enum_name(f->token));
 			pass = false;
 			continue;
 		}
@@ -241,7 +241,7 @@ piglit_init(int argc, char **argv)
 
 		if (!format_pass) {
 			printf("format %s:\n",
-			       f->name);
+			       piglit_get_gl_enum_name(f->token));
 
 			printf("  expected: ");
 			for (c = 0; c < CHANNELS; c++) {

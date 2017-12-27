@@ -84,7 +84,6 @@ enum channel {
 };
 
 struct sized_internalformat {
-	const char *name;
 	GLenum token;
 	enum bits_types bits[CHANNELS];
 };

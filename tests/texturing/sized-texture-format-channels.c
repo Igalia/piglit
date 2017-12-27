@@ -152,7 +152,8 @@ piglit_init(int argc, char **argv)
 
 		if (format_fail || format_print) {
 			printf("format %s%s:\n",
-			       f->name, format_fail ? " failure" : "");
+			       piglit_get_gl_enum_name(f->token),
+			       format_fail ? " failure" : "");
 
 			printf("  expected: ");
 			for (c = 0; c < CHANNELS; c++) {
