@@ -237,9 +237,9 @@ test_formats(const struct format *formats,
 				   format->texelSize);
 
 		printf("internalFormat = %s, format = %s, type = %s : %s\n",
-		       format->internalFormatName,
-		       format->formatName,
-		       format->typeName,
+		       piglit_get_gl_enum_name(format->internalFormat),
+		       piglit_get_gl_enum_name(format->format),
+		       piglit_get_gl_enum_name(format->type),
 		       pass ? "pass" : "fail");
 
 		overallResult &= pass;

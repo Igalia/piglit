@@ -40,8 +40,8 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const struct format
 formats[] = {
-	DEF_FORMAT(GL_RED, GL_RED, GL_UNSIGNED_BYTE, 1),
-	DEF_FORMAT(GL_RG, GL_RG, GL_UNSIGNED_BYTE, 2),
+	{ GL_RED, GL_RED, GL_UNSIGNED_BYTE, 1 },
+	{ GL_RG, GL_RG, GL_UNSIGNED_BYTE, 2 },
 };
 
 void

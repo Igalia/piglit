@@ -30,22 +30,7 @@ struct format {
 	GLenum format;
 	GLenum type;
 	GLsizei texelSize;
-
-	const char *internalFormatName;
-	const char *formatName;
-	const char *typeName;
 };
-
-#define DEF_FORMAT(internalFormatArg, formatArg, typeArg, texelSizeArg) \
-	{                                                               \
-		internalFormatArg,                                      \
-		formatArg,                                              \
-		typeArg,                                                \
-		texelSizeArg,                                           \
-		#internalFormatArg,                                     \
-		#formatArg,                                             \
-		#typeArg                                                \
-	}
 
 bool
 test_format(GLenum internalFormat,
