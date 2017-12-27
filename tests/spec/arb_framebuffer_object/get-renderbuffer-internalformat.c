@@ -61,7 +61,7 @@ test_format(const struct format_desc *format)
 	    format->internalformat <= 4)
 		return PIGLIT_SKIP;
 
-	printf("Testing %s: ", format->name);
+	printf("Testing %s: ", get_format_name(format->internalformat));
 	glGenRenderbuffers(1, &rb);
 	glBindRenderbuffer(GL_RENDERBUFFER, rb);
 	glRenderbufferStorage(GL_RENDERBUFFER, format->internalformat, 1, 1);

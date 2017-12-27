@@ -522,8 +522,9 @@ test_format(const struct format_desc *format)
 	int x;
 	int level;
 	GLboolean pass = GL_TRUE;
+	const char *name = get_format_name(format->internalformat);
 
-	printf("Testing %s", format->name);
+	printf("Testing %s", name);
 
 	if (format->base_internal_format == GL_STENCIL_INDEX)
 		clear_stencil = true;
@@ -539,7 +540,7 @@ test_format(const struct format_desc *format)
 		printf(" - FBO incomplete\n");
 		piglit_report_subtest_result(PIGLIT_SKIP,
 					     "%s (fbo incomplete)",
-					     format->name);
+					     name);
 		return PIGLIT_SKIP;
 	}
 	printf("\n");
@@ -578,7 +579,7 @@ test_format(const struct format_desc *format)
 	glDeleteTextures(1, &tex);
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "%s", format->name);
+				     "%s", name);
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 

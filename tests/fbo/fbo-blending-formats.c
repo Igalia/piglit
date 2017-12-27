@@ -91,6 +91,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 	GLuint tex, fb;
 	GLenum status;
 	int r, g, b, l, a, i;
+	const char *name = get_format_name(format->internalformat);
 
 	float res0[] = {0.3, 0.3, 0.3, 0.0};
 
@@ -292,11 +293,11 @@ static enum piglit_result test_format(const struct format_desc *format)
 		piglit_report_result(PIGLIT_FAIL);
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-	printf("Testing %s", format->name);
+	printf("Testing %s", name);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		printf(" - fbo incomplete (status = %s)\n",
 		       piglit_get_gl_enum_name(status));
-		piglit_report_subtest_result(PIGLIT_SKIP, "%s", format->name);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", name);
 		return PIGLIT_SKIP;
 	}
         printf("\n");
@@ -358,7 +359,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 
 	if (!pass) {
 		piglit_present_results();
-		piglit_report_subtest_result(PIGLIT_FAIL, "%s", format->name);
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
 		return PIGLIT_FAIL;
 	}
 
@@ -411,7 +412,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 	piglit_present_results();
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "%s", format->name);
+				     "%s", name);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

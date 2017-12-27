@@ -440,13 +440,14 @@ test_format(const struct format_desc *format, GLenum basetype)
 	int x;
 	int level;
 	GLboolean pass = GL_TRUE;
+	const char *name = get_format_name(format->internalformat);
 
 	if (basetype == GL_INT) {
 		printf("Skipping mipmap generation for integer texture.\n");
 		return GL_TRUE;
 	}
 
-	printf("Testing %s%s\n", format->name, tex_width == 256 ? "" : " (NPOT)");
+	printf("Testing %s%s\n", name, tex_width == 256 ? "" : " (NPOT)");
 	tex = create_tex(format->internalformat, format->base_internal_format,
 			 basetype);
 
@@ -466,7 +467,7 @@ test_format(const struct format_desc *format, GLenum basetype)
 	glDeleteTextures(1, &tex);
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "%s%s", format->name,
+				     "%s%s", name,
 				     npot ? " NPOT" : "");
 
 	return pass;

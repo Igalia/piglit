@@ -322,7 +322,7 @@ test_formats_type(const struct format_desc *intFormat,
 				w, h, 1, tx, ty, 0, tw, th, 1,
 				bits)) {
 			printf("texsubimage-unpack failed\n");
-			printf("  internal format: %s\n", piglit_get_gl_enum_name(intFormat->internalformat));
+			printf("  internal format: %s\n", get_format_name(intFormat->internalformat));
 			printf("  format: %s\n", piglit_get_gl_enum_name(srcFormat->format));
 			printf("  type: %s\n", piglit_get_gl_enum_name(type));
 			printf("  alignment: %d\n", alignment);

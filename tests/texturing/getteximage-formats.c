@@ -450,7 +450,10 @@ test_format(const struct test_desc *test,
 				glReadPixels(rx, ry, 1, 1, GL_RGBA, GL_FLOAT, pix);
 				if (!colors_equal(expected, pix, tolerance)) {
 					printf("%s failure: format: %s, level %d at pixel(%d, %d)\n",
-							 TestName, fmt->name, level, rx, ry);
+					       TestName,
+					       get_format_name(
+						       fmt->internalformat),
+					       level, rx, ry);
 					printf(" Expected (%f, %f, %f, %f)\n",
 							 expected[0], expected[1], expected[2], expected[3]);
 					printf("	 Found (%f, %f, %f, %f)\n",

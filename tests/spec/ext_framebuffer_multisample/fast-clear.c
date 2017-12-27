@@ -140,12 +140,13 @@ convert_srgb_color(const struct format_desc *format,
 		   float *color)
 {
 	int i;
+	const char *format_name = get_format_name(format->internalformat);
 
 	/* If the texture is not an sRGB format then no conversion is
 	 * needed regardless of the sRGB settings.
 	 */
-	if (strstr(format->name, "SRGB") == NULL &&
-	    strstr(format->name, "SLUMINANCE") == NULL)
+	if (strstr(format_name, "SRGB") == NULL &&
+	    strstr(format_name, "SLUMINANCE") == NULL)
 		return;
 
 	/* If GL_FRAMEBUFFER_SRGB was enabled when we did the clear
@@ -343,15 +344,16 @@ test_format(const struct format_desc *format)
 	GLuint tex;
 	GLuint fbo;
 	int i;
+	const char *name = get_format_name(format->internalformat);
 
 	if (format->internalformat == 3 || format->internalformat == 4)
 		return PIGLIT_SKIP;
 
 	/* Compressed formats aren't supported for multisampling */
-	if (strstr("COMPRESSED", format->name))
+	if (strstr("COMPRESSED", name))
 		return PIGLIT_SKIP;
 
-	printf("Testing %s\n", format->name);
+	printf("Testing %s\n", name);
 
 	if (single_sample)
 		tex_target = GL_TEXTURE_2D;

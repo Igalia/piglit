@@ -512,7 +512,7 @@ test_depth_format(GLenum target, const struct format_desc *format)
 	piglit_report_subtest_result(ret ? PIGLIT_PASS : PIGLIT_FAIL,
 				     "%s-%s",
 				     piglit_get_gl_enum_name(target),
-				     piglit_get_gl_enum_name(format->internalformat));
+				     get_format_name(format->internalformat));
 	glDeleteTextures(1, &tex);
 	return ret;
 }
@@ -539,7 +539,7 @@ test_stencil_format(GLenum target, const struct format_desc *format)
 	piglit_report_subtest_result(ret ? PIGLIT_PASS : PIGLIT_FAIL,
 				     "%s-%s",
 				     piglit_get_gl_enum_name(target),
-				     piglit_get_gl_enum_name(format->internalformat));
+				     get_format_name(format->internalformat));
 	glDeleteTextures(1, &tex);
 	return ret;
 }

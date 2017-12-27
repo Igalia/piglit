@@ -527,7 +527,7 @@ test_format(const struct format_desc *format)
 	 */
 	glClearColor(0, 0, 0, 0);
 
-	printf("Testing %s\n", format->name);
+	printf("Testing %s\n", get_format_name(format->internalformat));
 
 	/* Set up the framebuffers for rendering the test image.  This
 	 * might fail if the format we're testing isn't supported as a

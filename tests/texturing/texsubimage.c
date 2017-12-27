@@ -391,7 +391,7 @@ test_region(GLuint pbo, GLenum target, GLenum internal_format,
 		printf("texsubimage failed\n");
 		printf("  target: %s\n", piglit_get_gl_enum_name(target));
 		printf("  internal format: %s\n",
-			piglit_get_gl_enum_name(internal_format));
+			get_format_name(internal_format));
 		printf("  region: %d, %d  %d x %d\n",
 		       region->tx, region->ty, region->tw, region->th);
 		pass = false;
