@@ -254,17 +254,13 @@ done:
 	return pass;
 }
 
-#define ENTRY(token) { #token, token }
-struct {
-	const char *name;
-	GLenum token;
-} rb_internal_formats[] = {
-	ENTRY(GL_DEPTH_COMPONENT),
-	ENTRY(GL_DEPTH_COMPONENT32),
-	ENTRY(GL_DEPTH_COMPONENT24),
-	ENTRY(GL_DEPTH_COMPONENT16),
-	ENTRY(GL_DEPTH_STENCIL_EXT),
-	ENTRY(GL_DEPTH24_STENCIL8_EXT),
+GLenum rb_internal_formats[] = {
+	GL_DEPTH_COMPONENT,
+	GL_DEPTH_COMPONENT32,
+	GL_DEPTH_COMPONENT24,
+	GL_DEPTH_COMPONENT16,
+	GL_DEPTH_STENCIL_EXT,
+	GL_DEPTH24_STENCIL8_EXT,
 };
 
 void piglit_init(int argc, char **argv)
@@ -276,8 +272,10 @@ void piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_packed_depth_stencil");
 
 	for (i = 0; i < ARRAY_SIZE(rb_internal_formats); i++) {
-		pass = test_with_format(rb_internal_formats[i].token,
-					rb_internal_formats[i].name) && pass;
+		const char *name =
+			piglit_get_gl_enum_name(rb_internal_formats[i]);
+		pass = test_with_format(rb_internal_formats[i],
+					name) && pass;
 	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);

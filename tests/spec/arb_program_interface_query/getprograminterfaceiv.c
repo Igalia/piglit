@@ -97,23 +97,16 @@ struct subtest_t {
 	GLenum programInterface;
 	GLenum pname;
 	GLenum expected_error;
-
-
-	const char *programInterface_str;
-	const char *pname_str;
-	const char *error_str;
 };
 
-#define ST(programInterface, pname, error) { \
-	(programInterface), (pname), (error), #programInterface, #pname, #error \
-}
-
 static const struct subtest_t programInterface_subtests[] = {
- ST(GL_TRUE, GL_MAX_NAME_LENGTH, GL_INVALID_OPERATION),
- ST(GL_UNIFORM, GL_TRUE, GL_INVALID_OPERATION),
- ST(GL_ATOMIC_COUNTER_BUFFER, GL_MAX_NAME_LENGTH, GL_INVALID_OPERATION),
- ST(GL_UNIFORM, GL_MAX_NUM_ACTIVE_VARIABLES, GL_INVALID_OPERATION),
- ST(GL_PROGRAM_OUTPUT, GL_MAX_NUM_COMPATIBLE_SUBROUTINES, GL_INVALID_OPERATION),
+	{ GL_TRUE, GL_MAX_NAME_LENGTH, GL_INVALID_OPERATION },
+	{ GL_UNIFORM, GL_TRUE, GL_INVALID_OPERATION },
+	{ GL_ATOMIC_COUNTER_BUFFER, GL_MAX_NAME_LENGTH,
+		GL_INVALID_OPERATION },
+	{ GL_UNIFORM, GL_MAX_NUM_ACTIVE_VARIABLES, GL_INVALID_OPERATION },
+	{ GL_PROGRAM_OUTPUT, GL_MAX_NUM_COMPATIBLE_SUBROUTINES,
+		GL_INVALID_OPERATION },
 };
 
 static bool
@@ -133,6 +126,9 @@ run_subtest(const struct subtest_t st, GLuint prog, bool *pass)
 	enum piglit_result result;
 	bool local_pass = true;
 	int value;
+	const char *programInterface_str =
+		piglit_get_gl_enum_name(st.programInterface);
+	const char *pname_str = piglit_get_gl_enum_name(st.pname);
 
 	if (!check_extensions(st)) {
 		result = PIGLIT_SKIP;
@@ -142,7 +138,7 @@ run_subtest(const struct subtest_t st, GLuint prog, bool *pass)
 	glGetProgramInterfaceiv(prog, st.programInterface, st.pname, &value);
 	if (!piglit_check_gl_error(st.expected_error)) {
 		printf("	Call was glGetProgramInterfaceiv(prog, %s, "
-		       "%s, ...)\n", st.programInterface_str, st.pname_str);
+		       "%s, ...)\n", programInterface_str, pname_str);
 		local_pass = false;
 	}
 
@@ -150,8 +146,8 @@ run_subtest(const struct subtest_t st, GLuint prog, bool *pass)
 	result = local_pass ? PIGLIT_PASS : PIGLIT_FAIL;
 
 report_result:
-	piglit_report_subtest_result(result, "%s on %s", st.pname_str,
-				     st.programInterface_str);
+	piglit_report_subtest_result(result, "%s on %s", pname_str,
+				     programInterface_str);
 }
 
 void

@@ -190,19 +190,16 @@ setup_fbo(GLenum target, GLenum textarget, GLuint attachment)
 	}
 }
 
-#define ENUM(e) # e, e
-
 static const struct {
-	const char *target_name;
 	GLenum target;
 	const char *required_extension;
 } test_vectors[] = {
-	{ ENUM(GL_TEXTURE_1D), NULL },
-	{ ENUM(GL_TEXTURE_2D), NULL },
+	{ GL_TEXTURE_1D, NULL },
+	{ GL_TEXTURE_2D, NULL },
 
-	{ ENUM(GL_TEXTURE_RECTANGLE), "GL_ARB_texture_rectangle" },
-	{ ENUM(GL_TEXTURE_2D_MULTISAMPLE), "GL_ARB_texture_multisample" },
-	{ ENUM(GL_TEXTURE_2D_MULTISAMPLE_ARRAY), "GL_ARB_texture_multisample" },
+	{ GL_TEXTURE_RECTANGLE, "GL_ARB_texture_rectangle" },
+	{ GL_TEXTURE_2D_MULTISAMPLE, "GL_ARB_texture_multisample" },
+	{ GL_TEXTURE_2D_MULTISAMPLE_ARRAY, "GL_ARB_texture_multisample" },
 
 	/**
 	 * These do not require any extensions because they are part of OpenGL
@@ -211,12 +208,12 @@ static const struct {
 	 * GL_DEPTH_COMPONENT or GL_DEPTH_STENCIL formats before then.
 	 */
 	/*@{*/
-	{ ENUM(GL_TEXTURE_1D_ARRAY), NULL },
-	{ ENUM(GL_TEXTURE_2D_ARRAY), NULL },
-	{ ENUM(GL_TEXTURE_CUBE_MAP), NULL },
+	{ GL_TEXTURE_1D_ARRAY, NULL },
+	{ GL_TEXTURE_2D_ARRAY, NULL },
+	{ GL_TEXTURE_CUBE_MAP, NULL },
 	/*@}*/
 
-	{ ENUM(GL_TEXTURE_CUBE_MAP_ARRAY), "GL_ARB_texture_cube_map_array" },
+	{ GL_TEXTURE_CUBE_MAP_ARRAY, "GL_ARB_texture_cube_map_array" },
 };
 
 static NORETURN void
@@ -227,12 +224,14 @@ usage_and_exit(const char *name)
 	       name);
 
 	for (unsigned i = 0; i < ARRAY_SIZE(test_vectors); i++) {
+		const char *target_name =
+			piglit_get_gl_enum_name(test_vectors[i].target);
 		if (test_vectors[i].required_extension == NULL)
 			printf("\t%s\n",
-			       test_vectors[i].target_name);
+			       target_name);
 		else
 			printf("\t%s (requires %s)\n",
-			       test_vectors[i].target_name,
+			       target_name,
 			       test_vectors[i].required_extension);
 	}
 
@@ -253,7 +252,8 @@ piglit_init(int argc, char **argv)
 		usage_and_exit(argv[0]);
 
 	for (unsigned i = 0; i < ARRAY_SIZE(test_vectors); i++) {
-		if (strcmp(argv[1], test_vectors[i].target_name) == 0) {
+		if (strcmp(piglit_get_gl_enum_name(test_vectors[i].target),
+			   argv[1]) == 0) {
 			if (test_vectors[i].required_extension != NULL)
 				piglit_require_extension(test_vectors[i].required_extension);
 

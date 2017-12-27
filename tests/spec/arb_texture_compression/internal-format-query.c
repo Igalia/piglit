@@ -80,11 +80,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define ENUM_AND_STRING(e) \
-	# e, e
-
 struct test_vector {
-	const char *generic_compressed_format_string;
 	GLenum generic_compressed_format;
 	GLenum base_format;
 };
@@ -93,30 +89,30 @@ struct test_vector {
  * Generic texture formats in OpenGL 1.3 and GL_ARB_texture_compression.
  */
 static const struct test_vector arb_texture_compression_formats[] = {
-        { ENUM_AND_STRING(GL_COMPRESSED_ALPHA), GL_ALPHA },
-        { ENUM_AND_STRING(GL_COMPRESSED_LUMINANCE), GL_LUMINANCE },
-        { ENUM_AND_STRING(GL_COMPRESSED_LUMINANCE_ALPHA), GL_LUMINANCE_ALPHA },
-        { ENUM_AND_STRING(GL_COMPRESSED_INTENSITY), GL_INTENSITY },
-        { ENUM_AND_STRING(GL_COMPRESSED_RGB), GL_RGB },
-        { ENUM_AND_STRING(GL_COMPRESSED_RGBA), GL_RGBA },
+	{GL_COMPRESSED_ALPHA, GL_ALPHA},
+	{GL_COMPRESSED_LUMINANCE, GL_LUMINANCE},
+	{GL_COMPRESSED_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA},
+	{GL_COMPRESSED_INTENSITY, GL_INTENSITY},
+	{GL_COMPRESSED_RGB, GL_RGB},
+	{GL_COMPRESSED_RGBA, GL_RGBA},
 };
 
 /**
  * Generic texture formats in OpenGL 3.0 and GL_ARB_texture_rg.
  */
 static const struct test_vector arb_texture_rg_formats[] = {
-        { ENUM_AND_STRING(GL_COMPRESSED_RED), GL_RED },
-        { ENUM_AND_STRING(GL_COMPRESSED_RG), GL_RG },
+	{ GL_COMPRESSED_RED, GL_RED },
+	{ GL_COMPRESSED_RG, GL_RG },
 };
 
 /**
  * Generic texture formats in OpenGL 2.1 and GL_EXT_texture_sRGB.
  */
 static const struct test_vector ext_texture_srgb_formats[] = {
-	{ ENUM_AND_STRING(GL_COMPRESSED_SRGB_EXT), GL_RGB },
-	{ ENUM_AND_STRING(GL_COMPRESSED_SRGB_ALPHA_EXT), GL_RGBA },
-	{ ENUM_AND_STRING(GL_COMPRESSED_SLUMINANCE_EXT), GL_LUMINANCE },
-	{ ENUM_AND_STRING(GL_COMPRESSED_SLUMINANCE_ALPHA_EXT), GL_LUMINANCE_ALPHA },
+	{ GL_COMPRESSED_SRGB_EXT, GL_RGB },
+	{ GL_COMPRESSED_SRGB_ALPHA_EXT, GL_RGBA },
+	{ GL_COMPRESSED_SLUMINANCE_EXT, GL_LUMINANCE },
+	{ GL_COMPRESSED_SLUMINANCE_ALPHA_EXT, GL_LUMINANCE_ALPHA },
 };
 
 static GLubyte dummy_data[16 * 16 * 4];
@@ -157,10 +153,14 @@ try_formats(const struct test_vector *t, unsigned num_tests,
 		GLuint tex;
 		GLint is_compressed;
 		GLenum format;
+		const char *generic_compressed_format_string =
+				   piglit_get_gl_enum_name(
+					   t[i].generic_compressed_format);
 
-		if (!piglit_automatic) {
+			   if (!piglit_automatic)
+		{
 			printf("Trying %s/0x%04x (base format = 0x%04x)...\n",
-			       t[i].generic_compressed_format_string,
+			       generic_compressed_format_string,
 			       t[i].generic_compressed_format,
 			       t[i].base_format);
 		}
@@ -208,7 +208,7 @@ try_formats(const struct test_vector *t, unsigned num_tests,
 					"generic\n"
 					"format as the specific internal "
 					"format.\n",
-					t[i].generic_compressed_format_string);
+					generic_compressed_format_string);
 				pass = false;
 			} else if (format <= 4 || format == t[i].base_format) {
 				fprintf(stderr,
@@ -216,7 +216,7 @@ try_formats(const struct test_vector *t, unsigned num_tests,
 					"internal\n"
 					"format 0x%04x that is "
 					"non-compressed\n",
-					t[i].generic_compressed_format_string,
+					generic_compressed_format_string,
 					format);
 				pass = false;
 			} else if (j == num_compressed_formats) {
@@ -229,7 +229,7 @@ try_formats(const struct test_vector *t, unsigned num_tests,
 					"This may just mean the test does not "
 					"know about the compessed format that\n"
 					"was selected by the driver.\n",
-					t[i].generic_compressed_format_string,
+					generic_compressed_format_string,
 					piglit_get_gl_enum_name(format));
 			}
 		} else if (format != t[i].base_format) {
@@ -239,13 +239,13 @@ try_formats(const struct test_vector *t, unsigned num_tests,
 					"generic\n"
 					"format as the specific internal "
 					"format.\n",
-					t[i].generic_compressed_format_string);
+					generic_compressed_format_string);
 			} else {
 				fprintf(stderr,
 					"%s did not compress, but it got an "
 					"internal format of %s when "
 					"%s was expected.\n",
-					t[i].generic_compressed_format_string,
+					generic_compressed_format_string,
 					piglit_get_gl_enum_name(format),
 					piglit_get_gl_enum_name(t[i].base_format));
 			}

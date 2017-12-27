@@ -272,31 +272,25 @@ static const struct test_vector triangle_strip_adjacency_tests[] = {
 
 static const struct test_set
 {
-	const char *name;
 	GLenum prim_type;
 	const char *input_layout;
 	unsigned vertices_per_prim;
-	unsigned num_test_vectors;
 	const struct test_vector *test_vectors;
 } tests[] = {
-#define TEST(prim_type, input_layout, vertices_per_prim, test_array) \
-	{ #prim_type, prim_type, input_layout, vertices_per_prim, \
-	  ARRAY_SIZE(test_array), test_array }
-	TEST(GL_POINTS, "points", 1, points_tests),
-	TEST(GL_LINE_LOOP, "lines", 2, line_loop_tests),
-	TEST(GL_LINE_STRIP, "lines", 2, line_strip_tests),
-	TEST(GL_LINES, "lines", 2, lines_tests),
-	TEST(GL_TRIANGLES, "triangles", 3, triangles_tests),
-	TEST(GL_TRIANGLE_STRIP, "triangles", 3, triangle_strip_tests),
-	TEST(GL_TRIANGLE_FAN, "triangles", 3, triangle_fan_tests),
-	TEST(GL_LINES_ADJACENCY, "lines_adjacency", 4, lines_adjacency_tests),
-	TEST(GL_LINE_STRIP_ADJACENCY, "lines_adjacency", 4,
-	     line_strip_adjacency_tests),
-	TEST(GL_TRIANGLES_ADJACENCY, "triangles_adjacency", 6,
-	     triangles_adjacency_tests),
-	TEST(GL_TRIANGLE_STRIP_ADJACENCY, "triangles_adjacency", 6,
-	     triangle_strip_adjacency_tests),
-#undef TEST
+	{ GL_POINTS, "points", 1, points_tests },
+	{ GL_LINE_LOOP, "lines", 2, line_loop_tests },
+	{ GL_LINE_STRIP, "lines", 2, line_strip_tests },
+	{ GL_LINES, "lines", 2, lines_tests },
+	{ GL_TRIANGLES, "triangles", 3, triangles_tests },
+	{ GL_TRIANGLE_STRIP, "triangles", 3, triangle_strip_tests },
+	{ GL_TRIANGLE_FAN, "triangles", 3, triangle_fan_tests },
+	{ GL_LINES_ADJACENCY, "lines_adjacency", 4, lines_adjacency_tests },
+	{ GL_LINE_STRIP_ADJACENCY, "lines_adjacency", 4,
+		line_strip_adjacency_tests },
+	{ GL_TRIANGLES_ADJACENCY, "triangles_adjacency", 6,
+		triangles_adjacency_tests },
+	{ GL_TRIANGLE_STRIP_ADJACENCY, "triangles_adjacency", 6,
+		triangle_strip_adjacency_tests },
 };
 
 
@@ -310,7 +304,7 @@ print_usage_and_exit(const char *prog_name)
 	printf("Usage: %s <primitive>\n"
 	       "  where <primitive> is one of the following:\n", prog_name);
 	for (i = 0; i < ARRAY_SIZE(tests); i++)
-		printf("    %s\n", tests[i].name);
+		printf("    %s\n", piglit_get_prim_name(tests[i].prim_type));
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -325,7 +319,8 @@ do_test_vector(const struct test_set *test, const struct test_vector *vector)
 	unsigned actual_output_points;
 	bool pass = true;
 
-	printf("Testing %s(%d vertices)\n", test->name,
+	printf("Testing %s(%d vertices)\n",
+	       piglit_get_prim_name(tests->prim_type),
 	       vector->num_input_vertices);
 
 	/* Run vertices through the pipeline */
@@ -385,7 +380,8 @@ piglit_init(int argc, char **argv)
 	if (argc != 2)
 		print_usage_and_exit(argv[0]);
 	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-		if (strcmp(argv[1], tests[i].name) == 0) {
+		if (strcmp(piglit_get_prim_name(tests[i].prim_type),
+			   argv[1]) == 0) {
 			test = &tests[i];
 			break;
 		}
@@ -420,7 +416,7 @@ piglit_init(int argc, char **argv)
 	glGenQueries(1, &generated_query);
 	glEnable(GL_RASTERIZER_DISCARD);
 
-	for (i = 0; i < test->num_test_vectors; i++) {
+	for (i = 0; i < ARRAY_SIZE(test->test_vectors); i++) {
 		pass = do_test_vector(test, &test->test_vectors[i]) && pass;
 	}
 

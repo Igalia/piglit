@@ -112,24 +112,20 @@ static const char *varyings[] = { "primitive_id" };
 
 struct prim_type_info
 {
-	const char *name;
 	GLenum prim_type;
 	const char *input_layout;
 } prim_types[] = {
-#define PRIM_TYPE(prim_type, input_layout) \
-	{ #prim_type, prim_type, input_layout }
-	PRIM_TYPE(GL_POINTS, "points"),
-	PRIM_TYPE(GL_LINE_LOOP, "lines"),
-	PRIM_TYPE(GL_LINE_STRIP, "lines"),
-	PRIM_TYPE(GL_LINES, "lines"),
-	PRIM_TYPE(GL_TRIANGLES, "triangles"),
-	PRIM_TYPE(GL_TRIANGLE_STRIP, "triangles"),
-	PRIM_TYPE(GL_TRIANGLE_FAN, "triangles"),
-	PRIM_TYPE(GL_LINES_ADJACENCY, "lines_adjacency"),
-	PRIM_TYPE(GL_LINE_STRIP_ADJACENCY, "lines_adjacency"),
-	PRIM_TYPE(GL_TRIANGLES_ADJACENCY, "triangles_adjacency"),
-	PRIM_TYPE(GL_TRIANGLE_STRIP_ADJACENCY, "triangles_adjacency"),
-#undef PRIM_TYPE
+	{ GL_POINTS, "points" },
+	{ GL_LINE_LOOP, "lines" },
+	{ GL_LINE_STRIP, "lines" },
+	{ GL_LINES, "lines" },
+	{ GL_TRIANGLES, "triangles" },
+	{ GL_TRIANGLE_STRIP, "triangles" },
+	{ GL_TRIANGLE_FAN, "triangles" },
+	{ GL_LINES_ADJACENCY, "lines_adjacency" },
+	{ GL_LINE_STRIP_ADJACENCY, "lines_adjacency" },
+	{ GL_TRIANGLES_ADJACENCY, "triangles_adjacency" },
+	{ GL_TRIANGLE_STRIP_ADJACENCY, "triangles_adjacency" },
 };
 
 
@@ -140,7 +136,8 @@ print_usage_and_exit(const char *prog_name)
 	printf("Usage: %s <primitive> <restart-index>\n"
 	       "  where <primitive> is one of the following:\n", prog_name);
 	for(i = 0; i < ARRAY_SIZE(prim_types); i++)
-		printf("    %s\n", prim_types[i].name);
+		printf("    %s\n",
+		       piglit_get_prim_name(prim_types[i].prim_type));
 	printf("  and <restart-index> is one of the following:\n"
 	       "    ffs - use a primitive restart index that is all 0xffs\n"
 	       "    other - use a different primitive restart index\n");
@@ -167,7 +164,8 @@ piglit_init(int argc, char **argv)
 	if (argc != 3)
 		print_usage_and_exit(argv[0]);
 	for (i = 0; i < ARRAY_SIZE(prim_types); i++) {
-		if (strcmp(argv[1], prim_types[i].name) == 0) {
+		if (strcmp(piglit_get_prim_name(prim_types[i].prim_type),
+			   argv[1]) == 0) {
 			prim_type = prim_types[i].prim_type;
 			input_layout = prim_types[i].input_layout;
 			break;

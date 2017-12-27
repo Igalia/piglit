@@ -136,87 +136,83 @@ static const struct format_info formats[] = {
 };
 
 struct read_format_info {
-	const char *format_name, *type_name;
 	GLenum format, type;
 	int size;
 	bool sign;
 };
 
-#define READ_FORMAT(format, type, size, sign) \
-	{ #format, #type, format, type, size, sign }
-
 /* Integer formats from table 3.5 and 3.6 of the GL 3.0 specification */
 static const struct read_format_info read_formats[] = {
-	READ_FORMAT(GL_RGBA_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_RGBA_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_RGBA_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_RGBA_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_RGBA_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_RGBA_INTEGER, GL_BYTE,            8, true),
+	{ GL_RGBA_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_RGBA_INTEGER, GL_INT,            32, true },
+	{ GL_RGBA_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_RGBA_INTEGER, GL_SHORT,          16, true },
+	{ GL_RGBA_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_RGBA_INTEGER, GL_BYTE,            8, true },
 
-	READ_FORMAT(GL_RED_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_RED_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_RED_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_RED_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_RED_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_RED_INTEGER, GL_BYTE,            8, true),
+	{ GL_RED_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_RED_INTEGER, GL_INT,            32, true },
+	{ GL_RED_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_RED_INTEGER, GL_SHORT,          16, true },
+	{ GL_RED_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_RED_INTEGER, GL_BYTE,            8, true },
 
-	READ_FORMAT(GL_GREEN_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_GREEN_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_GREEN_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_GREEN_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_GREEN_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_GREEN_INTEGER, GL_BYTE,            8, true),
+	{ GL_GREEN_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_GREEN_INTEGER, GL_INT,            32, true },
+	{ GL_GREEN_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_GREEN_INTEGER, GL_SHORT,          16, true },
+	{ GL_GREEN_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_GREEN_INTEGER, GL_BYTE,            8, true },
 
-	READ_FORMAT(GL_BLUE_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_BLUE_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_BLUE_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_BLUE_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_BLUE_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_BLUE_INTEGER, GL_BYTE,            8, true),
+	{ GL_BLUE_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_BLUE_INTEGER, GL_INT,            32, true },
+	{ GL_BLUE_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_BLUE_INTEGER, GL_SHORT,          16, true },
+	{ GL_BLUE_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_BLUE_INTEGER, GL_BYTE,            8, true },
 
-	READ_FORMAT(GL_ALPHA_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_ALPHA_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_ALPHA_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_ALPHA_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_ALPHA_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_ALPHA_INTEGER, GL_BYTE,            8, true),
+	{ GL_ALPHA_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_ALPHA_INTEGER, GL_INT,            32, true },
+	{ GL_ALPHA_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_ALPHA_INTEGER, GL_SHORT,          16, true },
+	{ GL_ALPHA_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_ALPHA_INTEGER, GL_BYTE,            8, true },
 
-	READ_FORMAT(GL_RG_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_RG_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_RG_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_RG_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_RG_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_RG_INTEGER, GL_BYTE,            8, true),
+	{ GL_RG_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_RG_INTEGER, GL_INT,            32, true },
+	{ GL_RG_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_RG_INTEGER, GL_SHORT,          16, true },
+	{ GL_RG_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_RG_INTEGER, GL_BYTE,            8, true },
 
-	READ_FORMAT(GL_RGB_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_RGB_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_RGB_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_RGB_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_RGB_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_RGB_INTEGER, GL_BYTE,            8, true),
+	{ GL_RGB_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_RGB_INTEGER, GL_INT,            32, true },
+	{ GL_RGB_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_RGB_INTEGER, GL_SHORT,          16, true },
+	{ GL_RGB_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_RGB_INTEGER, GL_BYTE,            8, true },
 
 	/* RGBA was put at the top so that the more obvious failures come first. */
 
-	READ_FORMAT(GL_BGR_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_BGR_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_BGR_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_BGR_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_BGR_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_BGR_INTEGER, GL_BYTE,            8, true),
+	{ GL_BGR_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_BGR_INTEGER, GL_INT,            32, true },
+	{ GL_BGR_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_BGR_INTEGER, GL_SHORT,          16, true },
+	{ GL_BGR_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_BGR_INTEGER, GL_BYTE,            8, true },
 
-	READ_FORMAT(GL_BGRA_INTEGER, GL_UNSIGNED_INT,   32, false),
-	READ_FORMAT(GL_BGRA_INTEGER, GL_INT,            32, true),
-	READ_FORMAT(GL_BGRA_INTEGER, GL_UNSIGNED_SHORT, 16, false),
-	READ_FORMAT(GL_BGRA_INTEGER, GL_SHORT,          16, true),
-	READ_FORMAT(GL_BGRA_INTEGER, GL_UNSIGNED_BYTE,   8, false),
-	READ_FORMAT(GL_BGRA_INTEGER, GL_BYTE,            8, true),
+	{ GL_BGRA_INTEGER, GL_UNSIGNED_INT,   32, false },
+	{ GL_BGRA_INTEGER, GL_INT,            32, true },
+	{ GL_BGRA_INTEGER, GL_UNSIGNED_SHORT, 16, false },
+	{ GL_BGRA_INTEGER, GL_SHORT,          16, true },
+	{ GL_BGRA_INTEGER, GL_UNSIGNED_BYTE,   8, false },
+	{ GL_BGRA_INTEGER, GL_BYTE,            8, true },
 
 	/* FINISHME: Add more RGB10_A2UI.  Note the other packed formats
 	 * besides 10/10/10/2 included in the spec!
 	 */
-	READ_FORMAT(GL_RGBA_INTEGER, GL_UNSIGNED_INT_10_10_10_2,   32, false),
-	READ_FORMAT(GL_RGBA_INTEGER, GL_UNSIGNED_INT_2_10_10_10_REV,   32, false),
+	{ GL_RGBA_INTEGER, GL_UNSIGNED_INT_10_10_10_2,   32, false },
+	{ GL_RGBA_INTEGER, GL_UNSIGNED_INT_2_10_10_10_REV,   32, false },
 };
 
 static bool test_rg = false;
@@ -298,7 +294,9 @@ report_fail(const struct format_info *tex_info,
 	int i;
 
 	fprintf(stderr, "Failure reading from %s to %s/%s\n",
-		format_name, read_info->format_name, read_info->type_name);
+		format_name,
+		piglit_get_gl_enum_name(read_info->format),
+		piglit_get_gl_enum_name(read_info->type));
 
 	/* 10/channel + 3 spaces. */
 	fprintf(stderr, "  %43s", "expected RGBA in texels");
@@ -437,7 +435,8 @@ read_format(const struct format_info *tex_info,
 
 
 	printf("Reading from %s to %s/%s\n", name,
-	       read_info->format_name, read_info->type_name);
+	       piglit_get_gl_enum_name(read_info->format),
+	       piglit_get_gl_enum_name(read_info->type));
 
 	expected = (char *)malloc(texels_size);
 	read = (char *)malloc(texels_size);
