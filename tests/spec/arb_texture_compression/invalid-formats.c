@@ -49,14 +49,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define ENUM_AND_STRING(e) \
-	# e, e
-
-struct format_tuple {
-	const char *name;
-	GLenum format;
-};
-
 /**
  * Set of formats for a particular extension
  *
@@ -71,12 +63,12 @@ struct format_list {
 	/**
 	 * Formats that are part of the extension and should be exposed.
 	 */
-	struct format_tuple good[11];
+	GLenum good[11];
 
 	/**
 	 * Formats that are part of the extension but should not be exposed.
 	 */
-	struct format_tuple bad[29];
+	GLenum bad[29];
 };
 
 /**
@@ -90,14 +82,14 @@ struct format_list {
  */
 static const struct format_list bptc_formats = {
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_BPTC_UNORM_ARB) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB) },
-		{ NULL, 0 },
+		GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,
+		GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB,
+		GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB,
+		GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB,
+		0,
 	},
 	{
-		{ NULL, 0 },
+		0,
 	}
 };
 
@@ -106,14 +98,14 @@ static const struct format_list bptc_formats = {
  */
 static const struct format_list rgtc_formats = {
 	{
-		{ NULL, 0 },
+		0,
 	},
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_RED_RGTC1) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_RED_RGTC1) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RG_RGTC2) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_RG_RGTC2) },
-		{ NULL, 0 },
+		GL_COMPRESSED_RED_RGTC1,
+		GL_COMPRESSED_SIGNED_RED_RGTC1,
+		GL_COMPRESSED_RG_RGTC2,
+		GL_COMPRESSED_SIGNED_RG_RGTC2,
+		0,
 	}
 };
 
@@ -122,12 +114,12 @@ static const struct format_list rgtc_formats = {
  */
 static const struct format_list fxt1_formats = {
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGB_FXT1_3DFX) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_FXT1_3DFX) },
-		{ NULL, 0 },
+		GL_COMPRESSED_RGB_FXT1_3DFX,
+		GL_COMPRESSED_RGBA_FXT1_3DFX,
+		0,
 	},
 	{
-		{ NULL, 0 },
+		0,
 	}
 };
 
@@ -136,11 +128,11 @@ static const struct format_list fxt1_formats = {
  */
 static const struct format_list ati_3dc_formats = {
 	{
-		{ NULL, 0 },
+		0,
 	},
 	{
-		{ "GL_COMPRESSED_LUMINANCE_ALPHA_3DC_ATI", 0x8837 },
-		{ NULL, 0 },
+		GL_COMPRESSED_LUMINANCE_ALPHA_3DC_ATI,
+		0,
 	}
 };
 
@@ -149,14 +141,14 @@ static const struct format_list ati_3dc_formats = {
  */
 static const struct format_list latc_formats = {
 	{
-		{ NULL, 0 },
+		0,
 	},
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_LUMINANCE_LATC1_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT) },
-		{ NULL, 0 },
+		GL_COMPRESSED_LUMINANCE_LATC1_EXT,
+		GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT,
+		GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT,
+		GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT,
+		0,
 	}
 };
 
@@ -165,14 +157,14 @@ static const struct format_list latc_formats = {
  */
 static const struct format_list s3tc_formats = {
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGB_S3TC_DXT1_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT) },
-		{ NULL, 0 },
+		GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
+		GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,
+		GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
+		0,
 	},
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) },
-		{ NULL, 0 },
+		GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,
+		0,
 	}
 };
 
@@ -184,14 +176,14 @@ static const struct format_list s3tc_formats = {
  */
 static const struct format_list srgb_formats = {
 	{
-		{ NULL, 0 },
+		0,
 	},
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT) },
-		{ NULL, 0 },
+		GL_COMPRESSED_SRGB_S3TC_DXT1_EXT,
+		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT,
+		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT,
+		GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT,
+		0,
 	}
 };
 
@@ -200,20 +192,20 @@ static const struct format_list srgb_formats = {
  */
 static const struct format_list paletted_formats = {
 	{
-		{ ENUM_AND_STRING(GL_PALETTE4_RGB8_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE4_RGBA8_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE4_R5_G6_B5_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE4_RGBA4_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE4_RGB5_A1_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE8_RGB8_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE8_RGBA8_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE8_R5_G6_B5_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE8_RGBA4_OES) },
-		{ ENUM_AND_STRING(GL_PALETTE8_RGB5_A1_OES) },
-		{ NULL, 0 },
+		GL_PALETTE4_RGB8_OES,
+		GL_PALETTE4_RGBA8_OES,
+		GL_PALETTE4_R5_G6_B5_OES,
+		GL_PALETTE4_RGBA4_OES,
+		GL_PALETTE4_RGB5_A1_OES,
+		GL_PALETTE8_RGB8_OES,
+		GL_PALETTE8_RGBA8_OES,
+		GL_PALETTE8_R5_G6_B5_OES,
+		GL_PALETTE8_RGBA4_OES,
+		GL_PALETTE8_RGB5_A1_OES,
+		0,
 	},
 	{
-		{ NULL, 0 },
+		0,
 	}
 };
 
@@ -229,11 +221,11 @@ static const struct format_list paletted_formats = {
  */
 static const struct format_list etc1_formats = {
 	{
-		{ ENUM_AND_STRING(GL_ETC1_RGB8_OES) },
-		{ NULL, 0 },
+		GL_ETC1_RGB8_OES,
+		0,
 	},
 	{
-		{ NULL, 0 },
+		0,
 	}
 };
 
@@ -249,20 +241,20 @@ static const struct format_list etc1_formats = {
  */
 static const struct format_list etc2_formats = {
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGB8_ETC2) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ETC2) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA8_ETC2_EAC) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_R11_EAC) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_R11_EAC) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RG11_EAC) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_RG11_EAC) },
-		{ NULL, 0 },
+		GL_COMPRESSED_RGB8_ETC2,
+		GL_COMPRESSED_SRGB8_ETC2,
+		GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
+		GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,
+		GL_COMPRESSED_RGBA8_ETC2_EAC,
+		GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC,
+		GL_COMPRESSED_R11_EAC,
+		GL_COMPRESSED_SIGNED_R11_EAC,
+		GL_COMPRESSED_RG11_EAC,
+		GL_COMPRESSED_SIGNED_RG11_EAC,
+		0,
 	},
 	{
-		{ NULL, 0 },
+		0,
 	}
 };
 
@@ -271,38 +263,38 @@ static const struct format_list etc2_formats = {
  */
 static const struct format_list astc_formats = {
 	{
-		{ NULL, 0 },
+		0,
 	},
 	{
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_4x4_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_5x4_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_5x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_6x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_6x6_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_8x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_8x6_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_8x8_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x6_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x8_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_10x10_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_12x10_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA_ASTC_12x12_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR) },
-		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR) },
-		{ NULL, 0 },
+		GL_COMPRESSED_RGBA_ASTC_4x4_KHR,
+		GL_COMPRESSED_RGBA_ASTC_5x4_KHR,
+		GL_COMPRESSED_RGBA_ASTC_5x5_KHR,
+		GL_COMPRESSED_RGBA_ASTC_6x5_KHR,
+		GL_COMPRESSED_RGBA_ASTC_6x6_KHR,
+		GL_COMPRESSED_RGBA_ASTC_8x5_KHR,
+		GL_COMPRESSED_RGBA_ASTC_8x6_KHR,
+		GL_COMPRESSED_RGBA_ASTC_8x8_KHR,
+		GL_COMPRESSED_RGBA_ASTC_10x5_KHR,
+		GL_COMPRESSED_RGBA_ASTC_10x6_KHR,
+		GL_COMPRESSED_RGBA_ASTC_10x8_KHR,
+		GL_COMPRESSED_RGBA_ASTC_10x10_KHR,
+		GL_COMPRESSED_RGBA_ASTC_12x10_KHR,
+		GL_COMPRESSED_RGBA_ASTC_12x12_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,
+		GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,
+		0,
 	}
 };
 
@@ -334,19 +326,19 @@ piglit_display(void)
 }
 
 static bool
-reject_bad(const struct format_tuple *bad, GLenum *compressed_formats,
+reject_bad(const GLenum *bad, GLenum *compressed_formats,
 	   GLint num_compressed_formats, bool check_errors)
 {
 	bool pass = true;
 	unsigned i;
 	unsigned j;
 
-	for (i = 0; bad[i].format != 0; i++) {
+	for (i = 0; bad[i] != 0; i++) {
 		for (j = 0; j < num_compressed_formats; j++) {
 			if (compressed_formats[j] == 0)
 				continue;
 
-			if (compressed_formats[j] == bad[i].format)
+			if (compressed_formats[j] == bad[i])
 				break;
 		}
 
@@ -354,7 +346,8 @@ reject_bad(const struct format_tuple *bad, GLenum *compressed_formats,
 			if (check_errors) {
 				fprintf(stderr,
 					"%s should not be available.\n",
-					bad[i].name);
+					piglit_get_gl_enum_name(
+						bad[i]));
 				pass = false;
 			}
 
@@ -384,12 +377,12 @@ try_formats(const struct format_list *t, GLenum *compressed_formats,
 		unsigned i;
 		unsigned j;
 
-		for (i = 0; t->good[i].format != 0; i++) {
+		for (i = 0; t->good[i] != 0; i++) {
 			for (j = 0; j < num_compressed_formats; j++) {
 				if (compressed_formats[j] == 0)
 					continue;
 
-				if (compressed_formats[j] == t->good[i].format)
+				if (compressed_formats[j] == t->good[i])
 					break;
 			}
 
@@ -397,7 +390,8 @@ try_formats(const struct format_list *t, GLenum *compressed_formats,
 				if (check_errors && !optional) {
 					fprintf(stderr,
 						"%s should be available.\n",
-						t->good[i].name);
+						piglit_get_gl_enum_name(
+							t->good[i]));
 					pass = false;
 				}
 			} else {
