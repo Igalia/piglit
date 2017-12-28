@@ -50,21 +50,18 @@ enum {
 };
 int test = CLEAR;
 
-#define F(name) #name, name
-
 struct format {
-	const char *name;
 	GLuint iformat;
 	const char *extension;
 } formats[] = {
-	{F(GL_STENCIL_INDEX1),    NULL},
-	{F(GL_STENCIL_INDEX4),    NULL},
-	{F(GL_STENCIL_INDEX8),    NULL},
-	{F(GL_STENCIL_INDEX16),   NULL},
+	{GL_STENCIL_INDEX1,    NULL},
+	{GL_STENCIL_INDEX4,    NULL},
+	{GL_STENCIL_INDEX8,    NULL},
+	{GL_STENCIL_INDEX16,   NULL},
 
-	{F(GL_DEPTH24_STENCIL8),  "GL_EXT_packed_depth_stencil"},
+	{GL_DEPTH24_STENCIL8,  "GL_EXT_packed_depth_stencil"},
 
-	{F(GL_DEPTH32F_STENCIL8), "GL_ARB_depth_buffer_float"}
+	{GL_DEPTH32F_STENCIL8, "GL_ARB_depth_buffer_float"}
 };
 
 struct format f;
@@ -361,18 +358,20 @@ void piglit_init(int argc, char **argv)
 			test = BLIT;
 			continue;
 		}
+		const GLenum arg = piglit_get_gl_enum_from_name(argv[p]);
 		for (i = 0; i < sizeof(formats)/sizeof(*formats); i++) {
-			if (!strcmp(argv[p], formats[i].name)) {
+			if (arg == formats[i].iformat) {
 				if (formats[i].extension)
 					piglit_require_extension(formats[i].extension);
 				f = formats[i];
-				printf("Testing %s.\n", f.name);
+				printf("Testing %s.\n",
+				       piglit_get_gl_enum_name(f.iformat));
 				break;
 			}
 		}
 	}
 
-	if (!f.name) {
+	if (!f.iformat) {
 		printf("Not enough parameters.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
