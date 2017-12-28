@@ -1,17 +1,4 @@
 
 Piglit To-Do items
 
-
-Quite a few tests have GL enum names encoded in tables.  For example, in
-tests/texturing/texture-rg.c:
-
-static const struct format_info IntFormats[] = {
-   { "GL_R8", GL_R8, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_R16", GL_R16, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
-   { "GL_RG8", GL_RG8, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
-[...]
-
-There's no reason to do this.  The program could use piglit_get_gl_enum_name()
-instead to convert GL enums to string names.
-
-
+Write projects in TODO file.
