@@ -45,29 +45,26 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define F(name) #name, name
-
 struct format {
-	const char *name;
 	GLuint iformat, format, type;
 	const char *extension;
 } formats[] = {
-	{F(GL_DEPTH_COMPONENT16),  GL_DEPTH_COMPONENT, GL_FLOAT,
+	{GL_DEPTH_COMPONENT16,  GL_DEPTH_COMPONENT, GL_FLOAT,
 	 "GL_ARB_depth_texture"},
 
-	{F(GL_DEPTH_COMPONENT24),  GL_DEPTH_COMPONENT, GL_FLOAT,
+	{GL_DEPTH_COMPONENT24,  GL_DEPTH_COMPONENT, GL_FLOAT,
 	 "GL_ARB_depth_texture"},
 
-	{F(GL_DEPTH_COMPONENT32),  GL_DEPTH_COMPONENT, GL_FLOAT,
+	{GL_DEPTH_COMPONENT32,  GL_DEPTH_COMPONENT, GL_FLOAT,
 	 "GL_ARB_depth_texture"},
 
-	{F(GL_DEPTH24_STENCIL8),   GL_DEPTH_STENCIL,   GL_UNSIGNED_INT_24_8_EXT,
+	{GL_DEPTH24_STENCIL8,   GL_DEPTH_STENCIL,   GL_UNSIGNED_INT_24_8_EXT,
 	 "GL_EXT_packed_depth_stencil"},
 
-	{F(GL_DEPTH_COMPONENT32F), GL_DEPTH_COMPONENT, GL_FLOAT,
+	{GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT,
 	 "GL_ARB_depth_buffer_float"},
 
-	{F(GL_DEPTH32F_STENCIL8),  GL_DEPTH_STENCIL,   GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+	{GL_DEPTH32F_STENCIL8,  GL_DEPTH_STENCIL,   GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
 	 "GL_ARB_depth_buffer_float"}
 };
 
@@ -215,8 +212,9 @@ void piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_depth_texture");
 
 	for (p = 1; p < argc; p++) {
+		const GLenum arg = piglit_get_gl_enum_from_name(argv[p]);
 		for (i = 0; i < sizeof(formats)/sizeof(*formats); i++) {
-			if (!strcmp(argv[p], formats[i].name)) {
+			if (arg == formats[i].iformat) {
 				piglit_require_extension(formats[i].extension);
 				f = formats[i];
 				return;
@@ -224,7 +222,7 @@ void piglit_init(int argc, char **argv)
 		}
 	}
 
-	if (!f.name) {
+	if (!f.iformat) {
 		printf("Not enough parameters.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
