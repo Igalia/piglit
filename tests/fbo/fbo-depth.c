@@ -52,19 +52,16 @@ enum {
 };
 int test = CLEAR;
 
-#define F(name) #name, name
-
 struct format {
-	const char *name;
 	GLenum iformat;
 	const char *extension;
 } formats[] = {
-	{F(GL_DEPTH_COMPONENT16), "GL_ARB_depth_texture"},
-	{F(GL_DEPTH_COMPONENT24), "GL_ARB_depth_texture"},
-	{F(GL_DEPTH_COMPONENT32), "GL_ARB_depth_texture"},
-	{F(GL_DEPTH24_STENCIL8), "GL_EXT_packed_depth_stencil"},
-	{F(GL_DEPTH_COMPONENT32F), "GL_ARB_depth_buffer_float"},
-	{F(GL_DEPTH32F_STENCIL8), "GL_ARB_depth_buffer_float"}
+	{GL_DEPTH_COMPONENT16, "GL_ARB_depth_texture"},
+	{GL_DEPTH_COMPONENT24, "GL_ARB_depth_texture"},
+	{GL_DEPTH_COMPONENT32, "GL_ARB_depth_texture"},
+	{GL_DEPTH24_STENCIL8, "GL_EXT_packed_depth_stencil"},
+	{GL_DEPTH_COMPONENT32F, "GL_ARB_depth_buffer_float"},
+	{GL_DEPTH32F_STENCIL8, "GL_ARB_depth_buffer_float"}
 };
 
 struct format f;
@@ -345,18 +342,20 @@ void piglit_init(int argc, char **argv)
 			test = BLIT;
 			continue;
 		}
+		const GLenum arg = piglit_get_gl_enum_from_name(argv[p]);
 		for (i = 0; i < sizeof(formats)/sizeof(*formats); i++) {
-			if (!strcmp(argv[p], formats[i].name)) {
+			if (arg == formats[i].iformat) {
 				if (formats[i].extension)
 					piglit_require_extension(formats[i].extension);
 				f = formats[i];
-				printf("Testing %s.\n", f.name);
+				printf("Testing %s.\n",
+				       piglit_get_gl_enum_name(f.iformat));
 				break;
 			}
 		}
 	}
 
-	if (!f.name) {
+	if (!f.iformat) {
 		printf("Not enough parameters.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
