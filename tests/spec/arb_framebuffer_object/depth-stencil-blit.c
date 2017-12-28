@@ -47,23 +47,20 @@ GLint stencil_size;
 GLenum ds_format = GL_NONE;
 bool depth = false, stencil = false;
 
-#define F(name) #name, name
-
 static const struct {
-	const char *name;
 	GLenum iformat;
 	const char *extension;
 } formats[] = {
-	{F(GL_DEPTH_COMPONENT16), NULL},
-	{F(GL_DEPTH_COMPONENT24), NULL},
-	{F(GL_DEPTH_COMPONENT32), NULL},
-	{F(GL_DEPTH24_STENCIL8), "GL_EXT_packed_depth_stencil"},
-	{F(GL_DEPTH_COMPONENT32F), "GL_ARB_depth_buffer_float"},
-	{F(GL_DEPTH32F_STENCIL8), "GL_ARB_depth_buffer_float"},
-	{F(GL_STENCIL_INDEX1),    NULL},
-	{F(GL_STENCIL_INDEX4),    NULL},
-	{F(GL_STENCIL_INDEX8),    NULL},
-	{F(GL_STENCIL_INDEX16),   NULL},
+	{GL_DEPTH_COMPONENT16, NULL},
+	{GL_DEPTH_COMPONENT24, NULL},
+	{GL_DEPTH_COMPONENT32, NULL},
+	{GL_DEPTH24_STENCIL8, "GL_EXT_packed_depth_stencil"},
+	{GL_DEPTH_COMPONENT32F, "GL_ARB_depth_buffer_float"},
+	{GL_DEPTH32F_STENCIL8, "GL_ARB_depth_buffer_float"},
+	{GL_STENCIL_INDEX1,    NULL},
+	{GL_STENCIL_INDEX4,    NULL},
+	{GL_STENCIL_INDEX8,    NULL},
+	{GL_STENCIL_INDEX16,   NULL},
 };
 
 
@@ -342,15 +339,17 @@ piglit_init(int argc, char **argv)
 	else
 		skip = true;
 
+	const GLenum arg = piglit_get_gl_enum_from_name(argv[2]);
 	for (int i = 0; i < ARRAY_SIZE(formats); i++) {
-		if (!strcmp(argv[2], formats[i].name)) {
+		if (arg == formats[i].iformat) {
 
 			if (formats[i].extension &&
 			    !piglit_is_extension_supported(formats[i].extension))
 				continue;
 
 			ds_format = formats[i].iformat;
-			printf("Testing %s.\n", formats[i].name);
+			printf("Testing %s.\n",
+			       piglit_get_gl_enum_name(ds_format));
 			break;
 		}
 	}
