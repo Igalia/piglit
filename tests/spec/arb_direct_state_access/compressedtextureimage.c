@@ -51,7 +51,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 struct format {
-	const char *name;
 	GLenum token;
 	const char **extension;
 };
@@ -90,30 +89,29 @@ const char *BPTC[] = {
 	NULL
 };
 
-#define FORMAT(t, ext) { #t, t, ext }
 static struct format formats[] = {
-	FORMAT(GL_COMPRESSED_RGB_FXT1_3DFX, FXT1),
-	FORMAT(GL_COMPRESSED_RGBA_FXT1_3DFX, FXT1),
+	{ GL_COMPRESSED_RGB_FXT1_3DFX, FXT1 },
+	{ GL_COMPRESSED_RGBA_FXT1_3DFX, FXT1 },
 
-	FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, S3TC),
-	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, S3TC),
-	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, S3TC),
-	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, S3TC),
+	{ GL_COMPRESSED_RGB_S3TC_DXT1_EXT, S3TC },
+	{ GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, S3TC },
+	{ GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, S3TC },
+	{ GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, S3TC },
 
-	FORMAT(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, S3TC_srgb),
-	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, S3TC_srgb),
-	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, S3TC_srgb),
-	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, S3TC_srgb),
+	{ GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, S3TC_srgb },
+	{ GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, S3TC_srgb },
+	{ GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, S3TC_srgb },
+	{ GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, S3TC_srgb },
 
-	FORMAT(GL_COMPRESSED_RGBA_BPTC_UNORM, BPTC),
-	FORMAT(GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM, BPTC),
-	FORMAT(GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, BPTC),
-	FORMAT(GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT, BPTC),
+	{ GL_COMPRESSED_RGBA_BPTC_UNORM, BPTC },
+	{ GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM, BPTC },
+	{ GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, BPTC },
+	{ GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT, BPTC },
 
-	FORMAT(GL_COMPRESSED_RED_RGTC1_EXT, RGTC),
-	FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1_EXT, RGTC_signed),
-	FORMAT(GL_COMPRESSED_RED_GREEN_RGTC2_EXT, RGTC),
-	FORMAT(GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT, RGTC_signed),
+	{ GL_COMPRESSED_RED_RGTC1_EXT, RGTC },
+	{ GL_COMPRESSED_SIGNED_RED_RGTC1_EXT, RGTC_signed },
+	{ GL_COMPRESSED_RED_GREEN_RGTC2_EXT, RGTC },
+	{ GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT, RGTC_signed },
 };
 
 static void
@@ -220,7 +218,8 @@ piglit_display(void)
 		if (size != expected_size) {
 			fprintf(stderr, "Format %s level %d (%dx%d) size %d "
 				"doesn't match expected size %d\n",
-				format->name, level, w, h, size, expected_size);
+				piglit_get_gl_enum_name(format->token),
+				level, w, h, size, expected_size);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
@@ -256,7 +255,8 @@ usage(int argc, char **argv)
 	fprintf(stderr, "Usage: %s <format>\n", argv[0]);
 	fprintf(stderr, "format is one of:\n");
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
-		fprintf(stderr, "  %s\n", formats[i].name);
+		fprintf(stderr, "  %s\n",
+			piglit_get_gl_enum_name(formats[i].token));
 	}
 	exit(1);
 }
@@ -274,8 +274,9 @@ piglit_init(int argc, char **argv)
 
 	format = NULL;
 
+	const GLenum arg = piglit_get_gl_enum_from_name(argv[1]);
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
-		if (strcmp(formats[i].name, argv[1]) == 0) {
+		if (formats[i].token == arg) {
 			format = &formats[i];
 			break;
 		}
