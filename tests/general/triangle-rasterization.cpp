@@ -340,22 +340,19 @@ void triangle_art(uint32_t* buffer)
  */
 uint32_t* check_triangle()
 {
+	const float black[] = { 0, 0, 0 };
+	const float yellow[] = { 1, 1, 0 };
+
+	if (piglit_probe_rect_two_rgb(0, 0, fbo_width, fbo_height, black,
+				      yellow))
+		return NULL;
+
 	static uint32_t* buffer = 0;
 	if (!buffer) buffer = new uint32_t[fbo_width * fbo_height];
 
 	glReadPixels(0, 0, fbo_width, fbo_height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, buffer);
 
-	for (int y = 0; y < fbo_height; ++y) {
-		for (int x = 0; x < fbo_width; ++x) {
-			uint32_t val = buffer[y*fbo_width + x] & 0xFFFFFF00;
-
-			if (val != 0 && val != 0xFFFF0000) {
-				return buffer;
-			}
-		}
-	}
-
-	return NULL;
+	return buffer;
 }
 
 
