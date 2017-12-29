@@ -1,0 +1,77 @@
+#
+# This builds and installs Piglit.
+#
+# ~~~
+#  rocker build -f Rockerfile.piglit [--attach]                 \
+#    [--var TAG=piglit]         # piglit-17.0, piglit-13.0, ... \
+#    [--var RELEASE=xenial]     # master, pre-release-17.0, pre-release-13.0, ...
+# ~~~
+#
+# Environment variables that are used in the build:
+#  - BASE_DOCKER_IMAGE: name of the image in which this will be based (default: ubuntu)
+#  - DOCKER_IMAGE: name of the final image to be tagged (default: freedesktop/mesa)
+#  - BASE_PIGLIT_REPO: custom piglit repository to use with a specific release
+#  - MAKEFLAGS: flags to pass to make (e.g., "-j8")
+#  - CCACHE_DIR: ccache directory (default: ~/.ccache)
+#
+# To run
+#
+# ~~~
+#   mkdir -p -m777 ~/my_results_dir
+#   docker run --privileged --rm -t -v ~/my_results_dir:/results:Z  \
+#              -v /tmp/.X11-unix:/tmp/.X11-unix freedesktop/mesa:piglit
+# ~~~
+#
+
+{{ $base_image := (or .Env.BASE_DOCKER_IMAGE "ubuntu") }}
+{{ $image := (or .Env.BASE_DOCKER_IMAGE "freedesktop/mesa") }}
+{{ $release := (or .RELEASE "xenial") }}
+{{ $ccachedir := (or .Env.CCACHE_DIR "~/.ccache") }}
+
+FROM {{ $base_image }}:{{ $release }}
+
+LABEL maintainer "Andres Gomez <agomez@igalia.com>"
+
+USER root
+
+ENV LC_ALL=C.UTF-8
+
+RUN apt-get update                                                      \
+  && apt-get -y --no-install-recommends install sudo gcc g++ ccache     \
+    git pkg-config bash-completion cmake                                \
+    libz-dev libpng-dev libgl-dev libegl1-mesa-dev libwaffle-dev        \
+    python3-setuptools python3-pip                                      \
+  && rm -fr /var/lib/apt/lists/*
+
+RUN pip3 install numpy six mako
+
+RUN getent passwd local > /dev/null || adduser --gecos "" local && passwd -d local && adduser local sudo
+
+USER local
+
+{{ if .Env.MAKEFLAGS }}
+ENV MAKEFLAGS={{ .Env.MAKEFLAGS }}
+{{ end }}
+
+WORKDIR /home/local
+
+MOUNT {{ $ccachedir }}:/home/local/.ccache:Z
+
+RUN sudo chown -R local:local /home/local/.ccache
+
+ENV PATH=/usr/lib/ccache:$PATH
+
+ADD . /home/local/piglit
+RUN sudo chown -R local:local /home/local/piglit
+
+WORKDIR /home/local/piglit
+
+ATTACH [ "/bin/bash" ]
+
+RUN cmake . && cmake --build .
+
+VOLUME /results
+
+{{ if .TAG }}
+TAG {{ $image }}:{{ .TAG }}
+{{ end }}
