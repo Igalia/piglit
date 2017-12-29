@@ -1106,6 +1106,56 @@ can_probe_ubyte()
 	return r <= 8 && g <= 8 && b <= 8 && a <= 8;
 }
 
+static void
+print_components_ubyte(const GLubyte *pixel, unsigned components)
+{
+	int p;
+	for (p = 0; p < components; ++p)
+		printf(" %u", pixel[p]);
+}
+
+static void
+print_components_float(const float *pixel, unsigned components)
+{
+	int p;
+	for (p = 0; p < components; ++p)
+		printf(" %f", pixel[p]);
+}
+
+static void
+print_bad_pixel_ubyte(int x, int y, int num_components,
+		      const GLubyte *expected, const GLubyte *observed)
+{
+	printf("Probe color at (%i,%i)\n", x, y);
+	printf("  Expected:");
+	print_components_ubyte(expected, num_components);
+	printf("\n  Observed:");
+	print_components_ubyte(observed, num_components);
+	printf("\n");
+}
+
+static void
+print_bad_pixel_float(int x, int y, int num_components,
+		      const float *expected, const float *observed)
+{
+	printf("Probe color at (%i,%i)\n", x, y);
+	printf("  Expected:");
+	print_components_float(expected, num_components);
+	printf("\n  Observed:");
+	print_components_float(observed, num_components);
+	printf("\n");
+}
+
+static bool
+compare_pixels_float(const float *color1, const float *color2,
+		     int components)
+{
+	for (int p = 0; p < components; ++p)
+		if (fabsf(color1[p] - color2[p]) > piglit_tolerance[p])
+			return false;
+	return true;
+}
+
 int
 piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *out_probe)
 {
@@ -1167,9 +1217,7 @@ piglit_probe_pixel_rgb(int x, int y, const float* expected)
 	if (pass)
 		return 1;
 
-	printf("Probe color at (%i,%i)\n", x, y);
-	printf("  Expected: %f %f %f\n", expected[0], expected[1], expected[2]);
-	printf("  Observed: %f %f %f\n", probe[0], probe[1], probe[2]);
+	print_bad_pixel_float(x, y, 3, expected, probe);
 
 	return 0;
 }
@@ -1197,9 +1245,7 @@ piglit_probe_pixel_rgba(int x, int y, const float* expected)
 	if (pass)
 		return 1;
 
-	printf("Probe color at (%i,%i)\n", x, y);
-	printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
-	printf("  Observed: %f %f %f %f\n", probe[0], probe[1], probe[2], probe[3]);
+	print_bad_pixel_float(x, y, 4, expected, probe);
 
 	return 0;
 }
@@ -1247,20 +1293,9 @@ probe_rect_ubyte(int x, int y, int w, int h, int num_components,
 			for (p = 0; p < num_components; ++p) {
 				if (abs((int)probe[p] - (int)expected[p]) >= tolerance[p]) {
 					if (!silent) {
-						printf("Probe color at (%i,%i)\n", x+i, y+j);
-						if (num_components == 4) {
-							printf("  Expected: %u %u %u %u\n",
-							       expected[0], expected[1],
-							       expected[2], expected[3]);
-							printf("  Observed: %u %u %u %u\n",
-							       probe[0], probe[1], probe[2], probe[3]);
-						} else {
-							printf("  Expected: %u %u %u\n",
-							       expected[0], expected[1],
-							       expected[2]);
-							printf("  Observed: %u %u %u\n",
-							       probe[0], probe[1], probe[2]);
-						}
+						print_bad_pixel_ubyte(
+							x + i, y + j, 3,
+							expected, probe);
 					}
 					free(pixels);
 					return false;
@@ -1320,9 +1355,8 @@ piglit_probe_rect_r_ubyte(int x, int y, int w, int h, GLubyte expected)
 			GLubyte probe = pixels[j*w_aligned+i];
 
 			if (abs((int)probe - (int)expected) >= tolerance) {
-				printf("Probe color at (%i,%i)\n", x+i, y+j);
-				printf("  Expected: %u\n", expected);
-				printf("  Observed: %u\n", probe);
+				print_bad_pixel_ubyte(x + i, y + j, 1,
+						      &expected, &probe);
 
 				free(pixels);
 				return 0;
@@ -1352,11 +1386,9 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 
 			for (p = 0; p < 3; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe color at (%i,%i)\n", x+i, y+j);
-					printf("  Expected: %f %f %f\n",
-					       expected[0], expected[1], expected[2]);
-					printf("  Observed: %f %f %f\n",
-					       probe[0], probe[1], probe[2]);
+					print_bad_pixel_float(x + i, y + j, 3,
+							      expected,
+							      probe);
 
 					free(pixels);
 					return 0;
@@ -1423,11 +1455,9 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe color at (%i,%i)\n", x+i, y+j);
-					printf("  Expected: %f %f %f %f\n",
-					       expected[0], expected[1], expected[2], expected[3]);
-					printf("  Observed: %f %f %f %f\n",
-					       probe[0], probe[1], probe[2], probe[3]);
+					print_bad_pixel_float(x + i, y + j, 4,
+							      expected,
+							      probe);
 
 					free(pixels);
 					return 0;
@@ -1505,32 +1535,6 @@ piglit_probe_rect_rgba_uint(int x, int y, int w, int h,
 	return 1;
 }
 
-static void
-print_pixel_ubyte(const GLubyte *pixel, unsigned components)
-{
-	int p;
-	for (p = 0; p < components; ++p)
-		printf(" %u", pixel[p]);
-}
-
-static void
-print_pixel_float(const float *pixel, unsigned components)
-{
-	int p;
-	for (p = 0; p < components; ++p)
-		printf(" %f", pixel[p]);
-}
-
-static bool
-compare_pixels_float(const float *color1, const float *color2,
-		     int components)
-{
-	for (int p = 0; p < components; ++p)
-		if (fabsf(color1[p] - color2[p]) > piglit_tolerance[p])
-			return false;
-	return true;
-}
-
 /**
  * Read color data from the given rectangle and compare its RGB value to the
  * given two expected values.
@@ -1555,11 +1559,11 @@ piglit_probe_rect_two_rgb(int x, int y, int w, int h,
 
 			printf("Probe color at (%i,%i)\n", x + i, y + j);
 			printf("  Expected either:");
-			print_pixel_float(expected1, 3);
+			print_components_float(expected1, 3);
 			printf("\n  or:");
-			print_pixel_float(expected2, 3);
+			print_components_float(expected2, 3);
 			printf("\n  Observed:");
-			print_pixel_float(probe, 3);
+			print_components_float(probe, 3);
 			printf("\n");
 
 			free(pixels);
@@ -1605,9 +1609,9 @@ piglit_compare_pixels(int x, int y, const float *expected, const float *probe,
 		if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
 			printf("Probe at (%i,%i)\n", x, y);
 			printf("  Expected:");
-			print_pixel_float(expected, num_components);
+			print_components_float(expected, num_components);
 			printf("\n  Observed:");
-			print_pixel_float(probe, num_components);
+			print_components_float(probe, num_components);
 			printf("\n");
 
 			return 0;
@@ -1665,9 +1669,9 @@ piglit_compare_images_color(int x, int y, int w, int h, int num_components,
 				    >= tolerance[p]) {
 					printf("Probe at (%i,%i)\n", x+i, y+j);
 					printf("  Expected:");
-					print_pixel_float(expected, num_components);
+					print_components_float(expected, num_components);
 					printf("\n  Observed:");
-					print_pixel_float(probe, num_components);
+					print_components_float(probe, num_components);
 					printf("\n");
 
 					return 0;
@@ -1861,9 +1865,9 @@ piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
 
 				printf("Probe at (%i,%i)\n", x + i, y + j);
 				printf("  Expected:");
-				print_pixel_ubyte(expected, c);
+				print_components_ubyte(expected, c);
 				printf("\n  Observed:");
-				print_pixel_ubyte(probe, c);
+				print_components_ubyte(probe, c);
 				printf("\n");
 
 				free(pixels);
@@ -1909,11 +1913,9 @@ int piglit_probe_texel_rect_rgb(int target, int level, int x, int y,
 
 			for (p = 0; p < 3; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe color at (%i,%i)\n", i, j);
-					printf("  Expected: %f %f %f\n",
-					       expected[0], expected[1], expected[2]);
-					printf("  Observed: %f %f %f\n",
-					       probe[0], probe[1], probe[2]);
+					print_bad_pixel_float(i, j, 3,
+							      expected,
+							      probe);
 
 					free(buffer);
 					return 0;
@@ -1972,11 +1974,9 @@ int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe color at (%i,%i)\n", i, j);
-					printf("  Expected: %f %f %f %f\n",
-					       expected[0], expected[1], expected[2], expected[3]);
-					printf("  Observed: %f %f %f %f\n",
-					       probe[0], probe[1], probe[2], probe[3]);
+					print_bad_pixel_float(i, j, 4,
+							      expected,
+							      probe);
 
 					free(buffer);
 					return 0;
@@ -2042,10 +2042,13 @@ int piglit_probe_texel_volume_rgba(int target, int level, int x, int y, int z,
 				for (p = 0; p < 4; ++p) {
 					if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
 						printf("Probe color at (%i,%i,%i)\n", i, j, k);
-						printf("  Expected: %f %f %f %f\n",
-						       expected[0], expected[1], expected[2], expected[3]);
-						printf("  Observed: %f %f %f %f\n",
-						       probe[0], probe[1], probe[2], probe[3]);
+						printf("  Expected: ");
+						print_components_float(
+							expected, 4);
+						printf("\n  Observed: ");
+						print_components_float(probe,
+								       4);
+						printf("\n");
 
 						free(buffer);
 						return 0;
