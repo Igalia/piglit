@@ -152,6 +152,9 @@ int piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expect
 int piglit_probe_rect_rgba(int x, int y, int w, int h, const float* expected);
 int piglit_probe_rect_rgba_int(int x, int y, int w, int h, const int* expected);
 int piglit_probe_rect_rgba_uint(int x, int y, int w, int h, const unsigned int* expected);
+bool piglit_probe_rect_two_rgb(int x, int y, int w, int h,
+			       const float *expected1,
+			       const float *expected2);
 void piglit_compute_probe_tolerance(GLenum format, float *tolerance);
 
 /**

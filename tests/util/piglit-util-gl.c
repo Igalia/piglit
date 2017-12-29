@@ -1519,6 +1519,56 @@ print_pixel_float(const float *pixel, unsigned components)
 		printf(" %f", pixel[p]);
 }
 
+static bool
+compare_pixels_float(const float *color1, const float *color2,
+		     int components)
+{
+	for (int p = 0; p < components; ++p)
+		if (fabsf(color1[p] - color2[p]) > piglit_tolerance[p])
+			return false;
+	return true;
+}
+
+/**
+ * Read color data from the given rectangle and compare its RGB value to the
+ * given two expected values.
+ *
+ * Print a log message if the color value deviates from both expected values.
+ * \return true if the color values match, false otherwise
+ */
+bool
+piglit_probe_rect_two_rgb(int x, int y, int w, int h,
+			  const float *expected1, const float *expected2)
+{
+	/* RGBA readbacks are likely to be faster */
+	float *pixels = piglit_read_pixels_float(x, y, w, h, GL_RGBA, NULL);
+
+	for (int j = 0; j < h; j++) {
+		for (int i = 0; i < w; i++) {
+			float *probe = &pixels[(j * w + i) * 4];
+
+			if (compare_pixels_float(probe, expected1, 3) ||
+			    compare_pixels_float(probe, expected2, 3))
+				continue;
+
+			printf("Probe color at (%i,%i)\n", x + i, y + j);
+			printf("  Expected either:");
+			print_pixel_float(expected1, 3);
+			printf("\n  or:");
+			print_pixel_float(expected2, 3);
+			printf("\n  Observed:");
+			print_pixel_float(probe, 3);
+			printf("\n");
+
+			free(pixels);
+			return false;
+		}
+	}
+
+	free(pixels);
+	return true;
+}
+
 /**
  * Compute the appropriate tolerance for comparing images of the given
  * base format.
