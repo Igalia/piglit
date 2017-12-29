@@ -112,38 +112,6 @@ PIGLIT_GL_TEST_CONFIG_END
 
 GLuint color_uniform;
 
-/* Check that the framebuffer is yellow and black. */
-static bool
-check_framebuffer(void)
-{
-	int y, x;
-	uint32_t *buffer = malloc(sizeof(uint32_t) * piglit_width *
-				  piglit_height);
-#ifdef __BIG_ENDIAN__
-	const GLenum type = GL_UNSIGNED_INT_8_8_8_8_REV;
-#else
-	const GLenum type = GL_UNSIGNED_INT_8_8_8_8;
-#endif
-
-	glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, type, buffer);
-
-	for (y = 0; y < piglit_height; ++y) {
-		for (x = 0; x < piglit_width; ++x) {
-			uint32_t val = buffer[y * piglit_width + x] &
-				0xFFFFFF00;
-
-			if (val != 0 && val != 0xFFFF0000) {
-				fprintf(stderr,
-					"FAIL: Rendered primitives differ.\n");
-				return false;
-			}
-		}
-	}
-
-	free(buffer);
-	return true;
-}
-
 /* Parse command line arguments.
  *
  * Recognized command line arguments are:
@@ -240,8 +208,10 @@ enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
+	const float black[] = {0, 0, 0, 1};
 	const float red[] = {1, 0, 0, 1};
 	const float green[] = {0, 1, 0, 1};
+	const float yellow[] = {1, 1, 0, 1};
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -253,7 +223,8 @@ piglit_display(void)
 	glUniform4fv(color_uniform, 1, green);
 	draw(test->base);
 
-	pass = check_framebuffer() && pass;
+	pass = piglit_probe_rect_two_rgb(0, 0, piglit_width, piglit_height,
+					 black, yellow) && pass;
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	if (!piglit_automatic)
