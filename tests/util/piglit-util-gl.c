@@ -1373,33 +1373,34 @@ piglit_probe_rects_equal(int x1, int y1, int x2, int y2,
 			int w, int h, GLenum format)
 {
 	int retval;
-	GLfloat *pixels;
-	int ncomponents, rect_size;
+	int ncomponents;
 
 	/* Allocate buffer large enough for two rectangles */
 	ncomponents = piglit_num_components(format);
-	rect_size = w * h * ncomponents;
-	pixels = malloc(2 * rect_size * sizeof(GLfloat));
 
 	/* Load the pixels into the buffer and compare */
 	/* We only need to do one glReadPixels if the images are adjacent */
 	if ((x1 + w) == x2 && y1 == y2) {
-		piglit_read_pixels_float(x1, y1, 2*w, h, format, pixels);
+		float *pixels = piglit_read_pixels_float(x1, y1, 2 * w, h,
+							 format, NULL);
 		retval = piglit_compare_image_halves_color(2*w, h,
 						       ncomponents,
 						       piglit_tolerance,
 						       pixels);
+		free(pixels);
 	} else {
-		piglit_read_pixels_float(x1, y1, w, h, format, pixels);
-		piglit_read_pixels_float(x2, y2, w, h, format,
-					pixels + rect_size);
+		float *pixels1 =
+			piglit_read_pixels_float(x1, y1, w, h, format, NULL);
+		float *pixels2 =
+			piglit_read_pixels_float(x2, y2, w, h, format, NULL);
 		retval = piglit_compare_images_color(0, 0, w, h,
 					       ncomponents,
 					       piglit_tolerance,
-					       pixels, pixels + rect_size);
+					       pixels1, pixels2);
+		free(pixels1);
+		free(pixels2);
 	}
 
-	free(pixels);
 	return retval;
 }
 
@@ -2778,7 +2779,7 @@ piglit_rgbw_texture_3d(void)
  */
 GLuint piglit_integer_texture(GLenum internalFormat, int w, int h, int b, int a)
 {
-	int *img = malloc(w * h * 4 * sizeof(unsigned));
+	int *img = malloc(w * h * 4 * sizeof(int));
 	int *p;
 	int x, y;
 	GLuint tex;
@@ -2872,7 +2873,7 @@ piglit_depth_texture(GLenum target, GLenum internalformat, int w, int h, int d, 
 					f[y * w + x] = val;
 				else if (f2)
 					f2[(y * w + x)*2] = val;
-				else
+				else if (i)
 					i[y * w + x] = 0xffffff00 * val;
 			}
 		}
