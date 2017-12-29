@@ -1053,8 +1053,8 @@ piglit_get_luminance_intensity_bits(GLenum internalformat, int *bits)
  * GL_UNSIGNED_BYTE on GLES.  If pixels == NULL, malloc a float array of the
  * appropriate size, otherwise use the one provided. */
 static GLfloat *
-piglit_read_pixels_float(GLint x, GLint y, GLsizei width, GLsizei height,
-                         GLenum format, GLfloat *pixels)
+read_pixels_float(GLint x, GLint y, GLsizei width, GLsizei height,
+		  GLenum format, GLfloat *pixels)
 {
 	GLubyte *pixels_b;
 	unsigned i, ncomponents;
@@ -1077,7 +1077,7 @@ piglit_read_pixels_float(GLint x, GLint y, GLsizei width, GLsizei height,
 }
 
 static bool
-piglit_can_probe_ubyte()
+can_probe_ubyte()
 {
 	int r,g,b,a,read;
 
@@ -1113,7 +1113,7 @@ piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *out_pr
 	int i;
 	GLboolean pass = GL_TRUE;
 
-	piglit_read_pixels_float(x, y, 1, 1, GL_RGB, probe);
+	read_pixels_float(x, y, 1, 1, GL_RGB, probe);
 
 	for(i = 0; i < 3; ++i)
 		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i])
@@ -1132,7 +1132,7 @@ piglit_probe_pixel_rgba_silent(int x, int y, const float* expected, float *out_p
 	int i;
 	GLboolean pass = GL_TRUE;
 
-	piglit_read_pixels_float(x, y, 1, 1, GL_RGBA, probe);
+	read_pixels_float(x, y, 1, 1, GL_RGBA, probe);
 
 	for(i = 0; i < 4; ++i)
 		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i])
@@ -1158,7 +1158,7 @@ piglit_probe_pixel_rgb(int x, int y, const float* expected)
 	int i;
 	GLboolean pass = GL_TRUE;
 
-	piglit_read_pixels_float(x, y, 1, 1, GL_RGB, probe);
+	read_pixels_float(x, y, 1, 1, GL_RGB, probe);
 
 	for(i = 0; i < 3; ++i)
 		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i])
@@ -1188,7 +1188,7 @@ piglit_probe_pixel_rgba(int x, int y, const float* expected)
 	int i;
 	GLboolean pass = GL_TRUE;
 
-	piglit_read_pixels_float(x, y, 1, 1, GL_RGBA, probe);
+	read_pixels_float(x, y, 1, 1, GL_RGBA, probe);
 
 	for(i = 0; i < 4; ++i)
 		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i])
@@ -1205,7 +1205,7 @@ piglit_probe_pixel_rgba(int x, int y, const float* expected)
 }
 
 static void
-piglit_array_float_to_ubyte(int n, const float *f, GLubyte *b)
+array_float_to_ubyte(int n, const float *f, GLubyte *b)
 {
 	int i;
 
@@ -1214,7 +1214,7 @@ piglit_array_float_to_ubyte(int n, const float *f, GLubyte *b)
 }
 
 static void
-piglit_array_float_to_ubyte_roundup(int n, const float *f, GLubyte *b)
+array_float_to_ubyte_roundup(int n, const float *f, GLubyte *b)
 {
 	int i;
 
@@ -1223,7 +1223,7 @@ piglit_array_float_to_ubyte_roundup(int n, const float *f, GLubyte *b)
 }
 
 static bool
-piglit_probe_rect_ubyte(int x, int y, int w, int h, int num_components,
+probe_rect_ubyte(int x, int y, int w, int h, int num_components,
 			const float *fexpected, bool silent)
 {
 	int i, j, p;
@@ -1232,8 +1232,9 @@ piglit_probe_rect_ubyte(int x, int y, int w, int h, int num_components,
 	GLubyte tolerance[4];
 	GLubyte expected[4];
 
-	piglit_array_float_to_ubyte_roundup(num_components, piglit_tolerance, tolerance);
-	piglit_array_float_to_ubyte(num_components, fexpected, expected);
+	array_float_to_ubyte_roundup(num_components, piglit_tolerance,
+				     tolerance);
+	array_float_to_ubyte(num_components, fexpected, expected);
 
 	/* RGBA readbacks are likely to be faster */
 	pixels = malloc(w*h*4);
@@ -1279,10 +1280,10 @@ piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected)
 	GLfloat *probe;
 	GLfloat *pixels;
 
-	if (piglit_can_probe_ubyte())
-		return piglit_probe_rect_ubyte(x, y, w, h, 3, expected, true);
+	if (can_probe_ubyte())
+		return probe_rect_ubyte(x, y, w, h, 3, expected, true);
 
-	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGB, NULL);
+	pixels = read_pixels_float(x, y, w, h, GL_RGB, NULL);
 
 	for (j = 0; j < h; j++) {
 		for (i = 0; i < w; i++) {
@@ -1340,10 +1341,10 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 	GLfloat *probe;
 	GLfloat *pixels;
 
-	if (piglit_can_probe_ubyte())
-		return piglit_probe_rect_ubyte(x, y, w, h, 3, expected, false);
+	if (can_probe_ubyte())
+		return probe_rect_ubyte(x, y, w, h, 3, expected, false);
 
-	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGBA, NULL);
+	pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
 	for (j = 0; j < h; j++) {
 		for (i = 0; i < w; i++) {
@@ -1381,8 +1382,8 @@ piglit_probe_rects_equal(int x1, int y1, int x2, int y2,
 	/* Load the pixels into the buffer and compare */
 	/* We only need to do one glReadPixels if the images are adjacent */
 	if ((x1 + w) == x2 && y1 == y2) {
-		float *pixels = piglit_read_pixels_float(x1, y1, 2 * w, h,
-							 format, NULL);
+		float *pixels =
+			read_pixels_float(x1, y1, 2 * w, h, format, NULL);
 		retval = piglit_compare_image_halves_color(2*w, h,
 						       ncomponents,
 						       piglit_tolerance,
@@ -1390,9 +1391,9 @@ piglit_probe_rects_equal(int x1, int y1, int x2, int y2,
 		free(pixels);
 	} else {
 		float *pixels1 =
-			piglit_read_pixels_float(x1, y1, w, h, format, NULL);
+			read_pixels_float(x1, y1, w, h, format, NULL);
 		float *pixels2 =
-			piglit_read_pixels_float(x2, y2, w, h, format, NULL);
+			read_pixels_float(x2, y2, w, h, format, NULL);
 		retval = piglit_compare_images_color(0, 0, w, h,
 					       ncomponents,
 					       piglit_tolerance,
@@ -1411,10 +1412,10 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 	GLfloat *probe;
 	GLfloat *pixels;
 
-	if (piglit_can_probe_ubyte())
-		return piglit_probe_rect_ubyte(x, y, w, h, 4, expected, false);
+	if (can_probe_ubyte())
+		return probe_rect_ubyte(x, y, w, h, 4, expected, false);
 
-	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGBA, NULL);
+	pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
 	for (j = 0; j < h; j++) {
 		for (i = 0; i < w; i++) {
@@ -1542,7 +1543,7 @@ piglit_probe_rect_two_rgb(int x, int y, int w, int h,
 			  const float *expected1, const float *expected2)
 {
 	/* RGBA readbacks are likely to be faster */
-	float *pixels = piglit_read_pixels_float(x, y, w, h, GL_RGBA, NULL);
+	float *pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
 	for (int j = 0; j < h; j++) {
 		for (int i = 0; i < w; i++) {
@@ -1701,7 +1702,7 @@ piglit_probe_image_color(int x, int y, int w, int h, GLenum format,
 		format = GL_LUMINANCE;
 	}
 
-	pixels = piglit_read_pixels_float(x, y, w, h, format, NULL);
+	pixels = read_pixels_float(x, y, w, h, format, NULL);
 
 	result = piglit_compare_images_color(0, 0, w, h, c, tolerance, image,
 					     pixels);
