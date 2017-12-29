@@ -1653,9 +1653,11 @@ piglit_compare_images_color(int x, int y, int w, int h, int num_components,
 	for (j = 0; j < h; j++) {
 		for (i = 0; i < w; i++) {
 			const float *expected =
-				&expected_image[(j*w+i)*num_components];
+				&expected_image[((j + y) * w + i + x) *
+						num_components];
 			const float *probe =
-				&observed_image[(j*w+i)*num_components];
+				&observed_image[((j + y) * w + i + x) *
+						num_components];
 
 			for (p = 0; p < num_components; ++p) {
 				if (fabs(probe[p] - expected[p])
@@ -1677,8 +1679,9 @@ piglit_compare_images_color(int x, int y, int w, int h, int num_components,
 }
 
 /**
- * Compare the contents of the current read framebuffer with the given
- * in-memory floating-point image.
+ * Compare the region indicated by x, y, w and h of the current read
+ * framebuffer with the given in-memory floating-point image of
+ * dimensions w*h.
  */
 int
 piglit_probe_image_color(int x, int y, int w, int h, GLenum format,
@@ -1700,7 +1703,7 @@ piglit_probe_image_color(int x, int y, int w, int h, GLenum format,
 
 	pixels = piglit_read_pixels_float(x, y, w, h, format, NULL);
 
-	result = piglit_compare_images_color(x, y, w, h, c, tolerance, image,
+	result = piglit_compare_images_color(0, 0, w, h, c, tolerance, image,
 					     pixels);
 
 	free(pixels);
