@@ -7,5 +7,6 @@ piglit_add_executable(minmax_${piglit_target_api} minmax.c)
 piglit_add_executable(oes_compressed_etc2_texture-miptree_gles3 oes_compressed_etc2_texture-miptree.c)
 piglit_add_executable(texture-immutable-levels_gles3 texture-immutable-levels.c)
 piglit_add_executable(read_depth_gles3 read-depth.c)
+piglit_add_executable(gles-3.0-transform-feedback-uniform-buffer-object transform-feedback-uniform-buffer-object.c)
 
 # vim: ft=cmake:
