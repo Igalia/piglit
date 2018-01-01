@@ -76,6 +76,7 @@ piglit_init(int argc, char **argv)
 	static const uint8_t data[4] = {0x00, 0xff, 0x00, 0x00};
 	GLuint prog;
 	GLint max;
+	GLenum err;
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
@@ -101,6 +102,11 @@ piglit_init(int argc, char **argv)
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA8, tbo);
 	glBufferData(GL_TEXTURE_BUFFER,
 		     max * sizeof(data), NULL, GL_STATIC_READ);
+	err = glGetError();
+	if (err == GL_OUT_OF_MEMORY) {
+		printf("couldn't allocate buffer due to OOM, skipping.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 	glBufferSubData(GL_TEXTURE_BUFFER,
 			(max - 1) * sizeof(data), sizeof(data), data);
 
