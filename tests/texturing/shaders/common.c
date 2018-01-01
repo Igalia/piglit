@@ -378,6 +378,9 @@ require_GL_features(enum shader_target test_stage)
 	glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &tex_units);
 	if (test_stage == VS && tex_units <= 0)
 		piglit_report_result(PIGLIT_SKIP);
+
+	if (test_stage == TES)
+		piglit_require_extension("GL_ARB_tessellation_shader");
 }
 
 /**

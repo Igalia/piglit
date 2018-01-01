@@ -1491,8 +1491,8 @@ with profile.test_list.group_manager(
 textureSize_samplers_140 = textureSize_samplers_130 + [
     'sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer',
     'isamplerBuffer', 'usamplerBuffer']
-for stage in ['vs', 'gs', 'fs']:
-    if stage == 'gs':
+for stage in ['vs', 'gs', 'fs', 'tes']:
+    if stage == 'gs' or stage == 'tes':
         version = '1.50'
     else:
         version = '1.40'
@@ -1502,6 +1502,11 @@ for stage in ['vs', 'gs', 'fs']:
             'spec', 'glsl-{}'.format(version), 'execution', 'textureSize',
             '{}-textureSize-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['textureSize', '140', stage, sampler])
+for stage in ['vs', 'gs', 'fs']:
+    if stage == 'gs':
+        version = '1.50'
+    else:
+        version = '1.40'
     # texelFetch():
     for sampler in ['sampler2DRect', 'usampler2DRect', 'isampler2DRect']:
         profile.test_list[grouptools.join(
@@ -1711,7 +1716,7 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'ARB_texture_multisample',
                         'textureSize')) as g:
 
-    stages = ['vs', 'gs', 'fs']
+    stages = ['vs', 'gs', 'fs', 'tes']
     for stage, sampler in itertools.product(stages, samplers_atm):
         g(['textureSize', stage, sampler],
           '{}-textureSize-{}'.format(stage, sampler))
@@ -3199,7 +3204,7 @@ with profile.test_list.group_manager(
     g(['fbo-generatemipmap-cubemap', 'array', 'S3TC_DXT1'])
     g(['texsubimage', 'cube_map_array'])
 
-    for stage in ['vs', 'gs', 'fs']:
+    for stage in ['vs', 'gs', 'fs', 'tes']:
         # textureSize():
         for sampler in['samplerCubeArray', 'isamplerCubeArray',
                        'usamplerCubeArray', 'samplerCubeArrayShadow']:

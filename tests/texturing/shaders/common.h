@@ -91,7 +91,8 @@ enum shader_target {
 	UNKNOWN,
 	VS,
 	FS,
-	GS
+	GS,
+	TES,
 };
 
 float max2(float x, float y);

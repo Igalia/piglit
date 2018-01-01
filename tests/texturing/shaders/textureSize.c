@@ -60,7 +60,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	piglit_gl_process_args(&argc, argv, &config);
 
 	parse_args(argc, argv);
-	if (test_stage == GS) {
+	if (test_stage == GS || test_stage == TES) {
 		config.supports_gl_compat_version = 32;
 		config.supports_gl_core_version = 32;
 	} else {
@@ -154,7 +154,7 @@ piglit_display()
 
 		glUniform1i(lod_location, l);
 		glViewport(x, 10, 10, 10);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		glDrawArrays(test_stage == TES ? GL_PATCHES : GL_TRIANGLE_FAN, 0, 4);
 
 		pass &= piglit_probe_rect_rgba(x, 10, 10, 10, expected_color);
 	}
@@ -248,12 +248,14 @@ has_lod(void)
 int
 generate_GLSL(enum shader_target test_stage)
 {
-	int vs, gs = 0, fs;
+	int vs, gs = 0, tes = 0, tcs = 0, fs;
 	int prog;
 
 	static char *vs_code;
 	static char *gs_code = NULL;
 	static char *fs_code;
+	static char *tes_code = NULL;
+	static char *tcs_code = NULL;
 	char *lod_arg;
 	static const char *zeroes[3] = { "", "0, ", "0, 0, " };
 
@@ -357,6 +359,55 @@ generate_GLSL(enum shader_target test_stage)
 			 shader_version, extension, sampler.name, size, lod_arg,
 			 zeroes[3 - size]);
 		break;
+	case TES:
+		(void)!asprintf(&vs_code,
+			 "#version %d\n"
+			 "in vec4 vertex;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    gl_Position = vertex;\n"
+			 "}\n",
+			 shader_version);
+		(void)!asprintf(&tes_code,
+			 "#version %d\n%s"
+			 "#extension GL_ARB_tessellation_shader: require\n"
+			 "#define ivec1 int\n"
+			 "uniform int lod;\n"
+			 "uniform %s tex;\n"
+			 "layout(quads) in;\n"
+			 "flat out ivec%d size;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    gl_Position = vec4(gl_TessCoord.x * 2 - 1, gl_TessCoord.y * 2 - 1, 0, 1);\n"
+			 "    size = textureSize(tex%s);\n"
+			 "}\n",
+			 shader_version, extension, sampler.name, size, lod_arg);
+		(void)!asprintf(&tcs_code,
+			 "#version %d\n"
+			 "#extension GL_ARB_tessellation_shader: require\n"
+			 "layout(vertices = 4) out;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    gl_TessLevelInner[0] = 1.0;\n"
+			 "    gl_TessLevelInner[1] = 1.0;\n"
+			 "    gl_TessLevelOuter[0] = 1.0;\n"
+			 "    gl_TessLevelOuter[1] = 1.0;\n"
+			 "    gl_TessLevelOuter[2] = 1.0;\n"
+			 "    gl_TessLevelOuter[3] = 1.0;\n"
+			 "}\n",
+			 shader_version);
+		(void)!asprintf(&fs_code,
+			 "#version %d\n"
+			 "#define ivec1 int\n"
+			 "#define vec1 float\n"
+			 "flat in ivec%d size;\n"
+			 "out vec4 fragColor;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    fragColor = vec4(0.01 * size,%s 1);\n"
+			 "}\n",
+			 shader_version, size, zeroes[3 - size]);
+		break;
 	default:
 		assert(!"Should not get here.");
 		break;
@@ -366,9 +417,15 @@ generate_GLSL(enum shader_target test_stage)
 	if (gs_code) {
 		gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, gs_code);
 	}
+	if (tes_code) {
+		tes = piglit_compile_shader_text(GL_TESS_EVALUATION_SHADER, tes_code);
+	}
+	if (tcs_code) {
+		tcs = piglit_compile_shader_text(GL_TESS_CONTROL_SHADER, tcs_code);
+	}
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
 
-	if (!vs || (gs_code && !gs) || !fs)
+	if (!vs || (gs_code && !gs) || (tes_code && !tes) || !fs)
 		return 0;
 
 	prog = glCreateProgram();
@@ -376,6 +433,10 @@ generate_GLSL(enum shader_target test_stage)
 	if (gs_code)
 		glAttachShader(prog, gs);
 	glAttachShader(prog, fs);
+	if (tes_code)
+		glAttachShader(prog, tes);
+	if (tcs_code)
+		glAttachShader(prog, tcs);
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
@@ -386,7 +447,7 @@ generate_GLSL(enum shader_target test_stage)
 void
 fail_and_show_usage()
 {
-	printf("Usage: textureSize [140] <vs|gs|fs> <sampler type> [piglit args...]\n");
+	printf("Usage: textureSize [140] <vs|gs|fs|tes> <sampler type> [piglit args...]\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -409,6 +470,9 @@ parse_args(int argc, char **argv)
 			} else if (strcmp(argv[i], "fs") == 0) {
 				test_stage = FS;
 				continue;
+			} else if (strcmp(argv[i], "tes") == 0) {
+				test_stage = TES;
+				continue;
 			}
 		}
 
@@ -427,7 +491,7 @@ parse_args(int argc, char **argv)
 	if (test_stage == UNKNOWN || !sampler_found)
 		fail_and_show_usage();
 
-	if (test_stage == GS && shader_version < 150)
+	if ((test_stage == GS || test_stage == TES) && shader_version < 150)
 		shader_version = 150;
 }
 
