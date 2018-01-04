@@ -9,5 +9,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_texture_barrier-blending-in-shader blending-in-shader-arb.c)
+piglit_add_executable (arb_texture_barrier-texture-halves-ping-pong-operation-chain texture-halves-ping-pong-operation-chain.c)
 
 # vim: ft=cmake:
