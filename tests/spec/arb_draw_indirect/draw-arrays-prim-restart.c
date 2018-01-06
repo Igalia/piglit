@@ -22,7 +22,11 @@
  */
 
 /**
- * Test if primitive restart works with glDrawArraysIndirect.
+ * Test if primitive restart is ignored by glDrawArraysIndirect.
+ *
+ * glspec45 says since version 20141030 primitive restart only affects
+ * glDrawElements* calls. This is supposed to be a retroactive change.
+ * (See also https://bugs.freedesktop.org/show_bug.cgi?id=93308)
  */
 
 #include "piglit-util-gl.h"
@@ -78,10 +82,10 @@ piglit_init(int argc, char **argv)
 		-1, -1,
 		-1,  1,
 		 1, -1,
-		 1, -1, /* restart index */
+		-1,  1,
 		 1,  1,
 		 1, -1,
-		-1,  1,
+		 1, -1, /* dropped */
 	};
 	static const int indices[] = {
 		7, /* count */
