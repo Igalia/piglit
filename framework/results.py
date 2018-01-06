@@ -231,7 +231,13 @@ class TestResult(object):
 
         # Set special instances
         if 'subtests' in dict_:
-            inst.subtests = Subtests.from_dict(dict_['subtests'])
+            subtests = dict_['subtests']
+            if getattr(inst, 'result', status.NOTRUN) == status.CRASH:
+                # A test with subtests crashed.
+                # It's impossible to know what subtest (if any)
+                # crashed and how many subtests were not run.
+                subtests.update({'unknown': 'crash', '__type__': 'Subtests'})
+            inst.subtests = Subtests.from_dict(subtests)
         if 'time' in dict_:
             inst.time = TimeAttribute.from_dict(dict_['time'])
 
