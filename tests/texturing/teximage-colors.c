@@ -833,10 +833,42 @@ test_exact()
 		      observed);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
 
-	for (i = 0; i < texture_size; ++i)
-		pass &= memcmp(&data[i * texture_size * Bpp],
-			       &observed[i * tex_width * Bpp],
-			       texture_size * Bpp) == 0;
+	/*
+	 * For snorm formats, -127/-128 and -32767/-32768 represent the exact
+	 * same value (-1.0). Therefore, it is quite reasonable to expect
+	 * an implementation could return the other representation.
+	 * (We'll assume it will happen only one way the other way seems rather
+	 * unlikely.)
+	 */
+	if (format->data_type == GL_BYTE) {
+		int j;
+		for (j = 0; j < texture_size; ++j) {
+			for (i = 0; i < tex_width * channels; i++) {
+				if (!(data[i] == observed[i] ||
+				      ((GLbyte)data[i] == -128 &&
+				       (GLbyte)observed[i] == -127))) {
+					pass = GL_FALSE;
+				}
+			}
+		}
+	} else if (format->data_type == GL_SHORT) {
+		int j;
+		for (j = 0; j < texture_size; ++j) {
+			for (i = 0; i < tex_width * channels; i++) {
+				GLshort datas = ((GLshort *)data)[i];
+				GLshort obss = ((GLshort *)observed)[i];
+				if (!(datas == obss ||
+				      (datas == -32768 && obss == -32767))) {
+					pass = GL_FALSE;
+				}
+			}
+		}
+	} else {
+		for (i = 0; i < texture_size; ++i)
+			pass &= memcmp(&data[i * texture_size * Bpp],
+				&observed[i * tex_width * Bpp],
+				texture_size * Bpp) == 0;
+	}
 
 	free(observed);
 	free(tmp_float);
