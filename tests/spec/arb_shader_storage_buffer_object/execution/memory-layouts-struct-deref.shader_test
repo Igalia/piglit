@@ -1,0 +1,85 @@
+# Tests std140/std430 memory layouts of SSBOs when dereferencing structs that
+# contain arrays and/or other structs.
+
+# std140 rule #4:
+# If the member is an array of scalars or vectors, the base alignment and
+# array stride are set to [..] and rounded up to the base alignment of a vec4.
+# -> array stride and alignment of uint[] is rounded up to 16.
+
+# std140 rule #9:
+# If the member is a structure, the base alignment of the structure is N,
+# where N is the largest base alignment value of any of its members, and
+# rounded up to the base alignment of a vec4.
+# -> offsets for first members of sub-structs are rounded up to 16*n bytes.
+
+# std430:
+# When using the std430 storage layout, shader storage blocks will be laid out
+# in buffer storage identically to uniform and shader storage blocks using the
+# std140 layout, except that the base alignment and stride of arrays of
+# scalars and vectors in rule 4 and of structures in rule 9 are not rounded up
+# a multiple of the base alignment of a vec4.
+# -> array stride and alignment of uint[] equals the size of uint, i.e. 4.
+# -> offsets for first members of sub-structs containing only uints are
+#    rounded up to 4*n bytes.
+
+# Mesa bug 104492 describes an issue where Mesa would not respect those
+# std430 alignment and padding rules when accessing a struct inside a std430
+# buffer, and would assume std140 alignments and struct/array sizes instead.
+
+# Therefore, create 1 SSBO using std140 and 1 SSBO using std430, then assign
+# a value to the struct in the buffer blocks. After the draw call, probe the
+# SSBOs to make sure the values end up at the correct buffer offsets.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_storage_buffer_object
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 330
+#extension GL_ARB_shader_storage_buffer_object: require
+
+struct T {
+    uint c;
+};
+
+struct S {
+    uint a;
+    uint b[2];
+    T t;
+};
+
+layout(binding = 0, std140) buffer ssbo_std140 { S s140; };
+layout(binding = 1, std430) buffer ssbo_std430 { S s430; };
+
+void main() {
+    S s = S(42u, uint[2](1337u, 4711u), T(815u));
+    s140 = s;
+    s430 = s;
+}
+
+[test]
+ssbo 0 64
+ssbo 1 64 # 16 should be enough for std430, but assume that std140 is used
+
+draw rect -1 -1 2 2
+
+probe ssbo uint 0  0 == 42      # a
+probe ssbo uint 0  4 == 0       # b[0] should NOT end up here
+probe ssbo uint 0  8 == 0       # b[1] should NOT end up here
+probe ssbo uint 0 12 == 0       # c should NOT end up here
+probe ssbo uint 0 16 == 1337    # b[0]
+probe ssbo uint 0 20 == 0       # b[1] should NOT end up here (stride 16!)
+probe ssbo uint 0 32 == 4711    # b[1]
+probe ssbo uint 0 48 == 815     # c (b has padding, and T is 16n-aligned)
+
+probe ssbo uint 1  0 == 42      # a
+probe ssbo uint 1  4 == 1337    # b[0]
+probe ssbo uint 1  8 == 4711    # b[1] (array stride is 4)
+probe ssbo uint 1 12 == 815     # c (base alignment for T is 4)
+probe ssbo uint 1 16 == 0       # b[0] should NOT end up here
+probe ssbo uint 1 20 == 0       # b[1] should NOT end up here
+probe ssbo uint 1 32 == 0       # b[1] should NOT end up here
+probe ssbo uint 1 48 == 0       # c should NOT end up here
