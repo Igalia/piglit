@@ -2441,7 +2441,7 @@ with profile.test_list.group_manager(
        'explicit-offset-bufferstorage')
     g(['arb_enhanced_layouts-gs-stream-location-aliasing'],
        'gs-stream-location-aliasing')
-    for test in ['vs', 'vs_ifc', 'vs_named_ifc', 'vs_struct']:
+    for test in ['vs', 'vs_ifc', 'vs_named_ifc', 'vs_struct', 'vs_double']:
         g(['arb_enhanced_layouts-transform-feedback-layout-qualifiers', test],
           'arb_enhanced_layouts-transform-feedback-layout-qualifiers_' + test,
           run_concurrent=False)
