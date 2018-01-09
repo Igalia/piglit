@@ -9,6 +9,7 @@ shaders=(
 	vs_two_sets_named_ifc_text \
 	vs_two_sets_struct_text \
 	vs_two_sets_text \
+	vs_double_text \
 )
 
 for shader in "${shaders[@]}"; do
