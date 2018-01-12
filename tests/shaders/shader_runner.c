@@ -93,6 +93,15 @@ struct component_version {
 	char _string[100];
 };
 
+struct ubo_info {
+	int array_index;
+	int binding;
+	int offset;
+	int matrix_stride;
+	int row_major; /* int as we don't have a parse_bool */
+	int array_stride;
+};
+
 #define ENUM_STRING(e) { #e, e }
 
 extern float piglit_tolerance[4];
@@ -125,6 +134,7 @@ static GLuint compute_shaders[256];
 static unsigned num_compute_shaders = 0;
 static int num_uniform_blocks;
 static GLuint *uniform_block_bos;
+static int *uniform_block_indexes; /* ubo block index, indexed by ubo binding */
 static GLenum geometry_layout_input_type = GL_TRIANGLES;
 static GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
 static GLint geometry_layout_vertices_out = 0;
@@ -154,6 +164,7 @@ static bool sso_in_use = false;
 static bool glsl_in_use = false;
 static bool spirv_in_use = false;
 static bool spirv_replaces_glsl = false;
+static bool force_no_names = false;
 static GLchar *prog_err_info = NULL;
 static GLuint vao = 0;
 static GLuint draw_fbo, read_fbo;
@@ -1718,8 +1729,14 @@ check_texture_handle_support(void)
  * the data.  If the uniform is not in a uniform block, returns false.
  */
 static bool
-set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_index)
+set_ubo_uniform(char *name, const char *type,
+		const char *line,
+                struct ubo_info ubo_data)
 {
+	/* Note: on SPIR-V we can't access to uniform_index as we
+	 * could lack the name. We force that with force_no_names on
+	 * GLSL
+	 */
 	GLuint uniform_index;
 	GLint block_index;
 	GLint offset;
@@ -1757,34 +1774,67 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 
 	}
 
-
-	glGetUniformIndices(prog, 1, (const char **)&name, &uniform_index);
-	if (uniform_index == GL_INVALID_INDEX) {
-		printf("cannot get index of uniform \"%s\"\n", name);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	glGetActiveUniformsiv(prog, 1, &uniform_index,
-			      GL_UNIFORM_BLOCK_INDEX, &block_index);
-
-	if (block_index == -1)
-		return false;
-
-	/* if the uniform block is an array, then GetActiveUniformsiv with
-	 * UNIFORM_BLOCK_INDEX will have given us the index of the first
-	 * element in the array.
-	 */
-	block_index += ubo_array_index;
-
-	glGetActiveUniformsiv(prog, 1, &uniform_index,
-			      GL_UNIFORM_OFFSET, &offset);
-
-	if (name[name_len - 1] == ']') {
-		GLint stride;
+	if (!force_no_names) {
+		glGetUniformIndices(prog, 1, (const char **)&name, &uniform_index);
+		if (uniform_index == GL_INVALID_INDEX) {
+			printf("cannot get index of uniform \"%s\"\n", name);
+			piglit_report_result(PIGLIT_FAIL);
+		}
 
 		glGetActiveUniformsiv(prog, 1, &uniform_index,
-				      GL_UNIFORM_ARRAY_STRIDE, &stride);
-		offset += stride * array_index;
+				      GL_UNIFORM_BLOCK_INDEX, &block_index);
+
+		if (block_index == -1)
+			return false;
+
+		/* if the uniform block is an array, then GetActiveUniformsiv with
+		 * UNIFORM_BLOCK_INDEX will have given us the index of the first
+		 * element in the array.
+		 */
+		block_index += ubo_data.array_index;
+
+		glGetActiveUniformsiv(prog, 1, &uniform_index,
+				      GL_UNIFORM_OFFSET, &offset);
+
+		if (name[name_len - 1] == ']') {
+			GLint stride;
+
+			glGetActiveUniformsiv(prog, 1, &uniform_index,
+					      GL_UNIFORM_ARRAY_STRIDE, &stride);
+			offset += stride * array_index;
+		}
+	} else {
+		if (ubo_data.binding < 0) {
+			printf("if you force to use a explicit ubo binding, you "
+			       "need to provide it when filling the data with "
+			       "\"ubo binding\"\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		/* Not the best mapping structure, but we don't have
+		 * access to a hash table here
+		 */
+		block_index = uniform_block_indexes[ubo_data.binding];
+
+		/* if the uniform block is an array, then GetActiveUniformsiv with
+		 * UNIFORM_BLOCK_INDEX will have given us the index of the first
+		 * element in the array.
+		 */
+		block_index += ubo_data.array_index;
+
+		if (ubo_data.offset < 0) {
+			printf("if you force to use a explicit ubo binding, you "
+			       "need to provide offset when filling the data with "
+			       "\"ubo offset\"\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+		offset = ubo_data.offset;
+
+		/*
+		 * We use the initial value as a reference to know if
+		 * it is a array or not. It would be better a better
+		 * method though.
+		 */
 	}
 
 	glBindBuffer(GL_UNIFORM_BUFFER,
@@ -1846,10 +1896,15 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 
 		parse_floats(line, f, rows * cols, NULL);
 
-		glGetActiveUniformsiv(prog, 1, &uniform_index,
-				      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
-		glGetActiveUniformsiv(prog, 1, &uniform_index,
-				      GL_UNIFORM_IS_ROW_MAJOR, &row_major);
+		if (!force_no_names) {
+			glGetActiveUniformsiv(prog, 1, &uniform_index,
+					      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
+			glGetActiveUniformsiv(prog, 1, &uniform_index,
+					      GL_UNIFORM_IS_ROW_MAJOR, &row_major);
+		} else {
+                        matrix_stride = ubo_data.matrix_stride;
+                        row_major = ubo_data.row_major;
+		}
 
 		matrix_stride /= sizeof(float);
 
@@ -1880,10 +1935,16 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 
 		parse_doubles(line, d, rows * cols, NULL);
 
-		glGetActiveUniformsiv(prog, 1, &uniform_index,
-				      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
-		glGetActiveUniformsiv(prog, 1, &uniform_index,
-				      GL_UNIFORM_IS_ROW_MAJOR, &row_major);
+		if (!force_no_names) {
+			glGetActiveUniformsiv(prog, 1, &uniform_index,
+					      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
+			glGetActiveUniformsiv(prog, 1, &uniform_index,
+					      GL_UNIFORM_IS_ROW_MAJOR, &row_major);
+		} else {
+                        matrix_stride = ubo_data.matrix_stride;
+                        row_major = ubo_data.row_major;
+			assert(false);
+		}
 
 		matrix_stride /= sizeof(double);
 
@@ -1919,7 +1980,7 @@ set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_in
 }
 
 static void
-set_uniform(const char *line, int ubo_array_index)
+set_uniform(const char *line, struct ubo_info ubo_data)
 {
 	char name[512], type[512];
 	float f[16];
@@ -1939,7 +2000,7 @@ set_uniform(const char *line, int ubo_array_index)
 	} else {
 		GLuint prog;
 
-		if (set_ubo_uniform(name, type, line, ubo_array_index))
+		if (set_ubo_uniform(name, type, line, ubo_data))
 			return;
 
 		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
@@ -2948,17 +3009,31 @@ setup_ubos(void)
 	uniform_block_bos = calloc(num_uniform_blocks, sizeof(GLuint));
 	glGenBuffers(num_uniform_blocks, uniform_block_bos);
 
+	int max_ubos;
+	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_ubos);
+	uniform_block_indexes = calloc(max_ubos, sizeof(int));
+
 	for (i = 0; i < num_uniform_blocks; i++) {
 		GLint size;
+		GLint binding;
 
 		glGetActiveUniformBlockiv(prog, i, GL_UNIFORM_BLOCK_DATA_SIZE,
 					  &size);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, uniform_block_bos[i]);
 		glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
-		glBindBufferBase(GL_UNIFORM_BUFFER, i, uniform_block_bos[i]);
 
-		glUniformBlockBinding(prog, i, i);
+		if (!force_no_names) {
+			glUniformBlockBinding(prog, i, i);
+			uniform_block_indexes[i] = i;
+			binding = i;
+		} else {
+			glGetActiveUniformBlockiv(prog, i, GL_UNIFORM_BLOCK_BINDING,
+                                                  &binding);
+			uniform_block_indexes[binding] = i;
+		}
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, uniform_block_bos[i]);
 	}
 }
 
@@ -2988,6 +3063,8 @@ teardown_ubos(void)
 	glDeleteBuffers(num_uniform_blocks, uniform_block_bos);
 	free(uniform_block_bos);
 	uniform_block_bos = NULL;
+	free(uniform_block_indexes);
+	uniform_block_indexes = NULL;
 	num_uniform_blocks = 0;
 }
 
@@ -3128,7 +3205,7 @@ piglit_display(void)
 	enum piglit_result full_result = PIGLIT_PASS;
 	GLbitfield clear_bits = 0;
 	bool link_error_expected = false;
-	int ubo_array_index = 0;
+	struct ubo_info ubo_data = {0, -1, -1, -1, -1, -1};
 
 	if (test_start == NULL)
 		return PIGLIT_PASS;
@@ -4013,7 +4090,7 @@ piglit_display(void)
 			handle_texparameter(rest);
 		} else if (parse_str(line, "uniform ", &rest)) {
 			result = program_must_be_in_use();
-			set_uniform(rest, ubo_array_index);
+			set_uniform(rest, ubo_data);
 		} else if (parse_str(line, "subuniform ", &rest)) {
 			result = program_must_be_in_use();
 			check_shader_subroutine_support();
@@ -4035,7 +4112,17 @@ piglit_display(void)
 		} else if (parse_str(line, "link success", &rest)) {
 			result = program_must_be_in_use();
 		} else if (parse_str(line, "ubo array index ", &rest)) {
-			parse_ints(rest, &ubo_array_index, 1, NULL);
+			parse_ints(rest, &ubo_data.array_index, 1, NULL);
+		} else if (parse_str(line, "ubo binding ", &rest)) {
+			parse_ints(rest, &ubo_data.binding, 1, NULL);
+		} else if (parse_str(line, "ubo offset ", &rest)) {
+			parse_ints(rest, &ubo_data.offset, 1, NULL);
+		} else if (parse_str(line, "ubo matrix stride", &rest)) {
+			parse_ints(rest, &ubo_data.matrix_stride, 1, NULL);
+		} else if (parse_str(line, "ubo row major", &rest)) {
+			parse_ints(rest, &ubo_data.row_major, 1, NULL);
+		} else if (parse_str(line, "ubo array stride", &rest)) {
+			parse_ints(rest, &ubo_data.array_stride, 1, NULL);
 		} else if (parse_str(line, "active uniform ", &rest)) {
 			active_uniform(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
@@ -4189,6 +4276,7 @@ piglit_init(int argc, char **argv)
 
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	spirv_replaces_glsl = piglit_strip_arg(&argc, argv, "-spirv");
+	force_no_names = piglit_strip_arg(&argc, argv, "-force-no-names");
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
@@ -4273,6 +4361,7 @@ piglit_init(int argc, char **argv)
 			assert(num_compute_shaders == 0);
 			assert(num_uniform_blocks == 0);
 			assert(uniform_block_bos == NULL);
+                        assert(uniform_block_indexes == NULL);
 			geometry_layout_input_type = GL_TRIANGLES;
 			geometry_layout_output_type = GL_TRIANGLE_STRIP;
 			geometry_layout_vertices_out = 0;
