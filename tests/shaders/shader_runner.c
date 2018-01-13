@@ -100,7 +100,6 @@ struct block_info {
 	int offset;
 	int matrix_stride;
 	int row_major; /* int as we don't have a parse_bool */
-	int array_stride;
 };
 
 #define ENUM_STRING(e) { #e, e }
@@ -2164,9 +2163,11 @@ set_ubo_uniform(char *name, const char *type,
 		offset = block_data.offset;
 
 		/*
-		 * We use the initial value as a reference to know if
-		 * it is a array or not. It would be better a better
-		 * method though.
+		 * We don't get the array_stride for arrays. We just
+		 * use the offset. It is true that this force to add
+		 * the offsets explicitly on the shader test, but it
+		 * also avoid the need to identify if it is a array or
+		 * add a new variable at ubo info.
 		 */
 	}
 
@@ -4645,6 +4646,8 @@ piglit_init(int argc, char **argv)
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	spirv_replaces_glsl = piglit_strip_arg(&argc, argv, "-spirv");
 	force_no_names = piglit_strip_arg(&argc, argv, "-force-no-names");
+	if (spirv_replaces_glsl)
+		force_no_names = true;
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
