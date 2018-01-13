@@ -99,7 +99,6 @@ struct ubo_info {
 	int offset;
 	int matrix_stride;
 	int row_major; /* int as we don't have a parse_bool */
-	int array_stride;
 };
 
 #define ENUM_STRING(e) { #e, e }
@@ -1831,9 +1830,11 @@ set_ubo_uniform(char *name, const char *type,
 		offset = ubo_data.offset;
 
 		/*
-		 * We use the initial value as a reference to know if
-		 * it is a array or not. It would be better a better
-		 * method though.
+		 * We don't get the array_stride for arrays. We just
+		 * use the offset. It is true that this force to add
+		 * the offsets explicitly on the shader test, but it
+		 * also avoid the need to identify if it is a array or
+		 * add a new variable at ubo info.
 		 */
 	}
 
@@ -3205,7 +3206,7 @@ piglit_display(void)
 	enum piglit_result full_result = PIGLIT_PASS;
 	GLbitfield clear_bits = 0;
 	bool link_error_expected = false;
-	struct ubo_info ubo_data = {0, -1, -1, -1, -1, -1};
+	struct ubo_info ubo_data = {0, -1, -1, -1, -1};
 
 	if (test_start == NULL)
 		return PIGLIT_PASS;
@@ -4121,8 +4122,6 @@ piglit_display(void)
 			parse_ints(rest, &ubo_data.matrix_stride, 1, NULL);
 		} else if (parse_str(line, "ubo row major", &rest)) {
 			parse_ints(rest, &ubo_data.row_major, 1, NULL);
-		} else if (parse_str(line, "ubo array stride", &rest)) {
-			parse_ints(rest, &ubo_data.array_stride, 1, NULL);
 		} else if (parse_str(line, "active uniform ", &rest)) {
 			active_uniform(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
@@ -4277,6 +4276,8 @@ piglit_init(int argc, char **argv)
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	spirv_replaces_glsl = piglit_strip_arg(&argc, argv, "-spirv");
 	force_no_names = piglit_strip_arg(&argc, argv, "-force-no-names");
+	if (spirv_replaces_glsl)
+		force_no_names = true;
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
