@@ -64,6 +64,8 @@
 
 #define HUGE_STEP 1000
 
+static int test_stride = 1;
+
 /*
  * We will check each pair of blend factors
  * for each pixel in a square image of this
@@ -186,6 +188,13 @@ piglit_init(int argc, char **argv)
 	int alpha_tol = 0;
 	const char* blend_rgb_tol = getenv("PIGLIT_BLEND_RGB_TOLERANCE");
 	const char* blend_alpha_tol = getenv("PIGLIT_BLEND_ALPHA_TOLERANCE");
+
+	if (argc > 1 && strcmp(argv[1], "--quick") == 0) {
+		/* By default we run 27552 tests which is time consuming.
+		 * With --quick we run only 1/20 (5%) of the tests.
+		 */
+		test_stride = 20;
+	}
 
 	/* 
 	 * Hack: Make driver tests on incorrect hardware feasible
@@ -691,6 +700,7 @@ run_all_factor_sets(void)
 	bool pass = true;
 	int gl_version = piglit_get_gl_version();
 	int counter = 0; /* Number of tests we have done. */
+	int test_number = 0;
 	int step;
 	int op, opa;
 	int sf, sfa, df, dfa;
@@ -788,11 +798,14 @@ run_all_factor_sets(void)
 						for (dfa = 0; dfa < 
 						     num_dst_factors_sep;
 						     dfa += step) {
-							pass &= proc_factors(
-								sf, sfa, 
-								df, dfa,
-								&counter,
-								op, opa);
+							if (test_number % test_stride == 0) {
+								pass &= proc_factors(
+									sf, sfa,
+									df, dfa,
+									&counter,
+									op, opa);
+							}
+							test_number++;
 						}
 					}
 				}

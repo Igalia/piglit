@@ -68,6 +68,13 @@ with profile.test_list.group_manager(
     with profile.test_list.allow_reassignment:
         g(['ext_texture_env_combine-combine', '--quick'], 'texture-env-combine')
 
+# Set the --quick flag on the gl-1.0 blending test
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', '!opengl 1.0')) as g:
+    with profile.test_list.allow_reassignment:
+        g(['gl-1.0-blend-func', '--quick'], 'gl-1.0-blend-func')
+
 # Limit texture size to 512x512 for some texture_multisample tests.
 # The default (max supported size) can be pretty slow.
 with profile.test_list.group_manager(
