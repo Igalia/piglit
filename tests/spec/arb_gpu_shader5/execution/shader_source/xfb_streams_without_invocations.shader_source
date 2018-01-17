@@ -1,0 +1,197 @@
+[require]
+GLSL >= 4.50
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 23
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %_ ""
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+    %float_0 = OpConstant %float 0
+         %17 = OpConstantComposite %v4float %float_0 %float_0 %float_0 %float_0
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %19 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %19 %17
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450
+
+void main() {
+     gl_Position = vec4(0.0);
+}
+
+
+[geometry shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 41
+; Schema: 0
+               OpCapability Geometry
+               OpCapability TransformFeedback
+               OpCapability GeometryStreams
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Geometry %main "main" %_ %gl_in %stream0_0_out %stream2_0_out %stream2_1_out %stream1_0_out
+               OpExecutionMode %main Xfb
+               OpExecutionMode %main InputPoints
+               OpExecutionMode %main Invocations 1
+               OpExecutionMode %main OutputPoints
+               OpExecutionMode %main OutputVertices 3
+               OpSource GLSL 450
+               OpName %_ ""
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %gl_PerVertex Stream 0
+               OpDecorate %_ Stream 0
+               OpDecorate %_ XfbBuffer 0
+               OpDecorate %_ XfbStride 4
+               OpMemberDecorate %gl_PerVertex_0 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex_0 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex_0 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex_0 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex_0 Block
+               OpDecorate %stream0_0_out Location 0
+               OpDecorate %stream0_0_out Stream 0
+               OpDecorate %stream0_0_out XfbBuffer 0
+               OpDecorate %stream0_0_out XfbStride 4
+               OpDecorate %stream0_0_out Offset 0
+               OpDecorate %stream2_0_out Location 2
+               OpDecorate %stream2_0_out Stream 2
+               OpDecorate %stream2_0_out XfbBuffer 2
+               OpDecorate %stream2_0_out XfbStride 20
+               OpDecorate %stream2_0_out Offset 0
+               OpDecorate %stream2_1_out Location 3
+               OpDecorate %stream2_1_out Stream 2
+               OpDecorate %stream2_1_out XfbBuffer 2
+               OpDecorate %stream2_1_out XfbStride 20
+               OpDecorate %stream2_1_out Offset 4
+               OpDecorate %stream1_0_out Location 1
+               OpDecorate %stream1_0_out Stream 1
+               OpDecorate %stream1_0_out XfbBuffer 1
+               OpDecorate %stream1_0_out XfbStride 8
+               OpDecorate %stream1_0_out Offset 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%gl_PerVertex_0 = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_arr_gl_PerVertex_0_uint_1 = OpTypeArray %gl_PerVertex_0 %uint_1
+%_ptr_Input__arr_gl_PerVertex_0_uint_1 = OpTypePointer Input %_arr_gl_PerVertex_0_uint_1
+      %gl_in = OpVariable %_ptr_Input__arr_gl_PerVertex_0_uint_1 Input
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%_ptr_Output_float = OpTypePointer Output %float
+%stream0_0_out = OpVariable %_ptr_Output_float Output
+    %float_0 = OpConstant %float 0
+%stream2_0_out = OpVariable %_ptr_Output_float Output
+%stream2_1_out = OpVariable %_ptr_Output_v4float Output
+    %float_1 = OpConstant %float 1
+    %float_2 = OpConstant %float 2
+    %float_3 = OpConstant %float 3
+    %float_4 = OpConstant %float 4
+         %34 = OpConstantComposite %v4float %float_1 %float_2 %float_3 %float_4
+      %int_2 = OpConstant %int 2
+    %v2float = OpTypeVector %float 2
+%_ptr_Output_v2float = OpTypePointer Output %v2float
+%stream1_0_out = OpVariable %_ptr_Output_v2float Output
+         %39 = OpConstantComposite %v2float %float_0 %float_1
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %21 = OpAccessChain %_ptr_Input_v4float %gl_in %int_0 %int_0
+         %22 = OpLoad %v4float %21
+         %24 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %24 %22
+               OpStore %stream0_0_out %float_0
+               OpEmitStreamVertex %int_0
+               OpEndStreamPrimitive %int_0
+               OpStore %stream2_0_out %float_0
+               OpStore %stream2_1_out %34
+               OpEmitStreamVertex %int_2
+               OpEndStreamPrimitive %int_2
+               OpStore %stream1_0_out %39
+               OpEmitStreamVertex %int_1
+               OpEndStreamPrimitive %int_1
+               OpReturn
+               OpFunctionEnd
+
+[geometry shader]
+#version 450
+
+layout(points) in;
+layout(points, max_vertices = 3) out;
+
+layout(xfb_buffer = 0, xfb_stride = 4) out;
+layout(xfb_buffer = 1, xfb_stride = 8) out;
+layout(xfb_buffer = 2, xfb_stride = 20) out;
+
+layout(stream = 0, location = 0, xfb_buffer = 0, xfb_offset = 0)
+out float stream0_0_out;
+layout(stream = 1, location = 1, xfb_buffer = 1, xfb_offset = 0)
+out vec2 stream1_0_out;
+layout(stream = 2, location = 2, xfb_buffer = 2, xfb_offset = 0)
+out float stream2_0_out;
+layout(stream = 2, location = 3, xfb_buffer = 2, xfb_offset = 4)
+out vec4 stream2_1_out;
+
+void main() {
+  gl_Position = gl_in[0].gl_Position;
+  stream0_0_out = 0.0;
+  EmitStreamVertex(0);
+  EndStreamPrimitive(0);
+
+  stream2_0_out = 0.0;
+  stream2_1_out = vec4(1.0, 2.0, 3.0, 4.0);
+  EmitStreamVertex(2);
+  EndStreamPrimitive(2);
+
+  stream1_0_out = vec2(0.0, 1.0);
+  EmitStreamVertex(1);
+  EndStreamPrimitive(1);
+}
