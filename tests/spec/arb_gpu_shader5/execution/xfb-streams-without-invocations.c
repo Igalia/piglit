@@ -22,6 +22,7 @@
  */
 
 #include "piglit-util-gl.h"
+#include "piglit-shader-test.h"
 
 /**
  * @file xfb-streams-without-invocations.c
@@ -41,40 +42,13 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const char vs_pass_thru_text[] =
-	"#version 150\n"
-	"void main() {\n"
-	"  gl_Position = vec4(0.0);\n"
-	"}\n";
-
-static const char gs_text[] =
-	"#version 150\n"
-	"#extension GL_ARB_gpu_shader5 : enable\n"
-	"layout(points) in;\n"
-	"layout(points, max_vertices = 3) out;\n"
-	"layout(stream = 0) out float stream0_0_out;\n"
-	"layout(stream = 1) out vec2 stream1_0_out;\n"
-	"layout(stream = 2) out float stream2_0_out;\n"
-	"layout(stream = 2) out vec4 stream2_1_out;\n"
-	"void main() {\n"
-	"  gl_Position = gl_in[0].gl_Position;\n"
-	"  stream0_0_out = 0.0;\n"
-	"  EmitStreamVertex(0);\n"
-	"  EndStreamPrimitive(0);\n"
-
-	"  stream2_0_out = 0.0;\n"
-	"  stream2_1_out = vec4(1.0, 2.0, 3.0, 4.0);\n"
-	"  EmitStreamVertex(2);\n"
-	"  EndStreamPrimitive(2);\n"
-
-	"  stream1_0_out = vec2(0.0, 1.0);\n"
-	"  EmitStreamVertex(1);\n"
-	"  EndStreamPrimitive(1);\n"
-	"}";
-
 int stream_float_counts[] = { 1, 2, 5, 0 };
+static bool use_spirv = false;
 
 #define STREAMS 4
+
+#define SHADER_TEST_FILE_NAME "xfb_streams_without_invocations.shader_test"
+char shader_test_filename[4096];
 
 static const char *varyings[] = {
 	"stream0_0_out", "gl_NextBuffer",
@@ -82,10 +56,70 @@ static const char *varyings[] = {
 	"stream2_0_out", "stream2_1_out"
 };
 
-static void
-build_and_use_program()
+
+static GLuint
+assemble_spirv_shader(GLenum shader_type)
+{
+	char *shader_asm;
+	unsigned shader_asm_size;
+	GLuint shader;
+
+	if (!piglit_load_source_from_shader_test(shader_test_filename,
+						 shader_type, true,
+						 &shader_asm, &shader_asm_size)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	shader = piglit_assemble_spirv(shader_type,
+				       shader_asm_size,
+				       shader_asm);
+	free(shader_asm);
+
+	glSpecializeShader(shader,
+			   "main",
+			   0, /* numSpecializationConstants */
+			   NULL /* pConstantIndex */,
+			   NULL /* pConstantValue */);
+
+	return shader;
+}
+
+static GLuint
+build_spirv_program(void)
+{
+	GLuint prog, shader;
+
+	prog = glCreateProgram();
+
+	shader = assemble_spirv_shader(GL_VERTEX_SHADER);
+	glAttachShader(prog, shader);
+	glDeleteShader(shader);
+
+	shader = assemble_spirv_shader(GL_GEOMETRY_SHADER);
+	glAttachShader(prog, shader);
+	glDeleteShader(shader);
+
+	return prog;
+}
+
+static GLuint
+build_glsl_program()
 {
 	GLuint prog;
+	char *gs_text;
+	char *vs_pass_thru_text;
+
+	if (!piglit_load_source_from_shader_test(shader_test_filename,
+						 GL_GEOMETRY_SHADER, false,
+						 &gs_text, NULL))
+		return 0;
+
+
+	if (!piglit_load_source_from_shader_test(shader_test_filename,
+						 GL_VERTEX_SHADER, false,
+						 &vs_pass_thru_text, NULL))
+		return 0;
+
 
 	prog = piglit_build_simple_program_multiple_shaders(
 			GL_VERTEX_SHADER, vs_pass_thru_text,
@@ -93,6 +127,22 @@ build_and_use_program()
 
 	glTransformFeedbackVaryings(prog, ARRAY_SIZE(varyings), varyings,
 			GL_INTERLEAVED_ATTRIBS);
+
+	free(gs_text);
+	free(vs_pass_thru_text);
+
+	return prog;
+}
+
+static void
+build_and_use_program()
+{
+	GLuint prog;
+
+	if (use_spirv)
+		prog = build_spirv_program();
+	else
+		prog = build_glsl_program();
 
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
@@ -192,6 +242,25 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_gpu_shader5");
 	piglit_require_extension("GL_ARB_transform_feedback3");
+
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "spirv"))
+			use_spirv = true;
+	}
+
+	if (use_spirv)
+		piglit_require_extension("GL_ARB_gl_spirv");
+
+	piglit_join_paths(shader_test_filename,
+			  sizeof(shader_test_filename),
+			  7, /* num parts */
+			  piglit_source_dir(),
+			  "tests",
+			  "spec",
+			  "arb_gpu_shader5",
+			  "execution",
+			  "shader_test",
+			  SHADER_TEST_FILE_NAME);
 
 	build_and_use_program();
 
