@@ -1951,6 +1951,7 @@ with profile.test_list.group_manager(
     g(['arb_gpu_shader5-emitstreamvertex_stream_too_large'])
     g(['arb_gpu_shader5-tf-wrong-stream-value'])
     g(['arb_gpu_shader5-xfb-streams-without-invocations'])
+    g(['arb_gpu_shader5-xfb-streams-without-invocations', 'spirv'])
     g(['arb_gpu_shader5-emitstreamvertex_nodraw'])
     g(['arb_gpu_shader5-interpolateAtCentroid'])
     g(['arb_gpu_shader5-interpolateAtCentroid-packing'])
