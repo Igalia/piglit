@@ -73,6 +73,7 @@ static const char gs_text[] =
 	"}";
 
 int stream_float_counts[] = { 1, 2, 5, 0 };
+static bool use_spirv = false;
 
 #define STREAMS 4
 
@@ -82,8 +83,71 @@ static const char *varyings[] = {
 	"stream2_0_out", "stream2_1_out"
 };
 
-static void
-build_and_use_program()
+static GLuint
+load_spirv_shader(GLenum shader_type,
+		  const char *filename)
+{
+	char filepath[4096];
+	unsigned size;
+	char *source;
+	GLuint shader;
+
+	piglit_join_paths(filepath,
+			  sizeof(filepath),
+			  7, /* num parts */
+			  piglit_source_dir(),
+			  "tests",
+			  "spec",
+			  "arb_gpu_shader5",
+			  "execution",
+			  "spirv",
+			  filename);
+
+	source = piglit_load_raw_file(filepath, &size);
+
+	if (source == NULL) {
+		printf("Failed to load %s\n", filepath);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	shader = glCreateShader(shader_type);
+
+	glShaderBinary(1, &shader,
+		       GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+		       source,
+		       size);
+
+	free(source);
+
+	glSpecializeShader(shader,
+			   "main",
+			   0, /* numSpecializationConstants */
+			   NULL /* pConstantIndex */,
+			   NULL /* pConstantValue */);
+
+	return shader;
+}
+
+static GLuint
+build_spirv_program(void)
+{
+	GLuint prog, shader;
+
+	prog = glCreateProgram();
+
+	shader = load_spirv_shader(GL_VERTEX_SHADER, "vs_pass_through.spirv");
+	glAttachShader(prog, shader);
+	glDeleteShader(shader);
+
+	shader = load_spirv_shader(GL_GEOMETRY_SHADER, "gs_text.spirv");
+	glAttachShader(prog, shader);
+	glDeleteShader(shader);
+
+	return prog;
+}
+
+static GLuint
+build_glsl_program()
 {
 	GLuint prog;
 
@@ -93,6 +157,19 @@ build_and_use_program()
 
 	glTransformFeedbackVaryings(prog, ARRAY_SIZE(varyings), varyings,
 			GL_INTERLEAVED_ATTRIBS);
+
+	return prog;
+}
+
+static void
+build_and_use_program()
+{
+	GLuint prog;
+
+	if (use_spirv)
+		prog = build_spirv_program();
+	else
+		prog = build_glsl_program();
 
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
@@ -192,6 +269,14 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_gpu_shader5");
 	piglit_require_extension("GL_ARB_transform_feedback3");
+
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "spirv"))
+			use_spirv = true;
+	}
+
+	if (use_spirv)
+		piglit_require_extension("GL_ARB_gl_spirv");
 
 	build_and_use_program();
 
