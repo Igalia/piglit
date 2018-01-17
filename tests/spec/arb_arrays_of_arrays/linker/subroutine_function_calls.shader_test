@@ -1,0 +1,175 @@
+# Test for successful linking between vertex and fragment shaders
+
+[require]
+GLSL >= 1.20
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#version 430 core
+
+out float fs_result;
+
+/** GL_TRIANGLE_FAN-type quad vertex data. */
+const vec4 vertex_positions[4] = vec4[4](vec4( 1.0, -1.0, 0.0, 1.0),
+                                         vec4(-1.0, -1.0, 0.0, 1.0),
+                                         vec4(-1.0,  1.0, 0.0, 1.0),
+                                         vec4( 1.0,  1.0, 0.0, 1.0) );
+
+const int[] multiplier_array = int[]( 1,  2,  3,  4,  5,  6,  7,  8,
+                                     11, 12, 13, 14, 15, 16, 17, 18,
+                                     21, 22, 23, 24, 25, 26, 27, 28,
+                                     31, 32, 33, 34, 35, 36, 37, 38,
+                                     41, 42, 43, 44, 45, 46, 47, 48,
+                                     51, 52, 53, 54, 55, 56, 57, 58,
+                                     61, 62, 63, 64, 65, 66, 67, 68,
+                                     71, 72, 73, 74, 75, 76, 77, 78,
+                                     81, 82, 83, 84, 85, 86, 87, 88);
+// Subroutine types
+subroutine void inout_routine_type(inout double inout_array[2][2][2][2][2][2][2][2]);
+
+// Subroutine definitions
+subroutine(inout_routine_type) void original_routine(inout double inout_array[2][2][2][2][2][2][2][2]) {
+    uint i = 0u;
+    for (uint a = 0u; a < 2u; a++)
+    {
+        for (uint b = 0u; b < 2u; b++)
+        {
+            for (uint c = 0u; c < 2u; c++)
+            {
+                for (uint d = 0u; d < 2u; d++)
+                {
+                    for (uint e = 0u; e < 2u; e++)
+                    {
+                        for (uint f = 0u; f < 2u; f++)
+                        {
+                           for (uint g = 0u; g < 2u; g++)
+                           {
+                               for (uint h = 0u; h < 2u; h++)
+                               {
+                                   inout_array[a][b][c][d][e][f][g][h] *= double(multiplier_array[i % 64u]);
+                                   i+= 1u;
+                               }
+                           }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+subroutine(inout_routine_type) void new_routine(inout double inout_array[2][2][2][2][2][2][2][2]) {
+    uint i = 0u;
+    for (uint a = 0u; a < 2u; a++)
+    {
+        for (uint b = 0u; b < 2u; b++)
+        {
+            for (uint c = 0u; c < 2u; c++)
+            {
+                for (uint d = 0u; d < 2u; d++)
+                {
+                    for (uint e = 0u; e < 2u; e++)
+                    {
+                        for (uint f = 0u; f < 2u; f++)
+                        {
+                           for (uint g = 0u; g < 2u; g++)
+                           {
+                               for (uint h = 0u; h < 2u; h++)
+                               {
+                                   inout_array[a][b][c][d][e][f][g][h] /= double(multiplier_array[i % 64u]);
+                                   i+= 1u;
+                               }
+                           }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Subroutine uniform
+subroutine uniform inout_routine_type routine;
+
+
+void main()
+{
+    float result = 1.0;
+    uint iterator = 0u;
+    double my_array[2][2][2][2][2][2][2][2];
+    for (uint a = 0u; a < 2u; a++)
+    {
+        for (uint b = 0u; b < 2u; b++)
+        {
+            for (uint c = 0u; c < 2u; c++)
+            {
+                for (uint d = 0u; d < 2u; d++)
+                {
+                    for (uint e = 0u; e < 2u; e++)
+                    {
+                        for (uint f = 0u; f < 2u; f++)
+                        {
+                           for (uint g = 0u; g < 2u; g++)
+                           {
+                               for (uint h = 0u; h < 2u; h++)
+                               {
+                                   my_array[a][b][c][d][e][f][g][h] = 1.0;
+                               }
+                           }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    routine(my_array);
+
+    for (uint a = 0u; a < 2u; a++)
+    {
+        for (uint b = 0u; b < 2u; b++)
+        {
+            for (uint c = 0u; c < 2u; c++)
+            {
+                for (uint d = 0u; d < 2u; d++)
+                {
+                    for (uint e = 0u; e < 2u; e++)
+                    {
+                        for (uint f = 0u; f < 2u; f++)
+                        {
+                           for (uint g = 0u; g < 2u; g++)
+                           {
+                               for (uint h = 0u; h < 2u; h++)
+                               {
+                                   if (my_array[a][b][c][d][e][f][g][h] != double(multiplier_array[iterator % 64u]))
+                                   {
+                                       result = 0.0;
+                                   }
+                                   iterator += 1u;
+                               }
+                           }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    fs_result   = result;
+    gl_Position = vertex_positions[gl_VertexID];
+}
+
+[fragment shader]
+#version 430 core
+
+in float fs_result;
+
+out vec4 colour;
+
+void main()
+{
+    colour =  vec4(fs_result);
+}
+
+[test]
+link success
