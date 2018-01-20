@@ -1,13 +1,13 @@
-#cmakedefine HAVE_ASPRINTF
-#cmakedefine HAVE_FFS
-#cmakedefine HAVE_STRCHRNUL
-#cmakedefine HAVE_FOPEN_S
-#cmakedefine HAVE_SETRLIMIT
-#cmakedefine HAVE_STRNDUP
+#cmakedefine HAVE_ASPRINTF 1
+#cmakedefine HAVE_FFS 1
+#cmakedefine HAVE_STRCHRNUL 1
+#cmakedefine HAVE_FOPEN_S 1
+#cmakedefine HAVE_SETRLIMIT 1
+#cmakedefine HAVE_STRNDUP 1
 
-#cmakedefine HAVE_FCNTL_H
-#cmakedefine HAVE_SYS_STAT_H
-#cmakedefine HAVE_SYS_TYPES_H
-#cmakedefine HAVE_SYS_TIME_H
-#cmakedefine HAVE_SYS_RESOURCE_H
-#cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_FCNTL_H 1
+#cmakedefine HAVE_SYS_STAT_H 1
+#cmakedefine HAVE_SYS_TYPES_H 1
+#cmakedefine HAVE_SYS_TIME_H 1
+#cmakedefine HAVE_SYS_RESOURCE_H 1
+#cmakedefine HAVE_UNISTD_H 1
