@@ -243,9 +243,31 @@ piglit_display(void)
 }
 
 
+static void
+enumerate_subtests(void)
+{
+	const char *names[64];
+
+	assert(ARRAY_SIZE(formats) + ARRAY_SIZE(invalid_formats) < 64);
+
+	int t = 0;
+	for (int i = 0; i < ARRAY_SIZE(formats); i++) {
+		names[t++] = piglit_get_gl_enum_name(formats[i].format);
+	}
+	for (int i = 0; i < ARRAY_SIZE(invalid_formats); i++) {
+		names[t++] = piglit_get_gl_enum_name(invalid_formats[i]);
+	}
+	names[t] = NULL;
+
+	piglit_register_subtests(names);
+}
+
+
 void
 piglit_init(int argc, char**argv)
 {
+	enumerate_subtests();
+
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
 	have_extension[0] = GL_TRUE;
