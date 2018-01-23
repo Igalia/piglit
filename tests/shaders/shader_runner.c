@@ -1165,6 +1165,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 		break;
 
 	case requirements:
+		if (spirv_replaces_glsl) {
+			printf("Running on SPIR-V mode\n");
+		}
 		break;
 
 	case vertex_shader:
