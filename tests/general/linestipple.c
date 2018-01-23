@@ -104,9 +104,10 @@ probe_line(const struct stipple_line *line, int v1i, int v2i, GLuint *fragment)
 	return true;
 }
 
-static bool
-test_line(const struct stipple_line *line)
+static enum piglit_result
+test_line(void *data)
 {
+	struct stipple_line *line = data;
 	GLuint i;
 
 	glLineStipple(line->factor, line->pattern);
@@ -121,21 +122,21 @@ test_line(const struct stipple_line *line)
 		for (i = 0; i + 1 < line->nvertices; i += 2) {
 			GLuint fragment = 0;
 			if (!probe_line(line, i, i + 1, &fragment))
-				return false;
+				return PIGLIT_FAIL;
 		}
 	} else {
 		GLuint fragment = 0;
 		for (i = 0; i + 1 < line->nvertices; ++i) {
 			if (!probe_line(line, i, i + 1, &fragment))
-				return false;
+				return PIGLIT_FAIL;
 		}
 		if (line->primitive == GL_LINE_LOOP) {
 			if (!probe_line(line, i, 0, &fragment))
-				return false;
+				return PIGLIT_FAIL;
 		}
 	}
 
-	return true;
+	return PIGLIT_PASS;
 }
 
 static struct vertex BaselineVertices[] = { { 0, 0 },
@@ -198,11 +199,11 @@ static struct stipple_line Lines[] = {
 	}
 };
 
+
 enum piglit_result
 piglit_display(void)
 {
-	int i;
-	bool pass = true;
+	enum piglit_result result = PIGLIT_PASS;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -214,20 +215,22 @@ piglit_display(void)
 	glPushMatrix();
 	glTranslatef(basex, basey, 0.0);
 
-	for (i = 0; i < ARRAY_SIZE(Lines); ++i) {
-		printf("Testing %s:\n", Lines[i].name);
-		if (test_line(&Lines[i])) {
-			piglit_report_subtest_result(PIGLIT_PASS, "%s", Lines[i].name);
-		} else {
-			piglit_report_subtest_result(PIGLIT_FAIL, "%s", Lines[i].name);
-			pass = false;
-		}
+	struct piglit_subtest tests[ARRAY_SIZE(Lines) + 1];
+	for (int i = 0; i < ARRAY_SIZE(Lines); ++i) {
+		tests[i].name = Lines[i].name;
+		tests[i].option = "";
+		tests[i].subtest_func = test_line;
+		tests[i].data = &Lines[i];
 	}
+	tests[ARRAY_SIZE(Lines)].name = NULL;
+
+	result = piglit_run_selected_subtests(tests, NULL, 0, result);
+
 	glPopMatrix();
 
 	piglit_present_results();
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 void
