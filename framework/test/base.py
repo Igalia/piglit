@@ -236,6 +236,14 @@ class Test(object):
         """
         if is_crash_returncode(self.result.returncode):
             self.result.result = status.CRASH
+            if self.result.subtests:
+                # We know because subtests are ordered that the first test with
+                # a status of NOTRUN is the subtest that crashed, mark that
+                # test and move on.
+                for k, v in six.iteritems(self.result.subtests):
+                    if v == status.NOTRUN:
+                        self.result.subtests[k] = status.CRASH
+                        break
         elif self.result.returncode != 0:
             if self.result.result == status.PASS:
                 self.result.result = status.WARN

@@ -33,6 +33,8 @@ except ImportError:
 import pytest
 import six
 
+from six.moves import range
+
 from framework import dmesg
 from framework import log
 from framework import monitoring
@@ -282,6 +284,40 @@ class TestTest(object):
             test.interpret_result()
 
             assert test.result.result is status.FAIL
+
+        def test_crash_subtest_before_start(self):
+            """A test for a test with a subtest, that crashes at the start
+            of the run.
+            """
+            test = _Test(['foobar'])
+            test.result.returncode = -1
+            for x in (str(y) for y in range(5)):
+                test.result.subtests[x] = status.NOTRUN
+            test.interpret_result()
+
+            assert test.result.result is status.CRASH
+            assert test.result.subtests['0'] is status.CRASH
+            for x in (str(y) for y in range(1, 5)):
+                assert test.result.subtests[x] is status.NOTRUN
+
+        def test_crash_subtest_mid(self):
+            """A test for a test with a subtest, that crashes in the middle
+            of the run.
+            """
+            test = _Test(['foobar'])
+            test.result.returncode = -1
+            for x in (str(y) for y in range(2)):
+                test.result.subtests[x] = status.PASS
+            for x in (str(y) for y in range(2, 5)):
+                test.result.subtests[x] = status.NOTRUN
+            test.interpret_result()
+
+            assert test.result.result is status.CRASH
+            for x in (str(y) for y in range(2)):
+                assert test.result.subtests[x] is status.PASS
+            assert test.result.subtests['2'] is status.CRASH
+            for x in (str(y) for y in range(3, 5)):
+                assert test.result.subtests[x] is status.NOTRUN
 
 
 class TestWindowResizeMixin(object):
