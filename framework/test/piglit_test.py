@@ -34,6 +34,7 @@ except ImportError:
     import json
 
 from framework import core, options
+from framework import status
 from .base import Test, WindowResizeMixin, ValgrindMixin, TestIsSkip
 
 
@@ -73,7 +74,12 @@ class PiglitBaseTest(ValgrindMixin, Test):
 
         for each in self.result.out.split('\n'):
             if each.startswith('PIGLIT:'):
-                self.result.update(json.loads(each[8:]))
+                deserial = json.loads(each[8:])
+                if 'enumerate subtests' in deserial:
+                    for n in deserial['enumerate subtests']:
+                        self.result.subtests[n] = status.NOTRUN
+                else:
+                    self.result.update(deserial)
             else:
                 out.append(each)
 
