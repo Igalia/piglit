@@ -63,10 +63,8 @@ test_prim(GLenum prim, unsigned numVerts, const void *verts)
 
 	piglit_present_results();
 
-	if (!pass) {
-		piglit_report_subtest_result(PIGLIT_FAIL, "Primitive: %s",
-					     piglit_get_prim_name(prim));
-	}
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+			             "Primitive: %s", piglit_get_prim_name(prim));
 
 	return pass;
 }
