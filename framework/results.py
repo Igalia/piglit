@@ -41,7 +41,7 @@ __all__ = [
 class Subtests(collections.MutableMapping):
     """A dict-like object that stores Statuses as values."""
     def __init__(self, dict_=None):
-        self.__container = {}
+        self.__container = collections.OrderedDict()
 
         if dict_ is not None:
             self.update(dict_)
