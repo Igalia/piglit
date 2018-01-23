@@ -74,9 +74,6 @@ public:
 		glDeleteTextures(1, &tex);
 		glDeleteRenderbuffers(1, &rb);
 		glDeleteFramebuffers(1, &fbo);
-
-		piglit_report_subtest_result(_pass ? PIGLIT_PASS : PIGLIT_FAIL,
-					     "%s", name);
 	}
 
 	bool check_fbo_status(GLenum expect)
@@ -96,16 +93,16 @@ public:
 		return true;
 	}
 
-	bool pass()
+	enum piglit_result pass()
 	{
 		_pass = true;
-		return true;
+		return PIGLIT_PASS;
 	}
 
-	bool fail()
+	enum piglit_result fail()
 	{
 		_pass = false;
-		return false;
+		return PIGLIT_FAIL;
 	}
 
 	const char *name;
@@ -121,8 +118,8 @@ private:
 /**
  * Verify that attaching a 0x0 texture results in incompleteness.
  */
-bool
-incomplete_0_by_0_texture(void)
+extern "C" enum piglit_result
+incomplete_0_by_0_texture(void *data)
 {
 	incomplete_fbo_test t("0x0 texture", GL_TEXTURE_2D);
 
@@ -164,8 +161,8 @@ incomplete_0_by_0_texture(void)
 /**
  * Verify that attaching a 0x0 renderbuffer results in incompleteness.
  */
-bool
-incomplete_0_by_0_renderbuffer(void)
+extern "C" enum piglit_result
+incomplete_0_by_0_renderbuffer(void *data)
 {
 	incomplete_fbo_test t("0x0 renderbuffer", GL_RENDERBUFFER);
 
@@ -205,8 +202,8 @@ incomplete_0_by_0_renderbuffer(void)
  * Verify that attaching an invalid slice of a 3D texture results in
  * incompleteness.
  */
-bool
-invalid_3d_slice(void)
+extern "C" enum piglit_result
+invalid_3d_slice(void *data)
 {
 	incomplete_fbo_test t("invalid slice of 3D texture", GL_TEXTURE_3D);
 
@@ -251,7 +248,7 @@ invalid_3d_slice(void)
  * Common code the verify attaching an invalid layer of an array texture
  * results in incompleteness.
  */
-bool
+enum piglit_result
 invalid_array_layer_common(incomplete_fbo_test &t)
 {
 	const unsigned scale = (t.target == GL_TEXTURE_CUBE_MAP_ARRAY) ? 6 : 1;
@@ -294,16 +291,15 @@ invalid_array_layer_common(incomplete_fbo_test &t)
  * Verify that attaching an invalid layer of a 1D array texture results in
  * incompleteness.
  */
-bool
-invalid_1d_array_layer(void)
+extern "C" enum piglit_result
+invalid_1d_array_layer(void *data)
 {
 	static const char subtest_name[] =
 		"invalid layer of a 1D-array texture";
 
 	if (!piglit_is_extension_supported("GL_EXT_texture_array")
 	    && piglit_get_gl_version() < 30) {
-		piglit_report_subtest_result(PIGLIT_SKIP, "%s", subtest_name);
-		return true;
+		return PIGLIT_SKIP;
 	}
 
 	incomplete_fbo_test t(subtest_name, GL_TEXTURE_1D_ARRAY);
@@ -321,16 +317,15 @@ invalid_1d_array_layer(void)
  * Verify that attaching an invalid layer of a 2D array texture results in
  * incompleteness.
  */
-bool
-invalid_2d_array_layer(void)
+extern "C" enum piglit_result
+invalid_2d_array_layer(void *data)
 {
 	static const char subtest_name[] =
 		"invalid layer of a 2D-array texture";
 
 	if (!piglit_is_extension_supported("GL_EXT_texture_array")
 	    && piglit_get_gl_version() < 30) {
-		piglit_report_subtest_result(PIGLIT_SKIP, "%s", subtest_name);
-		return true;
+		return PIGLIT_SKIP;
 	}
 
 	incomplete_fbo_test t(subtest_name, GL_TEXTURE_2D_ARRAY);
@@ -348,16 +343,15 @@ invalid_2d_array_layer(void)
  * Verify that attaching an invalid layer of a cube array texture results in
  * incompleteness.
  */
-bool
-invalid_cube_array_layer(void)
+extern "C" enum piglit_result
+invalid_cube_array_layer(void *data)
 {
 	static const char subtest_name[] =
 		"invalid layer of a cube-array texture";
 
 	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map_array")
 	    && piglit_get_gl_version() < 40) {
-		piglit_report_subtest_result(PIGLIT_SKIP, "%s", subtest_name);
-		return true;
+		return PIGLIT_SKIP;
 	}
 
 	incomplete_fbo_test t(subtest_name, GL_TEXTURE_CUBE_MAP_ARRAY);
@@ -375,8 +369,8 @@ invalid_cube_array_layer(void)
  * Verify that deleting the texture attached the currently bound FBO
  * results in incompleteness.
  */
-bool
-delete_texture_of_current_fbo(void)
+extern "C" enum piglit_result
+delete_texture_of_current_fbo(void *data)
 {
 	incomplete_fbo_test t("delete texture of bound FBO",
 			      GL_TEXTURE_2D);
@@ -414,8 +408,8 @@ delete_texture_of_current_fbo(void)
  * Verify that deleting the renderbuffer attached the currently bound FBO
  * results in incompleteness.
  */
-bool
-delete_renderbuffer_of_current_fbo(void)
+extern "C" enum piglit_result
+delete_renderbuffer_of_current_fbo(void *data)
 {
 	incomplete_fbo_test t("delete renderbuffer of bound FBO",
 			      GL_RENDERBUFFER);
@@ -457,18 +451,23 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	bool pass = true;
+	enum piglit_result result = PIGLIT_SKIP;
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
 
-	pass = incomplete_0_by_0_texture() && pass;
-	pass = incomplete_0_by_0_renderbuffer() && pass;
-	pass = invalid_3d_slice() && pass;
-	pass = invalid_1d_array_layer() && pass;
-	pass = invalid_2d_array_layer() && pass;
-	pass = invalid_cube_array_layer() && pass;
-	pass = delete_texture_of_current_fbo() && pass;
-	pass = delete_renderbuffer_of_current_fbo() && pass;
+	piglit_subtest tests[] = {
+		{ "0x0 texture", "", incomplete_0_by_0_texture, NULL },
+		{ "0x0 renderbuffer", "", incomplete_0_by_0_renderbuffer, NULL },
+		{ "invalid slice of 3D texture", "", invalid_3d_slice, NULL },
+		{ "invalid layer of a 1D-array texture", "", invalid_1d_array_layer, NULL },
+		{ "invalid layer of a 2D-array texture", "", invalid_2d_array_layer, NULL },
+		{ "invalid layer of a cube-array texture", "", invalid_cube_array_layer, NULL },
+		{ "delete texture of bound FBO", "", delete_texture_of_current_fbo, NULL },
+		{ "delete renderbuffer of bound FBO", "", delete_renderbuffer_of_current_fbo, NULL },
+		{ NULL, NULL, NULL, NULL }
+	};
 
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+	result = piglit_run_selected_subtests(tests, NULL, 0, result);
+
+	piglit_report_result(result);
 }
