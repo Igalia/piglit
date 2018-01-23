@@ -235,12 +235,12 @@ class Test(object):
         """Convert the raw output of the test into a form piglit understands.
         """
         if is_crash_returncode(self.result.returncode):
-            self.result.result = 'crash'
+            self.result.result = status.CRASH
         elif self.result.returncode != 0:
-            if self.result.result == 'pass':
-                self.result.result = 'warn'
+            if self.result.result == status.PASS:
+                self.result.result = status.WARN
             else:
-                self.result.result = 'fail'
+                self.result.result = status.FAIL
 
     def run(self):
         """
