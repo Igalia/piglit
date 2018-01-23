@@ -752,19 +752,41 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 {
 	enum piglit_result result = previous_result;
 
+	/* print JSON list of subtests */
+	printf("PIGLIT: {\"enumerate subtests\": [");
 	if (num_selected_subtests) {
-		unsigned i;
-
-		for (i = 0; i < num_selected_subtests; i++) {
-			enum piglit_result subtest_result;
+		const char *prefix = "";
+		for (int i = 0; i < num_selected_subtests; i++) {
 			const char *const name = selected_subtests[i];
 			const struct piglit_subtest *subtest =
 				piglit_find_subtest(all_subtests, name);
 
 			if (subtest == NULL) {
+				printf("]}\n");
+				fflush(stdout);
 				piglit_loge("Unknown subtest \"%s\"", name);
 				piglit_report_result(PIGLIT_FAIL);
 			}
+			printf("%s\"%s\"", prefix, name);
+			prefix = ", ";
+
+		}
+	} else {
+		const char *prefix = "";
+		for (int i = 0; !PIGLIT_SUBTEST_END(&all_subtests[i]); i++) {
+			printf("%s\"%s\"", prefix, all_subtests[i].name);
+			prefix = ", ";
+		}
+	}
+	printf("]}\n");
+	fflush(stdout);
+
+	if (num_selected_subtests) {
+		for (int i = 0; i < num_selected_subtests; i++) {
+			enum piglit_result subtest_result;
+			const char *const name = selected_subtests[i];
+			const struct piglit_subtest *subtest =
+				piglit_find_subtest(all_subtests, name);
 
 			subtest_result = subtest->subtest_func(subtest->data);
 			piglit_report_subtest_result(subtest_result, "%s",
@@ -773,9 +795,7 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 			piglit_merge_result(&result, subtest_result);
 		}
 	} else {
-		unsigned i;
-
-		for (i = 0; !PIGLIT_SUBTEST_END(&all_subtests[i]); i++) {
+		for (int i = 0; !PIGLIT_SUBTEST_END(&all_subtests[i]); i++) {
 			const enum piglit_result subtest_result =
 				all_subtests[i].subtest_func(all_subtests[i].data);
 			piglit_report_subtest_result(subtest_result, "%s",
