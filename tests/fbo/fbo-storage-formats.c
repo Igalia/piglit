@@ -223,6 +223,12 @@ test(void)
 				piglit_report_subtest_result(PIGLIT_PASS, "%s", name);
 			}
 		}
+	} else {
+		printf("Skipping error tests because KHR_NO_ERROR is enabled\n");
+		for (i = 0; i < ARRAY_SIZE(invalid_formats); i++) {
+			const char *name = piglit_get_gl_enum_name(invalid_formats[i]);
+			piglit_report_subtest_result(PIGLIT_SKIP, "%s", name);
+		}
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
