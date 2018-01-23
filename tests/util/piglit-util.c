@@ -808,6 +808,17 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 	return result;
 }
 
+void
+piglit_register_subtests(const char *names[])
+{
+	printf("PIGLIT: {\"enumerate subtests\": [\"%s\"", names[0]);
+	for (int i = 1; names[i]; i++) {
+		printf(", \"%s\"", names[i]);
+	}
+	printf("]}\n");
+	fflush(stdout);
+}
+
 uint64_t
 piglit_gettid(void)
 {

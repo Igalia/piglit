@@ -151,6 +151,9 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 			     size_t num_selected_subtests,
 			     enum piglit_result previous_result);
 
+void
+piglit_register_subtests(const char *names[]);
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 #define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
