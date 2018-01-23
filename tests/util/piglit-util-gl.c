@@ -1249,7 +1249,7 @@ probe_rect_ubyte(int x, int y, int w, int h, int num_components,
 
 			if (!silent) {
 				print_bad_pixel_ubyte(
-					x + i, y + j, 3,
+					x + i, y + j, num_components,
 					expected, probe);
 			}
 			free(pixels);
