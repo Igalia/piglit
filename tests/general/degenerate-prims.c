@@ -41,22 +41,28 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
 
+struct test_data {
+	GLenum prim;
+	unsigned numVerts;
+	const void *verts;
+};
 
 /**
  * Test a specific degenerate primitive.
  * The expected outcome is that nothing will be drawn.
  */
-static bool
-test_prim(GLenum prim, unsigned numVerts, const void *verts)
+static enum piglit_result
+test_prim(void *_data)
 {
+	struct test_data *data = _data;
 	static const float black[] = {0, 0, 0, 0};
 	bool pass;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glVertexPointer(2, GL_FLOAT, 0, verts);
+	glVertexPointer(2, GL_FLOAT, 0, data->verts);
 	glEnable(GL_VERTEX_ARRAY);
-	glDrawArrays(prim, 0, numVerts);
+	glDrawArrays(data->prim, 0, data->numVerts);
 
 	/* Nothing should have been drawn / look for all black */
 	pass = piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, black);
@@ -64,7 +70,7 @@ test_prim(GLenum prim, unsigned numVerts, const void *verts)
 	piglit_present_results();
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-			             "Primitive: %s", piglit_get_prim_name(prim));
+			             "Primitive: %s", piglit_get_prim_name(data->prim));
 
 	return pass;
 }
@@ -77,7 +83,7 @@ piglit_display(void)
 		verts2[2][2] = { {-1, -1}, {1, 1} },
 		verts3[3][2] = { {-1, -1}, {1, -1}, {0, 1} },
 		verts4[4][2] = { {-1, -1}, {1, -1}, {1, 1}, {-1, 1} };
-	bool pass = true;
+	enum piglit_result result = PIGLIT_PASS;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -85,18 +91,31 @@ piglit_display(void)
 
 	glColor3f(1, 1, 1);
 
-	pass = test_prim(GL_POINTS, 0, verts2) && pass;
-	pass = test_prim(GL_LINES, 1, verts2) && pass;
-	pass = test_prim(GL_LINE_STRIP, 1, verts2) && pass;
-	pass = test_prim(GL_LINE_LOOP, 1, verts2) && pass;
-	pass = test_prim(GL_TRIANGLES, 2, verts3) && pass;
-	pass = test_prim(GL_TRIANGLE_STRIP, 2, verts3) && pass;
-	pass = test_prim(GL_TRIANGLE_FAN, 2, verts3) && pass;
-	pass = test_prim(GL_QUADS, 3, verts4) && pass;
-	pass = test_prim(GL_QUAD_STRIP, 3, verts4) && pass;
-	pass = test_prim(GL_POLYGON, 2, verts4) && pass;
+	struct test_data data[] = {
+		{ GL_POINTS, 0, verts2 },
+		{ GL_LINES, 1, verts2 },
+		{ GL_LINE_STRIP, 1, verts2 },
+		{ GL_LINE_LOOP, 1, verts2 },
+		{ GL_TRIANGLES, 2, verts3 },
+		{ GL_TRIANGLE_STRIP, 2, verts3 },
+		{ GL_TRIANGLE_FAN, 2, verts3 },
+		{ GL_QUADS, 3, verts4 },
+		{ GL_QUAD_STRIP, 3, verts4 },
+		{ GL_POLYGON, 2, verts4 },
+	};
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	struct piglit_subtest tests[ARRAY_SIZE(data) + 1];
+	for (int i = 0; i < ARRAY_SIZE(data); ++i) {
+		tests[i].name = piglit_get_prim_name(data[i].prim);
+		tests[i].option = "";
+		tests[i].subtest_func = test_prim;
+		tests[i].data = &data[i];
+	}
+	tests[ARRAY_SIZE(data)].name = NULL;
+
+	result  = piglit_run_selected_subtests(tests, NULL, 0, result);
+
+	return result;
 }
 
 
