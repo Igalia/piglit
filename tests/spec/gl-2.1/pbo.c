@@ -72,7 +72,7 @@ report_failure(const char *msg, const int line)
 #define TEXSIZE 64
 
 enum piglit_result
-test_sanity(void)
+test_sanity(void *null)
 {
 	GLuint pbs[1];
 	GLuint pb_binding;
@@ -127,7 +127,7 @@ test_sanity(void)
 }
 
 enum piglit_result
-test_draw_pixels(void)
+test_draw_pixels(void *null)
 {
 	int use_unpack;
 	int use_pack;
@@ -264,7 +264,7 @@ test_draw_pixels(void)
 
 
 enum piglit_result
-test_pixel_map(void)
+test_pixel_map(void *null)
 {
 	int use_unpack;
 	int use_pack;
@@ -387,7 +387,7 @@ test_pixel_map(void)
 }
 
 enum piglit_result
-test_bitmap(void)
+test_bitmap(void *null)
 {
 	GLuint pb_unpack[1];
 	GLuint pb_pack[1];
@@ -517,7 +517,7 @@ test_bitmap(void)
 #define WINDOW_SIZE WINSIZE * WINSIZE * 3
 
 enum piglit_result
-test_tex_image(void)
+test_tex_image(void *null)
 {
 	bool pass = true;
 
@@ -752,7 +752,7 @@ test_tex_image(void)
 }
 
 enum piglit_result
-test_tex_sub_image(void)
+test_tex_sub_image(void *null)
 {
 	GLuint pbs[1];
 	GLfloat t[TEXSIZE * TEXSIZE * 3];
@@ -854,7 +854,7 @@ test_tex_sub_image(void)
 }
 
 enum piglit_result
-test_polygon_stip(void)
+test_polygon_stip(void *null)
 {
 	int use_unpack = 0;
 	int use_pack = 0;
@@ -985,7 +985,7 @@ test_polygon_stip(void)
 }
 
 enum piglit_result
-test_error_handling(void)
+test_error_handling(void *null)
 {
 	bool pass = true;
 	GLuint fbs[1];
@@ -1058,38 +1058,23 @@ test_error_handling(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-struct test_func {
-	enum piglit_result (*func) (void);
-	char *name;
-};
-
 enum piglit_result
 piglit_display(void)
 {
-	int i = 0;
 	enum piglit_result result = PIGLIT_PASS;
-	enum piglit_result subtest;
-	static struct test_func funcs[] = {
-		{test_sanity,		  "test_sanity"},
-		{test_draw_pixels,	  "test_draw_pixels"},
-		{test_pixel_map,	  "test_pixel_map"},
-		{test_bitmap,		  "test_bitmap"},
-		{test_tex_image,	  "test_tex_image"},
-		{test_tex_sub_image,	  "test_tex_sub_image"},
-		{test_polygon_stip,	  "test_polygon_stip"},
-		{test_error_handling,     "test_error_handling"},
-		{NULL, ""}	 /* End of list sentinal */
+	static struct piglit_subtest funcs[] = {
+		{ "test_sanity", "", test_sanity, NULL },
+		{ "test_draw_pixels", "", test_draw_pixels, NULL },
+		{ "test_pixel_map", "", test_pixel_map, NULL },
+		{ "test_bitmap", "", test_bitmap, NULL },
+		{ "test_tex_image", "", test_tex_image, NULL },
+		{ "test_tex_sub_image", "", test_tex_sub_image, NULL },
+		{ "test_polygon_stip", "", test_polygon_stip, NULL },
+		{ "test_error_handling", "", test_error_handling, NULL },
+		{ NULL, NULL, NULL, NULL } /* End of list sentinal */
 	};
 
-	while (funcs[i].func)
-	{
-		subtest = funcs[i].func();
-		piglit_report_subtest_result(subtest, "%s",
-					     funcs[i].name);
-		if (subtest == PIGLIT_FAIL)
-			result = PIGLIT_FAIL;
-		i++;
-	}
+	result = piglit_run_selected_subtests(funcs, NULL, 0, result);
 
 	return result;
 }
