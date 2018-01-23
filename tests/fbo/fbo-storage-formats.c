@@ -190,8 +190,10 @@ test(void)
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
 		const char *name = piglit_get_gl_enum_name(formats[i].format);
 
-		if (!have_extension[formats[i].extension])
+		if (!have_extension[formats[i].extension]) {
+			piglit_report_subtest_result(PIGLIT_SKIP, "%s", name);
 			continue;
+		}
 
 		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, formats[i].format,
 					 piglit_width, piglit_height);
