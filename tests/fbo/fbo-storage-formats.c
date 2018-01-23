@@ -200,11 +200,10 @@ test(void)
 			pass = GL_FALSE;
 		} else {
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			piglit_report_subtest_result(PIGLIT_PASS,
-						     "%s (%s)",
-						     name,
-						     (status == GL_FRAMEBUFFER_COMPLETE ?
-						      "complete" : "incomplete"));
+			printf("%s is %s\n",
+		               name,
+			       (status == GL_FRAMEBUFFER_COMPLETE ?  "complete" : "incomplete"));
+			piglit_report_subtest_result(PIGLIT_PASS, "%s", name);
 		}
 	}
 
