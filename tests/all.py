@@ -973,6 +973,7 @@ with profile.test_list.group_manager(
     g(['gl-2.0-vertex-attr-0'])
     g(['gl-2.0-vertex-const-attr'])
     g(['gl-2.0-reuse_fragment_shader'])
+    g(['gl-2.0-shader-materials'])
     g(['attrib-assignments'])
     g(['getattriblocation-conventional'])
     g(['clip-flag-behavior'])
