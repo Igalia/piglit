@@ -1,0 +1,78 @@
+# SSBO test comparing a matrix using row_major layout and another
+# using column_major layout, when the data used for both is the same.
+
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (binding = 5, column_major) buffer column_ssbo
+ {
+    mat4 matrix;
+ } my_column_major;
+
+layout (binding = 7, row_major) buffer row_ssbo
+ {
+    mat4 matrix;
+ } my_row_major;
+
+void main()
+{
+   outColor = vec4(0.0, 1.0, 0.0, 0.0);
+
+   for (int column = 0; column < 4; column++)
+     for (int row = 0; row < 4; row++) {
+        if (my_column_major.matrix[column][row] != my_row_major.matrix[row][column])
+	   outColor = vec4(1.0, 0.0, 0.0, 0.0);
+     }
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+ssbo 5 64
+ssbo 5 subdata float 0  0.11
+ssbo 5 subdata float 4  0.12
+ssbo 5 subdata float 8  0.13
+ssbo 5 subdata float 12 0.14
+ssbo 5 subdata float 16 0.21
+ssbo 5 subdata float 20 0.22
+ssbo 5 subdata float 24 0.23
+ssbo 5 subdata float 28 0.24
+ssbo 5 subdata float 32 0.31
+ssbo 5 subdata float 36 0.32
+ssbo 5 subdata float 40 0.33
+ssbo 5 subdata float 44 0.34
+ssbo 5 subdata float 48 0.41
+ssbo 5 subdata float 52 0.42
+ssbo 5 subdata float 56 0.43
+ssbo 5 subdata float 60 0.44
+
+ssbo 7 64
+ssbo 7 subdata float 0  0.11
+ssbo 7 subdata float 4  0.12
+ssbo 7 subdata float 8  0.13
+ssbo 7 subdata float 12 0.14
+ssbo 7 subdata float 16 0.21
+ssbo 7 subdata float 20 0.22
+ssbo 7 subdata float 24 0.23
+ssbo 7 subdata float 28 0.24
+ssbo 7 subdata float 32 0.31
+ssbo 7 subdata float 36 0.32
+ssbo 7 subdata float 40 0.33
+ssbo 7 subdata float 44 0.34
+ssbo 7 subdata float 48 0.41
+ssbo 7 subdata float 52 0.42
+ssbo 7 subdata float 56 0.43
+ssbo 7 subdata float 60 0.44
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0

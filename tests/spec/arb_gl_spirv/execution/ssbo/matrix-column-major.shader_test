@@ -1,0 +1,49 @@
+# UBO test using a matrix. One stage
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (binding = 5, column_major) buffer ssbo
+ {
+    mat4 matrix;
+ } components;
+
+void main()
+{
+	outColor = vec4(components.matrix[3][0], components.matrix[3][1], components.matrix[3][2], components.matrix[3][3]);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+ssbo 5 64
+ssbo 5 subdata float 0  0.11
+ssbo 5 subdata float 4  0.12
+ssbo 5 subdata float 8  0.13
+ssbo 5 subdata float 12 0.14
+ssbo 5 subdata float 16 0.21
+ssbo 5 subdata float 20 0.22
+ssbo 5 subdata float 24 0.23
+ssbo 5 subdata float 28 0.24
+ssbo 5 subdata float 32 0.31
+ssbo 5 subdata float 36 0.32
+ssbo 5 subdata float 40 0.33
+ssbo 5 subdata float 44 0.34
+ssbo 5 subdata float 48 0.41
+ssbo 5 subdata float 52 0.42
+ssbo 5 subdata float 56 0.43
+ssbo 5 subdata float 60 0.44
+
+
+draw rect -1 -1 2 2
+probe all rgba 0.41 0.42 0.43 0.44

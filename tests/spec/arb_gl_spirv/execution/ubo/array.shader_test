@@ -1,0 +1,40 @@
+# UBO test using an array of ubos.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (binding = 5, row_major) uniform ComponentsBlock
+ {
+    vec4 c1;
+ } components[2];
+
+void main()
+{
+    outColor = components[0].c1 + components[1].c1;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+ubo binding 5
+
+ubo array index 0
+ubo offset 0
+uniform vec4 ComponentsBlock.c1 0.1 0.2 0.3 0.4
+
+ubo array index 1
+ubo offset 0
+uniform vec4 ComponentsBlock.c1 0.3 0.1 0.6 0.2
+
+draw rect -1 -1 2 2
+probe all rgba 0.4 0.3 0.9 0.6

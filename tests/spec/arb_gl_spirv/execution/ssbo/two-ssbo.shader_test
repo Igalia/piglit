@@ -1,0 +1,47 @@
+# SSBO test with two ssbos. Just one stage.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (binding = 5) buffer ssbo1
+ {
+    vec4 c1;
+ } components;
+
+layout (binding = 8) buffer ssbo2
+ {
+    vec4 c2;
+ } components2;
+
+void main()
+{
+	outColor = components.c1 + components2.c2;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+ssbo 5 32
+ssbo 5 subdata float 0  0.1
+ssbo 5 subdata float 4  0.2
+ssbo 5 subdata float 8  0.3
+ssbo 5 subdata float 12 0.4
+
+ssbo 8 32
+ssbo 8 subdata float 0  0.2
+ssbo 8 subdata float 4  0.3
+ssbo 8 subdata float 8  0.4
+ssbo 8 subdata float 12 0.5
+
+draw rect -1 -1 2 2
+probe all rgba 0.3 0.5 0.7 0.9

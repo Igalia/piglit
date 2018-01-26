@@ -1,0 +1,50 @@
+# UBO test using an array of ubo and indirect(dynamically uniform)
+# indexing. Just uses one stage.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (location = 10) uniform int u_idx;
+
+layout (binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+ } components[2];
+
+void main()
+{
+	outColor = components[u_idx].c1;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+ubo binding 5
+
+ubo array index 0
+ubo offset 0
+uniform vec4 ComponentsBlock.c1 0.1 0.2 0.3 0.4
+
+ubo array index 1
+ubo offset 0
+uniform vec4 ComponentsBlock.c1 0.4 0.3 0.2 0.1
+
+uniform int 10 0 # location 10, uniform u_idx
+
+draw rect -1 -1 2 2
+probe all rgba 0.1 0.2 0.3 0.4
+
+uniform int 10 1 # location 10, uniform u_idx
+
+draw rect -1 -1 2 2
+probe all rgba 0.4 0.3 0.2 0.1
