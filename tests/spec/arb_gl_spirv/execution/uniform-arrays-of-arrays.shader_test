@@ -1,0 +1,31 @@
+# Array of arrays of uniforms test
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (location = 10) uniform vec4 u_color[2][2];
+
+void main()
+{
+	color = u_color[0][0] + u_color[1][1];
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+uniform vec4 10 0.0 0.1 0.2 0.3
+uniform vec4 11 0.4 0.5 0.6 0.7
+uniform vec4 12 0.8 0.9 1.0 1.1
+uniform vec4 13 0.1 0.2 0.3 0.4
+
+draw rect -1 -1 1 1
+relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (0.1, 0.3, 0.5)
