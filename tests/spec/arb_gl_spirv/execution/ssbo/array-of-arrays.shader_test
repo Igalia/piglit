@@ -1,0 +1,55 @@
+# Equivalent to fs-const.shader_test at
+# arb_array_of_arrays/execution/ubo, but for ssbo
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (binding = 5) buffer ssbo {
+	vec4 color;
+} arr[2][2];
+
+
+void main()
+{
+	color = arr[0][0].color + arr[1][1].color;
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+ssbo 5 16
+ssbo 5 subdata float 0  0.11
+ssbo 5 subdata float 4  0.12
+ssbo 5 subdata float 8  0.13
+ssbo 5 subdata float 12 0.14
+
+ssbo 6 16
+ssbo 6 subdata float 0  0.21
+ssbo 6 subdata float 4  0.22
+ssbo 6 subdata float 8  0.23
+ssbo 6 subdata float 12 0.24
+
+ssbo 7 16
+ssbo 7 subdata float 0  0.31
+ssbo 7 subdata float 4  0.32
+ssbo 7 subdata float 8  0.33
+ssbo 7 subdata float 12 0.34
+
+ssbo 8 16
+ssbo 8 subdata float 0  0.41
+ssbo 8 subdata float 4  0.42
+ssbo 8 subdata float 8  0.43
+ssbo 8 subdata float 12 0.44
+
+
+draw rect -1 -1 2 2
+probe all rgba 0.52 0.54 0.56 0.58

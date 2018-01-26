@@ -1,0 +1,39 @@
+# This test has:
+#  * An ubo
+#  * An uniform with location 0
+#
+# At one point this test crashed. Keeping for regression catching.
+
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+layout (binding = 5) uniform block {
+	vec4 color;
+} arr;
+
+layout (location = 0) uniform int n;
+
+
+void main()
+{
+	color = arr.color;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+ubo binding 5
+ubo offset 0
+uniform vec4 block.color 0.0 0.1 0.2 0.3
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.1 0.2 0.3
