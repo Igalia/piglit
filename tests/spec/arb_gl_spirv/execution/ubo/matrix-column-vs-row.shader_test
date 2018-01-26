@@ -1,0 +1,58 @@
+# UBO test comparing a matrix using row_major layout and another using
+# column_major layout, when the data used for both is the same.
+
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (binding = 5, column_major) uniform ColumnBlock
+ {
+    mat4 matrix;
+ } my_column_major;
+
+layout (binding = 7, row_major) uniform RowBlock
+ {
+    mat4 matrix;
+ } my_row_major;
+
+void main()
+{
+   outColor = vec4(0.0, 1.0, 0.0, 0.0);
+
+   for (int column = 0; column < 4; column++)
+     for (int row = 0; row < 4; row++) {
+
+        //Note that here we compare exactly the same position because
+        // shader_runner already re-layout the data below if the matrix is in
+        // row_major layout
+        if (my_column_major.matrix[column][row] != my_row_major.matrix[column][row])
+	   outColor = vec4(1.0, 0.0, 0.0, 0.0);
+     }
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+ubo binding 5
+ubo offset 0
+ubo matrix stride 16
+ubo row major 0
+uniform mat4 ColumnBlock.matrix 0.11 0.12 0.13 0.14 0.21 0.22 0.23 0.24 0.31 0.32 0.33 0.34 0.41 0.42 0.43 0.44
+
+ubo binding 7
+ubo offset 0
+ubo matrix stride 16
+ubo row major 1
+uniform mat4 RowBlock.matrix 0.11 0.12 0.13 0.14 0.21 0.22 0.23 0.24 0.31 0.32 0.33 0.34 0.41 0.42 0.43 0.44
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0

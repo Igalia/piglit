@@ -1,0 +1,36 @@
+# UBO test using a matrix. One stage
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (binding = 5, row_major) uniform ComponentsBlock
+ {
+ mat4 matrix;
+ } components;
+
+void main()
+{
+	outColor = vec4(components.matrix[3][0], components.matrix[3][1], components.matrix[3][2], components.matrix[3][3]);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+ubo binding 5
+ubo offset 0
+ubo matrix stride 16
+ubo row major 1
+uniform mat4 ComponentsBlock.matrix 0.11 0.12 0.13 0.14 0.21 0.22 0.23 0.24 0.31 0.32 0.33 0.34 0.41 0.42 0.43 0.44
+
+draw rect -1 -1 2 2
+probe all rgba 0.41 0.42 0.43 0.44
