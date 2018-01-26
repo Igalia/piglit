@@ -1,0 +1,76 @@
+# UBO test with two ubos used on two different stages.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader]
+
+#version 450
+
+layout (location = 0) in vec4 piglit_vertex;
+layout (location = 1) out vec4 vertexColor;
+layout (binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+layout (binding = 6) uniform ComponentsBlock2
+ {
+    vec4 c1;
+    vec2 c2;
+ } components2;
+
+void main()
+{
+    vertexColor = components.c1 + vec4(components.c2, 0.0, 0.0);
+    vertexColor += components2.c1 + vec4(0.0, 0.0, components2.c2);
+    gl_Position = piglit_vertex;
+}
+
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (location = 1) in vec4 vertexColor;
+layout (binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+layout (binding = 6) uniform ComponentsBlock2
+ {
+    vec4 c1;
+    vec2 c2;
+ } components2;
+
+void main()
+{
+	vec4 color = components.c1 + vec4(components.c2, 0.0, 0.0);
+	color += components2.c1 + vec4(0.0, 0.0, components2.c2);
+	outColor = color - vertexColor + vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+ubo binding 5
+ubo offset 0
+uniform vec4 ComponentsBlock.c1 0.0 0.0 0.3 0.4
+ubo offset 16
+uniform vec2 ComponentsBlock.c2 0.1 0.2
+
+ubo binding 6
+ubo offset 0
+uniform vec4 ComponentsBlock.c1 0.3 0.2 0.1 0.6
+ubo offset 16
+uniform vec2 ComponentsBlock.c2 0.3 0.9
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
