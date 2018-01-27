@@ -553,6 +553,18 @@ test_data_check_against_get_tex_level_parameter(test_data *data,
         GLenum real_target = target;
         GLenum pname_equiv = translate_pname(pname);
 
+        /*
+         * Special case for texture buffer - this is not valid as
+         * glGetTexLevelParameteriv target with just ARB_tbo, only with gl 3.1.
+         * However, I believe the query2 should still return the correct
+         * values, despite the spec saying
+         * "For textures this query will return the same information as
+         * querying GetTexLevelParameter{if}v for TEXTURE_*_SIZE would return."
+         */
+        if (target == GL_TEXTURE_BUFFER && piglit_get_gl_version() < 31) {
+                return GL_TRUE;
+        }
+
         result = create_texture(target, internalformat, &tex, &buffer);
         if (!result)
                 return test_data_is_unsupported_response(data, pname);
