@@ -496,6 +496,37 @@ create_texture(const GLenum target,
         }
         return result;
 }
+
+
+static GLenum
+translate_pname(const GLenum pname)
+{
+        switch (pname) {
+        case GL_INTERNALFORMAT_RED_TYPE:
+        case GL_INTERNALFORMAT_GREEN_TYPE:
+        case GL_INTERNALFORMAT_BLUE_TYPE:
+        case GL_INTERNALFORMAT_ALPHA_TYPE:
+               return pname - GL_INTERNALFORMAT_RED_TYPE + GL_TEXTURE_RED_TYPE;
+         case GL_INTERNALFORMAT_DEPTH_TYPE:
+        /* case GL_INTERNALFORMAT_STENCIL_TYPE, */
+                return GL_TEXTURE_DEPTH_TYPE;
+        case GL_INTERNALFORMAT_RED_SIZE:
+        case GL_INTERNALFORMAT_GREEN_SIZE:
+        case GL_INTERNALFORMAT_BLUE_SIZE:
+        case GL_INTERNALFORMAT_ALPHA_SIZE:
+                return pname - GL_INTERNALFORMAT_RED_SIZE + GL_TEXTURE_RED_SIZE;
+        case GL_INTERNALFORMAT_DEPTH_SIZE:
+                return GL_TEXTURE_DEPTH_SIZE;
+        case GL_INTERNALFORMAT_STENCIL_SIZE:
+                return GL_TEXTURE_STENCIL_SIZE;
+        case GL_INTERNALFORMAT_SHARED_SIZE:
+                return GL_TEXTURE_SHARED_SIZE;
+        default:
+                assert(!"incorrect pname");
+                return 0;
+        }
+}
+
 /*
  * Builds a a texture using @target and @internalformat, and compares
  * the result of calling GetTexLevelParameter using @pname with the
@@ -520,6 +551,7 @@ test_data_check_against_get_tex_level_parameter(test_data *data,
         GLuint tex;
         GLuint buffer;
         GLenum real_target = target;
+        GLenum pname_equiv = translate_pname(pname);
 
         result = create_texture(target, internalformat, &tex, &buffer);
         if (!result)
@@ -530,7 +562,7 @@ test_data_check_against_get_tex_level_parameter(test_data *data,
         if (target == GL_TEXTURE_CUBE_MAP) {
                 real_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
         }
-        glGetTexLevelParameteriv(real_target, 0, pname, &param);
+        glGetTexLevelParameteriv(real_target, 0, pname_equiv, &param);
         if (!piglit_check_gl_error(GL_NO_ERROR)) {
                 result = false;
                 fprintf(stderr, "\tError calling glGetTexLevelParameter\n");

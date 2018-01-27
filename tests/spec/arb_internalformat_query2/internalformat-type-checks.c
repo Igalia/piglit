@@ -53,22 +53,6 @@ static const GLenum pnames[] = {
         /* GL_INTERNALFORMAT_STENCIL_TYPE, */
 };
 
-/* From spec:
- *
- * "For textures this query will return the same information
- *  as querying GetTexLevelParameter{if}v for TEXTURE_*_TYPE
- *  would return."
- *
- * The following are the pnames we would need to use when
- * calling GetTexLevelParameter (so equivalent to pnames)
- */
-static const GLenum equivalent_pnames[] = {
-        GL_TEXTURE_RED_TYPE,
-        GL_TEXTURE_GREEN_TYPE,
-        GL_TEXTURE_BLUE_TYPE,
-        GL_TEXTURE_ALPHA_TYPE,
-        GL_TEXTURE_DEPTH_TYPE,
-};
 
 /* From spec:
  *
@@ -120,7 +104,6 @@ static bool
 try_textures_type(const GLenum *targets, unsigned num_targets,
                   const GLenum *internalformats, unsigned num_internalformats,
                   const GLenum pname,
-                  const GLenum equivalent_pname,
                   test_data *data)
 {
         bool pass = true;
@@ -151,7 +134,7 @@ try_textures_type(const GLenum *targets, unsigned num_targets,
                                 value_test = value_test &&
                                         test_data_check_against_get_tex_level_parameter(data,
                                                                                         targets[i],
-                                                                                        equivalent_pname,
+                                                                                        pname,
                                                                                         internalformats[j]);
                         }
 
@@ -184,7 +167,7 @@ check_textures_type(void)
 
                         pass = try_textures_type(texture_targets, ARRAY_SIZE(texture_targets),
                                                  valid_internalformats, ARRAY_SIZE(valid_internalformats),
-                                                 pnames[i], equivalent_pnames[i],
+                                                 pnames[i],
                                                  data)
                                 && pass;
                 }

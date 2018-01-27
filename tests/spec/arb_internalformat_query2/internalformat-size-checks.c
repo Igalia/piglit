@@ -53,24 +53,6 @@ static const GLenum pnames[] = {
         GL_INTERNALFORMAT_SHARED_SIZE,
 };
 
-/* From spec:
- *
- * "For textures this query will return the same information
- *  as querying GetTexLevelParameter{if}v for TEXTURE_*_SIZE
- *  would return."
- *
- * The following are the pnames we would need to use when
- * calling GetTexLevelParameter (so equivalent to pnames)
- */
-static const GLenum equivalent_pnames[] = {
-        GL_TEXTURE_RED_SIZE,
-        GL_TEXTURE_GREEN_SIZE,
-        GL_TEXTURE_BLUE_SIZE,
-        GL_TEXTURE_ALPHA_SIZE,
-        GL_TEXTURE_DEPTH_SIZE,
-        GL_TEXTURE_STENCIL_SIZE,
-        GL_TEXTURE_SHARED_SIZE,
-};
 
 enum piglit_result
 piglit_display(void)
@@ -102,7 +84,6 @@ static bool
 try_textures_size(const GLenum *targets, unsigned num_targets,
                   const GLenum *internalformats, unsigned num_internalformats,
                   const GLenum pname,
-                  const GLenum equivalent_pname,
                   test_data *data)
 {
         bool pass = true;
@@ -128,7 +109,7 @@ try_textures_size(const GLenum *targets, unsigned num_targets,
                         value_test = supported ?
                                 test_data_check_against_get_tex_level_parameter(data,
                                                                                 targets[i],
-                                                                                equivalent_pname,
+                                                                                pname,
                                                                                 internalformats[j]) :
                                 test_data_is_unsupported_response(data, pname);
 
@@ -168,7 +149,7 @@ check_textures_size(void)
 
                         pass = try_textures_size(texture_targets, ARRAY_SIZE(texture_targets),
                                                  valid_internalformats, ARRAY_SIZE(valid_internalformats),
-                                                 pnames[i], equivalent_pnames[i],
+                                                 pnames[i],
                                                  data)
                                 && pass;
                 }
