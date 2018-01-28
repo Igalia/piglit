@@ -21,9 +21,10 @@
 """Piglit integration for the now open sourced Khronos CTS tests being
 developed at https://github.com/KhronosGroup/VK-GL-CTS
 
-By default this will run GL30, GL31, GL32, GL33, GL40, GL41, GL42, GL43, GL44
-and GL45 test cases. Those desiring to run only a subset of them should consider
-using the -t or -x options to include or exclude tests.
+By default this will run GL30, GL31, GL32, GL33, GL40, GL41, GL42,
+GL43, GL44, GL45 and GL46 test cases. Those desiring to run only a
+subset of them should consider using the -t or -x options to include
+or exclude tests.
 
 For example:
 ./piglit run khr_gl -c foo -t GL30- would run only GL30 tests
