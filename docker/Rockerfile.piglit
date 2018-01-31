@@ -1,0 +1,74 @@
+#
+# This builds Piglit.
+#
+# ~~~
+#  rocker build -f Rockerfile.piglit [--attach]                                 \
+#    [--var IMAGE=freedesktop/mesa] # freedesktop/mesa, myrepo/myproyect, ...   \
+#    [--var TAG=piglit]             # piglit-17.0, piglit-13.0, ...             \
+#    [--var PARENT=ubuntu:xenial]   # ubuntu:xenial, freedesktop/mesa:17.3, ...
+# ~~~
+#
+# Environment variables that are used in the build:
+#  - MAKEFLAGS: flags to pass to make (e.g., "-j8")
+#  - CCACHE_DIR: ccache directory (default: ~/.ccache)
+#
+# To run
+#
+# ~~~
+#   mkdir -p -m777 ~/my_results_dir
+#   docker run --privileged --rm -t -v ~/my_results_dir:/results:Z  \
+#              -v /tmp/.X11-unix:/tmp/.X11-unix freedesktop/mesa:piglit
+# ~~~
+#
+
+{{ $image := (or .IMAGE "freedesktop/mesa") }}
+{{ $parent_image := (or .PARENT "ubuntu:xenial") }}
+{{ $ccachedir := (or .Env.CCACHE_DIR "~/.ccache") }}
+
+FROM {{ $parent_image }}
+
+LABEL maintainer "Andres Gomez <agomez@igalia.com>"
+
+USER root
+
+ENV LC_ALL=C.UTF-8
+
+RUN apt-get update                                                      \
+  && apt-get -y --no-install-recommends install sudo gcc g++ ccache     \
+    git pkg-config bash-completion cmake                                \
+    libz-dev libpng-dev libgl-dev libegl1-mesa-dev libwaffle-dev        \
+    python3-setuptools python3-pip                                      \
+  && rm -fr /var/lib/apt/lists/*
+
+RUN pip3 install numpy six mako
+
+RUN getent passwd local > /dev/null || adduser --gecos "" local && passwd -d local && adduser local sudo
+
+USER local
+
+{{ if .Env.MAKEFLAGS }}
+ENV MAKEFLAGS={{ .Env.MAKEFLAGS }}
+{{ end }}
+
+WORKDIR /home/local
+
+MOUNT {{ $ccachedir }}:/home/local/.ccache:Z
+
+RUN sudo chown -R local:local /home/local/.ccache
+
+ENV PATH=/usr/lib/ccache:$PATH
+
+ADD . /home/local/piglit
+RUN sudo chown -R local:local /home/local/piglit
+
+WORKDIR /home/local/piglit
+
+ATTACH [ "/bin/bash" ]
+
+RUN cmake . && cmake --build .
+
+VOLUME /results
+
+{{ if .TAG }}
+TAG {{ $image }}:{{ .TAG }}
+{{ end }}
