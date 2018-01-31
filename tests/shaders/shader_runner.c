@@ -46,8 +46,10 @@ decode_drawing_mode(const char *mode_str);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.window_width = DEFAULT_WINDOW_WIDTH;
-	config.window_height = DEFAULT_WINDOW_HEIGHT;
+	if (!piglit_gl_test_config_override_size(&config)) {
+		config.window_width = DEFAULT_WINDOW_WIDTH;
+		config.window_height = DEFAULT_WINDOW_HEIGHT;
+	}
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
@@ -3972,8 +3974,10 @@ validate_current_gl_context(const char *filename)
 {
 	struct piglit_gl_test_config config = { 0 };
 
-	config.window_width = DEFAULT_WINDOW_WIDTH;
-	config.window_height = DEFAULT_WINDOW_HEIGHT;
+	if (!piglit_gl_test_config_override_size(&config)) {
+		config.window_width = DEFAULT_WINDOW_WIDTH;
+		config.window_height = DEFAULT_WINDOW_HEIGHT;
+	}
 
 	get_required_config(filename, &config);
 
