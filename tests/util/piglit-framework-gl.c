@@ -47,8 +47,8 @@ static void
 process_args(int *argc, char *argv[], unsigned *force_samples,
 	     struct piglit_gl_test_config *config);
 
-static bool
-override_size(struct piglit_gl_test_config *config)
+bool
+piglit_gl_test_config_override_size(struct piglit_gl_test_config *config)
 {
 	const char *default_size;
 	unsigned int width;
@@ -74,7 +74,7 @@ piglit_gl_test_config_init(struct piglit_gl_test_config *config)
 {
 	memset(config, 0, sizeof(*config));
 
-	if (!override_size(config)) {
+	if (!piglit_gl_test_config_override_size(config)) {
 		/* Default window size.  Note: Win8's min window width */
 		/* seems to be 160 pixels.  When the window size is */
 		/* unexpectedly resized, tests are marked as "WARN". */

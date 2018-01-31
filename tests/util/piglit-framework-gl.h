@@ -226,6 +226,9 @@ void
 piglit_gl_process_args(int *argc, char *argv[],
 		       struct piglit_gl_test_config *config);
 
+bool
+piglit_gl_test_config_override_size(struct piglit_gl_test_config *config);
+
 /**
  * Get the list of command-line selected tests from the piglit_gl_test_config
  *
