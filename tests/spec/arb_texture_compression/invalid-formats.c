@@ -412,6 +412,30 @@ try_formats(const struct format_list *t, GLenum *compressed_formats,
 	return pass;
 }
 
+
+static bool
+test_hint(void)
+{
+	GLint hint = 0;
+	glGetIntegerv(GL_TEXTURE_COMPRESSION_HINT, &hint);
+	if (hint != GL_DONT_CARE) {
+		printf("Unexpected default GL_TEXTURE_COMPRESSION_HINT"
+		       " value: %s\n", piglit_get_gl_enum_name(hint));
+		return false;
+	}
+
+	glHint(GL_TEXTURE_COMPRESSION_HINT, GL_NICEST);
+	glGetIntegerv(GL_TEXTURE_COMPRESSION_HINT, &hint);
+	if (hint != GL_NICEST) {
+		printf("Unexpected GL_TEXTURE_COMPRESSION_HINT"
+		       " value: %s\n", piglit_get_gl_enum_name(hint));
+		return false;
+	}
+
+	return true;
+}
+
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -592,6 +616,8 @@ piglit_init(int argc, char **argv)
 			}
 		}
 	}
+
+	pass = test_hint() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
