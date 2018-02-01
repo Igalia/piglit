@@ -695,22 +695,12 @@ fbo_use_test_set(const char *test_set, bool print_options)
 	}
 }
 
-static void add_result(bool *all_skip, enum piglit_result *end_result,
-		       enum piglit_result new_result)
-{
-	if (new_result != PIGLIT_SKIP)
-		*all_skip = false;
-
-	if (new_result == PIGLIT_FAIL)
-		*end_result = new_result;
-}
-
 typedef enum piglit_result (*test_func)(const struct format_desc *format);
 
 static enum piglit_result fbo_formats_display(test_func test_format)
 {
-	enum piglit_result result, end_result = PIGLIT_PASS;
-	bool all_skip = true;
+	enum piglit_result end_result = PIGLIT_SKIP;
+	enum piglit_result result;
 	unsigned i;
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
@@ -720,16 +710,14 @@ static enum piglit_result fbo_formats_display(test_func test_format)
 	if (piglit_automatic) {
 		for (i = 0; i < test_sets[test_index].num_formats; i++) {
 			result = test_format(&test_sets[test_index].format[i]);
-			add_result(&all_skip, &end_result, result);
+			piglit_merge_result(&end_result, result);
 		}
 	} else {
 		result = test_format(&test_sets[test_index].format[format_index]);
-		add_result(&all_skip, &end_result, result);
+		piglit_merge_result(&end_result, result);
 	}
 
 	piglit_present_results();
 
-	if (all_skip)
-		return PIGLIT_SKIP;
 	return end_result;
 }
