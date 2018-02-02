@@ -217,6 +217,10 @@ wfl_info = wflinfo.WflInfo()
 
 def gl_extension_supported(ext_name):
     """Is the named OpenGL extension supported?"""
+    if wfl_info.gl_extensions == set():
+        # Don't know what extensions are supported.  Return true so we don't
+        # skip anything.
+        return True
     return ext_name in wfl_info.gl_extensions
 
 
@@ -227,6 +231,9 @@ def is_feature_directory_supported(dir_name):
     it means the extension/version is possibly suppported.  We're a little
     fuzzy because we don't yet parse all the directory name possibilities
     (like ES tests).
+
+    Also, if the 'wflinfo' program is not installed or fails (i.e. we can't
+    determine the GL version/extension) we return True.
     """
     if dir_name[:4] in {"amd_", "arb_", "ati_", "ext_", "khr_", "oes_"}:
         # The directory is a GL extension name, but of the format "arb_foo_bar"
@@ -237,19 +244,19 @@ def is_feature_directory_supported(dir_name):
     elif dir_name[:5] == "gles-":
         # OpenGL ES test
         version = float(dir_name[5:])
-        return wfl_info.gles_version != None and version <= wfl_info.gles_version
+        return wfl_info.gles_version is None or version <= wfl_info.gles_version
     elif dir_name[:8] == "glsl-es-":
         # OpenGL ES shader test
         version = float(dir_name[8:])
-        return wfl_info.glsl_es_version != None and version <= wfl_info.glsl_es_version
+        return wfl_info.glsl_es_version is None or version <= wfl_info.glsl_es_version
     elif dir_name[:3] == "gl-":
         # The directory is a GL version
         version = float(dir_name[3:])
-        return version <= wfl_info.gl_version
+        return wfl_info.gl_version is None or version <= wfl_info.gl_version
     elif dir_name[:5] == "glsl-":
         # The directory is a GLSL version
         version = float(dir_name[5:])
-        return version <= wfl_info.glsl_version
+        return wfl_info.glsl_version is None or version <= wfl_info.glsl_version
     else:
         # The directory is something else.  Don't skip it.
         return True
