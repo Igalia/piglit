@@ -1,51 +1,25 @@
-# UBO test using an array of ubos. It doesn't use all the components
-# of the UBOS, but uses different components from different ubos, on
-# two different stages.
+# UBO test using an array of ubos.
 
 [require]
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_gl_spirv
 
-[vertex shader]
-
-#version 450
-
-layout (location = 0) in vec4 piglit_vertex;
-layout (location = 1) out vec4 vertexColor;
-layout (binding = 5, row_major) uniform ComponentsBlock
- {
-    vec4 c1;
-    vec2 c2;
-    mat2 matrix;
- } components[2];
-
-void main()
-{
-    vertexColor = vec4(components[0].matrix[0][0], components[0].matrix[0][1], components[0].matrix[1][0], components[0].matrix[1][1]);
-    vertexColor += components[1].c1 + vec4(components[1].c2, 0.0, 0.0);
-    gl_Position = piglit_vertex;
-}
-
+[vertex shader passthrough]
 
 [fragment shader]
 
 #version 450
 
 layout (location = 0) out vec4 outColor;
-layout (location = 1) in vec4 vertexColor;
 layout (binding = 5, row_major) uniform ComponentsBlock
  {
     vec4 c1;
-    vec2 c2;
-    mat2 matrix;
  } components[2];
 
 void main()
 {
-	vec4 color = components[1].c1 + vec4(components[1].c2, 0.0, 0.0);
-	color += vec4(components[0].matrix[0][0], components[0].matrix[0][1], components[0].matrix[1][0], components[0].matrix[1][1]);
-	outColor = color - vertexColor + vec4(0.0, 1.0, 0.0, 0.0);
+    outColor = components[0].c1 + components[1].c1;
 }
 
 [test]
@@ -55,26 +29,12 @@ clear
 ubo binding 5
 
 ubo array index 0
-
 ubo offset 0
-uniform vec4 ComponentsBlock.c1 0.0 0.0 0.3 0.4
-ubo offset 16
-uniform vec2 ComponentsBlock.c2 0.1 0.2
-
-ubo matrix stride 16
-ubo row major 0
-uniform mat4 ComponentsBlock.matrix 0.25 0.5 0.75 1.0
+uniform vec4 ComponentsBlock.c1 0.1 0.2 0.3 0.4
 
 ubo array index 1
-
 ubo offset 0
-uniform vec4 ComponentsBlock.c1 0.3 0.4 0.0 0.0
-ubo offset 16
-uniform vec2 ComponentsBlock.c2 0.5 0.3
-
-ubo matrix stride 16
-ubo row major 0
-uniform mat4 ComponentsBlock.matrix 0.5 0.25 0.175 1.0
+uniform vec4 ComponentsBlock.c1 0.3 0.1 0.6 0.2
 
 draw rect -1 -1 2 2
-probe all rgba 0.0 1.0 0.0 0.0
+probe all rgba 0.4 0.3 0.9 0.6
