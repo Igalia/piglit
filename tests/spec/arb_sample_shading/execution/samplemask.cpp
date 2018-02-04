@@ -34,7 +34,11 @@
  * 2. The bits of gl_SampleMaskIn over all fragment shader invocations form a
  *    partition of the set of samples. This subtest requires
  *    ARB_shader_atomic_counters to disambiguate between fragment shader
- *    invocations.
+ *    invocations. (Also verifies sampleID is 0 when msaa is disabled.)
+ * Additionally, there's a test to just verify gl_SampleMaskIn is 1 when 
+ * msaa is disabled (regardless of per-sample frequency shader or sample
+ * shading). (Omitted from test 2 because it's difficult to track down
+ * what's going wrong if drivers fail too many parts of the test.)
  *
  * The sample rate is controlled in one of two ways: Either glMinSampleShading
  * or a fragment shader variant that uses gl_SampleID is used.
@@ -71,21 +75,24 @@ enum rate_mode {
 static int num_samples;
 static int actual_num_samples;
 static bool partition_check_supported;
+static bool mask_in_one_supported;
 static const char *procname;
 static const char *testname;
 static const char *sample_rate;
 static unsigned prog_fix_sample_mask[2];
 static unsigned prog_fix_check;
+static unsigned prog_mask_in_one[2];
 static unsigned prog_partition_write[2];
 static unsigned prog_partition_check;
 static unsigned prog_partition_check_have_sampleid;
+static unsigned prog_partition_check_msaa_disabled;
 static Fbo ms_fbo;
 static Fbo ms_ifbo;
 
 static void
 print_usage_and_exit(const char *prog_name)
 {
-	printf("Usage: %s <num_samples> <rate> {fix|partition|all}\n"
+	printf("Usage: %s <num_samples> <rate> {fix|partition|mask_in_one|all}\n"
 	       "where <rate> is either a floating point MinSampleShading value\n"
 	       "             or 'sample', 'noms', or 'all'\n",
 	       prog_name);
@@ -165,6 +172,16 @@ compile_shaders(void)
 		"  }\n"
 		"}\n";
 
+	static const char frag_mask_in_one[] =
+		"#version 130\n"
+		"#extension GL_ARB_gpu_shader5 : enable\n"
+		"#extension GL_ARB_sample_shading : enable\n"
+		"out vec4 out_color;\n"
+		"void main()\n"
+		"{\n"
+		"  out_color = vec4(float(gl_SampleMaskIn[0]) / 10.0, 0.0, %s, 0.0);\n"
+		"}\n";
+
 	static const char frag_partition_write[] =
 		"#version 140\n"
 		"#extension GL_ARB_gpu_shader5 : enable\n"
@@ -183,16 +200,23 @@ compile_shaders(void)
 		"uniform isampler2DMS tex;\n"
 		"uniform int num_samples;\n"
 		"uniform bool have_sampleid;\n"
+		"uniform bool msaa_disabled;\n"
 		"out vec4 out_color;\n"
 		"void main()\n"
 		"{\n"
 		"  out_color = vec4(0, 1, 0, 1);\n"
 		"  for (int i = 0; i < num_samples; ++i) {\n"
 		"    ivec4 di = texelFetch(tex, ivec2(gl_FragCoord.xy), i);\n"
-		"    if ((di.x & (1 << i)) == 0)\n"
-		"      out_color = vec4(0.1, float(i) / 255, 0, 0);\n"
-		"    if (have_sampleid && di.z != i)\n"
-		"      out_color = vec4(0.2, float(i) / 255, float(di.z) / 255, 0);\n"
+		"    if (msaa_disabled) {\n"
+		"      /* omit di.x == 1 test here, drivers fail multiple parts already... */\n"
+		"      if (di.z != 0)\n"
+		"        out_color = vec4(0.2, float(i) / 255, float(di.z) / 255, 0);\n"
+		"    } else {\n"
+		"      if ((di.x & (1 << i)) == 0)\n"
+		"        out_color = vec4(0.1, float(i) / 255, float(di.x) / 255, 0);\n"
+		"      if (have_sampleid && di.z != i)\n"
+		"        out_color = vec4(0.2, float(i) / 255, float(di.z) / 255, 0);\n"
+		"    };\n"
 		"    for (int j = i + 1; j < num_samples; ++j) {\n"
 		"      ivec2 dj = texelFetch(tex, ivec2(gl_FragCoord.xy), j).xy;\n"
 		"      bool overlap = (di.x & dj.x) != 0;\n"
@@ -212,6 +236,10 @@ compile_shaders(void)
 	glUniform1i(glGetUniformLocation(prog_fix_check, "tex"), 0);
 	glUniform1i(glGetUniformLocation(prog_fix_check, "num_samples"), actual_num_samples);
 
+	if (mask_in_one_supported) {
+		build_program_variants(prog_mask_in_one, vert_fan, frag_mask_in_one);
+	}
+
 	if (partition_check_supported) {
 		build_program_variants(prog_partition_write, vert_fan, frag_partition_write);
 		prog_partition_check = piglit_build_simple_program(vert_passthrough, frag_partition_check);
@@ -221,17 +249,21 @@ compile_shaders(void)
 			    actual_num_samples);
 		prog_partition_check_have_sampleid =
 			glGetUniformLocation(prog_partition_check, "have_sampleid");
+		prog_partition_check_msaa_disabled =
+			glGetUniformLocation(prog_partition_check, "msaa_disabled");
 	}
 }
 
 static void
-draw_fan(enum rate_mode mode, float sample_rate)
+draw_fan(enum rate_mode mode, float sample_rate, bool msaa_force_disable)
 {
+	if (mode == rate_mode_sampleid_noms || msaa_force_disable) {
+		glDisable(GL_MULTISAMPLE);
+	}
 	if (mode == rate_mode_sampleshading) {
 		glEnable(GL_SAMPLE_SHADING);
 		glMinSampleShading(sample_rate);
-	} else if (mode == rate_mode_sampleid_noms)
-		glDisable(GL_MULTISAMPLE);
+	}
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 2 + 4 * VERTICES_PER_EDGE);
 	glDisable(GL_SAMPLE_SHADING);
 	glEnable(GL_MULTISAMPLE);
@@ -251,7 +283,49 @@ test_fix(enum rate_mode mode, float sample_rate)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
-	draw_fan(mode, sample_rate);
+	draw_fan(mode, sample_rate, false);
+
+	glDisable(GL_BLEND);
+
+	/* 2. Use the check shader to check correctness. */
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUseProgram(prog_fix_check);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, ms_fbo.color_tex[0]);
+
+	piglit_draw_rect(-1, -1, 2, 2);
+
+	static const float expected[4] = { 0, 1, 0, 1 };
+	if (!piglit_probe_rect_rgba(0, 0, WINDOW_SIZE, WINDOW_SIZE, expected))
+		return PIGLIT_FAIL;
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
+
+	return PIGLIT_PASS;
+}
+
+static enum piglit_result
+test_mask_in_one(enum rate_mode mode, float sample_rate)
+{
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+
+	/* 1. Draw everything outputting gl_SampleMaskIn, with msaa disabled; */
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ms_fbo.handle);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	/*
+	 * We'll abuse the sampleid_noms mode here and use the prog without
+	 * sample id to so we still have 3 somewhat meaningful modes - of
+	 * course with msaa always disabled it should always be the same.
+	 */
+	glUseProgram(prog_mask_in_one[mode == rate_mode_sampleid]);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	draw_fan(mode, sample_rate, true);
 
 	glDisable(GL_BLEND);
 
@@ -284,7 +358,7 @@ test_partition(enum rate_mode mode, float sample_rate)
 
 	glUseProgram(prog_partition_write[mode != rate_mode_sampleshading]);
 
-	draw_fan(mode, sample_rate);
+	draw_fan(mode, sample_rate, false);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -292,6 +366,7 @@ test_partition(enum rate_mode mode, float sample_rate)
 
 	glUseProgram(prog_partition_check);
 	glUniform1i(prog_partition_check_have_sampleid, mode == rate_mode_sampleid);
+	glUniform1i(prog_partition_check_msaa_disabled, mode == rate_mode_sampleid_noms);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, ms_ifbo.color_tex[0]);
 
 	piglit_draw_rect(-1, -1, 2, 2);
@@ -364,12 +439,17 @@ piglit_display()
 
 	if (all || !strcmp(testname, "fix")) {
 		run = true;
-		pass = iterate_sample_rates(testname, test_fix) && pass;
+		pass = iterate_sample_rates("fix", test_fix) && pass;
+	}
+
+	if (all || !strcmp(testname, "mask_in_one")) {
+		run = true;
+		pass = iterate_sample_rates("mask_in_one", test_mask_in_one) && pass;
 	}
 
 	if (all || !strcmp(testname, "partition")) {
 		run = true;
-		pass = iterate_sample_rates(testname, test_partition) && pass;
+		pass = iterate_sample_rates("partition", test_partition) && pass;
 	}
 
 	if (!run)
@@ -407,6 +487,9 @@ piglit_init(int argc, char **argv)
 	partition_check_supported =
 		piglit_is_extension_supported("GL_ARB_gpu_shader5") &&
 		piglit_is_extension_supported("GL_ARB_shader_atomic_counters");
+
+	mask_in_one_supported =
+		piglit_is_extension_supported("GL_ARB_gpu_shader5");
 
 	/* Skip the test if num_samples > GL_MAX_SAMPLES */
 	GLint max_samples;
