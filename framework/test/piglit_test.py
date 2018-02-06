@@ -33,6 +33,8 @@ try:
 except ImportError:
     import json
 
+import six
+
 from framework import core, options
 from framework import status
 from .base import Test, WindowResizeMixin, ValgrindMixin, TestIsSkip
@@ -84,6 +86,15 @@ class PiglitBaseTest(ValgrindMixin, Test):
                 out.append(each)
 
         self.result.out = '\n'.join(out)
+
+        # XXX: There are a number of tests that now enumerate their subtests,
+        # but don't properly report skip for all of them when the skip due to a
+        # missing feature. We should fix these tests to do the right thing, but
+        # for the moment this work around will suffice to keep things running.
+        if self.result.raw_result is status.SKIP and self.result.subtests:
+            for k, v in six.iteritems(self.result.subtests):
+                if v is status.NOTRUN:
+                    self.result.subtests[k] = status.SKIP
 
         super(PiglitBaseTest, self).interpret_result()
 

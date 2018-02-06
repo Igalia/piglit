@@ -183,6 +183,11 @@ class TestResult(object):
             return max(six.itervalues(self.subtests))
         return self.__result
 
+    @property
+    def raw_result(self):
+        """Get the result of the test without taking subtests into account."""
+        return self.__result
+
     @result.setter
     def result(self, new):
         try:
