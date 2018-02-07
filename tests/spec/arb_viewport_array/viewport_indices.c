@@ -201,7 +201,9 @@ test_preserve_invalid_index(GLint maxVP)
 #else
 		glGetFloati_vOES(GL_DEPTH_RANGE, i, drGet);
 #endif
-		if (drGet[0] != dr[0] || drGet[1] != dr[1]) {
+		/* Allow float precisions instead of double for desktop GL. */
+		if ((float)drGet[0] != (float)dr[0] ||
+		    (float)drGet[1] != (float)dr[1]) {
 			printf("DepthRange index %d got erroneously changed\n",
 			       i);
 			pass = false;
