@@ -10,3 +10,4 @@ link_libraries (
 
 piglit_add_executable (amd_performance_monitor_api api.c)
 piglit_add_executable (amd_performance_monitor_measure measure.c)
+piglit_add_executable (amd_performance_monitor_vc4 vc4.c)

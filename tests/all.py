@@ -1642,6 +1642,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'AMD_performance_monitor')) as g:
     g(['amd_performance_monitor_api'], 'api', run_concurrent=False)
+    g(['amd_performance_monitor_api'], 'vc4')
     g(['amd_performance_monitor_measure'], 'measure', run_concurrent=False)
 
 # Group ARB_arrays_of_arrays
