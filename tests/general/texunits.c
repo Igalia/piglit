@@ -283,7 +283,7 @@ test_texture_env(void)
    clear_errors();
 
    /* set per-unit state */
-   for (i = 0; i < MaxTextureCombinedUnits; i++) {
+   for (i = 0; i < MaxTextureCoordUnits; i++) {
       glActiveTexture(GL_TEXTURE0 + i);
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[i]);
       if (!piglit_check_gl_error(GL_NO_ERROR)) {
@@ -292,7 +292,7 @@ test_texture_env(void)
    }
 
    /* check per-unit state */
-   for (i = 0; i < MaxTextureCombinedUnits; i++) {
+   for (i = 0; i < MaxTextureCoordUnits; i++) {
       GLfloat v[4];
       glActiveTexture(GL_TEXTURE0 + i);
       glGetTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, v);
