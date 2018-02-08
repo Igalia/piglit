@@ -1,4 +1,4 @@
->/*!
+/*!
 
 [config]
 name: MUBUF stack addressing behavior
