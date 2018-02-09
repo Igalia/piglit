@@ -727,6 +727,9 @@ def parse_args():
     parser.add_argument("-X", "--excludes-from-file",
                         nargs='+',
                         help="Exclude shader_test files with path prefixes from the given file")
+    parser.add_argument("-n", "--no-transform",
+                        action="store_true",
+                        help="Don't try to transform GLSL shaders")
     parser.add_argument("-t", "--transformed",
                         action="store_true",
                         help="Print transformed GLSL shaders")
@@ -835,7 +838,7 @@ def process_shader_test(shader_test, config):
     if vertex_attribs is None:
         vertex_attribs = {'piglit_vertex': 0, 'piglit_texcoord': 1}
 
-    if have_glsl:
+    if have_glsl & (config.no_transform is False):
         skip_reasons = fixup_glsl_shaders(shaders, vertex_attribs)
 
         if config.mark_skip:
