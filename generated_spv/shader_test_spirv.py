@@ -64,9 +64,8 @@ def get_stage_order(stage):
 
 
 class ShaderSource(object):
-    def __init__(self, stage, spirv):
+    def __init__(self, stage):
         self.stage = stage
-        self.spirv = spirv
         self.__source_chunks = []
         self.__source_cache = None
 
@@ -741,6 +740,80 @@ def parse_args():
                         help="Path to one or more .shader_test files to process.")
     return parser.parse_args()
 
+def compile_glsl(shader_test, config, shader_group):
+    stage = shader_group[0].stage
+    extension = get_stage_extension(stage)
+    if extension is None:
+        print('{}: Bad shader stage: "{}"'.format(shader_test, stage))
+        return None
+
+    with tempfile.TemporaryDirectory() as tempdir:
+        filenames = []
+
+        for idx, shader in enumerate(shader_group):
+            filename = '{}/{}.{}'.format(tempdir, idx, extension)
+            filenames.append(filename)
+            with open(filename, 'w') as srcf:
+                print(shader.source(), file=srcf)
+
+        filename = '{}/glslang.conf'.format(tempdir)
+        write_glslang_conf(config, filename)
+        filenames.append(filename)
+
+        binary_name = tempdir + '/shader.' + extension + '.spv'
+
+        if config.verbose or config.transformed:
+            print('Writing {} shader binary to {}'.
+                  format(shader_group[0].stage, binary_name))
+
+        cmdline = [config.glslang, '-G', '-o', binary_name] + filenames
+        proc = subprocess.run(cmdline, stdout=subprocess.PIPE)
+
+        if proc.returncode != 0:
+            print('{}: Failed to build {} shader'.format(shader_test, stage))
+            print('Build command: {}\nOutput:\n{}'.format(
+                ' '.join(cmdline),
+                proc.stdout.decode(errors='ignore')))
+            for idx, shader in enumerate(shader_group):
+                print('Transformed GLSL #{}:\n{}'.format(idx, shader.source()))
+            return None
+
+        cmdline = [config.spirv_dis, binary_name]
+        proc = subprocess.run(cmdline, stdout=subprocess.PIPE)
+
+        if proc.returncode != 0:
+            print('{}: spirv-dis failed for {} shader'.format(shader_test, stage))
+            return None
+
+        return proc.stdout.decode()
+
+def filter_shader_test(fin, fout,
+                       replacements,
+                       add_spirv_line):
+    skipping = False
+    groupname = None
+
+    for line in fin:
+        if line.startswith('['):
+            groupname = line[1:line.index(']')]
+            skipping = RE_spirv_shader_groupname.match(groupname) is not None
+            if groupname in replacements:
+                replacement = replacements[groupname]
+                if len(replacement) > 0:
+                    fout.write('[' + groupname + ' spirv]\n')
+                    fout.write('; Automatically generated from the GLSL by '
+                               'shader_test_spirv.py. DO NOT EDIT\n')
+                    fout.write(replacement)
+                    fout.write('\n')
+                    replacements[groupname] = ''
+
+
+        if not skipping:
+            fout.write(line)
+
+        if add_spirv_line and groupname == 'require':
+            fout.write('SPIRV YES\n')
+            add_spirv_line = False
 
 def process_shader_test(shader_test, config):
     unsupported_gl_extensions = set([
@@ -754,7 +827,6 @@ def process_shader_test(shader_test, config):
 
     shaders = []
 
-    have_spirv = False
     have_glsl = False
 
     with open(shader_test, 'r') as filp:
@@ -769,8 +841,6 @@ def process_shader_test(shader_test, config):
                     shaders.append(shader)
                     shader = None
                 else:
-                    if shader.spirv and line.strip().startswith('#'):
-                        continue
                     shader.append(line)
                     continue
 
@@ -778,15 +848,10 @@ def process_shader_test(shader_test, config):
                 in_requirements = False
 
                 groupname = line[1:line.index(']')]
-                m = RE_spirv_shader_groupname.match(groupname)
-                if m is not None:
-                    shader = ShaderSource(m.group(1), spirv=True)
-                    have_spirv = True
-                    continue
 
                 m = RE_glsl_shader_groupname.match(groupname)
                 if m is not None:
-                    shader = ShaderSource(m.group(1), spirv=False)
+                    shader = ShaderSource(m.group(1))
                     have_glsl = True
                     continue
 
@@ -857,57 +922,29 @@ def process_shader_test(shader_test, config):
         if not shader_groups or shader.stage != shader_groups[-1][0].stage:
             shader_groups.append([shader])
         else:
-            assert shader_groups[-1][0].spirv == shader.spirv
             shader_groups[-1].append(shader)
 
+    replacements = {}
     for shader_group in shader_groups:
-        stage = shader_group[0].stage
-        extension = get_stage_extension(stage)
-        if extension is None:
-            print('{}: Bad shader stage: "{}"'.format(shader_test, stage))
+        spirv = compile_glsl(shader_test, config, shader_group)
+        if not spirv:
             return False
 
-        binary_name = shader_test + '.' + extension + '.spv'
-
-        if config.verbose or config.transformed:
-            print('Writing {} shader binary to {}'.format(shader_group[0].stage, binary_name))
-
-        if shader_group[0].spirv:
-            assert len(shader_group) == 1
-            shader = shader_group[0]
-            cmdline = [config.spirv_as, '-o', binary_name]
-            proc = subprocess.run(cmdline, input=shader.source().encode(),
-                                    stdout=subprocess.PIPE)
-        else:
-            with tempfile.TemporaryDirectory() as tempdir:
-                filenames = []
-
-                for idx, shader in enumerate(shader_group):
-                    filename = '{}/{}.{}'.format(tempdir, idx, extension)
-                    filenames.append(filename)
-                    with open(filename, 'w') as srcf:
-                        print(shader.source(), file=srcf)
-
-                filename = '{}/glslang.conf'.format(tempdir)
-                write_glslang_conf(config, filename)
-                filenames.append(filename)
-
-                cmdline = [config.glslang, '-G', '-o', binary_name] + filenames
-                proc = subprocess.run(cmdline, stdout=subprocess.PIPE)
-
-        if proc.returncode != 0:
-            print('{}: Failed to build {} shader'.format(shader_test, shader.stage))
-            print('Build command: {}\nOutput:\n{}'.format(
-                ' '.join(cmdline),
-                proc.stdout.decode(errors='ignore')))
-            if not shader_group[0].spirv:
-                for idx, shader in enumerate(shader_group):
-                    print('Transformed GLSL #{}:\n{}'.format(idx, shader.source()))
-            return False
+        replacements[shader_group[0].stage + ' shader'] = spirv
 
         if config.transformed:
             for shader in shader_group:
                 print(shader.source())
+
+    spv_shader_test_file = shader_test + '.spv'
+    if config.verbose:
+        print('Writing transformed shader_test to ' +
+              spv_shader_test_file)
+    with open(spv_shader_test_file, 'w') as fout:
+        with open(shader_test, 'r') as fin:
+            filter_shader_test(fin, fout,
+                               replacements,
+                               spirv_line == None)
 
     return True
 
@@ -942,7 +979,7 @@ def main():
     config = parse_args()
     success = True
 
-    config.spirv_as = get_option('PIGLIT_SPIRV_AS_BINARY', './generated_spv/spirv-as')
+    config.spirv_dis = get_option('PIGLIT_SPIRV_DIS_BINARY', './generated_spv/spirv-dis')
     config.glslang = get_option('PIGLIT_GLSLANG_VALIDATOR_BINARY', './generated_spv/glslangValidator')
 
     config.excludes = []
