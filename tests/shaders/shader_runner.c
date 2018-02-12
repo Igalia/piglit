@@ -29,6 +29,7 @@
 #include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 #include "piglit-framework-gl/piglit_gl_framework.h"
+#include "piglit-subprocess.h"
 
 #include "shader_runner_gles_workarounds.h"
 #include "parser_utils.h"
@@ -589,6 +590,7 @@ compile_glsl(GLenum target)
 	return PIGLIT_PASS;
 }
 
+
 static enum piglit_result
 compile_and_bind_program(GLenum target, const char *start, int len)
 {
@@ -762,6 +764,69 @@ out_binary:
 out_binary_name:
 	free(binary_name);
 	return result;
+}
+
+static enum piglit_result
+assemble_spirv(GLenum target)
+{
+	char *arguments[] = {
+		getenv("PIGLIT_SPIRV_AS_BINARY"),
+		"-o", "-",
+		NULL
+	};
+
+	if (arguments[0] == NULL)
+		arguments[0] = "spirv-as";
+
+	/* Strip comments from the source */
+	char *stripped_source = malloc(shader_string_size);
+	char *p = stripped_source;
+	bool at_start_of_line = true;
+
+	for (const char *in = shader_string;
+	     in < shader_string + shader_string_size;
+	     in++) {
+		if (*in == '#' && at_start_of_line) {
+			const char *end;
+			end = memchr(in,
+				     '\n',
+				     shader_string + shader_string_size - in);
+			if (end == NULL)
+				break;
+			in = end;
+		} else {
+			at_start_of_line = *in == '\n';
+			*(p++) = *in;
+		}
+	}
+
+	uint8_t *binary_source;
+	size_t binary_source_length;
+	bool res = piglit_subprocess(arguments,
+				     p - stripped_source,
+				     (const uint8_t *)
+				     stripped_source,
+				     &binary_source_length,
+				     &binary_source);
+
+	free(stripped_source);
+
+	if (!res) {
+		fprintf(stderr, "spirv-as failed\n");
+		return PIGLIT_FAIL;
+	}
+
+	enum piglit_result ret;
+
+	ret = load_and_specialize_spirv(target,
+					NULL, /* script_name */
+					(const char *)
+					binary_source,
+					binary_source_length);
+
+	free(binary_source);
+
+	return ret;
 }
 
 static enum piglit_result
@@ -1250,7 +1315,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 						line - shader_string);
 
 	case vertex_shader_spirv:
-		return load_and_specialize_spirv(GL_VERTEX_SHADER, script_name, NULL, 0);
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_VERTEX_SHADER);
 
 	case vertex_shader_specializations:
 		break;
@@ -1263,8 +1329,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return compile_glsl(GL_TESS_CONTROL_SHADER);
 
 	case tess_ctrl_shader_spirv:
-		return load_and_specialize_spirv(GL_TESS_CONTROL_SHADER,
-						 script_name, NULL, 0);
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_TESS_CONTROL_SHADER);
 
 	case tess_ctrl_shader_specializations:
 		break;
@@ -1277,8 +1343,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return compile_glsl(GL_TESS_EVALUATION_SHADER);
 
 	case tess_eval_shader_spirv:
-		return load_and_specialize_spirv(GL_TESS_EVALUATION_SHADER,
-						 script_name, NULL, 0);
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_TESS_EVALUATION_SHADER);
 
 	case tess_eval_shader_specializations:
 		break;
@@ -1291,8 +1357,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return compile_glsl(GL_GEOMETRY_SHADER);
 
 	case geometry_shader_spirv:
-		return load_and_specialize_spirv(GL_GEOMETRY_SHADER,
-						 script_name, NULL, 0);
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_GEOMETRY_SHADER);
 
 	case geometry_shader_specializations:
 		break;
@@ -1314,8 +1380,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 		break;
 
 	case fragment_shader_spirv:
-		return load_and_specialize_spirv(GL_FRAGMENT_SHADER,
-						 script_name, NULL, 0);
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_FRAGMENT_SHADER);
 
 	case fragment_shader_specializations:
 		break;
@@ -1328,8 +1394,8 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return compile_glsl(GL_COMPUTE_SHADER);
 
 	case compute_shader_spirv:
-		return load_and_specialize_spirv(GL_COMPUTE_SHADER,
-						 script_name, NULL, 0);
+		shader_string_size = line - shader_string;
+		return assemble_spirv(GL_COMPUTE_SHADER);
 
 	case compute_shader_specializations:
 		break;
@@ -1624,6 +1690,7 @@ process_test_script(const char *script_name)
 				shader_string_size = strlen(shader_string);
 			} else if (parse_str(line, "[vertex shader spirv]", NULL)) {
 				state = vertex_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[vertex shader specializations]", NULL)) {
 				state = vertex_shader_specializations;
 			} else if (parse_str(line, "[tessellation control shader]", NULL)) {
@@ -1631,6 +1698,7 @@ process_test_script(const char *script_name)
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation control shader spirv]", NULL)) {
 				state = tess_ctrl_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation control shader specializations]", NULL)) {
 				state = tess_ctrl_shader_specializations;
 			} else if (parse_str(line, "[tessellation evaluation shader]", NULL)) {
@@ -1638,6 +1706,7 @@ process_test_script(const char *script_name)
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation evaluation shader spirv]", NULL)) {
 				state = tess_eval_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation evaluation shader specializations]", NULL)) {
 				state = tess_eval_shader_specializations;
 			} else if (parse_str(line, "[geometry shader]", NULL)) {
@@ -1647,6 +1716,7 @@ process_test_script(const char *script_name)
 				state = geometry_shader_specializations;
 			} else if (parse_str(line, "[geometry shader spirv]", NULL)) {
 				state = geometry_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[geometry shader specializations]", NULL)) {
 				state = geometry_shader_specializations;
 			} else if (parse_str(line, "[geometry layout]", NULL)) {
@@ -1662,6 +1732,7 @@ process_test_script(const char *script_name)
 				state = fragment_shader_specializations;
 			} else if (parse_str(line, "[fragment shader spirv]", NULL)) {
 				state = fragment_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[fragment shader specializations]", NULL)) {
 				state = fragment_shader_specializations;
 			} else if (parse_str(line, "[compute shader]", NULL)) {
@@ -1669,6 +1740,7 @@ process_test_script(const char *script_name)
 				shader_string = NULL;
 			} else if (parse_str(line, "[compute shader spirv]", NULL)) {
 				state = compute_shader_spirv;
+				shader_string = NULL;
 			} else if (parse_str(line, "[compute shader specializations]", NULL)) {
 				state = compute_shader_specializations;
 			} else if (parse_str(line, "[vertex data]", NULL)) {
@@ -1710,6 +1782,12 @@ process_test_script(const char *script_name)
 			case fragment_shader:
 			case fragment_program:
 			case compute_shader:
+			case vertex_shader_spirv:
+			case tess_ctrl_shader_spirv:
+			case tess_eval_shader_spirv:
+			case geometry_shader_spirv:
+			case fragment_shader_spirv:
+			case compute_shader_spirv:
 				if (shader_string == NULL)
 					shader_string = (char *) line;
 				break;
@@ -1732,12 +1810,6 @@ process_test_script(const char *script_name)
 					vertex_data_start = line;
 				break;
 
-			case vertex_shader_spirv:
-			case tess_ctrl_shader_spirv:
-			case tess_eval_shader_spirv:
-			case geometry_shader_spirv:
-			case fragment_shader_spirv:
-			case compute_shader_spirv:
 			case test:
 				break;
 			}
