@@ -93,11 +93,10 @@ def gen_compiler(src, tests):
 
 
 #
-# Common definitions for framebuffer fetch tests.
+# Common test definitions independent of the framebuffer fetch
+# extension.
 #
-common_defs = [{'extension': 'EXT_shader_framebuffer_fetch',
-
-                # Allocate and bind a framebuffer object of the given
+common_defs = [{# Allocate and bind a framebuffer object of the given
                 # format and number of samples.
                 'bind_fb': lambda fmt, samples = 0:
                    'fb ms {0} 250 250 {1}'.format(fmt, samples) if samples > 0 else
@@ -138,11 +137,14 @@ common_defs = [{'extension': 'EXT_shader_framebuffer_fetch',
                 # 'frag_data' and 'last_frag_data' macros defined
                 # below to make sure the generated test is valid
                 # irrespective of the GLSL version.
-                'decl_frag_data': lambda api_version, n = 0, t = 'vec4', p = 'mediump':
-                   '' if api_version < 3.0 and t == 'vec4' and p == 'mediump' else
-                   p + ' ' + t + ' gl_LastFragData[gl_MaxDrawBuffers];' if api_version < 3.0 else
-                   'inout ' + p + ' ' + t + ' fcolor;' if n == 0 else
-                   'inout ' + p + ' ' + t + ' fcolor[{0}];'.format(n),
+                'decl_frag_data': lambda api_version, layout, n = 0, \
+                                         t = 'vec4', p = 'mediump':
+                   '' if api_version < 3.0 and not layout and t == 'vec4' \
+                                           and p == 'mediump' else
+                   layout + ' ' + p + ' ' + t + ' gl_LastFragData[gl_MaxDrawBuffers];' \
+                                                       if api_version < 3.0 else
+                   layout + ' inout ' + p + ' ' + t + ' fcolor;' if n == 0 else
+                   layout + ' inout ' + p + ' ' + t + ' fcolor[{0}];'.format(n),
 
                 'frag_data': lambda api_version, i = -1:
                    'gl_FragData[{0}]'.format(max(0, i)) if api_version < 3.0 else
@@ -153,6 +155,18 @@ common_defs = [{'extension': 'EXT_shader_framebuffer_fetch',
                    'gl_LastFragData[{0}]'.format(max(0, i)) if api_version < 3.0 else
                    'fcolor[{0}]'.format(i) if i >= 0 else
                    'fcolor'}]
+
+
+#
+# Common test definitions for all supported extensions.
+#
+all_defs = list(product(common_defs,
+                       [{'extension': 'EXT_shader_framebuffer_fetch',
+                         'layout': '',
+                         'barrier': ''},
+                        {'extension': 'EXT_shader_framebuffer_fetch_non_coherent',
+                         'layout': 'layout(noncoherent)',
+                         'barrier': 'fbfetch barrier'}]))
 
 
 def main():
@@ -179,7 +193,7 @@ def main():
         {
             color = gl_LastFragData[0];
         }
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'negative-gl_LastFragData-gles3',
                    'shader_stage': 'frag'}]))
 
@@ -203,7 +217,7 @@ def main():
         {
             gl_LastFragData[0] = vec4(1.0);
         }
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'negative-gl_LastFragData-write-gles2',
                    'shader_stage': 'frag'}]))
 
@@ -228,7 +242,7 @@ def main():
         {
             color += vec4(0.5);
         }
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'negative-inout-fragment-output-gles2',
                    'shader_stage': 'frag'}]))
 
@@ -253,7 +267,7 @@ def main():
         {
             gl_FragDepth += 0.5;
         }
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'negative-inout-gl_FragDepth-gles3',
                    'shader_stage': 'frag'}]))
 
@@ -277,7 +291,7 @@ def main():
         void main()
         {
         }
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'negative-inout-vertex-output-gles3',
                    'shader_stage': 'vert'}]))
 
@@ -299,7 +313,7 @@ def main():
         #version ${'300 es' if api_version >= 3.0 else '100'}
         #extension GL_${extension} : enable
 
-        ${decl_frag_data(api_version)}
+        ${decl_frag_data(api_version, layout)}
 
         void main()
         {
@@ -312,7 +326,9 @@ def main():
 
         clear color 0.0 0.0 1.0 0.0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         ${resolve_fb('GL_RGBA8', samples)}
@@ -320,7 +336,7 @@ def main():
         relative probe rect rgb (0, 0.0, 1.0, 1.0) (1.0, 0.0, 1.0)
 
         ${display_fb(api_version)}
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'simple-'}],
                  [{'name': 'ss-gles2', 'api_version': 2.0, 'samples': 0},
                   {'name': 'ss-gles3', 'api_version': 3.0, 'samples': 0},
@@ -361,7 +377,7 @@ def main():
         #extension GL_${extension} : enable
 
         ${'in' if api_version >= 3.0 else 'varying'} highp vec4 vcolor;
-        ${decl_frag_data(api_version, p=precision)}
+        ${decl_frag_data(api_version, layout, p=precision)}
 
         void main()
         {
@@ -388,7 +404,9 @@ def main():
 
         clear color 0.0 0.0 1.0 0.0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         ${resolve_fb('GL_RGBA8', samples)}
@@ -398,7 +416,7 @@ def main():
         relative probe rect rgb (0.55, 0.55, 0.45, 0.45) (1.0, 1.0, 1.0)
 
         ${display_fb(api_version)}
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'nonuniform-'}],
                  [{'name': 'ss-gles2', 'api_version': 2.0,
                    'samples': 0, 'precision': 'mediump'},
@@ -432,7 +450,7 @@ def main():
         #extension GL_${extension} : enable
 
         uniform sampler2D s;
-        ${decl_frag_data(api_version)}
+        ${decl_frag_data(api_version, layout)}
 
         void main()
         {
@@ -448,7 +466,9 @@ def main():
 
         clear color 0.5 0.0 0.0 0.0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         relative probe rect rgb (0.0, 0.0, 0.45, 0.45) (1.0, 0.0, 0.0)
@@ -457,7 +477,7 @@ def main():
         relative probe rect rgb (0.55, 0.55, 0.45, 0.45) (1.0, 0.5, 0.5)
 
         ${display_fb(api_version)}
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'texture-gles3',
                    'api_version': 3.0}]))
 
@@ -497,7 +517,7 @@ def main():
         #extension GL_${extension} : enable
 
         in highp vec4 vcolor;
-        ${decl_frag_data(api_version)}
+        ${decl_frag_data(api_version, layout)}
 
         void main()
         {
@@ -519,7 +539,9 @@ def main():
 
         clear color 0.0 0.0 1.0 0.0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         ${resolve_fb('GL_RGBA8', samples)}
@@ -530,7 +552,7 @@ def main():
         relative probe rect rgb (0.55, 0.55, 0.45, 0.45) (0.5, 0.5, 1.0)
 
         ${display_fb(api_version)}
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'discard-gles3-',
                    'api_version': 3.0}],
                  [{'name': 'ss', 'samples': 0},
@@ -571,7 +593,7 @@ def main():
         #define SCALE 100
 
         in highp vec4 vcolor;
-        ${decl_frag_data(api_version, t='ivec4')}
+        ${decl_frag_data(api_version, layout, t='ivec4')}
 
         void main()
         {
@@ -593,7 +615,9 @@ def main():
 
         clear color 0 0 1 0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         ${resolve_fb('GL_RGBA8I', samples)}
@@ -601,7 +625,7 @@ def main():
         relative probe rect rgba int (0.55, 0.0, 0.45, 0.45) (100, 0, 127, 100)
         relative probe rect rgba int (0.0, 0.55, 0.45, 0.45) (0, 100, 127, 100)
         relative probe rect rgba int (0.55, 0.55, 0.45, 0.45) (100, 100, 127, 100)
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'integer-gles3-'}],
                  [{'name': 'ss', 'samples': 0, 'api_version': 3.0},
                   {'name': 'ms2', 'samples': 2, 'api_version': 3.1},
@@ -623,7 +647,7 @@ def main():
         #version ${'300 es' if api_version >= 3.0 else '100'}
         #extension GL_${extension} : enable
 
-        ${decl_frag_data(api_version, 4)}
+        ${decl_frag_data(api_version, layout, 4)}
 
         void main()
         {
@@ -646,7 +670,9 @@ def main():
 
         clear color 0.0 0.0 0.5 0.0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         fb tex 2d 0
@@ -662,7 +688,7 @@ def main():
         relative probe rect rgb (0.0, 0.0, 1.0, 1.0) (0.0, 0.0, 1.0)
 
         ${display_fb(api_version)}
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'mrt-'}],
                  [{'name': 'gles2', 'api_version': 2.0},
                   {'name': 'gles3', 'api_version': 3.0}]))
@@ -697,7 +723,7 @@ def main():
         #extension GL_${extension} : enable
 
         in highp vec4 vcolor;
-        ${decl_frag_data(api_version)}
+        ${decl_frag_data(api_version, layout)}
 
         void main()
         {
@@ -714,7 +740,9 @@ def main():
 
         clear color 0.0 0.0 1.0 0.0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         relative probe rect rgb (0.0, 0.0, 0.45, 0.45) (0.0, 1.0, 1.0)
@@ -723,7 +751,7 @@ def main():
         relative probe rect rgb (0.55, 0.55, 0.45, 0.45) (1.0, 1.0, 1.0)
 
         ${display_fb(api_version)}
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'overwrite-gles3',
                    'api_version': 3.0}]))
 
@@ -743,7 +771,7 @@ def main():
         #version 300 es
         #extension GL_${extension} : enable
 
-        ${decl_frag_data(api_version)}
+        ${decl_frag_data(api_version, layout)}
         uniform highp vec4 ucolor;
 
         void main()
@@ -770,7 +798,9 @@ def main():
         uniform vec4 ucolor ${blend_colors[(l + z) % 4]}
         clear color 0.0 0.0 0.5 0.0
         clear
+        ${barrier}
         draw rect -1 -1 2 2
+        ${barrier}
         draw rect -1 -1 2 2
 
         %endfor
@@ -790,7 +820,7 @@ def main():
         %endfor
 
         ${display_fb(api_version)}
-    """, product(common_defs,
+    """, product(all_defs,
                  [{'name': 'single-slice-',
                    'api_version': 3.0}],
                  [{'name': '2darray-gles3', 'target': '2DArray',
