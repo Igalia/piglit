@@ -868,5 +868,160 @@ def main():
                   {'name': 'cubemap-gles3', 'target': 'Cube',
                    'levels': 1, 'layers': 6}]))
 
+    #
+    # Test framebuffer fetch functionality on a 1D framebuffer.
+    #
+    gen_execution("""\
+        [require]
+        GL >= ${api_version}
+        GLSL >= 1.50
+        GL_ARB_texture_storage
+        GL_${extension}
+
+        [vertex shader]
+        #version 150
+
+        in vec4 vertex;
+        out vec4 vcolor;
+
+        void main()
+        {
+            gl_Position = vertex;
+            // Transform the vertex coordinates so that the R
+            // component of the vertex color ranges between 0.0 and 1.0.
+            vcolor = vec4((1.0 + vertex.x) / 2.0, 0.7, 0.0, 1.0);
+        }
+
+        [fragment shader]
+        #version 150
+        #extension GL_${extension} : enable
+
+        in vec4 vcolor;
+        ${decl_frag_data(api_version, layout)}
+
+        void main()
+        {
+            // The else branch will be executed during the second
+            // overdraw.
+            if (${last_frag_data(api_version)}.x <= 0.5 &&
+                ${last_frag_data(api_version)}.y <= 0.5) {
+                ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                                            vcolor;
+            } else {
+                // Will give a solid color as result different for
+                // each half, assuming that the first branch was taken
+                // during the first pass.
+                ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                                            vec4((vcolor.x >= 0.5 ? 1.0 : 0.0) - vcolor.x,
+                                                 (vcolor.y >= 0.5 ? 1.0 : 0.0) - vcolor.y, 0, 0);
+            }
+        }
+
+        [test]
+        texture storage 0 1D GL_RGBA8 (1 250)
+        fb tex slice 1D 0 0 0
+
+        clear color 0.0 0.0 1.0 0.0
+        clear
+        ${barrier}
+        draw rect -1 -1 2 2
+        ${barrier}
+        draw rect -1 -1 2 2
+
+        relative probe rect rgb (0.0, 0.0, 0.45, 1.0) (0.0, 1.0, 1.0)
+        relative probe rect rgb (0.55, 0.0, 0.45, 1.0) (1.0, 1.0, 1.0)
+
+        fb draw winsys
+        blit color linear
+    """, product(all_defs,
+                 [{'name': '1d-gl32',
+                   'api_version': 3.2}]))
+
+    #
+    # Test framebuffer fetch functionality while rendering into
+    # multiple layers of an array or cubemap framebuffer
+    # simultaneously.
+    #
+    gen_execution("""\
+        [require]
+        GL >= ${api_version}
+        GLSL >= 1.50
+        GL_ARB_texture_storage
+        GL_${extension}
+
+        [vertex shader passthrough]
+        [geometry shader]
+        #version 150
+
+        layout(triangles) in;
+        layout(triangle_strip, max_vertices=18) out;
+
+        flat out int glayer;
+
+        void main()
+        {
+            for (int layer = 0; layer < ${layers}; layer++) {
+                for (int i = 0; i < 3; i++) {
+                    gl_Position = gl_in[i].gl_Position;
+                    gl_Layer = glayer = layer;
+                    EmitVertex();
+                }
+                EndPrimitive();
+            }
+        }
+
+        [fragment shader]
+        #version 150
+        #extension GL_${extension} : enable
+
+        flat in int glayer;
+        ${decl_frag_data(api_version, layout)}
+
+        void main()
+        {
+            ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                (glayer == 5 ? vec4(0.0, 0.5, 0.5, 0.0) :
+                 glayer == 4 ? vec4(0.5, 0.0, 0.5, 0.0) :
+                 glayer == 3 ? vec4(0.0, 0.0, 0.5, 0.0) :
+                 glayer == 2 ? vec4(0.5, 0.5, 0.0, 0.0) :
+                 glayer == 1 ? vec4(0.0, 0.5, 0.0, 0.0) :
+                 vec4(0.5, 0.0, 0.0, 0.0));
+        }
+
+        [test]
+        texture storage 0 ${target} GL_RGBA8 (${dimensions})
+        fb tex layered 0
+
+        clear color 0.0 0.0 0.5 0.0
+        clear
+        ${barrier}
+        draw rect -1 -1 2 2
+        ${barrier}
+        draw rect -1 -1 2 2
+
+        <%! expected_colors = ['(1.0, 0.0, 0.5)',
+                               '(0.0, 1.0, 0.5)',
+                               '(1.0, 1.0, 0.5)',
+                               '(0.0, 0.0, 1.0)',
+                               '(1.0, 0.0, 1.0)',
+                               '(0.0, 1.0, 1.0)'] %>
+
+        %for z in range(0, layers):
+        fb tex slice ${target} 0 0 ${z}
+        relative probe rect rgb (0.0, 0.0, 1.0, 1.0) ${expected_colors[z]}
+        %endfor
+
+        fb draw winsys
+        blit color linear
+    """, product(all_defs,
+                 [{'name': 'layered-',
+                   'api_version': 3.2}],
+                 [{'name': '1darray-gl32', 'target': '1DArray',
+                   'dimensions': '1 250 4', 'layers': 4},
+                  {'name': '2darray-gl32', 'target': '2DArray',
+                   'dimensions': '1 250 250 4', 'layers': 4},
+                  {'name': 'cubemap-gl32', 'target': 'Cube',
+                   'dimensions': '1 250 250', 'layers': 6}]))
+
 if __name__ == '__main__':
     main()
