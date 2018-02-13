@@ -1,0 +1,31 @@
+# Test using explicit uniform locations that aren’t sequential. Ie,
+# there is a gap between them.
+
+[require]
+GL >= 3.3
+GL_ARB_gl_spirv
+GLSL >= 4.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 430
+
+layout(location = 3) uniform vec4 part1;
+layout(location = 5) uniform vec4 part2;
+
+layout(location = 0) out vec4 outcolor;
+
+void main() {
+        outcolor = part1 + part2;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform vec4 3 0.1 0.15 0.2 0.25
+uniform vec4 5 0.3 0.35 0.4 0.45
+
+draw rect -1 -1 2 2
+probe all rgba 0.4 0.5 0.6 0.7
