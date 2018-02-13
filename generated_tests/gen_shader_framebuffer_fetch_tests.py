@@ -138,10 +138,11 @@ common_defs = [{'extension': 'EXT_shader_framebuffer_fetch',
                 # 'frag_data' and 'last_frag_data' macros defined
                 # below to make sure the generated test is valid
                 # irrespective of the GLSL version.
-                'decl_frag_data': lambda api_version, n = 0:
-                   '' if api_version < 3.0 else
-                   'inout highp vec4 fcolor;' if n == 0 else
-                   'inout highp vec4 fcolor[{0}];'.format(n),
+                'decl_frag_data': lambda api_version, n = 0, t = 'vec4', p = 'mediump':
+                   '' if api_version < 3.0 and t == 'vec4' and p == 'mediump' else
+                   p + ' ' + t + ' gl_LastFragData[gl_MaxDrawBuffers];' if api_version < 3.0 else
+                   'inout ' + p + ' ' + t + ' fcolor;' if n == 0 else
+                   'inout ' + p + ' ' + t + ' fcolor[{0}];'.format(n),
 
                 'frag_data': lambda api_version, i = -1:
                    'gl_FragData[{0}]'.format(max(0, i)) if api_version < 3.0 else
@@ -360,11 +361,7 @@ def main():
         #extension GL_${extension} : enable
 
         ${'in' if api_version >= 3.0 else 'varying'} highp vec4 vcolor;
-        ${decl_frag_data(api_version)}
-
-        %if api_version < 3.0 and precision:
-        ${precision} vec4 gl_LastFragData[gl_MaxDrawBuffers];
-        %endif
+        ${decl_frag_data(api_version, p=precision)}
 
         void main()
         {
@@ -404,21 +401,19 @@ def main():
     """, product(common_defs,
                  [{'name': 'nonuniform-'}],
                  [{'name': 'ss-gles2', 'api_version': 2.0,
-                   'samples': 0, 'precision': ''},
+                   'samples': 0, 'precision': 'mediump'},
                   {'name': 'ss-gles2-redecl-highp', 'api_version': 2.0,
                    'samples': 0, 'precision': 'highp'},
-                  {'name': 'ss-gles2-redecl-mediump', 'api_version': 2.0,
-                   'samples': 0, 'precision': 'mediump'},
                   {'name': 'ss-gles2-redecl-lowp', 'api_version': 2.0,
                    'samples': 0, 'precision': 'lowp'},
                   {'name': 'ss-gles3', 'api_version': 3.0,
-                   'samples': 0, 'precision': ''},
+                   'samples': 0, 'precision': 'mediump'},
                   {'name': 'ms2-gles3', 'api_version': 3.0,
-                   'samples': 2, 'precision': ''},
+                   'samples': 2, 'precision': 'mediump'},
                   {'name': 'ms8-gles3', 'api_version': 3.0,
-                   'samples': 8, 'precision': ''},
+                   'samples': 8, 'precision': 'mediump'},
                   {'name': 'ms16-gles3', 'api_version': 3.0,
-                   'samples': 16, 'precision': ''}]))
+                   'samples': 16, 'precision': 'mediump'}]))
 
     #
     # Test basic framebuffer fetch functionality in combination with
@@ -437,11 +432,12 @@ def main():
         #extension GL_${extension} : enable
 
         uniform sampler2D s;
-        inout highp vec4 fcolor;
+        ${decl_frag_data(api_version)}
 
         void main()
         {
-            fcolor += texelFetch(s, ivec2(gl_FragCoord), 0) / 4.0;
+            ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                                        texelFetch(s, ivec2(gl_FragCoord), 0) / 4.0;
         }
 
         [test]
@@ -501,16 +497,19 @@ def main():
         #extension GL_${extension} : enable
 
         in highp vec4 vcolor;
-        inout highp vec4 fcolor;
+        ${decl_frag_data(api_version)}
 
         void main()
         {
             // The condition makes sure that the discard branch is
             // taken for the top and right quadrants during the second
             // overdraw.
-            if (fcolor.x <= 0.45 && fcolor.y < 0.45)
-                fcolor += vec4(vcolor.x >= 0.5 ? 0.5 : 0.1,
-                               vcolor.y >= 0.5 ? 0.5 : 0.1, 0.0, 0.0);
+            if (${last_frag_data(api_version)}.x <= 0.45 &&
+                ${last_frag_data(api_version)}.y < 0.45)
+                ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                                            vec4(vcolor.x >= 0.5 ? 0.5 : 0.1,
+                                                 vcolor.y >= 0.5 ? 0.5 : 0.1,
+                                                 0.0, 0.0);
             else
                 discard;
         }
@@ -572,18 +571,21 @@ def main():
         #define SCALE 100
 
         in highp vec4 vcolor;
-        inout highp ivec4 fcolor;
+        ${decl_frag_data(api_version, t='ivec4')}
 
         void main()
         {
-           if (fcolor.x <= SCALE / 2 && fcolor.y <= SCALE / 2)
-              fcolor += ivec4(vcolor * float(SCALE));
+           if (${last_frag_data(api_version)}.x <= SCALE / 2 &&
+               ${last_frag_data(api_version)}.y <= SCALE / 2)
+              ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                                          ivec4(vcolor * float(SCALE));
            else
-              fcolor += ivec4((vcolor.x >= 0.5 ? SCALE : 0)
-                               - int(vcolor.x * float(SCALE)),
-                              (vcolor.y >= 0.5 ? SCALE : 0)
-                               - int(vcolor.y * float(SCALE)),
-                              0, 0);
+              ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                                          ivec4((vcolor.x >= 0.5 ? SCALE : 0)
+                                                 - int(vcolor.x * float(SCALE)),
+                                                (vcolor.y >= 0.5 ? SCALE : 0)
+                                                 - int(vcolor.y * float(SCALE)),
+                                                0, 0);
         }
 
         [test]
@@ -695,16 +697,16 @@ def main():
         #extension GL_${extension} : enable
 
         in highp vec4 vcolor;
-        inout highp vec4 fcolor;
+        ${decl_frag_data(api_version)}
 
         void main()
         {
             // The conditional assignment will be executed for the top
             // and right quadrants.
             if (vcolor.x >= 0.5 || vcolor.y >= 0.5)
-                fcolor += vec4(0.5, 0, 0, 0);
+                ${frag_data(api_version)} += vec4(0.5, 0, 0, 0);
 
-            fcolor += vec4(0.0, 0.5, 0, 0);
+            ${frag_data(api_version)} += vec4(0.0, 0.5, 0, 0);
         }
 
         [test]
@@ -741,12 +743,13 @@ def main():
         #version 300 es
         #extension GL_${extension} : enable
 
-        inout highp vec4 fcolor;
+        ${decl_frag_data(api_version)}
         uniform highp vec4 ucolor;
 
         void main()
         {
-            fcolor += ucolor;
+            ${frag_data(api_version)} = ${last_frag_data(api_version)} +
+                                        ucolor;
         }
 
         [test]
