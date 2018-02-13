@@ -72,7 +72,7 @@ test_prim(void *_data)
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
 			             "Primitive: %s", piglit_get_prim_name(data->prim));
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
