@@ -1,0 +1,69 @@
+# Test using explicit uniform locations that aren’t sequential. Ie,
+# there is a gap between them.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 16
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outcolor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %outcolor "outcolor"
+               OpName %part1 "part1"
+               OpName %part2 "part2"
+               OpDecorate %outcolor Location 0
+               OpDecorate %part1 Location 3
+               OpDecorate %part2 Location 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outcolor = OpVariable %_ptr_Output_v4float Output
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+      %part1 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+      %part2 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpLoad %v4float %part1
+         %14 = OpLoad %v4float %part2
+         %15 = OpFAdd %v4float %12 %14
+               OpStore %outcolor %15
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(location = 3) uniform vec4 part1;
+layout(location = 5) uniform vec4 part2;
+
+layout(location = 0) out vec4 outcolor;
+
+void main() {
+        outcolor = part1 + part2;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform vec4 3 0.1 0.15 0.2 0.25
+uniform vec4 5 0.3 0.35 0.4 0.45
+
+draw rect -1 -1 2 2
+probe all rgba 0.4 0.5 0.6 0.7
