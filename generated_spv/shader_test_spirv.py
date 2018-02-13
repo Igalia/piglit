@@ -423,7 +423,7 @@ class VariableDeclaration(Declaration):
                                    type_end, stage)
 
 
-def fixup_glsl_shaders(shaders, vertex_attribs):
+def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
     """
     There are many reasons why a set of GLSL shaders may not be suitable for
     compilation to SPIR-V. This function tries to fix many of them, and
@@ -563,6 +563,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs):
             cur_uniform_location[0] += var.size(skip_reasons)
 
         if loc is not None:
+            uniform_map[var.name()] = loc
             return 'layout(location={}) '.format(loc) + ' '.join(flat_declaration)
 
     def assign_location(flat_declaration):
@@ -789,14 +790,18 @@ def compile_glsl(shader_test, config, shader_group):
 
 def filter_shader_test(fin, fout,
                        replacements,
+                       uniform_map,
                        add_spirv_line):
     skipping = False
     groupname = None
+    in_test = False
+    uniform_re = re.compile(r'(\s*uniform\s+\S+\s+)(\S+)(.*)')
 
     for line in fin:
         if line.startswith('['):
             groupname = line[1:line.index(']')]
             skipping = RE_spirv_shader_groupname.match(groupname) is not None
+            in_test = groupname == 'test'
             if groupname in replacements:
                 replacement = replacements[groupname]
                 if len(replacement) > 0:
@@ -807,6 +812,13 @@ def filter_shader_test(fin, fout,
                     fout.write('\n')
                     replacements[groupname] = ''
 
+        if in_test:
+            md = uniform_re.match(line)
+            if md and md.group(2) in uniform_map:
+                line = (md.group(1) +
+                        str(uniform_map[md.group(2)]) +
+                        md.group(3) +
+                        '\n')
 
         if not skipping:
             fout.write(line)
@@ -828,6 +840,7 @@ def process_shader_test(shader_test, config):
     shaders = []
 
     have_glsl = False
+    uniform_map = {}
 
     with open(shader_test, 'r') as filp:
         shader = None
@@ -904,7 +917,7 @@ def process_shader_test(shader_test, config):
         vertex_attribs = {'piglit_vertex': 0, 'piglit_texcoord': 1}
 
     if have_glsl and not config.no_transform:
-        skip_reasons = fixup_glsl_shaders(shaders, vertex_attribs)
+        skip_reasons = fixup_glsl_shaders(shaders, vertex_attribs, uniform_map)
 
         if config.mark_skip:
             if skip_reasons or (spirv_line and spirv_line[0] == 'NO'):
@@ -944,6 +957,7 @@ def process_shader_test(shader_test, config):
         with open(shader_test, 'r') as fin:
             filter_shader_test(fin, fout,
                                replacements,
+                               uniform_map,
                                spirv_line == None)
 
     return True
