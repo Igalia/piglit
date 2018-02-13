@@ -222,6 +222,42 @@ def main():
                    'shader_stage': 'frag'}]))
 
     #
+    # Test framebuffer fetch output declarations with invalid layout
+    # qualifiers.  From the EXT_shader_framebuffer_fetch extension:
+    #
+    # "It is an error to declare an inout fragment output not
+    #  qualified with layout(noncoherent) if the
+    #  GL_EXT_shader_framebuffer_fetch extension hasn't been enabled."
+    #
+    # "The ability to use the inout and layout(noncoherent) qualifiers
+    #  at global scope in a fragment shader are optional and can be
+    #  enabled by
+    #   #extension GL_EXT_shader_framebuffer_fetch_non_coherent : <behavior>"
+    #
+    gen_compiler("""\
+        /*
+         * [config]
+         * expect_result: fail
+         * glsl_version: ${3.0 if api_version >= 3.0 else 1.0} es
+         * require_extensions: GL_${extension}
+         * [end config]
+         */
+        #version ${'300 es' if api_version >= 3.0 else '100'}
+        #extension GL_${extension} : enable
+
+        ${decl_frag_data(api_version, '' if layout else 'layout(noncoherent)')}
+
+        void main()
+        {
+            ${last_frag_data(api_version)};
+        }
+    """, product(all_defs,
+                 [{'name': 'negative-output-layout-',
+                   'shader_stage': 'frag'}],
+                 [{'name': 'gles2', 'api_version': 2.0},
+                  {'name': 'gles3', 'api_version': 3.0}]))
+
+    #
     # Test that GL(ES) 3+ user-defined inout arrays are not accepted
     # in earlier GLSL versions.
     #
