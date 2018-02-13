@@ -1211,6 +1211,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', '!opengl 4.3')) as g:
+    g(['get_glsl_versions'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', '!opengl 4.4')) as g:
     g(['tex-errors'])
 
