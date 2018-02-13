@@ -426,7 +426,7 @@ def main():
     #
     gen_execution("""\
         [require]
-        GL ES >= 3.0
+        GL ES >= ${api_version}
         GLSL ES >= 3.00
         GL_${extension}
 
@@ -460,9 +460,10 @@ def main():
         relative probe rect rgb (0.0, 0.55, 0.45, 0.45) (0.5, 0.0, 0.5)
         relative probe rect rgb (0.55, 0.55, 0.45, 0.45) (1.0, 0.5, 0.5)
 
-        ${display_fb(3.0)}
+        ${display_fb(api_version)}
     """, product(common_defs,
-                 [{'name': 'texture-gles3'}]))
+                 [{'name': 'texture-gles3',
+                   'api_version': 3.0}]))
 
     #
     # Test non-uniform fragment discard dependent on the result read
@@ -472,7 +473,7 @@ def main():
     #
     gen_execution("""\
         [require]
-        GL ES >= 3.0
+        GL ES >= ${api_version}
         GLSL ES >= 3.00
         GL_${extension}
         %if samples > 0:
@@ -529,9 +530,10 @@ def main():
         relative probe rect rgb (0.0, 0.55, 0.45, 0.45) (0.1, 0.5, 1.0)
         relative probe rect rgb (0.55, 0.55, 0.45, 0.45) (0.5, 0.5, 1.0)
 
-        ${display_fb(3.0)}
+        ${display_fb(api_version)}
     """, product(common_defs,
-                 [{'name': 'discard-gles3-'}],
+                 [{'name': 'discard-gles3-',
+                   'api_version': 3.0}],
                  [{'name': 'ss', 'samples': 0},
                   {'name': 'ms8', 'samples': 8}]))
 
@@ -669,7 +671,7 @@ def main():
     #
     gen_execution("""\
         [require]
-        GL ES >= 3.0
+        GL ES >= ${api_version}
         GLSL ES >= 3.00
         GL_${extension}
 
@@ -718,9 +720,10 @@ def main():
         relative probe rect rgb (0.0, 0.55, 0.45, 0.45) (1.0, 1.0, 1.0)
         relative probe rect rgb (0.55, 0.55, 0.45, 0.45) (1.0, 1.0, 1.0)
 
-        ${display_fb(3.0)}
+        ${display_fb(api_version)}
     """, product(common_defs,
-                 [{'name': 'overwrite-gles3'}]))
+                 [{'name': 'overwrite-gles3',
+                   'api_version': 3.0}]))
 
     #
     # Test framebuffer fetch functionality on individual slices of a
@@ -728,7 +731,7 @@ def main():
     #
     gen_execution("""\
         [require]
-        GL ES >= 3.0
+        GL ES >= ${api_version}
         GLSL ES >= 3.00
         GL_${extension}
 
@@ -783,9 +786,10 @@ def main():
         %endfor
         %endfor
 
-        ${display_fb(3.0)}
+        ${display_fb(api_version)}
     """, product(common_defs,
-                 [{'name': 'single-slice-'}],
+                 [{'name': 'single-slice-',
+                   'api_version': 3.0}],
                  [{'name': '2darray-gles3', 'target': '2DArray',
                    'levels': 1, 'layers': 4},
                   {'name': '2darray-mipmap-gles3', 'target': '2DArray',
