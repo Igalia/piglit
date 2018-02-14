@@ -557,7 +557,8 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
             assert skip_reasons
             return None
 
-        if size > 1:
+        # Don’t assign locations to uniform block declarations
+        if var.is_block:
             return None
 
         if layout == None and var.mode == 'uniform':
