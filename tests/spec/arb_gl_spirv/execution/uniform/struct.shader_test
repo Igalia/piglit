@@ -1,0 +1,80 @@
+# Test using a simple struct uniform with a non-zero explicit location
+
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 4.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 22
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outcolor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %outcolor "outcolor"
+               OpName %parts "parts"
+               OpMemberName %parts 0 "part1"
+               OpMemberName %parts 1 "part2"
+               OpName %fsin "fsin"
+               OpDecorate %outcolor Location 0
+               OpDecorate %fsin Location 4
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outcolor = OpVariable %_ptr_Output_v4float Output
+      %parts = OpTypeStruct %v4float %v4float
+%_ptr_UniformConstant_parts = OpTypePointer UniformConstant %parts
+       %fsin = OpVariable %_ptr_UniformConstant_parts UniformConstant
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %16 = OpAccessChain %_ptr_UniformConstant_v4float %fsin %int_0
+         %17 = OpLoad %v4float %16
+         %19 = OpAccessChain %_ptr_UniformConstant_v4float %fsin %int_1
+         %20 = OpLoad %v4float %19
+         %21 = OpFAdd %v4float %17 %20
+               OpStore %outcolor %21
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 430
+
+struct parts {
+        vec4 part1;
+        vec4 part2;
+};
+
+layout(location = 4) uniform parts fsin;
+
+layout(location = 0) out vec4 outcolor;
+
+void main() {
+        outcolor = fsin.part1 + fsin.part2;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform vec4 4 0.1 0.15 0.2 0.25
+uniform vec4 5 0.3 0.35 0.4 0.45
+
+draw rect -1 -1 2 2
+probe all rgba 0.4 0.5 0.6 0.7
