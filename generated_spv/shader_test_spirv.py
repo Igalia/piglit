@@ -791,17 +791,27 @@ def compile_glsl(shader_test, config, shader_group):
 def filter_shader_test(fin, fout,
                        replacements,
                        uniform_map,
+                       attrib_map,
                        add_spirv_line):
     skipping = False
     groupname = None
     in_test = False
+    in_vertex_data = False
     uniform_re = re.compile(r'(\s*uniform\s+\S+\s+)(\S+)(.*)')
+    attrib_re = re.compile(r'\b([\[\]a-zA-Z0-9_]+)((?:/[\[\]a-zA-Z_0-9]+){2})')
+
+    def vertex_data_replacement(md):
+        if md.group(1) in attrib_map:
+            return str(attrib_map[md.group(1)]) + md.group(2)
+        else:
+            return md.group(0)
 
     for line in fin:
         if line.startswith('['):
             groupname = line[1:line.index(']')]
             skipping = RE_spirv_shader_groupname.match(groupname) is not None
             in_test = groupname == 'test'
+            in_vertex_data = groupname == 'vertex data'
             if groupname in replacements:
                 replacement = replacements[groupname]
                 if len(replacement) > 0:
@@ -819,6 +829,8 @@ def filter_shader_test(fin, fout,
                         str(uniform_map[md.group(2)]) +
                         md.group(3) +
                         '\n')
+        elif in_vertex_data:
+            line = attrib_re.sub(vertex_data_replacement, line)
 
         if not skipping:
             fout.write(line)
@@ -958,6 +970,7 @@ def process_shader_test(shader_test, config):
             filter_shader_test(fin, fout,
                                replacements,
                                uniform_map,
+                               vertex_attribs,
                                spirv_line == None)
 
     return True
