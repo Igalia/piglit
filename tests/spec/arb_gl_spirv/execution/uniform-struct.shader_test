@@ -1,0 +1,34 @@
+# Test using a simple struct uniform with a non-zero explicit location
+
+[require]
+GL >= 3.3
+GLSL >= 4.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 430
+
+struct parts {
+        vec4 part1;
+        vec4 part2;
+};
+
+layout(location = 4) uniform parts fsin;
+
+layout(location = 0) out vec4 outcolor;
+
+void main() {
+        outcolor = fsin.part1 + fsin.part2;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform vec4 4 0.1 0.15 0.2 0.25
+uniform vec4 5 0.3 0.35 0.4 0.45
+
+draw rect -1 -1 2 2
+probe all rgba 0.4 0.5 0.6 0.7
