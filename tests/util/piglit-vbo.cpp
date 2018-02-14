@@ -131,6 +131,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #include "piglit-util.h"
 #include "piglit-util-gl.h"
@@ -312,6 +313,29 @@ public:
 	GLuint index;
 };
 
+static bool
+get_attrib_location(GLuint prog,
+		    const std::string &name,
+		    GLuint *index)
+{
+	errno = 0;
+
+	char *end;
+	unsigned long ul = strtoul(name.c_str(), &end, 10);
+
+	if (errno == 0 && *end == '\0' && ul <= UINT_MAX) {
+		*index = ul;
+		return true;
+	}
+
+	GLint attrib_location = glGetAttribLocation(prog, name.c_str());
+	if (attrib_location == -1)
+		return false;
+
+	*index = attrib_location;
+
+	return true;
+}
 
 /**
  * Build a vertex_attrib_description from a column header, by looking
@@ -408,12 +432,10 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 		this->matrix_index = 0;
 	}
 
-	GLint attrib_location = glGetAttribLocation(prog, name.c_str());
-	if (attrib_location == -1) {
+	if (!get_attrib_location(prog, name, &this->index)) {
 		printf("Unexpected vbo column name.  Got: %s\n", name.c_str());
 		piglit_report_result(PIGLIT_FAIL);
 	}
-	this->index = attrib_location;
 	/* If the type is integral, verify that integer vertex
 	 * attribute support is present.  Note: we treat it as a FAIL
 	 * if support is not present, because it's up to the test to
