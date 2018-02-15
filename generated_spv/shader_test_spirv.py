@@ -37,7 +37,9 @@ import tempfile
 
 RE_spirv_shader_groupname = re.compile(r'(.*) shader spirv$')
 RE_glsl_shader_groupname = re.compile(r'(.*) shader$')
-
+RE_if_start = re.compile(r'\s*#\s*if\s+([0-9]+)\s*$')
+RE_else = re.compile(r'\s*#\s*else\s*$')
+RE_endif = re.compile(r'\s*#\s*endif\s*$')
 
 def get_stage_extension(stage):
     d = {
@@ -866,10 +868,26 @@ def process_shader_test(shader_test, config):
                     shaders.append(shader)
                     shader = None
                 else:
+                    # Basic preprocessor handling of #if 1 / #else blocks
+                    md = RE_if_start.match(line)
+                    if md:
+                        if_stack.append(int(md.group(1)) != 0)
+                        line = '\n'
+                    elif len(if_stack) > 0:
+                        if RE_else.match(line):
+                            if_stack[-1] = not if_stack[-1]
+                            line = '\n'
+                        elif RE_endif.match(line):
+                            if_stack.pop()
+                            line = '\n'
+                        elif False in if_stack:
+                            line = '\n'
+
                     shader.append(line)
                     continue
 
             if line.startswith('['):
+                if_stack = []
                 in_requirements = False
 
                 groupname = line[1:line.index(']')]
