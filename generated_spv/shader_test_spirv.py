@@ -599,7 +599,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
             cur_uniform_location[0] += var.size(skip_reasons)
 
         if loc is not None:
-            uniform_map[var.name()] = loc
+            uniform_map[var.name()] = (var, loc)
             return 'layout(location={}) '.format(loc) + ' '.join(flat_declaration)
 
     def assign_location(flat_declaration):
@@ -824,6 +824,60 @@ def compile_glsl(shader_test, config, shader_group):
 
         return proc.stdout.decode()
 
+def process_accessors(var, accessors):
+    offset = 0
+    had_array = False
+
+    while len(accessors) > 0:
+        md = re.match(r'\[([0-9]+)\]', accessors)
+        if md:
+            if had_array:
+                return None
+            aoa_elements = var.aoa_elements([])
+            if aoa_elements is None or aoa_elements < 2:
+                return None
+            base_size = var.base_size([])
+            if base_size is None:
+                return None
+            offset += int(md.group(1)) * base_size
+            had_array = True
+            accessors = accessors[len(md.group(0)):]
+            continue
+
+        md = re.match(r'\.([a-zA-Z_][a-zA-Z_0-9]*)', accessors)
+        if md:
+            members = var.members([])
+            if members is None:
+                return None
+            for member in members:
+                if member.name() == md.group(1):
+                    var = member
+                    break
+                member_size = member.size([])
+                if member_size is None:
+                    return None
+                offset += member_size
+            else:
+                return None
+            had_array = False
+            accessors = accessors[len(md.group(0)):]
+            continue
+
+        return None
+
+    return offset
+
+def remap_uniform(name, uniform_map):
+    md = re.match(r'(.+?)([\[\.]|$)', name)
+    if md.group(1) not in uniform_map:
+        return None
+    var, loc = uniform_map[md.group(1)]
+    offset = process_accessors(var, name[len(md.group(1)):])
+    if offset is None:
+        return None
+    else:
+        return str(loc + offset)
+
 def filter_shader_test(fin, fout,
                        replacements,
                        uniform_map,
@@ -860,11 +914,13 @@ def filter_shader_test(fin, fout,
 
         if in_test:
             md = uniform_re.match(line)
-            if md and md.group(2) in uniform_map:
-                line = (md.group(1) +
-                        str(uniform_map[md.group(2)]) +
-                        md.group(3) +
-                        '\n')
+            if md:
+                replacement = remap_uniform(md.group(2), uniform_map)
+                if replacement:
+                    line = (md.group(1) +
+                            replacement +
+                            md.group(3) +
+                            '\n')
         elif in_vertex_data:
             line = attrib_re.sub(vertex_data_replacement, line)
 
