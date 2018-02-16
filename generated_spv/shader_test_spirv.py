@@ -366,9 +366,9 @@ class VariableDeclaration(Declaration):
         if (type(self.tokens[self.__type_end - 1]) == list and
             self.tokens[self.__type_end - 1][0] == '{'):
 
-            block = self.tokens[self.__type_end - 1]
+            block = self.tokens[self.__type_end - 1][1:-1]
             semicolons = [0] + [i for i, tok in enumerate(block) if tok == ';']
-            assert semicolons[-1] == len(block) - 2
+            assert semicolons[-1] == len(block) - 1
 
             return [
                 VariableDeclaration.parse(block[i:j], 'none')
