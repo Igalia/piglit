@@ -331,9 +331,9 @@ class VariableDeclaration(Declaration):
             return self.tokens[self.__layout]
         return None
 
-    def size(self, skip_reasons):
+    def aoa_elements(self, skip_reasons):
         """
-        Determine the number of locations occupied by this variable.
+        Determine the array size of this variable, or 1 if it is not an array.
         """
         aoa_elements = 1
         if not self.is_block:
@@ -353,6 +353,14 @@ class VariableDeclaration(Declaration):
 
                 aoa_elements *= elements
 
+        return aoa_elements
+
+    def members(self, skip_reasons):
+        """
+        Return a list of the child members of this variable, or an
+        empty list if it is not an aggregate type.
+        """
+
         if (type(self.tokens[self.__type_end - 1]) == list and
             self.tokens[self.__type_end - 1][0] == '{'):
 
@@ -360,14 +368,37 @@ class VariableDeclaration(Declaration):
             semicolons = [0] + [i for i, tok in enumerate(block) if tok == ';']
             assert semicolons[-1] == len(block) - 2
 
-            members = [
+            return [
                 VariableDeclaration.parse(block[i:j], 'none')
                 for i,j in zip(semicolons[:-1], semicolons[1:])
             ]
-
-            base_size = sum(member.size(skip_reasons) or 0 for member in members)
         else:
-            base_size = 1
+            return []
+
+    def base_size(self, skip_reasons):
+        """
+        Determine the base size (ie, not including the array size)
+        of this variable.
+        """
+        members = self.members(skip_reasons)
+        if members is None:
+            return None
+        elif len(members) > 0:
+            return sum(member.size(skip_reasons) or 0 for member in members)
+        else:
+            return 1
+
+    def size(self, skip_reasons):
+        """
+        Determine the number of locations occupied by this variable.
+        """
+        aoa_elements = self.aoa_elements(skip_reasons)
+        if aoa_elements is None:
+            return None
+
+        base_size = self.base_size(skip_reasons)
+        if base_size is None:
+            return None
 
         return base_size * aoa_elements
 
