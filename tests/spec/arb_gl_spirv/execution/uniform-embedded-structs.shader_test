@@ -1,0 +1,65 @@
+# Tests an array of arrays with an explicit uniform location
+
+[require]
+GL >= 3.3
+GLSL >= 4.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 430
+
+struct pair {
+        float a;
+        float b;
+};
+
+struct quadruple {
+        pair a;
+        pair b;
+};
+
+layout(location = 0) uniform struct {
+	quadruple r;
+	quadruple g;
+	quadruple b;
+} parts;
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(parts.r.a.a +
+                     parts.r.a.b +
+                     parts.r.b.a +
+                     parts.r.b.b,
+                     parts.g.a.a +
+                     parts.g.a.b +
+                     parts.g.b.a +
+                     parts.g.b.b,
+                     parts.b.a.a +
+                     parts.b.a.b +
+                     parts.b.b.a +
+                     parts.b.b.b,
+                     1.0);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+uniform float 0 0.02
+uniform float 1 0.04
+uniform float 2 0.06
+uniform float 3 0.08
+uniform float 4 0.1
+uniform float 5 0.12
+uniform float 6 0.14
+uniform float 7 0.16
+uniform float 8 0.18
+uniform float 9 0.2
+uniform float 10 0.22
+uniform float 11 0.24
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.52 0.84 1.0
