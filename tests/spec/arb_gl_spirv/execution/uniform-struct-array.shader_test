@@ -1,0 +1,43 @@
+# Tests an array of structs with an explicit uniform location
+
+[require]
+GL >= 3.3
+GLSL >= 4.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 430
+
+layout(location = 0) uniform struct {
+	float r;
+	float g;
+	float b;
+} parts[2];
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(0.0, 0.0, 0.0, 1.0);
+
+	for (int i = 0; i < 2; i++) {
+	    color.r += parts[i].r;
+	    color.g += parts[i].g;
+	    color.b += parts[i].b;
+	}
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+uniform float 0 0.1
+uniform float 1 0.2
+uniform float 2 0.3
+uniform float 3 0.4
+uniform float 4 0.5
+uniform float 5 0.6
+
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.7 0.9 1.0
