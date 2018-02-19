@@ -586,8 +586,6 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         if var is None:
             return None
 
-        layout = var.layout()
-        loc = None
         size = var.size(skip_reasons)
 
         if size is None:
@@ -598,13 +596,25 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         if var.is_block:
             return None
 
-        if layout == None and var.mode == 'uniform':
-            loc = cur_uniform_location[0]
-            cur_uniform_location[0] += var.size(skip_reasons)
+        if var.mode == 'uniform':
+            layout = var.layout()
 
-        if loc is not None:
-            uniform_map[var.name()] = (var, loc)
-            return 'layout(location={}) '.format(loc) + ' '.join(flat_declaration)
+            if layout is None:
+                loc = cur_uniform_location[0]
+                cur_uniform_location[0] += var.size(skip_reasons)
+            else:
+                try:
+                    loc_index = layout.index('location')
+                    loc = int(layout[loc_index + 2])
+                except ValueError:
+                    loc = None
+
+            if loc is not None:
+                uniform_map[var.name()] = (var, loc)
+
+            if layout == None:
+                return ('layout(location={}) '.
+                        format(loc) + ' '.join(flat_declaration))
 
     def assign_location(flat_declaration):
         assert flat_declaration[-1] == ';'
