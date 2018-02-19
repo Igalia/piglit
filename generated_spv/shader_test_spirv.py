@@ -333,9 +333,10 @@ class VariableDeclaration(Declaration):
 
     def aoa_elements(self, skip_reasons):
         """
-        Determine the array size of this variable, or 1 if it is not an array.
+        Returns a list of sizes for each array in this array-of-array
+        variable, or [] if it is not an array.
         """
-        aoa_elements = 1
+        aoa_elements = []
         if not self.is_block:
             for idx in range(0, self.__array_end - self.implicit_array):
                 array = self.tokens[idx]
@@ -353,7 +354,7 @@ class VariableDeclaration(Declaration):
                     skip_reasons.add('complicated array')
                     return None
 
-                aoa_elements *= elements
+                aoa_elements.append(elements)
 
         return aoa_elements
 
@@ -398,11 +399,14 @@ class VariableDeclaration(Declaration):
         if aoa_elements is None:
             return None
 
-        base_size = self.base_size(skip_reasons)
-        if base_size is None:
+        size = self.base_size(skip_reasons)
+        if size is None:
             return None
 
-        return base_size * aoa_elements
+        for array_size in aoa_elements:
+            size *= array_size
+
+        return size
 
     @staticmethod
     def parse(tokens, stage):
@@ -826,21 +830,21 @@ def compile_glsl(shader_test, config, shader_group):
 
 def process_accessors(var, accessors):
     offset = 0
-    had_array = False
+    array_level = 0
 
     while len(accessors) > 0:
         md = re.match(r'\[([0-9]+)\]', accessors)
         if md:
-            if had_array:
-                return None
             aoa_elements = var.aoa_elements([])
-            if aoa_elements is None or aoa_elements < 2:
+            if aoa_elements is None or array_level >= len(aoa_elements):
                 return None
             base_size = var.base_size([])
             if base_size is None:
                 return None
+            for array_size in aoa_elements[(array_level + 1):]:
+                base_size *= array_size
             offset += int(md.group(1)) * base_size
-            had_array = True
+            array_level += 1
             accessors = accessors[len(md.group(0)):]
             continue
 
@@ -859,7 +863,7 @@ def process_accessors(var, accessors):
                 offset += member_size
             else:
                 return None
-            had_array = False
+            array_level = 0
             accessors = accessors[len(md.group(0)):]
             continue
 
