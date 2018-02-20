@@ -1,0 +1,113 @@
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[compute shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 33
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main"
+               OpExecutionMode %main LocalSize 1 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %uival "uival"
+               OpName %auival "auival"
+               OpName %uival2 "uival2"
+               OpName %auival2 "auival2"
+               OpName %b "b"
+               OpMemberName %b 0 "val"
+               OpMemberName %b 1 "val2"
+               OpName %out_buffer "out_buffer"
+               OpDecorate %auival Offset 24
+               OpDecorate %auival DescriptorSet 0
+               OpDecorate %auival Binding 3
+               OpDecorate %auival2 Offset 0
+               OpDecorate %auival2 DescriptorSet 0
+               OpDecorate %auival2 Binding 2
+               OpMemberDecorate %b 0 Offset 0
+               OpMemberDecorate %b 1 Offset 4
+               OpDecorate %b BufferBlock
+               OpDecorate %out_buffer DescriptorSet 0
+               OpDecorate %out_buffer Binding 1
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+     %auival = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_1 = OpConstant %uint 1
+     %uint_0 = OpConstant %uint 0
+    %auival2 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+        %int = OpTypeInt 32 1
+      %int_1 = OpConstant %int 1
+          %b = OpTypeStruct %uint %uint
+%_ptr_Uniform_b = OpTypePointer Uniform %b
+ %out_buffer = OpVariable %_ptr_Uniform_b Uniform
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_uint = OpTypePointer Uniform %uint
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %uival = OpVariable %_ptr_Function_uint Function
+     %uival2 = OpVariable %_ptr_Function_uint Function
+         %13 = OpAtomicIIncrement %uint %auival %uint_1 %uint_0
+               OpStore %uival %13
+         %16 = OpAtomicIIncrement %uint %auival2 %uint_1 %uint_0
+         %17 = OpAtomicIDecrement %uint %auival2 %uint_1 %uint_0
+         %20 = OpISub %uint %17 %int_1
+         %21 = OpIAdd %uint %16 %20
+         %22 = OpAtomicLoad %uint %auival2 %uint_1 %uint_0
+         %23 = OpIAdd %uint %21 %22
+               OpStore %uival2 %23
+         %28 = OpLoad %uint %uival
+         %30 = OpAccessChain %_ptr_Uniform_uint %out_buffer %int_0
+               OpStore %30 %28
+         %31 = OpLoad %uint %uival2
+         %32 = OpAccessChain %_ptr_Uniform_uint %out_buffer %int_1
+               OpStore %32 %31
+               OpReturn
+               OpFunctionEnd
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (binding = 3, offset = 24) uniform atomic_uint auival;
+layout (binding = 2) uniform atomic_uint auival2;
+layout (binding = 1) buffer b {
+  uint val;
+  uint val2;
+} out_buffer;
+
+void main()
+{
+    uint uival = atomicCounterIncrement(auival);
+    uint uival2 = atomicCounterIncrement(auival2) +
+                  atomicCounterDecrement(auival2) +
+                  atomicCounter(auival2);
+
+    out_buffer.val = uival;
+    out_buffer.val2 = uival2;
+}
+
+[test]
+atomic counter buffer 3 7
+atomic counter buffer 2 1
+atomic counter 3 6 5
+atomic counter 2 0 3
+ssbo 1 8
+compute 1 1 1
+probe atomic counter buffer 3 20 == 0
+probe atomic counter buffer 3 24 == 6
+probe atomic counter buffer 2 0 == 3
+probe ssbo uint 1 0 == 5
+probe ssbo uint 1 4 == 9
