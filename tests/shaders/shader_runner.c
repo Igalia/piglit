@@ -172,6 +172,16 @@ static GLint read_width, read_height;
 
 static bool report_subtests = false;
 
+struct specialization_list {
+	size_t buffer_size;
+	size_t n_entries;
+	GLuint *indices;
+	union { GLuint u; GLfloat f; } *values;
+};
+
+static struct specialization_list
+specializations[SHADER_TYPES];
+
 static struct texture_binding {
 	GLuint obj;
 	unsigned width;
@@ -265,19 +275,25 @@ enum states {
 	vertex_shader,
 	vertex_shader_passthrough,
 	vertex_shader_spirv,
+	vertex_shader_specializations,
 	vertex_program,
 	tess_ctrl_shader,
 	tess_ctrl_shader_spirv,
+	tess_ctrl_shader_specializations,
 	tess_eval_shader,
 	tess_eval_shader_spirv,
+	tess_eval_shader_specializations,
 	geometry_shader,
 	geometry_shader_spirv,
+	geometry_shader_specializations,
 	geometry_layout,
 	fragment_shader,
 	fragment_shader_spirv,
+	fragment_shader_specializations,
 	fragment_program,
 	compute_shader,
 	compute_shader_spirv,
+	compute_shader_specializations,
 	vertex_data,
 	test,
 };
@@ -672,7 +688,36 @@ load_and_specialize_spirv(GLenum target, const char *script_name,
 	glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
 		       binary, size);
 
-	glSpecializeShaderARB(shader, "main", 0, NULL, NULL);
+	const struct specialization_list *specs;
+
+	switch (target) {
+	case GL_VERTEX_SHADER:
+		specs = specializations + 0;
+		break;
+	case GL_TESS_CONTROL_SHADER:
+		specs = specializations + 1;
+		break;
+	case GL_TESS_EVALUATION_SHADER:
+		specs = specializations + 2;
+		break;
+	case GL_GEOMETRY_SHADER:
+		specs = specializations + 3;
+		break;
+	case GL_FRAGMENT_SHADER:
+		specs = specializations + 4;
+		break;
+	case GL_COMPUTE_SHADER:
+		specs = specializations + 5;
+		break;
+	default:
+		assert(!"Should not get here.");
+	}
+
+	glSpecializeShaderARB(shader,
+			      "main",
+			      specs->n_entries,
+			      specs->indices,
+			      &specs->values[0].u);
 
 	GLint ok;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
@@ -1138,6 +1183,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 	case vertex_shader_spirv:
 		return load_and_specialize_spirv(GL_VERTEX_SHADER, script_name, NULL, 0);
 
+	case vertex_shader_specializations:
+		break;
+
 	case tess_ctrl_shader:
 		if (spirv_replaces_glsl)
 			return load_and_specialize_spirv(GL_TESS_CONTROL_SHADER,
@@ -1148,6 +1196,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 	case tess_ctrl_shader_spirv:
 		return load_and_specialize_spirv(GL_TESS_CONTROL_SHADER,
 						 script_name, NULL, 0);
+
+	case tess_ctrl_shader_specializations:
+		break;
 
 	case tess_eval_shader:
 		if (spirv_replaces_glsl)
@@ -1160,6 +1211,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return load_and_specialize_spirv(GL_TESS_EVALUATION_SHADER,
 						 script_name, NULL, 0);
 
+	case tess_eval_shader_specializations:
+		break;
+
 	case geometry_shader:
 		if (spirv_replaces_glsl)
 			return load_and_specialize_spirv(GL_GEOMETRY_SHADER,
@@ -1170,6 +1224,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 	case geometry_shader_spirv:
 		return load_and_specialize_spirv(GL_GEOMETRY_SHADER,
 						 script_name, NULL, 0);
+
+	case geometry_shader_specializations:
+		break;
 
 	case geometry_layout:
 		break;
@@ -1191,6 +1248,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return load_and_specialize_spirv(GL_FRAGMENT_SHADER,
 						 script_name, NULL, 0);
 
+	case fragment_shader_specializations:
+		break;
+
 	case compute_shader:
 		if (spirv_replaces_glsl)
 			return load_and_specialize_spirv(GL_COMPUTE_SHADER,
@@ -1201,6 +1261,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 	case compute_shader_spirv:
 		return load_and_specialize_spirv(GL_COMPUTE_SHADER,
 						 script_name, NULL, 0);
+
+	case compute_shader_specializations:
+		break;
 
 	case vertex_data:
 		vertex_data_end = line;
@@ -1367,6 +1430,93 @@ cleanup:
 }
 
 static enum piglit_result
+process_specialization(enum states state, const char *line)
+{
+	const char *end = strchrnul(line, '\n');
+	const char *next;
+	enum { TYPE_FLOAT, TYPE_UINT } type;
+
+	while (line < end && isspace(*line))
+		line++;
+
+	if (line >= end || *line == '#')
+		return PIGLIT_PASS;
+
+	if (parse_str(line, "uint", &next))
+		type = TYPE_UINT;
+	else if (parse_str(line, "float", &next))
+		type = TYPE_FLOAT;
+	else
+		goto invalid;
+
+	struct specialization_list *list;
+
+	switch (state) {
+	case vertex_shader_specializations:
+		list = specializations + 0;
+		break;
+	case tess_ctrl_shader_specializations:
+		list = specializations + 1;
+		break;
+	case tess_eval_shader_specializations:
+		list = specializations + 2;
+		break;
+	case geometry_shader_specializations:
+		list = specializations + 3;
+		break;
+	case fragment_shader_specializations:
+		list = specializations + 4;
+		break;
+	case compute_shader_specializations:
+		list = specializations + 5;
+		break;
+	default:
+		assert(!"Should not get here.");
+	}
+
+	if (list->n_entries >= list->buffer_size) {
+		if (list->buffer_size == 0)
+			list->buffer_size = 1;
+		else
+			list->buffer_size *= 2;
+		list->indices = realloc(list->indices,
+					(sizeof list->indices[0]) *
+					list->buffer_size);
+		list->values = realloc(list->values,
+				       (sizeof list->values[0]) *
+				       list->buffer_size);
+	}
+
+	if (parse_uints(next, list->indices + list->n_entries, 1, &next) != 1)
+		goto invalid;
+
+	switch (type) {
+	case TYPE_UINT:
+		if (parse_uints(next,
+				&list->values[list->n_entries].u,
+				1,
+				&next) != 1)
+			goto invalid;
+		break;
+	case TYPE_FLOAT:
+		if (parse_floats(next,
+				 &list->values[list->n_entries].f,
+				 1,
+				 &next) != 1)
+			goto invalid;
+		break;
+	}
+
+	list->n_entries++;
+
+	return PIGLIT_PASS;
+
+ invalid:
+	fprintf(stderr, "Invalid specialization line\n");
+	return PIGLIT_FAIL;
+}
+
+static enum piglit_result
 process_test_script(const char *script_name)
 {
 	unsigned text_size;
@@ -1404,21 +1554,31 @@ process_test_script(const char *script_name)
 				shader_string_size = strlen(shader_string);
 			} else if (parse_str(line, "[vertex shader spirv]", NULL)) {
 				state = vertex_shader_spirv;
+			} else if (parse_str(line, "[vertex shader specializations]", NULL)) {
+				state = vertex_shader_specializations;
 			} else if (parse_str(line, "[tessellation control shader]", NULL)) {
 				state = tess_ctrl_shader;
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation control shader spirv]", NULL)) {
 				state = tess_ctrl_shader_spirv;
+			} else if (parse_str(line, "[tessellation control shader specializations]", NULL)) {
+				state = tess_ctrl_shader_specializations;
 			} else if (parse_str(line, "[tessellation evaluation shader]", NULL)) {
 				state = tess_eval_shader;
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation evaluation shader spirv]", NULL)) {
 				state = tess_eval_shader_spirv;
+			} else if (parse_str(line, "[tessellation evaluation shader specializations]", NULL)) {
+				state = tess_eval_shader_specializations;
 			} else if (parse_str(line, "[geometry shader]", NULL)) {
 				state = geometry_shader;
 				shader_string = NULL;
+			} else if (parse_str(line, "[geometry shader specializations]", NULL)) {
+				state = geometry_shader_specializations;
 			} else if (parse_str(line, "[geometry shader spirv]", NULL)) {
 				state = geometry_shader_spirv;
+			} else if (parse_str(line, "[geometry shader specializations]", NULL)) {
+				state = geometry_shader_specializations;
 			} else if (parse_str(line, "[geometry layout]", NULL)) {
 				state = geometry_layout;
 				shader_string = NULL;
@@ -1428,13 +1588,19 @@ process_test_script(const char *script_name)
 			} else if (parse_str(line, "[fragment program]", NULL)) {
 				state = fragment_program;
 				shader_string = NULL;
+			} else if (parse_str(line, "[fragment shader specializations]", NULL)) {
+				state = fragment_shader_specializations;
 			} else if (parse_str(line, "[fragment shader spirv]", NULL)) {
 				state = fragment_shader_spirv;
+			} else if (parse_str(line, "[fragment shader specializations]", NULL)) {
+				state = fragment_shader_specializations;
 			} else if (parse_str(line, "[compute shader]", NULL)) {
 				state = compute_shader;
 				shader_string = NULL;
 			} else if (parse_str(line, "[compute shader spirv]", NULL)) {
 				state = compute_shader_spirv;
+			} else if (parse_str(line, "[compute shader specializations]", NULL)) {
+				state = compute_shader_specializations;
 			} else if (parse_str(line, "[vertex data]", NULL)) {
 				state = vertex_data;
 				vertex_data_start = NULL;
@@ -1477,6 +1643,19 @@ process_test_script(const char *script_name)
 				if (shader_string == NULL)
 					shader_string = (char *) line;
 				break;
+
+			case vertex_shader_specializations:
+			case tess_ctrl_shader_specializations:
+			case tess_eval_shader_specializations:
+			case geometry_shader_specializations:
+			case fragment_shader_specializations:
+			case compute_shader_specializations: {
+				enum piglit_result result =
+					process_specialization(state, line);
+				if (result != PIGLIT_PASS)
+					return result;
+				break;
+			}
 
 			case vertex_data:
 				if (vertex_data_start == NULL)
