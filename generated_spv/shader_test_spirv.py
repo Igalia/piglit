@@ -338,11 +338,18 @@ class VariableDeclaration(Declaration):
         """
         aoa_elements = []
         if not self.is_block:
-            for idx in range(0, self.__array_end - self.implicit_array):
+            had_empty = False
+            for idx in range(0, self.__array_end):
                 array = self.tokens[idx]
                 if type(array) != list or array[0] != '[':
                     continue
                 assert array[0] == '['
+                if len(array) == 2:
+                    if had_empty or not self.implicit_array or len(aoa_elements) > 0:
+                        skip_reasons.add('complicated array')
+                        return None
+                    had_empty = True
+                    continue
                 if len(array) != 3:
                     skip_reasons.add('complicated array')
                     return None
@@ -355,6 +362,10 @@ class VariableDeclaration(Declaration):
                     return None
 
                 aoa_elements.append(elements)
+
+            if had_empty != self.implicit_array:
+                skip_reasons.add('complicated array')
+                return None
 
         return aoa_elements
 
