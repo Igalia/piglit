@@ -3309,7 +3309,8 @@ draw_arrays_common(int first, size_t count)
 }
 
 static bool
-probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uint32_t value)
+probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op,
+		     uint32_t value, bool layout_params)
 {
         uint32_t *p;
 	uint32_t observed;
@@ -3320,7 +3321,8 @@ probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uin
 		"Invalid comparison operation at: %s\n", op);
 
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, atomics_bos[buffer_num]);
-	p = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, counter_num * sizeof(uint32_t),
+	p = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER,
+			     layout_params ? counter_num : counter_num * sizeof(uint32_t),
 			     sizeof(uint32_t), GL_MAP_READ_BIT);
 
         if (!p) {
@@ -3332,8 +3334,13 @@ probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op, uin
 	result = compare_uint(value, observed, cmp);
 
 	if (!result) {
-		printf("Atomic counter %d test failed: Reference %s Observed\n",
-		       counter_num, comparison_string(cmp));
+		if (layout_params)
+			printf("Atomic counter (binding = %d, offset = %d) test failed: "
+			       "Reference %s Observed\n",
+			       buffer_num, counter_num, comparison_string(cmp));
+		else
+			printf("Atomic counter %d test failed: Reference %s Observed\n",
+			       counter_num, comparison_string(cmp));
 		printf("  Reference: %u\n", value);
 		printf("  Observed:  %u\n", observed);
 		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
@@ -3399,7 +3406,7 @@ piglit_display(void)
 		float c[32];
 		double d[4];
 		int x, y, z, w, h, l, tex, level;
-		unsigned ux, uy;
+		unsigned ux, uy, uz;
 		char s[300]; // 300 for safety
 		enum piglit_result result = PIGLIT_PASS;
 
@@ -3848,9 +3855,15 @@ piglit_display(void)
 				result = PIGLIT_FAIL;
 			}
 		} else if (sscanf(line,
+				  "probe atomic counter buffer %u %u %s %u",
+				  &ux, &uy, s, &uz) == 4) {
+			if (!probe_atomic_counter(ux, uy, s, uz, true)) {
+				piglit_report_result(PIGLIT_FAIL);
+			}
+		} else if (sscanf(line,
 				  "probe atomic counter %u %s %u",
 				  &ux, s, &uy) == 3) {
-			if (!probe_atomic_counter(0, ux, s, uy)) {
+			if (!probe_atomic_counter(0, ux, s, uy, false)) {
 				piglit_report_result(PIGLIT_FAIL);
 			}
 		} else if (sscanf(line, "probe ssbo uint %d %d %s 0x%x",
