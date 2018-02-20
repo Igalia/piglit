@@ -594,7 +594,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
     def assign_uniform_location(flat_declaration):
         assert flat_declaration[-1] == ';'
         var = VariableDeclaration.parse(nest_tokens(flat_declaration[:-1]), cur_stage)
-        if var is None:
+        if var is None or var.mode != 'uniform':
             return None
 
         size = var.size(skip_reasons)
@@ -607,25 +607,24 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         if var.is_block:
             return None
 
-        if var.mode == 'uniform':
-            layout = var.layout()
+        layout = var.layout()
 
-            if layout is None:
-                loc = cur_uniform_location[0]
-                cur_uniform_location[0] += var.size(skip_reasons)
-            else:
-                try:
-                    loc_index = layout.index('location')
-                    loc = int(layout[loc_index + 2])
-                except ValueError:
-                    loc = None
+        if layout is None:
+            loc = cur_uniform_location[0]
+            cur_uniform_location[0] += var.size(skip_reasons)
+        else:
+            try:
+                loc_index = layout.index('location')
+                loc = int(layout[loc_index + 2])
+            except ValueError:
+                loc = None
 
-            if loc is not None:
-                uniform_map[var.name()] = (var, loc)
+        if loc is not None:
+            uniform_map[var.name()] = (var, loc)
 
-            if layout == None:
-                return ('layout(location={}) '.
-                        format(loc) + ' '.join(flat_declaration))
+        if layout == None:
+            return ('layout(location={}) '.
+                    format(loc) + ' '.join(flat_declaration))
 
     def assign_location(flat_declaration):
         assert flat_declaration[-1] == ';'
