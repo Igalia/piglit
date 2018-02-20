@@ -1,0 +1,55 @@
+# Simple shader test using specialization constants
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+SPIRV ONLY
+
+[vertex shader specializations]
+uint 0 42
+float 1 0.42
+
+[fragment shader specializations]
+float 5 0.0
+float 6 1.0
+float 7 0.0
+
+[vertex shader]
+#version 330
+
+layout(location = 0) in vec4 piglit_vertex;
+
+layout(constant_id = 0) const uint magic_number = 0;
+layout(constant_id = 1) const float magic_float = 0;
+
+void main()
+{
+        if (magic_number != 42 ||
+            abs(magic_float - 0.42) > 0.01) {
+                gl_Position = vec4(0.0);
+        } else {
+                gl_Position = piglit_vertex;
+        }
+}
+
+[fragment shader]
+#version 330
+
+layout(constant_id = 5) const float red = 1.0;
+layout(constant_id = 6) const float green = 0.3;
+layout(constant_id = 7) const float blue = 0.3;
+
+layout(location = 0) out vec4 out_color;
+
+void main()
+{
+        out_color = vec4(red, green, blue, 1.0);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
