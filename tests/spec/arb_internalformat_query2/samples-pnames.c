@@ -96,7 +96,10 @@ static const GLenum non_renderable_internalformats[] = {
 	GL_BGRA_INTEGER_EXT,
 	GL_LUMINANCE_INTEGER_EXT,
 	GL_LUMINANCE_ALPHA_INTEGER_EXT,
-	GL_RGB9_E5
+};
+
+static const GLenum tex_shared_exponent_formats[] = {
+	GL_RGB9_E5,
 };
 
 enum piglit_result
@@ -217,6 +220,16 @@ check_num_sample_counts(void)
                            GL_NUM_SAMPLE_COUNTS, data)
                         && pass;
 
+		/* RGB9_E5 is not defined as color-renderable unless
+		 * EXT_texture_shared_exponent is exposed.
+		 */
+		if (!piglit_is_extension_supported("GL_EXT_texture_shared_exponent")) {
+			pass = try(valid_targets, ARRAY_SIZE(valid_targets),
+				   tex_shared_exponent_formats, 1,
+				   GL_NUM_SAMPLE_COUNTS, data)
+				&& pass;
+		}
+
                 /*
                  *        ... or if <target> does not support
                  *        multiple samples (ie other than
@@ -265,6 +278,16 @@ check_samples(void)
                            non_renderable_internalformats, ARRAY_SIZE(non_renderable_internalformats),
                            GL_SAMPLES, data)
                         && pass;
+
+		/* RGB9_E5 is not defined as color-renderable unless
+		 * EXT_texture_shared_exponent is exposed.
+		 */
+		if (!piglit_is_extension_supported("GL_EXT_texture_shared_exponent")) {
+			pass = try(valid_targets, ARRAY_SIZE(valid_targets),
+				   tex_shared_exponent_formats, 1,
+				   GL_SAMPLES, data)
+				&& pass;
+		}
 
                 /*
                  * or if <target> does not support multiple samples (ie other

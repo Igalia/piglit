@@ -128,7 +128,10 @@ static const GLenum invalid_formats[] = {
 	GL_BGRA_INTEGER_EXT,
 	GL_LUMINANCE_INTEGER_EXT,
 	GL_LUMINANCE_ALPHA_INTEGER_EXT,
-	GL_RGB9_E5
+};
+
+static const GLenum tex_shared_exponent_formats[] = {
+	GL_RGB9_E5,
 };
 
 static const GLenum valid_pnames[] = {
@@ -294,6 +297,17 @@ piglit_init(int argc, char **argv)
 		   valid_pnames, ARRAY_SIZE(valid_pnames),
 		   GL_INVALID_ENUM)
 		&& pass;
+
+	/* RGB9_E5 is defined as color-renderable if EXT_texture_shared_exponent
+	 * is exposed, otherwise INVALID_ENUM should be returned.
+	 */
+	if (!piglit_is_extension_supported("GL_EXT_texture_shared_exponent")) {
+		pass = try(valid_targets, ARRAY_SIZE(valid_targets),
+			   tex_shared_exponent_formats, 1,
+			   valid_pnames, ARRAY_SIZE(valid_pnames),
+			   GL_INVALID_ENUM)
+			&& pass;
+	}
 
 	/* The GL_ARB_internalformat_query spec says:
 	 *
