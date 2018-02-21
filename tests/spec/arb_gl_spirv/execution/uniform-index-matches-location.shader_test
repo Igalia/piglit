@@ -8,11 +8,65 @@
 # get it wrong.
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 4.30
 GL_ARB_gl_spirv
 
 [vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 28
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outcolor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %outcolor "outcolor"
+               OpName %a "a"
+               OpName %_ ""
+               OpMemberName %_ 0 "b"
+               OpMemberName %_ 1 "c"
+               OpName %s "s"
+               OpDecorate %outcolor Location 0
+               OpDecorate %a Location 2
+               OpDecorate %s Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outcolor = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+%_ptr_UniformConstant_float = OpTypePointer UniformConstant %float
+          %a = OpVariable %_ptr_UniformConstant_float UniformConstant
+          %_ = OpTypeStruct %float %float
+%_ptr_UniformConstant__ = OpTypePointer UniformConstant %_
+          %s = OpVariable %_ptr_UniformConstant__ UniformConstant
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+      %int_1 = OpConstant %int 1
+    %float_1 = OpConstant %float 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %13 = OpLoad %float %a
+         %19 = OpAccessChain %_ptr_UniformConstant_float %s %int_0
+         %20 = OpLoad %float %19
+         %21 = OpFAdd %float %13 %20
+         %23 = OpAccessChain %_ptr_UniformConstant_float %s %int_1
+         %24 = OpLoad %float %23
+         %25 = OpFAdd %float %21 %24
+         %27 = OpCompositeConstruct %v4float %float_0 %25 %float_0 %float_1
+               OpStore %outcolor %27
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 #version 430

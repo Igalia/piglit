@@ -1,7 +1,37 @@
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_gl_spirv
+
+[compute shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 13
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main"
+               OpExecutionMode %main LocalSize 1 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %uishared "uishared"
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Workgroup_uint = OpTypePointer Workgroup %uint
+   %uishared = OpVariable %_ptr_Workgroup_uint Workgroup
+     %uint_2 = OpConstant %uint 2
+     %uint_1 = OpConstant %uint 1
+     %uint_0 = OpConstant %uint 0
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpAtomicIAdd %uint %uishared %uint_1 %uint_0 %uint_2
+               OpReturn
+               OpFunctionEnd
 
 [compute shader]
 #version 450

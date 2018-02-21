@@ -3,10 +3,128 @@
 
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 
 [vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 59
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %outColor "outColor"
+               OpName %column "column"
+               OpName %row "row"
+               OpName %column_ssbo "column_ssbo"
+               OpMemberName %column_ssbo 0 "matrix"
+               OpName %my_column_major "my_column_major"
+               OpName %row_ssbo "row_ssbo"
+               OpMemberName %row_ssbo 0 "matrix"
+               OpName %my_row_major "my_row_major"
+               OpDecorate %outColor Location 0
+               OpMemberDecorate %column_ssbo 0 ColMajor
+               OpMemberDecorate %column_ssbo 0 Offset 0
+               OpMemberDecorate %column_ssbo 0 MatrixStride 16
+               OpDecorate %column_ssbo BufferBlock
+               OpDecorate %my_column_major DescriptorSet 0
+               OpDecorate %my_column_major Binding 5
+               OpMemberDecorate %row_ssbo 0 RowMajor
+               OpMemberDecorate %row_ssbo 0 Offset 0
+               OpMemberDecorate %row_ssbo 0 MatrixStride 16
+               OpDecorate %row_ssbo BufferBlock
+               OpDecorate %my_row_major DescriptorSet 0
+               OpDecorate %my_row_major Binding 7
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %12 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_0
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %int_0 = OpConstant %int 0
+      %int_4 = OpConstant %int 4
+       %bool = OpTypeBool
+%mat4v4float = OpTypeMatrix %v4float 4
+%column_ssbo = OpTypeStruct %mat4v4float
+%_ptr_Uniform_column_ssbo = OpTypePointer Uniform %column_ssbo
+%my_column_major = OpVariable %_ptr_Uniform_column_ssbo Uniform
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+   %row_ssbo = OpTypeStruct %mat4v4float
+%_ptr_Uniform_row_ssbo = OpTypePointer Uniform %row_ssbo
+%my_row_major = OpVariable %_ptr_Uniform_row_ssbo Uniform
+         %53 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_0
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+     %column = OpVariable %_ptr_Function_int Function
+        %row = OpVariable %_ptr_Function_int Function
+               OpStore %outColor %12
+               OpStore %column %int_0
+               OpBranch %17
+         %17 = OpLabel
+               OpLoopMerge %19 %20 None
+               OpBranch %21
+         %21 = OpLabel
+         %22 = OpLoad %int %column
+         %25 = OpSLessThan %bool %22 %int_4
+               OpBranchConditional %25 %18 %19
+         %18 = OpLabel
+               OpStore %row %int_0
+               OpBranch %27
+         %27 = OpLabel
+               OpLoopMerge %29 %30 None
+               OpBranch %31
+         %31 = OpLabel
+         %32 = OpLoad %int %row
+         %33 = OpSLessThan %bool %32 %int_4
+               OpBranchConditional %33 %28 %29
+         %28 = OpLabel
+         %38 = OpLoad %int %column
+         %39 = OpLoad %int %row
+         %41 = OpAccessChain %_ptr_Uniform_float %my_column_major %int_0 %38 %39
+         %42 = OpLoad %float %41
+         %46 = OpLoad %int %row
+         %47 = OpLoad %int %column
+         %48 = OpAccessChain %_ptr_Uniform_float %my_row_major %int_0 %46 %47
+         %49 = OpLoad %float %48
+         %50 = OpFOrdNotEqual %bool %42 %49
+               OpSelectionMerge %52 None
+               OpBranchConditional %50 %51 %52
+         %51 = OpLabel
+               OpStore %outColor %53
+               OpBranch %52
+         %52 = OpLabel
+               OpBranch %30
+         %30 = OpLabel
+         %54 = OpLoad %int %row
+         %56 = OpIAdd %int %54 %int_1
+               OpStore %row %56
+               OpBranch %27
+         %29 = OpLabel
+               OpBranch %20
+         %20 = OpLabel
+         %57 = OpLoad %int %column
+         %58 = OpIAdd %int %57 %int_1
+               OpStore %column %58
+               OpBranch %17
+         %19 = OpLabel
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 
