@@ -1097,9 +1097,10 @@ process_requirement(const char *line)
 		if (parse_str(line, "ONLY", NULL)) {
 			spirv_replaces_glsl = true;
 		} else if (parse_str(line, "NO", &line)) {
-			if (spirv_replaces_glsl)
+			if (spirv_replaces_glsl) {
 				printf("Not compatible with SPIRV\n");
-			return PIGLIT_SKIP;
+				return PIGLIT_SKIP;
+			}
 		} else {
 			printf("Unknown SPIRV line in [require]\n");
 			return PIGLIT_FAIL;
