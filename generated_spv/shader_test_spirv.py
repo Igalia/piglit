@@ -838,7 +838,7 @@ def process_shader_test(shader_test, config):
     if vertex_attribs is None:
         vertex_attribs = {'piglit_vertex': 0, 'piglit_texcoord': 1}
 
-    if have_glsl & (config.no_transform is False):
+    if have_glsl and not config.no_transform:
         skip_reasons = fixup_glsl_shaders(shaders, vertex_attribs)
 
         if config.mark_skip:
