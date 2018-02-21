@@ -1,4 +1,5 @@
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_gl_spirv

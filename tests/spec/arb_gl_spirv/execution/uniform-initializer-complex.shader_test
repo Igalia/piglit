@@ -2,6 +2,7 @@
 # structs, arrays and matrices.
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 4.50
 
@@ -12,6 +13,11 @@ GLSL >= 4.50
 ; This is manually edited by hand to add the uniform constant
 ; initialiser because glslang seems to silently drop it.
 
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 59
+; Schema: 0
                OpCapability Shader
           %1 = OpExtInstImport "GLSL.std.450"
                OpMemoryModel Logical GLSL450
@@ -128,43 +134,43 @@ GLSL >= 4.50
                OpReturn
                OpFunctionEnd
 
-; [fragment shader]
-; #version 450
-;
-; layout (location = 0) out vec4 out_color;
-;
-; struct color {
-;         float r, g, b, a;
-; };
-;
-; struct base {
-;         color colors[4];
-;         mat4 transform;
-; };
-;
-; layout (location = 0) uniform base value =
-;         base(color[](color(0.01, 0.02, 0.03, 0.25),
-;                      color(0.04, 0.05, 0.06, 0.25),
-;                      color(0.07, 0.08, 0.09, 0.25),
-;                      color(0.85, 0.11, 0.12, 0.25)),
-;              mat4(vec4(0.0, 0.0, 1.0, 0.0),
-;                   vec4(1.0, 0.0, 0.0, 0.0),
-;                   vec4(0.0, 1.0, 0.0, 0.0),
-;                   vec4(0.0, 0.0, 0.0, 1.0)));
-;
-; void main()
-; {
-;         out_color = vec4(0.0);
-;
-;         for (int i = 0; i < 4; i++) {
-;                 out_color += vec4(value.colors[i].r,
-;                                   value.colors[i].g,
-;                                   value.colors[i].b,
-;                                   value.colors[i].a);
-;         }
-;
-;         out_color *= value.transform;
-; }
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 out_color;
+
+struct color {
+        float r, g, b, a;
+};
+
+struct base {
+        color colors[4];
+        mat4 transform;
+};
+
+layout (location = 0) uniform base value =
+        base(color[](color(0.01, 0.02, 0.03, 0.25),
+                     color(0.04, 0.05, 0.06, 0.25),
+                     color(0.07, 0.08, 0.09, 0.25),
+                     color(0.85, 0.11, 0.12, 0.25)),
+             mat4(vec4(0.0, 0.0, 1.0, 0.0),
+                  vec4(1.0, 0.0, 0.0, 0.0),
+                  vec4(0.0, 1.0, 0.0, 0.0),
+                  vec4(0.0, 0.0, 0.0, 1.0)));
+
+void main()
+{
+        out_color = vec4(0.0);
+
+        for (int i = 0; i < 4; i++) {
+                out_color += vec4(value.colors[i].r,
+                                  value.colors[i].g,
+                                  value.colors[i].b,
+                                  value.colors[i].a);
+        }
+
+        out_color *= value.transform;
+}
 
 [test]
 clear color 1.0 0.0 0.0 1.0
