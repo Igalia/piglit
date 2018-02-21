@@ -1,7 +1,45 @@
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_gl_spirv
+
+[compute shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 15
+; Schema: 0
+               OpCapability Shader
+               OpCapability StorageImageMultisample
+               OpCapability ImageQuery
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main"
+               OpExecutionMode %main LocalSize 1 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %samp "samp"
+               OpName %rimg2DMS "rimg2DMS"
+               OpDecorate %rimg2DMS Location 2
+               OpDecorate %rimg2DMS DescriptorSet 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+       %uint = OpTypeInt 32 0
+         %10 = OpTypeImage %uint 2D 0 0 1 2 Rgba8ui
+%_ptr_UniformConstant_10 = OpTypePointer UniformConstant %10
+   %rimg2DMS = OpVariable %_ptr_UniformConstant_10 UniformConstant
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+       %samp = OpVariable %_ptr_Function_int Function
+         %13 = OpLoad %10 %rimg2DMS
+         %14 = OpImageQuerySamples %int %13
+               OpStore %samp %14
+               OpReturn
+               OpFunctionEnd
 
 [compute shader]
 #version 450

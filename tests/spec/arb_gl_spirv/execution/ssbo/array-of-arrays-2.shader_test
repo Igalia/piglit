@@ -1,10 +1,64 @@
 # Using a array of arrays inside a ssbo, instead of a aoa of ssbo.
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 
 [vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 26
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color "color"
+               OpName %ssbo "ssbo"
+               OpMemberName %ssbo 0 "color"
+               OpName %arr "arr"
+               OpDecorate %color Location 0
+               OpDecorate %_arr_v4float_uint_2 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_2_uint_2 ArrayStride 32
+               OpMemberDecorate %ssbo 0 Offset 0
+               OpDecorate %ssbo BufferBlock
+               OpDecorate %arr DescriptorSet 0
+               OpDecorate %arr Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_v4float_uint_2 = OpTypeArray %v4float %uint_2
+%_arr__arr_v4float_uint_2_uint_2 = OpTypeArray %_arr_v4float_uint_2 %uint_2
+       %ssbo = OpTypeStruct %_arr__arr_v4float_uint_2_uint_2
+%_ptr_Uniform_ssbo = OpTypePointer Uniform %ssbo
+        %arr = OpVariable %_ptr_Uniform_ssbo Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %20 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_0
+         %21 = OpLoad %v4float %20
+         %23 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_1
+         %24 = OpLoad %v4float %23
+         %25 = OpFAdd %v4float %21 %24
+               OpStore %color %25
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 #version 450

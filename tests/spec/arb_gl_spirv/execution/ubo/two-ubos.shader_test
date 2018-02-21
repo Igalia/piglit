@@ -1,11 +1,68 @@
 # UBO test with two ubos. Just one stage.
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_gl_spirv
 
 [vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 24
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %outColor "outColor"
+               OpName %ComponentsBlock "ComponentsBlock"
+               OpMemberName %ComponentsBlock 0 "c1"
+               OpName %components "components"
+               OpName %ComponentsBlock2 "ComponentsBlock2"
+               OpMemberName %ComponentsBlock2 0 "c2"
+               OpName %components2 "components2"
+               OpDecorate %outColor Location 0
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+               OpMemberDecorate %ComponentsBlock2 0 Offset 0
+               OpDecorate %ComponentsBlock2 Block
+               OpDecorate %components2 DescriptorSet 0
+               OpDecorate %components2 Binding 8
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+%ComponentsBlock = OpTypeStruct %v4float
+%_ptr_Uniform_ComponentsBlock = OpTypePointer Uniform %ComponentsBlock
+ %components = OpVariable %_ptr_Uniform_ComponentsBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%ComponentsBlock2 = OpTypeStruct %v4float
+%_ptr_Uniform_ComponentsBlock2 = OpTypePointer Uniform %ComponentsBlock2
+%components2 = OpVariable %_ptr_Uniform_ComponentsBlock2 Uniform
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %16 = OpAccessChain %_ptr_Uniform_v4float %components %int_0
+         %17 = OpLoad %v4float %16
+         %21 = OpAccessChain %_ptr_Uniform_v4float %components2 %int_0
+         %22 = OpLoad %v4float %21
+         %23 = OpFAdd %v4float %17 %22
+               OpStore %outColor %23
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 

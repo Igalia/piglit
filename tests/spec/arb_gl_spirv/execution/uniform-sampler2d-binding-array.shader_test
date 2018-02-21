@@ -3,12 +3,19 @@
 # should increment from there.
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 
 [vertex shader passthrough]
 
 [fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 31
+; Schema: 0
                OpCapability Shader
           %1 = OpExtInstImport "GLSL.std.450"
                OpMemoryModel Logical GLSL450
@@ -55,17 +62,17 @@ GLSL >= 3.30
                OpReturn
                OpFunctionEnd
 
-; [fragment shader]
-; #version 450
-;
-; layout (location = 0) out vec4 color;
-;
-; layout (location = 0, binding = 3) uniform sampler2D tex[2];
-;
-; void main()
-; {
-; 	color = texture(tex[0], vec2(0.25)) + texture(tex[1], vec2(0.25));
-; }
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (location = 0, binding = 3) uniform sampler2D tex[2];
+
+void main()
+{
+	color = texture(tex[0], vec2(0.25)) + texture(tex[1], vec2(0.25));
+}
 
 [test]
 clear color 1.0 0.0 0.0 1.0

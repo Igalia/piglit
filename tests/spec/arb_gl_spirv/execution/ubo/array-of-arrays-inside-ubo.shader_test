@@ -1,10 +1,187 @@
 # Using a array of arrays inside a ubo, instead of a aoa of ubos.
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 
 [vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 111
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %fail_color "fail_color"
+               OpName %color "color"
+               OpName %block "block"
+               OpMemberName %block 0 "color"
+               OpName %arr "arr"
+               OpDecorate %color Location 0
+               OpDecorate %_arr_v4float_uint_3 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_3_uint_3 ArrayStride 48
+               OpMemberDecorate %block 0 Offset 0
+               OpDecorate %block Block
+               OpDecorate %arr DescriptorSet 0
+               OpDecorate %arr Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_0
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_0
+       %uint = OpTypeInt 32 0
+     %uint_3 = OpConstant %uint 3
+%_arr_v4float_uint_3 = OpTypeArray %v4float %uint_3
+%_arr__arr_v4float_uint_3_uint_3 = OpTypeArray %_arr_v4float_uint_3 %uint_3
+      %block = OpTypeStruct %_arr__arr_v4float_uint_3_uint_3
+%_ptr_Uniform_block = OpTypePointer Uniform %block
+        %arr = OpVariable %_ptr_Uniform_block Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+  %float_0_1 = OpConstant %float 0.1
+  %float_0_2 = OpConstant %float 0.2
+  %float_0_3 = OpConstant %float 0.3
+         %31 = OpConstantComposite %v4float %float_0 %float_0_1 %float_0_2 %float_0_3
+       %bool = OpTypeBool
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+  %float_0_4 = OpConstant %float 0.4
+  %float_0_5 = OpConstant %float 0.5
+  %float_0_6 = OpConstant %float 0.6
+  %float_0_7 = OpConstant %float 0.7
+         %46 = OpConstantComposite %v4float %float_0_4 %float_0_5 %float_0_6 %float_0_7
+      %int_2 = OpConstant %int 2
+  %float_0_8 = OpConstant %float 0.8
+  %float_0_9 = OpConstant %float 0.9
+         %57 = OpConstantComposite %v4float %float_0_8 %float_0_9 %float_0_1 %float_0_2
+         %65 = OpConstantComposite %v4float %float_0_3 %float_0_4 %float_0_5 %float_0_6
+         %73 = OpConstantComposite %v4float %float_0_7 %float_0_8 %float_0_9 %float_0_1
+         %81 = OpConstantComposite %v4float %float_0_2 %float_0_3 %float_0_4 %float_0_5
+         %89 = OpConstantComposite %v4float %float_0_6 %float_0_7 %float_0_8 %float_0_9
+         %97 = OpConstantComposite %v4float %float_0_8 %float_0_7 %float_0_6 %float_0_5
+        %105 = OpConstantComposite %v4float %float_0_4 %float_0_3 %float_0_2 %float_0_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %color %15
+         %26 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_0
+         %27 = OpLoad %v4float %26
+         %34 = OpFOrdNotEqual %v4bool %27 %31
+         %35 = OpAny %bool %34
+               OpSelectionMerge %37 None
+               OpBranchConditional %35 %36 %37
+         %36 = OpLabel
+         %38 = OpLoad %v4float %fail_color
+               OpStore %color %38
+               OpBranch %37
+         %37 = OpLabel
+         %40 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_1
+         %41 = OpLoad %v4float %40
+         %47 = OpFOrdNotEqual %v4bool %41 %46
+         %48 = OpAny %bool %47
+               OpSelectionMerge %50 None
+               OpBranchConditional %48 %49 %50
+         %49 = OpLabel
+         %51 = OpLoad %v4float %fail_color
+               OpStore %color %51
+               OpBranch %50
+         %50 = OpLabel
+         %53 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_2
+         %54 = OpLoad %v4float %53
+         %58 = OpFOrdNotEqual %v4bool %54 %57
+         %59 = OpAny %bool %58
+               OpSelectionMerge %61 None
+               OpBranchConditional %59 %60 %61
+         %60 = OpLabel
+         %62 = OpLoad %v4float %fail_color
+               OpStore %color %62
+               OpBranch %61
+         %61 = OpLabel
+         %63 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_0
+         %64 = OpLoad %v4float %63
+         %66 = OpFOrdNotEqual %v4bool %64 %65
+         %67 = OpAny %bool %66
+               OpSelectionMerge %69 None
+               OpBranchConditional %67 %68 %69
+         %68 = OpLabel
+         %70 = OpLoad %v4float %fail_color
+               OpStore %color %70
+               OpBranch %69
+         %69 = OpLabel
+         %71 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_1
+         %72 = OpLoad %v4float %71
+         %74 = OpFOrdNotEqual %v4bool %72 %73
+         %75 = OpAny %bool %74
+               OpSelectionMerge %77 None
+               OpBranchConditional %75 %76 %77
+         %76 = OpLabel
+         %78 = OpLoad %v4float %fail_color
+               OpStore %color %78
+               OpBranch %77
+         %77 = OpLabel
+         %79 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_2
+         %80 = OpLoad %v4float %79
+         %82 = OpFOrdNotEqual %v4bool %80 %81
+         %83 = OpAny %bool %82
+               OpSelectionMerge %85 None
+               OpBranchConditional %83 %84 %85
+         %84 = OpLabel
+         %86 = OpLoad %v4float %fail_color
+               OpStore %color %86
+               OpBranch %85
+         %85 = OpLabel
+         %87 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_2 %int_0
+         %88 = OpLoad %v4float %87
+         %90 = OpFOrdNotEqual %v4bool %88 %89
+         %91 = OpAny %bool %90
+               OpSelectionMerge %93 None
+               OpBranchConditional %91 %92 %93
+         %92 = OpLabel
+         %94 = OpLoad %v4float %fail_color
+               OpStore %color %94
+               OpBranch %93
+         %93 = OpLabel
+         %95 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_2 %int_1
+         %96 = OpLoad %v4float %95
+         %98 = OpFOrdNotEqual %v4bool %96 %97
+         %99 = OpAny %bool %98
+               OpSelectionMerge %101 None
+               OpBranchConditional %99 %100 %101
+        %100 = OpLabel
+        %102 = OpLoad %v4float %fail_color
+               OpStore %color %102
+               OpBranch %101
+        %101 = OpLabel
+        %103 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_2 %int_2
+        %104 = OpLoad %v4float %103
+        %106 = OpFOrdNotEqual %v4bool %104 %105
+        %107 = OpAny %bool %106
+               OpSelectionMerge %109 None
+               OpBranchConditional %107 %108 %109
+        %108 = OpLabel
+        %110 = OpLoad %v4float %fail_color
+               OpStore %color %110
+               OpBranch %109
+        %109 = OpLabel
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 #version 450
