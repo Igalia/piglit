@@ -1,6 +1,7 @@
 # Test a uniform with an initializer
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 4.50
 
@@ -11,6 +12,11 @@ GLSL >= 4.50
 ; This is manually edited by hand to add the uniform constant
 ; initialiser because glslang seems to silently drop it.
 
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 13
+; Schema: 0
                OpCapability Shader
           %1 = OpExtInstImport "GLSL.std.450"
                OpMemoryModel Logical GLSL450
@@ -40,17 +46,17 @@ GLSL >= 4.50
                OpReturn
                OpFunctionEnd
 
-; [fragment shader]
-; #version 450
-;
-; layout (location = 0) out vec4 color;
-;
-; layout (location = 0) uniform vec4 in_color = vec4(0.0, 1.0, 0.0, 1.0);
-;
-; void main()
-; {
-; 	color = in_color;
-; }
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (location = 0) uniform vec4 in_color = vec4(0.0, 1.0, 0.0, 1.0);
+
+void main()
+{
+	color = in_color;
+}
 
 [test]
 clear color 1.0 0.0 0.0 1.0

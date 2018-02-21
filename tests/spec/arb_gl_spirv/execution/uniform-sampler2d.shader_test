@@ -1,9 +1,50 @@
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 4.30
 GL_ARB_gl_spirv
 
 [vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 19
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %fragColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %fragColor "fragColor"
+               OpName %tex2D "tex2D"
+               OpDecorate %fragColor Location 0
+               OpDecorate %tex2D Location 0
+               OpDecorate %tex2D DescriptorSet 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %fragColor = OpVariable %_ptr_Output_v4float Output
+         %10 = OpTypeImage %float 2D 0 0 0 1 Unknown
+         %11 = OpTypeSampledImage %10
+%_ptr_UniformConstant_11 = OpTypePointer UniformConstant %11
+      %tex2D = OpVariable %_ptr_UniformConstant_11 UniformConstant
+    %v2float = OpTypeVector %float 2
+ %float_0_25 = OpConstant %float 0.25
+         %17 = OpConstantComposite %v2float %float_0_25 %float_0_25
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %14 = OpLoad %11 %tex2D
+         %18 = OpImageSampleImplicitLod %v4float %14 %17
+               OpStore %fragColor %18
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 #version 430
