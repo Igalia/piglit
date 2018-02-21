@@ -821,6 +821,9 @@ def parse_args():
     parser.add_argument("-t", "--transformed",
                         action="store_true",
                         help="Print transformed GLSL shaders")
+    parser.add_argument("-r", "--replace",
+                        action="store_true",
+                        help="Replace the original script with the transformed one")
     parser.add_argument("-v", "--verbose",
                         action="store_true",
                         help="Print verbose output")
@@ -1130,6 +1133,8 @@ def process_shader_test(shader_test, config):
                                uniform_map,
                                vertex_attribs,
                                spirv_line == None)
+    if config.replace:
+        os.rename(spv_shader_test_file, shader_test)
 
     return True
 
