@@ -1108,6 +1108,13 @@ leave_state(enum states state, const char *line, const char *script_name)
 		break;
 
 	case requirements:
+		if (spirv_replaces_glsl) {
+			printf("Running on SPIR-V mode\n");
+		} else {
+			printf("Running on GLSL mode\n");
+			if (force_no_names)
+				fprintf(stderr, "Note: forcing names\n");
+		}
 		break;
 
 	case vertex_shader:
@@ -1358,7 +1365,6 @@ cleanup:
 
 	return result;
 }
-
 
 static enum piglit_result
 process_test_script(const char *script_name)
@@ -4276,20 +4282,13 @@ piglit_init(int argc, char **argv)
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	spirv_replaces_glsl = piglit_strip_arg(&argc, argv, "-spirv");
 	force_no_names = piglit_strip_arg(&argc, argv, "-force-no-names");
-	if (spirv_replaces_glsl) {
-                printf("Running on SPIR-V mode\n");
+	if (spirv_replaces_glsl)
 		force_no_names = true;
-	} else {
-                printf("Running on GLSL mode\n");
-        }
 
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
 	}
-
-	if (force_no_names & !spirv_replaces_glsl)
-		fprintf(stderr, "Note: forcing names\n");
 
 	memcpy(default_piglit_tolerance, piglit_tolerance,
 	       sizeof(piglit_tolerance));
