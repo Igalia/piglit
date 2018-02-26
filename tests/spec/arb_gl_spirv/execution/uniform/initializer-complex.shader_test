@@ -1,0 +1,180 @@
+# Test a uniform with an initializer that has a type containing
+# structs, arrays and matrices.
+
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+
+; This is manually edited by hand to add the uniform constant
+; initialiser because glslang seems to silently drop it.
+
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 59
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %out_color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %out_color "out_color"
+               OpName %i "i"
+               OpName %color "color"
+               OpMemberName %color 0 "r"
+               OpMemberName %color 1 "g"
+               OpMemberName %color 2 "b"
+               OpMemberName %color 3 "a"
+               OpName %base "base"
+               OpMemberName %base 0 "colors"
+               OpMemberName %base 1 "transform"
+               OpName %value "value"
+               OpDecorate %out_color Location 0
+               OpDecorate %value Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %out_color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %11 = OpConstantComposite %v4float %float_0 %float_0 %float_0 %float_0
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %int_0 = OpConstant %int 0
+      %int_4 = OpConstant %int 4
+       %bool = OpTypeBool
+      %color = OpTypeStruct %float %float %float %float
+       %uint = OpTypeInt 32 0
+     %uint_4 = OpConstant %uint 4
+%_arr_color_uint_4 = OpTypeArray %color %uint_4
+%mat4v4float = OpTypeMatrix %v4float 4
+       %base = OpTypeStruct %_arr_color_uint_4 %mat4v4float
+%_ptr_UniformConstant_base = OpTypePointer UniformConstant %base
+        %f01 = OpConstant %float 0.01
+        %f02 = OpConstant %float 0.02
+        %f03 = OpConstant %float 0.03
+        %f04 = OpConstant %float 0.04
+        %f05 = OpConstant %float 0.05
+        %f06 = OpConstant %float 0.06
+        %f07 = OpConstant %float 0.07
+        %f08 = OpConstant %float 0.08
+        %f09 = OpConstant %float 0.09
+        %f11 = OpConstant %float 0.11
+        %f12 = OpConstant %float 0.12
+        %f25 = OpConstant %float 0.25
+        %f85 = OpConstant %float 0.85
+	 %c0 = OpConstantComposite %color %f01 %f02 %f03 %f25
+	 %c1 = OpConstantComposite %color %f04 %f05 %f06 %f25
+	 %c2 = OpConstantComposite %color %f07 %f08 %f09 %f25
+	 %c3 = OpConstantComposite %color %f85 %f11 %f12 %f25
+     %colors = OpConstantComposite %_arr_color_uint_4 %c0 %c1 %c2 %c3
+         %t0 = OpConstantComposite %v4float %float_0 %float_0 %float_1 %float_0
+         %t1 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_0
+         %t2 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_0
+         %t3 = OpConstantComposite %v4float %float_0 %float_0 %float_0 %float_1
+  %transform = OpConstantComposite %mat4v4float %t0 %t1 %t2 %t3
+%initializer = OpConstantComposite %base %colors %transform
+      %value = OpVariable %_ptr_UniformConstant_base UniformConstant %initializer
+%_ptr_UniformConstant_float = OpTypePointer UniformConstant %float
+      %int_1 = OpConstant %int 1
+      %int_2 = OpConstant %int 2
+      %int_3 = OpConstant %int 3
+%_ptr_UniformConstant_mat4v4float = OpTypePointer UniformConstant %mat4v4float
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %i = OpVariable %_ptr_Function_int Function
+               OpStore %out_color %11
+               OpStore %i %int_0
+               OpBranch %16
+         %16 = OpLabel
+               OpLoopMerge %18 %19 None
+               OpBranch %20
+         %20 = OpLabel
+         %21 = OpLoad %int %i
+         %24 = OpSLessThan %bool %21 %int_4
+               OpBranchConditional %24 %17 %18
+         %17 = OpLabel
+         %33 = OpLoad %int %i
+         %35 = OpAccessChain %_ptr_UniformConstant_float %value %int_0 %33 %int_0
+         %36 = OpLoad %float %35
+         %37 = OpLoad %int %i
+         %39 = OpAccessChain %_ptr_UniformConstant_float %value %int_0 %37 %int_1
+         %40 = OpLoad %float %39
+         %41 = OpLoad %int %i
+         %43 = OpAccessChain %_ptr_UniformConstant_float %value %int_0 %41 %int_2
+         %44 = OpLoad %float %43
+         %45 = OpLoad %int %i
+         %47 = OpAccessChain %_ptr_UniformConstant_float %value %int_0 %45 %int_3
+         %48 = OpLoad %float %47
+         %49 = OpCompositeConstruct %v4float %36 %40 %44 %48
+         %50 = OpLoad %v4float %out_color
+         %51 = OpFAdd %v4float %50 %49
+               OpStore %out_color %51
+               OpBranch %19
+         %19 = OpLabel
+         %52 = OpLoad %int %i
+         %53 = OpIAdd %int %52 %int_1
+               OpStore %i %53
+               OpBranch %16
+         %18 = OpLabel
+         %55 = OpAccessChain %_ptr_UniformConstant_mat4v4float %value %int_1
+         %56 = OpLoad %mat4v4float %55
+         %57 = OpLoad %v4float %out_color
+         %58 = OpVectorTimesMatrix %v4float %57 %56
+               OpStore %out_color %58
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 out_color;
+
+struct color {
+        float r, g, b, a;
+};
+
+struct base {
+        color colors[4];
+        mat4 transform;
+};
+
+layout (location = 0) uniform base value =
+        base(color[](color(0.01, 0.02, 0.03, 0.25),
+                     color(0.04, 0.05, 0.06, 0.25),
+                     color(0.07, 0.08, 0.09, 0.25),
+                     color(0.85, 0.11, 0.12, 0.25)),
+             mat4(vec4(0.0, 0.0, 1.0, 0.0),
+                  vec4(1.0, 0.0, 0.0, 0.0),
+                  vec4(0.0, 1.0, 0.0, 0.0),
+                  vec4(0.0, 0.0, 0.0, 1.0)));
+
+void main()
+{
+        out_color = vec4(0.0);
+
+        for (int i = 0; i < 4; i++) {
+                out_color += vec4(value.colors[i].r,
+                                  value.colors[i].g,
+                                  value.colors[i].b,
+                                  value.colors[i].a);
+        }
+
+        out_color *= value.transform;
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.30 0.97 0.26 1.0
