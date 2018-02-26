@@ -1,0 +1,83 @@
+# Tests a uniform initialiser with a mat4x3 type
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 30
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color_out
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color_out "color_out"
+               OpName %m "m"
+               OpName %color_in "color_in"
+               OpDecorate %color_out Location 0
+               OpDecorate %m Location 0
+               OpDecorate %m DescriptorSet 0
+               OpDecorate %color_in Location 1
+               OpDecorate %color_in DescriptorSet 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %color_out = OpVariable %_ptr_Output_v4float Output
+    %v3float = OpTypeVector %float 3
+%mat4v3float = OpTypeMatrix %v3float 4
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %14 = OpConstantComposite %v3float %float_0 %float_1 %float_0
+         %15 = OpConstantComposite %v3float %float_1 %float_0 %float_0
+         %16 = OpConstantComposite %v3float %float_0 %float_0 %float_1
+         %17 = OpConstantComposite %v3float %float_0 %float_0 %float_0
+         %18 = OpConstantComposite %mat4v3float %14 %15 %16 %17
+%_ptr_UniformConstant_mat4v3float = OpTypePointer UniformConstant %mat4v3float
+          %m = OpVariable %_ptr_UniformConstant_mat4v3float UniformConstant %18
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+   %color_in = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %21 = OpLoad %mat4v3float %m
+         %24 = OpLoad %v4float %color_in
+         %25 = OpMatrixTimesVector %v3float %21 %24
+         %26 = OpCompositeExtract %float %25 0
+         %27 = OpCompositeExtract %float %25 1
+         %28 = OpCompositeExtract %float %25 2
+         %29 = OpCompositeConstruct %v4float %26 %27 %28 %float_0
+               OpStore %color_out %29
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(location = 0) uniform mat4x3 m = mat4x3(0.0, 1.0, 0.0,
+                                               1.0, 0.0, 0.0,
+                                               0.0, 0.0, 1.0,
+                                               0.0, 0.0, 0.0);
+layout(location = 1) uniform vec4 color_in;
+
+layout(location = 0) out vec4 color_out;
+
+void main()
+{
+        color_out = vec4(m * color_in, 0.0);
+}
+
+[test]
+uniform vec4 1 1.0 0.0 0.5 0.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.5 0.0
