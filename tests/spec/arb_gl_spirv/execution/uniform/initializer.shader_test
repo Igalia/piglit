@@ -1,0 +1,66 @@
+# Test a uniform with an initializer
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+
+; This is manually edited by hand to add the uniform constant
+; initialiser because glslang seems to silently drop it.
+
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 13
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color "color"
+               OpName %in_color "in_color"
+               OpDecorate %color Location 0
+               OpDecorate %in_color Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+      %green = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+   %in_color = OpVariable %_ptr_UniformConstant_v4float UniformConstant %green
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpLoad %v4float %in_color
+               OpStore %color %12
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (location = 0) uniform vec4 in_color = vec4(0.0, 1.0, 0.0, 1.0);
+
+void main()
+{
+	color = in_color;
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
