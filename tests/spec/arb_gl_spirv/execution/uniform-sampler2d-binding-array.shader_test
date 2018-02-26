@@ -1,0 +1,78 @@
+# Test a texture sampler array with a binding initialiser. The
+# initialiser should set the first element and the subsequent ones
+# should increment from there.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color "color"
+               OpName %tex "tex"
+               OpDecorate %color Location 0
+               OpDecorate %tex Location 0
+               OpDecorate %tex DescriptorSet 0
+               OpDecorate %tex Binding 3
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %10 = OpTypeImage %float 2D 0 0 0 1 Unknown
+         %11 = OpTypeSampledImage %10
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_11_uint_2 = OpTypeArray %11 %uint_2
+%_ptr_UniformConstant__arr_11_uint_2 = OpTypePointer UniformConstant %_arr_11_uint_2
+        %tex = OpVariable %_ptr_UniformConstant__arr_11_uint_2 UniformConstant
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_UniformConstant_11 = OpTypePointer UniformConstant %11
+    %v2float = OpTypeVector %float 2
+ %float_0_25 = OpConstant %float 0.25
+         %24 = OpConstantComposite %v2float %float_0_25 %float_0_25
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %20 = OpAccessChain %_ptr_UniformConstant_11 %tex %int_0
+         %21 = OpLoad %11 %20
+         %25 = OpImageSampleImplicitLod %v4float %21 %24
+         %27 = OpAccessChain %_ptr_UniformConstant_11 %tex %int_1
+         %28 = OpLoad %11 %27
+         %29 = OpImageSampleImplicitLod %v4float %28 %24
+         %30 = OpFAdd %v4float %25 %29
+               OpStore %color %30
+               OpReturn
+               OpFunctionEnd
+
+; [fragment shader]
+; #version 450
+;
+; layout (location = 0) out vec4 color;
+;
+; layout (location = 0, binding = 3) uniform sampler2D tex[2];
+;
+; void main()
+; {
+; 	color = texture(tex[0], vec2(0.25)) + texture(tex[1], vec2(0.25));
+; }
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+
+texture checkerboard 3 0 (32, 32) (0.02, 0.04, 0.06, 0.08) (0.8, 0.0, 0.0, 1.0)
+texture checkerboard 4 0 (32, 32) (0.10, 0.92, 0.14, 0.16) (0.2, 0.0, 0.0, 1.0)
+
+draw rect -1 -1 2 2
+probe all rgba 0.12 0.96 0.20 0.24
