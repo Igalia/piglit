@@ -1,0 +1,68 @@
+# Tests a uniform initialiser with a dvec4 type
+
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 19
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color_out
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color_out "color_out"
+               OpName %color_in "color_in"
+               OpDecorate %color_out Location 0
+               OpDecorate %color_in Location 0
+               OpDecorate %color_in DescriptorSet 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %color_out = OpVariable %_ptr_Output_v4float Output
+     %double = OpTypeFloat 64
+   %v4double = OpTypeVector %double 4
+   %double_0 = OpConstant %double 0
+   %double_1 = OpConstant %double 1
+         %14 = OpConstantComposite %v4double %double_0 %double_1 %double_0 %double_0
+%_ptr_UniformConstant_v4double = OpTypePointer UniformConstant %v4double
+   %color_in = OpVariable %_ptr_UniformConstant_v4double UniformConstant %14
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %17 = OpLoad %v4double %color_in
+         %18 = OpFConvert %v4float %17
+               OpStore %color_out %18
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(location = 0) uniform dvec4 color_in = dvec4(0.0lf, 1.0lf, 0.0lf, 0.0lf);
+layout(location = 0) out vec4 color_out;
+
+void
+main()
+{
+        color_out = vec4(color_in);
+}
+
+[test]
+draw rect -1 -1 1 2
+uniform dvec4 0 0.0 0.0 1.0 0.0
+draw rect 0 -1 1 2
+uniform dvec4 0 0.0 1.0 0.0 0.0
+relative probe rgb (0.25, 0.5) (0.0, 1.0, 0.0)
+relative probe rgb (0.75, 0.5) (0.0, 0.0, 1.0)
