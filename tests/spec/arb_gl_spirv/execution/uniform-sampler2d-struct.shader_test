@@ -1,0 +1,38 @@
+# Test a texture sampler array within a struct. This is not allowed by
+# Vulkan so it needs special handling for GL_ARB_gl_spirv.
+
+[require]
+GL >= 3.3
+GLSL >= 4.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 430
+
+layout (location = 0) out vec4 color;
+
+struct Samp {
+        sampler2D tex;
+	float green_offset;
+};
+
+layout (location = 0) uniform Samp s;
+
+void main()
+{
+	color = texture(s.tex, vec2(0.25));
+	color.g += s.green_offset;
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+
+uniform int 0 3
+uniform float 1 0.45
+
+texture checkerboard 3 0 (32, 32) (0.0, 0.5, 0.0, 0.0) (0.8, 0.0, 0.0, 1.0)
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.95 0.0 0.0
