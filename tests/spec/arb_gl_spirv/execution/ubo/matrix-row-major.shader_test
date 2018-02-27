@@ -19,7 +19,6 @@ layout (binding = 5, row_major) uniform ComponentsBlock
 
 void main()
 {
-        //we create the color in this way so column_major and row_major produces different outcome
 	outColor = vec4(components.matrix[3][0], components.matrix[3][1], components.matrix[3][2], components.matrix[3][3]);
 }
 
