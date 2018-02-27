@@ -739,7 +739,7 @@ def parse_args():
     parser.add_argument("shader_tests",
                         nargs='+',
                         help="Path to one or more .shader_test files to process.")
-    return parser.parse_args(sys.argv)
+    return parser.parse_args()
 
 
 def process_shader_test(shader_test, config):
