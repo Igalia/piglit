@@ -19,7 +19,35 @@ layout (binding = 5) uniform block {
 
 void main()
 {
-	color = arr.color[0][0] + arr.color[1][1];
+	vec4 fail_color = vec4(1.0, 0.0, 0.0, 0.0);
+	color = vec4(0.0, 1.0, 0.0, 0.0);
+
+	if (arr.color[0][0] != vec4(0.0, 0.1, 0.2, 0.3))
+	   color = fail_color;
+
+	if (arr.color[0][1] != vec4(0.4, 0.5, 0.6, 0.7))
+           color = fail_color;
+
+	if (arr.color[0][2] != vec4(0.8, 0.9, 0.1, 0.2))
+           color = fail_color;
+
+	if (arr.color[1][0] != vec4(0.3, 0.4, 0.5, 0.6))
+           color = fail_color;
+
+        if (arr.color[1][1] != vec4(0.7, 0.8, 0.9, 0.1))
+           color = fail_color;
+
+        if (arr.color[1][2] != vec4(0.2, 0.3, 0.4, 0.5))
+           color = fail_color;
+
+        if (arr.color[2][0] != vec4(0.6, 0.7, 0.8, 0.9))
+           color = fail_color;
+
+        if (arr.color[2][1] != vec4(0.8, 0.7, 0.6, 0.5))
+           color = fail_color;
+
+        if (arr.color[2][2] != vec4(0.4, 0.3, 0.2, 0.1))
+           color = fail_color;
 }
 
 [test]
@@ -31,10 +59,21 @@ ubo offset 0
 uniform vec4 block.color[0][0] 0.0 0.1 0.2 0.3
 ubo offset 16
 uniform vec4 block.color[0][1] 0.4 0.5 0.6 0.7
+ubo offset 32
+uniform vec4 block.color[0][2] 0.8 0.9 0.1 0.2
 ubo offset 48
-uniform vec4 block.color[1][0] 0.8 0.9 1.0 1.1
+uniform vec4 block.color[1][0] 0.3 0.4 0.5 0.6
 ubo offset 64
-uniform vec4 block.color[1][1] 0.1 0.2 0.3 0.4
+uniform vec4 block.color[1][1] 0.7 0.8 0.9 0.1
+ubo offset 80
+uniform vec4 block.color[1][2] 0.2 0.3 0.4 0.5
+ubo offset 96
+uniform vec4 block.color[2][0] 0.6 0.7 0.8 0.9
+ubo offset 112
+uniform vec4 block.color[2][1] 0.8 0.7 0.6 0.5
+ubo offset 128
+uniform vec4 block.color[2][2] 0.4 0.3 0.2 0.1
+
 
 draw rect -1 -1 2 2
-probe all rgba 0.1 0.3 0.5 0.7
+probe all rgba 0.0 1.0 0.0 0.0
