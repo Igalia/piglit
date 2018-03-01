@@ -258,7 +258,6 @@ class GLSLSource(object):
 
         return tokens
 
-
 class CompatReplacement(object):
     def __init__(self, name, declaration):
         self.name = name
@@ -557,6 +556,8 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         'GL_AMD_conservative_depth',
     ])
 
+    structs = {}
+
     def first_transform_tokens(token):
         if token.startswith('#version'):
             return ''
@@ -591,9 +592,34 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
 
         return None
 
+    def process_struct(flat_declaration):
+        assert flat_declaration[-1] == ';'
+        if flat_declaration[0] != 'struct':
+            return None
+
+        nested_declaration = nest_tokens(flat_declaration[:-1])
+
+        if (len(nested_declaration) != 3 or
+            not isinstance(nested_declaration[2], list) or
+            nested_declaration[2][0] != '{'):
+            return None
+
+        structs[nested_declaration[1]] = [nested_declaration[0],
+                                          nested_declaration[2]]
+
+        return None
+
     def assign_uniform_location(flat_declaration):
         assert flat_declaration[-1] == ';'
-        var = VariableDeclaration.parse(nest_tokens(flat_declaration[:-1]), cur_stage)
+
+        nested_declaration = nest_tokens(flat_declaration[:-1])
+
+        for i, tok in enumerate(nested_declaration):
+            if isinstance(tok, str) and tok in structs:
+                nested_declaration[i:i+1] = structs[tok]
+                break
+
+        var = VariableDeclaration.parse(nested_declaration, cur_stage)
         if var is None or var.mode != 'uniform':
             return None
 
@@ -695,6 +721,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
             cur_out_location = [0]
             cur_uniform_location = [0]
 
+        structs = {}
 
         glsl = GLSLSource(shader.source())
 
@@ -706,6 +733,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         for compat in have_compat:
             glsl.insert_after_versions(compat_replacements[compat].declaration + '\n')
 
+        glsl.transform_toplevel_declarations(process_struct)
         glsl.transform_toplevel_declarations(assign_location)
         glsl.transform_toplevel_declarations(assign_uniform_location)
 
