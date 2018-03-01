@@ -1,0 +1,31 @@
+# From the GLSL 4.60 spec Section 5.9 (Expressions):
+#
+#      "Dividing by zero does not cause an exception but does
+#      result in an unspecified value."
+#
+# Here we make sure that constant evaluation doesn't crash on
+# a divide by zero.
+#
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+void main()
+{
+  int j = 0;
+
+  // We use a loop specifically to avoid Mesa's GLSL IR
+  // from doing the constant evaluating. In this case
+  // we want to test NIR which exclusively does loop
+  // unrolling on some drivers and will therefore end
+  // up doing the constant evaluation.
+  for (int i = 0; i < 4; i++)
+     j += 42/i;
+
+  gl_FragColor.x = 255.0f / float(j);
+}
+
+[test]
+link success
