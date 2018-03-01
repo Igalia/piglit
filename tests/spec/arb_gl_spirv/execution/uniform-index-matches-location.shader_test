@@ -1,0 +1,47 @@
+# This is a somewhat convoluted test to catch a particular problem
+# with the code we were using to assign a uniform index to a variable.
+# A uniform’s location starts off being the explicit location.
+# Previously while recursing through the uniform’s type, whenever the
+# location matches the current calculated location we were setting it
+# to the index. However, if the calculated index happens to match a
+# calculated location then it would set the index a second time and
+# get it wrong.
+
+[require]
+GL >= 3.3
+GLSL >= 4.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 430
+
+// This ends up with index 0
+layout (location = 2) uniform float a;
+
+// This ends up with index 1
+layout (location = 0) uniform struct {
+        // index 1, location 0
+        float b;
+        // index 2, location 1
+        //   -> this matches previous index, location gets set again
+        float c;
+} s;
+
+layout(location = 0) out vec4 outcolor;
+
+void main() {
+        outcolor = vec4(0.0, a + s.b + s.c, 0.0, 1.0);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform float 0 0.1
+uniform float 1 0.6
+uniform float 2 0.25
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.95 0.0 1.0
