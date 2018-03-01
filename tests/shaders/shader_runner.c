@@ -2673,6 +2673,169 @@ active_program_interface(const char *line)
 	return;
 }
 
+/**
+ * Equivalent to active_program_interface but using the binding
+ * instead of the name. This is required for ARB_gl_spirv as the name
+ * can be not available.
+ *
+ * Two notes:
+ *
+ * * Using the binding would only allow to identify the uniform/shader
+ *   storage block. So it is not possible to query for some resources,
+ *   like specific ubo/ssbo variables.
+ *
+ * * The normal GLSL path changes the binding of ssbo/ubo. So using
+ *   the binding would only work if you use on the test the binding
+ *   that shader_runner would use by default, or using -force-no-names
+ *   or -spirv modes.
+ *
+ * Format of the command:
+ *
+ *  verify program_interface_query_binding GL_INTERFACE_TYPE_ENUM binding GL_PNAME_ENUM integer
+ *
+ * or
+ *
+ *  verify program_interface_query_binding GL_INTERFACE_TYPE_ENUM binding GL_PNAME_ENUM GL_TYPE_ENUM
+ */
+static void
+active_program_interface_binding(const char *line)
+{
+	static const struct string_to_enum all_props[] = {
+		ENUM_STRING(GL_TYPE),
+		ENUM_STRING(GL_ARRAY_SIZE),
+		ENUM_STRING(GL_NAME_LENGTH),
+		ENUM_STRING(GL_BLOCK_INDEX),
+		ENUM_STRING(GL_OFFSET),
+		ENUM_STRING(GL_ARRAY_STRIDE),
+		ENUM_STRING(GL_MATRIX_STRIDE),
+		ENUM_STRING(GL_IS_ROW_MAJOR),
+		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER_INDEX),
+		ENUM_STRING(GL_BUFFER_BINDING),
+		ENUM_STRING(GL_BUFFER_DATA_SIZE),
+		ENUM_STRING(GL_NUM_ACTIVE_VARIABLES),
+		ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_GEOMETRY_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_FRAGMENT_SHADER),
+		ENUM_STRING(GL_REFERENCED_BY_COMPUTE_SHADER),
+		ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
+		ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
+		ENUM_STRING(GL_LOCATION),
+		ENUM_STRING(GL_LOCATION_INDEX),
+		ENUM_STRING(GL_LOCATION_COMPONENT),
+		ENUM_STRING(GL_IS_PER_PATCH),
+		ENUM_STRING(GL_NUM_COMPATIBLE_SUBROUTINES),
+		ENUM_STRING(GL_COMPATIBLE_SUBROUTINES),
+		{ NULL, 0 }
+	};
+
+	static const struct string_to_enum all_program_interface[] = {
+		ENUM_STRING(GL_UNIFORM),
+		ENUM_STRING(GL_UNIFORM_BLOCK),
+		ENUM_STRING(GL_PROGRAM_INPUT),
+		ENUM_STRING(GL_PROGRAM_OUTPUT),
+		ENUM_STRING(GL_BUFFER_VARIABLE),
+		ENUM_STRING(GL_SHADER_STORAGE_BLOCK),
+		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING),
+		{ NULL, 0 }
+	};
+
+	int binding;
+	unsigned prop, interface_type;
+	int expected;
+	int i;
+	int num_active_buffers;
+
+	if (!piglit_is_extension_supported("GL_ARB_program_interface_query") &&
+	    piglit_get_gl_version() < 43) {
+		fprintf(stderr,
+			"GL_ARB_program_interface_query not supported or "
+			"OpenGL version < 4.3\n");
+		return;
+	}
+
+	REQUIRE(parse_enum_tab(all_program_interface, line,
+			       &interface_type, &line),
+		"Bad program interface at: %s\n", line);
+	REQUIRE(parse_int(line, &binding, &line),
+		"Bad program resource binding at: %s\n", line);
+	REQUIRE(parse_enum_tab(all_props, line, &prop, &line),
+		"Bad glGetProgramResourceiv pname at: %s\n", line);
+	REQUIRE(parse_enum_tab(all_types, line, (unsigned *)&expected, &line) ||
+		parse_int(line, &expected, &line),
+		"Bad expected value at: %s\n", line);
+
+	glGetProgramInterfaceiv(prog, interface_type,
+				GL_ACTIVE_RESOURCES, &num_active_buffers);
+	for (i = 0; i < num_active_buffers; i++) {
+		GLint got;
+		GLint length;
+		bool pass = true;
+		unsigned binding_prop;
+		int current_binding = 0;
+
+		binding_prop = GL_BUFFER_BINDING;
+		glGetProgramResourceiv(prog, interface_type,
+				       i, 1, &binding_prop, 1,
+				       &length, &current_binding);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetProgramResourceiv error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (binding != current_binding)
+			continue;
+
+		/* Set 'got' to some value in case glGetProgramResourceiv
+		 * doesn't write to it.  That should only be able to occur
+		 * when the function raises a GL error, but "should" is kind
+		 * of a funny word.
+		 */
+		got = ~expected;
+		glGetProgramResourceiv(prog, interface_type,
+				       i, 1, &prop, 1,
+				       &length, &got);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetProgramResourceiv error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (got != expected) {
+			fprintf(stderr,
+				"glGetProgramResourceiv for binding %i prop %s: "
+				"expected %d, got %d\n",
+				binding, piglit_get_gl_enum_name(prop),
+				expected, got);
+			pass = false;
+		}
+
+		if (!pass)
+			piglit_report_result(PIGLIT_FAIL);
+
+		return;
+	}
+
+	fprintf(stderr, "No active resource with binding %i\n", binding);
+	piglit_report_result(PIGLIT_FAIL);
+	return;
+}
+
 static void
 set_parameter(const char *line)
 {
@@ -4126,6 +4289,8 @@ piglit_display(void)
 			active_uniform(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
 			active_program_interface(rest);
+                } else if (parse_str(line, "verify program_interface_query_binding ", &rest)) {
+			active_program_interface_binding(rest);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
