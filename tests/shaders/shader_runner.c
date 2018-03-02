@@ -880,6 +880,84 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	version_init(v, tag, core, es, full_num);
 }
 
+#define KNOWN_GL_SPV_MAPPING 3
+
+static const char* table[KNOWN_GL_SPV_MAPPING][2] =
+{{ "GL_AMD_shader_trinary_minmax", "SPV_AMD_shader_trinary_minmax"},
+ {"GL_ARB_shader_group_vote", "SPV_KHR_subgroup_vote"},
+ {"GL_ARB_shader_ballot", "SPV_KHR_shader_ballot"}};
+
+/*
+ * Returns the SPIR-V extension that defines the equivalent
+ * funcionality provided by the OpenGL extension @gl_name
+ */
+static const char *
+check_spv_extension_equivalent(const char *gl_name)
+{
+        unsigned int i;
+
+        for (i = 0 ; i < KNOWN_GL_SPV_MAPPING; i++)
+                if (strcmp(gl_name, table[i][0]) == 0)
+                        return table[i][1];
+
+	return NULL;
+}
+
+
+/* Perhaps we could move this to piglit-util. For now it is only used
+ * on shader_runner
+ */
+static const char **spirv_extensions = NULL;
+
+static void
+initialize_spv_extensions(void)
+{
+	int loop, num_spir_v_extensions;
+
+	if (spirv_extensions != NULL)
+		return;
+
+	glGetIntegerv(GL_NUM_SPIR_V_EXTENSIONS, &num_spir_v_extensions);
+	spirv_extensions = malloc (sizeof(char*) * (num_spir_v_extensions + 1));
+	assert (spirv_extensions != NULL);
+
+	for (loop = 0; loop < num_spir_v_extensions; loop++) {
+		spirv_extensions[loop] = (const char*) glGetStringi(GL_SPIR_V_EXTENSIONS, loop);
+	}
+
+	spirv_extensions[loop] = NULL;
+}
+
+static bool
+spv_is_extension_supported(const char *name)
+{
+	initialize_spv_extensions();
+	return piglit_is_extension_in_array(spirv_extensions, name);
+}
+
+/*
+ * Wrapper for extension checking.  If using a GLSL shader, this
+ * method is equivalent to call piglit_is_extension_supported.
+ *
+ * But with SPIR-V shaders we can't just check for the OpenGL
+ * extension, but also for the SPV equivalent if using a SPIR-V
+ * binary, as it is not mandatory to support the SPV extension even if
+ * the equivalent OpenGL one is.
+ */
+static bool
+shader_runner_is_extension_supported(const char *name)
+{
+	bool result = true;
+	if (spirv_replaces_glsl) {
+		const char *spv_name = check_spv_extension_equivalent(name);
+
+		if (spv_name != NULL)
+			result = result && spv_is_extension_supported(spv_name);
+	}
+
+	return result && piglit_is_extension_supported(name);
+}
+
 /**
  * Parse and check a line from the requirement section of the test
  */
@@ -995,12 +1073,12 @@ process_requirement(const char *line)
 
 	if (parse_str(line, "GL_", NULL) &&
 	    parse_word_copy(line, buffer, sizeof(buffer), &line)) {
-		if (!piglit_is_extension_supported(buffer))
+		if (!shader_runner_is_extension_supported(buffer))
 			return PIGLIT_SKIP;
 	} else if (parse_str(line, "!", &line) &&
 		   parse_str(line, "GL_", NULL) &&
 		   parse_word_copy(line, buffer, sizeof(buffer), &line)) {
-		if (piglit_is_extension_supported(buffer))
+		if (shader_runner_is_extension_supported(buffer))
 			return PIGLIT_SKIP;
 	} else if (parse_str(line, "GLSL", &line)) {
 		enum comparison cmp;
