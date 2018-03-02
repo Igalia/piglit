@@ -1,0 +1,8 @@
+link_libraries(
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	)
+
+piglit_add_executable (nv_image_formats copy-image-formats.c)
+
+# vim: ft=cmake:
