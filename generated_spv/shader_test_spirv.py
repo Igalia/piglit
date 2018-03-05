@@ -827,6 +827,9 @@ def parse_args():
     parser.add_argument("-r", "--replace",
                         action="store_true",
                         help="Replace the original script with the transformed one")
+    parser.add_argument("-j", "--jobs",
+                        nargs=1,
+                        help="Fork the given number of processes")
     parser.add_argument("-v", "--verbose",
                         action="store_true",
                         help="Print verbose output")
@@ -1186,7 +1189,27 @@ def main():
                 if line:
                     config.excludes.append(line)
 
-    for shader_test in expand_shader_tests(config):
+    if config.jobs:
+        n_jobs = int(config.jobs[0])
+    else:
+        n_jobs = 1
+
+    procs = []
+    proc_num = 0
+
+    all_tests = list(expand_shader_tests(config))
+
+    for i in range(1, n_jobs):
+        pid = os.fork()
+        if pid == 0:
+            proc_num = i
+            procs = []
+            break
+        procs.append(pid)
+
+    for shader_test_num in range(proc_num, len(all_tests), n_jobs):
+        shader_test = all_tests[shader_test_num]
+
         excluded = False
         for exclude in config.excludes:
             if shader_test.startswith(exclude):
@@ -1204,8 +1227,13 @@ def main():
             print('Uncaught exception during {}'.format(shader_test))
             raise
 
-    return success
+    for pid in procs:
+        pid, status = os.waitpid(pid, 0)
+        if (not os.WIFEXITED(status) or
+            os.WEXITSTATUS(status) != 0):
+            success = False
 
+    return success
 
 if __name__ == '__main__':
     if not main():
