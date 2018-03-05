@@ -636,8 +636,11 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         layout = var.layout()
 
         if layout is None:
-            loc = cur_uniform_location[0]
-            cur_uniform_location[0] += var.size(skip_reasons)
+            if var.name() in uniform_map:
+                loc = uniform_map[var.name()][1]
+            else:
+                loc = cur_uniform_location[0]
+                cur_uniform_location[0] += var.size(skip_reasons)
         else:
             try:
                 loc_index = layout.index('location')
