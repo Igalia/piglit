@@ -712,6 +712,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
     cur_stage = ''
 
     skip_reasons = set()
+    cur_uniform_location = [0]
 
     for shader in shaders:
         if cur_stage != shader.stage:
@@ -719,7 +720,6 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
             cur_stage = shader.stage
             cur_stage_out = {}
             cur_out_location = [0]
-            cur_uniform_location = [0]
 
         structs = {}
 
