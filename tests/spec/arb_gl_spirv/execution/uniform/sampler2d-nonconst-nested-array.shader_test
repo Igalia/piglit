@@ -1,0 +1,225 @@
+# This test verifies that dynamic uniform indexing of samplers within
+# a nested struct array for the fragment shader behaves correctly.
+#
+# It is a direct copy of arb_arrays_of_arrays/execution/sampler/
+# fs-nested-struct-arrays-nonconst-nested-array.shader_test
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 4
+; Bound: 71
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_gpu_shader5"
+               OpName %main "main"
+               OpName %select "select"
+               OpName %color "color"
+               OpName %S_inner "S_inner"
+               OpMemberName %S_inner 0 "tex"
+               OpMemberName %S_inner 1 "tex2"
+               OpName %S "S"
+               OpMemberName %S 0 "si"
+               OpMemberName %S 1 "tex"
+               OpMemberName %S 2 "final_member"
+               OpName %s "s"
+               OpName %n "n"
+               OpDecorate %select Location 1
+               OpDecorate %color Location 0
+               OpDecorate %s Location 2
+               OpDecorate %n Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+%_ptr_UniformConstant_int = OpTypePointer UniformConstant %int
+     %select = OpVariable %_ptr_UniformConstant_int UniformConstant
+      %int_0 = OpConstant %int 0
+       %bool = OpTypeBool
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %19 = OpTypeImage %float 2D 0 0 0 1 Unknown
+         %20 = OpTypeSampledImage %19
+    %S_inner = OpTypeStruct %20 %20
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_S_inner_uint_2 = OpTypeArray %S_inner %uint_2
+%_arr__arr_S_inner_uint_2_uint_2 = OpTypeArray %_arr_S_inner_uint_2 %uint_2
+     %uint_3 = OpConstant %uint 3
+%_arr_20_uint_3 = OpTypeArray %20 %uint_3
+%_arr__arr_20_uint_3_uint_2 = OpTypeArray %_arr_20_uint_3 %uint_2
+%_arr_20_uint_2 = OpTypeArray %20 %uint_2
+          %S = OpTypeStruct %_arr__arr_S_inner_uint_2_uint_2 %_arr__arr_20_uint_3_uint_2 %_arr_20_uint_2
+%_ptr_UniformConstant_S = OpTypePointer UniformConstant %S
+          %s = OpVariable %_ptr_UniformConstant_S UniformConstant
+      %int_1 = OpConstant %int 1
+          %n = OpVariable %_ptr_UniformConstant_int UniformConstant
+%_ptr_UniformConstant_20 = OpTypePointer UniformConstant %20
+    %v2float = OpTypeVector %float 2
+ %float_0_75 = OpConstant %float 0.75
+ %float_0_25 = OpConstant %float 0.25
+         %43 = OpConstantComposite %v2float %float_0_75 %float_0_25
+      %int_2 = OpConstant %int 2
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %9 = OpLoad %int %select
+         %12 = OpIEqual %bool %9 %int_0
+               OpSelectionMerge %14 None
+               OpBranchConditional %12 %13 %45
+         %13 = OpLabel
+         %35 = OpLoad %int %n
+         %36 = OpLoad %int %n
+         %38 = OpAccessChain %_ptr_UniformConstant_20 %s %int_1 %35 %36
+         %39 = OpLoad %20 %38
+         %44 = OpImageSampleImplicitLod %v4float %39 %43
+               OpStore %color %44
+               OpBranch %14
+         %45 = OpLabel
+         %46 = OpLoad %int %select
+         %47 = OpIEqual %bool %46 %int_1
+               OpSelectionMerge %49 None
+               OpBranchConditional %47 %48 %61
+         %48 = OpLabel
+         %50 = OpLoad %int %n
+         %51 = OpLoad %int %n
+         %52 = OpAccessChain %_ptr_UniformConstant_20 %s %int_0 %50 %51 %int_0
+         %53 = OpLoad %20 %52
+         %54 = OpImageSampleImplicitLod %v4float %53 %43
+         %55 = OpLoad %int %n
+         %56 = OpLoad %int %n
+         %57 = OpAccessChain %_ptr_UniformConstant_20 %s %int_0 %55 %56 %int_1
+         %58 = OpLoad %20 %57
+         %59 = OpImageSampleImplicitLod %v4float %58 %43
+         %60 = OpFAdd %v4float %54 %59
+               OpStore %color %60
+               OpBranch %49
+         %61 = OpLabel
+         %62 = OpLoad %int %select
+         %64 = OpIEqual %bool %62 %int_2
+               OpSelectionMerge %66 None
+               OpBranchConditional %64 %65 %66
+         %65 = OpLabel
+         %67 = OpLoad %int %n
+         %68 = OpAccessChain %_ptr_UniformConstant_20 %s %int_2 %67
+         %69 = OpLoad %20 %68
+         %70 = OpImageSampleImplicitLod %v4float %69 %43
+               OpStore %color %70
+               OpBranch %66
+         %66 = OpLabel
+               OpBranch %49
+         %49 = OpLabel
+               OpBranch %14
+         %14 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+struct S_inner {
+   sampler2D tex;
+   sampler2D tex2;
+};
+
+struct S {
+   S_inner si[2][2];
+   sampler2D tex[2][3];
+   sampler2D final_member[2];
+};
+
+layout(location = 2) uniform S s;
+
+layout(location = 0) uniform int n;
+layout(location = 1) uniform int select;
+
+out vec4 color;
+
+void main()
+{
+        if (select == 0) {
+                color = texture(s.tex[n][n], vec2(0.75, 0.25));
+        } else if (select == 1) {
+                color = (texture(s.si[n][n].tex, vec2(0.75, 0.25)) +
+                         texture(s.si[n][n].tex2, vec2(0.75, 0.25)));
+        } else if (select == 2) {
+                color = texture(s.final_member[n], vec2(0.75, 0.25));
+        }
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+# s.final_member[0]
+uniform int 16 1
+# s.tex[1][1]
+uniform int 14 2
+# s.si[0][0].tex
+uniform int 2 3
+# s.si[1][1].tex
+uniform int 8 4
+# s.si[0][0].tex2
+uniform int 3 5
+# s.si[1][1].tex2
+uniform int 9 6
+
+texture checkerboard 1 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 2 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 3 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.0, 0.0, 0.25, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 4 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.25, 0.25, 0.25, 1.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 5 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.0, 0.0, 0.75, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 6 0 (32, 32) (0.5, 0.0, 0.0, 0.0) (0.75, 0.75, 0.75, 1.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+uniform int 1 0
+uniform int 0 1
+draw rect 0 -1 1 1
+
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.0, 1.0, 0.0)
+
+uniform int 1 1
+uniform int 0 0
+draw rect -1 0 1 1
+
+relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 0.0, 1.0)
+
+uniform int 0 1
+draw rect 0 0 1 1
+
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (1.0, 1.0, 1.0)
+
+uniform int 1 2
+uniform int 0 0
+draw rect -1 -1 1 1
+
+relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (1.0, 0.0, 0.0)
