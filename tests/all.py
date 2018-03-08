@@ -1068,6 +1068,7 @@ with profile.test_list.group_manager(
       'forward-compatible-bit yes')
     g(['gl-3.0-forward-compatible-bit', 'no'],
       'forward-compatible-bit no')
+    g(['gl-3.0-texparameteri'])
     g(['gl-3.0-texture-integer'])
     g(['gl-3.0-vertexattribipointer'])
     g(['gl30basic'], run_concurrent=False)
