@@ -155,7 +155,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	endif()
 
         if(PIGLIT_HAS_WAYLAND)
-		list(APPEND UTIL_GL_LIBS ${WAYLAND_LIBRARIES})
+		list(APPEND UTIL_GL_LIBS ${WAYLAND_LDFLAGS})
         endif()
 
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
