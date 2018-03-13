@@ -630,7 +630,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
             return None
 
         # Don’t assign locations to uniform block declarations
-        if size > 1 and var.is_block:
+        if var.is_block:
             return None
 
         layout = var.layout()
