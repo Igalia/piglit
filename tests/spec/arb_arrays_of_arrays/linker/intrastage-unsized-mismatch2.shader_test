@@ -2,6 +2,7 @@
 # array sizes don't match.
 
 [require]
+SPIRV NO (test expects link failure)
 GLSL >= 1.20
 GL_ARB_arrays_of_arrays
 
