@@ -31,7 +31,7 @@
 #version ${str(version)}
 #extension ${extension} : require
 % for ext in extra_extensions:
-  #extension ${ext} : require
+#extension ${ext} : require
 % endfor
 
 #if !defined ${extension}
