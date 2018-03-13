@@ -1,4 +1,6 @@
 # glslang limitations:
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-struct-field.shader_test
+tests/spec/arb_arrays_of_arrays/linker/intrastage-struct-field.shader_test
 tests/spec/arb_bindless_texture/
 tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
 tests/spec/arb_fragment_layer_viewport/layer-vs-gs-write-simple.shader_test
