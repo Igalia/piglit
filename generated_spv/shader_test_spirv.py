@@ -820,6 +820,9 @@ def parse_args():
     parser.add_argument("-X", "--excludes-from-file",
                         nargs='+',
                         help="Exclude shader_test files with path prefixes from the given file")
+    parser.add_argument("-o", "--error-list-file",
+                        nargs='+',
+                        help="Prints the list of tests that failed to be converted on the given file")
     parser.add_argument("-n", "--no-transform",
                         action="store_true",
                         help="Don't try to transform GLSL shaders")
@@ -1233,6 +1236,10 @@ def main():
     num_total = 0
     num_skipped = 0;
 
+    error_list = None
+    if config.error_list_file is not None:
+        error_list = open(config.error_list_file[0], 'w')
+
     for shader_test_num in range(proc_num, len(all_tests), n_jobs):
         shader_test = all_tests[shader_test_num]
         num_total = num_total + 1
@@ -1251,6 +1258,10 @@ def main():
             if outcome == 0:
                 num_fail = num_fail + 1
                 success = False
+
+                if error_list is not None:
+                    error_list.write('{}\n'.format(shader_test))
+
                 if not config.keep_going:
                     break
             elif outcome == 1:
@@ -1280,6 +1291,9 @@ def main():
                      num_fail))
 
     print('Thank you for running shader_test_spirv!')
+
+    if error_list is not None:
+        error_list.close()
 
     return success
 
