@@ -44,8 +44,8 @@ GLSL >= ${glsl}
 [vertex shader]
 #version ${glsl_int}
 % if ver == 'GL_ARB_vertex_attrib_64bit':
-  #extension GL_ARB_gpu_shader_fp64 : require
-  #extension GL_ARB_vertex_attrib_64bit : require
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_vertex_attrib_64bit : require
 % endif
 
 % for vidx in range(4):
