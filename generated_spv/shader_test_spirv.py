@@ -1001,6 +1001,8 @@ def vertex_attribute_size(type):
 
     return 1
 
+#Returns: 0 for failure, 1 for success, 2 for skip
+#  FIXME: better return values
 def process_shader_test(shader_test, config):
     unsupported_gl_extensions = set([
         # Pretty much inherently unsupported
@@ -1069,26 +1071,26 @@ def process_shader_test(shader_test, config):
                     if config.verbose:
                         # Needs no SPIRV line, since shader_runner can also skip automatically
                         print('{}: skip due to GL ES'.format(shader_test))
-                    return True
+                    return 2
                 elif words[0] == 'SPIRV':
                     assert spirv_line is None
                     spirv_line = words[1:]
                     if len(spirv_line) >= 1:
                         if spirv_line[0] not in ('YES', 'NO', 'ONLY'):
                             print('{}: bad SPIRV line: {}'.format(shader_test, ' '.join(spirv_line)))
-                            return False
+                            return 0
 
                         if (spirv_line[0] == 'NO' and
                             (not config.recheck or
                              (len(spirv_line) >= 2 and spirv_line[1] == 'OTHER'))):
                             if config.verbose:
                                 print('{}: skip due to SPIRV NO line'.format(shader_test))
-                            return True
+                            return 2
                 elif (words[0] in unsupported_gl_extensions or words[0].startswith('GL_OES_')):
                     if config.verbose:
                         # Needs no SPIRV line, since shader_runner can also skip automatically
                         print('{}: skip due to {}'.format(shader_test, words[0]))
-                    return True
+                    return 2
                 continue
 
             if groupname == 'vertex data':
@@ -1120,8 +1122,8 @@ def process_shader_test(shader_test, config):
             print('{}: skip (reasons: {})'.format(shader_test, ', '.join(skip_reasons)))
             if spirv_line and spirv_line[0] != 'NO':
                 print('{}: SPIRV line indicates that skip should not happen'.format(shader_test))
-                return False
-            return True
+                return 0
+            return 2
 
     shader_groups = []
     for shader in shaders:
@@ -1134,7 +1136,7 @@ def process_shader_test(shader_test, config):
     for shader_group in shader_groups:
         spirv = compile_glsl(shader_test, config, shader_group)
         if not spirv:
-            return False
+            return 0
 
         replacements[shader_group[0].stage + ' shader'] = spirv
 
@@ -1156,7 +1158,7 @@ def process_shader_test(shader_test, config):
     if config.replace:
         os.rename(spv_shader_test_file, shader_test)
 
-    return True
+    return 1
 
 
 def expand_shader_tests(config):
@@ -1221,8 +1223,15 @@ def main():
             break
         procs.append(pid)
 
+    num_excluded = 0
+    num_success = 0
+    num_fail = 0
+    num_total = 0
+    num_skipped = 0;
+
     for shader_test_num in range(proc_num, len(all_tests), n_jobs):
         shader_test = all_tests[shader_test_num]
+        num_total = num_total + 1
 
         excluded = False
         for exclude in config.excludes:
@@ -1230,13 +1239,23 @@ def main():
                 excluded = True
                 break
         if excluded:
+            num_excluded = num_excluded + 1
             continue
 
         try:
-            if not process_shader_test(shader_test, config):
+            outcome = process_shader_test(shader_test, config)
+            if outcome == 0:
+                num_fail = num_fail + 1
                 success = False
                 if not config.keep_going:
                     break
+            elif outcome == 1:
+                num_success = num_success + 1
+            elif outcome == 2:
+                num_skipped = num_skipped +1
+            else:
+                print("Unknown return type when processing shader {}".format(shader_test))
+
         except:
             print('Uncaught exception during {}'.format(shader_test))
             raise
@@ -1246,6 +1265,11 @@ def main():
         if (not os.WIFEXITED(status) or
             os.WEXITSTATUS(status) != 0):
             success = False
+
+    print('[{}] skip: {}, excluded: {}, success: {}, fail: {}'.
+          format(num_total, num_skipped, num_excluded, num_success,
+                 num_fail))
+    print('Thank you for running shader_test_spirv!')
 
     return success
 
