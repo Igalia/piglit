@@ -552,6 +552,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         'GL_ARB_shader_bit_encoding',
         'GL_ARB_shader_precision',
         'GL_ARB_shader_storage_buffer_object',
+        'GL_ARB_shading_language_packing',
         'GL_ARB_texture_query_levels',
         'GL_ARB_uniform_buffer_object',
         'GL_ARB_vertex_attrib_64bit',
