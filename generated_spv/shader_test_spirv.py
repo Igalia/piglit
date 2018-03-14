@@ -35,6 +35,8 @@ import subprocess
 import sys
 import tempfile
 
+num_mark_skipped = 0
+
 RE_spirv_shader_groupname = re.compile(r'(.*) shader spirv$')
 RE_glsl_shader_groupname = re.compile(r'(.*) shader$')
 RE_if_start = re.compile(r'\s*#\s*if\s+([0-9]+)\s*$')
@@ -1119,7 +1121,9 @@ def process_shader_test(shader_test, config):
 
         if config.mark_skip:
             if skip_reasons or (spirv_line and spirv_line[0] == 'NO'):
+                global num_mark_skipped
                 update_spirv_line(shader_test, skip_reasons)
+                num_mark_skipped = num_mark_skipped + 1
 
         if skip_reasons:
             print('{}: skip (reasons: {})'.format(shader_test, ', '.join(skip_reasons)))
@@ -1277,9 +1281,15 @@ def main():
             os.WEXITSTATUS(status) != 0):
             success = False
 
-    print('[{}] skip: {}, excluded: {}, success: {}, fail: {}'.
-          format(num_total, num_skipped, num_excluded, num_success,
-                 num_fail))
+    if config.mark_skip is False:
+        print('[{}] skip: {}, excluded: {}, success: {}, fail: {}'.
+              format(num_total, num_skipped, num_excluded, num_success,
+                     num_fail))
+    else:
+        print('[{}] skip: {}, excluded: {}, mark_skipped: {}, success: {}, fail: {}'.
+              format(num_total, num_skipped, num_excluded, num_mark_skipped, num_success,
+                     num_fail))
+
     print('Thank you for running shader_test_spirv!')
 
     if error_list is not None:
