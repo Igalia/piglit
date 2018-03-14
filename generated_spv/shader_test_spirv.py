@@ -1253,6 +1253,12 @@ def main():
                 break
         if excluded:
             num_excluded = num_excluded + 1
+            if config.mark_skip:
+                global num_mark_skipped
+                skip_reasons = set()
+                skip_reasons.add('Test included on exclude file')
+                update_spirv_line(shader_test, skip_reasons)
+                num_mark_skipped = num_mark_skipped + 1
             continue
 
         try:
