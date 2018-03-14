@@ -1235,8 +1235,6 @@ def main():
     error_list = None
     if config.error_list_file is not None:
         error_list = open(config.error_list_file[0], 'w')
-    else:
-        print("no error list provided")
 
     for shader_test_num in range(proc_num, len(all_tests), n_jobs):
         shader_test = all_tests[shader_test_num]
