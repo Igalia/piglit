@@ -223,7 +223,8 @@ class GLSLSource(object):
 
     RE_whitespace = re.compile(r'( |\t|\n|//[^\n]*\n|/\*(\*+[^/]|[^*])*\*/)*')
     RE_identifier = re.compile(r'[_a-zA-Z][_a-zA-Z0-9]*')
-    RE_numeric_constant = re.compile(r'0(|x[0-9a-fA-F]+)|[1-9][0-9]*')
+    RE_numeric_constant = re.compile(r'[+-]?(((\d+(\.\d*)?)(?!x)|\.\d+)|' +
+                                     r'(0(x[0-9a-fA-F]+)?|[1-9][0-9]*(.\d+)?))')
     RE_end_of_preprocessor = re.compile(r'[^\\]\n')
 
     def tokenize(self, source):
