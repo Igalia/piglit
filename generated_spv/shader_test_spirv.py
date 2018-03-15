@@ -34,6 +34,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import itertools
 
 num_mark_skipped = 0
 
@@ -42,6 +43,39 @@ RE_glsl_shader_groupname = re.compile(r'(.*) shader$')
 RE_if_start = re.compile(r'\s*#\s*if\s+([0-9]+)\s*$')
 RE_else = re.compile(r'\s*#\s*else\s*$')
 RE_endif = re.compile(r'\s*#\s*endif\s*$')
+
+def make_spirv_variable_re(storage_mode):
+    return re.compile(r'^\s*%(\w+)\s*=\s*OpVariable\s+%(\w+)\s+' +
+                      re.escape(storage_mode) +
+                      r'(?: +%\w+)?\s*$',
+                      re.MULTILINE)
+
+RE_spirv_output_var = make_spirv_variable_re('Output')
+RE_spirv_input_var = make_spirv_variable_re('Input')
+RE_spirv_uniform_var = make_spirv_variable_re('UniformConstant')
+RE_spirv_location = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpDecorate\s+%(\w+)\s+' +
+                               r'Location\s+(\d+)\s*$',
+                               re.MULTILINE)
+RE_spirv_name = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpName\s+%(\w+)\s+' +
+                           r'"([^"]+)"\s*$',
+                           re.MULTILINE)
+RE_spirv_member_name = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpMemberName\s+' +
+                                  r'%(\w+)\s+(\d+)\s+"([^"]+)"\s*$',
+                                  re.MULTILINE)
+RE_spirv_type = re.compile(r'^\s*%(\w+)\s*=\s*OpType(\w+) *(.*?) *$',
+                           re.MULTILINE)
+RE_spirv_constant = re.compile(r'^\s*%(\w+)\s*=\s*OpConstant\s+' +
+                               r'%\w+\s+(.*?)\s*$',
+                               re.MULTILINE)
+
+passthrough_spirv = '''
+               OpName %piglit_vertex "piglit_vertex"
+               OpDecorate %piglit_vertex Location 0
+%piglit_vertex = OpVariable %_ptr_Input_v3float Input
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+    %v3float = OpTypeVector %float 3
+      %float = OpTypeFloat 32
+'''
 
 def get_stage_extension(stage):
     d = {
@@ -87,30 +121,96 @@ class ShaderSource(object):
         self.__source_chunks = [string]
         self.__source_cache = string
 
-def nest_tokens(tokens):
-    """
-    Given a flat list of tokens, create a nested list structure that reflects
-    (), [], and {}.
-    """
-    matching_parens = {
-        '(': ')',
-        '[': ']',
-        '{': '}'
-    }
+class SpirvType:
+    def uniform_size(self):
+        if self.base_type == 'Array':
+            return self.element_type.uniform_size() * self.length
+        elif self.base_type == 'Struct':
+            return sum(t.uniform_size() for t in self.member_types)
+        else:
+            return 1
 
-    stack = [[]]
-    for tok in tokens:
-        if tok in ['(', '[', '{']:
-            stack.append([tok])
-            continue
+class SpirvVariable:
+    pass
 
-        stack[-1].append(tok)
-        if len(stack) > 1 and tok == matching_parens.get(stack[-1][0]):
-            nest = stack.pop()
-            stack[-1].append(nest)
+class SpirvInfo:
+    def __init__(self, spirv):
+        self.names = {md.group(1): md.group(2)
+                      for md in RE_spirv_name.finditer(spirv)}
+        self.locations = {md.group(1): int(md.group(2))
+                          for md in RE_spirv_location.finditer(spirv)}
+        self.type_definitions = {md.group(1): [md.group(2)] +
+                                 md.group(3).split()
+                                 for md in RE_spirv_type.finditer(spirv)}
+        self.constants = {md.group(1): md.group(2)
+                          for md in RE_spirv_constant.finditer(spirv)}
 
-    assert len(stack) == 1
-    return stack[0]
+        self.types = {}
+
+        self.member_names = {}
+        for md in RE_spirv_member_name.finditer(spirv):
+            if md.group(1) not in self.member_names:
+                self.member_names[md.group(1)] = []
+            names = self.member_names[md.group(1)]
+            index = int(md.group(2))
+            if len(names) <= index:
+                names.extend(itertools.repeat(None, len(names) - index + 1))
+            names[index] = md.group(3)
+
+        self.inputs = self._get_variables(RE_spirv_input_var.finditer(spirv))
+        self.outputs = self._get_variables(RE_spirv_output_var.finditer(spirv))
+        self.uniforms = self._get_variables(
+            RE_spirv_uniform_var.finditer(spirv))
+
+    def _get_type(self, name):
+        if name in self.types:
+            return self.types[name]
+
+        dec = self.type_definitions[name]
+        t = SpirvType()
+        t.base_type = dec[0]
+        t.parts = dec[1:]
+
+        if t.base_type == 'Array':
+            t.element_type = self._get_type(dec[1][1:])
+            t.length = int(self.constants[dec[2][1:]])
+        elif (t.base_type == 'Vector' or
+              t.base_type == 'Matrix'):
+            t.element_type = self._get_type(dec[1][1:])
+            t.length = int(dec[2])
+        elif t.base_type == 'RuntimeArray':
+            t.element_type = self._get_type(dec[2][1:])
+        elif t.base_type == 'Struct':
+            t.member_types = [ self._get_type(mt[1:]) for mt in dec[1:] ]
+            t.member_names = self.member_names[name]
+        elif t.base_type == 'Int':
+            t.width = int(dec[1])
+            t.signedness = int(dec[2])
+        elif t.base_type == 'Float':
+            t.width = int(dec[1])
+        elif t.base_type == 'Pointer':
+            t.storage_class = dec[1]
+            t.deref_type = self._get_type(dec[2][1:])
+
+        self.types[name] = t
+        return t
+
+    def _get_variable(self, name, typename):
+        v = SpirvVariable()
+        v.type = self._get_type(typename)
+        if name in self.locations:
+            v.location = self.locations[name]
+        else:
+            v.location = None
+        v.name = self.names[name]
+        v.result_id = name
+        return v
+
+    def _get_variables(self, re_iter):
+        return { self.names[md.group(1)]: self._get_variable(md.group(1),
+                                                             md.group(2))
+                 for md in re_iter
+                 if md.group(1) in self.names }
 
 class GLSLSource(object):
     def __init__(self, source):
@@ -147,47 +247,6 @@ class GLSLSource(object):
             if transformed is not None:
                 idx = 2 * non_whitespace_idx + 1
                 transformations.append((idx, idx + 1, transformed))
-
-        self.__transform(transformations)
-
-    def transform_toplevel_declarations(self, fn):
-        """
-        Each declaration is passed to fn as a list of tokens without whitespace,
-        including the final semicolon. If fn returns None, the declaration is
-        preserved unchanged. Otherwise, fn must return a string that is
-        tokenized and replaces the original token.
-        """
-        src_tokens = self.__tokens
-        transformations = []
-
-        start = 1
-        idx = 1
-        scopes = []
-
-        while idx < len(src_tokens):
-            token = src_tokens[idx]
-
-            # Skip top-level preprocessor statements
-            if token.startswith('#') and start == idx:
-                start += 2
-                idx += 2
-                continue
-
-            # TODO recognize and skip function definitions
-
-            if not scopes and token == ';':
-                idx += 2
-                transformed = fn(src_tokens[start:idx:2])
-                if transformed is not None:
-                    transformations.append((start, idx - 1, transformed))
-                start = idx
-                continue
-
-            if token == '{':
-                scopes.append('}')
-            elif scopes and token == scopes[-1]:
-                scopes.pop()
-            idx += 2
 
         self.__transform(transformations)
 
@@ -266,216 +325,7 @@ class CompatReplacement(object):
         self.name = name
         self.declaration = declaration
 
-
-class Declaration(object):
-    @staticmethod
-    def parse(tokens, stage):
-        decl = VariableDeclaration.parse(tokens, stage)
-        if decl is not None:
-            return decl
-
-        instance_name = None
-        end = len(tokens)
-        if isinstance(tokens[end - 1], str):
-            if tokens[end - 1] in ('in', 'out'):
-                # Global layout declaration
-                return None
-
-            instance_name = tokens[end - 1]
-            end -= 1
-
-
-class VariableDeclaration(Declaration):
-    def __init__(self, tokens, name, array_end, is_block, instance_name, type_end, stage):
-        """
-        Initialize with nested tokens. The trailing semicolon must have been
-        removed.
-        """
-        self.tokens = tokens
-        self.__name = name
-        self.__instance_name = instance_name
-        self.__array_end = array_end
-        self.__type_end = type_end
-        self.is_block = is_block
-
-        try:
-            self.__layout = tokens.index('layout') + 1
-        except ValueError:
-            self.__layout = None
-
-        if 'in' in tokens:
-            self.mode = 'in'
-        elif 'out' in tokens:
-            self.mode = 'out'
-        elif 'uniform' in tokens:
-            self.mode = 'uniform'
-        else:
-            self.mode = 'other'
-
-        self.is_patch = 'patch' in tokens
-
-        if ((((stage == 'tessellation control' and (self.mode in ('in', 'out'))) or
-             (stage == 'tessellation evaluation' and self.mode == 'in')) and
-             not self.is_patch) or
-            (stage == 'geometry' and self.mode == 'in')):
-            assert self.__array_end - 1 > self.__name
-            assert type(tokens[self.__array_end - 1]) == list
-            assert tokens[self.__array_end - 1][0] == '['
-            self.implicit_array = True
-        else:
-            self.implicit_array = False
-
-    def name(self):
-        return self.tokens[self.__name]
-
-    def layout(self):
-        if self.__layout is not None:
-            return self.tokens[self.__layout]
-        return None
-
-    def aoa_elements(self, skip_reasons):
-        """
-        Returns a list of sizes for each array in this array-of-array
-        variable, or [] if it is not an array.
-        """
-        aoa_elements = []
-        if not self.is_block:
-            had_empty = False
-            for idx in range(0, self.__array_end):
-                array = self.tokens[idx]
-                if type(array) != list or array[0] != '[':
-                    continue
-                assert array[0] == '['
-                if len(array) == 2:
-                    if had_empty or not self.implicit_array or len(aoa_elements) > 0:
-                        skip_reasons.add('complicated array')
-                        return None
-                    had_empty = True
-                    continue
-                if len(array) != 3:
-                    skip_reasons.add('complicated array')
-                    return None
-                try:
-                    elements = int(array[1])
-                except ValueError:
-                    elements = 0
-                if elements <= 0:
-                    skip_reasons.add('complicated array')
-                    return None
-
-                aoa_elements.append(elements)
-
-            if had_empty != self.implicit_array:
-                skip_reasons.add('complicated array')
-                return None
-
-        return aoa_elements
-
-    def members(self, skip_reasons):
-        """
-        Return a list of the child members of this variable, or an
-        empty list if it is not an aggregate type.
-        """
-
-        if (type(self.tokens[self.__type_end - 1]) == list and
-            self.tokens[self.__type_end - 1][0] == '{'):
-
-            block = self.tokens[self.__type_end - 1][1:-1]
-            semicolons = [0] + [i for i, tok in enumerate(block) if tok == ';']
-            assert semicolons[-1] == len(block) - 1
-
-            return [
-                VariableDeclaration.parse(block[i:j], 'none')
-                for i,j in zip(semicolons[:-1], semicolons[1:])
-            ]
-        else:
-            return []
-
-    def base_size(self, skip_reasons):
-        """
-        Determine the base size (ie, not including the array size)
-        of this variable.
-        """
-        members = self.members(skip_reasons)
-        if members is None:
-            return None
-        elif len(members) > 0:
-            return sum(member.size(skip_reasons) or 0 for member in members)
-        else:
-            return 1
-
-    def size(self, skip_reasons):
-        """
-        Determine the number of locations occupied by this variable.
-        """
-        aoa_elements = self.aoa_elements(skip_reasons)
-        if aoa_elements is None:
-            return None
-
-        size = self.base_size(skip_reasons)
-        if size is None:
-            return None
-
-        for array_size in aoa_elements:
-            size *= array_size
-
-        return size
-
-    @staticmethod
-    def parse(tokens, stage):
-        try:
-            assignment_eq = tokens.index('=')
-        except ValueError:
-            assignment_eq = None
-
-        array_end = assignment_eq or len(tokens)
-        name = array_end
-        while name > 0:
-            name -= 1
-            if isinstance(tokens[name], list):
-                if tokens[name][0] == '[':
-                    continue
-                if tokens[name][0] == '{':
-                    # Might be a declaration of a struct or block without instance name
-                    type_end = name + 1
-                    name = None
-                    break
-                # Probably a function declaration
-                return None
-            else:
-                assert isinstance(tokens[name], str)
-                if tokens[name] in ('in', 'out'):
-                    # Global layout declaration
-                    return None
-                break
-
-        if name is not None:
-            type_end = name
-
-        is_block = False
-        instance_name = None
-        if isinstance(tokens[type_end - 1], list) and tokens[type_end - 1][0] == '{':
-            if type_end < 3:
-                # Can only be a non-interface variable of anonymous struct type
-                return None
-            if tokens[type_end - 2] == 'struct':
-                pass # Anonymous struct
-            elif tokens[type_end - 3] == 'struct':
-                pass # Named struct
-            else:
-                # Block
-                is_block = True
-                instance_name = name
-                name = type_end - 2
-
-        if not is_block and name is None:
-            return None # Struct definition
-
-        return VariableDeclaration(tokens, name, array_end, is_block, instance_name,
-                                   type_end, stage)
-
-
-def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
+def fixup_glsl_shaders(shaders):
     """
     There are many reasons why a set of GLSL shaders may not be suitable for
     compilation to SPIR-V. This function tries to fix many of them, and
@@ -560,8 +410,6 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
         'GL_AMD_conservative_depth',
     ])
 
-    structs = {}
-
     def first_transform_tokens(token):
         if token.startswith('#version'):
             return ''
@@ -596,121 +444,6 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
 
         return None
 
-    def process_struct(flat_declaration):
-        assert flat_declaration[-1] == ';'
-        if flat_declaration[0] != 'struct':
-            return None
-
-        nested_declaration = nest_tokens(flat_declaration[:-1])
-
-        if (len(nested_declaration) != 3 or
-            not isinstance(nested_declaration[2], list) or
-            nested_declaration[2][0] != '{'):
-            return None
-
-        structs[nested_declaration[1]] = [nested_declaration[0],
-                                          nested_declaration[2]]
-
-        return None
-
-    def assign_uniform_location(flat_declaration):
-        assert flat_declaration[-1] == ';'
-
-        nested_declaration = nest_tokens(flat_declaration[:-1])
-
-        for i, tok in enumerate(nested_declaration):
-            if isinstance(tok, str) and tok in structs:
-                nested_declaration[i:i+1] = structs[tok]
-                break
-
-        var = VariableDeclaration.parse(nested_declaration, cur_stage)
-        if var is None or var.mode != 'uniform':
-            return None
-
-        size = var.size(skip_reasons)
-
-        if size is None:
-            assert skip_reasons
-            return None
-
-        # Don’t assign locations to uniform block declarations
-        if var.is_block:
-            return None
-
-        layout = var.layout()
-
-        if layout is None:
-            if var.name() in uniform_map:
-                loc = uniform_map[var.name()][1]
-            else:
-                loc = cur_uniform_location[0]
-                cur_uniform_location[0] += var.size(skip_reasons)
-        else:
-            try:
-                loc_index = layout.index('location')
-                loc = int(layout[loc_index + 2])
-            except ValueError:
-                loc = None
-
-        if loc is not None:
-            uniform_map[var.name()] = (var, loc)
-
-        if layout == None:
-            return ('layout(location={}) '.
-                    format(loc) + ' '.join(flat_declaration))
-
-    def assign_location(flat_declaration):
-        assert flat_declaration[-1] == ';'
-        var = VariableDeclaration.parse(nest_tokens(flat_declaration[:-1]), cur_stage)
-        if var is None:
-            return None
-
-        # shared are in fact for uniforms and buffers. Filtering here for convenience
-        layout = var.layout()
-        if layout and 'shared' in layout:
-            skip_reasons.add('"shared" as layout qualifier')
-            return None
-
-        if var.mode == 'uniform':
-            return None
-
-        if var.mode == 'in' and 'invariant' in var.tokens:
-            skip_reasons.add('invariant input')
-            return None
-
-        if layout and 'location' in layout:
-            if var.mode == 'out':
-                if cur_out_location[0] > 0:
-                    skip_reasons.add('mixed explicit and implicit locations')
-                cur_out_location[0] = -1
-            return None
-
-        name = var.name()
-
-        loc = prev_stage_out.get(name)
-        if loc is None:
-            loc = cur_stage_out.get(name)
-
-        if loc is None and var.mode == 'out':
-            if name.startswith('gl_'):
-                return None
-
-            loc = cur_out_location[0]
-            if loc < 0:
-                skip_reasons.add('mixed explicit and implicit locations')
-                return None
-
-            size = var.size(skip_reasons)
-            if size is None:
-                assert skip_reasons
-                return None
-
-            cur_out_location[0] += size
-            cur_stage_out[name] = loc
-
-        if loc is not None:
-            return 'layout(location={}) '.format(loc) + ' '.join(flat_declaration)
-
     def scan_builtin(token):
         if token.startswith('gl_') and not token in good_builtins:
             skip_reasons.add(token)
@@ -719,21 +452,9 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
 
     shaders.sort(key=lambda shader: get_stage_order(shader.stage))
 
-    cur_stage_out = vertex_attribs
-    cur_stage = ''
-
     skip_reasons = set()
-    cur_uniform_location = [0]
 
     for shader in shaders:
-        if cur_stage != shader.stage:
-            prev_stage_out = cur_stage_out
-            cur_stage = shader.stage
-            cur_stage_out = {}
-            cur_out_location = [0]
-
-        structs = {}
-
         glsl = GLSLSource(shader.source())
 
         have_compat = set()
@@ -743,10 +464,6 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
 
         for compat in have_compat:
             glsl.insert_after_versions(compat_replacements[compat].declaration + '\n')
-
-        glsl.transform_toplevel_declarations(process_struct)
-        glsl.transform_toplevel_declarations(assign_location)
-        glsl.transform_toplevel_declarations(assign_uniform_location)
 
         glsl.transform_tokens(scan_builtin)
 
@@ -875,7 +592,7 @@ def compile_glsl(shader_test, config, shader_group):
             print('Writing {} shader binary to {}'.
                   format(shader_group[0].stage, binary_name))
 
-        cmdline = [config.glslang, '-G', '-o', binary_name] + filenames
+        cmdline = [config.glslang, '--aml', '-G', '-o', binary_name] + filenames
         proc = subprocess.run(cmdline, stdout=subprocess.PIPE)
 
         if proc.returncode != 0:
@@ -896,42 +613,34 @@ def compile_glsl(shader_test, config, shader_group):
 
         return proc.stdout.decode()
 
-def process_accessors(var, accessors):
+def process_accessors(spirv_type, accessors):
     offset = 0
-    array_level = 0
 
     while len(accessors) > 0:
+        while spirv_type.base_type == 'Pointer':
+            spirv_type = spirv_type.deref_type
+
         md = re.match(r'\[([0-9]+)\]', accessors)
         if md:
-            aoa_elements = var.aoa_elements([])
-            if aoa_elements is None or array_level >= len(aoa_elements):
+            if (spirv_type.base_type != 'Array' and
+                spirv_type.base_type != 'RuntimeArray'):
                 return None
-            base_size = var.base_size([])
-            if base_size is None:
-                return None
-            for array_size in aoa_elements[(array_level + 1):]:
-                base_size *= array_size
-            offset += int(md.group(1)) * base_size
-            array_level += 1
+            spirv_type = spirv_type.element_type
+            offset += int(md.group(1)) * spirv_type.uniform_size()
             accessors = accessors[len(md.group(0)):]
             continue
 
         md = re.match(r'\.([a-zA-Z_][a-zA-Z_0-9]*)', accessors)
         if md:
-            members = var.members([])
-            if members is None:
+            if spirv_type.base_type != 'Struct':
                 return None
-            for member in members:
-                if member.name() == md.group(1):
-                    var = member
-                    break
-                member_size = member.size([])
-                if member_size is None:
-                    return None
-                offset += member_size
-            else:
+            try:
+                index = spirv_type.member_names.index(md.group(1))
+            except ValueError:
                 return None
-            array_level = 0
+            for i in range(index):
+                offset += spirv_type.member_types[i].uniform_size()
+            spirv_type = spirv_type.member_types[index]
             accessors = accessors[len(md.group(0)):]
             continue
 
@@ -941,12 +650,14 @@ def remap_uniform(name, uniform_map):
     md = re.match(r'(.+?)([\[\.]|$)', name)
     if md.group(1) not in uniform_map:
         return None
-    var, loc = uniform_map[md.group(1)]
-    offset = process_accessors(var, name[len(md.group(1)):])
+    var = uniform_map[md.group(1)]
+    if var.location is None:
+        return None
+    offset = process_accessors(var.type, name[len(md.group(1)):])
     if offset is None:
         return None
     else:
-        return str(loc + offset)
+        return str(var.location + offset)
 
 def filter_shader_test(fin, fout,
                        replacements,
@@ -961,10 +672,11 @@ def filter_shader_test(fin, fout,
     attrib_re = re.compile(r'\b([\[\]a-zA-Z0-9_]+)((?:/[\[\]a-zA-Z_0-9]+){2})')
 
     def vertex_data_replacement(md):
-        if md.group(1) in attrib_map:
-            return str(attrib_map[md.group(1)]) + md.group(2)
-        else:
-            return md.group(0)
+        if md.group(1) in attrib_map.inputs:
+            loc = attrib_map.inputs[md.group(1)].location
+            if loc is not None:
+                return str(loc) + md.group(2)
+        return md.group(0)
 
     for line in fin:
         if line.startswith('['):
@@ -1001,16 +713,28 @@ def filter_shader_test(fin, fout,
             fout.write('SPIRV YES\n')
             add_spirv_line = False
 
-# Returns the number of locations @attr_type consume for a vertex
-# attrib.
-def vertex_attribute_size(type):
-    if type.startswith('mat'):
-        return int(type[3])
+# The --aml option of glslangValidator doesn’t know how to make the
+# locations match for interstage linking so instead we manually fudge
+# the SPIR-V source to use the same locations generated for the
+# outputs from the previous stage.
+def replace_inputs_with_outputs(spirv, prev_stage, this_stage):
+    replacements = {}
 
-    if type.startswith('dmat'):
-        return int(type[4])
+    for output in prev_stage.outputs.values():
+        if (output.location is None or
+            output.name not in this_stage.inputs):
+            continue
 
-    return 1
+        replacements[this_stage.inputs[output.name].result_id] = output.location
+
+    def get_replacement(md):
+        rid = md.group(1)
+        if rid in replacements:
+            return spirv[md.start():md.start(2)] + str(replacements[rid])
+        else:
+            return md.group(0)
+
+    return RE_spirv_location.sub(get_replacement, spirv)
 
 #Returns: 0 for failure, 1 for success, 2 for skip
 #  FIXME: better return values
@@ -1027,14 +751,12 @@ def process_shader_test(shader_test, config):
     shaders = []
 
     have_glsl = False
-    uniform_map = {}
 
     with open(shader_test, 'r') as filp:
         shader = None
 
         spirv_line = None
         groupname = ''
-        vertex_attribs = None
         for line in filp:
             if shader is not None:
                 if line.startswith('['):
@@ -1104,26 +826,8 @@ def process_shader_test(shader_test, config):
                     return 2
                 continue
 
-            if groupname == 'vertex data':
-                if vertex_attribs is None:
-                    attribs = [attrib.split('/') for attrib in line.strip().split()]
-                    vertex_attribs = {}
-                    for j, attrib in enumerate(attribs):
-                        name = attrib[0]
-                        type = attrib[2]
-                        if name.endswith('[0]'):
-                            if name[:-3] not in vertex_attribs:
-                                vertex_attribs[name[:-3]] = j
-                        else:
-                            if name not in vertex_attribs:
-                                vertex_attribs[name] = j
-                continue
-
-    if vertex_attribs is None:
-        vertex_attribs = {'piglit_vertex': 0, 'piglit_texcoord': 1}
-
     if have_glsl and not config.no_transform:
-        skip_reasons = fixup_glsl_shaders(shaders, vertex_attribs, uniform_map)
+        skip_reasons = fixup_glsl_shaders(shaders)
 
         if config.mark_skip:
             if skip_reasons or (spirv_line and spirv_line[0] == 'NO'):
@@ -1146,16 +850,34 @@ def process_shader_test(shader_test, config):
             shader_groups[-1].append(shader)
 
     replacements = {}
+    uniform_map = {}
+    prev_stage = None
+    vertex_stage = None
+
     for shader_group in shader_groups:
         spirv = compile_glsl(shader_test, config, shader_group)
         if not spirv:
             return 0
+
+        this_stage = SpirvInfo(spirv)
+
+        uniform_map.update(this_stage.uniforms)
+        if prev_stage is not None:
+            spirv = replace_inputs_with_outputs(spirv, prev_stage, this_stage)
+
+        if shader_group[0].stage == "vertex":
+            vertex_stage = this_stage
 
         replacements[shader_group[0].stage + ' shader'] = spirv
 
         if config.transformed:
             for shader in shader_group:
                 print(shader.source())
+
+        prev_stage = this_stage
+
+    if vertex_stage is None:
+        vertex_stage = SpirvInfo(passthrough_spirv)
 
     spv_shader_test_file = shader_test + '.spv'
     if config.verbose:
@@ -1166,7 +888,7 @@ def process_shader_test(shader_test, config):
             filter_shader_test(fin, fout,
                                replacements,
                                uniform_map,
-                               vertex_attribs,
+                               vertex_stage,
                                spirv_line == None)
     if config.replace:
         os.rename(spv_shader_test_file, shader_test)
