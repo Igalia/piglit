@@ -25,10 +25,9 @@
  *
  */
 
-/** @file fbo-drawbuffers2-colormask.c
+/** @file fbo-drawbuffers2-blend.c
  *
- * Tests that individual color masks per render target with
- * EXT_draw_buffers2 works.
+ * Tests per-buffer blend enable flags.
  */
 
 #include "piglit-util-gl.h"
