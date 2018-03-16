@@ -158,8 +158,10 @@ enum2program(const GLenum pname)
 		return "r";
 	case GL_Q:
 		return "q";
+	default:
+		assert(!"unexpected state enum");
+		return "";
 	}
-	assert(!"unexpected state enum");
 }
 
 enum piglit_result

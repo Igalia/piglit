@@ -191,8 +191,10 @@ enum2glsl(const GLenum pname)
 		return "R";
 	case GL_Q:
 		return "Q";
+	default:
+		assert(!"unexpected pname");
+		return "";
 	}
-	assert(0);
 }
 
 enum piglit_result

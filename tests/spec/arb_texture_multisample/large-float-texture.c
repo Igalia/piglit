@@ -456,6 +456,7 @@ texel_size(GLenum intFormat)
 		return 4 * sizeof(GLfloat);
 	default:
 		assert(!"Unexpected texture format");
+		return 0;
 	}
 }
 
