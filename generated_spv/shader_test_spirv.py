@@ -662,12 +662,17 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
     def assign_location(flat_declaration):
         assert flat_declaration[-1] == ';'
         var = VariableDeclaration.parse(nest_tokens(flat_declaration[:-1]), cur_stage)
-        if var is None or var.mode == 'uniform':
+
+        if var is None:
             return None
 
+        # shared are in fact for uniforms and buffers. Filtering here for convenience
         layout = var.layout()
         if layout and 'shared' in layout:
             skip_reasons.add('"shared" as layout qualifier')
+            return None
+
+        if var.mode == 'uniform':
             return None
 
         if var.mode == 'in' and 'invariant' in var.tokens:
