@@ -997,17 +997,6 @@ def filter_shader_test(fin, fout,
             fout.write('SPIRV YES\n')
             add_spirv_line = False
 
-# Returns the number of locations @attr_type consume for a vertex
-# attrib.
-def vertex_attribute_size(type):
-    if type.startswith('mat'):
-        return int(type[3])
-
-    if type.startswith('dmat'):
-        return int(type[4])
-
-    return 1
-
 #Returns: 0 for failure, 1 for success, 2 for skip
 #  FIXME: better return values
 def process_shader_test(shader_test, config):
@@ -1104,15 +1093,15 @@ def process_shader_test(shader_test, config):
                 if vertex_attribs is None:
                     attribs = [attrib.split('/') for attrib in line.strip().split()]
                     vertex_attribs = {}
-                    loc = 0
                     for j, attrib in enumerate(attribs):
                         name = attrib[0]
                         type = attrib[2]
                         if name.endswith('[0]'):
-                            vertex_attribs[name[:-3]] = loc
+                            if name[:-3] not in vertex_attribs:
+                                vertex_attribs[name[:-3]] = j
                         else:
-                            vertex_attribs[name] = loc
-                        loc = loc + vertex_attribute_size(type)
+                            if name not in vertex_attribs:
+                                vertex_attribs[name] = j
                 continue
 
     if vertex_attribs is None:
