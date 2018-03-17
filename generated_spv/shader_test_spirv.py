@@ -662,7 +662,7 @@ def fixup_glsl_shaders(shaders, vertex_attribs, uniform_map):
     def assign_location(flat_declaration):
         assert flat_declaration[-1] == ';'
         var = VariableDeclaration.parse(nest_tokens(flat_declaration[:-1]), cur_stage)
-        if var is None:
+        if var is None or var.mode == 'uniform':
             return None
 
         layout = var.layout()
