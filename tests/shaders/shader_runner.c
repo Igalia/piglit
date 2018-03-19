@@ -392,6 +392,9 @@ compare(float ref, float value, enum comparison cmp);
 static bool
 compare_uint(GLuint ref, GLuint value, enum comparison cmp);
 
+static bool
+compare_double(double ref, double value, enum comparison cmp);
+
 static void
 version_init(struct component_version *v, enum version_tag tag, bool core, bool es, unsigned num)
 {
@@ -866,6 +869,22 @@ compare(float ref, float value, enum comparison cmp)
 
 static bool
 compare_uint(GLuint ref, GLuint value, enum comparison cmp)
+{
+	switch (cmp) {
+	case equal:         return value == ref;
+	case not_equal:     return value != ref;
+	case less:          return value <  ref;
+	case greater_equal: return value >= ref;
+	case greater:       return value >  ref;
+	case less_equal:    return value <= ref;
+	}
+
+	assert(!"Should not get here.");
+	return false;
+}
+
+static bool
+compare_double(double ref, double value, enum comparison cmp)
 {
 	switch (cmp) {
 	case equal:         return value == ref;
@@ -3501,6 +3520,44 @@ probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op,
 	return true;
 }
 
+/* FIXME: perhaps we can factorize several pieces, instead of having
+ * two really similar probe_ssbo_xxx method. */
+static bool
+probe_ssbo_double(GLint ssbo_index, GLint ssbo_offset, const char *op, double value)
+{
+        double *p;
+	double observed;
+	enum comparison cmp;
+	bool result;
+
+	REQUIRE(parse_comparison_op(op, &cmp, NULL),
+		"Invalid comparison operation at: %s\n", op);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo[ssbo_index]);
+	p = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_offset,
+			     sizeof(double), GL_MAP_READ_BIT);
+
+	if (!p) {
+		printf("Couldn't map ssbo to verify expected value.\n");
+		return false;
+	}
+
+	observed = *p;
+	result = compare_double(value, observed, cmp);
+
+	if (!result) {
+		printf("SSBO %d test failed: Reference %s Observed\n",
+		       ssbo_offset, comparison_string(cmp));
+		printf("  Reference: %lf\n", value);
+		printf("  Observed:  %lf\n", observed);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		return false;
+	}
+
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	return true;
+}
+
 static bool
 probe_ssbo_uint(GLint ssbo_index, GLint ssbo_offset, const char *op, uint32_t value)
 {
@@ -4024,7 +4081,11 @@ piglit_display(void)
 				  &x, &y, s, &z) == 4) {
 			if (!probe_ssbo_uint(x, y, s, z))
 				result = PIGLIT_FAIL;
-		} else if (sscanf(line,
+		} else if (sscanf(line, "probe ssbo double %d %d %s %lf",
+				  &x, &y, s, &(d[0])) == 4) {
+			if (!probe_ssbo_double(x, y, s, d[0]))
+				result = PIGLIT_FAIL;
+		}else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
 				  "( %f , %f , %f , %f )",
 				  c + 0, c + 1,
