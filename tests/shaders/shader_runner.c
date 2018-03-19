@@ -930,12 +930,15 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	version_init(v, tag, core, es, full_num);
 }
 
-#define KNOWN_GL_SPV_MAPPING 3
+#define KNOWN_GL_SPV_MAPPING 6
 
 static const char* table[KNOWN_GL_SPV_MAPPING][2] =
 {{ "GL_AMD_shader_trinary_minmax", "SPV_AMD_shader_trinary_minmax"},
  {"GL_ARB_shader_group_vote", "SPV_KHR_subgroup_vote"},
- {"GL_ARB_shader_ballot", "SPV_KHR_shader_ballot"}};
+ {"GL_ARB_shader_ballot", "SPV_KHR_shader_ballot"},
+ {"GL_ARB_shader_subroutine", "not supported"},
+ {"GL_ARB_geometry_shader4", "not supported"},
+ {"GL_MESA_shader_integer_functions", "not supported"},};
 
 /*
  * Returns the SPIR-V extension that defines the equivalent
