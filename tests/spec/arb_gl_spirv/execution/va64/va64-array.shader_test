@@ -1,0 +1,449 @@
+
+
+
+
+[require]
+GLSL >= 1.50
+  GL_ARB_gpu_shader_fp64
+  GL_ARB_vertex_attrib_64bit
+GL_MAX_VERTEX_ATTRIBS >= 4
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_vertex_attrib_64bit : require
+
+    uniform double expected00;
+    uniform double expected01;
+    uniform double expected02;
+    uniform double expected03;
+    uniform double expected10[2];
+    uniform double expected11[2];
+    uniform double expected12[2];
+    uniform double expected13[2];
+  in double value0;
+  in double value1[2];
+in vec3 piglit_vertex;
+out vec4 fs_color;
+
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+    gl_Position = vec4(piglit_vertex.x, piglit_vertex.y, 0.0, 1.0);
+      if (piglit_vertex.z == -1.0) {
+          if (value0 != expected00) {
+              fs_color = RED;
+              return;
+          }
+          if (value1 != expected10) {
+              fs_color = RED;
+              return;
+          }
+      }
+      if (piglit_vertex.z == 0.0) {
+          if (value0 != expected01) {
+              fs_color = RED;
+              return;
+          }
+          if (value1 != expected11) {
+              fs_color = RED;
+              return;
+          }
+      }
+      if (piglit_vertex.z == 1.0) {
+          if (value0 != expected02) {
+              fs_color = RED;
+              return;
+          }
+          if (value1 != expected12) {
+              fs_color = RED;
+              return;
+          }
+      }
+      if (piglit_vertex.z == 2.0) {
+          if (value0 != expected03) {
+              fs_color = RED;
+              return;
+          }
+          if (value1 != expected13) {
+              fs_color = RED;
+              return;
+          }
+      }
+    fs_color = GREEN;
+}
+
+[fragment shader]
+#version 150
+
+in vec4 fs_color;
+out vec4 color;
+
+void main()
+{
+  color = fs_color;
+}
+
+[vertex data]
+    value0/double/double     value1[0]/double/double     value1[1]/double/double   piglit_vertex/float/vec3
+            0xffefffffffffffff                       0xffefffffffffffff                       0xcb1e35ed24eb6496                 -1.0 -1.0 -1.0
+            0xcb1e35ed24eb6496                       0xcb1e35ed24eb6496                       0xc8b1381a93a87849                  1.0 -1.0  0.0
+            0xc8b1381a93a87849                       0xc8b1381a93a87849                       0xc7efffffefffffff                  1.0  1.0  1.0
+            0xc7efffffefffffff                       0xc7efffffefffffff                       0xc170000000000000                 -1.0  1.0  2.0
+            0xcb1e35ed24eb6496                       0xcb1e35ed24eb6496                       0xc8b1381a93a87849                 -1.0 -1.0 -1.0
+            0xc8b1381a93a87849                       0xc8b1381a93a87849                       0xc7efffffefffffff                  1.0 -1.0  0.0
+            0xc7efffffefffffff                       0xc7efffffefffffff                       0xc170000000000000                  1.0  1.0  1.0
+            0xc170000000000000                       0xc170000000000000                       0xc014000000000000                 -1.0  1.0  2.0
+            0xc8b1381a93a87849                       0xc8b1381a93a87849                       0xc7efffffefffffff                 -1.0 -1.0 -1.0
+            0xc7efffffefffffff                       0xc7efffffefffffff                       0xc170000000000000                  1.0 -1.0  0.0
+            0xc170000000000000                       0xc170000000000000                       0xc014000000000000                  1.0  1.0  1.0
+            0xc014000000000000                       0xc014000000000000                       0xbfff25ce60000000                 -1.0  1.0  2.0
+            0xc7efffffefffffff                       0xc7efffffefffffff                       0xc170000000000000                 -1.0 -1.0 -1.0
+            0xc170000000000000                       0xc170000000000000                       0xc014000000000000                  1.0 -1.0  0.0
+            0xc014000000000000                       0xc014000000000000                       0xbfff25ce60000000                  1.0  1.0  1.0
+            0xbfff25ce60000000                       0xbfff25ce60000000                       0x8010000000000000                 -1.0  1.0  2.0
+            0xc170000000000000                       0xc170000000000000                       0xc014000000000000                 -1.0 -1.0 -1.0
+            0xc014000000000000                       0xc014000000000000                       0xbfff25ce60000000                  1.0 -1.0  0.0
+            0xbfff25ce60000000                       0xbfff25ce60000000                       0x8010000000000000                  1.0  1.0  1.0
+            0x8010000000000000                       0x8010000000000000                       0x0010000000000000                 -1.0  1.0  2.0
+            0xc014000000000000                       0xc014000000000000                       0xbfff25ce60000000                 -1.0 -1.0 -1.0
+            0xbfff25ce60000000                       0xbfff25ce60000000                       0x8010000000000000                  1.0 -1.0  0.0
+            0x8010000000000000                       0x8010000000000000                       0x0010000000000000                  1.0  1.0  1.0
+            0x0010000000000000                       0x0010000000000000                       0x3fff25ce60000000                 -1.0  1.0  2.0
+            0xbfff25ce60000000                       0xbfff25ce60000000                       0x8010000000000000                 -1.0 -1.0 -1.0
+            0x8010000000000000                       0x8010000000000000                       0x0010000000000000                  1.0 -1.0  0.0
+            0x0010000000000000                       0x0010000000000000                       0x3fff25ce60000000                  1.0  1.0  1.0
+            0x3fff25ce60000000                       0x3fff25ce60000000                       0x4014000000000000                 -1.0  1.0  2.0
+            0x8010000000000000                       0x8010000000000000                       0x0010000000000000                 -1.0 -1.0 -1.0
+            0x0010000000000000                       0x0010000000000000                       0x3fff25ce60000000                  1.0 -1.0  0.0
+            0x3fff25ce60000000                       0x3fff25ce60000000                       0x4014000000000000                  1.0  1.0  1.0
+            0x4014000000000000                       0x4014000000000000                       0x4170000000000000                 -1.0  1.0  2.0
+            0x0010000000000000                       0x0010000000000000                       0x3fff25ce60000000                 -1.0 -1.0 -1.0
+            0x3fff25ce60000000                       0x3fff25ce60000000                       0x4014000000000000                  1.0 -1.0  0.0
+            0x4014000000000000                       0x4014000000000000                       0x4170000000000000                  1.0  1.0  1.0
+            0x4170000000000000                       0x4170000000000000                       0x47efffffefffffff                 -1.0  1.0  2.0
+            0x3fff25ce60000000                       0x3fff25ce60000000                       0x4014000000000000                 -1.0 -1.0 -1.0
+            0x4014000000000000                       0x4014000000000000                       0x4170000000000000                  1.0 -1.0  0.0
+            0x4170000000000000                       0x4170000000000000                       0x47efffffefffffff                  1.0  1.0  1.0
+            0x47efffffefffffff                       0x47efffffefffffff                       0x48b1381a93a87849                 -1.0  1.0  2.0
+            0x4014000000000000                       0x4014000000000000                       0x4170000000000000                 -1.0 -1.0 -1.0
+            0x4170000000000000                       0x4170000000000000                       0x47efffffefffffff                  1.0 -1.0  0.0
+            0x47efffffefffffff                       0x47efffffefffffff                       0x48b1381a93a87849                  1.0  1.0  1.0
+            0x48b1381a93a87849                       0x48b1381a93a87849                       0x4b1e35ed24eb6496                 -1.0  1.0  2.0
+            0x4170000000000000                       0x4170000000000000                       0x47efffffefffffff                 -1.0 -1.0 -1.0
+            0x47efffffefffffff                       0x47efffffefffffff                       0x48b1381a93a87849                  1.0 -1.0  0.0
+            0x48b1381a93a87849                       0x48b1381a93a87849                       0x4b1e35ed24eb6496                  1.0  1.0  1.0
+            0x4b1e35ed24eb6496                       0x4b1e35ed24eb6496                       0x7fefffffffffffff                 -1.0  1.0  2.0
+            0x47efffffefffffff                       0x47efffffefffffff                       0x48b1381a93a87849                 -1.0 -1.0 -1.0
+            0x48b1381a93a87849                       0x48b1381a93a87849                       0x4b1e35ed24eb6496                  1.0 -1.0  0.0
+            0x4b1e35ed24eb6496                       0x4b1e35ed24eb6496                       0x7fefffffffffffff                  1.0  1.0  1.0
+            0x7fefffffffffffff                       0x7fefffffffffffff                       0x0000000000000000                 -1.0  1.0  2.0
+            0x48b1381a93a87849                       0x48b1381a93a87849                       0x4b1e35ed24eb6496                 -1.0 -1.0 -1.0
+            0x4b1e35ed24eb6496                       0x4b1e35ed24eb6496                       0x7fefffffffffffff                  1.0 -1.0  0.0
+            0x7fefffffffffffff                       0x7fefffffffffffff                       0x0000000000000000                  1.0  1.0  1.0
+            0x0000000000000000                       0x0000000000000000                       0xffefffffffffffff                 -1.0  1.0  2.0
+            0x4b1e35ed24eb6496                       0x4b1e35ed24eb6496                       0x7fefffffffffffff                 -1.0 -1.0 -1.0
+            0x7fefffffffffffff                       0x7fefffffffffffff                       0x0000000000000000                  1.0 -1.0  0.0
+            0x0000000000000000                       0x0000000000000000                       0xffefffffffffffff                  1.0  1.0  1.0
+            0xffefffffffffffff                       0xffefffffffffffff                       0xcb1e35ed24eb6496                 -1.0  1.0  2.0
+            0x7fefffffffffffff                       0x7fefffffffffffff                       0x0000000000000000                 -1.0 -1.0 -1.0
+            0x0000000000000000                       0x0000000000000000                       0xffefffffffffffff                  1.0 -1.0  0.0
+            0xffefffffffffffff                       0xffefffffffffffff                       0xcb1e35ed24eb6496                  1.0  1.0  1.0
+            0xcb1e35ed24eb6496                       0xcb1e35ed24eb6496                       0xc8b1381a93a87849                 -1.0  1.0  2.0
+            0x0000000000000000                       0x0000000000000000                       0xffefffffffffffff                 -1.0 -1.0 -1.0
+            0xffefffffffffffff                       0xffefffffffffffff                       0xcb1e35ed24eb6496                  1.0 -1.0  0.0
+            0xcb1e35ed24eb6496                       0xcb1e35ed24eb6496                       0xc8b1381a93a87849                  1.0  1.0  1.0
+            0xc8b1381a93a87849                       0xc8b1381a93a87849                       0xc7efffffefffffff                 -1.0  1.0  2.0
+
+[test]
+
+        uniform double expected00            0xffefffffffffffff
+        uniform double expected10[0]            0xffefffffffffffff
+        uniform double expected10[1]            0xcb1e35ed24eb6496
+        uniform double expected01            0xcb1e35ed24eb6496
+        uniform double expected11[0]            0xcb1e35ed24eb6496
+        uniform double expected11[1]            0xc8b1381a93a87849
+        uniform double expected02            0xc8b1381a93a87849
+        uniform double expected12[0]            0xc8b1381a93a87849
+        uniform double expected12[1]            0xc7efffffefffffff
+        uniform double expected03            0xc7efffffefffffff
+        uniform double expected13[0]            0xc7efffffefffffff
+        uniform double expected13[1]            0xc170000000000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 0 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0xcb1e35ed24eb6496
+        uniform double expected10[0]            0xcb1e35ed24eb6496
+        uniform double expected10[1]            0xc8b1381a93a87849
+        uniform double expected01            0xc8b1381a93a87849
+        uniform double expected11[0]            0xc8b1381a93a87849
+        uniform double expected11[1]            0xc7efffffefffffff
+        uniform double expected02            0xc7efffffefffffff
+        uniform double expected12[0]            0xc7efffffefffffff
+        uniform double expected12[1]            0xc170000000000000
+        uniform double expected03            0xc170000000000000
+        uniform double expected13[0]            0xc170000000000000
+        uniform double expected13[1]            0xc014000000000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 4 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0xc8b1381a93a87849
+        uniform double expected10[0]            0xc8b1381a93a87849
+        uniform double expected10[1]            0xc7efffffefffffff
+        uniform double expected01            0xc7efffffefffffff
+        uniform double expected11[0]            0xc7efffffefffffff
+        uniform double expected11[1]            0xc170000000000000
+        uniform double expected02            0xc170000000000000
+        uniform double expected12[0]            0xc170000000000000
+        uniform double expected12[1]            0xc014000000000000
+        uniform double expected03            0xc014000000000000
+        uniform double expected13[0]            0xc014000000000000
+        uniform double expected13[1]            0xbfff25ce60000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 8 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0xc7efffffefffffff
+        uniform double expected10[0]            0xc7efffffefffffff
+        uniform double expected10[1]            0xc170000000000000
+        uniform double expected01            0xc170000000000000
+        uniform double expected11[0]            0xc170000000000000
+        uniform double expected11[1]            0xc014000000000000
+        uniform double expected02            0xc014000000000000
+        uniform double expected12[0]            0xc014000000000000
+        uniform double expected12[1]            0xbfff25ce60000000
+        uniform double expected03            0xbfff25ce60000000
+        uniform double expected13[0]            0xbfff25ce60000000
+        uniform double expected13[1]            0x8010000000000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 12 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0xc170000000000000
+        uniform double expected10[0]            0xc170000000000000
+        uniform double expected10[1]            0xc014000000000000
+        uniform double expected01            0xc014000000000000
+        uniform double expected11[0]            0xc014000000000000
+        uniform double expected11[1]            0xbfff25ce60000000
+        uniform double expected02            0xbfff25ce60000000
+        uniform double expected12[0]            0xbfff25ce60000000
+        uniform double expected12[1]            0x8010000000000000
+        uniform double expected03            0x8010000000000000
+        uniform double expected13[0]            0x8010000000000000
+        uniform double expected13[1]            0x0010000000000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 16 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0xc014000000000000
+        uniform double expected10[0]            0xc014000000000000
+        uniform double expected10[1]            0xbfff25ce60000000
+        uniform double expected01            0xbfff25ce60000000
+        uniform double expected11[0]            0xbfff25ce60000000
+        uniform double expected11[1]            0x8010000000000000
+        uniform double expected02            0x8010000000000000
+        uniform double expected12[0]            0x8010000000000000
+        uniform double expected12[1]            0x0010000000000000
+        uniform double expected03            0x0010000000000000
+        uniform double expected13[0]            0x0010000000000000
+        uniform double expected13[1]            0x3fff25ce60000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 20 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0xbfff25ce60000000
+        uniform double expected10[0]            0xbfff25ce60000000
+        uniform double expected10[1]            0x8010000000000000
+        uniform double expected01            0x8010000000000000
+        uniform double expected11[0]            0x8010000000000000
+        uniform double expected11[1]            0x0010000000000000
+        uniform double expected02            0x0010000000000000
+        uniform double expected12[0]            0x0010000000000000
+        uniform double expected12[1]            0x3fff25ce60000000
+        uniform double expected03            0x3fff25ce60000000
+        uniform double expected13[0]            0x3fff25ce60000000
+        uniform double expected13[1]            0x4014000000000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 24 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x8010000000000000
+        uniform double expected10[0]            0x8010000000000000
+        uniform double expected10[1]            0x0010000000000000
+        uniform double expected01            0x0010000000000000
+        uniform double expected11[0]            0x0010000000000000
+        uniform double expected11[1]            0x3fff25ce60000000
+        uniform double expected02            0x3fff25ce60000000
+        uniform double expected12[0]            0x3fff25ce60000000
+        uniform double expected12[1]            0x4014000000000000
+        uniform double expected03            0x4014000000000000
+        uniform double expected13[0]            0x4014000000000000
+        uniform double expected13[1]            0x4170000000000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 28 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x0010000000000000
+        uniform double expected10[0]            0x0010000000000000
+        uniform double expected10[1]            0x3fff25ce60000000
+        uniform double expected01            0x3fff25ce60000000
+        uniform double expected11[0]            0x3fff25ce60000000
+        uniform double expected11[1]            0x4014000000000000
+        uniform double expected02            0x4014000000000000
+        uniform double expected12[0]            0x4014000000000000
+        uniform double expected12[1]            0x4170000000000000
+        uniform double expected03            0x4170000000000000
+        uniform double expected13[0]            0x4170000000000000
+        uniform double expected13[1]            0x47efffffefffffff
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 32 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x3fff25ce60000000
+        uniform double expected10[0]            0x3fff25ce60000000
+        uniform double expected10[1]            0x4014000000000000
+        uniform double expected01            0x4014000000000000
+        uniform double expected11[0]            0x4014000000000000
+        uniform double expected11[1]            0x4170000000000000
+        uniform double expected02            0x4170000000000000
+        uniform double expected12[0]            0x4170000000000000
+        uniform double expected12[1]            0x47efffffefffffff
+        uniform double expected03            0x47efffffefffffff
+        uniform double expected13[0]            0x47efffffefffffff
+        uniform double expected13[1]            0x48b1381a93a87849
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 36 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x4014000000000000
+        uniform double expected10[0]            0x4014000000000000
+        uniform double expected10[1]            0x4170000000000000
+        uniform double expected01            0x4170000000000000
+        uniform double expected11[0]            0x4170000000000000
+        uniform double expected11[1]            0x47efffffefffffff
+        uniform double expected02            0x47efffffefffffff
+        uniform double expected12[0]            0x47efffffefffffff
+        uniform double expected12[1]            0x48b1381a93a87849
+        uniform double expected03            0x48b1381a93a87849
+        uniform double expected13[0]            0x48b1381a93a87849
+        uniform double expected13[1]            0x4b1e35ed24eb6496
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 40 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x4170000000000000
+        uniform double expected10[0]            0x4170000000000000
+        uniform double expected10[1]            0x47efffffefffffff
+        uniform double expected01            0x47efffffefffffff
+        uniform double expected11[0]            0x47efffffefffffff
+        uniform double expected11[1]            0x48b1381a93a87849
+        uniform double expected02            0x48b1381a93a87849
+        uniform double expected12[0]            0x48b1381a93a87849
+        uniform double expected12[1]            0x4b1e35ed24eb6496
+        uniform double expected03            0x4b1e35ed24eb6496
+        uniform double expected13[0]            0x4b1e35ed24eb6496
+        uniform double expected13[1]            0x7fefffffffffffff
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 44 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x47efffffefffffff
+        uniform double expected10[0]            0x47efffffefffffff
+        uniform double expected10[1]            0x48b1381a93a87849
+        uniform double expected01            0x48b1381a93a87849
+        uniform double expected11[0]            0x48b1381a93a87849
+        uniform double expected11[1]            0x4b1e35ed24eb6496
+        uniform double expected02            0x4b1e35ed24eb6496
+        uniform double expected12[0]            0x4b1e35ed24eb6496
+        uniform double expected12[1]            0x7fefffffffffffff
+        uniform double expected03            0x7fefffffffffffff
+        uniform double expected13[0]            0x7fefffffffffffff
+        uniform double expected13[1]            0x0000000000000000
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 48 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x48b1381a93a87849
+        uniform double expected10[0]            0x48b1381a93a87849
+        uniform double expected10[1]            0x4b1e35ed24eb6496
+        uniform double expected01            0x4b1e35ed24eb6496
+        uniform double expected11[0]            0x4b1e35ed24eb6496
+        uniform double expected11[1]            0x7fefffffffffffff
+        uniform double expected02            0x7fefffffffffffff
+        uniform double expected12[0]            0x7fefffffffffffff
+        uniform double expected12[1]            0x0000000000000000
+        uniform double expected03            0x0000000000000000
+        uniform double expected13[0]            0x0000000000000000
+        uniform double expected13[1]            0xffefffffffffffff
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 52 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x4b1e35ed24eb6496
+        uniform double expected10[0]            0x4b1e35ed24eb6496
+        uniform double expected10[1]            0x7fefffffffffffff
+        uniform double expected01            0x7fefffffffffffff
+        uniform double expected11[0]            0x7fefffffffffffff
+        uniform double expected11[1]            0x0000000000000000
+        uniform double expected02            0x0000000000000000
+        uniform double expected12[0]            0x0000000000000000
+        uniform double expected12[1]            0xffefffffffffffff
+        uniform double expected03            0xffefffffffffffff
+        uniform double expected13[0]            0xffefffffffffffff
+        uniform double expected13[1]            0xcb1e35ed24eb6496
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 56 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x7fefffffffffffff
+        uniform double expected10[0]            0x7fefffffffffffff
+        uniform double expected10[1]            0x0000000000000000
+        uniform double expected01            0x0000000000000000
+        uniform double expected11[0]            0x0000000000000000
+        uniform double expected11[1]            0xffefffffffffffff
+        uniform double expected02            0xffefffffffffffff
+        uniform double expected12[0]            0xffefffffffffffff
+        uniform double expected12[1]            0xcb1e35ed24eb6496
+        uniform double expected03            0xcb1e35ed24eb6496
+        uniform double expected13[0]            0xcb1e35ed24eb6496
+        uniform double expected13[1]            0xc8b1381a93a87849
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 60 4
+  probe all rgba 0.0 1.0 0.0 1.0
+
+        uniform double expected00            0x0000000000000000
+        uniform double expected10[0]            0x0000000000000000
+        uniform double expected10[1]            0xffefffffffffffff
+        uniform double expected01            0xffefffffffffffff
+        uniform double expected11[0]            0xffefffffffffffff
+        uniform double expected11[1]            0xcb1e35ed24eb6496
+        uniform double expected02            0xcb1e35ed24eb6496
+        uniform double expected12[0]            0xcb1e35ed24eb6496
+        uniform double expected12[1]            0xc8b1381a93a87849
+        uniform double expected03            0xc8b1381a93a87849
+        uniform double expected13[0]            0xc8b1381a93a87849
+        uniform double expected13[1]            0xc7efffffefffffff
+  clear color 0.0 0.0 1.0 0.0
+  clear
+  draw arrays GL_TRIANGLE_FAN 64 4
+  probe all rgba 0.0 1.0 0.0 1.0
