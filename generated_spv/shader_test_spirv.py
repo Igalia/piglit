@@ -510,6 +510,10 @@ def update_spirv_line(shader_test, skip_reasons):
         for line in lines:
             print(line, file=filp, end='')
 
+def supports_uniform_location_override(config):
+    proc = subprocess.run([config.glslang, '-h'], stdout=subprocess.PIPE)
+    md = re.search(r'^ *-u<name>:<loc>', proc.stdout.decode(), re.MULTILINE)
+    return md is not None
 
 def write_glslang_conf(config, filename):
     """
@@ -566,7 +570,7 @@ def parse_args():
                         help="Path to one or more .shader_test files to process.")
     return parser.parse_args()
 
-def compile_glsl(shader_test, config, shader_group):
+def compile_glsl(shader_test, config, shader_group, uniform_map, max_uniform):
     stage = shader_group[0].stage
     extension = get_stage_extension(stage)
     if extension is None:
@@ -592,7 +596,15 @@ def compile_glsl(shader_test, config, shader_group):
             print('Writing {} shader binary to {}'.
                   format(shader_group[0].stage, binary_name))
 
-        cmdline = [config.glslang, '--aml', '-G', '-o', binary_name] + filenames
+        cmdline = [config.glslang, '--aml', '-G', '-o', binary_name]
+
+        if config.supports_uniform_location_override:
+            cmdline.extend(['--uniform-base', str(max_uniform)])
+            for var in uniform_map.values():
+                if var.location is not None:
+                    cmdline.append("-u{}:{}".format(var.name, var.location))
+
+        cmdline.extend(filenames)
         proc = subprocess.run(cmdline, stdout=subprocess.PIPE)
 
         if proc.returncode != 0:
@@ -853,15 +865,24 @@ def process_shader_test(shader_test, config):
 
     replacements = {}
     uniform_map = {}
+    max_uniform = 0
     prev_stage = None
     vertex_stage = None
 
     for shader_group in shader_groups:
-        spirv = compile_glsl(shader_test, config, shader_group)
+        spirv = compile_glsl(shader_test, config, shader_group,
+                             uniform_map, max_uniform)
         if not spirv:
             return 0
 
         this_stage = SpirvInfo(spirv)
+
+        for var in this_stage.uniforms.values():
+            if var.location is None:
+                continue
+            end = var.location + var.type.uniform_size()
+            if end > max_uniform:
+                max_uniform = end
 
         uniform_map.update(this_stage.uniforms)
         if prev_stage is not None:
@@ -930,6 +951,7 @@ def main():
 
     config.spirv_dis = get_option('PIGLIT_SPIRV_DIS_BINARY', './generated_spv/spirv-dis')
     config.glslang = get_option('PIGLIT_GLSLANG_VALIDATOR_BINARY', './generated_spv/glslangValidator')
+    config.supports_uniform_location_override = supports_uniform_location_override(config)
 
     config.excludes = []
 
