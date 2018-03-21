@@ -1111,12 +1111,15 @@ def process_shader_test(shader_test, config):
                     for j, attrib in enumerate(attribs):
                         name = attrib[0]
                         type = attrib[2]
+                        # For arrays we need to add both just the name
+                        # for the origin location when assigning out
+                        # locations, and the full name, with index,
+                        # for the replacements on the vertex data
                         if name.endswith('[0]'):
                             if name[:-3] not in vertex_attribs:
                                 vertex_attribs[name[:-3]] = j
-                        else:
-                            if name not in vertex_attribs:
-                                vertex_attribs[name] = j
+                        if name not in vertex_attribs:
+                            vertex_attribs[name] = j
                 continue
 
     if vertex_attribs is None:
