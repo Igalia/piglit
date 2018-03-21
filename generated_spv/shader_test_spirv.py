@@ -130,6 +130,14 @@ class SpirvType:
         else:
             return 1
 
+    def attrib_size(self):
+        if self.base_type == 'Array' or self.base_type == 'Matrix':
+            return self.element_type.attrib_size() * self.length
+        elif self.base_type == 'Struct':
+            return sum(t.attrib_size() for t in self.member_types)
+        else:
+            return 1
+
 class SpirvVariable:
     pass
 
@@ -625,7 +633,7 @@ def compile_glsl(shader_test, config, shader_group, uniform_map, max_uniform):
 
         return proc.stdout.decode()
 
-def process_accessors(spirv_type, accessors):
+def process_accessors(spirv_type, accessors, size_func):
     offset = 0
 
     while len(accessors) > 0:
@@ -638,7 +646,7 @@ def process_accessors(spirv_type, accessors):
                 spirv_type.base_type != 'RuntimeArray'):
                 return None
             spirv_type = spirv_type.element_type
-            offset += int(md.group(1)) * spirv_type.uniform_size()
+            offset += int(md.group(1)) * size_func(spirv_type)
             accessors = accessors[len(md.group(0)):]
             continue
 
@@ -651,25 +659,33 @@ def process_accessors(spirv_type, accessors):
             except ValueError:
                 return None
             for i in range(index):
-                offset += spirv_type.member_types[i].uniform_size()
+                offset += size_func(spirv_type.member_types[i])
             spirv_type = spirv_type.member_types[index]
             accessors = accessors[len(md.group(0)):]
             continue
 
     return offset
 
-def remap_uniform(name, uniform_map):
+def remap_variable(name, location_map, size_func):
     md = re.match(r'(.+?)([\[\.]|$)', name)
-    if md.group(1) not in uniform_map:
+    if md.group(1) not in location_map:
         return None
-    var = uniform_map[md.group(1)]
+    var = location_map[md.group(1)]
     if var.location is None:
         return None
-    offset = process_accessors(var.type, name[len(md.group(1)):])
+    offset = process_accessors(var.type,
+                               name[len(md.group(1)):],
+                               size_func)
     if offset is None:
         return None
     else:
         return str(var.location + offset)
+
+def remap_uniform(name, uniform_map):
+    return remap_variable(name, uniform_map, SpirvType.uniform_size)
+
+def remap_attribute(name, attrib_map):
+    return remap_variable(name, attrib_map, SpirvType.attrib_size)
 
 def filter_shader_test(fin, fout,
                        replacements,
@@ -684,11 +700,11 @@ def filter_shader_test(fin, fout,
     attrib_re = re.compile(r'\b([\[\]a-zA-Z0-9_]+)((?:/[\[\]a-zA-Z_0-9]+){2})')
 
     def vertex_data_replacement(md):
-        if md.group(1) in attrib_map.inputs:
-            loc = attrib_map.inputs[md.group(1)].location
-            if loc is not None:
-                return str(loc) + md.group(2)
-        return md.group(0)
+        replacement = remap_attribute(md.group(1), attrib_map)
+        if replacement is None:
+            return md.group(0)
+        else:
+            return replacement + md.group(2)
 
     for line in fin:
         if line.startswith('['):
@@ -909,7 +925,7 @@ def process_shader_test(shader_test, config):
             filter_shader_test(fin, fout,
                                replacements,
                                uniform_map,
-                               vertex_stage,
+                               vertex_stage.inputs,
                                spirv_line == None)
     if config.replace:
         os.rename(spv_shader_test_file, shader_test)
