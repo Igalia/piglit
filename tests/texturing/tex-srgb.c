@@ -68,27 +68,35 @@ nonlinear_to_linear(GLubyte cs8)
 	return table[cs8];
 }
 
-static void fill_level(int level, const GLfloat *color)
+static void fill_level(GLuint tex, int level, const GLfloat *color,
+		       bool with_clear)
 {
         GLfloat *data;
         int size = SIZE / (1 << level);
         int i;
 
-        /* Update a square inside the texture to red */
-        data = malloc(size * size * 4 * sizeof(GLfloat));
-        for (i = 0; i < 4 * size * size; i += 4) {
-                data[i + 0] = color[0];
-                data[i + 1] = color[1];
-                data[i + 2] = color[2];
-                data[i + 3] = color[3];
-        }
-        glTexImage2D(GL_TEXTURE_2D, level, GL_SRGB8_ALPHA8, size, size, 0,
-                     GL_RGBA, GL_FLOAT, data);
-        free(data);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	if (with_clear) {
+		glTexImage2D(GL_TEXTURE_2D, level, GL_SRGB8_ALPHA8, size, size,
+			     0, GL_RGBA, GL_FLOAT, NULL);
+		glClearTexImage(tex, level, GL_RGBA, GL_FLOAT, color);
+	} else {
+		/* Update a square inside the texture to red */
+		data = malloc(size * size * 4 * sizeof(GLfloat));
+		for (i = 0; i < 4 * size * size; i += 4) {
+			data[i + 0] = color[0];
+			data[i + 1] = color[1];
+			data[i + 2] = color[2];
+			data[i + 3] = color[3];
+		}
+		glTexImage2D(GL_TEXTURE_2D, level, GL_SRGB8_ALPHA8, size, size,
+			     0, GL_RGBA, GL_FLOAT, data);
+		free(data);
+	}
 }
 
 static GLboolean
-srgb_tex_test(int srgb_format)
+srgb_tex_test(bool with_clear)
 {
 	GLboolean pass = GL_TRUE;
 	float green[] = {0, 0.3, 0.0, 0};
@@ -101,9 +109,9 @@ srgb_tex_test(int srgb_format)
 
 	glGenTextures(1, &tex);
 
-	glBindTexture(GL_TEXTURE_2D, tex);
+	fill_level(tex, 0, green, with_clear);
 
-	fill_level(0, green);
+	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
@@ -154,7 +162,12 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
-	pass = srgb_tex_test(0);
+	pass = srgb_tex_test(false);
+
+	if (piglit_is_extension_supported("GL_ARB_clear_texture")) {
+		/* This case is of particular interest to Intel GPUs */
+		pass &= srgb_tex_test(true);
+	}
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
