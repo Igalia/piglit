@@ -1,0 +1,39 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+uniform vec4 red = vec4(1.0, 0.0, 0.0, 1.0);
+uniform vec4 color_delta = vec4(-1.0, 1.0, 0.0, 0.0);
+uniform float a = -1.0;
+uniform float b = 1.0;
+uniform float c = 0.5;
+
+attribute vec4 piglit_vertex;
+varying vec4 color;
+
+void main()
+{
+    gl_Position = piglit_vertex;
+
+    color = red;
+
+    /* This attempts to reproduce a bug in the i965 vec4 backend.  Three-
+     * source instructions, like LRP, cannot write to the null register.
+     * However, when the result is only used in a condition, the write can be
+     * (erroneously) eliminated.
+     */
+    if (mix(a, b, c) == 0)
+        color += color_delta;
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+    gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
