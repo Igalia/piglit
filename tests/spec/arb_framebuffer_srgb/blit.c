@@ -177,6 +177,7 @@
 
 const int PATTERN_WIDTH = 256;
 const int PATTERN_HEIGHT = 64;
+const float src_clear_col = 128.0 / 255.0;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -195,6 +196,7 @@ static GLsizei src_samples;
 static GLsizei dst_samples;
 static bool scaled_blit;
 static bool enable_srgb_framebuffer;
+static bool src_fill_mode_clear;
 
 /* GL objects */
 static GLuint src_fbo;
@@ -258,6 +260,7 @@ print_usage_and_exit(char *prog_name)
 {
 	printf("Usage: %s <backing_type> <sRGB_types> <blit_type>\n"
 	       "          <framebuffer_srgb_setting>\n"
+	       "          <src_fill_mode>\n"
 	       "  where <backing_type> is one of:\n"
 	       "    texture (ignored for multisampled framebuffers)\n"
 	       "    renderbuffer\n"
@@ -274,7 +277,10 @@ print_usage_and_exit(char *prog_name)
 	       "    scaled\n"
 	       "  where framebuffer_srgb_setting is one of:\n"
 	       "    enabled\n"
-	       "    disabled\n",
+	       "    disabled\n"
+	       "  where src_fill_mode is one of:\n"
+	       "    clear\n"
+	       "    render\n",
 	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -284,7 +290,7 @@ piglit_init(int argc, char **argv)
 {
 	GLint max_samples;
 
-	if (argc != 5) {
+	if (argc != 6) {
 		print_usage_and_exit(argv[0]);
 	}
 
@@ -340,6 +346,14 @@ piglit_init(int argc, char **argv)
 		enable_srgb_framebuffer = true;
 	} else if (strcmp(argv[4], "disabled") == 0) {
 		enable_srgb_framebuffer = false;
+	} else {
+		print_usage_and_exit(argv[0]);
+	}
+
+	if (strcmp(argv[5], "clear") == 0) {
+		src_fill_mode_clear = true;
+	} else if (strcmp(argv[5], "render") == 0) {
+		src_fill_mode_clear = false;
 	} else {
 		print_usage_and_exit(argv[0]);
 	}
@@ -401,7 +415,8 @@ analyze_image(GLuint fbo)
 	for (y = 0; y < PATTERN_HEIGHT; ++y) {
 		for (x = 0; x < PATTERN_WIDTH; ++x) {
 			for (component = 0; component < 4; ++component) {
-				float val = x / 255.0;
+				float val = src_fill_mode_clear ?
+					    src_clear_col : x / 255.0;
 				if (component < 3 && enable_srgb_framebuffer) {
 					if (src_format == GL_SRGB8_ALPHA8)
 						val = srgb_to_linear(val);
@@ -437,12 +452,18 @@ piglit_display()
 	}
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst_fbo);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, src_fbo);
-	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Draw the source image */
-	glViewport(0, 0, PATTERN_WIDTH, PATTERN_HEIGHT);
-	piglit_draw_rect(-1, -1, 2, 2);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, src_fbo);
+	if (src_fill_mode_clear) {
+		/* This case is of particular interest to Intel GPUs. */
+		glClearColor(src_clear_col, src_clear_col,
+			     src_clear_col, src_clear_col);
+		glClear(GL_COLOR_BUFFER_BIT);
+	} else {
+		glViewport(0, 0, PATTERN_WIDTH, PATTERN_HEIGHT);
+		piglit_draw_rect(-1, -1, 2, 2);
+	}
 
 	/* Do the blit */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo);

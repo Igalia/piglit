@@ -2026,11 +2026,13 @@ with profile.test_list.group_manager(
                               'msaa', 'scaled'):
                 for framebuffer_srgb_setting in ('enabled',
                                                  'disabled'):
-                    g(['arb_framebuffer_srgb-blit', backing_type, srgb_types,
-                        blit_type, framebuffer_srgb_setting],
-                      'blit {} {} {} {}'.format(
-                          backing_type, srgb_types, blit_type,
-                          framebuffer_srgb_setting))
+                    for src_fill_mode in ('clear', 'render'):
+                        g(['arb_framebuffer_srgb-blit', backing_type,
+                            srgb_types, blit_type, framebuffer_srgb_setting,
+                            src_fill_mode],
+                          'blit {} {} {} {} {}'.format(
+                              backing_type, srgb_types, blit_type,
+                              framebuffer_srgb_setting, src_fill_mode))
     g(['framebuffer-srgb'], run_concurrent=False)
     g(['arb_framebuffer_srgb-clear'])
     g(['arb_framebuffer_srgb-pushpop'])
