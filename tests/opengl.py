@@ -570,6 +570,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 1.0')) as g:
     g(['gl-1.0-beginend-coverage'])
+    g(['gl-1.0-bitmap-heart-dance'])
     g(['gl-1.0-dlist-beginend'])
     g(['gl-1.0-dlist-bitmap'])
     g(['gl-1.0-dlist-materials'])
