@@ -1,0 +1,99 @@
+# UBO test using a matrix. One stage
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 32
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %outColor "outColor"
+               OpName %ComponentsBlock "ComponentsBlock"
+               OpMemberName %ComponentsBlock 0 "matrix"
+               OpName %components "components"
+               OpDecorate %outColor Location 0
+               OpMemberDecorate %ComponentsBlock 0 ColMajor
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpMemberDecorate %ComponentsBlock 0 MatrixStride 16
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+%mat4v4float = OpTypeMatrix %v4float 4
+%ComponentsBlock = OpTypeStruct %mat4v4float
+%_ptr_Uniform_ComponentsBlock = OpTypePointer Uniform %ComponentsBlock
+ %components = OpVariable %_ptr_Uniform_ComponentsBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+      %int_3 = OpConstant %int 3
+       %uint = OpTypeInt 32 0
+     %uint_0 = OpConstant %uint 0
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+     %uint_1 = OpConstant %uint 1
+     %uint_2 = OpConstant %uint 2
+     %uint_3 = OpConstant %uint 3
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %20 = OpAccessChain %_ptr_Uniform_float %components %int_0 %int_3 %uint_0
+         %21 = OpLoad %float %20
+         %23 = OpAccessChain %_ptr_Uniform_float %components %int_0 %int_3 %uint_1
+         %24 = OpLoad %float %23
+         %26 = OpAccessChain %_ptr_Uniform_float %components %int_0 %int_3 %uint_2
+         %27 = OpLoad %float %26
+         %29 = OpAccessChain %_ptr_Uniform_float %components %int_0 %int_3 %uint_3
+         %30 = OpLoad %float %29
+         %31 = OpCompositeConstruct %v4float %21 %24 %27 %30
+               OpStore %outColor %31
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (binding = 5, column_major) uniform ComponentsBlock
+ {
+    mat4 matrix;
+ } components;
+
+void main()
+{
+	outColor = vec4(components.matrix[3][0], components.matrix[3][1], components.matrix[3][2], components.matrix[3][3]);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+block binding 5
+block offset 0
+block matrix stride 16
+block row major 0
+uniform mat4 ComponentsBlock.matrix 0.11 0.12 0.13 0.14 0.21 0.22 0.23 0.24 0.31 0.32 0.33 0.34 0.41 0.42 0.43 0.44
+
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_BUFFER_DATA_SIZE 64
+
+draw rect -1 -1 2 2
+probe all rgba 0.41 0.42 0.43 0.44
