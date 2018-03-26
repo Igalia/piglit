@@ -305,7 +305,7 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
             testname, ext = os.path.splitext(filename)
             if ext == '.shader_test':
                 if PROCESS_ISOLATION:
-                    test = ShaderTest(os.path.join(dirpath, filename))
+                    test = ShaderTest.new(os.path.join(dirpath, filename))
                 else:
                     shader_tests[groupname].append(os.path.join(dirpath, filename))
                     continue
@@ -337,7 +337,7 @@ for group, files in six.iteritems(shader_tests):
     if len(files) == 1:
         group = grouptools.join(
             group, os.path.basename(os.path.splitext(files[0])[0]))
-        profile.test_list[group] = ShaderTest(files[0])
+        profile.test_list[group] = ShaderTest.new(files[0])
     else:
         profile.test_list[group] = MultiShaderTest(files)
 

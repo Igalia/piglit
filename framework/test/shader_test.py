@@ -154,26 +154,31 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
 
     """
 
-    def __init__(self, filename):
-        if bool(os.environ.get('PIGLIT_NO_FAST_SKIP', False)):
-            # No need to parse the shader test file if we've disabled
-            # the FastSkip feature.
-            super(ShaderTest, self).__init__(
-                ['shader_runner', filename],
-                run_concurrent=True,)
-        else:
-            parser = Parser(filename)
-            parser.parse()
+    def __init__(self, command, gl_required=set(), gl_version=None,
+                 gles_version=None, glsl_version=None, glsl_es_version=None,
+                 **kwargs):
+        super(ShaderTest, self).__init__(
+            command,
+            run_concurrent=True,
+            gl_required=gl_required,
+            gl_version=gl_version,
+            gles_version=gles_version,
+            glsl_version=glsl_version,
+            glsl_es_version=glsl_es_version)
 
-            super(ShaderTest, self).__init__(
-                [parser.prog, parser.filename],
-                run_concurrent=True,
-                gl_required=parser.gl_required,
-                gl_version=parser.gl_version,
-                gles_version=parser.gles_version,
-                glsl_version=parser.glsl_version,
-                glsl_es_version=parser.glsl_es_version)
+    @classmethod
+    def new(cls, filename):
+        parser = Parser(filename)
+        parser.parse()
 
+        return cls(
+            [parser.prog, parser.filename],
+            run_concurrent=True,
+            gl_required=parser.gl_required,
+            gl_version=parser.gl_version,
+            gles_version=parser.gles_version,
+            glsl_version=parser.glsl_version,
+            glsl_es_version=parser.glsl_es_version)
 
     @PiglitBaseTest.command.getter
     def command(self):
@@ -197,6 +202,7 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
     """
 
     def __init__(self, filenames):
+        # TODO
         assert filenames
         prog = None
         files = []

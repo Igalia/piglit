@@ -93,7 +93,7 @@ class TestConfigParsing(object):
 
             [next section]
             """.format(operator, gles)))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert os.path.basename(test.command[0]) == expected
 
@@ -105,7 +105,7 @@ class TestConfigParsing(object):
             GL ES >= 3.0
             GLSL ES >= 3.00 es
             """))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert os.path.basename(test.command[0]) == "shader_runner_gles3"
 
@@ -117,7 +117,7 @@ class TestConfigParsing(object):
             GL >= 3.0
             GL_ARB_ham_sandwhich
             """))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert test.gl_required == {'GL_ARB_ham_sandwhich'}
 
@@ -129,7 +129,7 @@ class TestConfigParsing(object):
             GL >= 2.0
             GL_ARB_ham_sandwhich
             """))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert test.gl_version == 2.0
 
@@ -141,7 +141,7 @@ class TestConfigParsing(object):
             GL ES >= 2.0
             GL_ARB_ham_sandwhich
             """))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert test.gles_version == 2.0
 
@@ -153,7 +153,7 @@ class TestConfigParsing(object):
             GL >= 2.1
             GLSL >= 1.20
             """))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert test.glsl_version == 1.2
 
@@ -165,7 +165,7 @@ class TestConfigParsing(object):
             GL ES >= 2.0
             GLSL ES >= 1.00
             """))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert test.glsl_es_version == 1.0
 
@@ -185,7 +185,7 @@ class TestConfigParsing(object):
             GL_MAX_VARYING_COMPONENTS
             GL_ARB_foobar
             """))
-        test = shader_test.ShaderTest(six.text_type(p))
+        test = shader_test.ShaderTest.new(six.text_type(p))
 
         assert test.gl_version == 3.3
         assert test.glsl_version == 1.50
@@ -208,13 +208,13 @@ class TestCommand(object):
     def test_getter_adds_auto_and_fbo(self, test_file):
         """test.shader_test.ShaderTest: -auto and -fbo is added to the command.
         """
-        test = shader_test.ShaderTest(test_file)
+        test = shader_test.ShaderTest.new(test_file)
         assert '-auto' in test.command
         assert '-fbo' in test.command
 
     def test_setter_doesnt_add_auto_and_fbo(self, test_file):
         """Don't add -fbo or -auto to self._command when using the setter."""
-        test = shader_test.ShaderTest(test_file)
+        test = shader_test.ShaderTest.new(test_file)
         test.command += ['-newarg']
         assert '-auto' not in test._command
         assert '-fbo' not in test._command
