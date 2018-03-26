@@ -284,6 +284,9 @@ class TestProfile(object):
             'ignore_missing': False,
         }
 
+    def __len__(self):
+        return sum(1 for _ in self.itertests())
+
     def setup(self):
         """Method to do pre-run setup."""
 
@@ -381,15 +384,12 @@ def run(profiles, logger, backend, concurrency):
     """
     chunksize = 1
 
-    # The logger needs to know how many tests are running. Because of filters
-    # there's no way to do that without making a concrete list out of the
-    # filters profiles.
-    profiles = [(p, list(p.itertests())) for p in profiles]
-    log = LogManager(logger, sum(len(l) for _, l in profiles))
+    profiles = [(p, p.itertests()) for p in profiles]
+    log = LogManager(logger, sum(len(p) for p, _ in profiles))
 
     # check that after the filters are run there are actually tests to run.
-    if not any(l for _, l in profiles):
-        raise exceptions.PiglitUserError('no matching tests')
+    # if not any(l for _, l in profiles):
+        # raise exceptions.PiglitUserError('no matching tests')
 
     def test(name, test, profile, this_pool=None):
         """Function to call test.execute from map"""
