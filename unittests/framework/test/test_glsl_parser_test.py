@@ -83,7 +83,7 @@ def test_no_config_start(tmpdir):
         // [end config]"""))
 
     with pytest.raises(glsl.GLSLParserNoConfigError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 def test_find_config_start(tmpdir):
@@ -96,7 +96,7 @@ def test_find_config_start(tmpdir):
         // glsl_version: 1.10"""))
 
     with pytest.raises(exceptions.PiglitFatalError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 def test_no_config_end(tmpdir):
@@ -106,7 +106,7 @@ def test_no_config_end(tmpdir):
     p.write('// [config]')
 
     with pytest.raises(exceptions.PiglitFatalError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 def test_no_expect_result(tmpdir):
@@ -119,7 +119,7 @@ def test_no_expect_result(tmpdir):
         // [end config]"""))
 
     with pytest.raises(exceptions.PiglitFatalError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 def test_no_glsl_version(tmpdir):
@@ -132,7 +132,7 @@ def test_no_glsl_version(tmpdir):
         // [end config]"""))
 
     with pytest.raises(exceptions.PiglitFatalError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 def test_cpp_comments(tmpdir):
@@ -144,7 +144,7 @@ def test_cpp_comments(tmpdir):
         // expect_result: pass
         // glsl_version: 1.10
         // [end config]"""))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert test.command == [os.path.join(_TEST_BIN_DIR, 'glslparsertest'),
                             six.text_type(p), 'pass', '1.10']
@@ -161,7 +161,7 @@ def test_c_comments(tmpdir):
          * [end config]
          */"""))
 
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert test.command == [os.path.join(_TEST_BIN_DIR, 'glslparsertest'),
                             six.text_type(p), 'pass', '1.10']
@@ -177,7 +177,7 @@ def test_blank_in_config_cpp(tmpdir):
         // expect_result: pass
         // glsl_version: 1.10
         // [end config]"""))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert test.command == [os.path.join(_TEST_BIN_DIR, 'glslparsertest'),
                             six.text_type(p), 'pass', '1.10']
@@ -193,7 +193,7 @@ def test_empty_in_config_cpp(tmpdir):
         // expect_result: pass
         // glsl_version: 1.10
         // [end config]"""))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert test.command == [os.path.join(_TEST_BIN_DIR, 'glslparsertest'),
                             six.text_type(p), 'pass', '1.10']
@@ -210,7 +210,7 @@ def test_blank_in_config_c(tmpdir):
          * glsl_version: 1.10
          * [end config]
          */"""))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert test.command == [os.path.join(_TEST_BIN_DIR, 'glslparsertest'),
                             six.text_type(p), 'pass', '1.10']
@@ -227,7 +227,7 @@ def test_empty_in_config_c(tmpdir):
          * glsl_version: 1.10
          * [end config]
          */"""))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert test.command == [os.path.join(_TEST_BIN_DIR, 'glslparsertest'),
                             six.text_type(p), 'pass', '1.10']
@@ -253,7 +253,7 @@ def test_config_to_command(config, expected, tmpdir):
     """Test that config blocks are converted into the expected commands."""
     p = tmpdir.join('test.frag')
     p.write(config)
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
     # add the filename, which isn't known util now
     expected.insert(1, six.text_type(p))
 
@@ -272,7 +272,7 @@ def test_bad_section_name(tmpdir):
         // [end config]"""))
 
     with pytest.raises(exceptions.PiglitFatalError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 @pytest.mark.parametrize(
@@ -293,7 +293,7 @@ def test_duplicate_entry(extra, tmpdir):
         // [end config]""".format(extra)))
 
     with pytest.raises(exceptions.PiglitFatalError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 @pytest.mark.parametrize(
@@ -313,7 +313,7 @@ def test_invalid_extensions_separator(separator, tmpdir):
         // [end config]""".format(separator)))
 
     with pytest.raises(exceptions.PiglitFatalError):
-        glsl.GLSLParserTest(six.text_type(p))
+        glsl.GLSLParserTest.new(six.text_type(p))
 
 
 @pytest.mark.parametrize(
@@ -333,7 +333,7 @@ def test_valid_extensions(ext, tmpdir):
         // [end config]""".format(ext)))
 
     expected = ext.split(' ')
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert test.command[-len(expected):] == expected
 
@@ -365,7 +365,7 @@ def test_get_glslparsertest_gles2(version, has_bin, forced, tmpdir, mocker):
          * glsl_version: {}
          * [end config]
          */""".format(version)))
-    inst = glsl.GLSLParserTest(six.text_type(p))
+    inst = glsl.GLSLParserTest.new(six.text_type(p))
 
     assert os.path.basename(inst.command[0]) == expected
 
@@ -384,23 +384,23 @@ class TestGLSLParserTestSkipRequirements(object):
     def test_glsl_version(self, tmpdir):
         p = tmpdir.join('test.frag')
         self.write_config(p)
-        assert glsl.GLSLParserTest(six.text_type(p)).glsl_version == 4.3
+        assert glsl.GLSLParserTest.new(six.text_type(p)).glsl_version == 4.3
 
     def test_glsl_es_version(self, tmpdir):
         p = tmpdir.join('test.frag')
         self.write_config(p, version='3.0')
-        assert glsl.GLSLParserTest(six.text_type(p)).glsl_es_version == 3.0
+        assert glsl.GLSLParserTest.new(six.text_type(p)).glsl_es_version == 3.0
 
     def test_gl_required(self, tmpdir):
         p = tmpdir.join('test.frag')
         self.write_config(p, extra="require_extensions: GL_ARB_foo GL_ARB_bar")
-        assert glsl.GLSLParserTest(six.text_type(p)).gl_required == \
+        assert glsl.GLSLParserTest.new(six.text_type(p)).gl_required == \
             {'GL_ARB_foo', 'GL_ARB_bar'}
 
     def test_exclude_not_added_to_gl_required(self, tmpdir):
         p = tmpdir.join('test.frag')
         self.write_config(p, extra="require_extensions: GL_ARB_foo !GL_ARB_bar")
-        assert glsl.GLSLParserTest(six.text_type(p)).gl_required == \
+        assert glsl.GLSLParserTest.new(six.text_type(p)).gl_required == \
             {'GL_ARB_foo'}
 
 
@@ -417,7 +417,7 @@ def test_skip_desktop_without_binary(tmpdir, mocker):
          * glsl_version: 1.10
          * [end config]
          */"""))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     with pytest.raises(_TestIsSkip):
         test.is_skip()
@@ -446,7 +446,7 @@ def test_add_compatibility_requirement_fastskip(version, extension, tmpdir,
          * require_extensions: GL_ARB_ham_sandwhich
          * [end config]
          */""".format(version)))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     # The arb_compat extension was added to the fast skipping arguments
     assert extension in test.gl_required
@@ -476,7 +476,7 @@ def test_add_compatibility_requirement_binary(version, extension, tmpdir,
          * require_extensions: GL_ARB_ham_sandwhich
          * [end config]
          */""".format(version)))
-    test = glsl.GLSLParserTest(six.text_type(p))
+    test = glsl.GLSLParserTest.new(six.text_type(p))
 
     # The compat extension was added to the slow skipping (C level)
     # requirements

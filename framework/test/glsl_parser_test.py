@@ -272,11 +272,17 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
                 .tesc, .tese, .geom or .frag
     """
 
-    def __init__(self, filepath):
-        parsed = Parser(filepath)
+    def __init__(self, command, gl_required=set(), glsl_version=None,
+                 glsl_es_version=None, **kwargs):
         super(GLSLParserTest, self).__init__(
+            command, run_concurrent=True, gl_required=gl_required,
+            glsl_version=glsl_version, glsl_es_version=glsl_es_version)
+
+    @classmethod
+    def new(cls, filepath):
+        parsed = Parser(filepath)
+        return cls(
             parsed.command,
-            run_concurrent=True,
             gl_required=parsed.gl_required,
             glsl_version=parsed.glsl_version,
             glsl_es_version=parsed.glsl_es_version)
