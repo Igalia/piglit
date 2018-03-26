@@ -70,8 +70,11 @@ class PiglitBaseTest(ValgrindMixin, Test):
     def __init__(self, command, run_concurrent=True, **kwargs):
         super(PiglitBaseTest, self).__init__(command, run_concurrent, **kwargs)
 
+    @Test.command.getter
+    def command(self):
         # Prepend TEST_BIN_DIR to the path.
-        self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
+        cmd = os.path.join(TEST_BIN_DIR, super(PiglitBaseTest, self).command[0])
+        return [cmd] + self._command[1:]
 
     def interpret_result(self):
         out = []
