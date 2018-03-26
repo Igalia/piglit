@@ -137,13 +137,13 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
 
         if not require_platforms or set(require_platforms).issubset(
                 set(core.PLATFORMS)):
-            self.__require_platforms = require_platforms or []
+            self.require_platforms = require_platforms or []
         else:
             raise Exception("Error: require_platform is not valid")
 
         if (not exclude_platforms or
                 set(exclude_platforms).issubset(set(core.PLATFORMS))):
-            self.__exclude_platforms = exclude_platforms or []
+            self.exclude_platforms = exclude_platforms or []
         else:
             raise Exception("Error: exclude_platforms is not valid")
 
@@ -156,16 +156,16 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
 
         """
         platform = options.OPTIONS.env['PIGLIT_PLATFORM']
-        if self.__require_platforms and platform not in self.__require_platforms:
+        if self.require_platforms and platform not in self.require_platforms:
             raise TestIsSkip(
                 'Test requires one of the following platforms "{}" '
                 'but the platform is "{}"'.format(
-                    self.__require_platforms, platform))
-        elif self.__exclude_platforms and platform in self.__exclude_platforms:
+                    self.require_platforms, platform))
+        elif self.exclude_platforms and platform in self.exclude_platforms:
             raise TestIsSkip(
                 'Test cannot be run on any of the following platforms "{}" '
                 'and the platform is "{}"'.format(
-                    self.__exclude_platforms, platform))
+                    self.exclude_platforms, platform))
         super(PiglitGLTest, self).is_skip()
 
     @PiglitBaseTest.command.getter
