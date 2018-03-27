@@ -305,8 +305,8 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
         groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
         for filename in filenames:
             testname, ext = os.path.splitext(filename)
+            dirname = os.path.relpath(dirpath, ROOT_DIR)
             if ext == '.shader_test':
-                dirname = os.path.relpath(dirpath, ROOT_DIR)
                 if PROCESS_ISOLATION:
                     test = ShaderTest.new(os.path.join(dirname, filename))
                 else:
@@ -314,7 +314,7 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
                     continue
             elif ext in ['.vert', '.tesc', '.tese', '.geom', '.frag', '.comp']:
                 try:
-                    test = GLSLParserTest.new(os.path.join(dirpath, filename))
+                    test = GLSLParserTest.new(os.path.join(dirname, filename))
                 except GLSLParserNoConfigError:
                     # In the event that there is no config assume that it is a
                     # legacy test, and continue

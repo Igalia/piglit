@@ -33,7 +33,7 @@ import six
 from framework import exceptions
 from .base import TestIsSkip
 from .opengl import FastSkipMixin
-from .piglit_test import PiglitBaseTest, TEST_BIN_DIR
+from .piglit_test import PiglitBaseTest, TEST_BIN_DIR, ROOT_DIR
 
 __all__ = [
     'GLSLParserTest',
@@ -95,11 +95,12 @@ class Parser(object):
         self.gl_required = set()
         self.glsl_es_version = None
         self.glsl_version = None
+        abs_filepath = os.path.join(ROOT_DIR, filepath)
 
         try:
-            with io.open(filepath, mode='r', encoding='utf-8') as testfile:
+            with io.open(abs_filepath, mode='r', encoding='utf-8') as testfile:
                 testfile = testfile.read()
-                self.config = self.parse(testfile, filepath)
+                self.config = self.parse(testfile, abs_filepath)
             self.command = self.get_command(filepath)
         except GLSLParserInternalError as e:
             raise exceptions.PiglitFatalError(
@@ -277,6 +278,12 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         super(GLSLParserTest, self).__init__(
             command, run_concurrent=True, gl_required=gl_required,
             glsl_version=glsl_version, glsl_es_version=glsl_es_version)
+
+    @PiglitBaseTest.command.getter
+    def command(self):
+        command = super(GLSLParserTest, self).command
+        glslfile = os.path.join(ROOT_DIR, command[1])
+        return [command[0], glslfile] + command[2:]
 
     @classmethod
     def new(cls, filepath):
