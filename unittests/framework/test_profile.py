@@ -61,11 +61,6 @@ class TestLoadTestProfile(object):
         with pytest.raises(exceptions.PiglitFatalError):
             profile.load_test_profile('this_module_will_never_ever_exist')
 
-    def test_return_type(self):
-        """profile.load_test_profile: returns a TestProfile instance."""
-        assert isinstance(profile.load_test_profile('sanity'),
-                          profile.TestProfile)
-
 
 class TestTestProfile(object):
     """Tests for profile.TestProfile."""

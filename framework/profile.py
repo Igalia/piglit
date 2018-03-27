@@ -30,15 +30,18 @@ tests, and the Test instance.
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import ast
 import collections
 import contextlib
 import copy
 import importlib
+import io
 import itertools
 import multiprocessing
 import multiprocessing.dummy
 import os
 import re
+import xml.etree.cElementTree as et
 
 import six
 
@@ -47,6 +50,12 @@ from framework.dmesg import get_dmesg
 from framework.log import LogManager
 from framework.monitoring import Monitoring
 from framework.test.base import Test, DummyTest
+from framework.test.piglit_test import (
+    PiglitCLTest, PiglitGLTest, ASMParserTest, BuiltInConstantsTest,
+    CLProgramTester, ROOT_DIR,
+)
+from framework.test.shader_test import ShaderTest, MultiShaderTest
+from framework.test.glsl_parser_test import GLSLParserTest
 
 __all__ = [
     'RegexFilter',
@@ -256,6 +265,100 @@ class TestDict(collections.MutableMapping):
         self.__allow_reassignment -= 1
 
 
+def make_test(element):
+    """Rebuild a test instance from xml."""
+    def process(elem, opt):
+        k = elem.attrib['name']
+        v = elem.attrib['value']
+        try:
+            opt[k] = ast.literal_eval(v)
+        except ValueError:
+            opt[k] = v
+
+    type_ = element.attrib['type']
+    options = {}
+    for e in element.findall('./option'):
+        process(e, options)
+
+    if type_ == 'gl':
+        return PiglitGLTest(**options)
+    if type_ == 'gl_builtin':
+        return BuiltInConstantsTest(**options)
+    if type_ == 'cl':
+        return PiglitCLTest(**options)
+    if type_ == 'cl_prog':
+        return CLProgramTester(**options)
+    if type_ == 'shader':
+        return ShaderTest(**options)
+    if type_ == 'glsl_parser':
+        return GLSLParserTest(**options)
+    if type_ == 'asm_parser':
+        return ASMParserTest(**options)
+    if type_ == 'multi_shader':
+        options['skips'] = []
+        for e in element.findall('./Skips/Skip/option'):
+            skips = {}
+            process(e, skips)
+            options['skips'].append(skips)
+        return MultiShaderTest(**options)
+    raise Exception('Unreachable')
+
+
+class XMLProfile(object):
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.forced_test_list = []
+        self.filters = []
+        self.options = {
+            'dmesg': get_dmesg(False),
+            'monitor': Monitoring(False),
+            'ignore_missing': False,
+        }
+
+    def __len__(self):
+        if not (self.filters or self.forced_test_list):
+            with io.open(self.filename, 'rt') as f:
+                iter_ = et.iterparse(f, events=(b'start', ))
+                for _, elem in iter_:
+                    if elem.tag == 'PiglitTestList':
+                        return int(elem.attrib['count'])
+        return sum(1 for _ in self.itertests())
+
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
+    def _itertests(self):
+        """Always iterates tests instead of using the forced test_list."""
+        with io.open(self.filename, 'rt') as f:
+            doc = et.iterparse(f, events=(b'end', ))
+            _, root = next(doc)  # get the root so we can keep clearing it
+            for _, e in doc:
+                if e.tag != 'Test':
+                    continue
+                k = e.attrib['name']
+                v = make_test(e)
+                if all(f(k, v) for f in self.filters):
+                    yield k, v
+                root.clear()
+
+    def itertests(self):
+        if self.forced_test_list:
+            alltests = dict(self._itertests())
+            opts = collections.OrderedDict()
+            for n in self.forced_test_list:
+                if self.options['ignore_missing'] and n not in alltests:
+                    opts[n] = DummyTest(n, status.NOTRUN)
+                else:
+                    opts[n] = alltests[n]
+            return six.iteritems(opts)
+        else:
+            return iter(self._itertests())
+
+
 class TestProfile(object):
     """Class that holds a list of tests for execution.
 
@@ -347,6 +450,11 @@ def load_test_profile(filename):
     Arguments:
     filename -- the name of a python module to get a 'profile' from
     """
+    name = os.path.splitext(os.path.basename(filename))[0]
+    xml = os.path.join(ROOT_DIR, 'tests', name + '.xml')
+    if os.path.exists(xml):
+        return XMLProfile(xml)
+
     try:
         mod = importlib.import_module('tests.{0}'.format(
             os.path.splitext(os.path.basename(filename))[0]))
