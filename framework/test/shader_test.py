@@ -34,7 +34,7 @@ from framework import exceptions
 from framework import status
 from .base import ReducedProcessMixin, TestIsSkip
 from .opengl import FastSkipMixin, FastSkip
-from .piglit_test import PiglitBaseTest
+from .piglit_test import PiglitBaseTest, ROOT_DIR
 
 __all__ = [
     'ShaderTest',
@@ -67,7 +67,7 @@ class Parser(object):
         # cost. The first one looks for the start of the config block or raises
         # an exception. The second looks for the GL version or raises an
         # exception
-        with io.open(self.filename, mode='r', encoding='utf-8') as shader_file:
+        with io.open(os.path.join(ROOT_DIR, self.filename), 'r', encoding='utf-8') as shader_file:
             # The mock in python 3.3 doesn't support readlines(), so use
             # read().split() as a workaround
             lines = (l for l in shader_file.read().split('\n'))
@@ -183,7 +183,9 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
     @PiglitBaseTest.command.getter
     def command(self):
         """ Add -auto and -fbo to the test command """
-        return self._command + ['-auto', '-fbo']
+        command = super(ShaderTest, self).command
+        shaderfile = os.path.join(ROOT_DIR, command[1])
+        return [command[0]] + [shaderfile, '-auto', '-fbo']
 
     @command.setter
     def command(self, new):
@@ -283,10 +285,12 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
         self._process_skips()
         super(MultiShaderTest, self).run()
 
-    @PiglitBaseTest.command.getter  # pylint: disable=no-member
+    @PiglitBaseTest.command.getter
     def command(self):
-        """Add -auto to the test command."""
-        return self._command + ['-auto', '-report-subtests']
+        command = super(MultiShaderTest, self).command
+        shaderfiles = (x for x in command[1:] if not x.startswith('-'))
+        shaderfiles = [os.path.join(ROOT_DIR, s) for s in shaderfiles]
+        return [command[0]] + shaderfiles + ['-auto', '-report-subtests']
 
     def _is_subtest(self, line):
         return line.startswith('PIGLIT TEST:')

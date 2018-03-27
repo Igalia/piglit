@@ -21,7 +21,9 @@ from framework.driver_classifier import DriverClassifier
 from framework.test import (PiglitGLTest, PiglitBaseTest,
                             GLSLParserTest, GLSLParserNoConfigError)
 from framework.test.shader_test import ShaderTest, MultiShaderTest
-from framework.test.piglit_test import ASMParserTest, BuiltInConstantsTest
+from framework.test.piglit_test import (
+    ASMParserTest, BuiltInConstantsTest, ROOT_DIR
+)
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
 __all__ = ['profile']
@@ -304,8 +306,9 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
         for filename in filenames:
             testname, ext = os.path.splitext(filename)
             if ext == '.shader_test':
+                dirname = os.path.relpath(dirpath, ROOT_DIR)
                 if PROCESS_ISOLATION:
-                    test = ShaderTest.new(os.path.join(dirpath, filename))
+                    test = ShaderTest.new(os.path.join(dirname, filename))
                 else:
                     shader_tests[groupname].append(os.path.join(dirpath, filename))
                     continue
