@@ -168,12 +168,17 @@ static bool test_once()
 			i += points;
 
 			/* Compare results against reference image. */
-			pass &= piglit_probe_image_rgba(5+(1+base_size[0]) * z,
-							has_samples() ? 5+(1+base_size[1]) * l
-								      : 5 + level_y,
-							level_size[l][0],
-							level_size[l][1],
-							expected_colors[l][z]);
+			if (!piglit_probe_image_rgba(5 + (1 + base_size[0]) * z,
+						     has_samples() ?
+						     5 + (1 + base_size[1]) * l :
+						     5 + level_y,
+						     level_size[l][0],
+						     level_size[l][1],
+						     expected_colors[l][z])) {
+				piglit_loge("Failed at level %d, slice %d\n",
+					    l, z);
+				pass = false;
+			}
 			free(expected_colors[l][z]);
 		}
 		free(expected_colors[l]);
