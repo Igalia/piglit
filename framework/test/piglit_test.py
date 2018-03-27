@@ -45,14 +45,16 @@ __all__ = [
     'PiglitGLTest',
     'PiglitBaseTest',
     'CL_CONCURRENT',
+    'ROOT_DIR',
     'TEST_BIN_DIR',
 ]
 
 if 'PIGLIT_BUILD_DIR' in os.environ:
-    TEST_BIN_DIR = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
+    ROOT_DIR = os.environ['PIGLIT_BUILD_DIR']
 else:
-    TEST_BIN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                                 '../../bin'))
+    ROOT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '../..'))
+
+TEST_BIN_DIR = os.path.normpath(os.path.join(ROOT_DIR, 'bin'))
 
 CL_CONCURRENT = (not sys.platform.startswith('linux') or
                  glob.glob('/dev/dri/render*'))
