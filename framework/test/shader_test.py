@@ -201,11 +201,22 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
     filenames -- a list of absolute paths to shader test files
     """
 
-    def __init__(self, filenames):
+    def __init__(self, prog, files, subtests, skips):
+        super(MultiShaderTest, self).__init__(
+            [prog] + files,
+            subtests=subtests,
+            run_concurrent=True)
+
+        self.prog = prog
+        self.files = files
+        self.subtests = subtests
+        self.skips = [FastSkip(**s) for s in skips]
+
+    @classmethod
+    def new(cls, filenames):
         # TODO
         assert filenames
         prog = None
-        files = []
         subtests = []
         skips = []
 
@@ -215,7 +226,7 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
         for each in filenames:
             parser = Parser(each)
             parser.parse()
-            subtest = os.path.basename(os.path.splitext(each)[0]).lower()
+            subtests.append(os.path.basename(os.path.splitext(each)[0]).lower())
 
             if prog is not None:
                 # This allows mixing GLES2 and GLES3 shader test files
@@ -236,29 +247,41 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
             else:
                 prog = parser.prog
 
-            try:
-                skipper = FastSkip(gl_required=parser.gl_required,
-                                   gl_version=parser.gl_version,
-                                   gles_version=parser.gles_version,
-                                   glsl_version=parser.glsl_version,
-                                   glsl_es_version=parser.glsl_es_version)
-                skipper.test()
-            except TestIsSkip:
-                skips.append(subtest)
-                continue
-            files.append(parser.filename)
-            subtests.append(subtest)
+            skips.append({
+                'gl_required': parser.gl_required,
+                'gl_version': parser.gl_version,
+                'glsl_version': parser.glsl_version,
+                'gles_version': parser.gles_version,
+                'glsl_es_version': parser.glsl_es_version,
+            })
 
-        assert len(subtests) + len(skips) == len(filenames), \
+        return cls(prog, filenames, subtests, skips)
+
+    def _process_skips(self):
+        r_files = []
+        r_subtests = []
+        r_skips = []
+        for f, s, k in zip(self.files, self.subtests, self.skips):
+            try:
+                k.test()
+            except TestIsSkip:
+                r_skips.append(s)
+            else:
+                r_files.append(f)
+                r_subtests.append(s)
+
+        assert len(r_subtests) + len(r_skips) == len(self.files), \
             'not all tests accounted for'
 
-        super(MultiShaderTest, self).__init__(
-            [prog] + files,
-            subtests=subtests,
-            run_concurrent=True)
-
-        for name in skips:
+        for name in r_skips:
             self.result.subtests[name] = status.SKIP
+
+        self._expected = r_subtests
+        self._command = [self._command[0]] + r_files
+
+    def run(self):
+        self._process_skips()
+        super(MultiShaderTest, self).run()
 
     @PiglitBaseTest.command.getter  # pylint: disable=no-member
     def command(self):

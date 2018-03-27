@@ -339,7 +339,7 @@ for group, files in six.iteritems(shader_tests):
             group, os.path.basename(os.path.splitext(files[0])[0]))
         profile.test_list[group] = ShaderTest.new(files[0])
     else:
-        profile.test_list[group] = MultiShaderTest(files)
+        profile.test_list[group] = MultiShaderTest.new(files)
 
 
 # Collect and add all asmparsertests

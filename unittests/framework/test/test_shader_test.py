@@ -33,6 +33,7 @@ except ImportError:
 import pytest
 import six
 
+from framework import status
 from framework.test import shader_test
 
 # pylint: disable=invalid-name,no-self-use,protected-access
@@ -242,7 +243,7 @@ class TestMultiShaderTest(object):
 
                 [vertex shader]"""))
 
-            return shader_test.MultiShaderTest(
+            return shader_test.MultiShaderTest.new(
                 [six.text_type(one), six.text_type(two)])
 
         def test_prog(self, inst):
@@ -268,10 +269,11 @@ class TestMultiShaderTest(object):
         two.write(textwrap.dedent("""\
             [require]
             GLSL >= 4.0
+            GL_ARB_ham_sandwhich
 
             [vertex shader]"""))
 
-        return shader_test.MultiShaderTest(
+        return shader_test.MultiShaderTest.new(
             [six.text_type(one), six.text_type(two)])
 
     def test_resume(self, inst):
@@ -279,3 +281,14 @@ class TestMultiShaderTest(object):
         assert os.path.basename(actual[0]) == 'shader_runner'
         assert os.path.basename(actual[1]) == 'bar.shader_test'
         assert os.path.basename(actual[2]) == '-auto'
+
+    def test_skips_set(self, inst):
+        assert inst.skips[0].glsl_version == 3.0
+        assert inst.skips[1].glsl_version == 4.0
+        assert inst.skips[1].gl_required == {'GL_ARB_ham_sandwhich'}
+
+    def test_process_skips(self, inst):
+        expected = {'bar': status.SKIP, 'foo': status.NOTRUN}
+        with mock.patch.object(inst.skips[0].info, 'glsl_version', 3.0):
+            inst._process_skips()
+        assert dict(inst.result.subtests) == expected
