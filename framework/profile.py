@@ -359,6 +359,62 @@ class XMLProfile(object):
             return iter(self._itertests())
 
 
+class MetaProfile(object):
+
+    """Holds multiple profiles but acts like one.
+
+    This is meant to allow classic profiles like all to exist after being
+    split.
+    """
+
+    def __init__(self, filename):
+        self.forced_test_list = []
+        self.filters = []
+        self.options = {
+            'dmesg': get_dmesg(False),
+            'monitor': Monitoring(False),
+            'ignore_missing': False,
+        }
+
+        tree = et.parse(filename)
+        root = tree.getroot()
+        self._profiles = [load_test_profile(p.text)
+                          for p in root.findall('.//Profile')]
+
+        for p in self._profiles:
+            p.options = self.options
+
+    def __len__(self):
+        if self.forced_test_list or self.filters:
+            return sum(1 for _ in self.itertests())
+        return sum(len(p) for p in self._profiles)
+
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
+    def _itertests(self):
+        for p in self._profiles:
+            for k, v in p.itertests():
+                if all(f(k, v) for f in self.filters):
+                    yield k, v
+
+    def itertests(self):
+        if self.forced_test_list:
+            alltests = dict(self._itertests())
+            opts = collections.OrderedDict()
+            for n in self.forced_test_list:
+                if self.options['ignore_missing'] and n not in alltests:
+                    opts[n] = DummyTest(n, status.NOTRUN)
+                else:
+                    opts[n] = alltests[n]
+            return six.iteritems(opts)
+        else:
+            return iter(self._itertests())
+
+
 class TestProfile(object):
     """Class that holds a list of tests for execution.
 
@@ -456,14 +512,18 @@ def load_test_profile(filename, python=None):
               XML is tried.
     """
     name = os.path.splitext(os.path.basename(filename))[0]
-    xml = os.path.join('tests', name + '.xml')
     if not python:
+        meta = os.path.join(ROOT_DIR, 'tests', name + '.meta.xml')
+        if os.path.exists(meta):
+            return MetaProfile(meta)
+
         xml = os.path.join(ROOT_DIR, 'tests', name + '.xml')
         if os.path.exists(xml):
             return XMLProfile(xml)
 
     if python is False:
-        raise exceptions.PiglitFatalError('Cannot open "tests/{}.xml"'.format(name))
+        raise exceptions.PiglitFatalError(
+            'Cannot open "tests/{0}.xml" or "tests/{0}.meta.xml"'.format(name))
 
     try:
         mod = importlib.import_module('tests.{0}'.format(name))
