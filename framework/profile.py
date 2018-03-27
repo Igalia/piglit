@@ -429,7 +429,7 @@ class TestProfile(object):
                 yield k, v
 
 
-def load_test_profile(filename):
+def load_test_profile(filename, python=None):
     """Load a python module and return it's profile attribute.
 
     All of the python test files provide a profile attribute which is a
@@ -449,15 +449,24 @@ def load_test_profile(filename):
 
     Arguments:
     filename -- the name of a python module to get a 'profile' from
+
+    Keyword Arguments:
+    python -- If this is None (the default) XML is tried, and then a python
+              module. If True, then only python is tried, if False then only
+              XML is tried.
     """
     name = os.path.splitext(os.path.basename(filename))[0]
-    xml = os.path.join(ROOT_DIR, 'tests', name + '.xml')
-    if os.path.exists(xml):
-        return XMLProfile(xml)
+    xml = os.path.join('tests', name + '.xml')
+    if not python:
+        xml = os.path.join(ROOT_DIR, 'tests', name + '.xml')
+        if os.path.exists(xml):
+            return XMLProfile(xml)
+
+    if python is False:
+        raise exceptions.PiglitFatalError('Cannot open "tests/{}.xml"'.format(name))
 
     try:
-        mod = importlib.import_module('tests.{0}'.format(
-            os.path.splitext(os.path.basename(filename))[0]))
+        mod = importlib.import_module('tests.{0}'.format(name))
     except ImportError:
         raise exceptions.PiglitFatalError(
             'Failed to import "{}", there is either something wrong with the '
