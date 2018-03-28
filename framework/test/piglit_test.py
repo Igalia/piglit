@@ -189,3 +189,17 @@ class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
     """
     def __init__(self, command, run_concurrent=CL_CONCURRENT, **kwargs):
         super(PiglitCLTest, self).__init__(command, run_concurrent, **kwargs)
+
+
+class ASMParserTest(PiglitBaseTest):
+
+    """Test class for ASM parser tests."""
+
+    def __init__(self, type_, filename):
+        super(ASMParserTest, self).__init__(['asmparsertest', type_])
+        self.filename = filename
+
+    @PiglitBaseTest.command.getter
+    def command(self):
+        command = super(ASMParserTest, self).command
+        return command + [os.path.join(ROOT_DIR, self.filename)]
