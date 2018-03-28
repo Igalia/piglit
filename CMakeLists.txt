@@ -534,7 +534,13 @@ install (
 	DIRECTORY tests
 	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 	FILES_MATCHING REGEX ".*\\.(xml|py|program_test|shader_test|frag|vert|geom|tesc|tese|comp|ktx|cl|txt|inc)$"
-	REGEX "CMakeFiles|CMakeLists" EXCLUDE
+	REGEX "CMakeFiles|CMakeLists|serializer.py|opengl.py|cl.py|quick_gl.py|glslparser.py|shader.py|quick_shader.py|no_error.py|llvmpipe_gl.py|sanity.py" EXCLUDE
+)
+
+install (
+	DIRECTORY ${CMAKE_BINARY_DIR}/tests
+	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
+	FILES_MATCHING REGEX ".*\\.xml"
 )
 
 install (

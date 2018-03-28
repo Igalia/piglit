@@ -25,3 +25,5 @@ ENDIF(EGL_FOUND)
 IF(PIGLIT_BUILD_CL_TESTS)
 	add_subdirectory (cl)
 ENDIF(PIGLIT_BUILD_CL_TESTS)
+
+piglit_include_target_api()
