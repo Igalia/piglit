@@ -353,13 +353,14 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
             'asmparsertest', os.path.relpath(dirpath, _basedir)))
         type_ = os.path.basename(dirpath)
 
+        dirname = os.path.relpath(dirpath, ROOT_DIR)
         for filename in filenames:
             if not os.path.splitext(filename)[1] == '.txt':
                 continue
 
             group = grouptools.join(base_group, filename)
             profile.test_list[group] = ASMParserTest(
-                type_, os.path.join(dirpath, filename))
+                type_, os.path.join(dirname, filename))
 
 # Find and add all apitrace tests.
 classifier = DriverClassifier()
