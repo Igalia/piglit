@@ -3,12 +3,58 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
+import os
 
-from framework.test import GLSLParserTest
-from tests.all import profile as _profile
+from framework import grouptools
+from framework.profile import TestProfile
+from framework.test.glsl_parser_test import GLSLParserTest, GLSLParserNoConfigError
+from framework.test.piglit_test import ASMParserTest, ROOT_DIR
+from .py_modules.constants import GENERATED_TESTS_DIR, TESTS_DIR
 
 __all__ = ['profile']
 
-profile = _profile.copy()  # pylint: disable=invalid-name
+profile = TestProfile()
 
-profile.filters.append(lambda _, t: isinstance(t, GLSLParserTest))
+# Find and add all shader tests.
+basepath = os.path.normpath(os.path.join(TESTS_DIR, '..'))
+for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
+    for dirpath, _, filenames in os.walk(basedir):
+        groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
+        for filename in filenames:
+            testname, ext = os.path.splitext(filename)
+            if ext in ['.vert', '.tesc', '.tese', '.geom', '.frag', '.comp']:
+                try:
+                    test = GLSLParserTest.new(
+                        os.path.join(os.path.relpath(dirpath, basepath), filename))
+                except GLSLParserNoConfigError:
+                    # In the event that there is no config assume that it is a
+                    # legacy test, and continue
+                    continue
+
+                # For glslparser tests you can have multiple tests with the
+                # same name, but a different stage, so keep the extension.
+                testname = filename
+            else:
+                continue
+
+            group = grouptools.join(groupname, testname)
+            assert group not in profile.test_list, group
+
+            profile.test_list[group] = test
+
+# Collect and add all asmparsertests
+for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
+    _basedir = os.path.join(basedir, 'asmparsertest', 'shaders')
+    for dirpath, _, filenames in os.walk(_basedir):
+        base_group = grouptools.from_path(os.path.join(
+            'asmparsertest', os.path.relpath(dirpath, _basedir)))
+        type_ = os.path.basename(dirpath)
+
+        dirname = os.path.relpath(dirpath, ROOT_DIR)
+        for filename in filenames:
+            if not os.path.splitext(filename)[1] == '.txt':
+                continue
+
+            group = grouptools.join(base_group, filename)
+            profile.test_list[group] = ASMParserTest(
+                type_, os.path.join(dirname, filename))

@@ -4,12 +4,10 @@
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
-import collections
 import itertools
 import os
 import platform
 
-import six
 from six.moves import range
 
 from framework import grouptools
@@ -18,17 +16,12 @@ from framework import options
 from framework import wflinfo
 from framework.profile import TestProfile
 from framework.driver_classifier import DriverClassifier
-from framework.test import (PiglitGLTest, PiglitBaseTest,
-                            GLSLParserTest, GLSLParserNoConfigError)
-from framework.test.shader_test import ShaderTest, MultiShaderTest
 from framework.test.piglit_test import (
-    ASMParserTest, BuiltInConstantsTest, ROOT_DIR
+    PiglitGLTest, PiglitBaseTest, BuiltInConstantsTest
 )
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
 __all__ = ['profile']
-
-PROCESS_ISOLATION = options.OPTIONS.process_isolation
 
 # Disable bad hanging indent errors in pylint
 # There is a bug in pylint which causes the profile.test_list.group_manager to
@@ -213,8 +206,6 @@ def power_set(s):
 # Collecting all tests
 profile = TestProfile()  # pylint: disable=invalid-name
 
-shader_tests = collections.defaultdict(list)
-
 wfl_info = wflinfo.WflInfo()
 
 
@@ -294,73 +285,6 @@ def walk_filter_dir_tree(root):
 
     return retval
 
-
-# Find and add all shader tests.
-for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
-    if os.environ.get("PIGLIT_FILTER_DIRECTORIES"):
-        files = walk_filter_dir_tree(basedir)
-    else:
-        files = os.walk(basedir)
-    for dirpath, _, filenames in files:
-        groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
-        for filename in filenames:
-            testname, ext = os.path.splitext(filename)
-            dirname = os.path.relpath(dirpath, ROOT_DIR)
-            if ext == '.shader_test':
-                if PROCESS_ISOLATION:
-                    test = ShaderTest.new(os.path.join(dirname, filename))
-                else:
-                    shader_tests[groupname].append(os.path.join(dirpath, filename))
-                    continue
-            elif ext in ['.vert', '.tesc', '.tese', '.geom', '.frag', '.comp']:
-                try:
-                    test = GLSLParserTest.new(os.path.join(dirname, filename))
-                except GLSLParserNoConfigError:
-                    # In the event that there is no config assume that it is a
-                    # legacy test, and continue
-                    continue
-
-                # For glslparser tests you can have multiple tests with the
-                # same name, but a different stage, so keep the extension.
-                testname = filename
-            else:
-                continue
-
-            group = grouptools.join(groupname, testname)
-            assert group not in profile.test_list, group
-
-            profile.test_list[group] = test
-
-# Because we need to handle duplicate group names in TESTS and GENERATED_TESTS
-# this dictionary is constructed, then added to the actual test dictionary.
-for group, files in six.iteritems(shader_tests):
-    assert group not in profile.test_list, 'duplicate group: {}'.format(group)
-    # If there is only one file in the directory use a normal shader_test.
-    # Otherwise use a MultiShaderTest
-    if len(files) == 1:
-        group = grouptools.join(
-            group, os.path.basename(os.path.splitext(files[0])[0]))
-        profile.test_list[group] = ShaderTest.new(files[0])
-    else:
-        profile.test_list[group] = MultiShaderTest.new(files)
-
-
-# Collect and add all asmparsertests
-for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
-    _basedir = os.path.join(basedir, 'asmparsertest', 'shaders')
-    for dirpath, _, filenames in os.walk(_basedir):
-        base_group = grouptools.from_path(os.path.join(
-            'asmparsertest', os.path.relpath(dirpath, _basedir)))
-        type_ = os.path.basename(dirpath)
-
-        dirname = os.path.relpath(dirpath, ROOT_DIR)
-        for filename in filenames:
-            if not os.path.splitext(filename)[1] == '.txt':
-                continue
-
-            group = grouptools.join(base_group, filename)
-            profile.test_list[group] = ASMParserTest(
-                type_, os.path.join(dirname, filename))
 
 # Find and add all apitrace tests.
 classifier = DriverClassifier()

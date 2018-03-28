@@ -8,7 +8,7 @@ import platform
 import sys
 
 from framework.grouptools import join
-from tests.gpu import profile as _profile
+from tests.quick_gl import profile as _profile
 
 __all__ = ['profile']
 

@@ -1,6 +1,6 @@
-#!/usr/bin/env python
-#
+# encoding=utf-8
 # Copyright 2014 Advanced Micro Devices, Inc.
+# Copyright © 2018 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -20,18 +20,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#
-# Authors: Tom Stellard <thomas.stellard@amd.com>
-#
 
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
-from tests.cl import profile as _profile
+from framework.profile import TestProfile
 from framework.test import add_opencv_tests, add_oclconform_tests
 
-profile = _profile.copy()  # pylint: disable=invalid-name
+profile = TestProfile()
 
 add_opencv_tests(profile)
 add_oclconform_tests(profile)

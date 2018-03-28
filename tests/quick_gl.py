@@ -13,31 +13,15 @@ don't want that level of exhaustiveness, so this filter removes 80% in a random
 from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
-import random
 
 from framework import grouptools
 from framework.test import PiglitGLTest
-from framework.test.shader_test import ShaderTest
-from tests.all import profile as _profile
+from tests.opengl import profile as _profile
 
 __all__ = ['profile']
 
 # See the note in all.py about this warning
 # pylint: disable=bad-continuation
-
-
-class FilterVsIn(object):
-    """Filter out 80% of the Vertex Attrib 64 vs_in tests."""
-
-    def __init__(self):
-        self.random = random.Random()
-        self.random.seed(42)
-
-    def __call__(self, name, test):
-        if isinstance(test, ShaderTest) and 'vs_in' in grouptools.split(name):
-            # 20%
-            return self.random.random() <= .2
-        return True
 
 
 profile = _profile.copy()  # pylint: disable=invalid-name
@@ -92,7 +76,3 @@ with profile.test_list.group_manager(
         g(['arb_texture_multisample-large-float-texture', '--array',
            '--fp16'] + size_arg,
           'large-float-texture-array-fp16', run_concurrent=False)
-
-# These take too long
-profile.filters.append(lambda n, _: '-explosion' not in n)
-profile.filters.append(FilterVsIn())
