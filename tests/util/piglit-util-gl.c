@@ -1018,21 +1018,25 @@ read_pixels_float(GLint x, GLint y, GLsizei width, GLsizei height,
 		  GLenum format, GLfloat *pixels)
 {
 	GLubyte *pixels_b;
-	unsigned i, ncomponents;
+	unsigned i, j, k;
+	int comps = piglit_num_components(format);
 
-	ncomponents = width * height * piglit_num_components(format);
 	if (!pixels)
-		pixels = malloc(ncomponents * sizeof(GLfloat));
+		pixels = malloc(width * height * comps * sizeof(GLfloat));
 
 	if (!piglit_is_gles()) {
 		glReadPixels(x, y, width, height, format, GL_FLOAT, pixels);
 		return pixels;
 	}
 
-	pixels_b = malloc(ncomponents * sizeof(GLubyte));
-	glReadPixels(x, y, width, height, format, GL_UNSIGNED_BYTE, pixels_b);
-	for (i = 0; i < ncomponents; i++)
-		pixels[i] = pixels_b[i] / 255.0;
+	pixels_b = malloc(width * height * 4 * sizeof(GLubyte));
+	glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels_b);
+	k = 0;
+	for (i = 0; i < width * height; i++) {
+		for (j = 0; j < comps; j++) {
+			pixels[k++] = pixels_b[i*4+j] / 255.0f;
+		}
+	}
 	free(pixels_b);
 	return pixels;
 }
