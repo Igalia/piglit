@@ -203,3 +203,8 @@ class ASMParserTest(PiglitBaseTest):
     def command(self):
         command = super(ASMParserTest, self).command
         return command + [os.path.join(ROOT_DIR, self.filename)]
+
+
+class BuiltInConstantsTest(PiglitBaseTest):
+
+    """Test class for handling built in constants tests."""
