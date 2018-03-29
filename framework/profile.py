@@ -205,7 +205,7 @@ class TestDict(collections.MutableMapping):
         """
         assert isinstance(group, six.string_types), type(group)
 
-        def adder(args, name=None, **kwargs):
+        def adder(args, name=None, override_class=None, **kwargs):
             """Helper function that actually adds the tests.
 
             Arguments:
@@ -228,7 +228,9 @@ class TestDict(collections.MutableMapping):
             assert isinstance(name, six.string_types)
             lgroup = grouptools.join(group, name)
 
-            self[lgroup] = test_class(
+            class_ = override_class or test_class
+
+            self[lgroup] = class_(
                 args,
                 **dict(itertools.chain(six.iteritems(default_args),
                                        six.iteritems(kwargs))))
