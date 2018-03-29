@@ -21,7 +21,7 @@ from framework.driver_classifier import DriverClassifier
 from framework.test import (PiglitGLTest, PiglitBaseTest,
                             GLSLParserTest, GLSLParserNoConfigError)
 from framework.test.shader_test import ShaderTest, MultiShaderTest
-from framework.test.piglit_test import ASMParserTest
+from framework.test.piglit_test import ASMParserTest, BuiltInConstantsTest
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
 __all__ = ['profile']
@@ -1224,11 +1224,10 @@ with profile.test_list.group_manager(
 
 # Group spec/glsl-es-1.00
 with profile.test_list.group_manager(
-        PiglitGLTest,
+        BuiltInConstantsTest,
         grouptools.join('spec', 'glsl-es-1.00')) as g:
     g(['built-in-constants_gles2',
-       os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00',
-                    'minimum-maximums.txt')],
+       os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00', 'minimum-maximums.txt')],
       'built-in constants')
 
 # Group spec/glsl-1.10
@@ -1262,7 +1261,7 @@ with profile.test_list.group_manager(
               'simple {} {}'.format(type_, arrayspec))
 
 with profile.test_list.group_manager(
-        PiglitGLTest,
+        BuiltInConstantsTest,
         grouptools.join('spec', 'glsl-1.10')) as g:
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.10', 'minimum-maximums.txt')],
@@ -1280,7 +1279,8 @@ with profile.test_list.group_manager(
     g(['glsl-1.20-getactiveuniform-constant'])
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.20', 'minimum-maximums.txt')],
-      'built-in constants')
+      'built-in constants',
+      override_class=BuiltInConstantsTest)
 
 with profile.test_list.group_manager(
         PiglitGLTest,
@@ -1381,7 +1381,8 @@ with profile.test_list.group_manager(
     g(['glsl-1.30-texel-offset-limits'], 'texel-offset-limits')
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.30', 'minimum-maximums.txt')],
-      'built-in constants')
+      'built-in constants',
+       override_class=BuiltInConstantsTest)
 
 with profile.test_list.group_manager(
         PiglitGLTest,
@@ -1498,7 +1499,7 @@ with profile.test_list.group_manager(
 
 # Group spec/glsl-1.40
 with profile.test_list.group_manager(
-        PiglitGLTest,
+        BuiltInConstantsTest,
         grouptools.join('spec', 'glsl-1.40')) as g:
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.40', 'minimum-maximums.txt')],
@@ -1544,7 +1545,8 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'glsl-1.50')) as g:
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-1.50', 'minimum-maximums.txt')],
-      'built-in constants')
+      'built-in constants',
+      override_class=BuiltInConstantsTest)
     g(['glsl-1.50-gs-emits-too-few-verts'], 'gs-emits-too-few-verts')
     g(['glsl-1.50-geometry-end-primitive-optional-with-points-out'],
       'gs-end-primitive-optional-with-points-out')
@@ -1616,16 +1618,15 @@ with profile.test_list.group_manager(
                   prim_type, restart_index))
 
 with profile.test_list.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'glsl-3.30')) as g:
+        BuiltInConstantsTest, grouptools.join('spec', 'glsl-3.30')) as g:
     g(['built-in-constants',
        os.path.join(TESTS_DIR, 'spec', 'glsl-3.30', 'minimum-maximums.txt')],
       'built-in constants')
 
 with profile.test_list.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'glsl-es-3.00')) as g:
+        BuiltInConstantsTest, grouptools.join('spec', 'glsl-es-3.00')) as g:
     g(['built-in-constants_gles3',
-       os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00',
-                    'minimum-maximums.txt')],
+       os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00', 'minimum-maximums.txt')],
       'built-in constants')
 
 with profile.test_list.group_manager(
@@ -1634,10 +1635,9 @@ with profile.test_list.group_manager(
     g(['varying-struct-centroid_gles3'])
 
 with profile.test_list.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'glsl-es-3.10')) as g:
+        BuiltInConstantsTest, grouptools.join('spec', 'glsl-es-3.10')) as g:
     g(['built-in-constants_gles3',
-       os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.10',
-                    'minimum-maximums.txt')],
+       os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.10', 'minimum-maximums.txt')],
       'built-in constants')
 
 # AMD_performance_monitor
@@ -1669,9 +1669,9 @@ with profile.test_list.group_manager(
     g(['arb_tessellation_shader-invalid-patch-vertices-range'])
     g(['arb_tessellation_shader-invalid-primitive'])
     g(['built-in-constants',
-       os.path.join(TESTS_DIR, 'spec', 'arb_tessellation_shader',
-                    'minimum-maximums.txt')],
-      'built-in-constants')
+       os.path.join(TESTS_DIR, 'spec', 'arb_tessellation_shader', 'minimum-maximums.txt')],
+      'built-in-constants',
+      override_class=BuiltInConstantsTest)
     g(['arb_tessellation_shader-large-uniforms'])
     g(['arb_tessellation_shader-layout-mismatch'])
 
@@ -2427,9 +2427,9 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_shading_language_420pack')) as g:
     g(['built-in-constants',
-       os.path.join(TESTS_DIR, 'spec', 'arb_shading_language_420pack',
-                    'minimum-maximums.txt')],
-      'built-in constants')
+       os.path.join(TESTS_DIR, 'spec', 'arb_shading_language_420pack', 'minimum-maximums.txt')],
+      'built-in constants',
+      override_class=BuiltInConstantsTest)
     g(['arb_shading_language_420pack-multiple-layout-qualifiers'],
       'multiple layout qualifiers')
     g(['arb_shading_language_420pack-active-sampler-conflict'], 'active sampler conflict')
@@ -4365,9 +4365,9 @@ with profile.test_list.group_manager(
     g(['arb_compute_shader-api_errors'], 'api_errors')
     g(['arb_compute_shader-minmax'], 'minmax')
     g(['built-in-constants',
-       os.path.join(TESTS_DIR, 'spec', 'arb_compute_shader',
-                    'minimum-maximums.txt')],
-      'built-in constants')
+       os.path.join(TESTS_DIR, 'spec', 'arb_compute_shader', 'minimum-maximums.txt')],
+      'built-in constants',
+      override_class=BuiltInConstantsTest)
     g(['arb_compute_shader-work_group_size_too_large'],
       grouptools.join('compiler', 'work_group_size_too_large'))
     g(['arb_compute_shader-indirect-compute'], 'indirect-compute')
@@ -4881,11 +4881,10 @@ with profile.test_list.group_manager(
       run_concurrent=False)
 
 with profile.test_list.group_manager(
-        PiglitGLTest,
+        BuiltInConstantsTest,
         grouptools.join('spec', 'oes_geometry_shader')) as g:
     g(['built-in-constants_gles3',
-       os.path.join(TESTS_DIR, 'spec', 'oes_geometry_shader',
-                    'minimum-maximums.txt')],
+       os.path.join(TESTS_DIR, 'spec', 'oes_geometry_shader', 'minimum-maximums.txt')],
       'built-in constants')
 
 # Group EXT_shader_samples_identical
