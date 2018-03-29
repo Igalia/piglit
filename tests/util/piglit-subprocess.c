@@ -23,8 +23,11 @@
 
 #include "piglit-subprocess.h"
 
-#include <unistd.h>
 #include <stdio.h>
+
+#ifndef _WIN32
+
+#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
@@ -187,3 +190,18 @@ piglit_subprocess(char * const *arguments,
 		return ret;
 	}
 }
+
+#else /* _WIN32 */
+
+bool
+piglit_subprocess(char * const *arguments,
+		  size_t input_size,
+		  const uint8_t *input,
+		  size_t *output_size,
+		  uint8_t **output)
+{
+	fprintf(stderr, "piglit_subprocess is not implemented on Windows\n");
+	return false;
+}
+
+#endif /* _WIN32 */
