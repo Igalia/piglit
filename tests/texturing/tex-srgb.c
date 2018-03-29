@@ -68,28 +68,23 @@ nonlinear_to_linear(GLubyte cs8)
 	return table[cs8];
 }
 
-static void fill_level(GLuint tex, int level, const GLfloat *color,
-		       bool with_clear)
+static void fill_level(GLuint tex, const GLfloat *color, bool with_clear)
 {
-        GLfloat *data;
-        int size = SIZE / (1 << level);
-        int i;
-
 	glBindTexture(GL_TEXTURE_2D, tex);
 	if (with_clear) {
-		glTexImage2D(GL_TEXTURE_2D, level, GL_SRGB8_ALPHA8, size, size,
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, SIZE, SIZE,
 			     0, GL_RGBA, GL_FLOAT, NULL);
-		glClearTexImage(tex, level, GL_RGBA, GL_FLOAT, color);
+		glClearTexImage(tex, 0, GL_RGBA, GL_FLOAT, color);
 	} else {
-		/* Update a square inside the texture to red */
-		data = malloc(size * size * 4 * sizeof(GLfloat));
-		for (i = 0; i < 4 * size * size; i += 4) {
+		GLfloat *data = malloc(SIZE * SIZE * 4 * sizeof(GLfloat));
+		int i;
+		for (i = 0; i < 4 * SIZE * SIZE; i += 4) {
 			data[i + 0] = color[0];
 			data[i + 1] = color[1];
 			data[i + 2] = color[2];
 			data[i + 3] = color[3];
 		}
-		glTexImage2D(GL_TEXTURE_2D, level, GL_SRGB8_ALPHA8, size, size,
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, SIZE, SIZE,
 			     0, GL_RGBA, GL_FLOAT, data);
 		free(data);
 	}
@@ -109,7 +104,7 @@ srgb_tex_test(bool with_clear)
 
 	glGenTextures(1, &tex);
 
-	fill_level(tex, 0, green, with_clear);
+	fill_level(tex, green, with_clear);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
