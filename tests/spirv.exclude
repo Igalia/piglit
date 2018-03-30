@@ -51,3 +51,5 @@ tests/shaders/glsl-vec-array
 tests/shaders/ssa/fs-if-def-else-break
 tests/shaders/ssa/fs-lost-copy-problem
 tests/shaders/ssa/fs-swap-problem
+tests/spec/amd_conservative_depth/glsl-1.30/linker/matching-qualifiers-02
+tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01
