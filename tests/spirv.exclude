@@ -40,3 +40,5 @@ tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
 tests/spec/glsl-1.50/execution/redeclare-pervertex
 tests/shaders/glsl-fs-ivec4-mat3
 tests/shaders/link-struct-usage
+tests/spec/amd_conservative_depth/glsl-1.30/linker/matching-qualifiers-02
+tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01
