@@ -39,3 +39,4 @@ tests/spec/glsl-1.50/execution/gs-redeclares-pervertex
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
 tests/spec/glsl-1.50/execution/redeclare-pervertex
 tests/shaders/glsl-fs-ivec4-mat3
+tests/shaders/link-struct-usage
