@@ -40,3 +40,14 @@ tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
 tests/spec/glsl-1.50/execution/redeclare-pervertex
 tests/shaders/glsl-fs-ivec4-mat3
 tests/shaders/link-struct-usage
+tests/shaders/glsl-complex-subscript
+tests/shaders/glsl-const-initializer-01
+tests/shaders/glsl-const-initializer-02
+tests/shaders/glsl-const-initializer-03
+tests/shaders/glsl-fs-implicit-array-size-01
+tests/shaders/glsl-fs-implicit-array-size-02
+tests/shaders/glsl-fs-implicit-array-size-03
+tests/shaders/glsl-vec-array
+tests/shaders/ssa/fs-if-def-else-break
+tests/shaders/ssa/fs-lost-copy-problem
+tests/shaders/ssa/fs-swap-problem
