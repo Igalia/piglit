@@ -199,6 +199,11 @@ class BuiltInConstantsTest(PiglitBaseTest):
 
     """Test class for handling built in constants tests."""
 
+    @PiglitBaseTest.command.getter
+    def command(self):
+        command = super(BuiltInConstantsTest, self).command
+        command[1] = os.path.join(ROOT_DIR, 'tests', command[1])
+        return command
 
 class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
     """ OpenCL specific Test class.
