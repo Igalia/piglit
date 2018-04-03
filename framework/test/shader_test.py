@@ -167,12 +167,18 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
             glsl_es_version=glsl_es_version)
 
     @classmethod
-    def new(cls, filename):
+    def new(cls, filename, installed_name=None):
+        """Parse an XML file and create a new instance.
+
+        :param str filename: The name of the file to parse
+        :param str installed_name: The relative path to the file when installed
+            if not the same as the parsed name
+        """
         parser = Parser(filename)
         parser.parse()
 
         return cls(
-            [parser.prog, parser.filename],
+            [parser.prog, installed_name or filename],
             run_concurrent=True,
             gl_required=parser.gl_required,
             gl_version=parser.gl_version,
@@ -215,7 +221,7 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
         self.skips = [FastSkip(**s) for s in skips]
 
     @classmethod
-    def new(cls, filenames):
+    def new(cls, filenames, installednames=None):
         # TODO
         assert filenames
         prog = None
@@ -257,7 +263,7 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
                 'glsl_es_version': parser.glsl_es_version,
             })
 
-        return cls(prog, filenames, subtests, skips)
+        return cls(prog, installednames or filenames, subtests, skips)
 
     def _process_skips(self):
         r_files = []
