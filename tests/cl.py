@@ -104,47 +104,70 @@ with profile.test_list.group_manager(PiglitCLTest, 'interop') as g:
     g(['cl-interop-egl_khr_cl_event2'], 'EGL_KHR_cl_event2')
 
 
-def add_program_test_dir(group, dirpath):
-    for filename in os.listdir(dirpath):
+def add_program_test_dir(group, dirpath, buildbase, installbase):
+    for filename in os.listdir(os.path.join(buildbase, dirpath)):
         testname, ext = os.path.splitext(filename)
         if ext not in ['.cl', '.program_test']:
             continue
 
         profile.test_list[grouptools.join(group, testname)] = CLProgramTester(
-            os.path.join(os.path.relpath(dirpath, ROOT_DIR), filename))
+            os.path.join(installbase, dirpath, os.path.basename(filename)))
 
+
+base_test_dir = os.path.basename(TESTS_DIR)
+base_gen_dir = os.path.basename(GENERATED_TESTS_DIR)
 
 add_program_test_dir(grouptools.join('program', 'build'),
-                     os.path.join(TESTS_DIR, 'cl', 'program', 'build'))
+                     os.path.join('cl', 'program', 'build'),
+                     TESTS_DIR,
+                     base_test_dir)
 add_program_test_dir(grouptools.join('program', 'build', 'fail'),
-                     os.path.join(TESTS_DIR, 'cl', 'program', 'build', 'fail'))
+                     os.path.join('cl', 'program', 'build', 'fail'),
+                     TESTS_DIR,
+                     base_test_dir)
 add_program_test_dir(grouptools.join('program', 'execute'),
-                     os.path.join(TESTS_DIR, 'cl', 'program', 'execute'))
+                     os.path.join('cl', 'program', 'execute'),
+                     TESTS_DIR,
+                     base_test_dir)
 add_program_test_dir(grouptools.join('program', 'execute'),
-                     os.path.join(TESTS_DIR, 'cl', 'program', 'execute',
-                                  'builtin', 'atomic'))
+                     os.path.join('cl', 'program', 'execute', 'builtin', 'atomic'),
+                     TESTS_DIR,
+                     base_test_dir)
 add_program_test_dir(grouptools.join('program', 'execute'),
-                     os.path.join(TESTS_DIR, 'cl', 'program', 'execute',
-                                  'builtin', 'convert'))
+                     os.path.join('cl', 'program', 'execute', 'builtin', 'convert'),
+                     TESTS_DIR,
+                     base_test_dir)
 
 # Run generated built-in tests
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin', 'int'))
+                     os.path.join('cl', 'builtin', 'int'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
-                                  'math'))
+                     os.path.join('cl', 'builtin', 'math'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
-                                  'relational'))
+                     os.path.join('cl', 'builtin', 'relational'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
-                                  'common'))
+                     os.path.join('cl', 'builtin', 'common'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
-                                  'misc'))
+                     os.path.join('cl', 'builtin', 'misc'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
 add_program_test_dir(grouptools.join('program', 'execute', 'store'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'store'))
+                     os.path.join('cl', 'store'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
 add_program_test_dir(grouptools.join('program', 'execute', 'vstore'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'vstore'))
+                     os.path.join('cl', 'vstore'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
 add_program_test_dir(grouptools.join('program', 'execute', 'vload'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'vload'))
+                     os.path.join('cl', 'vload'),
+                     GENERATED_TESTS_DIR,
+                     base_gen_dir)
