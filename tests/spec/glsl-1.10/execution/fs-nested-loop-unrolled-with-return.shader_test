@@ -1,0 +1,40 @@
+# This tests for a bug in LLVM based drivers where the LLVM validator cannot
+# handle a break that is not the last instruction in the block. radeonsi
+# in order to speed up compilation only runs GLSL IR optimisation passes a
+# limited number of times. So we need to make sure it successfully removed any
+# instructions following a break before creating the LLVM IR.
+#
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main(void)
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform int a;
+
+vec4 getColour() {
+  /* We use a uniform in the outer loop comparision so it's not immediately
+   * unrolled.
+   */
+  for(int v124 = 0; v124 != a; v124++) {
+    for(int v229 = 1; v229 > 0; v229--) {
+      return vec4(0.0, 1.0, 0.0, 1.0);
+    }
+  }
+
+  return vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+void main(void) {
+  gl_FragColor = getColour();
+}
+
+[test]
+uniform int a 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
