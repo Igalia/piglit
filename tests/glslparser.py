@@ -59,7 +59,7 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
             'asmparsertest', os.path.relpath(dirpath, _basedir)))
         type_ = os.path.basename(dirpath)
 
-        dirname = os.path.relpath(dirpath, ROOT_DIR)
+        dirname = os.path.relpath(dirpath, os.path.join(basedir, '..'))
         for filename in filenames:
             if not os.path.splitext(filename)[1] == '.txt':
                 continue
