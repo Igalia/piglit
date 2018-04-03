@@ -122,7 +122,7 @@ class Parser(object):
         # If GLES is requested, but piglit was not built with a gles version,
         # then ARB_ES3<ver>_compatibility is required. Add it to
         # self.gl_required
-        if self.glsl_es_version and not _HAS_GLES_BIN:
+        if self.glsl_es_version and _FORCE_DESKTOP_VERSION:
             if self.glsl_es_version == 1.0:
                 ver = '2'
             elif self.glsl_es_version == 3.0:
@@ -148,14 +148,10 @@ class Parser(object):
         then the test will be skipped in the python layer.
 
         """
-        if (_is_gles_version(version)
-                and _HAS_GLES_BIN
-                and not _FORCE_DESKTOP_VERSION):
+        if _is_gles_version(version) and not _FORCE_DESKTOP_VERSION:
             return 'glslparsertest_gles2'
-        elif _HAS_GL_BIN:
-            return 'glslparsertest'
         else:
-            return 'None'
+            return 'glslparsertest'
 
     def get_command(self, filepath):
         """ Create the command argument to pass to super()
@@ -295,8 +291,12 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
             glsl_es_version=parsed.glsl_es_version)
 
     def is_skip(self):
-        if os.path.basename(self.command[0]) == 'None':
-            raise TestIsSkip('Test is for desktop OpenGL, '
-                             'but only an OpenGL ES binary has been built')
+        if os.path.basename(self.command[0]) == 'glslparsertest' and not _HAS_GL_BIN:
+            raise TestIsSkip('Test is for desktop OpenGL, but piglit was not '
+                             'built with OpenGL support.')
+        elif (os.path.basename(self.command[0]) == 'glslparsertest_gles2'
+              and not _HAS_GLES_BIN):
+            raise TestIsSkip('Test is for OpenGL ES, but piglit was not '
+                             'built with OpenGL ES support.')
 
         super(GLSLParserTest, self).is_skip()

@@ -339,22 +339,21 @@ def test_valid_extensions(ext, tmpdir):
 
 
 @pytest.mark.parametrize(
-    "version,has_bin,forced",
+    "version,forced",
     itertools.product(
         ['1.00', '3.00', '3.10', '3.20', '3.00 es', '3.10 es', '3.20 es'],
-        [True, False], [True, False]))
-def test_get_glslparsertest_gles2(version, has_bin, forced, tmpdir, mocker):
+        [True, False]))
+def test_get_glslparsertest_gles2(version, forced, tmpdir, mocker):
     """Tests for assigning the correct binary for GLES tests.
 
     Tests with and without the gles binary and with and without the force
     desktop mode.
     """
-    if not has_bin or forced:
+    if forced:
         expected = 'glslparsertest'
     else:
         expected = 'glslparsertest_gles2'
 
-    mocker.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', has_bin)
     mocker.patch('framework.test.glsl_parser_test._FORCE_DESKTOP_VERSION',
                  forced)
 
@@ -436,7 +435,7 @@ def test_add_compatibility_requirement_fastskip(version, extension, tmpdir,
 
     This test checks the fast skipping variable
     """
-    mocker.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', False)
+    mocker.patch('framework.test.glsl_parser_test._FORCE_DESKTOP_VERSION', True)
 
     p = tmpdir.join('test.frag')
     p.write(textwrap.dedent("""\
@@ -466,7 +465,7 @@ def test_add_compatibility_requirement_binary(version, extension, tmpdir,
 
     This test checks the glslparsertest binary command line.
     """
-    mocker.patch('framework.test.glsl_parser_test._HAS_GLES_BIN', False)
+    mocker.patch('framework.test.glsl_parser_test._FORCE_DESKTOP_VERSION', True)
 
     p = tmpdir.join('test.frag')
     p.write(textwrap.dedent("""\
