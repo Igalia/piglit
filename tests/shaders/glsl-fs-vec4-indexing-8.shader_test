@@ -1,0 +1,20 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform float id;
+void main()
+{
+	ivec4 test = ivec4(0, 1, 0, 0);
+	vec4 test2 = vec4(0.0, 1.0, 0.0, 0.0);
+	int index = int(id);
+	float col = test2[test[index]];
+	gl_FragColor = vec4(col);
+}
+
+[test]
+uniform float id 1
+draw rect -1 -1 2 2
+probe rgb 1 1 1.0 1.0 1.0
