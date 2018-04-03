@@ -14,7 +14,7 @@ from __future__ import (
 import os
 
 from framework.profile import TestProfile
-from framework.test import PiglitCLTest
+from framework.test.piglit_test import PiglitCLTest, CLProgramTester
 from framework import grouptools
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
@@ -110,8 +110,8 @@ def add_program_test_dir(group, dirpath):
         if ext not in ['.cl', '.program_test']:
             continue
 
-        profile.test_list[grouptools.join(group, testname)] = PiglitCLTest(
-            ['cl-program-tester', os.path.join(dirpath, filename)])
+        profile.test_list[grouptools.join(group, testname)] = CLProgramTester(
+            os.path.join(dirpath, filename))
 
 
 add_program_test_dir(grouptools.join('program', 'build'),

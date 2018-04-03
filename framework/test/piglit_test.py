@@ -181,16 +181,6 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
         self._command = [n for n in new if n not in ['-auto', '-fbo']]
 
 
-class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
-    """ OpenCL specific Test class.
-
-    Set concurrency based on CL requirements.
-
-    """
-    def __init__(self, command, run_concurrent=CL_CONCURRENT, **kwargs):
-        super(PiglitCLTest, self).__init__(command, run_concurrent, **kwargs)
-
-
 class ASMParserTest(PiglitBaseTest):
 
     """Test class for ASM parser tests."""
@@ -208,3 +198,28 @@ class ASMParserTest(PiglitBaseTest):
 class BuiltInConstantsTest(PiglitBaseTest):
 
     """Test class for handling built in constants tests."""
+
+
+class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
+    """ OpenCL specific Test class.
+
+    Set concurrency based on CL requirements.
+
+    """
+    def __init__(self, command, run_concurrent=CL_CONCURRENT, **kwargs):
+        super(PiglitCLTest, self).__init__(command, run_concurrent, **kwargs)
+
+
+class CLProgramTester(PiglitCLTest):
+
+    """Class for cl-program-tester tests."""
+
+    def __init__(self, filename):
+        super(CLProgramTester, self).__init__(['cl-program-tester'])
+        self.filename = filename
+
+    @PiglitCLTest.command.getter
+    def command(self):
+        command = super(CLProgramTester, self).command
+        command.insert(1, self.filename)
+        return command
