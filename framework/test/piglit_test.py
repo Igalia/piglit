@@ -226,5 +226,5 @@ class CLProgramTester(PiglitCLTest):
     @PiglitCLTest.command.getter
     def command(self):
         command = super(CLProgramTester, self).command
-        command.insert(1, self.filename)
+        command.insert(1, os.path.join(ROOT_DIR, self.filename))
         return command

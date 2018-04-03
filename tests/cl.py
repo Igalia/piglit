@@ -14,7 +14,7 @@ from __future__ import (
 import os
 
 from framework.profile import TestProfile
-from framework.test.piglit_test import PiglitCLTest, CLProgramTester
+from framework.test.piglit_test import PiglitCLTest, CLProgramTester, ROOT_DIR
 from framework import grouptools
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
@@ -111,7 +111,7 @@ def add_program_test_dir(group, dirpath):
             continue
 
         profile.test_list[grouptools.join(group, testname)] = CLProgramTester(
-            os.path.join(dirpath, filename))
+            os.path.join(os.path.relpath(dirpath, ROOT_DIR), filename))
 
 
 add_program_test_dir(grouptools.join('program', 'build'),
