@@ -56,8 +56,8 @@ else:
 
 TEST_BIN_DIR = os.path.normpath(os.path.join(ROOT_DIR, 'bin'))
 
-CL_CONCURRENT = (not sys.platform.startswith('linux') or
-                 glob.glob('/dev/dri/render*'))
+CL_CONCURRENT = bool(not sys.platform.startswith('linux') or
+                     glob.glob('/dev/dri/render*'))
 
 
 class PiglitBaseTest(ValgrindMixin, Test):
