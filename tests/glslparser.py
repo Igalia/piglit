@@ -17,15 +17,24 @@ profile = TestProfile()
 
 # Find and add all shader tests.
 basepath = os.path.normpath(os.path.join(TESTS_DIR, '..'))
+gen_basepath = os.path.relpath(os.path.join(GENERATED_TESTS_DIR, '..'), basepath)
+
 for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
+    isgenerated = basedir == GENERATED_TESTS_DIR
     for dirpath, _, filenames in os.walk(basedir):
         groupname = grouptools.from_path(os.path.relpath(dirpath, basedir))
         for filename in filenames:
             testname, ext = os.path.splitext(filename)
             if ext in ['.vert', '.tesc', '.tese', '.geom', '.frag', '.comp']:
+                dirname = os.path.relpath(dirpath, basepath)
+                filepath = os.path.join(dirname, filename)
+                if isgenerated:
+                    installpath = os.path.relpath(filepath, gen_basepath)
+                else:
+                    installpath = None
+
                 try:
-                    test = GLSLParserTest.new(
-                        os.path.join(os.path.relpath(dirpath, basepath), filename))
+                    test = GLSLParserTest.new(filepath, installpath)
                 except GLSLParserNoConfigError:
                     # In the event that there is no config assume that it is a
                     # legacy test, and continue

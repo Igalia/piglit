@@ -89,7 +89,7 @@ class Parser(object):
     _CONFIG_KEYS = frozenset(['expect_result', 'glsl_version',
                               'require_extensions', 'check_link'])
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, installpath=None):
         # a set that stores a list of keys that have been found already
         self.__found_keys = set()
         self.gl_required = set()
@@ -101,7 +101,7 @@ class Parser(object):
             with io.open(abs_filepath, mode='r', encoding='utf-8') as testfile:
                 testfile = testfile.read()
                 self.config = self.parse(testfile, abs_filepath)
-            self.command = self.get_command(filepath)
+            self.command = self.get_command(filepath, installpath)
         except GLSLParserInternalError as e:
             raise exceptions.PiglitFatalError(
                 'In file "{}":\n{}'.format(filepath, six.text_type(e)))
@@ -153,7 +153,7 @@ class Parser(object):
         else:
             return 'glslparsertest'
 
-    def get_command(self, filepath):
+    def get_command(self, filepath, installpath):
         """ Create the command argument to pass to super()
 
         This private helper creates a configparser object, then reads in the
@@ -172,7 +172,7 @@ class Parser(object):
         glsl = self.config['glsl_version']
         command = [
             self.pick_binary(glsl),
-            filepath,
+            installpath or filepath,
             self.config['expect_result'],
             self.config['glsl_version']
         ]
@@ -282,8 +282,15 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         return [command[0], glslfile] + command[2:]
 
     @classmethod
-    def new(cls, filepath):
-        parsed = Parser(filepath)
+    def new(cls, filepath, installpath=None):
+        """Parse a file and create an instance.
+
+        :param str filepath: the file to parse
+        :param Optional[str] installpath:
+            The relative path the file will be isntalled to if different than
+            filepath
+        """
+        parsed = Parser(filepath, installpath)
         return cls(
             parsed.command,
             gl_required=parsed.gl_required,
