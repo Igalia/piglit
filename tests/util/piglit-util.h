@@ -162,6 +162,8 @@ piglit_register_subtests(const char *names[]);
 #define MIN3(a, b, c) MIN2(MIN2((a), (b)), (c))
 #define MAX3(a, b, c) MAX2(MAX2((a), (b)), (c))
 #define ALIGN(value, alignment) (((value) + alignment - 1) & ~(alignment - 1))
+#define PIGLIT_STRINGIFY(macro_or_string) PIGLIT_STRINGIFY_ARG (macro_or_string)
+#define PIGLIT_STRINGIFY_ARG(contents) #contents
 
 /**
  * Utility macro that checks for a given opengl error, and report a
