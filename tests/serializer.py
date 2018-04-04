@@ -22,6 +22,7 @@
 """Script for taking profiles in python format and serializing them to XML."""
 
 import argparse
+import gzip
 import os
 import sys
 import xml.etree.cElementTree as et
@@ -133,7 +134,8 @@ def serializer(name, profile, outfile):
                 et.SubElement(env, 'env', name=k, value=v)
 
     tree = et.ElementTree(root)
-    tree.write(outfile, encoding='utf-8', xml_declaration=True)
+    with gzip.open(outfile, 'wb') as f:
+        tree.write(f, encoding='utf-8', xml_declaration=True)
 
 
 def main():

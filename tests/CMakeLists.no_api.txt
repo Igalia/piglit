@@ -45,14 +45,14 @@ add_custom_target(
 
 function(piglit_generate_xml name profile meta_target extra_args)
 	add_custom_command(
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/${name}.xml
-		COMMAND ${CMAKE_COMMAND} -E env PIGLIT_BUILD_TREE=${CMAKE_BINARY_DIR} ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/serializer.py ${name} ${CMAKE_CURRENT_SOURCE_DIR}/${profile}.py ${CMAKE_BINARY_DIR}/tests/${name}.xml  ${extra_args}
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/${name}.xml.gz
+		COMMAND ${CMAKE_COMMAND} -E env PIGLIT_BUILD_TREE=${CMAKE_BINARY_DIR} ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/serializer.py ${name} ${CMAKE_CURRENT_SOURCE_DIR}/${profile}.py ${CMAKE_BINARY_DIR}/tests/${name}.xml.gz  ${extra_args}
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${profile}.py ${CMAKE_CURRENT_SOURCE_DIR}/serializer.py ${ARGN}
 		VERBATIM
 	)
 	add_custom_target(
 		generate-${name}-xml
-		DEPENDS ${CMAKE_BINARY_DIR}/tests/${name}.xml
+		DEPENDS ${CMAKE_BINARY_DIR}/tests/${name}.xml.gz
 	)
 	add_dependencies(${meta_target} generate-${name}-xml)
 endfunction()

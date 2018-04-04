@@ -34,8 +34,8 @@ import ast
 import collections
 import contextlib
 import copy
+import gzip
 import importlib
-import io
 import itertools
 import multiprocessing
 import multiprocessing.dummy
@@ -318,7 +318,7 @@ class XMLProfile(object):
 
     def __len__(self):
         if not (self.filters or self.forced_test_list):
-            with io.open(self.filename, 'rt') as f:
+            with gzip.open(self.filename, 'rt') as f:
                 iter_ = et.iterparse(f, events=(b'start', ))
                 for _, elem in iter_:
                     if elem.tag == 'PiglitTestList':
@@ -333,7 +333,7 @@ class XMLProfile(object):
 
     def _itertests(self):
         """Always iterates tests instead of using the forced test_list."""
-        with io.open(self.filename, 'rt') as f:
+        with gzip.open(self.filename, 'rt') as f:
             doc = et.iterparse(f, events=(b'end', ))
             _, root = next(doc)  # get the root so we can keep clearing it
             for _, e in doc:
@@ -517,13 +517,13 @@ def load_test_profile(filename, python=None):
         if os.path.exists(meta):
             return MetaProfile(meta)
 
-        xml = os.path.join(ROOT_DIR, 'tests', name + '.xml')
+        xml = os.path.join(ROOT_DIR, 'tests', name + '.xml.gz')
         if os.path.exists(xml):
             return XMLProfile(xml)
 
     if python is False:
         raise exceptions.PiglitFatalError(
-            'Cannot open "tests/{0}.xml" or "tests/{0}.meta.xml"'.format(name))
+            'Cannot open "tests/{0}.xml.gz" or "tests/{0}.meta.xml"'.format(name))
 
     try:
         mod = importlib.import_module('tests.{0}'.format(name))
