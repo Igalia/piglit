@@ -1,0 +1,46 @@
+include_directories(
+        ${VULKAN_INCLUDE_DIR}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+)
+
+add_executable(vkrunner
+        vr-allocate-store.c
+        vr-allocate-store.h
+        vr-buffer.c
+        vr-buffer.h
+        vr-config.c
+        vr-config.h
+        vr-error-message.c
+        vr-error-message.h
+        vr-feature-offsets.c
+        vr-feature-offsets.h
+        vr-flush-memory.c
+        vr-flush-memory.h
+        vr-format-table.h
+        vr-format.h
+        vr-format.c
+        vr-list.c
+        vr-list.h
+        vr-script.c
+        vr-script.h
+        vr-vk.c
+        vr-vk.h
+        vr-vk-core-funcs.h
+        vr-vk-device-funcs.h
+        vr-vk-instance-funcs.h
+        vr-pipeline.c
+        vr-pipeline.h
+        vr-subprocess.c
+        vr-subprocess.h
+        vr-test.c
+        vr-test.h
+        vr-vbo.c
+        vr-vbo.h
+        vr-window.c
+        vr-window.h
+        main.c)
+
+# vim: ft=cmake:
