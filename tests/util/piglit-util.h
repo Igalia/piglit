@@ -50,6 +50,8 @@ extern "C" {
 #include <stdarg.h>
 #include <math.h>
 #include <float.h>
+#include <limits.h>
+#include <errno.h>
 
 #if defined(__APPLE__) || defined(__MINGW32__)
 #  include "libgen.h" // for basename
@@ -189,6 +191,8 @@ do { \
 				     __VA_ARGS__);		       \
 } while (0)
 
+unsigned short piglit_half_from_float(float val);
+
 static inline unsigned
 log2u(unsigned v)
 {
@@ -303,6 +307,30 @@ strtol_hex(const char *nptr, char **endptr)
 		return x.i;
 	} else {
 		return strtol(nptr, endptr, 0);
+	}
+}
+
+/**
+ * Wrapper for piglit_half_from_float() which allows using an exact
+ * hex bit pattern to generate a half float value.
+ */
+static inline unsigned short
+strtohf_hex(const char *nptr, char **endptr)
+{
+	/* skip spaces and tabs */
+	while (*nptr == ' ' || *nptr == '\t')
+		nptr++;
+
+	if (strncmp(nptr, "0x", 2) == 0) {
+		uint32_t u = strtoul(nptr, endptr, 16);
+		if (u > USHRT_MAX) {
+			errno = ERANGE;
+			return USHRT_MAX;
+		} else {
+			return u;
+		}
+	} else {
+		return piglit_half_from_float(strtod_inf(nptr, endptr));
 	}
 }
 

@@ -29,9 +29,6 @@
 extern "C" {
 #endif
 
-#include <errno.h>
-#include <limits.h>
-
 #include "piglit-util.h"
 
 #include <piglit/gl_wrap.h>
@@ -247,32 +244,6 @@ GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
 GLvoid piglit_draw_rect_back(float x, float y, float w, float h);
 void piglit_draw_rect_from_arrays(const void *verts, const void *tex,
 				  bool use_patches, unsigned instance_count);
-
-unsigned short piglit_half_from_float(float val);
-
-/**
- * Wrapper for piglit_half_from_float() which allows using an exact
- * hex bit pattern to generate a half float value.
- */
-static inline unsigned short
-strtohf_hex(const char *nptr, char **endptr)
-{
-	/* skip spaces and tabs */
-	while (*nptr == ' ' || *nptr == '\t')
-		nptr++;
-
-	if (strncmp(nptr, "0x", 2) == 0) {
-		uint32_t u = strtoul(nptr, endptr, 16);
-		if (u > USHRT_MAX) {
-			errno = ERANGE;
-			return USHRT_MAX;
-		} else {
-			return u;
-		}
-	} else {
-		return piglit_half_from_float(strtod_inf(nptr, endptr));
-	}
-}
 
 void piglit_escape_exit_key(unsigned char key, int x, int y);
 
