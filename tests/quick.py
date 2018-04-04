@@ -17,6 +17,7 @@ import random
 
 from framework import grouptools
 from framework.test import PiglitGLTest
+from framework.test.shader_test import ShaderTest
 from tests.all import profile as _profile
 
 __all__ = ['profile']
@@ -32,8 +33,8 @@ class FilterVsIn(object):
         self.random = random.Random()
         self.random.seed(42)
 
-    def __call__(self, name, _):
-        if 'vs_in' in name:
+    def __call__(self, name, test):
+        if isinstance(test, ShaderTest) and 'vs_in' in grouptools.split(name):
             # 20%
             return self.random.random() <= .2
         return True
