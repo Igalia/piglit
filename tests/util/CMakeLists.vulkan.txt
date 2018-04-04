@@ -1,0 +1,15 @@
+include_directories(
+	${UTIL_INCLUDES}
+	${VULKAN_INCLUDE_PATH}
+	)
+
+link_libraries(
+	piglitutil
+	${link_opts}
+	)
+
+piglit_add_library (piglitutil_${piglit_target_api}
+	piglit-util-vulkan.c
+)
+
+# vim: ft=cmake:
