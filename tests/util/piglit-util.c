@@ -867,3 +867,19 @@ piglit_free_aligned(void *p)
 	free(p);
 #endif
 }
+
+void
+piglit_fatal(const char *format, ...)
+{
+	va_list ap;
+
+	va_start(ap, format);
+	vfprintf(stderr, format, ap);
+	va_end(ap);
+
+	fputc('\n', stderr);
+
+	fflush(stderr);
+
+	abort();
+}

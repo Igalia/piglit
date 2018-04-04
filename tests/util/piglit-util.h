@@ -460,6 +460,8 @@ piglit_alloc_aligned(size_t alignment, size_t size);
 void
 piglit_free_aligned(void *p);
 
+NORETURN void
+piglit_fatal(const char *format, ...) PRINTFLIKE(1, 2);
 
 #ifdef __cplusplus
 } /* end extern "C" */
