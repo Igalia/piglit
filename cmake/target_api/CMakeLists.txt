@@ -42,3 +42,7 @@ endif(PIGLIT_BUILD_GLES3_TESTS)
 if(PIGLIT_BUILD_CL_TESTS)
 	add_subdirectory(cl)
 endif(PIGLIT_BUILD_CL_TESTS)
+
+if(PIGLIT_BUILD_VULKAN_TESTS)
+	add_subdirectory(vulkan)
+endif(PIGLIT_BUILD_VULKAN_TESTS)

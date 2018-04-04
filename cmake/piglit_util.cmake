@@ -29,7 +29,7 @@ function(piglit_include_target_api)
     # Verify that the value of `piglit_target_api` is valid.
     set(valid_api FALSE)
 
-    foreach(api "gl" "gles1" "gles2" "gles3" "cl" "no_api")
+    foreach(api "gl" "gles1" "gles2" "gles3" "cl" "vulkan" "no_api")
         if(piglit_target_api STREQUAL ${api})
             set(valid_api TRUE)
             break()
