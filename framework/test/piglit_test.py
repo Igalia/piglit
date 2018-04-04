@@ -44,6 +44,7 @@ __all__ = [
     'PiglitCLTest',
     'PiglitGLTest',
     'PiglitBaseTest',
+    'VkRunnerTest',
     'CL_CONCURRENT',
     'TEST_BIN_DIR',
 ]
@@ -184,3 +185,12 @@ class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
     """
     def __init__(self, command, run_concurrent=CL_CONCURRENT, **kwargs):
         super(PiglitCLTest, self).__init__(command, run_concurrent, **kwargs)
+
+
+class VkRunnerTest(PiglitBaseTest):
+    """ Make a PiglitTest instance for a VkRunner shader test file """
+
+    def __init__(self, filename):
+        super(VkRunnerTest, self).__init__(
+            ['vkrunner', filename],
+            run_concurrent=True)
