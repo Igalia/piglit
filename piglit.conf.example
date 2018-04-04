@@ -187,6 +187,10 @@ run_test=./%(test_name)s
 ; Default: True
 ;process isolation=True
 
+[vkrunner]
+; Path to the VkRunner executable
+; bin=/home/neil/local/bin/vkrunner
+
 [expected-failures]
 ; Provide a list of test names that are expected to fail.  These tests
 ; will be listed as passing in JUnit output when they fail.  Any

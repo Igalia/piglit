@@ -47,6 +47,8 @@ Optionally, you can install the following:
     (https://simplejson.readthedocs.org/en/latest/)
   - jsonstreams. A JSON stream writer for python.
     (https://jsonstreams.readthedocs.io/en/stable/)
+  - VkRunner. A shader script testing tool for Vulkan.
+    (https://github.com/igalia/vkrunner)
 
 For Python 2.x you can install the following to add features, these are
 unnecessary for python3:
@@ -285,6 +287,13 @@ behaves.
     When this variable is true in python then any timeouts given by tests
     will be ignored, and they will run until completion or they are killed.
 
+  - `PIGLIT_VKRUNNER_BINARY`
+
+    Can be used to override the path to the vkrunner executable for
+    running Vulkan shader tests. Alternatively the config option
+    vkrunner:bin can be used instead. If neither are set then vkrunner
+    will be searched for in the search path.
+
 
 ### 3.2 Note
 
@@ -338,7 +347,13 @@ The following test sets are currently available:
     opencv and oclconform.
 
 
-### 4.3 External Integration
+### 4.3 Vulkan tests
+
+  - **vulkan.py** This suite contains all Vulkan tests. Note that
+    currently all of the Vulkan tests require VkRunner. If it is not
+    installed then all of the tests will be skipped.
+
+### 4.4 External Integration
 
   - **xts.py** Support for running the X Test Suite using piglit.
   - **igt.py** Support for running Intel-gpu-tools test suite using piglit.

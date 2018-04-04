@@ -44,6 +44,7 @@ __all__ = [
     'PiglitCLTest',
     'PiglitGLTest',
     'PiglitBaseTest',
+    'VkRunnerTest',
     'CL_CONCURRENT',
     'ROOT_DIR',
     'TEST_BIN_DIR',
@@ -229,3 +230,25 @@ class CLProgramTester(PiglitCLTest):
         command = super(CLProgramTester, self).command
         command.insert(1, os.path.join(ROOT_DIR, self.filename))
         return command
+
+
+class VkRunnerTest(PiglitBaseTest):
+    """ Make a PiglitTest instance for a VkRunner shader test file """
+
+    def __init__(self, filename):
+        vkrunner_bin = os.environ.get('PIGLIT_VKRUNNER_BINARY')
+
+        if vkrunner_bin is None:
+            vkrunner_bin = core.PIGLIT_CONFIG.safe_get(
+                'vkrunner', 'bin', fallback='vkrunner')
+
+        super(VkRunnerTest, self).__init__(
+            [vkrunner_bin, filename],
+            run_concurrent=True)
+
+    @PiglitBaseTest.command.getter
+    def command(self):
+        # This is overriden because we don’t want PiglitBaseTest to
+        # prepend TEST_BIN_DIR so that it will look for vkrunner in
+        # the search path.
+        return self._command
