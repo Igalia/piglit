@@ -73,6 +73,7 @@ piglit_init(int argc, char **argv)
 	const float one = 1.0f;
 
 	piglit_require_extension("GL_ARB_compute_shader");
+	piglit_require_extension("GL_INTEL_blackhole_render");
 
 	data_buf = calloc(SIZE_X, sizeof(*data_buf));
 	glGenBuffers(1, &data_bo);
