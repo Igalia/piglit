@@ -34,6 +34,8 @@
 #include "shader_runner_gles_workarounds.h"
 #include "parser_utils.h"
 
+#include "shader_runner_vs_passthrough_spv.h"
+
 #define DEFAULT_WINDOW_WIDTH 250
 #define DEFAULT_WINDOW_HEIGHT 250
 
@@ -1124,6 +1126,12 @@ leave_state(enum states state, const char *line, const char *script_name)
 		return compile_glsl(GL_VERTEX_SHADER);
 
 	case vertex_shader_passthrough:
+		if (spirv_replaces_glsl) {
+			shader_string = (char *) passthrough_vertex_shader_source_spv;
+			shader_string_size = strlen(passthrough_vertex_shader_source_spv);
+
+			return assemble_spirv(GL_VERTEX_SHADER);
+		}
 		return compile_glsl(GL_VERTEX_SHADER);
 
 	case vertex_program:
