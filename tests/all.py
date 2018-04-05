@@ -4978,10 +4978,10 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'INTEL_blackhole_render')) as g:
-    g(['intel_conservative_rasterization-draw'])
-    g(['intel_conservative_rasterization-dispatch'])
-    g(['intel_conservative_rasterization-draw_gles2'])
-    g(['intel_conservative_rasterization-draw_gles3'])
+    g(['intel_blackhole-draw'])
+    g(['intel_blackhole-dispatch'])
+    g(['intel_blackhole-draw_gles2'])
+    g(['intel_blackhole-draw_gles3'])
 
 # Group ARB_bindless_texture
 with profile.test_list.group_manager(
