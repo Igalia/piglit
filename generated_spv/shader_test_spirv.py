@@ -53,9 +53,13 @@ def make_spirv_variable_re(storage_mode):
 RE_spirv_output_var = make_spirv_variable_re('Output')
 RE_spirv_input_var = make_spirv_variable_re('Input')
 RE_spirv_uniform_var = make_spirv_variable_re('UniformConstant')
+RE_spirv_ubo_var = make_spirv_variable_re('Uniform')
 RE_spirv_location = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpDecorate\s+%(\w+)\s+' +
                                r'Location\s+(\d+)\s*$',
                                re.MULTILINE)
+RE_spirv_binding = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpDecorate\s+%(\w+)\s+' +
+                              r'Binding\s+(\d+)\s*$',
+                              re.MULTILINE)
 RE_spirv_name = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpName\s+%(\w+)\s+' +
                            r'"([^"]+)"\s*$',
                            re.MULTILINE)
@@ -153,6 +157,8 @@ class SpirvInfo:
                       for md in RE_spirv_name.finditer(spirv)}
         self.locations = {md.group(1): int(md.group(2))
                           for md in RE_spirv_location.finditer(spirv)}
+        self.bindings = {md.group(1): int(md.group(2))
+                         for md in RE_spirv_binding.finditer(spirv)}
         self.type_definitions = {md.group(1): [md.group(2)] +
                                  md.group(3).split()
                                  for md in RE_spirv_type.finditer(spirv)}
@@ -175,6 +181,7 @@ class SpirvInfo:
         self.outputs = self._get_variables(RE_spirv_output_var.finditer(spirv))
         self.uniforms = self._get_variables(
             RE_spirv_uniform_var.finditer(spirv))
+        self.ubos = self._get_variables_list(RE_spirv_ubo_var.finditer(spirv))
 
     def _get_type(self, name):
         if name in self.types:
@@ -184,6 +191,11 @@ class SpirvInfo:
         t = SpirvType()
         t.base_type = dec[0]
         t.parts = dec[1:]
+
+        if name in self.names:
+            t.name = self.names[name]
+        else:
+            t.name = None
 
         if t.base_type == 'Array':
             t.element_type = self._get_type(dec[1][1:])
@@ -216,15 +228,25 @@ class SpirvInfo:
             v.location = self.locations[name]
         else:
             v.location = None
-        v.name = self.names[name]
+        if name in self.bindings:
+            v.binding = self.bindings[name]
+        else:
+            v.binding = None
+        if name in self.names:
+            v.name = self.names[name]
+        else:
+            v.name = None
         v.result_id = name
         return v
 
     def _get_variables(self, re_iter):
-        return { self.names[md.group(1)]: self._get_variable(md.group(1),
-                                                             md.group(2))
-                 for md in re_iter
-                 if md.group(1) in self.names }
+        return { var.name: var
+                 for var in self._get_variables_list(re_iter)
+                 if var.name is not None }
+
+    def _get_variables_list(self, re_iter):
+        return [ self._get_variable(md.group(1), md.group(2))
+                 for md in re_iter ]
 
 class GLSLSource(object):
     def __init__(self, source):
@@ -610,7 +632,7 @@ def compile_glsl(shader_test, config, shader_group, uniform_map, max_uniform):
             print('Writing {} shader binary to {}'.
                   format(shader_group[0].stage, binary_name))
 
-        cmdline = [config.glslang, '--aml', '-G', '-o', binary_name]
+        cmdline = [config.glslang, '--aml', '--amb', '-G', '-o', binary_name]
 
         if config.supports_uniform_location_override:
             cmdline.extend(['--uniform-base', str(max_uniform)])
@@ -694,17 +716,29 @@ def remap_uniform(name, uniform_map):
 def remap_attribute(name, attrib_map):
     return remap_variable(name, attrib_map, SpirvType.attrib_size)
 
+def get_ubo_binding(ubos, name):
+    for ubo in ubos:
+        t = ubo.type.deref()
+        if t.name == name:
+            return ubo.binding
+    return None
+
 def filter_shader_test(fin, fout,
                        replacements,
                        uniform_map,
+                       ubos,
                        attrib_map,
                        add_spirv_line):
     skipping = False
     groupname = None
     in_test = False
     in_vertex_data = False
+    block_binding = -1
     uniform_re = re.compile(r'(\s*uniform\s+\S+\s+)(\S+)(.*)')
     attrib_re = re.compile(r'\b([\[\]a-zA-Z0-9_]+)((?:/[\[\]a-zA-Z_0-9]+){2})')
+    block_binding_re = re.compile(r'\s*block\s+binding\s+([0-9]+)')
+    program_interface_query_re = re.compile(r'\s*verify\s+program_interface_'
+                                            r'query\s+\S+\s+(\S+)')
 
     def vertex_data_replacement(md):
         replacement = remap_attribute(md.group(1), attrib_map)
@@ -738,6 +772,18 @@ def filter_shader_test(fin, fout,
                             replacement +
                             md.group(3) +
                             '\n')
+
+            md = block_binding_re.match(line)
+            if md:
+                block_binding = int(md.group(1))
+
+            md = program_interface_query_re.match(line)
+            if md:
+                binding = get_ubo_binding(ubos, md.group(1))
+                if binding is not None and binding != block_binding:
+                    line = "block binding {}\n{}".format(binding, line)
+                    block_binding = binding
+
         elif in_vertex_data:
             line = attrib_re.sub(vertex_data_replacement, line)
 
@@ -886,6 +932,7 @@ def process_shader_test(shader_test, config):
 
     replacements = {}
     uniform_map = {}
+    ubos = []
     max_uniform = 0
     prev_stage = None
     vertex_stage = None
@@ -906,6 +953,7 @@ def process_shader_test(shader_test, config):
                 max_uniform = end
 
         uniform_map.update(this_stage.uniforms)
+        ubos.extend(this_stage.ubos)
         if prev_stage is not None:
             spirv = replace_inputs_with_outputs(spirv, prev_stage, this_stage)
 
@@ -932,6 +980,7 @@ def process_shader_test(shader_test, config):
             filter_shader_test(fin, fout,
                                replacements,
                                uniform_map,
+                               ubos,
                                vertex_stage.inputs,
                                spirv_line == None)
     if config.replace:
