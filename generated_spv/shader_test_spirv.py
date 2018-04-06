@@ -187,7 +187,7 @@ class SpirvInfo:
             t.element_type = self._get_type(dec[1][1:])
             t.length = int(dec[2])
         elif t.base_type == 'RuntimeArray':
-            t.element_type = self._get_type(dec[2][1:])
+            t.element_type = self._get_type(dec[1][1:])
         elif t.base_type == 'Struct':
             t.member_types = [ self._get_type(mt[1:]) for mt in dec[1:] ]
             t.member_names = self.member_names[name]
