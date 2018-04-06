@@ -138,6 +138,12 @@ class SpirvType:
         else:
             return 1
 
+    def deref(self):
+        t = self
+        while t.base_type == 'Pointer':
+            t = t.deref_type
+        return t
+
 class SpirvVariable:
     pass
 
@@ -637,8 +643,7 @@ def process_accessors(spirv_type, accessors, size_func):
     offset = 0
 
     while len(accessors) > 0:
-        while spirv_type.base_type == 'Pointer':
-            spirv_type = spirv_type.deref_type
+        spirv_type = spirv_type.deref()
 
         md = re.match(r'\[([0-9]+)\]', accessors)
         if md:
