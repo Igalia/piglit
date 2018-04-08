@@ -1964,6 +1964,46 @@ set_uniform(const char *line, int ubo_array_index)
 	return;
 }
 
+static void
+set_vertex_attrib(const char *line)
+{
+	char name[512], type[512];
+	uint32_t uints[16];
+	GLint loc;
+
+	REQUIRE(parse_word_copy(line, type, sizeof(type), &line) &&
+		parse_word_copy(line, name, sizeof(name), &line),
+		"Invalid set vertex attrib command at: %s\n", line);
+
+	if (isdigit(name[0])) {
+		loc = strtol(name, NULL, 0);
+	} else {
+		GLuint prog;
+
+		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
+		loc = glGetAttribLocation(prog, name);
+		if (loc < 0) {
+			printf("cannot get location of vertex attrib \"%s\"\n",
+			       name);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+        }
+
+	if (parse_str(type, "handle", NULL)) {
+		check_unsigned_support();
+		check_texture_handle_support();
+		parse_uints(line, uints, 1, NULL);
+		glVertexAttribL1ui64ARB(loc, get_resident_handle(uints[0])->handle);
+		return;
+	}
+
+	printf("unknown vertex attrib type \"%s\"\n", type);
+	printf("use [vertex data] instead if possible\n");
+	piglit_report_result(PIGLIT_FAIL);
+
+	return;
+}
+
 static GLenum lookup_shader_type(GLuint idx)
 {
 	switch (idx) {
@@ -3817,6 +3857,8 @@ piglit_display(void)
 			active_uniform(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
 			active_program_interface(rest);
+		} else if (parse_str(line, "vertex attrib ", &rest)) {
+			set_vertex_attrib(rest);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
