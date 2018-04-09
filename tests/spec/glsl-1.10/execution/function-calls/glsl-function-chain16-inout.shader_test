@@ -16,7 +16,7 @@ void f10(inout float f);
 void f14(inout float f);
 void main()
 {
-	float g;
+	float g = 0.1;
 	f01(g);
 	gl_FragColor = vec4(g, 0, 0, 1.0);
 }
@@ -52,7 +52,7 @@ void f13(inout float f);
 void f04(inout float f) {f05(f);}
 void f08(inout float f) {f09(f);}
 void f12(inout float f) {f13(f);}
-void f16(inout float f) {f=0.2;}
+void f16(inout float f) {f+=0.1;}
 
 
 [test]
