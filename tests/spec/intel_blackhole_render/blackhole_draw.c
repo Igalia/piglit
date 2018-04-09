@@ -54,24 +54,23 @@ piglit_display(void)
 	prog = piglit_build_simple_program(
 #if defined(PIGLIT_USE_OPENGL)
 		"#version 330\n"
-#elif defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3)
-		"#version 300 es\n"
-#endif
 		"in vec4 piglit_vertex;\n"
+#elif defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3)
+		"#version 100\n"
+		"attribute vec4 piglit_vertex;\n"
+#endif
 		"void main()\n"
 		"{\n"
 		"  gl_Position = piglit_vertex;\n"
 		"}\n",
 #if defined(PIGLIT_USE_OPENGL)
 		"#version 330\n"
-		"out vec4 color;\n"
 #elif defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3)
-		"#version 300 es\n"
-		"out highp vec4 color;\n"
+		"#version 100\n"
 #endif
 		"void main()\n"
 		"{\n"
-		"  color = vec4(1.0, 0.0, 0.0, 1.0);\n"
+		"  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
 		"}\n");
 	if (!prog)
 		piglit_report_result(PIGLIT_FAIL);
