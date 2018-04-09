@@ -60,12 +60,18 @@ RE_spirv_location = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpDecorate\s+%(\w+)\s+' +
 RE_spirv_binding = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpDecorate\s+%(\w+)\s+' +
                               r'Binding\s+(\d+)\s*$',
                               re.MULTILINE)
+RE_spirv_array_stride = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpDecorate\s+%(\w+)\s+' +
+                                   r'ArrayStride\s+(\d+)\s*$',
+                                   re.MULTILINE)
 RE_spirv_name = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpName\s+%(\w+)\s+' +
                            r'"([^"]+)"\s*$',
                            re.MULTILINE)
 RE_spirv_member_name = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpMemberName\s+' +
                                   r'%(\w+)\s+(\d+)\s+"([^"]+)"\s*$',
                                   re.MULTILINE)
+RE_spirv_member_offset = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpMemberDecorate\s+' +
+                                    r'%(\w+)\s+(\d+)\s+Offset\s+(\d+)\s*$',
+                                    re.MULTILINE)
 RE_spirv_type = re.compile(r'^\s*%(\w+)\s*=\s*OpType(\w+) *(.*?) *$',
                            re.MULTILINE)
 RE_spirv_constant = re.compile(r'^\s*%(\w+)\s*=\s*OpConstant\s+' +
@@ -159,6 +165,8 @@ class SpirvInfo:
                           for md in RE_spirv_location.finditer(spirv)}
         self.bindings = {md.group(1): int(md.group(2))
                          for md in RE_spirv_binding.finditer(spirv)}
+        self.array_strides = {md.group(1): int(md.group(2))
+                              for md in RE_spirv_array_stride.finditer(spirv)}
         self.type_definitions = {md.group(1): [md.group(2)] +
                                  md.group(3).split()
                                  for md in RE_spirv_type.finditer(spirv)}
@@ -176,6 +184,16 @@ class SpirvInfo:
             if len(names) <= index:
                 names.extend(itertools.repeat(None, len(names) - index + 1))
             names[index] = md.group(3)
+
+        self.member_offsets = {}
+        for md in RE_spirv_member_offset.finditer(spirv):
+            if md.group(1) not in self.member_offsets:
+                self.member_offsets[md.group(1)] = []
+            offsets = self.member_offsets[md.group(1)]
+            index = int(md.group(2))
+            if len(offsets) <= index:
+                offsets.extend(itertools.repeat(None, len(offsets) - index + 1))
+            offsets[index] = int(md.group(3))
 
         self.inputs = self._get_variables(RE_spirv_input_var.finditer(spirv))
         self.outputs = self._get_variables(RE_spirv_output_var.finditer(spirv))
@@ -197,6 +215,11 @@ class SpirvInfo:
         else:
             t.name = None
 
+        if name in self.array_strides:
+            t.array_stride = self.array_strides[name]
+        else:
+            t.array_stride = None
+
         if t.base_type == 'Array':
             t.element_type = self._get_type(dec[1][1:])
             t.length = int(self.constants[dec[2][1:]])
@@ -209,6 +232,10 @@ class SpirvInfo:
         elif t.base_type == 'Struct':
             t.member_types = [ self._get_type(mt[1:]) for mt in dec[1:] ]
             t.member_names = self.member_names[name]
+            if name in self.member_offsets:
+                t.member_offsets = self.member_offsets[name]
+            else:
+                t.member_offsets = None
         elif t.base_type == 'Int':
             t.width = int(dec[1])
             t.signedness = int(dec[2])
@@ -710,6 +737,68 @@ def remap_variable(name, location_map, size_func):
     else:
         return str(var.location + offset)
 
+def process_ubo_accessors(spirv_type, accessors):
+    offset = 0
+
+    while len(accessors) > 0:
+        spirv_type = spirv_type.deref()
+
+        md = re.match(r'\[([0-9]+)\]', accessors)
+        if md:
+            if ((spirv_type.base_type != 'Array' and
+                 spirv_type.base_type != 'RuntimeArray') or
+                spirv_type.array_stride is None):
+                return None
+
+            offset += int(md.group(1)) * spirv_type.array_stride
+            spirv_type = spirv_type.element_type
+            accessors = accessors[len(md.group(0)):]
+            continue
+
+        md = re.match(r'\.([a-zA-Z_][a-zA-Z_0-9]*)', accessors)
+        if md:
+            if spirv_type.base_type != 'Struct':
+                return None
+            try:
+                index = spirv_type.member_names.index(md.group(1))
+            except ValueError:
+                return None
+            offset += spirv_type.member_offsets[index]
+            spirv_type = spirv_type.member_types[index]
+            accessors = accessors[len(md.group(0)):]
+            continue
+
+        return None
+
+    return offset
+
+def remap_ubo_member_in_ubo(name, ubo):
+    if ubo.binding is None:
+        return None
+
+    offset = process_ubo_accessors(ubo.type,
+                                   "." + name)
+    if offset is None:
+        return None
+
+    return (ubo.binding, offset)
+
+def remap_ubo_member(name, ubos):
+    for ubo in ubos:
+        if ubo.name is not None:
+            continue
+        replacement = remap_ubo_member_in_ubo(name, ubo)
+        if replacement:
+            return replacement
+
+    md = re.match(r'([^\.]+)\.(.*)', name)
+    if md:
+        for ubo in ubos:
+            if ubo.name == md.group(1):
+                return remap_ubo_member_in_ubo(md.group(2), ubo)
+
+    return None
+
 def remap_uniform(name, uniform_map):
     return remap_variable(name, uniform_map, SpirvType.uniform_size)
 
@@ -766,12 +855,20 @@ def filter_shader_test(fin, fout,
         if in_test:
             md = uniform_re.match(line)
             if md:
-                replacement = remap_uniform(md.group(2), uniform_map)
+                replacement = remap_ubo_member(md.group(2), ubos)
                 if replacement:
-                    line = (md.group(1) +
-                            replacement +
-                            md.group(3) +
-                            '\n')
+                    (binding, offset) = replacement
+                    line = "block offset {}\n{}".format(offset, line)
+                    if binding != block_binding:
+                        block_binding = binding
+                        line = "block binding {}\n{}".format(binding, line)
+                else:
+                    replacement = remap_uniform(md.group(2), uniform_map)
+                    if replacement:
+                        line = (md.group(1) +
+                                replacement +
+                                md.group(3) +
+                                '\n')
 
             md = block_binding_re.match(line)
             if md:
