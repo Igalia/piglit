@@ -664,6 +664,8 @@ def process_accessors(spirv_type, accessors, size_func):
             accessors = accessors[len(md.group(0)):]
             continue
 
+        return None
+
     return offset
 
 def remap_variable(name, location_map, size_func):
