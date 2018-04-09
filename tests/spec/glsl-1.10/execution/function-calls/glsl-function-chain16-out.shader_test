@@ -1,0 +1,64 @@
+# This tests we inline functions correctly. Chaining the functions helps
+# us reach the GLSL IR -> NIR code with some functions intact when the
+# conservative optimise flag is set in Mesa. This allows us to test the
+# GLSL IR -> NIR conversion code for functions and the NIR function inlining
+# code.
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void f01(inout float f);
+void f02(inout float f);
+void f06(inout float f);
+void f10(inout float f);
+void f14(inout float f);
+void main()
+{
+	float g = 0.3;
+	f01(g);
+	gl_FragColor = vec4(0.0, g, 0, 1.0);
+}
+void f01(inout float f) {f02(f);}
+void f05(inout float f) {f06(f);}
+void f09(inout float f) {f10(f);}
+void f13(inout float f) {f14(f);}
+
+[fragment shader]
+void f03(inout float f);
+void f07(inout float f);
+void f11(inout float f);
+void f15(inout float f);
+void f02(inout float f) {f03(f);}
+void f06(inout float f) {f07(f);}
+void f10(inout float f) {f11(f);}
+void f14(inout float f) {f15(f);}
+
+[fragment shader]
+void f04(inout float f);
+void f08(inout float f);
+void f12(inout float f);
+void f16(inout float f);
+void f03(inout float f) {f04(f);}
+void f07(inout float f) {f08(f);}
+void f11(inout float f) {f12(f);}
+void f15(inout float f) {f16(f);}
+
+[fragment shader]
+void f05(inout float f);
+void f09(inout float f);
+void f13(inout float f);
+void f04(inout float f) {f05(f);}
+void f08(inout float f) {f09(f);}
+void f12(inout float f) {f13(f);}
+void f16(inout float f) {f=0.2;}
+
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 0.2 0 1.0

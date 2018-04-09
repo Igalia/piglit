@@ -1,0 +1,64 @@
+# This tests we inline functions correctly. Chaining the functions helps
+# us reach the GLSL IR -> NIR code with some functions intact when the
+# conservative optimise flag is set in Mesa. This allows us to test the
+# GLSL IR -> NIR conversion code for functions and the NIR function inlining
+# code.
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+float f01(in vec4 f);
+float f02(in vec4 f);
+float f06(in vec4 f);
+float f10(in vec4 f);
+float f14(in vec4 f);
+void main()
+{
+	vec4 g = vec4(0, 0.1, 0, 1.0);
+	f01(g);
+	gl_FragColor = vec4(f01(g), g.x, g.z, g.w);
+}
+float f01(in vec4 f) {return f02(f);}
+float f05(in vec4 f) {return f06(f);}
+float f09(in vec4 f) {return f10(f);}
+float f13(in vec4 f) {return f14(f);}
+
+[fragment shader]
+float f03(in vec4 f);
+float f07(in vec4 f);
+float f11(in vec4 f);
+float f15(in vec4 f);
+float f02(in vec4 f) {return f03(f);}
+float f06(in vec4 f) {return f07(f);}
+float f10(in vec4 f) {return f11(f);}
+float f14(in vec4 f) {return f15(f);}
+
+[fragment shader]
+float f04(in vec4 f);
+float f08(in vec4 f);
+float f12(in vec4 f);
+float f16(in vec4 f);
+float f03(in vec4 f) {return f04(f);}
+float f07(in vec4 f) {return f08(f);}
+float f11(in vec4 f) {return f12(f);}
+float f15(in vec4 f) {return f16(f);}
+
+[fragment shader]
+float f05(in vec4 f);
+float f09(in vec4 f);
+float f13(in vec4 f);
+float f04(in vec4 f) {return f05(f);}
+float f08(in vec4 f) {return f09(f);}
+float f12(in vec4 f) {return f13(f);}
+float f16(in vec4 f) {return f.y + 0.1;}
+
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.2 0 0 1.0
