@@ -1,0 +1,48 @@
+# Test that implicit type conversion of out parameters works properly.
+#
+# From the GLSL 1.30 spec (which clarifies, but does not change, the
+# rules for implicit type conversion in GLSL 1.20), section 6.1
+# (Function Definitions):
+#
+#   Mismatched types on output parameters (out or inout) must have a
+#   conversion from the formal parameter type to the calling argument
+#   type.
+#
+# This tests for a bug in Mesa GLSL IRs handling of these conversions.
+# Specifically if the function changes the index value use by the out
+# parameter we need to make sure it uses the value of the index before the
+# function was called and not the new value of the index.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+
+uniform int u = 1;
+
+void f(inout int i, out int x)
+{
+  x = 4;
+  i = 0;
+}
+
+void main()
+{
+  gl_Position = gl_Vertex;
+  vec4 value;
+
+  int i = u;
+  f(i, value[i]);
+  gl_FrontColor = vec4(1.0/value[1]);
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.25 0.25 0.25
