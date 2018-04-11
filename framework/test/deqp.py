@@ -1,4 +1,4 @@
-# Copyright 2014-2016 Intel Corporation
+# Copyright 2014-2016,2018 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,6 @@ from __future__ import (
 import abc
 import os
 import subprocess
-try:
-    from lxml import etree as et
-except ImportError:
-    from xml.etree import cElementTree as et
 
 import six
 from six.moves import range
@@ -90,23 +86,13 @@ def make_profile(test_list, test_class):
     return profile
 
 
-def gen_mustpass_tests(mp_list):
+def gen_mustpass_tests(mustpass):
     """Return a testlist from the mustpass list."""
-    root = et.parse(mp_list).getroot()
-    group = []
-
-    def gen(base):
-        for elem in base:
-            if elem.tag == 'Test':
-                yield '{}.{}'.format('.'.join(group), elem.get('name'))
-            else:
-                group.append(elem.get('name'))
-                for test in gen(elem):
-                    yield test
-                del group[-1]
-
-    for test in gen(root):
-        yield test
+    with open(mustpass, 'r') as f:
+        for l in f:
+            l = l.strip()
+            if l:
+                yield l
 
 
 def gen_caselist_txt(bin_, caselist, extra_args):

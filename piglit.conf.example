@@ -60,7 +60,7 @@ testB
 ; Path to the test case list of CTS for deqp-gles2. You can also set this with
 ; the environment variable PIGLIT_DEQP2_MUSTPASS. Piglit will run the subset of
 ; dEQP-GLES2 tests if this option is set.
-;mustpasslist=/home/knuth/src/deqp/android/cts/com.drawelements.deqp.gles2.xml
+;mustpasslist=/home/knuth/src/deqp/android/cts/master/gles2-master.txt
 
 [deqp-gles3]
 ;
@@ -77,7 +77,7 @@ testB
 ; Path to the test case list of CTS for deqp-gles3. You can also set this with
 ; the environment variable PIGLIT_DEQP3_MUSTPASS. Piglit will run the subset of
 ; dEQP-GLES3 tests if this option is set.
-;mustpasslist=/home/knuth/src/deqp/android/cts/com.drawelements.deqp.gles3.xml
+;mustpasslist=/home/knuth/src/deqp/android/cts/master/gles3-master.txt
 
 [deqp-gles31]
 ; Path to the deqp-gles31 executable
@@ -92,7 +92,7 @@ testB
 ; Path to the test case list of CTS for deqp-gles31. You can also set this with
 ; the environment variable PIGLIT_DEQP31_MUSTPASS. Piglit will run the subset of
 ; dEQP-GLES31 tests if this option is set.
-;mustpasslist=/home/knuth/src/deqp/android/cts/com.drawelements.deqp.gles31.xml
+;mustpasslist=/home/knuth/src/deqp/android/cts/master/gles31-master.txt
 
 [deqp-vk]
 ; Path to the deqp-vk executable
