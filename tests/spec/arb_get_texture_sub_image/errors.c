@@ -293,7 +293,7 @@ test_zero_size_image(void)
 	/* getting 0x0 image from 8x8 source should work */
 	glGetTextureSubImage(tex, 0,
 			     0, 0, 0,
-			     0, 0, 0,
+			     0, 0, 1,
 			     GL_RGBA, GL_UNSIGNED_BYTE,
 			     sizeof(image), image);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
@@ -306,7 +306,7 @@ test_zero_size_image(void)
 	/* getting 0x0 image from 0x0 source should work */
 	glGetTextureSubImage(tex, 0,
 			     0, 0, 0,
-			     0, 0, 0,
+			     0, 0, 1,
 			     GL_RGBA, GL_UNSIGNED_BYTE,
 			     sizeof(image), image);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
@@ -315,7 +315,7 @@ test_zero_size_image(void)
 	/* getting 0x0 image at an offset from 0x0 source should error */
 	glGetTextureSubImage(tex, 0,
 			     1, 2, 0,  /* offset */
-			     0, 0, 0,
+			     0, 0, 1,
 			     GL_RGBA, GL_UNSIGNED_BYTE,
 			     sizeof(image), image);
 	if (!piglit_check_gl_error(GL_INVALID_VALUE))
