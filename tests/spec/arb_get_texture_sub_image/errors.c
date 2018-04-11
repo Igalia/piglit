@@ -253,16 +253,20 @@ test_cubemap_faces(void)
                         0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_FLOAT, NULL);
         }
 
-        /* try to get all six cube faces, should fail */
+        /* try to query incomplete cube map, should fail */
         glGetTextureSubImage(tex, 0,
                              0, 0, 0,
-                             8, 8, 6,
+                             8, 8, 5,
                              GL_RGBA, GL_UNSIGNED_BYTE,
                              sizeof(results), results);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		pass = false;
 
-        /* try to get five cube faces, should pass */
+	/* upload final face */
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 5,
+	             0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_FLOAT, NULL);
+
+        /* try to query complete cube map, should now pass */
         glGetTextureSubImage(tex, 0,
                              0, 0, 0,
                              8, 8, 5,

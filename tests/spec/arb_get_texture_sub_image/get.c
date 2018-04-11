@@ -157,12 +157,16 @@ test_getsubimage(GLenum target,
 				     GL_RGBA, GL_UNSIGNED_BYTE, texData);
 			break;
 		case GL_TEXTURE_CUBE_MAP:
-			/* only set +Y face */
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-				     level, intFormat,
-				     mip_width, mip_height, 0,
-				     GL_RGBA, GL_UNSIGNED_BYTE,
-				     texData);
+			/* specify dimensions and format for all faces to make texture cube complete,
+			   but specify data for only the +Y face as it is the only one read back */
+			for (i = 0; i < 6; i++) {
+				GLubyte *faceData = i == 2 ? texData : NULL;
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					     level, intFormat,
+					     mip_width, mip_height, 0,
+					     GL_RGBA, GL_UNSIGNED_BYTE,
+					     faceData);
+			}
 			break;
 		}
 	}
