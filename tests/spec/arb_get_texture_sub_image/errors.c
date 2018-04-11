@@ -200,7 +200,7 @@ test_invalid_values(void)
 			     8, 8, 1, /* size */
 			     GL_RGBA, GL_FLOAT,  /* bad enum */
 			     sizeof(buffer), buffer);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
 		pass = false;
 
 	/* Test getting invalid offset */
