@@ -42,6 +42,10 @@ piglit_make_generated_tests(
 	gen_builtin_uniform_tests.py
 	builtin_function.py)
 piglit_make_generated_tests(
+	builtin_uniform_spirv_tests.list
+	gen_builtin_uniform_spirv_tests.py
+	builtin_function.py)
+piglit_make_generated_tests(
 	constant_array_size_tests.list
 	gen_constant_array_size_tests.py
 	builtin_function.py)
@@ -260,6 +264,7 @@ add_custom_target(gen-gl-tests
 			outerproduct_tests.list
 			outerproduct_invalid_params.list
 			builtin_uniform_tests.list
+			builtin_uniform_spirv_tests.list
 			constant_array_size_tests.list
 			const_builtin_equal_tests.list
 			builtin_packing_tests.list
