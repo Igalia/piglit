@@ -77,6 +77,7 @@ import pytest
     'gen_vp_tex',
     'interpolation-qualifier-built-in-variable',
     pytest.mark.slow('gen_builtin_uniform_tests'),
+    pytest.mark.slow('gen_builtin_uniform_spirv_tests'),
     pytest.mark.slow('gen_constant_array_size_tests'),
     pytest.mark.very_slow('gen_vs_in_fp64'),
 ])
