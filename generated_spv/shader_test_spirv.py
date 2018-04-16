@@ -72,6 +72,13 @@ RE_spirv_member_name = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpMemberName\s+' +
 RE_spirv_member_offset = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpMemberDecorate\s+' +
                                     r'%(\w+)\s+(\d+)\s+Offset\s+(\d+)\s*$',
                                     re.MULTILINE)
+RE_spirv_matrix_stride = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpMemberDecorate\s+'
+                                    r'%(\w+)\s+(\d+)\s+MatrixStride\s+'
+                                    r'(\d+)\s*$',
+                                    re.MULTILINE)
+RE_spirv_matrix_order = re.compile(r'^\s*(?:%\w+\s*=\s*)?OpMemberDecorate\s+'
+                                   r'%(\w+)\s+(\d+)\s+(Row|Col)Major\s*$',
+                                    re.MULTILINE)
 RE_spirv_type = re.compile(r'^\s*%(\w+)\s*=\s*OpType(\w+) *(.*?) *$',
                            re.MULTILINE)
 RE_spirv_constant = re.compile(r'^\s*%(\w+)\s*=\s*OpConstant\s+' +
@@ -175,25 +182,27 @@ class SpirvInfo:
 
         self.types = {}
 
-        self.member_names = {}
-        for md in RE_spirv_member_name.finditer(spirv):
-            if md.group(1) not in self.member_names:
-                self.member_names[md.group(1)] = []
-            names = self.member_names[md.group(1)]
-            index = int(md.group(2))
-            if len(names) <= index:
-                names.extend(itertools.repeat(None, len(names) - index + 1))
-            names[index] = md.group(3)
+        def get_member_decorations(regexp, func):
+            decorations = {}
+            for md in regexp.finditer(spirv):
+                if md.group(1) not in decorations:
+                    decorations[md.group(1)] = []
+                members = decorations[md.group(1)]
+                index = int(md.group(2))
+                if len(members) <= index:
+                    padding = itertools.repeat(None, index - len(members) + 1)
+                    members.extend(padding)
+                members[index] = func(md.group(3))
+            return decorations
 
-        self.member_offsets = {}
-        for md in RE_spirv_member_offset.finditer(spirv):
-            if md.group(1) not in self.member_offsets:
-                self.member_offsets[md.group(1)] = []
-            offsets = self.member_offsets[md.group(1)]
-            index = int(md.group(2))
-            if len(offsets) <= index:
-                offsets.extend(itertools.repeat(None, len(offsets) - index + 1))
-            offsets[index] = int(md.group(3))
+        self.member_names = get_member_decorations(RE_spirv_member_name,
+                                                   lambda x: x)
+        self.member_offsets = get_member_decorations(RE_spirv_member_offset,
+                                                     int)
+        self.matrix_strides = get_member_decorations(RE_spirv_matrix_stride,
+                                                     int)
+        self.matrix_orders = get_member_decorations(RE_spirv_matrix_order,
+                                                    str.lower)
 
         self.inputs = self._get_variables(RE_spirv_input_var.finditer(spirv))
         self.outputs = self._get_variables(RE_spirv_output_var.finditer(spirv))
@@ -236,6 +245,14 @@ class SpirvInfo:
                 t.member_offsets = self.member_offsets[name]
             else:
                 t.member_offsets = None
+            if name in self.matrix_strides:
+                t.matrix_strides = self.matrix_strides[name]
+            else:
+                t.matrix_strides = None
+            if name in self.matrix_strides:
+                t.matrix_orders = self.matrix_orders[name]
+            else:
+                t.matrix_orders = None
         elif t.base_type == 'Int':
             t.width = int(dec[1])
             t.signedness = int(dec[2])
@@ -739,6 +756,8 @@ def remap_variable(name, location_map, size_func):
 
 def process_ubo_accessors(spirv_type, accessors):
     offset = 0
+    matrix_stride = None
+    matrix_order = None
 
     while len(accessors) > 0:
         spirv_type = spirv_type.deref()
@@ -763,6 +782,12 @@ def process_ubo_accessors(spirv_type, accessors):
                 index = spirv_type.member_names.index(md.group(1))
             except ValueError:
                 return None
+            if (spirv_type.matrix_strides is not None and
+                index < len(spirv_type.matrix_strides)):
+                matrix_stride = spirv_type.matrix_strides[index]
+            if (spirv_type.matrix_orders is not None and
+                index < len(spirv_type.matrix_orders)):
+                matrix_order = spirv_type.matrix_orders[index]
             offset += spirv_type.member_offsets[index]
             spirv_type = spirv_type.member_types[index]
             accessors = accessors[len(md.group(0)):]
@@ -770,18 +795,17 @@ def process_ubo_accessors(spirv_type, accessors):
 
         return None
 
-    return offset
+    return (offset, matrix_stride, matrix_order)
 
 def remap_ubo_member_in_ubo(name, ubo):
     if ubo.binding is None:
         return None
 
-    offset = process_ubo_accessors(ubo.type,
-                                   "." + name)
-    if offset is None:
+    replacement = process_ubo_accessors(ubo.type, "." + name)
+    if replacement is None:
         return None
 
-    return (ubo.binding, offset)
+    return (ubo.binding, *replacement)
 
 def remap_ubo_member(name, ubos):
     for ubo in ubos:
@@ -823,6 +847,8 @@ def filter_shader_test(fin, fout,
     in_test = False
     in_vertex_data = False
     block_binding = -1
+    current_matrix_stride = None
+    current_matrix_order = None
     uniform_re = re.compile(r'(\s*uniform\s+\S+\s+)(\S+)(.*)')
     attrib_re = re.compile(r'\b([\[\]a-zA-Z0-9_]+)((?:/[\[\]a-zA-Z_0-9]+){2})')
     block_binding_re = re.compile(r'\s*block\s+binding\s+([0-9]+)')
@@ -857,11 +883,21 @@ def filter_shader_test(fin, fout,
             if md:
                 replacement = remap_ubo_member(md.group(2), ubos)
                 if replacement:
-                    (binding, offset) = replacement
+                    (binding, offset, matrix_stride, matrix_order) = replacement
                     line = "block offset {}\n{}".format(offset, line)
                     if binding != block_binding:
                         block_binding = binding
                         line = "block binding {}\n{}".format(binding, line)
+                    if (matrix_stride is not None and
+                        matrix_stride != current_matrix_stride):
+                        current_matrix_stride = matrix_stride
+                        line = "block matrix stride {}\n{}".format(
+                            matrix_stride, line)
+                    if (matrix_order is not None and
+                        matrix_order != current_matrix_order):
+                        current_matrix_order = matrix_order
+                        line = "block row major {}\n{}".format(
+                            1 if matrix_order == 'row' else 0, line)
                 else:
                     replacement = remap_uniform(md.group(2), uniform_map)
                     if replacement:
