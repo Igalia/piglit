@@ -2277,7 +2277,6 @@ set_ubo_uniform(char *name, const char *type,
 		} else {
                         matrix_stride = block_data.matrix_stride;
                         row_major = block_data.row_major;
-			assert(false);
 		}
 
 		matrix_stride /= sizeof(double);
