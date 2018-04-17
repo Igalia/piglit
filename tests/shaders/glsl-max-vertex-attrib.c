@@ -56,7 +56,7 @@ static const char *vShaderString =
 	"attribute float pos;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_Position = pos;\n"
+	"	gl_Position = vec4(pos, 0.0, 0.0, 1.0);\n"
 	"}\n";
 
 static const char *fShaderString =
@@ -77,26 +77,12 @@ enum piglit_result piglit_display(void)
 	GLenum type;
 	GLchar buffer[64];
 
-	GLuint program, vShader, fShader;
+	GLuint program;
 	int maxAttribCount;
 
 	/* --- valid program needed for some of the functions --- */
-
-	fShader = glCreateShader(GL_FRAGMENT_SHADER);
-	vShader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(fShader, 1, &fShaderString, NULL);
-	glShaderSource(vShader, 1, &vShaderString, NULL);
-
-	glCompileShader(vShader);
-	glCompileShader(fShader);
-
-	program = glCreateProgram();
-
-	glAttachShader(program, vShader);
-	glAttachShader(program, fShader);
-
-	glLinkProgram(program);
+	program = piglit_build_simple_program(vShaderString, fShaderString);
+	piglit_check_gl_error(GL_NO_ERROR);
 
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttribCount);
 
