@@ -173,7 +173,7 @@ compile_shaders(void)
 		"}\n";
 
 	static const char frag_mask_in_one[] =
-		"#version 130\n"
+		"#version 150\n"
 		"#extension GL_ARB_gpu_shader5 : enable\n"
 		"#extension GL_ARB_sample_shading : enable\n"
 		"out vec4 out_color;\n"
@@ -183,7 +183,7 @@ compile_shaders(void)
 		"}\n";
 
 	static const char frag_partition_write[] =
-		"#version 140\n"
+		"#version 150\n"
 		"#extension GL_ARB_gpu_shader5 : enable\n"
 		"#extension GL_ARB_sample_shading : enable\n"
 		"#extension GL_ARB_shader_atomic_counters : enable\n"
