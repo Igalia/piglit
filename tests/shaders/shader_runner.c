@@ -3664,6 +3664,9 @@ piglit_display(void)
 		} else if (sscanf(line, "ssbo %d subdata float %d %f", &x, &y, &c[0]) == 3) {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, 4, &c[0]);
+		} else if (sscanf(line, "ssbo %d subdata int %d %i", &x, &y, &z) == 3) {
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, 4, &z);
 		} else if (sscanf(line, "texture rgbw %d ( %d", &tex, &w) == 2) {
 			GLenum int_fmt = GL_RGBA;
 			int num_scanned =
