@@ -1,0 +1,70 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_storage_buffer_object
+GL_ARB_shader_atomic_counters
+GL_ARB_shader_atomic_counter_ops
+GL_NV_shader_atomic_float
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_shader_storage_buffer_object: require
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_shader_atomic_counter_ops: require
+#extension GL_NV_shader_atomic_float: require
+
+layout(binding = 0) buffer bufblock {
+       float value;
+};
+
+/* GL_ARB_shader_atomic_counters requires at least 8 total counters. */
+layout(binding = 0) uniform atomic_uint mask[7];
+layout(binding = 0) uniform atomic_uint fail;
+
+out vec4 color;
+
+void main()
+{
+	/* Each of 32 * N fragments should see a unique value.  Each value
+	 * observed is tracked in "mask."  The test automatically fails if a
+	 * duplicate value is observed.  After the shaders are done running,
+	 * the mask values will be probed to ensure that all possible values
+	 * were observed.
+	 */
+	float f = atomicAdd(value, .5);
+	uint i = uint(f * 2.0);
+	uint bit = i % 32u;
+	int c = int(i / 32u);
+	uint m = 1u << bit;
+
+	if (c < mask.length()) {
+		/* If the bit was already set, the test fails. */
+		if ((atomicCounterOrARB(mask[c], m) & m) != 0u)
+			atomicCounterIncrement(fail);
+
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+	} else {
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+	}
+}
+
+[test]
+atomic counters 8
+
+ssbo 0 32
+ssbo 0 subdata float 0 0.0
+
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw rect -1 -1 2 2
+
+probe atomic counter 0 == 4294967295
+probe atomic counter 1 == 4294967295
+probe atomic counter 2 == 4294967295
+probe atomic counter 3 == 4294967295
+probe atomic counter 4 == 4294967295
+probe atomic counter 5 == 4294967295
+probe atomic counter 6 == 4294967295
+probe atomic counter 7 == 0
