@@ -88,6 +88,31 @@ def shader_runner_type(glsl_type):
         return str(glsl_type)
 
 
+def matrix_stride(glsl_type):
+    """Calculates the matrix stride for a glsl type assuming std140 rules."""
+    component_size = 4
+
+    if glsl_type.num_rows == 3:
+        base_alignment = component_size * 4
+    else:
+        base_alignment = component_size * glsl_type.num_rows
+
+    # Align to a vec4
+    return (base_alignment + 15) & ~15
+
+
+def set_uniform(api, glsl_type, location, value):
+    if api == 'vulkan':
+        command = 'uniform ubo 0'
+    else:
+        command = 'uniform'
+    return "{} {} {} {}\n".format(
+        command,
+        shader_runner_type(glsl_type),
+        location,
+        shader_runner_format(value))
+
+
 class ShaderSource:
     """An object with an array of strings for each section of a SPIR-V
     shader. These can be combined together to generate the final
@@ -96,8 +121,11 @@ class ShaderSource:
     add them when it’s convenient.
     """
 
-    def __init__(self, stage):
+    Uniform = collections.namedtuple('Uniform', ('name', 'type', 'location'))
+
+    def __init__(self, stage, api):
         self.stage = stage
+        self.api = api
         self.capabilities = []
         self.extensions = []
         self.instruction_imports = ["%glsl450 = "
@@ -109,6 +137,8 @@ class ShaderSource:
                         "%void_function = OpTypeFunction %void"]
         self.types = set()
         self.execution_modes = ["OriginLowerLeft"]
+        self.next_uniform_location = 0
+        self.uniforms = []
 
         if stage in ('Vertex', 'Fragment', 'GLCompute'):
             self.add_capability('Shader')
@@ -117,7 +147,46 @@ class ShaderSource:
         elif stage in ('TessellationControl', 'TessellationEvaluation'):
             self.add_capability('Tessellation')
 
+    def get_next_uniform_location(self, type):
+        location = self.next_uniform_location
+
+        if self.api == 'gl':
+            self.next_uniform_location += 1
+            return location
+
+        # Align the location to the component size
+        base_type = type.base_type
+        if base_type in (glsl_int64_t, glsl_uint64_t):
+            comp_size = 8
+        else:
+            comp_size = 4
+
+        location = (location + comp_size - 1) & ~(comp_size - 1)
+
+        if type.num_cols > 1:
+            self.next_uniform_location = (location + matrix_stride(type) *
+                                          type.num_cols)
+        else:
+            self.next_uniform_location = location + comp_size * type.num_rows
+
+        return location
+
     def get_source(self):
+        if self.api == 'vulkan' and len(self.uniforms) > 0:
+            globals = self.globals + ["%uniforms_type = OpTypeStruct " +
+                                      " ".join(x.type for x in self.uniforms),
+                                      "%uniforms_ptr_type = OpTypePointer "
+                                      "Uniform %uniforms_type",
+                                      "%uniforms = OpVariable "
+                                      "%uniforms_ptr_type Uniform"]
+            annotations = self.annotations + ["OpDecorate %uniforms Binding 0",
+                                              "OpDecorate %uniforms "
+                                              "DescriptorSet 0",
+                                              "OpDecorate %uniforms_type Block"]
+        else:
+            globals = self.globals
+            annotations = self.annotations
+
         return ("\n".join("OpCapability {}".format(x)
                           for x in self.capabilities) + "\n" +
                 "\n".join("OpExtension \"{}\"".format(x)
@@ -128,13 +197,44 @@ class ShaderSource:
                 " ".join(self.interfaces) + "\n" +
                 "\n".join("OpExecutionMode %main {}".format(x)
                           for x in self.execution_modes) + "\n" +
-                "\n".join(self.annotations) + "\n" +
-                "\n".join(self.globals) + "\n" +
+                "\n".join(annotations) + "\n" +
+                "\n".join(globals) + "\n" +
                 "%main = OpFunction %void None %void_function\n" +
                 "%main_label = OpLabel\n" +
                 "\n".join(self.source) + "\n"
                 "OpReturn\n" +
                 "OpFunctionEnd\n")
+
+    def add_uniform(self, name, type):
+        location = self.get_next_uniform_location(type)
+        type_name = self.get_glsl_type(type)
+        self.uniforms.append(ShaderSource.Uniform(name, type_name, location))
+
+        if self.api == 'gl':
+            self.add_global("%uniform{} = OpVariable {} UniformConstant".format(
+                location, type_name))
+            self.add_annotation("OpDecorate %uniform{} Location {}".format(
+                location, location))
+            self.add_source("{} = OpLoad {} %uniform{}".format(
+                name, type_name, location))
+        elif self.api == 'vulkan':
+            type_ptr = self.get_pointer_type(type_name, 'Uniform')
+            uniform_num = len(self.uniforms) - 1
+            self.add_global("%uniforms_index{} = OpConstant {} {}".format(
+                uniform_num, self.get_int_type(32, False), uniform_num))
+            self.add_source("%uniform{}_ptr = OpAccessChain "
+                            "{} %uniforms %uniforms_index{}".format(
+                                uniform_num, type_ptr, uniform_num))
+            self.add_source("{} = OpLoad {} %uniform{}_ptr".format(
+                name, type_name, uniform_num))
+            self.add_annotation("OpMemberDecorate %uniforms_type "
+                                "{} Offset {}".format(uniform_num, location))
+            if type.num_cols > 1:
+                self.add_annotation("OpMemberDecorate %uniforms_type "
+                                    "{} MatrixStride {}".format(
+                                        uniform_num, matrix_stride(type)))
+
+        return location
 
     def add_annotation(self, line):
         self.annotations.append(line)
@@ -268,21 +368,14 @@ class Comparator(object):
         float_type = shader.get_float_type(32)
         vec4_type = shader.get_vec_type(float_type, 4)
         result_type = shader.get_glsl_type(rettype)
-        ptr_result_type = shader.get_pointer_type(result_type,
-                                                  "UniformConstant")
 
-        shader.add_global("%expected = OpVariable {} UniformConstant".format(
-            ptr_result_type))
-        shader.add_annotation("OpDecorate %expected Location 4")
+        self.expected_location = shader.add_uniform("%expected", rettype)
         shader.add_global("%one = OpConstant {} 1.0".format(float_type))
         shader.add_global("%zero = OpConstant {} 0.0".format(float_type))
         shader.add_global("%red = OpConstantComposite {} "
                           "%one %zero %zero %one".format(vec4_type))
         shader.add_global("%green = OpConstantComposite {} "
                           "%zero %one %zero %one".format(vec4_type))
-
-        shader.add_source("%expected_v = OpLoad {} %expected".format(
-            result_type))
 
     def add_result_end(self, shader):
         float_type = shader.get_float_type(32)
@@ -345,10 +438,7 @@ class BoolComparator(Comparator):
         return "%result"
 
     def draw_test(self, test_vector, draw_command):
-        test = 'uniform {0} 4 {1}\n'.format(
-            shader_runner_type(self.__signature.rettype),
-            shader_runner_format(column_major_values(test_vector.result)))
-        test += draw_command
+        test = draw_command
         return test
 
     def convert_to_float(self, value):
@@ -377,8 +467,9 @@ class IntComparator(Comparator):
         output_var = result == expected ? vec4(0.0, 1.0, 0.0, 1.0)
                                         : vec4(1.0, 0.0, 0.0, 1.0);
     """
-    def __init__(self, signature):
+    def __init__(self, signature, api):
         self.__signature = signature
+        self.__api = api
 
     def add_result_handler(self, shader, invocation):
         self.add_result_start(shader, self.__signature.rettype)
@@ -388,11 +479,11 @@ class IntComparator(Comparator):
 
         if num_rows == 1:
             shader.add_source("%res = OpIEqual {} "
-                              "%expected_v {}".format(bool_type, invocation))
+                              "%expected {}".format(bool_type, invocation))
         else:
             bvec_type = shader.get_vec_type(bool_type, num_rows)
             shader.add_source("%res_parts = OpIEqual {} "
-                              "%expected_v {}".format(bvec_type, invocation))
+                              "%expected {}".format(bvec_type, invocation))
             shader.add_source("%res = OpAll {} %res_parts".format(bool_type))
 
         self.add_result_end(shader)
@@ -400,9 +491,10 @@ class IntComparator(Comparator):
         return "%result"
 
     def draw_test(self, test_vector, draw_command):
-        test = 'uniform {0} 4 {1}\n'.format(
-            shader_runner_type(self.__signature.rettype),
-            shader_runner_format(column_major_values(test_vector.result)))
+        test = set_uniform(self.__api,
+                           self.__signature.rettype,
+                           self.expected_location,
+                           column_major_values(test_vector.result))
         test += draw_command
         return test
 
@@ -420,8 +512,9 @@ class FloatComparator(Comparator):
         output_var = distance(result, expected) <= tolerance
                      ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
     """
-    def __init__(self, signature):
+    def __init__(self, signature, api):
         self.__signature = signature
+        self.__api = api
 
     def add_result_handler(self, shader, invocation):
         self.add_result_start(shader, self.__signature.rettype)
@@ -429,19 +522,14 @@ class FloatComparator(Comparator):
         bool_type = shader.get_bool_type()
         bvec4_type = shader.get_vec_type(bool_type, 4)
         float_type = shader.get_float_type(32)
-        ptr_float_type = shader.get_pointer_type(float_type, "UniformConstant")
 
-        shader.add_global("%tolerance = OpVariable {} UniformConstant".format(
-            ptr_float_type))
-        shader.add_source("%tolerance_v = OpLoad {} %tolerance".format(
-            float_type))
-        shader.add_annotation("OpDecorate %tolerance Location 5")
+        self.tolerance_location = shader.add_uniform("%tolerance", glsl_float)
 
         if self.__signature.rettype.num_cols == 1:
             shader.add_source("%dist = OpExtInst {} %glsl450 Distance {} "
-                              "%expected_v".format(float_type, invocation))
+                              "%expected".format(float_type, invocation))
             shader.add_source("%res = OpFOrdLessThanEqual {} "
-                              "%dist %tolerance_v".format(bool_type))
+                              "%dist %tolerance".format(bool_type))
         else:
             base_type = shader.get_glsl_type(self.__signature.rettype.base_type)
             num_rows = self.__signature.rettype.num_rows
@@ -454,7 +542,7 @@ class FloatComparator(Comparator):
                                           index, base_type, invocation,
                                           col, row))
                     shader.add_source("%ec{} = OpCompositeExtract "
-                                      "{} %expected_v {} {}".format(
+                                      "{} %expected {} {}".format(
                                           index, base_type, col, row))
                     shader.add_source("%residual{} = OpFSub "
                                       "{} %ic{} %ec{}".format(
@@ -473,7 +561,7 @@ class FloatComparator(Comparator):
                                               index - 1, index))
                     index += 1
             shader.add_source("%tolerance_sq = OpFMul {} "
-                              "%tolerance_v %tolerance_v".format(base_type))
+                              "%tolerance %tolerance".format(base_type))
             shader.add_source("%res = OpFOrdLessThanEqual {} "
                               "%sum{} %tolerance_sq".format(
                                   bool_type, index - 1))
@@ -483,11 +571,14 @@ class FloatComparator(Comparator):
         return "%result"
 
     def draw_test(self, test_vector, draw_command):
-        test = 'uniform {0} 4 {1}\n'.format(
-            shader_runner_type(self.__signature.rettype),
-            shader_runner_format(column_major_values(test_vector.result)))
-        test += 'uniform float 5 {0}\n'.format(
-            shader_runner_format([test_vector.tolerance]))
+        test = set_uniform(self.__api,
+                           self.__signature.rettype,
+                           self.expected_location,
+                           column_major_values(test_vector.result))
+        test += set_uniform(self.__api,
+                            glsl_float,
+                            self.tolerance_location,
+                            [test_vector.tolerance])
         test += draw_command
         return test
 
@@ -503,7 +594,7 @@ class ShaderTest(object):
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, signature, test_vectors):
+    def __init__(self, signature, test_vectors, api):
         """Prepare to build a test for a single built-in.  signature
         is the signature of the built-in (a key from the
         builtin_function.test_suite dict), and test_vectors is the
@@ -513,6 +604,7 @@ class ShaderTest(object):
         """
         self._signature = signature
         self._test_vectors = test_vectors
+        self._api = api
 
         # Size of the rectangles drawn by the test.
         self.rect_width = 4
@@ -531,9 +623,9 @@ class ShaderTest(object):
             self._comparator = BoolComparator(signature)
         elif signature.rettype.base_type in (glsl_int, glsl_uint,
                                              glsl_int64_t, glsl_uint64_t):
-            self._comparator = IntComparator(signature)
+            self._comparator = IntComparator(signature, self._api)
         else:
-            self._comparator = FloatComparator(signature)
+            self._comparator = FloatComparator(signature, self._api)
 
     def glsl_version(self):
         return self._signature.version_introduced
@@ -563,6 +655,12 @@ class ShaderTest(object):
     def make_additional_requirements(self):
         """Return a string that should be included in the test's
         [require] section.
+        """
+        return ''
+
+    def make_additional_vulkan_requirements(self):
+        """Return a string that should be included in the test's
+        [require] section when running on Vulkan.
         """
         return ''
 
@@ -671,7 +769,7 @@ class ShaderTest(object):
 
         draw call.
         """
-        return False
+        return self._api == 'vulkan'
 
     def make_test_shader(self, stage):
         """Generate the shader code necessary to test the built-in.
@@ -679,7 +777,7 @@ class ShaderTest(object):
         declarations that need to be before the main() function of the
         shader.
         """
-        shader = ShaderSource(stage)
+        shader = ShaderSource(stage, self._api)
 
         if self._signature.extension == 'ARB_gpu_shader_int64':
             shader.add_capability('Int64')
@@ -690,18 +788,17 @@ class ShaderTest(object):
                 spv_extension))
             shader.add_extension(spv_extension)
 
+        self.arg_locations = []
+
         for i, arg in enumerate(self._signature.argtypes):
             t = shader.get_glsl_type(arg)
-            ptr_type = shader.get_pointer_type(t, "UniformConstant")
-            shader.add_global("%arg{} = OpVariable {} UniformConstant".format(
-                i, ptr_type))
-            shader.add_annotation("OpDecorate %arg{} Location {}".format(i, i))
-            shader.add_source("%arg{}_v = OpLoad {} %arg{}".format(i, t, i))
+            arg_loc = shader.add_uniform("%arg{}".format(i), arg)
+            self.arg_locations.append(arg_loc)
 
         shader.add_source("%invocation = {}".format(
             self._signature.template_spirv.format(
                 shader.get_glsl_type(self._signature.rettype),
-                *['%arg{0}_v'.format(i)
+                *['%arg{}'.format(i)
                   for i in range(len(self._signature.argtypes))])))
 
         self._comparator.add_result_handler(shader, "%invocation")
@@ -720,10 +817,11 @@ class ShaderTest(object):
         test = self.make_test_init()
         for test_num, test_vector in enumerate(self._test_vectors):
             for i in range(len(test_vector.arguments)):
-                test += 'uniform {0} {1} {2}\n'.format(
-                    shader_runner_type(self._signature.argtypes[i]),
-                    i, shader_runner_format(
-                        column_major_values(test_vector.arguments[i])))
+                test += set_uniform(self._api,
+                                    self._signature.argtypes[i],
+                                    self.arg_locations[i],
+                                    column_major_values(
+                                        test_vector.arguments[i]))
             test += self._comparator.draw_test(test_vector,
                                                self.draw_command(test_num))
             if self.needs_probe_per_draw():
@@ -743,20 +841,48 @@ class ShaderTest(object):
             subdir = self.extensions()[0].lower()
         else:
             subdir = 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100)
+        if self._api == 'gl':
+            api_dir = ['spec', 'arb_gl_spirv']
+            ext = 'shader_test'
+        elif self._api == 'vulkan':
+            api_dir = ['vulkan']
+            ext = 'vk_shader_test'
         return os.path.join(
-            'spec', 'arb_gl_spirv', subdir, 'execution', 'built-in-functions',
-            '{0}-{1}-{2}{3}.shader_test'.format(
+            *api_dir, subdir, 'execution', 'built-in-functions',
+            '{0}-{1}-{2}{3}.{4}'.format(
                 self.test_prefix(), self._signature.name, argtype_names,
-                self._comparator.testname_suffix()))
+                self._comparator.testname_suffix(), ext))
+
+    def map_vulkan_extension(self, ext):
+        vulkan_extensions = {
+            'ARB_tessellation_shader': 'tessellationShader',
+            'ARB_gpu_shader_int64': 'shaderInt64',
+            'AMD_shader_trinary_minmax': 'VK_AMD_shader_trinary_minmax'
+        }
+        if ext in vulkan_extensions:
+            return vulkan_extensions[ext]
+        else:
+            return None
 
     def generate_shader_test(self):
         """Generate the test and write it to the output file."""
-        shader_test = ('[require]\n'
-                       'SPIRV ONLY\n'
-                       'GLSL >= 4.50\n')
-        for extension in self.extensions():
-            shader_test += 'GL_{}\n'.format(extension)
-        shader_test += self.make_additional_requirements()
+        shader_test = '[require]\n'
+        if self._api == 'gl':
+            shader_test += ('SPIRV ONLY\n'
+                            'GLSL >= 4.50\n')
+            for extension in self.extensions():
+                shader_test += 'GL_{}\n'.format(extension)
+            shader_test += self.make_additional_requirements()
+        elif self._api == 'vulkan':
+            for extension in self.extensions():
+                vulkan_ext = self.map_vulkan_extension(extension)
+                if vulkan_ext:
+                    shader_test += '{}\n'.format(vulkan_ext)
+            extension = self.make_additional_requirements()
+            vulkan_ext = self.map_vulkan_extension(extension)
+            if vulkan_ext:
+                shader_test += '{}\n'.format(vulkan_ext)
+            shader_test += self.make_additional_vulkan_requirements()
         shader_test += '\n'
         vs = self.make_vertex_shader()
         if vs:
@@ -827,7 +953,7 @@ class VertexShaderTest(ShaderTest):
         return shader
 
     def make_fragment_shader(self):
-        shader = ShaderSource('Fragment')
+        shader = ShaderSource('Fragment', self._api)
         self.add_fragment_shader_passthrough(shader)
         return shader
 
@@ -858,7 +984,7 @@ class TessellationShaderTest(ShaderTest):
                                                                 self.rect_height)
 
     def make_vertex_shader(self):
-        shader = ShaderSource('Vertex')
+        shader = ShaderSource('Vertex', self._api)
         self.add_vertex_shader_passthrough(shader, builtin=False)
         return shader
 
@@ -940,7 +1066,7 @@ class TessellationShaderTest(ShaderTest):
         return shader
 
     def make_tess_eval_shader(self):
-        shader = ShaderSource('TessellationEvaluation')
+        shader = ShaderSource('TessellationEvaluation', self._api)
 
         shader.add_execution_mode("Quads")
         shader.add_execution_mode("SpacingEqual")
@@ -1015,7 +1141,7 @@ class TessellationShaderTest(ShaderTest):
         return shader
 
     def make_fragment_shader(self):
-        shader = ShaderSource('Fragment')
+        shader = ShaderSource('Fragment', self._api)
         self.add_fragment_shader_passthrough(shader)
         return shader
 
@@ -1030,7 +1156,7 @@ class GeometryShaderTest(ShaderTest):
         return max(150, ShaderTest.glsl_version(self))
 
     def make_vertex_shader(self):
-        shader = ShaderSource('Vertex')
+        shader = ShaderSource('Vertex', self._api)
         self.add_vertex_shader_passthrough(shader, builtin=False)
         return shader
 
@@ -1081,9 +1207,12 @@ class GeometryShaderTest(ShaderTest):
         return shader
 
     def make_fragment_shader(self):
-        shader = ShaderSource('Fragment')
+        shader = ShaderSource('Fragment', self._api)
         self.add_fragment_shader_passthrough(shader)
         return shader
+
+    def make_additional_vulkan_requirements(self):
+        return 'geometryShader'
 
 class FragmentShaderTest(ShaderTest):
     """Derived class for tests that exercise the built-in in a fragment
@@ -1093,7 +1222,7 @@ class FragmentShaderTest(ShaderTest):
         return 'fs'
 
     def make_vertex_shader(self):
-        shader = ShaderSource('Vertex')
+        shader = ShaderSource('Vertex', self._api)
         self.add_vertex_shader_passthrough(shader)
         return shader
 
@@ -1192,14 +1321,15 @@ clear
 
 
 def all_tests():
-    for signature, test_vectors in sorted(test_suite.items()):
-        if signature.template_spirv is None:
-            continue
-        # yield VertexShaderTest(signature, test_vectors)
-        # yield TessellationShaderTest(signature, test_vectors)
-        # yield GeometryShaderTest(signature, test_vectors)
-        yield FragmentShaderTest(signature, test_vectors)
-        # yield ComputeShaderTest(signature, test_vectors)
+    for api in ('gl', 'vulkan'):
+        for signature, test_vectors in sorted(test_suite.items()):
+            if signature.template_spirv is None:
+                continue
+            yield VertexShaderTest(signature, test_vectors, api)
+            yield TessellationShaderTest(signature, test_vectors, api)
+            yield GeometryShaderTest(signature, test_vectors, api)
+            yield FragmentShaderTest(signature, test_vectors, api)
+            #yield ComputeShaderTest(signature, test_vectors, api)
 
 
 def main():
