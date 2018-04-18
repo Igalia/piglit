@@ -1,0 +1,20 @@
+// [config]
+// expect_result: fail
+// glsl_version: 1.50
+// require_extensions: GL_ARB_compute_shader GL_INTEL_shader_atomic_float_minmax
+// [end config]
+//
+// The extension is supported by the implementation, but it is not enabled in
+// the shader.  This should fail to compile.
+
+#version 150
+#extension GL_ARB_compute_shader: require
+
+layout(local_size_x = 32) in;
+
+shared float a;
+
+void main()
+{
+	atomicExchange(a, 1.7);
+}
