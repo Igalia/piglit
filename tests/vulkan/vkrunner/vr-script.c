@@ -267,6 +267,37 @@ parse_ints(const char **p,
 }
 
 static bool
+parse_uints(const char **p,
+	    unsigned *out,
+	    int n_ints,
+	    const char *sep)
+{
+	unsigned long v;
+	char *tail;
+
+	for (int i = 0; i < n_ints; i++) {
+		while (isspace(**p))
+			(*p)++;
+
+		errno = 0;
+		v = strtoul(*p, &tail, 10);
+		if (errno != 0 || tail == *p || v > UINT_MAX)
+			return false;
+		*(out++) = (unsigned) v;
+		*p = tail;
+
+		if (sep && i < n_ints - 1) {
+			while (isspace(**p))
+				(*p)++;
+			if (!looking_at(p, sep))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+static bool
 parse_size_t(const char **p,
 	     size_t *out)
 {
@@ -292,6 +323,7 @@ parse_value_type(const char **p,
 		enum vr_script_type type;
 	} types[] = {
 		{ "int ", VR_SCRIPT_TYPE_INT },
+		{ "uint ", VR_SCRIPT_TYPE_UINT },
 		{ "float ", VR_SCRIPT_TYPE_FLOAT },
 		{ "double ", VR_SCRIPT_TYPE_DOUBLE },
 		{ "vec2 ", VR_SCRIPT_TYPE_VEC2 },
@@ -303,6 +335,9 @@ parse_value_type(const char **p,
 		{ "ivec2 ", VR_SCRIPT_TYPE_IVEC2 },
 		{ "ivec3 ", VR_SCRIPT_TYPE_IVEC3 },
 		{ "ivec4 ", VR_SCRIPT_TYPE_IVEC4 },
+		{ "uvec2 ", VR_SCRIPT_TYPE_UVEC2 },
+		{ "uvec3 ", VR_SCRIPT_TYPE_UVEC3 },
+		{ "uvec4 ", VR_SCRIPT_TYPE_UVEC4 },
 	};
 
 	for (int i = 0; i < ARRAY_SIZE(types); i++) {
@@ -322,6 +357,8 @@ parse_value(const char **p,
 	switch (value->type) {
 	case VR_SCRIPT_TYPE_INT:
 		return parse_ints(p, &value->i, 1, NULL);
+	case VR_SCRIPT_TYPE_UINT:
+		return parse_uints(p, &value->u, 1, NULL);
 	case VR_SCRIPT_TYPE_FLOAT:
 		return parse_floats(p, &value->f, 1, NULL);
 	case VR_SCRIPT_TYPE_DOUBLE:
@@ -344,6 +381,12 @@ parse_value(const char **p,
 		return parse_ints(p, value->ivec, 3, NULL);
 	case VR_SCRIPT_TYPE_IVEC4:
 		return parse_ints(p, value->ivec, 4, NULL);
+	case VR_SCRIPT_TYPE_UVEC2:
+		return parse_uints(p, value->uvec, 2, NULL);
+	case VR_SCRIPT_TYPE_UVEC3:
+		return parse_uints(p, value->uvec, 3, NULL);
+	case VR_SCRIPT_TYPE_UVEC4:
+		return parse_uints(p, value->uvec, 4, NULL);
 	}
 
 	piglit_fatal("should not be reached");
@@ -969,18 +1012,22 @@ vr_script_type_size(enum vr_script_type type)
 {
 	switch (type) {
 	case VR_SCRIPT_TYPE_INT:
+	case VR_SCRIPT_TYPE_UINT:
 	case VR_SCRIPT_TYPE_FLOAT:
 		return 4;
 	case VR_SCRIPT_TYPE_DOUBLE:
 		return 8;
 	case VR_SCRIPT_TYPE_VEC2:
 	case VR_SCRIPT_TYPE_IVEC2:
+	case VR_SCRIPT_TYPE_UVEC2:
 		return 4 * 2;
 	case VR_SCRIPT_TYPE_VEC3:
 	case VR_SCRIPT_TYPE_IVEC3:
+	case VR_SCRIPT_TYPE_UVEC3:
 		return 4 * 3;
 	case VR_SCRIPT_TYPE_VEC4:
 	case VR_SCRIPT_TYPE_IVEC4:
+	case VR_SCRIPT_TYPE_UVEC4:
 		return 4 * 4;
 	case VR_SCRIPT_TYPE_DVEC2:
 		return 8 * 2;
