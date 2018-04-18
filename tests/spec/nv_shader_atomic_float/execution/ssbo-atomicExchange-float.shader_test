@@ -1,0 +1,78 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_storage_buffer_object
+GL_ARB_shader_atomic_counters
+GL_ARB_shader_atomic_counter_ops
+GL_NV_shader_atomic_float
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 330
+#extension GL_ARB_shader_storage_buffer_object: require
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_shader_atomic_counter_ops: require
+#extension GL_NV_shader_atomic_float: require
+
+layout(binding = 0) buffer bufblock {
+       float value;
+};
+
+/* GL_ARB_shader_atomic_counters requires at least 8 total counters. */
+layout(binding = 0) uniform atomic_uint mask[7];
+layout(binding = 0) uniform atomic_uint fail;
+
+out vec4 color;
+
+const uint max_index = uint(mask.length()) * 32u + 31u;
+
+void main()
+{
+	uint x = uint(gl_FragCoord.x);
+	uint y = uint(gl_FragCoord.y);
+	uint local_index = y * 32u + x;
+
+	float new_value = (x < 32u && y < uint(mask.length()))
+		? 0.5 * float(local_index) : 3e10;
+
+	float f = atomicExchange(value, new_value);
+	uint i = uint(f * 2.);
+	uint bit = i % 32u;
+	int c = int(i / 32u);
+	uint m = 1u << bit;
+
+	if (i <= max_index) {
+		/* If the bit was already set, the test fails. */
+		uint r = atomicCounterOrARB(mask[c], m);
+		if ((r & m) != 0u)
+			atomicCounterIncrement(fail);
+
+		if (bit == local_index)
+			atomicCounterIncrement(fail);
+
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+	} else {
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+	}
+}
+
+[test]
+atomic counters 8
+
+ssbo 0 32
+ssbo 0 subdata float 0 3e10
+
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw rect -1 -1 2 2
+
+probe atomic counter 0 == 4294967295
+probe atomic counter 1 == 4294967295
+probe atomic counter 2 == 4294967295
+probe atomic counter 3 == 4294967295
+probe atomic counter 4 == 4294967295
+probe atomic counter 5 == 4294967295
+probe atomic counter 6 == 4294967295
+probe atomic counter 7 == 0
