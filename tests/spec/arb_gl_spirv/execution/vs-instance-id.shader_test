@@ -1,0 +1,165 @@
+# Tests that gl_InstanceID does not include the ‘baseinstance’
+# parameter of the draw call.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.5
+GL_ARB_gl_spirv
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 37
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %expected_instance_id %gl_InstanceID %color %_ %piglit_vertex %gl_VertexID
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %expected_instance_id "expected_instance_id"
+               OpName %gl_InstanceID "gl_InstanceID"
+               OpName %color "color"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %_ ""
+               OpName %piglit_vertex "piglit_vertex"
+               OpName %gl_VertexID "gl_VertexID"
+               OpDecorate %expected_instance_id Location 1
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+               OpDecorate %color Location 0
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %gl_VertexID BuiltIn VertexId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+%_ptr_Input_int = OpTypePointer Input %int
+%expected_instance_id = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %bool = OpTypeBool
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %22 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+         %24 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %9 = OpLoad %int %expected_instance_id
+         %11 = OpLoad %int %gl_InstanceID
+         %13 = OpIEqual %bool %9 %11
+               OpSelectionMerge %15 None
+               OpBranchConditional %13 %14 %23
+         %14 = OpLabel
+               OpStore %color %22
+               OpBranch %15
+         %23 = OpLabel
+               OpStore %color %24
+               OpBranch %15
+         %15 = OpLabel
+         %34 = OpLoad %v4float %piglit_vertex
+         %35 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %35 %34
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450
+
+layout(location = 0) in vec4 piglit_vertex;
+layout(location = 1) in int expected_instance_id;
+layout(location = 0) out vec4 color;
+
+void
+main()
+{
+        if (expected_instance_id == gl_InstanceID)
+	        color = vec4(0.0, 1.0, 0.0, 1.0);
+        else
+	        color = vec4(1.0, 0.0, 0.0, 1.0);
+
+        gl_Position = piglit_vertex;
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 13
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color_out %color_in
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color_out "color_out"
+               OpName %color_in "color_in"
+               OpDecorate %color_out Location 0
+               OpDecorate %color_in Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %color_out = OpVariable %_ptr_Output_v4float Output
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+   %color_in = OpVariable %_ptr_Input_v4float Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpLoad %v4float %color_in
+               OpStore %color_out %12
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(location = 0) in vec4 color_in;
+layout(location = 0) out vec4 color_out;
+
+void
+main()
+{
+        color_out = color_in;
+}
+
+[vertex data]
+0/float/vec2  1/int/int
+-1 -1         0
+1  -1         0
+-1 1          0
+1  1          0
+
+[test]
+clear color 0.8 0.0 0.0 0.0
+clear
+
+draw arrays instanced base GL_TRIANGLE_STRIP 0 4 1 5
+
+probe all rgba 0.0 1.0 0.0 1.0
