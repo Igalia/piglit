@@ -1,0 +1,139 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_storage_buffer_object
+GL_ARB_shader_atomic_counters
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 330
+#extension GL_ARB_shader_storage_buffer_object: require
+#extension GL_ARB_shader_atomic_counters: require
+
+layout(binding = 0) buffer bufblock {
+	uint array[64];
+	uint value;
+};
+
+layout(binding = 0) uniform atomic_uint fail;
+
+out vec4 color;
+
+void main()
+{
+	uint x = uint(gl_FragCoord.x);
+	uint y = uint(gl_FragCoord.y);
+	uint local_index = y * uint(array.length()) + x;
+	uint v;
+
+	/* For value, every instance should get 2147483647. */
+	v = atomicMax(value, local_index);
+	if (v != 2147483647u)
+		atomicCounterIncrement(fail);
+
+	if (value != 2147483647u)
+		atomicCounterIncrement(fail);
+
+	if (local_index < uint(array.length())) {
+		uint first_expected = local_index * 4u;
+		uint second_expected = (local_index + 1u) * 4u;
+
+		/* The per-instance value should give the old value on the
+		 * first step.  This is expected to be the byte offset of the
+		 * current array element.
+		 */
+		v = atomicMax(array[local_index], second_expected);
+		if (v != first_expected)
+			atomicCounterIncrement(fail);
+
+		/* The per-instance value should give the new value on the
+		 * second step.  This is expected to be the byte offset of the
+		 * next array element.
+		 */
+		v = atomicExchange(array[local_index], first_expected);
+		if (v != second_expected)
+			atomicCounterIncrement(fail);
+
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+	} else {
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+	}
+}
+
+[test]
+atomic counters 1
+
+ssbo 0 260
+ssbo 0 subdata int 0 0
+ssbo 0 subdata int 4 4
+ssbo 0 subdata int 8 8
+ssbo 0 subdata int 12 12
+ssbo 0 subdata int 16 16
+ssbo 0 subdata int 20 20
+ssbo 0 subdata int 24 24
+ssbo 0 subdata int 28 28
+ssbo 0 subdata int 32 32
+ssbo 0 subdata int 36 36
+ssbo 0 subdata int 40 40
+ssbo 0 subdata int 44 44
+ssbo 0 subdata int 48 48
+ssbo 0 subdata int 52 52
+ssbo 0 subdata int 56 56
+ssbo 0 subdata int 60 60
+ssbo 0 subdata int 64 64
+ssbo 0 subdata int 68 68
+ssbo 0 subdata int 72 72
+ssbo 0 subdata int 76 76
+ssbo 0 subdata int 80 80
+ssbo 0 subdata int 84 84
+ssbo 0 subdata int 88 88
+ssbo 0 subdata int 92 92
+ssbo 0 subdata int 96 96
+ssbo 0 subdata int 100 100
+ssbo 0 subdata int 104 104
+ssbo 0 subdata int 108 108
+ssbo 0 subdata int 112 112
+ssbo 0 subdata int 116 116
+ssbo 0 subdata int 120 120
+ssbo 0 subdata int 124 124
+ssbo 0 subdata int 128 128
+ssbo 0 subdata int 132 132
+ssbo 0 subdata int 136 136
+ssbo 0 subdata int 140 140
+ssbo 0 subdata int 144 144
+ssbo 0 subdata int 148 148
+ssbo 0 subdata int 152 152
+ssbo 0 subdata int 156 156
+ssbo 0 subdata int 160 160
+ssbo 0 subdata int 164 164
+ssbo 0 subdata int 168 168
+ssbo 0 subdata int 172 172
+ssbo 0 subdata int 176 176
+ssbo 0 subdata int 180 180
+ssbo 0 subdata int 184 184
+ssbo 0 subdata int 188 188
+ssbo 0 subdata int 192 192
+ssbo 0 subdata int 196 196
+ssbo 0 subdata int 200 200
+ssbo 0 subdata int 204 204
+ssbo 0 subdata int 208 208
+ssbo 0 subdata int 212 212
+ssbo 0 subdata int 216 216
+ssbo 0 subdata int 220 220
+ssbo 0 subdata int 224 224
+ssbo 0 subdata int 228 228
+ssbo 0 subdata int 232 232
+ssbo 0 subdata int 236 236
+ssbo 0 subdata int 240 240
+ssbo 0 subdata int 244 244
+ssbo 0 subdata int 248 248
+ssbo 0 subdata int 252 252
+ssbo 0 subdata int 256 2147483647
+
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw rect -1 -1 2 2
+
+probe atomic counter 0 == 0
