@@ -4983,6 +4983,16 @@ piglit_display(void)
 			size_t primcount = (size_t) z;
 			draw_arrays_common(first, count);
 			glDrawArraysInstanced(mode, first, count, primcount);
+		} else if (sscanf(line, "draw arrays instanced base %31s %d %d %d %d", s, &x, &y, &z, &w) == 5) {
+			GLenum mode = decode_drawing_mode(s);
+			int first = x;
+			size_t count = (size_t) y;
+			size_t primcount = (size_t) z;
+			GLuint baseinstance = (GLuint) w;
+			draw_arrays_common(first, count);
+			glDrawArraysInstancedBaseInstance(mode, first, count,
+							  primcount,
+							  baseinstance);
 		} else if (sscanf(line, "draw arrays %31s %d %d", s, &x, &y) == 3) {
 			GLenum mode = decode_drawing_mode(s);
 			int first = x;
