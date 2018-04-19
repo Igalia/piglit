@@ -173,6 +173,9 @@ static GLuint vao = 0;
 static GLuint draw_fbo, read_fbo;
 static GLint render_width, render_height;
 static GLint read_width, read_height;
+static uint16_t *elements_buffer;
+static size_t num_elements;
+static size_t elements_buffer_size;
 
 static bool report_subtests = false;
 
@@ -299,6 +302,7 @@ enum states {
 	compute_shader_spirv,
 	compute_shader_specializations,
 	vertex_data,
+	elements,
 	test,
 };
 
@@ -1399,6 +1403,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 		vertex_data_end = line;
 		break;
 
+	case elements:
+		break;
+
 	case test:
 		break;
 
@@ -1646,6 +1653,40 @@ process_specialization(enum states state, const char *line)
 	return PIGLIT_FAIL;
 }
 
+static enum piglit_result
+process_elements(enum states state, const char *line)
+{
+	const char *end = strchrnul(line, '\n');
+
+	while (true) {
+		while (line < end && isspace(*line))
+			line++;
+		if (line >= end  || *line == '#')
+			return PIGLIT_PASS;
+
+		if (num_elements >= elements_buffer_size) {
+			if (elements_buffer_size == 0)
+				elements_buffer_size = 1;
+			else
+				elements_buffer_size *= 2;
+			elements_buffer = realloc(elements_buffer,
+						  elements_buffer_size *
+						  sizeof *elements_buffer);
+		}
+
+		unsigned val;
+		if (parse_uints(line, &val, 1, &line) != 1 ||
+		    val > UINT16_MAX) {
+			fprintf(stderr, "Invalid elements line\n");
+			return PIGLIT_FAIL;
+		}
+
+		elements_buffer[num_elements++] = val;
+	}
+
+	return PIGLIT_PASS;
+}
+
 static char *
 spirv_replacement_script(const char *script_name)
 {
@@ -1773,6 +1814,8 @@ process_test_script(const char *script_name)
 			} else if (parse_str(line, "[vertex data]", NULL)) {
 				state = vertex_data;
 				vertex_data_start = NULL;
+			} else if (parse_str(line, "[elements]", NULL)) {
+				state = elements;
 			} else if (parse_str(line, "[test]", NULL)) {
 				test_start = strchrnul(line, '\n');
 				test_start_line_num = line_num + 1;
@@ -1836,6 +1879,14 @@ process_test_script(const char *script_name)
 				if (vertex_data_start == NULL)
 					vertex_data_start = line;
 				break;
+
+			case elements: {
+				enum piglit_result result =
+					process_elements(state, line);
+				if (result != PIGLIT_PASS)
+					return result;
+				break;
+			}
 
 			case test:
 				break;
@@ -3546,6 +3597,26 @@ draw_arrays_common(int first, size_t count)
 	return result;
 }
 
+static enum piglit_result
+draw_elements_common(int basevertex, int count)
+{
+	enum piglit_result result = program_must_be_in_use();
+	if (basevertex < 0) {
+		printf("draw elements 'basevertex' must be >= 0\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	if (count <= 0) {
+		printf("draw elements 'count' must be > 0\n");
+		piglit_report_result(PIGLIT_FAIL);
+	} else if (count > num_elements) {
+		printf("draw elements cannot draw beyond %lu\n",
+			(unsigned long) num_elements);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	bind_vao_if_supported();
+	return result;
+}
+
 static bool
 probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op,
 		     uint32_t value, bool layout_params)
@@ -3817,6 +3888,19 @@ piglit_display(void)
 			size_t count = (size_t) y;
 			result = draw_arrays_common(first, count);
 			glDrawArrays(mode, first, count);
+		} else if (sscanf(line, "draw elements %31s %d %d", s, &x, &y) == 3) {
+			GLenum mode = decode_drawing_mode(s);
+			size_t count = (size_t) x;
+			int basevertex = y;
+			result = draw_elements_common(basevertex, count);
+			if (basevertex > 0) {
+				glDrawElementsBaseVertex(mode, count,
+							 GL_UNSIGNED_SHORT,
+							 NULL, basevertex);
+			} else {
+				glDrawElements(mode, count,
+					       GL_UNSIGNED_SHORT, NULL);
+			}
 		} else if (parse_str(line, "disable ", &rest)) {
 			do_enable_disable(rest, false);
 		} else if (parse_str(line, "enable ", &rest)) {
@@ -4615,6 +4699,18 @@ piglit_display(void)
 	return full_result;
 }
 
+static void
+setup_elements_buffer(void)
+{
+	GLuint buffer_handle;
+	glGenBuffers(1, &buffer_handle);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_handle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		     num_elements * sizeof elements_buffer[0],
+		     elements_buffer,
+		     GL_STATIC_DRAW);
+}
+
 static enum piglit_result
 init_test(const char *file)
 {
@@ -4641,6 +4737,9 @@ init_test(const char *file)
 		num_vbo_rows = setup_vbo_from_text(prog, vertex_data_start,
 						   vertex_data_end);
 		vbo_present = true;
+
+		if (num_elements > 0)
+			setup_elements_buffer();
 	}
 	setup_ubos();
 	return PIGLIT_PASS;
