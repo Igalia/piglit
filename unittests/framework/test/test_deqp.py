@@ -299,28 +299,18 @@ class TestDEQPBaseTest(object):
 class TestGenMustpassTests(object):
     """Tests for the gen_mustpass_tests function."""
 
-    _xml = textwrap.dedent("""\
-        <?xml version="1.0" encoding="UTF-8"?>
-        <TestPackage name="dEQP-piglit-test" appPackageName="com.freedesktop.org.piglit.deqp" testType="deqpTest" xmlns:deqp="http://drawelements.com/deqp" deqp:glesVersion="196608">
-            <TestSuite name="dEQP.piglit">
-                <TestCase name="group1">
-                    <Test name="test1" />
-                    <Test name="test2" />
-                </TestCase>
-                <TestSuite name="nested">
-                    <TestCase name="group2">
-                        <Test name="test3" />
-                        <Test name="test4" />
-                    </TestCase>
-                </TestSuite>
-            </TestSuite>
-        </TestPackage>
-    """)
+    _txt = """\
+dEQP.piglit.group1.test1
+dEQP.piglit.group1.test2
+dEQP.piglit.nested.group2.test3
+dEQP.piglit.nested.group2.test4
+    """
 
     def test_basic(self, tmpdir):
-        p = tmpdir.join('foo.xml')
-        p.write(self._xml)
+        p = tmpdir.join('foo.txt')
+        p.write(self._txt)
         tests = set(deqp.gen_mustpass_tests(six.text_type(p)))
+        print(tests)
         assert tests == {
             'dEQP.piglit.group1.test1',
             'dEQP.piglit.group1.test2',
