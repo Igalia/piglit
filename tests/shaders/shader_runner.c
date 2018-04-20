@@ -5907,7 +5907,8 @@ piglit_init(int argc, char **argv)
 		force_no_names = true;
 
 	if (argc < 2) {
-		printf("usage: shader_runner <test.shader_test> [-glsl] [-force-no-names]\n");
+		printf("usage: shader_runner <test.shader_test> [-glsl] "
+		       "[-force-no-names] [-spirv]\n");
 		exit(1);
 	}
 
