@@ -54,15 +54,20 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
-	/* By default SPIR-V mode is false. It will not be enabled
-	 * unless the script includes SPIRV YES or SPIRV ONLY lines at
-	 * [require] section, so it will be handled later.
-	 */
-	if (argc > 1) {
-		get_required_config(argv[1], false, &config);
-	} else {
-		config.supports_gl_compat_version = 10;
-	}
+        if (argc > 1) {
+                bool spirv = false;
+
+                for (int i = 1; i < argc; ++i) {
+                        if (!strcmp(argv[i], "-spirv")) {
+                                spirv = true;
+                                break;
+                        }
+                }
+
+                get_required_config(argv[1], spirv, &config);
+        } else {
+                config.supports_gl_compat_version = 10;
+        }
 
 	current_config = config;
 
@@ -151,6 +156,7 @@ static bool glsl_in_use = false;
 static bool force_glsl = false;
 static bool spirv_in_use = false;
 static bool spirv_replaces_glsl = false;
+static bool test_contains_spirv = false;
 static GLchar *prog_err_info = NULL;
 static GLuint vao = 0;
 static GLuint draw_fbo, read_fbo;
@@ -1193,15 +1199,21 @@ process_requirement(const char *line)
 		spirv_replaces_glsl = !force_glsl;
 
 		if (parse_str(line, "ONLY", NULL)) {
+			spirv_replaces_glsl = true;
+			test_contains_spirv = true;
+
 			if (force_glsl) {
 				printf("This shader is not compatible with GLSL\n");
 				return PIGLIT_SKIP;
 			}
 		} else if (parse_str(line, "YES", NULL)) {
-			/* Empty. Everything already set. Just parsing
-			 * correct options
-			 */
-		} else {
+			test_contains_spirv = true;
+		} else if (parse_str(line, "NO", &line)) {
+			if (spirv_replaces_glsl) {
+				printf("This shader is not compatible with SPIR-V\n");
+				return PIGLIT_SKIP;
+			}
+                } else {
 			printf("Unknown SPIRV line in [require]\n");
 			return PIGLIT_FAIL;
 		}
@@ -1612,6 +1624,26 @@ process_specialization(enum states state, const char *line)
 	return PIGLIT_FAIL;
 }
 
+static char *
+spirv_replacement_script(const char *script_name)
+{
+	int len = strlen(script_name);
+	char *buf = malloc(len + 5);
+	memcpy(buf, script_name, len);
+	strcpy(buf + len, ".spv");
+
+	if (piglit_is_file_older_than(buf, script_name)) {
+		printf("SPIR-V shader_test %s is older than "
+		       "corresponding GLSL shader_test"
+		       "or does not exist.\n",
+		       buf);
+		free(buf);
+		return NULL;
+	}
+
+	return buf;
+}
+
 static enum piglit_result
 process_test_script(const char *script_name)
 {
@@ -1631,6 +1663,19 @@ process_test_script(const char *script_name)
 
 	while (line[0] != '\0') {
 		if (line[0] == '[') {
+			if (state == requirements &&
+				spirv_replaces_glsl &&
+				!test_contains_spirv) {
+					free(text);
+					char *replacement =
+                                                spirv_replacement_script(script_name);
+					if (replacement == NULL)
+						return PIGLIT_FAIL;
+					enum piglit_result res =
+						process_test_script(replacement);
+					free(replacement);
+					return res;
+				}
 			result = leave_state(state, line, script_name);
 			if (result != PIGLIT_PASS)
 				return result;
@@ -4499,6 +4544,13 @@ piglit_init(int argc, char **argv)
 
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	force_glsl =  piglit_strip_arg(&argc, argv, "-glsl");
+	spirv_replaces_glsl = piglit_strip_arg(&argc, argv, "-spirv");
+
+	if (force_glsl && spirv_replaces_glsl) {
+		printf("Options -glsl and -spirv can't be used at the same time\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
