@@ -4605,7 +4605,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	if (argc < 2) {
-		printf("usage: shader_runner <test.shader_test>\n");
+		printf("usage: shader_runner <test.shader_test> [-glsl] [-spirv]\n");
 		exit(1);
 	}
 
