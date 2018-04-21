@@ -645,6 +645,9 @@ def parse_args():
     parser.add_argument("-v", "--verbose",
                         action="store_true",
                         help="Print verbose output")
+    parser.add_argument("-m", "--mirror",
+                        nargs=1,
+                        help="Store the SPIR-V generated in a mirror directory, without .spv")
     parser.add_argument("shader_tests",
                         nargs='+',
                         help="Path to one or more .shader_test files to process.")
@@ -1104,7 +1107,16 @@ def process_shader_test(shader_test, config):
     if vertex_stage is None:
         vertex_stage = SpirvInfo(passthrough_spirv)
 
-    spv_shader_test_file = shader_test + '.spv'
+    if config.mirror:
+        spv_shader_test_file = config.mirror[0] + '/' + shader_test
+        directory_name = os.path.dirname(spv_shader_test_file)
+
+        if not os.path.exists(directory_name):
+            os.makedirs(directory_name)
+    else:
+        spv_shader_test_file = shader_test + '.spv'
+
+
     if config.verbose:
         print('Writing transformed shader_test to ' +
               spv_shader_test_file)
