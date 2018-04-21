@@ -54,20 +54,20 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
-        if (argc > 1) {
-                bool spirv = false;
+	if (argc > 1) {
+		bool spirv = false;
 
-                for (int i = 1; i < argc; ++i) {
-                        if (!strcmp(argv[i], "-spirv")) {
-                                spirv = true;
-                                break;
-                        }
-                }
+		for (int i = 1; i < argc; ++i) {
+			if (!strcmp(argv[i], "-spirv")) {
+				spirv = true;
+				break;
+			}
+		}
 
-                get_required_config(argv[1], spirv, &config);
-        } else {
-                config.supports_gl_compat_version = 10;
-        }
+		get_required_config(argv[1], spirv, &config);
+	} else {
+		config.supports_gl_compat_version = 10;
+	}
 
 	current_config = config;
 
