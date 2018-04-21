@@ -814,6 +814,8 @@ static enum piglit_result
 assemble_spirv(GLenum target)
 {
 	if (!piglit_is_extension_supported("GL_ARB_gl_spirv")) {
+		printf("GL_ARB_gl_spirv not supported, but required "
+			"to run SPIR-V shaders\n");
 		return PIGLIT_SKIP;
 	}
 
