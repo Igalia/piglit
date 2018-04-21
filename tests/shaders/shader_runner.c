@@ -1854,6 +1854,7 @@ struct requirement_parse_results {
 	bool found_glsl;
 	bool found_size;
 	bool found_depthbuffer;
+	bool found_spirv;
 	struct component_version gl_version;
 	struct component_version glsl_version;
 	unsigned size[2];
@@ -1872,6 +1873,7 @@ parse_required_config(struct requirement_parse_results *results,
 	results->found_glsl = false;
 	results->found_size = false;
 	results->found_depthbuffer = false;
+	results->found_spirv = false;
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
@@ -1921,8 +1923,13 @@ parse_required_config(struct requirement_parse_results *results,
 				parse_uints(line, results->size, 2, NULL);
 			} else if (parse_str(line, "depthbuffer", NULL)) {
 				results->found_depthbuffer = true;
+			} else if (parse_str(line, "SPIRV", &line)) {
+				if (parse_str(line, "ONLY", NULL) || parse_str(line, "YES", NULL)) {
+					results->found_spirv = true;
+				}
 			}
 		}
+
 
 		line = strchrnul(line, '\n');
 		if (line[0] != '\0')
@@ -1981,7 +1988,7 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
  * the GL and GLSL version requirements.  Use these to guide context creation.
  */
 static void
-get_required_config(const char *script_name, bool spirv,
+get_required_config(const char *script_name, bool force_spirv,
 		    struct piglit_gl_test_config *config)
 {
 	struct requirement_parse_results parse_results;
@@ -1990,7 +1997,7 @@ get_required_config(const char *script_name, bool spirv,
 	parse_required_config(&parse_results, script_name);
 	choose_required_gl_version(&parse_results, &required_gl_version);
 
-	if (spirv) {
+	if (force_spirv || parse_results.found_spirv) {
 		required_gl_version.es = false;
 		required_gl_version.core = true;
 		required_gl_version.num = MAX2(required_gl_version.num, 33);
