@@ -76,6 +76,7 @@ struct component_version {
 	} _tag;
 
 	bool core;
+	bool compat;
 	bool es;
 	unsigned num;
 	char _string[100];
@@ -344,12 +345,13 @@ static bool
 compare_uint(GLuint ref, GLuint value, enum comparison cmp);
 
 static void
-version_init(struct component_version *v, enum version_tag tag, bool core, bool es, unsigned num)
+version_init(struct component_version *v, enum version_tag tag, bool core, bool compat, bool es, unsigned num)
 {
 	assert(tag == VERSION_GL || tag == VERSION_GLSL);
 
 	v->_tag = tag;
 	v->core = core;
+	v->compat = compat;
 	v->es = es;
 	v->num = num;
 	v->_string[0] = 0;
@@ -696,6 +698,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	unsigned minor;
 	unsigned full_num;
 	const bool core = parse_str(line, "CORE", &line);
+	const bool compat = parse_str(line, "COMPAT", &line);
 	const bool es = parse_str(line, "ES", &line);
 
 	REQUIRE(parse_comparison_op(line, cmp, &line),
@@ -723,7 +726,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 		full_num = (major * 10) + minor;
 	}
 
-	version_init(v, tag, core, es, full_num);
+	version_init(v, tag, core, compat, es, full_num);
 }
 
 /**
@@ -1374,7 +1377,7 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
 		version_copy(gl_version, &parse_results->gl_version);
 	} else {
 		assert(!parse_results->found_glsl || !parse_results->glsl_version.es);
-		version_init(gl_version, VERSION_GL, false, false, 10);
+		version_init(gl_version, VERSION_GL, false, false, false, 10);
 	}
 
 	if (gl_version->es)
@@ -1420,7 +1423,8 @@ get_required_config(const char *script_name,
 	if (required_gl_version.es) {
 		config->supports_gl_es_version = required_gl_version.num;
 	} else if (required_gl_version.num >= 31) {
-		config->supports_gl_core_version = required_gl_version.num;
+		if (!required_gl_version.compat)
+			config->supports_gl_core_version = required_gl_version.num;
 		if (!required_gl_version.core)
 			config->supports_gl_compat_version = required_gl_version.num;
 	} else {
@@ -4018,11 +4022,11 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL();
 
 	version_init(&gl_version, VERSION_GL,
-		     core,
+		     core, !core,
 	             piglit_is_gles(),
 	             piglit_get_gl_version());
 	piglit_get_glsl_version(&es, &major, &minor);
-	version_init(&glsl_version, VERSION_GLSL, core, es,
+	version_init(&glsl_version, VERSION_GLSL, core, !core, es,
 	             (major * 100) + minor);
 
 #ifdef PIGLIT_USE_OPENGL
