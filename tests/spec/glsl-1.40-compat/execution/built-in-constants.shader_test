@@ -1,0 +1,24 @@
+[require]
+GL COMPAT >= 3.1
+GLSL >= 1.40
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+	// front color values should all be >= 1.0
+	gl_FrontColor = vec4(gl_MaxLights, gl_MaxClipPlanes,
+		  		gl_MaxTextureUnits,
+		  		gl_MaxTextureCoords);
+}
+
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = gl_Color;
+}
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (1.0, 1.0, 1.0, 1.0)
