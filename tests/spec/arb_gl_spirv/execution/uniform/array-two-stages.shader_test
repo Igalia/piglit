@@ -12,7 +12,7 @@ layout(location = 0) in vec4 piglit_vertex;
 
 layout(location = 0) out vec4 crosscolor;
 
-layout(location = 0) uniform vec4 uniforms[2];
+layout(location = 4) uniform vec4 uniforms[2];
 
 
 void main() {
@@ -23,7 +23,7 @@ void main() {
 [fragment shader]
 #version 450
 
-layout(location = 0) uniform vec4 uniforms[2];
+layout(location = 4) uniform vec4 uniforms[2];
 
 layout(location = 0) in vec4 crosscolor;
 
@@ -37,8 +37,8 @@ void main() {
 clear color 1.0 0.0 0.0 0.0
 clear
 
-uniform vec4 0 0.2 0.1 0.1 1.6
-uniform vec4 1 0.5 2.0 3.0 0.25
+uniform vec4 4 0.2 0.1 0.1 1.6
+uniform vec4 5 0.5 2.0 3.0 0.25
 
 draw rect -1 -1 2 2
 probe all rgba 0.1 0.2 0.3 0.4
