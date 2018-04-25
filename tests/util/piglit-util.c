@@ -972,3 +972,21 @@ piglit_half_from_float(float val)
 	result = (s << 15) | (e << 10) | m;
 	return result;
 }
+
+#ifndef __GCC__
+int
+piglit_popcount(unsigned x)
+{
+	int count = 0;
+
+	while (true) {
+		int next_bit = ffsl(x);
+
+		if (next_bit == 0)
+			return count;
+
+		count++;
+		x >>= next_bit;
+	}
+}
+#endif /* __GCC__ */

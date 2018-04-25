@@ -491,6 +491,13 @@ piglit_free_aligned(void *p);
 NORETURN void
 piglit_fatal(const char *format, ...) PRINTFLIKE(1, 2);
 
+#ifdef __GCC__
+#define piglit_popcount(x) __builtin_popcount(x)
+#else
+int
+piglit_popcount(unsigned x);
+#endif
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
