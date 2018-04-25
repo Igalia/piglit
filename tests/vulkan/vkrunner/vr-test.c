@@ -313,7 +313,7 @@ draw_rect(struct test_data *data,
 	struct test_buffer *buffer;
 
 	buffer = allocate_test_buffer(data,
-				      sizeof (struct vr_pipeline_vertex) * 6,
+				      sizeof (struct vr_pipeline_vertex) * 4,
 				      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	if (buffer == NULL)
 		return false;
@@ -332,16 +332,6 @@ draw_rect(struct test_data *data,
 
 	v->x = command->draw_rect.x;
 	v->y = command->draw_rect.y + command->draw_rect.h;
-	v->z = 0.0f;
-	v++;
-
-	v->x = command->draw_rect.x;
-	v->y = command->draw_rect.y + command->draw_rect.h;
-	v->z = 0.0f;
-	v++;
-
-	v->x = command->draw_rect.x + command->draw_rect.w;
-	v->y = command->draw_rect.y;
 	v->z = 0.0f;
 	v++;
 
@@ -365,7 +355,7 @@ draw_rect(struct test_data *data,
 				     &buffer->buffer,
 				     (VkDeviceSize[]) { 0 });
 	vr_vk.vkCmdDraw(data->window->command_buffer,
-			6, /* vertexCount */
+			4, /* vertexCount */
 			1, /* instanceCount */
 			0, /* firstVertex */
 			0 /* firstInstance */);
