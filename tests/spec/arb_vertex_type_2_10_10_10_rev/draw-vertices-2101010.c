@@ -89,7 +89,7 @@ static GLuint vboColorPointer(GLint size, GLenum type, GLsizei stride,
     return id;
 }
 
-static void test_packed_int_color_vertices(float x1, float y1, float x2, float y2, int index)
+static bool test_packed_int_color_vertices(float x1, float y1, float x2, float y2, int index)
 {
     unsigned int v[3];
     unsigned int c[3];
@@ -111,6 +111,10 @@ static void test_packed_int_color_vertices(float x1, float y1, float x2, float y
 
     glVertexPointer(4, GL_INT_2_10_10_10_REV, 4, v);
 
+    if (index >= 2 &&
+	!piglit_is_extension_supported("GL_EXT_vertex_array_bgra"))
+	    return false;
+
     glEnableClientState(GL_COLOR_ARRAY);
     switch (index) {
         case 0: vbo = vboColorPointer(4, GL_INT_2_10_10_10_REV, 4, c, sizeof(c), 0); break;
@@ -123,9 +127,11 @@ static void test_packed_int_color_vertices(float x1, float y1, float x2, float y
 
     glDisableClientState(GL_COLOR_ARRAY);
     glDeleteBuffers(1, &vbo);
+
+    return true;
 }
 
-static void test_packed_int_vertices(float x1, float y1, float x2, float y2, int index)
+static bool test_packed_int_vertices(float x1, float y1, float x2, float y2, int index)
 {
     unsigned int v[3];
     GLuint vbo;
@@ -148,9 +154,11 @@ static void test_packed_int_vertices(float x1, float y1, float x2, float y2, int
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glDeleteBuffers(1, &vbo);
+
+    return true;
 }
 
-static void test_int_vertices_abi(float x1, float y1, float x2, float y2, int index)
+static bool test_int_vertices_abi(float x1, float y1, float x2, float y2, int index)
 {
     GLuint v[3];
     GLuint c[3];
@@ -182,10 +190,12 @@ static void test_int_vertices_abi(float x1, float y1, float x2, float y2, int in
     glEnd();
 
     glEnableClientState(GL_VERTEX_ARRAY);
+
+    return true;
 }
 
 struct test {
-    void (*test)(float x1, float y1, float x2, float y2, int index);
+    bool (*test)(float x1, float y1, float x2, float y2, int index);
     int index;
     float expected_color_equation_22[4];
     float expected_color_equation_23[4];
@@ -230,7 +240,9 @@ piglit_display(void)
     for (i = 0; tests[i].test; i++) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        tests[i].test(x, y, x+20, y+20, tests[i].index);
+	if (!tests[i].test(x, y, x+20, y+20, tests[i].index))
+		continue;
+
         if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
