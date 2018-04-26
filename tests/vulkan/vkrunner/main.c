@@ -103,6 +103,7 @@ process_script(struct vr_config *config,
 	}
 
 	res = vr_window_new(&script->required_features,
+			    script->extensions,
 			    script->framebuffer_format,
 			    &window);
 	if (res != PIGLIT_PASS)

@@ -64,6 +64,7 @@ struct vr_window {
 
 enum piglit_result
 vr_window_new(const VkPhysicalDeviceFeatures *requires,
+	      const char *const *extensions,
 	      const struct vr_format *framebuffer_format,
 	      struct vr_window **window_out);
 
