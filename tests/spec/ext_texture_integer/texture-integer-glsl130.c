@@ -44,7 +44,7 @@ static const char *TestName = "texture-integer";
 static GLint TexWidth = 16, TexHeight = 16;
 static GLuint Texture;
 
-static GLint BiasUniform = -1, TexUniform = -1;
+static GLint BiasUniform[2] = {-1, -1}, TexUniform[2] = {-1, -1};
 
 struct format_info
 {
@@ -131,7 +131,17 @@ static const struct format_info rgb10_formats[] = {
 	{ GL_RGB10_A2UI, GL_BGRA_INTEGER_EXT, 10, GL_TRUE },
 };
 
-static const char *FragShaderText =
+/* The programs will be indexed by whether the texture is signed or not. */
+static const char *FragShaderText[2] = {
+	"#version 130\n"
+	"uniform vec4 bias; \n"
+	"uniform usampler2D tex; \n"
+	"void main() \n"
+	"{ \n"
+	"   vec4 t = vec4(texture(tex, gl_TexCoord[0].xy)); \n"
+	"   gl_FragColor = t + bias; \n"
+	"} \n",
+
 	"#version 130\n"
 	"uniform vec4 bias; \n"
 	"uniform isampler2D tex; \n"
@@ -139,10 +149,10 @@ static const char *FragShaderText =
 	"{ \n"
 	"   vec4 t = vec4(texture(tex, gl_TexCoord[0].xy)); \n"
 	"   gl_FragColor = t + bias; \n"
-	"} \n";
+	"} \n",
+};
 
-static GLuint Program;
-
+static GLuint Program[2];
 
 static int
 get_max_val(const struct format_info *info)
@@ -440,12 +450,14 @@ test_format(const struct format_info *info)
 		;
 	}
 
+	glUseProgram(Program[info->Signed]);
+
 	/* compute, set test bias */
 	bias[0] = expected[0] - value[0];
 	bias[1] = expected[1] - value[1];
 	bias[2] = expected[2] - value[2];
 	bias[3] = expected[3] - value[3];
-	glUniform4fv(BiasUniform, 1, bias);
+	glUniform4fv(BiasUniform[info->Signed], 1, bias);
 
 	/* draw */
 	glClearColor(0, 1, 1, 0);
@@ -584,17 +596,17 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	int i;
+
 	piglit_require_extension("GL_EXT_texture_integer");
 	piglit_require_GLSL_version(130);
 
-	Program = piglit_build_simple_program(NULL, FragShaderText);
-
-	glUseProgram(Program);
-
-	BiasUniform = glGetUniformLocation(Program, "bias");
-	TexUniform = glGetUniformLocation(Program, "tex");
-
-	glUniform1i(TexUniform, 0);  /* tex unit zero */
+	for (i = 0; i < 2; i++) {
+		Program[i] = piglit_build_simple_program(NULL,
+							 FragShaderText[i]);
+		BiasUniform[i] = glGetUniformLocation(Program[i], "bias");
+		TexUniform[i] = glGetUniformLocation(Program[i], "tex");
+	}
 
 	(void) check_error(__FILE__, __LINE__);
 
