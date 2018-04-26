@@ -58,6 +58,7 @@ struct load_state {
 	enum vr_script_source_type current_source_type;
 	enum section current_section;
 	struct vr_buffer commands;
+	struct vr_buffer extensions;
 	unsigned patch_size;
 };
 
@@ -82,6 +83,18 @@ vertex_shader_passthrough[] =
 	"{\n"
 	"	 gl_Position = piglit_vertex;\n"
 	"}\n";
+
+static void
+free_extensions(const char *const *extensions)
+{
+	if (extensions == NULL)
+		return;
+
+	for (const char *const *ext = extensions; *ext; ext++)
+		free((char *) *ext);
+
+	free((void *) extensions);
+}
 
 static void
 add_shader(struct load_state *data,
@@ -687,6 +700,31 @@ process_require_line(struct load_state *data)
 		}
 	}
 
+	int extension_len = 0;
+
+	while (true) {
+		char ch = start[extension_len];
+
+		if ((ch < 'A' || ch > 'Z') &&
+		    (ch < 'a' || ch > 'z') &&
+		    (ch < '0' || ch > '9') &&
+		    ch != '_')
+			break;
+
+		extension_len++;
+	}
+
+	if (is_end(start + extension_len)) {
+		int n_extensions =
+			data->extensions.length / sizeof (char *) - 1;
+		vr_buffer_set_length(&data->extensions,
+				     (n_extensions + 2) * sizeof (char *));
+		char **extensions = (char **) data->extensions.data;
+		extensions[n_extensions++] = strndup(start, extension_len);
+		extensions[n_extensions++] = NULL;
+		return true;
+	}
+
 	vr_error_message("%s:%i: Invalid require line",
 			 data->filename,
 			 data->line_num);
@@ -1184,6 +1222,7 @@ load_script_from_stream(const char *filename,
 		.line = VR_BUFFER_STATIC_INIT,
 		.buffer = VR_BUFFER_STATIC_INIT,
 		.commands = VR_BUFFER_STATIC_INIT,
+		.extensions = VR_BUFFER_STATIC_INIT,
 		.current_stage = -1,
 		.current_section = SECTION_NONE,
 		.patch_size = 3
@@ -1195,6 +1234,9 @@ load_script_from_stream(const char *filename,
 	data.script->framebuffer_format =
 		vr_format_lookup_by_vk_format(VK_FORMAT_B8G8R8A8_UNORM);
 	assert(data.script->framebuffer_format != NULL);
+
+	vr_buffer_set_length(&data.extensions, sizeof (const char *));
+	memset(data.extensions.data, 0, data.extensions.length);
 
 	for (stage = 0; stage < VR_SCRIPT_N_STAGES; stage++)
 		vr_list_init(&data.script->stages[stage]);
@@ -1221,8 +1263,11 @@ load_script_from_stream(const char *filename,
 	vr_buffer_destroy(&data.line);
 
 	if (res) {
+		data.script->extensions =
+			(const char *const *) data.extensions.data;
 		return data.script;
 	} else {
+		free_extensions((const char *const *) data.extensions.data);
 		vr_script_free(data.script);
 		return NULL;
 	}
@@ -1265,6 +1310,8 @@ vr_script_free(struct vr_script *script)
 		vr_vbo_free(script->vertex_data);
 
 	free(script->filename);
+
+	free_extensions(script->extensions);
 
 	free(script->commands);
 
