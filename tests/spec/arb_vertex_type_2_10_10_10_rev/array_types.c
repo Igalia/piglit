@@ -160,6 +160,10 @@ test(int x1, int y1, int x2, int y2, const struct test_info *test)
 	GLuint v[3], c[3];
 	bool pass;
 
+	if (test->size == GL_BGRA &&
+	    !piglit_is_extension_supported("GL_EXT_vertex_array_bgra"))
+		return true;
+
 	printf("testing: %s\n", test->name);
 
 	/* vertex positions */
