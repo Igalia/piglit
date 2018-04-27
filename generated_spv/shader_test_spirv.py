@@ -648,6 +648,9 @@ def parse_args():
     parser.add_argument("-m", "--mirror",
                         nargs=1,
                         help="Store the SPIR-V generated in a mirror directory, without .spv")
+    parser.add_argument("--strip-names",
+                        action="store_true",
+                        help="Remove all the debug names from the generated SPIR-V")
     parser.add_argument("shader_tests",
                         nargs='+',
                         help="Path to one or more .shader_test files to process.")
@@ -839,7 +842,8 @@ def get_ubo_binding(ubos, name):
             return ubo.binding
     return None
 
-def filter_shader_test(fin, fout,
+def filter_shader_test(config,
+                       fin, fout,
                        replacements,
                        uniform_map,
                        ubos,
@@ -877,7 +881,12 @@ def filter_shader_test(fin, fout,
                     fout.write('[' + groupname + ' spirv]\n')
                     fout.write('; Automatically generated from the GLSL by '
                                'shader_test_spirv.py. DO NOT EDIT\n')
-                    fout.write(replacement)
+                    if config.strip_names:
+                        for spirv_line in replacement.splitlines():
+                            if RE_spirv_name.match(spirv_line) is None and RE_spirv_member_name.match(spirv_line) is None:
+                                fout.write(spirv_line + '\n')
+                    else:
+                        fout.write(replacement)
                     fout.write('\n')
                     replacements[groupname] = ''
 
@@ -952,6 +961,7 @@ def replace_inputs_with_outputs(spirv, prev_stage, this_stage):
             return md.group(0)
 
     return RE_spirv_location.sub(get_replacement, spirv)
+
 
 #Returns: 0 for failure, 1 for success, 2 for skip
 #  FIXME: better return values
@@ -1122,7 +1132,8 @@ def process_shader_test(shader_test, config):
               spv_shader_test_file)
     with open(spv_shader_test_file, 'w') as fout:
         with open(shader_test, 'r') as fin:
-            filter_shader_test(fin, fout,
+            filter_shader_test(config,
+                               fin, fout,
                                replacements,
                                uniform_map,
                                ubos,
