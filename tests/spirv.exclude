@@ -42,3 +42,5 @@ tests/shaders/glsl-fs-ivec4-mat3
 tests/shaders/link-struct-usage
 tests/spec/amd_conservative_depth/glsl-1.30/linker/matching-qualifiers-02
 tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01
+# Doesn't make sense on SPIR-V (most of them name-mismatch tests)
+tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch
