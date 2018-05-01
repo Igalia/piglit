@@ -565,8 +565,15 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		ok = make_context_current_singlepass(wfl_fw, test_config,
 		                                     CONTEXT_GL_COMPAT,
 		                                     partial_config_attrib_list);
-		if (ok)
-		   return;
+		if (ok) {
+			if (test_config->supports_gl_compat_version == 31 &&
+			    !piglit_is_extension_supported("GL_ARB_compatibility")) {
+				printf("piglit: info: Failed to create a compat profile\n");
+				piglit_report_result(PIGLIT_SKIP);
+			}
+
+			return;
+		}
 	}
 
 #elif defined(PIGLIT_USE_OPENGL_ES1) || \
