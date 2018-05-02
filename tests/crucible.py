@@ -30,6 +30,7 @@ from __future__ import (
 import os
 import six
 import subprocess
+import tempfile
 
 from framework import grouptools, backends, exceptions
 from framework.core import PIGLIT_CONFIG
@@ -49,16 +50,20 @@ if crucible_bin is None:
 class CrucibleTest(Test):
     """Test representation for Crucible"""
     def __init__(self, case_name):
-        command = [crucible_bin, 'run', '--junit-xml=crucible.xml', case_name]
+        self.__out_xml = tempfile.NamedTemporaryFile(delete=True).name
+        command = [crucible_bin, 'run',
+                   '--junit-xml={}'.format(self.__out_xml), case_name]
         self._case = case_name
         super(CrucibleTest, self).__init__(command)
 
     def interpret_result(self):
-        test = backends.junit.REGISTRY.load('crucible.xml', 'none')
-        result = test.get_result(next(six.iterkeys(test.tests)))
-        self.result.result = result.name
-        os.remove('crucible.xml')
-        super(CrucibleTest, self).interpret_result()
+        try:
+            test = backends.junit.REGISTRY.load(self.__out_xml, 'none')
+            result = test.get_result(next(six.iterkeys(test.tests)))
+            self.result.result = result.name
+            super(CrucibleTest, self).interpret_result()
+        finally:
+            os.remove(self.__out_xml)
 
 def gen_caselist_txt(bin_):
     with open('crucible.txt', 'w') as d:
