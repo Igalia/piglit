@@ -28,6 +28,8 @@ import argparse
 import io
 import os
 
+import six
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -55,7 +57,14 @@ def main():
     for dirpath, _, filenames in os.walk(directory):
         for filename in filenames:
             if os.path.splitext(filename)[1] in exts:
-                files.append(os.path.join(dirpath, filename))
+                name = os.path.join(dirpath, filename)
+                if six.PY2:
+                    # This might not be correct, but it's fine. As long as the
+                    # two files are the same it'll work, and utf-8 is what
+                    # everyone *should* be using, and as a superset of ascii
+                    # *should* cover most people
+                    name = name.decode('utf-8', 'replace')
+                files.append(name)
 
     if os.path.exists(args.output):
         with io.open(args.output, 'rt', encoding='utf-8') as f:
