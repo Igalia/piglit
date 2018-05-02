@@ -1,0 +1,127 @@
+# Tests that PixelCenterInteger works. This is forbidden in Vulkan but
+# it is available in GLSL and the SPIR-V spec allows it. It isn’t
+# mentioned in the ARB_gl_spirv spec but it seems likely that it’s
+# intended to work.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 47
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %gl_FragCoord %color_out
+               OpExecutionMode %main PixelCenterInteger
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %frac_is_zero_f1_ "frac_is_zero(f1;"
+               OpName %val "val"
+               OpName %gl_FragCoord "gl_FragCoord"
+               OpName %param "param"
+               OpName %param_0 "param"
+               OpName %color_out "color_out"
+               OpDecorate %gl_FragCoord BuiltIn FragCoord
+               OpDecorate %color_out Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+%_ptr_Function_float = OpTypePointer Function %float
+       %bool = OpTypeBool
+          %9 = OpTypeFunction %bool %_ptr_Function_float
+%float_0_00100000005 = OpConstant %float 0.00100000005
+    %v4float = OpTypeVector %float 4
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%gl_FragCoord = OpVariable %_ptr_Input_v4float Input
+       %uint = OpTypeInt 32 0
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_float = OpTypePointer Input %float
+     %uint_1 = OpConstant %uint 1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %color_out = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %44 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+         %46 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %param = OpVariable %_ptr_Function_float Function
+    %param_0 = OpVariable %_ptr_Function_float Function
+         %27 = OpAccessChain %_ptr_Input_float %gl_FragCoord %uint_0
+         %28 = OpLoad %float %27
+               OpStore %param %28
+         %29 = OpFunctionCall %bool %frac_is_zero_f1_ %param
+               OpSelectionMerge %31 None
+               OpBranchConditional %29 %30 %31
+         %30 = OpLabel
+         %34 = OpAccessChain %_ptr_Input_float %gl_FragCoord %uint_1
+         %35 = OpLoad %float %34
+               OpStore %param_0 %35
+         %36 = OpFunctionCall %bool %frac_is_zero_f1_ %param_0
+               OpBranch %31
+         %31 = OpLabel
+         %37 = OpPhi %bool %29 %5 %36 %30
+               OpSelectionMerge %39 None
+               OpBranchConditional %37 %38 %45
+         %38 = OpLabel
+               OpStore %color_out %44
+               OpBranch %39
+         %45 = OpLabel
+               OpStore %color_out %46
+               OpBranch %39
+         %39 = OpLabel
+               OpReturn
+               OpFunctionEnd
+%frac_is_zero_f1_ = OpFunction %bool None %9
+        %val = OpFunctionParameter %_ptr_Function_float
+         %12 = OpLabel
+         %13 = OpLoad %float %val
+         %14 = OpExtInst %float %1 Fract %13
+         %15 = OpExtInst %float %1 FAbs %14
+         %17 = OpFOrdLessThan %bool %15 %float_0_00100000005
+               OpReturnValue %17
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(pixel_center_integer) in vec4 gl_FragCoord;
+
+layout(location = 0) out vec4 color_out;
+
+bool
+frac_is_zero(float val)
+{
+        /* Allow for a bit of tolerance */
+        return abs(fract(val)) < 0.001;
+}
+
+void
+main()
+{
+        /* With PixelCenterInteger all of the fractional parts of
+         * gl_FragCoord should be zero.
+         */
+        if (frac_is_zero(gl_FragCoord.x) && frac_is_zero(gl_FragCoord.y))
+                color_out = vec4(0.0, 1.0, 0.0, 1.0);
+        else
+                color_out = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.8 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
