@@ -32,7 +32,13 @@ import six
 import subprocess
 import tempfile
 
+try:
+    from lxml import etree
+except ImportError:
+    import xml.etree.cElementTree as etree
+
 from framework import grouptools, backends, exceptions
+from framework import status
 from framework.core import PIGLIT_CONFIG
 from framework.profile import TestProfile, Test
 
@@ -62,6 +68,10 @@ class CrucibleTest(Test):
             result = test.get_result(next(six.iterkeys(test.tests)))
             self.result.result = result.name
             super(CrucibleTest, self).interpret_result()
+        except etree.ParseError:
+            # This error is what cElementTree will generate, and is the parent
+            # of what lxml will generate.
+            self.result.result = status.CRASH
         finally:
             os.remove(self.__out_xml)
 
