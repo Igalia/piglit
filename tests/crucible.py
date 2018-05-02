@@ -39,7 +39,7 @@ __all__ = ['profile']
 
 crucible_bin = os.environ.get('PIGLIT_CRUCIBLE_BIN', None)
 if crucible_bin is None:
-    crucible_bin = PIGLIT_CONFIG.safe_get(('crucible', 'bin'), True)
+    crucible_bin = PIGLIT_CONFIG.safe_get('crucible', 'bin')
 
 if crucible_bin is None:
     raise exceptions.PiglitFatalError(
