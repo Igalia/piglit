@@ -57,3 +57,5 @@ tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01
 tests/spec/arb_gl_spirv
 # Doesn't make sense on SPIR-V (most of them name-mismatch tests)
 tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch
+# layout(shared) not supported, pending to re-implement automatically skip them
+tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-packaging-qualifier-mismatch.shader_test
