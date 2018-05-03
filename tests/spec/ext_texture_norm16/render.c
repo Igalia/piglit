@@ -44,6 +44,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
 PIGLIT_GL_TEST_CONFIG_END
 
+#define PIGLIT_RESULT(x) x ? PIGLIT_PASS : PIGLIT_FAIL
+
 static const char vs_source[] =
 	"#version 310 es\n"
 	"layout(location = 0) in highp vec4 vertex;\n"
@@ -261,11 +263,6 @@ verify_contents_float(const struct fmt_test *test)
 
 	bool res = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
 					  expected);
-
-	if (!res)
-		piglit_report_subtest_result(PIGLIT_FAIL,
-					     "format 0x%x read fail",
-					     test->iformat);
 	return res;
 }
 
@@ -327,12 +324,92 @@ buffer_test(const struct fmt_test *test)
 	return true;
 }
 
+
+static bool
+test_format(const struct fmt_test *test)
+{
+	bool pass = true;
+
+	/* The req_render formats match with formats that are
+	 * supported by texture buffer objects.
+	 */
+	if (piglit_is_extension_supported("GL_OES_texture_buffer") &&
+	    test->req_render) {
+		bool buf_test = buffer_test(test);
+		piglit_report_subtest_result(PIGLIT_RESULT(buf_test),
+					     "format 0x%x TBO test",
+					     test->iformat);
+		pass &= buf_test;
+	}
+
+	glUseProgram(prog);
+	glUniform1i(0 /* explicit loc */, 0);
+
+	/* Create a texture, upload data */
+	const GLuint texture = create_texture(test);
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	/* Can only texture from. */
+	if (!test->req_render) {
+		/* Render texture to window and verify contents. */
+		render_texture(texture, GL_TEXTURE_2D, 0);
+		bool render_test = verify_contents_float(test);
+		piglit_present_results();
+		piglit_report_subtest_result(PIGLIT_RESULT(render_test),
+					     "format 0x%x",
+					     test->iformat);
+		glDeleteTextures(1, &texture);
+		pass &= render_test;
+		return pass;
+	}
+
+	GLuint fbo_tex;
+	const GLuint fbo = create_fbo(test, &fbo_tex);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
+		GL_FRAMEBUFFER_COMPLETE) {
+		piglit_report_subtest_result(PIGLIT_FAIL,
+					     "format 0x%x fbo fail",
+					     test->iformat);
+		pass &= false;
+	}
+
+	render_texture(texture, GL_TEXTURE_2D, fbo);
+
+	/* If GL_EXT_copy_image is supported then create another
+	 * texture, copy contents and render result to fbo.
+	 */
+	GLuint texture_copy = 0;
+	if (piglit_is_extension_supported("GL_EXT_copy_image")) {
+		bool copy_pass =
+			test_copy_image(test, texture, &texture_copy);
+		pass &= copy_pass;
+		piglit_report_subtest_result(PIGLIT_RESULT(copy_pass),
+					     "copy image format 0x%x",
+					     test->iformat);
+		render_texture(texture_copy, GL_TEXTURE_2D, fbo);
+	}
+
+	/* If format can be read, verify contents. */
+	if (test->can_read)
+		pass &= verify_contents(test);
+
+	/* Render fbo contents to window. */
+	render_texture(fbo_tex, GL_TEXTURE_2D, 0);
+
+	piglit_present_results();
+
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteTextures(1, &texture);
+	glDeleteTextures(1, &texture_copy);
+
+	return pass;
+}
+
 enum piglit_result
 piglit_display(void)
 {
-	bool has_tbo =
-		piglit_is_extension_supported("GL_OES_texture_buffer");
-
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
@@ -348,92 +425,17 @@ piglit_display(void)
 	/* Loop over each format. */
 	const struct fmt_test *test = tests;
 	for (unsigned i = 0; i < ARRAY_SIZE(tests); i++, test++) {
-
-		/* The req_render formats match with formats that are
-		 * supported by texture buffer objects.
-		 */
-		if (has_tbo && test->req_render) {
-			bool buf_test = buffer_test(test);
-			piglit_report_subtest_result(buf_test ? PIGLIT_PASS : PIGLIT_FAIL,
-						     "format 0x%x TBO test",
-						     test->iformat);
-			pass &= buf_test;
-		}
-
-		glUseProgram(prog);
-		glUniform1i(0 /* explicit loc */, 0);
-
-		/* Create a texture, upload data */
-		const GLuint texture = create_texture(test);
-
-		glBindTexture(GL_TEXTURE_2D, texture);
-
-		/* Can only texture from. */
-		if (!test->req_render) {
-			/* Render texture to window and verify contents. */
-			render_texture(texture, GL_TEXTURE_2D, 0);
-			pass &= verify_contents_float(test);
-			piglit_present_results();
-			if (pass)
-				piglit_report_subtest_result(PIGLIT_PASS,
-							     "format 0x%x",
-							     test->iformat);
-			glDeleteTextures(1, &texture);
-			continue;
-		}
-
-		GLuint fbo_tex;
-		const GLuint fbo = create_fbo(test, &fbo_tex);
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
-			GL_FRAMEBUFFER_COMPLETE) {
-			piglit_report_subtest_result(PIGLIT_FAIL,
-						     "format 0x%x fbo fail",
-						     test->iformat);
-			pass &= false;
-		}
-
-		render_texture(texture, GL_TEXTURE_2D, fbo);
-
-		/* If GL_EXT_copy_image is supported then create another
-		 * texture, copy contents and render result to fbo.
-		 */
-		GLuint texture_copy = 0;
-		if (piglit_is_extension_supported("GL_EXT_copy_image")) {
-			bool copy_pass =
-				test_copy_image(test, texture, &texture_copy);
-			pass &= copy_pass;
-			piglit_report_subtest_result(copy_pass ?
-						     PIGLIT_PASS : PIGLIT_FAIL,
-						     "copy image format 0x%x",
-						     test->iformat);
-			render_texture(texture_copy, GL_TEXTURE_2D, fbo);
-		}
-
-		/* If format can be read, verify contents. */
-		if (test->can_read)
-			pass &= verify_contents(test);
-
-		/* Render fbo contents to window. */
-		render_texture(fbo_tex, GL_TEXTURE_2D, 0);
-
-		piglit_present_results();
-
-		glDeleteFramebuffers(1, &fbo);
-		glDeleteTextures(1, &texture);
-		glDeleteTextures(1, &texture_copy);
-
-		if (pass)
-			piglit_report_subtest_result(PIGLIT_PASS,
-						     "format 0x%x",
-						     test->iformat);
-
+		bool fmt_pass = test_format(test);
+		piglit_report_subtest_result(PIGLIT_RESULT(fmt_pass),
+					     "format 0x%x",
+					     test->iformat);
+		pass &= fmt_pass;
 	}
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return PIGLIT_RESULT(pass);
 }
 
 void
@@ -444,5 +446,6 @@ piglit_init(int argc, char **argv)
 	prog = piglit_build_simple_program(vs_source, fs_source);
 
 	if (piglit_is_extension_supported("GL_OES_texture_buffer"))
-		buf_prog = piglit_build_simple_program(vs_source, fs_buf_source);
+		buf_prog = piglit_build_simple_program(vs_source,
+						       fs_buf_source);
 }
