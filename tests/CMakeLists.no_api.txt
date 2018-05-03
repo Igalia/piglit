@@ -59,7 +59,6 @@ endfunction()
 
 add_custom_target(gen-gl-xml)
 piglit_generate_xml(opengl opengl gen-gl-xml "")
-piglit_generate_xml(no_error no_error gen-gl-xml "")
 piglit_generate_xml(quick_gl quick_gl gen-gl-xml "")
 piglit_generate_xml(llvmpipe_gl llvmpipe_gl gen-gl-xml "")
 piglit_generate_xml(sanity sanity gen-gl-xml "")
@@ -71,6 +70,7 @@ piglit_generate_xml(shader shader gen-gl-gen-xml "" gen-gl-tests static-shader-t
 piglit_generate_xml(quick_shader quick_shader gen-gl-gen-xml "" gen-gl-tests static-shader-tests)
 piglit_generate_xml(shader_multi shader gen-gl-gen-xml "--no-process-isolation" gen-gl-tests static-shader-tests)
 piglit_generate_xml(quick_shader_multi quick_shader gen-gl-gen-xml "--no-process-isolation" gen-gl-tests static-shader-tests)
+piglit_generate_xml(no_error no_error gen-gl-gen-xml "" gen-gl-tests static-shader-tests)
 
 add_custom_target(gen-cl-xml)
 piglit_generate_xml(cl cl gen-cl-xml "" gen-cl-tests static-program-tests)
