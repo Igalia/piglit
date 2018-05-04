@@ -61,14 +61,24 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_GTF_GLES_EXTRA_ARGS', ('gtf_gles', 'extra_
                               default='').split()
 
 
-class DEQPGTFTest(deqp.DEQPBaseTest):
+class _GTFMixin(object):
+    """Mixin that provides the shared bits for the GTF GLES class."""
+
     deqp_bin = _GTF_BIN
 
     @property
     def extra_args(self):
-        return super(DEQPGTFTest, self).extra_args + \
+        return super(_GTFMixin, self).extra_args + \
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
+class DEQPGTFSingleTest(_GTFMixin, deqp.DEQPSingleTest):
+    """Class For running the GTF GLES tests in a one test per process mode."""
+    pass
+
+class DEQPGTFGroupTest(_GTFMixin, deqp.DEQPGroupTrieTest):
+    """Class For running the GTF GLES tests in a multiple tests per process mode.
+    """
+    pass
 
 # Add all of the suites by default, users can use filters to remove them.
 profile = deqp.make_profile(  # pylint: disable=invalid-name
@@ -80,4 +90,4 @@ profile = deqp.make_profile(  # pylint: disable=invalid-name
         deqp.iter_deqp_test_cases(
             deqp.gen_caselist_txt(_GTF_BIN, 'GTF-GLES31-cases.txt', _EXTRA_ARGS)),
     ),
-    DEQPGTFTest)
+    single=DEQPGTFSingleTest, group=DEQPGTFGroupTest)
