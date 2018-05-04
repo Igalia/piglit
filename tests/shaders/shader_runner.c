@@ -720,8 +720,8 @@ program_binary_save_restore(bool script_command)
 }
 
 static enum piglit_result
-load_and_specialize_spirv(GLenum target,
-			  const char *binary, unsigned size)
+specialize_spirv(GLenum target,
+		 GLuint shader)
 {
 	if (glsl_in_use) {
 		printf("Cannot mix SPIR-V and non-SPIR-V shaders\n");
@@ -729,11 +729,6 @@ load_and_specialize_spirv(GLenum target,
 	}
 
 	spirv_in_use = true;
-
-	GLuint shader = glCreateShader(target);
-
-	glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-		       binary, size);
 
 	const struct specialization_list *specs;
 
@@ -822,15 +817,6 @@ assemble_spirv(GLenum target)
 		return PIGLIT_SKIP;
 	}
 
-	char *arguments[] = {
-		getenv("PIGLIT_SPIRV_AS_BINARY"),
-		"-o", "-",
-		NULL
-	};
-
-	if (arguments[0] == NULL)
-		arguments[0] = "spirv-as";
-
 	/* Strip comments from the source */
 	char *stripped_source = malloc(shader_string_size);
 	char *p = stripped_source;
@@ -853,32 +839,13 @@ assemble_spirv(GLenum target)
 		}
 	}
 
-	uint8_t *binary_source;
-	size_t binary_source_length;
-	bool res = piglit_subprocess(arguments,
-				     p - stripped_source,
-				     (const uint8_t *)
-				     stripped_source,
-				     &binary_source_length,
-				     &binary_source);
+	GLuint shader = piglit_assemble_spirv(target,
+					      p - stripped_source,
+					      stripped_source);
 
 	free(stripped_source);
 
-	if (!res) {
-		fprintf(stderr, "spirv-as failed\n");
-		return PIGLIT_FAIL;
-	}
-
-	enum piglit_result ret;
-
-	ret = load_and_specialize_spirv(target,
-					(const char *)
-					binary_source,
-					binary_source_length);
-
-	free(binary_source);
-
-	return ret;
+	return specialize_spirv(target, shader);
 }
 
 static enum piglit_result
