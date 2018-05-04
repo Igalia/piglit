@@ -1,0 +1,1 @@
+piglit_include_target_api()
