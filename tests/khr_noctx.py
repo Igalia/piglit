@@ -60,14 +60,24 @@ _EXTRA_ARGS = deqp.get_option('PIGLIT_KHR_NOCTX_EXTRA_ARGS', ('khr_noctx', 'extr
                               default='').split()
 
 
-class DEQPKHRTest(deqp.DEQPBaseTest):
+class _KHRMixin(object):
+    """Mixin that provides the shared bits for the KHR NOCTX class."""
+
     deqp_bin = _KHR_BIN
 
     @property
     def extra_args(self):
-        return super(DEQPKHRTest, self).extra_args + \
+        return super(_KHRMixin, self).extra_args + \
             [x for x in _EXTRA_ARGS if not x.startswith('--deqp-case')]
 
+class DEQPKHRSingleTest(_KHRMixin, deqp.DEQPSingleTest):
+    """Class For running the KHR NOCTX tests in a one test per process mode."""
+    pass
+
+class DEQPKHRGroupTest(_KHRMixin, deqp.DEQPGroupTrieTest):
+    """Class For running the KHR NOCTX tests in a multiple tests per process mode.
+    """
+    pass
 
 # Add all of the suites by default, users can use filters to remove them.
 profile = deqp.make_profile(  # pylint: disable=invalid-name
@@ -76,4 +86,4 @@ profile = deqp.make_profile(  # pylint: disable=invalid-name
             deqp.gen_caselist_txt(_KHR_BIN, 'KHR-NoContext-cases.txt',
                                   _EXTRA_ARGS)),
     ),
-    DEQPKHRTest)
+    single=DEQPKHRSingleTest, group=DEQPKHRGroupTest)
