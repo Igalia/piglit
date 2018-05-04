@@ -464,6 +464,42 @@ piglit_build_simple_program_multiple_shaders(GLenum target1,
 	return prog;
 }
 
+GLuint
+piglit_assemble_spirv(GLenum target,
+		      size_t source_length,
+		      const char *source)
+{
+	char *arguments[] = {
+		getenv("PIGLIT_SPIRV_AS_BINARY"),
+		"-o", "-",
+		NULL
+	};
+
+	if (arguments[0] == NULL)
+		arguments[0] = "spirv-as";
+
+	uint8_t *binary_source;
+	size_t binary_source_length;
+	bool res = piglit_subprocess(arguments,
+				     source_length,
+				     source,
+				     &binary_source_length,
+				     &binary_source);
+
+	if (!res) {
+		fprintf(stderr, "spirv-as failed\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	GLuint shader = glCreateShader(target);
+	glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
+		       binary_source, binary_source_length);
+
+	free(binary_source);
+
+	return shader;
+}
+
 void
 piglit_require_GLSL(void)
 {
