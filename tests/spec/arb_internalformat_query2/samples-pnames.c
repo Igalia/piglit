@@ -238,7 +238,7 @@ check_num_sample_counts(void)
                  *        returned.
                  */
                 pass = try(without_multisample_targets, ARRAY_SIZE(without_multisample_targets),
-                           valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                           valid_internalformats, num_valid_internalformats,
                            GL_NUM_SAMPLE_COUNTS, data)
                         && pass;
         }
@@ -296,7 +296,7 @@ check_samples(void)
                  */
 
                 pass = try(without_multisample_targets, ARRAY_SIZE(without_multisample_targets),
-                           valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                           valid_internalformats, num_valid_internalformats ,
                            GL_SAMPLES, data)
                         && pass;
         }
@@ -316,6 +316,7 @@ piglit_init(int argc, char **argv)
 
         piglit_require_extension("GL_ARB_framebuffer_object");
         piglit_require_extension("GL_ARB_internalformat_query2");
+        initialize_valid_internalformats();
 
         pass = check_num_sample_counts() && pass;
         pass = check_samples() && pass;

@@ -218,7 +218,7 @@ check_filter()
         for (testing64 = 0; testing64 <= 1; testing64++) {
                 test_data_set_testing64(data, testing64);
                 pass = try_local(valid_targets, ARRAY_SIZE(valid_targets),
-                                 valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                 valid_internalformats, num_valid_internalformats,
                                  GL_FILTER, data)
                         && pass;
         }

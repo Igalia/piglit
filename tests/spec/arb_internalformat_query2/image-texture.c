@@ -262,6 +262,7 @@ piglit_init(int argc, char **argv)
         bool pass = true;
 
         piglit_require_extension("GL_ARB_internalformat_query2");
+        initialize_valid_internalformats();
 
         pass =  check_image_texture()
                 && pass;

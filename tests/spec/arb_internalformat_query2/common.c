@@ -1063,3 +1063,32 @@ test_data_get_params_size(test_data *data)
 {
         return data->params_size;
 }
+
+void
+initialize_valid_internalformats()
+{
+        if (piglit_get_gl_version() == 43 ||
+            piglit_is_extension_supported("GL_ARB_ES3_compatibility")) {
+                unsigned i, j;
+
+                num_valid_internalformats = ARRAY_SIZE(base_valid_internalformats) +
+                        ARRAY_SIZE(arb_es3_compatibility_valid_internalformats);
+
+                valid_internalformats = malloc(sizeof(GLenum) *
+                                               num_valid_internalformats);
+
+                for (i = 0; i < ARRAY_SIZE(base_valid_internalformats); i++) {
+                        valid_internalformats[i] = base_valid_internalformats[i];
+                }
+
+                for (i = ARRAY_SIZE(base_valid_internalformats), j = 0;
+                     i < num_valid_internalformats; i++, j++) {
+                        valid_internalformats[i] =
+                                arb_es3_compatibility_valid_internalformats[j];
+                }
+
+        } else {
+                num_valid_internalformats = ARRAY_SIZE(base_valid_internalformats);
+                valid_internalformats = (GLenum *) base_valid_internalformats;
+        }
+}
