@@ -139,6 +139,16 @@ is_color_format(GLenum internalformat)
         case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM:
         case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT:
         case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT:
+        case GL_COMPRESSED_RGB8_ETC2:
+        case GL_COMPRESSED_SRGB8_ETC2:
+        case GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+        case GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+        case GL_COMPRESSED_RGBA8_ETC2_EAC:
+        case GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
+        case GL_COMPRESSED_R11_EAC:
+        case GL_COMPRESSED_SIGNED_R11_EAC:
+        case GL_COMPRESSED_RG11_EAC:
+        case GL_COMPRESSED_SIGNED_RG11_EAC:
                 return GL_TRUE;
         default:
                 return GL_FALSE;
@@ -252,7 +262,7 @@ check_format_components(void)
                         test_data_set_testing64(data, testing64);
 
                         pass = try(valid_targets, ARRAY_SIZE(valid_targets),
-                                   valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                   valid_internalformats, num_valid_internalformats,
                                    pnames[i], data)
                                 && pass;
                 }
@@ -274,6 +284,7 @@ piglit_init(int argc, char **argv)
         bool pass = true;
 
         piglit_require_extension("GL_ARB_internalformat_query2");
+        initialize_valid_internalformats();
 
         pass = check_format_components()
                 && pass;

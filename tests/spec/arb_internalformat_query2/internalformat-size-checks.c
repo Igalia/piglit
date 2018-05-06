@@ -148,7 +148,7 @@ check_textures_size(void)
                         test_data_set_testing64(data, testing64);
 
                         pass = try_textures_size(texture_targets, ARRAY_SIZE(texture_targets),
-                                                 valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                                 valid_internalformats, num_valid_internalformats,
                                                  pnames[i],
                                                  data)
                                 && pass;
@@ -170,6 +170,7 @@ piglit_init(int argc, char **argv)
         bool pass = true;
 
         piglit_require_extension("GL_ARB_internalformat_query2");
+        initialize_valid_internalformats();
 
         pass = check_textures_size()
                 && pass;

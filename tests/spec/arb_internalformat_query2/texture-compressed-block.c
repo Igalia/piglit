@@ -173,7 +173,7 @@ check_texture_compressed_block(const GLenum *pnames, unsigned num_pnames)
                 for (testing64 = 0; testing64 <= 1; testing64++) {
                         test_data_set_testing64(data, testing64);
                         pass = try_local(valid_targets, ARRAY_SIZE(valid_targets),
-                                         valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                         valid_internalformats, num_valid_internalformats,
                                          pnames[i], data)
                                 && pass;
                 }
@@ -195,6 +195,7 @@ piglit_init(int argc, char **argv)
         bool pass = true;
 
         piglit_require_extension("GL_ARB_internalformat_query2");
+        initialize_valid_internalformats();
 
         pass = check_texture_compressed_block(pnames, ARRAY_SIZE(pnames))
                 && pass;

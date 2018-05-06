@@ -263,7 +263,7 @@ check_basic(const GLenum *pnames, unsigned num_pnames,
                         test_data_set_testing64(data, testing64);
 
                         pass = try_basic(valid_targets, ARRAY_SIZE(valid_targets),
-                                         valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                         valid_internalformats, num_valid_internalformats,
                                          pnames[i],
                                          possible_values, num_possible_values,
                                          data)
@@ -288,6 +288,7 @@ piglit_init(int argc, char **argv)
         GLenum pname;
 
 	piglit_require_extension("GL_ARB_internalformat_query2");
+        initialize_valid_internalformats();
 
         pname = GL_INTERNALFORMAT_PREFERRED;
         pass = check_basic(&pname, 1, NULL, 0) && pass;

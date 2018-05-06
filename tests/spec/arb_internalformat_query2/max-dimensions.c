@@ -347,7 +347,7 @@ check_max_dimension(const GLenum pname,
                 test_data_set_testing64(data, testing64);
 
                 pass = try(valid_targets, ARRAY_SIZE(valid_targets),
-                           valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                           valid_internalformats, num_valid_internalformats,
                            pname, min_dimensions, data)
                         && pass;
         }
@@ -509,7 +509,7 @@ check_max_layers()
                 test_data_set_testing64(data, testing64);
 
                 pass = try_max_layers(valid_targets, ARRAY_SIZE(valid_targets),
-                                      valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                      valid_internalformats, num_valid_internalformats,
                                       data)
                         && pass;
         }
@@ -668,7 +668,7 @@ check_max_combined_dimensions()
                 test_data_set_testing64(data, testing64);
 
                 pass = try_max_combined_dimensions(valid_targets, ARRAY_SIZE(valid_targets),
-                                                   valid_internalformats, ARRAY_SIZE(valid_internalformats),
+                                                   valid_internalformats, num_valid_internalformats,
                                                    data)
                         && pass;
         }
@@ -685,6 +685,7 @@ piglit_init(int argc, char **argv)
         bool pass = true;
 
         piglit_require_extension("GL_ARB_internalformat_query2");
+        initialize_valid_internalformats();
 
         pass = check_max_dimension(GL_MAX_WIDTH, 1) && pass;
         pass = check_max_dimension(GL_MAX_HEIGHT, 2) && pass;
