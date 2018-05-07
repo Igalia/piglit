@@ -4855,5 +4855,11 @@ with profile.test_list.group_manager(
     g(['arb_bindless_texture-uint64_attribs'], 'uint64_attribs')
     g(['arb_bindless_texture-uniform'], 'uniform')
 
+# Group ARB_sample_locations
+with profile.test_list.group_manager(
+	PiglitGLTest,
+	grouptools.join('spec', 'ARB_sample_locations')) as g:
+    g(['arb_sample_locations'], 'test')
+
 if platform.system() is 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))

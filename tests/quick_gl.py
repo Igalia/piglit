@@ -60,6 +60,13 @@ with profile.test_list.group_manager(
     with profile.test_list.allow_reassignment:
         g(['gl-1.0-blend-func', '--quick'], 'gl-1.0-blend-func')
 
+# Set the --quick flag on the GL_ARB_sample_locations test
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_sample_locations')) as g:
+    with profile.test_list.allow_reassignment:
+        g(['arb_sample_locations', '--quick'], 'test')
+
 # Limit texture size to 512x512 for some texture_multisample tests.
 # The default (max supported size) can be pretty slow.
 with profile.test_list.group_manager(
