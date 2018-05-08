@@ -596,13 +596,16 @@ def run(profiles, logger, backend, concurrency):
             run_threads(single, profile, test_list)
         else:
             assert concurrency == "some"
+            # test_list is an iterator, we need to copy it to run it twice.
+            test_list = itertools.tee(test_list, 2)
+
             # Filter and return only thread safe tests to the threaded pool
-            run_threads(multi, profile, test_list,
+            run_threads(multi, profile, test_list[0],
                         lambda x: x[1].run_concurrent)
 
             # Filter and return the non thread safe tests to the single
             # pool
-            run_threads(single, profile, test_list,
+            run_threads(single, profile, test_list[1],
                         lambda x: not x[1].run_concurrent)
         profile.teardown()
 
