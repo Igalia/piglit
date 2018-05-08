@@ -46,6 +46,9 @@ class FilterVsIn(object):
             return self.random.random() <= .2
         return True
 
+    def reset(self):
+        self.random.seed(42)
+
 
 profile.filters.append(FilterVsIn())
 
