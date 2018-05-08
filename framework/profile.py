@@ -265,6 +265,42 @@ class TestDict(collections.MutableMapping):
         self.__allow_reassignment -= 1
 
 
+class Filters(collections.MutableSequence):
+
+    def __init__(self, iterable=None):
+        if iterable:
+            self.__container = list(iterable)
+        else:
+            self.__container = []
+
+    def __getitem__(self, index):
+        return self.__container[index]
+
+    def __setitem__(self, index, value):
+        self.__container[index] = value
+
+    def __delitem__(self, index):
+        del self.__container[index]
+
+    def __len__(self):
+        return len(self.__container)
+
+    def __add__(self, other):
+        return type(self)(itertools.chain(iter(self), iter(other)))
+
+    def insert(self, index, value):
+        self.__container.insert(index, value)
+
+    def run(self, iterable):
+        for f in self.__container:
+            if hasattr(f, 'reset'):
+                f.reset()
+
+        for k, v in iterable:
+            if all(f(k, v) for f in self.__container):
+                yield k, v
+
+
 def make_test(element):
     """Rebuild a test instance from xml."""
     def process(elem, opt):
@@ -309,7 +345,7 @@ class XMLProfile(object):
     def __init__(self, filename):
         self.filename = filename
         self.forced_test_list = []
-        self.filters = []
+        self.filters = Filters()
         self.options = {
             'dmesg': get_dmesg(False),
             'monitor': Monitoring(False),
@@ -369,7 +405,7 @@ class MetaProfile(object):
 
     def __init__(self, filename):
         self.forced_test_list = []
-        self.filters = []
+        self.filters = Filters()
         self.options = {
             'dmesg': get_dmesg(False),
             'monitor': Monitoring(False),
@@ -436,7 +472,7 @@ class TestProfile(object):
     def __init__(self):
         self.test_list = TestDict()
         self.forced_test_list = []
-        self.filters = []
+        self.filters = Filters()
         self.options = {
             'dmesg': get_dmesg(False),
             'monitor': Monitoring(False),
