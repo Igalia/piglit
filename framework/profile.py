@@ -369,17 +369,20 @@ class XMLProfile(object):
 
     def _itertests(self):
         """Always iterates tests instead of using the forced test_list."""
-        with gzip.open(self.filename, 'rt') as f:
-            doc = et.iterparse(f, events=(b'end', ))
-            _, root = next(doc)  # get the root so we can keep clearing it
-            for _, e in doc:
-                if e.tag != 'Test':
-                    continue
-                k = e.attrib['name']
-                v = make_test(e)
-                if all(f(k, v) for f in self.filters):
+        def _iter():
+            with gzip.open(self.filename, 'rt') as f:
+                doc = et.iterparse(f, events=(b'end', ))
+                _, root = next(doc)  # get the root so we can keep clearing it
+                for _, e in doc:
+                    if e.tag != 'Test':
+                        continue
+                    k = e.attrib['name']
+                    v = make_test(e)
                     yield k, v
-                root.clear()
+                    root.clear()
+
+        for k, v in self.filters.run(_iter()):
+            yield k, v
 
     def itertests(self):
         if self.forced_test_list:
@@ -432,10 +435,13 @@ class MetaProfile(object):
         pass
 
     def _itertests(self):
-        for p in self._profiles:
-            for k, v in p.itertests():
-                if all(f(k, v) for f in self.filters):
+        def _iter():
+            for p in self._profiles:
+                for k, v in p.itertests():
                     yield k, v
+
+        for k, v in self.filters.run(_iter()):
+            yield k, v
 
     def itertests(self):
         if self.forced_test_list:
@@ -516,9 +522,8 @@ class TestProfile(object):
         else:
             opts = self.test_list  # pylint: disable=redefined-variable-type
 
-        for k, v in six.iteritems(opts):
-            if all(f(k, v) for f in self.filters):
-                yield k, v
+        for k, v in self.filters.run(six.iteritems(opts)):
+            yield k, v
 
 
 def load_test_profile(filename, python=None):
