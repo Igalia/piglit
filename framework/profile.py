@@ -584,8 +584,8 @@ def run(profiles, logger, backend, concurrency):
             # more code, and adding side-effects
             test_list = (x for x in test_list if filterby(x))
 
-        pool.imap(lambda pair: test(pair[0], pair[1], profile, pool),
-                  test_list, chunksize)
+        for n, t in test_list:
+            pool.apply_async(test, [n, t, profile, pool])
 
     def run_profile(profile, test_list):
         """Run an individual profile."""
