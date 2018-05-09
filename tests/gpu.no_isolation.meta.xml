@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PiglitMetaProfile>
+  <!-- This inverses the order of shader and compiled tests, this is
+       intentional. For gpu (with isolation), shader tests are small and can be
+       assumed to be very quick, while compiled tests will almost certainly be
+       slower. Without isolation that is reversed, shader tests take much longer,
+       so putting them first improves runtime.
+  -->
+  <Profile>quick_shader.no_isolation</Profile>
+  <Profile>quick_gl</Profile>
+</PiglitMetaProfile>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PiglitMetaProfile>
+  <Profile>quick_shader.no_isolation</Profile>
+  <Profile>quick_gl</Profile>
+  <Profile>glslparser</Profile>
+</PiglitMetaProfile>
