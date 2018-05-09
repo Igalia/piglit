@@ -1,0 +1,41 @@
+# In this test, the sampler to use is selected in a vertex shader, passed
+# to the fragment shader as a (flat) input, and then used for a texture
+# lookup.
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_bindless_texture
+
+[vertex shader]
+#version 330
+#extension GL_ARB_bindless_texture: require
+
+layout (bindless_sampler) uniform sampler2D tex;
+in vec4 piglit_vertex;
+
+flat out sampler2D sampler_vs;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	sampler_vs = tex;
+}
+
+[fragment shader]
+#version 330
+#extension GL_ARB_bindless_texture: require
+
+flat in sampler2D sampler_vs;
+out vec4 color;
+
+void main()
+{
+	color = texture2D(sampler_vs, vec2(0, 0));
+}
+
+[test]
+texture rgbw 0 (16, 16)
+resident texture 0
+uniform handle tex 0
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0)

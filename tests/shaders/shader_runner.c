@@ -89,6 +89,7 @@ struct component_version {
 	} _tag;
 
 	bool core;
+	bool compat;
 	bool es;
 	unsigned num;
 	char _string[100];
@@ -172,6 +173,9 @@ static GLuint vao = 0;
 static GLuint draw_fbo, read_fbo;
 static GLint render_width, render_height;
 static GLint read_width, read_height;
+static uint16_t *elements_buffer;
+static size_t num_elements;
+static size_t elements_buffer_size;
 
 static bool report_subtests = false;
 
@@ -298,6 +302,7 @@ enum states {
 	compute_shader_spirv,
 	compute_shader_specializations,
 	vertex_data,
+	elements,
 	test,
 };
 
@@ -394,12 +399,13 @@ static bool
 compare_uint(GLuint ref, GLuint value, enum comparison cmp);
 
 static void
-version_init(struct component_version *v, enum version_tag tag, bool core, bool es, unsigned num)
+version_init(struct component_version *v, enum version_tag tag, bool core, bool compat, bool es, unsigned num)
 {
 	assert(tag == VERSION_GL || tag == VERSION_GLSL);
 
 	v->_tag = tag;
 	v->core = core;
+	v->compat = compat;
 	v->es = es;
 	v->num = num;
 	v->_string[0] = 0;
@@ -634,8 +640,8 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 }
 
 static enum piglit_result
-load_and_specialize_spirv(GLenum target,
-			  const char *binary, unsigned size)
+specialize_spirv(GLenum target,
+		 GLuint shader)
 {
 	if (glsl_in_use) {
 		printf("Cannot mix SPIR-V and non-SPIR-V shaders\n");
@@ -643,11 +649,6 @@ load_and_specialize_spirv(GLenum target,
 	}
 
 	spirv_in_use = true;
-
-	GLuint shader = glCreateShader(target);
-
-	glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
-		       binary, size);
 
 	const struct specialization_list *specs;
 
@@ -738,15 +739,6 @@ assemble_spirv(GLenum target)
 		return PIGLIT_SKIP;
 	}
 
-	char *arguments[] = {
-		getenv("PIGLIT_SPIRV_AS_BINARY"),
-		"-o", "-",
-		NULL
-	};
-
-	if (arguments[0] == NULL)
-		arguments[0] = "spirv-as";
-
 	/* Strip comments from the source */
 	char *stripped_source = malloc(shader_string_size);
 	char *p = stripped_source;
@@ -769,32 +761,13 @@ assemble_spirv(GLenum target)
 		}
 	}
 
-	uint8_t *binary_source;
-	size_t binary_source_length;
-	bool res = piglit_subprocess(arguments,
-				     p - stripped_source,
-				     (const uint8_t *)
-				     stripped_source,
-				     &binary_source_length,
-				     &binary_source);
+	GLuint shader = piglit_assemble_spirv(target,
+					      p - stripped_source,
+					      stripped_source);
 
 	free(stripped_source);
 
-	if (!res) {
-		fprintf(stderr, "spirv-as failed\n");
-		return PIGLIT_FAIL;
-	}
-
-	enum piglit_result ret;
-
-	ret = load_and_specialize_spirv(target,
-					(const char *)
-					binary_source,
-					binary_source_length);
-
-	free(binary_source);
-
-	return ret;
+	return specialize_spirv(target, shader);
 }
 
 static enum piglit_result
@@ -918,6 +891,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	unsigned minor;
 	unsigned full_num;
 	const bool core = parse_str(line, "CORE", &line);
+	const bool compat = parse_str(line, "COMPAT", &line);
 	const bool es = parse_str(line, "ES", &line);
 
 	REQUIRE(parse_comparison_op(line, cmp, &line),
@@ -945,7 +919,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 		full_num = (major * 10) + minor;
 	}
 
-	version_init(v, tag, core, es, full_num);
+	version_init(v, tag, core, compat, es, full_num);
 }
 
 #define KNOWN_GL_SPV_MAPPING 6
@@ -1396,6 +1370,9 @@ leave_state(enum states state, const char *line, const char *script_name)
 		vertex_data_end = line;
 		break;
 
+	case elements:
+		break;
+
 	case test:
 		break;
 
@@ -1643,6 +1620,40 @@ process_specialization(enum states state, const char *line)
 	return PIGLIT_FAIL;
 }
 
+static enum piglit_result
+process_elements(enum states state, const char *line)
+{
+	const char *end = strchrnul(line, '\n');
+
+	while (true) {
+		while (line < end && isspace(*line))
+			line++;
+		if (line >= end  || *line == '#')
+			return PIGLIT_PASS;
+
+		if (num_elements >= elements_buffer_size) {
+			if (elements_buffer_size == 0)
+				elements_buffer_size = 1;
+			else
+				elements_buffer_size *= 2;
+			elements_buffer = realloc(elements_buffer,
+						  elements_buffer_size *
+						  sizeof *elements_buffer);
+		}
+
+		unsigned val;
+		if (parse_uints(line, &val, 1, &line) != 1 ||
+		    val > UINT16_MAX) {
+			fprintf(stderr, "Invalid elements line\n");
+			return PIGLIT_FAIL;
+		}
+
+		elements_buffer[num_elements++] = val;
+	}
+
+	return PIGLIT_PASS;
+}
+
 static char *
 spirv_replacement_script(const char *script_name)
 {
@@ -1770,6 +1781,8 @@ process_test_script(const char *script_name)
 			} else if (parse_str(line, "[vertex data]", NULL)) {
 				state = vertex_data;
 				vertex_data_start = NULL;
+			} else if (parse_str(line, "[elements]", NULL)) {
+				state = elements;
 			} else if (parse_str(line, "[test]", NULL)) {
 				test_start = strchrnul(line, '\n');
 				test_start_line_num = line_num + 1;
@@ -1833,6 +1846,14 @@ process_test_script(const char *script_name)
 				if (vertex_data_start == NULL)
 					vertex_data_start = line;
 				break;
+
+			case elements: {
+				enum piglit_result result =
+					process_elements(state, line);
+				if (result != PIGLIT_PASS)
+					return result;
+				break;
+			}
 
 			case test:
 				break;
@@ -1959,7 +1980,7 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
 		version_copy(gl_version, &parse_results->gl_version);
 	} else {
 		assert(!parse_results->found_glsl || !parse_results->glsl_version.es);
-		version_init(gl_version, VERSION_GL, false, false, 10);
+		version_init(gl_version, VERSION_GL, false, false, false, 10);
 	}
 
 	if (gl_version->es)
@@ -2011,7 +2032,8 @@ get_required_config(const char *script_name, bool force_spirv,
 	if (required_gl_version.es) {
 		config->supports_gl_es_version = required_gl_version.num;
 	} else if (required_gl_version.num >= 31) {
-		config->supports_gl_core_version = required_gl_version.num;
+		if (!required_gl_version.compat)
+			config->supports_gl_core_version = required_gl_version.num;
 		if (!required_gl_version.core)
 			config->supports_gl_compat_version = required_gl_version.num;
 	} else {
@@ -2601,6 +2623,46 @@ set_uniform(const char *line, struct block_info block_data)
 	}
 
 	printf("unknown uniform type \"%s\"\n", type);
+	piglit_report_result(PIGLIT_FAIL);
+
+	return;
+}
+
+static void
+set_vertex_attrib(const char *line)
+{
+	char name[512], type[512];
+	uint32_t uints[16];
+	GLint loc;
+
+	REQUIRE(parse_word_copy(line, type, sizeof(type), &line) &&
+		parse_word_copy(line, name, sizeof(name), &line),
+		"Invalid set vertex attrib command at: %s\n", line);
+
+	if (isdigit(name[0])) {
+		loc = strtol(name, NULL, 0);
+	} else {
+		GLuint prog;
+
+		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
+		loc = glGetAttribLocation(prog, name);
+		if (loc < 0) {
+			printf("cannot get location of vertex attrib \"%s\"\n",
+			       name);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+        }
+
+	if (parse_str(type, "handle", NULL)) {
+		check_unsigned_support();
+		check_texture_handle_support();
+		parse_uints(line, uints, 1, NULL);
+		glVertexAttribL1ui64ARB(loc, get_resident_handle(uints[0])->handle);
+		return;
+	}
+
+	printf("unknown vertex attrib type \"%s\"\n", type);
+	printf("use [vertex data] instead if possible\n");
 	piglit_report_result(PIGLIT_FAIL);
 
 	return;
@@ -3502,6 +3564,26 @@ draw_arrays_common(int first, size_t count)
 	return result;
 }
 
+static enum piglit_result
+draw_elements_common(int basevertex, int count)
+{
+	enum piglit_result result = program_must_be_in_use();
+	if (basevertex < 0) {
+		printf("draw elements 'basevertex' must be >= 0\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	if (count <= 0) {
+		printf("draw elements 'count' must be > 0\n");
+		piglit_report_result(PIGLIT_FAIL);
+	} else if (count > num_elements) {
+		printf("draw elements cannot draw beyond %lu\n",
+			(unsigned long) num_elements);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	bind_vao_if_supported();
+	return result;
+}
+
 static bool
 probe_atomic_counter(unsigned buffer_num, GLint counter_num, const char *op,
 		     uint32_t value, bool layout_params)
@@ -3767,12 +3849,35 @@ piglit_display(void)
 			size_t primcount = (size_t) z;
 			draw_arrays_common(first, count);
 			glDrawArraysInstanced(mode, first, count, primcount);
+		} else if (sscanf(line, "draw arrays instanced base %31s %d %d %d %d", s, &x, &y, &z, &w) == 5) {
+			GLenum mode = decode_drawing_mode(s);
+			int first = x;
+			size_t count = (size_t) y;
+			size_t primcount = (size_t) z;
+			GLuint baseinstance = (GLuint) w;
+			draw_arrays_common(first, count);
+			glDrawArraysInstancedBaseInstance(mode, first, count,
+							  primcount,
+							  baseinstance);
 		} else if (sscanf(line, "draw arrays %31s %d %d", s, &x, &y) == 3) {
 			GLenum mode = decode_drawing_mode(s);
 			int first = x;
 			size_t count = (size_t) y;
 			result = draw_arrays_common(first, count);
 			glDrawArrays(mode, first, count);
+		} else if (sscanf(line, "draw elements %31s %d %d", s, &x, &y) == 3) {
+			GLenum mode = decode_drawing_mode(s);
+			size_t count = (size_t) x;
+			int basevertex = y;
+			result = draw_elements_common(basevertex, count);
+			if (basevertex > 0) {
+				glDrawElementsBaseVertex(mode, count,
+							 GL_UNSIGNED_SHORT,
+							 NULL, basevertex);
+			} else {
+				glDrawElements(mode, count,
+					       GL_UNSIGNED_SHORT, NULL);
+			}
 		} else if (parse_str(line, "disable ", &rest)) {
 			do_enable_disable(rest, false);
 		} else if (parse_str(line, "enable ", &rest)) {
@@ -4520,6 +4625,8 @@ piglit_display(void)
 			active_uniform(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
 			active_program_interface(rest, block_data);
+		} else if (parse_str(line, "vertex attrib ", &rest)) {
+			set_vertex_attrib(rest);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
@@ -4569,6 +4676,18 @@ piglit_display(void)
 	return full_result;
 }
 
+static void
+setup_elements_buffer(void)
+{
+	GLuint buffer_handle;
+	glGenBuffers(1, &buffer_handle);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_handle);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		     num_elements * sizeof elements_buffer[0],
+		     elements_buffer,
+		     GL_STATIC_DRAW);
+}
+
 static enum piglit_result
 init_test(const char *file)
 {
@@ -4595,6 +4714,9 @@ init_test(const char *file)
 		num_vbo_rows = setup_vbo_from_text(prog, vertex_data_start,
 						   vertex_data_end);
 		vbo_present = true;
+
+		if (num_elements > 0)
+			setup_elements_buffer();
 	}
 	setup_ubos();
 	return PIGLIT_PASS;
@@ -4691,11 +4813,11 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL();
 
 	version_init(&gl_version, VERSION_GL,
-		     core,
+		     core, !core,
 	             piglit_is_gles(),
 	             piglit_get_gl_version());
 	piglit_get_glsl_version(&es, &major, &minor);
-	version_init(&glsl_version, VERSION_GLSL, core, es,
+	version_init(&glsl_version, VERSION_GLSL, core, !core, es,
 	             (major * 100) + minor);
 
 #ifdef PIGLIT_USE_OPENGL

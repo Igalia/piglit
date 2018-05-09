@@ -839,7 +839,8 @@ def get_ubo_binding(ubos, name):
             return ubo.binding
     return None
 
-def filter_shader_test(fin, fout,
+def filter_shader_test(config,
+                       fin, fout,
                        replacements,
                        uniform_map,
                        ubos,
@@ -877,7 +878,12 @@ def filter_shader_test(fin, fout,
                     fout.write('[' + groupname + ' spirv]\n')
                     fout.write('; Automatically generated from the GLSL by '
                                'shader_test_spirv.py. DO NOT EDIT\n')
-                    fout.write(replacement)
+                    if config.strip_names:
+                        for spirv_line in replacement.splitlines():
+                            if RE_spirv_name.match(spirv_line) is None and RE_spirv_member_name.match(spirv_line) is None:
+                                fout.write(spirv_line + '\n')
+                    else:
+                        fout.write(replacement)
                     fout.write('\n')
                     replacements[groupname] = ''
 
@@ -1066,6 +1072,11 @@ def process_shader_test(shader_test, config):
         else:
             shader_groups[-1].append(shader)
 
+    if (len(shader_groups) == 0):
+        if config.verbose:
+            print('There is no GLSL shader to convert (vertex/fragment program perhaps?)')
+        return 2
+
     replacements = {}
     uniform_map = {}
     ubos = []
@@ -1122,7 +1133,8 @@ def process_shader_test(shader_test, config):
               spv_shader_test_file)
     with open(spv_shader_test_file, 'w') as fout:
         with open(shader_test, 'r') as fin:
-            filter_shader_test(fin, fout,
+            filter_shader_test(config,
+                               fin, fout,
                                replacements,
                                uniform_map,
                                ubos,

@@ -1,0 +1,50 @@
+# Same as basic-imageStore.shader_test, but with some math on the handle
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_bindless_texture
+GL_ARB_shader_image_load_store
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 330
+#extension GL_ARB_bindless_texture: require
+#extension GL_ARB_shader_image_load_store: enable
+
+uniform vec4 color;
+layout (bindless_image) writeonly uniform image2D tex;
+uniform uvec2 handleOffset;
+out vec4 outcolor;
+
+void main()
+{
+	uvec2 handle = uvec2(tex);
+	handle.x -= 0x12345678u;
+	handle.y -= 0x9abcdef0u;
+
+	image2D fixedTex = image2D(handle + handleOffset);
+
+	imageStore(fixedTex, ivec2(gl_FragCoord.xy), color);
+	outcolor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+# Texture 0 is the imageStore output.
+texture rgbw 0 (16, 16) GL_RGBA8
+resident image texture 0 GL_RGBA8
+uniform handle tex 0
+uniform uvec2 handleOffset 0x12345678 0x9abcdef0
+
+# Texture 1 is the rendering output. We don't care about this.
+texture rgbw 1 (16, 16) GL_RGBA8
+
+# Store red using imageStore
+uniform vec4 color 1.0 0.0 0.0 1.0
+fb tex 2d 1
+draw rect -1 -1 2 2
+
+# Test the result of imageStore
+memory barrier GL_FRAMEBUFFER_BARRIER_BIT
+fb tex 2d 0
+probe all rgba 1.0 0.0 0.0 1.0

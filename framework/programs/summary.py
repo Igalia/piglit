@@ -147,6 +147,11 @@ def console(input_):
                            const="incomplete",
                            dest='mode',
                            help="Only display tests that are incomplete.")
+    excGroup1.add_argument("-p", "--problems",
+                           action="store_const",
+                           const="problems",
+                           dest='mode',
+                           help="Only display tests that had problems.")
     parser.add_argument("-l", "--list",
                         action="store",
                         help="Use test results from a list file")
