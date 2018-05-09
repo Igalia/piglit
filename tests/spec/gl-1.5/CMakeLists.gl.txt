@@ -8,6 +8,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (gl-1.5-get-array-attribs get-array-attribs.c)
 piglit_add_executable (gl-1.5-normal3b3s-invariance normal3b3s-invariance.c)
 piglit_add_executable (gl-1.5-vertex-buffer-offsets vertex-buffer-offsets.c)
 

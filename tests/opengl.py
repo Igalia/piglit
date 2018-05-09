@@ -802,6 +802,7 @@ with profile.test_list.group_manager(
     g(['draw-vertices', 'user'], 'draw-vertices-user')
     g(['isbufferobj'])
     g(['depth-tex-compare'])
+    g(['gl-1.5-get-array-attribs'])
     g(['gl-1.5-normal3b3s-invariance', 'GL_BYTE'],
       'normal3b3s-invariance-byte')
     g(['gl-1.5-normal3b3s-invariance', 'GL_SHORT'],
