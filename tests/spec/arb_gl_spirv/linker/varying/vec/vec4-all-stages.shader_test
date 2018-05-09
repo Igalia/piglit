@@ -1,0 +1,21 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader]
+#version 450 core
+
+[tessellation control shader]
+#version 450 core
+
+[tesselation evaluation shader]
+#version 450 core
+
+[geometry shader]
+#version 450 core
+
+[fragment shader]
+#version 450 core
+
