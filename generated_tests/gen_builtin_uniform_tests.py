@@ -386,7 +386,7 @@ class ShaderTest(object):
     def draw_command(self, test_num):
         x = (test_num % self.tests_per_row) * self.rect_width
         y = (test_num // self.tests_per_row) * self.rect_height
-        assert(y < self.test_rows)
+        assert(y + self.rect_height <= self.win_height)
         return 'draw rect ortho {0} {1} {2} {3}\n'.format(x, y,
                                                           self.rect_width,
                                                           self.rect_height)
@@ -662,7 +662,7 @@ class TessellationShaderTest(ShaderTest):
     def draw_command(self, test_num):
         x = (test_num % self.tests_per_row) * self.rect_width
         y = (test_num // self.tests_per_row) * self.rect_height
-        assert(y < self.test_rows)
+        assert(y + self.rect_height <= self.win_height)
         return 'draw rect ortho patch {0} {1} {2} {3}\n'.format(x, y,
                                                                 self.rect_width,
                                                                 self.rect_height)
