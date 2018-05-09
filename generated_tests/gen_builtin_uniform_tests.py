@@ -48,6 +48,7 @@ from __future__ import print_function, division, absolute_import
 from builtin_function import *
 import abc
 import numpy
+import math
 import optparse
 import os
 import os.path
@@ -357,15 +358,14 @@ class ShaderTest(object):
         # Size of the rectangles drawn by the test.
         self.rect_width = 4
         self.rect_height = 4
-        # shader_runner currently defaults to a 250x250 window.  We
-        # could reduce window size to cut test time, but there are
-        # platform-dependent limits we haven't really characterized
-        # (smaller on Linux than Windows, but still present in some
-        # window managers).
-        self.win_width = 250
-        self.win_height = 250
+
+        # Use a 256xN window.  Make it at least 160 pixels tall to avoid
+        # window manager issues with small window sizes (see comments in
+        # piglit_gl_test_config_init() for details).
+        self.win_width = 256
         self.tests_per_row = (self.win_width // self.rect_width)
-        self.test_rows = (self.win_height // self.rect_height)
+        self.test_rows = math.ceil(len(test_vectors) / self.tests_per_row)
+        self.win_height = max(self.test_rows * self.rect_height, 160)
 
         if use_if:
             self._comparator = BoolIfComparator(signature)
@@ -560,6 +560,7 @@ class ShaderTest(object):
         shader_test = '[require]\n'
         shader_test += 'GLSL >= {0:1.2f}\n'.format(
             float(self.glsl_version()) / 100)
+        shader_test += 'SIZE {0}x{1}'.format(self.win_width, self.win_height)
         for extension in self.extensions():
             shader_test += 'GL_{}\n'.format(extension)
         shader_test += self.make_additional_requirements()
