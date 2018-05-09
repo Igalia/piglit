@@ -68,8 +68,8 @@ piglit_generate_xml(glslparser glslparser gen-gl-gen-xml "" gen-gl-tests static-
 piglit_generate_xml(glslparser_arb_compat glslparser gen-gl-gen-xml "--glsl-arb-compat" gen-gl-tests static-glslparser-tests static-asmparser-tests)
 piglit_generate_xml(shader shader gen-gl-gen-xml "" gen-gl-tests static-shader-tests)
 piglit_generate_xml(quick_shader quick_shader gen-gl-gen-xml "" gen-gl-tests static-shader-tests)
-piglit_generate_xml(shader_multi shader gen-gl-gen-xml "--no-process-isolation" gen-gl-tests static-shader-tests)
-piglit_generate_xml(quick_shader_multi quick_shader gen-gl-gen-xml "--no-process-isolation" gen-gl-tests static-shader-tests)
+piglit_generate_xml(shader.no_isolation shader gen-gl-gen-xml "--no-process-isolation" gen-gl-tests static-shader-tests)
+piglit_generate_xml(quick_shader.no_isolation quick_shader gen-gl-gen-xml "--no-process-isolation" gen-gl-tests static-shader-tests)
 piglit_generate_xml(no_error no_error gen-gl-gen-xml "" gen-gl-tests static-shader-tests)
 
 add_custom_target(gen-cl-xml)
