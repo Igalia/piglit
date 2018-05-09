@@ -56,6 +56,7 @@ from framework.test.piglit_test import (
 )
 from framework.test.shader_test import ShaderTest, MultiShaderTest
 from framework.test.glsl_parser_test import GLSLParserTest
+from framework.options import OPTIONS
 
 __all__ = [
     'RegexFilter',
@@ -552,8 +553,22 @@ def load_test_profile(filename, python=None):
               module. If True, then only python is tried, if False then only
               XML is tried.
     """
-    name = os.path.splitext(os.path.basename(filename))[0]
+    name, ext = os.path.splitext(os.path.basename(filename))
+    if ext == '.no_isolation':
+        name = filename
+
     if not python:
+        # If process-isolation is false then try to load a profile named
+        # {name}.no_isolation instead. This is only valid for xml based
+        # profiles.
+        if ext != '.no_isolation' and not OPTIONS.process_isolation:
+            try:
+                return load_test_profile(name + '.no_isolation' + ext, python)
+            except exceptions.PiglitFatalError:
+                # There might not be a .no_isolation version, try to load the
+                # regular version in that case.
+                pass
+
         meta = os.path.join(ROOT_DIR, 'tests', name + '.meta.xml')
         if os.path.exists(meta):
             return MetaProfile(meta)
