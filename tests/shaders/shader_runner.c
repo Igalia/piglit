@@ -1728,6 +1728,7 @@ process_test_script(const char *script_name)
 	enum states state = none;
 	const char *line = text;
 	enum piglit_result result;
+	bool test_really_contains_spirv = false;
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
@@ -1770,6 +1771,7 @@ process_test_script(const char *script_name)
 				shader_string_size = strlen(shader_string);
 			} else if (parse_str(line, "[vertex shader spirv]", NULL)) {
 				state = vertex_shader_spirv;
+                                test_really_contains_spirv = true;
 				shader_string = NULL;
 			} else if (parse_str(line, "[vertex shader specializations]", NULL)) {
 				state = vertex_shader_specializations;
@@ -1778,6 +1780,7 @@ process_test_script(const char *script_name)
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation control shader spirv]", NULL)) {
 				state = tess_ctrl_shader_spirv;
+                                test_really_contains_spirv = true;
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation control shader specializations]", NULL)) {
 				state = tess_ctrl_shader_specializations;
@@ -1786,6 +1789,7 @@ process_test_script(const char *script_name)
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation evaluation shader spirv]", NULL)) {
 				state = tess_eval_shader_spirv;
+                                test_really_contains_spirv = true;
 				shader_string = NULL;
 			} else if (parse_str(line, "[tessellation evaluation shader specializations]", NULL)) {
 				state = tess_eval_shader_specializations;
@@ -1796,6 +1800,7 @@ process_test_script(const char *script_name)
 				state = geometry_shader_specializations;
 			} else if (parse_str(line, "[geometry shader spirv]", NULL)) {
 				state = geometry_shader_spirv;
+                                test_really_contains_spirv = true;
 				shader_string = NULL;
 			} else if (parse_str(line, "[geometry shader specializations]", NULL)) {
 				state = geometry_shader_specializations;
@@ -1812,6 +1817,7 @@ process_test_script(const char *script_name)
 				state = fragment_shader_specializations;
 			} else if (parse_str(line, "[fragment shader spirv]", NULL)) {
 				state = fragment_shader_spirv;
+                                test_really_contains_spirv = true;
 				shader_string = NULL;
 			} else if (parse_str(line, "[fragment shader specializations]", NULL)) {
 				state = fragment_shader_specializations;
@@ -1820,6 +1826,7 @@ process_test_script(const char *script_name)
 				shader_string = NULL;
 			} else if (parse_str(line, "[compute shader spirv]", NULL)) {
 				state = compute_shader_spirv;
+                                test_really_contains_spirv = true;
 				shader_string = NULL;
 			} else if (parse_str(line, "[compute shader specializations]", NULL)) {
 				state = compute_shader_specializations;
@@ -1833,6 +1840,15 @@ process_test_script(const char *script_name)
 				test_start_line_num = line_num + 1;
 				if (test_start[0] != '\0')
 					test_start++;
+
+				if (!test_really_contains_spirv &&
+					spirv_replaces_glsl) {
+					fprintf(stderr, "SPIRV YES/ONLY test, but"
+						" spirv section was not found.\n");
+
+					return PIGLIT_FAIL;
+				}
+
 				return PIGLIT_PASS;
 			} else {
 				fprintf(stderr,
@@ -1911,6 +1927,14 @@ process_test_script(const char *script_name)
 
 		line_num++;
 	}
+
+	if (!test_really_contains_spirv &&
+	    spirv_replaces_glsl) {
+		fprintf(stderr, "SPIRV YES/ONLY test, but"
+			" spirv section was not found.\n");
+
+		return PIGLIT_FAIL;
+	 }
 
 	return leave_state(state, line, script_name);
 }
