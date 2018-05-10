@@ -73,5 +73,7 @@ uniform vec4 11 0.4 0.5 0.6 0.7
 uniform vec4 12 0.8 0.9 1.0 1.1
 uniform vec4 13 0.1 0.2 0.3 0.4
 
+verify program_query GL_ACTIVE_UNIFORMS 2
+
 draw rect -1 -1 1 1
 relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (0.1, 0.3, 0.5)
