@@ -198,6 +198,7 @@ uniform uint 0 5
 uniform uint 1 10
 uniform uint 2 14
 
+verify program_query GL_ACTIVE_UNIFORMS 3
 # Check original values for the atomic counters
 
 probe atomic counter buffer 0 0 == 0
