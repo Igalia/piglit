@@ -120,5 +120,7 @@ clear
 
 uniform vec4 0 0.0 1.0 0.0 1.0
 
+verify program_query GL_ACTIVE_UNIFORMS 1
+
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
