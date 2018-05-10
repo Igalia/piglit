@@ -187,6 +187,8 @@ atomic counter 0 1 3
 atomic counter 0 2 5
 atomic counter 0 3 7
 
+verify program_query GL_ACTIVE_UNIFORMS 8
+
 draw rect -1 -1 2 2
 
 probe atomic counter 0 == 1

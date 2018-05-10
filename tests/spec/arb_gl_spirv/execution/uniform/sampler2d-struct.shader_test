@@ -92,6 +92,8 @@ clear
 uniform int 0 3
 uniform float 1 0.45
 
+verify program_query GL_ACTIVE_UNIFORMS 2
+
 texture checkerboard 3 0 (32, 32) (0.0, 0.5, 0.0, 0.0) (0.8, 0.0, 0.0, 1.0)
 
 draw rect -1 -1 2 2
