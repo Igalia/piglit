@@ -2660,6 +2660,84 @@ set_subroutine_uniform(const char *line)
 }
 
 /**
+ * Query values from current program using glGetProgram.
+ *
+ * Format of the command:
+ *   verify program_query GL_PNAME_ENUM integer
+ *
+ * or
+ *
+ *   verify program_query GL_PNAME_ENUM <enum>
+ *
+ * Note: GL_COMPUTE_WORK_GROUP_SIZE is not supported, as is the only
+ * query that requires a params with more than one component, and we
+ * want to keep things simple.
+ *
+ */
+static void
+verify_program_query(const char *line)
+{
+	static const struct string_to_enum all_pnames[] = {
+		ENUM_STRING(GL_DELETE_STATUS),
+		ENUM_STRING(GL_LINK_STATUS),
+		ENUM_STRING(GL_VALIDATE_STATUS),
+		ENUM_STRING(GL_INFO_LOG_LENGTH),
+		ENUM_STRING(GL_ATTACHED_SHADERS),
+		ENUM_STRING(GL_ACTIVE_ATOMIC_COUNTER_BUFFERS),
+		ENUM_STRING(GL_ACTIVE_ATTRIBUTES),
+		ENUM_STRING(GL_ACTIVE_ATTRIBUTE_MAX_LENGTH),
+		ENUM_STRING(GL_ACTIVE_UNIFORMS),
+		ENUM_STRING(GL_ACTIVE_UNIFORM_BLOCKS),
+		ENUM_STRING(GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH),
+		ENUM_STRING(GL_ACTIVE_UNIFORM_MAX_LENGTH),
+		ENUM_STRING(GL_COMPUTE_WORK_GROUP_SIZE),
+		ENUM_STRING(GL_PROGRAM_BINARY_LENGTH),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_BUFFER_MODE),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYINGS),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH),
+		ENUM_STRING(GL_GEOMETRY_VERTICES_OUT),
+		ENUM_STRING(GL_GEOMETRY_INPUT_TYPE),
+		ENUM_STRING(GL_GEOMETRY_OUTPUT_TYPE),
+		{ NULL, 0 }
+	};
+
+	static const struct string_to_enum all_possible_param_enums[] = {
+		ENUM_STRING(GL_TRUE),
+		ENUM_STRING(GL_FALSE),
+		ENUM_STRING(GL_SEPARATE_ATTRIBS),
+		ENUM_STRING(GL_INTERLEAVED_ATTRIBS),
+		ENUM_STRING(GL_POINTS),
+		ENUM_STRING(GL_LINES),
+		ENUM_STRING(GL_LINES_ADJACENCY),
+		ENUM_STRING(GL_TRIANGLES),
+		ENUM_STRING(GL_TRIANGLES_ADJACENCY),
+		ENUM_STRING(GL_LINE_STRIP),
+		ENUM_STRING(GL_TRIANGLE_STRIP),
+		{ NULL, 0 }
+	};
+
+	unsigned pname;
+	int expected;
+	int value;
+
+	REQUIRE(parse_enum_tab(all_pnames, line,
+			       &pname, &line),
+		"Bad glGetProgram pname at: %s\n", line);
+
+	REQUIRE(parse_enum_tab(all_possible_param_enums, line, (unsigned *)&expected, &line) ||
+		parse_int(line, &expected, &line),
+		"Bad expected value at: %s\n", line);
+
+	glGetProgramiv(prog, pname, &value);
+
+	if (expected != value) {
+		fprintf(stderr, "glGetProgram(%s): expected %d, got %d\n",
+			piglit_get_gl_enum_name(pname), expected, value);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
+/**
  * Query a uniform using glGetActiveUniformsiv
  *
  * Format of the command:
@@ -4396,6 +4474,8 @@ piglit_display(void)
 			parse_ints(rest, &ubo_array_index, 1, NULL);
 		} else if (parse_str(line, "active uniform ", &rest)) {
 			active_uniform(rest);
+		} else if (parse_str(line, "verify program_query", &rest)) {
+                        verify_program_query(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
 			active_program_interface(rest);
 		} else if (parse_str(line, "vertex attrib ", &rest)) {
