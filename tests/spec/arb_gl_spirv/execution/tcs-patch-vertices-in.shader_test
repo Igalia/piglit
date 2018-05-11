@@ -1,0 +1,373 @@
+# A simple test that gl_PatchVerticesIn has the right value.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[tessellation control shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 67
+; Schema: 0
+               OpCapability Tessellation
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint TessellationControl %main "main" %gl_out %gl_InvocationID %gl_in %gl_TessLevelOuter %gl_TessLevelInner %gl_PatchVerticesIn %color_out
+               OpExecutionMode %main OutputVertices 3
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %gl_out "gl_out"
+               OpName %gl_InvocationID "gl_InvocationID"
+               OpName %gl_PerVertex_0 "gl_PerVertex"
+               OpMemberName %gl_PerVertex_0 0 "gl_Position"
+               OpMemberName %gl_PerVertex_0 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex_0 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex_0 3 "gl_CullDistance"
+               OpName %gl_in "gl_in"
+               OpName %gl_TessLevelOuter "gl_TessLevelOuter"
+               OpName %gl_TessLevelInner "gl_TessLevelInner"
+               OpName %gl_PatchVerticesIn "gl_PatchVerticesIn"
+               OpName %expected "expected"
+               OpName %color_out "color_out"
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %gl_InvocationID BuiltIn InvocationId
+               OpMemberDecorate %gl_PerVertex_0 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex_0 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex_0 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex_0 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex_0 Block
+               OpDecorate %gl_TessLevelOuter Patch
+               OpDecorate %gl_TessLevelOuter BuiltIn TessLevelOuter
+               OpDecorate %gl_TessLevelInner Patch
+               OpDecorate %gl_TessLevelInner BuiltIn TessLevelInner
+               OpDecorate %gl_PatchVerticesIn BuiltIn PatchVertices
+               OpDecorate %expected Location 0
+               OpDecorate %expected DescriptorSet 0
+               OpDecorate %expected Binding 0
+               OpDecorate %color_out Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+     %uint_3 = OpConstant %uint 3
+%_arr_gl_PerVertex_uint_3 = OpTypeArray %gl_PerVertex %uint_3
+%_ptr_Output__arr_gl_PerVertex_uint_3 = OpTypePointer Output %_arr_gl_PerVertex_uint_3
+     %gl_out = OpVariable %_ptr_Output__arr_gl_PerVertex_uint_3 Output
+        %int = OpTypeInt 32 1
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_InvocationID = OpVariable %_ptr_Input_int Input
+      %int_0 = OpConstant %int 0
+%gl_PerVertex_0 = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+    %uint_32 = OpConstant %uint 32
+%_arr_gl_PerVertex_0_uint_32 = OpTypeArray %gl_PerVertex_0 %uint_32
+%_ptr_Input__arr_gl_PerVertex_0_uint_32 = OpTypePointer Input %_arr_gl_PerVertex_0_uint_32
+      %gl_in = OpVariable %_ptr_Input__arr_gl_PerVertex_0_uint_32 Input
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+     %uint_4 = OpConstant %uint 4
+%_arr_float_uint_4 = OpTypeArray %float %uint_4
+%_ptr_Output__arr_float_uint_4 = OpTypePointer Output %_arr_float_uint_4
+%gl_TessLevelOuter = OpVariable %_ptr_Output__arr_float_uint_4 Output
+    %float_1 = OpConstant %float 1
+         %37 = OpConstantComposite %_arr_float_uint_4 %float_1 %float_1 %float_1 %float_1
+     %uint_2 = OpConstant %uint 2
+%_arr_float_uint_2 = OpTypeArray %float %uint_2
+%_ptr_Output__arr_float_uint_2 = OpTypePointer Output %_arr_float_uint_2
+%gl_TessLevelInner = OpVariable %_ptr_Output__arr_float_uint_2 Output
+         %42 = OpConstantComposite %_arr_float_uint_2 %float_1 %float_1
+%gl_PatchVerticesIn = OpVariable %_ptr_Input_int Input
+%_ptr_UniformConstant_int = OpTypePointer UniformConstant %int
+   %expected = OpVariable %_ptr_UniformConstant_int UniformConstant
+       %bool = OpTypeBool
+%_arr_v4float_uint_3 = OpTypeArray %v4float %uint_3
+%_ptr_Output__arr_v4float_uint_3 = OpTypePointer Output %_arr_v4float_uint_3
+  %color_out = OpVariable %_ptr_Output__arr_v4float_uint_3 Output
+    %float_0 = OpConstant %float 0
+         %57 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+  %float_255 = OpConstant %float 255
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %19 = OpLoad %int %gl_InvocationID
+         %26 = OpLoad %int %gl_InvocationID
+         %28 = OpAccessChain %_ptr_Input_v4float %gl_in %26 %int_0
+         %29 = OpLoad %v4float %28
+         %31 = OpAccessChain %_ptr_Output_v4float %gl_out %19 %int_0
+               OpStore %31 %29
+               OpStore %gl_TessLevelOuter %37
+               OpStore %gl_TessLevelInner %42
+         %44 = OpLoad %int %gl_PatchVerticesIn
+         %47 = OpLoad %int %expected
+         %49 = OpIEqual %bool %44 %47
+               OpSelectionMerge %51 None
+               OpBranchConditional %49 %50 %59
+         %50 = OpLabel
+         %55 = OpLoad %int %gl_InvocationID
+         %58 = OpAccessChain %_ptr_Output_v4float %color_out %55
+               OpStore %58 %57
+               OpBranch %51
+         %59 = OpLabel
+         %60 = OpLoad %int %gl_InvocationID
+         %61 = OpLoad %int %gl_PatchVerticesIn
+         %62 = OpConvertSToF %float %61
+         %64 = OpFDiv %float %62 %float_255
+         %65 = OpCompositeConstruct %v4float %float_1 %float_0 %64 %float_1
+         %66 = OpAccessChain %_ptr_Output_v4float %color_out %60
+               OpStore %66 %65
+               OpBranch %51
+         %51 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[tessellation control shader]
+#version 450
+
+layout(vertices = 3) out;
+layout(location = 0) uniform int expected;
+layout(location = 0) out vec4 color_out[];
+
+void
+main()
+{
+        gl_out[gl_InvocationID].gl_Position =
+                gl_in[gl_InvocationID].gl_Position;
+        gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
+        gl_TessLevelInner = float[2](1.0, 1.0);
+
+        if (gl_PatchVerticesIn == expected) {
+                color_out[gl_InvocationID] = vec4(0.0, 1.0, 0.0, 1.0);
+        } else {
+                color_out[gl_InvocationID] =
+                        vec4(1.0, 0.0, gl_PatchVerticesIn / 255.0, 1.0);
+        }
+}
+
+[tessellation evaluation shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 70
+; Schema: 0
+               OpCapability Tessellation
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint TessellationEvaluation %main "main" %color_out %color_in %gl_TessCoord %_ %gl_in
+               OpExecutionMode %main Triangles
+               OpExecutionMode %main SpacingEqual
+               OpExecutionMode %main VertexOrderCcw
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color_out "color_out"
+               OpName %color_in "color_in"
+               OpName %gl_TessCoord "gl_TessCoord"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %_ ""
+               OpName %gl_PerVertex_0 "gl_PerVertex"
+               OpMemberName %gl_PerVertex_0 0 "gl_Position"
+               OpMemberName %gl_PerVertex_0 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex_0 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex_0 3 "gl_CullDistance"
+               OpName %gl_in "gl_in"
+               OpDecorate %color_out Location 0
+               OpDecorate %color_in Location 0
+               OpDecorate %gl_TessCoord BuiltIn TessCoord
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpMemberDecorate %gl_PerVertex_0 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex_0 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex_0 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex_0 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex_0 Block
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %color_out = OpVariable %_ptr_Output_v4float Output
+       %uint = OpTypeInt 32 0
+    %uint_32 = OpConstant %uint 32
+%_arr_v4float_uint_32 = OpTypeArray %v4float %uint_32
+%_ptr_Input__arr_v4float_uint_32 = OpTypePointer Input %_arr_v4float_uint_32
+   %color_in = OpVariable %_ptr_Input__arr_v4float_uint_32 Input
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+    %v3float = OpTypeVector %float 3
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+%gl_TessCoord = OpVariable %_ptr_Input_v3float Input
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_float = OpTypePointer Input %float
+      %int_1 = OpConstant %int 1
+     %uint_1 = OpConstant %uint 1
+      %int_2 = OpConstant %int 2
+     %uint_2 = OpConstant %uint 2
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+%gl_PerVertex_0 = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_arr_gl_PerVertex_0_uint_32 = OpTypeArray %gl_PerVertex_0 %uint_32
+%_ptr_Input__arr_gl_PerVertex_0_uint_32 = OpTypePointer Input %_arr_gl_PerVertex_0_uint_32
+      %gl_in = OpVariable %_ptr_Input__arr_gl_PerVertex_0_uint_32 Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %18 = OpAccessChain %_ptr_Input_v4float %color_in %int_0
+         %19 = OpLoad %v4float %18
+         %25 = OpAccessChain %_ptr_Input_float %gl_TessCoord %uint_0
+         %26 = OpLoad %float %25
+         %27 = OpVectorTimesScalar %v4float %19 %26
+         %29 = OpAccessChain %_ptr_Input_v4float %color_in %int_1
+         %30 = OpLoad %v4float %29
+         %32 = OpAccessChain %_ptr_Input_float %gl_TessCoord %uint_1
+         %33 = OpLoad %float %32
+         %34 = OpVectorTimesScalar %v4float %30 %33
+         %35 = OpFAdd %v4float %27 %34
+         %37 = OpAccessChain %_ptr_Input_v4float %color_in %int_2
+         %38 = OpLoad %v4float %37
+         %40 = OpAccessChain %_ptr_Input_float %gl_TessCoord %uint_2
+         %41 = OpLoad %float %40
+         %42 = OpVectorTimesScalar %v4float %38 %41
+         %43 = OpFAdd %v4float %35 %42
+               OpStore %color_out %43
+         %52 = OpAccessChain %_ptr_Input_v4float %gl_in %int_0 %int_0
+         %53 = OpLoad %v4float %52
+         %54 = OpAccessChain %_ptr_Input_float %gl_TessCoord %uint_0
+         %55 = OpLoad %float %54
+         %56 = OpVectorTimesScalar %v4float %53 %55
+         %57 = OpAccessChain %_ptr_Input_v4float %gl_in %int_1 %int_0
+         %58 = OpLoad %v4float %57
+         %59 = OpAccessChain %_ptr_Input_float %gl_TessCoord %uint_1
+         %60 = OpLoad %float %59
+         %61 = OpVectorTimesScalar %v4float %58 %60
+         %62 = OpFAdd %v4float %56 %61
+         %63 = OpAccessChain %_ptr_Input_v4float %gl_in %int_2 %int_0
+         %64 = OpLoad %v4float %63
+         %65 = OpAccessChain %_ptr_Input_float %gl_TessCoord %uint_2
+         %66 = OpLoad %float %65
+         %67 = OpVectorTimesScalar %v4float %64 %66
+         %68 = OpFAdd %v4float %62 %67
+         %69 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %69 %68
+               OpReturn
+               OpFunctionEnd
+
+[tessellation evaluation shader]
+#version 450
+
+layout(triangles, equal_spacing) in;
+
+layout(location = 0) in vec4 color_in[];
+layout(location = 0) out vec4 color_out;
+
+void
+main()
+{
+        color_out = (color_in[0] * gl_TessCoord[0] +
+                     color_in[1] * gl_TessCoord[1] +
+                     color_in[2] * gl_TessCoord[2]);
+        gl_Position = (gl_in[0].gl_Position * gl_TessCoord[0] +
+                       gl_in[1].gl_Position * gl_TessCoord[1] +
+                       gl_in[2].gl_Position * gl_TessCoord[2]);
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 13
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color_out %color_in
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color_out "color_out"
+               OpName %color_in "color_in"
+               OpDecorate %color_out Location 0
+               OpDecorate %color_in Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %color_out = OpVariable %_ptr_Output_v4float Output
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+   %color_in = OpVariable %_ptr_Input_v4float Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpLoad %v4float %color_in
+               OpStore %color_out %12
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(location = 0) in vec4 color_in;
+layout(location = 0) out vec4 color_out;
+
+void
+main()
+{
+        color_out = color_in;
+}
+
+[vertex data]
+0/float/vec2
+-1 -1
+0 -1
+-1 1
+-1 1
+0 -1
+0 1
+0 -1
+1 -1
+0 1
+0 0
+0 1
+1 -1
+1 1
+0 0
+
+[test]
+clear color 0.9 0.0 0.0 0.0
+clear
+
+uniform int 0 3
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+
+uniform int 0 4
+patch parameter vertices 4
+draw arrays GL_PATCHES 6 8
+
+probe all rgba 0.0 1.0 0.0 1.0
