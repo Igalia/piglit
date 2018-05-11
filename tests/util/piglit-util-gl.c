@@ -1894,6 +1894,109 @@ piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
 	return 1;
 }
 
+static GLuint
+create_fbo_from_texture(GLenum target, GLint texture, GLint level, GLint layer)
+{
+	GLuint fbo;
+
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	if (layer > 0) {
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+					  texture, level, layer);
+	} else {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				       target, texture, level);
+	}
+
+	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
+	       GL_FRAMEBUFFER_COMPLETE);
+	return fbo;
+}
+
+static GLenum
+binding_from_target(GLenum target)
+{
+	switch (target)	{
+	case GL_TEXTURE_2D:
+		return GL_TEXTURE_BINDING_2D;
+	case GL_TEXTURE_2D_ARRAY:
+		return GL_TEXTURE_BINDING_2D_ARRAY;
+	default:
+		fprintf(stderr, "%s: unsupported target 0x%x\n",
+			__func__, target);
+		return 0;
+	}
+}
+
+/**
+ * Read texels in OpenGL ES compatible way.
+ *
+ * Currently bound texture is attached to a framebuffer object and
+ * contents are read using glReadPixels. Supported targets are
+ * GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY.
+ */
+static GLfloat *
+read_texture_via_fbo(int target, int level, int x, int y, int layer, int w,
+		     int h)
+{
+	GLint width, height, depth;
+	GLint current_read_fbo, current_draw_fbo, current_texture;
+	GLenum binding = binding_from_target(target);
+	unsigned char *buf;
+	GLfloat *buffer;
+	unsigned offset;
+
+	assert(binding != 0);
+
+	glGetIntegerv(binding, &current_texture);
+	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &current_read_fbo);
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_draw_fbo);
+
+	assert(target == GL_TEXTURE_2D || target == GL_TEXTURE_2D_ARRAY);
+
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH, &width);
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT, &height);
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_DEPTH, &depth);
+
+	/* Depth equals 1 in case of GL_TEXTURE_2D, in case of
+	 * GL_TEXTURE_2D_ARRAY we allocate space for many layers.
+	 */
+	buffer = malloc(width * height * depth * 4 * sizeof(GLfloat));
+	buf = malloc(width * height * depth * 4 * sizeof(unsigned char));
+
+	/* Read all layers. */
+	for (int i = layer; i >= 0; i--) {
+		GLuint fbo =
+			create_fbo_from_texture(target, current_texture, level,
+						i);
+		assert(fbo != 0);
+
+		/* Offset to the layer we are expected to read. Note, in case
+		 * of GL_TEXTURE_2D, offset will be always 0 as i equals 0.
+		 */
+		offset = i * (width * height * 4);
+		glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
+			     buf + offset);
+
+		glDeleteFramebuffers(1, &fbo);
+	}
+
+	/* Convert the result, callers expect floating point. */
+	for (unsigned k = 0; k < (layer + 1) * width * height * 4; k++)
+		buffer[k] = ((float) buf[k]) / 255.0;
+
+	free(buf);
+
+	/* Restore FBO state. */
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, current_read_fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_draw_fbo);
+
+	return buffer;
+}
+
+
 /**
  * Read a texel rectangle from the given location and compare its RGB value to
  * the given expected values.
@@ -1969,10 +2072,18 @@ int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
 
 	glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH, &width);
 	glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT, &height);
-	buffer = malloc(width * height * 4 * sizeof(GLfloat));
 
-	glGetTexImage(target, level, GL_RGBA, GL_FLOAT, buffer);
-
+#ifndef PIGLIT_USE_OPENGL
+	if (target == GL_TEXTURE_2D) {
+		buffer = read_texture_via_fbo(target, level, x, y, 0, w, h);
+	} else {
+#else
+		buffer = malloc(width * height * 4 * sizeof(GLfloat));
+		glGetTexImage(target, level, GL_RGBA, GL_FLOAT, buffer);
+#endif
+#ifndef PIGLIT_USE_OPENGL
+	}
+#endif
 	assert(x >= 0);
 	assert(y >= 0);
 	assert(x+w <= width);
@@ -2033,10 +2144,18 @@ int piglit_probe_texel_volume_rgba(int target, int level, int x, int y, int z,
 	glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH, &width);
 	glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT, &height);
 	glGetTexLevelParameteriv(target, level, GL_TEXTURE_DEPTH, &depth);
-	buffer = malloc(width * height * depth * 4 * sizeof(GLfloat));
 
-	glGetTexImage(target, level, GL_RGBA, GL_FLOAT, buffer);
-
+#ifndef PIGLIT_USE_OPENGL
+	if (target == GL_TEXTURE_2D_ARRAY) {
+		buffer = read_texture_via_fbo(target, level, x, y, z, w, h);
+	} else {
+#else
+		buffer = malloc(width * height * depth * 4 * sizeof(GLfloat));
+		glGetTexImage(target, level, GL_RGBA, GL_FLOAT, buffer);
+#endif
+#ifndef PIGLIT_USE_OPENGL
+	}
+#endif
 	assert(x >= 0);
 	assert(y >= 0);
 	assert(d >= 0);
