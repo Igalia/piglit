@@ -94,6 +94,9 @@ if(PIGLIT_USE_WAFFLE)
 		list(APPEND UTIL_GL_SOURCES
 			piglit-framework-gl/piglit_wl_framework.c
 		)
+		list(APPEND UTIL_GL_INCLUDES
+			${WAYLAND_wayland-client_INCLUDEDIR}
+		)
 	endif()
 	if(PIGLIT_HAS_X11)
 		list(APPEND UTIL_GL_SOURCES
