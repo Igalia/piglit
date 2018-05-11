@@ -1,5 +1,9 @@
 link_libraries(piglitutil_${piglit_target_api})
 
+piglit_add_executable(arb_texture_view-clear-into-view-2d-array_gles3 clear-into-view-2d-array.c common.c)
+piglit_add_executable(arb_texture_view-clear-into-view-2d_gles3 clear-into-view-2d.c common.c)
+piglit_add_executable(arb_texture_view-clear-into-view-layered_gles3 clear-into-view-layered.c common.c)
+piglit_add_executable(arb_texture_view-copytexsubimage-layers_gles3 copytexsubimage-layers.c common.c)
 piglit_add_executable(arb_texture_view-rendering-formats_gles3 rendering-formats.c)
 piglit_add_executable(arb_texture_view-rendering-layers_gles3 rendering_layers.c common.c)
 piglit_add_executable(arb_texture_view-rendering-levels_gles3 rendering_levels.c common.c)
@@ -10,4 +14,6 @@ piglit_add_executable(arb_texture_view-sampling-2d-array-as-cubemap-array_gles3 
 piglit_add_executable(arb_texture_view-formats_gles3 formats.c common.c)
 piglit_add_executable(arb_texture_view-queries_gles3 queries.c)
 piglit_add_executable(arb_texture_view-targets_gles3 targets.c common.c)
+piglit_add_executable(arb_texture_view-texsubimage-layers_gles3 texsubimage-layers.c common.c)
+piglit_add_executable(arb_texture_view-texsubimage-levels_gles3 texsubimage-levels.c common.c)
 piglit_add_executable(arb_texture_view-texture-immutable-levels_gles3 texture-immutable-levels.c)
