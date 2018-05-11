@@ -1,0 +1,262 @@
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[compute shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 86
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main"
+               OpExecutionMode %main LocalSize 1 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %uishared "uishared"
+               OpName %a0 "a0"
+               OpName %a1 "a1"
+               OpName %a2 "a2"
+               OpName %a3 "a3"
+               OpName %a4 "a4"
+               OpName %a5 "a5"
+               OpName %a6 "a6"
+               OpName %a7 "a7"
+               OpDecorate %a0 Offset 0
+               OpDecorate %a0 DescriptorSet 0
+               OpDecorate %a0 Binding 0
+               OpDecorate %a1 Offset 4
+               OpDecorate %a1 DescriptorSet 0
+               OpDecorate %a1 Binding 0
+               OpDecorate %a2 Offset 8
+               OpDecorate %a2 DescriptorSet 0
+               OpDecorate %a2 Binding 0
+               OpDecorate %a3 Offset 12
+               OpDecorate %a3 DescriptorSet 0
+               OpDecorate %a3 Binding 0
+               OpDecorate %a4 Offset 16
+               OpDecorate %a4 DescriptorSet 0
+               OpDecorate %a4 Binding 0
+               OpDecorate %a5 Offset 20
+               OpDecorate %a5 DescriptorSet 0
+               OpDecorate %a5 Binding 0
+               OpDecorate %a6 Offset 24
+               OpDecorate %a6 DescriptorSet 0
+               OpDecorate %a6 Binding 0
+               OpDecorate %a7 Offset 28
+               OpDecorate %a7 DescriptorSet 0
+               OpDecorate %a7 Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Workgroup_uint = OpTypePointer Workgroup %uint
+   %uishared = OpVariable %_ptr_Workgroup_uint Workgroup
+    %uint_10 = OpConstant %uint 10
+     %uint_1 = OpConstant %uint 1
+     %uint_0 = OpConstant %uint 0
+     %uint_2 = OpConstant %uint 2
+       %bool = OpTypeBool
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+         %a0 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+    %uint_15 = OpConstant %uint 15
+    %uint_12 = OpConstant %uint 12
+         %a1 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_3 = OpConstant %uint 3
+         %a2 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_6 = OpConstant %uint 6
+    %uint_11 = OpConstant %uint 11
+         %a3 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_4 = OpConstant %uint 4
+         %a4 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_5 = OpConstant %uint 5
+         %a5 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+         %a6 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+         %a7 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpAtomicExchange %uint %uishared %uint_1 %uint_0 %uint_10
+         %14 = OpAtomicIAdd %uint %uishared %uint_1 %uint_0 %uint_2
+         %16 = OpIEqual %bool %14 %uint_10
+               OpSelectionMerge %18 None
+               OpBranchConditional %16 %17 %18
+         %17 = OpLabel
+         %21 = OpAtomicIIncrement %uint %a0 %uint_1 %uint_0
+               OpBranch %18
+         %18 = OpLabel
+         %23 = OpAtomicUMin %uint %uishared %uint_1 %uint_0 %uint_15
+         %25 = OpIEqual %bool %23 %uint_12
+               OpSelectionMerge %27 None
+               OpBranchConditional %25 %26 %27
+         %26 = OpLabel
+         %29 = OpAtomicIIncrement %uint %a1 %uint_1 %uint_0
+               OpBranch %27
+         %27 = OpLabel
+         %31 = OpAtomicUMin %uint %uishared %uint_1 %uint_0 %uint_3
+         %32 = OpIEqual %bool %31 %uint_12
+               OpSelectionMerge %34 None
+               OpBranchConditional %32 %33 %34
+         %33 = OpLabel
+         %35 = OpAtomicIIncrement %uint %a1 %uint_1 %uint_0
+               OpBranch %34
+         %34 = OpLabel
+         %36 = OpAtomicUMax %uint %uishared %uint_1 %uint_0 %uint_1
+         %37 = OpIEqual %bool %36 %uint_3
+               OpSelectionMerge %39 None
+               OpBranchConditional %37 %38 %39
+         %38 = OpLabel
+         %41 = OpAtomicIIncrement %uint %a2 %uint_1 %uint_0
+               OpBranch %39
+         %39 = OpLabel
+         %43 = OpAtomicUMax %uint %uishared %uint_1 %uint_0 %uint_6
+         %44 = OpIEqual %bool %43 %uint_3
+               OpSelectionMerge %46 None
+               OpBranchConditional %44 %45 %46
+         %45 = OpLabel
+         %47 = OpAtomicIIncrement %uint %a2 %uint_1 %uint_0
+               OpBranch %46
+         %46 = OpLabel
+         %49 = OpAtomicAnd %uint %uishared %uint_1 %uint_0 %uint_11
+         %50 = OpIEqual %bool %49 %uint_6
+               OpSelectionMerge %52 None
+               OpBranchConditional %50 %51 %52
+         %51 = OpLabel
+         %54 = OpAtomicIIncrement %uint %a3 %uint_1 %uint_0
+               OpBranch %52
+         %52 = OpLabel
+         %56 = OpAtomicOr %uint %uishared %uint_1 %uint_0 %uint_4
+         %57 = OpIEqual %bool %56 %uint_2
+               OpSelectionMerge %59 None
+               OpBranchConditional %57 %58 %59
+         %58 = OpLabel
+         %61 = OpAtomicIIncrement %uint %a4 %uint_1 %uint_0
+               OpBranch %59
+         %59 = OpLabel
+         %63 = OpAtomicXor %uint %uishared %uint_1 %uint_0 %uint_5
+         %64 = OpIEqual %bool %63 %uint_6
+               OpSelectionMerge %66 None
+               OpBranchConditional %64 %65 %66
+         %65 = OpLabel
+         %68 = OpAtomicIIncrement %uint %a5 %uint_1 %uint_0
+               OpBranch %66
+         %66 = OpLabel
+         %69 = OpAtomicCompareExchange %uint %uishared %uint_1 %uint_0 %uint_0 %uint_4 %uint_3
+         %70 = OpIEqual %bool %69 %uint_3
+               OpSelectionMerge %72 None
+               OpBranchConditional %70 %71 %72
+         %71 = OpLabel
+         %74 = OpAtomicIIncrement %uint %a6 %uint_1 %uint_0
+               OpBranch %72
+         %72 = OpLabel
+         %75 = OpAtomicCompareExchange %uint %uishared %uint_1 %uint_0 %uint_0 %uint_5 %uint_3
+         %76 = OpIEqual %bool %75 %uint_4
+               OpSelectionMerge %78 None
+               OpBranchConditional %76 %77 %78
+         %77 = OpLabel
+         %79 = OpAtomicIIncrement %uint %a6 %uint_1 %uint_0
+               OpBranch %78
+         %78 = OpLabel
+         %80 = OpAtomicExchange %uint %uishared %uint_1 %uint_0 %uint_10
+         %81 = OpIEqual %bool %80 %uint_4
+               OpSelectionMerge %83 None
+               OpBranchConditional %81 %82 %83
+         %82 = OpLabel
+         %85 = OpAtomicIIncrement %uint %a7 %uint_1 %uint_0
+               OpBranch %83
+         %83 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 0) uniform atomic_uint a0;
+layout(binding = 0) uniform atomic_uint a1;
+layout(binding = 0) uniform atomic_uint a2;
+layout(binding = 0) uniform atomic_uint a3;
+layout(binding = 0) uniform atomic_uint a4;
+layout(binding = 0) uniform atomic_uint a5;
+layout(binding = 0) uniform atomic_uint a6;
+layout(binding = 0) uniform atomic_uint a7;
+
+shared uint uishared;
+
+void main()
+{
+    // uishared <- 10
+    atomicExchange(uishared, 10);
+
+    // uishared <- 12
+    if (atomicAdd(uishared, 2) == 10)
+       atomicCounterIncrement(a0);
+
+    // uishared <- 15
+    if (atomicMin(uishared, 15) == 12)
+       atomicCounterIncrement(a1);
+
+    // uishared <- 3
+    if (atomicMin(uishared, 3) == 12)
+       atomicCounterIncrement(a1);
+
+    // uishared <- 3
+    if (atomicMax(uishared, 1) == 3)
+       atomicCounterIncrement(a2);
+
+    // uishared <- 6
+    if (atomicMax(uishared, 6) == 3)
+       atomicCounterIncrement(a2);
+
+    // uishared <- 2
+    if (atomicAnd(uishared, 11) == 6)
+       atomicCounterIncrement(a3);
+
+    // uishared <- 6
+    if (atomicOr(uishared, 4) == 2)
+       atomicCounterIncrement(a4);
+
+    // uishared <- 3
+    if (atomicXor(uishared, 5) == 6)
+       atomicCounterIncrement(a5);
+
+    // uishared <- 4
+    if (atomicCompSwap(uishared, 3, 4) == 3)
+       atomicCounterIncrement(a6);
+
+    // uishared <- 4
+    if (atomicCompSwap(uishared, 3, 5) == 4)
+       atomicCounterIncrement(a6);
+
+    if (atomicExchange(uishared, 10) == 4)
+       atomicCounterIncrement(a7);
+}
+
+[test]
+atomic counters 8
+
+atomic counter 0 0 1
+atomic counter 0 1 3
+atomic counter 0 2 5
+atomic counter 0 3 7
+atomic counter 0 4 9
+atomic counter 0 5 11
+atomic counter 0 6 13
+atomic counter 0 7 15
+
+compute 1 1 1
+
+probe atomic counter 0 == 2
+probe atomic counter 1 == 5
+probe atomic counter 2 == 7
+probe atomic counter 3 == 8
+probe atomic counter 4 == 10
+probe atomic counter 5 == 12
+probe atomic counter 6 == 15
+probe atomic counter 7 == 16
+
