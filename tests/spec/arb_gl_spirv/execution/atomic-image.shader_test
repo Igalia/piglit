@@ -1,0 +1,425 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.5
+GL_ARB_gl_spirv
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 24
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %piglit_vertex %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %_ ""
+               OpName %piglit_vertex "piglit_vertex"
+               OpName %gl_VertexID "gl_VertexID"
+               OpName %gl_InstanceID "gl_InstanceID"
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %18 = OpLoad %v4float %piglit_vertex
+         %20 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %20 %18
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450
+in vec4 piglit_vertex;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 131
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color %gl_FragCoord
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color "color"
+               OpName %coord "coord"
+               OpName %gl_FragCoord "gl_FragCoord"
+               OpName %img "img"
+               OpName %a0 "a0"
+               OpName %a1 "a1"
+               OpName %a2 "a2"
+               OpName %a3 "a3"
+               OpName %a4 "a4"
+               OpName %a5 "a5"
+               OpName %a6 "a6"
+               OpName %a7 "a7"
+               OpDecorate %color Location 0
+               OpDecorate %gl_FragCoord BuiltIn FragCoord
+               OpDecorate %img Location 0
+               OpDecorate %img DescriptorSet 0
+               OpDecorate %img Binding 0
+               OpDecorate %img Coherent
+               OpDecorate %a0 Offset 0
+               OpDecorate %a0 DescriptorSet 0
+               OpDecorate %a0 Binding 0
+               OpDecorate %a1 Offset 4
+               OpDecorate %a1 DescriptorSet 0
+               OpDecorate %a1 Binding 0
+               OpDecorate %a2 Offset 8
+               OpDecorate %a2 DescriptorSet 0
+               OpDecorate %a2 Binding 0
+               OpDecorate %a3 Offset 12
+               OpDecorate %a3 DescriptorSet 0
+               OpDecorate %a3 Binding 0
+               OpDecorate %a4 Offset 16
+               OpDecorate %a4 DescriptorSet 0
+               OpDecorate %a4 Binding 0
+               OpDecorate %a5 Offset 20
+               OpDecorate %a5 DescriptorSet 0
+               OpDecorate %a5 Binding 0
+               OpDecorate %a6 Offset 24
+               OpDecorate %a6 DescriptorSet 0
+               OpDecorate %a6 Binding 0
+               OpDecorate %a7 Offset 28
+               OpDecorate %a7 DescriptorSet 0
+               OpDecorate %a7 Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %12 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+        %int = OpTypeInt 32 1
+      %v2int = OpTypeVector %int 2
+%_ptr_Function_v2int = OpTypePointer Function %v2int
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%gl_FragCoord = OpVariable %_ptr_Input_v4float Input
+    %v2float = OpTypeVector %float 2
+         %23 = OpTypeImage %int 2D 0 0 0 2 R32i
+%_ptr_UniformConstant_23 = OpTypePointer UniformConstant %23
+        %img = OpVariable %_ptr_UniformConstant_23 UniformConstant
+     %int_10 = OpConstant %int 10
+       %uint = OpTypeInt 32 0
+     %uint_0 = OpConstant %uint 0
+%_ptr_Image_int = OpTypePointer Image %int
+     %uint_1 = OpConstant %uint 1
+      %int_2 = OpConstant %int 2
+       %bool = OpTypeBool
+         %42 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+         %a0 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %int_15 = OpConstant %int 15
+     %int_12 = OpConstant %int 12
+         %a1 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+      %int_3 = OpConstant %int 3
+      %int_1 = OpConstant %int 1
+         %a2 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+      %int_6 = OpConstant %int 6
+     %int_11 = OpConstant %int 11
+         %a3 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+      %int_4 = OpConstant %int 4
+         %a4 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+      %int_5 = OpConstant %int 5
+         %a5 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+         %a6 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+         %a7 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %coord = OpVariable %_ptr_Function_v2int Function
+               OpStore %color %12
+         %20 = OpLoad %v4float %gl_FragCoord
+         %21 = OpVectorShuffle %v2float %20 %20 0 1
+         %22 = OpConvertFToS %v2int %21
+               OpStore %coord %22
+         %26 = OpLoad %v2int %coord
+         %31 = OpImageTexelPointer %_ptr_Image_int %img %26 %uint_0
+         %33 = OpAtomicExchange %int %31 %uint_1 %uint_0 %int_10
+         %34 = OpLoad %v2int %coord
+         %36 = OpImageTexelPointer %_ptr_Image_int %img %34 %uint_0
+         %37 = OpAtomicIAdd %int %36 %uint_1 %uint_0 %int_2
+         %39 = OpINotEqual %bool %37 %int_10
+               OpSelectionMerge %41 None
+               OpBranchConditional %39 %40 %41
+         %40 = OpLabel
+               OpStore %color %42
+         %45 = OpAtomicIIncrement %uint %a0 %uint_1 %uint_0
+               OpBranch %41
+         %41 = OpLabel
+         %46 = OpLoad %v2int %coord
+         %48 = OpImageTexelPointer %_ptr_Image_int %img %46 %uint_0
+         %49 = OpAtomicSMin %int %48 %uint_1 %uint_0 %int_15
+         %51 = OpINotEqual %bool %49 %int_12
+               OpSelectionMerge %53 None
+               OpBranchConditional %51 %52 %53
+         %52 = OpLabel
+               OpStore %color %42
+         %55 = OpAtomicIIncrement %uint %a1 %uint_1 %uint_0
+               OpBranch %53
+         %53 = OpLabel
+         %56 = OpLoad %v2int %coord
+         %58 = OpImageTexelPointer %_ptr_Image_int %img %56 %uint_0
+         %59 = OpAtomicSMin %int %58 %uint_1 %uint_0 %int_3
+         %60 = OpINotEqual %bool %59 %int_12
+               OpSelectionMerge %62 None
+               OpBranchConditional %60 %61 %62
+         %61 = OpLabel
+               OpStore %color %42
+         %63 = OpAtomicIIncrement %uint %a1 %uint_1 %uint_0
+               OpBranch %62
+         %62 = OpLabel
+         %64 = OpLoad %v2int %coord
+         %66 = OpImageTexelPointer %_ptr_Image_int %img %64 %uint_0
+         %67 = OpAtomicSMax %int %66 %uint_1 %uint_0 %int_1
+         %68 = OpINotEqual %bool %67 %int_3
+               OpSelectionMerge %70 None
+               OpBranchConditional %68 %69 %70
+         %69 = OpLabel
+               OpStore %color %42
+         %72 = OpAtomicIIncrement %uint %a2 %uint_1 %uint_0
+               OpBranch %70
+         %70 = OpLabel
+         %73 = OpLoad %v2int %coord
+         %75 = OpImageTexelPointer %_ptr_Image_int %img %73 %uint_0
+         %76 = OpAtomicSMax %int %75 %uint_1 %uint_0 %int_6
+         %77 = OpINotEqual %bool %76 %int_3
+               OpSelectionMerge %79 None
+               OpBranchConditional %77 %78 %79
+         %78 = OpLabel
+               OpStore %color %42
+         %80 = OpAtomicIIncrement %uint %a2 %uint_1 %uint_0
+               OpBranch %79
+         %79 = OpLabel
+         %81 = OpLoad %v2int %coord
+         %83 = OpImageTexelPointer %_ptr_Image_int %img %81 %uint_0
+         %84 = OpAtomicAnd %int %83 %uint_1 %uint_0 %int_11
+         %85 = OpINotEqual %bool %84 %int_6
+               OpSelectionMerge %87 None
+               OpBranchConditional %85 %86 %87
+         %86 = OpLabel
+               OpStore %color %42
+         %89 = OpAtomicIIncrement %uint %a3 %uint_1 %uint_0
+               OpBranch %87
+         %87 = OpLabel
+         %90 = OpLoad %v2int %coord
+         %92 = OpImageTexelPointer %_ptr_Image_int %img %90 %uint_0
+         %93 = OpAtomicOr %int %92 %uint_1 %uint_0 %int_4
+         %94 = OpINotEqual %bool %93 %int_2
+               OpSelectionMerge %96 None
+               OpBranchConditional %94 %95 %96
+         %95 = OpLabel
+               OpStore %color %42
+         %98 = OpAtomicIIncrement %uint %a4 %uint_1 %uint_0
+               OpBranch %96
+         %96 = OpLabel
+         %99 = OpLoad %v2int %coord
+        %101 = OpImageTexelPointer %_ptr_Image_int %img %99 %uint_0
+        %102 = OpAtomicXor %int %101 %uint_1 %uint_0 %int_5
+        %103 = OpINotEqual %bool %102 %int_6
+               OpSelectionMerge %105 None
+               OpBranchConditional %103 %104 %105
+        %104 = OpLabel
+               OpStore %color %42
+        %107 = OpAtomicIIncrement %uint %a5 %uint_1 %uint_0
+               OpBranch %105
+        %105 = OpLabel
+        %108 = OpLoad %v2int %coord
+        %109 = OpImageTexelPointer %_ptr_Image_int %img %108 %uint_0
+        %110 = OpAtomicCompareExchange %int %109 %uint_1 %uint_0 %uint_0 %int_4 %int_3
+        %111 = OpINotEqual %bool %110 %int_3
+               OpSelectionMerge %113 None
+               OpBranchConditional %111 %112 %113
+        %112 = OpLabel
+               OpStore %color %42
+        %115 = OpAtomicIIncrement %uint %a6 %uint_1 %uint_0
+               OpBranch %113
+        %113 = OpLabel
+        %116 = OpLoad %v2int %coord
+        %117 = OpImageTexelPointer %_ptr_Image_int %img %116 %uint_0
+        %118 = OpAtomicCompareExchange %int %117 %uint_1 %uint_0 %uint_0 %int_5 %int_3
+        %119 = OpINotEqual %bool %118 %int_4
+               OpSelectionMerge %121 None
+               OpBranchConditional %119 %120 %121
+        %120 = OpLabel
+               OpStore %color %42
+        %122 = OpAtomicIIncrement %uint %a6 %uint_1 %uint_0
+               OpBranch %121
+        %121 = OpLabel
+        %123 = OpLoad %v2int %coord
+        %124 = OpImageTexelPointer %_ptr_Image_int %img %123 %uint_0
+        %125 = OpAtomicExchange %int %124 %uint_1 %uint_0 %int_10
+        %126 = OpINotEqual %bool %125 %int_4
+               OpSelectionMerge %128 None
+               OpBranchConditional %126 %127 %128
+        %127 = OpLabel
+               OpStore %color %42
+        %130 = OpAtomicIIncrement %uint %a7 %uint_1 %uint_0
+               OpBranch %128
+        %128 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(r32i, binding = 0) coherent uniform iimage2D img;
+out vec4 color;
+
+layout(binding = 0) uniform atomic_uint a0;
+layout(binding = 0) uniform atomic_uint a1;
+layout(binding = 0) uniform atomic_uint a2;
+layout(binding = 0) uniform atomic_uint a3;
+layout(binding = 0) uniform atomic_uint a4;
+layout(binding = 0) uniform atomic_uint a5;
+layout(binding = 0) uniform atomic_uint a6;
+layout(binding = 0) uniform atomic_uint a7;
+
+void main()
+{
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+	ivec2 coord = ivec2(gl_FragCoord.xy);
+
+	// img <- 10
+	imageAtomicExchange(img, coord, 10);
+
+	// img <-12
+	if (imageAtomicAdd(img, coord, 2) != 10) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a0);
+	}
+
+        // img <-15
+	if (imageAtomicMin(img, coord, 15) != 12) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+           atomicCounterIncrement(a1);
+	}
+
+        // img <-3
+	if (imageAtomicMin(img, coord, 3) != 12) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+           atomicCounterIncrement(a1);
+	}
+
+        // img <-3
+	if (imageAtomicMax(img, coord, 1) != 3) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a2);
+	}
+
+	// img <-6
+	if (imageAtomicMax(img, coord, 6) != 3) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a2);
+	}
+
+        // img <-2
+	if (imageAtomicAnd(img, coord, 11) != 6) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a3);
+	}
+
+	// img <-6
+	if (imageAtomicOr(img, coord, 4) != 2) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a4);
+	}
+
+        // img <-3
+	if (imageAtomicXor(img, coord, 5) != 6) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a5);
+	}
+
+	// img <-4
+	if (imageAtomicCompSwap(img, coord, 3, 4) != 3) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a6);
+	}
+
+	// img <-4
+	if (imageAtomicCompSwap(img, coord, 3, 5) != 4) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a6);
+	}
+
+        if (imageAtomicExchange(img, coord, 10) != 4) {
+	   color = vec4(1.0, 0.0, 0.0, 1.0);
+	   atomicCounterIncrement(a7);
+	}
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+texture integer 0 (250, 250) (0, 0) GL_R32I
+image texture 0 GL_R32I
+
+atomic counters 8
+
+atomic counter 0 0 1
+atomic counter 0 1 3
+atomic counter 0 2 5
+atomic counter 0 3 7
+atomic counter 0 4 9
+atomic counter 0 5 11
+atomic counter 0 6 13
+atomic counter 0 7 15
+
+draw rect -1 -1 2 2
+
+probe atomic counter 0 == 1
+probe atomic counter 1 == 3
+probe atomic counter 2 == 5
+probe atomic counter 3 == 7
+probe atomic counter 4 == 9
+probe atomic counter 5 == 11
+probe atomic counter 6 == 13
+probe atomic counter 7 == 15
+
+probe all rgba 0.0 1.0 0.0 1.0
