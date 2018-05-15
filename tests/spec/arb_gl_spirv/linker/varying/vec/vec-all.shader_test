@@ -4,6 +4,198 @@ GL >= 4.5
 GLSL >= 4.50
 GL_ARB_gl_spirv
 
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 127
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %piglit_vertex %v2 %v3 %v4 %f %i %d %m2 %m3 %m4 %m3x4 %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %_ ""
+               OpName %piglit_vertex "piglit_vertex"
+               OpName %v2 "v2"
+               OpName %v3 "v3"
+               OpName %v4 "v4"
+               OpName %f "f"
+               OpName %i "i"
+               OpName %d "d"
+               OpName %m2 "m2"
+               OpName %m3 "m3"
+               OpName %m4 "m4"
+               OpName %m3x4 "m3x4"
+               OpName %gl_VertexID "gl_VertexID"
+               OpName %gl_InstanceID "gl_InstanceID"
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %v2 Location 0
+               OpDecorate %v3 Location 1
+               OpDecorate %v4 Location 2
+               OpDecorate %f Location 3
+               OpDecorate %i Flat
+               OpDecorate %i Location 4
+               OpDecorate %d Flat
+               OpDecorate %d Location 5
+               OpDecorate %m2 Location 6
+               OpDecorate %m3 Location 8
+               OpDecorate %m4 Location 11
+               OpDecorate %m3x4 Location 15
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+    %v2float = OpTypeVector %float 2
+%_ptr_Output_v2float = OpTypePointer Output %v2float
+         %v2 = OpVariable %_ptr_Output_v2float Output
+  %float_0_2 = OpConstant %float 0.2
+    %float_0 = OpConstant %float 0
+         %26 = OpConstantComposite %v2float %float_0_2 %float_0
+    %v3float = OpTypeVector %float 3
+%_ptr_Output_v3float = OpTypePointer Output %v3float
+         %v3 = OpVariable %_ptr_Output_v3float Output
+         %30 = OpConstantComposite %v3float %float_0_2 %float_0 %float_0
+         %v4 = OpVariable %_ptr_Output_v4float Output
+    %float_1 = OpConstant %float 1
+         %33 = OpConstantComposite %v4float %float_0_2 %float_0 %float_0 %float_1
+%_ptr_Output_float = OpTypePointer Output %float
+          %f = OpVariable %_ptr_Output_float Output
+%_ptr_Output_int = OpTypePointer Output %int
+          %i = OpVariable %_ptr_Output_int Output
+      %int_1 = OpConstant %int 1
+     %double = OpTypeFloat 64
+%_ptr_Output_double = OpTypePointer Output %double
+          %d = OpVariable %_ptr_Output_double Output
+   %double_1 = OpConstant %double 1
+%mat2v2float = OpTypeMatrix %v2float 2
+%_ptr_Output_mat2v2float = OpTypePointer Output %mat2v2float
+         %m2 = OpVariable %_ptr_Output_mat2v2float Output
+%mat3v3float = OpTypeMatrix %v3float 3
+%_ptr_Output_mat3v3float = OpTypePointer Output %mat3v3float
+         %m3 = OpVariable %_ptr_Output_mat3v3float Output
+%mat4v4float = OpTypeMatrix %v4float 4
+%_ptr_Output_mat4v4float = OpTypePointer Output %mat4v4float
+         %m4 = OpVariable %_ptr_Output_mat4v4float Output
+%mat3v4float = OpTypeMatrix %v4float 3
+%_ptr_Output_mat3v4float = OpTypePointer Output %mat3v4float
+       %m3x4 = OpVariable %_ptr_Output_mat3v4float Output
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %18 = OpLoad %v4float %piglit_vertex
+         %20 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %20 %18
+               OpStore %v2 %26
+               OpStore %v3 %30
+               OpStore %v4 %33
+               OpStore %f %float_1
+               OpStore %i %int_1
+               OpStore %d %double_1
+         %46 = OpLoad %v2float %v2
+         %47 = OpLoad %v2float %v2
+         %48 = OpCompositeExtract %float %46 0
+         %49 = OpCompositeExtract %float %46 1
+         %50 = OpCompositeExtract %float %47 0
+         %51 = OpCompositeExtract %float %47 1
+         %52 = OpCompositeConstruct %v2float %48 %49
+         %53 = OpCompositeConstruct %v2float %50 %51
+         %54 = OpCompositeConstruct %mat2v2float %52 %53
+               OpStore %m2 %54
+         %58 = OpLoad %v3float %v3
+         %59 = OpLoad %v3float %v3
+         %60 = OpLoad %v3float %v3
+         %61 = OpCompositeExtract %float %58 0
+         %62 = OpCompositeExtract %float %58 1
+         %63 = OpCompositeExtract %float %58 2
+         %64 = OpCompositeExtract %float %59 0
+         %65 = OpCompositeExtract %float %59 1
+         %66 = OpCompositeExtract %float %59 2
+         %67 = OpCompositeExtract %float %60 0
+         %68 = OpCompositeExtract %float %60 1
+         %69 = OpCompositeExtract %float %60 2
+         %70 = OpCompositeConstruct %v3float %61 %62 %63
+         %71 = OpCompositeConstruct %v3float %64 %65 %66
+         %72 = OpCompositeConstruct %v3float %67 %68 %69
+         %73 = OpCompositeConstruct %mat3v3float %70 %71 %72
+               OpStore %m3 %73
+         %77 = OpLoad %v4float %v4
+         %78 = OpLoad %v4float %v4
+         %79 = OpLoad %v4float %v4
+         %80 = OpLoad %v4float %v4
+         %81 = OpCompositeExtract %float %77 0
+         %82 = OpCompositeExtract %float %77 1
+         %83 = OpCompositeExtract %float %77 2
+         %84 = OpCompositeExtract %float %77 3
+         %85 = OpCompositeExtract %float %78 0
+         %86 = OpCompositeExtract %float %78 1
+         %87 = OpCompositeExtract %float %78 2
+         %88 = OpCompositeExtract %float %78 3
+         %89 = OpCompositeExtract %float %79 0
+         %90 = OpCompositeExtract %float %79 1
+         %91 = OpCompositeExtract %float %79 2
+         %92 = OpCompositeExtract %float %79 3
+         %93 = OpCompositeExtract %float %80 0
+         %94 = OpCompositeExtract %float %80 1
+         %95 = OpCompositeExtract %float %80 2
+         %96 = OpCompositeExtract %float %80 3
+         %97 = OpCompositeConstruct %v4float %81 %82 %83 %84
+         %98 = OpCompositeConstruct %v4float %85 %86 %87 %88
+         %99 = OpCompositeConstruct %v4float %89 %90 %91 %92
+        %100 = OpCompositeConstruct %v4float %93 %94 %95 %96
+        %101 = OpCompositeConstruct %mat4v4float %97 %98 %99 %100
+               OpStore %m4 %101
+        %105 = OpLoad %v4float %v4
+        %106 = OpLoad %v4float %v4
+        %107 = OpLoad %v4float %v4
+        %108 = OpCompositeExtract %float %105 0
+        %109 = OpCompositeExtract %float %105 1
+        %110 = OpCompositeExtract %float %105 2
+        %111 = OpCompositeExtract %float %105 3
+        %112 = OpCompositeExtract %float %106 0
+        %113 = OpCompositeExtract %float %106 1
+        %114 = OpCompositeExtract %float %106 2
+        %115 = OpCompositeExtract %float %106 3
+        %116 = OpCompositeExtract %float %107 0
+        %117 = OpCompositeExtract %float %107 1
+        %118 = OpCompositeExtract %float %107 2
+        %119 = OpCompositeExtract %float %107 3
+        %120 = OpCompositeConstruct %v4float %108 %109 %110 %111
+        %121 = OpCompositeConstruct %v4float %112 %113 %114 %115
+        %122 = OpCompositeConstruct %v4float %116 %117 %118 %119
+        %123 = OpCompositeConstruct %mat3v4float %120 %121 %122
+               OpStore %m3x4 %123
+               OpReturn
+               OpFunctionEnd
+
 [vertex shader]
 #version 450 core
 
@@ -36,6 +228,191 @@ void main()
 	m4 = mat4(v4, v4, v4, v4);
 	m3x4 = mat3x4(v4, v4, v4);
 }
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 137
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %f %d %i %m3 %m4 %m3x4 %v2 %v3 %v4 %color %m2
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %fact "fact"
+               OpName %f "f"
+               OpName %d "d"
+               OpName %i "i"
+               OpName %matrix "matrix"
+               OpName %m3 "m3"
+               OpName %m4 "m4"
+               OpName %m3x4 "m3x4"
+               OpName %vector "vector"
+               OpName %v2 "v2"
+               OpName %v3 "v3"
+               OpName %v4 "v4"
+               OpName %color "color"
+               OpName %m2 "m2"
+               OpDecorate %f Location 3
+               OpDecorate %d Flat
+               OpDecorate %d Location 5
+               OpDecorate %i Flat
+               OpDecorate %i Location 4
+               OpDecorate %m3 Location 8
+               OpDecorate %m4 Location 11
+               OpDecorate %m3x4 Location 15
+               OpDecorate %v2 Location 0
+               OpDecorate %v3 Location 1
+               OpDecorate %v4 Location 2
+               OpDecorate %color Location 0
+               OpDecorate %m2 Location 6
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+%_ptr_Function_float = OpTypePointer Function %float
+%_ptr_Input_float = OpTypePointer Input %float
+          %f = OpVariable %_ptr_Input_float Input
+     %double = OpTypeFloat 64
+%_ptr_Input_double = OpTypePointer Input %double
+          %d = OpVariable %_ptr_Input_double Input
+        %int = OpTypeInt 32 1
+%_ptr_Input_int = OpTypePointer Input %int
+          %i = OpVariable %_ptr_Input_int Input
+    %float_2 = OpConstant %float 2
+    %v3float = OpTypeVector %float 3
+%mat3v3float = OpTypeMatrix %v3float 3
+%_ptr_Function_mat3v3float = OpTypePointer Function %mat3v3float
+%_ptr_Input_mat3v3float = OpTypePointer Input %mat3v3float
+         %m3 = OpVariable %_ptr_Input_mat3v3float Input
+    %v4float = OpTypeVector %float 4
+%mat4v4float = OpTypeMatrix %v4float 4
+%_ptr_Input_mat4v4float = OpTypePointer Input %mat4v4float
+         %m4 = OpVariable %_ptr_Input_mat4v4float Input
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+%mat3v4float = OpTypeMatrix %v4float 3
+%_ptr_Input_mat3v4float = OpTypePointer Input %mat3v4float
+       %m3x4 = OpVariable %_ptr_Input_mat3v4float Input
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %v2float = OpTypeVector %float 2
+%_ptr_Input_v2float = OpTypePointer Input %v2float
+         %v2 = OpVariable %_ptr_Input_v2float Input
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+         %v3 = OpVariable %_ptr_Input_v3float Input
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+         %v4 = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+       %uint = OpTypeInt 32 0
+     %uint_0 = OpConstant %uint 0
+%_ptr_Output_float = OpTypePointer Output %float
+%mat2v2float = OpTypeMatrix %v2float 2
+%_ptr_Input_mat2v2float = OpTypePointer Input %mat2v2float
+         %m2 = OpVariable %_ptr_Input_mat2v2float Input
+      %int_0 = OpConstant %int 0
+     %uint_2 = OpConstant %uint 2
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+       %fact = OpVariable %_ptr_Function_float Function
+     %matrix = OpVariable %_ptr_Function_mat3v3float Function
+     %vector = OpVariable %_ptr_Function_v4float Function
+         %11 = OpLoad %float %f
+         %15 = OpLoad %double %d
+         %16 = OpFConvert %float %15
+         %17 = OpFMul %float %11 %16
+         %21 = OpLoad %int %i
+         %22 = OpConvertSToF %float %21
+         %23 = OpFAdd %float %17 %22
+         %25 = OpFDiv %float %23 %float_2
+               OpStore %fact %25
+         %32 = OpLoad %mat3v3float %m3
+         %37 = OpLoad %mat4v4float %m4
+         %40 = OpCompositeExtract %float %37 0 0
+         %41 = OpCompositeExtract %float %37 0 1
+         %42 = OpCompositeExtract %float %37 0 2
+         %43 = OpCompositeExtract %float %37 1 0
+         %44 = OpCompositeExtract %float %37 1 1
+         %45 = OpCompositeExtract %float %37 1 2
+         %46 = OpCompositeExtract %float %37 2 0
+         %47 = OpCompositeExtract %float %37 2 1
+         %48 = OpCompositeExtract %float %37 2 2
+         %49 = OpCompositeConstruct %v3float %40 %41 %42
+         %50 = OpCompositeConstruct %v3float %43 %44 %45
+         %51 = OpCompositeConstruct %v3float %46 %47 %48
+         %52 = OpCompositeConstruct %mat3v3float %49 %50 %51
+         %53 = OpCompositeExtract %v3float %32 0
+         %54 = OpCompositeExtract %v3float %52 0
+         %55 = OpFAdd %v3float %53 %54
+         %56 = OpCompositeExtract %v3float %32 1
+         %57 = OpCompositeExtract %v3float %52 1
+         %58 = OpFAdd %v3float %56 %57
+         %59 = OpCompositeExtract %v3float %32 2
+         %60 = OpCompositeExtract %v3float %52 2
+         %61 = OpFAdd %v3float %59 %60
+         %62 = OpCompositeConstruct %mat3v3float %55 %58 %61
+         %66 = OpLoad %mat3v4float %m3x4
+         %67 = OpCompositeExtract %float %66 0 0
+         %68 = OpCompositeExtract %float %66 0 1
+         %69 = OpCompositeExtract %float %66 0 2
+         %70 = OpCompositeExtract %float %66 1 0
+         %71 = OpCompositeExtract %float %66 1 1
+         %72 = OpCompositeExtract %float %66 1 2
+         %73 = OpCompositeExtract %float %66 2 0
+         %74 = OpCompositeExtract %float %66 2 1
+         %75 = OpCompositeExtract %float %66 2 2
+         %76 = OpCompositeConstruct %v3float %67 %68 %69
+         %77 = OpCompositeConstruct %v3float %70 %71 %72
+         %78 = OpCompositeConstruct %v3float %73 %74 %75
+         %79 = OpCompositeConstruct %mat3v3float %76 %77 %78
+         %80 = OpCompositeExtract %v3float %62 0
+         %81 = OpCompositeExtract %v3float %79 0
+         %82 = OpFSub %v3float %80 %81
+         %83 = OpCompositeExtract %v3float %62 1
+         %84 = OpCompositeExtract %v3float %79 1
+         %85 = OpFSub %v3float %83 %84
+         %86 = OpCompositeExtract %v3float %62 2
+         %87 = OpCompositeExtract %v3float %79 2
+         %88 = OpFSub %v3float %86 %87
+         %89 = OpCompositeConstruct %mat3v3float %82 %85 %88
+               OpStore %matrix %89
+         %95 = OpLoad %v2float %v2
+         %96 = OpCompositeExtract %float %95 0
+         %97 = OpCompositeExtract %float %95 1
+         %98 = OpCompositeConstruct %v4float %96 %97 %float_0 %float_0
+        %101 = OpLoad %v3float %v3
+        %102 = OpCompositeExtract %float %101 0
+        %103 = OpCompositeExtract %float %101 1
+        %104 = OpCompositeExtract %float %101 2
+        %105 = OpCompositeConstruct %v4float %102 %103 %104 %float_0
+        %106 = OpFAdd %v4float %98 %105
+        %109 = OpLoad %v4float %v4
+        %110 = OpFAdd %v4float %106 %109
+               OpStore %vector %110
+        %116 = OpAccessChain %_ptr_Output_float %color %uint_0
+               OpStore %116 %float_0
+        %117 = OpLoad %float %fact
+        %122 = OpAccessChain %_ptr_Input_v2float %m2 %int_0
+        %123 = OpLoad %v2float %122
+        %124 = OpCompositeExtract %float %123 0
+        %125 = OpCompositeExtract %float %123 1
+        %126 = OpCompositeConstruct %v2float %124 %125
+        %128 = OpAccessChain %_ptr_Function_float %matrix %int_0 %uint_2
+        %129 = OpLoad %float %128
+        %130 = OpVectorTimesScalar %v2float %126 %129
+        %131 = OpCompositeExtract %float %130 0
+        %132 = OpCompositeExtract %float %130 1
+        %133 = OpCompositeConstruct %v4float %131 %132 %float_0 %float_0
+        %134 = OpVectorTimesScalar %v4float %133 %117
+        %135 = OpLoad %v4float %vector
+        %136 = OpFAdd %v4float %134 %135
+               OpStore %color %136
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 #version 450 core
