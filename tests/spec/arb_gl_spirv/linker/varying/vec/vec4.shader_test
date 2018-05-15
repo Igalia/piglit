@@ -1,0 +1,36 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader]
+#version 450 core
+
+layout(location = 0) in vec4 piglit_vertex;
+layout(location = 0) out vec4 v1;
+layout(location = 1) out vec4 v2;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	v1 = vec4(1.0, 0.0, 0.0, 1.0);
+	v2 = vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[fragment shader]
+#version 450 core
+
+layout(location = 0) in vec4 v1;
+layout(location = 1) in vec4 v2;
+layout(location = 0) out vec4 out_color;
+
+void main()
+{
+	out_color = v1 + v2;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 0.0 1.0
