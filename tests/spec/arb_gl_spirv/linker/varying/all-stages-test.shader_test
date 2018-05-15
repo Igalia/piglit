@@ -1,0 +1,107 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+GL_ARB_tessellation_shader
+
+[vertex shader]
+#version 450 core
+
+layout(location = 0) in vec4 piglit_vertex;
+layout(location = 0) out mediump float f;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	f = 5.0;
+}
+
+[tessellation control shader]
+#version 450 core
+#extension GL_ARB_tessellation_shader : require
+
+layout(vertices = 3) out;
+layout(location = 0) in mediump float f[];
+layout(location = 0) out mediump float tc_out[];
+
+void main()
+{
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+
+	if(gl_InvocationID == 0) {
+		gl_TessLevelInner[0] = f[0];
+		gl_TessLevelOuter[0] = f[0];
+		gl_TessLevelOuter[1] = f[1];
+		gl_TessLevelOuter[2] = f[2];
+	}
+
+	tc_out[gl_InvocationID] = f[gl_InvocationID];
+}
+
+[tessellation evaluation shader]
+#version 450 core
+#extension GL_ARB_tessellation_shader : require
+
+layout(triangles, equal_spacing, cw) in;
+layout(location = 0) in mediump float tc_out[];
+layout(location = 0) out mediump float te_out;
+
+void main()
+{
+	gl_Position = gl_TessCoord.x * gl_in[0].gl_Position
+				+ gl_TessCoord.y * gl_in[1].gl_Position
+				+ gl_TessCoord.z * gl_in[2].gl_Position;
+
+	te_out = tc_out[2];
+}
+
+[geometry shader]
+#version 450 core
+
+layout(triangles) in;
+layout(points, max_vertices = 3) out;
+
+layout(location = 0) in mediump float te_out[];
+layout(location = 0) out mediump float geo_out;
+
+void main()
+{
+	for(int i = 0; i < gl_in.length(); i++) {
+		geo_out = te_out[i];
+
+		gl_Position = gl_in[i].gl_Position;
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 450 core
+
+layout(location = 0) out vec4 color;
+layout(location = 0) in mediump float geo_out;
+
+void main()
+{
+	color = vec4(geo_out / 5.0, 0.0, 0.0, 1.0);
+/*	color = vec4(sin(gl_FragCoord.x * 0.25) * 0.5 + 0.5,
+                 cos(gl_FragCoord.y * 0.25) * 0.5 + 0.5,
+                 sin(gl_FragCoord.x * 0.15) * cos(gl_FragCoord.y * 0.15),
+                 1.0);*/
+}
+[vertex data]
+0/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+probe rgba 0 0 1.0 0.0 0.0 1.0
