@@ -1821,10 +1821,8 @@ process_test_script(const char *script_name)
 
 			case requirements:
 				result = process_requirement(line);
-				if (result != PIGLIT_PASS) {
-                                        fprintf(stderr, "here2\n");
+				if (result != PIGLIT_PASS)
 					return result;
-                                }
 				break;
 
 			case geometry_layout:
@@ -1857,10 +1855,8 @@ process_test_script(const char *script_name)
 			case compute_shader_specializations: {
 				enum piglit_result result =
 					process_specialization(state, line);
-				if (result != PIGLIT_PASS) {
-                                        fprintf(stderr, "here3\n");
+				if (result != PIGLIT_PASS)
 					return result;
-                                }
 				break;
 			}
 
@@ -1872,10 +1868,8 @@ process_test_script(const char *script_name)
 			case elements: {
 				enum piglit_result result =
 					process_elements(state, line);
-				if (result != PIGLIT_PASS) {
-                                        fprintf(stderr, "here4\n");
+				if (result != PIGLIT_PASS)
 					return result;
-                                }
 				break;
 			}
 
