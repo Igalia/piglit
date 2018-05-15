@@ -1,0 +1,210 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 54
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %piglit_vertex %m1 %m2 %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %_ ""
+               OpName %piglit_vertex "piglit_vertex"
+               OpName %v1 "v1"
+               OpName %v2 "v2"
+               OpName %m1 "m1"
+               OpName %m2 "m2"
+               OpName %gl_VertexID "gl_VertexID"
+               OpName %gl_InstanceID "gl_InstanceID"
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %m1 Location 0
+               OpDecorate %m2 Location 2
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+    %v2float = OpTypeVector %float 2
+%_ptr_Function_v2float = OpTypePointer Function %v2float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %26 = OpConstantComposite %v2float %float_1 %float_0
+         %28 = OpConstantComposite %v2float %float_0 %float_1
+%mat2v2float = OpTypeMatrix %v2float 2
+%_ptr_Output_mat2v2float = OpTypePointer Output %mat2v2float
+         %m1 = OpVariable %_ptr_Output_mat2v2float Output
+         %m2 = OpVariable %_ptr_Output_mat2v2float Output
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %v1 = OpVariable %_ptr_Function_v2float Function
+         %v2 = OpVariable %_ptr_Function_v2float Function
+         %18 = OpLoad %v4float %piglit_vertex
+         %20 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %20 %18
+               OpStore %v1 %26
+               OpStore %v2 %28
+         %32 = OpLoad %v2float %v1
+         %33 = OpLoad %v2float %v2
+         %34 = OpCompositeExtract %float %32 0
+         %35 = OpCompositeExtract %float %32 1
+         %36 = OpCompositeExtract %float %33 0
+         %37 = OpCompositeExtract %float %33 1
+         %38 = OpCompositeConstruct %v2float %34 %35
+         %39 = OpCompositeConstruct %v2float %36 %37
+         %40 = OpCompositeConstruct %mat2v2float %38 %39
+               OpStore %m1 %40
+         %42 = OpLoad %v2float %v2
+         %43 = OpLoad %v2float %v1
+         %44 = OpCompositeExtract %float %42 0
+         %45 = OpCompositeExtract %float %42 1
+         %46 = OpCompositeExtract %float %43 0
+         %47 = OpCompositeExtract %float %43 1
+         %48 = OpCompositeConstruct %v2float %44 %45
+         %49 = OpCompositeConstruct %v2float %46 %47
+         %50 = OpCompositeConstruct %mat2v2float %48 %49
+               OpStore %m2 %50
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450 core
+
+layout(location = 0) in vec4 piglit_vertex;
+layout(location = 0) out mat2 m1;
+layout(location = 2) out mat2 m2;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	vec2 v1 = vec2(1.0, 0.0);
+	vec2 v2 = vec2(0.0, 1.0);
+
+	m1 = mat2(v1, v2);
+	m2 = mat2(v2, v1);
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 50
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %m1 %m2 %out_color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %v "v"
+               OpName %m1 "m1"
+               OpName %m2 "m2"
+               OpName %out_color "out_color"
+               OpDecorate %m1 Location 0
+               OpDecorate %m2 Location 2
+               OpDecorate %out_color Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v2float = OpTypeVector %float 2
+%_ptr_Function_v2float = OpTypePointer Function %v2float
+%mat2v2float = OpTypeMatrix %v2float 2
+%_ptr_Input_mat2v2float = OpTypePointer Input %mat2v2float
+         %m1 = OpVariable %_ptr_Input_mat2v2float Input
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v2float = OpTypePointer Input %v2float
+         %m2 = OpVariable %_ptr_Input_mat2v2float Input
+      %int_1 = OpConstant %int 1
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %out_color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %v = OpVariable %_ptr_Function_v2float Function
+         %16 = OpAccessChain %_ptr_Input_v2float %m1 %int_0
+         %17 = OpLoad %v2float %16
+         %18 = OpCompositeExtract %float %17 0
+         %19 = OpCompositeExtract %float %17 1
+         %20 = OpCompositeConstruct %v2float %18 %19
+         %22 = OpAccessChain %_ptr_Input_v2float %m2 %int_0
+         %23 = OpLoad %v2float %22
+         %24 = OpCompositeExtract %float %23 0
+         %25 = OpCompositeExtract %float %23 1
+         %26 = OpCompositeConstruct %v2float %24 %25
+         %27 = OpFMul %v2float %20 %26
+         %29 = OpAccessChain %_ptr_Input_v2float %m1 %int_1
+         %30 = OpLoad %v2float %29
+         %31 = OpCompositeExtract %float %30 0
+         %32 = OpCompositeExtract %float %30 1
+         %33 = OpCompositeConstruct %v2float %31 %32
+         %34 = OpFAdd %v2float %27 %33
+         %35 = OpAccessChain %_ptr_Input_v2float %m2 %int_1
+         %36 = OpLoad %v2float %35
+         %37 = OpCompositeExtract %float %36 0
+         %38 = OpCompositeExtract %float %36 1
+         %39 = OpCompositeConstruct %v2float %37 %38
+         %40 = OpFAdd %v2float %34 %39
+               OpStore %v %40
+         %44 = OpLoad %v2float %v
+         %47 = OpCompositeExtract %float %44 0
+         %48 = OpCompositeExtract %float %44 1
+         %49 = OpCompositeConstruct %v4float %47 %48 %float_0 %float_1
+               OpStore %out_color %49
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450 core
+
+layout(location = 0) in mat2 m1;
+layout(location = 2) in mat2 m2;
+layout(location = 0) out vec4 out_color;
+
+void main()
+{
+	vec2 v = vec2(m1[0]) * vec2(m2[0]) + vec2(m1[1]) + vec2(m2[1]);
+	out_color = vec4(v, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 0.0 1.0
