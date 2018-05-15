@@ -1,7 +1,138 @@
 [require]
+SPIRV YES
 GL >= 4.5
 GLSL >= 4.50
 GL_ARB_gl_spirv
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 86
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %piglit_vertex %m3x4 %m2x3 %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %_ ""
+               OpName %piglit_vertex "piglit_vertex"
+               OpName %v1 "v1"
+               OpName %v2 "v2"
+               OpName %v3 "v3"
+               OpName %m3x4 "m3x4"
+               OpName %m2x3 "m2x3"
+               OpName %gl_VertexID "gl_VertexID"
+               OpName %gl_InstanceID "gl_InstanceID"
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %m3x4 Location 0
+               OpDecorate %m2x3 Location 4
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %25 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_0
+         %27 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_0
+         %29 = OpConstantComposite %v4float %float_0 %float_0 %float_1 %float_0
+%mat3v4float = OpTypeMatrix %v4float 3
+%_ptr_Output_mat3v4float = OpTypePointer Output %mat3v4float
+       %m3x4 = OpVariable %_ptr_Output_mat3v4float Output
+    %v3float = OpTypeVector %float 3
+%mat2v3float = OpTypeMatrix %v3float 2
+%_ptr_Output_mat2v3float = OpTypePointer Output %mat2v3float
+       %m2x3 = OpVariable %_ptr_Output_mat2v3float Output
+     %uint_0 = OpConstant %uint 0
+%_ptr_Function_float = OpTypePointer Function %float
+    %v2float = OpTypeVector %float 2
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %v1 = OpVariable %_ptr_Function_v4float Function
+         %v2 = OpVariable %_ptr_Function_v4float Function
+         %v3 = OpVariable %_ptr_Function_v4float Function
+         %18 = OpLoad %v4float %piglit_vertex
+         %20 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %20 %18
+               OpStore %v1 %25
+               OpStore %v2 %27
+               OpStore %v3 %29
+         %33 = OpLoad %v4float %v1
+         %34 = OpLoad %v4float %v2
+         %35 = OpLoad %v4float %v3
+         %36 = OpCompositeExtract %float %33 0
+         %37 = OpCompositeExtract %float %33 1
+         %38 = OpCompositeExtract %float %33 2
+         %39 = OpCompositeExtract %float %33 3
+         %40 = OpCompositeExtract %float %34 0
+         %41 = OpCompositeExtract %float %34 1
+         %42 = OpCompositeExtract %float %34 2
+         %43 = OpCompositeExtract %float %34 3
+         %44 = OpCompositeExtract %float %35 0
+         %45 = OpCompositeExtract %float %35 1
+         %46 = OpCompositeExtract %float %35 2
+         %47 = OpCompositeExtract %float %35 3
+         %48 = OpCompositeConstruct %v4float %36 %37 %38 %39
+         %49 = OpCompositeConstruct %v4float %40 %41 %42 %43
+         %50 = OpCompositeConstruct %v4float %44 %45 %46 %47
+         %51 = OpCompositeConstruct %mat3v4float %48 %49 %50
+               OpStore %m3x4 %51
+         %58 = OpAccessChain %_ptr_Function_float %v1 %uint_0
+         %59 = OpLoad %float %58
+         %60 = OpAccessChain %_ptr_Function_float %v1 %uint_1
+         %61 = OpLoad %float %60
+         %63 = OpCompositeConstruct %v2float %59 %61
+         %64 = OpAccessChain %_ptr_Function_float %v2 %uint_0
+         %65 = OpLoad %float %64
+         %66 = OpAccessChain %_ptr_Function_float %v2 %uint_1
+         %67 = OpLoad %float %66
+         %68 = OpCompositeConstruct %v2float %65 %67
+         %69 = OpAccessChain %_ptr_Function_float %v3 %uint_0
+         %70 = OpLoad %float %69
+         %71 = OpAccessChain %_ptr_Function_float %v3 %uint_1
+         %72 = OpLoad %float %71
+         %73 = OpCompositeConstruct %v2float %70 %72
+         %74 = OpCompositeExtract %float %63 0
+         %75 = OpCompositeExtract %float %63 1
+         %76 = OpCompositeExtract %float %68 0
+         %77 = OpCompositeExtract %float %68 1
+         %78 = OpCompositeExtract %float %73 0
+         %79 = OpCompositeExtract %float %73 1
+         %80 = OpCompositeConstruct %v3float %74 %75 %76
+         %81 = OpCompositeConstruct %v3float %77 %78 %79
+         %82 = OpCompositeConstruct %mat2v3float %80 %81
+               OpStore %m2x3 %82
+               OpReturn
+               OpFunctionEnd
 
 [vertex shader]
 #version 450 core
@@ -21,6 +152,74 @@ void main()
 	m3x4 = mat3x4(v1, v2, v3);
 	m2x3 = mat2x3(vec2(v1.x, v1.y), vec2(v2.x, v2.y), vec2(v3.x, v3.y));
 }
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 42
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %m3x4 %m2x3 %out_color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %c1 "c1"
+               OpName %m3x4 "m3x4"
+               OpName %c2 "c2"
+               OpName %m2x3 "m2x3"
+               OpName %out_color "out_color"
+               OpDecorate %m3x4 Location 0
+               OpDecorate %m2x3 Location 4
+               OpDecorate %out_color Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+%mat3v4float = OpTypeMatrix %v4float 3
+%_ptr_Input_mat3v4float = OpTypePointer Input %mat3v4float
+       %m3x4 = OpVariable %_ptr_Input_mat3v4float Input
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+    %v3float = OpTypeVector %float 3
+%mat2v3float = OpTypeMatrix %v3float 2
+%_ptr_Input_mat2v3float = OpTypePointer Input %mat2v3float
+       %m2x3 = OpVariable %_ptr_Input_mat2v3float Input
+      %int_1 = OpConstant %int 1
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+    %float_1 = OpConstant %float 1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %out_color = OpVariable %_ptr_Output_v4float Output
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %c1 = OpVariable %_ptr_Function_v4float Function
+         %c2 = OpVariable %_ptr_Function_v4float Function
+         %16 = OpAccessChain %_ptr_Input_v4float %m3x4 %int_0
+         %17 = OpLoad %v4float %16
+         %18 = OpCompositeExtract %float %17 0
+         %19 = OpCompositeExtract %float %17 1
+         %20 = OpCompositeExtract %float %17 2
+         %21 = OpCompositeExtract %float %17 3
+         %22 = OpCompositeConstruct %v4float %18 %19 %20 %21
+               OpStore %c1 %22
+         %30 = OpAccessChain %_ptr_Input_v3float %m2x3 %int_1
+         %31 = OpLoad %v3float %30
+         %33 = OpCompositeExtract %float %31 0
+         %34 = OpCompositeExtract %float %31 1
+         %35 = OpCompositeExtract %float %31 2
+         %36 = OpCompositeConstruct %v4float %33 %34 %35 %float_1
+               OpStore %c2 %36
+         %39 = OpLoad %v4float %c1
+         %40 = OpLoad %v4float %c2
+         %41 = OpFAdd %v4float %39 %40
+               OpStore %out_color %41
+               OpReturn
+               OpFunctionEnd
 
 [fragment shader]
 #version 450 core
