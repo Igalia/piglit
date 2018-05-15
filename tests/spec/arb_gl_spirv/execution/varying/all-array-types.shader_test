@@ -1,0 +1,265 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 54
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %piglit_vertex %d %f %i %u %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %gl_PerVertex "gl_PerVertex"
+               OpMemberName %gl_PerVertex 0 "gl_Position"
+               OpMemberName %gl_PerVertex 1 "gl_PointSize"
+               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
+               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
+               OpName %_ ""
+               OpName %piglit_vertex "piglit_vertex"
+               OpName %d "d"
+               OpName %f "f"
+               OpName %i "i"
+               OpName %u "u"
+               OpName %gl_VertexID "gl_VertexID"
+               OpName %gl_InstanceID "gl_InstanceID"
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %d Flat
+               OpDecorate %d Location 0
+               OpDecorate %f Location 6
+               OpDecorate %i Flat
+               OpDecorate %i Location 2
+               OpDecorate %u Flat
+               OpDecorate %u Location 4
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+     %double = OpTypeFloat 64
+     %uint_2 = OpConstant %uint 2
+%_arr_double_uint_2 = OpTypeArray %double %uint_2
+%_ptr_Output__arr_double_uint_2 = OpTypePointer Output %_arr_double_uint_2
+          %d = OpVariable %_ptr_Output__arr_double_uint_2 Output
+ %double_0_5 = OpConstant %double 0.5
+%_ptr_Output_double = OpTypePointer Output %double
+      %int_1 = OpConstant %int 1
+%_arr_float_uint_2 = OpTypeArray %float %uint_2
+%_ptr_Output__arr_float_uint_2 = OpTypePointer Output %_arr_float_uint_2
+          %f = OpVariable %_ptr_Output__arr_float_uint_2 Output
+  %float_0_5 = OpConstant %float 0.5
+%_ptr_Output_float = OpTypePointer Output %float
+%_arr_int_uint_2 = OpTypeArray %int %uint_2
+%_ptr_Output__arr_int_uint_2 = OpTypePointer Output %_arr_int_uint_2
+          %i = OpVariable %_ptr_Output__arr_int_uint_2 Output
+%_ptr_Output_int = OpTypePointer Output %int
+%_arr_uint_uint_2 = OpTypeArray %uint %uint_2
+%_ptr_Output__arr_uint_uint_2 = OpTypePointer Output %_arr_uint_uint_2
+          %u = OpVariable %_ptr_Output__arr_uint_uint_2 Output
+     %uint_0 = OpConstant %uint 0
+%_ptr_Output_uint = OpTypePointer Output %uint
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %18 = OpLoad %v4float %piglit_vertex
+         %20 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %20 %18
+         %28 = OpAccessChain %_ptr_Output_double %d %int_0
+               OpStore %28 %double_0_5
+         %30 = OpAccessChain %_ptr_Output_double %d %int_1
+               OpStore %30 %double_0_5
+         %36 = OpAccessChain %_ptr_Output_float %f %int_0
+               OpStore %36 %float_0_5
+         %37 = OpAccessChain %_ptr_Output_float %f %int_1
+               OpStore %37 %float_0_5
+         %42 = OpAccessChain %_ptr_Output_int %i %int_0
+               OpStore %42 %int_1
+         %43 = OpAccessChain %_ptr_Output_int %i %int_1
+               OpStore %43 %int_0
+         %49 = OpAccessChain %_ptr_Output_uint %u %int_0
+               OpStore %49 %uint_0
+         %50 = OpAccessChain %_ptr_Output_uint %u %int_1
+               OpStore %50 %uint_1
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450 core
+
+layout(location = 0) in vec4 piglit_vertex;
+
+layout(location = 0) flat out double d[2];
+layout(location = 2) flat out int i[2];
+layout(location = 4) flat out uint u[2];
+layout(location = 6) out float f[2];
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	d[0] = 0.5;
+	d[1] = 0.5;
+
+	f[0] = 0.5;
+	f[1] = 0.5;
+
+	i[0] = 1;
+	i[1] = 0;
+
+	u[0] = 0;
+	u[1] = 1;
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 65
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %d %i %u %f %out_color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %r "r"
+               OpName %d "d"
+               OpName %g "g"
+               OpName %i "i"
+               OpName %b "b"
+               OpName %u "u"
+               OpName %a "a"
+               OpName %f "f"
+               OpName %out_color "out_color"
+               OpDecorate %d Flat
+               OpDecorate %d Location 0
+               OpDecorate %i Flat
+               OpDecorate %i Location 2
+               OpDecorate %u Flat
+               OpDecorate %u Location 4
+               OpDecorate %f Location 6
+               OpDecorate %out_color Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+%_ptr_Function_float = OpTypePointer Function %float
+     %double = OpTypeFloat 64
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_double_uint_2 = OpTypeArray %double %uint_2
+%_ptr_Input__arr_double_uint_2 = OpTypePointer Input %_arr_double_uint_2
+          %d = OpVariable %_ptr_Input__arr_double_uint_2 Input
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_double = OpTypePointer Input %double
+      %int_1 = OpConstant %int 1
+%_arr_int_uint_2 = OpTypeArray %int %uint_2
+%_ptr_Input__arr_int_uint_2 = OpTypePointer Input %_arr_int_uint_2
+          %i = OpVariable %_ptr_Input__arr_int_uint_2 Input
+%_ptr_Input_int = OpTypePointer Input %int
+%_arr_uint_uint_2 = OpTypeArray %uint %uint_2
+%_ptr_Input__arr_uint_uint_2 = OpTypePointer Input %_arr_uint_uint_2
+          %u = OpVariable %_ptr_Input__arr_uint_uint_2 Input
+%_ptr_Input_uint = OpTypePointer Input %uint
+%_arr_float_uint_2 = OpTypeArray %float %uint_2
+%_ptr_Input__arr_float_uint_2 = OpTypePointer Input %_arr_float_uint_2
+          %f = OpVariable %_ptr_Input__arr_float_uint_2 Input
+%_ptr_Input_float = OpTypePointer Input %float
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+  %out_color = OpVariable %_ptr_Output_v4float Output
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %r = OpVariable %_ptr_Function_float Function
+          %g = OpVariable %_ptr_Function_float Function
+          %b = OpVariable %_ptr_Function_float Function
+          %a = OpVariable %_ptr_Function_float Function
+         %18 = OpAccessChain %_ptr_Input_double %d %int_0
+         %19 = OpLoad %double %18
+         %21 = OpAccessChain %_ptr_Input_double %d %int_1
+         %22 = OpLoad %double %21
+         %23 = OpFAdd %double %19 %22
+         %24 = OpFConvert %float %23
+               OpStore %r %24
+         %30 = OpAccessChain %_ptr_Input_int %i %int_0
+         %31 = OpLoad %int %30
+         %32 = OpAccessChain %_ptr_Input_int %i %int_1
+         %33 = OpLoad %int %32
+         %34 = OpIAdd %int %31 %33
+         %35 = OpConvertSToF %float %34
+               OpStore %g %35
+         %41 = OpAccessChain %_ptr_Input_uint %u %int_0
+         %42 = OpLoad %uint %41
+         %43 = OpAccessChain %_ptr_Input_uint %u %int_1
+         %44 = OpLoad %uint %43
+         %45 = OpIAdd %uint %42 %44
+         %46 = OpConvertUToF %float %45
+               OpStore %b %46
+         %52 = OpAccessChain %_ptr_Input_float %f %int_0
+         %53 = OpLoad %float %52
+         %54 = OpAccessChain %_ptr_Input_float %f %int_1
+         %55 = OpLoad %float %54
+         %56 = OpFAdd %float %53 %55
+               OpStore %a %56
+         %60 = OpLoad %float %r
+         %61 = OpLoad %float %g
+         %62 = OpLoad %float %b
+         %63 = OpLoad %float %a
+         %64 = OpCompositeConstruct %v4float %60 %61 %62 %63
+               OpStore %out_color %64
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450 core
+
+layout(location = 0) out vec4 out_color;
+
+layout(location = 0) flat in double d[2];
+layout(location = 2) flat in int i[2];
+layout(location = 4) flat in uint u[2];
+layout(location = 6) in float f[2];
+
+void main()
+{
+	float r = float(d[0] + d[1]);
+	float g = float(i[0] + i[1]);
+	float b = float(u[0] + u[1]);
+	float a = f[0] + f[1];
+
+	out_color = vec4(r, g, b, a);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0
