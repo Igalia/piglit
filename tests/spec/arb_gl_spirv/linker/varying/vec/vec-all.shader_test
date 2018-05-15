@@ -1,0 +1,68 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader]
+#version 450 core
+
+layout(location = 0) in vec4 piglit_vertex;
+layout(location = 0) out vec2 v2;
+layout(location = 1) out vec3 v3;
+layout(location = 2) out vec4 v4;
+layout(location = 3) out float f;
+layout(location = 4) out flat int i;
+layout(location = 5) out flat double d;
+layout(location = 6) out mat2 m2;
+layout(location = 8) out mat3 m3;
+layout(location = 11) out mat4 m4;
+layout(location = 15) out mat3x4 m3x4;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	v2 = vec2(0.2, 0.0);
+	v3 = vec3(0.2, 0.0, 0.0);
+	v4 = vec4(0.2, 0.0, 0.0, 1.0);
+
+	f = 1.0;
+	i = 1;
+	d = 1.0;
+
+	m2 = mat2(v2, v2);
+	m3 = mat3(v3, v3, v3);
+	m4 = mat4(v4, v4, v4, v4);
+	m3x4 = mat3x4(v4, v4, v4);
+}
+
+[fragment shader]
+#version 450 core
+
+layout(location = 0) out vec4 color;
+
+layout(location = 0) in vec2 v2;
+layout(location = 1) in vec3 v3;
+layout(location = 2) in vec4 v4;
+layout(location = 3) in float f;
+layout(location = 4) in flat int i;
+layout(location = 5) in flat double d;
+layout(location = 6) in mat2 m2;
+layout(location = 8) in mat3 m3;
+layout(location = 11) in mat4 m4;
+layout(location = 15) in mat3x4 m3x4;
+
+void main()
+{
+	float fact = (f * float(d) + float(i)) / 2.0;
+	mat3 matrix = m3 + mat3(m4) - mat3(m3x4);
+	vec4 vector = vec4(v2, 0.0, 0.0) + vec4(v3, 0.0) + v4;
+
+	color[0] = 0.0;
+	color = fact * vec4(vec2(m2[0]) * matrix[0][2], 0.0, 0.0) + vector;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.6 0.0 0.0 1.0

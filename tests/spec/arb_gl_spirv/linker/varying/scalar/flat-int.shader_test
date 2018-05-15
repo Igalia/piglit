@@ -1,0 +1,34 @@
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 450
+
+layout(location = 0) in vec4 piglit_vertex;
+flat out int vint;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	vint = 1;
+}
+
+[fragment shader]
+#version 450
+
+layout(location = 0) out vec4 color;
+flat in int vint;
+
+void main()
+{
+	color = vec4(0.6, 0.0, 0.0, 1.0);
+	color.g = vint;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.6 1.0 0.0 1.0
