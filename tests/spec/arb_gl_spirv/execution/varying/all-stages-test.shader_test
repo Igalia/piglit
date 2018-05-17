@@ -367,7 +367,7 @@ void main()
                OpEntryPoint Geometry %main "main" %geo_out %te_out %_ %gl_in
                OpExecutionMode %main Triangles
                OpExecutionMode %main Invocations 1
-               OpExecutionMode %main OutputPoints
+               OpExecutionMode %main OutputTriangleStrip
                OpExecutionMode %main OutputVertices 3
                OpSource GLSL 450
                OpName %main "main"
@@ -464,7 +464,7 @@ void main()
 #version 450 core
 
 layout(triangles) in;
-layout(points, max_vertices = 3) out;
+layout(triangle_strip, max_vertices = 3) out;
 
 layout(location = 0) in mediump float te_out[];
 layout(location = 0) out mediump float geo_out;
@@ -545,4 +545,4 @@ clear color 0.1 0.1 0.1 0.1
 clear
 patch parameter vertices 3
 draw arrays GL_PATCHES 0 6
-probe rgba 0 0 1.0 0.0 0.0 1.0
+probe all rgba 1.0 0.0 0.0 1.0
