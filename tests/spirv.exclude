@@ -59,3 +59,8 @@ tests/spec/arb_gl_spirv
 tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch
 # layout(shared) not supported, pending to re-implement automatically skip them
 tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-packaging-qualifier-mismatch.shader_test
+# generates compile error on SPIRV (correct according to the spec: it should
+# generate compile OR linker error). The test expects that a linker error
+# will be generated so it doesn't make sense for SPIRV
+# Note: piglit doesn't check if compile errors are generated
+tests/spec/arb_shader_storage_buffer_object/linker/non_integral_size_array_member.shader_test
