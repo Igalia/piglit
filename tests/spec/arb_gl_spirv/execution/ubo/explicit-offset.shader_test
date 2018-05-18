@@ -1,0 +1,82 @@
+# Test a UBO with a member at an explicit offset
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 18
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outcolor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %_ ""
+               OpDecorate %outcolor Location 0
+               OpMemberDecorate %Block 0 Offset 16
+               OpDecorate %Block Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outcolor = OpVariable %_ptr_Output_v4float Output
+      %Block = OpTypeStruct %v4float
+%_ptr_Uniform_Block = OpTypePointer Uniform %Block
+          %_ = OpVariable %_ptr_Uniform_Block Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %16 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0
+         %17 = OpLoad %v4float %16
+               OpStore %outcolor %17
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(std140, binding = 0) uniform Block {
+    layout(offset = 16) vec4 a;
+};
+
+out vec4 outcolor;
+
+void main()
+{
+    outcolor = a;
+}
+
+[test]
+clear color 0.8 0.0 0.0 1.0
+
+# Set the offset at location 0. This shouldn’t affect the result
+# unless the shader is ignoring the offset.
+block binding 0
+block offset 0
+uniform vec4 a 0.9 0.0 0.0 1.0
+
+block binding 0
+block offset 16
+uniform vec4 a 0.0 1.0 0.0 1.0
+
+verify program_interface_query GL_UNIFORM_BLOCK Block GL_BUFFER_DATA_SIZE 32
+verify program_query GL_ACTIVE_UNIFORMS 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
