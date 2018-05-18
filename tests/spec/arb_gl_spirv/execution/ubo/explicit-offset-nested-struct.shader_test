@@ -1,0 +1,81 @@
+# Test a UBO with a member at an explicit offset. The member is itself
+# a struct with its own explicit offset.
+
+[require]
+SPIRV ONLY
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 20
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outcolor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %outcolor "outcolor"
+               OpName %InnerThing "InnerThing"
+               OpMemberName %InnerThing 0 "ignored"
+               OpMemberName %InnerThing 1 "a"
+               OpName %Block "Block"
+               OpMemberName %Block 0 "thing"
+               OpName %_ ""
+               OpDecorate %outcolor Location 0
+               OpMemberDecorate %InnerThing 0 Offset 0
+               OpMemberDecorate %InnerThing 1 Offset 64
+               OpMemberDecorate %Block 0 Offset 64
+               OpDecorate %Block Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outcolor = OpVariable %_ptr_Output_v4float Output
+ %InnerThing = OpTypeStruct %float %v4float
+      %Block = OpTypeStruct %InnerThing
+%_ptr_Uniform_Block = OpTypePointer Uniform %Block
+          %_ = OpVariable %_ptr_Uniform_Block Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %18 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_1
+         %19 = OpLoad %v4float %18
+               OpStore %outcolor %19
+               OpReturn
+               OpFunctionEnd
+
+[test]
+clear color 0.8 0.0 0.0 1.0
+
+# Set the value at a few locations. This shouldn’t affect the result
+# unless the shader is ignoring the offset.
+block binding 0
+block offset 0
+uniform vec4 a 0.9 0.0 0.0 1.0
+block offset 64
+uniform vec4 a 0.9 0.0 0.0 1.0
+block offset 80
+uniform vec4 a 0.9 0.0 0.0 1.0
+
+block offset 128
+uniform vec4 a 0.0 1.0 0.0 1.0
+
+verify program_interface_query GL_UNIFORM_BLOCK Block GL_BUFFER_DATA_SIZE 144
+verify program_query GL_ACTIVE_UNIFORMS 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
