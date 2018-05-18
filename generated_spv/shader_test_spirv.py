@@ -824,7 +824,7 @@ def remap_ubo_member(name, ubos):
     md = re.match(r'([^\.]+)\.(.*)', name)
     if md:
         for ubo in ubos:
-            if ubo.name == md.group(1):
+            if ubo.name == md.group(1) or ubo.type.deref().name == md.group(1):
                 return remap_ubo_member_in_ubo(md.group(2), ubo)
 
     return None
