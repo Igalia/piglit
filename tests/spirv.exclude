@@ -22,6 +22,7 @@ tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch-arr
 tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-double-overlap.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-overlap.shader_test
+tests/spec/arb_gpu_shader_fp64/linker/vs-to-fs-explicit-location-overlap.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/const-fma-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-ldexp-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-packDouble2x32.shader_test
