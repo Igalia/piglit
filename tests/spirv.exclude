@@ -37,6 +37,10 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-fma.shader_test
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
 tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-array.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-arrays-of-arrays.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-block.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-struct.shader_test
 tests/spec/arb_shader_atomic_counter_ops/
 tests/spec/arb_shader_clock/
 tests/spec/glsl-1.20/linker/link-order-a-b.shader_test
