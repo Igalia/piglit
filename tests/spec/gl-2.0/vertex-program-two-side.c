@@ -66,6 +66,16 @@ static float secondary_frontcolor[4] = {0.0, 0.25, 0.0, 0.0};
 static float secondary_backcolor[4] = {0.0, 0.0, 0.25, 0.0};
 static int draw_secondary_loc;
 
+char *vs_outputs[4] = {"", "", "", ""};
+char *gs_outputs[4] = {"", "", "", ""};
+char *gs_inputs_outputs[4] = {"", "", "", ""};
+
+static const char *dummy_vs_source =
+	"void main()\n"
+	"{\n"
+	"	gl_Position = gl_Vertex;\n"
+	"}\n";
+
 static const char *fs_source =
 	"uniform bool draw_secondary;\n"
 	"void main()\n"
@@ -76,24 +86,13 @@ static const char *fs_source =
 	"		gl_FragColor = gl_Color;\n"
 	"}\n";
 
-enum piglit_result
-piglit_display(void)
+static bool
+probe_colors()
 {
+	bool pass = true;
 	int x1 = 0, y1 = 0;
 	int w = piglit_width / 2, h = piglit_height / 2;
 	int x2 = piglit_width - w, y2 = piglit_height - h;
-	bool pass = true;
-
-	glClearColor(0.5, 0.5, 0.5, 0.5);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glUniform1i(draw_secondary_loc, false);
-	piglit_draw_rect(-1,  0,  1, 1); /* top left */
-	piglit_draw_rect( 1,  0, -1, 1); /* top right */
-
-	glUniform1i(draw_secondary_loc, true);
-	piglit_draw_rect(-1, -1,  1, 1); /* bot left */
-	piglit_draw_rect( 1, -1, -1, 1); /* bot right */
 
 	if (front) {
 		pass = pass && piglit_probe_rect_rgba(x1, y2, w, h,
@@ -127,13 +126,41 @@ piglit_display(void)
 		}
 	}
 
-	piglit_present_results();
+	return pass;
+}
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+static bool
+test_prog(unsigned prog, const char *test_name)
+{
+	glUseProgram(prog);
+	draw_secondary_loc = glGetUniformLocation(prog, "draw_secondary");
+	assert(draw_secondary_loc != -1);
+
+	if (enabled)
+		glEnable(GL_VERTEX_PROGRAM_TWO_SIDE);
+
+	/* Draw */
+	glClearColor(0.5, 0.5, 0.5, 0.5);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUniform1i(draw_secondary_loc, false);
+	piglit_draw_rect(-1,  0,  1, 1); /* top left */
+	piglit_draw_rect( 1,  0, -1, 1); /* top right */
+
+	glUniform1i(draw_secondary_loc, true);
+	piglit_draw_rect(-1, -1,  1, 1); /* bot left */
+	piglit_draw_rect( 1, -1, -1, 1); /* bot right */
+
+	/* probe and report result */
+	bool pass = probe_colors();
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL, "%s",
+				     test_name);
+
+	return pass;
 }
 
 static void
-setup_output(char **out, const char *name, float *values)
+setup_vs_output(char **out, const char *name, float *values)
 {
 	(void)!asprintf(out,
 		 "	%s = vec4(%f, %f, %f, %f);\n",
@@ -144,15 +171,94 @@ setup_output(char **out, const char *name, float *values)
 		 values[3]);
 }
 
+static void
+setup_gs_vars(char **in_out, char **out, const char *name, float *values)
+{
+	(void)!asprintf(in_out, "	%s = gl_in[i].%s;\n", name, name);
+	(void)!asprintf(out, "	%s = vec4(%f, %f, %f, %f);\n",
+			name,
+			values[0],
+			values[1],
+			values[2],
+			values[3]);
+}
+
+static void
+create_gs_source(char **gs_source, char **builtins)
+{
+	(void)!asprintf(gs_source,
+		"#version 150 compatibility\n"
+		"layout(triangles) in;\n"
+		"layout(triangle_strip, max_vertices = 3) out;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	for (int i = 0; i < 3; i++) {\n"
+		"		gl_Position = gl_in[i].gl_Position;\n"
+		"		%s%s%s%s\n"
+		"		EmitVertex();\n"
+		"	}\n"
+		"}\n",
+		builtins[0],
+		builtins[1],
+		builtins[2],
+		builtins[3]);
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	char *vs_source;
+	char *gs_source;
+	char *gs_source2;
+	bool pass;
+
+	(void)!asprintf(&vs_source,
+		 "void main()\n"
+		 "{\n"
+		 "	gl_Position = gl_Vertex;\n"
+		 "%s%s%s%s"
+		 "}\n",
+		 vs_outputs[0],
+		 vs_outputs[1],
+		 vs_outputs[2],
+		 vs_outputs[3]);
+
+	prog = piglit_build_simple_program(vs_source, fs_source);
+	pass = test_prog(prog, "vs and fs");
+
+	if (piglit_get_gl_version() >= 32) {
+		/* Test the gs outputs only */
+		create_gs_source(&gs_source, gs_outputs);
+		prog = piglit_build_simple_program_multiple_shaders(
+			GL_VERTEX_SHADER, dummy_vs_source,
+			GL_GEOMETRY_SHADER, gs_source,
+			GL_FRAGMENT_SHADER, fs_source,
+			0);
+
+		pass = pass && test_prog(prog, "gs-out and fs");
+
+		/* Test both the gs outputs and inputs */
+		create_gs_source(&gs_source2, gs_inputs_outputs);
+		prog = piglit_build_simple_program_multiple_shaders(
+			GL_VERTEX_SHADER, vs_source,
+			GL_GEOMETRY_SHADER, gs_source2,
+			GL_FRAGMENT_SHADER, fs_source,
+			0);
+
+		pass = pass && test_prog(prog, "vs, gs and fs");
+	} else {
+		piglit_report_subtest_result(PIGLIT_SKIP, "gs-out and fs");
+		piglit_report_subtest_result(PIGLIT_SKIP, "vs, gs and fs");
+	}
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
 void
 piglit_init(int argc, char **argv)
 {
-	char *vs_outputs[4] = {"", "", "", ""};
-	char *vs_source;
-	int i;
-
 	piglit_require_GLSL();
-
 	piglit_require_gl_version(20);
 
 	printf("Window quadrants show:\n");
@@ -162,7 +268,7 @@ piglit_init(int argc, char **argv)
 	printf("| front gl_SecondaryColor | back gl_SecondaryColor |\n");
 	printf("+-------------------------+------------------------+\n");
 
-	for (i = 1; i < argc; i++) {
+	for (unsigned i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "enabled") == 0) {
 			enabled = true;
 		} else if (strcmp(argv[i], "front") == 0) {
@@ -178,31 +284,20 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	if (front)
-		setup_output(&vs_outputs[0], "gl_FrontColor", frontcolor);
-	if (back)
-		setup_output(&vs_outputs[1], "gl_BackColor", backcolor);
-	if (front2)
-		setup_output(&vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
-	if (back2)
-		setup_output(&vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
-
-	(void)!asprintf(&vs_source,
-		 "void main()\n"
-		 "{\n"
-		 "	gl_Position = gl_Vertex;\n"
-		 "%s%s%s%s"
-		 "}\n",
-		 vs_outputs[0],
-		 vs_outputs[1],
-		 vs_outputs[2],
-		 vs_outputs[3]);
-
-	prog = piglit_build_simple_program(vs_source, fs_source);
-	glUseProgram(prog);
-	draw_secondary_loc = glGetUniformLocation(prog, "draw_secondary");
-	assert(draw_secondary_loc != -1);
-
-	if (enabled)
-		glEnable(GL_VERTEX_PROGRAM_TWO_SIDE);
+	if (front) {
+		setup_vs_output(&vs_outputs[0], "gl_FrontColor", frontcolor);
+		setup_gs_vars(&gs_inputs_outputs[0], &gs_outputs[0], "gl_FrontColor", frontcolor);
+	}
+	if (back) {
+		setup_vs_output(&vs_outputs[1], "gl_BackColor", backcolor);
+		setup_gs_vars(&gs_inputs_outputs[1], &gs_outputs[1], "gl_BackColor", backcolor);
+	}
+	if (front2) {
+		setup_vs_output(&vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
+		setup_gs_vars(&gs_inputs_outputs[2], &gs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
+	}
+	if (back2) {
+		setup_vs_output(&vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
+		setup_gs_vars(&gs_inputs_outputs[3], &gs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
+	}
 }
