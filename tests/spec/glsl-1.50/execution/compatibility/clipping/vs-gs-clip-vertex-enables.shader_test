@@ -1,0 +1,175 @@
+# This test sets up 6 clipping planes using gl_ClipVertex, which clip
+# a rectangle to a hexagon shape.  Then it tests various combinations
+# of enables for the 6 clipping planes, and verifies that they all
+# create the correct shape.
+#
+# To verify that each enable works, the combinations of enables were
+# chosen such that:
+# - Every plane is enabled at least once and disbled at least once.
+# - Every plane is enabled and disabled in a different pattern.
+#
+# Note: Some implementations have bugs related to improper coordinate
+# transformations of clip planes (which are already adequately tested
+# by the clip-plane-transformation test), so to avoid those bugs
+# contaminating the results of this test, we don't do any coordinate
+# transformation in this test.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150 compatibility
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	vec4 gl_ClipVertex;
+};
+
+void main(void)
+{
+	gl_Position = gl_Vertex;
+
+	gl_ClipVertex = gl_Position;
+}
+
+[geometry shader]
+#version 150 compatibility
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in gl_PerVertex {
+	vec4 gl_Position;
+	vec4 gl_ClipVertex;
+} gl_in[];
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gl_ClipVertex = gl_in[i].gl_ClipVertex;
+
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 120
+void main(void)
+{
+	gl_FragColor = vec4(1, 1, 1, 1);
+}
+
+[test]
+clip plane 0 0 1 0 0.5
+clip plane 1 -1 1 0 0.8
+clip plane 2 -1 -1 0 0.8
+clip plane 3 0 -1 0 0.5
+clip plane 4 1 -1 0 0.8
+clip plane 5 1 1 0 0.8
+clear color 0.0 0.0 0.0 0.0
+
+# Test with planes 0, 2, and 4 enabled.
+enable GL_CLIP_PLANE0
+disable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+disable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+disable GL_CLIP_PLANE5
+clear
+draw rect -1 -1 2 2
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.5, 0.2) (0.0, 0.0, 0.0, 0.0) # clipped by plane 0
+relative probe rgba (0.8, 0.3) (1.0, 1.0, 1.0, 1.0) # clipped by plane 1
+relative probe rgba (0.8, 0.7) (0.0, 0.0, 0.0, 0.0) # clipped by plane 2
+relative probe rgba (0.5, 0.8) (1.0, 1.0, 1.0, 1.0) # clipped by plane 3
+relative probe rgba (0.2, 0.7) (0.0, 0.0, 0.0, 0.0) # clipped by plane 4
+relative probe rgba (0.2, 0.3) (1.0, 1.0, 1.0, 1.0) # clipped by plane 5
+
+# Test with planes 0, 1, 4, and 5 enabled.
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+disable GL_CLIP_PLANE2
+disable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+clear
+draw rect -1 -1 2 2
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.5, 0.2) (0.0, 0.0, 0.0, 0.0) # clipped by plane 0
+relative probe rgba (0.8, 0.3) (0.0, 0.0, 0.0, 0.0) # clipped by plane 1
+relative probe rgba (0.8, 0.7) (1.0, 1.0, 1.0, 1.0) # clipped by plane 2
+relative probe rgba (0.5, 0.8) (1.0, 1.0, 1.0, 1.0) # clipped by plane 3
+relative probe rgba (0.2, 0.7) (0.0, 0.0, 0.0, 0.0) # clipped by plane 4
+relative probe rgba (0.2, 0.3) (0.0, 0.0, 0.0, 0.0) # clipped by plane 5
+
+# Test with planes 0, 1, 2, and 3 enabled.
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+disable GL_CLIP_PLANE4
+disable GL_CLIP_PLANE5
+clear
+draw rect -1 -1 2 2
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.5, 0.2) (0.0, 0.0, 0.0, 0.0) # clipped by plane 0
+relative probe rgba (0.8, 0.3) (0.0, 0.0, 0.0, 0.0) # clipped by plane 1
+relative probe rgba (0.8, 0.7) (0.0, 0.0, 0.0, 0.0) # clipped by plane 2
+relative probe rgba (0.5, 0.8) (0.0, 0.0, 0.0, 0.0) # clipped by plane 3
+relative probe rgba (0.2, 0.7) (1.0, 1.0, 1.0, 1.0) # clipped by plane 4
+relative probe rgba (0.2, 0.3) (1.0, 1.0, 1.0, 1.0) # clipped by plane 5
+
+# Test with planes 4 and 5 enabled.
+disable GL_CLIP_PLANE0
+disable GL_CLIP_PLANE1
+disable GL_CLIP_PLANE2
+disable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+clear
+draw rect -1 -1 2 2
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.5, 0.2) (1.0, 1.0, 1.0, 1.0) # clipped by plane 0
+relative probe rgba (0.8, 0.3) (1.0, 1.0, 1.0, 1.0) # clipped by plane 1
+relative probe rgba (0.8, 0.7) (1.0, 1.0, 1.0, 1.0) # clipped by plane 2
+relative probe rgba (0.5, 0.8) (1.0, 1.0, 1.0, 1.0) # clipped by plane 3
+relative probe rgba (0.2, 0.7) (0.0, 0.0, 0.0, 0.0) # clipped by plane 4
+relative probe rgba (0.2, 0.3) (0.0, 0.0, 0.0, 0.0) # clipped by plane 5

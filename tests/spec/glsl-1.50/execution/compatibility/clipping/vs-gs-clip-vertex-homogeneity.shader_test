@@ -1,0 +1,97 @@
+# This test verifies that the homogeneous coordinate of gl_ClipVertex
+# is properly respected, by doubling all the coordinates of
+# gl_ClipVertex (including the homogeneous coordinate) and verifying
+# that the clipped shape is still correct.
+#
+# In addition, this test:
+# - uses all 6 clip planes to clip a rectangle to a hexagon shape.
+# - sets gl_Position and gl_ClipVertex to different values, to verify
+#   that gl_Position determines screen position and gl_ClipVertex
+#   determines clipping.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150 compatibility
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	vec4 gl_ClipVertex;
+};
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	// Transform gl_ClipVertex in an arbitrary way so that
+	// we can verify it is being used for clipping instead of
+	// gl_Position.  The x and y coordinates are multiplied by 5,
+	// and the homogeneous coordinate is multiplied by 0.5, so the
+	// net result should be that x and y are scaled by a factor of
+	// 10.
+	gl_ClipVertex = gl_Vertex * vec4(5.0, 5.0, 1.0, 0.5);
+}
+
+[geometry shader]
+#version 150 compatibility
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in gl_PerVertex {
+	vec4 gl_Position;
+	vec4 gl_ClipVertex;
+} gl_in[];
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gl_ClipVertex = gl_in[i].gl_ClipVertex;
+
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 120
+void main(void)
+{
+	gl_FragColor = vec4(1, 1, 1, 1);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho 0 1 0 1
+clip plane 0 0 1 0 -2.5
+clip plane 1 -1 1 0 4
+clip plane 2 -1 -1 0 14
+clip plane 3 0 -1 0 7.5
+clip plane 4 1 -1 0 4
+clip plane 5 1 1 0 -6
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+draw rect 0.1 0.1 0.8 0.8
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.2, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.2) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.7) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.8) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.2, 0.7) (0.0, 0.0, 0.0, 0.0)

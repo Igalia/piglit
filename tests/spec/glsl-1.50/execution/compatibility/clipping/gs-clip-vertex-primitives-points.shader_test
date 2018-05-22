@@ -1,0 +1,72 @@
+# Verify that gl_ClipVertex affects different primitive types correctly.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 120
+
+attribute vec2 in_pos;
+
+uniform vec2 u_offset;
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(u_offset + in_pos, 0, 1);
+}
+
+[geometry shader]
+#version 150 compatibility
+
+layout(points) in;
+layout(points, max_vertices = 1) out;
+
+uniform float u_clipdist;
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gl_ClipVertex = vec4(u_clipdist, 0.0, 0.0, 0.0);
+
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 120
+void main(void)
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+in_pos/float/2
+ 0  0
+10  0
+ 0 10
+10 10
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+clip plane 0 1.0 0.0 0.0 0.0 # accept points where gl_ClipVertex.x >= 0
+enable GL_CLIP_PLANE0
+
+ortho
+
+# Test that primitives are clipped with a negative distance
+uniform float u_clipdist -1
+
+uniform vec2 u_offset 0.5 0.5
+draw arrays GL_POINTS 0 1
+probe rect rgba ( 0, 0, 20, 20) (0, 0, 0, 0)
+
+# Test that primitives are not clipped with zero distance
+uniform float u_clipdist 0
+
+uniform vec2 u_offset 0.5 20.5
+draw arrays GL_POINTS 0 1
+probe rect rgba ( 0, 20, 1, 1) (1, 0, 0, 1)

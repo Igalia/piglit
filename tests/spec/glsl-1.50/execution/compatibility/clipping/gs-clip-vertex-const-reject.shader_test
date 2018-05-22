@@ -1,0 +1,58 @@
+# From the GL 2.1 spec, section 2.17 (Clipping):
+#
+#   All points with eye coordinates (x_e y_e z_e w_e)^T that satisfy
+#
+#                          (x_e)
+#     (p_1' p_2' p_3' p_4')(y_e) >= 0
+#                          (z_e)
+#                          (w_e)
+#
+#   lie in the half-space defined by the plane; points that do not
+#   satisfy this condition do not lie in the half-space.
+#
+# This test checks that gl_ClipVertex works properly for the trivial
+# case where gl_ClipVertex is a constant value not satisfying the
+# above inequality.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 120
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[geometry shader]
+#version 150 compatibility
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gl_ClipVertex = vec4(-1.0, 0.0, 0.0, 0.0);
+
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 120
+void main(void)
+{
+	gl_FragColor = vec4(1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+clip plane 0 1.0 0.0 0.0 0.0 # accept points where gl_ClipVertex.x >= 0
+enable GL_CLIP_PLANE0
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 0.0 0.0

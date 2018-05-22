@@ -1,0 +1,83 @@
+# Verify that gl_ClipVertex affects different primitive types correctly.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150 compatibility
+
+out gl_PerVertex {
+	vec4 gl_Position;
+	vec4 gl_ClipVertex;
+};
+
+attribute vec2 in_pos;
+
+uniform vec2 u_offset;
+uniform float u_clipdist;
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(u_offset + in_pos, 0, 1);
+
+	gl_ClipVertex = vec4(u_clipdist, 0.0, 0.0, 0.0);
+}
+
+[geometry shader]
+#version 150 compatibility
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in gl_PerVertex {
+	vec4 gl_Position;
+	vec4 gl_ClipVertex;
+} gl_in[];
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gl_ClipVertex = gl_in[i].gl_ClipVertex;
+
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 120
+void main(void)
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+in_pos/float/2
+ 0  0
+10  0
+ 0 10
+10 10
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+clip plane 0 1.0 0.0 0.0 0.0 # accept points where gl_ClipVertex.x >= 0
+enable GL_CLIP_PLANE0
+
+ortho
+
+# Test that primitives are clipped with a negative distance
+uniform float u_clipdist -1
+
+uniform vec2 u_offset 40 0
+draw arrays GL_TRIANGLE_STRIP 0 4
+probe rect rgba (40, 0, 20, 20) (0, 0, 0, 0)
+
+# Test that primitives are not clipped with zero distance
+uniform float u_clipdist 0
+
+uniform vec2 u_offset 40 20
+draw arrays GL_TRIANGLE_STRIP 0 4
+probe rect rgba (40, 20, 10, 10) (1, 0, 0, 1)
