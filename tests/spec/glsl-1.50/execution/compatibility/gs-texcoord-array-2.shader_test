@@ -1,0 +1,52 @@
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150 compatibility
+
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[geometry shader]
+#version 150 compatibility
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+out vec4 gl_TexCoord[5];
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+
+		/* 0.05, 0.05, 0.10, 0.15, 0.20 */
+		for (int j = 0; j < 5; j++) {
+			gl_TexCoord[j] = vec4(float(j) * 0.05);
+		}
+
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 110
+
+varying vec4 gl_TexCoord[5];
+void main()
+{
+	vec4 result = vec4(0.0);
+
+	for (int i = 0; i < 4; i++)
+		result += gl_TexCoord[i];
+
+	/* 0.00 + 0.05 + 0.10 + 0.15 = 0.30 */
+	gl_FragColor = result;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgba 1 1 0.3 0.3 0.3 0.3
