@@ -39,12 +39,35 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-enum piglit_result
-piglit_display(void)
+const char * tests[4] = { "vs and fs", "gs-out and fs", "vs, gs and fs", NULL };
+
+static const char vs_source[] =
+	"void main()\n"
+	"{\n"
+	"	gl_Position = gl_Vertex;\n"
+	"	gl_FogFragCoord = gl_Position.x;\n"
+	"}\n";
+
+static const char *dummy_vs_source =
+	"void main()\n"
+	"{\n"
+	"	gl_Position = gl_Vertex;\n"
+	"}\n";
+
+static const char fs_source[] =
+	"void main()\n"
+	"{\n"
+	"	gl_FragColor = vec4(gl_FogFragCoord * gl_Fog.scale * vec2(1.0, -1.0), 0.0, 1.0);\n"
+	"}\n";
+
+static bool
+test_prog(unsigned prog, const char *test_name)
 {
 	static const float green[] = {0.0f, 1.0f, 0.0f, 1.0f};
 	static const float red[] = {1.0f, 0.0f, 0.0f, 1.0f};
 	bool pass = true;
+
+	glUseProgram(prog);
 
 	glClearColor(0.0, 0.0, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -57,7 +80,66 @@ piglit_display(void)
 				      piglit_width / 2, piglit_height,
 				      red) && pass;
 
-	piglit_present_results();
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL, "%s",
+				     test_name);
+
+	return pass;
+}
+
+static void
+create_gs_source(char **gs_source, char *fogFragCoordValue)
+{
+	(void)!asprintf(gs_source,
+		"#version 150 compatibility\n"
+		"layout(triangles) in;\n"
+		"layout(triangle_strip, max_vertices = 3) out;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	for (int i = 0; i < 3; i++) {\n"
+		"		gl_Position = gl_in[i].gl_Position;\n"
+		"		gl_FogFragCoord = %s;\n"
+		"		EmitVertex();\n"
+		"	}\n"
+		"}\n",
+		fogFragCoordValue);
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	bool pass = true;
+	char *gs_source;
+	char *gs_source2;
+
+	/* Test simple vs and fs program */
+	GLuint prog = piglit_build_simple_program(vs_source, fs_source);
+	test_prog(prog, tests[0]);
+
+	/* Test passing gl_FogFragCoord via the Geometry Shader */
+	if (piglit_get_gl_version() >= 32) {
+		/* Test gl_FogFragCoord gs output only */
+		create_gs_source(&gs_source, "gl_Position.x");
+		prog = piglit_build_simple_program_multiple_shaders(
+			GL_VERTEX_SHADER, dummy_vs_source,
+			GL_GEOMETRY_SHADER, gs_source,
+			GL_FRAGMENT_SHADER, fs_source,
+			0);
+		pass = pass && test_prog(prog, tests[1]);
+
+		/* Test gl_FogFragCoord both as a gs output and input */
+		create_gs_source(&gs_source2, "gl_in[i].gl_FogFragCoord");
+		prog = piglit_build_simple_program_multiple_shaders(
+			GL_VERTEX_SHADER, vs_source,
+			GL_GEOMETRY_SHADER, gs_source2,
+			GL_FRAGMENT_SHADER, fs_source,
+			0);
+		pass = pass && test_prog(prog, tests[2]);
+
+	} else {
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[1]);
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[2]);
+	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -65,22 +147,8 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	static const char vs_source[] =
-		"void main()\n"
-		"{\n"
-		"	gl_Position = gl_Vertex;\n"
-		"	gl_FogFragCoord = gl_Position.x;\n"
-		"}\n";
-	static const char fs_source[] =
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor = vec4(gl_FogFragCoord * gl_Fog.scale * vec2(1.0, -1.0), 0.0, 1.0);\n"
-		"}\n";
-	GLuint prog;
-
-	prog = piglit_build_simple_program(vs_source, fs_source);
+	piglit_register_subtests(tests);
 
 	glFogf(GL_FOG_START, 0.0f);
 	glFogf(GL_FOG_END, 0.0f);
-	glUseProgram(prog);
 }
