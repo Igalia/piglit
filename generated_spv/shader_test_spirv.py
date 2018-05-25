@@ -1132,14 +1132,19 @@ def process_shader_test(shader_test, config):
 
     if vertex_stage is None:
         vertex_stage = SpirvInfo(passthrough_spirv)
+        # If the test isn’t providing a vertex shader and is assuming
+        # a compatibility context, normally this would end up using
+        # the legacy fixed vertex processing. However the SPIR-V mode
+        # forces a core profile so in that case it will end up doing
+        # no vertex processing. Instead we will add a line to add the
+        # passthrough vertex shader. We don’t want to do this if the
+        # script provides tessellation or geometry shaders because
+        # that should fail to link and there are explicit tests for
+        # that.
         if not is_core:
-            # The test isn’t providing a vertex shader and is assuming
-            # a compatibility context. Normally this would end up with
-            # the default vertex shader but the SPIR-V mode forces a
-            # core profile so it will end up with no vertex shader.
-            # Instead we will add a line to add the passthrough vertex
-            # shader.
-            extra_sections = '[vertex shader passthrough]\n'
+            stages = set((s[0].stage for s in shader_groups))
+            if len(stages) == 1 and "fragment" in stages:
+                extra_sections = '[vertex shader passthrough]\n'
 
     if config.mirror:
         spv_shader_test_file = config.mirror[0] + '/' + shader_test
