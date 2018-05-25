@@ -848,7 +848,8 @@ def filter_shader_test(config,
                        uniform_map,
                        ubos,
                        attrib_map,
-                       add_spirv_line):
+                       add_spirv_line,
+                       extra_sections):
     skipping = False
     groupname = None
     in_test = False
@@ -889,6 +890,10 @@ def filter_shader_test(config,
                         fout.write(replacement)
                     fout.write('\n')
                     replacements[groupname] = ''
+
+            if in_test and extra_sections:
+                fout.write(extra_sections)
+                extra_sections = None
 
         if in_test:
             md = uniform_re.match(line)
@@ -978,6 +983,8 @@ def process_shader_test(shader_test, config):
     shaders = []
 
     have_glsl = False
+    is_core = False
+    has_vertex_shader_passthrough = False
 
     with open(shader_test, 'r') as filp:
         shader = None
@@ -1020,6 +1027,9 @@ def process_shader_test(shader_test, config):
                     have_glsl = True
                     continue
 
+                if groupname == 'vertex shader passthrough':
+                    has_vertex_shader_passthrough = True
+
                 continue
 
             if groupname == 'require':
@@ -1027,11 +1037,14 @@ def process_shader_test(shader_test, config):
                 if not words:
                     continue
 
-                if words[0] == 'GL' and words[1] == 'ES':
-                    if config.verbose:
-                        # Needs no SPIRV line, since shader_runner can also skip automatically
-                        print('{}: skip due to GL ES'.format(shader_test))
-                    return 2
+                if words[0] == 'GL':
+                    if words[1] == 'ES':
+                        if config.verbose:
+                            # Needs no SPIRV line, since shader_runner can also skip automatically
+                            print('{}: skip due to GL ES'.format(shader_test))
+                        return 2
+                    if 'CORE' in words:
+                        is_core = True
                 elif words[0] == 'SPIRV':
                     assert spirv_line is None
                     spirv_line = words[1:]
@@ -1119,8 +1132,23 @@ def process_shader_test(shader_test, config):
 
         prev_stage = this_stage
 
+    extra_sections = None
+
     if vertex_stage is None:
         vertex_stage = SpirvInfo(passthrough_spirv)
+        # If the test isn’t providing a vertex shader and is assuming
+        # a compatibility context, normally this would end up using
+        # the legacy fixed vertex processing. However the SPIR-V mode
+        # forces a core profile so in that case it will end up doing
+        # no vertex processing. Instead we will add a line to add the
+        # passthrough vertex shader. We don’t want to do this if the
+        # script provides tessellation or geometry shaders because
+        # that should fail to link and there are explicit tests for
+        # that.
+        if not is_core and not has_vertex_shader_passthrough:
+            stages = set((s[0].stage for s in shader_groups))
+            if len(stages) == 1 and "fragment" in stages:
+                extra_sections = '[vertex shader passthrough]\n'
 
     if config.mirror:
         spv_shader_test_file = config.mirror[0] + '/' + shader_test
@@ -1143,7 +1171,8 @@ def process_shader_test(shader_test, config):
                                uniform_map,
                                ubos,
                                vertex_stage.inputs,
-                               spirv_line == None)
+                               spirv_line == None,
+                               extra_sections)
     if config.replace:
         os.rename(spv_shader_test_file, shader_test)
 
