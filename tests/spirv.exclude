@@ -44,6 +44,7 @@ tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap
 tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-block.shader_test
 tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-struct.shader_test
 tests/spec/arb_shader_atomic_counter_ops/
+tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
 tests/spec/arb_shader_clock/
 tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks-instanced.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks-instanced.shader_test
