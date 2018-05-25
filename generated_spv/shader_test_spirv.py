@@ -984,6 +984,7 @@ def process_shader_test(shader_test, config):
 
     have_glsl = False
     is_core = False
+    has_vertex_shader_passthrough = False
 
     with open(shader_test, 'r') as filp:
         shader = None
@@ -1025,6 +1026,9 @@ def process_shader_test(shader_test, config):
                     shader = ShaderSource(m.group(1))
                     have_glsl = True
                     continue
+
+                if groupname == 'vertex shader passthrough':
+                    has_vertex_shader_passthrough = True
 
                 continue
 
@@ -1141,7 +1145,7 @@ def process_shader_test(shader_test, config):
         # script provides tessellation or geometry shaders because
         # that should fail to link and there are explicit tests for
         # that.
-        if not is_core:
+        if not is_core and not has_vertex_shader_passthrough:
             stages = set((s[0].stage for s in shader_groups))
             if len(stages) == 1 and "fragment" in stages:
                 extra_sections = '[vertex shader passthrough]\n'
