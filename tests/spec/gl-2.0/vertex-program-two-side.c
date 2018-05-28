@@ -66,9 +66,18 @@ static float secondary_frontcolor[4] = {0.0, 0.25, 0.0, 0.0};
 static float secondary_backcolor[4] = {0.0, 0.0, 0.25, 0.0};
 static int draw_secondary_loc;
 
+char *dummy_outputs[4] = {"", "", "", ""};
 char *vs_outputs[4] = {"", "", "", ""};
 char *gs_outputs[4] = {"", "", "", ""};
 char *gs_inputs_outputs[4] = {"", "", "", ""};
+char *tcs_outputs[4] = {"", "", "", ""};
+char *tcs_inputs_outputs[4] = {"", "", "", ""};
+char *tes_outputs[4] = {"", "", "", ""};
+char *tes_inputs_outputs[4] = {"", "", "", ""};
+
+const char * tests[7] = {"vs and fs", "gs-out and fs", "vs, gs and fs",
+			 "tes-out and fs", "tcs-out, tes and fs",
+			 "vs, tcs, tes and fs", NULL };
 
 static const char *dummy_vs_source =
 	"void main()\n"
@@ -130,7 +139,7 @@ probe_colors()
 }
 
 static bool
-test_prog(unsigned prog, const char *test_name)
+test_prog(unsigned prog, const char *test_name, bool use_patches)
 {
 	glUseProgram(prog);
 	draw_secondary_loc = glGetUniformLocation(prog, "draw_secondary");
@@ -144,12 +153,12 @@ test_prog(unsigned prog, const char *test_name)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUniform1i(draw_secondary_loc, false);
-	piglit_draw_rect(-1,  0,  1, 1); /* top left */
-	piglit_draw_rect( 1,  0, -1, 1); /* top right */
+	piglit_draw_rect_custom(-1,  0,  1, 1, use_patches, 1); /* top left */
+	piglit_draw_rect_custom( 1,  0, -1, 1, use_patches, 1); /* top right */
 
 	glUniform1i(draw_secondary_loc, true);
-	piglit_draw_rect(-1, -1,  1, 1); /* bot left */
-	piglit_draw_rect( 1, -1, -1, 1); /* bot right */
+	piglit_draw_rect_custom(-1, -1,  1, 1, use_patches, 1); /* bot left */
+	piglit_draw_rect_custom( 1, -1, -1, 1, use_patches, 1); /* bot right */
 
 	/* probe and report result */
 	bool pass = probe_colors();
@@ -184,6 +193,30 @@ setup_gs_vars(char **in_out, char **out, const char *name, float *values)
 }
 
 static void
+setup_tcs_vars(char **in_out, char **out, const char *name, float *values)
+{
+	(void)!asprintf(in_out, "	gl_out[gl_InvocationID].%s = gl_in[gl_InvocationID].%s;\n", name, name);
+	(void)!asprintf(out, "	gl_out[gl_InvocationID].%s = vec4(%f, %f, %f, %f);\n",
+			name,
+			values[0],
+			values[1],
+			values[2],
+			values[3]);
+}
+
+static void
+setup_tes_vars(char **in_out, char **out, const char *name, float *values)
+{
+	(void)!asprintf(in_out, "	INTERP_QUAD(gl_in[0].%s, %s);\n", name, name);
+	(void)!asprintf(out, "	INTERP_QUAD(vec4(%f, %f, %f, %f), %s);\n",
+			values[0],
+			values[1],
+			values[2],
+			values[3],
+			name);
+}
+
+static void
 create_gs_source(char **gs_source, char **builtins)
 {
 	(void)!asprintf(gs_source,
@@ -205,12 +238,58 @@ create_gs_source(char **gs_source, char **builtins)
 		builtins[3]);
 }
 
+static void
+create_tess_source(char **tcs_source, char **tcs_builtins,
+                   char **tes_source, char **tes_builtins)
+{
+	(void)!asprintf(tcs_source,
+		"#version 150 compatibility\n"
+		"#extension GL_ARB_tessellation_shader: require\n"
+		"layout(vertices = 4) out;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;\n"
+		"	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);\n"
+		"	gl_TessLevelInner = float[2](1.0, 1.0);\n"
+		"	%s%s%s%s\n"
+		"}\n",
+		tcs_builtins[0],
+		tcs_builtins[1],
+		tcs_builtins[2],
+		tcs_builtins[3]);
+
+	(void)!asprintf(tes_source,
+		"#version 150 compatibility\n"
+		"#extension GL_ARB_tessellation_shader: require\n"
+		"layout(quads) in;\n"
+		"\n"
+		"#define INTERP_QUAD(INi, OUT) do { \\\n"
+		"	vec4 v[4]; \\\n"
+		"	for (int i = 0; i < 4; i++) v[i] = INi; \\\n"
+		"		OUT = mix(mix(v[0], v[1], gl_TessCoord[0]), mix(v[2], v[3], \\\n"
+		"			  gl_TessCoord[0]), gl_TessCoord[1]); \\\n"
+		"} while(false);\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	INTERP_QUAD(gl_in[i].gl_Position, gl_Position);\n"
+		"	%s%s%s%s\n"
+		"}\n",
+		tes_builtins[0],
+		tes_builtins[1],
+		tes_builtins[2],
+		tes_builtins[3]);
+}
+
 enum piglit_result
 piglit_display(void)
 {
 	char *vs_source;
 	char *gs_source;
 	char *gs_source2;
+	char *tcs_source;
+	char *tes_source;
 	bool pass;
 
 	(void)!asprintf(&vs_source,
@@ -225,7 +304,7 @@ piglit_display(void)
 		 vs_outputs[3]);
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
-	pass = test_prog(prog, "vs and fs");
+	pass = test_prog(prog, tests[0], false);
 
 	if (piglit_get_gl_version() >= 32) {
 		/* Test the gs outputs only */
@@ -236,7 +315,7 @@ piglit_display(void)
 			GL_FRAGMENT_SHADER, fs_source,
 			0);
 
-		pass = pass && test_prog(prog, "gs-out and fs");
+		pass = pass && test_prog(prog, tests[1], false);
 
 		/* Test both the gs outputs and inputs */
 		create_gs_source(&gs_source2, gs_inputs_outputs);
@@ -246,10 +325,58 @@ piglit_display(void)
 			GL_FRAGMENT_SHADER, fs_source,
 			0);
 
-		pass = pass && test_prog(prog, "vs, gs and fs");
+		pass = pass && test_prog(prog, tests[2], false);
+
+		if (piglit_is_extension_supported("GL_ARB_tessellation_shader")) {
+			/* Test tes outputs only */
+			create_tess_source(&tcs_source, dummy_outputs,
+					   &tes_source, tes_outputs);
+			prog = piglit_build_simple_program_multiple_shaders(
+				GL_VERTEX_SHADER, dummy_vs_source,
+				GL_TESS_CONTROL_SHADER, tcs_source,
+				GL_TESS_EVALUATION_SHADER, tes_source,
+				GL_FRAGMENT_SHADER, fs_source,
+				0);
+			pass = pass && test_prog(prog, tests[3], true);
+			free(tcs_source);
+			free(tes_source);
+
+			/* Test tcs outputs and tes inputs/outputs */
+			create_tess_source(&tcs_source, tcs_outputs,
+					   &tes_source, tes_inputs_outputs);
+			prog = piglit_build_simple_program_multiple_shaders(
+				GL_VERTEX_SHADER, dummy_vs_source,
+				GL_TESS_CONTROL_SHADER, tcs_source,
+				GL_TESS_EVALUATION_SHADER, tes_source,
+				GL_FRAGMENT_SHADER, fs_source,
+				0);
+			pass = pass && test_prog(prog, tests[4], true);
+			free(tcs_source);
+			free(tes_source);
+
+			/* Test tcs inputs/outputs and tes inputs/outputs */
+			create_tess_source(&tcs_source, tcs_inputs_outputs,
+					   &tes_source, tes_inputs_outputs);
+			prog = piglit_build_simple_program_multiple_shaders(
+				GL_VERTEX_SHADER, vs_source,
+				GL_TESS_CONTROL_SHADER, tcs_source,
+				GL_TESS_EVALUATION_SHADER, tes_source,
+				GL_FRAGMENT_SHADER, fs_source,
+				0);
+			pass = pass && test_prog(prog, tests[5], true);
+			free(tcs_source);
+			free(tes_source);
+		} else {
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[3]);
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[4]);
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[5]);
+		}
 	} else {
-		piglit_report_subtest_result(PIGLIT_SKIP, "gs-out and fs");
-		piglit_report_subtest_result(PIGLIT_SKIP, "vs, gs and fs");
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[1]);
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[2]);
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[3]);
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[4]);
+		piglit_report_subtest_result(PIGLIT_SKIP, tests[5]);
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
@@ -284,20 +411,30 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
+	piglit_register_subtests(tests);
+
 	if (front) {
 		setup_vs_output(&vs_outputs[0], "gl_FrontColor", frontcolor);
 		setup_gs_vars(&gs_inputs_outputs[0], &gs_outputs[0], "gl_FrontColor", frontcolor);
+		setup_tcs_vars(&tcs_inputs_outputs[0], &tcs_outputs[0], "gl_FrontColor", frontcolor);
+		setup_tes_vars(&tes_inputs_outputs[0], &tes_outputs[0], "gl_FrontColor", frontcolor);
 	}
 	if (back) {
 		setup_vs_output(&vs_outputs[1], "gl_BackColor", backcolor);
 		setup_gs_vars(&gs_inputs_outputs[1], &gs_outputs[1], "gl_BackColor", backcolor);
+		setup_tcs_vars(&tcs_inputs_outputs[1], &tcs_outputs[1], "gl_BackColor", backcolor);
+		setup_tes_vars(&tes_inputs_outputs[1], &tes_outputs[1], "gl_BackColor", backcolor);
 	}
 	if (front2) {
 		setup_vs_output(&vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
 		setup_gs_vars(&gs_inputs_outputs[2], &gs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
+		setup_tcs_vars(&tcs_inputs_outputs[2], &tcs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
+		setup_tes_vars(&tes_inputs_outputs[2], &tes_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
 	}
 	if (back2) {
 		setup_vs_output(&vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
 		setup_gs_vars(&gs_inputs_outputs[3], &gs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
+		setup_tcs_vars(&tcs_inputs_outputs[3], &tcs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
+		setup_tes_vars(&tes_inputs_outputs[3], &tes_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
 	}
 }
