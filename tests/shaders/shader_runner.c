@@ -2952,6 +2952,7 @@ piglit_display(void)
 	GLbitfield clear_bits = 0;
 	bool link_error_expected = false;
 	int ubo_array_index = 0;
+	unsigned list = 0;
 
 	if (test_start == NULL)
 		return PIGLIT_PASS;
@@ -3865,6 +3866,21 @@ piglit_display(void)
 			active_program_interface(rest);
 		} else if (parse_str(line, "vertex attrib ", &rest)) {
 			set_vertex_attrib(rest);
+		} else if (parse_str(line, "newlist ", &rest)) {
+			GLenum mode;
+
+			REQUIRE(parse_enum_gl(rest, &mode, &rest),
+				"NewList mode command not understood at %s\n",
+				rest);
+
+			list = glGenLists(1);
+			glNewList(list, mode);
+		} else if (parse_str(line, "endlist", NULL)) {
+			glEndList();
+		} else if (parse_str(line, "calllist", NULL)) {
+			glCallList(list);
+		} else if (parse_str(line, "deletelist", NULL)) {
+			glDeleteLists(list, 1);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
