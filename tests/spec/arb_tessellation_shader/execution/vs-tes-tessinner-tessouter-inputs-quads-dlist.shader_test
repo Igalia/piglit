@@ -1,0 +1,84 @@
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+
+[vertex shader]
+in vec4 vertex;
+
+void main()
+{
+	gl_Position = vertex;
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+layout(quads) in;
+
+out vec4 color;
+
+void main() {
+	gl_Position = vec4(gl_TessCoord.xy * 2 - 1, 0, 1);
+	color = gl_TessLevelOuter[0] == 2.0 &&
+	        gl_TessLevelOuter[1] == 4.0 &&
+		gl_TessLevelOuter[2] == 7.0 &&
+		gl_TessLevelOuter[3] == 6.0 &&
+		gl_TessLevelInner[0] == 5.0 &&
+		gl_TessLevelInner[1] == 3.0 ?
+			vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+
+[fragment shader]
+in vec4 color;
+
+void main()
+{
+	gl_FragColor = color;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+
+newlist GL_COMPILE
+patch parameter vertices 4
+patch parameter default level outer 2 4 7 6
+patch parameter default level inner 5 3
+draw arrays GL_PATCHES 0 6
+endlist
+
+# make sure we haven't drawn anything yet
+probe all rgba 0.1 0.1 0.1 0.1
+
+# Set wrong patch param to make sure the call list is respected
+patch parameter default level outer 1 3 5 2
+patch parameter default level inner 6 4
+
+calllist
+probe all rgba 0.0 1.0 0.0 1.0
+deletelist
+
+clear color 0.1 0.1 0.1 0.1
+clear
+
+newlist GL_COMPILE_AND_EXECUTE
+patch parameter vertices 4
+patch parameter default level outer 2 4 7 6
+patch parameter default level inner 5 3
+draw arrays GL_PATCHES 0 6
+endlist
+
+probe all rgba 0.0 1.0 0.0 1.0
+deletelist
