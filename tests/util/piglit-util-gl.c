@@ -684,10 +684,22 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex,
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		}
 
-		if (instance_count > 1)
-			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, instance_count);
-		else
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		if (use_patches) {
+			GLint old_patch_vertices;
+
+			glGetIntegerv(GL_PATCH_VERTICES, &old_patch_vertices);
+			glPatchParameteri(GL_PATCH_VERTICES, 4);
+			if (instance_count > 1)
+				glDrawArraysInstanced(GL_PATCHES, 0, 4, instance_count);
+			else
+				glDrawArrays(GL_PATCHES, 0, 4);
+			glPatchParameteri(GL_PATCH_VERTICES, old_patch_vertices);
+		} else {
+			if (instance_count > 1)
+				glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, instance_count);
+			else
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
 
 		if (verts)
 			glDisableClientState(GL_VERTEX_ARRAY);
