@@ -39,6 +39,7 @@ unsigned num_tests = 0;
 int required_glsl_version = 0;
 char required_glsl_version_string[128];
 bool es_shader = false;
+bool compat_shader = false;
 GLenum shader_type = 0;
 
 /**
@@ -116,6 +117,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		config.supports_gl_es_version = 30;
 		break;
 	case 310:
+		config.supports_gl_es_version = 31;
+
 		/* It seems impossible that a desktop OpenGL implementation
 		 * would support GL_ARB_ES3_1_compatibility and not support at
 		 * least OpenGL 3.2.  Realistically, the compute shader
@@ -123,14 +126,15 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		 * GL_ARB_ES3_1_compatibility implementations will be OpenGL
 		 * 4.2 or later.
 		 */
-		config.supports_gl_core_version = 32;
-		config.supports_gl_es_version = 31;
-		break;
+		if (!compat_shader) {
+			config.supports_gl_core_version = 32;
+			break;
+		}
 	default: {
 		const unsigned int gl_version
 			= required_gl_version_from_glsl_version(required_glsl_version);
 		config.supports_gl_compat_version = gl_version;
-		if (gl_version < 31)
+		if (gl_version < 31 || compat_shader)
 			config.supports_gl_core_version = 0;
 		else
 			config.supports_gl_core_version = gl_version;
@@ -208,7 +212,7 @@ parse_file(const char *filename)
 
 	/* The format of the test file is:
 	 *
-	 * version [es|core]
+	 * version [es|core|compatibility]
 	 * GL_VERTEX_SHADER|GL_GEOMETRY_SHADER|GL_FRAGMENT_SHADER|GL_COMPUTE_SHADER
 	 * GL_ARB_some_extension
 	 * gl_MaxFoo 8
@@ -232,11 +236,13 @@ parse_file(const char *filename)
 	required_glsl_version = strtol(line, &endptr, 10);
 	parse_whitespace(endptr, (const char **)&line);
 	es_shader = strncmp("es\n", line, 3) == 0;
+	compat_shader = strncmp("compatibility\n", line, 7) == 0;
 
 	if (required_glsl_version <= 0 ||
 	    (line != end_of_line &&
 	     strncmp("es\n", line, 3) != 0 &&
-	     strncmp("core\n", line, 5) != 0)) {
+	     strncmp("core\n", line, 5) != 0 &&
+	     strncmp("compatibility\n", line, 7) != 0)) {
 		fprintf(stderr, "Parse error in version line.\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
