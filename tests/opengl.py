@@ -1395,6 +1395,10 @@ with profile.test_list.group_manager(
        os.path.join('spec', 'glsl-1.50', 'minimum-maximums.txt')],
       'built-in constants',
       override_class=BuiltInConstantsTest)
+    g(['built-in-constants',
+       os.path.join('spec', 'glsl-1.50', 'minimum-maximums-compat.txt')],
+      'built-in constants compatibility',
+      override_class=BuiltInConstantsTest)
     g(['glsl-1.50-gs-emits-too-few-verts'], 'gs-emits-too-few-verts')
     g(['glsl-1.50-geometry-end-primitive-optional-with-points-out'],
       'gs-end-primitive-optional-with-points-out')

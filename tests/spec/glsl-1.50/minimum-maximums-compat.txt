@@ -1,0 +1,4 @@
+150 compatibility
+gl_MaxClipPlanes 8
+gl_MaxTextureCoords 8
+gl_MaxTextureUnits 2
