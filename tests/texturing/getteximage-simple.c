@@ -8,6 +8,10 @@
  * texture images is executed before the readback.
  *
  * This used to crash for R300+bufmgr.
+ *
+ * This also used to stress test the blit methods in i965. The BLT engine only
+ * supports pitch sizes up to but not including 32768 dwords. BLORP supports
+ * even larger sizes.
  */
 
 #include "piglit-util-gl.h"
@@ -21,10 +25,10 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define MAX_TYPE_VAL UINT8_MAX
-#define PIX_TYPE GLubyte
-#define TEX_TYPE GL_UNSIGNED_BYTE
-#define TEX_INT_FMT GL_RGBA8
+#define MAX_TYPE_VAL 1.0
+#define PIX_TYPE GLfloat
+#define TEX_TYPE GL_FLOAT
+#define TEX_INT_FMT GL_RGBA32F
 #define TEX_FMT GL_RGBA
 #define CHANNELS_PER_PIXEL 4
 
@@ -42,8 +46,8 @@ static bool test_getteximage(PIX_TYPE *data, size_t data_size, GLint w, GLint h)
 			const unsigned pixel_channel = i % CHANNELS_PER_PIXEL;
 			printf("GetTexImage() returns incorrect data in element %i\n", i);
 			printf("    corresponding to (%i,%i) channel %i\n", pixel % w, pixel / w, pixel_channel);
-			printf("    expected: %i\n", data[i]);
-			printf("    got: %i\n", compare[i]);
+			printf("    expected: %f\n", data[i]);
+			printf("    got: %f\n", compare[i]);
 			match = false;
 			break;
 		}
@@ -53,11 +57,13 @@ static bool test_getteximage(PIX_TYPE *data, size_t data_size, GLint w, GLint h)
 	return match;
 }
 
+
 enum piglit_result
 piglit_display(void)
 {
-	GLsizei height = 16;
-	GLsizei width = 64;
+	GLsizei height = 2;
+	GLsizei width;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &width);
 
 	/* Upload random data to a texture with the given dimensions */
 	const unsigned data_channels = width * height * CHANNELS_PER_PIXEL;
@@ -94,6 +100,9 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	if (TEX_TYPE == GL_FLOAT)
+		piglit_require_extension("GL_ARB_texture_float");
+
 	GLuint tex;
 
 	glGenTextures(1, &tex);
