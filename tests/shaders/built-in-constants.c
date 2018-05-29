@@ -400,7 +400,7 @@ create_shader(GLenum type)
 		 * OpenGL 3.2.
 		 */
 		if (type == GL_GEOMETRY_SHADER &&
-		    required_glsl_version < 320)
+		    required_glsl_version < 150)
 			return 0;
 	}
 	/* Only create compute shaders when explicitly requested
