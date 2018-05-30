@@ -1,0 +1,64 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_storage_buffer_object
+GL_INTEL_shader_atomic_float_minmax
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_shader_storage_buffer_object: require
+#extension GL_INTEL_shader_atomic_float_minmax: require
+
+layout(binding = 0) buffer bufblock {
+	float value[8];
+};
+
+#define POS_NAN(x) (0x7f800000u | (0x007fffffu & uint(x)))
+#define NEG_NAN(x) (0xff800000u | (0x007fffffu & uint(x)))
+
+uniform uint comparitors[] = uint[](POS_NAN(0x00ffffff),
+				    NEG_NAN(0x00ffffff),
+				    POS_NAN(0x00555555),
+				    NEG_NAN(0x00555555),
+				    POS_NAN(0x00aaaaaa),
+				    NEG_NAN(0x00aaaaaa),
+				    floatBitsToUint(0.0),
+				    floatBitsToUint(1.0));
+
+out vec4 color;
+
+void main()
+{
+	uint idx = uint(gl_FragCoord.x + gl_FragCoord.y) % uint(value.length());
+
+	/* This compare-and-swap should never succeed because NaN is never
+	 * equal to anything.  Either the value in the SSBO or the value being
+	 * compared is NaN.  If the compare-and-swap succeeds, the SSBO
+	 * element will forever be set to float(idx).
+	 */
+	atomicCompSwap(value[idx],
+		       uintBitsToFloat(comparitors[idx]),
+		       42.0);
+
+	color = value[idx] == 42.0
+		? vec4(1.0, 0.0, 0.0, 1.0)
+		: vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+ssbo 0 32
+ssbo 0 subdata int  0 0x7fffffff
+ssbo 0 subdata int  4 0xffffffff
+ssbo 0 subdata int  8 0x7fd55555
+ssbo 0 subdata int 12 0xffd55555
+ssbo 0 subdata float 16 0.0
+ssbo 0 subdata float 20 1.0
+ssbo 0 subdata int 24 0x7faaaaaa
+ssbo 0 subdata int 28 0xffaaaaaa
+
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
