@@ -45,7 +45,6 @@ static bool Uniformui(void);
 void
 piglit_init(int argc, char **argv)
 {
-	unsigned glsl_version;
 	bool pass = true;
 
 	pass = Uniformui() && pass;
