@@ -55,6 +55,10 @@ tests/spec/glsl-1.10/linker/global-initializer-mismatch-3-shaders.shader_test
 tests/spec/glsl-1.10/linker/global-initializer-unmatched-expression.shader_test
 tests/spec/glsl-1.50/linker/intrastage-interface-arrays-unmatched-sizes.shader_test
 tests/spec/glsl-1.50/linker/intrastage-interface-named-array.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-mismatch.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-needed.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-mismatch.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-needed.shader_test
 tests/spec/glsl-1.20/linker/link-order-a-b.shader_test
 tests/spec/glsl-1.20/linker/link-order-b-a.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-conflicting-input-layouts.shader_test
