@@ -55,6 +55,13 @@ tests/spec/glsl-1.10/linker/global-initializer-mismatch-3-shaders.shader_test
 tests/spec/glsl-1.10/linker/global-initializer-unmatched-expression.shader_test
 tests/spec/glsl-1.20/linker/link-order-a-b.shader_test
 tests/spec/glsl-1.20/linker/link-order-b-a.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-conflicting-input-layouts.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-conflicts-with-static-usage.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size-blocks.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size-blocks.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-no-input-layout-declared.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-bulk-copy.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-in-bulk-read.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-in-explicitly-sized.shader_test
