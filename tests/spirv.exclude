@@ -106,6 +106,8 @@ tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-stor
 tests/spec/arb_shader_storage_buffer_object/linker/non_integral_size_array_member.shader_test
 tests/spec/arb_explicit_uniform_location/linker/overlap-array-loc.shader_test
 tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
+tests/spec/glsl-1.50/linker/gs-different-max-vertices-multiple-shader-objects.shader_test
+tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.shader_test
 # Tries to link a global variable between two compilation units
 # of the vertex shader. glslang doesn’t cope with this and instead
 # creates two copies of the global variable so it doesn’t work.
