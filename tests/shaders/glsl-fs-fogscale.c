@@ -137,8 +137,8 @@ piglit_display(void)
 		pass = pass && test_prog(prog, tests[2]);
 
 	} else {
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[1]);
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[2]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[1]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[2]);
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
