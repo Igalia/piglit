@@ -62,6 +62,9 @@ tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size-blocks.shad
 tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size-blocks.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-no-input-layout-declared.shader_test
+tests/spec/glsl-1.50/linker/gs-must-tests/specify-input-type.shader_test
+tests/spec/glsl-1.50/linker/gs-must-tests/specify-max-vertices.shader_test
+tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-bulk-copy.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-in-bulk-read.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-in-explicitly-sized.shader_test
