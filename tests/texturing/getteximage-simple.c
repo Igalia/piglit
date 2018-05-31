@@ -21,9 +21,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static GLubyte data[4096]; /* 64*16*4 */
-
-static int test_getteximage(void)
+static int test_getteximage(GLubyte *data)
 {
 	GLubyte compare[4096];
 	int i;
@@ -50,6 +48,12 @@ piglit_display(void)
 {
 	int pass;
 
+	GLubyte data[4096]; /* 64*16*4 */
+	for(int i = 0; i < 4096; ++i)
+		data[i] = rand() & 0xff;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -75,16 +79,11 @@ piglit_display(void)
 void piglit_init(int argc, char **argv)
 {
 	GLuint tex;
-	int i;
-
-	for(i = 0; i < 4096; ++i)
-		data[i] = rand() & 0xff;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	piglit_gen_ortho_projection(0.0, 1.0, 0.0, 1.0, -2.0, 6.0, GL_FALSE);
 }
