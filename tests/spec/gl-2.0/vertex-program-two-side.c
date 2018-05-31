@@ -367,16 +367,16 @@ piglit_display(void)
 			free(tcs_source);
 			free(tes_source);
 		} else {
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[3]);
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[4]);
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[5]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[3]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[4]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[5]);
 		}
 	} else {
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[1]);
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[2]);
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[3]);
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[4]);
-		piglit_report_subtest_result(PIGLIT_SKIP, tests[5]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[1]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[2]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[3]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[4]);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[5]);
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
