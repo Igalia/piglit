@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 		XSync(dpy, 0);
 		pass = validate_glx_error_code(BadAccess, -1);
 
-		exit(pass ? 0 : 1);
+		_exit(pass ? 0 : 1);
 	}
 
 	/* The test passes if the child exited normally with a return value of

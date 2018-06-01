@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 		pass = try_import_context(0xDEADBEEF, invalid)
 			&& pass;
 
-		exit(pass ? 0 : 1);
+		_exit(pass ? 0 : 1);
 	}
 
 	/* The test passes if the child exited normally with a return value of
