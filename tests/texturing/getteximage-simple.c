@@ -21,38 +21,52 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static int test_getteximage(GLubyte *data)
+#define MAX_TYPE_VAL UINT8_MAX
+#define PIX_TYPE GLubyte
+#define TEX_TYPE GL_UNSIGNED_BYTE
+#define TEX_INT_FMT GL_RGBA8
+#define TEX_FMT GL_RGBA
+#define CHANNELS_PER_PIXEL 4
+
+static bool test_getteximage(PIX_TYPE *data, size_t data_size, GLint w, GLint h)
 {
-	GLubyte compare[4096];
-	int i;
+	PIX_TYPE *compare = (PIX_TYPE *)malloc(data_size);
 
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, compare);
+	glGetTexImage(GL_TEXTURE_2D, 0, TEX_FMT, TEX_TYPE, compare);
 
-	for(i = 0; i < 4096; ++i) {
+	bool match = true;
+	const unsigned data_channels = w * h / CHANNELS_PER_PIXEL;
+	for (unsigned i = 0; i < data_channels; ++i) {
 		if (data[i] != compare[i]) {
-			const unsigned pixel = i / 4;
-			const unsigned channel = i % 4;
-			printf("GetTexImage() returns incorrect data in byte %i\n", i);
-			printf("    corresponding to (%i,%i) channel %i\n", pixel % 64, pixel / 64, channel);
+			const unsigned pixel = i / CHANNELS_PER_PIXEL;
+			const unsigned pixel_channel = i % CHANNELS_PER_PIXEL;
+			printf("GetTexImage() returns incorrect data in element %i\n", i);
+			printf("    corresponding to (%i,%i) channel %i\n", pixel % w, pixel / w, pixel_channel);
 			printf("    expected: %i\n", data[i]);
 			printf("    got: %i\n", compare[i]);
-			return 0;
+			match = false;
+			break;
 		}
 	}
 
-	return 1;
+	free(compare);
+	return match;
 }
 
 enum piglit_result
 piglit_display(void)
 {
-	int pass;
+	GLsizei height = 16;
+	GLsizei width = 64;
 
-	GLubyte data[4096]; /* 64*16*4 */
-	for(int i = 0; i < 4096; ++i)
-		data[i] = rand() & 0xff;
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	/* Upload random data to a texture with the given dimensions */
+	const unsigned data_channels = width * height * CHANNELS_PER_PIXEL;
+	const size_t data_size = data_channels * sizeof(PIX_TYPE);
+	PIX_TYPE *data = (PIX_TYPE *)malloc(data_size);
+	for (unsigned i = 0; i < data_channels; ++i)
+		data[i] = ((float)rand() / RAND_MAX) * MAX_TYPE_VAL;
+	glTexImage2D(GL_TEXTURE_2D, 0, TEX_INT_FMT, width, height, 0, TEX_FMT,
+		     TEX_TYPE, data);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -71,7 +85,9 @@ piglit_display(void)
 
 	piglit_present_results();
 
-	pass = test_getteximage();
+	bool pass = test_getteximage(data, data_size, width, height);
+
+	free(data);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
