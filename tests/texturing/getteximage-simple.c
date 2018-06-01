@@ -32,8 +32,10 @@ static int test_getteximage(void)
 
 	for(i = 0; i < 4096; ++i) {
 		if (data[i] != compare[i]) {
+			const unsigned pixel = i / 4;
+			const unsigned channel = i % 4;
 			printf("GetTexImage() returns incorrect data in byte %i\n", i);
-			printf("    corresponding to (%i,%i) channel %i\n", i / 64, (i / 4) % 16, i % 4);
+			printf("    corresponding to (%i,%i) channel %i\n", pixel % 64, pixel / 64, channel);
 			printf("    expected: %i\n", data[i]);
 			printf("    got: %i\n", compare[i]);
 			return 0;
