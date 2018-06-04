@@ -1,0 +1,61 @@
+# This tests unrolling of a loop with a single exit point.
+#
+# Here we test that loop is correctly unrolled when the induction variable is
+# inside an if branch.
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+
+  vec4 colour = vec4(1.0, 0.0, 0.0, 1.0);
+
+  int i = 1;
+  int j = 0; // we use this so the if doesn't get reduced to a series of bcsel
+  do {
+
+    j++;
+
+    if (i >= 3) {
+      if (i == 3) {
+         colour = vec4(0.0, 1.0, 0.0, 1.0);
+         j++;
+         if (j != 6)
+           colour = vec4(1.0, 0.0, 1.0, 1.0);
+      } else {
+        colour = vec4(1.0, 1.0, 0.0, 1.0);
+      }
+      break;
+    } else {
+      if (i != 1) {
+         j++;
+      }
+    }
+
+   if (i >= 5) {
+      j++; // unreachable
+      break;
+    } else {
+      if (i != 1) {
+         j++;
+      }
+      i++;
+    }
+  } while (i < 4);
+
+  gl_FrontColor = colour;
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
