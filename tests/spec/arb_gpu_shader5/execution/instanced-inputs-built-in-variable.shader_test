@@ -1,0 +1,62 @@
+# This test is essentially the same as the "instanced-inputs.shader_test" test
+# except that it makes use of gl_Position between the vertx and geometry
+# shader. Using gl_Position allows us to reproduce Mesa bug #96354.
+
+[require]
+GL >= 2.0
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 vertex;
+
+void main()
+{
+   gl_Position = vertex;
+}
+
+[geometry shader]
+#extension GL_ARB_gpu_shader5 : require
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+layout(invocations = 4) in;
+
+void main()
+{
+   vec2 offset;
+   if (gl_InvocationID == 0)
+      offset.xy = vec2(-0.5, -0.5);
+   else if (gl_InvocationID == 1)
+      offset.xy = vec2( 0.5, -0.5);
+   else if (gl_InvocationID == 2)
+      offset.xy = vec2(-0.5,  0.5);
+   else if (gl_InvocationID == 3)
+      offset.xy = vec2( 0.5,  0.5);
+
+   for (int i = 0; i < 3; i++) {
+       gl_Position = gl_in[i].gl_Position;
+       gl_Position.xy += offset;
+       EmitVertex();
+   }
+}
+
+[fragment shader]
+void main()
+{
+   gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-0.5 -0.5
+ 0.5 -0.5
+-0.5  0.0
+ 0.5  0.0
+-0.5  0.5
+ 0.5  0.5
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLE_STRIP 0 6
+probe all rgba 0.0 1.0 0.0 1.0
