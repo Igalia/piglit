@@ -1894,6 +1894,7 @@ piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
 	return 1;
 }
 
+#ifndef PIGLIT_USE_OPENGL
 static GLuint
 create_fbo_from_texture(GLenum target, GLint texture, GLint level, GLint layer)
 {
@@ -1995,6 +1996,7 @@ read_texture_via_fbo(int target, int level, int x, int y, int layer, int w,
 
 	return buffer;
 }
+#endif
 
 
 /**
