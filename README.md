@@ -56,7 +56,7 @@ unnecessary for python3:
   - subprocess32. A backport of the subprocess from python3.2, which includes
     timeout support. This only works for Linux
 
-For testing the python framework using "py.test unittests/framework"
+For testing the python framework using `py.test unittests/framework`
   - py.test. A python test framework, used for running the python framework
     test suite.
   - tox. A tool for testing python packages against multiple configurations of
@@ -74,34 +74,36 @@ For testing the python framework using "py.test unittests/framework"
 
 Now configure the build system:
 
-  $ ccmake .
+    $ ccmake .
 
 This will start cmake's configuration tool, just follow the onscreen
 instructions. The default settings should be fine, but I recommend you:
  - Press 'c' once (this will also check for dependencies) and then
- - Set "CMAKE_BUILD_TYPE" to "Debug"
+ - Set `CMAKE_BUILD_TYPE` to `Debug`
 Now you can press 'c' again and then 'g' to generate the build system.
 Now build everything:
 
-  $ make
+    $ make
 
 
 ### 2.1 Cross Compiling
 
 On Linux, if cross-compiling a 32-bit build on a 64-bit host, first make sure
 you didn't have CMakeCache.txt file left from 64-bit build (it would retain old
-flags), then you must invoke cmake with options "-DCMAKE_SYSTEM_PROCESSOR=x86
--DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32".
+flags), then you must invoke cmake with options
+`-DCMAKE_SYSTEM_PROCESSOR=x86 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32`.
 
 
 ### 2.2 Ubuntu
 
 Install development packages.
-  $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy python-mako freeglut3-dev x11proto-gl-dev libxrender-dev libwaffle-dev
+
+    $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy python-mako freeglut3-dev x11proto-gl-dev libxrender-dev libwaffle-dev
 
 Configure and build.
-  $ cmake .
-  $ make
+
+    $ cmake .
+    $ make
 
 
 ### 2.3 Mac OS X
@@ -114,8 +116,9 @@ Install Xcode.
 http://developer.apple.com/xcode
 
 Configure and build.
-  $ cmake .
-  $ make
+
+    $ cmake .
+    $ make
 
 
 ### 2.4 Cygwin
@@ -131,8 +134,9 @@ Install development packages.
   - libglut-devel
 
 Configure and build.
-  $ cmake .
-  $ make
+
+    $ cmake .
+    $ make
 
 
 ### 2.5 Windows
@@ -152,13 +156,15 @@ https://mingw-w64.org/
 
 Download OpenGL Core API and Extension Header Files.
 http://www.opengl.org/registry/#headers
-Pass -DGLEXT_INCLUDE_DIR=/path/to/headers
+Pass `-DGLEXT_INCLUDE_DIR=/path/to/headers`
 
 Install python mako.
-> pip install mako
+
+    pip install mako
 
 Install NumPy.
-> pip install numpy
+
+    pip install numpy
 
 
 #### 2.5.1 GLUT
@@ -166,8 +172,8 @@ Install NumPy.
 Download freeglut for Mingw.
 http://www.transmissionzero.co.uk/software/freeglut-devel/
 
-> cmake -H. -Bbuild -G "Ninja" -DGLEXT_INCLUDE_DIR=\path\to\glext -DGLUT_INCLUDE_DIR=\path\to\freeglut\include -DGLUT_glut_LIBRARY=\path\to\freeglut\lib\x64\libfreeglut.a -DGLEXT_INCLUDE_DIR=\path\to\glext
-> ninja -C build
+    cmake -H. -Bbuild -G "Ninja" -DGLEXT_INCLUDE_DIR=\path\to\glext -DGLUT_INCLUDE_DIR=\path\to\freeglut\include -DGLUT_glut_LIBRARY=\path\to\freeglut\lib\x64\libfreeglut.a -DGLEXT_INCLUDE_DIR=\path\to\glext
+    ninja -C build
 
 
 #### 2.5.2 Waffle
@@ -178,7 +184,7 @@ http://www.waffle-gl.org/
 Open the Command Prompt.
 CD to piglit directory.
 
-> cmake -H. -Bbuild -G "Ninja" -DGLEXT_INCLUDE_DIR=\path\to\glext -DPIGLIT_USE_WAFFLE=TRUE -DWAFFLE_INCLUDE_DIRS=\path\to\waffle\include\waffle WAFFLE_LDFLAGS=\path\to\waffle\lib\libwaffle-1.a
+    cmake -H. -Bbuild -G "Ninja" -DGLEXT_INCLUDE_DIR=\path\to\glext -DPIGLIT_USE_WAFFLE=TRUE -DWAFFLE_INCLUDE_DIRS=\path\to\waffle\include\waffle WAFFLE_LDFLAGS=\path\to\waffle\lib\libwaffle-1.a
 
 
 3. How to run tests
@@ -186,7 +192,7 @@ CD to piglit directory.
 
 Make sure that everything is set up correctly:
 
-  $ ./piglit run sanity results/sanity
+    $ ./piglit run sanity results/sanity
 
 You may include '.py' on the profile, or you may exclude it (sanity vs sanity.py),
 both are equally valid.
@@ -196,37 +202,39 @@ which may be useful for shell tab completion.
 
 You may provide multiple profiles to be run at the same time:
 
-  $ ./piglit run quick_cl gpu deqp_gles3 results/gl-cl-combined
+    $ ./piglit run quick_cl gpu deqp_gles3 results/gl-cl-combined
 
 Use
 
-  $ ./piglit run
-  or
-  $ ./piglit run -h
+    $ ./piglit run
+
+or
+
+    $ ./piglit run -h
 
 To learn more about the command's syntax.
 
 Have a look into the tests/ directory to see what test profiles are available:
 
-  $ ls tests/*.py
+    $ ls tests/*.py
 
 See also section 4.
 
 To create some nice formatted test summaries, run
 
-  $ ./piglit summary html summary/sanity results/sanity
+    $ ./piglit summary html summary/sanity results/sanity
 
 Hint: You can combine multiple test results into a single summary.
       During development, you can use this to watch for regressions:
 
-  $ ./piglit summary html summary/compare results/baseline results/current
+    $ ./piglit summary html summary/compare results/baseline results/current
 
       You can combine as many testruns as you want this way (in theory;
       the HTML layout becomes awkward when the number of testruns increases)
 
 Have a look at the results with a browser:
 
-  $ xdg-open summary/sanity/index.html
+    $ xdg-open summary/sanity/index.html
 
 The summary shows the 'status' of a test:
 
@@ -281,11 +289,12 @@ behaves.
 
 ### 3.2 Note
 
-The way 'piglit run' and 'piglit summary' count tests are different, 'piglit
-run' counts the number of Test derived instance in the profile(s) selected,
-while 'piglit summary' counts the number of subtests a result contains, or it's
-result if there are no subtests. This means that the number shown by 'piglit
-run' will be less than or equal to the number calculated by 'piglit summary'.
+The way `piglit run` and `piglit summary` count tests are different,
+`piglit run` counts the number of Test derived instance in the profile(s)
+selected, while `piglit summary` counts the number of subtests a result
+contains, or it's result if there are no subtests. This means that the number
+shown by `piglit run` will be less than or equal to the number calculated by
+`piglit summary`.
 
 
 ### 3.3 Shell Completions
@@ -467,7 +476,8 @@ I suggest using Chad Versace's repo of dEQP, which contains a gbm target.
 https://github.com/chadversary/deqp
 
 It should be built as follows:
-cmake . -DDEQP_TARGET=gbm -GNinja
+
+    cmake . -DDEQP_TARGET=gbm -GNinja
 
 Additional targets are available in the targets directory. gbm isn't compatible
 for most (any?) blob driver, so another target might be necessary if that is a
@@ -476,25 +486,26 @@ requirement. One of the x11_* targets or drm is probably a good choice.
 The use of ninja is optional.
 
 Once dEQP is built add the following information to piglit.conf, which can
-either be located in the root of the piglit repo, or in $XDG_CONFIG_HOME
-(usually $HOME/.config).
+either be located in the root of the piglit repo, or in `$XDG_CONFIG_HOME`
+(usually `$HOME/.config`).
 
-"""
-[deqp-gles2]
-bin=<deqp source dir>/modules/gles2/deqp-gles2
+    [deqp-gles2]
+    bin=<deqp source dir>/modules/gles2/deqp-gles2
 
-[deqp-gles3]
-bin=<deqp source dir>/modules/gles3/deqp-gles3
+    [deqp-gles3]
+    bin=<deqp source dir>/modules/gles3/deqp-gles3
 
-[deqp-gles31]
-bin=<deqp source dir>/modules/gles31/deqp-gles31
-"""
+    [deqp-gles31]
+    bin=<deqp source dir>/modules/gles31/deqp-gles31
 
 These platforms can be run using deqp_gles*.py as a suite in piglit.
-For example: ./piglit run deqp_gles31 my_results -c
+For example:
+
+    ./piglit run deqp_gles31 my_results -c
 
 It is also possible to mix integrated suites and piglit profiles together:
-./piglit run deqp_gles31 quick cl my_results
+
+    ./piglit run deqp_gles31 quick cl my_results
 
 dEQP profiles generally contain all of the tests from the previous profile, so
 gles31 covers gles3 and gles2.
@@ -504,7 +515,5 @@ gles31 covers gles3 and gles2.
 
 Add the following to your piglit.conf file:
 
-"""
-[cts]
-bin=<cts source dir>/cts/glcts
-"""
+    [cts]
+    bin=<cts source dir>/cts/glcts
