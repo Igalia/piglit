@@ -225,12 +225,12 @@ To create some nice formatted test summaries, run
     $ ./piglit summary html summary/sanity results/sanity
 
 Hint: You can combine multiple test results into a single summary.
-      During development, you can use this to watch for regressions:
+During development, you can use this to watch for regressions:
 
     $ ./piglit summary html summary/compare results/baseline results/current
 
-      You can combine as many testruns as you want this way (in theory;
-      the HTML layout becomes awkward when the number of testruns increases)
+You can combine as many testruns as you want this way (in theory;
+the HTML layout becomes awkward when the number of testruns increases)
 
 Have a look at the results with a browser:
 
