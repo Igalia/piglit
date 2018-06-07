@@ -237,18 +237,13 @@ Have a look at the results with a browser:
 
 The summary shows the 'status' of a test:
 
- pass   This test has completed successfully.
-
- warn   The test completed successfully, but something unexpected happened.
-        Look at the details for more information.
-
- fail   The test failed.
-
- crash  The test binary exited with a non-zero exit code.
-
- skip   The test was skipped.
-
- timeout  The test ran longer than its allotted time and was forcibly killed.
+  - **pass:**   This test has completed successfully.
+  - **warn:**   The test completed successfully, but something unexpected happened.
+    Look at the details for more information.
+  - **fail:**   The test failed.
+  - **crash:**  The test binary exited with a non-zero exit code.
+  - **skip:**   The test was skipped.
+  - **timeout:**  The test ran longer than its allotted time and was forcibly killed.
 
 
 There are also dmesg-* statuses. These have the same meaning as above, but are
