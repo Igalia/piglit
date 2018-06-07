@@ -1249,7 +1249,8 @@ array_float_to_ubyte_roundup(int n, const float *f, GLubyte *b)
 
 static bool
 probe_rect_ubyte(int x, int y, int w, int h, int num_components,
-			const float *fexpected, bool silent)
+		 const float *fexpected, size_t x_pitch, size_t y_pitch,
+		 bool silent)
 {
 	int i, j;
 	GLubyte *probe;
@@ -1259,7 +1260,8 @@ probe_rect_ubyte(int x, int y, int w, int h, int num_components,
 
 	array_float_to_ubyte_roundup(num_components, piglit_tolerance,
 				     tolerance);
-	array_float_to_ubyte(num_components, fexpected, expected);
+	if (x_pitch == 0 && y_pitch == 0)
+		array_float_to_ubyte(num_components, fexpected, expected);
 
 	/* RGBA readbacks are likely to be faster */
 	pixels = malloc(w*h*4);
@@ -1268,6 +1270,13 @@ probe_rect_ubyte(int x, int y, int w, int h, int num_components,
 	for (j = 0; j < h; j++) {
 		for (i = 0; i < w; i++) {
 			probe = &pixels[(j*w+i)*4];
+
+			if (x_pitch != 0 || y_pitch != 0) {
+				const float *pexp = fexpected + i * x_pitch +
+								j * y_pitch;
+				array_float_to_ubyte(num_components,
+						     pexp, expected);
+			}
 
 			if (compare_pixels_ubyte(probe, expected, tolerance,
 						 num_components))
@@ -1295,7 +1304,7 @@ piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected)
 	GLfloat *pixels;
 
 	if (can_probe_ubyte())
-		return probe_rect_ubyte(x, y, w, h, 3, expected, true);
+		return probe_rect_ubyte(x, y, w, h, 3, expected, 0, 0, true);
 
 	pixels = read_pixels_float(x, y, w, h, GL_RGB, NULL);
 
@@ -1355,7 +1364,7 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 	GLfloat *pixels;
 
 	if (can_probe_ubyte())
-		return probe_rect_ubyte(x, y, w, h, 3, expected, false);
+		return probe_rect_ubyte(x, y, w, h, 3, expected, 0, 0, false);
 
 	pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
@@ -1463,7 +1472,7 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 	GLfloat *pixels;
 
 	if (can_probe_ubyte())
-		return probe_rect_ubyte(x, y, w, h, 4, expected, false);
+		return probe_rect_ubyte(x, y, w, h, 4, expected, 0, 0, false);
 
 	pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
