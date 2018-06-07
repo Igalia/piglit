@@ -1,0 +1,294 @@
+# SSBO test using an array of arrays of ubos. UBO with two members.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 120
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpMemberDecorate %AOA 0 Offset 0
+               OpMemberDecorate %AOA 1 Offset 16
+               OpDecorate %AOA BufferBlock
+               OpDecorate %arr DescriptorSet 0
+               OpDecorate %arr Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+    %v2float = OpTypeVector %float 2
+        %AOA = OpTypeStruct %v4float %v2float
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_AOA_uint_2 = OpTypeArray %AOA %uint_2
+%_arr__arr_AOA_uint_2_uint_2 = OpTypeArray %_arr_AOA_uint_2 %uint_2
+%_ptr_Uniform__arr__arr_AOA_uint_2_uint_2 = OpTypePointer Uniform %_arr__arr_AOA_uint_2_uint_2
+        %arr = OpVariable %_ptr_Uniform__arr__arr_AOA_uint_2_uint_2 Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%float_610_072205 = OpConstant %float 610.072205
+%float_24998_1719 = OpConstant %float 24998.1719
+%float_8190_74414 = OpConstant %float 8190.74414
+%float_26479_0312 = OpConstant %float 26479.0312
+         %33 = OpConstantComposite %v4float %float_610_072205 %float_24998_1719 %float_8190_74414 %float_26479_0312
+       %bool = OpTypeBool
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+%float_n27681_2891 = OpConstant %float -27681.2891
+%float_9081_78711 = OpConstant %float 9081.78711
+         %47 = OpConstantComposite %v2float %float_n27681_2891 %float_9081_78711
+     %v2bool = OpTypeVector %bool 2
+%float_15538_2891 = OpConstant %float 15538.2891
+%float_5642_53711 = OpConstant %float 5642.53711
+%float_n23131_3867 = OpConstant %float -23131.3867
+%float_18541_5391 = OpConstant %float 18541.5391
+         %60 = OpConstantComposite %v4float %float_15538_2891 %float_5642_53711 %float_n23131_3867 %float_18541_5391
+%float_n12496_1973 = OpConstant %float -12496.1973
+%float_n5854_81055 = OpConstant %float -5854.81055
+         %70 = OpConstantComposite %v2float %float_n12496_1973 %float_n5854_81055
+%float_n32637_8945 = OpConstant %float -32637.8945
+%float_12265_4824 = OpConstant %float 12265.4824
+%float_n13669_0615 = OpConstant %float -13669.0615
+%float_27760_8262 = OpConstant %float 27760.8262
+         %82 = OpConstantComposite %v4float %float_n32637_8945 %float_12265_4824 %float_n13669_0615 %float_27760_8262
+%float_20530_7109 = OpConstant %float 20530.7109
+%float_n10508_5107 = OpConstant %float -10508.5107
+         %92 = OpConstantComposite %v2float %float_20530_7109 %float_n10508_5107
+%float_n1013_09918 = OpConstant %float -1013.09918
+%float_n23371_9824 = OpConstant %float -23371.9824
+%float_n3101_10449 = OpConstant %float -3101.10449
+%float_n19908_5312 = OpConstant %float -19908.5312
+        %104 = OpConstantComposite %v4float %float_n1013_09918 %float_n23371_9824 %float_n3101_10449 %float_n19908_5312
+%float_n29557_3516 = OpConstant %float -29557.3516
+%float_30238_998 = OpConstant %float 30238.998
+        %114 = OpConstantComposite %v2float %float_n29557_3516 %float_30238_998
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %color %15
+         %27 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_0
+         %28 = OpLoad %v4float %27
+         %36 = OpFOrdNotEqual %v4bool %28 %33
+         %37 = OpAny %bool %36
+               OpSelectionMerge %39 None
+               OpBranchConditional %37 %38 %39
+         %38 = OpLabel
+         %40 = OpLoad %v4float %fail_color
+               OpStore %color %40
+               OpBranch %39
+         %39 = OpLabel
+         %43 = OpAccessChain %_ptr_Uniform_v2float %arr %int_0 %int_0 %int_1
+         %44 = OpLoad %v2float %43
+         %49 = OpFOrdNotEqual %v2bool %44 %47
+         %50 = OpAny %bool %49
+               OpSelectionMerge %52 None
+               OpBranchConditional %50 %51 %52
+         %51 = OpLabel
+         %53 = OpLoad %v4float %fail_color
+               OpStore %color %53
+               OpBranch %52
+         %52 = OpLabel
+         %54 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_0
+         %55 = OpLoad %v4float %54
+         %61 = OpFOrdNotEqual %v4bool %55 %60
+         %62 = OpAny %bool %61
+               OpSelectionMerge %64 None
+               OpBranchConditional %62 %63 %64
+         %63 = OpLabel
+         %65 = OpLoad %v4float %fail_color
+               OpStore %color %65
+               OpBranch %64
+         %64 = OpLabel
+         %66 = OpAccessChain %_ptr_Uniform_v2float %arr %int_0 %int_1 %int_1
+         %67 = OpLoad %v2float %66
+         %71 = OpFOrdNotEqual %v2bool %67 %70
+         %72 = OpAny %bool %71
+               OpSelectionMerge %74 None
+               OpBranchConditional %72 %73 %74
+         %73 = OpLabel
+         %75 = OpLoad %v4float %fail_color
+               OpStore %color %75
+               OpBranch %74
+         %74 = OpLabel
+         %76 = OpAccessChain %_ptr_Uniform_v4float %arr %int_1 %int_0 %int_0
+         %77 = OpLoad %v4float %76
+         %83 = OpFOrdNotEqual %v4bool %77 %82
+         %84 = OpAny %bool %83
+               OpSelectionMerge %86 None
+               OpBranchConditional %84 %85 %86
+         %85 = OpLabel
+         %87 = OpLoad %v4float %fail_color
+               OpStore %color %87
+               OpBranch %86
+         %86 = OpLabel
+         %88 = OpAccessChain %_ptr_Uniform_v2float %arr %int_1 %int_0 %int_1
+         %89 = OpLoad %v2float %88
+         %93 = OpFOrdNotEqual %v2bool %89 %92
+         %94 = OpAny %bool %93
+               OpSelectionMerge %96 None
+               OpBranchConditional %94 %95 %96
+         %95 = OpLabel
+         %97 = OpLoad %v4float %fail_color
+               OpStore %color %97
+               OpBranch %96
+         %96 = OpLabel
+         %98 = OpAccessChain %_ptr_Uniform_v4float %arr %int_1 %int_1 %int_0
+         %99 = OpLoad %v4float %98
+        %105 = OpFOrdNotEqual %v4bool %99 %104
+        %106 = OpAny %bool %105
+               OpSelectionMerge %108 None
+               OpBranchConditional %106 %107 %108
+        %107 = OpLabel
+        %109 = OpLoad %v4float %fail_color
+               OpStore %color %109
+               OpBranch %108
+        %108 = OpLabel
+        %110 = OpAccessChain %_ptr_Uniform_v2float %arr %int_1 %int_1 %int_1
+        %111 = OpLoad %v2float %110
+        %115 = OpFOrdNotEqual %v2bool %111 %114
+        %116 = OpAny %bool %115
+               OpSelectionMerge %118 None
+               OpBranchConditional %116 %117 %118
+        %117 = OpLabel
+        %119 = OpLoad %v4float %fail_color
+               OpStore %color %119
+               OpBranch %118
+        %118 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 color;
+layout (std430, binding = 5) buffer AOA
+ {
+    vec4 c1;
+    vec2 c2;
+ } arr[2][2];
+
+void main()
+{
+       vec4 fail_color = vec4(1.0, 0.0, 0.0, 1.0);
+       color = vec4(0.0, 1.0, 0.0, 1.0);
+
+       if (arr[0][0].c1 != vec4(610.072190433, 24998.1713741, 8190.74402991, 26479.0313725)) {
+          color = fail_color;
+       }
+       if (arr[0][0].c2 != vec2(-27681.288716, 9081.78673991)) {
+          color = fail_color;
+       }
+
+       if (arr[0][1].c1 != vec4(15538.2894026, 5642.53723964, -23131.3873198, 18541.5383078)) {
+          color = fail_color;
+       }
+       if (arr[0][1].c2 != vec2(-12496.1967803, -5854.8105745)) {
+          color = fail_color;
+       }
+
+       if (arr[1][0].c1 != vec4(-32637.8949874, 12265.4819562, -13669.0617838, 27760.8253605)) {
+          color = fail_color;
+       }
+       if (arr[1][0].c2 != vec2(20530.7108263, -10508.5105669)) {
+          color = fail_color;
+       }
+
+       if (arr[1][1].c1 != vec4(-1013.0991989, -23371.9822385, -3101.104448, -19908.5317922)) {
+          color = fail_color;
+       }
+       if (arr[1][1].c2 != vec2(-29557.3508507, 30238.9989166)) {
+          color = fail_color;
+       }
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+clear color 1.0 0.0 0.0 0.0
+clear
+
+ssbo 5 32
+#c1
+ssbo 5 subdata float 0 610.072190433
+ssbo 5 subdata float 4 24998.1713741
+ssbo 5 subdata float 8 8190.74402991
+ssbo 5 subdata float 12 26479.0313725
+#c2
+ssbo 5 subdata float 16 -27681.288716
+ssbo 5 subdata float 20 9081.78673991
+
+ssbo 6 32
+#c1
+ssbo 6 subdata float 0 15538.2894026
+ssbo 6 subdata float 4 5642.53723964
+ssbo 6 subdata float 8  -23131.3873198
+ssbo 6 subdata float 12  18541.5383078
+#c2
+ssbo 6 subdata float 16 -12496.1967803
+ssbo 6 subdata float 20 -5854.8105745
+
+ssbo 7 32
+#c1
+ssbo 7 subdata float 0 -32637.8949874
+ssbo 7 subdata float 4 12265.4819562
+ssbo 7 subdata float 8 -13669.0617838
+ssbo 7 subdata float 12 27760.8253605
+#c2
+ssbo 7 subdata float 16 20530.7108263
+ssbo 7 subdata float 20 -10508.5105669
+
+ssbo 8 32
+#c1
+ssbo 8 subdata float 0 -1013.0991989
+ssbo 8 subdata float 4 -23371.9822385
+ssbo 8 subdata float 8 -3101.104448
+ssbo 8 subdata float 12 -19908.5317922
+#c2
+ssbo 8 subdata float 16 -29557.3508507
+ssbo 8 subdata float 20 30238.9989166
+
+block binding 5
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[0][0] GL_NUM_ACTIVE_VARIABLES 2
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[0][0] GL_BUFFER_DATA_SIZE 32
+
+block binding 6
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[0][1] GL_NUM_ACTIVE_VARIABLES 2
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[0][1] GL_BUFFER_DATA_SIZE 32
+
+block binding 7
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[1][0] GL_NUM_ACTIVE_VARIABLES 2
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[1][0] GL_BUFFER_DATA_SIZE 32
+
+block binding 8
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[1][1] GL_NUM_ACTIVE_VARIABLES 2
+verify program_interface_query GL_SHADER_STORAGE_BLOCK AOA[1][1] GL_BUFFER_DATA_SIZE 32
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
