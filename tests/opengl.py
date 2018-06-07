@@ -4535,6 +4535,12 @@ with profile.test_list.group_manager(
     g(['egl_mesa_platform_surfaceless'], 'conformance')
 
 with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'egl_ext_image_dma_buf_import_modifiers'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_ext_image_dma_buf_import_modifiers-query'], 'conformance')
+
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', '!opengl ES 2.0')) as g:
     g(['glsl-fs-pointcoord_gles2'], 'glsl-fs-pointcoord')
     g(['invalid-es3-queries_gles2'])
