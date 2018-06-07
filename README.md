@@ -1,6 +1,7 @@
 
 Piglit
-------
+======
+
 1. About
 2. Setup
 3. How to run tests
@@ -85,8 +86,7 @@ Now build everything:
   $ make
 
 
-2.1 Cross Compiling
--------------------
+### 2.1 Cross Compiling
 
 On Linux, if cross-compiling a 32-bit build on a 64-bit host, first make sure
 you didn't have CMakeCache.txt file left from 64-bit build (it would retain old
@@ -94,8 +94,7 @@ flags), then you must invoke cmake with options "-DCMAKE_SYSTEM_PROCESSOR=x86
 -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32".
 
 
-2.2 Ubuntu
-----------
+### 2.2 Ubuntu
 
 Install development packages.
   $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy python-mako freeglut3-dev x11proto-gl-dev libxrender-dev libwaffle-dev
@@ -105,8 +104,7 @@ Configure and build.
   $ make
 
 
-2.3 Mac OS X
-------------
+### 2.3 Mac OS X
 
 Install CMake.
 http://cmake.org/cmake/resources/software.html
@@ -120,8 +118,7 @@ Configure and build.
   $ make
 
 
-2.4 Cygwin
-----------
+### 2.4 Cygwin
 
 Install development packages.
   - cmake
@@ -138,8 +135,7 @@ Configure and build.
   $ make
 
 
-2.5 Windows
------------
+### 2.5 Windows
 
 Install Python 3.
 http://www.python.org/download
@@ -165,8 +161,7 @@ Install NumPy.
 > pip install numpy
 
 
-2.5.1 GLUT
-----------
+#### 2.5.1 GLUT
 
 Download freeglut for Mingw.
 http://www.transmissionzero.co.uk/software/freeglut-devel/
@@ -175,8 +170,7 @@ http://www.transmissionzero.co.uk/software/freeglut-devel/
 > ninja -C build
 
 
-2.5.2 Waffle
-------------
+#### 2.5.2 Waffle
 
 Download and build waffle for MinGW.
 http://www.waffle-gl.org/
@@ -253,8 +247,8 @@ The summary shows the 'status' of a test:
 There are also dmesg-* statuses. These have the same meaning as above, but are
 triggered by dmesg related messages.
 
-3.1 Environment Variables
--------------------------
+
+### 3.1 Environment Variables
 
 There are a number of environment variables that control the way piglit
 behaves.
@@ -284,8 +278,8 @@ behaves.
        When this variable is true in python then any timeouts given by tests
        will be ignored, and they will run until completion or they are killed.
 
-3.2 Note
---------
+
+### 3.2 Note
 
 The way 'piglit run' and 'piglit summary' count tests are different, 'piglit
 run' counts the number of Test derived instance in the profile(s) selected,
@@ -294,8 +288,7 @@ result if there are no subtests. This means that the number shown by 'piglit
 run' will be less than or equal to the number calculated by 'piglit summary'.
 
 
-3.3 Shell Completions
----------------------
+### 3.3 Shell Completions
 
 Piglit has completions for bash, located in completions/bash/piglit. Once this
 file is sourced into bash `piglit` and `./piglit` will have tab completion
@@ -311,8 +304,7 @@ Test sets are specified as Python scripts in the tests directory.
 The following test sets are currently available:
 
 
-4.1 OpenGL Tests
-----------------
+### 4.1 OpenGL Tests
 
 sanity.py
     This suite contains minimal OpenGL sanity tests. These tests must
@@ -347,8 +339,7 @@ no_error.py
 	A modified version of the test list run as khr_no_error variants
 
 
-4.2 OpenCL Tests
-----------------
+### 4.2 OpenCL Tests
 
 cl.py
     This suite contains all OpenCL tests.
@@ -358,8 +349,7 @@ quick_cl.py
 	and oclconform.
 
 
-4.3 External Integration
-------------------------
+### 4.3 External Integration
 
 xts.py
 	Support for running the X Test Suite using piglit.
@@ -468,8 +458,7 @@ Most integration is done through the use of piglit.conf, or through environment
 variables, with piglit.conf being the preferred method.
 
 
-6.1 dEQP
---------
+### 6.1 dEQP
 
 Piglit provides a generic layer for dEQP based test suites, and specific
 integration for several suites.
@@ -511,8 +500,7 @@ dEQP profiles generally contain all of the tests from the previous profile, so
 gles31 covers gles3 and gles2.
 
 
-6.2 Khronos CTS
----------------
+### 6.2 Khronos CTS
 
 Add the following to your piglit.conf file:
 
