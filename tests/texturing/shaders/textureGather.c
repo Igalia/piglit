@@ -52,7 +52,6 @@ float *expected;
 enum piglit_result
 piglit_display(void)
 {
-	int i, j;
 	bool pass = true;
 
 	glViewport(0, 0, texture_width, texture_height);
@@ -73,11 +72,11 @@ piglit_display(void)
 	else
 		glDrawArrays(GL_POINTS, 0, texture_width * texture_height);
 
-	for (j = 1; j < texture_height - 1; j++)
-		for (i = 1; i < texture_width - 1; i++) {
-			float *pe = &expected[4 * (j * texture_width + i)];
-			pass = piglit_probe_pixel_rgba(i, j, pe) && pass;
-		}
+	pass = piglit_probe_rect_rgba_varying(1, 1,
+					      texture_width - 2,
+					      texture_height - 2,
+					      expected + (texture_width + 1) * 4,
+					      texture_width * 4 * sizeof(float));
 
 	piglit_present_results();
 
