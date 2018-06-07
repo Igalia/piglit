@@ -108,7 +108,7 @@ Configure and build.
 2.3 Mac OS X
 ------------
 
-Install CMake. 
+Install CMake.
 http://cmake.org/cmake/resources/software.html
 Download and install 'Mac OSX Universal' platform.
 
@@ -201,7 +201,7 @@ You may also preface test profiles with tests/ (or any other path you like),
 which may be useful for shell tab completion.
 
 You may provide multiple profiles to be run at the same time:
-  
+
   $ ./piglit run quick_cl gpu deqp_gles3 results/gl-cl-combined
 
 Use
@@ -248,7 +248,7 @@ The summary shows the 'status' of a test:
  skip   The test was skipped.
 
  timeout  The test ran longer than its allotted time and was forcibly killed.
-         
+
 
 There are also dmesg-* statuses. These have the same meaning as above, but are
 triggered by dmesg related messages.
@@ -259,7 +259,7 @@ triggered by dmesg related messages.
 There are a number of environment variables that control the way piglit
 behaves.
 
- PIGLIT_COMPRESSION    
+ PIGLIT_COMPRESSION
       Overrides the compression method used. The same values that piglit.conf
       allows for core:compression.
 
@@ -311,7 +311,7 @@ Test sets are specified as Python scripts in the tests directory.
 The following test sets are currently available:
 
 
-4.1 OpenGL Tests 
+4.1 OpenGL Tests
 ----------------
 
 sanity.py
@@ -420,7 +420,7 @@ python framework:
 
    It starts each test as a subprocess, captures stdout and stderr, and waits
    for the test to return.
-   
+
    It provides test timeouts by setting the instances 'timeout' attribute to an
    integer > 0 which is the number of seconds the test should run.
 
