@@ -1,0 +1,197 @@
+# UBO test using an array of arrays of ubos. UBO with just one member.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 77
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpMemberDecorate %AOA 0 Offset 0
+               OpDecorate %AOA Block
+               OpDecorate %arr DescriptorSet 0
+               OpDecorate %arr Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+        %AOA = OpTypeStruct %v4float
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_AOA_uint_2 = OpTypeArray %AOA %uint_2
+%_arr__arr_AOA_uint_2_uint_2 = OpTypeArray %_arr_AOA_uint_2 %uint_2
+%_ptr_Uniform__arr__arr_AOA_uint_2_uint_2 = OpTypePointer Uniform %_arr__arr_AOA_uint_2_uint_2
+        %arr = OpVariable %_ptr_Uniform__arr__arr_AOA_uint_2_uint_2 Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%float_610_072205 = OpConstant %float 610.072205
+%float_24998_1719 = OpConstant %float 24998.1719
+%float_8190_74414 = OpConstant %float 8190.74414
+%float_26479_0312 = OpConstant %float 26479.0312
+         %32 = OpConstantComposite %v4float %float_610_072205 %float_24998_1719 %float_8190_74414 %float_26479_0312
+       %bool = OpTypeBool
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+%float_15538_2891 = OpConstant %float 15538.2891
+%float_5642_53711 = OpConstant %float 5642.53711
+%float_n23131_3867 = OpConstant %float -23131.3867
+%float_18541_5391 = OpConstant %float 18541.5391
+         %47 = OpConstantComposite %v4float %float_15538_2891 %float_5642_53711 %float_n23131_3867 %float_18541_5391
+%float_n32637_8945 = OpConstant %float -32637.8945
+%float_12265_4824 = OpConstant %float 12265.4824
+%float_n13669_0615 = OpConstant %float -13669.0615
+%float_27760_8262 = OpConstant %float 27760.8262
+         %59 = OpConstantComposite %v4float %float_n32637_8945 %float_12265_4824 %float_n13669_0615 %float_27760_8262
+%float_n1013_09918 = OpConstant %float -1013.09918
+%float_n23371_9824 = OpConstant %float -23371.9824
+%float_n3101_10449 = OpConstant %float -3101.10449
+%float_n19908_5312 = OpConstant %float -19908.5312
+         %71 = OpConstantComposite %v4float %float_n1013_09918 %float_n23371_9824 %float_n3101_10449 %float_n19908_5312
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %color %15
+         %26 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_0
+         %27 = OpLoad %v4float %26
+         %35 = OpFOrdNotEqual %v4bool %27 %32
+         %36 = OpAny %bool %35
+               OpSelectionMerge %38 None
+               OpBranchConditional %36 %37 %38
+         %37 = OpLabel
+         %39 = OpLoad %v4float %fail_color
+               OpStore %color %39
+               OpBranch %38
+         %38 = OpLabel
+         %41 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_0
+         %42 = OpLoad %v4float %41
+         %48 = OpFOrdNotEqual %v4bool %42 %47
+         %49 = OpAny %bool %48
+               OpSelectionMerge %51 None
+               OpBranchConditional %49 %50 %51
+         %50 = OpLabel
+         %52 = OpLoad %v4float %fail_color
+               OpStore %color %52
+               OpBranch %51
+         %51 = OpLabel
+         %53 = OpAccessChain %_ptr_Uniform_v4float %arr %int_1 %int_0 %int_0
+         %54 = OpLoad %v4float %53
+         %60 = OpFOrdNotEqual %v4bool %54 %59
+         %61 = OpAny %bool %60
+               OpSelectionMerge %63 None
+               OpBranchConditional %61 %62 %63
+         %62 = OpLabel
+         %64 = OpLoad %v4float %fail_color
+               OpStore %color %64
+               OpBranch %63
+         %63 = OpLabel
+         %65 = OpAccessChain %_ptr_Uniform_v4float %arr %int_1 %int_1 %int_0
+         %66 = OpLoad %v4float %65
+         %72 = OpFOrdNotEqual %v4bool %66 %71
+         %73 = OpAny %bool %72
+               OpSelectionMerge %75 None
+               OpBranchConditional %73 %74 %75
+         %74 = OpLabel
+         %76 = OpLoad %v4float %fail_color
+               OpStore %color %76
+               OpBranch %75
+         %75 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 color;
+layout (binding = 5, row_major) uniform AOA
+ {
+    vec4 c1;
+ } arr[2][2];
+
+void main()
+{
+       vec4 fail_color = vec4(1.0, 0.0, 0.0, 1.0);
+       color = vec4(0.0, 1.0, 0.0, 1.0);
+
+       if (arr[0][0].c1 != vec4(610.072190433, 24998.1713741, 8190.74402991, 26479.0313725)) {
+          color = fail_color;
+       }
+       if (arr[0][1].c1 != vec4(15538.2894026, 5642.53723964, -23131.3873198, 18541.5383078)) {
+          color = fail_color;
+       }
+       if (arr[1][0].c1 != vec4(-32637.8949874, 12265.4819562, -13669.0617838, 27760.8253605)) {
+          color = fail_color;
+       }
+       if (arr[1][1].c1 != vec4(-1013.0991989, -23371.9822385, -3101.104448, -19908.5317922)) {
+          color = fail_color;
+       }
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+# Note that to fill the data we use the first binding, even if each
+# individual index would be associated with a different binding. We
+# keep using array index for that.
+
+block binding 5
+
+block array index 0
+block offset 0
+uniform vec4 AOA.c1 610.072190433 24998.1713741 8190.74402991 26479.0313725
+
+block array index 1
+block offset 0
+uniform vec4 AOA.c1 15538.2894026 5642.53723964 -23131.3873198 18541.5383078
+
+block array index 2
+block offset 0
+uniform vec4 AOA.c1 -32637.8949874 12265.4819562 -13669.0617838 27760.8253605
+
+block array index 3
+block offset 0
+uniform vec4 AOA.c1 -1013.0991989 -23371.9822385 -3101.104448 -19908.5317922
+
+block binding 5
+verify program_interface_query GL_UNIFORM_BLOCK AOA[0][0] GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK AOA[0][0] GL_BUFFER_DATA_SIZE 16
+
+block binding 6
+verify program_interface_query GL_UNIFORM_BLOCK AOA[0][1] GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK AOA[0][1] GL_BUFFER_DATA_SIZE 16
+
+block binding 7
+verify program_interface_query GL_UNIFORM_BLOCK AOA[1][0] GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK AOA[1][0] GL_BUFFER_DATA_SIZE 16
+
+block binding 8
+verify program_interface_query GL_UNIFORM_BLOCK AOA[1][1] GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK AOA[1][1] GL_BUFFER_DATA_SIZE 16
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
