@@ -79,8 +79,7 @@ Now configure the build system:
 This will start cmake's configuration tool, just follow the onscreen
 instructions. The default settings should be fine, but I recommend you:
  - Press 'c' once (this will also check for dependencies) and then
- - Set `CMAKE_BUILD_TYPE` to `Debug`
-Now you can press 'c' again and then 'g' to generate the build system.
+ - Set `CMAKE_BUILD_TYPE` to `Debug` Now you can press 'c' again and then 'g' to generate the build system.
 Now build everything:
 
     $ make
@@ -261,30 +260,35 @@ triggered by dmesg related messages.
 There are a number of environment variables that control the way piglit
 behaves.
 
- PIGLIT_COMPRESSION
-      Overrides the compression method used. The same values that piglit.conf
-      allows for core:compression.
+  - `PIGLIT_COMPRESSION`
 
- PIGLIT_PLATFORM
-      Overrides the platform run on. These allow the same values as ``piglit
-      run -p``. This values is honored by the tests themselves, and can be used
-      when running a single test.
+    Overrides the compression method used. The same values that piglit.conf
+    allows for core:compression.
 
- PIGLIT_FORCE_GLSLPARSER_DESKTOP
-      Force glslparser tests to be run with the desktop (non-gles) version of
-      glslparsertest. This can be used to test ES<x>_COMPATABILITY extensions
-      for OpenGL
+  - `PIGLIT_PLATFORM`
 
- PIGLIT_NO_FAST_SKIP
-       Piglit has a mechanism run in the python layer for skipping tests with
-       unmet OpenGL or window system dependencies without starting a new
-       process (which is expensive). Sometimes this system doesn't work or is
-       undesirable, setting this environment variable to True will disable this
-       system.
+    Overrides the platform run on. These allow the same values as `piglit run -p`.
+    This values is honored by the tests themselves, and can be used when running
+    a single test.
 
- PIGLIT_NO_TIMEOUT
-       When this variable is true in python then any timeouts given by tests
-       will be ignored, and they will run until completion or they are killed.
+  - `PIGLIT_FORCE_GLSLPARSER_DESKTOP`
+
+    Force glslparser tests to be run with the desktop (non-gles) version of
+    glslparsertest. This can be used to test ESX_compatability extensions
+    for OpenGL
+
+  - `PIGLIT_NO_FAST_SKIP`
+
+    Piglit has a mechanism run in the python layer for skipping tests with
+    unmet OpenGL or window system dependencies without starting a new
+    process (which is expensive). Sometimes this system doesn't work or is
+    undesirable, setting this environment variable to True will disable this
+    system.
+
+  - `PIGLIT_NO_TIMEOUT`
+
+    When this variable is true in python then any timeouts given by tests
+    will be ignored, and they will run until completion or they are killed.
 
 
 ### 3.2 Note
