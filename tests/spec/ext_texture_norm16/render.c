@@ -91,22 +91,23 @@ static const GLfloat vertex_data[] = {
 	1.0f,  0.0f
 };
 
-static const struct fmt_test {
+static struct fmt_test {
 	GLenum iformat;
 	GLenum base_format;
 	unsigned bpp;
 	GLenum type;
 	bool req_render;
 	bool can_read;
+	bool can_texbuf;
 } tests[] = {
-	{ GL_R16_EXT,		GL_RED,		2,	GL_UNSIGNED_SHORT,	true,	true,	},
-	{ GL_RG16_EXT,		GL_RG,		4,	GL_UNSIGNED_SHORT,	true,	true,	},
-	{ GL_RGB16_EXT,		GL_RGB,		6,	GL_UNSIGNED_SHORT,	false,	true,	},
-	{ GL_RGBA16_EXT,	GL_RGBA,	8,	GL_UNSIGNED_SHORT,	true,	true,	},
-	{ GL_R16_SNORM_EXT,	GL_RED,		2,	GL_SHORT,		false,	false,	},
-	{ GL_RG16_SNORM_EXT,	GL_RG,		4,	GL_SHORT,		false,	false,	},
-	{ GL_RGB16_SNORM_EXT,	GL_RGB,		6,	GL_SHORT,		false,	false,	},
-	{ GL_RGBA16_SNORM_EXT,	GL_RGBA,	8,	GL_SHORT,		false,	false,	},
+	{ GL_R16_EXT,		GL_RED,		2,	GL_UNSIGNED_SHORT,	true,	true,	true	},
+	{ GL_RG16_EXT,		GL_RG,		4,	GL_UNSIGNED_SHORT,	true,	true,	true	},
+	{ GL_RGB16_EXT,		GL_RGB,		6,	GL_UNSIGNED_SHORT,	false,	true,	false	},
+	{ GL_RGBA16_EXT,	GL_RGBA,	8,	GL_UNSIGNED_SHORT,	true,	true,	true	},
+	{ GL_R16_SNORM_EXT,	GL_RED,		2,	GL_SHORT,		false,	false,	false	},
+	{ GL_RG16_SNORM_EXT,	GL_RG,		4,	GL_SHORT,		false,	false,	false	},
+	{ GL_RGB16_SNORM_EXT,	GL_RGB,		6,	GL_SHORT,		false,	false,	false	},
+	{ GL_RGBA16_SNORM_EXT,	GL_RGBA,	8,	GL_SHORT,		false,	false,	false	},
 };
 
 static GLuint prog;
@@ -330,11 +331,8 @@ test_format(const struct fmt_test *test)
 {
 	bool pass = true;
 
-	/* The req_render formats match with formats that are
-	 * supported by texture buffer objects.
-	 */
 	if (piglit_is_extension_supported("GL_OES_texture_buffer") &&
-	    test->req_render) {
+	    test->can_texbuf) {
 		bool buf_test = buffer_test(test);
 		piglit_report_subtest_result(PIGLIT_RESULT(buf_test),
 					     "format 0x%x TBO test",
@@ -422,8 +420,21 @@ piglit_display(void)
 
 	bool pass = true;
 
+	struct fmt_test *test = tests;
+	/* Toggle 'req_rend' for EXT_render_snorm compatible formats. */
+	if (piglit_is_extension_supported("GL_EXT_render_snorm")) {
+		for (unsigned i = 0; i < ARRAY_SIZE(tests); i++, test++) {
+			switch (test->iformat) {
+			case GL_R16_SNORM_EXT:
+			case GL_RG16_SNORM_EXT:
+			case GL_RGBA16_SNORM_EXT:
+				test->req_render = true;
+			}
+		}
+	}
+
 	/* Loop over each format. */
-	const struct fmt_test *test = tests;
+	test = tests;
 	for (unsigned i = 0; i < ARRAY_SIZE(tests); i++, test++) {
 		bool fmt_pass = test_format(test);
 		piglit_report_subtest_result(PIGLIT_RESULT(fmt_pass),
