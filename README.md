@@ -314,89 +314,52 @@ The following test sets are currently available:
 
 ### 4.1 OpenGL Tests
 
-sanity.py
-    This suite contains minimal OpenGL sanity tests. These tests must
-    pass, otherwise the other tests will not generate reliable results.
-
-all.py
-    This suite contains all OpenGL tests.
-
-quick.py
-    Run all tests, but cut down significantly on their runtime
+  - **sanity.py** This suite contains minimal OpenGL sanity tests. These tests
+    must pass, otherwise the other tests will not generate reliable results.
+  - **all.py** This suite contains all OpenGL tests.
+  - **quick.py** Run all tests, but cut down significantly on their runtime
     (and thus on the number of problems they can find).
-
-gpu.py
-	A further reduced set of tests from quick.py, this runs tests only
-	for hardware functionality and not tests for the software stack.
-
-llvmpipe.py
-	A reduced set of tests from gpu.py removing tests that are problematic
-	using llvmpipe
-
-cpu.py
-	This profile runs tests that don't touch the gpu, in other words all of
-	the tests in quick.py that are not run by gpu.py
-
-glslparser.py
-	A subset of all.py which runs only glslparser tests
-
-shader.py
-	A subset of all.py which runs only shader tests
-
-no_error.py
-	A modified version of the test list run as khr_no_error variants
+  - **gpu.py** A further reduced set of tests from quick.py, this runs tests
+    only for hardware functionality and not tests for the software stack.
+  - **llvmpipe.py** A reduced set of tests from gpu.py removing tests that are
+    problematic using llvmpipe
+  - **cpu.py** This profile runs tests that don't touch the gpu, in other words
+    all of the tests in quick.py that are not run by gpu.py
+  - **glslparser.py** A subset of all.py which runs only glslparser tests
+  - **shader.py** A subset of all.py which runs only shader tests
+  - **no_error.py** A modified version of the test list run as khr_no_error
+    variants
 
 
 ### 4.2 OpenCL Tests
 
-cl.py
-    This suite contains all OpenCL tests.
-
-quick_cl.py
-	This runs all of the tests from cl.py as well as tests from opencv
-	and oclconform.
+  - **cl.py** This suite contains all OpenCL tests.
+  - **quick_cl.py** This runs all of the tests from cl.py as well as tests from
+    opencv and oclconform.
 
 
 ### 4.3 External Integration
 
-xts.py
-	Support for running the X Test Suite using piglit.
-
-igt.py
-	Support for running Intel-gpu-tools test suite using piglit.
-
-deqp_egl.py
-	Support for running dEQP's EGL profile with piglit.
-
-deqp_gles2.py
-	Support for running dEQP's gles2 profile with piglit.
-
-deqp_gles3.py
-	Support for running dEQP's gles3 profile with piglit.
-
-deqp_gles31.py
-	Support for running dEQP's gles3.1 profile with piglit.
-
-deqp_vk.py
-	Support for running the official Khronos Vulkan CTS profile with piglit.
-
-khr_gl.py
-	Support for running the open source Khronos OpenGL CTS tests with piglit.
-
-khr_gl45.py
-	Support for running the open source Khronos OpenGL 4.5 CTS tests with piglit.
-
-cts_gl.py
-	Support for running the closed source Khronos OpenGL CTS tests with piglit.
-
-cts_gl45.py
-	Support for running the closed source Khronos OpenGL 4.5 CTS tests with piglit.
-
-cts_gles.py
-	Support for running the closed source Khronos GLES CTS tests with piglit.
-
-oglconform.py
-	Support for running sub-test of the Intel oglconform test suite with piglit.
+  - **xts.py** Support for running the X Test Suite using piglit.
+  - **igt.py** Support for running Intel-gpu-tools test suite using piglit.
+  - **deqp_egl.py** Support for running dEQP's EGL profile with piglit.
+  - **deqp_gles2.py** Support for running dEQP's gles2 profile with piglit.
+  - **deqp_gles3.py** Support for running dEQP's gles3 profile with piglit.
+  - **deqp_gles31.py** Support for running dEQP's gles3.1 profile with piglit.
+  - **deqp_vk.py** Support for running the official Khronos Vulkan CTS profile
+    with piglit.
+  - **khr_gl.py** Support for running the open source Khronos OpenGL CTS tests
+    with piglit.
+  - **khr_gl45.py** Support for running the open source Khronos OpenGL 4.5 CTS
+    tests with piglit.
+  - **cts_gl.py** Support for running the closed source Khronos OpenGL CTS
+    tests with piglit.
+  - **cts_gl45.py** Support for running the closed source Khronos OpenGL 4.5
+    CTS tests with piglit.
+  - **cts_gles.py** Support for running the closed source Khronos GLES CTS
+    tests with piglit.
+  - **oglconform.py** Support for running sub-test of the Intel oglconform test
+    suite with piglit.
 
 
 5. How to write tests
