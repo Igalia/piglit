@@ -1346,30 +1346,7 @@ probe_rect(int x, int y, int w, int h, int num_components,
 int
 piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected)
 {
-	int i, j;
-	GLfloat *probe;
-	GLfloat *pixels;
-
-	if (can_probe_ubyte())
-		return probe_rect_ubyte(x, y, w, h, 3, expected, 0, 0, true);
-
-	pixels = read_pixels_float(x, y, w, h, GL_RGB, NULL);
-
-	for (j = 0; j < h; j++) {
-		for (i = 0; i < w; i++) {
-			probe = &pixels[(j*w+i)*3];
-
-			if (compare_pixels_float(probe, expected,
-						 piglit_tolerance, 3))
-				continue;
-
-			free(pixels);
-			return 0;
-		}
-	}
-
-	free(pixels);
-	return 1;
+	return probe_rect(x, y, w, h, 3, expected, 0, 0, true);
 }
 
 /* More efficient variant if you don't know need floats and GBA channels. */
@@ -1406,34 +1383,7 @@ piglit_probe_rect_r_ubyte(int x, int y, int w, int h, GLubyte expected)
 int
 piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 {
-	int i, j;
-	GLfloat *probe;
-	GLfloat *pixels;
-
-	if (can_probe_ubyte())
-		return probe_rect_ubyte(x, y, w, h, 3, expected, 0, 0, false);
-
-	pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
-
-	for (j = 0; j < h; j++) {
-		for (i = 0; i < w; i++) {
-			probe = &pixels[(j*w+i)*4];
-
-			if (compare_pixels_float(probe, expected,
-						 piglit_tolerance, 3))
-				continue;
-
-			print_bad_pixel_float(x + i, y + j, 3,
-					      expected,
-					      probe);
-
-			free(pixels);
-			return 0;
-		}
-	}
-
-	free(pixels);
-	return 1;
+	return probe_rect(x, y, w, h, 3, expected, 0, 0, false);
 }
 
 int
@@ -1514,34 +1464,7 @@ piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
 int
 piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 {
-	int i, j;
-	GLfloat *probe;
-	GLfloat *pixels;
-
-	if (can_probe_ubyte())
-		return probe_rect_ubyte(x, y, w, h, 4, expected, 0, 0, false);
-
-	pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
-
-	for (j = 0; j < h; j++) {
-		for (i = 0; i < w; i++) {
-			probe = &pixels[(j*w+i)*4];
-
-			if (compare_pixels_float(probe, expected,
-						 piglit_tolerance, 4))
-				continue;
-
-			print_bad_pixel_float(x + i, y + j, 4,
-					      expected,
-					      probe);
-
-			free(pixels);
-			return 0;
-		}
-	}
-
-	free(pixels);
-	return 1;
+	return probe_rect(x, y, w, h, 4, expected, 0, 0, false);
 }
 
 int
