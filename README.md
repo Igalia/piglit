@@ -376,45 +376,45 @@ All new tests must be added to the appropriate profile, all.py profile for
 OpenGL and cl.py for OpenCL. There are a few basic test classes supported by the
 python framework:
 
- PiglitBaseTest
-   A shared base class for all native piglit tests.
+  - `PiglitBaseTest`
+    A shared base class for all native piglit tests.
 
-   It starts each test as a subprocess, captures stdout and stderr, and waits
-   for the test to return.
+    It starts each test as a subprocess, captures stdout and stderr, and waits
+    for the test to return.
 
-   It provides test timeouts by setting the instances 'timeout' attribute to an
-   integer > 0 which is the number of seconds the test should run.
+    It provides test timeouts by setting the instances 'timeout' attribute to an
+    integer > 0 which is the number of seconds the test should run.
 
-   It interprets output by reading stdout and looking for 'PIGLIT: ' in the
-   output, and then reading any trailing characters as well formed json
-   returning the test result.
+    It interprets output by reading stdout and looking for 'PIGLIT: ' in the
+    output, and then reading any trailing characters as well formed json
+    returning the test result.
 
-   This is a base class and should not be used directly, but provides an
-   explanation of the behavior of the following classes.
+    This is a base class and should not be used directly, but provides an
+    explanation of the behavior of the following classes.
 
- PiglitGLTest
-   A test class for native piglit OpenGL tests.
+  - `PiglitGLTest`
+    A test class for native piglit OpenGL tests.
 
-   In addition to the properties of PiglitBaseTest it provides a mechanism for
-   detecting test window resizes and rerunning tests as well as keyword
-   arguments for platform requirements.
+    In addition to the properties of PiglitBaseTest it provides a mechanism for
+    detecting test window resizes and rerunning tests as well as keyword
+    arguments for platform requirements.
 
- PiglitCLTest
-   A test class for native piglit OpenCL tests.
+  - `PiglitCLTest`
+    A test class for native piglit OpenCL tests.
 
-   It currently provides no special features.
+    It currently provides no special features.
 
- GLSLParserTest
-   A class for testing a glsl parser.
+  - `GLSLParserTest`
+    A class for testing a glsl parser.
 
-   It is generally unnecessary to call this class directly as it uses a helper
-   function to search directories for tests.
+    It is generally unnecessary to call this class directly as it uses a helper
+    function to search directories for tests.
 
- ShaderTest
-   A class for testing using OpenGL shaders.
+  - `ShaderTest`
+    A class for testing using OpenGL shaders.
 
-   It is generally unnecessary to call this class directly as it uses a helper
-   function to search directories for tests.
+    It is generally unnecessary to call this class directly as it uses a helper
+    function to search directories for tests.
 
 
 6. Integration
