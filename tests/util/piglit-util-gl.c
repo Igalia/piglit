@@ -1296,6 +1296,53 @@ probe_rect_ubyte(int x, int y, int w, int h, int num_components,
 	return true;
 }
 
+static bool
+probe_rect_float(int x, int y, int w, int h, int num_components,
+		 const float *fexpected, size_t x_pitch, size_t y_pitch,
+		 bool silent)
+{
+	float *pixels = read_pixels_float(x, y, w, h, GL_RGBA, NULL);
+
+	for (int j = 0; j < h; j++) {
+		for (int i = 0; i < w; i++) {
+			float *probe = &pixels[(j*w+i)*4];
+			const float *pexp = fexpected + i * x_pitch +
+							j * y_pitch;
+
+			if (compare_pixels_float(probe, pexp,
+						 piglit_tolerance,
+						 num_components))
+				continue;
+
+			if (!silent) {
+				print_bad_pixel_float(x + i, y + j,
+						      num_components,
+						      fexpected, probe);
+			}
+			free(pixels);
+			return false;
+		}
+	}
+
+	free(pixels);
+	return true;
+}
+
+static bool
+probe_rect(int x, int y, int w, int h, int num_components,
+	   const float *fexpected, size_t x_pitch, size_t y_pitch,
+	   bool silent)
+{
+	if (can_probe_ubyte()) {
+		return probe_rect_ubyte(x, y, w, h, num_components, fexpected,
+					x_pitch, y_pitch, silent);
+	} else {
+		return probe_rect_float(x, y, w, h, num_components, fexpected,
+					x_pitch, y_pitch, silent);
+	}
+}
+
+
 int
 piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected)
 {
