@@ -44,27 +44,19 @@
         <td>${options}</td>
       </tr>
       <tr>
-        <td>uname -a</td>
+        <td>info</td>
         <td>
-          <pre>${uname}</pre>
-        </td>
-      </tr>
-      <tr>
-        <td>lspci</td>
-        <td>
-          <pre>${lspci}</pre>
-        </td>
-      </tr>
-      <tr>
-        <td>glxinfo</td>
-        <td>
-          <pre>${glxinfo}</pre>
-        </td>
-      </tr>
-      <tr>
-        <td>clinfo</td>
-        <td>
-          <pre>${clinfo}</pre>
+          <table>
+            % for key, sub in sorted(six.iteritems(info)):
+              % if isinstance(sub, str):
+                <tr><td>${str}</td></tr>
+              % else:
+                % for subkey, value in sorted(six.iteritems(sub)):
+                <tr><td>${subkey}</td><td><pre>${value}</pre></td></tr>
+                % endfor
+              % endif
+            % endfor
+          </table>
         </td>
       </tr>
     </table>
