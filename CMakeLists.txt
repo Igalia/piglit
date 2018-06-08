@@ -15,6 +15,10 @@ if (POLICY CMP0042)
 	cmake_policy (SET CMP0042 NEW)
 endif()
 
+if (POLICY CMP0072)
+        cmake_policy (SET CMP0072 OLD)
+endif()
+
 project (piglit)
 
 # Require MinGW
