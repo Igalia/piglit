@@ -100,10 +100,10 @@ def _make_testrun_info(results, destination, exclude=None):
                 totals=each.totals['root'],
                 time=each.time_elapsed.delta,
                 options=each.options,
-                uname=each.uname,
-                glxinfo=each.glxinfo,
-                clinfo=each.clinfo,
-                lspci=each.lspci))
+                uname=each.info['system'].get('uname'),
+                glxinfo=each.info['system'].get('glxinfo'),
+                clinfo=each.info['system'].get('clinfo'),
+                lspci=each.info['system'].get('lspci')))
 
         # Then build the individual test results
         for key, value in six.iteritems(each.tests):

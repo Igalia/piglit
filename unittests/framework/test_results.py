@@ -467,13 +467,17 @@ class TestTestrunResult(object):
         def setup_class(cls):
             """Setup values used by all tests."""
             test = results.TestrunResult()
+            test.info = {
+                'system': {
+                    'uname': 'this is uname',
+                    'glxinfo': 'glxinfo',
+                    'clinfo': 'clinfo',
+                    'wglinfo': 'wglinfo',
+                    'lspci': 'this is lspci',
+                }
+            }
             test.name = 'name'
-            test.uname = 'this is uname'
             test.options = {'some': 'option'}
-            test.glxinfo = 'glxinfo'
-            test.clinfo = 'clinfo'
-            test.wglinfo = 'wglinfo'
-            test.lspci = 'this is lspci'
             test.time_elapsed.end = 1.23
             test.tests = {'a test': results.TestResult('pass')}
 
@@ -483,29 +487,20 @@ class TestTestrunResult(object):
             """name is properly encoded."""
             assert self.test['name'] == 'name'
 
-        def test_uname(self):
-            """uname is properly encoded."""
-            assert self.test['uname'] == 'this is uname'
+        def test_info(self):
+            assert self.test['info'] == {
+                'system': {
+                    'uname': 'this is uname',
+                    'glxinfo': 'glxinfo',
+                    'clinfo': 'clinfo',
+                    'wglinfo': 'wglinfo',
+                    'lspci': 'this is lspci',
+                }
+            }
 
         def test_options(self):
             """options is properly encoded."""
             assert dict(self.test['options']) == {'some': 'option'}
-
-        def test_glxinfo(self):
-            """glxinfo is properly encoded."""
-            assert self.test['glxinfo'] == 'glxinfo'
-
-        def test_wglinfo(self):
-            """wglinfo is properly encoded."""
-            assert self.test['wglinfo'] == 'wglinfo'
-
-        def test_clinfo(self):
-            """clinfo is properly encoded."""
-            assert self.test['clinfo'] == 'clinfo'
-
-        def test_lspci(self):
-            """lspci is properly encoded."""
-            assert self.test['lspci'] == 'this is lspci'
 
         def test_time(self):
             """time_elapsed is properly encoded."""
@@ -527,8 +522,7 @@ class TestTestrunResult(object):
             return results.TestrunResult.from_dict(shared.JSON)
 
         @pytest.mark.parametrize("attrib", [
-            'name', 'uname', 'glxinfo', 'wglinfo', 'lspci', 'results_version',
-            'clinfo', 'options',
+            'name', 'results_version', 'info', 'options',
         ])
         def test_attribs_restored(self, attrib, inst):
             """tests for basic attributes."""

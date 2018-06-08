@@ -298,13 +298,8 @@ class Totals(dict):
 class TestrunResult(object):
     """The result of a single piglit run."""
     def __init__(self):
-        self.name = None
-        self.uname = None
+        self.info = {}
         self.options = {}
-        self.glxinfo = None
-        self.wglinfo = None
-        self.clinfo = None
-        self.lspci = None
         self.time_elapsed = TimeAttribute()
         self.tests = collections.OrderedDict()
         self.totals = collections.defaultdict(Totals)
@@ -372,8 +367,7 @@ class TestrunResult(object):
 
         """
         res = cls()
-        for name in ['name', 'uname', 'options', 'glxinfo', 'wglinfo', 'lspci',
-                     'results_version', 'clinfo']:
+        for name in ['name', 'info', 'options', 'results_version']:
             value = dict_.get(name)
             if value:
                 setattr(res, name, value)

@@ -53,7 +53,7 @@ __all__ = [
 ]
 
 # The current version of the JSON results
-CURRENT_JSON_VERSION = 9
+CURRENT_JSON_VERSION = 10
 
 # The minimum JSON format supported
 MINIMUM_SUPPORTED_VERSION = 7
@@ -322,6 +322,7 @@ def _update_results(results, filepath):
         updates = {
             7: _update_seven_to_eight,
             8: _update_eight_to_nine,
+            9: _update_nine_to_ten,
         }
 
         while results['results_version'] < CURRENT_JSON_VERSION:
@@ -396,6 +397,19 @@ def _update_eight_to_nine(result):
             test['pid'] = []
 
     result['results_version'] = 9
+
+    return result
+
+
+def _update_nine_to_ten(result):
+    result['info'] = {}
+    result['info']['system'] = {}
+    for e in ['glxinfo', 'wglinfo', 'clinfo', 'lspci', 'uname']:
+        r = result.pop(e)
+        if r:
+            result['info']['system'][e] = r
+
+    result['results_version'] = 10
 
     return result
 

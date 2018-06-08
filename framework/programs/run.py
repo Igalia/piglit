@@ -259,7 +259,8 @@ def _create_metadata(args, name, forced_test_list):
 
     metadata = {'options': opts}
     metadata['name'] = name
-    metadata.update(core.collect_system_info())
+    metadata['info'] = {}
+    metadata['info']['system'] = core.collect_system_info()
 
     return metadata
 

@@ -224,3 +224,83 @@ class TestV8toV9(object):
         jsonschema.validate(
             json.loads(json.dumps(result, default=backends.json.piglit_encoder)),
             schema)
+
+
+class TestV9toV10(object):
+    """Tests for Version 8 to version 9."""
+
+    data = {
+        "results_version": 9,
+        "name": "test",
+        "options": {
+            "profile": ['quick'],
+            "dmesg": False,
+            "verbose": False,
+            "platform": "gbm",
+            "sync": False,
+            "valgrind": False,
+            "filter": [],
+            "concurrent": "all",
+            "test_count": 0,
+            "exclude_tests": [],
+            "exclude_filter": [],
+            "env": {},
+        },
+        "lspci": "stuff",
+        "uname": "more stuff",
+        "glxinfo": "and stuff",
+        "wglinfo": "stuff",
+        "clinfo": "stuff",
+        "tests": {
+            'a@test': {
+                "time": {
+                    'start': 1.2,
+                    'end': 1.8,
+                    '__type__': 'TimeAttribute'
+                },
+                'dmesg': '',
+                'result': 'fail',
+                '__type__': 'TestResult',
+                'command': '/a/command',
+                'traceback': None,
+                'out': '',
+                'environment': 'A=variable',
+                'returncode': 0,
+                'err': '',
+                'pid': [5],
+                'subtests': {
+                    '__type__': 'Subtests',
+                },
+                'exception': None,
+            },
+        },
+        "time_elapsed": {
+            'start': 1.2,
+            'end': 1.8,
+            '__type__': 'TimeAttribute'
+        },
+        '__type__': 'TestrunResult',
+    }
+
+    @pytest.fixture
+    def result(self, tmpdir):
+        p = tmpdir.join('result.json')
+        p.write(json.dumps(self.data, default=backends.json.piglit_encoder))
+        with p.open('r') as f:
+            return backends.json._update_nine_to_ten(backends.json._load(f))
+
+    @pytest.mark.parametrize("key", ['glxinfo', 'wglinfo', 'clinfo', 'uname', 'lspci'])
+    def test(self, key, result):
+        assert key not in result, 'Root key/value not removed'
+        assert key in result['info']['system'], 'Key not added to info/system'
+        assert result['info']['system'][key] == self.data[key], \
+            'Value not set properly.'
+
+    def test_valid(self, result):
+        with open(os.path.join(os.path.dirname(__file__), 'schema',
+                               'piglit-10.json'),
+                  'r') as f:
+            schema = json.load(f)
+        jsonschema.validate(
+            json.loads(json.dumps(result, default=backends.json.piglit_encoder)),
+            schema)

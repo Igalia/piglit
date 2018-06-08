@@ -31,24 +31,21 @@ from framework.options import OPTIONS
 INITIAL_METADATA = {
     'name': 'name',
     'options': dict(OPTIONS),
-    'clinfo': None,
-    'glxinfo': None,
-    'wglinfo': None,
-    'lspci': None,
-    'uname': None,
+    'info': {
+        'system': {}
+    }
 }
 
 # This is current JSON data, in raw form with only the minimum required
 # changes. This does not contain piglit specifc objects, only strings, floats,
 # ints, and Nones (instead of JSON's null)
 JSON = {
-    "results_version": 9,
+    "results_version": 10,
     "time_elapsed": {
         "start": 1469638791.2351687,
         "__type__": "TimeAttribute",
         "end": 1469638791.4387212
     },
-    "wglinfo": None,
     "tests": {
         "spec@!opengl 1.0@gl-1.0-readpixsanity": {
             "dmesg": "",
@@ -75,11 +72,6 @@ JSON = {
                             " PIGLIT_PLATFORM=\"gbm\"")
         }
     },
-    # pylint: disable=line-too-long
-    "lspci": "00:00.0 Host bridge...",
-    "clinfo": None,
-    "uname": "uname",
-    # pylint: enable=line-too-long
     "options": {
         "dmesg": False,
         "concurrent": "some",
@@ -102,7 +94,11 @@ JSON = {
     },
     "name": "foo",
     "__type__": "TestrunResult",
-    "glxinfo": None,
+    "info": {
+        "system": {
+            "lspci": "00:00.0 Host bridge...",
+        },
+    },
     "totals": {
         "spec": {
             '__type__': 'Totals',

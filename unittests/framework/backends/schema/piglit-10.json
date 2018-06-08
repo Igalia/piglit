@@ -1,0 +1,125 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "TestrunResult",
+    "description": "The collection of all results",
+    "type": "object",
+    "properties": {
+        "__type__": { "type": "string" },
+        "name": { "type": "string" },
+        "results_version": { "type": "number" },
+        "time_elapsed": { "$ref": "#/definitions/timeAttribute" },
+        "info": {
+            "type": "object",
+            "description": "Relavent information about the system running tests.",
+            "additionalProperties": { 
+                "type": "object",
+                "additionalProperties": { "type": "string" }
+            }
+        },
+        "options": {
+            "descrption": "The options that were invoked with this run. These are implementation specific and not required.",
+            "type": "object",
+            "properties": {
+                "exclude_tests": { 
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "uniqueItems": true
+                },
+                "include_filter": { 
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "exclude_filter": { 
+                    "type": "array",
+                    "items": { "type": "string" }
+                },
+                "sync": { "type": "boolean" },
+                "valgrind": { "type": "boolean" },
+                "monitored": { "type": "boolean" },
+                "dmesg": { "type": "boolean" },
+                "execute": { "type": "boolean" },
+                "concurrent": { "enum": ["none", "all", "some"] },
+                "platform": { "type": "string" },
+                "log_level": { "type": "string" },
+                "env": {
+                    "description": "Environment variables that must be specified",
+                    "type": "object",
+                    "additionalProperties": { "type": "string" }
+                },
+                "profile": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            }
+        },
+        "totals": {
+            "type": "object",
+            "description": "A calculation of the group totals.",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "crash": { "type": "number" },
+                    "dmesg-fail": { "type": "number" },
+                    "dmesg-warn": { "type": "number" },
+                    "fail": { "type": "number" },
+                    "incomplete": { "type": "number" },
+                    "notrun": { "type": "number" },
+                    "pass": { "type": "number" },
+                    "skip": { "type": "number" },
+                    "timeout": { "type": "number" },
+                    "warn": { "type": "number" }
+                },
+                "additionalProperties": false,
+                "required": [ "crash", "dmesg-fail", "dmesg-warn", "fail", "incomplete", "notrun", "pass", "skip", "timeout", "warn" ]
+            }
+        },
+        "tests": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "__type__": { "type": "string" },
+                    "err": { "type": "string" },
+                    "exception": { "type": ["string", "null"] },
+                    "result": {
+                        "type": "string",
+                        "enum": [ "pass", "fail", "crash", "warn", "incomplete", "notrun", "skip", "dmesg-warn", "dmesg-fail" ]
+                    },
+                    "environment": { "type": "string" },
+                    "command": { "type": "string" },
+                    "traceback": { "type": ["string", "null"] },
+                    "out": { "type": "string" },
+                    "dmesg": { "type": "string" },
+                    "pid": {
+                        "type": "array",
+                        "items": { "type": "number" }
+                    },
+                    "returncode": { "type": [ "number", "null" ] },
+                    "time": { "$ref": "#/definitions/timeAttribute" },
+                    "subtests": {
+                        "type": "object",
+                        "properties": { "__type__": { "type": "string" } },
+                        "additionalProperties": { "type": "string" },
+                        "required": [ "__type__" ]
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [ "__type__", "name", "results_version", "time_elapsed", "tests", "info" ],
+    "definitions": {
+        "timeAttribute": {
+            "type": "object",
+            "description": "An element containing a start and end time",
+            "properties": {
+                "__type__": { "type": "string" },
+                "start": { "type": "number" },
+                "end": { "type": "number" }
+            },
+            "additionalProperties": false,
+            "required": [ "__type__", "start", "end" ]
+        }
+    }
+}
