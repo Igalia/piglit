@@ -514,7 +514,7 @@ add_subdirectory(generated_tests)
 install (
 	FILES
 		COPYING
-		README
+		README.md
 		RELEASE
 	DESTINATION share/doc/piglit${PIGLIT_INSTALL_VERSION_SUFFIX}
 )
