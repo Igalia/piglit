@@ -20,21 +20,21 @@ void main()
 
     if (i >= 3) {
       if (i == 3) {
-         colour = vec4(0.0, 1.0, 0.0, 1.0);
-         j++;
-         if (j != 6)
-           colour = vec4(1.0, 0.0, 1.0, 1.0);
+        colour = vec4(0.0, 1.0, 0.0, 1.0);
+        j++;
+        if (j != 6)
+          colour = vec4(1.0, 0.0, 1.0, 1.0);
       } else {
         colour = vec4(1.0, 1.0, 0.0, 1.0);
       }
       break;
     } else {
       if (i != 1) {
-         j++;
+        j++;
       }
     }
 
-   if (i >= 5) {
+    if (i >= 5) {
       j++; // unreachable
       break;
     } else {
