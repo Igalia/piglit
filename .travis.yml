@@ -15,8 +15,6 @@ matrix:
   include:
     - python: 2.7
       env: TOX_ENV="py27-{generator,noaccel,accel-nix,streams}"
-    - python: 3.3
-      env: TOX_ENV="py33-{generator,noaccel,accel-nix,streams}"
     - python: 3.4
       env: TOX_ENV="py34-{generator,noaccel,accel-nix,streams}"
     - python: 3.5
