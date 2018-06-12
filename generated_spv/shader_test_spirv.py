@@ -803,11 +803,14 @@ def process_ubo_accessors(spirv_type, accessors):
 
     return (offset, matrix_stride, matrix_order)
 
-def remap_ubo_member_in_ubo(name, ubo):
+def remap_ubo_member_in_ubo(name, ubo, ubo_type=None):
     if ubo.binding is None:
         return None
 
-    replacement = process_ubo_accessors(ubo.type, "." + name)
+    if ubo_type is None:
+        ubo_type = ubo.type
+
+    replacement = process_ubo_accessors(ubo_type, "." + name)
     if replacement is None:
         return None
 
@@ -824,8 +827,15 @@ def remap_ubo_member(name, ubos):
     md = re.match(r'([^\.]+)\.(.*)', name)
     if md:
         for ubo in ubos:
-            if ubo.name == md.group(1) or ubo.type.deref().name == md.group(1):
-                return remap_ubo_member_in_ubo(md.group(2), ubo)
+            ubo_type = ubo.type.deref()
+            # The scripts specify UBO arrays by just the name of the
+            # block as if it wasn’t an array and then use the
+            # out-of-band “ubo array index” command to specify the
+            # index
+            while ubo_type.base_type == 'Array':
+                ubo_type = ubo_type.element_type
+            if ubo.name == md.group(1) or ubo_type.name == md.group(1):
+                return remap_ubo_member_in_ubo(md.group(2), ubo, ubo_type)
 
     return None
 
