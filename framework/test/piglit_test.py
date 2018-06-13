@@ -205,6 +205,7 @@ class BuiltInConstantsTest(PiglitBaseTest):
         command[1] = os.path.join(ROOT_DIR, 'tests', command[1])
         return command
 
+
 class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
     """ OpenCL specific Test class.
 
