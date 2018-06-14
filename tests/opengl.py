@@ -2224,6 +2224,7 @@ with profile.test_list.group_manager(
     g(['arb-provoking-vertex-control'], run_concurrent=False)
     g(['arb-provoking-vertex-initial'], run_concurrent=False)
     g(['arb-provoking-vertex-render'], run_concurrent=False)
+    g(['arb-provoking-vertex-clipped-geometry-flatshading'], run_concurrent=False)
     g(['arb-quads-follow-provoking-vertex'], run_concurrent=False)
     g(['arb-xfb-before-flatshading'], run_concurrent=False)
 
