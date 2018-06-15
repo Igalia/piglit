@@ -117,9 +117,13 @@ def gen_caselist_txt(bin_, caselist, extra_args):
 
     # TODO: need to catch some exceptions here...
     with open(os.devnull, 'w') as d:
+        env = os.environ.copy()
+        env['MESA_GL_VERSION_OVERRIDE'] = '4.6'
+        env['MESA_GLES_VERSION_OVERRIDE'] = '3.2'
+
         subprocess.check_call(
             [bin_, '--deqp-runmode=txt-caselist'] + extra_args, cwd=basedir,
-            stdout=d, stderr=d)
+            stdout=d, stderr=d, env=env)
     assert os.path.exists(caselist_path)
     return caselist_path
 
