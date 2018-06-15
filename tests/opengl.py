@@ -1685,6 +1685,8 @@ with profile.test_list.group_manager(
       'NUM_PROGRAM_BINARY_FORMATS over-run check')
     g(['arb_get_program_binary-retrievable_hint'],
       'PROGRAM_BINARY_RETRIEVABLE_HINT')
+    g(['arb_get_program_binary-xfb-varyings'],
+      'xfb-varyings')
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'EXT_depth_bounds_test')) as g:

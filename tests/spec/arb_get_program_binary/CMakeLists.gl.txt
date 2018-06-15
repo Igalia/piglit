@@ -14,5 +14,6 @@ piglit_add_executable (arb_get_program_binary-retrievable_hint retrievable_hint.
 piglit_add_executable (arb_get_program_binary-reset-uniform reset-uniform.c gpb-common.c)
 piglit_add_executable (arb_get_program_binary-restore-implicit-use-program
                        restore-implicit-use-program.c gpb-common.c)
+piglit_add_executable (arb_get_program_binary-xfb-varyings xfb-varyings.c gpb-common.c)
 
 # vim: ft=cmake:
