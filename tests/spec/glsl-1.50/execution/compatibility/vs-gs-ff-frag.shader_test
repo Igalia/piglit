@@ -1,0 +1,43 @@
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150 compatibility
+
+void main()
+{
+   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+   gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[geometry shader]
+#version 150 compatibility
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+varying float v;
+
+void main()
+{
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		gl_FrontColor = gl_in[i].gl_FrontColor;
+
+		/* Verify that a geometry shader that writes a
+		 * non-fixed-function varying is compatible with
+		 * fixed-function fragment processing.
+		 */
+		v = 0.0;
+
+		EmitVertex();
+	}
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
