@@ -144,7 +144,7 @@ generate_and_display_drawbuffers(int count)
 	/* Build the shader that writes different color to each buffer. */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 
-	fs_count_source = malloc(strlen(fs_source) + 5);
+	fs_count_source = malloc(strlen(fs_source) + 10);
 	sprintf(fs_count_source, fs_source, count);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_count_source);
 	free(fs_count_source);
