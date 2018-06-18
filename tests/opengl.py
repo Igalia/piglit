@@ -1519,6 +1519,7 @@ with profile.test_list.group_manager(
     g(['arb_tessellation_shader-get-tcs-params'])
     g(['arb_tessellation_shader-get-tes-params'])
     g(['arb_tessellation_shader-minmax'])
+    g(['arb_tessellation_shader-immediate-mode-draw-patches'])
     g(['arb_tessellation_shader-invalid-get-program-params'])
     g(['arb_tessellation_shader-invalid-patch-vertices-range'])
     g(['arb_tessellation_shader-invalid-primitive'])

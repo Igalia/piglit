@@ -11,6 +11,7 @@ link_libraries (
 
 piglit_add_executable (arb_tessellation_shader-get-tcs-params get-tcs-params.c)
 piglit_add_executable (arb_tessellation_shader-get-tes-params get-tes-params.c)
+piglit_add_executable (arb_tessellation_shader-immediate-mode-draw-patches immediate-mode-draw-patches.c)
 piglit_add_executable (arb_tessellation_shader-invalid-get-program-params invalid-get-program-params.c)
 piglit_add_executable (arb_tessellation_shader-invalid-patch-vertices-range invalid-patch-vertices-range.c)
 piglit_add_executable (arb_tessellation_shader-invalid-primitive invalid-primitive.c)
