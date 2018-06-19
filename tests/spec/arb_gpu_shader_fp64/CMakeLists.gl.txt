@@ -8,6 +8,7 @@ link_libraries (
        ${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (arb_gpu_shader_fp64-dlist-uniforms dlist-fp64-uniforms.c)
 piglit_add_executable (arb_gpu_shader_fp64-double_in_bool_uniform double_in_bool_uniform.c)
 piglit_add_executable (arb_gpu_shader_fp64-fs-non-uniform-control-flow-ssbo fs-non-uniform-control-flow-ssbo.c)
 piglit_add_executable (arb_gpu_shader_fp64-vs-non-uniform-control-flow-ssbo vs-non-uniform-control-flow-ssbo.c)
