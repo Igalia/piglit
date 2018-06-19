@@ -1,0 +1,1227 @@
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_atomic_counters
+GL_ARB_shader_storage_buffer_object
+GL_INTEL_shader_atomic_float_minmax
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_shader_storage_buffer_object: require
+#extension GL_INTEL_shader_atomic_float_minmax: require
+
+layout(binding = 0) buffer bufblock {
+	float value[1024];
+};
+
+layout(binding = 0) uniform atomic_uint fail;
+
+layout(pixel_center_integer) in vec4 gl_FragCoord;
+out vec4 color;
+
+bool already_set_color = false;
+
+uint make_qnan(uint mantissa_bits, bool negative)
+{
+	return (negative ? 0xffc00000u : 0x7fc00000u) |
+	       (0x003fffffu & mantissa_bits);
+}
+
+uint make_snan(uint mantissa_bits, bool negative)
+{
+	return (negative ? 0xff800000u : 0x7f800000u) |
+	       (0x003fffffu & mantissa_bits);
+}
+
+bool is_qnan(uint x)
+{
+	return ((0x7fc00000u & x) == 0x7fc00000u) && (~0x003fffffu & x) != 0u;
+}
+
+bool is_snan(uint x)
+{
+	return ((0x7fc00000u & x) == 0x7f800000u) && (~0x003fffffu & x) != 0u;
+}
+
+bool is_qnan(float x)
+{
+	return is_qnan(floatBitsToUint(x));
+}
+
+bool is_snan(float x)
+{
+	return is_snan(floatBitsToUint(x));
+}
+
+void expect(bool cond)
+{
+	if (!cond) {
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+		atomicCounterIncrement(fail);
+	} else if (!already_set_color) {
+		/* Use of the global flag ensures that a second test won't set
+		 * green a fragment previously set red.
+		 */
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+	}
+
+	already_set_color = true;
+}
+
+void main()
+{
+	const uint width = 32u;
+	uint y = uint(gl_FragCoord.y);
+	uint x = uint(gl_FragCoord.x);
+
+	/* This ensures that each element of "value" is only accessed by a
+	 * single fragment.  This guarantee enables us to make assumptions
+	 * about the data stored therein.
+	 */
+	if (y >= width || x >= (uint(value.length()) / width))
+		discard;
+
+	uint idx = (y * width) + x;
+
+	uint comparitor;
+
+	uint j = y & 7u;
+	if (j <= 3u)
+		comparitor = floatBitsToUint(float(idx));
+	else if (j == 4u)
+		comparitor = make_qnan(idx * 101701u, false);
+	else if (j == 5u)
+		comparitor = make_qnan(idx * 89137u, true);
+	else if (j == 6u)
+		comparitor = make_snan(idx * 2399u, false);
+	else
+		comparitor = make_snan(idx * 337u, true);
+
+	float result = atomicMax(value[idx], uintBitsToFloat(comparitor));
+
+	uint k = idx & 7u;
+	if (k <= 3u)
+		expect(!isnan(result));
+	else if (k == 4u)
+		expect(is_qnan(result) &&
+		       (floatBitsToUint(result) & 0x80000000u) == 0u);
+	else if (k == 5u)
+		expect(is_qnan(result) &&
+		       (floatBitsToUint(result) & 0x80000000u) != 0u);
+	else if (k == 6u)
+		expect(is_snan(result) &&
+		       (floatBitsToUint(result) & 0x80000000u) == 0u);
+	else
+		expect(is_snan(result) &&
+		       (floatBitsToUint(result) & 0x80000000u) != 0u);
+
+	float after = value[idx];
+
+	if (is_snan(result)) {
+		/* According to the hardware specifications,
+		 *
+		 *    fmax(sNaN, x) => sNaN
+		 *    fmax(sNaN, qNaN) => sNaN
+		 *    fmax(sNaN, sNaN) => sNaN   The hardware specification
+		 *                               does not explicitly state
+                 *                               which.
+		 */
+		if (is_snan(comparitor))
+			expect(is_snan(after));
+		else
+			expect(floatBitsToUint(after) == floatBitsToUint(result));
+	} else if (is_qnan(result)) {
+		/* According to the hardware specifications,
+		 *
+		 *    fmax(qNaN, sNaN) => sNaN
+		 *    fmax(qNaN, x) => x
+		 *    fmax(qNaN, qNaN) => qNaN   The hardware specification
+		 *                               does not explicitly state
+                 *                               which.
+		 */
+		if (is_snan(comparitor))
+			expect(floatBitsToUint(after) == comparitor);
+		else if (is_qnan(comparitor))
+			expect(is_qnan(after));
+		else
+			expect(after == float(idx));
+	} else {
+		/* According to the hardware specifications,
+		 *
+		 *    fmax(x, sNaN) => sNaN
+		 *    fmax(x, qNaN) => x
+		 */
+		if (is_snan(comparitor))
+			expect(floatBitsToUint(after) == comparitor);
+		else if (is_qnan(comparitor))
+			expect(after == float(idx) - 0.5);
+		else
+			expect(after == float(idx));
+	}
+}
+
+[test]
+atomic counters 1
+
+# It is not expected that the data for this test will ever need to be
+# regenerated.  Should that need arise, this this Python code can be
+# run in-place by:
+#
+#     grep ^#python <test name> | sed 's/#python //' | python3
+#
+#python r = 1024
+#python print("ssbo 0 {}".format(r * 4))
+#python for i in range(0, r):
+#python     if (i & 7) <= 3:
+#python         print("ssbo 0 subdata float {} {}".format(i * 4, float(i) - 0.5))
+#python     elif (i & 7) == 4:
+#python         # Positive qNaN
+#python         nan = 0x7fc00000 | (0x003fffff & (i * 3361))
+#python         print("ssbo 0 subdata int {} 0x{:x}".format(i * 4, nan))
+#python     elif (i & 7) == 5:
+#python         # Negative qNaN
+#python         nan = 0xffc00000 | (0x003fffff & (i * 13859))
+#python         print("ssbo 0 subdata int {} 0x{:x}".format(i * 4, nan))
+#python     elif (i & 7) == 6:
+#python         # Positive sNaN
+#python         nan = 0x7f800000 | (0x003fffff & (i * 25117))
+#python         print("ssbo 0 subdata int {} 0x{:x}".format(i * 4, nan))
+#python     elif (i & 7) == 7:
+#python         # Negative sNaN
+#python         nan = 0xff800000 | (0x003fffff & (i * 97523))
+#python         print("ssbo 0 subdata int {} 0x{:x}".format(i * 4, nan))
+
+ssbo 0 4096
+ssbo 0 subdata float 0 -0.5
+ssbo 0 subdata float 4 0.5
+ssbo 0 subdata float 8 1.5
+ssbo 0 subdata float 12 2.5
+ssbo 0 subdata int 16 0x7fc03484
+ssbo 0 subdata int 20 0xffc10eaf
+ssbo 0 subdata int 24 0x7f824cae
+ssbo 0 subdata int 28 0xff8a6aa5
+ssbo 0 subdata float 32 7.5
+ssbo 0 subdata float 36 8.5
+ssbo 0 subdata float 40 9.5
+ssbo 0 subdata float 44 10.5
+ssbo 0 subdata int 48 0x7fc09d8c
+ssbo 0 subdata int 52 0xffc2bfc7
+ssbo 0 subdata int 56 0x7f855d96
+ssbo 0 subdata int 60 0xff96523d
+ssbo 0 subdata float 64 15.5
+ssbo 0 subdata float 68 16.5
+ssbo 0 subdata float 72 17.5
+ssbo 0 subdata float 76 18.5
+ssbo 0 subdata int 80 0x7fc10694
+ssbo 0 subdata int 84 0xffc470df
+ssbo 0 subdata int 88 0x7f886e7e
+ssbo 0 subdata int 92 0xffa239d5
+ssbo 0 subdata float 96 23.5
+ssbo 0 subdata float 100 24.5
+ssbo 0 subdata float 104 25.5
+ssbo 0 subdata float 108 26.5
+ssbo 0 subdata int 112 0x7fc16f9c
+ssbo 0 subdata int 116 0xffc621f7
+ssbo 0 subdata int 120 0x7f8b7f66
+ssbo 0 subdata int 124 0xffae216d
+ssbo 0 subdata float 128 31.5
+ssbo 0 subdata float 132 32.5
+ssbo 0 subdata float 136 33.5
+ssbo 0 subdata float 140 34.5
+ssbo 0 subdata int 144 0x7fc1d8a4
+ssbo 0 subdata int 148 0xffc7d30f
+ssbo 0 subdata int 152 0x7f8e904e
+ssbo 0 subdata int 156 0xffba0905
+ssbo 0 subdata float 160 39.5
+ssbo 0 subdata float 164 40.5
+ssbo 0 subdata float 168 41.5
+ssbo 0 subdata float 172 42.5
+ssbo 0 subdata int 176 0x7fc241ac
+ssbo 0 subdata int 180 0xffc98427
+ssbo 0 subdata int 184 0x7f91a136
+ssbo 0 subdata int 188 0xff85f09d
+ssbo 0 subdata float 192 47.5
+ssbo 0 subdata float 196 48.5
+ssbo 0 subdata float 200 49.5
+ssbo 0 subdata float 204 50.5
+ssbo 0 subdata int 208 0x7fc2aab4
+ssbo 0 subdata int 212 0xffcb353f
+ssbo 0 subdata int 216 0x7f94b21e
+ssbo 0 subdata int 220 0xff91d835
+ssbo 0 subdata float 224 55.5
+ssbo 0 subdata float 228 56.5
+ssbo 0 subdata float 232 57.5
+ssbo 0 subdata float 236 58.5
+ssbo 0 subdata int 240 0x7fc313bc
+ssbo 0 subdata int 244 0xffcce657
+ssbo 0 subdata int 248 0x7f97c306
+ssbo 0 subdata int 252 0xff9dbfcd
+ssbo 0 subdata float 256 63.5
+ssbo 0 subdata float 260 64.5
+ssbo 0 subdata float 264 65.5
+ssbo 0 subdata float 268 66.5
+ssbo 0 subdata int 272 0x7fc37cc4
+ssbo 0 subdata int 276 0xffce976f
+ssbo 0 subdata int 280 0x7f9ad3ee
+ssbo 0 subdata int 284 0xffa9a765
+ssbo 0 subdata float 288 71.5
+ssbo 0 subdata float 292 72.5
+ssbo 0 subdata float 296 73.5
+ssbo 0 subdata float 300 74.5
+ssbo 0 subdata int 304 0x7fc3e5cc
+ssbo 0 subdata int 308 0xffd04887
+ssbo 0 subdata int 312 0x7f9de4d6
+ssbo 0 subdata int 316 0xffb58efd
+ssbo 0 subdata float 320 79.5
+ssbo 0 subdata float 324 80.5
+ssbo 0 subdata float 328 81.5
+ssbo 0 subdata float 332 82.5
+ssbo 0 subdata int 336 0x7fc44ed4
+ssbo 0 subdata int 340 0xffd1f99f
+ssbo 0 subdata int 344 0x7fa0f5be
+ssbo 0 subdata int 348 0xff817695
+ssbo 0 subdata float 352 87.5
+ssbo 0 subdata float 356 88.5
+ssbo 0 subdata float 360 89.5
+ssbo 0 subdata float 364 90.5
+ssbo 0 subdata int 368 0x7fc4b7dc
+ssbo 0 subdata int 372 0xffd3aab7
+ssbo 0 subdata int 376 0x7fa406a6
+ssbo 0 subdata int 380 0xff8d5e2d
+ssbo 0 subdata float 384 95.5
+ssbo 0 subdata float 388 96.5
+ssbo 0 subdata float 392 97.5
+ssbo 0 subdata float 396 98.5
+ssbo 0 subdata int 400 0x7fc520e4
+ssbo 0 subdata int 404 0xffd55bcf
+ssbo 0 subdata int 408 0x7fa7178e
+ssbo 0 subdata int 412 0xff9945c5
+ssbo 0 subdata float 416 103.5
+ssbo 0 subdata float 420 104.5
+ssbo 0 subdata float 424 105.5
+ssbo 0 subdata float 428 106.5
+ssbo 0 subdata int 432 0x7fc589ec
+ssbo 0 subdata int 436 0xffd70ce7
+ssbo 0 subdata int 440 0x7faa2876
+ssbo 0 subdata int 444 0xffa52d5d
+ssbo 0 subdata float 448 111.5
+ssbo 0 subdata float 452 112.5
+ssbo 0 subdata float 456 113.5
+ssbo 0 subdata float 460 114.5
+ssbo 0 subdata int 464 0x7fc5f2f4
+ssbo 0 subdata int 468 0xffd8bdff
+ssbo 0 subdata int 472 0x7fad395e
+ssbo 0 subdata int 476 0xffb114f5
+ssbo 0 subdata float 480 119.5
+ssbo 0 subdata float 484 120.5
+ssbo 0 subdata float 488 121.5
+ssbo 0 subdata float 492 122.5
+ssbo 0 subdata int 496 0x7fc65bfc
+ssbo 0 subdata int 500 0xffda6f17
+ssbo 0 subdata int 504 0x7fb04a46
+ssbo 0 subdata int 508 0xffbcfc8d
+ssbo 0 subdata float 512 127.5
+ssbo 0 subdata float 516 128.5
+ssbo 0 subdata float 520 129.5
+ssbo 0 subdata float 524 130.5
+ssbo 0 subdata int 528 0x7fc6c504
+ssbo 0 subdata int 532 0xffdc202f
+ssbo 0 subdata int 536 0x7fb35b2e
+ssbo 0 subdata int 540 0xff88e425
+ssbo 0 subdata float 544 135.5
+ssbo 0 subdata float 548 136.5
+ssbo 0 subdata float 552 137.5
+ssbo 0 subdata float 556 138.5
+ssbo 0 subdata int 560 0x7fc72e0c
+ssbo 0 subdata int 564 0xffddd147
+ssbo 0 subdata int 568 0x7fb66c16
+ssbo 0 subdata int 572 0xff94cbbd
+ssbo 0 subdata float 576 143.5
+ssbo 0 subdata float 580 144.5
+ssbo 0 subdata float 584 145.5
+ssbo 0 subdata float 588 146.5
+ssbo 0 subdata int 592 0x7fc79714
+ssbo 0 subdata int 596 0xffdf825f
+ssbo 0 subdata int 600 0x7fb97cfe
+ssbo 0 subdata int 604 0xffa0b355
+ssbo 0 subdata float 608 151.5
+ssbo 0 subdata float 612 152.5
+ssbo 0 subdata float 616 153.5
+ssbo 0 subdata float 620 154.5
+ssbo 0 subdata int 624 0x7fc8001c
+ssbo 0 subdata int 628 0xffe13377
+ssbo 0 subdata int 632 0x7fbc8de6
+ssbo 0 subdata int 636 0xffac9aed
+ssbo 0 subdata float 640 159.5
+ssbo 0 subdata float 644 160.5
+ssbo 0 subdata float 648 161.5
+ssbo 0 subdata float 652 162.5
+ssbo 0 subdata int 656 0x7fc86924
+ssbo 0 subdata int 660 0xffe2e48f
+ssbo 0 subdata int 664 0x7fbf9ece
+ssbo 0 subdata int 668 0xffb88285
+ssbo 0 subdata float 672 167.5
+ssbo 0 subdata float 676 168.5
+ssbo 0 subdata float 680 169.5
+ssbo 0 subdata float 684 170.5
+ssbo 0 subdata int 688 0x7fc8d22c
+ssbo 0 subdata int 692 0xffe495a7
+ssbo 0 subdata int 696 0x7f82afb6
+ssbo 0 subdata int 700 0xff846a1d
+ssbo 0 subdata float 704 175.5
+ssbo 0 subdata float 708 176.5
+ssbo 0 subdata float 712 177.5
+ssbo 0 subdata float 716 178.5
+ssbo 0 subdata int 720 0x7fc93b34
+ssbo 0 subdata int 724 0xffe646bf
+ssbo 0 subdata int 728 0x7f85c09e
+ssbo 0 subdata int 732 0xff9051b5
+ssbo 0 subdata float 736 183.5
+ssbo 0 subdata float 740 184.5
+ssbo 0 subdata float 744 185.5
+ssbo 0 subdata float 748 186.5
+ssbo 0 subdata int 752 0x7fc9a43c
+ssbo 0 subdata int 756 0xffe7f7d7
+ssbo 0 subdata int 760 0x7f88d186
+ssbo 0 subdata int 764 0xff9c394d
+ssbo 0 subdata float 768 191.5
+ssbo 0 subdata float 772 192.5
+ssbo 0 subdata float 776 193.5
+ssbo 0 subdata float 780 194.5
+ssbo 0 subdata int 784 0x7fca0d44
+ssbo 0 subdata int 788 0xffe9a8ef
+ssbo 0 subdata int 792 0x7f8be26e
+ssbo 0 subdata int 796 0xffa820e5
+ssbo 0 subdata float 800 199.5
+ssbo 0 subdata float 804 200.5
+ssbo 0 subdata float 808 201.5
+ssbo 0 subdata float 812 202.5
+ssbo 0 subdata int 816 0x7fca764c
+ssbo 0 subdata int 820 0xffeb5a07
+ssbo 0 subdata int 824 0x7f8ef356
+ssbo 0 subdata int 828 0xffb4087d
+ssbo 0 subdata float 832 207.5
+ssbo 0 subdata float 836 208.5
+ssbo 0 subdata float 840 209.5
+ssbo 0 subdata float 844 210.5
+ssbo 0 subdata int 848 0x7fcadf54
+ssbo 0 subdata int 852 0xffed0b1f
+ssbo 0 subdata int 856 0x7f92043e
+ssbo 0 subdata int 860 0xffbff015
+ssbo 0 subdata float 864 215.5
+ssbo 0 subdata float 868 216.5
+ssbo 0 subdata float 872 217.5
+ssbo 0 subdata float 876 218.5
+ssbo 0 subdata int 880 0x7fcb485c
+ssbo 0 subdata int 884 0xffeebc37
+ssbo 0 subdata int 888 0x7f951526
+ssbo 0 subdata int 892 0xff8bd7ad
+ssbo 0 subdata float 896 223.5
+ssbo 0 subdata float 900 224.5
+ssbo 0 subdata float 904 225.5
+ssbo 0 subdata float 908 226.5
+ssbo 0 subdata int 912 0x7fcbb164
+ssbo 0 subdata int 916 0xfff06d4f
+ssbo 0 subdata int 920 0x7f98260e
+ssbo 0 subdata int 924 0xff97bf45
+ssbo 0 subdata float 928 231.5
+ssbo 0 subdata float 932 232.5
+ssbo 0 subdata float 936 233.5
+ssbo 0 subdata float 940 234.5
+ssbo 0 subdata int 944 0x7fcc1a6c
+ssbo 0 subdata int 948 0xfff21e67
+ssbo 0 subdata int 952 0x7f9b36f6
+ssbo 0 subdata int 956 0xffa3a6dd
+ssbo 0 subdata float 960 239.5
+ssbo 0 subdata float 964 240.5
+ssbo 0 subdata float 968 241.5
+ssbo 0 subdata float 972 242.5
+ssbo 0 subdata int 976 0x7fcc8374
+ssbo 0 subdata int 980 0xfff3cf7f
+ssbo 0 subdata int 984 0x7f9e47de
+ssbo 0 subdata int 988 0xffaf8e75
+ssbo 0 subdata float 992 247.5
+ssbo 0 subdata float 996 248.5
+ssbo 0 subdata float 1000 249.5
+ssbo 0 subdata float 1004 250.5
+ssbo 0 subdata int 1008 0x7fccec7c
+ssbo 0 subdata int 1012 0xfff58097
+ssbo 0 subdata int 1016 0x7fa158c6
+ssbo 0 subdata int 1020 0xffbb760d
+ssbo 0 subdata float 1024 255.5
+ssbo 0 subdata float 1028 256.5
+ssbo 0 subdata float 1032 257.5
+ssbo 0 subdata float 1036 258.5
+ssbo 0 subdata int 1040 0x7fcd5584
+ssbo 0 subdata int 1044 0xfff731af
+ssbo 0 subdata int 1048 0x7fa469ae
+ssbo 0 subdata int 1052 0xff875da5
+ssbo 0 subdata float 1056 263.5
+ssbo 0 subdata float 1060 264.5
+ssbo 0 subdata float 1064 265.5
+ssbo 0 subdata float 1068 266.5
+ssbo 0 subdata int 1072 0x7fcdbe8c
+ssbo 0 subdata int 1076 0xfff8e2c7
+ssbo 0 subdata int 1080 0x7fa77a96
+ssbo 0 subdata int 1084 0xff93453d
+ssbo 0 subdata float 1088 271.5
+ssbo 0 subdata float 1092 272.5
+ssbo 0 subdata float 1096 273.5
+ssbo 0 subdata float 1100 274.5
+ssbo 0 subdata int 1104 0x7fce2794
+ssbo 0 subdata int 1108 0xfffa93df
+ssbo 0 subdata int 1112 0x7faa8b7e
+ssbo 0 subdata int 1116 0xff9f2cd5
+ssbo 0 subdata float 1120 279.5
+ssbo 0 subdata float 1124 280.5
+ssbo 0 subdata float 1128 281.5
+ssbo 0 subdata float 1132 282.5
+ssbo 0 subdata int 1136 0x7fce909c
+ssbo 0 subdata int 1140 0xfffc44f7
+ssbo 0 subdata int 1144 0x7fad9c66
+ssbo 0 subdata int 1148 0xffab146d
+ssbo 0 subdata float 1152 287.5
+ssbo 0 subdata float 1156 288.5
+ssbo 0 subdata float 1160 289.5
+ssbo 0 subdata float 1164 290.5
+ssbo 0 subdata int 1168 0x7fcef9a4
+ssbo 0 subdata int 1172 0xfffdf60f
+ssbo 0 subdata int 1176 0x7fb0ad4e
+ssbo 0 subdata int 1180 0xffb6fc05
+ssbo 0 subdata float 1184 295.5
+ssbo 0 subdata float 1188 296.5
+ssbo 0 subdata float 1192 297.5
+ssbo 0 subdata float 1196 298.5
+ssbo 0 subdata int 1200 0x7fcf62ac
+ssbo 0 subdata int 1204 0xffffa727
+ssbo 0 subdata int 1208 0x7fb3be36
+ssbo 0 subdata int 1212 0xff82e39d
+ssbo 0 subdata float 1216 303.5
+ssbo 0 subdata float 1220 304.5
+ssbo 0 subdata float 1224 305.5
+ssbo 0 subdata float 1228 306.5
+ssbo 0 subdata int 1232 0x7fcfcbb4
+ssbo 0 subdata int 1236 0xffc1583f
+ssbo 0 subdata int 1240 0x7fb6cf1e
+ssbo 0 subdata int 1244 0xff8ecb35
+ssbo 0 subdata float 1248 311.5
+ssbo 0 subdata float 1252 312.5
+ssbo 0 subdata float 1256 313.5
+ssbo 0 subdata float 1260 314.5
+ssbo 0 subdata int 1264 0x7fd034bc
+ssbo 0 subdata int 1268 0xffc30957
+ssbo 0 subdata int 1272 0x7fb9e006
+ssbo 0 subdata int 1276 0xff9ab2cd
+ssbo 0 subdata float 1280 319.5
+ssbo 0 subdata float 1284 320.5
+ssbo 0 subdata float 1288 321.5
+ssbo 0 subdata float 1292 322.5
+ssbo 0 subdata int 1296 0x7fd09dc4
+ssbo 0 subdata int 1300 0xffc4ba6f
+ssbo 0 subdata int 1304 0x7fbcf0ee
+ssbo 0 subdata int 1308 0xffa69a65
+ssbo 0 subdata float 1312 327.5
+ssbo 0 subdata float 1316 328.5
+ssbo 0 subdata float 1320 329.5
+ssbo 0 subdata float 1324 330.5
+ssbo 0 subdata int 1328 0x7fd106cc
+ssbo 0 subdata int 1332 0xffc66b87
+ssbo 0 subdata int 1336 0x7f8001d6
+ssbo 0 subdata int 1340 0xffb281fd
+ssbo 0 subdata float 1344 335.5
+ssbo 0 subdata float 1348 336.5
+ssbo 0 subdata float 1352 337.5
+ssbo 0 subdata float 1356 338.5
+ssbo 0 subdata int 1360 0x7fd16fd4
+ssbo 0 subdata int 1364 0xffc81c9f
+ssbo 0 subdata int 1368 0x7f8312be
+ssbo 0 subdata int 1372 0xffbe6995
+ssbo 0 subdata float 1376 343.5
+ssbo 0 subdata float 1380 344.5
+ssbo 0 subdata float 1384 345.5
+ssbo 0 subdata float 1388 346.5
+ssbo 0 subdata int 1392 0x7fd1d8dc
+ssbo 0 subdata int 1396 0xffc9cdb7
+ssbo 0 subdata int 1400 0x7f8623a6
+ssbo 0 subdata int 1404 0xff8a512d
+ssbo 0 subdata float 1408 351.5
+ssbo 0 subdata float 1412 352.5
+ssbo 0 subdata float 1416 353.5
+ssbo 0 subdata float 1420 354.5
+ssbo 0 subdata int 1424 0x7fd241e4
+ssbo 0 subdata int 1428 0xffcb7ecf
+ssbo 0 subdata int 1432 0x7f89348e
+ssbo 0 subdata int 1436 0xff9638c5
+ssbo 0 subdata float 1440 359.5
+ssbo 0 subdata float 1444 360.5
+ssbo 0 subdata float 1448 361.5
+ssbo 0 subdata float 1452 362.5
+ssbo 0 subdata int 1456 0x7fd2aaec
+ssbo 0 subdata int 1460 0xffcd2fe7
+ssbo 0 subdata int 1464 0x7f8c4576
+ssbo 0 subdata int 1468 0xffa2205d
+ssbo 0 subdata float 1472 367.5
+ssbo 0 subdata float 1476 368.5
+ssbo 0 subdata float 1480 369.5
+ssbo 0 subdata float 1484 370.5
+ssbo 0 subdata int 1488 0x7fd313f4
+ssbo 0 subdata int 1492 0xffcee0ff
+ssbo 0 subdata int 1496 0x7f8f565e
+ssbo 0 subdata int 1500 0xffae07f5
+ssbo 0 subdata float 1504 375.5
+ssbo 0 subdata float 1508 376.5
+ssbo 0 subdata float 1512 377.5
+ssbo 0 subdata float 1516 378.5
+ssbo 0 subdata int 1520 0x7fd37cfc
+ssbo 0 subdata int 1524 0xffd09217
+ssbo 0 subdata int 1528 0x7f926746
+ssbo 0 subdata int 1532 0xffb9ef8d
+ssbo 0 subdata float 1536 383.5
+ssbo 0 subdata float 1540 384.5
+ssbo 0 subdata float 1544 385.5
+ssbo 0 subdata float 1548 386.5
+ssbo 0 subdata int 1552 0x7fd3e604
+ssbo 0 subdata int 1556 0xffd2432f
+ssbo 0 subdata int 1560 0x7f95782e
+ssbo 0 subdata int 1564 0xff85d725
+ssbo 0 subdata float 1568 391.5
+ssbo 0 subdata float 1572 392.5
+ssbo 0 subdata float 1576 393.5
+ssbo 0 subdata float 1580 394.5
+ssbo 0 subdata int 1584 0x7fd44f0c
+ssbo 0 subdata int 1588 0xffd3f447
+ssbo 0 subdata int 1592 0x7f988916
+ssbo 0 subdata int 1596 0xff91bebd
+ssbo 0 subdata float 1600 399.5
+ssbo 0 subdata float 1604 400.5
+ssbo 0 subdata float 1608 401.5
+ssbo 0 subdata float 1612 402.5
+ssbo 0 subdata int 1616 0x7fd4b814
+ssbo 0 subdata int 1620 0xffd5a55f
+ssbo 0 subdata int 1624 0x7f9b99fe
+ssbo 0 subdata int 1628 0xff9da655
+ssbo 0 subdata float 1632 407.5
+ssbo 0 subdata float 1636 408.5
+ssbo 0 subdata float 1640 409.5
+ssbo 0 subdata float 1644 410.5
+ssbo 0 subdata int 1648 0x7fd5211c
+ssbo 0 subdata int 1652 0xffd75677
+ssbo 0 subdata int 1656 0x7f9eaae6
+ssbo 0 subdata int 1660 0xffa98ded
+ssbo 0 subdata float 1664 415.5
+ssbo 0 subdata float 1668 416.5
+ssbo 0 subdata float 1672 417.5
+ssbo 0 subdata float 1676 418.5
+ssbo 0 subdata int 1680 0x7fd58a24
+ssbo 0 subdata int 1684 0xffd9078f
+ssbo 0 subdata int 1688 0x7fa1bbce
+ssbo 0 subdata int 1692 0xffb57585
+ssbo 0 subdata float 1696 423.5
+ssbo 0 subdata float 1700 424.5
+ssbo 0 subdata float 1704 425.5
+ssbo 0 subdata float 1708 426.5
+ssbo 0 subdata int 1712 0x7fd5f32c
+ssbo 0 subdata int 1716 0xffdab8a7
+ssbo 0 subdata int 1720 0x7fa4ccb6
+ssbo 0 subdata int 1724 0xff815d1d
+ssbo 0 subdata float 1728 431.5
+ssbo 0 subdata float 1732 432.5
+ssbo 0 subdata float 1736 433.5
+ssbo 0 subdata float 1740 434.5
+ssbo 0 subdata int 1744 0x7fd65c34
+ssbo 0 subdata int 1748 0xffdc69bf
+ssbo 0 subdata int 1752 0x7fa7dd9e
+ssbo 0 subdata int 1756 0xff8d44b5
+ssbo 0 subdata float 1760 439.5
+ssbo 0 subdata float 1764 440.5
+ssbo 0 subdata float 1768 441.5
+ssbo 0 subdata float 1772 442.5
+ssbo 0 subdata int 1776 0x7fd6c53c
+ssbo 0 subdata int 1780 0xffde1ad7
+ssbo 0 subdata int 1784 0x7faaee86
+ssbo 0 subdata int 1788 0xff992c4d
+ssbo 0 subdata float 1792 447.5
+ssbo 0 subdata float 1796 448.5
+ssbo 0 subdata float 1800 449.5
+ssbo 0 subdata float 1804 450.5
+ssbo 0 subdata int 1808 0x7fd72e44
+ssbo 0 subdata int 1812 0xffdfcbef
+ssbo 0 subdata int 1816 0x7fadff6e
+ssbo 0 subdata int 1820 0xffa513e5
+ssbo 0 subdata float 1824 455.5
+ssbo 0 subdata float 1828 456.5
+ssbo 0 subdata float 1832 457.5
+ssbo 0 subdata float 1836 458.5
+ssbo 0 subdata int 1840 0x7fd7974c
+ssbo 0 subdata int 1844 0xffe17d07
+ssbo 0 subdata int 1848 0x7fb11056
+ssbo 0 subdata int 1852 0xffb0fb7d
+ssbo 0 subdata float 1856 463.5
+ssbo 0 subdata float 1860 464.5
+ssbo 0 subdata float 1864 465.5
+ssbo 0 subdata float 1868 466.5
+ssbo 0 subdata int 1872 0x7fd80054
+ssbo 0 subdata int 1876 0xffe32e1f
+ssbo 0 subdata int 1880 0x7fb4213e
+ssbo 0 subdata int 1884 0xffbce315
+ssbo 0 subdata float 1888 471.5
+ssbo 0 subdata float 1892 472.5
+ssbo 0 subdata float 1896 473.5
+ssbo 0 subdata float 1900 474.5
+ssbo 0 subdata int 1904 0x7fd8695c
+ssbo 0 subdata int 1908 0xffe4df37
+ssbo 0 subdata int 1912 0x7fb73226
+ssbo 0 subdata int 1916 0xff88caad
+ssbo 0 subdata float 1920 479.5
+ssbo 0 subdata float 1924 480.5
+ssbo 0 subdata float 1928 481.5
+ssbo 0 subdata float 1932 482.5
+ssbo 0 subdata int 1936 0x7fd8d264
+ssbo 0 subdata int 1940 0xffe6904f
+ssbo 0 subdata int 1944 0x7fba430e
+ssbo 0 subdata int 1948 0xff94b245
+ssbo 0 subdata float 1952 487.5
+ssbo 0 subdata float 1956 488.5
+ssbo 0 subdata float 1960 489.5
+ssbo 0 subdata float 1964 490.5
+ssbo 0 subdata int 1968 0x7fd93b6c
+ssbo 0 subdata int 1972 0xffe84167
+ssbo 0 subdata int 1976 0x7fbd53f6
+ssbo 0 subdata int 1980 0xffa099dd
+ssbo 0 subdata float 1984 495.5
+ssbo 0 subdata float 1988 496.5
+ssbo 0 subdata float 1992 497.5
+ssbo 0 subdata float 1996 498.5
+ssbo 0 subdata int 2000 0x7fd9a474
+ssbo 0 subdata int 2004 0xffe9f27f
+ssbo 0 subdata int 2008 0x7f8064de
+ssbo 0 subdata int 2012 0xffac8175
+ssbo 0 subdata float 2016 503.5
+ssbo 0 subdata float 2020 504.5
+ssbo 0 subdata float 2024 505.5
+ssbo 0 subdata float 2028 506.5
+ssbo 0 subdata int 2032 0x7fda0d7c
+ssbo 0 subdata int 2036 0xffeba397
+ssbo 0 subdata int 2040 0x7f8375c6
+ssbo 0 subdata int 2044 0xffb8690d
+ssbo 0 subdata float 2048 511.5
+ssbo 0 subdata float 2052 512.5
+ssbo 0 subdata float 2056 513.5
+ssbo 0 subdata float 2060 514.5
+ssbo 0 subdata int 2064 0x7fda7684
+ssbo 0 subdata int 2068 0xffed54af
+ssbo 0 subdata int 2072 0x7f8686ae
+ssbo 0 subdata int 2076 0xff8450a5
+ssbo 0 subdata float 2080 519.5
+ssbo 0 subdata float 2084 520.5
+ssbo 0 subdata float 2088 521.5
+ssbo 0 subdata float 2092 522.5
+ssbo 0 subdata int 2096 0x7fdadf8c
+ssbo 0 subdata int 2100 0xffef05c7
+ssbo 0 subdata int 2104 0x7f899796
+ssbo 0 subdata int 2108 0xff90383d
+ssbo 0 subdata float 2112 527.5
+ssbo 0 subdata float 2116 528.5
+ssbo 0 subdata float 2120 529.5
+ssbo 0 subdata float 2124 530.5
+ssbo 0 subdata int 2128 0x7fdb4894
+ssbo 0 subdata int 2132 0xfff0b6df
+ssbo 0 subdata int 2136 0x7f8ca87e
+ssbo 0 subdata int 2140 0xff9c1fd5
+ssbo 0 subdata float 2144 535.5
+ssbo 0 subdata float 2148 536.5
+ssbo 0 subdata float 2152 537.5
+ssbo 0 subdata float 2156 538.5
+ssbo 0 subdata int 2160 0x7fdbb19c
+ssbo 0 subdata int 2164 0xfff267f7
+ssbo 0 subdata int 2168 0x7f8fb966
+ssbo 0 subdata int 2172 0xffa8076d
+ssbo 0 subdata float 2176 543.5
+ssbo 0 subdata float 2180 544.5
+ssbo 0 subdata float 2184 545.5
+ssbo 0 subdata float 2188 546.5
+ssbo 0 subdata int 2192 0x7fdc1aa4
+ssbo 0 subdata int 2196 0xfff4190f
+ssbo 0 subdata int 2200 0x7f92ca4e
+ssbo 0 subdata int 2204 0xffb3ef05
+ssbo 0 subdata float 2208 551.5
+ssbo 0 subdata float 2212 552.5
+ssbo 0 subdata float 2216 553.5
+ssbo 0 subdata float 2220 554.5
+ssbo 0 subdata int 2224 0x7fdc83ac
+ssbo 0 subdata int 2228 0xfff5ca27
+ssbo 0 subdata int 2232 0x7f95db36
+ssbo 0 subdata int 2236 0xffbfd69d
+ssbo 0 subdata float 2240 559.5
+ssbo 0 subdata float 2244 560.5
+ssbo 0 subdata float 2248 561.5
+ssbo 0 subdata float 2252 562.5
+ssbo 0 subdata int 2256 0x7fdcecb4
+ssbo 0 subdata int 2260 0xfff77b3f
+ssbo 0 subdata int 2264 0x7f98ec1e
+ssbo 0 subdata int 2268 0xff8bbe35
+ssbo 0 subdata float 2272 567.5
+ssbo 0 subdata float 2276 568.5
+ssbo 0 subdata float 2280 569.5
+ssbo 0 subdata float 2284 570.5
+ssbo 0 subdata int 2288 0x7fdd55bc
+ssbo 0 subdata int 2292 0xfff92c57
+ssbo 0 subdata int 2296 0x7f9bfd06
+ssbo 0 subdata int 2300 0xff97a5cd
+ssbo 0 subdata float 2304 575.5
+ssbo 0 subdata float 2308 576.5
+ssbo 0 subdata float 2312 577.5
+ssbo 0 subdata float 2316 578.5
+ssbo 0 subdata int 2320 0x7fddbec4
+ssbo 0 subdata int 2324 0xfffadd6f
+ssbo 0 subdata int 2328 0x7f9f0dee
+ssbo 0 subdata int 2332 0xffa38d65
+ssbo 0 subdata float 2336 583.5
+ssbo 0 subdata float 2340 584.5
+ssbo 0 subdata float 2344 585.5
+ssbo 0 subdata float 2348 586.5
+ssbo 0 subdata int 2352 0x7fde27cc
+ssbo 0 subdata int 2356 0xfffc8e87
+ssbo 0 subdata int 2360 0x7fa21ed6
+ssbo 0 subdata int 2364 0xffaf74fd
+ssbo 0 subdata float 2368 591.5
+ssbo 0 subdata float 2372 592.5
+ssbo 0 subdata float 2376 593.5
+ssbo 0 subdata float 2380 594.5
+ssbo 0 subdata int 2384 0x7fde90d4
+ssbo 0 subdata int 2388 0xfffe3f9f
+ssbo 0 subdata int 2392 0x7fa52fbe
+ssbo 0 subdata int 2396 0xffbb5c95
+ssbo 0 subdata float 2400 599.5
+ssbo 0 subdata float 2404 600.5
+ssbo 0 subdata float 2408 601.5
+ssbo 0 subdata float 2412 602.5
+ssbo 0 subdata int 2416 0x7fdef9dc
+ssbo 0 subdata int 2420 0xfffff0b7
+ssbo 0 subdata int 2424 0x7fa840a6
+ssbo 0 subdata int 2428 0xff87442d
+ssbo 0 subdata float 2432 607.5
+ssbo 0 subdata float 2436 608.5
+ssbo 0 subdata float 2440 609.5
+ssbo 0 subdata float 2444 610.5
+ssbo 0 subdata int 2448 0x7fdf62e4
+ssbo 0 subdata int 2452 0xffc1a1cf
+ssbo 0 subdata int 2456 0x7fab518e
+ssbo 0 subdata int 2460 0xff932bc5
+ssbo 0 subdata float 2464 615.5
+ssbo 0 subdata float 2468 616.5
+ssbo 0 subdata float 2472 617.5
+ssbo 0 subdata float 2476 618.5
+ssbo 0 subdata int 2480 0x7fdfcbec
+ssbo 0 subdata int 2484 0xffc352e7
+ssbo 0 subdata int 2488 0x7fae6276
+ssbo 0 subdata int 2492 0xff9f135d
+ssbo 0 subdata float 2496 623.5
+ssbo 0 subdata float 2500 624.5
+ssbo 0 subdata float 2504 625.5
+ssbo 0 subdata float 2508 626.5
+ssbo 0 subdata int 2512 0x7fe034f4
+ssbo 0 subdata int 2516 0xffc503ff
+ssbo 0 subdata int 2520 0x7fb1735e
+ssbo 0 subdata int 2524 0xffaafaf5
+ssbo 0 subdata float 2528 631.5
+ssbo 0 subdata float 2532 632.5
+ssbo 0 subdata float 2536 633.5
+ssbo 0 subdata float 2540 634.5
+ssbo 0 subdata int 2544 0x7fe09dfc
+ssbo 0 subdata int 2548 0xffc6b517
+ssbo 0 subdata int 2552 0x7fb48446
+ssbo 0 subdata int 2556 0xffb6e28d
+ssbo 0 subdata float 2560 639.5
+ssbo 0 subdata float 2564 640.5
+ssbo 0 subdata float 2568 641.5
+ssbo 0 subdata float 2572 642.5
+ssbo 0 subdata int 2576 0x7fe10704
+ssbo 0 subdata int 2580 0xffc8662f
+ssbo 0 subdata int 2584 0x7fb7952e
+ssbo 0 subdata int 2588 0xff82ca25
+ssbo 0 subdata float 2592 647.5
+ssbo 0 subdata float 2596 648.5
+ssbo 0 subdata float 2600 649.5
+ssbo 0 subdata float 2604 650.5
+ssbo 0 subdata int 2608 0x7fe1700c
+ssbo 0 subdata int 2612 0xffca1747
+ssbo 0 subdata int 2616 0x7fbaa616
+ssbo 0 subdata int 2620 0xff8eb1bd
+ssbo 0 subdata float 2624 655.5
+ssbo 0 subdata float 2628 656.5
+ssbo 0 subdata float 2632 657.5
+ssbo 0 subdata float 2636 658.5
+ssbo 0 subdata int 2640 0x7fe1d914
+ssbo 0 subdata int 2644 0xffcbc85f
+ssbo 0 subdata int 2648 0x7fbdb6fe
+ssbo 0 subdata int 2652 0xff9a9955
+ssbo 0 subdata float 2656 663.5
+ssbo 0 subdata float 2660 664.5
+ssbo 0 subdata float 2664 665.5
+ssbo 0 subdata float 2668 666.5
+ssbo 0 subdata int 2672 0x7fe2421c
+ssbo 0 subdata int 2676 0xffcd7977
+ssbo 0 subdata int 2680 0x7f80c7e6
+ssbo 0 subdata int 2684 0xffa680ed
+ssbo 0 subdata float 2688 671.5
+ssbo 0 subdata float 2692 672.5
+ssbo 0 subdata float 2696 673.5
+ssbo 0 subdata float 2700 674.5
+ssbo 0 subdata int 2704 0x7fe2ab24
+ssbo 0 subdata int 2708 0xffcf2a8f
+ssbo 0 subdata int 2712 0x7f83d8ce
+ssbo 0 subdata int 2716 0xffb26885
+ssbo 0 subdata float 2720 679.5
+ssbo 0 subdata float 2724 680.5
+ssbo 0 subdata float 2728 681.5
+ssbo 0 subdata float 2732 682.5
+ssbo 0 subdata int 2736 0x7fe3142c
+ssbo 0 subdata int 2740 0xffd0dba7
+ssbo 0 subdata int 2744 0x7f86e9b6
+ssbo 0 subdata int 2748 0xffbe501d
+ssbo 0 subdata float 2752 687.5
+ssbo 0 subdata float 2756 688.5
+ssbo 0 subdata float 2760 689.5
+ssbo 0 subdata float 2764 690.5
+ssbo 0 subdata int 2768 0x7fe37d34
+ssbo 0 subdata int 2772 0xffd28cbf
+ssbo 0 subdata int 2776 0x7f89fa9e
+ssbo 0 subdata int 2780 0xff8a37b5
+ssbo 0 subdata float 2784 695.5
+ssbo 0 subdata float 2788 696.5
+ssbo 0 subdata float 2792 697.5
+ssbo 0 subdata float 2796 698.5
+ssbo 0 subdata int 2800 0x7fe3e63c
+ssbo 0 subdata int 2804 0xffd43dd7
+ssbo 0 subdata int 2808 0x7f8d0b86
+ssbo 0 subdata int 2812 0xff961f4d
+ssbo 0 subdata float 2816 703.5
+ssbo 0 subdata float 2820 704.5
+ssbo 0 subdata float 2824 705.5
+ssbo 0 subdata float 2828 706.5
+ssbo 0 subdata int 2832 0x7fe44f44
+ssbo 0 subdata int 2836 0xffd5eeef
+ssbo 0 subdata int 2840 0x7f901c6e
+ssbo 0 subdata int 2844 0xffa206e5
+ssbo 0 subdata float 2848 711.5
+ssbo 0 subdata float 2852 712.5
+ssbo 0 subdata float 2856 713.5
+ssbo 0 subdata float 2860 714.5
+ssbo 0 subdata int 2864 0x7fe4b84c
+ssbo 0 subdata int 2868 0xffd7a007
+ssbo 0 subdata int 2872 0x7f932d56
+ssbo 0 subdata int 2876 0xffadee7d
+ssbo 0 subdata float 2880 719.5
+ssbo 0 subdata float 2884 720.5
+ssbo 0 subdata float 2888 721.5
+ssbo 0 subdata float 2892 722.5
+ssbo 0 subdata int 2896 0x7fe52154
+ssbo 0 subdata int 2900 0xffd9511f
+ssbo 0 subdata int 2904 0x7f963e3e
+ssbo 0 subdata int 2908 0xffb9d615
+ssbo 0 subdata float 2912 727.5
+ssbo 0 subdata float 2916 728.5
+ssbo 0 subdata float 2920 729.5
+ssbo 0 subdata float 2924 730.5
+ssbo 0 subdata int 2928 0x7fe58a5c
+ssbo 0 subdata int 2932 0xffdb0237
+ssbo 0 subdata int 2936 0x7f994f26
+ssbo 0 subdata int 2940 0xff85bdad
+ssbo 0 subdata float 2944 735.5
+ssbo 0 subdata float 2948 736.5
+ssbo 0 subdata float 2952 737.5
+ssbo 0 subdata float 2956 738.5
+ssbo 0 subdata int 2960 0x7fe5f364
+ssbo 0 subdata int 2964 0xffdcb34f
+ssbo 0 subdata int 2968 0x7f9c600e
+ssbo 0 subdata int 2972 0xff91a545
+ssbo 0 subdata float 2976 743.5
+ssbo 0 subdata float 2980 744.5
+ssbo 0 subdata float 2984 745.5
+ssbo 0 subdata float 2988 746.5
+ssbo 0 subdata int 2992 0x7fe65c6c
+ssbo 0 subdata int 2996 0xffde6467
+ssbo 0 subdata int 3000 0x7f9f70f6
+ssbo 0 subdata int 3004 0xff9d8cdd
+ssbo 0 subdata float 3008 751.5
+ssbo 0 subdata float 3012 752.5
+ssbo 0 subdata float 3016 753.5
+ssbo 0 subdata float 3020 754.5
+ssbo 0 subdata int 3024 0x7fe6c574
+ssbo 0 subdata int 3028 0xffe0157f
+ssbo 0 subdata int 3032 0x7fa281de
+ssbo 0 subdata int 3036 0xffa97475
+ssbo 0 subdata float 3040 759.5
+ssbo 0 subdata float 3044 760.5
+ssbo 0 subdata float 3048 761.5
+ssbo 0 subdata float 3052 762.5
+ssbo 0 subdata int 3056 0x7fe72e7c
+ssbo 0 subdata int 3060 0xffe1c697
+ssbo 0 subdata int 3064 0x7fa592c6
+ssbo 0 subdata int 3068 0xffb55c0d
+ssbo 0 subdata float 3072 767.5
+ssbo 0 subdata float 3076 768.5
+ssbo 0 subdata float 3080 769.5
+ssbo 0 subdata float 3084 770.5
+ssbo 0 subdata int 3088 0x7fe79784
+ssbo 0 subdata int 3092 0xffe377af
+ssbo 0 subdata int 3096 0x7fa8a3ae
+ssbo 0 subdata int 3100 0xff8143a5
+ssbo 0 subdata float 3104 775.5
+ssbo 0 subdata float 3108 776.5
+ssbo 0 subdata float 3112 777.5
+ssbo 0 subdata float 3116 778.5
+ssbo 0 subdata int 3120 0x7fe8008c
+ssbo 0 subdata int 3124 0xffe528c7
+ssbo 0 subdata int 3128 0x7fabb496
+ssbo 0 subdata int 3132 0xff8d2b3d
+ssbo 0 subdata float 3136 783.5
+ssbo 0 subdata float 3140 784.5
+ssbo 0 subdata float 3144 785.5
+ssbo 0 subdata float 3148 786.5
+ssbo 0 subdata int 3152 0x7fe86994
+ssbo 0 subdata int 3156 0xffe6d9df
+ssbo 0 subdata int 3160 0x7faec57e
+ssbo 0 subdata int 3164 0xff9912d5
+ssbo 0 subdata float 3168 791.5
+ssbo 0 subdata float 3172 792.5
+ssbo 0 subdata float 3176 793.5
+ssbo 0 subdata float 3180 794.5
+ssbo 0 subdata int 3184 0x7fe8d29c
+ssbo 0 subdata int 3188 0xffe88af7
+ssbo 0 subdata int 3192 0x7fb1d666
+ssbo 0 subdata int 3196 0xffa4fa6d
+ssbo 0 subdata float 3200 799.5
+ssbo 0 subdata float 3204 800.5
+ssbo 0 subdata float 3208 801.5
+ssbo 0 subdata float 3212 802.5
+ssbo 0 subdata int 3216 0x7fe93ba4
+ssbo 0 subdata int 3220 0xffea3c0f
+ssbo 0 subdata int 3224 0x7fb4e74e
+ssbo 0 subdata int 3228 0xffb0e205
+ssbo 0 subdata float 3232 807.5
+ssbo 0 subdata float 3236 808.5
+ssbo 0 subdata float 3240 809.5
+ssbo 0 subdata float 3244 810.5
+ssbo 0 subdata int 3248 0x7fe9a4ac
+ssbo 0 subdata int 3252 0xffebed27
+ssbo 0 subdata int 3256 0x7fb7f836
+ssbo 0 subdata int 3260 0xffbcc99d
+ssbo 0 subdata float 3264 815.5
+ssbo 0 subdata float 3268 816.5
+ssbo 0 subdata float 3272 817.5
+ssbo 0 subdata float 3276 818.5
+ssbo 0 subdata int 3280 0x7fea0db4
+ssbo 0 subdata int 3284 0xffed9e3f
+ssbo 0 subdata int 3288 0x7fbb091e
+ssbo 0 subdata int 3292 0xff88b135
+ssbo 0 subdata float 3296 823.5
+ssbo 0 subdata float 3300 824.5
+ssbo 0 subdata float 3304 825.5
+ssbo 0 subdata float 3308 826.5
+ssbo 0 subdata int 3312 0x7fea76bc
+ssbo 0 subdata int 3316 0xffef4f57
+ssbo 0 subdata int 3320 0x7fbe1a06
+ssbo 0 subdata int 3324 0xff9498cd
+ssbo 0 subdata float 3328 831.5
+ssbo 0 subdata float 3332 832.5
+ssbo 0 subdata float 3336 833.5
+ssbo 0 subdata float 3340 834.5
+ssbo 0 subdata int 3344 0x7feadfc4
+ssbo 0 subdata int 3348 0xfff1006f
+ssbo 0 subdata int 3352 0x7f812aee
+ssbo 0 subdata int 3356 0xffa08065
+ssbo 0 subdata float 3360 839.5
+ssbo 0 subdata float 3364 840.5
+ssbo 0 subdata float 3368 841.5
+ssbo 0 subdata float 3372 842.5
+ssbo 0 subdata int 3376 0x7feb48cc
+ssbo 0 subdata int 3380 0xfff2b187
+ssbo 0 subdata int 3384 0x7f843bd6
+ssbo 0 subdata int 3388 0xffac67fd
+ssbo 0 subdata float 3392 847.5
+ssbo 0 subdata float 3396 848.5
+ssbo 0 subdata float 3400 849.5
+ssbo 0 subdata float 3404 850.5
+ssbo 0 subdata int 3408 0x7febb1d4
+ssbo 0 subdata int 3412 0xfff4629f
+ssbo 0 subdata int 3416 0x7f874cbe
+ssbo 0 subdata int 3420 0xffb84f95
+ssbo 0 subdata float 3424 855.5
+ssbo 0 subdata float 3428 856.5
+ssbo 0 subdata float 3432 857.5
+ssbo 0 subdata float 3436 858.5
+ssbo 0 subdata int 3440 0x7fec1adc
+ssbo 0 subdata int 3444 0xfff613b7
+ssbo 0 subdata int 3448 0x7f8a5da6
+ssbo 0 subdata int 3452 0xff84372d
+ssbo 0 subdata float 3456 863.5
+ssbo 0 subdata float 3460 864.5
+ssbo 0 subdata float 3464 865.5
+ssbo 0 subdata float 3468 866.5
+ssbo 0 subdata int 3472 0x7fec83e4
+ssbo 0 subdata int 3476 0xfff7c4cf
+ssbo 0 subdata int 3480 0x7f8d6e8e
+ssbo 0 subdata int 3484 0xff901ec5
+ssbo 0 subdata float 3488 871.5
+ssbo 0 subdata float 3492 872.5
+ssbo 0 subdata float 3496 873.5
+ssbo 0 subdata float 3500 874.5
+ssbo 0 subdata int 3504 0x7fececec
+ssbo 0 subdata int 3508 0xfff975e7
+ssbo 0 subdata int 3512 0x7f907f76
+ssbo 0 subdata int 3516 0xff9c065d
+ssbo 0 subdata float 3520 879.5
+ssbo 0 subdata float 3524 880.5
+ssbo 0 subdata float 3528 881.5
+ssbo 0 subdata float 3532 882.5
+ssbo 0 subdata int 3536 0x7fed55f4
+ssbo 0 subdata int 3540 0xfffb26ff
+ssbo 0 subdata int 3544 0x7f93905e
+ssbo 0 subdata int 3548 0xffa7edf5
+ssbo 0 subdata float 3552 887.5
+ssbo 0 subdata float 3556 888.5
+ssbo 0 subdata float 3560 889.5
+ssbo 0 subdata float 3564 890.5
+ssbo 0 subdata int 3568 0x7fedbefc
+ssbo 0 subdata int 3572 0xfffcd817
+ssbo 0 subdata int 3576 0x7f96a146
+ssbo 0 subdata int 3580 0xffb3d58d
+ssbo 0 subdata float 3584 895.5
+ssbo 0 subdata float 3588 896.5
+ssbo 0 subdata float 3592 897.5
+ssbo 0 subdata float 3596 898.5
+ssbo 0 subdata int 3600 0x7fee2804
+ssbo 0 subdata int 3604 0xfffe892f
+ssbo 0 subdata int 3608 0x7f99b22e
+ssbo 0 subdata int 3612 0xffbfbd25
+ssbo 0 subdata float 3616 903.5
+ssbo 0 subdata float 3620 904.5
+ssbo 0 subdata float 3624 905.5
+ssbo 0 subdata float 3628 906.5
+ssbo 0 subdata int 3632 0x7fee910c
+ssbo 0 subdata int 3636 0xffc03a47
+ssbo 0 subdata int 3640 0x7f9cc316
+ssbo 0 subdata int 3644 0xff8ba4bd
+ssbo 0 subdata float 3648 911.5
+ssbo 0 subdata float 3652 912.5
+ssbo 0 subdata float 3656 913.5
+ssbo 0 subdata float 3660 914.5
+ssbo 0 subdata int 3664 0x7feefa14
+ssbo 0 subdata int 3668 0xffc1eb5f
+ssbo 0 subdata int 3672 0x7f9fd3fe
+ssbo 0 subdata int 3676 0xff978c55
+ssbo 0 subdata float 3680 919.5
+ssbo 0 subdata float 3684 920.5
+ssbo 0 subdata float 3688 921.5
+ssbo 0 subdata float 3692 922.5
+ssbo 0 subdata int 3696 0x7fef631c
+ssbo 0 subdata int 3700 0xffc39c77
+ssbo 0 subdata int 3704 0x7fa2e4e6
+ssbo 0 subdata int 3708 0xffa373ed
+ssbo 0 subdata float 3712 927.5
+ssbo 0 subdata float 3716 928.5
+ssbo 0 subdata float 3720 929.5
+ssbo 0 subdata float 3724 930.5
+ssbo 0 subdata int 3728 0x7fefcc24
+ssbo 0 subdata int 3732 0xffc54d8f
+ssbo 0 subdata int 3736 0x7fa5f5ce
+ssbo 0 subdata int 3740 0xffaf5b85
+ssbo 0 subdata float 3744 935.5
+ssbo 0 subdata float 3748 936.5
+ssbo 0 subdata float 3752 937.5
+ssbo 0 subdata float 3756 938.5
+ssbo 0 subdata int 3760 0x7ff0352c
+ssbo 0 subdata int 3764 0xffc6fea7
+ssbo 0 subdata int 3768 0x7fa906b6
+ssbo 0 subdata int 3772 0xffbb431d
+ssbo 0 subdata float 3776 943.5
+ssbo 0 subdata float 3780 944.5
+ssbo 0 subdata float 3784 945.5
+ssbo 0 subdata float 3788 946.5
+ssbo 0 subdata int 3792 0x7ff09e34
+ssbo 0 subdata int 3796 0xffc8afbf
+ssbo 0 subdata int 3800 0x7fac179e
+ssbo 0 subdata int 3804 0xff872ab5
+ssbo 0 subdata float 3808 951.5
+ssbo 0 subdata float 3812 952.5
+ssbo 0 subdata float 3816 953.5
+ssbo 0 subdata float 3820 954.5
+ssbo 0 subdata int 3824 0x7ff1073c
+ssbo 0 subdata int 3828 0xffca60d7
+ssbo 0 subdata int 3832 0x7faf2886
+ssbo 0 subdata int 3836 0xff93124d
+ssbo 0 subdata float 3840 959.5
+ssbo 0 subdata float 3844 960.5
+ssbo 0 subdata float 3848 961.5
+ssbo 0 subdata float 3852 962.5
+ssbo 0 subdata int 3856 0x7ff17044
+ssbo 0 subdata int 3860 0xffcc11ef
+ssbo 0 subdata int 3864 0x7fb2396e
+ssbo 0 subdata int 3868 0xff9ef9e5
+ssbo 0 subdata float 3872 967.5
+ssbo 0 subdata float 3876 968.5
+ssbo 0 subdata float 3880 969.5
+ssbo 0 subdata float 3884 970.5
+ssbo 0 subdata int 3888 0x7ff1d94c
+ssbo 0 subdata int 3892 0xffcdc307
+ssbo 0 subdata int 3896 0x7fb54a56
+ssbo 0 subdata int 3900 0xffaae17d
+ssbo 0 subdata float 3904 975.5
+ssbo 0 subdata float 3908 976.5
+ssbo 0 subdata float 3912 977.5
+ssbo 0 subdata float 3916 978.5
+ssbo 0 subdata int 3920 0x7ff24254
+ssbo 0 subdata int 3924 0xffcf741f
+ssbo 0 subdata int 3928 0x7fb85b3e
+ssbo 0 subdata int 3932 0xffb6c915
+ssbo 0 subdata float 3936 983.5
+ssbo 0 subdata float 3940 984.5
+ssbo 0 subdata float 3944 985.5
+ssbo 0 subdata float 3948 986.5
+ssbo 0 subdata int 3952 0x7ff2ab5c
+ssbo 0 subdata int 3956 0xffd12537
+ssbo 0 subdata int 3960 0x7fbb6c26
+ssbo 0 subdata int 3964 0xff82b0ad
+ssbo 0 subdata float 3968 991.5
+ssbo 0 subdata float 3972 992.5
+ssbo 0 subdata float 3976 993.5
+ssbo 0 subdata float 3980 994.5
+ssbo 0 subdata int 3984 0x7ff31464
+ssbo 0 subdata int 3988 0xffd2d64f
+ssbo 0 subdata int 3992 0x7fbe7d0e
+ssbo 0 subdata int 3996 0xff8e9845
+ssbo 0 subdata float 4000 999.5
+ssbo 0 subdata float 4004 1000.5
+ssbo 0 subdata float 4008 1001.5
+ssbo 0 subdata float 4012 1002.5
+ssbo 0 subdata int 4016 0x7ff37d6c
+ssbo 0 subdata int 4020 0xffd48767
+ssbo 0 subdata int 4024 0x7f818df6
+ssbo 0 subdata int 4028 0xff9a7fdd
+ssbo 0 subdata float 4032 1007.5
+ssbo 0 subdata float 4036 1008.5
+ssbo 0 subdata float 4040 1009.5
+ssbo 0 subdata float 4044 1010.5
+ssbo 0 subdata int 4048 0x7ff3e674
+ssbo 0 subdata int 4052 0xffd6387f
+ssbo 0 subdata int 4056 0x7f849ede
+ssbo 0 subdata int 4060 0xffa66775
+ssbo 0 subdata float 4064 1015.5
+ssbo 0 subdata float 4068 1016.5
+ssbo 0 subdata float 4072 1017.5
+ssbo 0 subdata float 4076 1018.5
+ssbo 0 subdata int 4080 0x7ff44f7c
+ssbo 0 subdata int 4084 0xffd7e997
+ssbo 0 subdata int 4088 0x7f87afc6
+ssbo 0 subdata int 4092 0xffb24f0d
+
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw rect -1 -1 2 2
+probe atomic counter 0 == 0
+
