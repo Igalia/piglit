@@ -25,12 +25,14 @@ import errno
 import os
 import subprocess
 import sys
+import threading
 
 import six
 
-from framework import exceptions, core
+from framework import exceptions
+from framework.core import lazy_property
 from framework.options import OPTIONS
-from framework.test import piglit_test
+# from framework.test import piglit_test
 
 
 class StopWflinfo(exceptions.PiglitException):
@@ -38,6 +40,15 @@ class StopWflinfo(exceptions.PiglitException):
     def __init__(self, reason):
         super(StopWflinfo, self).__init__()
         self.reason = reason
+
+
+class ProfileInfo(object):
+    """Information about a single profile (core, compat, es1, es2, etc)."""
+
+    def __init__(self, shader_version, language_version, extensions):
+        self.shader_version = shader_version
+        self.api_version = language_version
+        self.extensions = extensions
 
 
 class WflInfo(object):
@@ -56,6 +67,15 @@ class WflInfo(object):
 
     """
     __shared_state = {}
+    __core_init = False
+    __core_lock = threading.Lock()
+    __compat_init = False
+    __compat_lock = threading.Lock()
+    __es1_init = False
+    __es1_lock = threading.Lock()
+    __es2_init = False
+    __es2_lock = threading.Lock()
+
     def __new__(cls, *args, **kwargs):
         # Implement the borg pattern:
         # https://code.activestate.com/recipes/66531-singleton-we-dont-need-no-stinkin-singleton-the-bo/
@@ -94,9 +114,9 @@ class WflInfo(object):
 
                 # setup execution environment where we extend the PATH env var
                 # to include the piglit TEST_BIN_DIR
-                new_env = os.environ
-                new_env['PATH'] = ':'.join([piglit_test.TEST_BIN_DIR,
-                                            os.environ['PATH']])
+                new_env = os.environ.copy()
+                # new_env['PATH'] = ':'.join([piglit_test.TEST_BIN_DIR,
+                                            # os.environ['PATH']])
 
                 raw = subprocess.check_output(cmd, env=new_env, stderr=d)
 
@@ -120,8 +140,79 @@ class WflInfo(object):
                 return line
         raise Exception('Unreachable')
 
-    @core.lazy_property
-    def gl_extensions(self):
+    def __get_shader_version(self, profile):
+        """Calculate the maximum OpenGL Shader Language version."""
+        ret = 0.0
+        if profile in ['core', 'compat', 'none']:
+            try:
+                raw = self.__call_wflinfo(
+                    ['--verbose', '--api', 'gl', '--profile', profile])
+            except StopWflinfo as e:
+                if e.reason not in ['Called', 'OSError']:
+                    raise
+            else:
+                try:
+                    # GLSL versions are M.mm formatted
+                    line = self.__getline(raw.split('\n'), 'OpenGL shading language')
+                    ret = float(line.split(":")[1][:5])
+                except (IndexError, ValueError):
+                    # This is caused by wflinfo returning an error
+                    pass
+        elif profile in ['gles2', 'gles3']:
+            try:
+                raw = self.__call_wflinfo(['--verbose', '--api', profile])
+            except StopWflinfo as e:
+                if e.reason not in ['Called', 'OSError']:
+                    raise
+            else:
+                try:
+                    # GLSL ES version numbering is insane.
+                    # For version >= 3 the numbers are 3.00, 3.10, etc.
+                    # For version 2, they are 1.0.xx
+                    ret = float(self.__getline(
+                        raw.split('\n'),
+                        'OpenGL shading language').split()[-1][:3])
+                except (IndexError, ValueError):
+                    # Handle wflinfo internal errors
+                    pass
+        return ret
+
+    def __get_language_version(self, profile):
+        ret = 0.0
+        if profile in ['core', 'compat', 'none']:
+            try:
+                raw = self.__call_wflinfo(['--api', 'gl', '--profile', profile])
+            except StopWflinfo as e:
+                if e.reason not in ['Called', 'OSError']:
+                    raise
+            else:
+                try:
+                    # Grab the GL version string, trim any release_number values
+                    ret = float(self.__getline(
+                        raw.split('\n'),
+                        'OpenGL version string').split()[3][:3])
+                except (IndexError, ValueError):
+                    # This is caused by wlfinfo returning an error
+                    pass
+        else:
+            try:
+                raw = self.__call_wflinfo(['--api', profile])
+            except StopWflinfo as e:
+                if e.reason not in ['Called', 'OSError']:
+                    raise
+            else:
+                try:
+                    # Yes, search for "OpenGL version string" in GLES
+                    # GLES doesn't support patch versions.
+                    ret = float(self.__getline(
+                        raw.split('\n'),
+                        'OpenGL version string').split()[5])
+                except (IndexError, ValueError):
+                    # This is caused by wlfinfo returning an error
+                    pass
+        return ret
+
+    def __get_extensions(self, profile):
         """Call wflinfo to get opengl extensions.
 
         This provides a very conservative set of extensions, it provides every
@@ -134,30 +225,23 @@ class WflInfo(object):
         _trim = len('OpenGL extensions: ')
         all_ = set()
 
-        def helper(const, vars_):
+        def helper(args):
             """Helper function to reduce code duplication."""
             # This is a pretty fragile function but it really does help with
             # duplication
-            for var in vars_:
-                try:
-                    ret = self.__call_wflinfo(const + [var])
-                except StopWflinfo as e:
-                    # This means the particular api or profile is unsupported
-                    if e.reason == 'Called':
-                        continue
-                    else:
-                        raise
-                all_.update(set(self.__getline(
-                    ret.split('\n'), 'OpenGL extensions')[_trim:].split()))
+            ret = self.__call_wflinfo(args)
+            all_.update(set(self.__getline(
+                ret.split('\n'), 'OpenGL extensions')[_trim:].split()))
 
         try:
-            helper(['--verbose', '--api'], ['gles1', 'gles2', 'gles3'])
-            helper(['--verbose', '--api', 'gl', '--profile'],
-                   ['core', 'compat', 'none'])
+            if profile in ['core', 'compat', 'none']:
+                helper(['--verbose', '--api', 'gl', '--profile', profile])
+            else:
+                helper(['--verbose', '--api', profile])
         except StopWflinfo as e:
             # Handle wflinfo not being installed by returning an empty set. This
             # will essentially make FastSkipMixin a no-op.
-            if e.reason == 'OSError':
+            if e.reason in ['OSError', 'Called']:
                 return set()
             raise
 
@@ -167,126 +251,84 @@ class WflInfo(object):
             return set()
         return ret
 
-    @core.lazy_property
-    def gl_version(self):
-        """Calculate the maximum opengl version.
+    def __build_info(self, profile):
+        return ProfileInfo(
+            self.__get_shader_version(profile),
+            self.__get_language_version(profile),
+            self.__get_extensions(profile)
+        )
 
-        This will try (in order): core, compat, and finally no profile,
-        stopping when it finds a profile. It assumes that most implementations
-        will have core and compat as equals, or core as superior to compat in
-        terms of support.
+    @lazy_property
+    def core(self):
+        with self.__core_lock:
+            if not self.__core_init:
+                self.__core_init = True
+                return self.__build_info('core')
+        return self.core
 
-        """
-        ret = None
-        for profile in ['core', 'compat', 'none']:
-            try:
-                raw = self.__call_wflinfo(['--api', 'gl', '--profile', profile])
-            except StopWflinfo as e:
-                if e.reason == 'Called':
-                    continue
-                elif e.reason == 'OSError':
-                    break
-                raise
-            else:
-                try:
-                    # Grab the GL version string, trim any release_number values
-                    ret = float(self.__getline(
-                        raw.split('\n'),
-                        'OpenGL version string').split()[3][:3])
-                except (IndexError, ValueError):
-                    # This is caused by wlfinfo returning an error
-                    pass
-                break
-        return ret
+    @lazy_property
+    def compat(self):
+        with self.__compat_lock:
+            if not self.__compat_init:
+                self.__compat_init = True
+                comp = self.__build_info('compat')
+                if comp.api_version == 0.0:
+                    # In this case there are not compat profiles, try agian
+                    # with a "legacy" profile, which could be promoted to
+                    # compat
+                    return self.__build_info('none')
+                return comp
+        return self.compat
 
-    @core.lazy_property
+    @lazy_property
+    def es1(self):
+        with self.__es1_lock:
+            if not self.__es1_init:
+                self.__es1_init = True
+                return self.__build_info('gles1')
+        return self.es1
+
+    @lazy_property
+    def es2(self):
+        with self.__es2_lock:
+            if not self.__es2_init:
+                self.__es2_init = True
+                return self.__build_info('gles2')
+        return self.es2
+
+    @lazy_property
+    def es3(self):
+        return self.es2
+
+    @property
     def gles_version(self):
-        """Calculate the maximum opengl es version.
+        v = max([self.es1.api_version, self.es2.api_version])
+        if v == 0.0:
+            return None
+        return v
 
-        The design of this function isn't 100% correct. GLES1 and GLES2+ behave
-        differently, since 2+ can be silently promoted, but 1 cannot. This
-        means that a driver can implement 2, 3, 3.1, etc, but never have 1
-        support.
+    @property
+    def gl_version(self):
+        v = max([self.core.api_version, self.compat.api_version])
+        if v == 0.0:
+            return None
+        return v
 
-        I don't think this is a big deal for a couple of reasons. First, piglit
-        has a very small set of GLES1 tests, so they shouldn't have big impact
-        on runtime, and second, the design of the FastSkipMixin is
-        conservative: it would rather run a few tests that should be skipped
-        than skip a few tests that should be run.
-
-        """
-        ret = None
-        for api in ['gles3', 'gles2', 'gles1']:
-            try:
-                raw = self.__call_wflinfo(['--api', api])
-            except StopWflinfo as e:
-                if e.reason == 'Called':
-                    continue
-                elif e.reason == 'OSError':
-                    break
-                raise
-            else:
-                try:
-                    # Yes, search for "OpenGL version string" in GLES
-                    # GLES doesn't support patch versions.
-                    ret = float(self.__getline(
-                        raw.split('\n'),
-                        'OpenGL version string').split()[5])
-                except (IndexError, ValueError):
-                    # This is caused by wlfinfo returning an error
-                    pass
-                break
-        return ret
-
-    @core.lazy_property
+    @property
     def glsl_version(self):
-        """Calculate the maximum OpenGL Shader Language version."""
-        ret = None
-        for profile in ['core', 'compat', 'none']:
-            try:
-                raw = self.__call_wflinfo(
-                    ['--verbose', '--api', 'gl', '--profile', profile])
-            except StopWflinfo as e:
-                if e.reason == 'Called':
-                    continue
-                elif e.reason == 'OSError':
-                    break
-                raise
-            else:
-                try:
-                    # GLSL versions are M.mm formatted
-                    line = self.__getline(raw.split('\n'), 'OpenGL shading language')
-                    ret = float(line.split(":")[1][:5])
-                except (IndexError, ValueError):
-                    # This is caused by wflinfo returning an error
-                    pass
-                break
-        return ret
+        v = max([self.core.shader_version, self.compat.shader_version])
+        if v == 0.0:
+            return None
+        return v
 
-    @core.lazy_property
+    @property
     def glsl_es_version(self):
-        """Calculate the maximum OpenGL ES Shader Language version."""
-        ret = None
-        for api in ['gles3', 'gles2']:
-            try:
-                raw = self.__call_wflinfo(['--verbose', '--api', api])
-            except StopWflinfo as e:
-                if e.reason == 'Called':
-                    continue
-                elif e.reason == 'OSError':
-                    break
-                raise
-            else:
-                try:
-                    # GLSL ES version numbering is insane.
-                    # For version >= 3 the numbers are 3.00, 3.10, etc.
-                    # For version 2, they are 1.0.xx
-                    ret = float(self.__getline(
-                        raw.split('\n'),
-                        'OpenGL shading language').split()[-1][:3])
-                except (IndexError, ValueError):
-                    # Handle wflinfo internal errors
-                    pass
-                break
-        return ret
+        v = max([self.es1.shader_version, self.es2.shader_version])
+        if v == 0.0:
+            return None
+        return v
 
+    @property
+    def gl_extensions(self):
+        return set.union(self.es1.extensions, self.es2.extensions,
+                         self.core.extensions, self.compat.extensions)

@@ -78,8 +78,14 @@ class TestWflInfo(object):
             """wflinfo.WflInfo.gl_extensions: Provides list of gl
             extensions.
             """
-            rv = (b'foo\nbar\nboink\nOpenGL extensions: '
-                  b'GL_foobar GL_ham_sandwhich\n')
+            rv = textwrap.dedent("""\
+                foo
+                bar
+                boink
+                OpenGL version string: 1.1
+                OpenGL shading language: 1.1
+                OpenGL extensions: GL_foobar GL_ham_sandwhich
+            """).encode('utf-8')
             expected = set(['GL_foobar', 'GL_ham_sandwhich'])
 
             with mock.patch('framework.wflinfo.subprocess.check_output',
@@ -93,8 +99,10 @@ class TestWflInfo(object):
                 Waffle api: gl
                 OpenGL vendor string: Intel Open Source Technology Center
                 OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
-                OpenGL version string: 18 (Core Profile) Mesa 11.0.4
                 OpenGL context flags: 0x0
+                OpenGL shading language: 1.1
+                OpenGL extensions: GL_foobar GL_ham_sandwhich
+                OpenGL version string: 18 (Core Profile) Mesa 11.0.4
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
@@ -108,6 +116,8 @@ class TestWflInfo(object):
                 OpenGL vendor string: Intel Open Source Technology Center
                 OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
                 OpenGL version string: OpenGL ES 7.1 Mesa 11.0.4
+                OpenGL shading language: 1.1
+                OpenGL extensions: GL_foobar GL_ham_sandwhich
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
@@ -138,6 +148,7 @@ class TestWflInfo(object):
                 OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
                 OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4
                 OpenGL shading language version string: OpenGL ES GLSL ES 1.0.17
+                OpenGL version string: 1.1 (Core Profile) Mesa 11.0.4
                 OpenGL extensions: this is some extension strings.
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
@@ -167,6 +178,8 @@ class TestWflInfo(object):
                 OpenGL vendor string: Intel Open Source Technology Center
                 OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
                 OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4
+                OpenGL shading language version string: OpenGL ES GLSL ES 5.00
+                OpenGL extensions: this is some extension strings.
                 OpenGL context flags: 0x0
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
@@ -199,6 +212,8 @@ class TestWflInfo(object):
                 OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
                 OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4
                 OpenGL context flags: 0x0
+                OpenGL shading language version string: 9.30.7
+                OpenGL extensions: ARB_ham_sandwich
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
@@ -216,6 +231,8 @@ class TestWflInfo(object):
                 Warning: I'm a big fat warnngs
                 OpenGL version string: 18.0.1 (Core Profile) Mesa 11.0.4
                 OpenGL context flags: 0x0
+                OpenGL shading language version string: 9.30.7
+                OpenGL extensions: ARB_ham_sandwich
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
