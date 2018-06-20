@@ -120,7 +120,7 @@ class TestConfigParsing(object):
             """))
         test = shader_test.ShaderTest.new(six.text_type(p))
 
-        assert test.gl_required == {'GL_ARB_ham_sandwhich'}
+        assert test.require_extensions == {'GL_ARB_ham_sandwhich'}
 
     def test_skip_gl_version(self, tmpdir):
         """test.shader_test.ShaderTest: finds gl_version."""
@@ -132,7 +132,7 @@ class TestConfigParsing(object):
             """))
         test = shader_test.ShaderTest.new(six.text_type(p))
 
-        assert test.gl_version == 2.0
+        assert test.require_version == 2.0
 
     def test_skip_gles_version(self, tmpdir):
         """test.shader_test.ShaderTest: finds gles_version."""
@@ -144,7 +144,7 @@ class TestConfigParsing(object):
             """))
         test = shader_test.ShaderTest.new(six.text_type(p))
 
-        assert test.gles_version == 2.0
+        assert test.require_version == 2.0
 
     def test_skip_glsl_version(self, tmpdir):
         """test.shader_test.ShaderTest: finds glsl_version."""
@@ -156,7 +156,7 @@ class TestConfigParsing(object):
             """))
         test = shader_test.ShaderTest.new(six.text_type(p))
 
-        assert test.glsl_version == 1.2
+        assert test.require_shader == 1.2
 
     def test_skip_glsl_es_version(self, tmpdir):
         """test.shader_test.ShaderTest: finds glsl_es_version."""
@@ -168,7 +168,7 @@ class TestConfigParsing(object):
             """))
         test = shader_test.ShaderTest.new(six.text_type(p))
 
-        assert test.glsl_es_version == 1.0
+        assert test.require_shader == 1.0
 
     def test_ignore_directives(self, tmpdir):
         """There are some directives for shader_runner that are not interpreted
@@ -188,9 +188,9 @@ class TestConfigParsing(object):
             """))
         test = shader_test.ShaderTest.new(six.text_type(p))
 
-        assert test.gl_version == 3.3
-        assert test.glsl_version == 1.50
-        assert test.gl_required == {'GL_ARB_foobar'}
+        assert test.require_version == 3.3
+        assert test.require_shader == 1.50
+        assert test.require_extensions == {'GL_ARB_foobar'}
 
 
 class TestCommand(object):
@@ -283,12 +283,12 @@ class TestMultiShaderTest(object):
         assert os.path.basename(actual[2]) == '-auto'
 
     def test_skips_set(self, inst):
-        assert inst.skips[0].glsl_version == 3.0
-        assert inst.skips[1].glsl_version == 4.0
-        assert inst.skips[1].gl_required == {'GL_ARB_ham_sandwhich'}
+        assert inst.skips[0].shader_version == 3.0
+        assert inst.skips[1].shader_version == 4.0
+        assert inst.skips[1].extensions == {'GL_ARB_ham_sandwhich'}
 
     def test_process_skips(self, inst):
         expected = {'bar': status.SKIP, 'foo': status.NOTRUN}
-        with mock.patch.object(inst.skips[0].info, 'glsl_version', 3.0):
+        with mock.patch.object(inst.skips[0].info.core, 'shader_version', 3.0):
             inst._process_skips()
         assert dict(inst.result.subtests) == expected

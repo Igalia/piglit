@@ -46,11 +46,12 @@ class TestFastSkipMixin(object):  # pylint: disable=too-many-public-methods
     def patch(self):
         """Create a Class with FastSkipMixin, but patch various bits."""
         _mock_wflinfo = mock.Mock(spec=wflinfo.WflInfo)
-        _mock_wflinfo.gl_version = 3.3
-        _mock_wflinfo.gles_version = 3.0
-        _mock_wflinfo.glsl_version = 3.3
-        _mock_wflinfo.glsl_es_version = 2.0
-        _mock_wflinfo.gl_extensions = set(['bar'])
+        _mock_wflinfo.core.api_version = 3.3
+        _mock_wflinfo.core.shader_version = 3.3
+        _mock_wflinfo.core.extensions = set(['bar'])
+        _mock_wflinfo.es2.api_version = 3.0
+        _mock_wflinfo.es2.shader_version = 2.0
+        _mock_wflinfo.es2.extensions = set(['bar'])
 
         with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
             yield
@@ -64,9 +65,9 @@ class TestFastSkipMixin(object):  # pylint: disable=too-many-public-methods
         Since you're not suppoed to be able to pass gl and gles version, this
         uses two seperate constructor calls.
         """
-        self._Test(['foo'], gl_required={'foo'}, gl_version=3, glsl_version=2)
-        self._Test(['foo'], gl_required={'foo'}, gles_version=3,
-                   glsl_es_version=2)
+        self._Test(['foo'], extensions={'foo'}, api_version=3, shader_version=2)
+        self._Test(['foo'], extensions={'foo'}, api_version=3,
+                   shader_version=2)
 
 
 class TestFastSkip(object):
@@ -76,24 +77,25 @@ class TestFastSkip(object):
     def patch(self):
         """Create a Class with FastSkipMixin, but patch various bits."""
         _mock_wflinfo = mock.Mock(spec=wflinfo.WflInfo)
-        _mock_wflinfo.gl_version = 3.3
-        _mock_wflinfo.gles_version = 3.0
-        _mock_wflinfo.glsl_version = 3.3
-        _mock_wflinfo.glsl_es_version = 2.0
-        _mock_wflinfo.gl_extensions = set(['bar'])
+        _mock_wflinfo.core.api_version = 3.3
+        _mock_wflinfo.core.shader_version = 3.3
+        _mock_wflinfo.core.extensions = set(['bar'])
+        _mock_wflinfo.es2.api_version = 3.0
+        _mock_wflinfo.es2.shader_version = 2.0
+        _mock_wflinfo.es2.extensions = set(['bar'])
 
         with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
             yield
 
     @pytest.fixture
     def inst(self):
-        return opengl.FastSkip()
+        return opengl.FastSkip(api='core')
 
     def test_should_skip(self, inst):
         """test.opengl.FastSkipMixin.test: Skips when requires is missing
         from extensions.
         """
-        inst.gl_required.add('foobar')
+        inst.extensions.add('foobar')
         with pytest.raises(_TestIsSkip):
             inst.test()
 
@@ -101,79 +103,79 @@ class TestFastSkip(object):
         """test.opengl.FastSkipMixin.test: runs when requires is in
         extensions.
         """
-        inst.gl_required.add('bar')
+        inst.extensions.add('bar')
         inst.test()
 
-    def test_max_gl_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.test: skips if gl_version >
-        __max_gl_version.
+    def test_max_api_version_lt(self, inst):
+        """test.opengl.FastSkipMixin.test: skips if api_version >
+        __max_api_version.
         """
-        inst.gl_version = 4.0
+        inst.api_version = 4.0
         with pytest.raises(_TestIsSkip):
             inst.test()
 
-    def test_max_gl_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if gl_version <
-        __max_gl_version.
+    def test_max_api_version_gt(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if api_version <
+        __max_api_version.
         """
-        inst.gl_version = 1.0
+        inst.api_version = 1.0
 
-    def test_max_gl_version_set(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if gl_version is None"""
+    def test_max_api_version_set(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if api_version is None"""
         inst.test()
 
-    def test_max_gles_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.test: skips if gles_version >
-        __max_gles_version.
+    def test_max_api_version_lt(self, inst):
+        """test.opengl.FastSkipMixin.test: skips if api_version >
+        __max_api_version.
         """
-        inst.gles_version = 4.0
+        inst.api_version = 4.0
         with pytest.raises(_TestIsSkip):
             inst.test()
 
-    def test_max_gles_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if gles_version <
-        __max_gles_version.
+    def test_max_api_version_gt(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if api_version <
+        __max_api_version.
         """
-        inst.gles_version = 1.0
+        inst.api_version = 1.0
 
-    def test_max_gles_version_set(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if gles_version is None"""
+    def test_max_api_version_set(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if api_version is None"""
         inst.test()
 
-    def test_max_glsl_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.test: skips if glsl_version >
-        __max_glsl_version.
+    def test_max_shader_version_lt(self, inst):
+        """test.opengl.FastSkipMixin.test: skips if shader_version >
+        __max_shader_version.
         """
-        inst.glsl_version = 4.0
+        inst.shader_version = 4.0
         with pytest.raises(_TestIsSkip):
             inst.test()
 
-    def test_max_glsl_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if glsl_version <
-        __max_glsl_version.
+    def test_max_shader_version_gt(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if shader_version <
+        __max_shader_version.
         """
-        inst.glsl_version = 1.0
+        inst.shader_version = 1.0
 
-    def test_max_glsl_version_set(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if glsl_version is None"""
+    def test_max_shader_version_set(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if shader_version is None"""
         inst.test()
 
-    def test_max_glsl_es_version_lt(self, inst):
-        """test.opengl.FastSkipMixin.test: skips if glsl_es_version >
-        __max_glsl_es_version.
+    def test_max_shader_version_lt(self, inst):
+        """test.opengl.FastSkipMixin.test: skips if shader_version >
+        __max_shader_version.
         """
-        inst.glsl_es_version = 4.0
+        inst.shader_version = 4.0
         with pytest.raises(_TestIsSkip):
             inst.test()
 
-    def test_max_glsl_es_version_gt(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if glsl_es_version <
-        __max_glsl_es_version.
+    def test_max_shader_version_gt(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if shader_version <
+        __max_shader_version.
         """
-        inst.glsl_es_version = 1.0
+        inst.shader_version = 1.0
 
-    def test_max_glsl_es_version_set(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if glsl_es_version is None"""
+    def test_max_shader_version_set(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if shader_version is None"""
         inst.test()
 
     class TestEmpty(object):
@@ -183,24 +185,25 @@ class TestFastSkip(object):
         def patch(self):
             """Create a Class with FastSkipMixin, but patch various bits."""
             _mock_wflinfo = mock.Mock(spec=wflinfo.WflInfo)
-            _mock_wflinfo.gl_version = None
-            _mock_wflinfo.gles_version = None
-            _mock_wflinfo.glsl_version = None
-            _mock_wflinfo.glsl_es_version = None
-            _mock_wflinfo.gl_extensions = set()
+            _mock_wflinfo.core.api_version = 0.0
+            _mock_wflinfo.core.shader_version = 0.0
+            _mock_wflinfo.core.extensions = set()
+            _mock_wflinfo.es2.api_version = 0.0
+            _mock_wflinfo.es2.shader_version = 0.0
+            _mock_wflinfo.es2.extensions = set()
 
             with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
                 yield
 
         @pytest.fixture
         def inst(self):
-            return opengl.FastSkip()
+            return opengl.FastSkip(api='core')
 
         def test_extension_empty(self, inst):
             """test.opengl.FastSkipMixin.test: if extensions are empty test
             runs.
             """
-            inst.gl_required.add('foobar')
+            inst.info.core.extensions.add('foobar')
             inst.test()
 
         def test_requires_empty(self, inst):
@@ -209,32 +212,18 @@ class TestFastSkip(object):
             """
             inst.test()
 
-        def test_max_gl_version_unset(self, inst):
-            """test.opengl.FastSkipMixin.test: runs if __max_gl_version is
-            None.
-            """
-            inst.gl_version = 1.0
-            inst.test()
-
-        def test_max_glsl_es_version_unset(self, inst):
-            """test.opengl.FastSkipMixin.test: runs if __max_glsl_es_version is
-            None.
-            """
-            inst.glsl_es_version = 1.0
-            inst.test()
-
-    def test_max_glsl_version_unset(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if __max_glsl_version is
+    def test_max_shader_version_unset(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if __max_shader_version is
         None.
         """
-        inst.glsl_version = 1.0
+        inst.shader_version = 1.0
         inst.test()
 
-    def test_max_gles_version_unset(self, inst):
-        """test.opengl.FastSkipMixin.test: runs if __max_gles_version is
+    def test_max_api_version_unset(self, inst):
+        """test.opengl.FastSkipMixin.test: runs if __max_api_version is
         None.
         """
-        inst.gles_version = 1.0
+        inst.api_version = 1.0
         inst.test()
 
 
@@ -245,11 +234,12 @@ class TestFastSkipMixinDisabled(object):
     def patch(self):
         """Create a Class with FastSkipMixin, but patch various bits."""
         _mock_wflinfo = mock.Mock(spec=wflinfo.WflInfo)
-        _mock_wflinfo.gl_version = 3.3
-        _mock_wflinfo.gles_version = 3.0
-        _mock_wflinfo.glsl_version = 3.3
-        _mock_wflinfo.glsl_es_version = 2.0
-        _mock_wflinfo.gl_extensions = set(['bar'])
+        _mock_wflinfo.es2.api_version = 3.3
+        _mock_wflinfo.es2.shader_version = 2.0
+        _mock_wflinfo.es2.extensions = set(['bar'])
+        _mock_wflinfo.core.api_version = 3.0
+        _mock_wflinfo.core.shader_version = 3.3
+        _mock_wflinfo.core.extensions = set(['bar'])
 
         with mock.patch('framework.test.opengl.FastSkip.info', _mock_wflinfo):
             yield
@@ -263,6 +253,6 @@ class TestFastSkipMixinDisabled(object):
         Since you're not suppoed to be able to pass gl and gles version, this
         uses two seperate constructor calls.
         """
-        self._Test(['foo'], gl_required={'foo'}, gl_version=3, glsl_version=2)
-        self._Test(['foo'], gl_required={'foo'}, gles_version=3,
-                   glsl_es_version=2)
+        self._Test(['foo'], extensions={'foo'}, api_version=3, shader_version=2)
+        self._Test(['foo'], extensions={'foo'}, api_version=3,
+                   shader_version=2)

@@ -47,17 +47,16 @@ class Parser(object):
 
     _is_gl = re.compile(r'GL (<|<=|=|>=|>) \d\.\d')
     _match_gl_version = re.compile(
-        r'^GL\s+(?P<es>ES)?\s*(?P<op>(<|<=|=|>=|>))\s*(?P<ver>\d\.\d)')
+        r'^GL\s+(?P<profile>(ES|CORE|COMPAT))?\s*(?P<op>(<|<=|=|>=|>))\s*(?P<ver>\d\.\d)')
     _match_glsl_version = re.compile(
         r'^GLSL\s+(?P<es>ES)?\s*(?P<op>(<|<=|=|>=|>))\s*(?P<ver>\d\.\d+)')
 
     def __init__(self, filename):
         self.filename = filename
-        self.gl_required = set()
-        self._gl_version = None
-        self._gles_version = None
-        self._glsl_version = None
-        self._glsl_es_version = None
+        self.extensions = set()
+        self.api_version = 0.0
+        self.shader_version = 0.0
+        self.api = None
         self.prog = None
         self.__op = None
         self.__sl_op = None
@@ -88,39 +87,58 @@ class Parser(object):
                 line = line.strip()
                 if not (line.startswith('GL_MAX') or line.startswith('GL_NUM')):
                     self.extensions.add(line)
+                    if line == 'GL_ARB_compatibility':
+                        assert self.api is None or self.api == 'compat'
+                        self.api = 'compat'
                 continue
 
             # Find any GLES requirements.
-            if not (self._gl_version or self._gles_version):
+            if not self.api_version:
                 m = self._match_gl_version.match(line)
                 if m:
                     self.__op = m.group('op')
-                    if m.group('es'):
-                        self._gles_version = float(m.group('ver'))
-                    else:
-                        self._gl_version = float(m.group('ver'))
+                    self.api_version = float(m.group('ver'))
+                    if m.group('profile') == 'ES':
+                        assert self.api is None or self.api == 'gles2'
+                        self.api = 'gles2'
+                    elif m.group('profile') == 'COMPAT':
+                        assert self.api is None or self.api == 'compat'
+                        self.api = 'compat'
+                    elif self.api_version >= 3.1:
+                        assert self.api is None or self.api == 'core'
+                        self.api = 'core'
                     continue
 
-            if not (self._glsl_version or self._glsl_es_version):
+            if not self.shader_version:
                 # Find any GLSL requirements
                 m = self._match_glsl_version.match(line)
                 if m:
                     self.__sl_op = m.group('op')
+                    self.shader_version = float(m.group('ver'))
                     if m.group('es'):
-                        self._glsl_es_version = float(m.group('ver'))
-                    else:
-                        self._glsl_version = float(m.group('ver'))
+                        assert self.api is None or self.api == 'gles2'
+                        self.api = 'gles2'
                     continue
 
             if line.startswith('['):
+                if not self.api:
+                    # Because this is inferred rather than explicitly declared
+                    # check this after al other requirements are parsed. It's
+                    # possible that a test can declare glsl >= 1.30 and GL >=
+                    # 4.0
+                    if self.shader_version < 1.4:
+                        self.api = 'compat'
+                    else:
+                        self.api = 'core'
                 break
 
         # Select the correct binary to run the test, but be as conservative as
         # possible by always selecting the lowest version that meets the
         # criteria.
-        if self._gles_version:
+        if self.api == 'gles2':
             if self.__op in ['<', '<='] or (
-                    self.__op in ['=', '>='] and self._gles_version < 3):
+                    self.__op in ['=', '>='] and self.api_version is not None
+                    and self.api_version < 3):
                 self.prog = 'shader_runner_gles2'
             else:
                 self.prog = 'shader_runner_gles3'
@@ -155,17 +173,15 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
 
     """
 
-    def __init__(self, command, gl_required=set(), gl_version=None,
-                 gles_version=None, glsl_version=None, glsl_es_version=None,
-                 **kwargs):
+    def __init__(self, command, api=None, extensions=set(),
+                  shader_version=None, api_version=None, **kwargs):
         super(ShaderTest, self).__init__(
             command,
             run_concurrent=True,
-            gl_required=gl_required,
-            gl_version=gl_version,
-            gles_version=gles_version,
-            glsl_version=glsl_version,
-            glsl_es_version=glsl_es_version)
+            api=api,
+            extensions=extensions,
+            shader_version=shader_version,
+            api_version=api_version)
 
     @classmethod
     def new(cls, filename, installed_name=None):
@@ -181,11 +197,10 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
         return cls(
             [parser.prog, installed_name or filename],
             run_concurrent=True,
-            gl_required=parser.gl_required,
-            gl_version=parser.gl_version,
-            gles_version=parser.gles_version,
-            glsl_version=parser.glsl_version,
-            glsl_es_version=parser.glsl_es_version)
+            api=parser.api,
+            extensions=parser.extensions,
+            shader_version=parser.shader_version,
+            api_version=parser.api_version)
 
     @PiglitBaseTest.command.getter
     def command(self):
@@ -263,11 +278,10 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
                 prog = parser.prog
 
             skips.append({
-                'gl_required': parser.gl_required,
-                'gl_version': parser.gl_version,
-                'glsl_version': parser.glsl_version,
-                'gles_version': parser.gles_version,
-                'glsl_es_version': parser.glsl_es_version,
+                'extensions': parser.extensions,
+                'api_version': parser.api_version,
+                'shader_version': parser.shader_version,
+                'api': parser.api,
             })
 
         return cls(prog, installednames or filenames, subtests, skips)

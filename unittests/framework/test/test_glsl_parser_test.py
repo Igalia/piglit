@@ -380,26 +380,47 @@ class TestGLSLParserTestSkipRequirements(object):
             // {}
             // [end config]""".format(version, extra)))
 
-    def test_glsl_version(self, tmpdir):
-        p = tmpdir.join('test.frag')
-        self.write_config(p)
-        assert glsl.GLSLParserTest.new(six.text_type(p)).glsl_version == 4.3
+    class TestShaderVersions:
 
-    def test_glsl_es_version(self, tmpdir):
-        p = tmpdir.join('test.frag')
-        self.write_config(p, version='3.0')
-        assert glsl.GLSLParserTest.new(six.text_type(p)).glsl_es_version == 3.0
+        @staticmethod
+        def write_config(filename, version='4.3', extra=''):
+            filename.write(textwrap.dedent("""\
+                // [config]
+                // expect_result: pass
+                // glsl_version: {}
+                // {}
+                // [end config]""".format(version, extra)))
 
-    def test_gl_required(self, tmpdir):
+        def test_glsl(self, tmpdir):
+            p = tmpdir.join('test.frag')
+            self.write_config(p)
+            assert glsl.GLSLParserTest.new(six.text_type(p)).require_shader == 4.3
+
+        def test_glsl_es(self, tmpdir):
+            p = tmpdir.join('test.frag')
+            self.write_config(p, version='3.0')
+            assert glsl.GLSLParserTest.new(six.text_type(p)).require_shader == 3.0
+
+
+    @pytest.mark.parametrize(
+        "value,expected",
+        [('3.0', 'gles3'), ('1.0', 'gles2'), ('4.3', 'core'),
+         ('4.3 compatibility', 'compat')])
+    def test_apis(self, tmpdir, value, expected):
+        p = tmpdir.join('test.frag')
+        self.write_config(p, version=value)
+        assert glsl.GLSLParserTest.new(six.text_type(p)).require_api == expected
+
+    def test_require_extensions(self, tmpdir):
         p = tmpdir.join('test.frag')
         self.write_config(p, extra="require_extensions: GL_ARB_foo GL_ARB_bar")
-        assert glsl.GLSLParserTest.new(six.text_type(p)).gl_required == \
+        assert glsl.GLSLParserTest.new(six.text_type(p)).require_extensions == \
             {'GL_ARB_foo', 'GL_ARB_bar'}
 
-    def test_exclude_not_added_to_gl_required(self, tmpdir):
+    def test_exclude_not_added_to_require_extensions(self, tmpdir):
         p = tmpdir.join('test.frag')
         self.write_config(p, extra="require_extensions: GL_ARB_foo !GL_ARB_bar")
-        assert glsl.GLSLParserTest.new(six.text_type(p)).gl_required == \
+        assert glsl.GLSLParserTest.new(six.text_type(p)).require_extensions == \
             {'GL_ARB_foo'}
 
 
@@ -448,7 +469,7 @@ def test_add_compatibility_requirement_fastskip(version, extension, tmpdir,
     test = glsl.GLSLParserTest.new(six.text_type(p))
 
     # The arb_compat extension was added to the fast skipping arguments
-    assert extension in test.gl_required
+    assert extension in test.require_extensions
 
 
 

@@ -95,9 +95,9 @@ class Parser(object):
     def __init__(self, filepath, installpath=None):
         # a set that stores a list of keys that have been found already
         self.__found_keys = set()
-        self.gl_required = set()
-        self.glsl_es_version = None
-        self.glsl_version = None
+        self.api = None
+        self.extensions = set()
+        self.shader_version = None
         abs_filepath = os.path.join(ROOT_DIR, filepath)
 
         try:
@@ -115,29 +115,39 @@ class Parser(object):
         """Set OpenGL and OpenGL ES fast skipping conditions."""
         glsl = self.config['glsl_version']
         if _is_gles_version(glsl):
-            self.glsl_es_version = float(glsl[:3])
+            self.shader_version = float(glsl[:3])
+            if self.shader_version >= 3.0:
+                self.api = 'gles3'
+            else:
+                self.api = 'gles2'
         elif glsl.endswith('compatibility'):
-            self.glsl_version = float(glsl[:3])
+            self.shader_version = float(glsl[:3])
+            self.api = 'compat'
         else:
-            self.glsl_version = float(glsl)
+            self.shader_version = float(glsl)
+            self.api = 'core'
 
         req = self.config['require_extensions']
-        self.gl_required = set(r for r in req.split() if not r.startswith('!'))
+        self.extensions = set(r for r in req.split() if not r.startswith('!'))
+
+        if self.api != 'compat' and 'GL_ARB_compatibility' in self.extensions:
+            assert self.api == 'core', 'arb_compat with gles?'
+            self.api = 'compat'
 
         # If GLES is requested, but piglit was not built with a gles version,
         # then ARB_ES3<ver>_compatibility is required. Add it to
-        # self.gl_required
-        if self.glsl_es_version and _FORCE_DESKTOP_VERSION:
-            if self.glsl_es_version == 1.0:
+        # self.extensions
+        if self.api.startswith('gles') and _FORCE_DESKTOP_VERSION:
+            if self.shader_version == 1.0:
                 ver = '2'
-            elif self.glsl_es_version == 3.0:
+            elif self.shader_version == 3.0:
                 ver = '3'
-            elif self.glsl_es_version == 3.1:
+            elif self.shader_version == 3.1:
                 ver = '3_1'
-            elif self.glsl_es_version == 3.2:
+            elif self.shader_version == 3.2:
                 ver = '3_2'
             ext = 'ARB_ES{}_compatibility'.format(ver)
-            self.gl_required.add(ext)
+            self.extensions.add(ext)
             self.command.append(ext)
 
     @staticmethod
@@ -274,11 +284,13 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
                 .tesc, .tese, .geom or .frag
     """
 
-    def __init__(self, command, gl_required=set(), glsl_version=None,
-                 glsl_es_version=None, **kwargs):
+    def __init__(self, command, api=None, extensions=set(),
+                 shader_version=None, **kwargs):
         super(GLSLParserTest, self).__init__(
-            command, run_concurrent=True, gl_required=gl_required,
-            glsl_version=glsl_version, glsl_es_version=glsl_es_version)
+            command, run_concurrent=True,
+            api=api,
+            extensions=extensions,
+            shader_version=shader_version)
 
     @PiglitBaseTest.command.getter
     def command(self):
@@ -298,9 +310,9 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
         parsed = Parser(filepath, installpath)
         return cls(
             parsed.command,
-            gl_required=parsed.gl_required,
-            glsl_version=parsed.glsl_version,
-            glsl_es_version=parsed.glsl_es_version)
+            api=parsed.api,
+            extensions=parsed.extensions,
+            shader_version=parsed.shader_version)
 
     def is_skip(self):
         if os.path.basename(self.command[0]) == 'glslparsertest' and not _HAS_GL_BIN:
