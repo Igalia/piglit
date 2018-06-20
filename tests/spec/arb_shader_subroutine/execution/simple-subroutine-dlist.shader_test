@@ -1,0 +1,92 @@
+# simple display list test using one shader subroutine.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+GL_ARB_shader_subroutine
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shader_subroutine: enable
+
+out vec4 color;
+
+subroutine vec4 getcolor();
+subroutine uniform getcolor GetColor;
+
+subroutine(getcolor)
+vec4 color_red()
+{
+	return vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+subroutine(getcolor)
+vec4 color_green()
+{
+	return vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+subroutine(getcolor)
+vec4 color_blue()
+{
+	return vec4(0.0, 0.0, 1.0, 1.0);
+}
+
+void main()
+{
+	color = GetColor();
+}
+
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+
+# Initialise subroutine to make sure call list is respected
+subuniform GL_FRAGMENT_SHADER GetColor color_blue
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 1.0 1.0
+
+clear color 0.1 0.1 0.1 0.1
+clear
+
+newlist GL_COMPILE
+subuniform GL_FRAGMENT_SHADER GetColor color_red
+draw rect -1 -1 2 2
+endlist
+
+# make sure we haven't drawn anything yet
+probe all rgba 0.1 0.1 0.1 0.1
+
+# Set wrong subroutine to make sure the call list is respected
+subuniform GL_FRAGMENT_SHADER GetColor color_blue
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 1.0 1.0
+
+calllist
+probe all rgba 1.0 0.0 0.0 1.0
+
+deletelist
+
+clear color 0.1 0.1 0.1 0.1
+clear
+
+newlist GL_COMPILE_AND_EXECUTE
+subuniform GL_FRAGMENT_SHADER GetColor color_green
+draw rect -1 -1 2 2
+endlist
+
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Set wrong subroutine to make sure the call list is respected
+subuniform GL_FRAGMENT_SHADER GetColor color_blue
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 1.0 1.0
+
+clear color 0.1 0.1 0.1 0.1
+clear
+
+calllist
+probe all rgba 0.0 1.0 0.0 1.0
