@@ -54,21 +54,22 @@ def parser():
 
 
 def _serialize_skips(test, elem):
-    if getattr(test, 'gl_required', None):
-        et.SubElement(elem, 'option', name='gl_required',
-                      value=repr(test.gl_required))
-    if getattr(test, 'gl_version', None):
-        et.SubElement(elem, 'option', name='gl_version',
-                      value=repr(test.gl_version))
-    if getattr(test, 'gles_version', None):
-        et.SubElement(elem, 'option', name='gles_version',
-                      value=repr(test.gles_version))
-    if getattr(test, 'glsl_version', None):
-        et.SubElement(elem, 'option', name='glsl_version',
-                      value=repr(test.glsl_version))
-    if getattr(test, 'glsl_es_version', None):
-        et.SubElement(elem, 'option', name='glsl_es_version',
-                      value=repr(test.glsl_es_version))
+    elems = [
+        ('require_shader', 'shader_version'),
+        ('require_api', 'api'),
+        ('require_version', 'api_version'),
+        ('require_extensions', 'extensions'),
+    ]
+    for e, f in elems:
+        value = getattr(test, e, None)
+
+        # For most tests (except MultiShader, we use the test value 'e', but
+        # for MultiShader what's exposed is a FastSkip object, and the methods
+        # are 'f'
+        if not value:
+            value = getattr(test, f, None)
+        if value:
+            et.SubElement(elem, 'option', name=f, value=repr(value))
 
 
 def serializer(name, profile, outfile):
