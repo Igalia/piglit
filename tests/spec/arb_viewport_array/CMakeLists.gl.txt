@@ -11,6 +11,7 @@ link_libraries(
 piglit_add_executable(arb_viewport_array-clear clear.c)
 piglit_add_executable(arb_viewport_array-viewport-indices viewport_indices.c)
 piglit_add_executable(arb_viewport_array-depthrange-indices depth_range_indices.c)
+piglit_add_executable(arb_viewport_array-dlist dlist.c)
 piglit_add_executable(arb_viewport_array-scissor-check scissor_check.c)
 piglit_add_executable(arb_viewport_array-scissor-indices scissor_indices.c)
 piglit_add_executable(arb_viewport_array-bounds bounds.c)

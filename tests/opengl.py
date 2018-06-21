@@ -2691,6 +2691,7 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'arb_viewport_array')) as g:
     g(['arb_viewport_array-viewport-indices'], 'viewport-indices')
     g(['arb_viewport_array-depthrange-indices'], 'depthrange-indices')
+    g(['arb_viewport_array-dlist'], 'display-list')
     g(['arb_viewport_array-scissor-check'], 'scissor-check')
     g(['arb_viewport_array-scissor-indices'], 'scissor-indices')
     g(['arb_viewport_array-bounds'], 'bounds')
