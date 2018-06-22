@@ -84,8 +84,10 @@ class Parser(object):
                     "In file {}: Config block not found".format(self.filename))
 
         for line in lines:
-            if line.startswith('GL_') and not line.startswith('GL_MAX'):
-                self.gl_required.add(line.strip())
+            if line.startswith('GL_'):
+                line = line.strip()
+                if not (line.startswith('GL_MAX') or line.startswith('GL_NUM')):
+                    self.extensions.add(line)
                 continue
 
             # Find any GLES requirements.
