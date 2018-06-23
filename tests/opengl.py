@@ -1732,8 +1732,10 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'ARB_draw_indirect')) as g:
     g(['arb_draw_indirect-api-errors'])
     g(['arb_draw_indirect-draw-arrays'])
+    g(['arb_draw_indirect-draw-arrays-compat'])
     g(['arb_draw_indirect-draw-arrays-prim-restart'])
     g(['arb_draw_indirect-draw-elements'])
+    g(['arb_draw_indirect-draw-elements-compat'])
     g(['arb_draw_indirect-draw-arrays-base-instance'])
     g(['arb_draw_indirect-draw-elements-base-instance'])
     g(['arb_draw_indirect-draw-elements-prim-restart'])
