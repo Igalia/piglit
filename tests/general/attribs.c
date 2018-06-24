@@ -107,6 +107,18 @@ static void draw_quad(unsigned mode, float *v,
 		}
 		glEnd();
 		glEndList();
+
+		/* Clear to make sure the calls didn't get executed
+		 * immediately.
+		 */
+		glBegin(GL_QUADS);
+		for (i = 0; i < 4; i++) {
+			attrib(0.1, 0.1, 0.1, 0.1);
+			glVertex2fv(&verts[i*2]);
+		}
+		glEnd();
+
+		/* Now call the display list */
 		glCallList(1);
 		break;
 	default:
