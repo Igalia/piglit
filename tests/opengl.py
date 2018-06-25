@@ -3354,8 +3354,6 @@ with profile.test_list.group_manager(
 
     for mode in ['main_binding', 'indexed_binding', 'buffer_start',
                  'buffer_size']:
-        g(['ext_transform_feedback-get-buffer-size', mode],
-          'get-buffer-size {}'.format(mode))
         g(['ext_transform_feedback-get-buffer-state', mode],
           'get-buffer-state {}'.format(mode))
 
