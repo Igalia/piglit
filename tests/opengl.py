@@ -4748,8 +4748,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'EXT_shader_samples_identical')) as g:
     for sample_count in MSAA_SAMPLE_COUNTS:
-        g(['ext_shader_samples_identical', sample_count])
-    g(['ext_shader_samples_identical-simple-fs'], 'simple-fs')
+        g(['ext_shader_samples_identical-simple-fs', sample_count])
 
 # Group ARB_shader_draw_parameters
 with profile.test_list.group_manager(
