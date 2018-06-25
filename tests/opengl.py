@@ -1065,7 +1065,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 4.3')) as g:
-    g(['get_glsl_versions'])
+    g(['gl-4.3-get_glsl_versions'], 'get_glsl_version')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
