@@ -3591,7 +3591,6 @@ with profile.test_list.group_manager(
       'getuniformblockindex')
     g(['arb_uniform_buffer_object-getuniformindices'], 'getuniformindices')
     g(['arb_uniform_buffer_object-getuniformlocation'], 'getuniformlocation')
-    g(['arb_uniform_buffer_object-layout-std140'], 'layout-std140')
     g(['arb_uniform_buffer_object-layout-std140-base-size-and-alignment'],
       'layout-std140-base-size-and-alignment')
     g(['arb_uniform_buffer_object-link-mismatch-blocks'],
