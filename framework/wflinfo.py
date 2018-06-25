@@ -299,36 +299,3 @@ class WflInfo(object):
     @lazy_property
     def es3(self):
         return self.es2
-
-    @property
-    def gles_version(self):
-        v = max([self.es1.api_version, self.es2.api_version])
-        if v == 0.0:
-            return None
-        return v
-
-    @property
-    def gl_version(self):
-        v = max([self.core.api_version, self.compat.api_version])
-        if v == 0.0:
-            return None
-        return v
-
-    @property
-    def glsl_version(self):
-        v = max([self.core.shader_version, self.compat.shader_version])
-        if v == 0.0:
-            return None
-        return v
-
-    @property
-    def glsl_es_version(self):
-        v = max([self.es1.shader_version, self.es2.shader_version])
-        if v == 0.0:
-            return None
-        return v
-
-    @property
-    def gl_extensions(self):
-        return set.union(self.es1.extensions, self.es2.extensions,
-                         self.core.extensions, self.compat.extensions)

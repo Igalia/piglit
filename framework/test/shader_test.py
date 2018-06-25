@@ -145,25 +145,6 @@ class Parser(object):
         else:
             self.prog = 'shader_runner'
 
-    # FIXME: All of these properties are a work-around for the fact that the
-    # FastSkipMixin assumes that operations are always > or >=
-
-    @property
-    def gl_version(self):
-        return self._gl_version if self.__op not in ['<', '<='] else None
-
-    @property
-    def gles_version(self):
-        return self._gles_version if self.__op not in ['<', '<='] else None
-
-    @property
-    def glsl_version(self):
-        return self._glsl_version if self.__sl_op not in ['<', '<='] else None
-
-    @property
-    def glsl_es_version(self):
-        return self._glsl_es_version if self.__sl_op not in ['<', '<='] else None
-
 
 class ShaderTest(FastSkipMixin, PiglitBaseTest):
     """ Parse a shader test file and return a PiglitTest instance
