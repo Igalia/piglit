@@ -74,8 +74,8 @@ class TestWflInfo(object):
             """Setup each instance, patching necissary bits."""
             self._test = wflinfo.WflInfo()
 
-        def test_gl_extension(self):
-            """wflinfo.WflInfo.gl_extensions: Provides list of gl
+        def test_extension(self):
+            """wflinfo.WflInfo.<api>.extensions: Provides list of gl
             extensions.
             """
             rv = textwrap.dedent("""\
@@ -90,10 +90,10 @@ class TestWflInfo(object):
 
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.gl_extensions == expected
+                assert self._test.compat.extensions == expected
 
-        def test_gl_version(self):
-            """wflinfo.WflInfo.gl_version: Provides a version number."""
+        def test_api_version(self):
+            """wflinfo.WflInfo.<api>.api_version: Provides a version number."""
             rv = textwrap.dedent("""\
                 Waffle platform: gbm
                 Waffle api: gl
@@ -102,14 +102,17 @@ class TestWflInfo(object):
                 OpenGL context flags: 0x0
                 OpenGL shading language: 1.1
                 OpenGL extensions: GL_foobar GL_ham_sandwhich
-                OpenGL version string: 18 (Core Profile) Mesa 11.0.4
+                OpenGL version string: 18 (Compat Profile) Mesa 11.0.4
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.gl_version == 18.0
+                assert self._test.compat.api_version == 18.0
 
-        def test_gles_version(self):
-            """wflinfo.WflInfo.gles_version: Provides a version number."""
+        def test_api_version_gles(self):
+            """wflinfo.WflInfo.<es>.api_version: Provides a version number.
+
+            The format for GLES is different than for Desktop GL.
+            """
             rv = textwrap.dedent("""\
                 Waffle platform: gbm
                 Waffle api: gles3
@@ -121,10 +124,10 @@ class TestWflInfo(object):
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.gles_version == 7.1
+                assert self._test.es2.api_version == 7.1
 
         def test_glsl_version(self):
-            """wflinfo.WflInfo.glsl_version: Provides a version number."""
+            """wflinfo.WflInfo.<api>.shader_version: Provides a version number."""
             rv = textwrap.dedent("""\
                 Waffle platform: gbm
                 Waffle api: gl
@@ -137,10 +140,10 @@ class TestWflInfo(object):
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.glsl_version == 9.3
+                assert self._test.core.shader_version == 9.3
 
-        def test_glsl_es_version_1(self):
-            """wflinfo.WflInfo.glsl_es_version: works with gles2."""
+        def test_glsl_es_version(self):
+            """wflinfo.WflInfo.<es>.shader_version: works with gles2."""
             rv = textwrap.dedent("""\
                 Waffle platform: gbm
                 Waffle api: gles2
@@ -153,25 +156,10 @@ class TestWflInfo(object):
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.glsl_es_version == 1.0
-
-        def test_glsl_es_version_3plus(self):
-            """wflinfo.WflInfo.glsl_es_version: works with gles3."""
-            rv = textwrap.dedent("""\
-                Waffle platform: gbm
-                Waffle api: gles3
-                OpenGL vendor string: Intel Open Source Technology Center
-                OpenGL renderer string: Mesa DRI Intel(R) Haswell Mobile
-                OpenGL version string: OpenGL ES 3.0 Mesa 11.0.4
-                OpenGL shading language version string: OpenGL ES GLSL ES 5.00
-                OpenGL extensions: this is some extension strings.
-            """).encode('utf-8')
-            with mock.patch('framework.wflinfo.subprocess.check_output',
-                            mock.Mock(return_value=rv)):
-                assert self._test.glsl_es_version == 5.0
+                assert self._test.es2.shader_version == 1.0
 
         def test_gl_version_patch(self):
-            """wflinfo.WflInfo.gl_version: Works with patch versions."""
+            """wflinfo.WflInfo.*.api_version: Works with patch versions."""
             rv = textwrap.dedent("""\
                 Waffle platform: gbm
                 Waffle api: gl
@@ -184,10 +172,10 @@ class TestWflInfo(object):
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.gl_version == 18.0
+                assert self._test.core.api_version == 18.0
 
         def test_glsl_version_patch(self):
-            """wflinfo.WflInfo.glsl_version: Works with patch versions."""
+            """wflinfo.WflInfo.*.shader_version: Works with patch versions."""
             rv = textwrap.dedent("""\
                 Waffle platform: gbm
                 Waffle api: gl
@@ -200,10 +188,10 @@ class TestWflInfo(object):
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.glsl_version == 9.3
+                assert self._test.core.shader_version == 9.3
 
         def test_leading_junk(self):
-            """wflinfo.WflInfo.gl_version: Handles leading junk."""
+            """wflinfo.WflInfo.*.api_version: Handles leading junk."""
             rv = textwrap.dedent("""\
                 Warning: I'm a big fat warnngs
                 Waffle platform: gbm
@@ -217,10 +205,10 @@ class TestWflInfo(object):
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.gl_version == 18.0
+                assert self._test.core.api_version == 18.0
 
         def test_mixed_junk(self):
-            """wflinfo.WflInfo.gl_version: Handles mixed junk."""
+            """wflinfo.WflInfo.*.api_version: Handles mixed junk."""
             rv = textwrap.dedent("""\
                 Waffle platform: gbm
                 Waffle api: gl
@@ -236,7 +224,7 @@ class TestWflInfo(object):
             """).encode('utf-8')
             with mock.patch('framework.wflinfo.subprocess.check_output',
                             mock.Mock(return_value=rv)):
-                assert self._test.gl_version == 18.0
+                assert self._test.core.api_version == 18.0
 
     class TestWAFFLEINFO_GL_ERROR(object):
         """Test class for WflInfo when "WFLINFO_GL_ERROR" is returned."""
@@ -270,31 +258,19 @@ class TestWflInfo(object):
             """wflinfo.WflInfo.gl_version: handles WFLINFO_GL_ERROR
             correctly.
             """
-            assert inst.gl_version is None
-
-        def test_gles_version(self, inst):
-            """wflinfo.WflInfo.gles_version: handles WFLINFO_GL_ERROR
-            correctly.
-            """
-            assert inst.gles_version is None
+            assert inst.core.api_version == 0.0
 
         def test_glsl_version(self, inst):
             """wflinfo.WflInfo.glsl_version: handles WFLINFO_GL_ERROR
             correctly.
             """
-            assert inst.glsl_version is None
-
-        def test_glsl_es_version(self, inst):
-            """wflinfo.WflInfo.glsl_es_version: handles WFLINFO_GL_ERROR
-            correctly.
-            """
-            assert inst.glsl_es_version is None
+            assert inst.core.shader_version == 0.0
 
         def test_gl_extensions(self, inst):
             """wflinfo.WflInfo.gl_extensions: handles WFLINFO_GL_ERROR
             correctly.
             """
-            assert inst.gl_extensions == set()
+            assert inst.core.extensions == set()
 
     class TestOSError(object):
         """Tests for the Wflinfo functions to handle OSErrors."""
@@ -324,31 +300,19 @@ class TestWflInfo(object):
             """wflinfo.WflInfo.gl_extensions: Handles OSError "no file"
             gracefully.
             """
-            inst.gl_extensions
+            assert inst.core.extensions == set()
 
         def test_gl_version(self, inst):
             """wflinfo.WflInfo.get_gl_version: Handles OSError "no file"
             gracefull.
             """
-            inst.gl_version
-
-        def test_gles_version(self, inst):
-            """wflinfo.WflInfo.get_gles_version: Handles OSError "no file"
-            gracefully.
-            """
-            inst.gles_version
+            assert inst.core.api_version == 0.0
 
         def test_glsl_version(self, inst):
             """wflinfo.WflInfo.glsl_version: Handles OSError "no file"
             gracefully.
             """
-            inst.glsl_version
-
-        def test_glsl_es_version(self, inst):
-            """wflinfo.WflInfo.glsl_es_version: Handles OSError "no file"
-            gracefully.
-            """
-            inst.glsl_es_version
+            assert inst.core.shader_version == 0.0
 
     class TestCalledProcessError(object):
         """Tests for the WflInfo functions to handle OSErrors."""
@@ -379,28 +343,16 @@ class TestWflInfo(object):
             """wflinfo.WflInfo.gl_extensions: Handles CalledProcessError
             gracefully.
             """
-            inst.gl_extensions
+            assert inst.core.extensions == set()
 
         def test_gl_version(self, inst):
             """wflinfo.WflInfo.get_gl_version: Handles CalledProcessError
             gracefully.
             """
-            inst.gl_version
-
-        def test_gles_version(self, inst):
-            """wflinfo.WflInfo.gles_version: Handles CalledProcessError
-            gracefully.
-            """
-            inst.gles_version
+            assert inst.core.api_version == 0.0
 
         def test_glsl_version(self, inst):
             """wflinfo.WflInfo.glsl_version: Handles CalledProcessError
             gracefully.
             """
-            inst.glsl_version
-
-        def test_glsl_es_version(self, inst):
-            """wflinfo.WflInfo.glsl_es_version: Handles CalledProcessError
-            gracefully.
-            """
-            inst.glsl_es_version
+            assert inst.core.shader_version == 0.0
