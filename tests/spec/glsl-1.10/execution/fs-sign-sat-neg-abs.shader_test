@@ -1,0 +1,22 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform vec4 arg0;
+uniform vec4 expect;
+
+void main()
+{
+	if (clamp(sign(-abs(arg0)), 0.0, 1.0) != expect)
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+uniform vec4 arg0 -5.0 5.0 0.0 0.0
+uniform vec4 expect 0.0 0.0 0.0 0.0
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
