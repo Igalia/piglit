@@ -1,0 +1,197 @@
+# Test that have several "normal" uniforms with explicit location, and
+# several uniform atomic counter, that has not explicit location. For
+# the latter mesa assigns a internal location. Development test, to
+# ensure that they are properly assigned.
+
+[require]
+SPIRV YES
+GL >= 4.5
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 59
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpDecorate %a0 Offset 0
+               OpDecorate %a0 DescriptorSet 0
+               OpDecorate %a0 Binding 0
+               OpDecorate %u0 Location 2
+               OpDecorate %u0 DescriptorSet 0
+               OpDecorate %u0 Binding 1
+               OpDecorate %a1 Offset 4
+               OpDecorate %a1 DescriptorSet 0
+               OpDecorate %a1 Binding 0
+               OpDecorate %u1 Location 4
+               OpDecorate %u1 DescriptorSet 0
+               OpDecorate %u1 Binding 2
+               OpDecorate %a2 Offset 8
+               OpDecorate %a2 DescriptorSet 0
+               OpDecorate %a2 Binding 0
+               OpDecorate %u2 Location 7
+               OpDecorate %u2 DescriptorSet 0
+               OpDecorate %u2 Binding 3
+               OpDecorate %a3 Offset 12
+               OpDecorate %a3 DescriptorSet 0
+               OpDecorate %a3 Binding 0
+               OpDecorate %u3 Location 10
+               OpDecorate %u3 DescriptorSet 0
+               OpDecorate %u3 Binding 4
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %12 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+         %a0 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_1 = OpConstant %uint 1
+     %uint_0 = OpConstant %uint 0
+       %bool = OpTypeBool
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+         %u0 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+         %a1 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_3 = OpConstant %uint 3
+         %u1 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+         %a2 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_5 = OpConstant %uint 5
+         %u2 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+         %a3 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_7 = OpConstant %uint 7
+         %u3 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+     %uival0 = OpVariable %_ptr_Function_uint Function
+     %uival1 = OpVariable %_ptr_Function_uint Function
+     %uival2 = OpVariable %_ptr_Function_uint Function
+     %uival3 = OpVariable %_ptr_Function_uint Function
+               OpStore %color %12
+         %20 = OpAtomicLoad %uint %a0 %uint_1 %uint_0
+               OpStore %uival0 %20
+         %21 = OpLoad %uint %uival0
+         %23 = OpINotEqual %bool %21 %uint_1
+               OpSelectionMerge %25 None
+               OpBranchConditional %23 %24 %25
+         %24 = OpLabel
+         %28 = OpLoad %v4float %u0
+               OpStore %color %28
+               OpBranch %25
+         %25 = OpLabel
+         %31 = OpAtomicLoad %uint %a1 %uint_1 %uint_0
+               OpStore %uival1 %31
+         %32 = OpLoad %uint %uival1
+         %34 = OpINotEqual %bool %32 %uint_3
+               OpSelectionMerge %36 None
+               OpBranchConditional %34 %35 %36
+         %35 = OpLabel
+         %38 = OpLoad %v4float %u1
+               OpStore %color %38
+               OpBranch %36
+         %36 = OpLabel
+         %41 = OpAtomicLoad %uint %a2 %uint_1 %uint_0
+               OpStore %uival2 %41
+         %42 = OpLoad %uint %uival2
+         %44 = OpINotEqual %bool %42 %uint_5
+               OpSelectionMerge %46 None
+               OpBranchConditional %44 %45 %46
+         %45 = OpLabel
+         %48 = OpLoad %v4float %u2
+               OpStore %color %48
+               OpBranch %46
+         %46 = OpLabel
+         %51 = OpAtomicLoad %uint %a3 %uint_1 %uint_0
+               OpStore %uival3 %51
+         %52 = OpLoad %uint %uival3
+         %54 = OpINotEqual %bool %52 %uint_7
+               OpSelectionMerge %56 None
+               OpBranchConditional %54 %55 %56
+         %55 = OpLabel
+         %58 = OpLoad %v4float %u3
+               OpStore %color %58
+               OpBranch %56
+         %56 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 2)  uniform vec4 u0;
+layout (location = 4)  uniform vec4 u1;
+layout (location = 7)  uniform vec4 u2;
+layout (location = 10) uniform vec4 u3;
+
+layout(binding = 0) uniform atomic_uint a0;
+layout(binding = 0) uniform atomic_uint a1;
+layout(binding = 0) uniform atomic_uint a2;
+layout(binding = 0) uniform atomic_uint a3;
+
+layout (location = 0) out vec4 color;
+
+void main()
+{
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	uint uival0 = atomicCounter(a0);
+	if (uival0 != 1) {
+		color = u0;
+	}
+
+	uint uival1 = atomicCounter(a1);
+	if (uival1 != 3) {
+		color = u1;
+	}
+
+	uint uival2 = atomicCounter(a2);
+	if (uival2 != 5) {
+		color = u2;
+	}
+
+	uint uival3 = atomicCounter(a3);
+	if (uival3 != 7) {
+		color = u3;
+	}
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform vec4 2  1.0 0.0 0.0 1.0
+uniform vec4 4  1.0 0.0 0.0 1.0
+uniform vec4 7  1.0 0.0 0.0 1.0
+uniform vec4 10 1.0 0.0 0.0 1.0
+
+atomic counters 8
+
+atomic counter 0 0 1
+atomic counter 0 1 3
+atomic counter 0 2 5
+atomic counter 0 3 7
+
+draw rect -1 -1 2 2
+
+probe atomic counter 0 == 1
+probe atomic counter 1 == 3
+probe atomic counter 2 == 5
+probe atomic counter 3 == 7
+
+probe all rgba 0.0 1.0 0.0 1.0
