@@ -1687,6 +1687,10 @@ with profile.test_list.group_manager(
       'PROGRAM_BINARY_RETRIEVABLE_HINT')
     g(['arb_get_program_binary-xfb-varyings'],
       'xfb-varyings')
+    g(['arb_get_program_binary-restore-implicit-use-program'],
+      'restore-implicit-use-program')
+    g(['arb_get_program_binary-reset-uniform'],
+      'reset-uniform')
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'EXT_depth_bounds_test')) as g:
