@@ -4848,8 +4848,8 @@ with profile.test_list.group_manager(
 
 # Group ARB_compute_variable_group_size
 with profile.test_list.group_manager(
-	PiglitGLTest,
-	grouptools.join('spec', 'ARB_compute_variable_group_size')) as g:
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_compute_variable_group_size')) as g:
     g(['arb_compute_variable_group_size-errors'], 'errors')
     g(['arb_compute_variable_group_size-local-size'], 'local-size')
     g(['arb_compute_variable_group_size-minmax'], 'minmax')
@@ -4878,8 +4878,8 @@ with profile.test_list.group_manager(
 
 # Group ARB_bindless_texture
 with profile.test_list.group_manager(
-	PiglitGLTest,
-	grouptools.join('spec', 'ARB_bindless_texture')) as g:
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_bindless_texture')) as g:
     g(['arb_bindless_texture-border-color'], 'border-color')
     g(['arb_bindless_texture-conversions'], 'conversions')
     g(['arb_bindless_texture-errors'], 'errors')
@@ -4892,8 +4892,8 @@ with profile.test_list.group_manager(
 
 # Group ARB_sample_locations
 with profile.test_list.group_manager(
-	PiglitGLTest,
-	grouptools.join('spec', 'ARB_sample_locations')) as g:
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_sample_locations')) as g:
     g(['arb_sample_locations'], 'test')
 
 with profile.test_list.group_manager(
