@@ -1,0 +1,37 @@
+# This exercises a bug found in a Doom shader where the lessThan() comparison
+# was only done against a single component of the mixed arithmetic expression
+# rather than all four components.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 110
+
+uniform vec4 a;
+uniform vec4 b;
+
+void main() {
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (any(lessThan(b.w + a.xyzw, vec4(0.0))))
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+
+uniform vec4 a 0.5 0.5 0.5 -1.0
+uniform vec4 b 1.0 1.0 1.0 0.5
+draw rect -1 -1 2 2
+
+probe all rgba 1.0 0.0 0.0 1.0
+
+uniform vec4 a 0.5 0.5 0.5 -0.5
+uniform vec4 b 1.0 1.0 1.0 0.5
+draw rect -1 -1 2 2
+
+probe all rgba 0.0 1.0 0.0 1.0
