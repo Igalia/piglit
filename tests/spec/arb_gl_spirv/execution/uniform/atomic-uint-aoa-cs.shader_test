@@ -1,0 +1,249 @@
+# Tests the atomic counter operations described in the
+# ARB_shader_atomic_counters specification using AOAs
+# of atomic counters in a CS with  local_sizes_x, y, z
+# equal to 3, 2 and 1 respectively.
+#
+# Checks the final value of the atomic counter and the values
+# returned by the operations.
+#
+# The declaration of the atomic counters array uses the atomic
+# counter layout qualifiers binding and offset.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+
+[compute shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 68
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_LocalInvocationIndex
+               OpExecutionMode %main LocalSize 3 2 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %a00_out "a00_out"
+               OpName %a "a"
+               OpName %a00_expected "a00_expected"
+               OpName %gl_LocalInvocationIndex "gl_LocalInvocationIndex"
+               OpName %ok_a00 "ok_a00"
+               OpName %a01_out "a01_out"
+               OpName %a01_expected "a01_expected"
+               OpName %ok_a01 "ok_a01"
+               OpName %a12_out "a12_out"
+               OpName %a12_expected "a12_expected"
+               OpName %ok_a12 "ok_a12"
+               OpDecorate %a Offset 4
+               OpDecorate %a DescriptorSet 0
+               OpDecorate %a Binding 0
+               OpDecorate %a00_expected Location 0
+               OpDecorate %a00_expected DescriptorSet 0
+               OpDecorate %a00_expected Binding 4
+               OpDecorate %gl_LocalInvocationIndex BuiltIn LocalInvocationIndex
+               OpDecorate %ok_a00 Offset 0
+               OpDecorate %ok_a00 DescriptorSet 0
+               OpDecorate %ok_a00 Binding 1
+               OpDecorate %a01_expected Location 6
+               OpDecorate %a01_expected DescriptorSet 0
+               OpDecorate %a01_expected Binding 5
+               OpDecorate %ok_a01 Offset 0
+               OpDecorate %ok_a01 DescriptorSet 0
+               OpDecorate %ok_a01 Binding 2
+               OpDecorate %a12_expected Location 12
+               OpDecorate %a12_expected DescriptorSet 0
+               OpDecorate %a12_expected Binding 6
+               OpDecorate %ok_a12 Offset 0
+               OpDecorate %ok_a12 DescriptorSet 0
+               OpDecorate %ok_a12 Binding 3
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+     %uint_3 = OpConstant %uint 3
+%_arr_uint_uint_3 = OpTypeArray %uint %uint_3
+     %uint_2 = OpConstant %uint 2
+%_arr__arr_uint_uint_3_uint_2 = OpTypeArray %_arr_uint_uint_3 %uint_2
+%_ptr_AtomicCounter__arr__arr_uint_uint_3_uint_2 = OpTypePointer AtomicCounter %_arr__arr_uint_uint_3_uint_2
+          %a = OpVariable %_ptr_AtomicCounter__arr__arr_uint_uint_3_uint_2 AtomicCounter
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+     %uint_1 = OpConstant %uint 1
+     %uint_0 = OpConstant %uint 0
+     %uint_6 = OpConstant %uint 6
+%_arr_uint_uint_6 = OpTypeArray %uint %uint_6
+%_ptr_UniformConstant__arr_uint_uint_6 = OpTypePointer UniformConstant %_arr_uint_uint_6
+%a00_expected = OpVariable %_ptr_UniformConstant__arr_uint_uint_6 UniformConstant
+%_ptr_Input_uint = OpTypePointer Input %uint
+%gl_LocalInvocationIndex = OpVariable %_ptr_Input_uint Input
+%_ptr_UniformConstant_uint = OpTypePointer UniformConstant %uint
+       %bool = OpTypeBool
+     %ok_a00 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+      %int_1 = OpConstant %int 1
+%a01_expected = OpVariable %_ptr_UniformConstant__arr_uint_uint_6 UniformConstant
+     %ok_a01 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+      %int_2 = OpConstant %int 2
+%a12_expected = OpVariable %_ptr_UniformConstant_uint UniformConstant
+     %ok_a12 = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %v3uint = OpTypeVector %uint 3
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_3 %uint_2 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+    %a00_out = OpVariable %_ptr_Function_uint Function
+    %a01_out = OpVariable %_ptr_Function_uint Function
+    %a12_out = OpVariable %_ptr_Function_uint Function
+         %18 = OpAccessChain %_ptr_AtomicCounter_uint %a %int_0 %int_0
+         %21 = OpAtomicIIncrement %uint %18 %uint_1 %uint_0
+               OpStore %a00_out %21
+         %22 = OpLoad %uint %a00_out
+         %29 = OpLoad %uint %gl_LocalInvocationIndex
+         %31 = OpAccessChain %_ptr_UniformConstant_uint %a00_expected %29
+         %32 = OpLoad %uint %31
+         %34 = OpIEqual %bool %22 %32
+               OpSelectionMerge %36 None
+               OpBranchConditional %34 %35 %36
+         %35 = OpLabel
+         %38 = OpAtomicIIncrement %uint %ok_a00 %uint_1 %uint_0
+               OpBranch %36
+         %36 = OpLabel
+         %41 = OpAccessChain %_ptr_AtomicCounter_uint %a %int_0 %int_1
+         %42 = OpAtomicIDecrement %uint %41 %uint_1 %uint_0
+         %43 = OpISub %uint %42 %int_1
+               OpStore %a01_out %43
+         %44 = OpLoad %uint %a01_out
+         %46 = OpLoad %uint %gl_LocalInvocationIndex
+         %47 = OpAccessChain %_ptr_UniformConstant_uint %a01_expected %46
+         %48 = OpLoad %uint %47
+         %49 = OpIEqual %bool %44 %48
+               OpSelectionMerge %51 None
+               OpBranchConditional %49 %50 %51
+         %50 = OpLabel
+         %53 = OpAtomicIIncrement %uint %ok_a01 %uint_1 %uint_0
+               OpBranch %51
+         %51 = OpLabel
+         %56 = OpAccessChain %_ptr_AtomicCounter_uint %a %int_1 %int_2
+         %57 = OpAtomicLoad %uint %56 %uint_1 %uint_0
+               OpStore %a12_out %57
+         %58 = OpLoad %uint %a12_out
+         %60 = OpLoad %uint %a12_expected
+         %61 = OpIEqual %bool %58 %60
+               OpSelectionMerge %63 None
+               OpBranchConditional %61 %62 %63
+         %62 = OpLabel
+         %65 = OpAtomicIIncrement %uint %ok_a12 %uint_1 %uint_0
+               OpBranch %63
+         %63 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 3, local_size_y = 2, local_size_z = 1) in;
+
+layout (binding = 0, offset = 4) uniform atomic_uint a[2][3];
+
+layout (binding = 1) uniform atomic_uint ok_a00;
+layout (binding = 2) uniform atomic_uint ok_a01;
+layout (binding = 3) uniform atomic_uint ok_a12;
+
+layout (location = 0) uniform uint a00_expected[6];
+layout (location = 6) uniform uint a01_expected[6];
+layout (location = 12) uniform uint a12_expected;
+
+void main()
+{
+    uint a00_out = atomicCounterIncrement(a[0][0]);
+    if (a00_out == a00_expected[gl_LocalInvocationIndex])
+       atomicCounterIncrement(ok_a00);
+
+    uint a01_out = atomicCounterDecrement(a[0][1]);
+    if (a01_out == a01_expected[gl_LocalInvocationIndex])
+       atomicCounterIncrement(ok_a01);
+
+    uint a12_out = atomicCounter(a[1][2]);
+    if (a12_out == a12_expected)
+       atomicCounterIncrement(ok_a12);
+}
+
+[test]
+
+# Initialize atomic counters
+
+atomic counter buffer 0 7
+
+atomic counter buffer 1 1
+atomic counter buffer 2 1
+atomic counter buffer 3 1
+
+atomic counter 0 0 0
+
+atomic counter 0 1 10  # a[0][0]
+atomic counter 0 2 20  # a[0][1]
+atomic counter 0 3 0   # a[0][2]
+atomic counter 0 4 0   # a[1][0]
+atomic counter 0 5 0   # a[1][1]
+atomic counter 0 6 30  # a[1][2]
+
+atomic counter 1 0 0   # ok_a00
+atomic counter 2 0 0   # ok_a01
+atomic counter 3 0 0   # ok_a12
+
+# Expected return values for the atomic counter operations
+# depending on the invocation number.
+
+uniform uint 0 10  # a00_expected[0]
+uniform uint 1 11  # a00_expected[1]
+uniform uint 2 12  # a00_expected[2]
+uniform uint 3 13  # a00_expected[3]
+uniform uint 4 14  # a00_expected[4]
+uniform uint 5 15  # a00_expected[5]
+
+uniform uint 6 19   # a01_expected[0]
+uniform uint 7 18   # a01_expected[1]
+uniform uint 8 17   # a01_expected[2]
+uniform uint 9 16   # a01_expected[3]
+uniform uint 10 15  # a01_expected[4]
+uniform uint 11 14  # a01_expected[5]
+
+uniform uint 12 30  # a12_expected
+
+# Check original values for the atomic counters
+
+probe atomic counter buffer 0 0 == 0
+
+probe atomic counter buffer 0 4 == 10   # a[0][0]
+probe atomic counter buffer 0 8 == 20   # a[0][1]
+probe atomic counter buffer 0 12 == 0   # a[0][2]
+probe atomic counter buffer 0 16 == 0   # a[1][0]
+probe atomic counter buffer 0 20 == 0   # a[1][1]
+probe atomic counter buffer 0 24 == 30  # a[1][2]
+
+probe atomic counter buffer 1 0 == 0   # ok_a00
+probe atomic counter buffer 2 0 == 0   # ok_a01
+probe atomic counter buffer 3 0 == 0   # ok_a12
+
+compute 1 1 1
+
+# Check final values for the atomic counters
+
+probe atomic counter buffer 0 0 == 0
+
+probe atomic counter buffer 0 4 == 16   # a[0][0]
+probe atomic counter buffer 0 8 == 14   # a[0][1]
+probe atomic counter buffer 0 12 == 0   # a[0][2]
+probe atomic counter buffer 0 16 == 0   # a[1][0]
+probe atomic counter buffer 0 20 == 0   # a[1][1]
+probe atomic counter buffer 0 24 == 30  # a[1][2]
+
+probe atomic counter buffer 1 0 == 6   # ok_a00
+probe atomic counter buffer 2 0 == 6   # ok_a01
+probe atomic counter buffer 3 0 == 6   # ok_a12
