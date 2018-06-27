@@ -4864,6 +4864,7 @@ with profile.test_list.group_manager(
     g(['intel_conservative_rasterization-tri'])
     g(['intel_conservative_rasterization-depthcoverage_gles3'])
     g(['intel_conservative_rasterization-innercoverage_gles3'])
+    g(['intel_conservative_rasterization-invalid_gles3'])
     g(['intel_conservative_rasterization-tri_gles3'])
 
 # Group INTEL_blackhole_render
