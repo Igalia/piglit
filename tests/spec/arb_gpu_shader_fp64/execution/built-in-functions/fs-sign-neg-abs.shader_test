@@ -1,0 +1,33 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64: require
+
+uniform dvec4 arg0;
+uniform dvec4 arg1;
+uniform dvec4 expect;
+
+out vec4 piglit_fragcolor;
+
+void main()
+{
+	if (sign(-abs(arg0)) != -sign(abs(arg1)))
+		piglit_fragcolor = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (sign(-abs(arg0)) != -abs(sign(arg1)))
+		piglit_fragcolor = vec4(0.5, 0.0, 0.5, 1.0);
+	else if (sign(-abs(arg0)) != expect)
+		piglit_fragcolor = vec4(0.0, 0.0, 1.0, 1.0);
+	else
+		piglit_fragcolor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+uniform dvec4 arg0 -5.0 5.0 0.0 0.0
+uniform dvec4 arg1 -2.0 2.0 0.0 0.0
+uniform dvec4 expect -1.0 -1.0 0.0 0.0
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
