@@ -44,8 +44,42 @@
 #define img_width drawing_size
 #define img_height drawing_size
 
+static struct piglit_gl_test_config *piglit_config;
+
+static enum piglit_result test_logicop(void * data);
+
+#define TEST_ELEMENT(mode)              \
+	{                               \
+		#mode,                  \
+		#mode,                  \
+		test_logicop,           \
+		(void *)(intptr_t)mode  \
+	}
+static struct piglit_subtest tests[] = {
+	TEST_ELEMENT(GL_CLEAR),
+	TEST_ELEMENT(GL_SET),
+	TEST_ELEMENT(GL_COPY),
+	TEST_ELEMENT(GL_COPY_INVERTED),
+	TEST_ELEMENT(GL_NOOP),
+	TEST_ELEMENT(GL_INVERT),
+	TEST_ELEMENT(GL_AND),
+	TEST_ELEMENT(GL_NAND),
+	TEST_ELEMENT(GL_OR),
+	TEST_ELEMENT(GL_NOR),
+	TEST_ELEMENT(GL_XOR),
+	TEST_ELEMENT(GL_EQUIV),
+	TEST_ELEMENT(GL_AND_REVERSE),
+	TEST_ELEMENT(GL_AND_INVERTED),
+	TEST_ELEMENT(GL_OR_REVERSE),
+	TEST_ELEMENT(GL_OR_INVERTED),
+	{ 0 }
+};
+#undef TEST_ELEMENT
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	piglit_config = &config;
+	config.subtests = tests;
 	config.supports_gl_compat_version = 11;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
@@ -53,29 +87,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
-
-
-static const GLenum logicop_modes[] = {
-	GL_CLEAR,
-	GL_SET,
-	GL_COPY,
-	GL_COPY_INVERTED,
-	GL_NOOP,
-	GL_INVERT,
-	GL_AND,
-	GL_NAND,
-	GL_OR,
-	GL_NOR,
-	GL_XOR,
-	GL_EQUIV,
-	GL_AND_REVERSE,
-	GL_AND_INVERTED,
-	GL_OR_REVERSE,
-	GL_OR_INVERTED
-};
-
-static GLenum test_single = 0;  /* 0 = test all logicop modes */
-
 
 static GLubyte*
 random_image_data(void)
@@ -211,8 +222,9 @@ make_image(GLuint *name, GLubyte *data)
 }
 
 static enum piglit_result
-test_logicop(GLenum logicop)
+test_logicop(void * data)
 {
+	GLenum logicop = (GLenum)(intptr_t)data;
 	bool pass = true;
 	int x, y;
 	GLuint dst_name;
@@ -297,45 +309,18 @@ enum piglit_result
 piglit_display(void)
 {
 	enum piglit_result result = PIGLIT_PASS;
-	enum piglit_result subtest;
-	unsigned int op;
-
-	for (op = 0; op < ARRAY_SIZE(logicop_modes); ++op) {
-		if (test_single == 0 || test_single == logicop_modes[op]) {
-			subtest = test_logicop(logicop_modes[op]);
-			piglit_report_subtest_result(subtest, "%s",
-				piglit_get_gl_enum_name(logicop_modes[op]));
-			if (subtest == PIGLIT_FAIL)
-				result = PIGLIT_FAIL;
-		}
-	}
+	result = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
 
 	return result;
 }
-
 
 void
 piglit_init(int argc, char **argv)
 {
 	srand(0);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
-	if (argc > 1) {
-		/* argv[1] may be one of the logic op modes, like "GL_XOR" */
-		int i;
-
-		for (i = 0; i < ARRAY_SIZE(logicop_modes); i++) {
-			const char * mode =
-				piglit_get_gl_enum_name(logicop_modes[i]);
-			if (strcmp(argv[1], mode) == 0) {
-				test_single = logicop_modes[i];
-				break;
-			}
-		}
-		if (test_single == 0) {
-			printf("Invalid glLogicOp mode %s\n", argv[1]);
-			piglit_report_result(PIGLIT_SKIP);
-		}
-	}
-
 }
