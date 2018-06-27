@@ -4896,5 +4896,10 @@ with profile.test_list.group_manager(
 	grouptools.join('spec', 'ARB_sample_locations')) as g:
     g(['arb_sample_locations'], 'test')
 
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'NV_image_formats')) as g:
+    g(['nv_image_formats-gles3'])
+
 if platform.system() is 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))
