@@ -207,4 +207,13 @@ void piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_pixel_buffer_object");
 	piglit_require_extension("GL_MESA_pack_invert");
 	piglit_require_extension("GL_EXT_bgra");
+
+	const char * names[] = {
+		"non-PBO unorm BGRA",
+		"PBO unorm BGRA",
+		"non-PBO float RGBA",
+		"PBO float RGBA",
+		NULL,
+	};
+	piglit_register_subtests(names);
 }
