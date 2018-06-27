@@ -4090,6 +4090,7 @@ with profile.test_list.group_manager(
     g(['attribs', 'GL_ARB_vertex_type_2_10_10_10_rev'], 'attribs')
     g(['arb_vertex_type_2_10_10_10_rev-array_types'])
     g(['gl-3.3-vertex-attrib-p-types'], 'attrib-p-types')
+    g(['gl-3.3-vertex-attrib-p-type-size-match'], 'attrib-p-type-size-match')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
