@@ -1,0 +1,211 @@
+# Tests the atomic counter operations described in the
+# ARB_shader_atomic_counters spec for an array of atomic
+# counters in a FS.
+#
+# Checks the final value of the atomic counters and the
+# values returned by the operations.
+#
+# The declaration of the atomic counter array uses the atomic
+# counter layout qualifiers binding and offset.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 6
+; Bound: 74
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %a0_out "a0_out"
+               OpName %a "a"
+               OpName %a0_expected "a0_expected"
+               OpName %color "color"
+               OpName %a1_out "a1_out"
+               OpName %a1_expected "a1_expected"
+               OpName %a2_out "a2_out"
+               OpName %a2_expected "a2_expected"
+               OpDecorate %a Offset 4
+               OpDecorate %a DescriptorSet 0
+               OpDecorate %a Binding 0
+               OpDecorate %a0_expected Location 0
+               OpDecorate %a0_expected DescriptorSet 0
+               OpDecorate %a0_expected Binding 1
+               OpDecorate %color Location 0
+               OpDecorate %a1_expected Location 1
+               OpDecorate %a1_expected DescriptorSet 0
+               OpDecorate %a1_expected Binding 2
+               OpDecorate %a2_expected Location 2
+               OpDecorate %a2_expected DescriptorSet 0
+               OpDecorate %a2_expected Binding 3
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+     %uint_3 = OpConstant %uint 3
+%_arr_uint_uint_3 = OpTypeArray %uint %uint_3
+%_ptr_AtomicCounter__arr_uint_uint_3 = OpTypePointer AtomicCounter %_arr_uint_uint_3
+          %a = OpVariable %_ptr_AtomicCounter__arr_uint_uint_3 AtomicCounter
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+     %uint_1 = OpConstant %uint 1
+     %uint_0 = OpConstant %uint 0
+%_ptr_UniformConstant_uint = OpTypePointer UniformConstant %uint
+%a0_expected = OpVariable %_ptr_UniformConstant_uint UniformConstant
+       %bool = OpTypeBool
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+  %float_255 = OpConstant %float 255
+      %int_1 = OpConstant %int 1
+%a1_expected = OpVariable %_ptr_UniformConstant_uint UniformConstant
+%float_0_100000001 = OpConstant %float 0.100000001
+      %int_2 = OpConstant %int 2
+%a2_expected = OpVariable %_ptr_UniformConstant_uint UniformConstant
+%float_0_200000003 = OpConstant %float 0.200000003
+         %73 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+     %a0_out = OpVariable %_ptr_Function_uint Function
+     %a1_out = OpVariable %_ptr_Function_uint Function
+     %a2_out = OpVariable %_ptr_Function_uint Function
+         %16 = OpAccessChain %_ptr_AtomicCounter_uint %a %int_0
+         %19 = OpAtomicLoad %uint %16 %uint_1 %uint_0
+               OpStore %a0_out %19
+         %20 = OpLoad %uint %a0_out
+         %23 = OpLoad %uint %a0_expected
+         %25 = OpINotEqual %bool %20 %23
+               OpSelectionMerge %27 None
+               OpBranchConditional %25 %26 %27
+         %26 = OpLabel
+         %34 = OpLoad %uint %a0_out
+         %35 = OpConvertUToF %float %34
+         %37 = OpFDiv %float %35 %float_255
+         %38 = OpCompositeConstruct %v4float %float_1 %float_0 %37 %float_1
+               OpStore %color %38
+               OpReturn
+         %27 = OpLabel
+         %42 = OpAccessChain %_ptr_AtomicCounter_uint %a %int_1
+         %43 = OpAtomicIIncrement %uint %42 %uint_1 %uint_0
+               OpStore %a1_out %43
+         %44 = OpLoad %uint %a1_out
+         %46 = OpLoad %uint %a1_expected
+         %47 = OpINotEqual %bool %44 %46
+               OpSelectionMerge %49 None
+               OpBranchConditional %47 %48 %49
+         %48 = OpLabel
+         %51 = OpLoad %uint %a1_out
+         %52 = OpConvertUToF %float %51
+         %53 = OpFDiv %float %52 %float_255
+         %54 = OpCompositeConstruct %v4float %float_1 %float_0_100000001 %53 %float_1
+               OpStore %color %54
+               OpReturn
+         %49 = OpLabel
+         %58 = OpAccessChain %_ptr_AtomicCounter_uint %a %int_2
+         %59 = OpAtomicIDecrement %uint %58 %uint_1 %uint_0
+         %60 = OpISub %uint %59 %int_1
+               OpStore %a2_out %60
+         %61 = OpLoad %uint %a2_out
+         %63 = OpLoad %uint %a2_expected
+         %64 = OpINotEqual %bool %61 %63
+               OpSelectionMerge %66 None
+               OpBranchConditional %64 %65 %66
+         %65 = OpLabel
+         %68 = OpLoad %uint %a2_out
+         %69 = OpConvertUToF %float %68
+         %70 = OpFDiv %float %69 %float_255
+         %71 = OpCompositeConstruct %v4float %float_1 %float_0_200000003 %70 %float_1
+               OpStore %color %71
+               OpReturn
+         %66 = OpLabel
+               OpStore %color %73
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (binding = 0, offset = 4) uniform atomic_uint a[3];
+
+layout (location = 0) uniform uint a0_expected;
+layout (location = 1) uniform uint a1_expected;
+layout (location = 2) uniform uint a2_expected;
+
+layout (location = 0) out vec4 color;
+
+void main()
+{
+	uint a0_out = atomicCounter(a[0]);
+	if (a0_out != a0_expected) {
+		color = vec4(1.0, 0.0, float(a0_out) / 255.0, 1.0);
+		return;
+	}
+
+	uint a1_out = atomicCounterIncrement(a[1]);
+	if (a1_out != a1_expected) {
+		color = vec4(1.0, 0.1, float(a1_out) / 255.0, 1.0);
+		return;
+	}
+
+	uint a2_out = atomicCounterDecrement(a[2]);
+	if (a2_out != a2_expected) {
+		color = vec4(1.0, 0.2, float(a2_out) / 255.0, 1.0);
+		return;
+	}
+
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+
+clear color 0.0 0.0 0.0 0.0
+clear
+
+# Initialize atomic counters
+
+atomic counter buffer 0 4
+atomic counter 0 0 2
+atomic counter 0 1 3
+atomic counter 0 2 9
+atomic counter 0 3 15
+
+# Expected return values for the atomic counter operations
+
+uniform uint 0 3
+uniform uint 1 9
+uniform uint 2 14
+
+# Check original values for the atomic counters
+
+probe atomic counter buffer 0 0 == 2
+probe atomic counter buffer 0 4 == 3
+probe atomic counter buffer 0 8 == 9
+probe atomic counter buffer 0 12 == 15
+
+draw rect ortho 0 0 1 1
+
+# Check final values for the atomic counters
+
+probe atomic counter buffer 0 0 == 2
+probe atomic counter buffer 0 4 == 3
+probe atomic counter buffer 0 8 == 10
+probe atomic counter buffer 0 12 == 14
+
+probe rgba 0 0 0.0 1.0 0.0 1.0
