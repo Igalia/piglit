@@ -401,6 +401,7 @@ with profile.test_list.group_manager(
     g(['glx-swap-pixmap'], run_concurrent=False)
     g(['glx-swap-pixmap-bad'], run_concurrent=False)
     g(['glx-swap-singlebuffer'], run_concurrent=False)
+    g(['glx-swap-copy'], run_concurrent=False)
     g(['glx-make-current'], run_concurrent=False)
     g(['glx-make-glxdrawable-current'], run_concurrent=False)
     g(['glx-context-flush-control'], run_concurrent=False)
