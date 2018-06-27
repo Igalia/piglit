@@ -31,15 +31,6 @@
 
 #include "piglit-util-gl.h"
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-config.supports_gl_es_version = 31;
-
-PIGLIT_GL_TEST_CONFIG_END
-
-#define WIDTH 16
-#define HEIGHT 16
-
 const struct image_format {
 	/** Format name as specified by GLSL. */
 	const char *name;
@@ -80,6 +71,32 @@ const struct image_format {
 	{ "r16_snorm", GL_R16_SNORM, GL_RED, GL_SHORT },
 	{ "r8_snorm", GL_R8_SNORM, GL_RED, GL_BYTE },
 };
+
+static struct piglit_subtest tests[ARRAY_SIZE(image_formats) + 1];
+static struct piglit_gl_test_config * piglit_config;
+static enum piglit_result run_test(void *);
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+piglit_config = &config;
+
+for (unsigned i = 0; i < ARRAY_SIZE(image_formats); ++i) {
+
+	char * name[64];
+	asprintf(name, "copy-%s", image_formats[i].name);
+	tests[i].name = *name;
+	tests[i].option = image_formats[i].name;
+	tests[i].subtest_func = run_test;
+	tests[i].data = (void *)&image_formats[i];
+}
+config.subtests = tests;
+
+config.supports_gl_es_version = 31;
+
+PIGLIT_GL_TEST_CONFIG_END
+
+#define WIDTH 16
+#define HEIGHT 16
 
 static const char *
 glsl_image_type_name(GLenum format)
@@ -190,9 +207,10 @@ format_is_norm16(GLenum format)
 	}
 }
 
-static bool
-run_test(const struct image_format *image_format)
+static enum piglit_result
+run_test(void * data)
 {
+	struct image_format * image_format = (struct image_format *)data;
 	GLuint src, dst, prog;
 	char *fs_source;
 
@@ -205,7 +223,7 @@ run_test(const struct image_format *image_format)
 	if (format_is_norm16(image_format->format)) {
 		if (!piglit_is_extension_supported("GL_EXT_texture_norm16")) {
 			piglit_check_gl_error(GL_INVALID_VALUE);
-			return true;
+			return PIGLIT_PASS;
 		}
 	}
 	piglit_check_gl_error(GL_NO_ERROR);
@@ -234,7 +252,7 @@ run_test(const struct image_format *image_format)
 		     image_format->name,
 		     glsl_image_type_name(image_format->format),
 		     glsl_type_name(image_format->format)) < 0)
-		return false;
+		return PIGLIT_FAIL;
 
 	prog = piglit_build_simple_program(
 		"#version 310 es\n"
@@ -250,31 +268,21 @@ run_test(const struct image_format *image_format)
 
 	piglit_draw_rect(-1, -1, 1, 1);
 
-	return true;
+	return PIGLIT_PASS;
 }
-
-#define subtest(status, result, ...) do {				\
-		enum piglit_result _status = ((result) ? PIGLIT_PASS :  \
-					      PIGLIT_FAIL);             \
-									\
-		piglit_report_subtest_result(_status, __VA_ARGS__);     \
-									\
-		if (_status == PIGLIT_FAIL)                             \
-			*status = PIGLIT_FAIL;                          \
-	} while (0)
 
 void
 piglit_init(int argc, char **argv)
 {
 	enum piglit_result status = PIGLIT_PASS;
-	unsigned i;
 
 	piglit_require_extension("GL_NV_image_formats");
 
-	for (i = 0 ; i < ARRAY_SIZE(image_formats); ++i) {
-		subtest(&status, run_test(&image_formats[i]),
-			"copy-%s", image_formats[i].name);
-	}
+	status = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		status);
 
 	piglit_report_result(status);
 }
