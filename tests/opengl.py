@@ -2481,6 +2481,19 @@ with profile.test_list.group_manager(
     g(['arb_texture_view-formats_gles3'], 'formats')
     g(['arb_texture_view-queries_gles3'], 'queries')
     g(['arb_texture_view-targets_gles3'], 'targets')
+    g(['arb_texture_view-clear-into-view-2d_gles3'], 'clear-into-view-2d')
+    g(['arb_texture_view-clear-into-view-2d-array_gles3'],
+      'clear-into-view-2d-array')
+    g(['arb_texture_view-clear-into-view-layered_gles3'],
+      'clear-into-view-layered')
+    g(['arb_texture_view-copytexsubimage-layers_gles3'],
+      'copytexsubimage-layers')
+    g(['arb_texture_view-texsubimage-levels_gles3'], 'texsubimage-levels')
+    g(['arb_texture_view-texsubimage-levels_gles3', 'pbo'],
+      'texsubimage-levels pbo')
+    g(['arb_texture_view-texsubimage-layers_gles3'], 'texsubimage-layers')
+    g(['arb_texture_view-texsubimage-layers_gles3', 'pbo'],
+      'texsubimage-layers pbo')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
