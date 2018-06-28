@@ -120,15 +120,49 @@ report_failure(struct type *type, float *buffer, int count)
 
 }
 
-enum piglit_result
-piglit_display(void)
-{
-	bool pass = true;
+static bool
+run_subtest(struct type * type) {
+	bool case_pass = true;
+	int returned_count, j;
+	const char *name = piglit_get_gl_enum_name(type->type);
 	float buffer[2 +
 		     ARRAY_SIZE(vertex_array) +
 		     ARRAY_SIZE(color_array) +
 		     ARRAY_SIZE(texcoord_array)];
-	int i, j;
+
+	printf("Testing %s\n", name);
+
+	for (j = 0; j < ARRAY_SIZE(buffer); j++)
+		buffer[j] = -1.0;
+
+	glFeedbackBuffer(ARRAY_SIZE(buffer), type->type, buffer);
+	glRenderMode(GL_FEEDBACK);
+	glDrawArrays(GL_TRIANGLES, 0, 4);
+	returned_count = glRenderMode(GL_RENDER);
+
+	if (returned_count != type->count) {
+		case_pass = false;
+	} else {
+		for (j = 0; j < type->count; j++) {
+			if (fabs(buffer[j] - type->values[j]) > .01)
+				case_pass = false;
+		}
+	}
+
+	if (!case_pass) {
+		report_failure(type, buffer, returned_count);
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
+	} else {
+		piglit_report_subtest_result(PIGLIT_PASS, "%s", name);
+	}
+	return case_pass;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	bool pass = true;
+	int i;
 
 	piglit_ortho_projection(piglit_width, piglit_height, false);
 
@@ -143,38 +177,7 @@ piglit_display(void)
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	for (i = 0; i < ARRAY_SIZE(types); i++) {
-		bool case_pass = true;
-		int returned_count;
-		const char *name = piglit_get_gl_enum_name(types[i].type);
-
-		printf("Testing %s\n", name);
-
-		for (j = 0; j < ARRAY_SIZE(buffer); j++)
-			buffer[j] = -1.0;
-
-		glFeedbackBuffer(ARRAY_SIZE(buffer), types[i].type, buffer);
-		glRenderMode(GL_FEEDBACK);
-		glDrawArrays(GL_TRIANGLES, 0, 4);
-		returned_count = glRenderMode(GL_RENDER);
-
-		if (returned_count != types[i].count) {
-			case_pass = false;
-		} else {
-			for (j = 0; j < types[i].count; j++) {
-				if (fabs(buffer[j] - types[i].values[j]) > .01)
-					case_pass = false;
-			}
-		}
-
-		if (!case_pass) {
-			pass = false;
-			report_failure(&types[i], buffer, returned_count);
-			piglit_report_subtest_result(PIGLIT_FAIL,
-						     "%s", name);
-		} else {
-			piglit_report_subtest_result(PIGLIT_PASS,
-						     "%s", name);
-		}
+		run_subtest(&types[i]);
 	}
 
 	piglit_present_results();
