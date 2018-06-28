@@ -27,21 +27,13 @@
 
 #include "piglit-util-gl.h"
 
-
-PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_compat_version = 11;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
-PIGLIT_GL_TEST_CONFIG_END
-
-
 static const GLfloat red[] = {1.0, 0.0, 0.0, 1.0};
 static const GLfloat green[] = {0.0, 1.0, 0.0, 1.0};
 static const GLfloat black[] = {0.0, 0.0, 0.0, 0.0};
+static const struct piglit_gl_test_config * piglit_config;
 
-
-static bool
-test_call_list_inside_begin_end(void)
+static enum piglit_result
+test_call_list_inside_begin_end(void * unused)
 {
 	GLuint list;
 	bool pass;
@@ -68,15 +60,13 @@ test_call_list_inside_begin_end(void)
 		&& pass;
 
 	piglit_present_results();
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "glCallList inside glBegin-glEnd");
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
-static bool
-test_call_list_inside_nested_begin_end(void)
+static enum piglit_result
+test_call_list_inside_nested_begin_end(void * unused)
 {
 	GLuint inner, outer;
 	bool pass;
@@ -114,15 +104,13 @@ test_call_list_inside_nested_begin_end(void)
 	glDeleteLists(outer, 1);
 
 	piglit_present_results();
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "nested glCallList inside glBegin-glEnd");
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
-static bool
-test_illegal_rect_list_inside_begin_end(void)
+static enum piglit_result
+test_illegal_rect_list_inside_begin_end(void * unused)
 {
 	GLuint list;
 	bool pass;
@@ -154,15 +142,13 @@ test_illegal_rect_list_inside_begin_end(void)
 		&& pass;
 
 	piglit_present_results();
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "illegal glRect inside glBegin-glEnd");
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
-static bool
-test_illegal_drawarrays_list_inside_begin_end(void)
+static enum piglit_result
+test_illegal_drawarrays_list_inside_begin_end(void * unused)
 {
 	GLuint list;
 	bool pass;
@@ -200,10 +186,8 @@ test_illegal_drawarrays_list_inside_begin_end(void)
 		&& pass;
 
 	piglit_present_results();
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-		"illegal glDrawArrays inside glBegin-glEnd");
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
@@ -211,8 +195,8 @@ test_illegal_drawarrays_list_inside_begin_end(void)
  * As above, but don't actually enable the vertex arrays.
  * This catches another Mesa bug.
  */
-static bool
-test_illegal_drawarrays_list_inside_begin_end2(void)
+static enum piglit_result
+test_illegal_drawarrays_list_inside_begin_end2(void * unused)
 {
 	GLuint list;
 	bool pass;
@@ -239,15 +223,13 @@ test_illegal_drawarrays_list_inside_begin_end2(void)
 		&& pass;
 
 	piglit_present_results();
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-		"illegal glDrawArrays inside glBegin-glEnd (2)");
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
-static bool
-test_separate_begin_vertex_end_lists(void)
+static enum piglit_result
+test_separate_begin_vertex_end_lists(void * unused)
 {
 	GLuint begin, vertex, end;
 	bool pass;
@@ -289,15 +271,13 @@ test_separate_begin_vertex_end_lists(void)
 	glDeleteLists(end, 1);
 
 	piglit_present_results();
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "separate glBegin-glVertex-glEnd lists");
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
-static bool
-test_illegal_begin_mode(void)
+static enum piglit_result
+test_illegal_begin_mode(void * unused)
 {
 	GLuint list;
 	bool pass;
@@ -328,27 +308,79 @@ test_illegal_begin_mode(void)
            && pass;
 
 	piglit_present_results();
-	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "illegal glBegin mode in display list");
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
+
+
+static const struct piglit_subtest tests[] = {
+	{
+		"glCallList inside glBegin-glEnd",
+		"calllist-in-begin-end",
+		test_call_list_inside_begin_end,
+		NULL
+	},
+	{
+		"nested glCallList inside glBegin-glEnd",
+		"nested-calllist-in-begin-end",
+		test_call_list_inside_nested_begin_end,
+		NULL
+	},
+	{
+		"illegal glRect inside glBegin-glEnd",
+		"rectlist-in-begin-end",
+		test_illegal_rect_list_inside_begin_end,
+		NULL
+	},
+	{
+		"illegal glDrawArrays inside glBegin-glEnd",
+		"drawarrays-in-begin-end",
+		test_illegal_drawarrays_list_inside_begin_end,
+		NULL
+	},
+	{
+		"illegal glDrawArrays inside glBegin-glEnd (2)",
+		"drawarrays-in-begin-end-2",
+		test_illegal_drawarrays_list_inside_begin_end2,
+		NULL
+	},
+	{
+		"separate glBegin-glVertex-glEnd lists",
+		"separate-begin-vertex-end",
+		test_separate_begin_vertex_end_lists,
+		NULL
+	},
+	{
+		"illegal glBegin mode in display list",
+		"illegal-begin-mode",
+		test_illegal_begin_mode,
+		NULL
+	},
+	{ 0 },
+};
+
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+	piglit_config = &config;
+	config.subtests = tests;
+	config.supports_gl_compat_version = 11;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
+PIGLIT_GL_TEST_CONFIG_END
 
 
 enum piglit_result
 piglit_display(void)
 {
-	bool pass = true;
+	enum piglit_result result = PIGLIT_PASS;
 
-	pass = test_call_list_inside_begin_end() && pass;
-	pass = test_call_list_inside_nested_begin_end() && pass;
-	pass = test_illegal_rect_list_inside_begin_end() && pass;
-	pass = test_illegal_drawarrays_list_inside_begin_end() && pass;
-	pass = test_illegal_drawarrays_list_inside_begin_end2() && pass;
-	pass = test_separate_begin_vertex_end_lists() && pass;
-        pass = test_illegal_begin_mode() && pass;
+	result = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 
