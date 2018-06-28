@@ -416,10 +416,7 @@ piglit_display(void)
 	fs = get_fs(max_varyings);
 	pass = run_subtest(vs, fs, max_xfb_varyings,
 			   max_varyings, xfb_varying_array);
-	if (!pass) {
-		status = PIGLIT_FAIL;
-	}
-	piglit_report_subtest_result(status,
+	piglit_report_subtest_result(pass ? status : PIGLIT_FAIL,
 				     "max-varying-single-dimension-array");
 
 	/* Test arrays of arrays */
@@ -429,11 +426,8 @@ piglit_display(void)
 		fs = get_fs_aoa(max_varyings);
 		subtest_result = run_subtest(vs, fs, max_xfb_varyings,
 					     max_varyings, xfb_varying_aoa);
-		if (!subtest_result) {
-			status = PIGLIT_FAIL;
-			pass = false;
-		}
-		piglit_report_subtest_result(status,
+		pass &= subtest_result;
+		piglit_report_subtest_result(subtest_result ? status : PIGLIT_FAIL,
 					     "max-varying-arrays-of-arrays");
 	} else {
 		piglit_report_subtest_result(PIGLIT_SKIP,
@@ -441,7 +435,7 @@ piglit_display(void)
 	}
 	piglit_present_results();
 
-	return status;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)
