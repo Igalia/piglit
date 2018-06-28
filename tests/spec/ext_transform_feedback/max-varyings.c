@@ -42,19 +42,7 @@
 #define MAX_VARYING 32
 #define AOA_OUTER_DIM 2
 
-/* 10x10 rectangles with 2 pixels of pad.  Deal with up to 32 varyings. */
-
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-	config.supports_gl_compat_version = 20;
-
-	config.window_width = (2+MAX_VARYING*12);
-	config.window_height = (2+MAX_VARYING*12);
-	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
-	config.khr_no_error_support = PIGLIT_NO_ERRORS;
-
-PIGLIT_GL_TEST_CONFIG_END
-
+static const struct piglit_gl_test_config * piglit_config;
 static const char *xfb_varying_array[MAX_VARYING];
 static const char *xfb_varying_aoa[MAX_VARYING];
 static GLuint xfb_buf;
@@ -377,65 +365,118 @@ end:
 	return pass;
 }
 
+struct common_data {
+	int max_varyings;
+	GLint max_components;
+	int max_xfb_varyings;
+	GLint max_xfb_components;
+};
+
+static enum piglit_result
+test_1d_array(void * data) {
+	struct common_data * test_data = (struct common_data *)data;
+
+	GLuint vs = get_vs(test_data->max_varyings);
+	GLuint fs = get_fs(test_data->max_varyings);
+	bool pass = run_subtest(
+		vs, fs,
+		test_data->max_xfb_varyings,
+		test_data->max_varyings,
+		xfb_varying_array);
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+static enum piglit_result
+test_aoa(void * data) {
+	if (!piglit_is_extension_supported("GL_ARB_arrays_of_arrays")) {
+		return PIGLIT_SKIP;
+	}
+
+	struct common_data * test_data = (struct common_data *)data;
+
+	GLuint vs = get_vs_aoa(test_data->max_varyings);
+	GLuint fs = get_fs_aoa(test_data->max_varyings);
+	bool pass = run_subtest(
+		vs,
+		fs,
+		test_data->max_xfb_varyings,
+		test_data->max_varyings, xfb_varying_aoa);
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+static struct piglit_subtest tests[] = {
+	{
+		"max-varying-single-dimension-array",
+		"1d-array",
+		test_1d_array,
+		NULL,
+	},
+	{
+		"max-varying-arrays-of-arrays",
+		"aoa",
+		test_aoa,
+		NULL,
+	},
+	{ NULL }
+};
+
+/* 10x10 rectangles with 2 pixels of pad.  Deal with up to 32 varyings. */
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	piglit_config = &config;
+	config.subtests = tests;
+	config.supports_gl_compat_version = 20;
+
+	config.window_width = (2+MAX_VARYING*12);
+	config.window_height = (2+MAX_VARYING*12);
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
+PIGLIT_GL_TEST_CONFIG_END
+
 enum piglit_result
 piglit_display(void)
 {
-	GLint max_components;
-	int max_varyings;
-	int max_xfb_varyings = 0;
-	GLint max_xfb_components;
-	GLboolean pass;
+	struct common_data data = { 0, 0, 0, 0 };
 	enum piglit_result status = PIGLIT_PASS;
-	GLuint vs, fs;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	glGetIntegerv(GL_MAX_VARYING_FLOATS, &max_components);
-	max_varyings = max_components / 4;
-	init_xfb_varyings(max_varyings);
+	glGetIntegerv(GL_MAX_VARYING_FLOATS, &data.max_components);
+	data.max_varyings = data.max_components / 4;
+	init_xfb_varyings(data.max_varyings);
 
-	printf("GL_MAX_VARYING_FLOATS = %i\n", max_components);
+	printf("GL_MAX_VARYING_FLOATS = %i\n", data.max_components);
 
-	if (max_varyings > MAX_VARYING) {
+	if (data.max_varyings > MAX_VARYING) {
 		printf("test not designed to handle >%d varying vec4s.\n"
 		       "(implementation reports %d components)\n",
-		       max_components, MAX_VARYING);
-		max_varyings = MAX_VARYING;
+		       data.max_components, MAX_VARYING);
+		data.max_varyings = MAX_VARYING;
 		status = PIGLIT_WARN;
 	}
 
 	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS,
-		      &max_xfb_components);
-	max_xfb_varyings = MIN2(max_xfb_components / 4, max_varyings);
+		      &data.max_xfb_components);
+	data.max_xfb_varyings = MIN2(data.max_xfb_components / 4, data.max_varyings);
 
 	printf("GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS = %i\n",
-	       max_xfb_components);
+	       data.max_xfb_components);
 
-	/* Test single dimension array */
-	vs = get_vs(max_varyings);
-	fs = get_fs(max_varyings);
-	pass = run_subtest(vs, fs, max_xfb_varyings,
-			   max_varyings, xfb_varying_array);
-	piglit_report_subtest_result(pass ? status : PIGLIT_FAIL,
-				     "max-varying-single-dimension-array");
-
-	/* Test arrays of arrays */
-	if (piglit_is_extension_supported("GL_ARB_arrays_of_arrays")) {
-		bool subtest_result;
-		vs = get_vs_aoa(max_varyings);
-		fs = get_fs_aoa(max_varyings);
-		subtest_result = run_subtest(vs, fs, max_xfb_varyings,
-					     max_varyings, xfb_varying_aoa);
-		pass &= subtest_result;
-		piglit_report_subtest_result(subtest_result ? status : PIGLIT_FAIL,
-					     "max-varying-arrays-of-arrays");
-	} else {
-		piglit_report_subtest_result(PIGLIT_SKIP,
-					     "max-varying-arrays-of-arrays");
+	for (unsigned i = 0; i < ARRAY_SIZE(tests); ++i) {
+		tests[i].data = (void *)&data;
 	}
-	piglit_present_results();
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	status = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		status);
+
+	return status;
 }
 
 void piglit_init(int argc, char **argv)
