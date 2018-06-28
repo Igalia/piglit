@@ -133,6 +133,9 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	const char * subtests[] = { "compile and execute", "call", NULL };
+	piglit_register_subtests(subtests);
+
 	static const float verts[4][4] = {
 		/* x   y   z   w */
 		{ -1, -1, 1.0, 1 },
