@@ -895,10 +895,36 @@ test_endlist()
 	return true;
 }
 
+static void
+enumerate_subtests(void) {
+	const char * subtests[ARRAY_SIZE(ok_tests) + ARRAY_SIZE(error_tests) +
+			      ARRAY_SIZE(error_only_tests) +
+			      ARRAY_SIZE(nondlist_error_tests) + 2];
+	unsigned i = 0;
+	for (unsigned j = 0; j < ARRAY_SIZE(ok_tests); ++j, ++i) {
+		subtests[i] = ok_tests[j].name;
+	}
+	for (unsigned j = 0; j < ARRAY_SIZE(error_tests); ++j, ++i) {
+		subtests[i] = error_tests[j].name;
+	}
+	for (unsigned j = 0; j < ARRAY_SIZE(error_only_tests); ++j, ++i) {
+		subtests[i] = error_only_tests[j].name;
+	}
+	for (unsigned j = 0; j < ARRAY_SIZE(nondlist_error_tests); ++j, ++i) {
+		subtests[i] = nondlist_error_tests[j].name;
+	}
+	subtests[i++] = "glEndList";
+	subtests[i] = NULL;
+
+	piglit_register_subtests(subtests);
+}
+
 void
 piglit_init(int argc, char **argv)
 {
 	bool pass;
+
+	enumerate_subtests();
 
 	/* Set up some state to be used by our various test
 	 * functions
