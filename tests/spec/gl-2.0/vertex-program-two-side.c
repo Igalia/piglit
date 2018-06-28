@@ -367,9 +367,9 @@ piglit_display(void)
 			free(tcs_source);
 			free(tes_source);
 		} else {
-		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[3]);
-		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[4]);
-		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[5]);
+			piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[3]);
+			piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[4]);
+			piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[5]);
 		}
 	} else {
 		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[1]);
