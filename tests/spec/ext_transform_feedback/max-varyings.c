@@ -46,7 +46,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 20;
 
 	config.window_width = (2+MAX_VARYING*12);
 	config.window_height = (2+MAX_VARYING*12);
@@ -440,7 +440,6 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	piglit_require_gl_version(20);
 	piglit_require_GLSL_version(120);
 	piglit_require_transform_feedback();
 	glGenBuffers(1, &xfb_buf);
