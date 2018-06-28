@@ -435,6 +435,9 @@ piglit_display(void)
 		}
 		piglit_report_subtest_result(status,
 					     "max-varying-arrays-of-arrays");
+	} else {
+		piglit_report_subtest_result(PIGLIT_SKIP,
+					     "max-varying-arrays-of-arrays");
 	}
 	piglit_present_results();
 
