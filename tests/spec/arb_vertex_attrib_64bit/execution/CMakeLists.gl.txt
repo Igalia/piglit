@@ -9,6 +9,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_vertex_attrib_64bit-double_attribs double_attribs.c)
+piglit_add_executable (arb_vertex_attrib_64bit-double_attribs_dlist double_attribs_dlist.c)
 piglit_add_executable (arb_vertex_attrib_64bit-check-explicit-location check-explicit-location.c)
 piglit_add_executable (arb_vertex_attrib_64bit-getactiveattrib  getactiveattrib.c)
 piglit_add_executable (arb_vertex_attrib_64bit-max-vertex-attrib max-vertex-attrib.c)
