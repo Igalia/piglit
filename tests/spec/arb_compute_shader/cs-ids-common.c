@@ -104,14 +104,61 @@ clear_program()
 }
 
 static enum piglit_result
-confirm_size()
+compare_atomic_counters(uint32_t *values, uint32_t xs, uint32_t ys,
+                        uint32_t zs)
 {
+	bool pass = true;
 	uint32_t *p;
+
+	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
+	p = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER,
+			     0,
+			     NUM_ATOMIC_COUNTERS * sizeof(uint32_t),
+			     GL_MAP_READ_BIT);
+
+	if (!p) {
+		printf("Couldn't map atomic counter to verify expected value.\n");
+		return PIGLIT_FAIL;
+	}
+
+	for (unsigned i = 0; i < NUM_ATOMIC_COUNTERS; i++) {
+		uint32_t found = p[i];
+		if (verbose)
+			printf("Atomic counter %d\n"
+			       "  Reference: %u\n"
+			       "  Observed:  %u\n"
+			       "  Result: %s\n",
+			       i, values[i], found,
+			       values[i] == found ? "pass" : "fail");
+		if (values[i] != found) {
+			printf("Atomic counter test %d failed for (%d, %d, %d)\n",
+			       i, xs, ys, zs);
+			printf("  Reference: %u\n", values[i]);
+			printf("  Observed:  %u\n", found);
+			pass = false;
+			break;
+		}
+	}
+
+	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+enum piglit_result
+cs_ids_confirm_initial_atomic_counters()
+{
+	uint32_t atomics_init[NUM_ATOMIC_COUNTERS] = { 0 };
+	return compare_atomic_counters(atomics_init, 0, 0, 0);
+}
+
+enum piglit_result
+cs_ids_confirm_size()
+{
 	uint32_t values[NUM_ATOMIC_COUNTERS];
 	uint32_t i, x, y, z;
 	uint32_t xs, ys, zs;
 	uint32_t hx, hy, hz;
-	bool pass = true;
 
 	xs = local_x;
 	ys = local_y;
@@ -158,39 +205,7 @@ confirm_size()
 			values[i] *= global_x * global_y * global_z;
 	}
 
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
-	p = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER,
-			     0,
-			     NUM_ATOMIC_COUNTERS * sizeof(uint32_t),
-			     GL_MAP_READ_BIT);
-
-	if (!p) {
-		printf("Couldn't map atomic counter to verify expected value.\n");
-		return PIGLIT_FAIL;
-	}
-
-	for (i = 0; i < NUM_ATOMIC_COUNTERS; i++) {
-		uint32_t found = p[i];
-		if (verbose)
-			printf("Atomic counter %d\n"
-			       "  Reference: %u\n"
-			       "  Observed:  %u\n"
-			       "  Result: %s\n",
-			       i, values[i], found,
-			       values[i] == found ? "pass" : "fail");
-		if (values[i] != found) {
-			printf("Atomic counter test %d failed for (%d, %d, %d)\n",
-			       i, xs, ys, zs);
-			printf("  Reference: %u\n", values[i]);
-			printf("  Observed:  %u\n", found);
-			pass = false;
-			break;
-		}
-	}
-
-	glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return compare_atomic_counters(values, xs, ys, zs);
 }
 
 
@@ -263,25 +278,34 @@ cs_ids_set_global_size(uint32_t x, uint32_t y, uint32_t z)
 }
 
 
-enum piglit_result
-cs_ids_run_test()
+void
+cs_ids_setup_atomics_for_test()
 {
-	enum piglit_result result;
 	uint32_t atomics_init[NUM_ATOMIC_COUNTERS] = { 0 };
 
+	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
+	glBufferData(GL_ATOMIC_COUNTER_BUFFER,
+		     sizeof(atomics_init),
+		     atomics_init, GL_STATIC_DRAW);
+}
+
+
+/* Running the test without checking the result is useful for creating display
+ * list tests.
+ */
+void
+cs_ids_run_test_without_check()
+{
 	if (verbose)
 		printf("Testing local dim = %dx%dx%d; "
 		       "global dim = %dx%dx%d\n",
 		       local_x, local_y, local_z,
 		       global_x, global_y, global_z);
 
-	if (local_x == 0 || local_y == 0 || local_z == 0)
-		return PIGLIT_FAIL;
-
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
-	glBufferData(GL_ATOMIC_COUNTER_BUFFER,
-		     sizeof(atomics_init),
-		     atomics_init, GL_STATIC_DRAW);
+	if (local_x == 0 || local_y == 0 || local_z == 0) {
+		fprintf(stderr, "Internal error: local size not set\n");
+		return;
+	}
 
 	glUseProgram(prog);
 
@@ -293,8 +317,18 @@ cs_ids_run_test()
 		glDispatchCompute(global_x, global_y, global_z);
 	}
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+}
 
-	result = confirm_size();
+
+enum piglit_result
+cs_ids_run_test()
+{
+	enum piglit_result result;
+
+	cs_ids_setup_atomics_for_test();
+	cs_ids_run_test_without_check();
+
+	result = cs_ids_confirm_size();
 	if (result != PIGLIT_PASS)
 		piglit_report_result(result);
 

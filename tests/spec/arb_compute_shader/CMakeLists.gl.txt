@@ -14,6 +14,7 @@ piglit_add_executable (arb_compute_shader-minmax minmax.c)
 
 set(depends cs-ids-common.c common.c)
 
+piglit_add_executable (arb_compute_shader-dlist dlist.c ${depends})
 piglit_add_executable (arb_compute_shader-indirect-compute indirect-compute.c ${depends})
 piglit_add_executable (arb_compute_shader-local-id local-id.c ${depends})
 piglit_add_executable (arb_compute_shader-render-and-compute render-and-compute.c ${depends})

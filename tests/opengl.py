@@ -4233,6 +4233,7 @@ with profile.test_list.group_manager(
       override_class=BuiltInConstantsTest)
     g(['arb_compute_shader-work_group_size_too_large'],
       grouptools.join('compiler', 'work_group_size_too_large'))
+    g(['arb_compute_shader-dlist'], 'display-list')
     g(['arb_compute_shader-indirect-compute'], 'indirect-compute')
     g(['arb_compute_shader-local-id'], 'local-id' + '-explosion')
     g(['arb_compute_shader-render-and-compute'], 'render-and-compute')

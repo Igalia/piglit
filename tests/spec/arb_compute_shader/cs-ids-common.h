@@ -64,4 +64,16 @@ cs_ids_set_global_size(uint32_t x, uint32_t y, uint32_t z);
 enum piglit_result
 cs_ids_run_test();
 
+void
+cs_ids_run_test_without_check();
+
+void
+cs_ids_setup_atomics_for_test();
+
+enum piglit_result
+cs_ids_confirm_initial_atomic_counters();
+
+enum piglit_result
+cs_ids_confirm_size();
+
 #endif
