@@ -29,10 +29,53 @@
 
 #include "piglit-util-gl.h"
 
+static struct piglit_gl_test_config * piglit_config;
+static enum piglit_result test_format(void * data);
+
+#define CREATE_TEST(name)              \
+	{                              \
+		#name,                 \
+		#name,                 \
+		test_format,           \
+		(void *)(intptr_t)name \
+	}
+static struct piglit_subtest tests[] = {
+	CREATE_TEST(GL_RGBA32I),
+	CREATE_TEST(GL_RGB32I),
+	CREATE_TEST(GL_RG32I),
+	CREATE_TEST(GL_R32I),
+	CREATE_TEST(GL_RGBA16I),
+	CREATE_TEST(GL_RGB16I),
+	CREATE_TEST(GL_RG16I),
+	CREATE_TEST(GL_R16I),
+	CREATE_TEST(GL_RGBA8I),
+	CREATE_TEST(GL_RGB8I),
+	CREATE_TEST(GL_RG8I),
+	CREATE_TEST(GL_R8I),
+
+	CREATE_TEST(GL_RGBA32UI),
+	CREATE_TEST(GL_RGB32UI),
+	CREATE_TEST(GL_RG32UI),
+	CREATE_TEST(GL_R32UI),
+	CREATE_TEST(GL_RGBA16UI),
+	CREATE_TEST(GL_RGB16UI),
+	CREATE_TEST(GL_RG16UI),
+	CREATE_TEST(GL_R16UI),
+	CREATE_TEST(GL_RGBA8UI),
+	CREATE_TEST(GL_RGB8UI),
+	CREATE_TEST(GL_RG8UI),
+	CREATE_TEST(GL_R8UI),
+	{ 0 },
+};
+#undef CREATE_TEST
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
+	piglit_config = &config;
+	config.subtests = tests;
 	config.supports_gl_compat_version = 30;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 
@@ -197,9 +240,10 @@ setup_fbo(GLenum intFormat)
 
 
 
-static bool
-test_format(GLenum intFormat)
+static enum piglit_result
+test_format(void * data)
 {
+	GLenum intFormat = (GLenum)(intptr_t)data;
 	static const GLint red[4] = {1000, 0, 0, 0};
 	static const GLint green[4] = {2000, 0, 0, 0};
 	static const GLint blue[4] = {0, 0, 3000, 0};
@@ -209,11 +253,9 @@ test_format(GLenum intFormat)
 	int x1 = TexSize * 3 / 4;
 	int y1 = TexSize * 3 / 4;
 	bool pass = true;
-	enum piglit_result result;
 
 	if (!setup_fbo(intFormat)) {
-		result = PIGLIT_SKIP;
-		goto end;
+		return PIGLIT_SKIP;
 	}
 
 	/* Draw different value into each texture quadrant */
@@ -234,54 +276,22 @@ test_format(GLenum intFormat)
 	pass = probe_int(x0, y1, blue, intFormat) && pass;
 	pass = probe_int(x1, y1, alpha, intFormat) && pass;
 
-	result = pass ? PIGLIT_PASS : PIGLIT_FAIL;
-
-end:
-	piglit_report_subtest_result(result,
-				     "Format %s",
-				     piglit_get_gl_enum_name(intFormat));
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
 enum piglit_result
 piglit_display(void)
 {
-	static const GLenum formats[] = {
-		GL_RGBA32I,
-		GL_RGB32I,
-		GL_RG32I,
-		GL_R32I,
-		GL_RGBA16I,
-		GL_RGB16I,
-		GL_RG16I,
-		GL_R16I,
-		GL_RGBA8I,
-		GL_RGB8I,
-		GL_RG8I,
-		GL_R8I,
+	enum piglit_result result = PIGLIT_PASS;
 
-		GL_RGBA32UI,
-		GL_RGB32UI,
-		GL_RG32UI,
-		GL_R32UI,
-		GL_RGBA16UI,
-		GL_RGB16UI,
-		GL_RG16UI,
-		GL_R16UI,
-		GL_RGBA8UI,
-		GL_RGB8UI,
-		GL_RG8UI,
-		GL_R8UI,
-	};
-	bool pass = true;
-	int i;
+	result = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
 
-	for (i = 0; i < ARRAY_SIZE(formats); i++) {
-		pass = test_format(formats[i]) && pass;
-	}
-
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 
