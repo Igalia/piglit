@@ -39,6 +39,7 @@ from framework import exceptions
 from framework import monitoring
 from framework import profile
 from framework.results import TimeAttribute
+from framework.test import base
 from . import parsers
 
 __all__ = ['run',
@@ -220,6 +221,13 @@ def _run_parser(input_):
                         dest="ignore_missing",
                         action="store_true",
                         help="missing tests are considered as 'notrun'")
+    parser.add_argument('--timeout',
+                        dest='timeout',
+                        action='store',
+                        type=int,
+                        default=None,
+                        metavar='<int>',
+                        help='Set a default timeout threshold for tests to run in.')
     parser.add_argument("test_profile",
                         metavar="<Profile path(s)>",
                         nargs='+',
@@ -247,6 +255,7 @@ def _create_metadata(args, name, forced_test_list):
         opts['platform'] = args.platform
     opts['forced_test_list'] = forced_test_list
     opts['ignore_missing'] = args.ignore_missing
+    opts['timeout'] = args.timeout
 
     metadata = {'options': opts}
     metadata['name'] = name
@@ -291,6 +300,7 @@ def run(input_):
 
     """
     args = _run_parser(input_)
+    base.Test.timeout = args.timeout
     _disable_windows_exception_messages()
 
     # If dmesg is requested we must have serial run, this is because dmesg
@@ -423,6 +433,7 @@ def resume(input_):
     core.get_config(args.config_file)
 
     options.OPTIONS.env['PIGLIT_PLATFORM'] = results.options['platform']
+    base.Test.timeout = results.options['timeout']
 
     results.options['env'] = core.collect_system_info()
     results.options['name'] = results.name
