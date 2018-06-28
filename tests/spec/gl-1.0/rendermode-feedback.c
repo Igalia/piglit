@@ -28,15 +28,6 @@
  * Tests that glRenderMode(GL_FEEDBACK) rendering trivially works.
  */
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-	config.supports_gl_compat_version = 10;
-
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-	config.khr_no_error_support = PIGLIT_NO_ERRORS;
-
-PIGLIT_GL_TEST_CONFIG_END
-
 static float vertex_array[] = {
 	1.0, 2.0, 0.4, 1.0,
 	3.0, 4.0, 0.6, 1.0,
@@ -103,6 +94,30 @@ struct type {
 	  ARRAY_SIZE(gl_4d_color_texture_values) },
 };
 
+static enum piglit_result run_subtest(void * data);
+static const struct piglit_gl_test_config * piglit_config;
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	piglit_config = &config;
+
+	struct piglit_subtest tests[ARRAY_SIZE(types) + 1];
+	for (unsigned i = 0; i < ARRAY_SIZE(types); ++i) {
+		tests[i].name = piglit_get_gl_enum_name(types[i].type);
+		tests[i].option = tests[i].name;
+		tests[i].subtest_func = run_subtest;
+		tests[i].data = (void *)&types[i];
+	}
+	tests[ARRAY_SIZE(types)] = (struct piglit_subtest){ 0 };
+	config.subtests = tests;
+
+	config.supports_gl_compat_version = 10;
+
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
+PIGLIT_GL_TEST_CONFIG_END
+
 static void
 report_failure(struct type *type, float *buffer, int count)
 {
@@ -117,11 +132,11 @@ report_failure(struct type *type, float *buffer, int count)
 		fprintf(stderr, "  %9f    %9f\n", type->values[i], buffer[i]);
 	}
 	fprintf(stderr, "\n");
-
 }
 
-static bool
-run_subtest(struct type * type) {
+static enum piglit_result
+run_subtest(void * data) {
+	struct type * type = (struct type *)data;
 	bool case_pass = true;
 	int returned_count, j;
 	const char *name = piglit_get_gl_enum_name(type->type);
@@ -151,18 +166,14 @@ run_subtest(struct type * type) {
 
 	if (!case_pass) {
 		report_failure(type, buffer, returned_count);
-		piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
-	} else {
-		piglit_report_subtest_result(PIGLIT_PASS, "%s", name);
 	}
-	return case_pass;
+	return case_pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result
 piglit_display(void)
 {
-	bool pass = true;
-	int i;
+	enum piglit_result result = PIGLIT_PASS;
 
 	piglit_ortho_projection(piglit_width, piglit_height, false);
 
@@ -176,13 +187,15 @@ piglit_display(void)
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	for (i = 0; i < ARRAY_SIZE(types); i++) {
-		run_subtest(&types[i]);
-	}
+	result = piglit_run_selected_subtests(
+		piglit_config->subtests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
 
 	piglit_present_results();
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 void
