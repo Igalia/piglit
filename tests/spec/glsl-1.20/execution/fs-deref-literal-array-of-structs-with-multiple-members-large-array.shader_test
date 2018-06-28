@@ -19,7 +19,7 @@ void main()
 struct Foo {
   int value;
 
-  /* A second member of a differnt size ensures we calculate member offsets
+  /* A second member of a different size ensures we calculate member offsets
    * correctly.
    */
   ivec2 value2;
@@ -47,11 +47,10 @@ draw rect -1 -1 1 1
 uniform int i 1
 uniform ivec2 expected_value 500 600
 draw rect 0 -1 1 1
-probe all rgba 0.0 1.0 0.0 1.0
-uniform int i 0
+uniform int i 2
 uniform ivec2 expected_value 800 900
 draw rect -1 0 1 1
-uniform int i 1
+uniform int i 3
 uniform ivec2 expected_value 1100 1200
 draw rect 0 0 1 1
 probe all rgba 0.0 1.0 0.0 1.0
