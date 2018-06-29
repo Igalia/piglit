@@ -39,47 +39,22 @@
 
 #include "piglit-util-gl.h"
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-#if PIGLIT_USE_OPENGL
-	config.supports_gl_compat_version = 21;
-#else
-	config.supports_gl_es_version = 20;
-#endif
-	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_DOUBLE;
-
-PIGLIT_GL_TEST_CONFIG_END
-
 GLint prog, color, zflip;
 
-enum piglit_result
-piglit_display(void)
+static const struct piglit_gl_test_config * piglit_config;
+static const float blue[4] = {0, 0, 1, 1};
+static const float red[4] = {1, 0, 0, 1};
+static const float green[4] = {0, 1, 0, 1};
+
+/* NOTE: It appears that at least nvidia hw will end up wrapping around if the
+ * final z value goes below 0 (or something). This can come up when testing
+ * without the clamp.
+ */
+
+static enum piglit_result
+test_negative_clamp(void * unused)
 {
-	static const float blue[4] = {0, 0, 1, 1};
-	static const float red[4] = {1, 0, 0, 1};
-	static const float green[4] = {0, 1, 0, 1};
-
-	bool passa = true, passb = true;
-
-	glUseProgram(prog);
-
-	glViewport(0, 0, piglit_width, piglit_height);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_POLYGON_OFFSET_FILL);
-
-	glUniform1f(zflip, 1.0);
-	glClearColor(0, 0, 1, 1);
-#ifdef PIGLIT_USE_OPENGL
-	glClearDepth(0.5);
-#else
-	glClearDepthf(0.5);
-#endif
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/* NOTE: It appears that at least nvidia hw will end up
-	 * wrapping around if the final z value goes below 0 (or
-	 * something). This can come up when testing without the
-	 * clamp.
-	 */
+	bool pass = true;
 
 	/* Draw red rectangle that slopes between 1 and 0.1. Use a
 	 * polygon offset with a high factor but small clamp
@@ -89,7 +64,7 @@ piglit_display(void)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	if (!piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, blue)) {
 		printf("  FAIL: red rect peeks over blue rect\n");
-		passa = false;
+		pass = false;
 	}
 
 	/* And now set the clamp such that all parts of the polygon
@@ -100,11 +75,16 @@ piglit_display(void)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	if (!piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green)) {
 		printf("  FAIL: green rect does not cover blue rect\n");
-		passa = false;
+		pass = false;
 	}
 
-	piglit_report_subtest_result(passa ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "negative clamp");
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+static enum piglit_result
+test_positive_clamp(void * unused)
+{
+	bool pass = true;
 
 	/* Now try this again with the inverse approach and a positive
 	 * clamp value. The polygon will now slope between -1 and
@@ -121,7 +101,7 @@ piglit_display(void)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	if (!piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, blue)) {
 		printf("  FAIL: red rect peeks over blue rect\n");
-		passb = false;
+		pass = false;
 	}
 
 	/* And now set the clamp so that all parts of the polygon pass
@@ -132,15 +112,67 @@ piglit_display(void)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	if (!piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green)) {
 		printf("  FAIL: green rect does not cover blue rect\n");
-		passb = false;
+		pass = false;
 	}
 
-	piglit_report_subtest_result(passb ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "positive clamp");
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
 
+static const struct piglit_subtest tests[] = {
+	{
+		"negative clamp",
+		"neg_clamp",
+		test_negative_clamp,
+		NULL
+	},
+	{
+		"positive clamp",
+		"pos_clamp",
+		test_positive_clamp,
+		NULL
+	},
+	{ NULL }
+};
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+	piglit_config = &config;
+	config.subtests = tests;
+#if PIGLIT_USE_OPENGL
+	config.supports_gl_compat_version = 21;
+#else
+	config.supports_gl_es_version = 20;
+#endif
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
+
+enum piglit_result
+piglit_display(void)
+{
+	glUseProgram(prog);
+
+	glViewport(0, 0, piglit_width, piglit_height);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_POLYGON_OFFSET_FILL);
+
+	glUniform1f(zflip, 1.0);
+	glClearColor(0, 0, 1, 1);
+#ifdef PIGLIT_USE_OPENGL
+	glClearDepth(0.5);
+#else
+	glClearDepthf(0.5);
+#endif
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	enum piglit_result result = PIGLIT_PASS;
+	result = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
 	piglit_present_results();
 
-	return (passa && passb) ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 void
