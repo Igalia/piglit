@@ -124,9 +124,9 @@ test_get_semaphore_parameter_enum_errors(void * unused)
 		NULL         \
 	}
 static const struct piglit_subtest tests[] = {
-	ADD_TEST(test_get_unsigned_byte_v_enum_errors, "usigned-byte-v-bad-enum"),
-	ADD_TEST(test_get_unsigned_byte_i_v_enum_errors, "usigned-byte-i-v-bad-enum"),
-	ADD_TEST(test_get_unsigned_byte_i_v_value_errors, "usigned-byte-i-v-bad-value"),
+	ADD_TEST(test_get_unsigned_byte_v_enum_errors, "unsigned-byte-v-bad-enum"),
+	ADD_TEST(test_get_unsigned_byte_i_v_enum_errors, "unsigned-byte-i-v-bad-enum"),
+	ADD_TEST(test_get_unsigned_byte_i_v_value_errors, "unsigned-byte-i-v-bad-value"),
 
 	ADD_TEST(test_gen_semaphores_value_errors, "gen-semaphores-bad-value"),
 	ADD_TEST(test_delete_semaphores_value_errors, "gen-semaphores-bad-value"),
