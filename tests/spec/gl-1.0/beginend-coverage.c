@@ -925,6 +925,8 @@ piglit_init(int argc, char **argv)
 			 GL_INVALID_OPERATION) && pass;
 	pass = run_tests(error_only_tests, ARRAY_SIZE(error_only_tests),
 			 GL_INVALID_OPERATION) && pass;
+	pass = run_tests(nondlist_error_tests, ARRAY_SIZE(nondlist_error_tests),
+			 GL_INVALID_OPERATION) && pass;
 
 	if (test_endlist()) {
 		piglit_report_subtest_result(PIGLIT_PASS, "glEndList");
