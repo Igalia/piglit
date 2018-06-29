@@ -28,16 +28,10 @@
 
 #include "piglit-util-gl.h"
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
+static const struct piglit_gl_test_config * piglit_config;
 
-	config.supports_gl_compat_version = 10;
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
-	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
-
-PIGLIT_GL_TEST_CONFIG_END
-
-static bool
-test_import_semaphore_fd_enum_errors()
+static enum piglit_result
+test_import_semaphore_fd_enum_errors(void * unused)
 {
 	GLuint sem;
 	int fd = -1;
@@ -50,26 +44,42 @@ test_import_semaphore_fd_enum_errors()
 	 */
 	glImportSemaphoreFdEXT(sem, GL_NONE, fd);
 
-	return piglit_check_gl_error(GL_INVALID_ENUM);
+	return piglit_check_gl_error(GL_INVALID_ENUM) ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-#define X(f, desc)					     	\
-	do {							\
-		const bool subtest_pass = (f);			\
-		piglit_report_subtest_result(subtest_pass	\
-									 ? PIGLIT_PASS : PIGLIT_FAIL, \
-									 (desc));		\
-		pass = pass && subtest_pass;			\
-	} while (0)
+static const struct piglit_subtest tests[] = {
+	{
+		"import-semaphore-fd-bad-enum",
+		"bad-enum",
+		test_import_semaphore_fd_enum_errors,
+		NULL,
+	},
+	{ NULL },
+
+};
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	piglit_config = &config;
+	config.subtests = tests;
+	config.supports_gl_compat_version = 10;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
 piglit_display(void)
 {
-	bool pass = true;
+	enum piglit_result result = PIGLIT_PASS;
 
-	X(test_import_semaphore_fd_enum_errors(), "import-semaphore-fd-bad-enum");
+	result = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 
