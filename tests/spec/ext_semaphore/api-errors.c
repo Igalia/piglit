@@ -28,36 +28,32 @@
 
 #include "piglit-util-gl.h"
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
+static const struct piglit_gl_test_config * piglit_config;
 
-	config.supports_gl_compat_version = 10;
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
-	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
+#define RESULT(error) piglit_check_gl_error(error) ? PIGLIT_PASS : PIGLIT_FAIL
 
-PIGLIT_GL_TEST_CONFIG_END
-
-static bool
-test_get_unsigned_byte_v_enum_errors()
+static enum piglit_result
+test_get_unsigned_byte_v_enum_errors(void * unused)
 {
 	GLubyte data[GL_UUID_SIZE_EXT];
 
 	glGetUnsignedBytevEXT(UINT32_MAX, data);
 
-	return piglit_check_gl_error(GL_INVALID_ENUM);
+	return RESULT(GL_INVALID_ENUM);
 }
 
-static bool
-test_get_unsigned_byte_i_v_enum_errors()
+static enum piglit_result
+test_get_unsigned_byte_i_v_enum_errors(void * unused)
 {
 	GLubyte data[GL_UUID_SIZE_EXT];
 
 	glGetUnsignedBytei_vEXT(UINT32_MAX, 0, data);
 
-	return piglit_check_gl_error(GL_INVALID_ENUM);
+	return RESULT(GL_INVALID_ENUM);
 }
 
-static bool
-test_get_unsigned_byte_i_v_value_errors()
+static enum piglit_result
+test_get_unsigned_byte_i_v_value_errors(void * unused)
 {
 	GLubyte data[GL_UUID_SIZE_EXT];
 	GLint numDevices;
@@ -66,31 +62,31 @@ test_get_unsigned_byte_i_v_value_errors()
 
 	glGetUnsignedBytei_vEXT(GL_DEVICE_UUID_EXT, numDevices + 1, data);
 
-	return piglit_check_gl_error(GL_INVALID_VALUE);
+	return RESULT(GL_INVALID_VALUE);
 }
 
-static bool
-test_gen_semaphores_value_errors()
+static enum piglit_result
+test_gen_semaphores_value_errors(void * unused)
 {
 	GLuint sem;
 
 	glGenSemaphoresEXT(-1, &sem);
 
-	return piglit_check_gl_error(GL_INVALID_VALUE);
+	return RESULT(GL_INVALID_VALUE);
 }
 
-static bool
-test_delete_semaphores_value_errors()
+static enum piglit_result
+test_delete_semaphores_value_errors(void * unused)
 {
 	GLuint sem;
 
 	glDeleteSemaphoresEXT(-1, &sem);
 
-	return piglit_check_gl_error(GL_INVALID_VALUE);
+	return RESULT(GL_INVALID_VALUE);
 }
 
-static bool
-test_semaphore_parameter_enum_errors()
+static enum piglit_result
+test_semaphore_parameter_enum_errors(void * unused)
 {
 	GLuint sem;
 	GLuint64 param;
@@ -103,11 +99,11 @@ test_semaphore_parameter_enum_errors()
 	 */
 	glSemaphoreParameterui64vEXT(0, sem, &param);
 
-	return piglit_check_gl_error(GL_INVALID_ENUM);
+	return RESULT(GL_INVALID_ENUM);
 }
 
-static bool
-test_get_semaphore_parameter_enum_errors()
+static enum piglit_result
+test_get_semaphore_parameter_enum_errors(void * unused)
 {
 	GLuint sem;
 	GLuint64 param;
@@ -115,35 +111,55 @@ test_get_semaphore_parameter_enum_errors()
 	glGenSemaphoresEXT(1, &sem);
 	glGetSemaphoreParameterui64vEXT(0, sem, &param);
 
-	return piglit_check_gl_error(GL_INVALID_ENUM);
+	return RESULT(GL_INVALID_ENUM);
 }
 
-#define X(f, desc)					     	\
-	do {							\
-		const bool subtest_pass = (f);			\
-		piglit_report_subtest_result(subtest_pass	\
-									 ? PIGLIT_PASS : PIGLIT_FAIL, \
-									 (desc));		\
-		pass = pass && subtest_pass;			\
-	} while (0)
+#undef RESULT
+
+#define ADD_TEST(func, name) \
+	{                    \
+		name,        \
+		name,        \
+		func,        \
+		NULL         \
+	}
+static const struct piglit_subtest tests[] = {
+	ADD_TEST(test_get_unsigned_byte_v_enum_errors, "usigned-byte-v-bad-enum"),
+	ADD_TEST(test_get_unsigned_byte_i_v_enum_errors, "usigned-byte-i-v-bad-enum"),
+	ADD_TEST(test_get_unsigned_byte_i_v_value_errors, "usigned-byte-i-v-bad-value"),
+
+	ADD_TEST(test_gen_semaphores_value_errors, "gen-semaphores-bad-value"),
+	ADD_TEST(test_delete_semaphores_value_errors, "gen-semaphores-bad-value"),
+	ADD_TEST(test_delete_semaphores_value_errors, "gen-semaphores-bad-value"),
+
+	ADD_TEST(test_semaphore_parameter_enum_errors, "semaphore-parameter-bad-enum"),
+	ADD_TEST(test_get_semaphore_parameter_enum_errors, "get-semaphore-parameter-bad-enum"),
+	{ NULL },
+};
+#undef ADD_TEST
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	piglit_config = &config;
+	config.subtests = tests;
+	config.supports_gl_compat_version = 10;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.khr_no_error_support = PIGLIT_HAS_ERRORS;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
 piglit_display(void)
 {
-	bool pass = true;
+	enum piglit_result result = PIGLIT_PASS;
 
-	X(test_get_unsigned_byte_v_enum_errors(), "usigned-byte-v-bad-enum");
-	X(test_get_unsigned_byte_i_v_enum_errors(), "usigned-byte-i-v-bad-enum");
-	X(test_get_unsigned_byte_i_v_value_errors(), "usigned-byte-i-v-bad-value");
+	piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
 
-	X(test_gen_semaphores_value_errors(), "gen-semaphores-bad-value");
-	X(test_delete_semaphores_value_errors(), "gen-semaphores-bad-value");
-	X(test_delete_semaphores_value_errors(), "gen-semaphores-bad-value");
-
-	X(test_semaphore_parameter_enum_errors(), "semaphore-parameter-bad-enum");
-	X(test_get_semaphore_parameter_enum_errors(), "get-semaphore-parameter-bad-enum");
-
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return result;
 }
 
 
