@@ -64,7 +64,6 @@ def _import(name):
     'tests.deqp_gles31',
     'tests.deqp_vk',
     'tests.deqp_egl',
-    'tests.es3conform',
     'tests.igt',
     'tests.oglconform',
     'tests.xts',
@@ -93,12 +92,6 @@ def test_igt_igttest():
     """ igt.IGTTest initializes """
     mod = _import('tests.igt')
     mod.IGTTest('foo')
-
-
-def test_es3conform_gtftest():
-    """ es3conform.GTFTest initializes """
-    mod = _import('tests.es3conform')
-    mod.GTFTest('testpath')
 
 
 def test_oglconform_oglctest():

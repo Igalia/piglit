@@ -22,8 +22,7 @@
 """ Module implementing tests for test/all.py and friends
 
 This module only provides tests for native piiglit tests (OpenGL and OpenCL),
-it does not provide tests for non native tests that use piglit (oglconfrom,
-es3conform, etc)
+it does not provide tests for non native tests that use piglit (oglconfrom, etc)
 
 """
 

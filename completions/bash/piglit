@@ -52,7 +52,7 @@ __piglit_run() {
                      "-p" "--platform")
     local profiles=("all" "cl" "cpu" "cts_gl" "cts_gl45" "cts_gles" "deqp_egl"
                     "deqp_gles2" "deqp_gles3" "deqp_gles31" "deqp_vk"
-                    "es3conform" "glslparser" "gpu" "igt" "khr_gl" "khr_gl45"
+                    "glslparser" "gpu" "igt" "khr_gl" "khr_gl45"
                     "llvmpipe" "no_error" "oglconform" "quick" "quick_cl"
                     "sanity" "shader" "xts" "xts-render")
 
