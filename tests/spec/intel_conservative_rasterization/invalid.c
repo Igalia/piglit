@@ -35,6 +35,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 #if defined(PIGLIT_USE_OPENGL)
 	config.supports_gl_core_version = 42;
+#elif defined(PIGLIT_USE_OPENGL_ES3)
+	config.supports_gl_es_version = 31;
 #endif
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -52,6 +54,9 @@ void piglit_init(int argc, char **argv)
 	GLuint prog = piglit_build_simple_program(
 #if defined(PIGLIT_USE_OPENGL)
 		"#version 330\n"
+#elif defined(PIGLIT_USE_OPENGL_ES3)
+		"#version 310 es\n"
+		"precision highp float;\n"
 #endif
 		"in vec4 piglit_vertex;\n"
 		"void main()\n"
@@ -60,8 +65,13 @@ void piglit_init(int argc, char **argv)
 		"}\n",
 #if defined(PIGLIT_USE_OPENGL)
 		"#version 330\n"
-		"out vec4 color;\n"
+#elif defined(PIGLIT_USE_OPENGL_ES3)
+		"#version 310 es\n"
+		"precision highp float;\n"
 #endif
+		"\n"
+		"out vec4 color;\n"
+		"\n"
 		"void main()\n"
 		"{\n"
 		"  color = vec4(1.0, 0.0, 0.0, 1.0);\n"
@@ -89,7 +99,9 @@ void piglit_init(int argc, char **argv)
 	glEnableVertexAttribArray(0);
 
 	glEnable(GL_CONSERVATIVE_RASTERIZATION_INTEL);
+#ifdef PIGLIT_USE_OPENGL
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glDrawArrays(GL_POINTS, 0, 3);
@@ -100,6 +112,7 @@ void piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
 
+#ifdef PIGLIT_USE_OPENGL
 	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 	glDrawArrays(GL_LINES, 0, 3);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
@@ -109,6 +122,7 @@ void piglit_init(int argc, char **argv)
 	glDrawArrays(GL_LINES, 0, 3);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
+#endif
 
 	piglit_report_result(PIGLIT_PASS);
 }
