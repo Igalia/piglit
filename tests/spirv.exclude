@@ -20,6 +20,7 @@ tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap4.shader_t
 tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch-array.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/query-component.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-double-overlap.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-overlap.shader_test
