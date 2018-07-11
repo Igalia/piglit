@@ -1,3 +1,4 @@
+# encoding=utf-8
 # Copyright © 2018 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
