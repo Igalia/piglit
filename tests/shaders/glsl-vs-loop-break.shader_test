@@ -3,12 +3,14 @@ GLSL >= 1.10
 
 [vertex shader]
 varying vec4 color;
+uniform int iters;
+uniform int target;
 void main()
 {
 	gl_Position = gl_Vertex;
 
-	for (int i = 0; i < 8; i++) {
-		if (i > 4) {
+	for (int i = 0; i < iters; i++) {
+		if (i > target) {
 			color = vec4(0.0, 1.0, 0.0, 0.0);
 			break;
 		}
@@ -24,5 +26,7 @@ void main()
 }
 
 [test]
+uniform int iters 8
+uniform int target 4
 draw rect -1 -1 2 2
 relative probe rgb (0.03, 0.25) (0.0, 1.0, 0.0)
