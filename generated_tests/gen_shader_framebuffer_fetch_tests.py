@@ -77,7 +77,7 @@ def gen_execution(src, tests):
     """
     return gen(src,
                (dict(t, path = os.path.join(
-                   'spec', t['extension'], 'execution',
+                   'spec', t['extension'], 'execution', t['api'],
                    t['name'] + '.shader_test')) for t in tests))
 
 
@@ -88,7 +88,7 @@ def gen_compiler(src, tests):
     """
     return gen(src,
                (dict(t, path = os.path.join(
-                   'spec', t['extension'], 'compiler',
+                   'spec', t['extension'], 'compiler', t['api'],
                    t['name'] + '.' + t['shader_stage'])) for t in tests))
 
 
@@ -194,7 +194,8 @@ def main():
             color = gl_LastFragData[0];
         }
     """, product(all_defs,
-                 [{'name': 'negative-gl_LastFragData-gles3',
+                 [{'name': 'negative-gl_LastFragData',
+                   'api': 'gles3',
                    'shader_stage': 'frag'}]))
 
     #
@@ -218,7 +219,8 @@ def main():
             gl_LastFragData[0] = vec4(1.0);
         }
     """, product(all_defs,
-                 [{'name': 'negative-gl_LastFragData-write-gles2',
+                 [{'name': 'negative-gl_LastFragData-write',
+                   'api': 'gles2',
                    'shader_stage': 'frag'}]))
 
     #
@@ -252,10 +254,10 @@ def main():
             ${last_frag_data(api_version)};
         }
     """, product(all_defs,
-                 [{'name': 'negative-output-layout-',
+                 [{'name': 'negative-output-layout',
                    'shader_stage': 'frag'}],
-                 [{'name': 'gles2', 'api_version': 2.0},
-                  {'name': 'gles3', 'api_version': 3.0}]))
+                 [{'api': 'gles2', 'api_version': 2.0},
+                  {'api': 'gles3', 'api_version': 3.0}]))
 
     #
     # Test that GL(ES) 3+ user-defined inout arrays are not accepted
@@ -279,7 +281,8 @@ def main():
             color += vec4(0.5);
         }
     """, product(all_defs,
-                 [{'name': 'negative-inout-fragment-output-gles2',
+                 [{'name': 'negative-inout-fragment-output',
+                   'api': 'gles2',
                    'shader_stage': 'frag'}]))
 
     #
@@ -304,7 +307,8 @@ def main():
             gl_FragDepth += 0.5;
         }
     """, product(all_defs,
-                 [{'name': 'negative-inout-gl_FragDepth-gles3',
+                 [{'name': 'negative-inout-gl_FragDepth',
+                   'api': 'gles3',
                    'shader_stage': 'frag'}]))
 
     #
@@ -328,7 +332,8 @@ def main():
         {
         }
     """, product(all_defs,
-                 [{'name': 'negative-inout-vertex-output-gles3',
+                 [{'name': 'negative-inout-vertex-output',
+                   'api': 'gles3',
                    'shader_stage': 'vert'}]))
 
     #
@@ -374,11 +379,11 @@ def main():
         ${display_fb(api_version)}
     """, product(all_defs,
                  [{'name': 'simple-'}],
-                 [{'name': 'ss-gles2', 'api_version': 2.0, 'samples': 0},
-                  {'name': 'ss-gles3', 'api_version': 3.0, 'samples': 0},
-                  {'name': 'ms2-gles3', 'api_version': 3.0, 'samples': 2},
-                  {'name': 'ms8-gles3', 'api_version': 3.0, 'samples': 8},
-                  {'name': 'ms16-gles3', 'api_version': 3.0, 'samples': 16}]))
+                 [{'name': 'ss', 'api': 'gles2', 'api_version': 2.0, 'samples': 0},
+                  {'name': 'ss', 'api': 'gles3', 'api_version': 3.0, 'samples': 0},
+                  {'name': 'ms2', 'api': 'gles3', 'api_version': 3.0, 'samples': 2},
+                  {'name': 'ms8', 'api': 'gles3', 'api_version': 3.0, 'samples': 8},
+                  {'name': 'ms16', 'api': 'gles3', 'api_version': 3.0, 'samples': 16}]))
 
     #
     # Test read-back from a framebuffer with non-uniform contents
@@ -454,19 +459,19 @@ def main():
         ${display_fb(api_version)}
     """, product(all_defs,
                  [{'name': 'nonuniform-'}],
-                 [{'name': 'ss-gles2', 'api_version': 2.0,
+                 [{'name': 'ss', 'api': 'gles2', 'api_version': 2.0,
                    'samples': 0, 'precision': 'mediump'},
-                  {'name': 'ss-gles2-redecl-highp', 'api_version': 2.0,
-                   'samples': 0, 'precision': 'highp'},
-                  {'name': 'ss-gles2-redecl-lowp', 'api_version': 2.0,
-                   'samples': 0, 'precision': 'lowp'},
-                  {'name': 'ss-gles3', 'api_version': 3.0,
+                   {'name': 'ss-redecl-highp', 'api': 'gles2',
+                    'api_version': 2.0, 'samples': 0, 'precision': 'highp'},
+                   {'name': 'ss-redecl-lowp', 'api': 'gles2',
+                    'api_version': 2.0, 'samples': 0, 'precision': 'lowp'},
+                   {'name': 'ss', 'api': 'gles3', 'api_version': 3.0,
                    'samples': 0, 'precision': 'mediump'},
-                  {'name': 'ms2-gles3', 'api_version': 3.0,
+                   {'name': 'ms2', 'api': 'gles3', 'api_version': 3.0,
                    'samples': 2, 'precision': 'mediump'},
-                  {'name': 'ms8-gles3', 'api_version': 3.0,
+                   {'name': 'ms8', 'api': 'gles3', 'api_version': 3.0,
                    'samples': 8, 'precision': 'mediump'},
-                  {'name': 'ms16-gles3', 'api_version': 3.0,
+                   {'name': 'ms16', 'api': 'gles3', 'api_version': 3.0,
                    'samples': 16, 'precision': 'mediump'}]))
 
     #
@@ -514,7 +519,8 @@ def main():
 
         ${display_fb(api_version)}
     """, product(all_defs,
-                 [{'name': 'texture-gles3',
+                 [{'name': 'texture',
+                   'api': 'gles3',
                    'api_version': 3.0}]))
 
     #
@@ -589,7 +595,8 @@ def main():
 
         ${display_fb(api_version)}
     """, product(all_defs,
-                 [{'name': 'discard-gles3-',
+                 [{'name': 'discard-',
+                   'api': 'gles3',
                    'api_version': 3.0}],
                  [{'name': 'ss', 'samples': 0},
                   {'name': 'ms8', 'samples': 8}]))
@@ -662,7 +669,7 @@ def main():
         relative probe rect rgba int (0.0, 0.55, 0.45, 0.45) (0, 100, 127, 100)
         relative probe rect rgba int (0.55, 0.55, 0.45, 0.45) (100, 100, 127, 100)
     """, product(all_defs,
-                 [{'name': 'integer-gles3-'}],
+                 [{'name': 'integer-', 'api': 'gles3'}],
                  [{'name': 'ss', 'samples': 0, 'api_version': 3.0},
                   {'name': 'ms2', 'samples': 2, 'api_version': 3.1},
                   {'name': 'ms8', 'samples': 8, 'api_version': 3.1}]))
@@ -725,9 +732,9 @@ def main():
 
         ${display_fb(api_version)}
     """, product(all_defs,
-                 [{'name': 'mrt-'}],
-                 [{'name': 'gles2', 'api_version': 2.0},
-                  {'name': 'gles3', 'api_version': 3.0}]))
+                 [{'name': 'mrt'}],
+                 [{'api': 'gles2', 'api_version': 2.0},
+                  {'api': 'gles3', 'api_version': 3.0}]))
 
     #
     # Test framebuffer fetch functionality with multiple assignments
@@ -788,7 +795,8 @@ def main():
 
         ${display_fb(api_version)}
     """, product(all_defs,
-                 [{'name': 'overwrite-gles3',
+                 [{'name': 'overwrite',
+                   'api': 'gles3',
                    'api_version': 3.0}]))
 
     #
@@ -858,14 +866,15 @@ def main():
         ${display_fb(api_version)}
     """, product(all_defs,
                  [{'name': 'single-slice-',
+                   'api': 'gles3',
                    'api_version': 3.0}],
-                 [{'name': '2darray-gles3', 'target': '2DArray',
+                 [{'name': '2darray', 'target': '2DArray',
                    'levels': 1, 'layers': 4},
-                  {'name': '2darray-mipmap-gles3', 'target': '2DArray',
+                  {'name': '2darray-mipmap', 'target': '2DArray',
                    'levels': 4, 'layers': 1},
-                  {'name': '3d-gles3', 'target': '3D',
+                  {'name': '3d', 'target': '3D',
                    'levels': 1, 'layers': 4},
-                  {'name': 'cubemap-gles3', 'target': 'Cube',
+                  {'name': 'cubemap', 'target': 'Cube',
                    'levels': 1, 'layers': 6}]))
 
     #
@@ -934,7 +943,8 @@ def main():
         fb draw winsys
         blit color linear
     """, product(all_defs,
-                 [{'name': '1d-gl32',
+                 [{'name': '1d',
+                   'api': 'gl',
                    'api_version': 3.2}]))
 
     #
@@ -1015,12 +1025,13 @@ def main():
         blit color linear
     """, product(all_defs,
                  [{'name': 'layered-',
+                   'api': 'gl',
                    'api_version': 3.2}],
-                 [{'name': '1darray-gl32', 'target': '1DArray',
+                 [{'name': '1darray', 'target': '1DArray',
                    'dimensions': '1 250 4', 'layers': 4},
-                  {'name': '2darray-gl32', 'target': '2DArray',
+                  {'name': '2darray', 'target': '2DArray',
                    'dimensions': '1 250 250 4', 'layers': 4},
-                  {'name': 'cubemap-gl32', 'target': 'Cube',
+                  {'name': 'cubemap', 'target': 'Cube',
                    'dimensions': '1 250 250', 'layers': 6}]))
 
 if __name__ == '__main__':
