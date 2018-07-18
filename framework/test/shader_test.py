@@ -251,7 +251,8 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
                         # check
                         raise exceptions.PiglitInternalError(
                             'GLES and GL shaders in the same command!\n'
-                            'Cannot pick a shader_runner binary!')
+                            'Cannot pick a shader_runner binary!\n'
+                            'in file: {}'.format(os.path.dirname(each)))
             else:
                 prog = parser.prog
 
