@@ -995,9 +995,9 @@ def process_shader_test(shader_test, config):
     have_glsl = False
     is_core = False
     has_vertex_shader_passthrough = False
+    shader = None
 
     with open(shader_test, 'r') as filp:
-        shader = None
 
         spirv_line = None
         groupname = ''
@@ -1075,6 +1075,14 @@ def process_shader_test(shader_test, config):
                         print('{}: skip due to {}'.format(shader_test, words[0]))
                     return 2
                 continue
+
+    # This is needed to handle if the shader test doesn't have a
+    # [test] section. That could happen if the test is intended to be
+    # used by a different program, where the test conditions are
+    # handled by them.
+    if shader is not None:
+        shaders.append(shader)
+        shader = None
 
     if have_glsl and not config.no_transform:
         skip_reasons = fixup_glsl_shaders(shaders)
