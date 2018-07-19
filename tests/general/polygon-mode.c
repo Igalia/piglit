@@ -217,7 +217,7 @@ identify_primitive(const GLfloat positions[4][2],
 
 
 static GLboolean
-test_combo(GLenum frontMode, GLenum backMode)
+test_combo(GLenum frontMode, GLenum backMode, GLenum cullMode)
 {
    GLenum frontPrim = get_prim_mode(frontMode);
    GLenum backPrim = get_prim_mode(backMode);
@@ -225,26 +225,49 @@ test_combo(GLenum frontMode, GLenum backMode)
    GLenum expectedPrims[4];
    int i;
 
+   glDisable(GL_CULL_FACE);
+
    /* Draw reference image */
    glClear(GL_COLOR_BUFFER_BIT);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   glDrawArrays(frontPrim, 0, 4);
-   glDrawArrays(backPrim, 4, 4);
-   glDrawArrays(frontPrim, 8, 4);
-   glDrawArrays(backPrim, 12, 4);
+   if (cullMode == GL_NONE || cullMode == GL_BACK) {
+      glDrawArrays(frontPrim, 0, 4);
+   }
+   if (cullMode == GL_NONE || cullMode == GL_FRONT) {
+      glDrawArrays(backPrim, 4, 4);
+   }
+   if (cullMode == GL_NONE || cullMode == GL_BACK) {
+      glDrawArrays(frontPrim, 8, 4);
+   }
+   if (cullMode == GL_NONE || cullMode == GL_FRONT) {
+      glDrawArrays(backPrim, 12, 4);
+   }
 
    /* determine what kind of primitives were drawn */
    for (i = 0; i < 4; i++) {
-      GLenum testMode = (i & 1) ? backMode : frontMode;
+      GLenum testMode = GL_NONE;
+
+      if (i & 1) {
+	 /* back-facing quad */
+	 if (cullMode == GL_NONE || cullMode == GL_FRONT) {
+	    testMode = backMode;
+	 }
+      } else {
+	 /* front-facing quad */
+	 if (cullMode == GL_NONE || cullMode == GL_BACK) {
+	    testMode = frontMode;
+	 }
+      }
 
       expectedPrims[i] = identify_primitive(&Positions[4 * i], Colors[4 * i]);
 
       if (expectedPrims[i] != testMode) {
          /* we didn't get the expected reference primitive */
          fprintf(stderr,
-                 "%s: reference drawing failed for frontPrim=%s, backPrim=%s\n",
+                 "%s: reference drawing failed for frontPrim=%s, backPrim=%s, cull=%s\n",
                  TestName, piglit_get_gl_enum_name(frontMode),
-		 piglit_get_gl_enum_name(backMode));
+		 piglit_get_gl_enum_name(backMode),
+		 piglit_get_gl_enum_name(cullMode));
 	 fprintf(stderr, "At position %d, found prim %s instead of %s\n",
 		 i, piglit_get_gl_enum_name(expectedPrims[i]),
 		 piglit_get_gl_enum_name(testMode));
@@ -256,15 +279,22 @@ test_combo(GLenum frontMode, GLenum backMode)
    glClear(GL_COLOR_BUFFER_BIT);
    glPolygonMode(GL_FRONT, frontMode);
    glPolygonMode(GL_BACK, backMode);
+   if (cullMode == GL_NONE) {
+      glDisable(GL_CULL_FACE);
+   } else {
+      glEnable(GL_CULL_FACE);
+      glCullFace(cullMode);
+   }
    glDrawArrays(GL_QUADS, 0, 16);
 
    /* check that these prims match the reference prims */
    for (i = 0; i < 4; i++) {
       GLenum prim = identify_primitive(&Positions[4 * i], Colors[4 * i]);
       if (prim != expectedPrims[i]) {
-         fprintf(stderr, "%s: glPolygonMode(front=%s, back=%s) failed\n",
+         fprintf(stderr, "%s: glPolygonMode(front=%s, back=%s), glCullMode(%s) failed\n",
                  TestName, piglit_get_gl_enum_name(frontMode),
-		 piglit_get_gl_enum_name(backMode));
+		 piglit_get_gl_enum_name(backMode),
+		 piglit_get_gl_enum_name(cullMode));
 	 fprintf(stderr, "At position %d, found prim %s instead of %s\n",
 		 i, piglit_get_gl_enum_name(prim),
 		 piglit_get_gl_enum_name(expectedPrims[i]));
@@ -281,7 +311,12 @@ test_combo(GLenum frontMode, GLenum backMode)
 static GLboolean
 test_polygonmode(void)
 {
+   static const GLenum cullModes[] =
+      { GL_NONE, GL_FRONT, GL_BACK, GL_FRONT_AND_BACK };
+   static const GLenum fillModes[] =
+      { GL_FILL, GL_LINE, GL_POINT };
    GLenum pass = GL_TRUE;
+   int i, j, k;
 
    glVertexPointer(2, GL_FLOAT, 0, Positions);
    glColorPointer(4, GL_FLOAT, 0, Colors);
@@ -289,29 +324,15 @@ test_polygonmode(void)
    glEnableClientState(GL_VERTEX_ARRAY);
    glEnableClientState(GL_COLOR_ARRAY);
 
-   if (!test_combo(GL_FILL, GL_LINE))
-      pass = GL_FALSE;
-
-   if (!test_combo(GL_FILL, GL_POINT))
-      pass = GL_FALSE;
-
-   if (!test_combo(GL_POINT, GL_LINE))
-      pass = GL_FALSE;
-
-   if (!test_combo(GL_POINT, GL_FILL))
-      pass = GL_FALSE;
-
-   if (!test_combo(GL_LINE, GL_FILL))
-      pass = GL_FALSE;
-
-   if (!test_combo(GL_LINE, GL_POINT))
-      pass = GL_FALSE;
-
-   if (!test_combo(GL_LINE, GL_LINE))
-      pass = GL_FALSE;
-
-   if (!test_combo(GL_POINT, GL_POINT))
-      pass = GL_FALSE;
+   for (i = 0; i < ARRAY_SIZE(cullModes); i++) {
+      for (j = 0; j < ARRAY_SIZE(fillModes); j++) {
+	 for (k = 0; k < ARRAY_SIZE(fillModes); k++) {
+	    if (!test_combo(fillModes[k], fillModes[j], cullModes[i])) {
+	       pass = GL_FALSE;
+	    }
+	 }
+      }
+   }
 
    return pass;
 }
