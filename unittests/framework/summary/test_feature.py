@@ -77,7 +77,7 @@ PROFILE.test_list['spec@gl-2.0@d'] = _maketest('fail')
 
 
 class TestFeatResult(object):
-    """Tests fro the FeatResult class."""
+    """Tests for the FeatResult class."""
 
     @pytest.fixture(scope='session')
     def feature(self, tmpdir_factory):

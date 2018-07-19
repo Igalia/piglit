@@ -501,11 +501,14 @@ class TestProfile(object):
         This method creates a copy with references to the original instance
         using copy.copy. This allows profiles to be "subclassed" by other
         profiles, without modifying the original.
+
+        copy.deepcopy is used for the filters so the original is
+        actually not modified in this case.
         """
         new = copy.copy(self)
         new.test_list = copy.copy(self.test_list)
         new.forced_test_list = copy.copy(self.forced_test_list)
-        new.filters = copy.copy(self.filters)
+        new.filters = copy.deepcopy(self.filters)
         return new
 
     def itertests(self):
