@@ -32,7 +32,7 @@ from framework.test.base import Test as _Test
 
 
 class Test(_Test):
-    """A Test dericed class with a stub interpret_result.
+    """A Test derived class with a stub interpret_result.
 
     This class provides a way to test the Test class.
     """
