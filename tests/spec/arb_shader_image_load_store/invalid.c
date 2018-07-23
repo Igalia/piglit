@@ -268,13 +268,11 @@ invalidate_incompatible_format(const struct image_info img, GLuint prog)
         GLenum base_format = image_base_internal_format(img.format);
         /* Pick an incompatible texture format with a compatible base
          * type. */
-        bool ret = init_level(img, 0, (base_format == GL_RGBA32F ?
-                                       GL_RGBA8 : GL_RG32UI), W, H);
-
         glBindImageTexture(0, get_texture(0), 0, GL_TRUE, 0,
-                           GL_READ_WRITE, img.format->format);
+                           GL_READ_WRITE, (base_format == GL_RGBA32F ?
+                                           GL_RGBA8 : GL_RG32UI));
 
-        return ret && piglit_check_gl_error(GL_NO_ERROR);
+        return piglit_check_gl_error(GL_NO_ERROR);
 }
 
 static bool
@@ -346,6 +344,8 @@ piglit_init(int argc, char **argv)
         for (op = image_ops; op->name; ++op) {
                 const struct image_info def_img = image_info(
                         GL_TEXTURE_2D, op->formats[0].format, W, H);
+                const struct image_info def_img_buffer = image_info(
+                        GL_TEXTURE_BUFFER, op->formats[0].format, W, H);
 
                 /*
                  * According to the spec, an access is considered
@@ -398,6 +398,15 @@ piglit_init(int argc, char **argv)
                         run_test(op, def_img, def_img,
                                  invalidate_incompatible_format, false),
                         "%s/incompatible format test", op->name);
+
+                /* Test for the regression which happened when
+                 * GL_TEXTURE_BUFFER was allowed to have incompatible format.
+                 */
+                subtest(&status, true,
+                        run_test(op, def_img_buffer, def_img_buffer,
+                                 invalidate_incompatible_format, false),
+                        "%s/incompatible format test/image%s",
+                        op->name, def_img_buffer.target->name);
 
                 /*
                  * " * the texture bound to the image unit has layers,
