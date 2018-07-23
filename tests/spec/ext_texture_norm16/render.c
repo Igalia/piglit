@@ -173,13 +173,11 @@ generate_data(const struct fmt_test *test)
 }
 
 static GLuint
-create_texture(const struct fmt_test *test)
+create_empty_texture()
 {
 	GLuint tex;
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-
-	generate_data(test);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -187,6 +185,25 @@ create_texture(const struct fmt_test *test)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	return tex;
+}
+
+static GLuint
+create_texture(const struct fmt_test *test)
+{
+	GLuint tex = create_empty_texture();
+	generate_data(test);
+	return tex;
+}
+
+static GLuint
+create_rbo(const struct fmt_test *test)
+{
+	GLuint rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, test->iformat, piglit_width,
+			      piglit_height);
+	return rbo;
 }
 
 static GLuint
@@ -362,6 +379,21 @@ test_format(const struct fmt_test *test)
 		return pass;
 	}
 
+	/* Test glRenderbufferStorage. */
+	GLuint rbo = create_rbo(test);
+	if (!rbo || !piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_subtest_result(PIGLIT_FAIL,
+					     "format 0x%x RBO test",
+					     test->iformat);
+		pass &= false;
+	} else {
+		piglit_report_subtest_result(PIGLIT_PASS,
+					     "format 0x%x RBO test",
+					     test->iformat);
+	}
+	glDeleteRenderbuffers(1, &rbo);
+
+	/* Create framebuffer object. */
 	GLuint fbo_tex;
 	const GLuint fbo = create_fbo(test, &fbo_tex);
 
@@ -374,6 +406,21 @@ test_format(const struct fmt_test *test)
 	}
 
 	render_texture(texture, GL_TEXTURE_2D, fbo);
+
+	/* Test glCopyTexImage2D by copying current fbo content to
+	 * a texture, rendering copy back to fbo and verifying fbo contents.
+	 */
+	GLuint tmp_tex = create_empty_texture();
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, test->iformat, 0, 0, piglit_width,
+			 piglit_height, 0);
+
+	render_texture(tmp_tex, GL_TEXTURE_2D, fbo);
+
+	/* If format can be read, verify contents. */
+	if (test->can_read)
+		pass &= verify_contents(test);
+
+	glDeleteTextures(1, &tmp_tex);
 
 	/* If GL_EXT_copy_image is supported then create another
 	 * texture, copy contents and render result to fbo.
