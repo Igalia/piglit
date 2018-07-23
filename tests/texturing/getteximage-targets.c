@@ -88,7 +88,7 @@ compare_layer(int layer, int num_elements, int tolerance,
 			printf("GetTexImage() returns incorrect data in byte %i for layer %i\n",
 			       i, layer);
 			printf("    corresponding to (%i,%i), channel %i\n",
-			       (i / 4) / IMAGE_WIDTH, (i / 4) % IMAGE_HEIGHT, i % 4);
+			       (i / 4) % IMAGE_WIDTH, (i / 4) / IMAGE_WIDTH, i % 4);
 			printf("    expected: %i\n", expected[i]);
 			printf("    got: %i\n", data[i]);
 			return false;
