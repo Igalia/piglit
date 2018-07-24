@@ -55,7 +55,6 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
-	config.supports_gl_core_version = 31;
 
 	config.window_width  = 200;
 	config.window_height = 200;
@@ -106,18 +105,27 @@ static GLuint indices[] = {
 };
 static GLsizei indices_size = sizeof(indices);
 
-static const GLvoid * const indices_offset[] = {
-	(GLvoid*) 0, (GLvoid*)(6 * sizeof(GLuint))
+static const uintptr_t indices_offset[] = {
+	0, 6 * sizeof(GLuint)
 };
 static GLsizei indices_count[] = {
 	6, 6
 };
 
 static GLint basevertex[] = { 2, 2 };
+static bool indirect;
 
 void
 piglit_init(int argc, char **argv)
 {
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-indirect") == 0) {
+			piglit_require_extension("GL_ARB_multi_draw_indirect");
+			puts("Testing GL_ARB_multi_draw_indirect");
+			indirect = true;
+		}
+	}
+
 	GLuint program;
 	GLuint vertex_index;
 
@@ -131,29 +139,27 @@ piglit_init(int argc, char **argv)
 	program = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(program);
 
+	/* Retrieve index from vs */
+	vertex_index = glGetAttribLocation(program, "vertex");
+	glEnableVertexAttribArray(vertex_index);
 
 	/* Gen vertex array buffer */
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
+	if (indirect) {
+		/* Use non-VBO attributes to test this codepath. */
+		glVertexAttribPointer(vertex_index, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+	} else {
+		glGenBuffers(1, &vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(vertex_index, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	}
 
 	/* Gen indices array buffer */
 	glGenBuffers(1, &indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size,
 		     indices, GL_STATIC_DRAW);
-
-	/* Gen VAO */
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	/* Retrieve index from vs */
-	vertex_index = glGetAttribLocation(program, "vertex");
-
-	/* Enabel vertexAttribPointer */
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glEnableVertexAttribArray(vertex_index);
-	glVertexAttribPointer(vertex_index, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	if(!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
@@ -172,9 +178,30 @@ piglit_display(void)
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
-	glMultiDrawElementsBaseVertex(GL_TRIANGLES, indices_count,
-				      GL_UNSIGNED_INT, (GLvoid*)indices_offset,
-				      2, basevertex);
+	if (indirect) {
+		unsigned data[2 * 5];
+
+		for (unsigned i = 0; i < 2; i++) {
+			data[i*5+0] = indices_count[i];
+			data[i*5+1] = 1;
+			data[i*5+2] = indices_offset[i] / sizeof(GLuint);
+			data[i*5+3] = basevertex[i];
+			data[i*5+4] = 0;
+		}
+		GLuint ib;
+
+		glGenBuffers(1, &ib);
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ib);
+		glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(data), data,
+			     GL_STATIC_DRAW);
+
+		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, 2, 0);
+		glDeleteBuffers(1, &ib);
+	} else {
+		glMultiDrawElementsBaseVertex(GL_TRIANGLES, indices_count,
+					      GL_UNSIGNED_INT, (GLvoid*)indices_offset,
+					      2, basevertex);
+	}
 
 	/* Check for test pass */
 	pass = piglit_probe_pixel_rgb(100, 175, blue) && pass;

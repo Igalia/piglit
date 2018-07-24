@@ -1757,7 +1757,8 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_multi_draw_indirect')) as g:
-    g(['gl-3.0-multidrawarrays-vertexid', '-indirect'],
+    g(['gl-3.0-multidrawarrays-vertexid', '-indirect'])
+    g(['arb_draw_elements_base_vertex-multidrawelements', '-indirect'])
 
 # Group ARB_fragment_program
 with profile.test_list.group_manager(
