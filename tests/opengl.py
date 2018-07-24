@@ -1753,6 +1753,12 @@ with profile.test_list.group_manager(
     g(['arb_draw_indirect-vertexid', 'elements'],
       'gl_VertexID used with glDrawElementsIndirect')
 
+# Group ARB_draw_indirect
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_multi_draw_indirect')) as g:
+    g(['gl-3.0-multidrawarrays-vertexid', '-indirect'],
+
 # Group ARB_fragment_program
 with profile.test_list.group_manager(
         PiglitGLTest,

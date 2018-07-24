@@ -42,6 +42,8 @@ static const float blue[]    = { 0, 0, 1, 1 };
 static const float gold[]    = { 1, 1, 0, 1 };
 static const float magenta[] = { 1, 0, 1, 1 };
 
+static bool indirect;
+
 enum piglit_result
 piglit_display(void)
 {
@@ -53,10 +55,31 @@ piglit_display(void)
 	glClearColor(0.2, 0.2, 0.2, 0.2);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glMultiDrawArrays(GL_TRIANGLE_FAN,
-			  first,
-			  count,
-			  ARRAY_SIZE(count));
+	if (indirect) {
+		unsigned data[ARRAY_SIZE(count) * 4];
+
+		for (unsigned i = 0; i < ARRAY_SIZE(count); i++) {
+			data[i*4+0] = count[i];
+			data[i*4+1] = 1;
+			data[i*4+2] = first[i];
+			data[i*4+3] = 0;
+		}
+		GLuint ib;
+
+		glGenBuffers(1, &ib);
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ib);
+		glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(data), data,
+			     GL_STATIC_DRAW);
+
+		glMultiDrawArraysIndirect(GL_TRIANGLE_FAN, NULL,
+					  ARRAY_SIZE(count), 0);
+		glDeleteBuffers(1, &ib);
+	} else {
+		glMultiDrawArrays(GL_TRIANGLE_FAN,
+				  first,
+				  count,
+				  ARRAY_SIZE(count));
+	}
 
 	pass = piglit_probe_rect_rgba(0, 0,
 				      piglit_width / 2, piglit_height /2,
@@ -83,6 +106,14 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-indirect") == 0) {
+			piglit_require_extension("GL_ARB_multi_draw_indirect");
+			puts("Testing GL_ARB_multi_draw_indirect");
+			indirect = true;
+		}
+	}
+
 	static const GLfloat verts[] = {
 		/* These vertices should never be accessed due to the way
 		 * glMultiDrawArrays is called.
@@ -157,19 +188,24 @@ piglit_init(int argc, char **argv)
 		"	gl_FragColor = vec4(c, 1);\n"
 		"}\n");
 
-	GLuint vao;
-	GLuint buf;
-
 	glUseProgram(prog);
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	if (indirect) {
+		/* Use non-VBO attributes to test this codepath. */
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
+	} else {
+		GLuint vao;
+		GLuint buf;
 
-	glGenBuffers(1, &buf);
-	glBindBuffer(GL_ARRAY_BUFFER, buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts,
-		     GL_STATIC_DRAW);
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+		glGenBuffers(1, &buf);
+		glBindBuffer(GL_ARRAY_BUFFER, buf);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts,
+			     GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *) 0);
+	}
 	glEnableVertexAttribArray(0);
 }
