@@ -4585,6 +4585,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'egl_mesa_device_software'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_mesa_device_software'], 'conformance')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'egl_mesa_platform_surfaceless'),
         exclude_platforms=['glx']) as g:
     g(['egl_mesa_platform_surfaceless'], 'conformance')

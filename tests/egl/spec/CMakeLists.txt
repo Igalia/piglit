@@ -8,6 +8,7 @@ add_subdirectory (egl_khr_get_all_proc_addresses)
 add_subdirectory (egl_khr_gl_image)
 add_subdirectory (egl_khr_fence_sync)
 add_subdirectory (egl_khr_surfaceless_context)
+add_subdirectory (egl_mesa_device_software)
 add_subdirectory (egl_mesa_platform_surfaceless)
 
 if (PIGLIT_HAS_X11)
