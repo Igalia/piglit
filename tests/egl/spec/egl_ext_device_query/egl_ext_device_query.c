@@ -99,6 +99,10 @@ main(void)
 	if (!piglit_check_egl_error(EGL_BAD_PARAMETER))
 		piglit_report_result(PIGLIT_FAIL);
 
+	devstring = queryDeviceString(EGL_NO_DEVICE_EXT, EGL_EXTENSIONS);
+	if (!piglit_check_egl_error(EGL_BAD_DEVICE_EXT))
+		piglit_report_result(PIGLIT_FAIL);
+
 	devstring = queryDeviceString(device, EGL_EXTENSIONS);
 	if (devstring == NULL) {
 		printf("Empty device extension string\n");
