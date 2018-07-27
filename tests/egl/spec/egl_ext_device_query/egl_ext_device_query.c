@@ -29,7 +29,6 @@ int
 main(void)
 {
 	EGLDisplay dpy;
-	EGLint egl_major, egl_minor;
 	EGLDeviceEXT device = EGL_NO_DEVICE_EXT;
 	EGLAttrib attr;
 	const char *devstring = NULL;
@@ -72,7 +71,7 @@ main(void)
 	if (!piglit_check_egl_error(EGL_NOT_INITIALIZED))
 		piglit_report_result(PIGLIT_FAIL);
 
-	if (!eglInitialize(dpy, &egl_major, &egl_minor)) {
+	if (!eglInitialize(dpy, NULL, NULL)) {
 		printf("eglInitialize failed\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
