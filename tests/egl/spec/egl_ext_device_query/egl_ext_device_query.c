@@ -64,7 +64,7 @@ main(void)
 	dpy = eglGetDisplay(NULL);
 	if (!dpy) {
 		printf("failed to get EGLDisplay\n");
-		piglit_report_result(PIGLIT_SKIP);
+		piglit_report_result(PIGLIT_WARN);
 	}
 
 	queryDisplayAttrib(dpy, EGL_DEVICE_EXT, (EGLAttrib *)&device);
