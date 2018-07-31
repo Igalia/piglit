@@ -239,8 +239,8 @@ verify_contents(const struct fmt_test *test)
 	bool result = true;
 	unsigned amount = piglit_width * piglit_height;
 	unsigned short *pix = malloc (amount * 8);
-	glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA,
-		     GL_UNSIGNED_SHORT, pix);
+	glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, test->type,
+		     pix);
 
 	/* Setup expected value, alpha is always max in the test. */
 	unsigned short value[4] = { 0 };
@@ -476,6 +476,7 @@ piglit_display(void)
 			case GL_RG16_SNORM_EXT:
 			case GL_RGBA16_SNORM_EXT:
 				test->req_render = true;
+				test->can_read = true;
 			}
 		}
 	}
