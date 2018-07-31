@@ -68,6 +68,7 @@ test_initialize_display(void *test_data)
 
 	test_setup(&dpy);
 
+	eglTerminate(dpy);
 	return PIGLIT_PASS;
 }
 
@@ -101,6 +102,7 @@ test_create_window(void *test_data)
 	if (!piglit_check_egl_error(EGL_BAD_NATIVE_WINDOW))
 		return PIGLIT_FAIL;
 
+	eglTerminate(dpy);
 	return PIGLIT_PASS;
 }
 
@@ -132,6 +134,7 @@ test_create_pixmap(void *test_data)
 	if (!piglit_check_egl_error(EGL_BAD_NATIVE_PIXMAP))
 		return PIGLIT_FAIL;
 
+	eglTerminate(dpy);
 	return PIGLIT_PASS;
 }
 
@@ -192,7 +195,7 @@ test_create_pbuffer(void *test_data)
 	}
 
 	eglDestroySurface(dpy, surf);
-
+	eglTerminate(dpy);
 	return PIGLIT_PASS;
 }
 
