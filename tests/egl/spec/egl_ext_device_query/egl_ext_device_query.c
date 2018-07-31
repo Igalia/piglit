@@ -77,37 +77,49 @@ main(void)
 	}
 
 	queryDisplayAttrib(dpy, 0xbad1dea, (EGLAttrib *)&device);
-	if (!piglit_check_egl_error(EGL_BAD_ATTRIBUTE))
+	if (!piglit_check_egl_error(EGL_BAD_ATTRIBUTE)) {
+		eglTerminate(dpy);
 		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	if (!queryDisplayAttrib(dpy, EGL_DEVICE_EXT, (EGLAttrib *)&device)) {
 		printf("Failed to query display\n");
+		eglTerminate(dpy);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (device == EGL_NO_DEVICE_EXT) {
 		printf("Got no device handle\n");
+		eglTerminate(dpy);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	queryDeviceAttrib(device, 0xbad1dea, &attr);
-	if (!piglit_check_egl_error(EGL_BAD_ATTRIBUTE))
+	if (!piglit_check_egl_error(EGL_BAD_ATTRIBUTE)) {
+		eglTerminate(dpy);
 		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	devstring = queryDeviceString(device, 0xbad1dea);
-	if (!piglit_check_egl_error(EGL_BAD_PARAMETER))
+	if (!piglit_check_egl_error(EGL_BAD_PARAMETER)) {
+		eglTerminate(dpy);
 		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	devstring = queryDeviceString(EGL_NO_DEVICE_EXT, EGL_EXTENSIONS);
-	if (!piglit_check_egl_error(EGL_BAD_DEVICE_EXT))
+	if (!piglit_check_egl_error(EGL_BAD_DEVICE_EXT)) {
+		eglTerminate(dpy);
 		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	devstring = queryDeviceString(device, EGL_EXTENSIONS);
 	if (devstring == NULL) {
 		printf("Empty device extension string\n");
+		eglTerminate(dpy);
 		piglit_report_result(PIGLIT_WARN);
 	}
 
+	eglTerminate(dpy);
 	printf("Device extension string: %s\n", devstring);
 	piglit_report_result(PIGLIT_PASS);
 }
