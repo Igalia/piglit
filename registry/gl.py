@@ -65,7 +65,6 @@ def parse():
 def _repair_xml(xml_registry):
     fixes = set((
         'GL_ALL_ATTRIB_BITS',
-        'glOcclusionQueryEventMaskAMD',
         'gles2_GL_ACTIVE_PROGRAM_EXT',
     ))
 
@@ -88,16 +87,6 @@ def _repair_xml(xml_registry):
             enum.set('value', '0x000FFFFF')
 
             fixes.remove('GL_ALL_ATTRIB_BITS')
-            continue
-
-        if ('glOcclusionQueryEventMaskAMD' in fixes and
-                enums.get('namespace') == 'OcclusionQueryEventMaskAMD'):
-            # This tag's attributes are totally broken.
-            enums.set('namespace', 'GL')
-            enums.set('group', 'OcclusionQueryEventMaskAMD')
-            enums.set('type', 'bitmask')
-
-            fixes.remove('glOcclusionQueryEventMaskAMD')
             continue
 
         if ('gles2_GL_ACTIVE_PROGRAM_EXT' in fixes and
