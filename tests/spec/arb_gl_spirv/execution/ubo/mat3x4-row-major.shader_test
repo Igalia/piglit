@@ -1,4 +1,4 @@
-# UBO test using a mat3x4. One stage
+# UBO test using a row_major mat3x4. One stage
 
 [require]
 SPIRV YES
