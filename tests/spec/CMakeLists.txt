@@ -1,3 +1,4 @@
+add_subdirectory (amd_framebuffer_multisample_advanced)
 add_subdirectory (amd_performance_monitor)
 add_subdirectory (amd_pinned_memory)
 add_subdirectory (arb_arrays_of_arrays)

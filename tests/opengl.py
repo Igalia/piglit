@@ -2932,6 +2932,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'amd_framebuffer_multisample_advanced')) as g:
+    g(['amd_framebuffer_multisample_advanced-api'], 'api-glcore')
+    g(['amd_framebuffer_multisample_advanced-api-gles'], 'api-gles3')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_framebuffer_object')) as g:
     g(['fbo-generatemipmap-noimage'])
     g(['fbo-1d'])

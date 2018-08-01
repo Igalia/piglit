@@ -1,0 +1,4 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable (amd_framebuffer_multisample_advanced-api-gles api.c)
+# vim: ft=cmake:
