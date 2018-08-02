@@ -79,6 +79,11 @@ main(void)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	if (!numdevs) {
+		printf("Zero devices enumerated\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
 	for (i = 0; i < numdevs; i++)
 	    if (devs[i] == NULL) {
 		printf("Enumerated device slot not initialized\n");
