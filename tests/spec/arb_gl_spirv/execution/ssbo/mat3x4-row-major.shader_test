@@ -107,10 +107,6 @@ ssbo 5 subdata float 48 0.14
 ssbo 5 subdata float 52 0.24
 ssbo 5 subdata float 56 0.34
 
-block binding 5
-verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_NUM_ACTIVE_VARIABLES 1
-verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_BUFFER_DATA_SIZE 64
-
 uniform int 10 0 # u_idx
 draw rect -1 -1 2 2
 probe all rgba 0.11 0.12 0.13 0.14
@@ -122,3 +118,7 @@ probe all rgba 0.21 0.22 0.23 0.24
 uniform int 10 2 # u_idx
 draw rect -1 -1 2 2
 probe all rgba 0.31 0.32 0.33 0.34
+
+block binding 5
+verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_BUFFER_DATA_SIZE 64

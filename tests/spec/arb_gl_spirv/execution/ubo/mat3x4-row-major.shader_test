@@ -80,10 +80,13 @@ block binding 5
 block offset 0
 block matrix stride 16
 block row major 1
+block row major 1
+block matrix stride 16
+block offset 0
 uniform mat3x4 ComponentsBlock.matrix 0.11 0.12 0.13 0.14 0.21 0.22 0.23 0.24 0.31 0.32 0.33 0.34
-
-verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_NUM_ACTIVE_VARIABLES 1
-#verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_BUFFER_DATA_SIZE 48
 
 draw rect -1 -1 2 2
 probe all rgba 0.63 0.66 0.69 0.72
+
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_BUFFER_DATA_SIZE 64
