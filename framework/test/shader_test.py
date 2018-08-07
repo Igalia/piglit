@@ -68,9 +68,7 @@ class Parser(object):
         # an exception. The second looks for the GL version or raises an
         # exception
         with io.open(os.path.join(ROOT_DIR, self.filename), 'r', encoding='utf-8') as shader_file:
-            # The mock in python 3.3 doesn't support readlines(), so use
-            # read().split() as a workaround
-            lines = (l for l in shader_file.read().split('\n'))
+            lines = (l for l in shader_file.readlines())
 
             # Find the config section
             for line in lines:
