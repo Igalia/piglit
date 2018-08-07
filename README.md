@@ -30,7 +30,7 @@ The original tests have been taken from
 
 First of all, you need to make sure that the following are installed:
 
-  - Python 2.7.x
+  - Python 2.7.x or >=3.4
   - Python Mako module
   - numpy (http://www.numpy.org)
   - six (https://pypi.python.org/pypi/six)
