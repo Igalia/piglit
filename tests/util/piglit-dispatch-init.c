@@ -225,8 +225,10 @@ get_core_proc_address(const char *function_name, int gl_10x_version)
 	switch (gl_10x_version) {
 	case 11:
 		p = do_dlsym(&gles1_handle, GLES1_LIB, function_name);
+		break;
 	case 20:
 		p = do_dlsym(&gles2_handle, GLES2_LIB, function_name);
+		break;
 	case 10:
 	default:
 		/* We query the address of core OpenGL functions as if they
