@@ -46,6 +46,8 @@ static const char vs_pass_thru_text[] =
 
 #define VS_TWO_SETS_STRUCT_NAME "vs_two_sets_struct.shader_source"
 
+#define VS_DOUBLE_NAME "vs_double.shader_source"
+
 static const char gs_text_two_sets_tmpl[] =
 	"#version 150\n"
 	"#extension GL_ARB_enhanced_layouts: require\n"
@@ -81,10 +83,12 @@ struct test_config {
 	const char *shader_source_filename;
 	bool spirv;
 	GLint gs_invocation_n;
+	bool doubles;
 };
 
 #define BUF_1_FLOAT_N 6
 #define BUF_2_FLOAT_N 5
+#define BUF_DOUBLE_N 7
 
 
 static void
@@ -96,6 +100,7 @@ print_usage_and_exit(const char *prog_name)
 	       "    vs_ifc (vertex shader only, with interface block)\n"
 	       "    vs_named_ifc (vertex shader only, with named interface block)\n"
 	       "    vs_struct (vertex shader only, with structs)\n"
+	       "    vs_double (vertex shader only, using doubles)\n"
 	       "    gs (with geometry shader invoked once per stage)\n"
 	       "    gs_max (with geometry shader invoked max times per "
 	       "stage)\n"
@@ -191,17 +196,11 @@ build_and_use_program(const struct test_config *config)
 	glUseProgram(prog);
 }
 
-static bool
-probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
+static void
+probe_queries(const GLuint *queries,
+	      unsigned primitive_n)
 {
-	bool pass;
-	unsigned i;
 	GLuint query_result;
-	float *first;
-	float *second;
-
-	const unsigned first_n = primitive_n * BUF_1_FLOAT_N;
-	const unsigned second_n = primitive_n * BUF_2_FLOAT_N;
 
 	glGetQueryObjectuiv(queries[0], GL_QUERY_RESULT, &query_result);
 	if (query_result != primitive_n) {
@@ -216,6 +215,20 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 			primitive_n, query_result);
 		piglit_report_result(PIGLIT_FAIL);
 	}
+}
+
+
+static bool
+probe_buffers_float(const GLuint *xfb,
+		    unsigned primitive_n)
+{
+	bool pass;
+	unsigned i;
+	float *first;
+	float *second;
+
+	const unsigned first_n = primitive_n * BUF_1_FLOAT_N;
+	const unsigned second_n = primitive_n * BUF_2_FLOAT_N;
 
 	first = malloc(first_n * sizeof(float));
 	second = malloc(second_n * sizeof(float));
@@ -247,6 +260,31 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 	return pass;
 }
 
+static bool
+probe_buffers_double(const GLuint *xfb,
+		     unsigned primitive_n)
+{
+	bool pass;
+	unsigned i, j;
+	double *first;
+
+	const unsigned first_n = primitive_n * BUF_DOUBLE_N;
+
+	first = malloc(first_n * sizeof(double));
+
+	for (i = 0; i < primitive_n; ++i) {
+		for (j = 0; j < BUF_DOUBLE_N; j++)
+			first[i * BUF_DOUBLE_N + j] = i + j + 1;
+	}
+
+	pass = piglit_probe_buffer_doubles(xfb[0], GL_TRANSFORM_FEEDBACK_BUFFER,
+					   "first", 1, first_n, first);
+
+	free(first);
+
+	return pass;
+}
+
 static void
 parse_args(int argc, char **argv, struct test_config *config)
 {
@@ -256,36 +294,49 @@ parse_args(int argc, char **argv, struct test_config *config)
 		const char *name;
 		const char *shader_source_filename;
 		unsigned gs_invocation_n;
+		bool doubles;
 	} test_types[] = {
 		{
 			"vs",
 			"vs_two_sets.shader_source",
-			0
+			0,
+			false
 		},
 		{
 			"vs_ifc",
 			"vs_two_sets_ifc.shader_source",
-			0
+			0,
+			false
 		},
 		{
 			"vs_named_ifc",
 			"vs_two_sets_named_ifc.shader_source",
-			0
+			0,
+			false
 		},
 		{
 			"vs_struct",
 			"vs_two_sets_struct.shader_source",
-			0
+			0,
+			false
+		},
+		{
+			"vs_double",
+			"vs_double.shader_source",
+			0,
+			true,
 		},
 		{
 			"gs",
 			NULL,
-			1
+			1,
+			false
 		},
 		{
 			"gs_max",
 			NULL,
-			INT_MAX
+			INT_MAX,
+			false
 		}
 	};
 
@@ -298,6 +349,8 @@ parse_args(int argc, char **argv, struct test_config *config)
 					test_types[j].shader_source_filename,
 				config->gs_invocation_n =
 					test_types[j].gs_invocation_n;
+				config->doubles =
+					test_types[j].doubles;
 				option_was_handled = true;
 				goto option_handled;
 			}
@@ -358,6 +411,9 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
+	if (config.doubles)
+	   piglit_require_GLSL_version(450);
+
 	/* Zero invocations means the feedback is produced by vertex shader */
 	primitive_n = config.gs_invocation_n ? config.gs_invocation_n : 1;
 
@@ -367,8 +423,11 @@ piglit_init(int argc, char **argv)
 	glGenBuffers(ARRAY_SIZE(xfb), xfb);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb[0]);
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
-		primitive_n * BUF_1_FLOAT_N * sizeof(float), NULL,
-		GL_STREAM_READ);
+		     primitive_n *
+		     MAX2(BUF_1_FLOAT_N * sizeof(float),
+			  BUF_DOUBLE_N * sizeof(double)),
+		     NULL,
+		     GL_STREAM_READ);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, xfb[1]);
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
 		primitive_n * BUF_2_FLOAT_N * sizeof(float), NULL,
@@ -399,7 +458,11 @@ piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	pass = probe_buffers(xfb, queries, primitive_n);
+	probe_queries(queries, primitive_n);
+	if (config.doubles)
+		pass = probe_buffers_double(xfb, primitive_n);
+	else
+		pass = probe_buffers_float(xfb, primitive_n);
 
 	glDeleteBuffers(2, xfb);
 	glDeleteQueries(2, queries);
