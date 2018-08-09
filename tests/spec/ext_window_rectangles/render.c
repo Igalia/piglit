@@ -33,6 +33,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 GLint prog, color;
 GLuint fb;
+static int max_rectangles;
 
 enum piglit_result
 piglit_display(void)
@@ -57,42 +58,68 @@ piglit_display(void)
 
 	glViewport(0, 0, 20, 20);
 
-	glClearColor(0, 0, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	for (int num_rectangles = 1; num_rectangles <= max_rectangles; num_rectangles++) {
+		glClearColor(0, 0, 1, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-	glWindowRectanglesEXT(GL_EXCLUSIVE_EXT, 8, rect);
-	glUniform4fv(color, 1, green);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glWindowRectanglesEXT(GL_EXCLUSIVE_EXT, num_rectangles, rect);
+		glUniform4fv(color, 1, green);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	for (int i = 0; i < 20; i++) {
-		for (int j = 0; j < 20; j++) {
-			// excluded
-			if ((i == 0 && (j == 0 || j == 2 || j == 4)) ||
-			    (i == 1 && (j == 1 || j == 3 || j == 5)) ||
-			    (i == 2 && (j == 0 || j == 2)))
-				pass &= piglit_probe_pixel_rgba(j, i, blue);
-			else
-				pass &= piglit_probe_pixel_rgba(j, i, green);
+		bool subresult = true;
+
+		for (int y = 0; y < 20; y++) {
+			for (int x = 0; x < 20; x++) {
+				bool excluded = false;
+
+				for (int i = 0; i < num_rectangles; i++) {
+					if (rect[i*4+0] == x &&
+					    rect[i*4+1] == y) {
+						excluded = true;
+						break;
+					}
+				}
+				if (excluded)
+					subresult &= piglit_probe_pixel_rgba(x, y, blue);
+				else
+					subresult &= piglit_probe_pixel_rgba(x, y, green);
+			}
 		}
+		piglit_report_subtest_result(subresult ? PIGLIT_PASS : PIGLIT_FAIL,
+					     "exclusive, num rectangles = %u", num_rectangles);
+		pass &= subresult;
 	}
 
-	glClearColor(0, 0, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	for (int num_rectangles = 1; num_rectangles <= max_rectangles; num_rectangles++) {
+		glClearColor(0, 0, 1, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-	glWindowRectanglesEXT(GL_INCLUSIVE_EXT, 8, rect);
-	glUniform4fv(color, 1, green);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glWindowRectanglesEXT(GL_INCLUSIVE_EXT, num_rectangles, rect);
+		glUniform4fv(color, 1, green);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	for (int i = 0; i < 20; i++) {
-		for (int j = 0; j < 20; j++) {
-			// included
-			if ((i == 0 && (j == 0 || j == 2 || j == 4)) ||
-			    (i == 1 && (j == 1 || j == 3 || j == 5)) ||
-			    (i == 2 && (j == 0 || j == 2)))
-				pass &= piglit_probe_pixel_rgba(j, i, green);
-			else
-				pass &= piglit_probe_pixel_rgba(j, i, blue);
+		bool subresult = true;
+
+		for (int y = 0; y < 20; y++) {
+			for (int x = 0; x < 20; x++) {
+				bool included = false;
+
+				for (int i = 0; i < num_rectangles; i++) {
+					if (rect[i*4+0] == x &&
+					    rect[i*4+1] == y) {
+						included = true;
+						break;
+					}
+				}
+				if (included)
+					subresult &= piglit_probe_pixel_rgba(x, y, green);
+				else
+					subresult &= piglit_probe_pixel_rgba(x, y, blue);
+			}
 		}
+		piglit_report_subtest_result(subresult ? PIGLIT_PASS : PIGLIT_FAIL,
+					     "inclusive, num rectangles = %u", num_rectangles);
+		pass &= subresult;
 	}
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
@@ -119,6 +146,8 @@ piglit_init(int argc, char **argv)
 	GLuint bo, rb;
 
 	piglit_require_extension("GL_EXT_window_rectangles");
+	glGetIntegerv(GL_MAX_WINDOW_RECTANGLES_EXT, &max_rectangles);
+	assert(max_rectangles <= 8);
 
 	prog = piglit_build_simple_program(
 #ifdef PIGLIT_USE_OPENGL
