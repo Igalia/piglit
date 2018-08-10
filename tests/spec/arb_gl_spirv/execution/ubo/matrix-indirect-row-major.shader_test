@@ -12,7 +12,7 @@ GL_ARB_gl_spirv
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 37
 ; Schema: 0
                OpCapability Shader
@@ -21,12 +21,6 @@ GL_ARB_gl_spirv
                OpEntryPoint Fragment %main "main" %outColor
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %outColor "outColor"
-               OpName %ComponentsBlock "ComponentsBlock"
-               OpMemberName %ComponentsBlock 0 "matrix"
-               OpName %components "components"
-               OpName %u_idx "u_idx"
                OpDecorate %outColor Location 0
                OpMemberDecorate %ComponentsBlock 0 RowMajor
                OpMemberDecorate %ComponentsBlock 0 Offset 0
@@ -36,6 +30,7 @@ GL_ARB_gl_spirv
                OpDecorate %components Binding 5
                OpDecorate %u_idx Location 10
                OpDecorate %u_idx DescriptorSet 0
+               OpDecorate %u_idx Binding 0
        %void = OpTypeVoid
           %3 = OpTypeFunction %void
       %float = OpTypeFloat 32
@@ -81,7 +76,7 @@ GL_ARB_gl_spirv
 
 layout (location = 0) out vec4 outColor;
 layout (location = 10) uniform int u_idx;
-layout (binding = 5, row_major) uniform ComponentsBlock
+layout (std140, binding = 5, row_major) uniform ComponentsBlock
  {
    mat4 matrix;
  } components;

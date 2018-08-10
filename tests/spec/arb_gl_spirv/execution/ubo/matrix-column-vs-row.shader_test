@@ -13,7 +13,7 @@ GLSL >= 3.30
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 59
 ; Schema: 0
                OpCapability Shader
@@ -22,16 +22,6 @@ GLSL >= 3.30
                OpEntryPoint Fragment %main "main" %outColor
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %outColor "outColor"
-               OpName %column "column"
-               OpName %row "row"
-               OpName %ColumnBlock "ColumnBlock"
-               OpMemberName %ColumnBlock 0 "matrix"
-               OpName %my_column_major "my_column_major"
-               OpName %RowBlock "RowBlock"
-               OpMemberName %RowBlock 0 "matrix"
-               OpName %my_row_major "my_row_major"
                OpDecorate %outColor Location 0
                OpMemberDecorate %ColumnBlock 0 ColMajor
                OpMemberDecorate %ColumnBlock 0 Offset 0
@@ -131,12 +121,12 @@ GLSL >= 3.30
 #version 450
 
 layout (location = 0) out vec4 outColor;
-layout (binding = 5, column_major) uniform ColumnBlock
+layout (std140, binding = 5, column_major) uniform ColumnBlock
  {
     mat4 matrix;
  } my_column_major;
 
-layout (binding = 7, row_major) uniform RowBlock
+layout (std140, binding = 7, row_major) uniform RowBlock
  {
     mat4 matrix;
  } my_row_major;

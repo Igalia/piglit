@@ -11,7 +11,7 @@ GLSL >= 3.30
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 84
 ; Schema: 0
                OpCapability Shader
@@ -20,13 +20,6 @@ GLSL >= 3.30
                OpEntryPoint Fragment %main "main" %color
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %fail_color "fail_color"
-               OpName %color "color"
-               OpName %ssbo "ssbo"
-               OpMemberName %ssbo 0 "color"
-               OpMemberName %ssbo 1 "position"
-               OpName %arr "arr"
                OpDecorate %color Location 0
                OpDecorate %_arr_v4float_uint_4 ArrayStride 16
                OpDecorate %_arr__arr_v4float_uint_4_uint_3 ArrayStride 64
@@ -64,31 +57,31 @@ GLSL >= 3.30
         %int = OpTypeInt 32 1
       %int_0 = OpConstant %int 0
 %_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
- %float_0_11 = OpConstant %float 0.11
- %float_0_12 = OpConstant %float 0.12
- %float_0_13 = OpConstant %float 0.13
- %float_0_14 = OpConstant %float 0.14
-         %37 = OpConstantComposite %v4float %float_0_11 %float_0_12 %float_0_13 %float_0_14
+%float_0_109999999 = OpConstant %float 0.109999999
+%float_0_119999997 = OpConstant %float 0.119999997
+%float_0_129999995 = OpConstant %float 0.129999995
+%float_0_140000001 = OpConstant %float 0.140000001
+         %37 = OpConstantComposite %v4float %float_0_109999999 %float_0_119999997 %float_0_129999995 %float_0_140000001
        %bool = OpTypeBool
      %v4bool = OpTypeVector %bool 4
       %int_1 = OpConstant %int 1
- %float_0_21 = OpConstant %float 0.21
- %float_0_22 = OpConstant %float 0.22
- %float_0_23 = OpConstant %float 0.23
- %float_0_24 = OpConstant %float 0.24
-         %52 = OpConstantComposite %v4float %float_0_21 %float_0_22 %float_0_23 %float_0_24
+%float_0_209999993 = OpConstant %float 0.209999993
+%float_0_219999999 = OpConstant %float 0.219999999
+%float_0_230000004 = OpConstant %float 0.230000004
+%float_0_239999995 = OpConstant %float 0.239999995
+         %52 = OpConstantComposite %v4float %float_0_209999993 %float_0_219999999 %float_0_230000004 %float_0_239999995
       %int_2 = OpConstant %int 2
       %int_3 = OpConstant %int 3
- %float_0_31 = OpConstant %float 0.31
- %float_0_32 = OpConstant %float 0.32
- %float_0_33 = OpConstant %float 0.33
- %float_0_34 = OpConstant %float 0.34
-         %66 = OpConstantComposite %v4float %float_0_31 %float_0_32 %float_0_33 %float_0_34
- %float_0_41 = OpConstant %float 0.41
- %float_0_42 = OpConstant %float 0.42
- %float_0_43 = OpConstant %float 0.43
- %float_0_44 = OpConstant %float 0.44
-         %78 = OpConstantComposite %v4float %float_0_41 %float_0_42 %float_0_43 %float_0_44
+%float_0_310000002 = OpConstant %float 0.310000002
+%float_0_319999993 = OpConstant %float 0.319999993
+%float_0_330000013 = OpConstant %float 0.330000013
+%float_0_340000004 = OpConstant %float 0.340000004
+         %66 = OpConstantComposite %v4float %float_0_310000002 %float_0_319999993 %float_0_330000013 %float_0_340000004
+%float_0_409999996 = OpConstant %float 0.409999996
+%float_0_419999987 = OpConstant %float 0.419999987
+%float_0_430000007 = OpConstant %float 0.430000007
+%float_0_439999998 = OpConstant %float 0.439999998
+         %78 = OpConstantComposite %v4float %float_0_409999996 %float_0_419999987 %float_0_430000007 %float_0_439999998
        %main = OpFunction %void None %3
           %5 = OpLabel
  %fail_color = OpVariable %_ptr_Function_v4float Function
@@ -146,7 +139,7 @@ GLSL >= 3.30
 
 layout (location = 0) out vec4 color;
 
-layout (binding = 5) buffer ssbo {
+layout (std430, binding = 5) buffer ssbo {
 	vec4 color[2][3][4];
 	vec4 position[2][2];
 } arr;

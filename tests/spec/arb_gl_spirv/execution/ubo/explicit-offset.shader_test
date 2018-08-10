@@ -19,10 +19,6 @@ GLSL >= 4.50
                OpEntryPoint Fragment %main "main" %outcolor
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %outcolor "outcolor"
-               OpName %Block "Block"
-               OpMemberName %Block 0 "a"
                OpName %_ ""
                OpDecorate %outcolor Location 0
                OpMemberDecorate %Block 0 Offset 16

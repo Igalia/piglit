@@ -12,7 +12,7 @@ GL_ARB_gl_spirv
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 29
 ; Schema: 0
                OpCapability Shader
@@ -21,11 +21,6 @@ GL_ARB_gl_spirv
                OpEntryPoint Fragment %main "main" %outColor
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %outColor "outColor"
-               OpName %ComponentsSSBO "ComponentsSSBO"
-               OpMemberName %ComponentsSSBO 0 "c1"
-               OpName %components "components"
                OpDecorate %outColor Location 0
                OpMemberDecorate %ComponentsSSBO 0 Offset 0
                OpDecorate %ComponentsSSBO BufferBlock
@@ -67,7 +62,7 @@ GL_ARB_gl_spirv
 #version 450
 
 layout (location = 0) out vec4 outColor;
-layout (binding = 5) buffer ComponentsSSBO
+layout (std430, binding = 5) buffer ComponentsSSBO
  {
     vec4 c1;
  } components[3];
