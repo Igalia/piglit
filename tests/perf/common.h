@@ -25,7 +25,7 @@
 typedef void (*perf_rate_func)(unsigned count);
 
 double
-perf_measure_rate(perf_rate_func f);
+perf_measure_rate(perf_rate_func f, double minDuration);
 
 #endif /* COMMON_H */
 

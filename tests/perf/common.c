@@ -38,9 +38,8 @@ perf_get_time(void)
  * Return the rate (iterations/second).
  */
 double
-perf_measure_rate(perf_rate_func f)
+perf_measure_rate(perf_rate_func f, double minDuration)
 {
-	const double minDuration = 0.5;
 	double rate = 0.0, prevRate = 0.0;
 	unsigned subiters;
 
@@ -59,7 +58,7 @@ perf_measure_rate(perf_rate_func f)
 			subiters *= 2;
 		} while (t1 - t0 < 0.1 * minDuration);
 	}
-	/*perf_printf("initial subIters = %u\n", subiters);*/
+	/*printf("initial subIters = %u\n", subiters);*/
 
 	while (1) {
 		const double t0 = perf_get_time();

@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (drawoverhead drawoverhead.c common.c)
+piglit_add_executable (draw-prim-rate draw-prim-rate.c common.c)
 
 # vim: ft=cmake:

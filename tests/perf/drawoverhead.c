@@ -641,7 +641,7 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	static unsigned test_index;
 	test_index++;
 
-	double rate = perf_measure_rate(f);
+	double rate = perf_measure_rate(f, 0.5);
 	double ratio = base_rate ? rate / base_rate : 1;
 
 	printf(" %3u, %s (%2u VBO| %u UBO| %2u %s) w/ %s change,%*s"
