@@ -652,6 +652,9 @@ def parse_args():
     parser.add_argument("--strip-names",
                         action="store_true",
                         help="Remove all the debug names from the generated SPIR-V")
+    parser.add_argument("--no-uniform-remap",
+                        action="store_true",
+                        help="Don't do a uniform/ubo remap")
     parser.add_argument("shader_tests",
                         nargs='+',
                         help="Path to one or more .shader_test files to process.")
@@ -908,7 +911,7 @@ def filter_shader_test(config,
 
         if in_test:
             md = uniform_re.match(line)
-            if md:
+            if md and not config.no_uniform_remap:
                 replacement = remap_ubo_member(md.group(2), ubos)
                 if replacement:
                     (binding, offset, matrix_stride, matrix_order) = replacement
