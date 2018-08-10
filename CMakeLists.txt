@@ -227,7 +227,7 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 ENDIF()
 
 set(Python_ADDITIONAL_VERSIONS
-    3.6 3.5 3.4 3.3 2.7)
+    3.7 3.6 3.5 3.4 3.3 2.7)
 find_package(PythonInterp REQUIRED)
 find_package(PythonSix 1.5.2 REQUIRED)
 find_package(PythonNumpy 1.7.0 REQUIRED)
