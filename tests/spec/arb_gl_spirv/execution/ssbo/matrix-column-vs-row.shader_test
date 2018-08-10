@@ -12,7 +12,7 @@ GLSL >= 3.30
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 59
 ; Schema: 0
                OpCapability Shader
@@ -21,16 +21,6 @@ GLSL >= 3.30
                OpEntryPoint Fragment %main "main" %outColor
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %outColor "outColor"
-               OpName %column "column"
-               OpName %row "row"
-               OpName %column_ssbo "column_ssbo"
-               OpMemberName %column_ssbo 0 "matrix"
-               OpName %my_column_major "my_column_major"
-               OpName %row_ssbo "row_ssbo"
-               OpMemberName %row_ssbo 0 "matrix"
-               OpName %my_row_major "my_row_major"
                OpDecorate %outColor Location 0
                OpMemberDecorate %column_ssbo 0 ColMajor
                OpMemberDecorate %column_ssbo 0 Offset 0
@@ -130,12 +120,12 @@ GLSL >= 3.30
 #version 450
 
 layout (location = 0) out vec4 outColor;
-layout (binding = 5, column_major) buffer column_ssbo
+layout (std430, binding = 5, column_major) buffer column_ssbo
  {
     mat4 matrix;
  } my_column_major;
 
-layout (binding = 7, row_major) buffer row_ssbo
+layout (std430, binding = 7, row_major) buffer row_ssbo
  {
     mat4 matrix;
  } my_row_major;
@@ -191,9 +181,14 @@ ssbo 7 subdata float 52 0.42
 ssbo 7 subdata float 56 0.43
 ssbo 7 subdata float 60 0.44
 
+block binding 6
+block binding 5
+verify program_interface_query GL_SHADER_STORAGE_BLOCK column_ssbo GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_SHADER_STORAGE_BLOCK column_ssbo GL_BUFFER_DATA_SIZE 64
+
 block binding 7
-verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_NUM_ACTIVE_VARIABLES 1
-verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_BUFFER_DATA_SIZE 64
+verify program_interface_query GL_SHADER_STORAGE_BLOCK row_ssbo GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_SHADER_STORAGE_BLOCK row_ssbo GL_BUFFER_DATA_SIZE 64
 
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 0.0

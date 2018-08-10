@@ -13,7 +13,7 @@ GL_ARB_shader_storage_buffer_object
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 27
 ; Schema: 0
                OpCapability Shader
@@ -22,13 +22,7 @@ GL_ARB_shader_storage_buffer_object
                OpEntryPoint Fragment %main "main" %color_out
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %color_out "color_out"
-               OpName %ssbo "ssbo"
-               OpMemberName %ssbo 0 "base_color"
-               OpMemberName %ssbo 1 "other_colors"
                OpName %_ ""
-               OpName %color_num "color_num"
                OpDecorate %color_out Location 0
                OpDecorate %_runtimearr_v4float ArrayStride 16
                OpMemberDecorate %ssbo 0 Offset 0
@@ -38,6 +32,7 @@ GL_ARB_shader_storage_buffer_object
                OpDecorate %_ Binding 0
                OpDecorate %color_num Location 0
                OpDecorate %color_num DescriptorSet 0
+               OpDecorate %color_num Binding 1
        %void = OpTypeVoid
           %3 = OpTypeFunction %void
       %float = OpTypeFloat 32
@@ -73,7 +68,7 @@ GL_ARB_shader_storage_buffer_object
 
 layout(location = 0) out vec4 color_out;
 
-layout(binding = 0) buffer ssbo
+layout(std430, binding = 0) buffer ssbo
 {
         vec4 base_color;
         vec4 other_colors[];
