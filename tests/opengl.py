@@ -3078,6 +3078,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_render_snorm')) as g:
+    g(['ext_render_snorm-render'], 'render')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_frag_depth')) as g:
     g(['fragdepth_gles2'])
 

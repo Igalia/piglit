@@ -1,0 +1,7 @@
+link_libraries (
+	piglitutil_${piglit_target_api}
+)
+
+piglit_add_executable (ext_render_snorm-render render.c)
+
+# vim: ft=cmake:
