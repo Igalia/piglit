@@ -1,0 +1,155 @@
+# UBO test using two mat3x2. The content is the same, but the matrix
+# stride is different. Used to test that the size is properly
+# computed, and the content properly accessed in both cases.
+
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py, and then edited by hand to set the proper matrix stride
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 57
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %_ ""
+               OpName %__0 ""
+               OpMemberDecorate %Block16 0 ColMajor
+               OpMemberDecorate %Block16 0 Offset 0
+               OpMemberDecorate %Block16 0 MatrixStride 16
+               OpDecorate %Block16 Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 5
+               OpMemberDecorate %Block32 0 ColMajor
+               OpMemberDecorate %Block32 0 Offset 0
+               OpMemberDecorate %Block32 0 MatrixStride 32
+               OpDecorate %Block32 Block
+               OpDecorate %__0 DescriptorSet 0
+               OpDecorate %__0 Binding 6
+               OpDecorate %outColor Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v2float = OpTypeVector %float 2
+%mat3v2float = OpTypeMatrix %v2float 3
+%_ptr_Function_mat3v2float = OpTypePointer Function %mat3v2float
+    %Block16 = OpTypeStruct %mat3v2float
+%_ptr_Uniform_Block16 = OpTypePointer Uniform %Block16
+          %_ = OpVariable %_ptr_Uniform_Block16 Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_mat3v2float = OpTypePointer Uniform %mat3v2float
+    %Block32 = OpTypeStruct %mat3v2float
+%_ptr_Uniform_Block32 = OpTypePointer Uniform %Block32
+        %__0 = OpVariable %_ptr_Uniform_Block32 Uniform
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+%_ptr_Function_v2float = OpTypePointer Function %v2float
+      %int_1 = OpConstant %int 1
+      %int_2 = OpConstant %int 2
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %54 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_0
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %difference = OpVariable %_ptr_Function_mat3v2float Function
+         %17 = OpAccessChain %_ptr_Uniform_mat3v2float %_ %int_0
+         %18 = OpLoad %mat3v2float %17
+         %22 = OpAccessChain %_ptr_Uniform_mat3v2float %__0 %int_0
+         %23 = OpLoad %mat3v2float %22
+         %24 = OpCompositeExtract %v2float %18 0
+         %25 = OpCompositeExtract %v2float %23 0
+         %26 = OpFSub %v2float %24 %25
+         %27 = OpCompositeExtract %v2float %18 1
+         %28 = OpCompositeExtract %v2float %23 1
+         %29 = OpFSub %v2float %27 %28
+         %30 = OpCompositeExtract %v2float %18 2
+         %31 = OpCompositeExtract %v2float %23 2
+         %32 = OpFSub %v2float %30 %31
+         %33 = OpCompositeConstruct %mat3v2float %26 %29 %32
+               OpStore %difference %33
+         %38 = OpAccessChain %_ptr_Function_v2float %difference %int_0
+         %39 = OpLoad %v2float %38
+         %41 = OpAccessChain %_ptr_Function_v2float %difference %int_1
+         %42 = OpLoad %v2float %41
+         %44 = OpAccessChain %_ptr_Function_v2float %difference %int_2
+         %45 = OpLoad %v2float %44
+         %46 = OpFAdd %v2float %42 %45
+         %47 = OpCompositeExtract %float %39 0
+         %48 = OpCompositeExtract %float %39 1
+         %49 = OpCompositeExtract %float %46 0
+         %50 = OpCompositeExtract %float %46 1
+         %51 = OpCompositeConstruct %v4float %47 %48 %49 %50
+               OpStore %outColor %51
+         %55 = OpLoad %v4float %outColor
+         %56 = OpFAdd %v4float %55 %54
+               OpStore %outColor %56
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (std140, binding = 5, column_major) uniform Block16
+ {
+ mat3x2 m16;
+ };
+
+/* Note that there is no way to set the matrix_stride on GLSL. This GLSL was used
+ * initially to generate the SPIRV-V, and then matrix stride was tweaked.
+ * That's the reason this is a SPIRV ONLY test. GLSL here is just as reference.
+ */
+layout (std140, binding = 6, column_major) uniform Block32
+ {
+ mat3x2 m32;
+ };
+
+void main()
+{
+        mat3x2 difference = m16 - m32;
+	outColor = vec4(difference[0], difference[1] + difference[2]);
+	outColor += vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+block binding 5
+block offset 0
+block matrix stride 16
+block row major 0
+uniform mat3x2 m 0.11 0.12 0.21 0.22 0.31 0.32
+
+block binding 6
+block offset 0
+block matrix stride 32
+block row major 0
+uniform mat3x2 m 0.11 0.12 0.21 0.22 0.31 0.32
+
+block binding 5
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_BUFFER_DATA_SIZE 48
+
+block binding 6
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_BUFFER_DATA_SIZE 96
+
+verify program_query GL_ACTIVE_UNIFORMS 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
