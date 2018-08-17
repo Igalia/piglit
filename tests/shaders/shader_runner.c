@@ -3286,12 +3286,20 @@ program_interface_query_resource_by_name(unsigned interface_type,
 			if (strcmp(name, name_buf) != 0)
 				continue;
 
-			if (prop == GL_NAME_LENGTH && name_len != expected) {
+			/* glGetProgramResourceName does not consider the NULL
+			 * terminator when returning the name length, however,
+			 * glGetProgramResourceiv does.
+			 */
+			if (prop == GL_NAME_LENGTH &&
+			    name_len != (expected - 1)) {
 				fprintf(stderr,
-					"glGetProgramResourceName(%s, %s): "
-					"expected %d (0x%04x), got %d (0x%04x)\n",
+					"glGetProgramResourceName(%s, %s, %s): "
+					"expected length: %d (0x%04x), "
+					"got length: %d (0x%04x)\n",
+					piglit_get_gl_enum_name(interface_type),
 					name, piglit_get_gl_enum_name(prop),
-					expected, expected, name_len, name_len);
+					expected - 1, expected - 1,
+					name_len, name_len);
 				pass = false;
 			}
 		} else {
