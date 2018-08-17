@@ -1,0 +1,212 @@
+# Tests some program pname queries (glGetProgramiv) not related with names
+# both in GLSL shaders and in shaders constructed from SPIR-V binaries.
+#
+# ARB_gl_spirv:
+#
+# 19. How should the program interface query operations behave for program
+#     objects created from SPIR-V shaders?
+#
+#    ...
+# C) Allow as much as possible to work "naturally". You can query for
+#    the number of active resources, and for details about them. Anything
+#    that doesn't query by name will work as expected.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[geometry shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 41
+; Schema: 0
+               OpCapability Geometry
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Geometry %main "main" %_ %gl_in
+               OpExecutionMode %main Triangles
+               OpExecutionMode %main Invocations 1
+               OpExecutionMode %main OutputTriangleStrip
+               OpExecutionMode %main OutputVertices 3
+               OpSource GLSL 450
+               OpName %_ ""
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpMemberDecorate %gl_PerVertex_0 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex_0 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex_0 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex_0 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex_0 Block
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %int_0 = OpConstant %int 0
+      %int_3 = OpConstant %int 3
+       %bool = OpTypeBool
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+%gl_PerVertex_0 = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+     %uint_3 = OpConstant %uint 3
+%_arr_gl_PerVertex_0_uint_3 = OpTypeArray %gl_PerVertex_0 %uint_3
+%_ptr_Input__arr_gl_PerVertex_0_uint_3 = OpTypePointer Input %_arr_gl_PerVertex_0_uint_3
+      %gl_in = OpVariable %_ptr_Input__arr_gl_PerVertex_0_uint_3 Input
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %i = OpVariable %_ptr_Function_int Function
+               OpStore %i %int_0
+               OpBranch %10
+         %10 = OpLabel
+               OpLoopMerge %12 %13 None
+               OpBranch %14
+         %14 = OpLabel
+         %15 = OpLoad %int %i
+         %18 = OpSLessThan %bool %15 %int_3
+               OpBranchConditional %18 %11 %12
+         %11 = OpLabel
+         %32 = OpLoad %int %i
+         %34 = OpAccessChain %_ptr_Input_v4float %gl_in %32 %int_0
+         %35 = OpLoad %v4float %34
+         %37 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %37 %35
+               OpEmitVertex
+               OpBranch %13
+         %13 = OpLabel
+         %38 = OpLoad %int %i
+         %40 = OpIAdd %int %38 %int_1
+               OpStore %i %40
+               OpBranch %10
+         %12 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[geometry shader]
+#version 430
+#extension GL_ARB_geometry_shader4: enable
+
+layout (triangles) in;
+layout (triangle_strip, max_vertices=3) out;
+
+void main () {
+ int i;
+ for (i = 0; i < 3; i++) {
+   gl_Position = gl_in[i].gl_Position;
+   EmitVertex();
+ }
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 32
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outColor Location 0
+               OpDecorate %c3 Location 1
+               OpDecorate %c3 DescriptorSet 0
+               OpDecorate %c3 Binding 0
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpMemberDecorate %ComponentsBlock 1 Offset 16
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+         %c3 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+    %v2float = OpTypeVector %float 2
+%ComponentsBlock = OpTypeStruct %v4float %v2float
+%_ptr_Uniform_ComponentsBlock = OpTypePointer Uniform %ComponentsBlock
+ %components = OpVariable %_ptr_Uniform_ComponentsBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+    %float_0 = OpConstant %float 0
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpLoad %v4float %c3
+         %20 = OpAccessChain %_ptr_Uniform_v4float %components %int_0
+         %21 = OpLoad %v4float %20
+         %22 = OpFAdd %v4float %12 %21
+         %25 = OpAccessChain %_ptr_Uniform_v2float %components %int_1
+         %26 = OpLoad %v2float %25
+         %28 = OpCompositeExtract %float %26 0
+         %29 = OpCompositeExtract %float %26 1
+         %30 = OpCompositeConstruct %v4float %28 %29 %float_0 %float_0
+         %31 = OpFAdd %v4float %22 %30
+               OpStore %outColor %31
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (location = 1) uniform vec4 c3;
+
+layout (binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+void main()
+{
+	outColor = c3 + components.c1 + vec4(components.c2, 0.0, 0.0);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+block binding 5
+block offset 0
+uniform vec4 ComponentsBlock.c1 0.1 0.2 0.3 0.4
+block offset 16
+uniform vec2 ComponentsBlock.c2 0.1 0.2
+
+uniform vec4 1 0.0 0.1 0.3 0.0
+
+verify program_query GL_ATTACHED_SHADERS 3
+verify program_query GL_ACTIVE_ATOMIC_COUNTER_BUFFERS 0
+verify program_query GL_ACTIVE_ATTRIBUTES 1
+verify program_query GL_ACTIVE_UNIFORMS 3
+verify program_query GL_ACTIVE_UNIFORM_BLOCKS 1
+verify program_query GL_GEOMETRY_VERTICES_OUT 3
+verify program_query GL_GEOMETRY_INPUT_TYPE  GL_TRIANGLES
+verify program_query GL_GEOMETRY_OUTPUT_TYPE GL_TRIANGLE_STRIP
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.5 0.6 0.4
+
