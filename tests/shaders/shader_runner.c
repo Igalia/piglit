@@ -3147,50 +3147,297 @@ active_uniform(const char *line)
 	return;
 }
 
+enum program_interface_queries {
+	/* Query a property of an interface in a program using
+	 * glGetProgramInterfaceiv.
+	 */
+	INTERFACE_QUERY = 0,
+
+	/* Query a property of a resource in a
+	 * using glGetProgramResourceiv.
+	 */
+	RESOURCE_QUERY,
+
+	/* Query a property of an active resource using
+	 * glGetProgramResourceiv. The <name> of the resource is passed
+	 * as argument instead of the <index>, which will be gotten
+	 * by iterating the list of active resources.
+	 */
+	RESOURCE_BY_NAME_QUERY,
+
+	/* Query a resource name's and length using
+	 * glGetProgramResourceName.
+	 */
+	RESOURCE_NAME_QUERY,
+
+	/* Query the index of a resource within a program
+	 * using glProgramResourceIndex.
+	 */
+	RESOURCE_INDEX_QUERY,
+
+	/* Query the location of a resource within a program
+	 * using glGetProgramResourceLocation.
+	 */
+	RESOURCE_LOCATION_QUERY,
+
+	/* Query the fragment color index of a variable within
+	 * a program using glGetProgramResourceLocationIndex.
+	 */
+	RESOURCE_LOCATION_INDEX_QUERY,
+};
+
+static void
+program_interface_query_check_error_int(const char *query_str,
+					int expected, int got)
+{
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		fprintf(stderr, "%s error\n", query_str);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (got != expected) {
+		fprintf(stderr, "%s: expected = %d, got = %d\n",
+			query_str, expected, got);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
+static void
+program_interface_query_check_error_name(const char *query_str,
+					 int expected_length, int got_length,
+					 const char *expected_name,
+					 const char *got_name)
+{
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		fprintf(stderr, "%s error\n", query_str);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (got_length != expected_length || strcmp(got_name, expected_name)) {
+		fprintf(stderr,
+			"%s: expected (length = %d, name = \"%s\"),"
+			"got (length = %d, name = \"%s\")\n", query_str,
+			expected_length, expected_name,
+			got_length, got_name);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
+static void
+program_interface_query_resource(unsigned interface_type, GLuint index,
+				 unsigned prop, int expected,
+				 const char *query_str)
+{
+	int length, got;
+
+	/* Set 'got' to some value in case glGetProgramResourceiv
+	 * doesn't write to it.  That should only be able to occur
+	 * when the function raises a GL error, but "should" is kind
+	 * of a funny word.
+	 */
+	got = ~expected;
+
+	glGetProgramResourceiv(prog, interface_type, index, 1, &prop, 1,
+			       &length, &got);
+
+	program_interface_query_check_error_int(query_str, expected, got);
+}
+
+static void
+program_interface_query_resource_by_name(unsigned interface_type,
+					 const char *name, unsigned prop,
+					 int expected, const char *query_str,
+					 struct block_info block_data)
+{
+	int i;
+	int num_active_resources;
+
+	glGetProgramInterfaceiv(prog, interface_type,
+				GL_ACTIVE_RESOURCES, &num_active_resources);
+	for (i = 0; i < num_active_resources; i++) {
+		bool pass = true;
+
+		/* Check if the resource i in the active resource list is the
+		 * one we are looking for.
+		 */
+		if (!force_no_names) {
+			char name_buf[512];
+			GLsizei name_len;
+
+			glGetProgramResourceName(prog, interface_type,
+						 i, 512, &name_len, name_buf);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr,
+					"glGetProgramResourceName error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			if (strcmp(name, name_buf) != 0)
+				continue;
+
+			if (prop == GL_NAME_LENGTH && name_len != expected) {
+				fprintf(stderr,
+					"glGetProgramResourceName(%s, %s): "
+					"expected %d (0x%04x), got %d (0x%04x)\n",
+					name, piglit_get_gl_enum_name(prop),
+					expected, expected, name_len, name_len);
+				pass = false;
+			}
+		} else {
+			GLint length;
+			unsigned binding_prop = GL_BUFFER_BINDING;
+			int current_binding = 0;
+
+			glGetProgramResourceiv(prog, interface_type,
+					       i, 1, &binding_prop, 1,
+					       &length, &current_binding);
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr,
+					"glGetProgramResourceiv error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			if (block_data.binding != current_binding)
+				continue;
+		}
+
+		/* Resource found. Do the actual query. */
+		program_interface_query_resource(interface_type, i, prop,
+						 expected, query_str);
+
+		if (!pass)
+			piglit_report_result(PIGLIT_FAIL);
+
+		return;
+	}
+
+	if (!force_no_names)
+		fprintf(stderr, "No active resource named \"%s\"\n", name);
+	else
+		fprintf(stderr,
+			"No active resource with binding %i\n",
+			block_data.binding);
+
+	piglit_report_result(PIGLIT_FAIL);
+	return;
+}
+
+static void
+program_interface_query_resource_name(unsigned interface_type,
+				      GLuint index,
+				      GLsizei expected_length,
+				      const char *expected_name,
+				      const char *query_str)
+{
+	GLsizei got_length;
+	char got_name[512];
+
+	glGetProgramResourceName(prog, interface_type, index, sizeof(got_name),
+				 &got_length, got_name);
+
+	program_interface_query_check_error_name(query_str,
+						 expected_length, got_length,
+						 expected_name, got_name);
+}
+
+static void
+program_interface_query_resource_index(unsigned interface_type,
+				       const char *name, GLuint expected,
+				       const char *query_str)
+{
+	GLuint got = glGetProgramResourceIndex(prog, interface_type, name);
+
+	program_interface_query_check_error_int(query_str, expected, got);
+}
+
+static void
+program_interface_query_resource_location(unsigned interface_type,
+					  const char *name, GLint expected,
+					  const char *query_str)
+{
+
+	GLint got = glGetProgramResourceLocation(prog, interface_type, name);
+
+	program_interface_query_check_error_int(query_str, expected, got);
+}
+
+static void
+program_interface_query_resource_location_index(unsigned interface_type,
+						const char *name,
+						GLint expected,
+						const char *query_str)
+{
+	GLint got = glGetProgramResourceLocationIndex(prog, interface_type,
+						      name);
+
+	program_interface_query_check_error_int(query_str, expected, got);
+}
+
 /**
- * Query an active resource using ARB_program_interface_query functions
+ * Query properties of interfaces and resources used by a program
+ * using ARB_program_interface_query queries.
  *
  * Format of the command:
+ *   verify program_interface_query <query> <params> <expected values>
  *
- *  verify program_interface_query GL_INTERFACE_TYPE_ENUM name GL_PNAME_ENUM integer
+ * 1) The allowed values for <query> are:
  *
- * or
+ *   command string            program_interface_queries
+ *                                       enum
+ * -------------------------   --------------------------
+ * - "interface"             -> INTERFACE_QUERY
+ * - "resource"              -> RESOURCE_QUERY
+ * - "resourceName"          -> RESOURCE_NAME_QUERY
+ * - "resourceIndex"         -> RESOURCE_INDEX_QUERY
+ * - "resourceLocation"      -> RESOURCE_LOCATION_QUERY
+ * - "resourceLocationIndex" -> RESOURCE_LOCATION_INDEX_QUERY
+ * - ""                      -> RESOURCE_BY_NAME_QUERY
  *
- *  verify program_interface_query GL_INTERFACE_TYPE_ENUM name GL_PNAME_ENUM GL_TYPE_ENUM
+ * if no <query> is specified, RESOURCE_BY_NAME_QUERY is assummed. See the
+ * comments in the program_interface_queries declaration for more details
+ * about the queries.
+ *
+ * 2) The allowed values for <params> and <expected values> for each of the
+ * queries, in the order they should be specified, are:
+ *
+ * - INTERFACE_QUERY:
+ *    - Params: <programInterface> <pname> <expected>
+ *    - Command: verify program_interface_query interface GL_INTERFACE_ENUM
+ *               GL_PNAME_ENUM int
+ *
+ * - RESOURCE_QUERY:
+ *    - Params: <programInterface> <index> <pname> <expected>
+ *    - Command: verify program_interface_query resource GL_INTERFACE_ENUM
+ *               GL_INT GL_PNAME_ENUM {int/GL_TYPE_ENUM}
+ *
+ * - RESOURCE_BY_NAME_QUERY:
+ *    - Params: <programInterface> <name> <pname> <expected>
+ *    - Command: verify program_interface_query GL_INTERFACE_ENUM string
+ *               GL_PNAME_ENUM {int/GL_TYPE_ENUM}
+ *
+ * - RESOURCE_NAME_QUERY:
+ *    - Params: <programInterface> <index> <expected_length> <expected_name>
+ *    - Command: verify program_interface_query resourceName GL_INTERFACE_ENUM
+ *               GL_UINT int string
+ *
+ * - RESOURCE_INDEX_QUERY:
+ *    - Params: <programInterface> <name> <expected>
+ *    - Command: verify program_interface_query resourceIndex GL_INTERFACE_ENUM
+ *               string {uint/GL_INVALID_INDEX}
+ *
+ * - RESOURCE_LOCATION_QUERY:
+ *    - Params: <programInterface> <name> <expected>
+ *    - Command: verify program_interface_query resourceLocation
+ *               GL_INTERFACE_ENUM string int
+ *
+ * - RESOURCE_LOCATION_INDEX_QUERY:
+ *    - Params: <programInterface> <name> <expected>
+ *    - Command: verify program_interface_query resourceLocationIndex
+ *               GL_INTERFACE_ENUM string int
  */
 static void
-active_program_interface(const char *line, struct block_info block_data)
+verify_program_interface_query(const char *line, struct block_info block_data)
 {
-	static const struct string_to_enum all_props[] = {
-		ENUM_STRING(GL_TYPE),
-		ENUM_STRING(GL_ARRAY_SIZE),
-		ENUM_STRING(GL_NAME_LENGTH),
-		ENUM_STRING(GL_BLOCK_INDEX),
-		ENUM_STRING(GL_OFFSET),
-		ENUM_STRING(GL_ARRAY_STRIDE),
-		ENUM_STRING(GL_MATRIX_STRIDE),
-		ENUM_STRING(GL_IS_ROW_MAJOR),
-		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER_INDEX),
-		ENUM_STRING(GL_BUFFER_BINDING),
-		ENUM_STRING(GL_BUFFER_DATA_SIZE),
-		ENUM_STRING(GL_NUM_ACTIVE_VARIABLES),
-		ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_GEOMETRY_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_FRAGMENT_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_COMPUTE_SHADER),
-		ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
-		ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
-		ENUM_STRING(GL_LOCATION),
-		ENUM_STRING(GL_LOCATION_INDEX),
-		ENUM_STRING(GL_LOCATION_COMPONENT),
-		ENUM_STRING(GL_IS_PER_PATCH),
-		ENUM_STRING(GL_NUM_COMPATIBLE_SUBROUTINES),
-		ENUM_STRING(GL_COMPATIBLE_SUBROUTINES),
-		{ NULL, 0 }
-	};
-
 	static const struct string_to_enum all_program_interface[] = {
 		ENUM_STRING(GL_UNIFORM),
 		ENUM_STRING(GL_UNIFORM_BLOCK),
@@ -3215,12 +3462,9 @@ active_program_interface(const char *line, struct block_info block_data)
 		{ NULL, 0 }
 	};
 
-	char name[512];
-	char name_buf[512];
-	unsigned prop, interface_type;
-	int expected;
-	int i;
-	int num_active_buffers;
+	enum program_interface_queries query;
+	unsigned interface_type;
+	char query_str[512];
 
 	if (!piglit_is_extension_supported("GL_ARB_program_interface_query") &&
 	    piglit_get_gl_version() < 43) {
@@ -3230,97 +3474,244 @@ active_program_interface(const char *line, struct block_info block_data)
 		return;
 	}
 
+	if (parse_str(line,"interface", &line)) {
+		query = INTERFACE_QUERY;
+	} else if (parse_str(line,"resourceName", &line)) {
+		query = RESOURCE_NAME_QUERY;
+	} else if (parse_str(line,"resourceIndex", &line)) {
+		query = RESOURCE_INDEX_QUERY;
+	} else if (parse_str(line,"resourceLocationIndex", &line)) {
+		query = RESOURCE_LOCATION_INDEX_QUERY;
+	} else if (parse_str(line,"resourceLocation", &line)) {
+		query = RESOURCE_LOCATION_QUERY;
+	} else if (parse_str(line,"resource", &line)) {
+		query = RESOURCE_QUERY;
+	} else {
+		query = RESOURCE_BY_NAME_QUERY;
+	}
+
 	REQUIRE(parse_enum_tab(all_program_interface, line,
 			       &interface_type, &line),
 		"Bad program interface at: %s\n", line);
-	REQUIRE(parse_word_copy(line, name, sizeof(name), &line),
-		"Bad program resource name at: %s\n", line);
-	REQUIRE(parse_enum_tab(all_props, line, &prop, &line),
-		"Bad glGetProgramResourceiv pname at: %s\n", line);
-	REQUIRE(parse_enum_tab(all_types, line, (unsigned *)&expected, &line) ||
-		parse_int(line, &expected, &line),
-		"Bad expected value at: %s\n", line);
 
-	glGetProgramInterfaceiv(prog, interface_type,
-				GL_ACTIVE_RESOURCES, &num_active_buffers);
-	for (i = 0; i < num_active_buffers; i++) {
+	switch (query) {
+	case INTERFACE_QUERY: {
+		static const struct string_to_enum all_pnames[] = {
+			ENUM_STRING(GL_ACTIVE_RESOURCES),
+			ENUM_STRING(GL_MAX_NAME_LENGTH),
+			ENUM_STRING(GL_MAX_NUM_ACTIVE_VARIABLES),
+			ENUM_STRING(GL_MAX_NUM_COMPATIBLE_SUBROUTINES),
+			{ NULL, 0 }
+		};
+
+		unsigned pname;
+		int expected;
 		GLint got;
-		GLint length;
-		GLsizei name_len;
-		bool pass = true;
 
-		if (!force_no_names) {
-			glGetProgramResourceName(prog, interface_type,
-						 i, 512, &name_len, name_buf);
+		REQUIRE(parse_enum_tab(all_pnames, line, &pname, &line),
+			"Bad glGetProgramInterfaceiv pname at: %s\n", line);
+		REQUIRE(parse_int(line, &expected, &line),
+			"Bad expected value at: %s\n", line);
 
-			if (!piglit_check_gl_error(GL_NO_ERROR)) {
-				fprintf(stderr, "glGetProgramResourceName error\n");
-				piglit_report_result(PIGLIT_FAIL);
-			}
+		snprintf(query_str, sizeof(query_str),
+			 "glGetProgramInterfaceiv(%s, %s)",
+			 piglit_get_gl_enum_name(interface_type),
+			 piglit_get_gl_enum_name(pname));
 
-			if (strcmp(name, name_buf) != 0)
-				continue;
-
-			if (prop == GL_NAME_LENGTH && name_len != expected) {
-				fprintf(stderr,
-					"glGetProgramResourceName(%s, %s): "
-					"expected %d (0x%04x), got %d (0x%04x)\n",
-					name, piglit_get_gl_enum_name(prop),
-					expected, expected, name_len, name_len);
-				pass = false;
-			}
-		} else {
-			unsigned binding_prop = GL_BUFFER_BINDING;
-			int current_binding = 0;
-
-			glGetProgramResourceiv(prog, interface_type,
-					       i, 1, &binding_prop, 1,
-					       &length, &current_binding);
-			if (!piglit_check_gl_error(GL_NO_ERROR)) {
-				fprintf(stderr, "glGetProgramResourceiv error\n");
-				piglit_report_result(PIGLIT_FAIL);
-			}
-			if (block_data.binding != current_binding)
-				continue;
-		}
-
-		/* Set 'got' to some value in case glGetActiveUniformsiv
-		 * doesn't write to it.  That should only be able to occur
-		 * when the function raises a GL error, but "should" is kind
-		 * of a funny word.
-		 */
+		/* Do the actual query. */
 		got = ~expected;
-		glGetProgramResourceiv(prog, interface_type,
-				       i, 1, &prop, 1,
-				       &length, &got);
-
-		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			fprintf(stderr, "glGetProgramResourceiv error\n");
-			piglit_report_result(PIGLIT_FAIL);
-		}
-
-		if (got != expected) {
-			fprintf(stderr,
-				"glGetProgramResourceiv(%s, %s): "
-				"expected %d, got %d\n",
-				name, piglit_get_gl_enum_name(prop),
-				expected, got);
-			pass = false;
-		}
-
-		if (!pass)
-			piglit_report_result(PIGLIT_FAIL);
-
-		return;
+		glGetProgramInterfaceiv(prog, interface_type, pname, &got);
+		program_interface_query_check_error_int(query_str,
+							expected, got);
 	}
+		break;
+	case RESOURCE_QUERY:
+	case RESOURCE_BY_NAME_QUERY: {
+		static const struct string_to_enum all_props[] = {
+			ENUM_STRING(GL_TYPE),
+			ENUM_STRING(GL_ARRAY_SIZE),
+			ENUM_STRING(GL_NAME_LENGTH),
+			ENUM_STRING(GL_BLOCK_INDEX),
+			ENUM_STRING(GL_OFFSET),
+			ENUM_STRING(GL_ARRAY_STRIDE),
+			ENUM_STRING(GL_MATRIX_STRIDE),
+			ENUM_STRING(GL_IS_ROW_MAJOR),
+			ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER_INDEX),
+			ENUM_STRING(GL_BUFFER_BINDING),
+			ENUM_STRING(GL_BUFFER_DATA_SIZE),
+			ENUM_STRING(GL_NUM_ACTIVE_VARIABLES),
+			ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_GEOMETRY_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_FRAGMENT_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_COMPUTE_SHADER),
+			ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
+			ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
+			ENUM_STRING(GL_LOCATION),
+			ENUM_STRING(GL_LOCATION_INDEX),
+			ENUM_STRING(GL_LOCATION_COMPONENT),
+			ENUM_STRING(GL_IS_PER_PATCH),
+			ENUM_STRING(GL_NUM_COMPATIBLE_SUBROUTINES),
+			ENUM_STRING(GL_COMPATIBLE_SUBROUTINES),
+			{ NULL, 0 }
+		};
 
-	if (!force_no_names)
-		fprintf(stderr, "No active resource named \"%s\"\n", name);
-	else
-		fprintf(stderr, "No active resource with binding %i\n", block_data.binding);
+		GLuint index;
+		char name[512];
+		unsigned prop;
+		int expected;
 
-	piglit_report_result(PIGLIT_FAIL);
-	return;
+		if (query == RESOURCE_QUERY) {
+			REQUIRE(parse_uint(line, &index, &line),
+				"Bad program resource index at: %s\n", line);
+		} else {
+			if (parse_str(line, "\"\"", &line))
+				name[0] = '\0';
+			else
+				REQUIRE(parse_word_copy(line, name,
+							sizeof(name), &line),
+					"Bad program resource name at: %s\n",
+					line);
+		}
+
+		REQUIRE(parse_enum_tab(all_props, line, &prop, &line),
+			"Bad glGetProgramResourceiv prop at: %s\n", line);
+		REQUIRE(parse_enum_tab(all_types, line, (unsigned *) &expected,
+				       &line) ||
+			parse_int(line, &expected, &line),
+			"Bad expected value at: %s\n", line);
+
+		if (query == RESOURCE_QUERY) {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceiv(%s, %d, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 index, piglit_get_gl_enum_name(prop));
+
+			program_interface_query_resource(interface_type, index,
+							 prop, expected,
+							 query_str);
+		} else {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceiv(%s, %s, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 name, piglit_get_gl_enum_name(prop));
+
+			program_interface_query_resource_by_name(interface_type,
+								 name, prop,
+								 expected,
+								 query_str,
+								 block_data);
+		}
+	}
+		break;
+
+	case RESOURCE_NAME_QUERY: {
+		GLuint index;
+		GLsizei expected_length;
+		char expected_name[512];
+
+		REQUIRE(parse_uint(line, &index, &line),
+			"Bad program interface resource index at: %s\n", line);
+
+		REQUIRE(parse_int(line, &expected_length, &line),
+			"Bad expected length at: %s\n", line);
+
+		if (parse_str(line, "\"\"", &line))
+			expected_name[0] = '\0';
+		else
+			REQUIRE(parse_word_copy(line, expected_name,
+						sizeof(expected_name), &line),
+				"Bad expected name at: %s\n", line);
+
+		if (strlen(expected_name) != expected_length) {
+			fprintf(stderr,
+				"Expected values for length and name do not "
+				"match: length = %d, name = \"%s\" "
+				"(name's real length = %zu)\n",
+				expected_length, expected_name,
+				strlen(expected_name));
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		snprintf(query_str, sizeof(query_str),
+			 "glGetProgramResourceName(%s, %d)",
+			 piglit_get_gl_enum_name(interface_type),
+			 index);
+
+		program_interface_query_resource_name(interface_type, index,
+						      expected_length,
+						      expected_name, query_str);
+	}
+		break;
+	case RESOURCE_INDEX_QUERY: {
+		static const struct string_to_enum invalid_index[] = {
+			ENUM_STRING(GL_INVALID_INDEX),
+			{ NULL, 0 }
+		};
+
+		char name[512];
+		GLuint expected;
+
+		if (parse_str(line, "\"\"", &line))
+			name[0] = '\0';
+		else
+			REQUIRE(parse_word_copy(line, name, sizeof(name),
+						&line),
+				"Bad name at: %s\n", line);
+
+		REQUIRE(parse_enum_tab(invalid_index, line,
+				       (unsigned *) &expected, &line) ||
+			parse_uint(line, &expected, &line),
+			"Bad expected index at: %s\n", line);
+
+		snprintf(query_str, sizeof(query_str),
+			 "glGetProgramResourceIndex (%s, %s)",
+			 piglit_get_gl_enum_name(interface_type),
+			 name);
+
+		program_interface_query_resource_index(interface_type, name,
+						       expected, query_str);
+	}
+		break;
+	case RESOURCE_LOCATION_QUERY:
+	case RESOURCE_LOCATION_INDEX_QUERY: {
+		char name[512];
+		GLint expected;
+
+		if (parse_str(line, "\"\"", &line))
+			name[0] = '\0';
+		else
+			REQUIRE(parse_word_copy(line, name, sizeof(name),
+						&line),
+				"Bad name at: %s\n", line);
+
+		REQUIRE(parse_int(line, &expected, &line),
+			"Bad expected value at: %s\n", line);
+
+		if (query == RESOURCE_LOCATION_QUERY) {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceLocation(%s, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 name);
+
+			program_interface_query_resource_location(
+				interface_type, name, expected, query_str);
+		} else {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceLocationIndex(%s, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 name);
+
+			program_interface_query_resource_location_index(
+				interface_type, name, expected, query_str);
+		}
+	}
+		break;
+
+	default:
+		assert(!"Should not get here.");
+	}
 }
 
 static void
@@ -4846,7 +5237,7 @@ piglit_display(void)
 		} else if (parse_str(line, "verify program_query", &rest)) {
                         verify_program_query(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
-			active_program_interface(rest, block_data);
+			verify_program_interface_query(rest, block_data);
 		} else if (parse_str(line, "vertex attrib ", &rest)) {
 			set_vertex_attrib(rest);
 		} else if (parse_str(line, "newlist ", &rest)) {
