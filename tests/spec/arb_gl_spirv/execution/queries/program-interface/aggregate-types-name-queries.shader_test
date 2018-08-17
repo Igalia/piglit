@@ -1,0 +1,225 @@
+# Tests the program interface queries related with names over aggregate
+# types (arrays, structs, arrays of arrays) in shaders constructed from
+# SPIR-V binaries where no name reflection information is available.
+#
+# ATOMIC_COUNTER_BUFFER interface is excluded, since active atomic
+# counter buffer resources are not assigned name strings
+# (ARB_program_interface_query) so that interface is not an allowed argument in
+# such queries.
+#
+# Queries which accept 'name' as parameter like GetProgramResourceIndex,
+# GetProgramResourceLocation and GetProgramResourceLocationIndex are tested in
+# another file.
+#
+# ARB_gl_spirv:
+#
+# 22. How do the program interface query APIs work when no name reflection
+#     information is available?
+#
+#    RESOLVED: The following naturally follows from the specification:
+#
+#    GetProgramInterfaceiv(.., pname=MAX_NAME_LENGTH, ..) -> params = 1
+#    ...
+#    GetProgramResourceName(.., length, name) -> length=0, name = ""
+#    GetProgramResourceiv(.., props=NAME_LENGTH, ..) -> params = 1
+#    ...
+
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 45
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outColor Location 0
+               OpDecorate %u Location 1
+               OpDecorate %u DescriptorSet 0
+               OpDecorate %u Binding 1
+               OpDecorate %_arr_v4float_uint_2 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_2_uint_3 ArrayStride 32
+               OpDecorate %_arr__arr__arr_v4float_uint_2_uint_3_uint_2 ArrayStride 96
+               OpDecorate %_arr_v4float_uint_2_0 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_2_0_uint_2 ArrayStride 32
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpMemberDecorate %ComponentsBlock 1 Offset 192
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+               OpMemberDecorate %parts_0 0 Offset 0
+               OpMemberDecorate %parts_0 1 Offset 16
+               OpMemberDecorate %SSBOComponentsBlock 0 Offset 0
+               OpDecorate %SSBOComponentsBlock BufferBlock
+               OpDecorate %ssbo_components DescriptorSet 0
+               OpDecorate %ssbo_components Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+      %parts = OpTypeStruct %v4float %v4float
+%_ptr_UniformConstant_parts = OpTypePointer UniformConstant %parts
+          %u = OpVariable %_ptr_UniformConstant_parts UniformConstant
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_v4float_uint_2 = OpTypeArray %v4float %uint_2
+     %uint_3 = OpConstant %uint 3
+%_arr__arr_v4float_uint_2_uint_3 = OpTypeArray %_arr_v4float_uint_2 %uint_3
+%_arr__arr__arr_v4float_uint_2_uint_3_uint_2 = OpTypeArray %_arr__arr_v4float_uint_2_uint_3 %uint_2
+%_arr_v4float_uint_2_0 = OpTypeArray %v4float %uint_2
+%_arr__arr_v4float_uint_2_0_uint_2 = OpTypeArray %_arr_v4float_uint_2_0 %uint_2
+%ComponentsBlock = OpTypeStruct %_arr__arr__arr_v4float_uint_2_uint_3_uint_2 %_arr__arr_v4float_uint_2_0_uint_2
+%_arr_ComponentsBlock_uint_2 = OpTypeArray %ComponentsBlock %uint_2
+%_ptr_Uniform__arr_ComponentsBlock_uint_2 = OpTypePointer Uniform %_arr_ComponentsBlock_uint_2
+ %components = OpVariable %_ptr_Uniform__arr_ComponentsBlock_uint_2 Uniform
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+    %parts_0 = OpTypeStruct %v4float %v4float
+%SSBOComponentsBlock = OpTypeStruct %parts_0
+%_ptr_Uniform_SSBOComponentsBlock = OpTypePointer Uniform %SSBOComponentsBlock
+%ssbo_components = OpVariable %_ptr_Uniform_SSBOComponentsBlock Uniform
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %16 = OpAccessChain %_ptr_UniformConstant_v4float %u %int_0
+         %17 = OpLoad %v4float %16
+         %32 = OpAccessChain %_ptr_Uniform_v4float %components %int_0 %int_0 %int_1 %int_1 %int_1
+         %33 = OpLoad %v4float %32
+         %34 = OpFAdd %v4float %17 %33
+         %35 = OpAccessChain %_ptr_Uniform_v4float %components %int_0 %int_1 %int_1 %int_1
+         %36 = OpLoad %v4float %35
+         %37 = OpFAdd %v4float %34 %36
+         %42 = OpAccessChain %_ptr_Uniform_v4float %ssbo_components %int_0 %int_1
+         %43 = OpLoad %v4float %42
+         %44 = OpFAdd %v4float %37 %43
+               OpStore %outColor %44
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+struct parts {
+        vec4 u1;
+        vec4 u2;
+};
+
+layout (location = 1) uniform parts u;
+
+layout (location = 0) out vec4 outColor;
+
+layout (binding = 5, std140) uniform ComponentsBlock
+ {
+    vec4 c1[2][3][2];
+    vec4 c2[2][2];
+ } components[2];
+
+layout (binding = 0) buffer SSBOComponentsBlock
+ {
+    parts s1;
+ } ssbo_components;
+
+void main()
+{
+    outColor = u.u1 +
+               components[0].c1[1][1][1] +
+               components[0].c2[1][1] +
+	       ssbo_components.s1.u2;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+# Initialization --
+
+# ComponentsBlock
+block binding 5
+block array index 0
+block offset 144
+uniform vec4 ComponentsBlock.c1[1][1][1] 0.1 0.2 0.3 0.4
+block offset 240
+uniform vec4 ComponentsBlock.c2[1][1] 0.1 0.2 0.0 0.0
+
+# u
+uniform vec4 1 0.0 0.1 0.3 0.0
+uniform vec4 2 0.0 0.0 0.0 0.0
+
+# SSBOComponentsBlock
+block binding 0
+ssbo 0 32
+# u2
+ssbo 0 subdata float 16 0.0
+ssbo 0 subdata float 20 0.0
+ssbo 0 subdata float 24 0.1
+ssbo 0 subdata float 28 0.0
+
+# Queries --
+
+# - GetProgramInterfaceiv(.., pname=MAX_NAME_LENGTH, ..) -> params = 1
+
+verify program_interface_query interface GL_PROGRAM_INPUT        GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_PROGRAM_OUTPUT       GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_UNIFORM_BLOCK        GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_SHADER_STORAGE_BLOCK GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_UNIFORM              GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_BUFFER_VARIABLE      GL_MAX_NAME_LENGTH 1
+
+# - GetProgramResourceName(.., length, name) -> length=0, name = ""
+
+verify program_interface_query resourceName GL_PROGRAM_INPUT        (0 0)   0 ""
+verify program_interface_query resourceName GL_PROGRAM_OUTPUT       (0 0)   0 ""
+verify program_interface_query resourceName GL_UNIFORM_BLOCK        (5)     0 ""
+verify program_interface_query resourceName GL_UNIFORM_BLOCK        (6)     0 ""
+verify program_interface_query resourceName GL_SHADER_STORAGE_BLOCK (0)     0 ""
+verify program_interface_query resourceName GL_UNIFORM              (var 1) 0 ""
+verify program_interface_query resourceName GL_UNIFORM              (var 2) 0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 0)   0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 32)  0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 64)  0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 96)  0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 128) 0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 160) 0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 192) 0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 224) 0 ""
+verify program_interface_query resourceName GL_BUFFER_VARIABLE      (0 0)   0 ""
+verify program_interface_query resourceName GL_BUFFER_VARIABLE      (0 16)  0 ""
+
+# - GetProgramResourceiv(.., props=NAME_LENGTH, ..) -> params = 1
+
+verify program_interface_query resourceByData GL_PROGRAM_INPUT        (0 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_PROGRAM_OUTPUT       (0 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM_BLOCK        (5)     GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM_BLOCK        (6)     GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_SHADER_STORAGE_BLOCK (0)     GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (var 1) GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (var 2) GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 32)  GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 64)  GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 96)  GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 128) GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 160) GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 192) GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 224) GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_BUFFER_VARIABLE      (0 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_BUFFER_VARIABLE      (0 16)  GL_NAME_LENGTH 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.5 0.7 0.4
