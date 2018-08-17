@@ -22,6 +22,7 @@
  */
 
 #include "piglit-util-gl.h"
+#include "piglit-shader-test.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -30,37 +31,73 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const char vs_two_buff_text[] =
-	"#version 150\n"
-	"#extension GL_ARB_enhanced_layouts: require\n"
-	"\n"
-	"layout(xfb_buffer = 1) out;\n"
-	"layout(xfb_offset = 0) out float x1_out;\n"
-	"layout(xfb_offset = 4) out float x2_out[2];\n"
-	"layout(xfb_offset = 12) out vec3 x3_out;\n"
-	"layout(xfb_buffer = 3) out;\n"
-	"layout(xfb_offset = 0, xfb_buffer = 3) out float y1_out;\n"
-	"layout(xfb_offset = 4) out vec4 y2_out;\n"
-	"void main() {\n"
-	"  gl_Position = vec4(0.0);\n"
-	"  x1_out = 1.0;\n"
-	"  x2_out[0] = 2.0;\n"
-	"  x2_out[1] = 3.0;\n"
-	"  x3_out = vec3(4.0, 5.0, 6.0);\n"
-	"  y1_out = 7.0;\n"
-	"  y2_out = vec4(8.0, 9.0, 10.0, 11.0);\n"
-	"}";
+#define VS_TWO_BUFF_NAME "vs_two_buff.shader_test"
 
 static const char *varying_names[2][3] = {
 	 {"x1_out", "x2_out", "x3_out"},
 	 {"y1_out", "y2_out", ""} };
 
+static const int varying_types[2][3] = {
+	{GL_FLOAT, GL_FLOAT, GL_FLOAT_VEC3},
+	{GL_FLOAT, GL_FLOAT_VEC4} };
+
+static const int varying_offsets[2][3] = {
+	{0, 4, 12},
+	{0, 4}};
+
+static const int varying_buff_index[2][3] = {
+	{0, 0, 0},
+	{1, 1}};
 
 static GLuint
-build_and_use_program(const char *vs_text)
+compile_spirv_program(GLenum shader_type,
+		      const unsigned spirv_asm_size,
+		      const char *spirv_asm)
 {
-	GLuint prog = piglit_build_simple_program_multiple_shaders(
-				GL_VERTEX_SHADER, vs_text, 0);
+	GLuint shader, prog;
+
+	shader = piglit_assemble_spirv(shader_type,
+				       spirv_asm_size,
+				       spirv_asm);
+
+	glSpecializeShader(shader,
+			   "main",
+			   0, /* numSpecializationConstants */
+			   NULL /* pConstantIndex */,
+			   NULL /* pConstantValue */);
+
+	prog = glCreateProgram();
+	glAttachShader(prog, shader);
+	glDeleteShader(shader);
+
+	return prog;
+}
+
+static GLuint
+build_and_use_program(const char *shader_test_filename, bool spirv)
+{
+	GLuint prog;
+	char filepath[4096];
+	char *source;
+	unsigned source_size;
+
+	piglit_join_paths(filepath, sizeof(filepath), 6, /* num parts */
+			  piglit_source_dir(), "tests", "spec",
+			  "arb_enhanced_layouts", "shader_test",
+			  shader_test_filename);
+
+
+	piglit_load_source_from_shader_test(filepath, GL_VERTEX_SHADER, spirv,
+					    &source, &source_size);
+
+	if (spirv)
+		prog = compile_spirv_program(GL_VERTEX_SHADER, source_size,
+					     source);
+	else
+		prog = piglit_build_simple_program_multiple_shaders(
+			GL_VERTEX_SHADER, source, 0);
+
+	free(source);
 
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
@@ -75,26 +112,43 @@ build_and_use_program(const char *vs_text)
 
 static bool
 check_varyings_match(GLuint prog, GLint *values, unsigned num_values,
-		unsigned buffer)
+		     unsigned buffer, bool spirv)
 {
 	bool match = true;
+	char name[10];
+	GLint got[3];
+	GLenum props[] = {GL_TRANSFORM_FEEDBACK_BUFFER_INDEX,
+			  GL_OFFSET, GL_TYPE};
 
 	for (unsigned i = 0; i < num_values; i++) {
-		char name[10];
 		glGetProgramResourceName(prog, GL_TRANSFORM_FEEDBACK_VARYING,
 					values[i], 10, NULL, name);
 
+		glGetProgramResourceiv(prog, GL_TRANSFORM_FEEDBACK_VARYING,
+				       values[i], 3, props, 3, NULL, got);
+
 		bool match_found = false;
+		const char *varying_name = "";
 		for (unsigned i = 0; i < num_values; i++) {
-			if (strcmp(name, varying_names[buffer][i]) == 0) {
+			if (!spirv)
+				varying_name = varying_names[buffer][i];
+
+			if ((strcmp(name, varying_name) == 0) &&
+			    (got[0] == varying_buff_index[buffer][i]) &&
+			    (got[1] == varying_offsets[buffer][i]) &&
+				(got[2] == varying_types[buffer][i])) {
 				match_found = true;
 				break;
 			}
 		}
+
 		if (!match_found) {
 			match = false;
-			printf("ACTIVE_VARIABLES did no return an index for "
-				"%s\n", varying_names[buffer][i]);
+			printf("ACTIVE_VARIABLES did not return an index for "
+			       "the resource with name: \"%s\", "
+			       "buffer index: %d, offset: %d and type: %d\n",
+			       varying_names[buffer][i], got[0], got[1],
+			       got[2]);
 			break;
 		}
 	}
@@ -112,12 +166,18 @@ piglit_init(int argc, char **argv)
 	bool num_active[2] = { false, false };
 	bool varying_idx[2] = { false, false };
 	GLuint prog;
+	bool spirv = false;
 
 	piglit_require_GLSL_version(150);
 	piglit_require_extension("GL_ARB_transform_feedback3");
 	piglit_require_extension("GL_ARB_enhanced_layouts");
 
-	prog = build_and_use_program(vs_two_buff_text);
+	if (argc > 1 && !strcmp(argv[1], "spirv")) {
+		spirv = true;
+		piglit_require_extension("GL_ARB_gl_spirv");
+	}
+
+	prog = build_and_use_program(VS_TWO_BUFF_NAME, spirv);
 
 	GLint value;
         GLint values[5];
@@ -159,7 +219,8 @@ piglit_init(int argc, char **argv)
 			}
 
 			varying_idx[i] =
-				check_varyings_match(prog, &values[2], 3, 0);
+				check_varyings_match(prog, &values[2], 3, 0,
+						     spirv);
 		} else if (values[0] == 3) {
 			if (values[1] == 2) {
 				num_active[i] = true;
@@ -169,7 +230,8 @@ piglit_init(int argc, char **argv)
 			}
 
 			varying_idx[i] =
-				 check_varyings_match(prog, &values[2], 2, 1);
+				check_varyings_match(prog, &values[2], 2, 1,
+						     spirv);
 		}
 	}
 
