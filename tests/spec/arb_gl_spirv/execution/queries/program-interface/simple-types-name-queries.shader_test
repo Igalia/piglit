@@ -1,0 +1,242 @@
+# Tests the program interface queries related with names in shaders
+# constructed from SPIR-V binaries where no name reflection information
+# is available.
+#
+# ATOMIC_COUNTER_BUFFER interface is excluded, since active atomic
+# counter buffer resources are not assigned name strings
+# (ARB_program_interface_query) so that interface is not an allowed argument in
+# such queries.
+#
+# ARB_gl_spirv:
+#
+# 22. How do the program interface query APIs work when no name reflection
+#     information is available?
+#
+#    RESOLVED: The following naturally follows from the specification:
+#
+#    GetProgramInterfaceiv(.., pname=MAX_NAME_LENGTH, ..) -> params = 1
+#    GetProgramResourceIndex(.., name) -> INVALID_INDEX
+#    GetProgramResourceName(.., length, name) -> length=0, name = ""
+#    GetProgramResourceiv(.., props=NAME_LENGTH, ..) -> params = 1
+#    GetProgramResourceLocation(.., name) -> -1
+#    GetProgramResourceLocationIndex(.., name) -> -1
+#    ...
+
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 38
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outColor Location 0
+               OpDecorate %u1 Location 1
+               OpDecorate %u1 DescriptorSet 0
+               OpDecorate %u1 Binding 1
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpMemberDecorate %ComponentsBlock 1 Offset 16
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+               OpMemberDecorate %SSBOComponentsBlock 0 Offset 0
+               OpMemberDecorate %SSBOComponentsBlock 1 Offset 16
+               OpDecorate %SSBOComponentsBlock BufferBlock
+               OpDecorate %ssbo_components DescriptorSet 0
+               OpDecorate %ssbo_components Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+         %u1 = OpVariable %_ptr_UniformConstant_v4float UniformConstant
+    %v2float = OpTypeVector %float 2
+%ComponentsBlock = OpTypeStruct %v4float %v2float
+%_ptr_Uniform_ComponentsBlock = OpTypePointer Uniform %ComponentsBlock
+ %components = OpVariable %_ptr_Uniform_ComponentsBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+%SSBOComponentsBlock = OpTypeStruct %v4float %v2float
+%_ptr_Uniform_SSBOComponentsBlock = OpTypePointer Uniform %SSBOComponentsBlock
+%ssbo_components = OpVariable %_ptr_Uniform_SSBOComponentsBlock Uniform
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %12 = OpLoad %v4float %u1
+         %20 = OpAccessChain %_ptr_Uniform_v4float %components %int_0
+         %21 = OpLoad %v4float %20
+         %22 = OpFAdd %v4float %12 %21
+         %25 = OpAccessChain %_ptr_Uniform_v2float %components %int_1
+         %26 = OpLoad %v2float %25
+         %30 = OpAccessChain %_ptr_Uniform_v2float %ssbo_components %int_1
+         %31 = OpLoad %v2float %30
+         %32 = OpCompositeExtract %float %26 0
+         %33 = OpCompositeExtract %float %26 1
+         %34 = OpCompositeExtract %float %31 0
+         %35 = OpCompositeExtract %float %31 1
+         %36 = OpCompositeConstruct %v4float %32 %33 %34 %35
+         %37 = OpFAdd %v4float %22 %36
+               OpStore %outColor %37
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 outColor;
+
+layout (location = 1) uniform vec4 u1;
+
+layout (binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+layout (binding = 0) buffer SSBOComponentsBlock
+ {
+    vec4 s1;
+    vec2 s2;
+ } ssbo_components;
+
+void main()
+{
+    outColor = u1 + components.c1 + vec4(components.c2, ssbo_components.s2);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+# Initialization --
+
+# ComponentsBlock
+block binding 5
+block offset 0
+uniform vec4 ComponentsBlock.c1 0.1 0.2 0.3 0.4
+block offset 16
+uniform vec2 ComponentsBlock.c2 0.1 0.2
+
+# u1
+uniform vec4 1 0.0 0.1 0.3 0.0
+
+# SSBOComponentsBlock
+block binding 0
+ssbo 0 32 # size, aligned to 16
+# s1
+ssbo 0 subdata float 0  0.1
+ssbo 0 subdata float 4  0.2
+ssbo 0 subdata float 8  0.3
+ssbo 0 subdata float 12 0.4
+# s2
+ssbo 0 subdata float 16 0.1
+ssbo 0 subdata float 20 0.0
+
+# Queries --
+
+# - GetProgramInterfaceiv(.., pname=MAX_NAME_LENGTH, ..) -> params = 1
+
+verify program_interface_query interface GL_PROGRAM_INPUT        GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_PROGRAM_OUTPUT       GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_UNIFORM              GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_UNIFORM_BLOCK        GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_SHADER_STORAGE_BLOCK GL_MAX_NAME_LENGTH 1
+verify program_interface_query interface GL_BUFFER_VARIABLE      GL_MAX_NAME_LENGTH 1
+
+# Subroutines
+#
+# ARB_gl_spirv
+#
+# 25. What about subroutine queries based on names?
+
+#    RESOLVED. SPIR-V does not currently support subroutines, so it is not
+#    possibly to have any active subroutines from a SPIR-V based shader,
+#    and thus there is never anything to report.
+
+verify program_interface_query interface GL_VERTEX_SUBROUTINE                  GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_FRAGMENT_SUBROUTINE                GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_GEOMETRY_SUBROUTINE                GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_COMPUTE_SUBROUTINE                 GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_TESS_CONTROL_SUBROUTINE            GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_TESS_EVALUATION_SUBROUTINE         GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_VERTEX_SUBROUTINE_UNIFORM          GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_FRAGMENT_SUBROUTINE_UNIFORM        GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_GEOMETRY_SUBROUTINE_UNIFORM        GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_COMPUTE_SUBROUTINE_UNIFORM         GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_TESS_CONTROL_SUBROUTINE_UNIFORM    GL_MAX_NAME_LENGTH 0
+verify program_interface_query interface GL_TESS_EVALUATION_SUBROUTINE_UNIFORM GL_MAX_NAME_LENGTH 0
+
+# - GetProgramResourceIndex(.., name) -> INVALID_INDEX
+
+verify program_interface_query resourceIndex GL_PROGRAM_INPUT        "" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_PROGRAM_OUTPUT       "" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_UNIFORM              "" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_UNIFORM_BLOCK        "" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_SHADER_STORAGE_BLOCK "" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_BUFFER_VARIABLE      "" GL_INVALID_INDEX
+
+verify program_interface_query resourceIndex GL_PROGRAM_INPUT        "nonexistent" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_PROGRAM_OUTPUT       "nonexistent" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_UNIFORM              "nonexistent" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_UNIFORM_BLOCK        "nonexistent" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_SHADER_STORAGE_BLOCK "nonexistent" GL_INVALID_INDEX
+verify program_interface_query resourceIndex GL_BUFFER_VARIABLE      "nonexistent" GL_INVALID_INDEX
+
+# - GetProgramResourceLocation(.., name) -> -1
+
+verify program_interface_query resourceLocation GL_PROGRAM_INPUT  "" -1
+verify program_interface_query resourceLocation GL_PROGRAM_OUTPUT "" -1
+verify program_interface_query resourceLocation GL_UNIFORM        "" -1
+
+verify program_interface_query resourceLocation GL_PROGRAM_INPUT  "nonexistent" -1
+verify program_interface_query resourceLocation GL_PROGRAM_OUTPUT "nonexistent" -1
+verify program_interface_query resourceLocation GL_UNIFORM        "nonexistent" -1
+
+# - GetProgramResourceLocationIndex(.., name) -> -1
+
+verify program_interface_query resourceLocationIndex GL_PROGRAM_OUTPUT "" -1
+verify program_interface_query resourceLocationIndex GL_PROGRAM_OUTPUT "nonexistent" -1
+
+# - GetProgramResourceName(.., length, name) -> length=0, name = ""
+
+verify program_interface_query resourceName GL_PROGRAM_INPUT        (0 0)   0 ""
+verify program_interface_query resourceName GL_PROGRAM_OUTPUT       (0 0)   0 ""
+verify program_interface_query resourceName GL_UNIFORM_BLOCK        (5)     0 ""
+verify program_interface_query resourceName GL_SHADER_STORAGE_BLOCK (0)     0 ""
+verify program_interface_query resourceName GL_UNIFORM              (var 1) 0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 0)   0 ""
+verify program_interface_query resourceName GL_UNIFORM              (5 16)  0 ""
+verify program_interface_query resourceName GL_BUFFER_VARIABLE      (0 0)   0 ""
+verify program_interface_query resourceName GL_BUFFER_VARIABLE      (0 16)  0 ""
+
+# - GetProgramResourceiv(.., props=NAME_LENGTH, ..) -> params = 1
+
+verify program_interface_query resourceByData GL_PROGRAM_OUTPUT       (0 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_PROGRAM_INPUT        (0 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM_BLOCK        (5)     GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_SHADER_STORAGE_BLOCK (0)     GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (var 1) GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_UNIFORM              (5 16)  GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_BUFFER_VARIABLE      (0 0)   GL_NAME_LENGTH 1
+verify program_interface_query resourceByData GL_BUFFER_VARIABLE      (0 16)  GL_NAME_LENGTH 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.5 0.7 0.4
