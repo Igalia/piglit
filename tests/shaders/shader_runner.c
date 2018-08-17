@@ -2977,36 +2977,57 @@ active_uniform(const char *line)
 }
 
 static void
-query_check_error_int(const char *query_str, int expected, int got)
+query_check_error_int(const char *query_str, const char *old_query_str,
+		      int expected, int got)
 {
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
-		fprintf(stderr, "%s error\n", query_str);
+		fprintf(stderr, "%s error\n",
+			old_query_str ? old_query_str : query_str);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (got != expected) {
-		fprintf(stderr, "%s: expected = %d, got = %d\n",
-			query_str, expected, got);
+		if (old_query_str) {
+			fprintf(stderr,
+				"%s returns a different value than %s: "
+				"expected = %d, got = %d\n",
+				old_query_str, query_str,
+				expected, got);
+		} else {
+			fprintf(stderr, "%s: expected = %d, got = %d\n",
+				query_str, expected, got);
+		}
 		piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
 static void
-query_check_error_name(const char *query_str,
+query_check_error_name(const char *query_str, const char *old_query_str,
 		       int expected_length, int got_length,
 		       const char *expected_name, const char *got_name)
 {
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
-		fprintf(stderr, "%s error\n", query_str);
+		fprintf(stderr, "%s error\n",
+			old_query_str ? old_query_str : query_str);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (got_length != expected_length || strcmp(got_name, expected_name)) {
-		fprintf(stderr,
-			"%s: expected (length = %d, name = \"%s\"),"
-			"got (length = %d, name = \"%s\")\n", query_str,
-			expected_length, expected_name,
-			got_length, got_name);
+		if (old_query_str != NULL) {
+			fprintf(stderr,
+				"%s returns different values than %s: "
+				"expected (length = %d, name = \"%s\"), "
+				"got (length = %d, name = \"%s\")\n",
+				old_query_str, query_str,
+				expected_length, expected_name,
+				got_length, got_name);
+		} else {
+			fprintf(stderr,
+				"%s: expected (length = %d, name = \"%s\"),"
+				"got (length = %d, name = \"%s\")\n", query_str,
+				expected_length, expected_name,
+				got_length, got_name);
+		}
 		piglit_report_result(PIGLIT_FAIL);
 	}
 }
@@ -3178,7 +3199,37 @@ query_resource(unsigned interface_type, GLuint index, unsigned prop,
 	glGetProgramResourceiv(prog, interface_type, index, 1, &prop, 1,
 			       &length, &got);
 
-	query_check_error_int(query_str, expected, got);
+	query_check_error_int(query_str, NULL, expected, got);
+
+	/* Check GL_NAME_LENGTH query compatibility with the old query APIs.
+	 * We want to check that these queries return the appropiate values for
+	 * length specially in the absence of name reflection (ARB_gl_spirv).
+	 */
+	if (prop == GL_NAME_LENGTH &&
+	    (interface_type == GL_UNIFORM ||
+	     interface_type == GL_UNIFORM_BLOCK)) {
+		GLint old_got;
+		const char *old_query_str = NULL;
+
+		switch (interface_type) {
+		case GL_UNIFORM:
+			old_query_str = "glGetActiveUniformsiv";
+			glGetActiveUniformsiv(prog, 1, &index,
+					      GL_UNIFORM_NAME_LENGTH, &old_got);
+			break;
+		case GL_UNIFORM_BLOCK:
+			old_query_str = "glGetActiveUniformBlockiv";
+			glGetActiveUniformBlockiv(prog, index,
+						  GL_UNIFORM_BLOCK_NAME_LENGTH,
+						  &old_got);
+			break;
+		default:
+			break;
+		}
+
+		query_check_error_int(query_str, old_query_str,
+				      expected, old_got);
+	}
 }
 
 static void
@@ -3240,8 +3291,55 @@ query_resource_name(unsigned interface_type, GLuint index,
 	glGetProgramResourceName(prog, interface_type, index, sizeof(got_name),
 				 &got_length, got_name);
 
-	query_check_error_name(query_str, expected_length, got_length,
+	query_check_error_name(query_str, NULL, expected_length, got_length,
 			       expected_name, got_name);
+
+	/* Check compatibility with the old APIs as defined in the
+	 * ARB_program_interface_query specification.
+	 */
+	if (interface_type == GL_UNIFORM ||
+	    interface_type == GL_UNIFORM_BLOCK ||
+	    interface_type == GL_PROGRAM_INPUT) {
+		GLsizei old_length;
+		char old_name[512];
+		const char *old_query_str = NULL;
+
+		switch (interface_type) {
+		case GL_UNIFORM:
+			old_query_str = "glGetActiveUniformName";
+			glGetActiveUniformName(prog, index, sizeof(old_name),
+					       &old_length, old_name);
+
+			query_check_error_name(query_str, old_query_str,
+					       expected_length, old_length,
+					       expected_name, old_name);
+
+			old_query_str = "glGetActiveUniform";
+			glGetActiveUniform(prog, index, sizeof(old_name),
+					   &old_length, NULL, NULL, old_name);
+
+			break;
+		case GL_UNIFORM_BLOCK:
+			old_query_str = "glGetActiveUniformBlockName";
+			glGetActiveUniformBlockName(prog, index,
+						    sizeof(old_name),
+						    &old_length, old_name);
+
+			break;
+		case GL_PROGRAM_INPUT:
+			old_query_str = "glGetActiveAttrib";
+			glGetActiveAttrib(prog, index, sizeof(old_name),
+				  &old_length, NULL, NULL, old_name);
+
+			break;
+		default:
+			break;
+		}
+
+		query_check_error_name(query_str, old_query_str,
+				       expected_length, old_length,
+				       expected_name, old_name);
+	}
 }
 
 static void
@@ -3250,7 +3348,36 @@ query_resource_index(unsigned interface_type, const char *name, GLuint expected,
 {
 	GLuint got = glGetProgramResourceIndex(prog, interface_type, name);
 
-	query_check_error_int(query_str, expected, got);
+	query_check_error_int(query_str, NULL, expected, got);
+
+	/* Check compatibility with the old APIs as defined in the
+	 * ARB_program_interface_query specification.
+	 */
+	if (interface_type == GL_UNIFORM ||
+	    interface_type == GL_UNIFORM_BLOCK) {
+		GLuint old;
+		const char *old_query_str = NULL;
+
+		switch (interface_type) {
+		case GL_UNIFORM: {
+			const GLchar *names[] = { name };
+
+			old_query_str = "glGetUniformIndices";
+			glGetUniformIndices(prog, 1, names, &old);
+		}
+			break;
+		case GL_UNIFORM_BLOCK:
+			old_query_str = "glGetUniformBlockIndex";
+			old = glGetUniformBlockIndex(prog, name);
+
+			break;
+		default:
+			break;
+		}
+
+		query_check_error_int(query_str, old_query_str,
+				      expected, old);
+	}
 }
 
 static void
@@ -3260,7 +3387,39 @@ query_resource_location(unsigned interface_type, const char *name,
 
 	GLint got = glGetProgramResourceLocation(prog, interface_type, name);
 
-	query_check_error_int(query_str, expected, got);
+	query_check_error_int(query_str, NULL, expected, got);
+
+	/* Check compatibility with the old APIs as defined in the
+	 * ARB_program_interface_query specification.
+	 */
+	if (interface_type == GL_UNIFORM ||
+	    interface_type == GL_PROGRAM_INPUT ||
+	    interface_type == GL_PROGRAM_OUTPUT) {
+		GLint old;
+		const char *old_query_str = NULL;
+
+		switch (interface_type) {
+		case GL_UNIFORM:
+			old_query_str = "glGetUniformLocation";
+			old = glGetUniformLocation(prog, name);
+			break;
+		case GL_PROGRAM_INPUT:
+			old_query_str = "glGetAttriblocation";
+			old = glGetAttribLocation(prog, name);
+
+			break;
+		case GL_PROGRAM_OUTPUT:
+			old_query_str = "glGetFragDataLocation";
+			old = glGetFragDataLocation(prog, name);
+
+			break;
+		default:
+			break;
+		}
+
+		query_check_error_int(query_str,old_query_str,
+				      expected, old);
+	}
 }
 
 static void
@@ -3270,7 +3429,17 @@ query_resource_location_index(unsigned interface_type, const char *name,
 	GLint got = glGetProgramResourceLocationIndex(prog, interface_type,
 						      name);
 
-	query_check_error_int(query_str, expected, got);
+	query_check_error_int(query_str, NULL, expected, got);
+
+	/* Check compatibility with the old APIs as defined in the
+	 * ARB_program_interface_query specification.
+	 */
+	if (interface_type == GL_PROGRAM_OUTPUT) {
+		GLint old = glGetFragDataIndex(prog, name);
+
+		query_check_error_int(query_str, "glGetFragDataIndex",
+				      expected, old);
+	}
 }
 
 static void
@@ -3573,7 +3742,8 @@ verify_program_interface_query(const char *line,
 		/* Do the actual query. */
 		got = ~expected;
 		glGetProgramInterfaceiv(prog, interface_type, pname, &got);
-		query_check_error_int(query_str, expected, got);
+
+		query_check_error_int(query_str, NULL, expected, got);
 	}
 		break;
 	case QUERY_RESOURCE_BY_DATA:
