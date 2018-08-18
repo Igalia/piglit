@@ -1,0 +1,147 @@
+# UBO test using two ubos, with an array with the same size and type,
+# but setting a different array stride for each one. Used to test that
+# the size is properly computed, and the content properly accessed in
+# both cases.
+
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py, and then edited by hand to set the proper array stride
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 47
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %_ ""
+               OpName %__0 ""
+               OpDecorate %color Location 0
+               OpDecorate %_arr_v4float_uint_3 ArrayStride 16
+               OpMemberDecorate %block16 0 Offset 0
+               OpDecorate %block16 Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 5
+               OpDecorate %_arr_v4float_uint_3_0 ArrayStride 32
+               OpMemberDecorate %block32 0 Offset 0
+               OpDecorate %block32 Block
+               OpDecorate %__0 DescriptorSet 0
+               OpDecorate %__0 Binding 6
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+       %uint = OpTypeInt 32 0
+     %uint_3 = OpConstant %uint 3
+%_arr_v4float_uint_3 = OpTypeArray %v4float %uint_3
+    %block16 = OpTypeStruct %_arr_v4float_uint_3
+%_ptr_Uniform_block16 = OpTypePointer Uniform %block16
+          %_ = OpVariable %_ptr_Uniform_block16 Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+      %int_1 = OpConstant %int 1
+      %int_2 = OpConstant %int 2
+%_arr_v4float_uint_3_0 = OpTypeArray %v4float %uint_3
+    %block32 = OpTypeStruct %_arr_v4float_uint_3_0
+%_ptr_Uniform_block32 = OpTypePointer Uniform %block32
+        %__0 = OpVariable %_ptr_Uniform_block32 Uniform
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %44 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_0
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %19 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_0
+         %20 = OpLoad %v4float %19
+         %22 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_1
+         %23 = OpLoad %v4float %22
+         %24 = OpFAdd %v4float %20 %23
+         %26 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_2
+         %27 = OpLoad %v4float %26
+         %28 = OpFAdd %v4float %24 %27
+         %33 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_0
+         %34 = OpLoad %v4float %33
+         %35 = OpFSub %v4float %28 %34
+         %36 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_1
+         %37 = OpLoad %v4float %36
+         %38 = OpFSub %v4float %35 %37
+         %39 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_2
+         %40 = OpLoad %v4float %39
+         %41 = OpFSub %v4float %38 %40
+               OpStore %color %41
+         %45 = OpLoad %v4float %color
+         %46 = OpFAdd %v4float %45 %44
+               OpStore %color %46
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (std140, binding = 5) uniform block16 {
+	vec4 arr16[3];
+};
+
+/*
+ * This array will have a array_stride of 32.
+ *
+ * Note that there is no way to set a explicit array_stride on GLSL. This GLSL
+ * was used initially to generate the SPIRV-V, and then array stride was tweaked.
+ * That's the reason this is a SPIRV ONLY test. GLSL here is just as reference.
+ */
+layout (std140, binding = 6) uniform block32 {
+	vec4 arr32[3];
+};
+
+
+void main()
+{
+	color = arr16[0] + arr16[1] + arr16[2] - arr32[0] - arr32[1] - arr32[2];
+	color += vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+block binding 5
+block offset 0
+uniform vec4 arr16[0] 0.0 0.1 0.2 0.3
+block offset 16
+uniform vec4 arr16[1] 0.4 0.5 0.6 0.2
+block offset 32
+uniform vec4 arr16[2] 0.1 0.3 0.1 0.2
+
+block binding 6
+block offset 0
+uniform vec4 arr32[0] 0.0 0.1 0.2 0.3
+block offset 32
+uniform vec4 arr32[1] 0.4 0.5 0.6 0.2
+block offset 64
+uniform vec4 arr32[2] 0.1 0.3 0.1 0.2
+
+block binding 5
+verify program_interface_query GL_UNIFORM_BLOCK block16 GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK block16 GL_BUFFER_DATA_SIZE 48
+
+block binding 6
+verify program_interface_query GL_UNIFORM_BLOCK block32 GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK block32 GL_BUFFER_DATA_SIZE 96
+
+verify program_query GL_ACTIVE_UNIFORMS 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
