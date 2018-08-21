@@ -1112,7 +1112,7 @@ def process_shader_test(shader_test, config):
 
     if (len(shader_groups) == 0):
         if config.verbose:
-            print('There is no GLSL shader to convert (vertex/fragment program perhaps?)')
+            print('Skipping {}: There is no GLSL shader to convert (vertex/fragment program perhaps?)'.format(shader_test))
         return 2
 
     replacements = {}
