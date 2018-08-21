@@ -10,7 +10,7 @@ GL_ARB_gl_spirv
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 41
 ; Schema: 0
                OpCapability Shader
@@ -18,21 +18,7 @@ GL_ARB_gl_spirv
                OpMemoryModel Logical GLSL450
                OpEntryPoint Vertex %main "main" %vertexColor %_ %piglit_vertex %gl_VertexID %gl_InstanceID
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %vertexColor "vertexColor"
-               OpName %ssbo "ssbo"
-               OpMemberName %ssbo 0 "c1"
-               OpMemberName %ssbo 1 "c2"
-               OpName %components "components"
-               OpName %gl_PerVertex "gl_PerVertex"
-               OpMemberName %gl_PerVertex 0 "gl_Position"
-               OpMemberName %gl_PerVertex 1 "gl_PointSize"
-               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
-               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
                OpName %_ ""
-               OpName %piglit_vertex "piglit_vertex"
-               OpName %gl_VertexID "gl_VertexID"
-               OpName %gl_InstanceID "gl_InstanceID"
                OpDecorate %vertexColor Location 1
                OpMemberDecorate %ssbo 0 Offset 0
                OpMemberDecorate %ssbo 1 Offset 16
@@ -97,7 +83,7 @@ GL_ARB_gl_spirv
 
 layout (location = 0) in vec4 piglit_vertex;
 layout (location = 1) out vec4 vertexColor;
-layout (binding = 5) buffer ssbo
+layout (std430, binding = 5) buffer ssbo
  {
     vec4 c1;
     vec2 c2;
@@ -114,7 +100,7 @@ void main()
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 35
 ; Schema: 0
                OpCapability Shader
@@ -123,14 +109,6 @@ void main()
                OpEntryPoint Fragment %main "main" %outColor %vertexColor
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %color "color"
-               OpName %ssbo "ssbo"
-               OpMemberName %ssbo 0 "c1"
-               OpMemberName %ssbo 1 "c2"
-               OpName %components "components"
-               OpName %outColor "outColor"
-               OpName %vertexColor "vertexColor"
                OpMemberDecorate %ssbo 0 Offset 0
                OpMemberDecorate %ssbo 1 Offset 16
                OpDecorate %ssbo BufferBlock
@@ -182,7 +160,7 @@ void main()
 
 layout (location = 0) out vec4 outColor;
 layout (location = 1) in vec4 vertexColor;
-layout (binding = 5) buffer ssbo
+layout (std430, binding = 5) buffer ssbo
  {
     vec4 c1;
     vec2 c2;

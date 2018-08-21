@@ -11,7 +11,7 @@ GLSL >= 3.30
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 6
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 25
 ; Schema: 0
                OpCapability Shader
@@ -20,11 +20,6 @@ GLSL >= 3.30
                OpEntryPoint Fragment %main "main" %color
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %color "color"
-               OpName %ssbo "ssbo"
-               OpMemberName %ssbo 0 "color"
-               OpName %arr "arr"
                OpDecorate %color Location 0
                OpDecorate %_arr_v4float_uint_4 ArrayStride 16
                OpMemberDecorate %ssbo 0 Offset 0
@@ -63,7 +58,7 @@ GLSL >= 3.30
 
 layout (location = 0) out vec4 color;
 
-layout (binding = 5) buffer ssbo {
+layout (std430, binding = 5) buffer ssbo {
 	vec4 color[4];
 } arr;
 
