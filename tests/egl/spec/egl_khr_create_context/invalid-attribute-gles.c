@@ -79,6 +79,22 @@ int main(int argc, char **argv)
 	 *    attribute is only meaningful for OpenGL contexts, and specifying it
 	 *    for other types of contexts, including OpenGL ES contexts, will
 	 *    generate an error."
+	 *
+	 * However, after making the extension part of core EGL 1.5,
+	 * EGL_CONTEXT_OPENGL_RESET_NOTIFICATION_STRATEGY_KHR was made a valid
+	 * attribute for OpenGL ES contexts:
+	 *
+	 *    "The attribute EGL_CONTEXT_OPENGL_RESET_NOTIFICATION_STRATEGY
+	 *    specifies reset notification behavior for a context supporting
+	 *    robust buffer access.  The attribute value may be either
+	 *    EGL_NO_RESET_NOTIFICATION or EGL_LOSE_CONTEXT_ON_RESET, which
+	 *    respectively result in reset notification behavior of
+	 *    GL_NO_RESET_NOTIFICATION_ARB and GL_LOSE_CONTEXT_ON_RESET_ARB, as
+	 *    described by the OpenGL GL_ARB_robustness extension, or by
+	 *    equivalent functionality.
+	 *
+	 *    This attribute is supported only for OpenGL and OpenGL ES
+	 *    contexts."
 	 */
 	EGLint bad_attributes[] = {
 		0xffff0000,
@@ -97,6 +113,14 @@ int main(int argc, char **argv)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(bad_attributes); i++) {
+		/* Skip EGL_CONTEXT_OPENGL_RESET_NOTIFICATION_STRATEGY_KHR if
+		 * it's EGL 1.5+
+		 */
+		if ((bad_attributes[i] == EGL_CONTEXT_OPENGL_RESET_NOTIFICATION_STRATEGY_KHR) &&
+		    check_egl_version_at_least(1, 5)) {
+			continue;
+		}
+
 		pass = try_attribute(bad_attributes[i]) && pass;
 	}
 

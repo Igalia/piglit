@@ -27,6 +27,8 @@
 
 static Display *dpy = NULL;
 EGLDisplay egl_dpy;
+EGLint egl_major;
+EGLint egl_minor;
 EGLConfig cfg;
 EGLContext ctx;
 
@@ -87,7 +89,6 @@ EGL_KHR_create_context_setup(EGLint renderable_type_mask)
 		EGL_NONE
 	};
 	EGLint count;
-	EGLint major, minor;
 
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
@@ -101,7 +102,7 @@ EGL_KHR_create_context_setup(EGLint renderable_type_mask)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	if (!eglInitialize(egl_dpy, &major, &minor)) {
+	if (!eglInitialize(egl_dpy, &egl_major, &egl_minor)) {
 		fprintf(stderr, "eglInitialize() failed\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}

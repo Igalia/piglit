@@ -51,6 +51,8 @@
 #endif
 
 extern EGLDisplay egl_dpy;
+extern EGLint egl_major;
+extern EGLint egl_minor;
 extern EGLConfig cfg;
 extern EGLContext ctx;
 
@@ -74,4 +76,10 @@ version_is_valid_for_context(int ctx_major, int major, int minor)
 		}
 	}
 	return false;
+}
+
+static inline bool
+check_egl_version_at_least(int major, int minor)
+{
+	return ((egl_major > major) || ((egl_major == major) && (egl_minor >= minor)));
 }
