@@ -137,6 +137,7 @@ piglit_load_source_from_shader_test(const char *filename,
 	if (first_line == NULL) {
 		fprintf(stderr, "Could not find groupname \"%s\" on file \"%s\"\n",
 			group_name, filename);
+		free(text);
 		return false;
 	}
 
