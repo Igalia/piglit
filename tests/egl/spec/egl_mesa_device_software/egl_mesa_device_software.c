@@ -33,7 +33,7 @@ main(void)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	EGLDeviceEXT devs[NDEVS];
-	EGLint i, numdevs, swdevs;
+	EGLint i, numdevs, swdevs = 0;
 	EGLDeviceEXT device = EGL_NO_DEVICE_EXT;
 	EGLAttrib attr;
 	const char *devstring = NULL;
