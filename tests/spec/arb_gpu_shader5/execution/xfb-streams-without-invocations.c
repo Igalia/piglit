@@ -117,8 +117,10 @@ build_glsl_program()
 
 	if (!piglit_load_source_from_shader_test(shader_source_filename,
 						 GL_VERTEX_SHADER, false,
-						 &vs_pass_thru_text, NULL))
+						 &vs_pass_thru_text, NULL)) {
+		free(gs_text);
 		return 0;
+	}
 
 
 	prog = piglit_build_simple_program_multiple_shaders(
