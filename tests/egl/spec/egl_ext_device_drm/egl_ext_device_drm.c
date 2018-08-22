@@ -39,7 +39,7 @@ main(void)
 	EGLDisplay dpy1, dpy2, dpy3;
 	enum piglit_result result = PIGLIT_PASS;
 	EGLDeviceEXT devs[NDEVS];
-	EGLint i, numdevs, drmdevs;
+	EGLint i, numdevs, drmdevs = 0;
 	EGLDeviceEXT device = EGL_NO_DEVICE_EXT;
 	EGLAttrib attr;
 	const char *devstring = NULL;
