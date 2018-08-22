@@ -1,0 +1,25 @@
+[require]
+GLSL >= 1.20
+
+# This test exercises a Mesa GLSL bug where 'invariant' qualifier
+# propagated on uniforms causing a linker failure due to mismatch
+# of uniforms declaration between stages.
+
+[vertex shader]
+#version 120
+uniform float t;
+invariant gl_Position;
+void main()
+{
+  gl_Position = vec4(t);
+}
+
+[fragment shader]
+#version 120
+uniform float t;
+void main()
+{
+}
+
+[test]
+link success
