@@ -37,6 +37,15 @@ arg_out: 0 buffer int[16]        \
 arg_in: 1 buffer int[16] \
  0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 
+
+[test]
+name: byval struct align 8
+kernel_name: kernel_call_byval_struct_align8
+dimensions: 1
+global_size: 1 0 0
+
+arg_out: 0 buffer int[1]  1
+
 !*/
 
 #define NOINLINE __attribute__((noinline))
@@ -153,4 +162,31 @@ kernel void call_sret_Char_IntArray_func(global int* output, global int* input)
     }
 
     output[id] = sum;
+}
+
+typedef struct ByVal_Struct_Align8 {
+    long xs[9];
+} ByVal_Struct_Align8;
+
+__attribute__((noinline))
+int func(ByVal_Struct_Align8 val)
+{
+    for (int i = 0; i < 9; ++i)
+    {
+        long ld = val.xs[i];
+        if (ld != i)
+            return 0;
+    }
+    return 1;
+}
+
+__kernel void kernel_call_byval_struct_align8(__global uint* result)
+{
+    struct ByVal_Struct_Align8 val = { { 0x1337 } };
+    for (int i = 0; i < 9; ++i)
+    {
+        val.xs[i] = i;
+    }
+
+    *result = func(val);
 }
