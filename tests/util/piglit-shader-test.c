@@ -143,7 +143,7 @@ piglit_load_source_from_shader_test(const char *filename,
 	text_size = line - first_line + 1;
 
 	if (output_source) {
-		*output_source = malloc(sizeof(char*) * text_size);
+		*output_source = malloc(sizeof(char) * text_size);
 		snprintf(*output_source, line - first_line + 1, "%s", first_line);
 	}
 
