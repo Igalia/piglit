@@ -1703,6 +1703,13 @@ with profile.test_list.group_manager(
     g(['depth-clamp-range'])
     g(['depth-clamp-status'])
 
+# AMD_depth_clamp_separate
+with profile.test_list.group_manager(
+        PiglitGLTest, grouptools.join('spec', 'AMD_depth_clamp_separate')) as g:
+    g(['amd_depth_clamp_separate_status'])
+    g(['amd_depth_clamp_separate_range'])
+
+# Group ARB_draw_elements_base_vertex
 # Group ARB_draw_elements_base_vertex
 with profile.test_list.group_manager(
         PiglitGLTest,
