@@ -105,6 +105,17 @@ struct block_info {
 	int row_major; /* int as we don't have a parse_bool */
 };
 
+/* @FIXME: Make it an union */
+struct resource_info {
+	GLenum interface;
+	int location;
+	int location_component;
+	int binding;
+	int offset;
+	bool is_atomic;
+};
+
+
 #define ENUM_STRING(e) { #e, e }
 
 extern float piglit_tolerance[4];
@@ -3171,7 +3182,7 @@ enum program_interface_queries {
 	RESOURCE_NAME_QUERY,
 
 	/* Query the index of a resource within a program
-	 * using glProgramResourceIndex.
+	 * using glGetProgramResourceIndex.
 	 */
 	RESOURCE_INDEX_QUERY,
 
@@ -3241,6 +3252,145 @@ program_interface_query_check_error_name(const char *query_str,
 				got_length, got_name);
 		piglit_report_result(PIGLIT_FAIL);
 	}
+}
+
+static int
+resource_info_get_block_or_atomic_buffer_index(struct resource_info *resource)
+{
+	/* Gets the block index from the buffer binding */
+	assert(resource->interface == GL_UNIFORM ||
+	       resource->interface == GL_BUFFER_VARIABLE);
+
+	GLenum block_interface_type;
+	if (resource->interface == GL_BUFFER_VARIABLE)
+		block_interface_type = GL_SHADER_STORAGE_BLOCK;
+	else if (resource->is_atomic)
+		block_interface_type = GL_ATOMIC_COUNTER_BUFFER;
+	else
+		block_interface_type = GL_UNIFORM_BLOCK;
+
+	int num_resources;
+	glGetProgramInterfaceiv(prog, block_interface_type, GL_ACTIVE_RESOURCES,
+				&num_resources);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	GLint index;
+	GLint got;
+	GLenum prop = GL_BUFFER_BINDING;
+	for (index = 0; index < num_resources; index++) {
+		glGetProgramResourceiv(prog, block_interface_type, index, 1,
+				       &prop, 1, NULL, &got);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (got == resource->binding)
+			return index;
+	}
+
+	return -1;
+}
+
+static int
+resource_info_get_index(struct resource_info *resource)
+{
+	int index;
+	int num_resources;
+
+	glGetProgramInterfaceiv(prog, resource->interface, GL_ACTIVE_RESOURCES,
+				&num_resources);
+
+	for (index = 0; index < num_resources; index++) {
+		switch (resource->interface) {
+		case GL_PROGRAM_INPUT:
+		case GL_PROGRAM_OUTPUT: {
+			GLenum props[] = {GL_LOCATION, GL_LOCATION_COMPONENT};
+			GLint got[2];
+			glGetProgramResourceiv(prog, resource->interface, index, 2,
+					       props, 2, NULL, got);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			if (got[0] == resource->location &&
+			    got[1] == resource->location_component)
+				return index;
+		}
+			break;
+		case GL_UNIFORM:
+		case GL_BUFFER_VARIABLE: {
+			/* Atomic counter, or var inside an ubo or ssbo */
+			if (resource->binding != -1) {
+				int block_index =
+					resource_info_get_block_or_atomic_buffer_index(resource);
+
+				if (block_index == -1)
+					return -1;
+
+				GLenum props[] = {resource->is_atomic ?
+						  GL_ATOMIC_COUNTER_BUFFER_INDEX :
+						  GL_BLOCK_INDEX,
+						  GL_OFFSET};
+				GLint got[2];
+				glGetProgramResourceiv(prog, resource->interface,
+						       index, 2, props, 2, NULL, got);
+
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				if (got[0] == block_index &&
+				    got[1] == resource->offset)
+					return index;
+			} else {
+				assert(resource->interface != GL_BUFFER_VARIABLE);
+				/* The uniform neither inside a block nor is
+				 * an atomic */
+				GLint got;
+				GLenum prop = GL_LOCATION;
+				glGetProgramResourceiv(prog, resource->interface, index,
+						       1, &prop, 1, NULL, &got);
+
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				if (got == resource->location)
+					return index;
+			}
+		}
+			break;
+		case GL_UNIFORM_BLOCK:
+		case GL_SHADER_STORAGE_BLOCK:
+		case GL_ATOMIC_COUNTER_BUFFER: {
+			GLint got;
+			GLenum prop = GL_BUFFER_BINDING;
+			glGetProgramResourceiv(prog, resource->interface, index,
+					       1, &prop, 1, NULL, &got);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			if (got == resource->binding)
+				return index;
+		}
+			break;
+		case GL_TRANSFORM_FEEDBACK_VARYING:
+			/* Not supported*/
+			break;
+			/* @FIXME: Add subroutine or subroutine uniforms */
+		default:
+			break;
+		}
+	}
+
+	return -1;
 }
 
 static void
@@ -3546,6 +3696,61 @@ program_interface_query_resource_location_index(unsigned interface_type,
 	}
 }
 
+static void
+clear_resource_info(struct resource_info *resource)
+{
+	resource->interface = GL_NONE;
+	resource->location = -1;
+	resource->location_component = -1;
+	resource->binding = -1;
+	resource->offset = -1;
+	resource->is_atomic = false;
+}
+
+static void
+parse_resource_info(const char *line, struct resource_info *resource)
+{
+	switch (resource->interface) {
+	case GL_PROGRAM_INPUT:
+	case GL_PROGRAM_OUTPUT:
+		REQUIRE(parse_int(line, &(resource->location), &line),
+			"Bad location for resource at: %s\n", line);
+		REQUIRE(parse_int(line, &(resource->location_component), &line),
+			"Bad location component for resource at: %s\n",
+			line);
+		break;
+	case GL_UNIFORM:
+		if (parse_str(line, "var", &line)) {
+			REQUIRE(parse_int(line, &(resource->location), &line),
+				"Bad location for resource at: %s\n", line);
+			return;
+		}
+
+		if (parse_str(line, "atomic", &line)) {
+			resource->is_atomic = true;
+		}
+		/* No break */
+	case GL_BUFFER_VARIABLE:
+		REQUIRE(parse_int(line, &(resource->binding), &line),
+			"Bad binding for resource at: %s\n", line);
+		REQUIRE(parse_int(line, &(resource->offset), &line),
+			"Bad offset for resource at: %s\n", line);
+
+		break;
+	case GL_UNIFORM_BLOCK:
+	case GL_SHADER_STORAGE_BLOCK:
+	case GL_ATOMIC_COUNTER_BUFFER:
+		REQUIRE(parse_int(line, &(resource->binding), &line),
+			"Bad binding for resource at: %s\n", line);
+		break;
+	case GL_TRANSFORM_FEEDBACK_VARYING:
+		/* unsupported */
+		break;
+	/* @FIXME: subroutine cases */
+	default:
+		assert(0);
+	}
+}
 /**
  * Query properties of interfaces and resources used by a program
  * using ARB_program_interface_query queries.
@@ -3609,7 +3814,9 @@ program_interface_query_resource_location_index(unsigned interface_type,
  *               GL_INTERFACE_ENUM string int
  */
 static void
-verify_program_interface_query(const char *line, struct block_info block_data)
+verify_program_interface_query(const char *line,
+			       struct resource_info *resource,
+			       struct block_info block_data)
 {
 	static const struct string_to_enum all_program_interface[] = {
 		ENUM_STRING(GL_UNIFORM),
@@ -3644,6 +3851,14 @@ verify_program_interface_query(const char *line, struct block_info block_data)
 		fprintf(stderr,
 			"GL_ARB_program_interface_query not supported or "
 			"OpenGL version < 4.3\n");
+		return;
+	}
+
+	if (parse_str(line, "resource data", &line)) {
+		REQUIRE(parse_enum_tab(all_program_interface, line,
+				       &(resource->interface), &line),
+			"Bad program interface for the resource at: %s\n", line);
+		parse_resource_info(line, resource);
 		return;
 	}
 
@@ -3756,6 +3971,12 @@ verify_program_interface_query(const char *line, struct block_info block_data)
 			"Bad expected value at: %s\n", line);
 
 		if (query == RESOURCE_QUERY) {
+			/* If resource information was provided we use the index
+			 * returned by the API, instead of the passed argument.
+			 */
+			if (resource->interface != GL_NONE)
+				index = resource_info_get_index(resource);
+
 			snprintf(query_str, sizeof(query_str),
 				 "glGetProgramResourceiv(%s, %d, %s)",
 				 piglit_get_gl_enum_name(interface_type),
@@ -3764,6 +3985,7 @@ verify_program_interface_query(const char *line, struct block_info block_data)
 			program_interface_query_resource(interface_type, index,
 							 prop, expected,
 							 query_str);
+			clear_resource_info(resource);
 		} else {
 			snprintf(query_str, sizeof(query_str),
 				 "glGetProgramResourceiv(%s, %s, %s)",
@@ -4449,6 +4671,7 @@ piglit_display(void)
 	bool link_error_expected = false;
 	unsigned list = 0;
 	struct block_info block_data = {0, -1, -1, -1, -1};
+	struct resource_info resource = {GL_NONE, -1, -1, -1, -1, false};
 
 	if (test_start == NULL)
 		return PIGLIT_PASS;
@@ -5410,7 +5633,7 @@ piglit_display(void)
 		} else if (parse_str(line, "verify program_query", &rest)) {
                         verify_program_query(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
-			verify_program_interface_query(rest, block_data);
+			verify_program_interface_query(rest, &resource, block_data);
 		} else if (parse_str(line, "vertex attrib ", &rest)) {
 			set_vertex_attrib(rest);
 		} else if (parse_str(line, "newlist ", &rest)) {
