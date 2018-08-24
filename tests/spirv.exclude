@@ -134,3 +134,5 @@ tests/shaders/link-struct-usage
 tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 # expects linker errors in GLSL, but the code is valid on SPIRV
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
+# GL_ARB_shader_subroutine is not supported
+tests/spec/arb_shader_subroutine
