@@ -405,7 +405,7 @@ class CompatReplacement(object):
         self.name = name
         self.declaration = declaration
 
-def fixup_glsl_shaders(shaders):
+def fixup_glsl_shaders(shaders, skip_reasons):
     """
     There are many reasons why a set of GLSL shaders may not be suitable for
     compilation to SPIR-V. This function tries to fix many of them, and
@@ -531,8 +531,6 @@ def fixup_glsl_shaders(shaders):
             skip_reasons.add(token)
 
     shaders.sort(key=lambda shader: get_stage_order(shader.stage))
-
-    skip_reasons = set()
 
     for shader in shaders:
         glsl = GLSLSource(shader.source())
@@ -986,7 +984,7 @@ def replace_inputs_with_outputs(spirv, prev_stage, this_stage):
 
 #Returns: 0 for failure, 1 for success, 2 for skip
 #  FIXME: better return values
-def process_shader_test(shader_test, config):
+def process_shader_test(shader_test, config, skip_reasons):
     unsupported_gl_extensions = set([
         # Pretty much inherently unsupported
         'GL_ARB_geometry_shader4',
@@ -1083,8 +1081,8 @@ def process_shader_test(shader_test, config):
                                 print('{}: skip due to SPIRV NO line'.format(shader_test))
                             return 2
                 elif (words[0] in unsupported_gl_extensions or words[0].startswith('GL_OES_')):
+                    skip_reasons.add('{} not supported by ARB_gl_spirv'.format(words[0]))
                     if config.verbose:
-                        # Needs no SPIRV line, since shader_runner can also skip automatically
                         print('{}: skip due to {}'.format(shader_test, words[0]))
                     return 2
                 continue
@@ -1098,16 +1096,11 @@ def process_shader_test(shader_test, config):
         shader = None
 
     if have_glsl and not config.no_transform:
-        skip_reasons = fixup_glsl_shaders(shaders)
-
-        if config.mark_skip:
-            if skip_reasons or (spirv_line and spirv_line[0] == 'NO'):
-                global num_mark_skipped
-                update_spirv_line(shader_test, skip_reasons)
-                num_mark_skipped = num_mark_skipped + 1
+        fixup_glsl_shaders(shaders, skip_reasons)
 
         if skip_reasons:
-            print('{}: skip (reasons: {})'.format(shader_test, ', '.join(skip_reasons)))
+            if config.verbose:
+                print('{}: skip (reasons: {})'.format(shader_test, ', '.join(skip_reasons)))
             if spirv_line and spirv_line[0] != 'NO':
                 print('{}: SPIRV line indicates that skip should not happen'.format(shader_test))
                 return 0
@@ -1121,8 +1114,13 @@ def process_shader_test(shader_test, config):
             shader_groups[-1].append(shader)
 
     if (len(shader_groups) == 0):
+        # If we are here, we are on a case without GLSL code. The options are
+        # a vertex/fragment program, or a pure-SPIR-V shader. On the latter
+        # we don't want to add a skip_reason, in order to avoid being mark-skipped
+        if spirv_line is None:
+            skip_reasons.add('There is no GLSL shader to convert (vertex/fragment program perhaps?)')
         if config.verbose:
-            print('Skipping {}: There is no GLSL shader to convert (vertex/fragment program perhaps?)'.format(shader_test))
+            print('Skipping {}: There is no GLSL shader to convert (vertex/fragment program, or only SPIR-V perhaps?)'.format(shader_test))
         return 2
 
     replacements = {}
@@ -1288,6 +1286,7 @@ def main():
         skip_list = open(config.skip_list_file[0], 'w')
 
     for shader_test_num in range(proc_num, len(all_tests), n_jobs):
+        skip_reasons = set()
         shader_test = all_tests[shader_test_num]
         num_total = num_total + 1
 
@@ -1302,14 +1301,13 @@ def main():
                     skip_list.write('{}\n'.format(shader_test))
             if config.mark_skip:
                 global num_mark_skipped
-                skip_reasons = set()
                 skip_reasons.add('Test included on exclude file')
                 update_spirv_line(shader_test, skip_reasons)
                 num_mark_skipped = num_mark_skipped + 1
             continue
 
         try:
-            outcome = process_shader_test(shader_test, config)
+            outcome = process_shader_test(shader_test, config, skip_reasons)
             if outcome == 0:
                 num_fail = num_fail + 1
                 success = False
@@ -1331,6 +1329,11 @@ def main():
         except:
             print('Uncaught exception during {}'.format(shader_test))
             raise
+
+        if config.mark_skip:
+            if skip_reasons:
+                update_spirv_line(shader_test, skip_reasons)
+                num_mark_skipped = num_mark_skipped + 1
 
     for pid in procs:
         pid, status = os.waitpid(pid, 0)
