@@ -159,12 +159,14 @@ ssbo 0 subdata float 20 0.0
 # Inputs/outputs
 
 verify program_interface_query interface GL_PROGRAM_INPUT GL_MAX_NAME_LENGTH 1
+verify program_interface_query resource data GL_PROGRAM_INPUT 0 0
 verify program_interface_query resource GL_PROGRAM_INPUT 0 GL_NAME_LENGTH 1
 verify program_interface_query resourceName GL_PROGRAM_INPUT 0 0 ""
 verify program_interface_query resourceIndex GL_PROGRAM_INPUT "" GL_INVALID_INDEX
 verify program_interface_query resourceLocation GL_PROGRAM_INPUT "" -1
 
 verify program_interface_query interface GL_PROGRAM_OUTPUT GL_MAX_NAME_LENGTH 1
+verify program_interface_query resource data GL_PROGRAM_OUTPUT 0 0
 verify program_interface_query resource GL_PROGRAM_OUTPUT 0 GL_NAME_LENGTH 1
 verify program_interface_query resourceName GL_PROGRAM_OUTPUT 0 0 ""
 verify program_interface_query resourceIndex GL_PROGRAM_OUTPUT "" GL_INVALID_INDEX
@@ -174,14 +176,24 @@ verify program_interface_query resourceLocationIndex GL_PROGRAM_OUTPUT "" -1
 # Uniforms
 
 verify program_interface_query interface GL_UNIFORM GL_MAX_NAME_LENGTH 1
+verify program_interface_query resource data GL_UNIFORM var 1
 verify program_interface_query resource GL_UNIFORM 0 GL_NAME_LENGTH 1
 verify program_interface_query resourceName GL_UNIFORM 0 0 ""
 verify program_interface_query resourceIndex GL_UNIFORM "" GL_INVALID_INDEX
 verify program_interface_query resourceLocation GL_UNIFORM "" -1
 
+verify program_interface_query resource data GL_UNIFORM 5 0
+verify program_interface_query resource GL_UNIFORM 0 GL_NAME_LENGTH 1
+verify program_interface_query resourceName GL_UNIFORM 1 0 ""
+
+verify program_interface_query resource data GL_UNIFORM 5 16
+verify program_interface_query resource GL_UNIFORM 0 GL_NAME_LENGTH 1
+verify program_interface_query resourceName GL_UNIFORM 2 0 ""
+
 # Uniform block
 
 verify program_interface_query interface GL_UNIFORM_BLOCK GL_MAX_NAME_LENGTH 1
+verify program_interface_query resource data GL_UNIFORM_BLOCK 5
 verify program_interface_query resource GL_UNIFORM_BLOCK 0 GL_NAME_LENGTH 1
 verify program_interface_query resourceName GL_UNIFORM_BLOCK 0 0 ""
 verify program_interface_query resourceIndex GL_UNIFORM_BLOCK "" GL_INVALID_INDEX
@@ -189,6 +201,7 @@ verify program_interface_query resourceIndex GL_UNIFORM_BLOCK "" GL_INVALID_INDE
 # SSBOs
 
 verify program_interface_query interface GL_SHADER_STORAGE_BLOCK GL_MAX_NAME_LENGTH 1
+verify program_interface_query resource data GL_SHADER_STORAGE_BLOCK 0
 verify program_interface_query resource GL_SHADER_STORAGE_BLOCK 0 GL_NAME_LENGTH 1
 verify program_interface_query resourceName GL_SHADER_STORAGE_BLOCK 0 0 ""
 verify program_interface_query resourceIndex GL_SHADER_STORAGE_BLOCK "" GL_INVALID_INDEX
@@ -196,9 +209,14 @@ verify program_interface_query resourceIndex GL_SHADER_STORAGE_BLOCK "" GL_INVAL
 # Buffer variables
 
 verify program_interface_query interface GL_BUFFER_VARIABLE GL_MAX_NAME_LENGTH 1
+verify program_interface_query resource data GL_BUFFER_VARIABLE 0 0
 verify program_interface_query resource GL_BUFFER_VARIABLE 0 GL_NAME_LENGTH 1
 verify program_interface_query resourceName GL_BUFFER_VARIABLE 0 0 ""
 verify program_interface_query resourceIndex GL_BUFFER_VARIABLE "" GL_INVALID_INDEX
+
+verify program_interface_query resource data GL_BUFFER_VARIABLE 0 16
+verify program_interface_query resource GL_BUFFER_VARIABLE 1 GL_NAME_LENGTH 1
+verify program_interface_query resourceName GL_BUFFER_VARIABLE 1 0 ""
 
 # Subroutines
 #
