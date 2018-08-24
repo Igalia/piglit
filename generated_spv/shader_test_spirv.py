@@ -991,7 +991,7 @@ def process_shader_test(shader_test, config, skip_reasons):
 
         # glslang limitation
         'GL_MESA_shader_integer_functions',
-        'GL_EXT_shader_framebuffer_fetch'
+        'GL_EXT_shader_framebuffer_fetch',
         'GL_EXT_shader_framebuffer_fetch_non_coherent'
     ])
 
