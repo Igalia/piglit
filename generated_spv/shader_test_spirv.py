@@ -616,6 +616,9 @@ def parse_args():
     parser.add_argument("--recheck",
                         action="store_true",
                         help="Force a re-check of tests marked SPIRV NO (except SPIRV NO OTHER)")
+    parser.add_argument("--skip-already-processed",
+                        action="store_true",
+                        help="Skip tests already marked as SPIRV YES or SPIRV ONLY. Those are not included on the mark_skip.")
     parser.add_argument("--mark-skip",
                         action="store_true",
                         help="Update shader_test files in place with required SPIRV NO lines")
@@ -1081,6 +1084,13 @@ def process_shader_test(shader_test, config, skip_reasons):
                             if config.verbose:
                                 print('{}: skip due to SPIRV NO line'.format(shader_test))
                             return 2
+
+                        if (spirv_line[0] == 'YES' or spirv_line[0] == 'ONLY'):
+                            if (config.skip_already_processed):
+                                if (config.verbose):
+                                    print('{}: already have SPIRV yes')
+                                return 2;
+
                 elif (words[0] in unsupported_gl_extensions or words[0].startswith('GL_OES_')):
                     skip_reasons.add('{} not supported by ARB_gl_spirv'.format(words[0]))
                     if config.verbose:
