@@ -983,7 +983,7 @@ def replace_inputs_with_outputs(spirv, prev_stage, this_stage):
 
 #Returns: 0 for failure, 1 for success, 2 for skip
 #  FIXME: better return values
-def process_shader_test(shader_test, config):
+def process_shader_test(shader_test, config, skip_reasons):
     unsupported_gl_extensions = set([
         # Pretty much inherently unsupported
         'GL_ARB_geometry_shader4',
@@ -1073,6 +1073,7 @@ def process_shader_test(shader_test, config):
                                 print('{}: skip due to SPIRV NO line'.format(shader_test))
                             return 2
                 elif (words[0] in unsupported_gl_extensions or words[0].startswith('GL_OES_')):
+                    skip_reasons.add('{} not supported by ARB_gl_spirv'.format(words[0]))
                     if config.verbose:
                         # Needs no SPIRV line, since shader_runner can also skip automatically
                         print('{}: skip due to {}'.format(shader_test, words[0]))
@@ -1268,6 +1269,7 @@ def main():
     num_fail = 0
     num_total = 0
     num_skipped = 0;
+    skip_reasons = set()
 
     error_list = None
     if config.error_list_file is not None:
@@ -1284,16 +1286,11 @@ def main():
                 break
         if excluded:
             num_excluded = num_excluded + 1
-            if config.mark_skip:
-                global num_mark_skipped
-                skip_reasons = set()
-                skip_reasons.add('Test included on exclude file')
-                update_spirv_line(shader_test, skip_reasons)
-                num_mark_skipped = num_mark_skipped + 1
+            skip_reasons.add('Test included on exclude file')
             continue
 
         try:
-            outcome = process_shader_test(shader_test, config)
+            outcome = process_shader_test(shader_test, config, skip_reasons)
             if outcome == 0:
                 num_fail = num_fail + 1
                 success = False
@@ -1313,6 +1310,11 @@ def main():
         except:
             print('Uncaught exception during {}'.format(shader_test))
             raise
+
+    if config.mark_skip and len(skip_reasons) > 0:
+        global num_mark_skipped
+        update_spirv_line(shader_test, skip_reasons)
+        num_mark_skipped = num_mark_skipped + 1
 
     for pid in procs:
         pid, status = os.waitpid(pid, 0)
