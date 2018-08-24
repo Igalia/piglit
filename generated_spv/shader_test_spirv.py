@@ -630,6 +630,9 @@ def parse_args():
     parser.add_argument("-o", "--error-list-file",
                         nargs='+',
                         help="Prints the list of tests that failed to be converted on the given file")
+    parser.add_argument("--skip-list-file",
+                        nargs='+',
+                        help="Prints the list of tests that were skipped or excluded to be converted on the given file")
     parser.add_argument("-n", "--no-transform",
                         action="store_true",
                         help="Don't try to transform GLSL shaders")
@@ -1280,6 +1283,10 @@ def main():
     if config.error_list_file is not None:
         error_list = open(config.error_list_file[0], 'w')
 
+    skip_list = None
+    if config.skip_list_file is not None:
+        skip_list = open(config.skip_list_file[0], 'w')
+
     for shader_test_num in range(proc_num, len(all_tests), n_jobs):
         shader_test = all_tests[shader_test_num]
         num_total = num_total + 1
@@ -1291,6 +1298,8 @@ def main():
                 break
         if excluded:
             num_excluded = num_excluded + 1
+            if skip_list is not None:
+                    skip_list.write('{}\n'.format(shader_test))
             if config.mark_skip:
                 global num_mark_skipped
                 skip_reasons = set()
@@ -1314,6 +1323,8 @@ def main():
                 num_success = num_success + 1
             elif outcome == 2:
                 num_skipped = num_skipped +1
+                if skip_list is not None:
+                    skip_list.write('{}\n'.format(shader_test))
             else:
                 print("Unknown return type when processing shader {}".format(shader_test))
 
@@ -1340,6 +1351,9 @@ def main():
 
     if error_list is not None:
         error_list.close()
+
+    if skip_list is not None:
+        skip_list.close()
 
     return success
 
