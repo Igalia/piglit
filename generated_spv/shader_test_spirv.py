@@ -1001,7 +1001,6 @@ def process_shader_test(shader_test, config, skip_reasons):
         # glslang limitation
         'GL_MESA_shader_integer_functions',
         'GL_ARB_shader_atomic_counter_ops',
-        'GL_EXT_shader_integer_mix',
         'GL_INTEL_shader_atomic_float_minmax'
     ])
 
