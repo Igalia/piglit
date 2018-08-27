@@ -1,0 +1,33 @@
+# Exercises a Mesa GLSL linker bug.
+#
+# Output "foo" variable is not used in the "main" vertex shader
+# but used in fragment shader
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+out vec4 foo;
+void unused()
+{
+    foo=vec4(1);
+}
+
+[vertex shader]
+in vec4 pos;
+void main()
+{
+    gl_Position = pos;
+}
+
+[fragment shader]
+in vec4 foo;
+out vec4 color;
+
+void main()
+{
+    gl_FragColor=foo;
+}
+
+[test]
+link success
