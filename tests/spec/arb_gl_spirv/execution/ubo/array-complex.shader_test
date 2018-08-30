@@ -1,0 +1,183 @@
+# UBO test using an array of ubos, with a complex content.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 77
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outColor Location 0
+               OpMemberDecorate %S 0 Offset 0
+               OpMemberDecorate %S 1 Offset 16
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpMemberDecorate %ComponentsBlock 1 Offset 8
+               OpMemberDecorate %ComponentsBlock 2 Offset 16
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+               OpDecorate %normal_array Location 3
+               OpDecorate %normal_array DescriptorSet 0
+               OpDecorate %normal_array Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+    %v2float = OpTypeVector %float 2
+    %v3float = OpTypeVector %float 3
+          %S = OpTypeStruct %v3float %v4float
+%ComponentsBlock = OpTypeStruct %float %v2float %S
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_ComponentsBlock_uint_2 = OpTypeArray %ComponentsBlock %uint_2
+%_ptr_Uniform__arr_ComponentsBlock_uint_2 = OpTypePointer Uniform %_arr_ComponentsBlock_uint_2
+ %components = OpVariable %_ptr_Uniform__arr_ComponentsBlock_uint_2 Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+    %float_0 = OpConstant %float 0
+      %int_2 = OpConstant %int 2
+%_ptr_Uniform_v3float = OpTypePointer Uniform %v3float
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+     %uint_5 = OpConstant %uint 5
+%_arr_v4float_uint_5 = OpTypeArray %v4float %uint_5
+%_ptr_UniformConstant__arr_v4float_uint_5 = OpTypePointer UniformConstant %_arr_v4float_uint_5
+%normal_array = OpVariable %_ptr_UniformConstant__arr_v4float_uint_5 UniformConstant
+%_ptr_UniformConstant_v4float = OpTypePointer UniformConstant %v4float
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %22 = OpAccessChain %_ptr_Uniform_float %components %int_0 %int_0
+         %23 = OpLoad %float %22
+         %24 = OpCompositeConstruct %v4float %23 %23 %23 %23
+         %27 = OpAccessChain %_ptr_Uniform_v2float %components %int_0 %int_1
+         %28 = OpLoad %v2float %27
+         %30 = OpCompositeExtract %float %28 0
+         %31 = OpCompositeExtract %float %28 1
+         %32 = OpCompositeConstruct %v4float %30 %31 %float_0 %float_0
+         %33 = OpFAdd %v4float %24 %32
+         %36 = OpAccessChain %_ptr_Uniform_v3float %components %int_0 %int_2 %int_0
+         %37 = OpLoad %v3float %36
+         %38 = OpCompositeExtract %float %37 0
+         %39 = OpCompositeExtract %float %37 1
+         %40 = OpCompositeExtract %float %37 2
+         %41 = OpCompositeConstruct %v4float %38 %39 %40 %float_0
+         %42 = OpFAdd %v4float %33 %41
+         %44 = OpAccessChain %_ptr_Uniform_v4float %components %int_0 %int_2 %int_1
+         %45 = OpLoad %v4float %44
+         %46 = OpFAdd %v4float %42 %45
+               OpStore %outColor %46
+         %47 = OpAccessChain %_ptr_Uniform_float %components %int_1 %int_0
+         %48 = OpLoad %float %47
+         %49 = OpCompositeConstruct %v4float %48 %48 %48 %48
+         %50 = OpAccessChain %_ptr_Uniform_v2float %components %int_1 %int_1
+         %51 = OpLoad %v2float %50
+         %52 = OpCompositeExtract %float %51 0
+         %53 = OpCompositeExtract %float %51 1
+         %54 = OpCompositeConstruct %v4float %52 %53 %float_0 %float_0
+         %55 = OpFAdd %v4float %49 %54
+         %56 = OpAccessChain %_ptr_Uniform_v3float %components %int_1 %int_2 %int_0
+         %57 = OpLoad %v3float %56
+         %58 = OpCompositeExtract %float %57 0
+         %59 = OpCompositeExtract %float %57 1
+         %60 = OpCompositeExtract %float %57 2
+         %61 = OpCompositeConstruct %v4float %58 %59 %60 %float_0
+         %62 = OpFAdd %v4float %55 %61
+         %63 = OpAccessChain %_ptr_Uniform_v4float %components %int_1 %int_2 %int_1
+         %64 = OpLoad %v4float %63
+         %65 = OpFAdd %v4float %62 %64
+         %66 = OpLoad %v4float %outColor
+         %67 = OpFSub %v4float %66 %65
+               OpStore %outColor %67
+         %73 = OpAccessChain %_ptr_UniformConstant_v4float %normal_array %int_0
+         %74 = OpLoad %v4float %73
+         %75 = OpLoad %v4float %outColor
+         %76 = OpFAdd %v4float %75 %74
+               OpStore %outColor %76
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+struct S {
+  vec3 c3;
+  vec4 c4;
+};
+
+layout (location = 0) out vec4 outColor;
+layout (std140, binding = 5, row_major) uniform ComponentsBlock
+ {
+    float c1;
+    vec2 c2;
+    S s;
+ } components[2];
+
+layout (location = 3) uniform vec4 normal_array[5];
+
+void main()
+{
+    outColor =  vec4(components[0].c1) + vec4(components[0].c2, 0.0, 0.0)  + vec4(components[0].s.c3, 0) + components[0].s.c4;
+    outColor -= vec4(components[1].c1) + vec4(components[1].c2, 0.0, 0.0)  + vec4(components[1].s.c3, 0) + components[1].s.c4;
+    outColor += normal_array[0];
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+uniform vec4 3 0.2 0.1 0.1 0.1
+
+block binding 5
+
+block array index 0
+block offset 0
+uniform float ComponentsBlock.c1   0.5
+block offset 8
+uniform vec2  ComponentsBlock.c2   0.2 0.3
+block offset 16
+uniform vec3  ComponentsBlock.s.c3 0.2 0.5 0.4
+block offset 32
+uniform vec4  ComponentsBlock.s.c4 0.2 0.3 0.4 0.5
+
+block array index 1
+block offset 0
+uniform float ComponentsBlock.c1   0.1
+block offset 8
+uniform vec2  ComponentsBlock.c2   0.3 0.1
+block offset 16
+uniform vec3  ComponentsBlock.s.c3 0.5 0.3 0.3
+block offset 32
+uniform vec4  ComponentsBlock.s.c4 0.1 0.4 0.2 0.4
+
+
+block binding 5
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock[0] GL_NUM_ACTIVE_VARIABLES 4
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock[0] GL_BUFFER_DATA_SIZE 48
+
+block binding 6
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock[1] GL_NUM_ACTIVE_VARIABLES 4
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock[1] GL_BUFFER_DATA_SIZE 48
+
+verify program_query GL_ACTIVE_UNIFORMS 5
+
+draw rect -1 -1 2 2
+probe all rgba 0.3 0.8 0.8 0.6
