@@ -1,0 +1,184 @@
+# Using a array of arrays inside a ubo, instead of a aoa of ubos.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 77
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpDecorate %_arr_v4float_uint_4 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_4_uint_3 ArrayStride 64
+               OpDecorate %_arr__arr__arr_v4float_uint_4_uint_3_uint_2 ArrayStride 192
+               OpDecorate %_arr_v4float_uint_2 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_2_uint_2 ArrayStride 32
+               OpMemberDecorate %block 0 Offset 0
+               OpMemberDecorate %block 1 Offset 384
+               OpDecorate %block Block
+               OpDecorate %arr DescriptorSet 0
+               OpDecorate %arr Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+       %uint = OpTypeInt 32 0
+     %uint_4 = OpConstant %uint 4
+%_arr_v4float_uint_4 = OpTypeArray %v4float %uint_4
+     %uint_3 = OpConstant %uint 3
+%_arr__arr_v4float_uint_4_uint_3 = OpTypeArray %_arr_v4float_uint_4 %uint_3
+     %uint_2 = OpConstant %uint 2
+%_arr__arr__arr_v4float_uint_4_uint_3_uint_2 = OpTypeArray %_arr__arr_v4float_uint_4_uint_3 %uint_2
+%_arr_v4float_uint_2 = OpTypeArray %v4float %uint_2
+%_arr__arr_v4float_uint_2_uint_2 = OpTypeArray %_arr_v4float_uint_2 %uint_2
+      %block = OpTypeStruct %_arr__arr__arr_v4float_uint_4_uint_3_uint_2 %_arr__arr_v4float_uint_2_uint_2
+%_ptr_Uniform_block = OpTypePointer Uniform %block
+        %arr = OpVariable %_ptr_Uniform_block Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%float_0_100000001 = OpConstant %float 0.100000001
+%float_0_200000003 = OpConstant %float 0.200000003
+%float_0_300000012 = OpConstant %float 0.300000012
+         %36 = OpConstantComposite %v4float %float_0 %float_0_100000001 %float_0_200000003 %float_0_300000012
+       %bool = OpTypeBool
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+%float_0_400000006 = OpConstant %float 0.400000006
+  %float_0_5 = OpConstant %float 0.5
+%float_0_600000024 = OpConstant %float 0.600000024
+%float_0_699999988 = OpConstant %float 0.699999988
+         %51 = OpConstantComposite %v4float %float_0_400000006 %float_0_5 %float_0_600000024 %float_0_699999988
+      %int_2 = OpConstant %int 2
+      %int_3 = OpConstant %int 3
+%float_0_800000012 = OpConstant %float 0.800000012
+%float_0_899999976 = OpConstant %float 0.899999976
+         %63 = OpConstantComposite %v4float %float_0_800000012 %float_0_899999976 %float_1 %float_0_100000001
+         %71 = OpConstantComposite %v4float %float_0_300000012 %float_0_5 %float_0_699999988 %float_0_899999976
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %color %15
+         %31 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_0 %int_0
+         %32 = OpLoad %v4float %31
+         %39 = OpFOrdNotEqual %v4bool %32 %36
+         %40 = OpAny %bool %39
+               OpSelectionMerge %42 None
+               OpBranchConditional %40 %41 %42
+         %41 = OpLabel
+         %43 = OpLoad %v4float %fail_color
+               OpStore %color %43
+               OpBranch %42
+         %42 = OpLabel
+         %45 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_1 %int_1
+         %46 = OpLoad %v4float %45
+         %52 = OpFOrdNotEqual %v4bool %46 %51
+         %53 = OpAny %bool %52
+               OpSelectionMerge %55 None
+               OpBranchConditional %53 %54 %55
+         %54 = OpLabel
+         %56 = OpLoad %v4float %fail_color
+               OpStore %color %56
+               OpBranch %55
+         %55 = OpLabel
+         %59 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_2 %int_3
+         %60 = OpLoad %v4float %59
+         %64 = OpFOrdNotEqual %v4bool %60 %63
+         %65 = OpAny %bool %64
+               OpSelectionMerge %67 None
+               OpBranchConditional %65 %66 %67
+         %66 = OpLabel
+         %68 = OpLoad %v4float %fail_color
+               OpStore %color %68
+               OpBranch %67
+         %67 = OpLabel
+         %69 = OpAccessChain %_ptr_Uniform_v4float %arr %int_1 %int_1 %int_1
+         %70 = OpLoad %v4float %69
+         %72 = OpFOrdNotEqual %v4bool %70 %71
+         %73 = OpAny %bool %72
+               OpSelectionMerge %75 None
+               OpBranchConditional %73 %74 %75
+         %74 = OpLabel
+         %76 = OpLoad %v4float %fail_color
+               OpStore %color %76
+               OpBranch %75
+         %75 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (std140, binding = 5, std140) uniform block {
+	vec4 color[2][3][4];
+	vec4 position[2][2];
+} arr;
+
+
+
+void main()
+{
+	vec4 fail_color = vec4(1.0, 0.0, 0.0, 1.0);
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (arr.color[0][0][0] != vec4(0.0, 0.1, 0.2, 0.3))
+	   color = fail_color;
+
+	if (arr.color[1][1][1] != vec4(0.4, 0.5, 0.6, 0.7))
+	   color = fail_color;
+
+	if (arr.color[1][2][3] != vec4(0.8, 0.9, 1.0, 0.1))
+	   color = fail_color;
+
+	if (arr.position[1][1] != vec4(0.3, 0.5, 0.7, 0.9))
+	   color = fail_color;
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+block binding 5
+block offset 0
+uniform vec4 block.color[0][0][0] 0.0 0.1 0.2 0.3
+
+block offset 272
+uniform vec4 block.color[1][1][1] 0.4 0.5 0.6 0.7
+
+block offset 368
+uniform vec4 block.color[1][2][3] 0.8 0.9 1.0 0.1
+
+block offset 432
+uniform vec4 block.position[1][1] 0.3 0.5 0.7 0.9
+
+
+verify program_interface_query GL_UNIFORM_BLOCK block GL_NUM_ACTIVE_VARIABLES 8
+verify program_interface_query GL_UNIFORM_BLOCK block GL_BUFFER_DATA_SIZE 448
+
+verify program_query GL_ACTIVE_UNIFORMS 8
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
