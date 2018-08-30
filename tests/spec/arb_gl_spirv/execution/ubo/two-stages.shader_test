@@ -1,0 +1,276 @@
+# Simple UBO test with two stages using the same UBO.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 63
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %vertexColor %_ %piglit_vertex %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %_ ""
+               OpDecorate %vertexColor Location 1
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpMemberDecorate %ComponentsBlock 1 Offset 16
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%vertexColor = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+    %v2float = OpTypeVector %float 2
+%ComponentsBlock = OpTypeStruct %v4float %v2float
+%_ptr_Uniform_ComponentsBlock = OpTypePointer Uniform %ComponentsBlock
+ %components = OpVariable %_ptr_Uniform_ComponentsBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%float_4575_7998 = OpConstant %float 4575.7998
+%float_14191_6123 = OpConstant %float 14191.6123
+%float_n30199_3086 = OpConstant %float -30199.3086
+%float_n31303_4219 = OpConstant %float -31303.4219
+         %29 = OpConstantComposite %v4float %float_4575_7998 %float_14191_6123 %float_n30199_3086 %float_n31303_4219
+       %bool = OpTypeBool
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+%float_n10231_1807 = OpConstant %float -10231.1807
+%float_11729_6475 = OpConstant %float 11729.6475
+         %43 = OpConstantComposite %v2float %float_n10231_1807 %float_11729_6475
+     %v2bool = OpTypeVector %bool 2
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %vertexColor %15
+         %23 = OpAccessChain %_ptr_Uniform_v4float %components %int_0
+         %24 = OpLoad %v4float %23
+         %32 = OpFOrdNotEqual %v4bool %24 %29
+         %33 = OpAny %bool %32
+               OpSelectionMerge %35 None
+               OpBranchConditional %33 %34 %35
+         %34 = OpLabel
+         %36 = OpLoad %v4float %fail_color
+               OpStore %vertexColor %36
+               OpBranch %35
+         %35 = OpLabel
+         %39 = OpAccessChain %_ptr_Uniform_v2float %components %int_1
+         %40 = OpLoad %v2float %39
+         %45 = OpFOrdNotEqual %v2bool %40 %43
+         %46 = OpAny %bool %45
+               OpSelectionMerge %48 None
+               OpBranchConditional %46 %47 %48
+         %47 = OpLabel
+         %49 = OpLoad %v4float %fail_color
+               OpStore %vertexColor %49
+               OpBranch %48
+         %48 = OpLabel
+         %58 = OpLoad %v4float %piglit_vertex
+         %59 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %59 %58
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+
+#version 450
+
+layout (location = 0) in vec4 piglit_vertex;
+layout (location = 1) out vec4 vertexColor;
+
+
+layout (std140, binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+void main()
+{
+	vec4 fail_color = vec4(1.0, 0.0, 0.0, 1.0);
+	vertexColor = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (components.c1 != vec4(4575.7996643, 14191.6120546, -30199.3084764, -31303.4210269))
+	   vertexColor = fail_color;
+
+	if (components.c2 != vec2(-10231.1810483, 11729.6478218))
+	   vertexColor = fail_color;
+
+	gl_Position = piglit_vertex;
+}
+
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 58
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color %vertexColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpMemberDecorate %ComponentsBlock 1 Offset 16
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+               OpDecorate %vertexColor Location 1
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+    %v2float = OpTypeVector %float 2
+%ComponentsBlock = OpTypeStruct %v4float %v2float
+%_ptr_Uniform_ComponentsBlock = OpTypePointer Uniform %ComponentsBlock
+ %components = OpVariable %_ptr_Uniform_ComponentsBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%float_4575_7998 = OpConstant %float 4575.7998
+%float_14191_6123 = OpConstant %float 14191.6123
+%float_n30199_3086 = OpConstant %float -30199.3086
+%float_n31303_4219 = OpConstant %float -31303.4219
+         %29 = OpConstantComposite %v4float %float_4575_7998 %float_14191_6123 %float_n30199_3086 %float_n31303_4219
+       %bool = OpTypeBool
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+%float_n10231_1807 = OpConstant %float -10231.1807
+%float_11729_6475 = OpConstant %float 11729.6475
+         %43 = OpConstantComposite %v2float %float_n10231_1807 %float_11729_6475
+     %v2bool = OpTypeVector %bool 2
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%vertexColor = OpVariable %_ptr_Input_v4float Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %color %15
+         %23 = OpAccessChain %_ptr_Uniform_v4float %components %int_0
+         %24 = OpLoad %v4float %23
+         %32 = OpFOrdNotEqual %v4bool %24 %29
+         %33 = OpAny %bool %32
+               OpSelectionMerge %35 None
+               OpBranchConditional %33 %34 %35
+         %34 = OpLabel
+         %36 = OpLoad %v4float %fail_color
+               OpStore %color %36
+               OpBranch %35
+         %35 = OpLabel
+         %39 = OpAccessChain %_ptr_Uniform_v2float %components %int_1
+         %40 = OpLoad %v2float %39
+         %45 = OpFOrdNotEqual %v2bool %40 %43
+         %46 = OpAny %bool %45
+               OpSelectionMerge %48 None
+               OpBranchConditional %46 %47 %48
+         %47 = OpLabel
+         %49 = OpLoad %v4float %fail_color
+               OpStore %color %49
+               OpBranch %48
+         %48 = OpLabel
+         %52 = OpLoad %v4float %vertexColor
+         %53 = OpFOrdNotEqual %v4bool %52 %15
+         %54 = OpAny %bool %53
+               OpSelectionMerge %56 None
+               OpBranchConditional %54 %55 %56
+         %55 = OpLabel
+         %57 = OpLoad %v4float %fail_color
+               OpStore %color %57
+               OpBranch %56
+         %56 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 color;
+layout (location = 1) in vec4 vertexColor;
+layout (std140, binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+void main()
+{
+	vec4 fail_color = vec4(1.0, 0.0, 0.0, 1.0);
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (components.c1 != vec4(4575.7996643, 14191.6120546, -30199.3084764, -31303.4210269))
+	   color = fail_color;
+
+	if (components.c2 != vec2(-10231.1810483, 11729.6478218))
+	   color = fail_color;
+
+	if (vertexColor != vec4(0.0, 1.0, 0.0, 1.0))
+	   color = fail_color;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+block binding 5
+block offset 0
+uniform vec4 ComponentsBlock.c1 4575.7996643 14191.6120546 -30199.3084764 -31303.4210269
+block offset 16
+uniform vec2 ComponentsBlock.c2 -10231.1810483 11729.6478218
+
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_NUM_ACTIVE_VARIABLES 2
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_BUFFER_DATA_SIZE 32
+
+verify program_query GL_ACTIVE_UNIFORMS 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
