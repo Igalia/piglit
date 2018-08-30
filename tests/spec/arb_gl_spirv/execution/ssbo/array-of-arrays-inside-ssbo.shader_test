@@ -1,0 +1,210 @@
+# Using a array of arrays inside a ssbo, instead of a aoa of ssbo.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 84
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpDecorate %_arr_v4float_uint_4 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_4_uint_3 ArrayStride 64
+               OpDecorate %_arr__arr__arr_v4float_uint_4_uint_3_uint_2 ArrayStride 192
+               OpDecorate %_arr_v4float_uint_2 ArrayStride 16
+               OpDecorate %_arr__arr_v4float_uint_2_uint_2 ArrayStride 32
+               OpMemberDecorate %ssbo 0 Offset 0
+               OpMemberDecorate %ssbo 1 Offset 384
+               OpDecorate %ssbo BufferBlock
+               OpDecorate %arr DescriptorSet 0
+               OpDecorate %arr Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+       %uint = OpTypeInt 32 0
+     %uint_4 = OpConstant %uint 4
+%_arr_v4float_uint_4 = OpTypeArray %v4float %uint_4
+     %uint_3 = OpConstant %uint 3
+%_arr__arr_v4float_uint_4_uint_3 = OpTypeArray %_arr_v4float_uint_4 %uint_3
+     %uint_2 = OpConstant %uint 2
+%_arr__arr__arr_v4float_uint_4_uint_3_uint_2 = OpTypeArray %_arr__arr_v4float_uint_4_uint_3 %uint_2
+%_arr_v4float_uint_2 = OpTypeArray %v4float %uint_2
+%_arr__arr_v4float_uint_2_uint_2 = OpTypeArray %_arr_v4float_uint_2 %uint_2
+       %ssbo = OpTypeStruct %_arr__arr__arr_v4float_uint_4_uint_3_uint_2 %_arr__arr_v4float_uint_2_uint_2
+%_ptr_Uniform_ssbo = OpTypePointer Uniform %ssbo
+        %arr = OpVariable %_ptr_Uniform_ssbo Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%float_0_109999999 = OpConstant %float 0.109999999
+%float_0_119999997 = OpConstant %float 0.119999997
+%float_0_129999995 = OpConstant %float 0.129999995
+%float_0_140000001 = OpConstant %float 0.140000001
+         %37 = OpConstantComposite %v4float %float_0_109999999 %float_0_119999997 %float_0_129999995 %float_0_140000001
+       %bool = OpTypeBool
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+%float_0_209999993 = OpConstant %float 0.209999993
+%float_0_219999999 = OpConstant %float 0.219999999
+%float_0_230000004 = OpConstant %float 0.230000004
+%float_0_239999995 = OpConstant %float 0.239999995
+         %52 = OpConstantComposite %v4float %float_0_209999993 %float_0_219999999 %float_0_230000004 %float_0_239999995
+      %int_2 = OpConstant %int 2
+      %int_3 = OpConstant %int 3
+%float_0_310000002 = OpConstant %float 0.310000002
+%float_0_319999993 = OpConstant %float 0.319999993
+%float_0_330000013 = OpConstant %float 0.330000013
+%float_0_340000004 = OpConstant %float 0.340000004
+         %66 = OpConstantComposite %v4float %float_0_310000002 %float_0_319999993 %float_0_330000013 %float_0_340000004
+%float_0_409999996 = OpConstant %float 0.409999996
+%float_0_419999987 = OpConstant %float 0.419999987
+%float_0_430000007 = OpConstant %float 0.430000007
+%float_0_439999998 = OpConstant %float 0.439999998
+         %78 = OpConstantComposite %v4float %float_0_409999996 %float_0_419999987 %float_0_430000007 %float_0_439999998
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %color %15
+         %31 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_0 %int_0 %int_0
+         %32 = OpLoad %v4float %31
+         %40 = OpFOrdNotEqual %v4bool %32 %37
+         %41 = OpAny %bool %40
+               OpSelectionMerge %43 None
+               OpBranchConditional %41 %42 %43
+         %42 = OpLabel
+         %44 = OpLoad %v4float %fail_color
+               OpStore %color %44
+               OpBranch %43
+         %43 = OpLabel
+         %46 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_1 %int_1
+         %47 = OpLoad %v4float %46
+         %53 = OpFOrdNotEqual %v4bool %47 %52
+         %54 = OpAny %bool %53
+               OpSelectionMerge %56 None
+               OpBranchConditional %54 %55 %56
+         %55 = OpLabel
+         %57 = OpLoad %v4float %fail_color
+               OpStore %color %57
+               OpBranch %56
+         %56 = OpLabel
+         %60 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0 %int_1 %int_2 %int_3
+         %61 = OpLoad %v4float %60
+         %67 = OpFOrdNotEqual %v4bool %61 %66
+         %68 = OpAny %bool %67
+               OpSelectionMerge %70 None
+               OpBranchConditional %68 %69 %70
+         %69 = OpLabel
+         %71 = OpLoad %v4float %fail_color
+               OpStore %color %71
+               OpBranch %70
+         %70 = OpLabel
+         %72 = OpAccessChain %_ptr_Uniform_v4float %arr %int_1 %int_1 %int_1
+         %73 = OpLoad %v4float %72
+         %79 = OpFOrdNotEqual %v4bool %73 %78
+         %80 = OpAny %bool %79
+               OpSelectionMerge %82 None
+               OpBranchConditional %80 %81 %82
+         %81 = OpLabel
+         %83 = OpLoad %v4float %fail_color
+               OpStore %color %83
+               OpBranch %82
+         %82 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+
+layout (std430, binding = 5) buffer ssbo {
+	vec4 color[2][3][4];
+	vec4 position[2][2];
+} arr;
+
+
+
+void main()
+{
+	vec4 fail_color = vec4(1.0, 0.0, 0.0, 1.0);
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (arr.color[0][0][0] != vec4(0.11, 0.12, 0.13, 0.14))
+	   color = fail_color;
+
+	if (arr.color[1][1][1] != vec4(0.21, 0.22, 0.23, 0.24))
+	   color = fail_color;
+
+	if (arr.color[1][2][3] != vec4(0.31, 0.32, 0.33, 0.34))
+	   color = fail_color;
+
+	if (arr.position[1][1] != vec4(0.41, 0.42, 0.43, 0.44))
+	   color = fail_color;
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+ssbo 5 448
+#arr.color[0][0][0]
+ssbo 5 subdata float 0  0.11
+ssbo 5 subdata float 4  0.12
+ssbo 5 subdata float 8  0.13
+ssbo 5 subdata float 12 0.14
+
+#arr.color[1][1][1]
+ssbo 5 subdata float 272 0.21
+ssbo 5 subdata float 276 0.22
+ssbo 5 subdata float 280 0.23
+ssbo 5 subdata float 284 0.24
+
+#arr.color[1][2][3]
+ssbo 5 subdata float 368 0.31
+ssbo 5 subdata float 372 0.32
+ssbo 5 subdata float 376 0.33
+ssbo 5 subdata float 380 0.34
+
+#arr.position[1][1]
+ssbo 5 subdata float 432 0.41
+ssbo 5 subdata float 436 0.42
+ssbo 5 subdata float 440 0.43
+ssbo 5 subdata float 444 0.44
+
+block binding 5
+
+# FIXME: next query is commented out as it is not working
+# properly. ubo and ssbo has different rules for resources (see
+# ARB_program_interface_query issue 7), and that difference it is
+# still not implemented
+
+# verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_NUM_ACTIVE_VARIABLES 4
+
+verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_BUFFER_DATA_SIZE 448
+verify program_query GL_ACTIVE_UNIFORMS 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
