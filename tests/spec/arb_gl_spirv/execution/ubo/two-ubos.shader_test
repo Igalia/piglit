@@ -1,0 +1,98 @@
+# UBO test with two ubos. Just one stage.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 24
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outColor Location 0
+               OpMemberDecorate %ComponentsBlock 0 Offset 0
+               OpDecorate %ComponentsBlock Block
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+               OpMemberDecorate %ComponentsBlock2 0 Offset 0
+               OpDecorate %ComponentsBlock2 Block
+               OpDecorate %components2 DescriptorSet 0
+               OpDecorate %components2 Binding 8
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+%ComponentsBlock = OpTypeStruct %v4float
+%_ptr_Uniform_ComponentsBlock = OpTypePointer Uniform %ComponentsBlock
+ %components = OpVariable %_ptr_Uniform_ComponentsBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%ComponentsBlock2 = OpTypeStruct %v4float
+%_ptr_Uniform_ComponentsBlock2 = OpTypePointer Uniform %ComponentsBlock2
+%components2 = OpVariable %_ptr_Uniform_ComponentsBlock2 Uniform
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %16 = OpAccessChain %_ptr_Uniform_v4float %components %int_0
+         %17 = OpLoad %v4float %16
+         %21 = OpAccessChain %_ptr_Uniform_v4float %components2 %int_0
+         %22 = OpLoad %v4float %21
+         %23 = OpFAdd %v4float %17 %22
+               OpStore %outColor %23
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (std140, binding = 5) uniform ComponentsBlock
+ {
+    vec4 c1;
+ } components;
+
+layout (std140, binding = 8) uniform ComponentsBlock2
+ {
+    vec4 c2;
+ } components2;
+
+void main()
+{
+	outColor = components.c1 + components2.c2;
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+block binding 5
+block offset 0
+uniform vec4 ComponentsBlock.c1 0.1 0.2 0.3 0.4
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock GL_BUFFER_DATA_SIZE 16
+
+block binding 8
+block offset 0
+uniform vec4 ComponentsBlock2.c2 0.2 0.3 0.4 0.5
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock2 GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK ComponentsBlock2 GL_BUFFER_DATA_SIZE 16
+
+verify program_query GL_ACTIVE_UNIFORMS 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.3 0.5 0.7 0.9
