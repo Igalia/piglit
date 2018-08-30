@@ -1,0 +1,304 @@
+# UBO test comparing a matrix using row_major layout and another using
+# column_major layout, when the data used for both is the same.
+
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 152
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %_ ""
+               OpName %__0 ""
+               OpDecorate %color Location 0
+               OpMemberDecorate %ColumnBlock 0 ColMajor
+               OpMemberDecorate %ColumnBlock 0 Offset 0
+               OpMemberDecorate %ColumnBlock 0 MatrixStride 16
+               OpDecorate %ColumnBlock Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 5
+               OpMemberDecorate %RowBlock 0 RowMajor
+               OpMemberDecorate %RowBlock 0 Offset 0
+               OpMemberDecorate %RowBlock 0 MatrixStride 16
+               OpDecorate %RowBlock Block
+               OpDecorate %__0 DescriptorSet 0
+               OpDecorate %__0 Binding 7
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Function_v4float = OpTypePointer Function %v4float
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+       %bool = OpTypeBool
+%mat4v4float = OpTypeMatrix %v4float 4
+%ColumnBlock = OpTypeStruct %mat4v4float
+%_ptr_Uniform_ColumnBlock = OpTypePointer Uniform %ColumnBlock
+          %_ = OpVariable %_ptr_Uniform_ColumnBlock Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%float_29616_166 = OpConstant %float 29616.166
+%float_n21563_2676 = OpConstant %float -21563.2676
+%float_n3274_39771 = OpConstant %float -3274.39771
+%float_n7391_61914 = OpConstant %float -7391.61914
+         %30 = OpConstantComposite %v4float %float_29616_166 %float_n21563_2676 %float_n3274_39771 %float_n7391_61914
+     %v4bool = OpTypeVector %bool 4
+      %int_1 = OpConstant %int 1
+%float_29371_457 = OpConstant %float 29371.457
+%float_7793_47266 = OpConstant %float 7793.47266
+%float_n20661_791 = OpConstant %float -20661.791
+%float_n26402_4414 = OpConstant %float -26402.4414
+         %44 = OpConstantComposite %v4float %float_29371_457 %float_7793_47266 %float_n20661_791 %float_n26402_4414
+      %int_2 = OpConstant %int 2
+%float_11556_8564 = OpConstant %float 11556.8564
+%float_20357_9199 = OpConstant %float 20357.9199
+%float_15432_0186 = OpConstant %float 15432.0186
+%float_17385_4688 = OpConstant %float 17385.4688
+         %58 = OpConstantComposite %v4float %float_11556_8564 %float_20357_9199 %float_15432_0186 %float_17385_4688
+      %int_3 = OpConstant %int 3
+%float_21131_9121 = OpConstant %float 21131.9121
+%float_17015_2715 = OpConstant %float 17015.2715
+%float_n30233_4414 = OpConstant %float -30233.4414
+%float_n15875_874 = OpConstant %float -15875.874
+         %72 = OpConstantComposite %v4float %float_21131_9121 %float_17015_2715 %float_n30233_4414 %float_n15875_874
+   %RowBlock = OpTypeStruct %mat4v4float
+%_ptr_Uniform_RowBlock = OpTypePointer Uniform %RowBlock
+        %__0 = OpVariable %_ptr_Uniform_RowBlock Uniform
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+ %fail_color = OpVariable %_ptr_Function_v4float Function
+               OpStore %fail_color %12
+               OpStore %color %15
+         %24 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_0
+         %25 = OpLoad %v4float %24
+         %32 = OpFOrdNotEqual %v4bool %25 %30
+         %33 = OpAny %bool %32
+         %34 = OpLogicalNot %bool %33
+               OpSelectionMerge %36 None
+               OpBranchConditional %34 %35 %36
+         %35 = OpLabel
+         %38 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_1
+         %39 = OpLoad %v4float %38
+         %45 = OpFOrdNotEqual %v4bool %39 %44
+         %46 = OpAny %bool %45
+               OpBranch %36
+         %36 = OpLabel
+         %47 = OpPhi %bool %33 %5 %46 %35
+         %48 = OpLogicalNot %bool %47
+               OpSelectionMerge %50 None
+               OpBranchConditional %48 %49 %50
+         %49 = OpLabel
+         %52 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_2
+         %53 = OpLoad %v4float %52
+         %59 = OpFOrdNotEqual %v4bool %53 %58
+         %60 = OpAny %bool %59
+               OpBranch %50
+         %50 = OpLabel
+         %61 = OpPhi %bool %47 %36 %60 %49
+         %62 = OpLogicalNot %bool %61
+               OpSelectionMerge %64 None
+               OpBranchConditional %62 %63 %64
+         %63 = OpLabel
+         %66 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_3
+         %67 = OpLoad %v4float %66
+         %73 = OpFOrdNotEqual %v4bool %67 %72
+         %74 = OpAny %bool %73
+               OpBranch %64
+         %64 = OpLabel
+         %75 = OpPhi %bool %61 %50 %74 %63
+               OpSelectionMerge %77 None
+               OpBranchConditional %75 %76 %77
+         %76 = OpLabel
+         %78 = OpLoad %v4float %fail_color
+               OpStore %color %78
+               OpBranch %77
+         %77 = OpLabel
+         %82 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_0
+         %83 = OpLoad %v4float %82
+         %84 = OpFOrdNotEqual %v4bool %83 %30
+         %85 = OpAny %bool %84
+         %86 = OpLogicalNot %bool %85
+               OpSelectionMerge %88 None
+               OpBranchConditional %86 %87 %88
+         %87 = OpLabel
+         %89 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_1
+         %90 = OpLoad %v4float %89
+         %91 = OpFOrdNotEqual %v4bool %90 %44
+         %92 = OpAny %bool %91
+               OpBranch %88
+         %88 = OpLabel
+         %93 = OpPhi %bool %85 %77 %92 %87
+         %94 = OpLogicalNot %bool %93
+               OpSelectionMerge %96 None
+               OpBranchConditional %94 %95 %96
+         %95 = OpLabel
+         %97 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_2
+         %98 = OpLoad %v4float %97
+         %99 = OpFOrdNotEqual %v4bool %98 %58
+        %100 = OpAny %bool %99
+               OpBranch %96
+         %96 = OpLabel
+        %101 = OpPhi %bool %93 %88 %100 %95
+        %102 = OpLogicalNot %bool %101
+               OpSelectionMerge %104 None
+               OpBranchConditional %102 %103 %104
+        %103 = OpLabel
+        %105 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_3
+        %106 = OpLoad %v4float %105
+        %107 = OpFOrdNotEqual %v4bool %106 %72
+        %108 = OpAny %bool %107
+               OpBranch %104
+        %104 = OpLabel
+        %109 = OpPhi %bool %101 %96 %108 %103
+               OpSelectionMerge %111 None
+               OpBranchConditional %109 %110 %111
+        %110 = OpLabel
+        %112 = OpLoad %v4float %fail_color
+               OpStore %color %112
+               OpBranch %111
+        %111 = OpLabel
+        %113 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_0
+        %114 = OpLoad %v4float %113
+        %115 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_0
+        %116 = OpLoad %v4float %115
+        %117 = OpFOrdNotEqual %v4bool %114 %116
+        %118 = OpAny %bool %117
+        %119 = OpLogicalNot %bool %118
+               OpSelectionMerge %121 None
+               OpBranchConditional %119 %120 %121
+        %120 = OpLabel
+        %122 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_1
+        %123 = OpLoad %v4float %122
+        %124 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_1
+        %125 = OpLoad %v4float %124
+        %126 = OpFOrdNotEqual %v4bool %123 %125
+        %127 = OpAny %bool %126
+               OpBranch %121
+        %121 = OpLabel
+        %128 = OpPhi %bool %118 %111 %127 %120
+        %129 = OpLogicalNot %bool %128
+               OpSelectionMerge %131 None
+               OpBranchConditional %129 %130 %131
+        %130 = OpLabel
+        %132 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_2
+        %133 = OpLoad %v4float %132
+        %134 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_2
+        %135 = OpLoad %v4float %134
+        %136 = OpFOrdNotEqual %v4bool %133 %135
+        %137 = OpAny %bool %136
+               OpBranch %131
+        %131 = OpLabel
+        %138 = OpPhi %bool %128 %121 %137 %130
+        %139 = OpLogicalNot %bool %138
+               OpSelectionMerge %141 None
+               OpBranchConditional %139 %140 %141
+        %140 = OpLabel
+        %142 = OpAccessChain %_ptr_Uniform_v4float %_ %int_0 %int_3
+        %143 = OpLoad %v4float %142
+        %144 = OpAccessChain %_ptr_Uniform_v4float %__0 %int_0 %int_3
+        %145 = OpLoad %v4float %144
+        %146 = OpFOrdNotEqual %v4bool %143 %145
+        %147 = OpAny %bool %146
+               OpBranch %141
+        %141 = OpLabel
+        %148 = OpPhi %bool %138 %131 %147 %140
+               OpSelectionMerge %150 None
+               OpBranchConditional %148 %149 %150
+        %149 = OpLabel
+        %151 = OpLoad %v4float %fail_color
+               OpStore %color %151
+               OpBranch %150
+        %150 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 color;
+layout (std140, binding = 5, column_major) uniform ColumnBlock
+ {
+    mat4 column_matrix;
+ };
+
+layout (std140, binding = 7, row_major) uniform RowBlock
+ {
+    mat4 row_matrix;
+ };
+
+void main()
+{
+	vec4 fail_color = vec4(1.0, 0.0, 0.0, 1.0);
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (column_matrix[0] != vec4(29616.166598, -21563.2666972, -3274.39775692, -7391.61915007) ||
+	    column_matrix[1] != vec4(29371.4563058, 7793.47278553, -20661.7912871, -26402.4415351) ||
+            column_matrix[2] != vec4(11556.8560616, 20357.9190661, 15432.018204, 17385.4694591) ||
+            column_matrix[3] != vec4(21131.9116045, 17015.271809, -30233.4408637, -15875.8741436)) {
+	   color = fail_color;
+	}
+
+	if (row_matrix[0] != vec4(29616.166598, -21563.2666972, -3274.39775692, -7391.61915007) ||
+	    row_matrix[1] != vec4(29371.4563058, 7793.47278553, -20661.7912871, -26402.4415351) ||
+            row_matrix[2] != vec4(11556.8560616, 20357.9190661, 15432.018204, 17385.4694591) ||
+            row_matrix[3] != vec4(21131.9116045, 17015.271809, -30233.4408637, -15875.8741436)) {
+	   color = fail_color;
+	}
+
+	if (column_matrix[0] != row_matrix[0] ||
+	    column_matrix[1] != row_matrix[1] ||
+            column_matrix[2] != row_matrix[2] ||
+            column_matrix[3] != row_matrix[3]) {
+	   color = fail_color;
+	}
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+block binding 5
+block offset 0
+block matrix stride 16
+block row major 0
+uniform mat4 column_matrix 29616.166598 -21563.2666972 -3274.39775692 -7391.61915007 29371.4563058 7793.47278553 -20661.7912871 -26402.4415351 11556.8560616 20357.9190661 15432.018204 17385.4694591 21131.9116045 17015.271809 -30233.4408637 -15875.8741436
+
+block binding 7
+block offset 0
+block matrix stride 16
+block row major 1
+uniform mat4 row_matrix 29616.166598 -21563.2666972 -3274.39775692 -7391.61915007 29371.4563058 7793.47278553 -20661.7912871 -26402.4415351 11556.8560616 20357.9190661 15432.018204 17385.4694591 21131.9116045 17015.271809 -30233.4408637 -15875.8741436
+
+block binding 5
+verify program_interface_query GL_UNIFORM_BLOCK ColumnBlock GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK ColumnBlock GL_BUFFER_DATA_SIZE 64
+
+block binding 7
+verify program_interface_query GL_UNIFORM_BLOCK RowBlock GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK RowBlock GL_BUFFER_DATA_SIZE 64
+
+verify program_query GL_ACTIVE_UNIFORMS 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
