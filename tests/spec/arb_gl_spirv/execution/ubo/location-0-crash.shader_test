@@ -1,0 +1,93 @@
+# This test has:
+#  * An ubo
+#  * An uniform with location 0
+#
+# At one point this test crashed. Keeping for regression catching.
+
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 24
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpMemberDecorate %block 0 Offset 0
+               OpDecorate %block Block
+               OpDecorate %arr DescriptorSet 0
+               OpDecorate %arr Binding 5
+               OpDecorate %n Location 0
+               OpDecorate %n DescriptorSet 0
+               OpDecorate %n Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+      %block = OpTypeStruct %v4float
+%_ptr_Uniform_block = OpTypePointer Uniform %block
+        %arr = OpVariable %_ptr_Uniform_block Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+%_ptr_UniformConstant_int = OpTypePointer UniformConstant %int
+          %n = OpVariable %_ptr_UniformConstant_int UniformConstant
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %16 = OpAccessChain %_ptr_Uniform_v4float %arr %int_0
+         %17 = OpLoad %v4float %16
+         %20 = OpLoad %int %n
+         %21 = OpConvertSToF %float %20
+         %22 = OpCompositeConstruct %v4float %21 %21 %21 %21
+         %23 = OpFAdd %v4float %17 %22
+               OpStore %color %23
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout (location = 0) out vec4 color;
+layout (std140, binding = 5) uniform block {
+	vec4 color;
+} arr;
+
+layout (location = 0) uniform int n;
+
+
+void main()
+{
+	color = arr.color + vec4(n);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+block binding 5
+block offset 0
+block offset 0
+uniform vec4 block.color 0.0 0.1 0.2 0.3
+
+verify program_interface_query GL_UNIFORM_BLOCK block GL_NUM_ACTIVE_VARIABLES 1
+verify program_interface_query GL_UNIFORM_BLOCK block GL_BUFFER_DATA_SIZE 16
+
+verify program_query GL_ACTIVE_UNIFORMS 2
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.1 0.2 0.3
