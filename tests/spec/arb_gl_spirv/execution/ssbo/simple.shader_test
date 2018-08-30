@@ -1,0 +1,97 @@
+# Simple SSBO test: just one stage. No arrays.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 28
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outColor Location 0
+               OpMemberDecorate %ssbo 0 Offset 0
+               OpMemberDecorate %ssbo 1 Offset 16
+               OpDecorate %ssbo BufferBlock
+               OpDecorate %components DescriptorSet 0
+               OpDecorate %components Binding 5
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+    %v2float = OpTypeVector %float 2
+       %ssbo = OpTypeStruct %v4float %v2float
+%_ptr_Uniform_ssbo = OpTypePointer Uniform %ssbo
+ %components = OpVariable %_ptr_Uniform_ssbo Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+    %float_0 = OpConstant %float 0
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %17 = OpAccessChain %_ptr_Uniform_v4float %components %int_0
+         %18 = OpLoad %v4float %17
+         %21 = OpAccessChain %_ptr_Uniform_v2float %components %int_1
+         %22 = OpLoad %v2float %21
+         %24 = OpCompositeExtract %float %22 0
+         %25 = OpCompositeExtract %float %22 1
+         %26 = OpCompositeConstruct %v4float %24 %25 %float_0 %float_0
+         %27 = OpFAdd %v4float %18 %26
+               OpStore %outColor %27
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+
+#version 450
+
+layout (location = 0) out vec4 outColor;
+layout (std430, binding = 5) buffer ssbo
+ {
+    vec4 c1;
+    vec2 c2;
+ } components;
+
+void main()
+{
+	outColor = components.c1 + vec4(components.c2, 0.0, 0.0);
+}
+
+[test]
+ssbo 5 32 # size, aligned to 16
+#c1
+ssbo 5 subdata float 0  0.1
+ssbo 5 subdata float 4  0.2
+ssbo 5 subdata float 8  0.3
+ssbo 5 subdata float 12 0.4
+#c2
+ssbo 5 subdata float 16 0.1
+ssbo 5 subdata float 20 0.2
+
+clear color 1.0 0.0 0.0 0.0
+clear
+
+block binding 5
+verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_NUM_ACTIVE_VARIABLES 2
+verify program_interface_query GL_SHADER_STORAGE_BLOCK ssbo GL_BUFFER_DATA_SIZE 32
+
+verify program_query GL_ACTIVE_UNIFORMS 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.4 0.3 0.4
