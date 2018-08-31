@@ -8,6 +8,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (arb_vertex_array-delete-object-0 delete-object-0.c)
 piglit_add_executable (arb_vertex_array-isvertexarray isvertexarray.c)
 
 # vim: ft=cmake:

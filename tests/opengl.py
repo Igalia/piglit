@@ -2667,6 +2667,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'arb_vertex_array_object')) as g:
     g(['vao-element-array-buffer'])
+    g(['arb_vertex_array-delete-object-0'], 'delete-object-0')
     g(['arb_vertex_array-isvertexarray'], 'isvertexarray')
 
 with profile.test_list.group_manager(
