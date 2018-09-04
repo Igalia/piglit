@@ -1,0 +1,29 @@
+[require]
+GLSL >= 1.20
+
+# This test exercises a Mesa GLSL bug where 'invariant' qualifier
+# propagates on one definition of the global variable defined in several
+# shaders of one stage, causing linking error due to qualifier mismatch.
+
+[vertex shader]
+#version 120
+float x;
+
+[vertex shader]
+#version 120
+float x;
+invariant gl_Position;
+
+void main()
+{
+  gl_Position = vec4(x);
+}
+
+[fragment shader]
+#version 120
+void main()
+{
+}
+
+[test]
+link success
