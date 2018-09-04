@@ -39,6 +39,7 @@
 #define DEFAULT_WINDOW_WIDTH 250
 #define DEFAULT_WINDOW_HEIGHT 250
 
+static bool spirv_replaces_glsl = false;
 static struct piglit_gl_test_config current_config;
 
 static void
@@ -61,7 +62,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	 * [require] section, so it will be handled later.
 	 */
 	if (argc > 1) {
-		get_required_config(argv[1], false, &config);
+		get_required_config(argv[1], spirv_replaces_glsl, &config);
 	} else {
 		config.supports_gl_compat_version = 10;
 	}
@@ -154,7 +155,6 @@ static bool sso_in_use = false;
 static bool glsl_in_use = false;
 static bool force_glsl = false;
 static bool spirv_in_use = false;
-static bool spirv_replaces_glsl = false;
 static GLchar *prog_err_info = NULL;
 static GLuint vao = 0;
 static GLuint draw_fbo, read_fbo;
