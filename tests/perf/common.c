@@ -96,22 +96,3 @@ perf_measure_rate(perf_rate_func f)
 		printf("%s returning iters %u  rate %f\n", __FUNCTION__, subiters, rate);
 	return rate;
 }
-
-/* Note static buffer, can only use once per printf.
- */
-const char *
-perf_human_float( double d )
-{
-	static char buf[80];
-
-	if (d > 1000000000.0)
-		snprintf(buf, sizeof(buf), "%.2f billion", d / 1000000000.0);
-	else if (d > 1000000.0)
-		snprintf(buf, sizeof(buf), "%.2f million", d / 1000000.0);
-	else if (d > 1000.0)
-		snprintf(buf, sizeof(buf), "%.2f thousand", d / 1000.0);
-	else
-		snprintf(buf, sizeof(buf), "%.2f", d);
-
-	return buf;
-}

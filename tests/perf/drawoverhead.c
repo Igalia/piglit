@@ -41,7 +41,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	}
 	puts(config.supports_gl_core_version ? "Using Core profile." :
 					       "Using Compatibility profile.");
-	puts("Draw calls per second:");
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE |
                                PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
@@ -645,8 +644,8 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	double rate = perf_measure_rate(f);
 	double ratio = base_rate ? rate / base_rate : 1;
 
-	printf(" %3u: %s (%2u VBO, %u UBO, %2u %s) w/ %s change:%*s"
-	       COLOR_CYAN "%s" COLOR_RESET " %s(%.1f%%)" COLOR_RESET "\n",
+	printf(" %3u, %s (%2u VBO| %u UBO| %2u %s) w/ %s change,%*s"
+	       COLOR_CYAN "%5u" COLOR_RESET ", %s%.1f%%" COLOR_RESET "\n",
 	       test_index, call, num_vbos, num_ubos,
 	       num_textures ? num_textures :
 	         num_tbos ? num_tbos :
@@ -657,7 +656,7 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	         num_imgbos ? "ImB" : "   ",
 	       change,
 	       MAX2(36 - (int)strlen(change) - (int)strlen(call), 0), "",
-	       perf_human_float(rate),
+	       (unsigned)(rate / 1000),
 	       base_rate == 0 ? COLOR_RESET :
 				ratio > 0.7 ? COLOR_GREEN :
 				ratio > 0.4 ? COLOR_YELLOW : COLOR_RED,
@@ -825,6 +824,7 @@ perf_draw_variant(const char *call, bool is_indexed)
 enum piglit_result
 piglit_display(void)
 {
+	puts("   #, Test name                                              ,    Thousands draws/s, Difference vs the 1st");
 	perf_draw_variant("DrawElements", true);
 	perf_draw_variant("DrawArrays", false);
 

@@ -27,8 +27,5 @@ typedef void (*perf_rate_func)(unsigned count);
 double
 perf_measure_rate(perf_rate_func f);
 
-const char *
-perf_human_float( double d );
-
 #endif /* COMMON_H */
 
