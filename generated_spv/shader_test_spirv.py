@@ -578,7 +578,7 @@ def update_spirv_line(shader_test, skip_reasons):
         else:
             return
     else:
-        words = spirv_line.strip().split()
+        words = lines[spirv_idx].strip().split()
         if (len(words) >= 2 and (words[1] == 'ONLY' or (words[1] == 'YES' and not skip_reasons))):
             return
 
@@ -1344,6 +1344,10 @@ def main():
             if skip_reasons:
                 update_spirv_line(shader_test, skip_reasons)
                 num_mark_skipped = num_mark_skipped + 1
+
+        if config.recheck and outcome == 1:
+            print("Rechecking, lets update line")
+            update_spirv_line(shader_test, None)
 
     for pid in procs:
         pid, status = os.waitpid(pid, 0)
