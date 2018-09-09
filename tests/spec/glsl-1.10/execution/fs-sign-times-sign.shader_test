@@ -1,0 +1,53 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform vec4 v[25];
+
+void main()
+{
+	vec4 color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	for (int i = 0; i < 25; i++) {
+		if (sign(v[i].x) * sign(v[i].y) != v[i].z)
+			color = vec4(1.0, 0.0, 0.0, 1.0);
+	}
+
+	gl_FragColor = color;
+}
+
+[test]
+uniform vec4 v[0]         5.0        5.0  1.0 0.0
+uniform vec4 v[1]         5.0       -5.0 -1.0 0.0
+uniform vec4 v[2]         5.0        0.0  0.0 0.0
+uniform vec4 v[3]         5.0 0x7f000000  1.0 0.0
+uniform vec4 v[4]         5.0 0xff000000 -1.0 0.0
+
+uniform vec4 v[5]        -5.0        5.0 -1.0 0.0
+uniform vec4 v[6]        -5.0       -5.0  1.0 0.0
+uniform vec4 v[7]        -5.0        0.0  0.0 0.0
+uniform vec4 v[8]        -5.0 0x7f000000 -1.0 0.0
+uniform vec4 v[9]        -5.0 0xff000000  1.0 0.0
+
+uniform vec4 v[10]        0.0        5.0  0.0 0.0
+uniform vec4 v[11]        0.0       -5.0  0.0 0.0
+uniform vec4 v[12]        0.0        0.0  0.0 0.0
+uniform vec4 v[13]        0.0 0x7f000000  0.0 0.0
+uniform vec4 v[14]        0.0 0xff000000  0.0 0.0
+
+uniform vec4 v[15] 0x7f000000        5.0  1.0 0.0
+uniform vec4 v[16] 0x7f000000       -5.0 -1.0 0.0
+uniform vec4 v[17] 0x7f000000        0.0  0.0 0.0
+uniform vec4 v[18] 0x7f000000 0x7f000000  1.0 0.0
+uniform vec4 v[19] 0x7f000000 0xff000000 -1.0 0.0
+
+uniform vec4 v[20] 0xff000000        5.0 -1.0 0.0
+uniform vec4 v[21] 0xff000000       -5.0  1.0 0.0
+uniform vec4 v[22] 0xff000000        0.0  0.0 0.0
+uniform vec4 v[23] 0xff000000 0x7f000000 -1.0 0.0
+uniform vec4 v[24] 0xff000000 0xff000000  1.0 0.0
+
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
