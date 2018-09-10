@@ -2028,7 +2028,8 @@ struct requirement_parse_results {
 
 static void
 parse_required_config(struct requirement_parse_results *results,
-		      const char *script_name)
+		      const char *script_name,
+		      bool force_spirv)
 {
 	unsigned text_size;
 	char *text = piglit_load_text_file(script_name, &text_size);
@@ -2072,6 +2073,11 @@ parse_required_config(struct requirement_parse_results *results,
 					results->found_glsl = true;
 					version_copy(&results->glsl_version, &version);
 				}
+
+				if (version.compat && force_spirv) {
+					printf("ARB_gl_spirv is not compatible with compatibility profile\n");
+					piglit_report_result(PIGLIT_SKIP);
+				}
 			} else if (parse_str(line, "GL", &line)) {
 				enum comparison cmp;
 				struct component_version version;
@@ -2083,6 +2089,10 @@ parse_required_config(struct requirement_parse_results *results,
 				    || cmp == equal) {
 					results->found_gl = true;
 					version_copy(&results->gl_version, &version);
+				}
+				if (version.compat && force_spirv) {
+					printf("ARB_gl_spirv is not compatible with compatibility profile\n");
+					piglit_report_result(PIGLIT_SKIP);
 				}
 			} else if (parse_str(line, "SIZE", &line)) {
 				results->found_size = true;
@@ -2160,7 +2170,7 @@ get_required_config(const char *script_name, bool force_spirv,
 	struct requirement_parse_results parse_results;
 	struct component_version required_gl_version;
 
-	parse_required_config(&parse_results, script_name);
+	parse_required_config(&parse_results, script_name, force_spirv);
 	choose_required_gl_version(&parse_results, &required_gl_version);
 
 	if (force_spirv || parse_results.found_spirv) {
