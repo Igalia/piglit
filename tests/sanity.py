@@ -66,10 +66,15 @@ def add_shader_test(shader):
 
 profile = TestProfile()
 
-add_shader_test('tests/shaders/glsl-algebraic-add-zero.shader_test')
-add_shader_test('tests/spec/glsl-1.50/execution/geometry-basic.shader_test')
-add_shader_test('tests/spec/arb_tessellation_shader/execution/sanity.shader_test')
-add_shader_test('tests/spec/arb_compute_shader/execution/basic-ssbo.shader_test')
+shader_tests = (
+    'tests/shaders/glsl-algebraic-add-zero.shader_test',
+    'tests/spec/arb_compute_shader/execution/basic-ssbo.shader_test',
+    'tests/spec/arb_tessellation_shader/execution/sanity.shader_test',
+    'tests/spec/glsl-1.50/execution/geometry-basic.shader_test',
+)
+
+for shader_test in shader_tests:
+    add_shader_test(shader_test)
 
 with profile.test_list.group_manager(
         PiglitGLTest,
