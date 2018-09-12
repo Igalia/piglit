@@ -1,0 +1,82 @@
+[require]
+GL >= 3.0
+GLSL >= 1.30
+GL_EXT_shader_integer_mix
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_EXT_shader_integer_mix: require
+
+// { A, B, absoluteDifference(A, B) }
+uniform uvec3 data[40];
+
+out vec4 color;
+
+uint abs_diff(uint a, uint b)
+{
+    /* This can fail if the compiler replaces the (a < b) with the result of
+     * one of the subtractions.  For inputs a = 0x80000000, b = 4,
+     * int(0x80000000) < 4, but int(0x80000000)-4 overflows and results in
+     * 0x7ffffffc.  That's not less than zero, so the flags get set
+     * differently than for (a < b).
+     */
+    return mix(a - b, b - a, a < b);
+}
+
+void main()
+{
+    uint idx = uint(gl_FragCoord.x) % uint(data.length());
+    uvec3 v = data[idx];
+
+    if (abs_diff(v.x, v.y) == uint(v.z)) {
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+    } else {
+	color = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+}
+
+[test]
+uniform uvec3 data[0] 0x80000000 0x80000000 0x00000000
+uniform uvec3 data[1] 0x80000000 0x80000001 0x00000001
+uniform uvec3 data[2] 0x80000000 0xf8000000 0x78000000
+uniform uvec3 data[3] 0x80000000 0xf8000001 0x78000001
+uniform uvec3 data[4] 0x80000000 0xff800000 0x7f800000
+uniform uvec3 data[5] 0x80000000 0xff800001 0x7f800001
+uniform uvec3 data[6] 0x80000000 0xfff80000 0x7ff80000
+uniform uvec3 data[7] 0x80000000 0xfff80001 0x7ff80001
+uniform uvec3 data[8] 0x80000000 0xffff8000 0x7fff8000
+uniform uvec3 data[9] 0x80000000 0xffff8001 0x7fff8001
+uniform uvec3 data[10] 0x80000000 0xfffff800 0x7ffff800
+uniform uvec3 data[11] 0x80000000 0xfffff801 0x7ffff801
+uniform uvec3 data[12] 0x80000000 0xffffff80 0x7fffff80
+uniform uvec3 data[13] 0x80000000 0xffffff81 0x7fffff81
+uniform uvec3 data[14] 0x80000000 0xfffffff8 0x7ffffff8
+uniform uvec3 data[15] 0x80000000 0xfffffff9 0x7ffffff9
+uniform uvec3 data[16] 0x80000000 0xfffffffa 0x7ffffffa
+uniform uvec3 data[17] 0x80000000 0xfffffffb 0x7ffffffb
+uniform uvec3 data[18] 0x80000000 0xfffffffc 0x7ffffffc
+uniform uvec3 data[19] 0x80000000 0xfffffffd 0x7ffffffd
+uniform uvec3 data[20] 0x80000000 0xfffffffe 0x7ffffffe
+uniform uvec3 data[21] 0x80000000 0xffffffff 0x7fffffff
+uniform uvec3 data[22] 0x80000000 0x00000000 0x80000000
+uniform uvec3 data[23] 0x80000000 0x00000001 0x7fffffff
+uniform uvec3 data[24] 0x80000000 0x00000002 0x7ffffffe
+uniform uvec3 data[25] 0x80000000 0x00000003 0x7ffffffd
+uniform uvec3 data[26] 0x80000000 0x00000004 0x7ffffffc
+uniform uvec3 data[27] 0x80000000 0x00000005 0x7ffffffb
+uniform uvec3 data[28] 0x80000000 0x00000006 0x7ffffffa
+uniform uvec3 data[29] 0x80000000 0x00000007 0x7ffffff9
+uniform uvec3 data[30] 0x80000000 0x00000008 0x7ffffff8
+uniform uvec3 data[31] 0x80000000 0x0000007f 0x7fffff81
+uniform uvec3 data[32] 0x80000000 0x00000080 0x7fffff80
+uniform uvec3 data[33] 0x80000000 0x000007ff 0x7ffff801
+uniform uvec3 data[34] 0x80000000 0x00000800 0x7ffff800
+uniform uvec3 data[35] 0x80000000 0x00007fff 0x7fff8001
+uniform uvec3 data[36] 0x80000000 0x00008000 0x7fff8000
+uniform uvec3 data[37] 0x80000000 0x0007ffff 0x7ff80001
+uniform uvec3 data[38] 0x80000000 0x00080000 0x7ff80000
+uniform uvec3 data[39] 0x80000000 0x007fffff 0x7f800001
+
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0
