@@ -151,6 +151,21 @@ def countLeadingZeros_sources():
     return sources
 
 
+def countTrailingZeros_sources():
+    sources=[]
+    random.seed(0)
+
+    for i in range(1024):
+        num_zeros = i % 33
+
+        if i < 33:
+            sources.append(0xffffffff << num_zeros)
+        else:
+            sources.append((random.randint(0, 0xffffffff) | 1) << num_zeros)
+
+    return sources
+
+
 FUNCS = {
     'absoluteDifference-int': {
         'input':      'int',
@@ -203,6 +218,17 @@ FUNCS = {
         'results':    generate_results_empty,
         'template':   'countLeadingZeros.shader_test.mako',
         'func':       'countLeadingZeros',
+        'operator':   None,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'countTrailingZeros-uint': {
+        'input':      'uint',
+        'output':     'uint',
+        'sources':    countTrailingZeros_sources,
+        'results':    generate_results_empty,
+        'template':   'countLeadingZeros.shader_test.mako',
+        'func':       'countTrailingZeros',
         'operator':   None,
         'version':    '1.30',
         'extensions': None,
