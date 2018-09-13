@@ -1531,6 +1531,7 @@ with profile.test_list.group_manager(
       override_class=BuiltInConstantsTest)
     g(['arb_tessellation_shader-large-uniforms'])
     g(['arb_tessellation_shader-layout-mismatch'])
+    g(['arb_tessellation_shader-tes-gs-max-output', '-small', '-scan', '1', '50'])
 
 # Group ARB_texture_multisample
 with profile.test_list.group_manager(
