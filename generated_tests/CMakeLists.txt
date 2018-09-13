@@ -218,6 +218,7 @@ piglit_make_generated_tests(
 	intel_shader_integer_functions2_tests.list
 	gen_intel_shader_integer_functions2_tests.py
 	templates/gen_intel_shader_integer_functions2_tests/absoluteDifference.shader_test.mako
+	templates/gen_intel_shader_integer_functions2_tests/countLeadingZeros.shader_test.mako
 	)
 
 # OpenCL Test generators

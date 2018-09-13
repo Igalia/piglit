@@ -25,6 +25,8 @@ from __future__ import print_function, division, absolute_import
 import struct
 import os
 import numpy as np
+import random
+
 import six
 
 from templates import template_file
@@ -42,6 +44,11 @@ def generate_results_commutative(srcs, operator):
             results.append(operator(srcs[i], srcs[j]))
 
     return results
+
+
+def generate_results_empty(unused1, unused2):
+    """Some tests don't need any explicit results stored in the shader."""
+    return []
 
 
 def abs_isub32(_a, _b):
@@ -129,6 +136,21 @@ def absoluteDifference64_sources():
     return [np.uint64(x) for x in srcs]
 
 
+def countLeadingZeros_sources():
+    sources=[]
+    random.seed(0)
+
+    for i in range(1024):
+        num_zeros = i % 33
+
+        if i < 33:
+            sources.append(0xffffffff >> num_zeros)
+        else:
+            sources.append((random.randint(0, 0xffffffff) | (1 << 31)) >> num_zeros)
+
+    return sources
+
+
 FUNCS = {
     'absoluteDifference-int': {
         'input':      'int',
@@ -173,6 +195,17 @@ FUNCS = {
         'operator':   abs_usub64,
         'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
         'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'countLeadingZeros-uint': {
+        'input':      'uint',
+        'output':     'uint',
+        'sources':    countLeadingZeros_sources,
+        'results':    generate_results_empty,
+        'template':   'countLeadingZeros.shader_test.mako',
+        'func':       'countLeadingZeros',
+        'operator':   None,
+        'version':    '1.30',
+        'extensions': None,
     },
 }
 
