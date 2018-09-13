@@ -214,6 +214,11 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	shader_framebuffer_fetch_tests.list
 	gen_shader_framebuffer_fetch_tests.py)
+piglit_make_generated_tests(
+	intel_shader_integer_functions2_tests.list
+	gen_intel_shader_integer_functions2_tests.py
+	templates/gen_intel_shader_integer_functions2_tests/absoluteDifference.shader_test.mako
+	)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -274,6 +279,7 @@ add_custom_target(gen-gl-tests
 			shader_framebuffer_fetch_tests.list
 			shader_image_load_store_tests.list
 			shader_image_nv_image_formats_tests.list
+			intel_shader_integer_functions2_tests.list
 			shader_intel_conservative_rasterization.list
 			variable_index_read_tests.list
 			gen_extensions_defined.list
