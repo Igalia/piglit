@@ -128,5 +128,7 @@ clear
 uniform vec4 0 0.2 0.1 0.1 1.6
 uniform vec4 1 0.5 2.0 3.0 0.25
 
+verify program_query GL_ACTIVE_UNIFORMS 2
+
 draw rect -1 -1 2 2
 probe all rgba 0.1 0.2 0.3 0.4

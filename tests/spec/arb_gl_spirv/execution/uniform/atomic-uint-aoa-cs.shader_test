@@ -216,6 +216,8 @@ uniform uint 11 14  # a01_expected[5]
 
 uniform uint 12 30  # a12_expected
 
+verify program_query GL_ACTIVE_UNIFORMS 8
+
 # Check original values for the atomic counters
 
 probe atomic counter buffer 0 0 == 0
