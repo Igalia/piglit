@@ -176,5 +176,7 @@ void main()
 clear color 1.0 0.0 0.0 1.0
 clear
 
+verify program_query GL_ACTIVE_UNIFORMS 17
+
 draw rect -1 -1 2 2
 probe all rgba 0.30 0.97 0.26 1.0
