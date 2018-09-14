@@ -197,6 +197,8 @@ uniform uint 0 3
 uniform uint 1 15
 uniform uint 2 17
 
+verify program_query GL_ACTIVE_UNIFORMS 5
+
 # Check original values for the atomic counters
 
 probe atomic counter buffer 0 0 == 0   # outside array (offset qualifier was 4)

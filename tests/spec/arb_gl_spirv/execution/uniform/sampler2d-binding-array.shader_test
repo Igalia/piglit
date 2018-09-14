@@ -81,5 +81,7 @@ clear
 texture checkerboard 3 0 (32, 32) (0.02, 0.04, 0.06, 0.08) (0.8, 0.0, 0.0, 1.0)
 texture checkerboard 4 0 (32, 32) (0.10, 0.92, 0.14, 0.16) (0.2, 0.0, 0.0, 1.0)
 
+verify program_query GL_ACTIVE_UNIFORMS 1
+
 draw rect -1 -1 2 2
 probe all rgba 0.12 0.96 0.20 0.24

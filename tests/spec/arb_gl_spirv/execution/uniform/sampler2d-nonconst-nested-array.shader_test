@@ -164,6 +164,8 @@ void main()
 clear color 0.2 0.2 0.2 0.2
 clear
 
+verify program_query GL_ACTIVE_UNIFORMS 13
+
 # s.final_member[0]
 uniform int 16 1
 # s.tex[1][1]
