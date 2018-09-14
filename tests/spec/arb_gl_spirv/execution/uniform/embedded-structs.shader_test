@@ -147,5 +147,7 @@ uniform float 9 0.2
 uniform float 10 0.22
 uniform float 11 0.24
 
+verify program_query GL_ACTIVE_UNIFORMS 12
+
 draw rect -1 -1 2 2
 probe all rgba 0.2 0.52 0.84 1.0
