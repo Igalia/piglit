@@ -46,6 +46,20 @@ def generate_results_commutative(srcs, operator):
     return results
 
 
+def generate_results_commutative_with_diagonal(srcs, operator):
+    """Generate results for an operator that is commutative.
+
+    Commutative operators will only generate an upper-right triangular
+    matrix of results, but the diagonal must also be explicitly stored.
+    """
+    results = []
+    for i in range(len(srcs)):
+        for j in range(i, len(srcs)):
+            results.append(operator(srcs[i], srcs[j]))
+
+    return results
+
+
 def generate_results_empty(unused1, unused2):
     """Some tests don't need any explicit results stored in the shader."""
     return []
@@ -77,6 +91,54 @@ def abs_usub64(_a, _b):
     b = np.uint64(_b)
 
     return a - b if a > b else b - a
+
+
+def iadd_sat32(_a, _b):
+    a = np.int32(_a)
+    b = np.int32(_b)
+
+    if a > 0:
+        if b > (np.iinfo(np.int32).max - a):
+            return np.iinfo(np.int32).max
+    else:
+        if b < (np.iinfo(np.int32).min - a):
+            return np.iinfo(np.int32).min
+
+    return a + b
+
+
+def uadd_sat32(_a, _b):
+    a = np.uint32(_a)
+    b = np.uint32(_b)
+
+    if b > (np.iinfo(np.uint32).max - a):
+        return np.iinfo(np.uint32).max
+
+    return a + b
+
+
+def iadd_sat64(_a, _b):
+    a = np.int64(_a)
+    b = np.int64(_b)
+
+    if a > 0:
+        if b > (np.iinfo(np.int64).max - a):
+            return np.iinfo(np.int64).max
+    else:
+        if b < (np.iinfo(np.int64).min - a):
+            return np.iinfo(np.int64).min
+
+    return a + b
+
+
+def uadd_sat64(_a, _b):
+    a = np.uint64(_a)
+    b = np.uint64(_b)
+
+    if b > (np.iinfo(np.uint64).max - a):
+        return np.iinfo(np.uint64).max
+
+    return a + b
 
 
 def absoluteDifference32_sources():
@@ -133,6 +195,64 @@ def absoluteDifference64_sources():
     ]
 
     assert len(srcs) == 64
+    return [np.uint64(x) for x in srcs]
+
+
+def addSaturate_int32_sources():
+    srcs = [0, 1, -1, 2, 3, 0x40000000, 0x7fffffff, -0x7fffffff, -0x80000000 ]
+
+    random.seed(0)
+    for i in range(2, 32):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    for i in range(4):
+        srcs.append(random.randint(-0x7ffffffe, -2))
+
+    assert len(srcs) == 43
+    return srcs
+
+
+def addSaturate_uint32_sources():
+    srcs = [0, 1, 2, 3, 0x40000000, 0x7fffffff, 0x80000000, 0xf0f0f0f0, 0xff00ff00 ]
+
+    random.seed(0)
+    for i in range(2, 32):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    for i in range(43 - len(srcs)):
+        srcs.append(random.randint(-0x7ffffffe, -2))
+
+    assert len(srcs) == 43
+    return srcs
+
+
+def addSaturate_int64_sources():
+    srcs = [0, 1, -1, 2, 3, 0x4000000000000000, 0x7fffffffffffffff, -0x7fffffffffffffff, -0x8000000000000000 ]
+
+    random.seed(0)
+    for i in range(16, 64):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    while len(srcs) < 62:
+        srcs.append(random.randint(-0x7ffffffffffffffe, -2))
+
+    assert len(srcs) == 62
+    return [np.int64(np.uint64(x)) for x in srcs]
+
+
+def addSaturate_uint64_sources():
+    srcs = [0, 1, 2, 3, 0x4000000000000000, 0x7fffffffffffffff, 0x8000000000000000, 0xf0f0f0f0f0f0f0f0, 0xff00ff00ff00ff00 ]
+
+    random.seed(0)
+    for i in range(16, 64):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    while len(srcs) < 61:
+        srcs.append(random.randint(0, 0xffffffffffffffff))
+
+    srcs.append(np.uint64(0xdeadbeefdeadbeef))
+
+    assert len(srcs) == 62
     return [np.uint64(x) for x in srcs]
 
 
@@ -232,6 +352,50 @@ FUNCS = {
         'operator':   None,
         'version':    '1.30',
         'extensions': None,
+    },
+    'addSaturate-int': {
+        'input':      'int',
+        'output':     'int',
+        'sources':    addSaturate_int32_sources,
+        'results':    generate_results_commutative_with_diagonal,
+        'template':   'addSaturate.shader_test.mako',
+        'func':       'addSaturate',
+        'operator':   iadd_sat32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'addSaturate-uint': {
+        'input':      'uint',
+        'output':     'uint',
+        'sources':    addSaturate_uint32_sources,
+        'results':    generate_results_commutative_with_diagonal,
+        'template':   'addSaturate.shader_test.mako',
+        'func':       'addSaturate',
+        'operator':   uadd_sat32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'addSaturate-int64': {
+        'input':      'int64_t',
+        'output':     'int64_t',
+        'sources':    addSaturate_int64_sources,
+        'results':    generate_results_commutative_with_diagonal,
+        'template':   'addSaturate.shader_test.mako',
+        'func':       'addSaturate',
+        'operator':   iadd_sat64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'addSaturate-uint64': {
+        'input':      'uint64_t',
+        'output':     'uint64_t',
+        'sources':    addSaturate_uint64_sources,
+        'results':    generate_results_commutative_with_diagonal,
+        'template':   'addSaturate.shader_test.mako',
+        'func':       'addSaturate',
+        'operator':   uadd_sat64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
     },
 }
 
