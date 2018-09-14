@@ -60,6 +60,17 @@ def generate_results_commutative_with_diagonal(srcs, operator):
     return results
 
 
+def generate_results_without_diagonal(srcs, operator):
+    """Generate full matrix of results without the diagonal."""
+    results = []
+    for i in range(len(srcs)):
+        for j in range(len(srcs)):
+            if i != j:
+                results.append(operator(srcs[i], srcs[j]))
+
+    return results
+
+
 def generate_results_empty(unused1, unused2):
     """Some tests don't need any explicit results stored in the shader."""
     return []
@@ -139,6 +150,46 @@ def uadd_sat64(_a, _b):
         return np.iinfo(np.uint64).max
 
     return a + b
+
+
+def isub_sat32(a, b):
+    r = np.int64(np.int32(a)) - np.int64(np.int32(b))
+
+    if r > np.int64(0x07fffffff):
+        return np.int32(0x7fffffff)
+
+    if r < np.int64(-0x080000000):
+        return np.int32(0x80000000)
+
+    return np.int32(r)
+
+
+def usub_sat32(_a, _b):
+    a = np.uint32(_a)
+    b = np.uint32(_b)
+
+    return a - b if a > b else np.uint32(0)
+
+
+def isub_sat64(_a, _b):
+    a = np.int64(_a)
+    b = np.int64(_b)
+
+    if a >= 0:
+        if (a - np.iinfo(np.int64).max) > b:
+            return np.iinfo(np.int64).max
+    elif b >= 0:
+        if a < (np.iinfo(np.int64).min + b):
+            return np.iinfo(np.int64).min
+
+    return a - b
+
+
+def usub_sat64(_a, _b):
+    a = np.uint64(_a)
+    b = np.uint64(_b)
+
+    return a - b if a > b else np.uint64(0)
 
 
 def absoluteDifference32_sources():
@@ -286,6 +337,70 @@ def countTrailingZeros_sources():
     return sources
 
 
+def subtractSaturate_int32_sources():
+    srcs = [0, 1, -1, np.int32(0x80000000), -0x7fffffff, 0x7fffffff ]
+
+    random.seed(0)
+    for i in range(2, 32, 3):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    srcs.append(random.randint(0, 1 << 30) | (1 << 30))
+
+    for i in range(2, 32, 3):
+        srcs.append(-(random.randint(0, 1 << i) | (1 << i)))
+
+    srcs.append(-(random.randint(0, 1 << 30) | (1 << 30)))
+
+    while len(srcs) < 32:
+        srcs.append(random.randint(-0x80000000, 0x7fffffff))
+
+    assert len(srcs) == 32
+    return [np.int32(x) for x in srcs]
+
+
+def subtractSaturate_uint32_sources():
+    srcs = [0, 1, 0xf0f0f0f0 ]
+
+    random.seed(0)
+    for i in range(2, 31):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    assert len(srcs) == 32
+    return srcs
+
+
+def subtractSaturate_int64_sources():
+    srcs = [0, 1, -1, -0x8000000000000000, -0x7fffffffffffffff, 0x7fffffffffffffff ]
+
+    random.seed(0)
+    for i in range(2, 32, 3):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    srcs.append(random.randint(0, 1 << 30) | (1 << 30))
+
+    for i in range(16, 64, 3):
+        srcs.append(-(random.randint(0, 1 << i) | (1 << i)))
+
+    srcs.append(-(random.randint(0, 1 << 30) | (1 << 30)))
+
+    while len(srcs) < 45:
+        srcs.append(random.randint(-0x8000000000000000, 0x7fffffffffffffff))
+
+    assert len(srcs) == 45
+    return [np.int64(x) for x in srcs]
+
+
+def subtractSaturate_uint64_sources():
+    srcs = [0, 1, 0xf0f0f0f0f0f0f0f0 ]
+
+    random.seed(0)
+    for i in range(22, 64):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    assert len(srcs) == 45
+    return srcs
+
+
 FUNCS = {
     'absoluteDifference-int': {
         'input':      'int',
@@ -394,6 +509,50 @@ FUNCS = {
         'template':   'addSaturate.shader_test.mako',
         'func':       'addSaturate',
         'operator':   uadd_sat64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'subtractSaturate-int': {
+        'input':      'int',
+        'output':     'int',
+        'sources':    subtractSaturate_int32_sources,
+        'results':    generate_results_without_diagonal,
+        'template':   'subtractSaturate.shader_test.mako',
+        'func':       'subtractSaturate',
+        'operator':   isub_sat32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'subtractSaturate-uint': {
+        'input':      'uint',
+        'output':     'uint',
+        'sources':    subtractSaturate_uint32_sources,
+        'results':    generate_results_without_diagonal,
+        'template':   'subtractSaturate.shader_test.mako',
+        'func':       'subtractSaturate',
+        'operator':   usub_sat32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'subtractSaturate-int64': {
+        'input':      'int64_t',
+        'output':     'int64_t',
+        'sources':    subtractSaturate_int64_sources,
+        'results':    generate_results_without_diagonal,
+        'template':   'subtractSaturate.shader_test.mako',
+        'func':       'subtractSaturate',
+        'operator':   isub_sat64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'subtractSaturate-uint64': {
+        'input':      'uint64_t',
+        'output':     'uint64_t',
+        'sources':    subtractSaturate_uint64_sources,
+        'results':    generate_results_without_diagonal,
+        'template':   'subtractSaturate.shader_test.mako',
+        'func':       'subtractSaturate',
+        'operator':   usub_sat64,
         'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
         'extensions': 'GL_ARB_gpu_shader_int64',
     },

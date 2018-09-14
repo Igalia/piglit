@@ -220,6 +220,7 @@ piglit_make_generated_tests(
 	templates/gen_intel_shader_integer_functions2_tests/absoluteDifference.shader_test.mako
 	templates/gen_intel_shader_integer_functions2_tests/addSaturate.shader_test.mako
 	templates/gen_intel_shader_integer_functions2_tests/countLeadingZeros.shader_test.mako
+	templates/gen_intel_shader_integer_functions2_tests/subtractSaturate.shader_test.mako
 	)
 
 # OpenCL Test generators
