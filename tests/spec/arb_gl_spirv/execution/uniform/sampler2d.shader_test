@@ -63,6 +63,8 @@ texture checkerboard 0 0 (32, 32) (0.0, 1.0, 0.0, 1.0) (1.0, 0.0, 0.0, 1.0)
 texparameter 2D min nearest
 texparameter 2D mag nearest
 
+verify program_query GL_ACTIVE_UNIFORMS 1
+
 clear
 clear color 0.0 0.0 1.0 0.0
 

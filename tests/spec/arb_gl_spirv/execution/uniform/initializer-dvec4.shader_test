@@ -64,5 +64,8 @@ draw rect -1 -1 1 2
 uniform dvec4 0 0.0 0.0 1.0 0.0
 draw rect 0 -1 1 2
 uniform dvec4 0 0.0 1.0 0.0 0.0
+
+verify program_query GL_ACTIVE_UNIFORMS 1
+
 relative probe rgb (0.25, 0.5) (0.0, 1.0, 0.0)
 relative probe rgb (0.75, 0.5) (0.0, 0.0, 1.0)
