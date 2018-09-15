@@ -64,7 +64,11 @@ in vec4 piglit_vertex;
 ${output_type} get_expected_result(uint i, uint j)
 {
     if (i == j)
+    % if func == "absoluteDifference":
         return ${output_type}(0);
+    % else:
+        return ${output_type}(src[i]);
+    % endif
 
     uint row = min(i, j);
     uint col = max(i, j) - row;
@@ -145,7 +149,11 @@ uniform Expected { u64vec2 expected[(int(SUM_N_to_1(src.length())) - src.length(
 ${output_type} get_expected_result(uint i, uint j)
 {
     if (i == j)
+    % if func == "absoluteDifference":
         return ${output_type}(0);
+    % else:
+        return ${output_type}(src[i]);
+    % endif
 
     uint row = min(i, j);
     uint col = max(i, j) - row;

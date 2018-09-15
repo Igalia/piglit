@@ -192,6 +192,34 @@ def usub_sat64(_a, _b):
     return a - b if a > b else np.uint64(0)
 
 
+def u_hadd32(_a, _b):
+    a = np.uint32(_a)
+    b = np.uint32(_b)
+
+    return (a >> 1) + (b >> 1) + ((a & b) & 1)
+
+
+def s_hadd32(_a, _b):
+    a = np.int32(_a)
+    b = np.int32(_b)
+
+    return (a >> 1) + (b >> 1) + ((a & b) & 1)
+
+
+def u_hadd64(_a, _b):
+    a = np.uint64(_a)
+    b = np.uint64(_b)
+
+    return (a >> np.uint64(1)) + (b >> np.uint64(1)) + ((a & b) & np.uint64(1))
+
+
+def s_hadd64(_a, _b):
+    a = np.int64(_a)
+    b = np.int64(_b)
+
+    return (a >> np.int64(1)) + (b >> np.int64(1)) + ((a & b) & np.int64(1))
+
+
 def absoluteDifference32_sources():
     srcs = []
     for x in range(0, 32, 4):
@@ -509,6 +537,50 @@ FUNCS = {
         'template':   'addSaturate.shader_test.mako',
         'func':       'addSaturate',
         'operator':   uadd_sat64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'average-int': {
+        'input':      'int',
+        'output':     'int',
+        'sources':    absoluteDifference32_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'average',
+        'operator':   s_hadd32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'average-uint': {
+        'input':      'uint',
+        'output':     'uint',
+        'sources':    absoluteDifference32_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'average',
+        'operator':   u_hadd32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'average-int64': {
+        'input':      'int64_t',
+        'output':     'int64_t',
+        'sources':    absoluteDifference64_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'average',
+        'operator':   s_hadd64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'average-uint64': {
+        'input':      'uint64_t',
+        'output':     'uint64_t',
+        'sources':    absoluteDifference64_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'average',
+        'operator':   u_hadd64,
         'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
         'extensions': 'GL_ARB_gpu_shader_int64',
     },
