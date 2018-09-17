@@ -248,6 +248,14 @@ def s_rhadd64(_a, _b):
     return (a >> np.int64(1)) + (b >> np.int64(1)) + ((a | b) & np.int64(1))
 
 
+def imul_32x16(a, b):
+    return np.int32(a) * ((np.int32(b) << 16) >> 16)
+
+
+def umul_32x16(a, b):
+    return np.uint32(np.uint32(a) * (np.uint32(b) & 0x0000ffff))
+
+
 def absoluteDifference32_sources():
     srcs = []
     for x in range(0, 32, 4):
@@ -391,6 +399,26 @@ def countTrailingZeros_sources():
             sources.append((random.randint(0, 0xffffffff) | 1) << num_zeros)
 
     return sources
+
+
+def multiply32x16_int32_sources():
+    srcs = [0, 1, -1, np.int32(0x80000000), -0x7fffffff, 0x7fffffff ]
+
+    random.seed(0)
+    for i in range(2, 32, 3):
+        srcs.append(random.randint(0, 1 << i) | (1 << i))
+
+    srcs.append(random.randint(0, 1 << 30) | (1 << 30))
+
+    for i in range(2, 32, 3):
+        srcs.append(-(random.randint(0, 1 << i) | (1 << i)))
+
+    srcs.append(-(random.randint(0, 1 << 30) | (1 << 30)))
+
+    while len(srcs) < 512:
+        srcs.append(random.randint(-0x80000000, 0x7fffffff))
+
+    return srcs
 
 
 def subtractSaturate_int32_sources():
@@ -655,6 +683,28 @@ FUNCS = {
         'operator':   u_rhadd64,
         'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
         'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'multiply32x16-int': {
+        'input':      'int',
+        'output':     'int',
+        'sources':    multiply32x16_int32_sources,
+        'results':    generate_results_empty,
+        'template':   'multiply32x16.shader_test.mako',
+        'func':       'multiply32x16',
+        'operator':   imul_32x16,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'multiply32x16-uint': {
+        'input':      'uint',
+        'output':     'uint',
+        'sources':    multiply32x16_int32_sources,
+        'results':    generate_results_empty,
+        'template':   'multiply32x16.shader_test.mako',
+        'func':       'multiply32x16',
+        'operator':   umul_32x16,
+        'version':    '1.30',
+        'extensions': None,
     },
     'subtractSaturate-int': {
         'input':      'int',
