@@ -220,6 +220,34 @@ def s_hadd64(_a, _b):
     return (a >> np.int64(1)) + (b >> np.int64(1)) + ((a & b) & np.int64(1))
 
 
+def u_rhadd32(_a, _b):
+    a = np.uint32(_a)
+    b = np.uint32(_b)
+
+    return (a >> 1) + (b >> 1) + ((a | b) & 1)
+
+
+def s_rhadd32(_a, _b):
+    a = np.int32(_a)
+    b = np.int32(_b)
+
+    return (a >> 1) + (b >> 1) + ((a | b) & 1)
+
+
+def u_rhadd64(_a, _b):
+    a = np.uint64(_a)
+    b = np.uint64(_b)
+
+    return (a >> np.uint64(1)) + (b >> np.uint64(1)) + ((a | b) & np.uint64(1))
+
+
+def s_rhadd64(_a, _b):
+    a = np.int64(_a)
+    b = np.int64(_b)
+
+    return (a >> np.int64(1)) + (b >> np.int64(1)) + ((a | b) & np.int64(1))
+
+
 def absoluteDifference32_sources():
     srcs = []
     for x in range(0, 32, 4):
@@ -581,6 +609,50 @@ FUNCS = {
         'template':   'absoluteDifference.shader_test.mako',
         'func':       'average',
         'operator':   u_hadd64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
+        },
+    'averageRounded-int': {
+        'input':      'int',
+        'output':     'int',
+        'sources':    absoluteDifference32_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'averageRounded',
+        'operator':   s_rhadd32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'averageRounded-uint': {
+        'input':      'uint',
+        'output':     'uint',
+        'sources':    absoluteDifference32_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'averageRounded',
+        'operator':   u_rhadd32,
+        'version':    '1.30',
+        'extensions': None,
+    },
+    'averageRounded-int64': {
+        'input':      'int64_t',
+        'output':     'int64_t',
+        'sources':    absoluteDifference64_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'averageRounded',
+        'operator':   s_rhadd64,
+        'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
+        'extensions': 'GL_ARB_gpu_shader_int64',
+    },
+    'averageRounded-uint64': {
+        'input':      'uint64_t',
+        'output':     'uint64_t',
+        'sources':    absoluteDifference64_sources,
+        'results':    generate_results_commutative,
+        'template':   'absoluteDifference.shader_test.mako',
+        'func':       'averageRounded',
+        'operator':   u_rhadd64,
         'version':    '4.00',  # GL_ARB_gpu_shader_int64 requires 4.0.
         'extensions': 'GL_ARB_gpu_shader_int64',
     },
