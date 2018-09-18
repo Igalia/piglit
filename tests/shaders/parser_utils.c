@@ -94,7 +94,25 @@ parse_int64s(const char *s, int64_t *i, unsigned n, const char **rest)
 	unsigned j;
 
 	for (j = 0; j < n; j++) {
-		int64_t v = strtoll(s = end, (char **)&end, 0);
+		int64_t v;
+
+		s = end;
+		while (isspace(s[0]))
+			s++;
+
+		/* If the user specified a raw hex value, just parse the raw
+		 * bit pattern.  Hex values that represent negative numbers
+		 * would be clamped to INT64_MAX by strtoll (and errno would
+		 * be set to ERANGE).
+		 */
+		errno = 0;
+		if (strncmp("0x", s, 2) == 0)
+			v = (int64_t) strtoull(s, (char **)&end, 0);
+		else
+			v = strtoll(s, (char **)&end, 0);
+
+		assert(errno == 0);
+
 		if (s == end)
 			break;
 		i[j] = v;
