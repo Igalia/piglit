@@ -4,12 +4,6 @@ GL >= 4.5
 GLSL >= 4.50
 GL_ARB_gl_spirv
 
-; This test shows that simple functions work OK. The problem is that we
-; cannot test more comlex cases that use uniforms or varyings due to a
-; glslang problem: https://github.com/KhronosGroup/glslang/issues/1285 that
-; causes invalid SPIR-V generation. More complex functions tests will be
-; added when this issue is fixed.
-
 [vertex shader passthrough]
 
 [fragment shader spirv]
