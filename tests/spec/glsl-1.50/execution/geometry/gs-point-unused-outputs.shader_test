@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 pos;
+out vec4 color;
+
+void main() {
+  gl_Position = pos;
+  color = vec4(1, 1, 1, 1);
+}
+
+[geometry shader]
+#version 150
+
+layout (points) in;
+layout (points, max_vertices = 1) out;
+
+in vec4 color[];
+out vec4 out_position;
+out vec4 out_color;
+
+void main() {
+  out_position = gl_in[0].gl_Position;
+  out_color = color[0];
+  EmitVertex();
+}
+
+[vertex data]
+pos/float/4
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+
+[test]
+clear color 1 1 1 1
+clear
+
+draw arrays GL_POINTS 0 2
