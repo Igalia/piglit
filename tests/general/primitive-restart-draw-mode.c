@@ -133,12 +133,13 @@ static const char vs_text[] =
 	"attribute vec2 vertex;\n"
 	"uniform vec2 offset;\n"
 	"uniform vec2 window_size;\n"
-	"uniform vec4 color;\n"
+	"uniform vec4 color, bcolor;\n"
 	"void main()\n"
 	"{\n"
 	"  gl_Position = vec4((vertex + offset) / window_size * 2.0 - 1.0,\n"
 	"                     0.0, 1.0);\n"
 	"  gl_FrontColor = color;\n"
+	"  gl_BackColor = bcolor;\n"
 	"}\n";
 
 
@@ -147,6 +148,7 @@ static GLint vertex_attr;
 static GLint window_size_loc;
 static GLint offset_loc;
 static GLint color_loc;
+static GLint bcolor_loc;
 
 
 static void
@@ -195,14 +197,19 @@ piglit_init(int argc, char **argv)
 	window_size_loc = glGetUniformLocation(prog, "window_size");
 	offset_loc = glGetUniformLocation(prog, "offset");
 	color_loc = glGetUniformLocation(prog, "color");
+	bcolor_loc = glGetUniformLocation(prog, "bcolor");
+
+	glEnable(GL_VERTEX_PROGRAM_TWO_SIDE);
 }
 
 
 static void
 draw_pattern(int restart_pos, bool use_primitive_restart)
 {
-	/* Draw test pattern in blue */
+	/* Draw front faces blue and back faces red. */
 	glUniform4f(color_loc, 0.25, 0.25, 1.0, 1.0);
+	glUniform4f(bcolor_loc, 0.7, 0.2, 0.2, 1.0);
+
 	if (use_primitive_restart) {
 		GLubyte index_buffer[NUM_VERTICES + 1];
 		int i;
