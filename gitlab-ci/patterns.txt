@@ -1,0 +1,36 @@
+# Format: <include/exclude>-<driver>: tests
+# If <include> is used, it will run only those tests.
+# Otherwise, it will run all the tests except those <exclude>
+
+exclude-i965: arb_post_depth_coverage-basic
+exclude-i965: arb_post_depth_coverage-multisampling arb_post_depth_coverage-sample-shading
+exclude-i965: arb_query_buffer_object-qbo
+exclude-i965: arb_timer_query-timestamp-get
+exclude-i965: ext_framebuffer_multisample-accuracy
+exclude-i965: ext_texture_env_combine
+exclude-i965: ext_timer_query-time-elapsed
+exclude-i965: glx-oml-sync-control-swapbuffersmsc-divisor-zero glx-oml-sync-control-waitformsc
+exclude-i965: glx-oml-sync-control-timing glx-copy-sub-buffer glx-multithread-texture
+exclude-i965: glx_arb_sync_control.*swapbuffersmsc-divisor-zero glx_arb_sync_control.*waitformsc
+exclude-i965: layer-gs-writes-in-range
+exclude-i965: masked-clear
+exclude-i965: texcombine texCombine
+exclude-llvmpipe: ext_texture_env_combine
+exclude-llvmpipe: glx-multithread-shader-compile
+exclude-llvmpipe: texcombine texCombine
+exclude-softpipe: arb_shader_image_load_store-shader-mem-barrier
+exclude-softpipe: spec.*vs-loop-complex-unroll-nested-break
+exclude-softpipe: texcombine texCombine
+exclude-softpipe: triangle-rasterization
+exclude-swr: amd_shader_trinary_minmax.*fs-mid3-ivec2-ivec2-ivec2 amd_shader_trinary_minmax.*vs-min3-ivec2-ivec2-ivec2 amd_shader_trinary_minmax.*fs-min3-int-int-int amd_shader_trinary_minmax.*vs-max3-int-int-int amd_shader_trinary_minmax.*fs-mid3-int-int-int amd_shader_trinary_minmax.*vs-min3-int-int-int
+exclude-swr: ext_texture_env_combine
+exclude-swr: ext_transform_feedback-immediate-reuse-index-buffer
+exclude-swr: ext_transform_feedback.*immediate-reuse-index-buffer stencil-twoside ext_texture_array.*maxlayers bound-resource-limits
+exclude-swr: fs-clamp-int-int-int vs-clamp-int-int-int
+exclude-swr: fs-op-ne-bvec4-bvec4 fs-op-ne-bvec4-bvec4-using-if fs-op-eq-bvec4-bvec4 fs-op-eq-bvec4-bvec4-using-if vs-op-selection-bool-bvec4-bvec4 vs-op-eq-bvec4-bvec4-using-if
+exclude-swr: glx-multi-context-ib-1
+exclude-swr: glx-multi-context-single-window
+exclude-swr: spec.*ext_transform_feedback.*immediate-reuse-uniform-buffer
+exclude-swr: streaming-texture-leak
+exclude-swr: tex-miplevel-selection
+exclude-swr: texcombine texCombine

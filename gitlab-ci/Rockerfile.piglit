@@ -1,0 +1,76 @@
+#
+# This builds and installs Piglit.
+#
+# ~~~
+#  rocker build -f Rockerfile.piglit [--attach]		\
+#    [--var TAG=piglit]         # 17.0, 13.0, ...	\
+# ~~~
+#
+# Environment variables that are used in the build:
+#  - BASE_IMAGE: name of the base image (default: mesa:master)
+#  - DOCKER_IMAGE: name of the final image to be tagged (default: piglit[:$TAG])
+#  - MAKEFLAGS: flags to pass to make (e.g., "-j8")
+#  - CCACHE_DIR: ccache directory (default: ~/.ccache)
+#
+# To run
+#
+# ~~~
+#   mkdir -p -m777 ~/my_results_dir
+#   docker run --rm -t -v ~/my_results_dir:/results:Z  \
+#              -v /tmp/.X11-unix:/tmp/.X11-unix \
+#              -e DISPLAY=unix$DISPLAY \
+#              -e FPR_EXTRA_ARGS="--verbosity full" \
+#              -e GL_DRIVER=i965 piglit
+# ~~~
+#
+# GL_DRIVER = [ i965, nouveau, nvidia, radeon, amd, llvmpipe, swr, softpipe ]
+#
+
+{{ $base_image := (or .Env.BASE_IMAGE "mesa:master") }}
+{{ $image := (or .Env.DOCKER_IMAGE "piglit") }}
+{{ $ccachedir := (or .Env.CCACHE_DIR "~/.ccache") }}
+
+FROM {{ $base_image }}
+
+LABEL maintainer "Juan A. Suarez Romero <jasuarez@igalia.com>"
+
+RUN apt-get update                                                      \
+  && apt-get -y --no-install-recommends install cmake libwaffle-dev     \
+    libpng-dev libxkbcommon-dev libglu1-mesa-dev libegl1-mesa-dev unzip \
+    python3-setuptools python3-pip curl jq	 		  	\
+  && rm -fr /var/lib/apt/lists/*
+
+RUN pip3 install numpy six mako ninja
+
+USER local
+
+{{ if .Env.MAKEFLAGS }}
+ENV MAKEFLAGS={{ .Env.MAKEFLAGS }}
+{{ end }}
+
+WORKDIR /home/local
+
+ADD . piglit
+RUN sudo chown -R local:local piglit
+
+WORKDIR /home/local/piglit
+
+RUN if [ -d .git ] ; then git show --stat > /home/local/piglit-head.txt ; else echo "FROM TARBALL" > /home/local/piglit-head.txt ; fi
+
+MOUNT {{ $ccachedir }}:/home/local/.ccache:Z
+
+RUN sudo chown -R local:local /home/local/.ccache
+
+ENV PATH=/usr/lib/ccache:$PATH
+
+ATTACH [ "/bin/bash" ]
+
+RUN cmake -GNinja . && cmake --build .
+
+VOLUME /results
+
+CMD "/bin/sh" "-c" "cat /home/local/mesa-head.txt >> /results/mesa-head.txt && cat /home/local/piglit-head.txt >> /results/piglit-head.txt && export MESA_COMMIT=\$(grep commit /home/local/mesa-head.txt | cut -d \" \" -f 2) && /home/local/piglit/gitlab-ci/run-testsuite.sh \$FPR_EXTRA_ARGS --base-path /home/local --results-path /results --patterns-file /home/local/piglit/gitlab-ci/patterns.txt --driver \$GL_DRIVER --commit \$MESA_COMMIT "
+
+{{ if .TAG }}
+TAG {{ $image }}:{{ .TAG }}
+{{ end }}
