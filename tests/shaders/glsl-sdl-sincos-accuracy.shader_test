@@ -1,0 +1,32 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+/* SDL2 prior to 12156:e5a666405750 (Aug 28) would render a bunch of
+ * its contents using cos/sin in the VS to handle a user-passed angle
+ * value (See SDL's RenderCopyEx, for example).  If our error at angle
+ * == 0.0 is too much, we'll slightly rotate the images even with
+ * nearest filtering.
+ */
+uniform float angle;
+void main()
+{
+	float sin_err = abs(sin(angle) - 0.0);
+	float cos_err = abs(cos(angle) - 1.0);
+	/* Allow a tolerance of half a pixel of error at a 2048x2048
+	 * window (viewport is from -1 to 1).
+	 */
+	float tolerance = 2.0 / 2048.0 / 2.0;
+
+	gl_FragColor = vec4(sin_err >= tolerance,
+			    sin_err < tolerance && cos_err < tolerance,
+			    cos_err >= tolerance,
+			    0.0);
+}
+
+[test]
+uniform float angle 0.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
