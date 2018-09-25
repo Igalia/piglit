@@ -4641,6 +4641,7 @@ with profile.test_list.group_manager(
     g(['texture-immutable-levels_gles3'], 'texture-immutable-levels')
     g(['gles-3.0-drawarrays-vertexid'], 'gl_VertexID used with glDrawArrays')
     g(['gles-3.0-transform-feedback-uniform-buffer-object'])
+    g(['gles-3.0-attribute-aliasing'], 'vertex attribute aliasing')
 
     for test_mode in ['teximage', 'texsubimage']:
         g(['ext_texture_array-compressed_gles3', test_mode, '-fbo'],
