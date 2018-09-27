@@ -67,10 +67,28 @@ def add_shader_test(shader):
 profile = TestProfile()
 
 shader_tests = (
+    'tests/fast_color_clear/all-colors.shader_test',
+    'tests/shaders/arb_texture_gather-miplevels.shader_test',
     'tests/shaders/glsl-algebraic-add-zero.shader_test',
+    'tests/shaders/glsl-derivs-varyings.shader_test',
+    'tests/shaders/glsl-fs-max-3.shader_test',
+    'tests/shaders/glsl-fs-texture2d-branching.shader_test',
+    'tests/shaders/glsl-vs-mat-mul-1.shader_test',
+    'tests/spec/arb_arrays_of_arrays/execution/image_store/basic-imageStore-mixed-const-non-const-uniform-index.shader_test',
+    'tests/spec/arb_arrays_of_arrays/execution/sampler/vs-struct-nonconst.shader_test',
     'tests/spec/arb_compute_shader/execution/basic-ssbo.shader_test',
+    'tests/spec/arb_compute_shader/execution/shared-atomics.shader_test',
+    'tests/spec/arb_derivative_control/execution/dfdx-dfdy.shader_test',
+    'tests/spec/arb_gpu_shader5/execution/built-in-functions/fs-bitfieldReverse.shader_test',
+    'tests/spec/arb_shader_ballot/execution/fs-readFirstInvocation-uint-loop.shader_test',
+    'tests/spec/arb_shader_group_vote/cs-all.shader_test',
+    'tests/spec/arb_shader_image_load_store/execution/write-to-rendered-image.shader_test',
+    'tests/spec/arb_shader_subroutine/execution/two-subroutines-nested.shader_test',
+    'tests/spec/arb_shader_texture_lod/execution/glsl-fs-shadow2DGradARB-cumulative.shader_test',
+    'tests/spec/arb_tessellation_shader/execution/barrier-patch.shader_test',
     'tests/spec/arb_tessellation_shader/execution/sanity.shader_test',
     'tests/spec/glsl-1.50/execution/geometry-basic.shader_test',
+    'tests/spec/oes_viewport_array/viewport-gs-write-simple.shader_test',
 )
 
 for shader_test in shader_tests:
