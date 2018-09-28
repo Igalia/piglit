@@ -49,8 +49,13 @@ gen_basepath = os.path.relpath(os.path.join(GENERATED_TESTS_DIR, '..'), basepath
 
 def add_shader_test(shader):
     """Given an adder, creates a group and adds a shader test."""
-    basedir = TESTS_DIR
-    abs_path = os.path.abspath(os.path.join(basedir, shader))
+    for d in (TESTS_DIR, GENERATED_TESTS_DIR,):
+        s = os.path.abspath(os.path.join(d, shader))
+        if os.path.exists(s):
+            basedir = d
+            abs_path = s
+            break
+
     dirpath, filename = os.path.split(os.path.join(basedir, shader))
     dirname = os.path.relpath(dirpath, basepath)
     filepath = os.path.join(dirname, filename)

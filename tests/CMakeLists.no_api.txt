@@ -61,7 +61,7 @@ add_custom_target(gen-gl-xml)
 piglit_generate_xml(opengl opengl gen-gl-xml "")
 piglit_generate_xml(quick_gl quick_gl gen-gl-xml "")
 piglit_generate_xml(llvmpipe_gl llvmpipe_gl gen-gl-xml "")
-piglit_generate_xml(sanity sanity gen-gl-xml "")
+piglit_generate_xml(sanity sanity gen-gl-xml "" gen-gl-tests)
 
 add_custom_target(gen-gl-gen-xml)
 piglit_generate_xml(glslparser glslparser gen-gl-gen-xml "" gen-gl-tests static-glslparser-tests static-asmparser-tests)
