@@ -22,6 +22,7 @@
  */
 
 #include "piglit-util-gl.h"
+#include "common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -45,50 +46,6 @@ static const GLenum good_compressed_tex_3d_targets[] = {
 	GL_TEXTURE_CUBE_MAP_ARRAY_EXT,
 	GL_TEXTURE_3D,
 };
-
-static const struct astc_fmt {
-	/** The GLenum for the ASTC format. */
-	GLenum fmt;
-
-	/** The block width. */
-	int bw;
-
-	/** The block height. */
-	int bh;
-
-	/** The number of bytes per block. */
-	int bb;
-} formats[] = {
-	{GL_COMPRESSED_RGBA_ASTC_4x4_KHR          ,  4,  4, 16},
-	{GL_COMPRESSED_RGBA_ASTC_5x4_KHR          ,  5,  4, 16},
-	{GL_COMPRESSED_RGBA_ASTC_5x5_KHR          ,  5,  5, 16},
-	{GL_COMPRESSED_RGBA_ASTC_6x5_KHR          ,  6,  5, 16},
-	{GL_COMPRESSED_RGBA_ASTC_6x6_KHR          ,  6,  6, 16},
-	{GL_COMPRESSED_RGBA_ASTC_8x5_KHR          ,  8,  5, 16},
-	{GL_COMPRESSED_RGBA_ASTC_8x6_KHR          ,  8,  6, 16},
-	{GL_COMPRESSED_RGBA_ASTC_8x8_KHR          ,  8,  8, 16},
-	{GL_COMPRESSED_RGBA_ASTC_10x5_KHR         , 10,  5, 16},
-	{GL_COMPRESSED_RGBA_ASTC_10x6_KHR         , 10,  6, 16},
-	{GL_COMPRESSED_RGBA_ASTC_10x8_KHR         , 10,  8, 16},
-	{GL_COMPRESSED_RGBA_ASTC_10x10_KHR        , 10, 10, 16},
-	{GL_COMPRESSED_RGBA_ASTC_12x10_KHR        , 12, 10, 16},
-	{GL_COMPRESSED_RGBA_ASTC_12x12_KHR        , 12, 12, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR  ,  4,  4, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR  ,  5,  4, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR  ,  5,  5, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR  ,  6,  5, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR  ,  6,  6, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR  ,  8,  5, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR  ,  8,  6, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR  ,  8,  8, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR , 10,  5, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR , 10,  6, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR , 10,  8, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR, 10, 10, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR, 12, 10, 16},
-	{GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR, 12, 12, 16}
-};
-
 
 #define REQUIRE_ERROR(expected_error) \
 do { \
