@@ -4390,6 +4390,7 @@ with profile.test_list.group_manager(
     g(['khr_compressed_astc-array_gles3'], 'array-gles')
     g(['khr_compressed_astc-basic_gl'], 'basic-gl')
     g(['khr_compressed_astc-basic_gles2'], 'basic-gles')
+    g(['void-extent-dl-bug'], 'void-extent-dl-bug')
 
     for subtest in ('hdr', 'ldr', 'srgb', "srgb-fp", "srgb-sd"):
         g(['khr_compressed_astc-miptree_gl', '-subtest', subtest],

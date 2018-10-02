@@ -6,5 +6,6 @@ piglit_add_executable(khr_compressed_astc-miptree_${piglit_target_api} khr_compr
 piglit_add_executable(khr_compressed_astc-sliced-3d-miptree_${piglit_target_api} khr_compressed_astc-sliced-3d-miptree.c)
 piglit_add_executable(khr_compressed_astc-array_${piglit_target_api} khr_compressed_astc-miptree-array.c)
 piglit_add_executable(khr_compressed_astc-basic_${piglit_target_api} khr_compressed_astc-basic.c)
+piglit_add_executable(void-extent-dl-bug void-extent-dl-bug.c)
 
 # vim: ft=cmake:
