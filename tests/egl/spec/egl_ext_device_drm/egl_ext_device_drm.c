@@ -162,7 +162,10 @@ main(void)
 		if (fd < 0) {
 			printf("Failed to open drm device file %s: %s\n",
 				devstring, strerror(errno));
-			piglit_report_result(PIGLIT_FAIL);
+			printf("Make sure you have permissions to open %s\n");
+			result = PIGLIT_WARN;
+			eglTerminate(dpy1);
+			continue;
 		}
 #ifndef EGL_DRM_MASTER_FD_EXT
 #define EGL_DRM_MASTER_FD_EXT                   0x333C
