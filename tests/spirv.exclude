@@ -107,6 +107,9 @@ tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01
 tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-shader-storage-blocks-member-offset-qualifier-mismatch
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-uniform-blocks-member-offset-qualifier-mismatch
+# Doesn't make sense on ARB_gl_spirv: intrastage tests (some should be catched by glslang)
+tests/spec/arb_enhanced_layouts/linker/explicit-offsets/intrastage-ssbo-different-offset-across-shaders
+tests/spec/arb_enhanced_layouts/linker/explicit-offsets/intrastage-ubo-different-offset-across-shaders
 # layout(shared) not supported, pending to re-implement automatically skip them
 tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-packaging-qualifier-mismatch.shader_test
 # tests that expect linker errors in GLSL and generete compiler errors on
