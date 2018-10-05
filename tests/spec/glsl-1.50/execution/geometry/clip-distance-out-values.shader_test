@@ -20,7 +20,7 @@ void main()
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
-float gl_ClipDistance[8];
+out float gl_ClipDistance[8];
 
 struct vertex_data {
   vec4 position;
