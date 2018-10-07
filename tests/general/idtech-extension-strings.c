@@ -79,7 +79,7 @@ const char *const q3demo_list[] = {
 const char *const star_trek_voyager_list[] = {
 	"GL_S3_s3tc",
 	"GL_EXT_texture_compression_s3tc",
-	"GL_EXT_texture_env_add"
+	"GL_EXT_texture_env_add",
 	"GL_EXT_texture_filter_anisotropic",
 	"GL_EXT_texture_edge_clamp",
 	"GL_ARB_multitexture",
