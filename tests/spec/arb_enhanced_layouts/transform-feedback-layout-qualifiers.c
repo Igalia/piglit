@@ -203,7 +203,6 @@ build_and_use_program(unsigned gs_invocation_n, const char *vs_text)
 		free(gs_text);
 	}
 
-	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
