@@ -131,6 +131,8 @@ compile_spirv_program(GLenum shader_type,
 	glAttachShader(prog, shader);
 	glDeleteShader(shader);
 
+	glLinkProgram(prog);
+
 	return prog;
 }
 
@@ -187,7 +189,6 @@ build_and_use_program(const struct test_config *config)
 		free(gs_text);
 	}
 
-	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
