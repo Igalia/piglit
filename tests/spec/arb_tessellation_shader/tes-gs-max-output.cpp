@@ -71,13 +71,37 @@ struct testcase {
 	unsigned num_extra_components; /* # extra components per GS output vertex */
 
 	bool operator<(const testcase &o) const {
-		return std::make_tuple(num_instances, num_patches, tessfactor_u,
-				       tessfactor_v, num_invocations, num_outputs,
-				       num_extra_components)
-			<
-		       std::make_tuple(o.num_instances, o.num_patches, o.tessfactor_u,
-				       o.tessfactor_v, o.num_invocations, o.num_outputs,
-				       o.num_extra_components);
+		if (num_instances < o.num_instances)
+			return true;
+		if (num_instances > o.num_instances)
+			return false;
+
+		if (num_patches < o.num_patches)
+			return true;
+		if (num_patches > o.num_patches)
+			return false;
+
+		if (tessfactor_u < o.tessfactor_u)
+			return true;
+		if (tessfactor_u > o.tessfactor_u)
+			return false;
+
+		if (tessfactor_v < o.tessfactor_v)
+			return true;
+		if (tessfactor_v > o.tessfactor_v)
+			return false;
+
+		if (num_invocations < o.num_invocations)
+			return true;
+		if (num_invocations > o.num_invocations)
+			return false;
+
+		if (num_outputs < o.num_outputs)
+			return true;
+		if (num_outputs > o.num_outputs)
+			return false;
+
+		return num_extra_components < o.num_extra_components;
 	}
 };
 
@@ -349,7 +373,8 @@ add_testcase(const struct testcase *tc)
 
 		fragmentshaderkey fskey;
 		fskey.num_extra_components = tc->num_extra_components;
-		auto fsit = fragmentshaders.find(fskey);
+		std::map<fragmentshaderkey, GLuint>::const_iterator fsit =
+			fragmentshaders.find(fskey);
 		if (fsit == fragmentshaders.end()) {
 			if (asprintf(&text, fs_text, tc->num_extra_components) < 0)
 				abort();
@@ -401,7 +426,8 @@ run_testcase(const struct testcase *tc)
 	gskey.num_invocations = tc->num_invocations;
 	gskey.num_outputs = tc->num_outputs;
 	gskey.num_extra_components = tc->num_extra_components;
-	auto progit = testprograms.find(gskey);
+	std::map<geometryshaderkey, GLuint>::const_iterator progit =
+		testprograms.find(gskey);
 	assert(progit != testprograms.end());
 
 	glUseProgram(progit->second);

@@ -252,7 +252,8 @@ add_testcase(const struct testcase *tc)
 
 		fragmentshaderkey fskey;
 		fskey.num_components = tc->num_components;
-		auto fsit = fragmentshaders.find(fskey);
+		std::map<fragmentshaderkey, GLuint>::const_iterator fsit =
+			fragmentshaders.find(fskey);
 		if (fsit == fragmentshaders.end()) {
 			if (asprintf(&text, fs_text, tc->num_components) < 0)
 				abort();
@@ -298,7 +299,8 @@ run_testcase(const struct testcase *tc)
 	gskey.num_invocations = tc->num_invocations;
 	gskey.num_outputs = tc->num_outputs;
 	gskey.num_components = tc->num_components;
-	auto progit = testprograms.find(gskey);
+	std::map<geometryshaderkey, GLuint>::const_iterator  progit =
+		testprograms.find(gskey);
 	assert(progit != testprograms.end());
 
 	glUseProgram(progit->second);
