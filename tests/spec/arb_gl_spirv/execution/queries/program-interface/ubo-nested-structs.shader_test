@@ -1,0 +1,232 @@
+# Tests the program interface queries not related with names over
+# an UBO containing nested structs in a shader constructed from SPIR-V
+# binaries where no name reflection information is available.
+#
+# ARB_gl_spirv:
+#
+# 19. How should the program interface query operations behave for program
+#    objects created from SPIR-V shaders?
+#
+#   C) Allow as much as possible to work "naturally". You can query for
+#   the number of active resources, and for details about them. Anything
+#   that doesn't query by name will work as expected... If everything
+#   is specified a-priori by location/binding/offset/index/component
+#   in the shader, this may be sufficient.
+#
+#   RESOLVED.  Pick (c), but also allow debug names to be returned if an
+#   implementation wants to.
+
+[require]
+SPIRV ONLY
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_gl_spirv
+
+[vertex shader passthrough]
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 51
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outColor
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outColor Location 0
+               OpDecorate %_arr_v2float_uint_2 ArrayStride 16
+               OpMemberDecorate %parts 0 Offset 0
+               OpMemberDecorate %parts 1 Offset 16
+               OpDecorate %_arr_parts_uint_2 ArrayStride 48
+               OpMemberDecorate %parts2 0 Offset 0
+               OpMemberDecorate %parts2 1 Offset 48
+               OpDecorate %_arr_parts2_uint_2 ArrayStride 144
+               OpMemberDecorate %block 0 Offset 0
+               OpDecorate %block Block
+               OpDecorate %ubo DescriptorSet 0
+               OpDecorate %ubo Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outColor = OpVariable %_ptr_Output_v4float Output
+    %v2float = OpTypeVector %float 2
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_v2float_uint_2 = OpTypeArray %v2float %uint_2
+      %parts = OpTypeStruct %v4float %_arr_v2float_uint_2
+%_arr_parts_uint_2 = OpTypeArray %parts %uint_2
+     %parts2 = OpTypeStruct %parts %_arr_parts_uint_2
+%_arr_parts2_uint_2 = OpTypeArray %parts2 %uint_2
+      %block = OpTypeStruct %_arr_parts2_uint_2
+%_ptr_Uniform_block = OpTypePointer Uniform %block
+        %ubo = OpVariable %_ptr_Uniform_block Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+      %int_1 = OpConstant %int 1
+%_ptr_Uniform_v2float = OpTypePointer Uniform %v2float
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %24 = OpAccessChain %_ptr_Uniform_v4float %ubo %int_0 %int_0 %int_0 %int_0
+         %25 = OpLoad %v4float %24
+         %28 = OpAccessChain %_ptr_Uniform_v2float %ubo %int_0 %int_0 %int_0 %int_1 %int_0
+         %29 = OpLoad %v2float %28
+         %30 = OpAccessChain %_ptr_Uniform_v2float %ubo %int_0 %int_0 %int_0 %int_1 %int_1
+         %31 = OpLoad %v2float %30
+         %32 = OpCompositeExtract %float %29 0
+         %33 = OpCompositeExtract %float %29 1
+         %34 = OpCompositeExtract %float %31 0
+         %35 = OpCompositeExtract %float %31 1
+         %36 = OpCompositeConstruct %v4float %32 %33 %34 %35
+         %37 = OpFAdd %v4float %25 %36
+         %38 = OpAccessChain %_ptr_Uniform_v4float %ubo %int_0 %int_1 %int_1 %int_0 %int_0
+         %39 = OpLoad %v4float %38
+         %40 = OpFAdd %v4float %37 %39
+         %41 = OpAccessChain %_ptr_Uniform_v2float %ubo %int_0 %int_0 %int_1 %int_1 %int_1 %int_0
+         %42 = OpLoad %v2float %41
+         %43 = OpAccessChain %_ptr_Uniform_v2float %ubo %int_0 %int_1 %int_1 %int_1 %int_1 %int_1
+         %44 = OpLoad %v2float %43
+         %45 = OpCompositeExtract %float %42 0
+         %46 = OpCompositeExtract %float %42 1
+         %47 = OpCompositeExtract %float %44 0
+         %48 = OpCompositeExtract %float %44 1
+         %49 = OpCompositeConstruct %v4float %45 %46 %47 %48
+         %50 = OpFAdd %v4float %40 %49
+               OpStore %outColor %50
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+struct parts {
+       vec4 u1;
+       vec2 u2[2];
+};
+
+struct parts2 {
+       parts s1;
+       parts s2[2];
+};
+
+
+layout (location = 0) out vec4 outColor;
+
+layout (binding = 0, std140) uniform block {
+    parts2 s[2];
+} ubo;
+
+void main()
+{
+    outColor = ubo.s[0].s1.u1 + vec4(ubo.s[0].s1.u2[0], ubo.s[0].s1.u2[1]) +
+               ubo.s[1].s2[0].u1 + vec4(ubo.s[0].s2[1].u2[0], ubo.s[1].s2[1].u2[1]);
+}
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+# Initialization --
+
+block binding 0
+block offset 0
+uniform vec4 ubo.s[0].s1.u1 0.0 0.2 0.0 0.1
+block offset 16
+uniform vec2 ubo.s[0].s1.u2[0] 0.1 0.0
+block offset 32
+uniform vec2 ubo.s[0].s1.u2[1] 0.3 0.2
+block offset 112
+uniform vec2 ubo.s[0].s2[1].u2[0] 0.0 0.1
+block offset 192
+uniform vec4 ubo.s[1].s2[0].u1 0.1 0.2 0.2 0.0
+block offset 272
+uniform vec2 ubo.s[1].s2[1].u2[1] 0.2 0.1
+
+# Queries
+
+verify program_interface_query interface GL_UNIFORM_BLOCK        GL_ACTIVE_RESOURCES 1
+verify program_interface_query interface GL_UNIFORM              GL_ACTIVE_RESOURCES 12
+
+# - Uniform block
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_BUFFER_BINDING 0
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_BUFFER_DATA_SIZE 288
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_NUM_ACTIVE_VARIABLES 12
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_REFERENCED_BY_VERTEX_SHADER          0
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_REFERENCED_BY_COMPUTE_SHADER         0
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_REFERENCED_BY_TESS_CONTROL_SHADER    0
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_REFERENCED_BY_TESS_EVALUATION_SHADER 0
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_REFERENCED_BY_GEOMETRY_SHADER        0
+verify program_interface_query resource GL_UNIFORM_BLOCK (0) GL_REFERENCED_BY_FRAGMENT_SHADER        1
+
+# - Uniforms
+
+# block.s[0].s1.u1
+verify program_interface_query resource GL_UNIFORM (0 0) GL_TYPE GL_FLOAT_VEC4
+verify program_interface_query resource GL_UNIFORM (0 0) GL_BLOCK_INDEX 0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_OFFSET 0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_ARRAY_SIZE 1
+verify program_interface_query resource GL_UNIFORM (0 0) GL_ARRAY_STRIDE 0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_MATRIX_STRIDE 0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_IS_ROW_MAJOR 0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_ATOMIC_COUNTER_BUFFER_INDEX -1
+verify program_interface_query resource GL_UNIFORM (0 0) GL_LOCATION -1
+verify program_interface_query resource GL_UNIFORM (0 0) GL_REFERENCED_BY_VERTEX_SHADER          0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_REFERENCED_BY_COMPUTE_SHADER         0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_REFERENCED_BY_TESS_CONTROL_SHADER    0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_REFERENCED_BY_TESS_EVALUATION_SHADER 0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_REFERENCED_BY_GEOMETRY_SHADER        0
+verify program_interface_query resource GL_UNIFORM (0 0) GL_REFERENCED_BY_FRAGMENT_SHADER        1
+
+# block.s[0].s1.u2
+verify program_interface_query resource GL_UNIFORM (0 16) GL_TYPE GL_FLOAT_VEC2
+verify program_interface_query resource GL_UNIFORM (0 16) GL_ARRAY_SIZE 2
+verify program_interface_query resource GL_UNIFORM (0 16) GL_ARRAY_STRIDE 16
+
+# block.s[0].s2[0].u1
+verify program_interface_query resource GL_UNIFORM (0 48) GL_TYPE GL_FLOAT_VEC4
+
+# block.s[0].s2[0].u2
+verify program_interface_query resource GL_UNIFORM (0 64) GL_TYPE GL_FLOAT_VEC2
+verify program_interface_query resource GL_UNIFORM (0 64) GL_ARRAY_SIZE 2
+verify program_interface_query resource GL_UNIFORM (0 64) GL_ARRAY_STRIDE 16
+
+# block.s[0].s2[1].u1
+verify program_interface_query resource GL_UNIFORM (0 96) GL_TYPE GL_FLOAT_VEC4
+
+# block.s[0].s2[1].u2
+verify program_interface_query resource GL_UNIFORM (0 112) GL_TYPE GL_FLOAT_VEC2
+verify program_interface_query resource GL_UNIFORM (0 112) GL_ARRAY_SIZE 2
+verify program_interface_query resource GL_UNIFORM (0 112) GL_ARRAY_STRIDE 16
+
+# block.s[1].s1.u1
+verify program_interface_query resource GL_UNIFORM (0 144) GL_TYPE GL_FLOAT_VEC4
+
+# block.s[1].s1.u2
+verify program_interface_query resource GL_UNIFORM (0 160) GL_TYPE GL_FLOAT_VEC2
+verify program_interface_query resource GL_UNIFORM (0 160) GL_ARRAY_SIZE 2
+verify program_interface_query resource GL_UNIFORM (0 160) GL_ARRAY_STRIDE 16
+
+# block.s[1].s2[0].u1
+verify program_interface_query resource GL_UNIFORM (0 192) GL_TYPE GL_FLOAT_VEC4
+
+# block.s[1].s2[0].u2
+verify program_interface_query resource GL_UNIFORM (0 208) GL_TYPE GL_FLOAT_VEC2
+verify program_interface_query resource GL_UNIFORM (0 208) GL_ARRAY_SIZE 2
+verify program_interface_query resource GL_UNIFORM (0 208) GL_ARRAY_STRIDE 16
+
+# block.s[1].s2[1].u1
+verify program_interface_query resource GL_UNIFORM (0 240) GL_TYPE GL_FLOAT_VEC4
+
+# block.s[1].s2[0].u2
+verify program_interface_query resource GL_UNIFORM (0 256) GL_TYPE GL_FLOAT_VEC2
+verify program_interface_query resource GL_UNIFORM (0 256) GL_ARRAY_SIZE 2
+verify program_interface_query resource GL_UNIFORM (0 256) GL_ARRAY_STRIDE 16
+
+draw rect -1 -1 2 2
+probe all rgba 0.2 0.5 0.7 0.4
