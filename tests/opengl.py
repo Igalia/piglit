@@ -2325,7 +2325,7 @@ with profile.test_list.group_manager(
       'arb_enhanced_layouts-transform-feedback-layout-qualifiers_gs_max',
       run_concurrent=False)
     g(['arb_enhanced_layouts-transform-feedback-layout-query-api'],
-       'transform-feedback-layout-query-api')
+      'arb_enhanced_layouts-transform-feedback-layout-query-api')
 
 # Group ARB_explicit_attrib_location
 with profile.test_list.group_manager(
