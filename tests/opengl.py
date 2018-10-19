@@ -676,6 +676,7 @@ with profile.test_list.group_manager(
     g(['polygon-mode-facing'])
     g(['polygon-mode-offset'])
     g(['polygon-offset'])
+    g(['ppgtt_memory_alignment'])
     g(['push-pop-texture-state'])
     g(['quad-invariance'])
     g(['readpix-z'])
