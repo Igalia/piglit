@@ -3707,17 +3707,6 @@ program_interface_query_resource_location_index(unsigned interface_type,
 }
 
 static void
-clear_resource_info(struct resource_info *resource)
-{
-	resource->interface = GL_NONE;
-	resource->location = -1;
-	resource->location_component = -1;
-	resource->binding = -1;
-	resource->offset = -1;
-	resource->is_atomic = false;
-}
-
-static void
 parse_resource_info(const char **line, unsigned interface_type,
 		    struct resource_info *resource)
 {
