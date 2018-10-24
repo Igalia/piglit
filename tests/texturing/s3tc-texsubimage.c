@@ -36,7 +36,11 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 11;
+#else // PIGLIT_USE_OPENGL_ES2
+	config.supports_gl_es_version = 20;
+#endif
 
 	config.window_width = 500;
 	config.window_height = 600;
@@ -52,12 +56,45 @@ const float green[4] = {0.0, 1.0, 0.0, 1.0};
 const float blue[4] =  {0.0, 0.0, 1.0, 1.0};
 const float white[4] = {1.0, 1.0, 1.0, 1.0};
 
+#ifdef  PIGLIT_USE_OPENGL_ES2
+
+const char *vs_source =
+	"#version 100\n"
+	"attribute vec4 piglit_vertex;\n"
+	"attribute vec2 piglit_texcoord;\n"
+	"varying mediump vec2 tex_coord;\n"
+	"uniform mat4 proj;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"        gl_Position = proj * piglit_vertex;\n"
+	"        tex_coord = piglit_texcoord;\n"
+	"}\n";
+
+const char *fs_source =
+	"#version 100\n"
+	"varying mediump vec2 tex_coord;\n"
+	"uniform sampler2D tex;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"        gl_FragColor = texture2D(tex, tex_coord);\n"
+	"}\n";
+
+#include "piglit-matrix.h"
+
+GLint tex_program;
+
+#endif
+
 static void
 display_mipmaps(int start_x, int start_y)
 {
 	int i;
 
+#ifdef PIGLIT_USE_OPENGL
 	glEnable(GL_TEXTURE_2D);
+#endif
 
 	/* Disply all the mipmap levels */
 	for (i = SIZE; i > 0; i /= 2) {
@@ -221,5 +258,16 @@ piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_EXT_texture_compression_s3tc");
 
+#ifdef PIGLIT_USE_OPENGL
+
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+#else // PIGLIT_USE_OPENGL_ES2
+
+	tex_program = piglit_build_simple_program(vs_source, fs_source);
+	glUseProgram(tex_program);
+	GLint proj_loc = glGetUniformLocation(tex_program, "proj");
+	piglit_ortho_uniform(proj_loc, piglit_width, piglit_height);
+
+#endif
 }
