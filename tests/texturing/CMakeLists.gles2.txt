@@ -1,0 +1,5 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable (s3tc-teximage_gles2 s3tc-teximage.c)
+
+# vim: ft=cmake:
