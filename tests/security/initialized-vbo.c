@@ -70,6 +70,7 @@ piglit_display(void)
 
 	glDeleteBuffers(1, &buf);
 
+	free(tmp);
 	return pass ? PIGLIT_PASS : PIGLIT_WARN;
 }
 
