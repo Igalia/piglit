@@ -2461,6 +2461,7 @@ with profile.test_list.group_manager(
     g(['arb_texture_view-rendering-target'], 'rendering-target')
     g(['arb_texture_view-rendering-levels'], 'rendering-levels')
     g(['arb_texture_view-rendering-layers'], 'rendering-layers')
+    g(['arb_texture_view-rendering-layers-image'], 'rendering-layers-image')
     g(['arb_texture_view-rendering-formats'], 'rendering-formats')
     g(['arb_texture_view-rendering-r32ui'], 'rendering-r32ui')
     g(['arb_texture_view-lifetime-format'], 'lifetime-format')
