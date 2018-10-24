@@ -36,7 +36,11 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
     config.supports_gl_compat_version = 11;
+#else // PIGLIT_USE_OPENGL_ES2
+    config.supports_gl_es_version = 31;
+#endif
 
     config.window_width = 200;
     config.window_height = 200;
@@ -50,6 +54,36 @@ static const float green[4] = {0.0, 1.0, 0.0, 1.0};
 static const float blue[4] =  {0.0, 0.0, 1.0, 1.0};
 static const float white[4] = {1.0, 1.0, 1.0, 1.0};
 
+#ifdef  PIGLIT_USE_OPENGL_ES2
+
+const char *vs_source =
+	"#version 100\n"
+	"attribute vec4 piglit_vertex;\n"
+	"attribute vec2 piglit_texcoord;\n"
+	"varying mediump vec2 tex_coord;\n"
+	"uniform mat4 proj;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"        gl_Position = proj * piglit_vertex;\n"
+	"        tex_coord = piglit_texcoord;\n"
+	"}\n";
+
+const char *fs_source =
+	"#version 100\n"
+	"varying mediump vec2 tex_coord;\n"
+	"uniform sampler2D tex;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"        gl_FragColor = texture2D(tex, tex_coord);\n"
+	"}\n";
+
+#include "piglit-matrix.h"
+
+GLint tex_program, proj_loc;
+
+#endif
 
 static const GLenum s3tc_formats[] = {
 	GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
@@ -66,12 +100,19 @@ check_rendering_(int width, int height, int line)
 	const int h = height / 2 - 2;
 	bool pass = true;
 
+#ifdef PIGLIT_USE_OPENGL
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+#else
+	glUseProgram(tex_program);
+	piglit_ortho_uniform(proj_loc, piglit_width, piglit_height);
+#endif
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
+#ifdef PIGLIT_USE_OPENGL
 	glEnable(GL_TEXTURE_2D);
 	glColor3f(1, 1, 1);
+#endif
 
 	/* draw the texture */
 	piglit_draw_rect_tex(0, 0, width, height, 0, 0, 1, 1);
@@ -128,7 +169,9 @@ check_gl_error2_(GLenum err1, GLenum err2, int line)
 static bool
 test_format(int width, int height, GLfloat *image, GLenum requested_format)
 {
+#ifdef PIGLIT_USE_OPENGL
 	GLubyte *compressed_image;
+#endif
 	GLenum format2;
 	int x, y, w, h;
 	GLuint tex;
@@ -183,6 +226,7 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 		pass = false;
 	}
 
+#ifdef PIGLIT_USE_OPENGL
 	/* Use GL_TEXTURE_COMPRESSED_IMAGE_SIZE even if it wasn't what we
 	 * expected to avoid corruption due to under-allocated buffer.
 	 */
@@ -190,6 +234,7 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 
 	/* Read back the compressed image data */
 	glGetCompressedTexImage(GL_TEXTURE_2D, 0, compressed_image);
+#endif
 
 	/* Try texsubimage on 4-texel boundary - should work */
 	x = 20;
@@ -216,6 +261,7 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
+#ifdef PIGLIT_USE_OPENGL
 	/* Try compressed subimage on 4-texel boundary - should work */
 	x = 12;
 	y = 8;
@@ -260,6 +306,7 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 				  piglit_compressed_image_size(format, 4, 4),
 				  compressed_image +
 				  piglit_compressed_pixel_offset(format, width, x, y));
+
 	/* Note, we can get either of these errors depending on the order
 	 * in which glCompressedTexSubImage parameters are checked.
 	 * INVALID_OPERATION for the bad size or INVALID_VALUE for the
@@ -373,10 +420,11 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	pass = check_rendering(width, height) && pass;
 
-	glDeleteTextures(1, &tex);
-
 	free(compressed_image);
 
+#endif
+
+	glDeleteTextures(1, &tex);
 	return pass;
 }
 
@@ -520,4 +568,9 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_EXT_texture_compression_s3tc");
+
+#ifdef PIGLIT_USE_OPENGL_ES2
+	tex_program = piglit_build_simple_program(vs_source, fs_source);
+	proj_loc = glGetUniformLocation(tex_program, "proj");
+#endif
 }
