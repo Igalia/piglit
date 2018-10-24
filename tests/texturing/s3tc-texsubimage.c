@@ -61,13 +61,8 @@ display_mipmaps(int start_x, int start_y)
 
 	/* Disply all the mipmap levels */
 	for (i = SIZE; i > 0; i /= 2) {
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0, 0.0); glVertex2f(start_x + 0, start_y + 0);
-		glTexCoord2f(1.0, 0.0); glVertex2f(start_x + i, start_y + 0);
-		glTexCoord2f(1.0, 1.0); glVertex2f(start_x + i, start_y + i);
-		glTexCoord2f(0.0, 1.0); glVertex2f(start_x + 0, start_y + i);
-		glEnd();
-
+		piglit_draw_rect_tex(start_x, start_y, i, i,
+		                     0.0f, 0.0f, 1.0f, 1.0f);
 		start_x += i + 5;
 	}
 }
