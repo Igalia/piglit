@@ -31,7 +31,18 @@ clear color 0 0 0 1
 clear
 
 uniform dvec4 u_in 2 3 4 9
-uniform ivec4 u_exponent 1 1 2 3
+
+# The function frexp() splits each single-precision floating-point number in
+# <x> into a binary significand, a floating-point number in the range [0.5,
+# 1.0), and an integral exponent of two, such that:
+#
+#    x = significand * 2 ^ exponent
+#
+# 2 = 0.5 * 2^2
+# 3 = 0.75 * 2^2
+# 4 = 0.5 * 2^3
+# 9 = 0.5625 * 2^4
+uniform ivec4 u_exponent 2 2 3 4
 
 draw rect -1 -1 2 2
 probe all rgba 0 1 0 1
