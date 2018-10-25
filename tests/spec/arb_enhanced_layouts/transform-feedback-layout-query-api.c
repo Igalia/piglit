@@ -177,6 +177,7 @@ piglit_init(int argc, char **argv)
 	if (argc > 1 && !strcmp(argv[1], "spirv")) {
 		spirv = true;
 		piglit_require_extension("GL_ARB_gl_spirv");
+		printf("Running on SPIR-V mode\n");
 	}
 
 	prog = build_and_use_program(VS_TWO_BUFF_NAME, spirv);
