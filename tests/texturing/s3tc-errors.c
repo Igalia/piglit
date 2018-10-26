@@ -39,7 +39,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 #ifdef PIGLIT_USE_OPENGL
     config.supports_gl_compat_version = 11;
 #else // PIGLIT_USE_OPENGL_ES2
-    config.supports_gl_es_version = 31;
+    config.supports_gl_es_version = 20;
 #endif
 
     config.window_width = 200;
@@ -196,34 +196,37 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	pass = check_rendering(width, height) && pass;
 
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED,
-				 &is_compressed);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
-				 &format);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-				 GL_TEXTURE_COMPRESSED_IMAGE_SIZE,
-				 &compressed_size);
+	if (!piglit_is_gles() || piglit_get_gl_version() >= 31) {
 
-	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED,
+					 &is_compressed);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+					 GL_TEXTURE_INTERNAL_FORMAT, &format);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+					 GL_TEXTURE_COMPRESSED_IMAGE_SIZE,
+					 &compressed_size);
 
-	if (!is_compressed) {
-		printf("Image was not compressed\n");
-		pass = false;
-	}
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	if (format != requested_format) {
-		printf("Internal Format mismatch. Found: 0x%04x Expected: 0x%04x\n",
-		       format, requested_format);
-		pass = false;
-	}
+		if (!is_compressed) {
+			printf("Image was not compressed\n");
+			pass = false;
+		}
 
-	expected_size = piglit_compressed_image_size(requested_format, width,
-			height);
+		if (format != requested_format) {
+			printf("Internal Format mismatch. Found: 0x%04x Expected: 0x%04x\n",
+			       format, requested_format);
+			pass = false;
+		}
 
-	if (compressed_size != expected_size) {
-		printf("Compressed image size mismatch. Found: %u Expected: %u\n",
-		       compressed_size, expected_size);
-		pass = false;
+		expected_size = piglit_compressed_image_size(requested_format,
+				width, height);
+
+		if (compressed_size != expected_size) {
+			printf("Compressed image size mismatch. Found: %u Expected: %u\n",
+			       compressed_size, expected_size);
+			pass = false;
+		}
 	}
 
 #ifdef PIGLIT_USE_OPENGL
