@@ -2,14 +2,7 @@
 GL ES >= 2.0
 GLSL ES >= 1.00
 
-[vertex shader]
-
-attribute vec4 piglit_vertex;
-
-void main()
-{
-        gl_Position = piglit_vertex;
-}
+[vertex shader passthrough]
 
 [fragment shader]
 #version 100
