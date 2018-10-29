@@ -8,8 +8,10 @@ GLSL >= 1.30
 
 [vertex shader]
 out vec4 foo;
+out vec4 bar;
 void unused()
 {
+    bar=vec4(0);
     foo=vec4(1);
 }
 
@@ -22,11 +24,12 @@ void main()
 
 [fragment shader]
 in vec4 foo;
+in vec4 bar;
 out vec4 color;
 
 void main()
 {
-    gl_FragColor=foo;
+    gl_FragColor=foo*bar;
 }
 
 [test]
