@@ -94,12 +94,7 @@ piglit_init(int argc, char **argv)
 		EGL_CONTEXT_PRIORITY_LOW_IMG
 	};
 
-	/* Require EGL_MESA_platform_surfaceless extension. */
-	const char *exts = eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
-	if (!strstr(exts, "EGL_MESA_platform_surfaceless"))
-		piglit_report_result(PIGLIT_SKIP);
-
-	dpy = piglit_egl_get_default_display(EGL_PLATFORM_SURFACELESS_MESA);
+	dpy = piglit_egl_get_default_display(EGL_NONE);
 
 	ok = eglInitialize(dpy, &major, &minor);
 	if (!ok) {
