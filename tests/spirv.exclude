@@ -7,24 +7,9 @@ tests/spec/arb_fragment_layer_viewport/layer-vs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-gs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-write-gs-no-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-write-simple.shader_test
-tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap.shader_test
-tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap-aoa.shader_test
-tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-mixed-order-overlap.shader_test
-tests/spec/arb_enhanced_layouts/linker/block-member-locations/named-block-member-location-overlap.shader_test
-tests/spec/arb_enhanced_layouts/linker/block-member-locations/named-block-member-mixed-order-overlap.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap-array.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap2.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap3.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap4.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch-array.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/query-component.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-double-overlap.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-overlap.shader_test
-tests/spec/arb_gpu_shader_fp64/linker/vs-to-fs-explicit-location-overlap.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/const-fma-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-ldexp-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-packDouble2x32.shader_test
@@ -40,10 +25,6 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
 tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
-tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-array.shader_test
-tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-arrays-of-arrays.shader_test
-tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-block.shader_test
-tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-struct.shader_test
 tests/spec/arb_shader_atomic_counter_ops/
 tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
 tests/spec/arb_shader_clock/
@@ -113,3 +94,25 @@ tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
 # GL_ARB_shader_subroutine is not supported
 tests/spec/arb_shader_subroutine
+# Intrastage linking errors. No SPIR-V generated.
+# Glslang detects location overlaps:
+tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap.shader_test
+tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap-aoa.shader_test
+tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-mixed-order-overlap.shader_test
+tests/spec/arb_enhanced_layouts/linker/block-member-locations/named-block-member-location-overlap.shader_test
+tests/spec/arb_enhanced_layouts/linker/block-member-locations/named-block-member-mixed-order-overlap.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap-array.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap2.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap3.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-overlap4.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch-array.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-double-overlap.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-overlap.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-array.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-arrays-of-arrays.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-block.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-struct.shader_test
+tests/spec/arb_gpu_shader_fp64/linker/vs-to-fs-explicit-location-overlap.shader_test
+
