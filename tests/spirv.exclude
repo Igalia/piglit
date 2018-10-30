@@ -94,6 +94,52 @@ tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
 # GL_ARB_shader_subroutine is not supported
 tests/spec/arb_shader_subroutine
+# Interstage linking errors:
+#
+# a) Input/output cross-stage mismatches only required to be detected in GLSL
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-atomic-counter-mismatch.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-dimension-size-mismatch.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-dimensions-mismatch.shader_tes
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-interface-field-mismatch.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-interface-field-mismatch2.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-interface-field-unsized-mismatch.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-interface-field-unsized-mismatch2.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-type-mismatch.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-unsized-mismatch.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-unsized-mismatch2.shader_test
+tests/spec/arb_arrays_of_arrays/linker/vs-to-gs-invalid-dimensions.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-mismatch.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-type-mismatch-double-float.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-type-mismatch-signed-float.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-type-mismatch-signed-unsigned.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-type-mismatch-unsigned-float.shader_test
+tests/spec/arb_gpu_shader5/linker/sample-qualifier-unqualified-vs-fs.shader_test
+tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-mismatch-array.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/shader-storage-block-different-size.shader_test
+tests/spec/glsl-1.50/execution/vs-gs-arrays-fail.shader_test
+tests/spec/glsl-1.50/execution/vs-gs-varyings-match-types.shader_test
+tests/spec/glsl-1.50/linker/interface-vs-array-to-fs-named.shader_test
+tests/spec/glsl-1.50/linker/interface-vs-array-to-fs-unnamed.shader_test
+tests/spec/glsl-1.50/linker/interface-vs-array-to-gs-array-sized.shader_test
+tests/spec/glsl-1.50/linker/interface-vs-array-to-gs-array-unsized.shader_test
+tests/spec/glsl-1.50/linker/interface-vs-named-to-fs-array.shader_test
+tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
+#
+# b) Uniform cross-stage mismatches only required to be detected in GLSL
+tests/spec/arb_shading_language_420pack/linker/different-bindings-image2D.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-sampler2D.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-member-name-mismatch.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-array-size-mismatch.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-member-count-mismatch.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-member-order-mismatch.shader_test
+tests/spec/glsl-1.50/linker/skip-stage-uniform-block-array-size-mismatch.shader_test
+tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch.shader_test
+#
+# c) Builtin related cross-stage mismatches only required to be detected in GLSL
+tests/spec/glsl-1.50/linker/interstage-pervertex-redeclaration-mismatch.shader_test
+tests/spec/glsl-1.50/linker/interstage-pervertex-redeclaration-needed.shader_test
 # Intrastage linking errors. No SPIR-V generated.
 # Glslang detects location overlaps:
 tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap.shader_test
