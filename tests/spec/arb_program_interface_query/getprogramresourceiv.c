@@ -360,7 +360,7 @@ static const struct subtest_t subtests[] = {
 	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
-	{ GL_LOCATION, 1, { -1 } }, /* valid index == anything but -1 */
+	{ GL_LOCATION, 1, { -1 } }, /* invalid index */
 	{ 0, 0, { 0 } }}
  },
  { &prog_loc, GL_PROGRAM_INPUT, "input0", NULL, {
@@ -396,12 +396,12 @@ static const struct subtest_t subtests[] = {
 	{ GL_NAME_LENGTH, 1, { 6 } },
 	{ GL_TYPE, 1, { GL_FLOAT_VEC4 } },
 	{ GL_ARRAY_SIZE, 1, { 1 } },
-	{ GL_OFFSET, 1, { -1 } }, /* valid index == anything but -1 */
+	{ GL_OFFSET, 1, { -1 } }, /* invalid index */
 	{ GL_BLOCK_INDEX, 1, { -1 } }, /* invalid index */
-	{ GL_ARRAY_STRIDE, 1, { -1 } }, /* valid index == anything but -1 */
+	{ GL_ARRAY_STRIDE, 1, { -1 } }, /* invalid index */
 	{ GL_MATRIX_STRIDE, 1, { -1 } },
 	{ GL_IS_ROW_MAJOR, 1, { 0 } },
-	{ GL_ATOMIC_COUNTER_BUFFER_INDEX, 1, { -1 } }, /* valid index == anything but -1 */
+	{ GL_ATOMIC_COUNTER_BUFFER_INDEX, 1, { -1 } }, /* invalid index */
 	{ GL_REFERENCED_BY_VERTEX_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_TESS_CONTROL_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
@@ -421,8 +421,8 @@ static const struct subtest_t subtests[] = {
        { GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
        { GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 0 } },
        { GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
-       { GL_LOCATION, 1, { 0 } }, /* valid index == anything but -1 */
-       { GL_LOCATION_INDEX, 1, { -1 } }, /* valid index == anything but -1 */
+       { GL_LOCATION, 1, { -1 } }, /* invalid index */
+       { GL_LOCATION_INDEX, 1, { -1 } }, /* invalid index */
        { GL_IS_PER_PATCH, 1, { 1 } },
        { 0, 0, { 0 } }}
 },
@@ -435,14 +435,14 @@ static const struct subtest_t subtests[] = {
 	{ GL_ARRAY_STRIDE, 1, { 0 } }, /* valid index == anything but -1 */
 	{ GL_MATRIX_STRIDE, 1, { 0 } },
 	{ GL_IS_ROW_MAJOR, 1, { 0 } },
-	{ GL_ATOMIC_COUNTER_BUFFER_INDEX, 1, { -1 } }, /* valid index == anything but -1 */
+	{ GL_ATOMIC_COUNTER_BUFFER_INDEX, 1, { -1 } }, /* invalid index */
 	{ GL_REFERENCED_BY_VERTEX_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_TESS_CONTROL_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_TESS_EVALUATION_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_GEOMETRY_SHADER, 1, { 0 } },
 	{ GL_REFERENCED_BY_FRAGMENT_SHADER, 1, { 1 } },
 	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
-	{ GL_LOCATION, 1, { -1 } }, /* valid index == anything but -1 */
+	{ GL_LOCATION, 1, { -1 } }, /* invalid index */
 	{ 0, 0, { 0 } }}
  },
  { &prog_std, GL_UNIFORM_BLOCK, "fs_uniform_block", fs_std_fs_uniform_blk, {
