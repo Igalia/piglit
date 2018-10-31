@@ -145,6 +145,8 @@ tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
 # b) Uniform cross-stage mismatches only required to be detected in GLSL
 tests/spec/arb_shading_language_420pack/linker/different-bindings-image2D.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-sampler2D.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks.shader_test
 # Intrastage linking errors. No SPIR-V generated.
 # Glslang detects location overlaps:
 tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap.shader_test
