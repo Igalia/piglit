@@ -111,8 +111,9 @@ tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
 # GL_ARB_shader_subroutine is not supported
 tests/spec/arb_shader_subroutine
-# Interstage linking errors. Input/output cross-stage mismatches detected by
-# GLSL which do not need to be detected in SPIR-V:
+# Interstage linking errors:
+#
+# a) Input/output cross-stage mismatches only required to be detected in GLSL
 tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-atomic-counter-mismatch.shader_test
 tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-dimension-size-mismatch.shader_test
 tests/spec/arb_arrays_of_arrays/linker/vs-to-fs-dimensions-mismatch.shader_tes
@@ -140,6 +141,10 @@ tests/spec/glsl-1.50/linker/interface-vs-array-to-gs-array-sized.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-array-to-gs-array-unsized.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-named-to-fs-array.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
+#
+# b) Uniform cross-stage mismatches only required to be detected in GLSL
+tests/spec/arb_shading_language_420pack/linker/different-bindings-image2D.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-sampler2D.shader_test
 # Intrastage linking errors. No SPIR-V generated.
 # Glslang detects location overlaps:
 tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap.shader_test
