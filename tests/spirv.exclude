@@ -183,6 +183,9 @@ tests/spec/arb_gpu_shader_fp64/linker/vs-to-fs-explicit-location-overlap.shader_
 #
 # b) Varyings mismatch
 tests/spec/arb_arrays_of_arrays/linker/intrastage-unsized-mismatch.shader_test
+tests/spec/glsl-1.20/linker/centroid-mismatched.shader_test
+tests/spec/glsl-1.20/linker/intrastage-unsized-array-mismatch.shader_test
+tests/spec/glsl-1.20/linker/invariant-mismatched.shader_test
 #
 # c) Compute shader inputs mismatch
 tests/spec/arb_compute_shader/linker/mismatched_local_work_sizes.shader_test
