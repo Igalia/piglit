@@ -147,6 +147,12 @@ tests/spec/arb_shading_language_420pack/linker/different-bindings-image2D.shader
 tests/spec/arb_shading_language_420pack/linker/different-bindings-sampler2D.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-member-name-mismatch.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-array-size-mismatch.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-member-count-mismatch.shader_test
+tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-member-order-mismatch.shader_test
+tests/spec/glsl-1.50/linker/skip-stage-uniform-block-array-size-mismatch.shader_test
+tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch.shader_test
 # Intrastage linking errors. No SPIR-V generated.
 # Glslang detects location overlaps:
 tests/spec/arb_enhanced_layouts/linker/block-member-locations/block-member-location-overlap.shader_test
