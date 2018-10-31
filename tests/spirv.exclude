@@ -186,4 +186,5 @@ tests/spec/arb_arrays_of_arrays/linker/intrastage-unsized-mismatch.shader_test
 #
 # c) Compute shader inputs mismatch
 tests/spec/arb_compute_shader/linker/mismatched_local_work_sizes.shader_test
+tests/spec/arb_compute_shader/linker/no_local_work_size.shader_test
 
