@@ -162,7 +162,8 @@ main(void)
 		if (fd < 0) {
 			printf("Failed to open drm device file %s: %s\n",
 				devstring, strerror(errno));
-			printf("Make sure you have permissions to open %s\n");
+			printf("Make sure you have permissions to open %s\n",
+				devstring);
 			result = PIGLIT_WARN;
 			eglTerminate(dpy1);
 			continue;
