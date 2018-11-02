@@ -128,7 +128,7 @@ check_extension_list(const char *application_name,
 	}
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     application_name);
+				     "%s", application_name);
 	return pass;
 }
 
