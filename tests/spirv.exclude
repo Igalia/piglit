@@ -192,4 +192,6 @@ tests/spec/glsl-1.50/linker/intrastage-interface-unnamed-array.shader_test
 # c) Compute shader inputs mismatch
 tests/spec/arb_compute_shader/linker/mismatched_local_work_sizes.shader_test
 tests/spec/arb_compute_shader/linker/no_local_work_size.shader_test
-
+#
+# d) Built-in redeclarations
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-7.shader_test
