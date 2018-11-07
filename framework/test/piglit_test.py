@@ -247,6 +247,8 @@ class VkRunnerTest(PiglitBaseTest):
             [vkrunner_bin, filename],
             run_concurrent=True)
 
+        self.filename = filename
+
     @PiglitBaseTest.command.getter
     def command(self):
         # This is overriden because we don't want PiglitBaseTest to
