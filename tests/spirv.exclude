@@ -43,8 +43,6 @@ tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-mismatch.shade
 tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-needed.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-mismatch.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-needed.shader_test
-tests/spec/glsl-1.20/linker/link-order-a-b.shader_test
-tests/spec/glsl-1.20/linker/link-order-b-a.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-conflicting-input-layouts.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-layout-conflicts-with-static-usage.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size.shader_test
@@ -55,12 +53,6 @@ tests/spec/glsl-1.50/linker/gs-input-sizing-no-input-layout-declared.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-input-type.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-max-vertices.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
-tests/spec/glsl-1.50/execution/geometry/clip-distance-bulk-copy.shader_test
-tests/spec/glsl-1.50/execution/geometry/clip-distance-in-bulk-read.shader_test
-tests/spec/glsl-1.50/execution/geometry/clip-distance-in-explicitly-sized.shader_test
-tests/spec/glsl-1.50/execution/geometry/clip-distance-in-param.shader_test
-tests/spec/glsl-1.50/execution/geometry/clip-distance-in-values.shader_test
-tests/spec/glsl-1.50/execution/geometry/clip-distance-itemized-copy.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-out-values.shader_test
 tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-1.shader_test
 tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-2.shader_test
@@ -76,12 +68,7 @@ tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-matching-case-4.shade
 tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-missing.shader_test
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-consistent-with-static-usage.shader_test
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-larger-than-static-usage.shader_test
-tests/spec/glsl-1.50/execution/gs-redeclares-both-pervertex
-tests/spec/glsl-1.50/execution/gs-redeclares-pervertex
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
-tests/spec/glsl-1.50/execution/redeclare-pervertex
-tests/shaders/glsl-fs-ivec4-mat3
-tests/shaders/link-struct-usage
 # No spirv generated: glslang issue #1516
 tests/spec/amd_conservative_depth/glsl-1.30/linker/matching-qualifiers-02
 # No spirv generated: test expect link error. glslang fails for the same.
@@ -103,10 +90,6 @@ tests/spec/arb_explicit_uniform_location/linker/overlap-array-loc.shader_test
 tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
 tests/spec/glsl-1.50/linker/gs-different-max-vertices-multiple-shader-objects.shader_test
 tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.shader_test
-# Tries to link a global variable between two compilation units
-# of the vertex shader. glslang doesn’t cope with this and instead
-# creates two copies of the global variable so it doesn’t work.
-tests/shaders/link-struct-usage
 # Uses legacy clip planes. SPIR-V forces a core context so this won’t work
 tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 # expects linker errors in GLSL, but the code is valid on SPIRV
