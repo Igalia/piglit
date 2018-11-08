@@ -12,7 +12,6 @@ tests/spec/arb_shader_subroutine
 #
 # glslang limitations:
 tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/query-component.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/const-fma-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-ldexp-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-packDouble2x32.shader_test
@@ -178,3 +177,6 @@ tests/spec/arb_compute_shader/linker/no_local_work_size.shader_test
 #
 # d) Built-in redeclarations
 tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-7.shader_test
+#
+# Use queries based on names
+tests/spec/arb_enhanced_layouts/linker/component-layout/query-component.shader_test
