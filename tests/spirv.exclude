@@ -1,4 +1,4 @@
-# Unsupported extensions
+# Unsupported extensions:
 tests/spec/arb_bindless_texture/
 tests/spec/arb_fragment_layer_viewport/layer-vs-gs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/layer-vs-write-gs-no-write-simple.shader_test
@@ -8,7 +8,11 @@ tests/spec/arb_fragment_layer_viewport/viewport-vs-write-gs-no-write-simple.shad
 tests/spec/arb_fragment_layer_viewport/viewport-vs-write-simple.shader_test
 tests/spec/arb_shader_atomic_counter_ops/
 tests/spec/arb_shader_clock/
-tests/spec/arb_shader_subroutine
+tests/spec/arb_shader_subroutine/
+#
+# Unsupported layout(shared):
+# pending to re-implement automatically skip them
+tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-packaging-qualifier-mismatch.shader_test
 #
 # glslang limitations:
 tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
@@ -29,65 +33,20 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
 tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
-tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
-tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks-instanced.shader_test
-tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks-instanced.shader_test
-tests/spec/glsl-1.10/linker/global-const-intializer-mismatch.shader_test
-tests/spec/glsl-1.10/linker/global-initializer-matched-expression.shader_test
-tests/spec/glsl-1.10/linker/global-initializer-mismatch-2-shaders.shader_test
-tests/spec/glsl-1.10/linker/global-initializer-mismatch-3-shaders.shader_test
-tests/spec/glsl-1.10/linker/global-initializer-unmatched-expression.shader_test
-tests/spec/glsl-1.50/linker/intrastage-interface-arrays-unmatched-sizes.shader_test
-tests/spec/glsl-1.50/linker/intrastage-interface-named-array.shader_test
-tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-mismatch.shader_test
-tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-needed.shader_test
-tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-mismatch.shader_test
-tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-needed.shader_test
-tests/spec/glsl-1.50/linker/gs-input-sizing-conflicting-input-layouts.shader_test
-tests/spec/glsl-1.50/linker/gs-input-sizing-layout-conflicts-with-static-usage.shader_test
-tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size.shader_test
-tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size-blocks.shader_test
-tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size.shader_test
-tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size-blocks.shader_test
-tests/spec/glsl-1.50/linker/gs-input-sizing-no-input-layout-declared.shader_test
-tests/spec/glsl-1.50/linker/gs-must-tests/specify-input-type.shader_test
-tests/spec/glsl-1.50/linker/gs-must-tests/specify-max-vertices.shader_test
-tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-out-values.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-1.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-2.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-3.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-4.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-5.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-6.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-8.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-9.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-matching-case-1.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-matching-case-2.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-matching-case-4.shader_test
-tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-missing.shader_test
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-consistent-with-static-usage.shader_test
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-larger-than-static-usage.shader_test
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
-# No spirv generated: glslang issue #1516
+# glslang issue #1516. No SPIR-V generated.
 tests/spec/amd_conservative_depth/glsl-1.30/linker/matching-qualifiers-02
-# No spirv generated: test expect link error. glslang fails for the same.
-tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01
 # Doesn't make sense on SPIR-V (most of them name-mismatch tests)
-tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch
+# error: buffer block with binding `0' has mismatching definition
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-shader-storage-blocks-member-offset-qualifier-mismatch
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-uniform-blocks-member-offset-qualifier-mismatch
-# Doesn't make sense on ARB_gl_spirv: intrastage tests (some should be catched by glslang)
-tests/spec/arb_enhanced_layouts/linker/explicit-offsets/intrastage-ssbo-different-offset-across-shaders
-tests/spec/arb_enhanced_layouts/linker/explicit-offsets/intrastage-ubo-different-offset-across-shaders
-# layout(shared) not supported, pending to re-implement automatically skip them
-tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-packaging-qualifier-mismatch.shader_test
 # tests that expect linker errors in GLSL and generete compiler errors on
 # SPIRV (correct according to the spec but should be excluded because we
 # don't have checks for compile errors.
 tests/spec/arb_shader_storage_buffer_object/linker/non_integral_size_array_member.shader_test
-tests/spec/arb_explicit_uniform_location/linker/overlap-array-loc.shader_test
-tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
 tests/spec/glsl-1.50/linker/gs-different-max-vertices-multiple-shader-objects.shader_test
 tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.shader_test
 # Uses legacy clip planes. SPIR-V forces a core context so this won’t work
@@ -126,10 +85,14 @@ tests/spec/glsl-1.50/linker/interface-vs-named-to-fs-array.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
 #
 # b) Uniform cross-stage mismatches only required to be detected in GLSL
+tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
+tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-image2D.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-sampler2D.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks-instanced.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks.shader_test
+tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks-instanced.shader_test
 tests/spec/glsl-1.50/linker/interface-blocks-member-name-mismatch.shader_test
 tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-array-size-mismatch.shader_test
 tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-member-count-mismatch.shader_test
@@ -158,27 +121,67 @@ tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch.sha
 tests/spec/arb_enhanced_layouts/linker/component-layout/fs-out-type-mismatch-array.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-double-overlap.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-overlap.shader_test
+tests/spec/arb_explicit_uniform_location/linker/overlap-array-loc.shader_test
 tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-array.shader_test
 tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-arrays-of-arrays.shader_test
 tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-block.shader_test
 tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-overlap-struct.shader_test
 tests/spec/arb_gpu_shader_fp64/linker/vs-to-fs-explicit-location-overlap.shader_test
 #
-# b) Varyings mismatch
+# b) Declaration mismatches
 tests/spec/arb_arrays_of_arrays/linker/intrastage-unsized-mismatch.shader_test
+tests/spec/arb_compute_shader/linker/mismatched_local_work_sizes.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
+tests/spec/arb_enhanced_layouts/linker/explicit-offsets/intrastage-ssbo-different-offset-across-shaders.shader_test
+tests/spec/arb_enhanced_layouts/linker/explicit-offsets/intrastage-ubo-different-offset-across-shaders.shader_test
+tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
 tests/spec/glsl-1.20/linker/centroid-mismatched.shader_test
 tests/spec/glsl-1.20/linker/intrastage-unsized-array-mismatch.shader_test
 tests/spec/glsl-1.20/linker/invariant-mismatched.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-conflicting-input-layouts.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-conflicts-with-static-usage.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-greater-than-size-blocks.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-layout-less-than-size-blocks.shader_test
+tests/spec/glsl-1.50/linker/gs-input-sizing-no-input-layout-declared.shader_test
 tests/spec/glsl-1.50/linker/interface-blocks-multiple-vs-member-count-mismatch.shader_test
+tests/spec/glsl-1.50/linker/intrastage-interface-arrays-unmatched-sizes.shader_test
+tests/spec/glsl-1.50/linker/intrastage-interface-named-array.shader_test
 tests/spec/glsl-1.50/linker/intrastage-interface-unnamed-array.shader_test
 #
-# c) Compute shader inputs mismatch
-tests/spec/arb_compute_shader/linker/mismatched_local_work_sizes.shader_test
+# c) Other checks shaders must fullfill.
 tests/spec/arb_compute_shader/linker/no_local_work_size.shader_test
+tests/spec/glsl-1.50/linker/gs-must-tests/specify-input-type.shader_test
+tests/spec/glsl-1.50/linker/gs-must-tests/specify-max-vertices.shader_test
+tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
 #
 # d) Built-in redeclarations
+tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-mismatch.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-needed.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-mismatch.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-needed.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-1.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-2.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-3.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-4.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-5.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-6.shader_test
 tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-7.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-8.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-9.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-matching-case-1.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-matching-case-2.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-matching-case-4.shader_test
+tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-missing.shader_test
+#
+# e) Global vars mismatch
+tests/spec/glsl-1.10/linker/global-const-intializer-mismatch.shader_test
+tests/spec/glsl-1.10/linker/global-initializer-matched-expression.shader_test
+tests/spec/glsl-1.10/linker/global-initializer-mismatch-2-shaders.shader_test
+tests/spec/glsl-1.10/linker/global-initializer-mismatch-3-shaders.shader_test
+tests/spec/glsl-1.10/linker/global-initializer-unmatched-expression.shader_test
 #
 # Use queries based on names
 tests/spec/arb_enhanced_layouts/linker/component-layout/query-component.shader_test
