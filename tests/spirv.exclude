@@ -1,12 +1,17 @@
-# glslang limitations:
+# Unsupported extensions
 tests/spec/arb_bindless_texture/
-tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
 tests/spec/arb_fragment_layer_viewport/layer-vs-gs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/layer-vs-write-gs-no-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/layer-vs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-gs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-write-gs-no-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-write-simple.shader_test
+tests/spec/arb_shader_atomic_counter_ops/
+tests/spec/arb_shader_clock/
+tests/spec/arb_shader_subroutine
+#
+# glslang limitations:
+tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/query-component.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/const-fma-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-ldexp-double.shader_test
@@ -23,9 +28,7 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
 tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
-tests/spec/arb_shader_atomic_counter_ops/
 tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
-tests/spec/arb_shader_clock/
 tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks-instanced.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks-instanced.shader_test
 tests/spec/glsl-1.10/linker/global-const-intializer-mismatch.shader_test
@@ -90,8 +93,6 @@ tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.sha
 tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 # expects linker errors in GLSL, but the code is valid on SPIRV
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
-# GL_ARB_shader_subroutine is not supported
-tests/spec/arb_shader_subroutine
 # Interstage linking errors:
 #
 # a) Input/output cross-stage mismatches only required to be detected in GLSL
