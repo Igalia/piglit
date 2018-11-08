@@ -1,0 +1,47 @@
+# Tests a large uint local array.
+# Vulkan equivalent to tests/spec/glsl-1.30/execution/fs-large-local-array.shader_test
+# And quoting from that test:
+#
+#    "Test correct handling of local-scope declared arrays large enough to
+#     typically not fit into first level GPU memory such as its register file,
+#     requiring storing/loading to some device-specific scratch space.
+#
+#     One hardware example is R600 where arrays larger than 124*vec4 cannot
+#     fit into its GPR register file and has to be spilled to scratch memory.
+#     As of 2017-03-06 this is the largest known register file of any GPU, so
+#     the test uses that as a size to guarantee some form of spilling on any GPU."
+
+[require]
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 450
+
+layout (binding = 5) uniform block {
+       uint i;
+};
+
+layout (location = 0) out vec4 out_color;
+
+void main()
+{
+	uint A[130];
+        A[20] = 0u;
+	A[i] = 37u;
+        out_color.rba = vec3(0.0, 0.0, 1.0);
+	out_color.g = float(A[20] == 37u);
+}
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+
+uniform ubo 5 uint 0 19
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.0 0.0 1.0
+
+clear
+uniform ubo 5 uint 0 20
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
