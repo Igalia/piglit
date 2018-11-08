@@ -248,7 +248,7 @@ class VkRunnerTest(PiglitBaseTest):
 
     @PiglitBaseTest.command.getter
     def command(self):
-        # This is overriden because we don’t want PiglitBaseTest to
+        # This is overriden because we don't want PiglitBaseTest to
         # prepend TEST_BIN_DIR so that it will look for vkrunner in
         # the search path.
         return self._command
