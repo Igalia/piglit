@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 one_parameter_110 = [
     "radians",

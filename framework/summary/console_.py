@@ -1,3 +1,4 @@
+# coding=utf-8
 # Copyright 2013-2016 Intel Corporation
 # Copyright 2013, 2014 Advanced Micro Devices
 # Copyright 2014 VMWare

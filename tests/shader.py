@@ -1,3 +1,4 @@
+# coding=utf-8
 """A profile that runs only ShaderTest instances."""
 
 from __future__ import (

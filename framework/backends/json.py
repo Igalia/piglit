@@ -1,3 +1,4 @@
+# coding=utf-8
 # Copyright (c) 2014, 2016-2017 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy

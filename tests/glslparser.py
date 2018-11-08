@@ -1,3 +1,4 @@
+# coding=utf-8
 """A profile that runs only GLSLParserTest instances."""
 
 from __future__ import (
