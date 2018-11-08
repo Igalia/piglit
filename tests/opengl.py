@@ -3027,6 +3027,8 @@ with profile.test_list.group_manager(
       'ext_image_dma_buf_import-sample_yuv420', run_concurrent=False)
     g(['ext_image_dma_buf_import-sample_yuv', '-fmt=YV12', '-alpha-one'],
       'ext_image_dma_buf_import-sample_yvu420', run_concurrent=False)
+    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=AYUV'],
+      'ext_image_dma_buf_import-sample_ayuv', run_concurrent=False)
     g(['ext_image_dma_buf_import-transcode-nv12-as-r8-gr88'],
       'ext_image_dma_buf_import-transcode-nv12-as-r8-gr88',
       run_concurrent=False)

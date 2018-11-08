@@ -77,6 +77,27 @@ piglit_display(void)
 		/* U */
 		120, 140,
 		120, 140,
+	}, ayuv[] = {
+		/* AYUV (TODO: find a way to test alpha channel) */
+		130, 120,  50, 255,
+		130, 127,  70, 255,
+		130, 133,  90, 255,
+		130, 140, 110, 255,
+
+		140, 120,  50, 255,
+		140, 127,  70, 255,
+		140, 133,  90, 255,
+		140, 140, 110, 255,
+
+		150, 120,  50, 255,
+		150, 127,  70, 255,
+		150, 133,  90, 255,
+		150, 140, 110, 255,
+
+		160, 120,  50, 255,
+		160, 127,  70, 255,
+		160, 133,  90, 255,
+		160, 140, 110, 255,
 	};
 
 	static const unsigned char expected[4 * 4 * 4] = {
@@ -113,6 +134,9 @@ piglit_display(void)
 		break;
 	case DRM_FORMAT_YVU420:
 		t = yvu420;
+		break;
+	case DRM_FORMAT_AYUV:
+		t = ayuv;
 		break;
 	default:
 		return PIGLIT_SKIP;

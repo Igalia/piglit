@@ -154,6 +154,7 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
 	case DRM_FORMAT_ABGR8888:
 	case DRM_FORMAT_RGBA8888:
 	case DRM_FORMAT_BGRA8888:
+	case DRM_FORMAT_AYUV:
 		cpp = 4;
 		break;
 	case DRM_FORMAT_NV12:
