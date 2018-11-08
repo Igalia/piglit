@@ -53,7 +53,7 @@ from framework.monitoring import Monitoring
 from framework.test.base import Test, DummyTest
 from framework.test.piglit_test import (
     PiglitCLTest, PiglitGLTest, ASMParserTest, BuiltInConstantsTest,
-    CLProgramTester, ROOT_DIR,
+    CLProgramTester, VkRunnerTest, ROOT_DIR,
 )
 from framework.test.shader_test import ShaderTest, MultiShaderTest
 from framework.test.glsl_parser_test import GLSLParserTest
@@ -332,6 +332,8 @@ def make_test(element):
         return GLSLParserTest(**options)
     if type_ == 'asm_parser':
         return ASMParserTest(**options)
+    if type_ == 'vkrunner':
+        return VkRunnerTest(**options)
     if type_ == 'multi_shader':
         options['skips'] = []
         for e in element.findall('./Skips/Skip/option'):

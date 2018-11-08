@@ -42,6 +42,12 @@ add_custom_target(
 	COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/find_static_tests.py ${CMAKE_CURRENT_SOURCE_DIR} program ${CMAKE_CURRENT_BINARY_DIR}/program.list
 	VERBATIM
 )
+add_custom_target(
+	static-vkrunner-tests
+	BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/vkrunner.list
+	COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/find_static_tests.py ${CMAKE_CURRENT_SOURCE_DIR} vkrunner ${CMAKE_CURRENT_BINARY_DIR}/vkrunner.list
+	VERBATIM
+)
 
 function(piglit_generate_xml name profile meta_target extra_args)
 	add_custom_command(
@@ -72,6 +78,9 @@ piglit_generate_xml(shader.no_isolation shader gen-gl-gen-xml "--no-process-isol
 piglit_generate_xml(quick_shader.no_isolation quick_shader gen-gl-gen-xml "--no-process-isolation" gen-gl-tests static-shader-tests)
 piglit_generate_xml(no_error no_error gen-gl-gen-xml "" gen-gl-tests static-shader-tests)
 
+add_custom_target(gen-vulkan-xml)
+piglit_generate_xml(vulkan vulkan gen-vulkan-xml "" static-vkrunner-tests)
+
 add_custom_target(gen-cl-xml)
 piglit_generate_xml(cl cl gen-cl-xml "" gen-cl-tests static-program-tests)
 
@@ -85,5 +94,7 @@ endif(${PIGLIT_BUILD_GL_TESTS} OR ${PIGLIT_BUILD_GLES2_TESTS} OR ${PIGLIT_BUILD_
 if(${PIGLIT_BUILD_CL_TESTS})
 	add_dependencies(gen-xml gen-cl-xml)
 endif(${PIGLIT_BUILD_CL_TESTS})
+
+add_dependencies(gen-xml gen-vulkan-xml)
 
 # vim: ft=cmake

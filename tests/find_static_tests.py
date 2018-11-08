@@ -36,7 +36,7 @@ def main():
     parser.add_argument('sourcedir')
     parser.add_argument(
         'mode',
-        choices=['shader', 'glslparser', 'asmparser', 'program'])
+        choices=['shader', 'glslparser', 'asmparser', 'program', 'vkrunner'])
     parser.add_argument('output')
     args = parser.parse_args()
 
@@ -48,6 +48,9 @@ def main():
         directory = args.sourcedir
     elif args.mode == 'shader':
         exts = ['.shader_test']
+        directory = args.sourcedir
+    elif args.mode == 'vkrunner':
+        exts = ['.vk_shader_test']
         directory = args.sourcedir
     elif args.mode == 'program':
         exts = ['.program_test']

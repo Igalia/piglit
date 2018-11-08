@@ -33,7 +33,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 from framework.test.piglit_test import (
     PiglitGLTest, PiglitCLTest, ASMParserTest, BuiltInConstantsTest,
-    CLProgramTester,
+    CLProgramTester, VkRunnerTest
 )
 from framework.test.shader_test import ShaderTest, MultiShaderTest
 from framework.test.glsl_parser_test import GLSLParserTest
@@ -120,6 +120,11 @@ def serializer(name, profile, outfile):
         elif isinstance(test, PiglitCLTest):
             elem = et.SubElement(root, 'Test', type='cl', name=name)
             et.SubElement(elem, 'option', name='command', value=repr(test._command))
+            continue
+        elif isinstance(test, VkRunnerTest):
+            elem = et.SubElement(root, 'Test', type='vkrunner', name=name)
+            et.SubElement(elem, 'option', name='filename',
+                          value=repr(test.filename))
             continue
         else:
             continue
