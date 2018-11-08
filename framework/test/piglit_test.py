@@ -244,14 +244,14 @@ class VkRunnerTest(PiglitBaseTest):
                 'vkrunner', 'bin', fallback='vkrunner')
 
         super(VkRunnerTest, self).__init__(
-            [vkrunner_bin, filename],
+            [vkrunner_bin],
             run_concurrent=True)
 
         self.filename = filename
 
     @PiglitBaseTest.command.getter
     def command(self):
-        # This is overriden because we don't want PiglitBaseTest to
-        # prepend TEST_BIN_DIR so that it will look for vkrunner in
+        # self._command is used because we don't want PiglitBaseTest
+        # to prepend TEST_BIN_DIR so that it will look for vkrunner in
         # the search path.
-        return self._command
+        return self._command + [os.path.join(ROOT_DIR, self.filename)]
