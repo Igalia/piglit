@@ -236,8 +236,13 @@ test_object_label_types()
 	    piglit_get_gl_version() >= 30) {
 		/* Test QUERY */
 		glGenQueries(1, &query);
-		glBeginQuery(GL_SAMPLES_PASSED, query);
-		glEndQuery(GL_SAMPLES_PASSED);
+		if (piglit_is_gles()) {
+			glBeginQuery(GL_ANY_SAMPLES_PASSED, query);
+			glEndQuery(GL_ANY_SAMPLES_PASSED);
+		} else {
+			glBeginQuery(GL_SAMPLES_PASSED, query);
+			glEndQuery(GL_SAMPLES_PASSED);
+		}
 		ObjectLabel(GL_QUERY, query, -1, TestLabel);
 		GetObjectLabel(GL_QUERY, query, TestLabelLen + 1, &length[QUERY_IDX], label[QUERY_IDX]);
 
