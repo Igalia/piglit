@@ -12,6 +12,7 @@ tests/spec/arb_shader_subroutine
 #
 # glslang limitations:
 tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
+# a) SPIR-V not generated because 'array size must be a constant integer expression':
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/const-fma-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-ldexp-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-packDouble2x32.shader_test
@@ -24,6 +25,7 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-findLSB.shader_tes
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-findMSB.shader_test
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-fma.shader_test
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
+#
 tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
