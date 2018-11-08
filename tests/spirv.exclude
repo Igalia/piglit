@@ -7,8 +7,6 @@ tests/spec/arb_fragment_layer_viewport/layer-vs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-gs-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-write-gs-no-write-simple.shader_test
 tests/spec/arb_fragment_layer_viewport/viewport-vs-write-simple.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
-tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/component-layout/query-component.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/const-fma-double.shader_test
 tests/spec/arb_gpu_shader_fp64/execution/built-in-functions/fs-const-ldexp-double.shader_test
@@ -183,6 +181,7 @@ tests/spec/arb_gpu_shader_fp64/linker/vs-to-fs-explicit-location-overlap.shader_
 #
 # b) Varyings mismatch
 tests/spec/arb_arrays_of_arrays/linker/intrastage-unsized-mismatch.shader_test
+tests/spec/arb_enhanced_layouts/linker/component-layout/intrastage-vs-mismatch.shader_test
 tests/spec/glsl-1.20/linker/centroid-mismatched.shader_test
 tests/spec/glsl-1.20/linker/intrastage-unsized-array-mismatch.shader_test
 tests/spec/glsl-1.20/linker/invariant-mismatched.shader_test
