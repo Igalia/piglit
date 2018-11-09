@@ -3016,8 +3016,6 @@ with profile.test_list.group_manager(
       run_concurrent=False)
     g(['ext_image_dma_buf_import-intel_external_sampler_only'],
       run_concurrent=False)
-    g(['ext_image_dma_buf_import-intel_external_sampler_with_dma_only'],
-      run_concurrent=False)
     g(['ext_image_dma_buf_import-refcount'])
     g(['ext_image_dma_buf_import-sample_rgb', '-fmt=AR24'],
       'ext_image_dma_buf_import-sample_argb8888', run_concurrent=False)
