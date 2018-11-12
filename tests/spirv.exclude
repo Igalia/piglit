@@ -74,7 +74,6 @@ tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-type-mismatch-s
 tests/spec/arb_enhanced_layouts/linker/component-layout/vs-to-fs-type-mismatch-unsigned-float.shader_test
 tests/spec/arb_gpu_shader5/linker/sample-qualifier-unqualified-vs-fs.shader_test
 tests/spec/arb_separate_shader_objects/linker/vs-to-fs-explicit-location-mismatch-array.shader_test
-tests/spec/arb_shader_storage_buffer_object/linker/shader-storage-block-different-size.shader_test
 tests/spec/glsl-1.50/execution/vs-gs-arrays-fail.shader_test
 tests/spec/glsl-1.50/execution/vs-gs-varyings-match-types.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-array-to-fs-named.shader_test
@@ -87,6 +86,12 @@ tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
 # b) Uniform cross-stage mismatches only required to be detected in GLSL
 tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
 tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-member-array-size-mismatch.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-member-count-mismatch.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-member-qualifier-mismatch.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-member-type-mismatch.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-memory-qualifier-mismatch.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/shader-storage-block-different-size.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-image2D.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-sampler2D.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks.shader_test
