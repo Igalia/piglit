@@ -81,6 +81,7 @@ tests/spec/glsl-1.50/linker/interface-vs-named-to-fs-array.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
 #
 # b) Uniform cross-stage mismatches only required to be detected in GLSL
+tests/spec/arb_arrays_of_arrays/linker/uniform-block-array-size-and-instance-name-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-shader-storage-blocks-member-offset-qualifier-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-uniform-blocks-member-offset-qualifier-mismatch.shader_test
 tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
@@ -97,6 +98,11 @@ tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage
 tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks-instanced.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks-instanced.shader_test
+tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-member-array-size-mismatch.shader_test
+tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-member-count-mismatch.shader_test
+tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-member-qualifier-mismatch.shader_test
+tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-member-type-mismatch.shader_test
+tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-memory-qualifier-mismatch.shader_test
 tests/spec/glsl-1.50/linker/interface-blocks-member-name-mismatch.shader_test
 tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-array-size-mismatch.shader_test
 tests/spec/glsl-1.50/linker/interface-blocks-vs-fs-member-count-mismatch.shader_test
@@ -107,6 +113,9 @@ tests/spec/glsl-1.50/linker/uniform-block-array-size-and-instance-name-mismatch.
 # c) Builtin related cross-stage mismatches only required to be detected in GLSL
 tests/spec/glsl-1.50/linker/interstage-pervertex-redeclaration-mismatch.shader_test
 tests/spec/glsl-1.50/linker/interstage-pervertex-redeclaration-needed.shader_test
+#
+# d) Name related checks where linking is supposed to be successful
+tests/spec/arb_arrays_of_arrays/linker/uniform-block-array-instance-name-mismatch.shader_test
 #
 # Intrastage linking errors:
 #
@@ -153,9 +162,15 @@ tests/spec/glsl-1.50/linker/interface-blocks-multiple-vs-member-count-mismatch.s
 tests/spec/glsl-1.50/linker/intrastage-interface-arrays-unmatched-sizes.shader_test
 tests/spec/glsl-1.50/linker/intrastage-interface-named-array.shader_test
 tests/spec/glsl-1.50/linker/intrastage-interface-unnamed-array.shader_test
+tests/spec/glsl-1.50/linker/intrastage-unsized-interface-array-mismatch.shader_test
+tests/spec/glsl-1.50/linker/intrastage-unsized-interface-array-mismatch2.shader_test
 #
 # c) Other checks shaders must fullfill.
 tests/spec/arb_compute_shader/linker/no_local_work_size.shader_test
+tests/spec/arb_gpu_shader5/linker/stream-different-zero-gs-fs.shader_test
+tests/spec/arb_gpu_shader5/linker/stream-invalid-prim-output.shader_test
+tests/spec/arb_gpu_shader5/linker/stream-negative-value.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/unsized_array_member.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-input-type.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-max-vertices.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
@@ -164,6 +179,7 @@ tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
 tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-mismatch.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-needed.shader_test
+tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-unneeded.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-mismatch.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-out-redeclaration-needed.shader_test
 tests/spec/glsl-1.50/execution/fragcoord-layout-qualifiers-conflicting-case-1.shader_test
