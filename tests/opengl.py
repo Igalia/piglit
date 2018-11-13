@@ -3022,11 +3022,11 @@ with profile.test_list.group_manager(
       'ext_image_dma_buf_import-sample_argb8888', run_concurrent=False)
     g(['ext_image_dma_buf_import-sample_rgb', '-fmt=XR24', '-alpha-one'],
       'ext_image_dma_buf_import-sample_xrgb8888', run_concurrent=False)
-    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=NV12', '-alpha-one'],
+    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=NV12'],
       'ext_image_dma_buf_import-sample_nv12', run_concurrent=False)
-    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=YU12', '-alpha-one'],
+    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=YU12'],
       'ext_image_dma_buf_import-sample_yuv420', run_concurrent=False)
-    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=YV12', '-alpha-one'],
+    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=YV12'],
       'ext_image_dma_buf_import-sample_yvu420', run_concurrent=False)
     g(['ext_image_dma_buf_import-sample_yuv', '-fmt=AYUV'],
       'ext_image_dma_buf_import-sample_ayuv', run_concurrent=False)
