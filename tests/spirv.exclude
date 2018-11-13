@@ -178,9 +178,10 @@ tests/spec/arb_gpu_shader5/linker/stream-invalid-prim-output.shader_test
 tests/spec/arb_gpu_shader5/linker/stream-negative-value.shader_test
 tests/spec/arb_shader_storage_buffer_object/linker/non_integral_size_array_member.shader_test
 tests/spec/arb_shader_storage_buffer_object/linker/unsized_array_member.shader_test
-tests/spec/glsl-1.50/linker/gs-must-tests/specify-input-type.shader_test
-tests/spec/glsl-1.50/linker/gs-must-tests/specify-max-vertices.shader_test
-tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
+tests/spec/glsl-1.50/linker/gs-must-specify-input-type.shader_test
+tests/spec/glsl-1.50/linker/gs-must-specify-max-vertices.shader_test
+tests/spec/glsl-1.50/linker/gs-must-specify-output-type.shader_test
+
 #
 # d) Built-in redeclarations
 tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01.shader_test
