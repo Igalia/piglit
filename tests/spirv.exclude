@@ -50,6 +50,13 @@ tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.sha
 tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 # expects linker errors in GLSL, but the code is valid on SPIRV
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
+# Specify the layout in a different compilation unit and glslang does not cope with it.
+# (SPIR-V generation failed):
+tests/spec/arb_compute_shader/execution/separate-global-id.shader_test
+tests/spec/arb_compute_shader/execution/separate-global-id-2.shader_test
+tests/spec/arb_compute_shader/linker/matched_local_work_sizes.shader_test
+tests/spec/arb_gpu_shader5/execution/invocations-matching.shader_test
+tests/spec/arb_tessellation_shader/linker/tcs-output-size-declared-in-other-shader.shader_test
 # Query resources using names:
 tests/spec/arb_uniform_buffer_object/example_from_spec.shader_test
 tests/spec/arb_uniform_buffer_object/field_after_struct_base_alignment.shader_test
