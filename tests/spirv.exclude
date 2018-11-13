@@ -155,6 +155,7 @@ tests/spec/arb_enhanced_layouts/linker/explicit-offsets/intrastage-ubo-different
 tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
 tests/spec/glsl-1.20/linker/centroid-mismatched.shader_test
 tests/spec/glsl-1.20/linker/intrastage-unsized-array-mismatch.shader_test
+tests/spec/glsl-1.20/linker/intrastage-unsized-array-mismatch2.shader_test
 tests/spec/glsl-1.20/linker/invariant-mismatched.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-conflicting-input-layouts.shader_test
 tests/spec/glsl-1.50/linker/gs-input-sizing-layout-conflicts-with-static-usage.shader_test
