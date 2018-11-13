@@ -50,6 +50,13 @@ tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.sha
 tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 # expects linker errors in GLSL, but the code is valid on SPIRV
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
+# Query resources using names:
+tests/spec/arb_uniform_buffer_object/example_from_spec.shader_test
+tests/spec/arb_uniform_buffer_object/field_after_struct_base_alignment.shader_test
+tests/spec/arb_uniform_buffer_object/row-major-matrix-inside-array-of-struct.shader_test
+tests/spec/arb_uniform_buffer_object/std140-row_major-array-struct-struct-mat2x3-mat2x4-and-int.shader_test
+tests/spec/arb_uniform_buffer_object/struct_base_alignment.shader_test
+tests/spec/glsl-1.50/uniform_buffer/struct_base_alignment.shader_test
 # Interstage linking errors:
 #
 # a) Input/output cross-stage mismatches only required to be detected in GLSL
