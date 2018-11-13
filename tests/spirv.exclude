@@ -30,8 +30,6 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-findMSB.shader_tes
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-fma.shader_test
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
 #
-tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
-tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
 tests/spec/glsl-1.50/execution/geometry/clip-distance-out-values.shader_test
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-consistent-with-static-usage.shader_test
@@ -55,7 +53,9 @@ tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.s
 tests/spec/arb_compute_shader/execution/separate-global-id.shader_test
 tests/spec/arb_compute_shader/execution/separate-global-id-2.shader_test
 tests/spec/arb_compute_shader/linker/matched_local_work_sizes.shader_test
+tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-matching.shader_test
+tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
 tests/spec/arb_tessellation_shader/linker/tcs-output-size-declared-in-other-shader.shader_test
 # Query resources using names:
 tests/spec/arb_uniform_buffer_object/example_from_spec.shader_test
