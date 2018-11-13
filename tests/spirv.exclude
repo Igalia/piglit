@@ -13,6 +13,7 @@ tests/spec/arb_shader_subroutine/
 # Unsupported layout(shared):
 # pending to re-implement automatically skip them
 tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-packaging-qualifier-mismatch.shader_test
+tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-packaging-qualifier-mismatch.shader_test
 #
 # glslang limitations:
 tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
@@ -34,6 +35,7 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
 tests/spec/arb_compute_shader/execution/separate-global-id.shader_test
 tests/spec/arb_compute_shader/execution/separate-global-id-2.shader_test
 tests/spec/arb_compute_shader/linker/matched_local_work_sizes.shader_test
+tests/spec/arb_compute_shader/linker/one_local_work_size.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-matching.shader_test
 tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
@@ -42,6 +44,7 @@ tests/spec/glsl-1.50/execution/gs-input-sizing-layout-consistent-with-static-usa
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-larger-than-static-usage.shader_test
 tests/spec/glsl-1.50/linker/gs-different-max-vertices-multiple-shader-objects.shader_test
 tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.shader_test
+tests/spec/glsl-1.50/linker/intrastage-unsized-interface-array.shader_test
 #
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
@@ -83,13 +86,19 @@ tests/spec/glsl-1.50/linker/interface-vs-array-to-gs-array-sized.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-array-to-gs-array-unsized.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-named-to-fs-array.shader_test
 tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
+tests/spec/glsl-1.50/linker/unsized-in-named-interface-block.shader_test
+tests/spec/glsl-1.50/linker/unsized-in-named-interface-block-gs.shader_test
+tests/spec/glsl-1.50/linker/unsized-in-unnamed-interface-block.shader_test
+tests/spec/glsl-1.50/linker/unsized-in-unnamed-interface-block-gs.shader_test
 #
 # b) Uniform cross-stage mismatches only required to be detected in GLSL
 tests/spec/arb_arrays_of_arrays/linker/uniform-block-array-size-and-instance-name-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-shader-storage-blocks-member-offset-qualifier-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-uniform-blocks-member-offset-qualifier-mismatch.shader_test
+tests/spec/arb_explicit_uniform_location/linker/overlap-array-loc-stages.shader_test
 tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
 tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
+tests/spec/arb_explicit_uniform_location/linker/unused-uniform-reserve-location.shader_test
 tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
 tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-member-array-size-mismatch.shader_test
 tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-member-count-mismatch.shader_test
