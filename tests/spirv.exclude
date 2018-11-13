@@ -31,7 +31,6 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-fma.shader_test
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
 #
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
-tests/spec/glsl-1.50/execution/geometry/clip-distance-out-values.shader_test
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-consistent-with-static-usage.shader_test
 tests/spec/glsl-1.50/execution/gs-input-sizing-layout-larger-than-static-usage.shader_test
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
