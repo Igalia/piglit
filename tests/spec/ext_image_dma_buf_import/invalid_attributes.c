@@ -162,10 +162,17 @@ test_invalid_format(unsigned w, unsigned h, int fd, unsigned stride,
 		EGL_NONE
 	};
 
+	/**
+	 * The spec says:
+	 *
+	 *     "If <target> is EGL_LINUX_DMA_BUF_EXT, and the EGL_LINUX_DRM_FOURCC_EXT
+	 *      attribute is set to a format not supported by the EGL, EGL_BAD_MATCH
+	 *      is generated."
+	 */
 	img = eglCreateImageKHR(eglGetCurrentDisplay(), EGL_NO_CONTEXT,
 			EGL_LINUX_DMA_BUF_EXT, (EGLClientBuffer)0, attr);
 
-	if (!piglit_check_egl_error(EGL_BAD_ATTRIBUTE)) {
+	if (!piglit_check_egl_error(EGL_BAD_MATCH)) {
 		if (img)
 			eglDestroyImageKHR(eglGetCurrentDisplay(), img);
 		return false;
