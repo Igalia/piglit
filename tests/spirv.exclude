@@ -29,25 +29,7 @@ tests/spec/arb_gpu_shader5/execution/built-in-functions/const-findLSB.shader_tes
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-findMSB.shader_test
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-fma.shader_test
 tests/spec/arb_gpu_shader5/execution/built-in-functions/const-ldexp.shader_test
-#
-tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
-tests/spec/glsl-1.50/execution/gs-input-sizing-layout-consistent-with-static-usage.shader_test
-tests/spec/glsl-1.50/execution/gs-input-sizing-layout-larger-than-static-usage.shader_test
-tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
-# glslang issue #1516. No SPIR-V generated.
-tests/spec/amd_conservative_depth/glsl-1.30/linker/matching-qualifiers-02
-# error: buffer block with binding `0' has mismatching definition
-# tests that expect linker errors in GLSL and generete compiler errors on
-# SPIRV (correct according to the spec but should be excluded because we
-# don't have checks for compile errors.
-tests/spec/arb_shader_storage_buffer_object/linker/non_integral_size_array_member.shader_test
-tests/spec/glsl-1.50/linker/gs-different-max-vertices-multiple-shader-objects.shader_test
-tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.shader_test
-# Uses legacy clip planes. SPIR-V forces a core context so this won’t work
-tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
-# expects linker errors in GLSL, but the code is valid on SPIRV
-tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
-# Specify the layout in a different compilation unit and glslang does not cope with it.
+# b) Specify the layout in a different compilation unit and glslang does not cope with it.
 # (SPIR-V generation failed):
 tests/spec/arb_compute_shader/execution/separate-global-id.shader_test
 tests/spec/arb_compute_shader/execution/separate-global-id-2.shader_test
@@ -56,6 +38,15 @@ tests/spec/arb_gpu_shader5/execution/invocations-conflicting.shader_test
 tests/spec/arb_gpu_shader5/execution/invocations-matching.shader_test
 tests/spec/arb_gpu_shader5/execution/invocation-id-in-separate-gs.shader_test
 tests/spec/arb_tessellation_shader/linker/tcs-output-size-declared-in-other-shader.shader_test
+tests/spec/glsl-1.50/execution/gs-input-sizing-layout-consistent-with-static-usage.shader_test
+tests/spec/glsl-1.50/execution/gs-input-sizing-layout-larger-than-static-usage.shader_test
+tests/spec/glsl-1.50/linker/gs-different-max-vertices-multiple-shader-objects.shader_test
+tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.shader_test
+#
+tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
+tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
+# Uses legacy clip planes. SPIR-V forces a core context so this won’t work
+tests/spec/glsl-1.20/execution/clipping/fixed-clip-enables
 # Query resources using names:
 tests/spec/arb_uniform_buffer_object/example_from_spec.shader_test
 tests/spec/arb_uniform_buffer_object/field_after_struct_base_alignment.shader_test
@@ -97,6 +88,7 @@ tests/spec/glsl-1.50/linker/interface-vs-unnamed-to-fs-array.shader_test
 tests/spec/arb_arrays_of_arrays/linker/uniform-block-array-size-and-instance-name-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-shader-storage-blocks-member-offset-qualifier-mismatch.shader_test
 tests/spec/arb_enhanced_layouts/linker/explicit-offsets/instance-matching-uniform-blocks-member-offset-qualifier-mismatch.shader_test
+tests/spec/arb_explicit_uniform_location/linker/overlap-location-across-stages.shader_test
 tests/spec/arb_explicit_uniform_location/linker/set-explicit-location-twice.shader_test
 tests/spec/arb_shader_atomic_counters/linker/different-bindings-atomic-counter.shader_test
 tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-member-array-size-mismatch.shader_test
@@ -183,6 +175,7 @@ tests/spec/arb_compute_shader/linker/no_local_work_size.shader_test
 tests/spec/arb_gpu_shader5/linker/stream-different-zero-gs-fs.shader_test
 tests/spec/arb_gpu_shader5/linker/stream-invalid-prim-output.shader_test
 tests/spec/arb_gpu_shader5/linker/stream-negative-value.shader_test
+tests/spec/arb_shader_storage_buffer_object/linker/non_integral_size_array_member.shader_test
 tests/spec/arb_shader_storage_buffer_object/linker/unsized_array_member.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-input-type.shader_test
 tests/spec/glsl-1.50/linker/gs-must-tests/specify-max-vertices.shader_test
@@ -190,6 +183,8 @@ tests/spec/glsl-1.50/linker/gs-must-tests/specify-output-type.shader_test
 #
 # d) Built-in redeclarations
 tests/spec/amd_conservative_depth/glsl-1.30/linker/mismatched-qualifiers-01.shader_test
+# (glslang issue #1516)
+tests/spec/amd_conservative_depth/glsl-1.30/linker/matching-qualifiers-02.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-mismatch.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-needed.shader_test
 tests/spec/glsl-1.50/linker/intrastage-pervertex-in-redeclaration-unneeded.shader_test
