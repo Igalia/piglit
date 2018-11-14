@@ -45,6 +45,12 @@ tests/spec/glsl-1.50/execution/gs-input-sizing-layout-larger-than-static-usage.s
 tests/spec/glsl-1.50/linker/gs-different-max-vertices-multiple-shader-objects.shader_test
 tests/spec/glsl-1.50/linker/gs-different-output-type-multiple-shader-objects.shader_test
 tests/spec/glsl-1.50/linker/intrastage-unsized-interface-array.shader_test
+# c) The explicit location requirement makes the shaders reach the maximum number
+# of locations limit, as vars won't be grouped to occupy less locations:
+tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-array-float-index-rd.shader_test
+tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-array-vec2-index-rd.shader_test
+tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-array-vec3-index-rd.shader_test
+tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-array-vec4-index-rd.shader_test
 #
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
