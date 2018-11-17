@@ -134,6 +134,9 @@ static GLuint ssbo[32];
 static unsigned num_shader_include_paths = 0;
 static char **shader_include_path;
 
+#define MAX_XFB_BUFFERS 4 /* Same value used at nir_xfb_info */
+static GLuint xfb[MAX_XFB_BUFFERS];
+
 #define SHADER_TYPES 6
 static GLuint *subuniform_locations[SHADER_TYPES];
 static int num_subuniform_locations[SHADER_TYPES];
@@ -3567,6 +3570,12 @@ teardown_shader_include_paths(void)
 	free(shader_include_path);
 }
 
+static void
+teardown_xfb(void)
+{
+	glDeleteBuffers(MAX_XFB_BUFFERS, xfb);
+}
+
 static enum piglit_result
 program_must_be_in_use(void)
 {
@@ -3728,6 +3737,95 @@ probe_ssbo_int(GLint ssbo_index, GLint ssbo_offset, const char *op, int32_t valu
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	return true;
+}
+
+GLenum piglit_xfb_primitive_mode(GLenum draw_arrays_mode)
+{
+	switch (draw_arrays_mode) {
+	case GL_POINTS:
+		return GL_POINTS;
+	case GL_LINES:
+	case GL_LINE_LOOP:
+	case GL_LINE_STRIP:
+	case GL_LINES_ADJACENCY:
+	case GL_LINE_STRIP_ADJACENCY:
+		return GL_LINES;
+	case GL_TRIANGLES:
+	case GL_TRIANGLE_STRIP:
+	case GL_TRIANGLE_FAN:
+	case GL_TRIANGLES_ADJACENCY:
+	case GL_TRIANGLE_STRIP_ADJACENCY:
+		return GL_TRIANGLES;
+	}
+
+	printf("glDrawArrays mode %s not supported for a transform feedback operation\n",
+	       piglit_get_gl_enum_name(draw_arrays_mode));
+	piglit_report_result(PIGLIT_FAIL);
+}
+
+static void
+piglit_xfb_draw_arrays(GLenum mode, int first, size_t count)
+{
+	GLenum primitive_mode = piglit_xfb_primitive_mode(mode);
+
+	glEnable(GL_RASTERIZER_DISCARD);
+
+	/* We don't need to call glBindBufferBase here, it is done on
+	 * the "xfb buffer object" command
+	 */
+
+	glBeginTransformFeedback(primitive_mode);
+	glDrawArrays(mode, first, count);
+	glEndTransformFeedback();
+
+	glDisable(GL_RASTERIZER_DISCARD);
+
+	glFlush();
+}
+
+static bool
+probe_xfb_float(GLuint buf, unsigned n, float expected)
+{
+	float *p;
+	bool result;
+	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, buf);
+	p = glMapBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, n * sizeof(float),
+			     sizeof(float), GL_MAP_READ_BIT);
+	if (!p) {
+		printf("Couldn't map xfb buffer %u\n", buf);
+		return false;
+	}
+	result = fabsf(expected - *p) < piglit_tolerance[0];
+	if (!result) {
+		printf("xfb buffer %i[%i]: %f, Expected: %f\n",
+		       buf, n, *p, expected);
+	}
+
+	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
+	return result;
+}
+
+static bool
+probe_xfb_double(GLuint buf, unsigned n, double expected)
+{
+	double *p;
+	bool result;
+
+	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, buf);
+	p = glMapBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, n * sizeof(double),
+			     sizeof(double), GL_MAP_READ_BIT);
+	if (!p) {
+		printf("Couldn't map xfb buffer %u\n", buf);
+		return false;
+	}
+	result = fabs(expected - *p) < piglit_tolerance[0];
+	if (!result) {
+		printf("xfb buffer %i[%i]: %lf, Expected: %lf\n",
+		       buf, n, *p, expected);
+	}
+
+	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
+	return result;
 }
 
 enum piglit_result
@@ -4353,6 +4451,32 @@ piglit_display(void)
 			glBufferData(GL_SHADER_STORAGE_BUFFER, y,
 				     ssbo_init, GL_DYNAMIC_DRAW);
 			free(ssbo_init);
+		}
+		else if (sscanf(line, "xfb buffer object %u %u", &ux, &uy) == 2) {
+			GLuint *xfb_init = calloc(uy, 1);
+			if (ux < 0 || ux >= MAX_XFB_BUFFERS) {
+				printf("xfb buffer id %d out of range\n", ux);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			glGenBuffers(1, &xfb[ux]);
+			glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, ux, xfb[ux]);
+			glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, uy,
+				     xfb_init, GL_STREAM_READ);
+			free(xfb_init);
+		} else if (sscanf(line, "xfb draw arrays %31s %d %d", s, &x, &y) == 3) {
+			GLenum mode = decode_drawing_mode(s);
+			int first = x;
+			size_t count = (size_t) y;
+			result = draw_arrays_common(first, count);
+			piglit_xfb_draw_arrays(mode, first, count);
+		} else if (sscanf(line, "probe xfb buffer float %u %u %f",
+				  &ux, &uy, &c[0]) == 3) {
+			if (!probe_xfb_float(xfb[ux], uy, c[0]))
+				result = PIGLIT_FAIL;
+		} else if (sscanf(line, "probe xfb buffer double %u %u %lf",
+				  &ux, &uy, &d[0]) == 3) {
+			if (!probe_xfb_double(xfb[ux], uy, d[0]))
+				result = PIGLIT_FAIL;
 		} else if (sscanf(line, "ssbo %d subdata float %d %f", &x, &y, &c[0]) == 3) {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, 4, &c[0]);
@@ -5098,6 +5222,7 @@ piglit_init(int argc, char **argv)
 			teardown_atomics();
 			teardown_fbos();
 			teardown_shader_include_paths();
+			teardown_xfb();
 		}
 		exit(0);
 	}
