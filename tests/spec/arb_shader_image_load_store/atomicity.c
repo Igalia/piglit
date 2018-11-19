@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Intel Corporation
+ * Copyright © 2018 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -58,16 +59,7 @@
 /** Total number of pixels in the window and image. */
 #define N (W * H)
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-config.supports_gl_core_version = 32;
-
-config.window_width = W;
-config.window_height = H;
-config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-config.khr_no_error_support = PIGLIT_NO_ERRORS;
-
-PIGLIT_GL_TEST_CONFIG_END
+static struct piglit_gl_test_config *piglit_config;
 
 static bool
 init_image(const struct image_info img, uint32_t v)
@@ -112,56 +104,28 @@ check_image_const(const struct image_info img, unsigned n, uint32_t v)
                              pixels, v, 0, 0, 0);
 }
 
-/**
- * Test skeleton: Init image to \a init_value, run the provided shader
- * \a op, check that the first \a check_sz pixels of the image equal
- * \a check_value and optionally check that the resulting fragment
- * values on the framebuffer are unique.
- */
-static bool
-run_test(uint32_t init_value, unsigned check_sz, uint32_t check_value,
-         bool check_unique, const char *op)
+struct testcase
 {
-        const struct grid_info grid =
-                grid_info(GL_FRAGMENT_SHADER, GL_R32UI, W, H);
-        const struct image_info img =
-                image_info(GL_TEXTURE_1D, GL_R32UI, W, H);
-        GLuint prog = generate_program(
-                grid, GL_FRAGMENT_SHADER,
-                concat(image_hunk(img, ""),
-                       hunk("volatile IMAGE_UNIFORM_T img;\n"),
-                       hunk(op), NULL));
-        bool ret = prog &&
-                init_fb(grid) &&
-                init_image(img, init_value) &&
-                set_uniform_int(prog, "img", 0) &&
-                draw_grid(grid, prog) &&
-                check_image_const(img, check_sz, check_value) &&
-                (!check_unique || check_fb_unique(grid));
+	uint32_t init_value;
+	unsigned check_sz;
+	uint32_t check_value;
+	bool check_unique;
+	const char * op;
+};
 
-        glDeleteProgram(prog);
-        return ret;
-}
-
-void
-piglit_init(int argc, char **argv)
-{
-        enum piglit_result status = PIGLIT_PASS;
-
-        piglit_require_extension("GL_ARB_shader_image_load_store");
-
+static struct testcase testdata[] = {
         /*
          * If imageAtomicAdd() is atomic the return values obtained
          * from each call are guaranteed to be unique.
          */
-        subtest(&status, true,
-                run_test(0, 1, N, true,
-                         "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                         "       return GRID_T("
-                         "          imageAtomicAdd(img, IMAGE_ADDR(ivec2(0)), 1u),"
-                         "          0, 0, 1);\n"
-                         "}\n"),
-                "imageAtomicAdd");
+	{
+		0, 1, N, true,
+		"GRID_T op(ivec2 idx, GRID_T x) {\n"
+		"       return GRID_T("
+		"          imageAtomicAdd(img, IMAGE_ADDR(ivec2(0)), 1u),"
+		"          0, 0, 1);\n"
+		"}\n",
+	},
 
         /*
          * Call imageAtomicMin() on a fixed location from within a
@@ -175,20 +139,20 @@ piglit_init(int argc, char **argv)
          * repeat.  In the end we obtain a unique counter value for
          * each fragment if the read-modify-write operation is atomic.
          */
-        subtest(&status, true,
-                run_test(0xffffffff, 1, 0xffffffff - N, true,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       uint old, v = 0xffffffffu;"
-                        "\n"
-                        "       do {\n"
-                        "               old = v;\n"
-                        "               v = imageAtomicMin(img, IMAGE_ADDR(ivec2(0)),"
-                        "                                  v - 1u);\n"
-                        "       } while (v != old);\n"
-                        "\n"
-                        "       return GRID_T(v, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicMin");
+	{
+                0xffffffff, 1, 0xffffffff - N, true,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       uint old, v = 0xffffffffu;"
+                "\n"
+                "       do {\n"
+                "               old = v;\n"
+                "               v = imageAtomicMin(img, IMAGE_ADDR(ivec2(0)),"
+                "                                  v - 1u);\n"
+                "       } while (v != old);\n"
+                "\n"
+                "       return GRID_T(v, 0, 0, 1);\n"
+                "}\n",
+	},
 
         /*
          * Use imageAtomicMax() on a fixed location to increment a
@@ -196,94 +160,93 @@ piglit_init(int argc, char **argv)
          * atomicity of the built-in guarantees that the obtained
          * values will be unique for each fragment.
          */
-        subtest(&status, true,
-                run_test(0, 1, N, true,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       uint old, v = 0u;"
-                        "\n"
-                        "       do {\n"
-                        "               old = v;\n"
-                        "               v = imageAtomicMax(img, IMAGE_ADDR(ivec2(0)),"
-                        "                                  v + 1u);\n"
-                        "       } while (v != old);\n"
-                        "\n"
-                        "       return GRID_T(v, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicMax");
+	{
+                0, 1, N, true,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       uint old, v = 0u;"
+                "\n"
+                "       do {\n"
+                "               old = v;\n"
+                "               v = imageAtomicMax(img, IMAGE_ADDR(ivec2(0)),"
+                "                                  v + 1u);\n"
+                "       } while (v != old);\n"
+                "\n"
+                "       return GRID_T(v, 0, 0, 1);\n"
+                "}\n",
+	},
 
         /*
          * Use imageAtomicAnd() to flip individual bits of a bitmap
          * atomically.  The atomicity of the built-in guarantees that
          * all bits will be clear on termination.
          */
-        subtest(&status, true,
-                run_test(0xffffffff, N / 32, 0, false,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       int i = IMAGE_ADDR(idx);\n"
-                        "       uint m = ~(1u << (i % 32));\n"
-                        "\n"
-                        "       imageAtomicAnd(img, i / 32, m);\n"
-                        "\n"
-                        "       return GRID_T(0, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicAnd");
+	{
+                0xffffffff, N / 32, 0, false,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       int i = IMAGE_ADDR(idx);\n"
+                "       uint m = ~(1u << (i % 32));\n"
+                "\n"
+                "       imageAtomicAnd(img, i / 32, m);\n"
+                "\n"
+                "       return GRID_T(0, 0, 0, 1);\n"
+                "}\n",
+	},
 
         /*
          * Use imageAtomicOr() to flip individual bits of a bitmap
          * atomically.  The atomicity of the built-in guarantees that
          * all bits will be set on termination.
          */
-        subtest(&status, true,
-                run_test(0, N / 32, 0xffffffff, false,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       int i = IMAGE_ADDR(idx);\n"
-                        "       uint m = (1u << (i % 32));\n"
-                        "\n"
-                        "       imageAtomicOr(img, i / 32, m);\n"
-                        "\n"
-                        "       return GRID_T(0, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicOr");
+	{
+                0, N / 32, 0xffffffff, false,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       int i = IMAGE_ADDR(idx);\n"
+                "       uint m = (1u << (i % 32));\n"
+                "\n"
+                "       imageAtomicOr(img, i / 32, m);\n"
+                "\n"
+                "       return GRID_T(0, 0, 0, 1);\n"
+                "}\n",
+	},
 
         /*
          * Use imageAtomicXor() to flip individual bits of a bitmap
          * atomically.  The atomicity of the built-in guarantees that
          * all bits will have been inverted on termination.
          */
-        subtest(&status, true,
-                run_test(0x55555555, N / 32, 0xaaaaaaaa, false,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       int i = IMAGE_ADDR(idx);\n"
-                        "       uint m = (1u << (i % 32));\n"
-                        "\n"
-                        "       imageAtomicXor(img, i / 32, m);\n"
-                        "\n"
-                        "       return GRID_T(0, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicXor");
+	{
+                0x55555555, N / 32, 0xaaaaaaaa, false,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       int i = IMAGE_ADDR(idx);\n"
+                "       uint m = (1u << (i % 32));\n"
+                "\n"
+                "       imageAtomicXor(img, i / 32, m);\n"
+                "\n"
+                "       return GRID_T(0, 0, 0, 1);\n"
+                "}\n",
+	},
 
         /*
          * Use imageAtomicExchange() to flip individual bits of a
          * bitmap atomically.  The atomicity of the built-in
          * guarantees that all bits will be set on termination.
          */
-        subtest(&status, true,
-                run_test(0, N / 32, 0xffffffff, false,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       int i = IMAGE_ADDR(idx);\n"
-                        "       uint m = (1u << (i % 32));\n"
-                        "       uint old = 0u;\n"
-                        "\n"
-                        "       do {\n"
-                        "               m |= old;\n"
-                        "               old = imageAtomicExchange("
-                        "                       img, i / 32, m);\n"
-                        "       } while ((old & ~m) != 0u);\n"
-                        "\n"
-                        "       return GRID_T(0, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicExchange");
-
+	{
+                0, N / 32, 0xffffffff, false,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       int i = IMAGE_ADDR(idx);\n"
+                "       uint m = (1u << (i % 32));\n"
+                "       uint old = 0u;\n"
+                "\n"
+                "       do {\n"
+                "               m |= old;\n"
+                "               old = imageAtomicExchange("
+                "                       img, i / 32, m);\n"
+                "       } while ((old & ~m) != 0u);\n"
+                "\n"
+                "       return GRID_T(0, 0, 0, 1);\n"
+                "}\n",
+	},
 #if 0
         /*
          * Use imageAtomicExchange() on a fixed location to increment
@@ -318,21 +281,22 @@ piglit_init(int argc, char **argv)
          * hang.  It seems to work fine on nVidia though, it would be
          * interesting to see if it works on other platforms.
          */
-        subtest(&status, true,
-                run_test(0, 1, N, true,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       uint p = 0xffffffffu, v = 0xffffffffu;\n"
-                        "\n"
-                        "       do {\n"
-                        "               if (p != 0xffffffffu)\n"
-                        "                       v = p++;\n"
-                        "               p = imageAtomicExchange("
-                        "                  img, IMAGE_ADDR(ivec2(0)), p);\n"
-                        "       } while (v == 0xffffffffu);\n"
-                        "\n"
-                        "       return GRID_T(v, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicExchange (locking)");
+	{
+                0, 1, N, true,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       uint p = 0xffffffffu, v = 0xffffffffu;\n"
+                "\n"
+                "       do {\n"
+                "               if (p != 0xffffffffu)\n"
+                "                       v = p++;\n"
+                "               p = imageAtomicExchange("
+                "                  img, IMAGE_ADDR(ivec2(0)), p);\n"
+                "       } while (v == 0xffffffffu);\n"
+                "\n"
+                "       return GRID_T(v, 0, 0, 1);\n"
+                "}\n",
+                "imageAtomicExchange (locking)",
+	},
 #endif
 
         /*
@@ -342,22 +306,133 @@ piglit_init(int argc, char **argv)
          * argument.  The atomicity of the built-in guarantees that
          * the obtained values will be unique for each fragment.
          */
-        subtest(&status, true,
-                run_test(0, 1, N, true,
-                        "GRID_T op(ivec2 idx, GRID_T x) {\n"
-                        "       uint old, v = 0u;"
-                        "\n"
-                        "       do {\n"
-                        "               old = v;\n"
-                        "               v = imageAtomicCompSwap("
-                        "                  img, IMAGE_ADDR(ivec2(0)), v, v + 1u);\n"
-                        "       } while (v != old);\n"
-                        "\n"
-                        "       return GRID_T(v, 0, 0, 1);\n"
-                        "}\n"),
-                "imageAtomicCompSwap");
+	{
+                0, 1, N, true,
+                "GRID_T op(ivec2 idx, GRID_T x) {\n"
+                "       uint old, v = 0u;"
+                "\n"
+                "       do {\n"
+                "               old = v;\n"
+                "               v = imageAtomicCompSwap("
+                "                  img, IMAGE_ADDR(ivec2(0)), v, v + 1u);\n"
+                "       } while (v != old);\n"
+                "\n"
+                "       return GRID_T(v, 0, 0, 1);\n"
+                "}\n",
+	},
+};
 
-        piglit_report_result(status);
+/**
+ * Test skeleton: Init image to \a init_value, run the provided shader
+ * \a op, check that the first \a check_sz pixels of the image equal
+ * \a check_value and optionally check that the resulting fragment
+ * values on the framebuffer are unique.
+ */
+static enum piglit_result
+run_test(void * data)
+{
+	const struct testcase * test = (const struct testcase *)data;
+
+        const struct grid_info grid =
+                grid_info(GL_FRAGMENT_SHADER, GL_R32UI, W, H);
+        const struct image_info img =
+                image_info(GL_TEXTURE_1D, GL_R32UI, W, H);
+        GLuint prog = generate_program(
+                grid, GL_FRAGMENT_SHADER,
+                concat(image_hunk(img, ""),
+                       hunk("volatile IMAGE_UNIFORM_T img;\n"),
+                       hunk(test->op), NULL));
+        bool ret = prog &&
+                init_fb(grid) &&
+                init_image(img, test->init_value) &&
+                set_uniform_int(prog, "img", 0) &&
+                draw_grid(grid, prog) &&
+                check_image_const(img, test->check_sz, test->check_value) &&
+                (!test->check_unique || check_fb_unique(grid));
+
+        glDeleteProgram(prog);
+        return ret ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+static struct piglit_subtest tests[] = {
+	{
+		"imageAtomicAdd",
+		"add",
+		run_test,
+		(void *)&testdata[0],
+	},
+	{
+		"imageAtomicMin",
+		"min",
+		run_test,
+		(void *)&testdata[1],
+	},
+	{
+                "imageAtomicMax",
+		"max",
+		run_test,
+		(void *)&testdata[2],
+	},
+	{
+                "imageAtomicAnd",
+		"and",
+		run_test,
+		(void *)&testdata[3],
+	},
+	{
+                "imageAtomicOr",
+		"or",
+		run_test,
+		(void *)&testdata[4],
+	},
+	{
+                "imageAtomicXor",
+		"xor",
+		run_test,
+		(void *)&testdata[5],
+	},
+	{
+                "imageAtomicExchange",
+		"exchange",
+		run_test,
+		(void *)&testdata[6],
+	},
+	{
+                "imageAtomicCompSwap",
+		"comp_swap",
+		run_test,
+		(void *)&testdata[7],
+	},
+	{0},
+};
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+piglit_config = &config;
+config.subtests = tests;
+config.supports_gl_core_version = 32;
+
+config.window_width = W;
+config.window_height = H;
+config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+config.khr_no_error_support = PIGLIT_NO_ERRORS;
+
+PIGLIT_GL_TEST_CONFIG_END
+
+void
+piglit_init(int argc, char **argv)
+{
+        piglit_require_extension("GL_ARB_shader_image_load_store");
+
+        enum piglit_result result = PIGLIT_PASS;
+
+	result = piglit_run_selected_subtests(
+		tests,
+		piglit_config->selected_subtests,
+		piglit_config->num_selected_subtests,
+		result);
+
+	piglit_report_result(result);
 }
 
 enum piglit_result
