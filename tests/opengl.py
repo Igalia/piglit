@@ -2335,8 +2335,6 @@ with profile.test_list.group_manager(
       run_concurrent=False)
     g(['arb_enhanced_layouts-transform-feedback-layout-query-api'],
       'arb_enhanced_layouts-transform-feedback-layout-query-api')
-    g(['arb_enhanced_layouts-transform-feedback-layout-query-api', 'spirv'],
-      'arb_enhanced_layouts-transform-feedback-layout-query-api_spirv')
 
 # Group ARB_explicit_attrib_location
 with profile.test_list.group_manager(
