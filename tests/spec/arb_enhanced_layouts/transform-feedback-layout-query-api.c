@@ -162,8 +162,6 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	bool active_res = true;
 	bool max_active = true;
-	bool varyings = true;
-	bool varying_max_length = true;
 	bool buff_bind[2] = { true, true };
 	bool num_active[2] = { false, false };
 	bool varying_idx[2] = { false, false };
@@ -183,31 +181,7 @@ piglit_init(int argc, char **argv)
 	prog = build_and_use_program(VS_TWO_BUFF_NAME, spirv);
 
 	GLint value;
-	GLint values[5];
-
-	glGetProgramiv(prog, GL_TRANSFORM_FEEDBACK_VARYINGS, &value);
-	if (value != 5) {
-		printf("Expected 5 TRANSFORM_FEEDBACK_VARYINGS found %d\n",
-		       value);
-		varyings = false;
-	}
-
-	piglit_report_subtest_result(varyings ? PIGLIT_PASS : PIGLIT_FAIL,
-			"Query TRANSFORM_FEEDBACK_VARYINGS");
-
-	glGetProgramiv(prog, GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH, &value);
-	GLint expected = spirv ? 1 : 7;
-	if (value != expected) {
-		printf("Expected TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH to be "
-		       "%d, found %d\n", expected, value);
-		varying_max_length = false;
-	}
-
-	piglit_report_subtest_result(varying_max_length ?
-				     PIGLIT_PASS : PIGLIT_FAIL,
-				     "Query TRANSFORM_FEEDBACK_VARYING_"
-				     "MAX_LENGTH");
-
+        GLint values[5];
 	glGetProgramInterfaceiv(prog, GL_TRANSFORM_FEEDBACK_BUFFER,
 			GL_ACTIVE_RESOURCES, &value);
 	if (value != 2) {
@@ -279,7 +253,7 @@ piglit_init(int argc, char **argv)
 
 	pass = active_res && max_active && buff_bind[0] && buff_bind[1] &&
 		num_active[0] && num_active[1] && varying_idx[0] &&
-		varying_idx[1] && varyings && varying_max_length;
+		varying_idx[1];
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
