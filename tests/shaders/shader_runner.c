@@ -154,6 +154,7 @@ static GLuint xfb[MAX_XFB_BUFFERS];
 
 /* Store expected xfb values. Used for floats and doubles values */
 static void *expected_buffer = NULL;
+static GLuint queries[2];
 
 #define SHADER_TYPES 6
 static GLuint *subuniform_locations[SHADER_TYPES];
@@ -3564,6 +3565,68 @@ enum program_interface_queries {
 };
 
 /**
+ * Checks if the GL_QUERY_RESULT of a given query object has the
+ * expected value.
+ *
+ * Note that right now it only supports the following two queries:
+ *    * GL_PRIMITIVES_GENERATED
+ *    * GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN
+ *
+ * As right now we are only creating those query objects with xfb
+ * rendering.
+ *
+ * Format of the command:
+ *
+ *  verify query_object GL_PRIMITIVES_GENERATED integer
+ *
+ * or
+ *
+ *  verify query_object GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN integer
+ */
+static void
+verify_query_object_result(const char *line)
+{
+	static const struct string_to_enum all_targets[] = {
+		ENUM_STRING(GL_PRIMITIVES_GENERATED),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN),
+		{ NULL, 0 }
+	};
+
+	unsigned target;
+	unsigned expected;
+	unsigned value = 0;
+	unsigned index = 0;
+
+	REQUIRE(parse_enum_tab(all_targets, line,
+			       &target, &line),
+		"Bad query object target at: %s\n", line);
+
+	REQUIRE(parse_uint(line, &expected, &line),
+		"Bad expected value at: %s\n", line);
+
+        /* Previous require already checks if the target is one of the
+         * supported ones.
+         */
+        index = target == GL_PRIMITIVES_GENERATED ? 0 : 1;
+
+	if (queries[index]) {
+		glGetQueryObjectuiv(queries[index], GL_QUERY_RESULT, &value);
+	} else {
+		fprintf(stderr, "query object for target %s is not initialized. "
+			"Did you forget to call \"xfb draw arrays\"?\n",
+			piglit_get_gl_enum_name(target));
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (expected != value) {
+		fprintf(stderr, "glGetQueryObjectuiv(GL_QUERY_RESULT) for a %s "
+                        "query object: expected %d, got %d\n",
+			piglit_get_gl_enum_name(target), expected, value);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
+/**
  * Query properties of interfaces and resources used by a program
  * using ARB_program_interface_query queries.
  *
@@ -4350,6 +4413,10 @@ teardown_xfb(void)
 	}
 	if (expected_buffer != NULL)
 		free(expected_buffer);
+	for (unsigned i = 0; i < 2 ; ++i) {
+		if (queries[0])
+			glDeleteQueries(1, &queries[i]);
+	}
 }
 
 static enum piglit_result
@@ -4508,6 +4575,10 @@ piglit_xfb_draw_arrays(GLenum mode, int first, size_t count)
 {
 	GLenum primitive_mode = piglit_xfb_primitive_mode(mode);
 
+	glGenQueries(2, queries);
+	glBeginQuery(GL_PRIMITIVES_GENERATED, queries[0]);
+	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, queries[1]);
+
 	glEnable(GL_RASTERIZER_DISCARD);
 
 	/* We don't need to call glBindBufferBase here, it is done on
@@ -4521,6 +4592,9 @@ piglit_xfb_draw_arrays(GLenum mode, int first, size_t count)
 	glDisable(GL_RASTERIZER_DISCARD);
 
 	glFlush();
+
+	glEndQuery(GL_PRIMITIVES_GENERATED);
+	glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
 }
 
 enum piglit_result
@@ -5518,6 +5592,8 @@ piglit_display(void)
                         verify_program_query(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
 			verify_program_interface_query(rest, block_data);
+		} else if (parse_str(line, "verify query_object", &rest)) {
+			verify_query_object_result(rest);
 		} else if (parse_str(line, "vertex attrib ", &rest)) {
 			set_vertex_attrib(rest);
 		} else if (parse_str(line, "newlist ", &rest)) {
