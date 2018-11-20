@@ -1,5 +1,5 @@
 [require]
-SPIRV ONLY
+SPIRV YES
 GLSL >= 4.50
 
 [vertex shader spirv]
@@ -167,4 +167,3 @@ expected buffer float 4 11.0
 probe xfb buffer float 2 5
 
 verify program_query GL_TRANSFORM_FEEDBACK_VARYINGS 8
-verify program_query GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH 1
