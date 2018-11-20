@@ -1,0 +1,160 @@
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 55
+; Schema: 0
+               OpCapability Shader
+               OpCapability TransformFeedback
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %__0 %__1 %gl_VertexID %gl_InstanceID
+               OpExecutionMode %main Xfb
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_enhanced_layouts"
+               OpName %_ ""
+               OpName %__0 ""
+               OpName %__1 ""
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %_ XfbBuffer 0
+               OpDecorate %_ XfbStride 24
+               OpMemberDecorate %block 0 Offset 12
+               OpMemberDecorate %block 1 Offset 16
+               OpMemberDecorate %block 3 Offset 0
+               OpDecorate %block Block
+               OpDecorate %__0 Location 0
+               OpDecorate %__0 XfbBuffer 0
+               OpDecorate %__0 XfbStride 24
+               OpMemberDecorate %block2 0 Offset 0
+               OpMemberDecorate %block2 1 Offset 4
+               OpDecorate %block2 Block
+               OpDecorate %__1 Location 4
+               OpDecorate %__1 XfbBuffer 2
+               OpDecorate %__1 XfbStride 20
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+    %float_0 = OpConstant %float 0
+         %17 = OpConstantComposite %v4float %float_0 %float_0 %float_0 %float_0
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+    %v2float = OpTypeVector %float 2
+    %v3float = OpTypeVector %float 3
+      %block = OpTypeStruct %float %v2float %v3float %v3float
+%_ptr_Output_block = OpTypePointer Output %block
+        %__0 = OpVariable %_ptr_Output_block Output
+    %float_4 = OpConstant %float 4
+%_ptr_Output_float = OpTypePointer Output %float
+      %int_1 = OpConstant %int 1
+    %float_5 = OpConstant %float 5
+    %float_6 = OpConstant %float 6
+         %31 = OpConstantComposite %v2float %float_5 %float_6
+%_ptr_Output_v2float = OpTypePointer Output %v2float
+      %int_3 = OpConstant %int 3
+    %float_1 = OpConstant %float 1
+    %float_2 = OpConstant %float 2
+    %float_3 = OpConstant %float 3
+         %38 = OpConstantComposite %v3float %float_1 %float_2 %float_3
+%_ptr_Output_v3float = OpTypePointer Output %v3float
+     %block2 = OpTypeStruct %float %v4float
+%_ptr_Output_block2 = OpTypePointer Output %block2
+        %__1 = OpVariable %_ptr_Output_block2 Output
+    %float_7 = OpConstant %float 7
+    %float_8 = OpConstant %float 8
+    %float_9 = OpConstant %float 9
+   %float_10 = OpConstant %float 10
+   %float_11 = OpConstant %float 11
+         %50 = OpConstantComposite %v4float %float_8 %float_9 %float_10 %float_11
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %19 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %19 %17
+         %27 = OpAccessChain %_ptr_Output_float %__0 %int_0
+               OpStore %27 %float_4
+         %33 = OpAccessChain %_ptr_Output_v2float %__0 %int_1
+               OpStore %33 %31
+         %40 = OpAccessChain %_ptr_Output_v3float %__0 %int_3
+               OpStore %40 %38
+         %45 = OpAccessChain %_ptr_Output_float %__1 %int_0
+               OpStore %45 %float_7
+         %51 = OpAccessChain %_ptr_Output_v4float %__1 %int_1
+               OpStore %51 %50
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+
+out block {
+  layout(xfb_offset = 12) out float x1_out;
+  layout(xfb_offset = 16) out vec2 x2_out;
+  layout(xfb_buffer = 0) out vec3 not_captured;
+  layout(xfb_offset = 0) out vec3 x3_out;
+};
+layout(xfb_buffer = 2) out;
+layout(xfb_offset = 0) out block2 {
+  float y1_out;
+  vec4 y2_out;
+};
+
+void main() {
+  gl_Position = vec4(0.0);
+  x1_out = 4.0;
+  x2_out = vec2(5.0, 6.0);
+  x3_out = vec3(1.0, 2.0, 3.0);
+  y1_out = 7.0;
+  y2_out = vec4(8.0, 9.0, 10.0, 11.0);
+}
+
+[test]
+xfb buffer object 0 64
+xfb buffer object 2 64
+
+xfb draw arrays GL_POINTS 0 1
+
+verify query_object GL_PRIMITIVES_GENERATED 1
+verify query_object GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN 1
+
+expected buffer 64
+expected buffer float 0 1.0
+expected buffer float 1 2.0
+expected buffer float 2 3.0
+expected buffer float 3 4.0
+expected buffer float 4 5.0
+expected buffer float 5 6.0
+
+probe xfb buffer float 0 5
+
+expected buffer 64 # Not really needed, just to clean.
+expected buffer float 0 7.0
+expected buffer float 1 8.0
+expected buffer float 2 9.0
+expected buffer float 3 10.0
+expected buffer float 4 11.0
+
+probe xfb buffer float 2 5
+
+verify program_query GL_TRANSFORM_FEEDBACK_VARYINGS 5
