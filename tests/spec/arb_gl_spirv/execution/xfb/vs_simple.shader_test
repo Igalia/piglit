@@ -1,0 +1,80 @@
+# Really simple XFB test
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+GL_ARB_gl_spirv
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 20
+; Schema: 0
+               OpCapability Shader
+               OpCapability TransformFeedback
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %color %xfb_out %gl_VertexID %gl_InstanceID
+               OpExecutionMode %main Xfb
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpDecorate %color XfbBuffer 0
+               OpDecorate %color XfbStride 4
+               OpDecorate %xfb_out Location 1
+               OpDecorate %xfb_out XfbBuffer 0
+               OpDecorate %xfb_out XfbStride 4
+               OpDecorate %xfb_out Offset 0
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %12 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+%_ptr_Output_float = OpTypePointer Output %float
+    %xfb_out = OpVariable %_ptr_Output_float Output
+%float_1_23099995 = OpConstant %float 1.23099995
+        %int = OpTypeInt 32 1
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+               OpStore %color %12
+               OpStore %xfb_out %float_1_23099995
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450
+
+layout(location = 0) out vec4 color;
+layout(location = 1, xfb_buffer=0, xfb_offset = 0) out float xfb_out;
+
+void main() {
+  color = vec4(0.0, 1.0, 0.0, 1.0);
+  xfb_out = 1.231;
+}
+
+[test]
+
+xfb buffer object 0 4
+
+xfb draw arrays GL_POINTS 0 1
+
+verify query_object GL_PRIMITIVES_GENERATED 1
+verify query_object GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN 1
+
+expected buffer 4
+expected buffer float 0 1.231
+
+probe xfb buffer float 0 1
+
+verify program_query GL_TRANSFORM_FEEDBACK_VARYINGS 1
