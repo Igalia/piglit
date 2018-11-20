@@ -1,0 +1,117 @@
+# xfb testing with an array of structs
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 38
+; Schema: 0
+               OpCapability Shader
+               OpCapability TransformFeedback
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %color %var %gl_VertexID %gl_InstanceID
+               OpExecutionMode %main Xfb
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpDecorate %color XfbBuffer 0
+               OpDecorate %color XfbStride 28
+               OpDecorate %var Location 0
+               OpDecorate %var XfbBuffer 0
+               OpDecorate %var XfbStride 28
+               OpDecorate %var Offset 0
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %12 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_float_uint_2 = OpTypeArray %float %uint_2
+          %S = OpTypeStruct %float %v4float %_arr_float_uint_2
+%_ptr_Output_S = OpTypePointer Output %S
+        %var = OpVariable %_ptr_Output_S Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Output_float = OpTypePointer Output %float
+      %int_1 = OpConstant %int 1
+    %float_2 = OpConstant %float 2
+    %float_3 = OpConstant %float 3
+    %float_4 = OpConstant %float 4
+    %float_5 = OpConstant %float 5
+         %28 = OpConstantComposite %v4float %float_2 %float_3 %float_4 %float_5
+      %int_2 = OpConstant %int 2
+    %float_6 = OpConstant %float 6
+    %float_7 = OpConstant %float 7
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+               OpStore %color %12
+         %22 = OpAccessChain %_ptr_Output_float %var %int_0
+               OpStore %22 %float_1
+         %29 = OpAccessChain %_ptr_Output_v4float %var %int_1
+               OpStore %29 %28
+         %32 = OpAccessChain %_ptr_Output_float %var %int_2 %int_0
+               OpStore %32 %float_6
+         %34 = OpAccessChain %_ptr_Output_float %var %int_2 %int_1
+               OpStore %34 %float_7
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450
+
+struct S {
+   float f;
+   vec4 v;
+   float f2[2];
+};
+
+layout(location=0) out vec4 color;
+
+//FIXME: setting a explicit location there makes the test to fail, as
+//       if the output buffer alignment requirements would change.
+
+layout(xfb_offset=0, xfb_buffer=0) out S var;
+
+void main() {
+  color = vec4(0.0, 1.0, 0.0, 1.0);
+
+  var.f = 1.0;
+  var.v = vec4(2.0, 3.0, 4.0, 5.0);
+  var.f2[0] = 6.0;
+  var.f2[1] = 7.0;
+}
+
+[test]
+xfb buffer object 0 32
+
+xfb draw arrays GL_POINTS 0 1
+
+verify query_object GL_PRIMITIVES_GENERATED 1
+verify query_object GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN 1
+
+expected buffer 32
+
+expected buffer float 0  1.0
+expected buffer float 1  2.0
+expected buffer float 2  3.0
+expected buffer float 3  4.0
+expected buffer float 4  5.0
+expected buffer float 5  6.0
+
+probe xfb buffer float 0 6
+
+verify program_query GL_TRANSFORM_FEEDBACK_VARYINGS 3
