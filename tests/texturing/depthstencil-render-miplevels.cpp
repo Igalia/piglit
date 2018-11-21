@@ -360,8 +360,8 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_depth_texture");
 	piglit_require_extension("GL_ARB_texture_non_power_of_two");
 
-	depth_miplevel_data = (float **)calloc(max_miplevel, sizeof(float *));
-	stencil_miplevel_data = (uint8_t **)calloc(max_miplevel,
+	depth_miplevel_data = (float **)calloc(max_miplevel + 1, sizeof(float *));
+	stencil_miplevel_data = (uint8_t **)calloc(max_miplevel + 1,
 						   sizeof(uint8_t *));
 
 	/* argv[2]: buffer combination */
