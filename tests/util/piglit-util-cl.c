@@ -1322,13 +1322,14 @@ piglit_cl_enqueue_ND_range_kernel(cl_command_queue command_queue,
                                   cl_kernel kernel, cl_uint work_dim,
                                   const size_t* global_offset,
                                   const size_t* global_work_size,
-                                  const size_t* local_work_size)
+                                  const size_t* local_work_size,
+				  cl_event *ev)
 {
 	cl_int errNo;
 
 	errNo = clEnqueueNDRangeKernel(command_queue, kernel, work_dim,
 	                               global_offset, global_work_size,
-	                               local_work_size, 0, NULL, NULL);
+	                               local_work_size, 0, NULL, ev);
 	if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
 		fprintf(stderr,
 		        "Could not enqueue ND range kernel: %s\n",
@@ -1347,13 +1348,15 @@ piglit_cl_execute_ND_range_kernel(cl_command_queue command_queue,
                                   const size_t* local_work_size)
 {
 	int errNo;
+	cl_event ev;
 
 	if(!piglit_cl_enqueue_ND_range_kernel(command_queue,
 	                                     kernel,
 	                                     work_dim,
 	                                     global_offset,
 	                                     global_work_size,
-	                                     local_work_size)) {
+	                                     local_work_size,
+					     &ev)) {
 		return false;
 	}
 

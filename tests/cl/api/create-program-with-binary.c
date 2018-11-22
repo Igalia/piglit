@@ -185,7 +185,8 @@ piglit_cl_test(const int argc,
 		size_t local_work_size = 1;
 		cl_command_queue queue = ctx->command_queues[i];
 		if (!piglit_cl_enqueue_ND_range_kernel(queue, kernel, 1, NULL,
-					&global_work_size, &local_work_size)) {
+					&global_work_size, &local_work_size,
+					NULL)) {
 			fprintf(stderr, "Failed to execute binary kernel.");
 			piglit_merge_result(&result, PIGLIT_FAIL);
 		}

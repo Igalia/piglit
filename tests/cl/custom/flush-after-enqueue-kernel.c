@@ -92,7 +92,8 @@ piglit_cl_test(const int argc,
 	}
 
 	if (!piglit_cl_enqueue_ND_range_kernel(context->command_queues[0],
-					kernel, 3, NULL, global_size, local_size)) {
+					kernel, 3, NULL, global_size, local_size,
+					NULL)) {
 		return PIGLIT_FAIL;
 	}
 

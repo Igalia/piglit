@@ -734,6 +734,7 @@ piglit_cl_set_kernel_buffer_arg(cl_kernel kernel,
  * @param global_offset     Global offset.
  * @param global_work_size  Global work sizes.
  * @param local_work_size   Local work sizes.
+ * @param ev                Location to store execution event.
  * @return                  \c true on succes, \c false otherwise.
  */
 bool
@@ -742,7 +743,8 @@ piglit_cl_enqueue_ND_range_kernel(cl_command_queue command_queue,
                                   cl_uint work_dim,
                                   const size_t* global_offset,
                                   const size_t* global_work_size,
-                                  const size_t* local_work_size);
+                                  const size_t* local_work_size,
+				  cl_event *ev);
 
 /**
  * \brief Enqueue ND-range kernel and wait it to complete.

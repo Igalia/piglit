@@ -75,7 +75,8 @@ piglit_cl_test(const int argc,
 	}
 
 	if (!piglit_cl_enqueue_ND_range_kernel(queue, kernel, 1, NULL,
-	                                       &global_size, &local_size)) {
+	                                       &global_size, &local_size,
+					       NULL)) {
 		return PIGLIT_FAIL;
 	}
 
@@ -85,7 +86,8 @@ piglit_cl_test(const int argc,
 	}
 
 	if (!piglit_cl_enqueue_ND_range_kernel(queue, kernel, 1, NULL,
-	                                       &global_size, &local_size)) {
+	                                       &global_size, &local_size,
+					       NULL)) {
 		return PIGLIT_FAIL;
 	}
 
@@ -99,7 +101,8 @@ piglit_cl_test(const int argc,
 	}
 
 	if (!piglit_cl_enqueue_ND_range_kernel(queue, kernel, 1, NULL,
-	                                       &global_size, &local_size)) {
+	                                       &global_size, &local_size,
+					       NULL)) {
 		return PIGLIT_FAIL;
 	}
 
