@@ -146,6 +146,18 @@ draw_row(const float* color, int length,
 	}
 }
 
+static bool
+check_row(const float *color, int length, int x, int y, int spacex)
+{
+	bool pass = true;
+	for (int i = 0; i < length; i++) {
+		int probe_x = x + 8 + spacex + 4;
+		int probe_y = y + 4;
+		pass &= piglit_probe_pixel_rgb(probe_x, probe_y, color);
+	}
+	return pass;
+}
+
 static GLuint fragShader, program;
 
 enum piglit_result
@@ -203,8 +215,15 @@ piglit_display(void)
 
 	piglit_present_results();
 
-	pass = piglit_probe_rects_equal(0, 0, 0, piglit_height/2,
-		piglit_width, piglit_height/2, GL_RGB);
+	pass &= check_row(     red, length, x, y + 5*spacing, spacing);
+	pass &= check_row(  salmon, length, x, y + 4*spacing, spacing);
+	pass &= check_row(    pink, length, x, y + 3*spacing, spacing);
+	pass &= check_row(  orange, length, x, y + 2*spacing, spacing);
+	pass &= check_row(ltorange, length, x, y + 1*spacing, spacing);
+	pass &= check_row(  yellow, length, x, y + 0*spacing, spacing);
+
+	pass &= piglit_probe_rects_equal(0, 0, 0, piglit_height/2,
+					 piglit_width, piglit_height/2, GL_RGB);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
