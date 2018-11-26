@@ -1,0 +1,148 @@
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 51
+; Schema: 0
+               OpCapability Shader
+               OpCapability TransformFeedback
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %color %x %gl_VertexID %gl_InstanceID
+               OpExecutionMode %main Xfb
+               OpSource GLSL 450
+               OpDecorate %color Location 0
+               OpDecorate %color XfbBuffer 0
+               OpDecorate %color XfbStride 32
+               OpMemberDecorate %block 1 Offset 16
+               OpDecorate %block Block
+               OpDecorate %x Location 0
+               OpDecorate %x XfbBuffer 0
+               OpDecorate %x XfbStride 32
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+         %11 = OpConstantComposite %v4float %float_0 %float_0 %float_0 %float_0
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_float_uint_2 = OpTypeArray %float %uint_2
+      %block = OpTypeStruct %float %v4float %_arr_float_uint_2
+%_arr_block_uint_2 = OpTypeArray %block %uint_2
+%_ptr_Output__arr_block_uint_2 = OpTypePointer Output %_arr_block_uint_2
+          %x = OpVariable %_ptr_Output__arr_block_uint_2 Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+    %float_1 = OpConstant %float 1
+%_ptr_Output_float = OpTypePointer Output %float
+      %int_1 = OpConstant %int 1
+    %float_2 = OpConstant %float 2
+    %float_3 = OpConstant %float 3
+    %float_4 = OpConstant %float 4
+    %float_5 = OpConstant %float 5
+         %29 = OpConstantComposite %v4float %float_2 %float_3 %float_4 %float_5
+      %int_2 = OpConstant %int 2
+    %float_6 = OpConstant %float 6
+    %float_7 = OpConstant %float 7
+    %float_8 = OpConstant %float 8
+    %float_9 = OpConstant %float 9
+   %float_10 = OpConstant %float 10
+   %float_11 = OpConstant %float 11
+   %float_12 = OpConstant %float 12
+         %42 = OpConstantComposite %v4float %float_9 %float_10 %float_11 %float_12
+   %float_13 = OpConstant %float 13
+   %float_14 = OpConstant %float 14
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+               OpStore %color %11
+         %23 = OpAccessChain %_ptr_Output_float %x %int_0 %int_0
+               OpStore %23 %float_1
+         %30 = OpAccessChain %_ptr_Output_v4float %x %int_0 %int_1
+               OpStore %30 %29
+         %33 = OpAccessChain %_ptr_Output_float %x %int_0 %int_2 %int_0
+               OpStore %33 %float_6
+         %35 = OpAccessChain %_ptr_Output_float %x %int_0 %int_2 %int_1
+               OpStore %35 %float_7
+         %37 = OpAccessChain %_ptr_Output_float %x %int_1 %int_0
+               OpStore %37 %float_8
+         %43 = OpAccessChain %_ptr_Output_v4float %x %int_1 %int_1
+               OpStore %43 %42
+         %45 = OpAccessChain %_ptr_Output_float %x %int_1 %int_2 %int_0
+               OpStore %45 %float_13
+         %47 = OpAccessChain %_ptr_Output_float %x %int_1 %int_2 %int_1
+               OpStore %47 %float_14
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450
+
+out block {
+  float f;
+  layout(xfb_buffer=0, xfb_offset = 16) vec4 v; // we only capture this, but twice
+  float f2[2];
+} x[2];
+
+layout(location=0) out vec4 color;
+
+void main() {
+  color = vec4(0.0);
+
+  x[0].f = 1.0;
+  x[0].v = vec4(2.0, 3.0, 4.0, 5.0);
+  x[0].f2[0] = 6.0;
+  x[0].f2[1] = 7.0;
+
+  x[1].f = 8.0;
+  x[1].v = vec4(9.0, 10.0, 11.0, 12.0);
+  x[1].f2[0] = 13.0;
+  x[1].f2[1] = 14.0;
+}
+
+[test]
+xfb buffer object 0 64
+xfb buffer object 1 64
+
+xfb draw arrays GL_POINTS 0 1
+
+verify query_object GL_PRIMITIVES_GENERATED 1
+verify query_object GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN 1
+
+expected buffer 64
+#Only the vector is captured, so the buffer is not touched for other components
+expected buffer float 0 0
+expected buffer float 1 0
+expected buffer float 2 0
+expected buffer float 3 0
+expected buffer float 4 2.0
+expected buffer float 5 3.0
+expected buffer float 6 4.0
+expected buffer float 7 5.0
+probe xfb buffer float 0 8
+
+expected buffer 64 # Not really needed, just to clean.
+#Only the vector is captured, so the buffer is not touched for other components
+expected buffer float 0 0
+expected buffer float 1 0
+expected buffer float 2 0
+expected buffer float 3 0
+expected buffer float 4 9.0
+expected buffer float 5 10.0
+expected buffer float 6 11.0
+expected buffer float 7 12.0
+probe xfb buffer float 1 8
+
+verify program_query GL_TRANSFORM_FEEDBACK_VARYINGS 2
