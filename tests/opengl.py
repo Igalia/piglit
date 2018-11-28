@@ -2657,6 +2657,11 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_texture_compression_bptc')) as g:
+    g(['bptc-api_gles2'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ext_vertex_array_bgra')) as g:
     g(['bgra-sec-color-pointer'], run_concurrent=False)
     g(['bgra-vert-attrib-pointer'], run_concurrent=False)
@@ -3200,6 +3205,7 @@ with profile.test_list.group_manager(
     g(['fbo-generatemipmap-formats', 'GL_EXT_texture_compression_rgtc-signed'],
       'fbo-generatemipmap-formats-signed')
     add_texwrap_format_tests(g, 'GL_EXT_texture_compression_rgtc')
+    g(['rgtc-api_gles2'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
