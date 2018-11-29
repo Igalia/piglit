@@ -4418,6 +4418,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
          PiglitGLTest,
+         grouptools.join('spec', 'khr_parallel_shader_compile')) as g:
+    g(['khr_parallel_shader_compile-basic'], 'basic')
+    g(['khr_parallel_shader_compile-basic_gles2'], 'basic_gles2')
+
+with profile.test_list.group_manager(
+         PiglitGLTest,
          grouptools.join('spec', 'khr_texture_compression_astc')) as g:
     g(['arb_texture_compression-invalid-formats', 'astc'], 'invalid formats')
     g(['khr_compressed_astc-array_gl'], 'array-gl')
