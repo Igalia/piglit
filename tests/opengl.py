@@ -3013,8 +3013,7 @@ with profile.test_list.group_manager(
     g(['ext_image_dma_buf_import-invalid_attributes'], run_concurrent=False)
     g(['ext_image_dma_buf_import-missing_attributes'], run_concurrent=False)
     g(['ext_image_dma_buf_import-ownership_transfer'], run_concurrent=False)
-    g(['ext_image_dma_buf_import-intel_unsupported_format'],
-      run_concurrent=False)
+    g(['ext_image_dma_buf_import-unsupported_format'], run_concurrent=False)
     g(['ext_image_dma_buf_import-intel_external_sampler_only'],
       run_concurrent=False)
     g(['ext_image_dma_buf_import-refcount'])

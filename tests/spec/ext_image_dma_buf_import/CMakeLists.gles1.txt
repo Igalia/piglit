@@ -21,7 +21,7 @@ if(PIGLIT_BUILD_DMA_BUF_TESTS)
 	piglit_add_executable(ext_image_dma_buf_import-invalid_attributes invalid_attributes.c image_common.c)
 	piglit_add_executable(ext_image_dma_buf_import-missing_attributes missing_attributes.c image_common.c)
 	piglit_add_executable(ext_image_dma_buf_import-ownership_transfer ownership_transfer.c image_common.c)
-	piglit_add_executable(ext_image_dma_buf_import-intel_unsupported_format intel_unsupported_format.c image_common.c)
+	piglit_add_executable(ext_image_dma_buf_import-unsupported_format unsupported_format.c image_common.c)
 	piglit_add_executable(ext_image_dma_buf_import-intel_external_sampler_only intel_external_sampler_only.c image_common.c)
 endif()
 
