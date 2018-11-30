@@ -51,7 +51,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define DRM_FORMAT_INVALID fourcc_code('F', 'O', 'O', '0')
+#define DRM_FORMAT_NONEXISTENT fourcc_code('F', 'O', 'O', '0')
 
 static bool
 test_excess_attributes(unsigned w, unsigned h, int fd, unsigned stride,
@@ -155,7 +155,7 @@ test_invalid_format(unsigned w, unsigned h, int fd, unsigned stride,
 	EGLint attr[] = {
 		EGL_WIDTH, w,
 		EGL_HEIGHT, h,
-		EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_INVALID,
+		EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_NONEXISTENT,
 		EGL_DMA_BUF_PLANE0_FD_EXT, fd,
 		EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
 		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,
