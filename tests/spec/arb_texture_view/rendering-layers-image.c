@@ -142,26 +142,19 @@ test_render_layers(const struct test_info *test)
 	return pass;
 }
 
-#define X(f, desc) \
-	do { \
-		const bool subtest_pass = (f); \
-		piglit_report_subtest_result(subtest_pass \
-						 ? PIGLIT_PASS : PIGLIT_FAIL, \
-						 (desc)); \
-		pass = pass && subtest_pass; \
-	} while (0)
-
 enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
 	for (int test_idx = 0; test_idx < ARRAY_SIZE(tests); test_idx++) {
 		const struct test_info *test = &tests[test_idx];
-		char test_name[128];
-		snprintf(test_name, sizeof(test_name), "layers rendering of %s", test->uniform_type);
-		X(test_render_layers(test), test_name);
+
+		const bool subtest_pass = test_render_layers(test);
+
+		piglit_report_subtest_result(subtest_pass ? PIGLIT_PASS : PIGLIT_FAIL,
+					     "layers rendering of %s", test->uniform_type);
+		pass = pass && subtest_pass;
 	}
-#undef X
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
