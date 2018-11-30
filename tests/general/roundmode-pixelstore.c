@@ -79,13 +79,17 @@ test(float val, int expect)
 void
 piglit_init(int argc, char **argv)
 {
-	int ret;
 	bool pass = true;
-	ret = fesetround(FE_UPWARD);
-	if (ret != 0) {
-		printf("Couldn't set rounding mode\n");
+
+#ifdef FE_UPWARD
+	if (fesetround(FE_UPWARD) != 0) {
+		printf("Setting rounding mode failed\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+#else
+	printf("Cannot set rounding mode\n");
+	piglit_report_result(PIGLIT_SKIP);
+#endif
 
 	pass = test(2.2, 2) && pass;
 	pass = test(2.8, 3) && pass;
