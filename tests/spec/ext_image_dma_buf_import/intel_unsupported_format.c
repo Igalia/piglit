@@ -47,7 +47,7 @@ create_image(unsigned w, unsigned h, int fd, unsigned stride, unsigned offset)
 	EGLint attr[] = {
 		EGL_WIDTH, w,
 		EGL_HEIGHT, h,
-		EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_RGB332,
+		EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_INVALID,
 		EGL_DMA_BUF_PLANE0_FD_EXT, fd,
 		EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
 		EGL_DMA_BUF_PLANE0_PITCH_EXT, stride,

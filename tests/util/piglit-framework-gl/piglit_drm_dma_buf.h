@@ -40,6 +40,11 @@
 #define DRM_FORMAT_GR88 fourcc_code('G', 'R', '8', '8')
 #endif
 
+/* added in libdrm 2.4.95 */
+#ifndef DRM_FORMAT_INVALID
+#define DRM_FORMAT_INVALID 0
+#endif
+
 struct piglit_dma_buf {
 	unsigned w;
 	unsigned h;
