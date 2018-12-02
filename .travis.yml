@@ -1,6 +1,10 @@
-sudo: false
-os: linux
 language: python
+
+os: linux
+
+# Use Ubuntu Xenial (16.04 LTS) environment.
+dist: xenial
+
 cache:
   - ccache
   - pip
@@ -23,7 +27,6 @@ matrix:
       env: TOX_ENV="py36-{generator,noaccel,accel-nix,streams}"
     - python: 3.7
       env: TOX_ENV="py37-{generator,noaccel,accel-nix,streams}"
-      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
     - env: BUILD=cmake
 
 install:
