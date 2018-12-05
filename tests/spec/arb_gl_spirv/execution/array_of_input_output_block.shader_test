@@ -1,0 +1,171 @@
+# This tests defines an array of interface block output on the vertex
+# shader, and consume it as an array of blocks input on the fragment
+# shader.
+
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 44
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %_ %piglit_vertex %x %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpName %_ ""
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %block Block
+               OpDecorate %x Location 0
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %block = OpTypeStruct %v4float %v4float
+     %uint_2 = OpConstant %uint 2
+%_arr_block_uint_2 = OpTypeArray %block %uint_2
+%_ptr_Output__arr_block_uint_2 = OpTypePointer Output %_arr_block_uint_2
+          %x = OpVariable %_ptr_Output__arr_block_uint_2 Output
+    %float_0 = OpConstant %float 0
+%float_0_100000001 = OpConstant %float 0.100000001
+         %28 = OpConstantComposite %v4float %float_0 %float_0_100000001 %float_0 %float_0_100000001
+      %int_1 = OpConstant %int 1
+%float_0_200000003 = OpConstant %float 0.200000003
+         %32 = OpConstantComposite %v4float %float_0 %float_0_200000003 %float_0 %float_0_200000003
+%float_0_300000012 = OpConstant %float 0.300000012
+         %35 = OpConstantComposite %v4float %float_0 %float_0_300000012 %float_0 %float_0_300000012
+%float_0_400000006 = OpConstant %float 0.400000006
+  %float_0_5 = OpConstant %float 0.5
+         %39 = OpConstantComposite %v4float %float_0 %float_0_400000006 %float_0 %float_0_5
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %18 = OpLoad %v4float %piglit_vertex
+         %20 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %20 %18
+         %29 = OpAccessChain %_ptr_Output_v4float %x %int_0 %int_0
+               OpStore %29 %28
+         %33 = OpAccessChain %_ptr_Output_v4float %x %int_0 %int_1
+               OpStore %33 %32
+         %36 = OpAccessChain %_ptr_Output_v4float %x %int_1 %int_0
+               OpStore %36 %35
+         %40 = OpAccessChain %_ptr_Output_v4float %x %int_1 %int_1
+               OpStore %40 %39
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 450
+
+out block {
+    vec4 v;
+    vec4 v2;
+} x[2];
+
+layout(location=0) in vec4 piglit_vertex;
+
+void main() {
+  gl_Position = piglit_vertex;
+
+  x[0].v  = vec4(0.0, 0.1, 0.0, 0.1);
+  x[0].v2 = vec4(0.0, 0.2, 0.0, 0.2);
+
+  x[1].v  = vec4(0.0, 0.3, 0.0, 0.3);
+  x[1].v2 = vec4(0.0, 0.4, 0.0, 0.5);
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 31
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %outcolor %x
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpDecorate %outcolor Location 0
+               OpDecorate %block Block
+               OpDecorate %x Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+   %outcolor = OpVariable %_ptr_Output_v4float Output
+      %block = OpTypeStruct %v4float %v4float
+       %uint = OpTypeInt 32 0
+     %uint_2 = OpConstant %uint 2
+%_arr_block_uint_2 = OpTypeArray %block %uint_2
+%_ptr_Input__arr_block_uint_2 = OpTypePointer Input %_arr_block_uint_2
+          %x = OpVariable %_ptr_Input__arr_block_uint_2 Input
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %19 = OpAccessChain %_ptr_Input_v4float %x %int_0 %int_0
+         %20 = OpLoad %v4float %19
+         %22 = OpAccessChain %_ptr_Input_v4float %x %int_0 %int_1
+         %23 = OpLoad %v4float %22
+         %24 = OpFAdd %v4float %20 %23
+         %25 = OpAccessChain %_ptr_Input_v4float %x %int_1 %int_0
+         %26 = OpLoad %v4float %25
+         %27 = OpFAdd %v4float %24 %26
+         %28 = OpAccessChain %_ptr_Input_v4float %x %int_1 %int_1
+         %29 = OpLoad %v4float %28
+         %30 = OpFAdd %v4float %27 %29
+               OpStore %outcolor %30
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 450
+
+layout(location=0) out vec4 outcolor;
+
+in block {
+    vec4 v;
+    vec4 v2;
+} x[2];
+
+void main() {
+   outcolor = x[0].v + x[0].v2 + x[1].v + x[1].v2;
+}
+
+
+[test]
+clear color 1.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
