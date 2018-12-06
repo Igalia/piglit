@@ -10,7 +10,7 @@ GLSL >= 4.50
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 4
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 24
 ; Schema: 0
                OpCapability Shader
@@ -18,16 +18,7 @@ GLSL >= 4.50
                OpMemoryModel Logical GLSL450
                OpEntryPoint Vertex %main "main" %_ %piglit_vertex %gl_VertexID %gl_InstanceID
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %gl_PerVertex "gl_PerVertex"
-               OpMemberName %gl_PerVertex 0 "gl_Position"
-               OpMemberName %gl_PerVertex 1 "gl_PointSize"
-               OpMemberName %gl_PerVertex 2 "gl_ClipDistance"
-               OpMemberName %gl_PerVertex 3 "gl_CullDistance"
                OpName %_ ""
-               OpName %piglit_vertex "piglit_vertex"
-               OpName %gl_VertexID "gl_VertexID"
-               OpName %gl_InstanceID "gl_InstanceID"
                OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
                OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
                OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
@@ -75,7 +66,7 @@ void main() {
 ; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 4
+; Generator: Khronos Glslang Reference Front End; 7
 ; Bound: 13
 ; Schema: 0
                OpCapability Shader
@@ -84,8 +75,6 @@ void main() {
                OpEntryPoint Fragment %main "main" %outcolor
                OpExecutionMode %main OriginLowerLeft
                OpSource GLSL 450
-               OpName %main "main"
-               OpName %outcolor "outcolor"
                OpDecorate %outcolor Location 0
        %void = OpTypeVoid
           %3 = OpTypeFunction %void
@@ -93,9 +82,9 @@ void main() {
     %v4float = OpTypeVector %float 4
 %_ptr_Output_v4float = OpTypePointer Output %v4float
    %outcolor = OpVariable %_ptr_Output_v4float Output
-    %float_1 = OpConstant %float 1
     %float_0 = OpConstant %float 0
-         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_0
+    %float_1 = OpConstant %float 1
+         %12 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
        %main = OpFunction %void None %3
           %5 = OpLabel
                OpStore %outcolor %12
@@ -108,7 +97,7 @@ void main() {
 layout(location = 0) out vec4 outcolor;
 
 void main() {
-    outcolor = vec4(1.0, 0.0, 0.0, 0.0);
+    outcolor = vec4(0.0, 1.0, 0.0, 1.0);
 }
 
 [test]
@@ -116,4 +105,4 @@ clear color 1.0 0.0 0.0 0.0
 clear
 
 draw rect -1 -1 2 2
-probe all rgba 1.0 0.0 0.0 0.0
+probe all rgba 0.0 1.0 0.0 1.0
