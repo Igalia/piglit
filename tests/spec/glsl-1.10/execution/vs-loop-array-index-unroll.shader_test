@@ -1,0 +1,58 @@
+# This tests unrolling of a loop with a single exit point where the exact trip
+# count is unknown, but the max iteration count can be guessed using the size
+# of an array indexed via the induction variable.
+#
+# Here we test all possible (defined) outcomes for the loop.
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform int loop_count;
+
+void main()
+{
+  vec4 colour_array[4];
+
+  colour_array[0] = vec4(0.0, 0.25, 0.0, 1.0);
+  colour_array[1] = vec4(0.0, 0.5, 0.0, 1.0);
+  colour_array[2] = vec4(0.0, 0.75, 0.0, 1.0);
+  colour_array[3] = vec4(0.0, 1.0, 0.0, 1.0);
+
+  gl_Position = gl_Vertex;
+
+  vec4 colour = vec4(1.0, 1.0, 1.0, 1.0);
+  for (int i = 0; i < loop_count; i++) {
+    colour = colour_array[i];
+  }
+
+  gl_FrontColor = colour;
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+
+uniform int loop_count 0
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0
+
+uniform int loop_count 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.25 0.0 1.0
+
+uniform int loop_count 2
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.5 0.0 1.0
+
+uniform int loop_count 3
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.75 0.0 1.0
+
+uniform int loop_count 4
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
