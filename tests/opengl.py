@@ -704,6 +704,7 @@ with profile.test_list.group_manager(
     g(['getteximage-targets', '1D'])
     g(['getteximage-targets', '2D'])
     g(['teximage-scale-bias'])
+    g(['tex-upside-down-miptree'])
     add_msaa_visual_plain_tests(g, ['draw-pixels'])
     add_msaa_visual_plain_tests(g, ['read-front'], run_concurrent=False)
     add_msaa_visual_plain_tests(g, ['read-front', 'clear-front-first'],
