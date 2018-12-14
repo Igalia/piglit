@@ -436,7 +436,7 @@ def resume(input_):
     options.OPTIONS.process_isolation = results.options['process_isolation']
     options.OPTIONS.jobs = args.jobs
     options.OPTIONS.no_retry = args.no_retry
-    options.OPTIONS.force_glsl = results.options['glsl']
+    options.OPTIONS.force_glsl = results.options['force_glsl']
 
     core.get_config(args.config_file)
 
