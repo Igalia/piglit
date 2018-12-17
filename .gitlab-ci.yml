@@ -5,8 +5,7 @@ pages:
   - pip install sphinx
   - pip install Flask-Sphinx-Themes
   - cd docs
-  - apk --no-cache add make
-  - make html
+  - ./build-html.sh
   - mv _build/html/ ../public/
   artifacts:
     paths:
