@@ -1,14 +1,17 @@
-image: alpine
-
 pages:
+  image: alpine
   script:
   - apk --no-cache add py2-pip python-dev
   - pip install sphinx
+  - cd docs
   - apk --no-cache add make
   - make html
-  - mv _build/html/ public/
+  - mv _build/html/ ../public/
   artifacts:
     paths:
     - public
   only:
-  - master
+    refs:
+      - master
+    changes:
+      - docs/**
