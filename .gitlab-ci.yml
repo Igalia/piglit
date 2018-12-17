@@ -3,6 +3,7 @@ pages:
   script:
   - apk --no-cache add py2-pip python-dev
   - pip install sphinx
+  - pip install Flask-Sphinx-Themes
   - cd docs
   - apk --no-cache add make
   - make html
