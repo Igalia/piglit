@@ -1,0 +1,32 @@
+[require]
+GLSL >= 1.30
+GL_ARB_shader_bit_encoding
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_shader_bit_encoding: enable
+
+out vec4 piglit_fragcolor;
+
+uniform int x = 37;
+uniform int y = 46;
+
+void main()
+{
+    bool a = x == 37;    // Must be true.
+    bool b = y == 46;    // Must be true.
+
+    /* This reproduces bug #109075.  In that bug, '-int(XYZ) & anything' was
+     * optimized as though it were '-int(XYZ) & floatBitsToInt(1.0)'.
+     */
+    piglit_fragcolor = vec4(intBitsToFloat(-int(a) & floatBitsToInt(0.5)),
+			    intBitsToFloat(-int(b) & floatBitsToInt(0.5)),
+			    0.0,
+			    1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.5 0.0 1.0
+
