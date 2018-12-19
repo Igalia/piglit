@@ -139,7 +139,7 @@ piglit_init(int argc, char **argv)
 		max_active = false;
 	}
 
-	piglit_report_subtest_result(active_res ? PIGLIT_PASS : PIGLIT_FAIL,
+	piglit_report_subtest_result(max_active ? PIGLIT_PASS : PIGLIT_FAIL,
 			"Query MAX_NUM_ACTIVE_VARIABLES");
 
 	GLenum props[] = {GL_BUFFER_BINDING, GL_NUM_ACTIVE_VARIABLES,
