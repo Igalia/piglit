@@ -3016,8 +3016,7 @@ confirm_program_resource(GLenum interface_type, GLuint resource_index,
 	if (!force_no_names) {
 		GLsizei resource_name_len;
 
-		glGetProgramResourceName(prog, interface_type,
-					 resource_index, 512, &resource_name_len, resource_name_buf);
+		glGetProgramResourceName(prog, interface_type, resource_index, 512, &resource_name_len, resource_name_buf);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
 			fprintf(stderr, "glGetProgramResourceName error\n");
@@ -3027,12 +3026,21 @@ confirm_program_resource(GLenum interface_type, GLuint resource_index,
 		if (strcmp(resource_name, resource_name_buf) != 0)
 			return false;
 
-		if (prop == GL_NAME_LENGTH && resource_name_len != value_expected) {
+		 /* glGetProgramResourceName does not consider the NULL
+		  * terminator when returning the name length, however,
+		  * glGetProgramResourceiv does. We take that into account
+		  * when doing the comparison.
+		  */
+		if (prop == GL_NAME_LENGTH &&
+		    resource_name_len != (value_expected - 1)) {
 			fprintf(stderr,
-				"glGetProgramResourceName(%s, %s): "
-				"expected %d (0x%04x), got %d (0x%04x)\n",
+				"glGetProgramResourceName(%s, %s, %s): "
+				"expected length: %d (0x%04x), "
+				"got length: %d (0x%04x)\n",
+				piglit_get_gl_enum_name(interface_type),
 				resource_name, piglit_get_gl_enum_name(prop),
-				value_expected, value_expected, resource_name_len, resource_name_len);
+				value_expected - 1, value_expected - 1,
+				resource_name_len, resource_name_len);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 	} else {
