@@ -101,6 +101,15 @@ struct block_info {
 	int row_major; /* int as we don't have a parse_bool */
 };
 
+struct resource_info {
+	GLenum interface;
+	int location;
+	int location_component;
+	int binding;
+	int offset;
+	bool is_atomic;
+};
+
 #define ENUM_STRING(e) { #e, e }
 
 extern float piglit_tolerance[4];
@@ -3076,6 +3085,191 @@ confirm_program_resource(GLenum interface_type, GLuint resource_index,
 }
 
 static void
+query_check_error_int(const char *query_str, int expected, int got)
+{
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		fprintf(stderr, "%s error\n", query_str);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (got != expected) {
+		fprintf(stderr, "%s: expected = %d, got = %d\n",
+			query_str, expected, got);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
+static int
+resource_info_get_block_or_atomic_buffer_index(struct resource_info *resource)
+{
+	/* Gets the block index from the buffer binding */
+	assert(resource->interface == GL_UNIFORM ||
+	       resource->interface == GL_BUFFER_VARIABLE);
+
+	GLenum block_interface_type;
+	if (resource->interface == GL_BUFFER_VARIABLE)
+		block_interface_type = GL_SHADER_STORAGE_BLOCK;
+	else if (resource->is_atomic)
+		block_interface_type = GL_ATOMIC_COUNTER_BUFFER;
+	else
+		block_interface_type = GL_UNIFORM_BLOCK;
+
+	int num_resources;
+	glGetProgramInterfaceiv(prog, block_interface_type, GL_ACTIVE_RESOURCES,
+				&num_resources);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	GLint index;
+	GLint got;
+	GLenum prop = GL_BUFFER_BINDING;
+	for (index = 0; index < num_resources; index++) {
+		glGetProgramResourceiv(prog, block_interface_type, index, 1,
+				       &prop, 1, NULL, &got);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (got == resource->binding)
+			return index;
+	}
+
+	return -1;
+}
+
+static int
+resource_info_get_index(struct resource_info *resource)
+{
+	int index;
+	int num_resources;
+
+	glGetProgramInterfaceiv(prog, resource->interface, GL_ACTIVE_RESOURCES,
+				&num_resources);
+
+	for (index = 0; index < num_resources; index++) {
+		switch (resource->interface) {
+		case GL_PROGRAM_INPUT:
+		case GL_PROGRAM_OUTPUT: {
+			GLenum props[] = {GL_LOCATION, GL_LOCATION_COMPONENT};
+			GLint got[2];
+			glGetProgramResourceiv(prog, resource->interface, index, 2,
+					       props, 2, NULL, got);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			if (got[0] == resource->location &&
+			    got[1] == resource->location_component)
+				return index;
+		}
+			break;
+		case GL_UNIFORM:
+		case GL_BUFFER_VARIABLE: {
+			/* Atomic counter, or var inside an ubo or ssbo */
+			if (resource->binding != -1) {
+				int block_index =
+					resource_info_get_block_or_atomic_buffer_index(resource);
+
+				if (block_index == -1)
+					return -1;
+
+				GLenum props[] = {resource->is_atomic ?
+						  GL_ATOMIC_COUNTER_BUFFER_INDEX :
+						  GL_BLOCK_INDEX,
+						  GL_OFFSET};
+				GLint got[2];
+				glGetProgramResourceiv(prog, resource->interface,
+						       index, 2, props, 2, NULL, got);
+
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				if (got[0] == block_index &&
+				    got[1] == resource->offset)
+					return index;
+			} else {
+				assert(resource->interface != GL_BUFFER_VARIABLE);
+				/* The uniform neither inside a block nor is
+				 * an atomic */
+				GLint got;
+				GLenum prop = GL_LOCATION;
+				glGetProgramResourceiv(prog, resource->interface, index,
+						       1, &prop, 1, NULL, &got);
+
+				if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				if (got == resource->location)
+					return index;
+			}
+		}
+			break;
+		case GL_UNIFORM_BLOCK:
+		case GL_SHADER_STORAGE_BLOCK:
+		case GL_ATOMIC_COUNTER_BUFFER: {
+			GLint got;
+			GLenum prop = GL_BUFFER_BINDING;
+			glGetProgramResourceiv(prog, resource->interface, index,
+					       1, &prop, 1, NULL, &got);
+
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			if (got == resource->binding)
+				return index;
+		}
+			break;
+		case GL_TRANSFORM_FEEDBACK_VARYING:
+		case GL_VERTEX_SUBROUTINE:
+		case GL_TESS_CONTROL_SUBROUTINE:
+		case GL_TESS_EVALUATION_SUBROUTINE:
+		case GL_GEOMETRY_SUBROUTINE:
+		case GL_FRAGMENT_SUBROUTINE:
+		case GL_COMPUTE_SUBROUTINE:
+		case GL_VERTEX_SUBROUTINE_UNIFORM:
+		case GL_TESS_CONTROL_SUBROUTINE_UNIFORM:
+		case GL_TESS_EVALUATION_SUBROUTINE_UNIFORM:
+		case GL_GEOMETRY_SUBROUTINE_UNIFORM:
+		case GL_FRAGMENT_SUBROUTINE_UNIFORM:
+		case GL_COMPUTE_SUBROUTINE_UNIFORM:
+			fprintf(stderr, "Subroutines and XFB not implemented "
+				"for this query");
+			piglit_report_result(PIGLIT_FAIL);
+			break;
+		default:
+			assert("Should not be here!");
+		}
+	}
+	return -1;
+}
+
+static void
+query_resource(unsigned interface_type, GLuint index, unsigned prop,
+	       int expected, const char *query_str)
+{
+	int length, got;
+
+	/* Set 'got' to some value in case glGetProgramResourceiv
+	 * doesn't write to it.  That should only be able to occur
+	 * when the function raises a GL error, but "should" is kind
+	 * of a funny word.
+	 */
+	got = ~expected;
+
+	glGetProgramResourceiv(prog, interface_type, index, 1, &prop, 1,
+			       &length, &got);
+
+	query_check_error_int(query_str, expected, got);
+}
+
+static void
 query_resource_by_name(unsigned interface_type, const char *name, unsigned prop,
 		       int expected, const char *query_str,
 		       struct block_info block_data)
@@ -3132,6 +3326,73 @@ query_resource_by_name(unsigned interface_type, const char *name, unsigned prop,
 
 	piglit_report_result(PIGLIT_FAIL);
 	return;
+}
+
+static void
+parse_resource_info(const char **line, unsigned interface_type,
+		    struct resource_info *resource)
+{
+	REQUIRE(parse_str(*line, "(", line),
+		"Couldn't parse resource info:\%s\n", *line);
+
+	resource->interface = interface_type;
+
+	switch (resource->interface) {
+	case GL_PROGRAM_INPUT:
+	case GL_PROGRAM_OUTPUT:
+		REQUIRE(parse_int(*line, &(resource->location), line),
+			"Bad location for resource at: %s\n", *line);
+		REQUIRE(parse_int(*line, &(resource->location_component), line),
+			"Bad location component for resource at: %s\n",
+			*line);
+		break;
+	case GL_UNIFORM:
+		if (parse_str(*line, "var", line)) {
+			REQUIRE(parse_int(*line, &(resource->location), line),
+				"Bad location for resource at: %s\n", *line);
+			break;
+		}
+
+		if (parse_str(*line, "atomic", line)) {
+			resource->is_atomic = true;
+		}
+		/* No break */
+	case GL_BUFFER_VARIABLE:
+		REQUIRE(parse_int(*line, &(resource->binding), line),
+			"Bad binding for resource at: %s\n", *line);
+		REQUIRE(parse_int(*line, &(resource->offset), line),
+			"Bad offset for resource at: %s\n", *line);
+
+		break;
+	case GL_UNIFORM_BLOCK:
+	case GL_SHADER_STORAGE_BLOCK:
+	case GL_ATOMIC_COUNTER_BUFFER:
+		REQUIRE(parse_int(*line, &(resource->binding), line),
+			"Bad binding for resource at: %s\n", *line);
+		break;
+	case GL_TRANSFORM_FEEDBACK_VARYING:
+	case GL_VERTEX_SUBROUTINE:
+	case GL_TESS_CONTROL_SUBROUTINE:
+	case GL_TESS_EVALUATION_SUBROUTINE:
+	case GL_GEOMETRY_SUBROUTINE:
+	case GL_FRAGMENT_SUBROUTINE:
+	case GL_COMPUTE_SUBROUTINE:
+	case GL_VERTEX_SUBROUTINE_UNIFORM:
+	case GL_TESS_CONTROL_SUBROUTINE_UNIFORM:
+	case GL_TESS_EVALUATION_SUBROUTINE_UNIFORM:
+	case GL_GEOMETRY_SUBROUTINE_UNIFORM:
+	case GL_FRAGMENT_SUBROUTINE_UNIFORM:
+	case GL_COMPUTE_SUBROUTINE_UNIFORM:
+		fprintf(stderr, "Subroutines and XFB not implemented for this "
+			"query");
+		piglit_report_result(PIGLIT_FAIL);
+		break;
+	default:
+		assert("Should not be here!");
+	}
+
+	REQUIRE(parse_str(*line, ")", line),
+		"Couldn't parse resource info:\%s\n", *line);
 }
 
 enum program_interface_queries {
@@ -3341,6 +3602,7 @@ verify_program_interface_query(const char *line,
 		"Bad program interface at: %s\n", line);
 
 	switch (query) {
+	case QUERY_RESOURCE_BY_DATA:
 	case QUERY_RESOURCE_BY_NAME: {
 		static const struct string_to_enum all_props[] = {
 			ENUM_STRING(GL_TYPE),
@@ -3372,17 +3634,25 @@ verify_program_interface_query(const char *line,
 			{ NULL, 0 }
 		};
 
+		struct resource_info resource = {GL_NONE, -1, -1, -1, -1, false};
+		GLuint index;
 		char name[512];
+
 		unsigned prop;
 		int expected;
 
-		if (parse_str(line, "\"\"", &line))
-			name[0] = '\0';
-		else
-			REQUIRE(parse_word_copy(line, name, sizeof(name),
-						&line),
-				"Bad program resource name at: %s\n",
-				line);
+		if (query == QUERY_RESOURCE_BY_DATA) {
+			parse_resource_info(&line, interface_type, &resource);
+			index = resource_info_get_index(&resource);
+		} else {
+			if (parse_str(line, "\"\"", &line))
+				name[0] = '\0';
+			else
+				REQUIRE(parse_word_copy(line, name,
+							sizeof(name), &line),
+					"Bad program resource name at: %s\n",
+					line);
+		}
 
 		REQUIRE(parse_enum_tab(all_props, line, &prop, &line),
 			"Bad glGetProgramResourceiv prop at: %s\n", line);
@@ -3391,17 +3661,27 @@ verify_program_interface_query(const char *line,
 			parse_int(line, &expected, &line),
 			"Bad expected value at: %s\n", line);
 
-		snprintf(query_str, sizeof(query_str),
-			 "glGetProgramResourceiv(%s, %s, %s)",
-			 piglit_get_gl_enum_name(interface_type),
-			 name, piglit_get_gl_enum_name(prop));
+		if (query == QUERY_RESOURCE_BY_DATA) {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceiv(%s, %d, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 index, piglit_get_gl_enum_name(prop));
 
-		query_resource_by_name(interface_type, name, prop, expected,
-				       query_str, block_data);
+			query_resource(interface_type, index, prop, expected,
+				       query_str);
+		} else {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceiv(%s, %s, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 name, piglit_get_gl_enum_name(prop));
+
+			query_resource_by_name(interface_type, name, prop,
+					       expected, query_str, block_data);
+		}
+
 	}
 		break;
 	case QUERY_INTERFACE:
-	case QUERY_RESOURCE_BY_DATA:
 	case QUERY_RESOURCE_INDEX:
 	case QUERY_RESOURCE_LOCATION:
 	case QUERY_RESOURCE_LOCATION_INDEX:
