@@ -3245,6 +3245,35 @@ query_resource_name(unsigned interface_type, GLuint index,
 }
 
 static void
+query_resource_index(unsigned interface_type, const char *name, GLuint expected,
+		     const char *query_str)
+{
+	GLuint got = glGetProgramResourceIndex(prog, interface_type, name);
+
+	query_check_error_int(query_str, expected, got);
+}
+
+static void
+query_resource_location(unsigned interface_type, const char *name,
+			GLint expected, const char *query_str)
+{
+
+	GLint got = glGetProgramResourceLocation(prog, interface_type, name);
+
+	query_check_error_int(query_str, expected, got);
+}
+
+static void
+query_resource_location_index(unsigned interface_type, const char *name,
+			      GLint expected, const char *query_str)
+{
+	GLint got = glGetProgramResourceLocationIndex(prog, interface_type,
+						      name);
+
+	query_check_error_int(query_str, expected, got);
+}
+
+static void
 parse_resource_info(const char **line, unsigned interface_type,
 		    struct resource_info *resource)
 {
@@ -3626,6 +3655,69 @@ verify_program_interface_query(const char *line,
 
 	}
 		break;
+	case QUERY_RESOURCE_INDEX: {
+		static const struct string_to_enum invalid_index[] = {
+			ENUM_STRING(GL_INVALID_INDEX),
+			{ NULL, 0 }
+		};
+
+		char name[512];
+		GLuint expected;
+
+		if (parse_str(line, "\"\"", &line))
+			name[0] = '\0';
+		else
+			REQUIRE(parse_word_copy(line, name, sizeof(name),
+						&line),
+				"Bad name at: %s\n", line);
+
+		REQUIRE(parse_enum_tab(invalid_index, line,
+				       (unsigned *) &expected, &line) ||
+			parse_uint(line, &expected, &line),
+			"Bad expected index at: %s\n", line);
+
+		snprintf(query_str, sizeof(query_str),
+			 "glGetProgramResourceIndex (%s, %s)",
+			 piglit_get_gl_enum_name(interface_type),
+			 name);
+
+		query_resource_index(interface_type, name, expected, query_str);
+	}
+		break;
+	case QUERY_RESOURCE_LOCATION:
+	case QUERY_RESOURCE_LOCATION_INDEX: {
+		char name[512];
+		GLint expected;
+
+		if (parse_str(line, "\"\"", &line))
+			name[0] = '\0';
+		else
+			REQUIRE(parse_word_copy(line, name, sizeof(name),
+						&line),
+				"Bad name at: %s\n", line);
+
+		REQUIRE(parse_int(line, &expected, &line),
+			"Bad expected value at: %s\n", line);
+
+		if (query == QUERY_RESOURCE_LOCATION) {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceLocation(%s, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 name);
+
+			query_resource_location(interface_type, name, expected,
+						query_str);
+		} else {
+			snprintf(query_str, sizeof(query_str),
+				 "glGetProgramResourceLocationIndex(%s, %s)",
+				 piglit_get_gl_enum_name(interface_type),
+				 name);
+
+			query_resource_location_index(interface_type, name,
+						      expected, query_str);
+		}
+	}
+		break;
 	case QUERY_RESOURCE_NAME: {
 		struct resource_info resource = {GL_NONE, -1, -1, -1, -1, false};
 		GLuint index;
@@ -3663,11 +3755,6 @@ verify_program_interface_query(const char *line,
 		query_resource_name(interface_type, index,
 				    expected_length, expected_name, query_str);
 	}
-		break;
-	case QUERY_RESOURCE_INDEX:
-	case QUERY_RESOURCE_LOCATION:
-	case QUERY_RESOURCE_LOCATION_INDEX:
-		assert(!"Not implemented.");
 		break;
 	default:
 		assert(!"Should not get here.");
