@@ -3010,14 +3010,16 @@ active_uniform(const char *line)
  */
 static bool
 confirm_program_resource(GLenum interface_type, GLuint resource_index,
-			 char *resource_name, char *resource_name_buf,
-			 struct block_info block_data, unsigned prop, int value_expected)
+			 const char *resource_name, char *resource_name_buf,
+			 struct block_info block_data, unsigned prop,
+			 int value_expected)
 {
 	if (!force_no_names) {
 		GLsizei resource_name_len;
 
-		glGetProgramResourceName(prog, interface_type,
-					 resource_index, 512, &resource_name_len, resource_name_buf);
+		glGetProgramResourceName(prog, interface_type, resource_index,
+					 512, &resource_name_len,
+					 resource_name_buf);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
 			fprintf(stderr, "glGetProgramResourceName error\n");
