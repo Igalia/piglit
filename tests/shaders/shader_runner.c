@@ -3075,99 +3075,14 @@ confirm_program_resource(GLenum interface_type, GLuint resource_index,
 	return true;
 }
 
-/**
- * Query an active resource using ARB_program_interface_query functions
- *
- * Format of the command:
- *
- *  verify program_interface_query GL_INTERFACE_TYPE_ENUM name GL_PNAME_ENUM integer
- *
- * or
- *
- *  verify program_interface_query GL_INTERFACE_TYPE_ENUM name GL_PNAME_ENUM GL_TYPE_ENUM
- */
 static void
-active_program_interface(const char *line, struct block_info block_data)
+query_resource_by_name(unsigned interface_type, const char *name, unsigned prop,
+		       int expected, const char *query_str,
+		       struct block_info block_data)
 {
-	static const struct string_to_enum all_props[] = {
-		ENUM_STRING(GL_TYPE),
-		ENUM_STRING(GL_ARRAY_SIZE),
-		ENUM_STRING(GL_NAME_LENGTH),
-		ENUM_STRING(GL_BLOCK_INDEX),
-		ENUM_STRING(GL_OFFSET),
-		ENUM_STRING(GL_ARRAY_STRIDE),
-		ENUM_STRING(GL_MATRIX_STRIDE),
-		ENUM_STRING(GL_IS_ROW_MAJOR),
-		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER_INDEX),
-		ENUM_STRING(GL_BUFFER_BINDING),
-		ENUM_STRING(GL_BUFFER_DATA_SIZE),
-		ENUM_STRING(GL_NUM_ACTIVE_VARIABLES),
-		ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_GEOMETRY_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_FRAGMENT_SHADER),
-		ENUM_STRING(GL_REFERENCED_BY_COMPUTE_SHADER),
-		ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
-		ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
-		ENUM_STRING(GL_LOCATION),
-		ENUM_STRING(GL_LOCATION_INDEX),
-		ENUM_STRING(GL_LOCATION_COMPONENT),
-		ENUM_STRING(GL_IS_PER_PATCH),
-		ENUM_STRING(GL_NUM_COMPATIBLE_SUBROUTINES),
-		ENUM_STRING(GL_COMPATIBLE_SUBROUTINES),
-		{ NULL, 0 }
-	};
-
-	static const struct string_to_enum all_program_interface[] = {
-		ENUM_STRING(GL_UNIFORM),
-		ENUM_STRING(GL_UNIFORM_BLOCK),
-		ENUM_STRING(GL_PROGRAM_INPUT),
-		ENUM_STRING(GL_PROGRAM_OUTPUT),
-		ENUM_STRING(GL_BUFFER_VARIABLE),
-		ENUM_STRING(GL_SHADER_STORAGE_BLOCK),
-		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER),
-		ENUM_STRING(GL_VERTEX_SUBROUTINE),
-		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE),
-		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE),
-		ENUM_STRING(GL_GEOMETRY_SUBROUTINE),
-		ENUM_STRING(GL_FRAGMENT_SUBROUTINE),
-		ENUM_STRING(GL_COMPUTE_SUBROUTINE),
-		ENUM_STRING(GL_VERTEX_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_GEOMETRY_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_FRAGMENT_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_COMPUTE_SUBROUTINE_UNIFORM),
-		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING),
-		{ NULL, 0 }
-	};
-
-	char name[512];
 	char name_buf[512];
-	unsigned prop, interface_type;
-	int expected;
 	int i;
 	int num_active_buffers;
-
-	if (!piglit_is_extension_supported("GL_ARB_program_interface_query") &&
-	    piglit_get_gl_version() < 43) {
-		fprintf(stderr,
-			"GL_ARB_program_interface_query not supported or "
-			"OpenGL version < 4.3\n");
-		return;
-	}
-
-	REQUIRE(parse_enum_tab(all_program_interface, line,
-			       &interface_type, &line),
-		"Bad program interface at: %s\n", line);
-	REQUIRE(parse_word_copy(line, name, sizeof(name), &line),
-		"Bad program resource name at: %s\n", line);
-	REQUIRE(parse_enum_tab(all_props, line, &prop, &line),
-		"Bad glGetProgramResourceiv pname at: %s\n", line);
-	REQUIRE(parse_enum_tab(all_types, line, (unsigned *)&expected, &line) ||
-		parse_int(line, &expected, &line),
-		"Bad expected value at: %s\n", line);
 
 	glGetProgramInterfaceiv(prog, interface_type,
 				GL_ACTIVE_RESOURCES, &num_active_buffers);
@@ -3217,6 +3132,285 @@ active_program_interface(const char *line, struct block_info block_data)
 
 	piglit_report_result(PIGLIT_FAIL);
 	return;
+}
+
+enum program_interface_queries {
+	/* Query a property of an interface in a program using
+	 * glGetProgramInterfaceiv().
+	 */
+	QUERY_INTERFACE = 0,
+
+	/* Query a property of an active resource using
+	 * glGetProgramResourceiv(). We will search first for the resource
+	 * to get its resource index, needed to do the query, using the data
+	 * passed to the shader_runner command, data which will vary depending
+	 * on the interface.
+	 *
+	 * This is useful for shaders coming from SPIR-V binaries where
+	 * name-reflection information is not mandatory (ARB_gl_spirv).
+	 */
+	QUERY_RESOURCE_BY_DATA,
+
+	/* Query a property of an active resource using
+	 * glGetProgramResourceiv(). We will search first for the resource
+	 * to get its resource index, needed to do the query, using the
+	 * resource name passed to the shader_runner command.
+	 */
+	QUERY_RESOURCE_BY_NAME,
+
+	/* Query the index of a resource within a program
+	 * using glGetProgramResourceIndex().
+	 */
+	QUERY_RESOURCE_INDEX,
+
+	/* Query the location of a resource within a program
+	 * using glGetProgramResourceLocation().
+	 */
+	QUERY_RESOURCE_LOCATION,
+
+	/* Query the fragment color index of a variable within
+	 * a program using glGetProgramResourceLocationIndex().
+	 */
+	QUERY_RESOURCE_LOCATION_INDEX,
+
+	/* Query an active resource's name and length using
+	 * glGetProgramResourceName(). We will search first for the resource
+	 * to get its resource index, needed to do the query, using the data
+	 * passed to the shader_runner command, data which will vary depending
+	 * on the interface.
+	 */
+	QUERY_RESOURCE_NAME,
+};
+
+/**
+ * Query properties of interfaces and resources used by a program
+ * using ARB_program_interface_query queries.
+ *
+ * A) Correspondence between the program_interface_queries enum and the OpenGL
+ * query commands:
+ *
+ *  program_interface_queries            OpenGL command
+ *            enum
+ * ---------------------------        -------------------------
+ * - QUERY_INTERFACE               -> glGetProgramInterfaceiv()
+ * - QUERY_RESOURCE_BY_DATA        -> glGetProgramResourceiv()
+ * - QUERY_RESOURCE_BY_NAME        -> glGetProgramResourceiv()
+ * - QUERY_RESOURCE_INDEX          -> glGetProgramResourceIndex()
+ * - QUERY_RESOURCE_LOCATION       -> glGetProgramResourceLocation()
+ * - QUERY_RESOURCE_LOCATION_INDEX -> glGetProgramResourceLocationIndex()
+ * - QUERY_RESOURCE_NAME           -> glGetProgramResourceName()
+ *
+ * See the comments in the program_interface_queries enum declaration for more
+ * details.
+ *
+ * B) Format of the command:
+ *   verify program_interface_query <query> <params> <expected values>
+ *
+ * 1) The allowed values for <query> are:
+ *
+ *   command string            program_interface_queries
+ *                                       enum
+ * -------------------------   --------------------------
+ * - "interface"             -> QUERY_INTERFACE
+ * - "resource"              -> QUERY_RESOURCE_BY_DATA
+ * - ""                      -> QUERY_RESOURCE_BY_NAME
+ * - "resourceIndex"         -> QUERY_RESOURCE_INDEX
+ * - "resourceLocation"      -> QUERY_RESOURCE_LOCATION
+ * - "resourceLocationIndex" -> QUERY_RESOURCE_LOCATION_INDEX
+ * - "resourceName"          -> QUERY_RESOURCE_NAME
+ *
+ * if no <query> is specified, QUERY_RESOURCE_BY_NAME is assummed.
+ *
+ * 2) The allowed values for <params> and <expected values> for each of the
+ * queries, in the order they should be specified, are:
+ *
+ * Note: some of the queries accept a <resource data> parameter, which goes
+ * between parenthesis and serves to identify the resource without using its
+ * name. Its usage is detailed in 3).
+ *
+ * - QUERY_INTERFACE:
+ *    - Params: <programInterface> <pname> <expected>
+ *    - Command: verify program_interface_query interface GL_INTERFACE_ENUM
+ *               GL_PNAME_ENUM int
+ *
+ * - QUERY_RESOURCE_BY_DATA:
+ *    - Params: <programInterface> (<resource data>) <pname> <expected>
+ *    - Command: verify program_interface_query resource GL_INTERFACE_ENUM
+ *               (RESOURCE_DATA) GL_PNAME_ENUM {int/GL_TYPE_ENUM}
+ *
+ * - QUERY_RESOURCE_BY_NAME:
+ *    - Params: <programInterface> <name> <pname> <expected>
+ *    - Command: verify program_interface_query GL_INTERFACE_ENUM string
+ *               GL_PNAME_ENUM {int/GL_TYPE_ENUM}
+ *
+ * - QUERY_RESOURCE_NAME:
+ *    - Params: <programInterface> (<resource data>) <expected_length>
+ *               <expected_name>
+ *    - Command: verify program_interface_query resourceName GL_INTERFACE_ENUM
+ *               (RESOURCE_DATA) int string
+ *
+ * - QUERY_RESOURCE_INDEX:
+ *    - Params: <programInterface> <name> <expected>
+ *    - Command: verify program_interface_query resourceIndex GL_INTERFACE_ENUM
+ *               string {uint/GL_INVALID_INDEX}
+ *
+ * - QUERY_RESOURCE_LOCATION:
+ *    - Params: <programInterface> <name> <expected>
+ *    - Command: verify program_interface_query resourceLocation
+ *               GL_INTERFACE_ENUM string int
+ *
+ * - QUERY_RESOURCE_LOCATION_INDEX:
+ *    - Params: <programInterface> <name> <expected>
+ *    - Command: verify program_interface_query resourceLocationIndex
+ *               GL_INTERFACE_ENUM string int
+ *
+ * 3) The info accepted in <resource data> depends on which interface is going
+ * to be queried, being:
+ *
+ * - <location> <component> for GL_PROGRAM_INPUT and GL_PROGRAM_OUTPUT.
+ *    - int int
+ * - <binding> for GL_UNIFORM_BLOCK, GL_SHADER_STORAGE_BLOCK and
+ *   GL_ATOMIC_COUNTER_BUFFER.
+ *    - int
+ * - <binding> <offset> for GL_UNIFORM inside an UBO and GL_BUFFER_VARIABLE.
+ *    - int int
+ * - "atomic" <binding> <offset> for GL_UNIFORM atomic counters.
+ *    - atomic int int
+ * - "var" <location> for GL_UNIFORM variables.
+ *    - var int
+ * Other interfaces are not supported.
+ */
+static void
+verify_program_interface_query(const char *line,
+			       struct block_info block_data)
+{
+	static const struct string_to_enum all_program_interface[] = {
+		ENUM_STRING(GL_UNIFORM),
+		ENUM_STRING(GL_UNIFORM_BLOCK),
+		ENUM_STRING(GL_PROGRAM_INPUT),
+		ENUM_STRING(GL_PROGRAM_OUTPUT),
+		ENUM_STRING(GL_BUFFER_VARIABLE),
+		ENUM_STRING(GL_SHADER_STORAGE_BLOCK),
+		ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE),
+		ENUM_STRING(GL_VERTEX_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_GEOMETRY_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_FRAGMENT_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_COMPUTE_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING),
+		{ NULL, 0 }
+	};
+
+	enum program_interface_queries query;
+	unsigned interface_type;
+	char query_str[512];
+
+	if (!piglit_is_extension_supported("GL_ARB_program_interface_query") &&
+	    piglit_get_gl_version() < 43) {
+		fprintf(stderr,
+			"GL_ARB_program_interface_query not supported or "
+			"OpenGL version < 4.3\n");
+		return;
+	}
+
+	if (parse_str(line,"interface", &line)) {
+		query = QUERY_INTERFACE;
+	} else if (parse_str(line,"resourceName", &line)) {
+		query = QUERY_RESOURCE_NAME;
+	} else if (parse_str(line,"resourceIndex", &line)) {
+		query = QUERY_RESOURCE_INDEX;
+	} else if (parse_str(line,"resourceLocationIndex", &line)) {
+		query = QUERY_RESOURCE_LOCATION_INDEX;
+	} else if (parse_str(line,"resourceLocation", &line)) {
+		query = QUERY_RESOURCE_LOCATION;
+	} else if (parse_str(line,"resource", &line)) {
+		query = QUERY_RESOURCE_BY_DATA;
+	} else {
+		query = QUERY_RESOURCE_BY_NAME;
+	}
+
+	REQUIRE(parse_enum_tab(all_program_interface, line,
+			       &interface_type, &line),
+		"Bad program interface at: %s\n", line);
+
+	switch (query) {
+	case QUERY_RESOURCE_BY_NAME: {
+		static const struct string_to_enum all_props[] = {
+			ENUM_STRING(GL_TYPE),
+			ENUM_STRING(GL_ARRAY_SIZE),
+			ENUM_STRING(GL_NAME_LENGTH),
+			ENUM_STRING(GL_BLOCK_INDEX),
+			ENUM_STRING(GL_OFFSET),
+			ENUM_STRING(GL_ARRAY_STRIDE),
+			ENUM_STRING(GL_MATRIX_STRIDE),
+			ENUM_STRING(GL_IS_ROW_MAJOR),
+			ENUM_STRING(GL_ATOMIC_COUNTER_BUFFER_INDEX),
+			ENUM_STRING(GL_BUFFER_BINDING),
+			ENUM_STRING(GL_BUFFER_DATA_SIZE),
+			ENUM_STRING(GL_NUM_ACTIVE_VARIABLES),
+			ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_GEOMETRY_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_FRAGMENT_SHADER),
+			ENUM_STRING(GL_REFERENCED_BY_COMPUTE_SHADER),
+			ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
+			ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
+			ENUM_STRING(GL_LOCATION),
+			ENUM_STRING(GL_LOCATION_INDEX),
+			ENUM_STRING(GL_LOCATION_COMPONENT),
+			ENUM_STRING(GL_IS_PER_PATCH),
+			ENUM_STRING(GL_NUM_COMPATIBLE_SUBROUTINES),
+			ENUM_STRING(GL_COMPATIBLE_SUBROUTINES),
+			{ NULL, 0 }
+		};
+
+		char name[512];
+		unsigned prop;
+		int expected;
+
+		if (parse_str(line, "\"\"", &line))
+			name[0] = '\0';
+		else
+			REQUIRE(parse_word_copy(line, name, sizeof(name),
+						&line),
+				"Bad program resource name at: %s\n",
+				line);
+
+		REQUIRE(parse_enum_tab(all_props, line, &prop, &line),
+			"Bad glGetProgramResourceiv prop at: %s\n", line);
+		REQUIRE(parse_enum_tab(all_types, line, (unsigned *) &expected,
+				       &line) ||
+			parse_int(line, &expected, &line),
+			"Bad expected value at: %s\n", line);
+
+		snprintf(query_str, sizeof(query_str),
+			 "glGetProgramResourceiv(%s, %s, %s)",
+			 piglit_get_gl_enum_name(interface_type),
+			 name, piglit_get_gl_enum_name(prop));
+
+		query_resource_by_name(interface_type, name, prop, expected,
+				       query_str, block_data);
+	}
+		break;
+	case QUERY_INTERFACE:
+	case QUERY_RESOURCE_BY_DATA:
+	case QUERY_RESOURCE_INDEX:
+	case QUERY_RESOURCE_LOCATION:
+	case QUERY_RESOURCE_LOCATION_INDEX:
+	case QUERY_RESOURCE_NAME:
+		assert(!"Not implemented.");
+		break;
+	default:
+		assert(!"Should not get here.");
+	}
 }
 
 static void
@@ -4699,7 +4893,7 @@ piglit_display(void)
 		} else if (parse_str(line, "verify program_query", &rest)) {
                         verify_program_query(rest);
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
-			active_program_interface(rest, block_data);
+			verify_program_interface_query(rest, block_data);
 		} else if (parse_str(line, "vertex attrib ", &rest)) {
 			set_vertex_attrib(rest);
 		} else if (parse_str(line, "newlist ", &rest)) {
