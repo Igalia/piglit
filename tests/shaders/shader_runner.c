@@ -3483,6 +3483,35 @@ verify_program_interface_query(const char *line,
 		"Bad program interface at: %s\n", line);
 
 	switch (query) {
+	case QUERY_INTERFACE: {
+		static const struct string_to_enum all_pnames[] = {
+			ENUM_STRING(GL_ACTIVE_RESOURCES),
+			ENUM_STRING(GL_MAX_NAME_LENGTH),
+			ENUM_STRING(GL_MAX_NUM_ACTIVE_VARIABLES),
+			ENUM_STRING(GL_MAX_NUM_COMPATIBLE_SUBROUTINES),
+			{ NULL, 0 }
+		};
+
+		unsigned pname;
+		int expected;
+		GLint got;
+
+		REQUIRE(parse_enum_tab(all_pnames, line, &pname, &line),
+			"Bad glGetProgramInterfaceiv pname at: %s\n", line);
+		REQUIRE(parse_int(line, &expected, &line),
+			"Bad expected value at: %s\n", line);
+
+		snprintf(query_str, sizeof(query_str),
+			 "glGetProgramInterfaceiv(%s, %s)",
+			 piglit_get_gl_enum_name(interface_type),
+			 piglit_get_gl_enum_name(pname));
+
+		/* Do the actual query. */
+		got = ~expected;
+		glGetProgramInterfaceiv(prog, interface_type, pname, &got);
+		query_check_error_int(query_str, expected, got);
+	}
+		break;
 	case QUERY_RESOURCE_BY_DATA:
 	case QUERY_RESOURCE_BY_NAME: {
 		static const struct string_to_enum all_props[] = {
@@ -3562,7 +3591,6 @@ verify_program_interface_query(const char *line,
 
 	}
 		break;
-	case QUERY_INTERFACE:
 	case QUERY_RESOURCE_INDEX:
 	case QUERY_RESOURCE_LOCATION:
 	case QUERY_RESOURCE_LOCATION_INDEX:
