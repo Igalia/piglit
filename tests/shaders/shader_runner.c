@@ -2976,88 +2976,6 @@ active_uniform(const char *line)
 	return;
 }
 
-
-/*
- * Confirms if @resource_index is a given resource, within @interface_type.
- *
- * In order to identify it, it uses by default @resource_name. If
- * force_no_names mode is activated it uses the binding contained at
- * @block_data. Note that for the latter, only ubos or ssbos are
- * supported as @interface_type.
- *
- * @resource_name_buf, @prop and @value_expected are only used for
- * some extra checks.
- *
- * Return true if @resource_index is the resource within
- * @interface_type we search for. false otherwise.
- */
-static bool
-confirm_program_resource(GLenum interface_type, GLuint resource_index,
-			 const char *resource_name, char *resource_name_buf,
-			 struct block_info block_data, unsigned prop,
-			 int value_expected)
-{
-	if (!force_no_names) {
-		GLsizei resource_name_len;
-
-		glGetProgramResourceName(prog, interface_type, resource_index,
-					 512, &resource_name_len,
-					 resource_name_buf);
-
-		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			fprintf(stderr, "glGetProgramResourceName error\n");
-			piglit_report_result(PIGLIT_FAIL);
-		}
-
-		if (strcmp(resource_name, resource_name_buf) != 0)
-			return false;
-
-		 /* glGetProgramResourceName does not consider the NULL
-		  * terminator when returning the name length, however,
-		  * glGetProgramResourceiv does. We take that into account
-		  * when doing the comparison.
-		  */
-		if (prop == GL_NAME_LENGTH &&
-		    resource_name_len != (value_expected - 1)) {
-			fprintf(stderr,
-				"glGetProgramResourceName(%s, %s, %s): "
-				"expected length: %d (0x%04x), "
-				"got length: %d (0x%04x)\n",
-				piglit_get_gl_enum_name(interface_type),
-				resource_name, piglit_get_gl_enum_name(prop),
-				value_expected - 1, value_expected - 1,
-				resource_name_len, resource_name_len);
-			piglit_report_result(PIGLIT_FAIL);
-		}
-	} else {
-		unsigned binding_prop = GL_BUFFER_BINDING;
-		int current_binding = 0;
-		GLint length;
-
-		if (interface_type != GL_SHADER_STORAGE_BLOCK &&
-		    interface_type != GL_UNIFORM_BLOCK) {
-			fprintf(stderr,
-				"active_program_interface queries under force_no_names "
-				"mode are only supported for GL_SHADER_STORAGE_BLOCK "
-				"or GL_UNIFORM_BLOCK interfaces\n");
-			piglit_report_result(PIGLIT_FAIL);
-		}
-
-		glGetProgramResourceiv(prog, interface_type,
-				       resource_index, 1, &binding_prop, 1,
-				       &length, &current_binding);
-		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			fprintf(stderr, "glGetProgramResourceiv error\n");
-			piglit_report_result(PIGLIT_FAIL);
-		}
-
-		if (block_data.binding != current_binding)
-			return false;
-	}
-
-	return true;
-}
-
 static void
 query_check_error_int(const char *query_str, int expected, int got)
 {
@@ -3248,57 +3166,46 @@ query_resource_by_name(unsigned interface_type, const char *name, unsigned prop,
 		       int expected, const char *query_str,
 		       struct block_info block_data)
 {
-	char name_buf[512];
-	int i;
-	int num_active_buffers;
+	int index;
 
-	glGetProgramInterfaceiv(prog, interface_type,
-				GL_ACTIVE_RESOURCES, &num_active_buffers);
-	for (i = 0; i < num_active_buffers; i++) {
-		GLint got;
-		GLint length;
-		bool pass = true;
-
-		if (!confirm_program_resource(interface_type, i, name, name_buf,
-					      block_data, prop, expected))
-			continue;
-
-		/* Set 'got' to some value in case glGetActiveUniformsiv
-		 * doesn't write to it.  That should only be able to occur
-		 * when the function raises a GL error, but "should" is kind
-		 * of a funny word.
-		 */
-		got = ~expected;
-		glGetProgramResourceiv(prog, interface_type,
-				       i, 1, &prop, 1,
-				       &length, &got);
+	/* Get the resource index */
+	if (!force_no_names) {
+		index = glGetProgramResourceIndex(prog, interface_type, name);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			fprintf(stderr, "glGetProgramResourceiv error\n");
+			fprintf(stderr, "glGetProgramResourceIndex error\n");
 			piglit_report_result(PIGLIT_FAIL);
 		}
-
-		if (got != expected) {
+		if (index == GL_INVALID_INDEX) {
+			fprintf(stderr, "No active resource named \"%s\"\n",
+				name);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	} else {
+		if (interface_type != GL_SHADER_STORAGE_BLOCK &&
+		    interface_type != GL_UNIFORM_BLOCK) {
 			fprintf(stderr,
-				"glGetProgramResourceiv(%s, %s): "
-				"expected %d, got %d\n",
-				name, piglit_get_gl_enum_name(prop),
-				expected, got);
-			pass = false;
+				"force_no_names only supported by this query "
+				"for GL_SHADER_STORAGE_BLOCK and "
+				"GL_UNIFORM_BLOCK interfaces\n");
+			piglit_report_result(PIGLIT_FAIL);
 		}
 
-		if (!pass)
-			piglit_report_result(PIGLIT_FAIL);
+		struct resource_info resource = {GL_NONE, -1, -1, -1, -1, false};
+		resource.interface = interface_type;
+		resource.binding = block_data.binding;
 
-		return;
+		index = resource_info_get_index(&resource);
+		if (index == -1) {
+			fprintf(stderr,
+				"No active resource with binding %i\n",
+				block_data.binding);
+			piglit_report_result(PIGLIT_FAIL);
+		}
 	}
 
-	if (!force_no_names)
-		fprintf(stderr, "No active resource named \"%s\"\n", name);
-	else
-		fprintf(stderr, "No active resource with binding %i\n", block_data.binding);
-
-	piglit_report_result(PIGLIT_FAIL);
+	/* Do the actual query. */
+	query_resource(interface_type, index, prop, expected, query_str);
 	return;
 }
 
