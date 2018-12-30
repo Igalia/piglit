@@ -412,13 +412,25 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* Try CompressedTexImage with size which is a not a multiple of the
-         * block size - should not be an erorr
+         * block size - should not be an error
          */
 	w = width - 1;
 	h = height - 1;
 	glCompressedTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0,
 			       piglit_compressed_image_size(format, w, h),
 			       compressed_image);
+
+	if (piglit_get_gl_version() < 20 &&
+	    !piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")) {
+		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+
+		/* Reload the original into the texture. */
+		w = width;
+		h = height;
+		glCompressedTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0,
+				       piglit_compressed_image_size(format, w, h),
+				       compressed_image);
+	}
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	pass = check_rendering(width, height) && pass;
