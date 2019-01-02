@@ -58,16 +58,12 @@ float depth_color[NUM_DEPTHS][4] = {
 	{0.0, 1.0, 1.0, 0.0},
 };
 
-int pot_depth;
-
 static int
-create_3d_fbo(void)
+create_3d_fbo(int pot_depth)
 {
 	GLuint tex, fb;
 	GLenum status;
 	int depth;
-	pot_depth = piglit_is_extension_supported("GL_ARB_texture_non_power_of_two") ?
-		NUM_DEPTHS: POT_DEPTHS;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_3D, tex);
@@ -109,7 +105,6 @@ create_3d_fbo(void)
 		piglit_draw_rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
 	}
 
-
 done:
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
@@ -121,7 +116,7 @@ done:
  * 3D texture.
  */
 static void
-draw_depth(int x, int y, int depth)
+draw_depth(int x, int y, int depth, int pot_depth)
 {
 	float depth_coord = (float)depth / (pot_depth - 1);
 
@@ -171,12 +166,12 @@ piglit_display(void)
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	tex = create_3d_fbo();
+	tex = create_3d_fbo(POT_DEPTHS);
 
 	for (depth = 0; depth < NUM_DEPTHS; depth++) {
 		int x = 1 + depth * (BUF_WIDTH + 1);
 		int y = 1;
-		draw_depth(x, y, depth);
+		draw_depth(x, y, depth, POT_DEPTHS);
 	}
 
 	for (depth = 0; depth < NUM_DEPTHS; depth++) {
@@ -186,6 +181,24 @@ piglit_display(void)
 	}
 
 	glDeleteTextures(1, &tex);
+
+	if (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")) {
+		tex = create_3d_fbo(NUM_DEPTHS);
+
+		for (depth = 0; depth < NUM_DEPTHS; depth++) {
+			int x = 1 + depth * (BUF_WIDTH + 1);
+			int y = 2 + BUF_HEIGHT;
+			draw_depth(x, y, depth, NUM_DEPTHS);
+		}
+
+		for (depth = 0; depth < NUM_DEPTHS; depth++) {
+			int x = 1 + depth * (BUF_WIDTH + 1);
+			int y = 2 + BUF_HEIGHT;
+			pass &= test_depth_drawing(x, y, depth_color[depth]);
+		}
+
+		glDeleteTextures(1, &tex);
+	}
 
 	piglit_present_results();
 
