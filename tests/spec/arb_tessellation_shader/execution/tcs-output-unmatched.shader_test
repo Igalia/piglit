@@ -1,0 +1,67 @@
+# Test that TCS per-vertex outputs which are used only in
+# TCS stage are not converted to local variables
+# and indeed share data within the patch.
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+GL_ARB_separate_shader_objects
+GL_ARB_shader_atomic_counters
+
+[vertex shader passthrough]
+
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_shader_atomic_counters: require
+layout(vertices = 3) out;
+
+layout(location = 0) out vec4 out_unused_in_tes[];
+
+layout(binding = 0) uniform atomic_uint mismatches;
+
+void main()
+{
+	out_unused_in_tes[gl_InvocationID] = gl_in[gl_InvocationID].gl_Position;
+
+	barrier();
+
+	if (out_unused_in_tes[0] != gl_in[0].gl_Position ||
+		out_unused_in_tes[1] != gl_in[1].gl_Position ||
+		out_unused_in_tes[2] != gl_in[2].gl_Position) {
+		atomicCounterIncrement(mismatches);
+	}
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+layout(triangles) in;
+
+void main()
+{
+	gl_Position = vec4(0);
+}
+
+
+[fragment shader]
+
+void main()
+{
+	gl_FragColor = vec4(1.0);
+}
+
+[vertex data]
+piglit_vertex/float/4
+1 1 1 1
+2 2 2 2
+3 3 3 3
+
+[test]
+atomic counters 1
+
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 3
+
+probe atomic counter 0 == 0
