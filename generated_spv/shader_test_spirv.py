@@ -1001,7 +1001,14 @@ def process_shader_test(shader_test, config, skip_reasons):
         # glslang limitation
         'GL_MESA_shader_integer_functions',
         'GL_ARB_shader_atomic_counter_ops',
-        'GL_INTEL_shader_atomic_float_minmax'
+        'GL_INTEL_shader_atomic_float_minmax',
+
+        # FIXME: classify them either by inherently unsupported
+        # or glslang limitation
+        'GL_ARB_bindless_texture',
+        'GL_AMD_vertex_shader_layer',
+        'GL_AMD_vertex_shader_viewport_index',
+        'GL_ARB_shader_clock'
     ])
 
     shaders = []
