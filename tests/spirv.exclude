@@ -1,15 +1,3 @@
-# Unsupported extensions:
-tests/spec/arb_bindless_texture/
-tests/spec/arb_fragment_layer_viewport/layer-vs-gs-write-simple.shader_test
-tests/spec/arb_fragment_layer_viewport/layer-vs-write-gs-no-write-simple.shader_test
-tests/spec/arb_fragment_layer_viewport/layer-vs-write-simple.shader_test
-tests/spec/arb_fragment_layer_viewport/viewport-vs-gs-write-simple.shader_test
-tests/spec/arb_fragment_layer_viewport/viewport-vs-write-gs-no-write-simple.shader_test
-tests/spec/arb_fragment_layer_viewport/viewport-vs-write-simple.shader_test
-tests/spec/arb_shader_atomic_counter_ops/
-tests/spec/arb_shader_clock/
-tests/spec/arb_shader_subroutine/
-#
 # Unsupported layout(shared):
 # pending to re-implement automatically skip them
 tests/spec/arb_shader_storage_buffer_object/linker/instance-matching-shader-storage-blocks-packaging-qualifier-mismatch.shader_test
