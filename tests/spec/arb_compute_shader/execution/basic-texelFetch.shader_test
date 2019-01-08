@@ -1,10 +1,197 @@
 # Verify simple sampling of a texture with output to an atomic counter
 
 [require]
+SPIRV YES
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_compute_shader
 GL_ARB_shader_atomic_counters
+
+[compute shader spirv]
+; Automatically generated from the GLSL by shader_test_spirv.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 121
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main"
+               OpExecutionMode %main LocalSize 1 1 1
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_compute_shader"
+               OpSourceExtension "GL_ARB_shader_atomic_counters"
+               OpDecorate %tex Location 0
+               OpDecorate %tex DescriptorSet 0
+               OpDecorate %tex Binding 1
+               OpDecorate %r Offset 0
+               OpDecorate %r DescriptorSet 0
+               OpDecorate %r Binding 0
+               OpDecorate %g Offset 4
+               OpDecorate %g DescriptorSet 0
+               OpDecorate %g Binding 0
+               OpDecorate %b Offset 8
+               OpDecorate %b DescriptorSet 0
+               OpDecorate %b Binding 0
+               OpDecorate %w Offset 12
+               OpDecorate %w DescriptorSet 0
+               OpDecorate %w Binding 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+     %uint_0 = OpConstant %uint 0
+    %uint_64 = OpConstant %uint 64
+       %bool = OpTypeBool
+        %int = OpTypeInt 32 1
+      %v2int = OpTypeVector %int 2
+%_ptr_Function_v2int = OpTypePointer Function %v2int
+      %float = OpTypeFloat 32
+    %v3float = OpTypeVector %float 3
+%_ptr_Function_v3float = OpTypePointer Function %v3float
+         %40 = OpTypeImage %float 2D 0 0 0 1 Unknown
+         %41 = OpTypeSampledImage %40
+%_ptr_UniformConstant_41 = OpTypePointer UniformConstant %41
+        %tex = OpVariable %_ptr_UniformConstant_41 UniformConstant
+      %int_0 = OpConstant %int 0
+    %v4float = OpTypeVector %float 4
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %54 = OpConstantComposite %v3float %float_1 %float_0 %float_0
+     %v3bool = OpTypeVector %bool 3
+    %uint_32 = OpConstant %uint 32
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+          %r = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_1 = OpConstant %uint 1
+         %73 = OpConstantComposite %v3float %float_0 %float_1 %float_0
+          %g = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+         %88 = OpConstantComposite %v3float %float_0 %float_0 %float_1
+          %b = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+        %103 = OpConstantComposite %v3float %float_1 %float_1 %float_1
+          %w = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %y = OpVariable %_ptr_Function_uint Function
+          %x = OpVariable %_ptr_Function_uint Function
+      %coord = OpVariable %_ptr_Function_v2int Function
+      %color = OpVariable %_ptr_Function_v3float Function
+               OpStore %y %uint_0
+               OpBranch %10
+         %10 = OpLabel
+               OpLoopMerge %12 %13 None
+               OpBranch %14
+         %14 = OpLabel
+         %15 = OpLoad %uint %y
+         %18 = OpULessThan %bool %15 %uint_64
+               OpBranchConditional %18 %11 %12
+         %11 = OpLabel
+               OpStore %x %uint_0
+               OpBranch %20
+         %20 = OpLabel
+               OpLoopMerge %22 %23 None
+               OpBranch %24
+         %24 = OpLabel
+         %25 = OpLoad %uint %x
+         %26 = OpULessThan %bool %25 %uint_64
+               OpBranchConditional %26 %21 %22
+         %21 = OpLabel
+         %31 = OpLoad %uint %x
+         %32 = OpBitcast %int %31
+         %33 = OpLoad %uint %y
+         %34 = OpBitcast %int %33
+         %35 = OpCompositeConstruct %v2int %32 %34
+               OpStore %coord %35
+         %44 = OpLoad %41 %tex
+         %45 = OpLoad %v2int %coord
+         %47 = OpImage %40 %44
+         %49 = OpImageFetch %v4float %47 %45 Lod %int_0
+         %50 = OpVectorShuffle %v3float %49 %49 0 1 2
+               OpStore %color %50
+         %51 = OpLoad %v3float %color
+         %56 = OpFOrdEqual %v3bool %51 %54
+         %57 = OpAll %bool %56
+         %58 = OpLoad %uint %x
+         %60 = OpULessThan %bool %58 %uint_32
+         %61 = OpLogicalAnd %bool %57 %60
+         %62 = OpLoad %uint %y
+         %63 = OpULessThan %bool %62 %uint_32
+         %64 = OpLogicalAnd %bool %61 %63
+               OpSelectionMerge %66 None
+               OpBranchConditional %64 %65 %71
+         %65 = OpLabel
+         %70 = OpAtomicIIncrement %uint %r %uint_1 %uint_0
+               OpBranch %66
+         %71 = OpLabel
+         %72 = OpLoad %v3float %color
+         %74 = OpFOrdEqual %v3bool %72 %73
+         %75 = OpAll %bool %74
+         %76 = OpLoad %uint %x
+         %77 = OpUGreaterThanEqual %bool %76 %uint_32
+         %78 = OpLogicalAnd %bool %75 %77
+         %79 = OpLoad %uint %y
+         %80 = OpULessThan %bool %79 %uint_32
+         %81 = OpLogicalAnd %bool %78 %80
+               OpSelectionMerge %83 None
+               OpBranchConditional %81 %82 %86
+         %82 = OpLabel
+         %85 = OpAtomicIIncrement %uint %g %uint_1 %uint_0
+               OpBranch %83
+         %86 = OpLabel
+         %87 = OpLoad %v3float %color
+         %89 = OpFOrdEqual %v3bool %87 %88
+         %90 = OpAll %bool %89
+         %91 = OpLoad %uint %x
+         %92 = OpULessThan %bool %91 %uint_32
+         %93 = OpLogicalAnd %bool %90 %92
+         %94 = OpLoad %uint %y
+         %95 = OpUGreaterThanEqual %bool %94 %uint_32
+         %96 = OpLogicalAnd %bool %93 %95
+               OpSelectionMerge %98 None
+               OpBranchConditional %96 %97 %101
+         %97 = OpLabel
+        %100 = OpAtomicIIncrement %uint %b %uint_1 %uint_0
+               OpBranch %98
+        %101 = OpLabel
+        %102 = OpLoad %v3float %color
+        %104 = OpFOrdEqual %v3bool %102 %103
+        %105 = OpAll %bool %104
+        %106 = OpLoad %uint %x
+        %107 = OpUGreaterThanEqual %bool %106 %uint_32
+        %108 = OpLogicalAnd %bool %105 %107
+        %109 = OpLoad %uint %y
+        %110 = OpUGreaterThanEqual %bool %109 %uint_32
+        %111 = OpLogicalAnd %bool %108 %110
+               OpSelectionMerge %113 None
+               OpBranchConditional %111 %112 %113
+        %112 = OpLabel
+        %115 = OpAtomicIIncrement %uint %w %uint_1 %uint_0
+               OpBranch %113
+        %113 = OpLabel
+               OpBranch %98
+         %98 = OpLabel
+               OpBranch %83
+         %83 = OpLabel
+               OpBranch %66
+         %66 = OpLabel
+               OpBranch %23
+         %23 = OpLabel
+        %116 = OpLoad %uint %x
+        %118 = OpIAdd %uint %116 %int_1
+               OpStore %x %118
+               OpBranch %20
+         %22 = OpLabel
+               OpBranch %13
+         %13 = OpLabel
+        %119 = OpLoad %uint %y
+        %120 = OpIAdd %uint %119 %int_1
+               OpStore %y %120
+               OpBranch %10
+         %12 = OpLabel
+               OpReturn
+               OpFunctionEnd
 
 [compute shader]
 #version 330
@@ -50,7 +237,7 @@ void main()
 [test]
 # Setup tex image
 texture rgbw 0 (64, 64)
-uniform int tex 0
+uniform int 0 0
 image texture 0 GL_RGBA8
 
 atomic counters 4
