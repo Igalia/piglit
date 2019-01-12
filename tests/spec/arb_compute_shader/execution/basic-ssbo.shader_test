@@ -16,7 +16,7 @@ layout(local_size_x = SIZE) in;
 
 layout(binding = 0) uniform atomic_uint counter;
 
-layout(std430)
+layout(std430, binding = 0)
 buffer SSBO {
 	uint	u[SIZE];
 };
