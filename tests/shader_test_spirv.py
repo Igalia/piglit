@@ -488,6 +488,7 @@ def fixup_glsl_shaders(shaders, skip_reasons):
         'GL_ARB_uniform_buffer_object',
         'GL_ARB_vertex_attrib_64bit',
         'GL_AMD_conservative_depth',
+        'GL_EXT_shader_integer_mix',
     ])
 
     def first_transform_tokens(token):
