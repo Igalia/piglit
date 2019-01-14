@@ -18,7 +18,7 @@ layout(location = 0) flat out dvec3 a;
 // consumes W component
 layout(location = 1, component = 2) flat out double b;
 
-out vec4 vertex_to_gs;
+layout(location = 2) out vec4 vertex_to_gs;
 
 in vec4 piglit_vertex;
 
@@ -45,7 +45,7 @@ layout(location = 0) flat in dvec3 a[3];
 // consumes W component
 layout(location = 1, component = 2) flat in double b[3];
 
-in vec4 vertex_to_gs[3];
+layout(location = 2) in vec4 vertex_to_gs[3];
 
 // consume X/Y/Z components
 layout(location = 0) flat out dvec3 a_to_fs;
