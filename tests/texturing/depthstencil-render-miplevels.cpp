@@ -109,9 +109,40 @@ bool attach_together = false;
 bool attach_stencil_first = false;
 GLenum depth_format;
 int miplevel0_size;
-int max_miplevel;
-float **depth_miplevel_data;
-uint8_t **stencil_miplevel_data;
+int max_miplevel = 0;
+float **depth_miplevel_data = NULL;
+uint8_t **stencil_miplevel_data = NULL;
+
+static void
+init_buffers()
+{
+       if (!depth_miplevel_data)
+               depth_miplevel_data = (float **)calloc(max_miplevel + 1, sizeof(float *));
+       if (!stencil_miplevel_data)
+               stencil_miplevel_data = (uint8_t **)calloc(max_miplevel + 1,
+                                                          sizeof(uint8_t *));
+}
+
+static void
+deinit_buffers()
+{
+       if (depth_miplevel_data)
+       {
+               for (int i = 0; i <= max_miplevel; ++i)
+                       if (depth_miplevel_data[i])
+                               free(depth_miplevel_data[i]);
+               free(depth_miplevel_data);
+               depth_miplevel_data = NULL;
+       }
+       if (stencil_miplevel_data)
+       {
+               for (int i = 0; i <= max_miplevel; ++i)
+                       if (stencil_miplevel_data[i])
+                               free(stencil_miplevel_data[i]);
+               free(stencil_miplevel_data);
+               stencil_miplevel_data = NULL;
+       }
+}
 
 /**
  * Check if the given depth/stencil/rgba texture internal format is supported.
@@ -222,9 +253,11 @@ set_up_framebuffer_for_miplevel(int level)
 	GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 	if (status == GL_FRAMEBUFFER_UNSUPPORTED && level == 0) {
 		printf("This buffer combination is unsupported\n");
+		deinit_buffers();
 		piglit_report_result(PIGLIT_SKIP);
 	} else if (status != GL_FRAMEBUFFER_COMPLETE) {
 		printf("FBO incomplete at miplevel %d\n", level);
+		deinit_buffers();
 		piglit_report_result(PIGLIT_FAIL);
 	}
 }
@@ -359,10 +392,6 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_depth_texture");
 	piglit_require_extension("GL_ARB_texture_non_power_of_two");
-
-	depth_miplevel_data = (float **)calloc(max_miplevel + 1, sizeof(float *));
-	stencil_miplevel_data = (uint8_t **)calloc(max_miplevel + 1,
-						   sizeof(uint8_t *));
 
 	/* argv[2]: buffer combination */
 	if (strcmp(argv[2], "s=z24_s8") == 0) {
@@ -510,7 +539,10 @@ render_results_to_screen()
 				     GL_RED, GL_FLOAT,
 				     depth_miplevel_data[level]);
 			if (!piglit_check_gl_error(GL_NO_ERROR))
+			{
+				deinit_buffers();
 				piglit_report_result(PIGLIT_FAIL);
+			}
 		}
 
 		render_tex_to_screen(tex, 0, 1);
@@ -527,7 +559,10 @@ render_results_to_screen()
 				     GL_RED, GL_UNSIGNED_BYTE,
 				     stencil_miplevel_data[level]);
 			if (!piglit_check_gl_error(GL_NO_ERROR))
+			{
+				deinit_buffers();
 				piglit_report_result(PIGLIT_FAIL);
+			}
 		}
 
 		render_tex_to_screen(tex, miplevel0_size + 10, 1);
@@ -572,6 +607,8 @@ piglit_display()
 		set_up_framebuffer_for_miplevel(level);
 		populate_miplevel(level);
 	}
+
+	init_buffers();
 	for (int level = 0; level <= max_miplevel; ++level) {
 		set_up_framebuffer_for_miplevel(level);
 		pass = test_miplevel(level) && pass;
@@ -579,6 +616,7 @@ piglit_display()
 
 	if (!piglit_automatic)
 		render_results_to_screen();
+	deinit_buffers();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
