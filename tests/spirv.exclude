@@ -106,6 +106,7 @@ tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage
 tests/spec/arb_shading_language_420pack/linker/different-bindings-shader-storage-blocks-instanced.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks.shader_test
 tests/spec/arb_shading_language_420pack/linker/different-bindings-uniform-blocks-instanced.shader_test
+tests/spec/glsl-1.10/linker/uniform-type-mismatch.shader_test
 tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-member-array-size-mismatch.shader_test
 tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-member-count-mismatch.shader_test
 tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-member-qualifier-mismatch.shader_test
