@@ -18,6 +18,14 @@ function(piglit_make_generated_tests file_list generator_script)
 		VERBATIM)
 endfunction(piglit_make_generated_tests custom_target generator_script)
 
+function(piglit_make_generated_tests_for_gl_spirv file_list generator_script source_prefix source_tests)
+	add_custom_command(
+		OUTPUT ${file_list}
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${generator_script} ${source_tests} --prefix=${source_prefix} ${ARGN}
+		DEPENDS ${generator_script} ${source_prefix}/${source_tests}
+		VERBATIM)
+endfunction(piglit_make_generated_tests_for_gl_spirv)
+
 # Generators for OpenGL tests
 piglit_make_generated_tests(
 	builtin_packing_tests.list
@@ -202,6 +210,17 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	shader_framebuffer_fetch_tests.list
 	gen_shader_framebuffer_fetch_tests.py)
+piglit_make_generated_tests_for_gl_spirv(
+	gl_spirv_tests.list
+	gen_gl_spirv_tests.py
+	${CMAKE_SOURCE_DIR}
+	tests
+	--excludes-from-file=${CMAKE_SOURCE_DIR}/tests/gl_spirv.exclude
+	--success-list-file=gl_spirv_tests.list
+	--mirror=spec/arb_gl_spirv/translated
+	--keep-going
+	--strip-names
+	--jobs=4)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -285,6 +304,12 @@ add_custom_target(gen-cl-tests
 			cl_vload_tests.list
 )
 
+# Create a custom target for generating ARB_gl_spirv shader_tests
+# This is not added to the default target, instead it is added
+# as a dependency of gen-tests if the generation of the
+# ARB_gl_spirv shader_tests is enabled
+add_custom_target(gen-gl-spirv-tests DEPENDS gl_spirv_tests.list)
+
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
 add_custom_target(gen-tests ALL COMMENT "meta-target for other test generators")
@@ -299,3 +324,9 @@ endif(${PIGLIT_BUILD_GL_TESTS} OR ${PIGLIT_BUILD_GLES2_TESTS} OR ${PIGLIT_BUILD_
 if(${PIGLIT_BUILD_CL_TESTS})
 	add_dependencies(gen-tests gen-cl-tests)
 endif(${PIGLIT_BUILD_CL_TESTS})
+
+# Add gen-gl-spirv-tests as a dependency of the gen-tests if they are
+# requested.
+if(${PIGLIT_GENERATE_GL_SPIRV_TESTS})
+	add_dependencies(gen-tests gen-gl-spirv-tests)
+endif(${PIGLIT_GENERATE_GL_SPIRV_TESTS})
