@@ -49,6 +49,9 @@ option(PIGLIT_BUILD_GLES2_TESTS "Build tests for OpenGL ES2" ${PIGLIT_BUILD_GLES
 option(PIGLIT_BUILD_GLES3_TESTS "Build tests for OpenGL ES3" ${PIGLIT_BUILD_GLES_TESTS_DEFAULT})
 option(PIGLIT_BUILD_CL_TESTS "Build tests for OpenCL" OFF)
 
+option(PIGLIT_GENERATE_GL_SPIRV_TESTS
+	"Generate ARB_gl_spirv tests by converting GLSL shader_tests to SPIR-V" OFF)
+
 if(PIGLIT_BUILD_GL_TESTS)
 	find_package(OpenGL REQUIRED)
 endif()
