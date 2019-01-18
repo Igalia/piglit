@@ -39,6 +39,12 @@ tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-ar
 tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-array-vec2-index-rd.shader_test
 tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-array-vec3-index-rd.shader_test
 tests/spec/arb_tessellation_shader/execution/variable-indexing/tes-both-input-array-vec4-index-rd.shader_test
+# d) invariant qualifiers on non-output variables
+tests/spec/glsl-1.50/linker/invariant-qualifier-everywhere-gs-fs-inconsistency.shader_test
+tests/spec/glsl-1.50/linker/invariant-qualifier-everywhere-vs-gs-inconsistency.shader_test
+tests/spec/glsl-1.50/execution/invariant-qualifier-everywhere.shader_test
+tests/spec/glsl-1.50/execution/unsized-in-unnamed-interface-block-multiple.shader_test
+tests/shaders/glsl-invariant-pragma.shader_test
 #
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
