@@ -20,12 +20,10 @@ GLSL >= 4.50
                OpDecorate %color Location 0
                OpDecorate %color XfbBuffer 0
                OpDecorate %color XfbStride 28
-               OpMemberDecorate %S 0 Offset 0
-               OpMemberDecorate %S 1 Offset 4
-               OpMemberDecorate %S 2 Offset 20
                OpDecorate %var Location 0
                OpDecorate %var XfbBuffer 0
                OpDecorate %var XfbStride 28
+               OpDecorate %var Offset 0
                OpDecorate %gl_VertexID BuiltIn VertexId
                OpDecorate %gl_InstanceID BuiltIn InstanceId
        %void = OpTypeVoid
