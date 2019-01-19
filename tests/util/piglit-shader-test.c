@@ -140,7 +140,7 @@ piglit_load_source_from_shader_test(const char *filename,
 		return false;
 	}
 
-	text_size = line - first_line + 1;
+	text_size = line - first_line;
 
 	if (output_source)
 		*output_source = strndup(first_line, text_size);
