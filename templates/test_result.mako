@@ -72,7 +72,7 @@
       <tr>
         <td>Command</td>
         <td>
-          </pre>${value.command}</pre>
+          <pre>${value.command}</pre>
         </td>
       </tr>
     % if value.exception:
