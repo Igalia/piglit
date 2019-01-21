@@ -133,7 +133,7 @@
             ## Add the left most column, the name of the group
             <td>
               <div class="head" style="margin-left: ${depth * 1.75}em">
-                <b>${elem}</b>
+                <b>${elem | h}</b>
               </div>
             </td>
             ## add each group's totals
@@ -149,7 +149,7 @@
         
         <td>
           <div class="group" style="margin-left: ${depth * 1.75}em">
-            ${grouptools.testname(test)}
+            ${grouptools.testname(test) | h}
           </div>
         </td>
         % for res in results.results:
