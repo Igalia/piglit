@@ -4654,6 +4654,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'egl_mesa_query_driver'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_mesa_query_driver'], 'conformance')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'egl_mesa_platform_surfaceless'),
         exclude_platforms=['glx']) as g:
     g(['egl_mesa_platform_surfaceless'], 'conformance')

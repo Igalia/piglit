@@ -12,6 +12,7 @@ add_subdirectory (egl_khr_fence_sync)
 add_subdirectory (egl_khr_surfaceless_context)
 add_subdirectory (egl_mesa_device_software)
 add_subdirectory (egl_mesa_platform_surfaceless)
+add_subdirectory (egl_mesa_query_driver)
 
 if (PIGLIT_HAS_X11)
 	add_subdirectory (egl_chromium_sync_control)
