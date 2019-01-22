@@ -95,7 +95,7 @@
       <tr>
         <th/>
         % for res in results.results:
-          <th class="head"><b>${res.name}</b><br />\
+          <th class="head"><b>${res.name}</b><br>\
           (<a href="${normalize_href(os.path.join(escape_pathname(res.name), 'index.html'))}">info</a>)</th>
         % endfor
       </tr>
