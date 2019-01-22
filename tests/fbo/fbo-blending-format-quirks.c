@@ -42,8 +42,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static enum piglit_result test_formats(const char *name, GLenum formats[2],
-				       float expect[2][4], GLenum factors[2])
+static enum piglit_result
+test_formats(const char *name, const GLenum formats[2],
+	     const float expect[2][4], const GLenum factors[2])
 {
 	GLboolean pass = GL_TRUE;
 	GLuint tex[2], fb;
