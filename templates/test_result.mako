@@ -39,8 +39,8 @@
           % for image in images:
             <tr>
               <td>${image['image_desc']}</td>
-              <td><img src="file://${image['image_ref']}" /></td>
-              <td><img src="file://${image['image_render']}" /></td>
+              <td><img src="file://${image['image_ref']}"></td>
+              <td><img src="file://${image['image_render']}"></td>
             </tr>
           % endfor
           </table>
