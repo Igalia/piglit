@@ -1,0 +1,63 @@
+# From Section 8.13.2 (Interpolation Functions) of the GLSL 4.60 spec:
+#
+#   "For all of the interpolation functions, interpolant must be an l-value
+#    from an in declaration; this can include a variable, a block or
+#    structure member, an array element, or some combination of these."
+#
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 piglit_vertex;
+
+struct S {
+   float b; /* second variable to test that varying packing doesn't break anything */
+   vec3 a;
+};
+
+out S vs2ps[2];
+
+void main()
+{
+   gl_Position = piglit_vertex;
+
+   vs2ps[0].a.xy = piglit_vertex.xy;
+   vs2ps[1].a.z = piglit_vertex.z;
+   vs2ps[0].b = 0.0;
+   vs2ps[1].b = 1.0;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+struct S {
+   float b;
+   vec3 a;
+};
+
+in S vs2ps[2];
+
+out vec4 color;
+
+void main()
+{
+   /* All pixels are fully covered, so these should be the same. */
+   vec3 tmp = vs2ps[0].a - interpolateAtCentroid(vs2ps[0].a);
+   vec3 tmp2 = vs2ps[1].a - interpolateAtCentroid(vs2ps[1].a);
+   vec3 delta = vec3(tmp.xy, tmp2.z);
+
+   if (delta != vec3(0.0)) {
+      color = vec4(1.0, delta.x + 0.5, delta.y + 0.5, delta.z + 0.5);
+   } else {
+      color = vec4(vs2ps[0].b, vs2ps[1].b, 0.0, 1.0);
+   }
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
