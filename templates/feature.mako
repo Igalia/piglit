@@ -30,7 +30,7 @@
   <head>
     <meta charset="UTF-8">
     <title>Result summary</title>
-    <link rel="stylesheet" href="index.css" type="text/css" />
+    <link rel="stylesheet" href="index.css">
   </head>
   <body>
     <h1>Feature readiness</h1>

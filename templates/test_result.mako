@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>${testname} - Details</title>
-    <link rel="stylesheet" href="${css}" type="text/css" />
+    <link rel="stylesheet" href="${css}">
   </head>
   <body>
     <h1>Results for ${testname}</h1>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>Result summary</title>
-    <link rel="stylesheet" href="status.css" type="text/css" />
+    <link rel="stylesheet" href="status.css">
   </head>
   <body>
     <h1>Result summary</h1>

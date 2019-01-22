@@ -6,7 +6,7 @@
   <head>
     <meta charset="UTF-8">
     <title>${name} - System info</title>
-    <link rel="stylesheet" href="../result.css" type="text/css" />
+    <link rel="stylesheet" href="../result.css">
   </head>
   <body>
     <h1>System info for ${name}</h1>
