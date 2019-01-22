@@ -2,7 +2,7 @@
   import six
 %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>${name} - System info</title>

@@ -26,7 +26,7 @@
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>Result summary</title>
