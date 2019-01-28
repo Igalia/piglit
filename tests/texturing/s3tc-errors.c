@@ -171,8 +171,8 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 {
 #ifdef PIGLIT_USE_OPENGL
 	GLubyte *compressed_image;
-#endif
 	GLenum format2;
+#endif
 	int x, y, w, h;
 	GLuint tex;
 	bool pass = true;
