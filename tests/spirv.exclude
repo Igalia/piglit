@@ -45,7 +45,13 @@ tests/spec/glsl-1.50/linker/invariant-qualifier-everywhere-vs-gs-inconsistency.s
 tests/spec/glsl-1.50/execution/invariant-qualifier-everywhere.shader_test
 tests/spec/glsl-1.50/execution/unsized-in-unnamed-interface-block-multiple.shader_test
 tests/shaders/glsl-invariant-pragma.shader_test
-#
+# e) glslang assign incorrectly locations for struct variables with
+#   the different names across stages. Works fine if assigning
+#   location manually
+tests/spec/arb_separate_shader_objects/execution/layout-location-named-block.shader_test
+tests/spec/arb_separate_shader_objects/execution/layout-location-struct.shader_test
+tests/spec/arb_separate_shader_objects/execution/layout-location-struct-mixed-with-implicitly-assigned-varying.shader_test
+
 tests/spec/arb_gpu_shader5/execution/samplemaskin-indirect.shader_test
 tests/spec/glsl-1.50/execution/interface-blocks-complex-vs-fs.shader_test
 # Uses legacy clip planes. SPIR-V forces a core context so this won’t work
