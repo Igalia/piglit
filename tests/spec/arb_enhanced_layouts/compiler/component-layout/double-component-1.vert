@@ -1,6 +1,6 @@
 // [config]
 // expect_result: fail
-// glsl_version: 1.40
+// glsl_version: 1.50
 // require_extensions: GL_ARB_enhanced_layouts GL_ARB_gpu_shader_fp64 GL_ARB_separate_shader_objects
 // [end config]
 //
@@ -9,7 +9,7 @@
 //   "It is a compile-time error to use component 1 or 3 as the beginning of a
 //   double or dvec2."
 
-#version 140
+#version 150
 #extension GL_ARB_enhanced_layouts: require
 #extension GL_ARB_gpu_shader_fp64: require
 #extension GL_ARB_separate_shader_objects: require
