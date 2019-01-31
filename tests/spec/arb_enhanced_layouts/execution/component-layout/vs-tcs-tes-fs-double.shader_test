@@ -15,13 +15,16 @@ GL_ARB_gpu_shader_fp64
 
 in vec4 vertex;
 
-// consume Y/Z/W components
+// consume also X/Y components in location 1
 layout(location = 0) flat out dvec3 a;
 
-// consumes X component
+// consume Z/W components
 layout(location = 1, component = 2) flat out double b;
 
+// consume X/Y components
 layout(location = 2, component = 0) flat out double c;
+
+// consume Z/W components
 layout(location = 2, component = 2) flat out double d;
 
 void main()
@@ -44,22 +47,28 @@ void main()
 
 layout(vertices = 3) out;
 
-// consume Y/Z/W components
+// consume also X/Y components in location 1
 layout(location = 0) flat in dvec3 a[];
 
-// consumes X component
+// consume Z/W components
 layout(location = 1, component = 2) flat in double b[];
 
+// consume X/Y components
 layout(location = 2, component = 0) flat in double c[];
+
+// consume Z/W components
 layout(location = 2, component = 2) flat in double d[];
 
-// consume Y/Z/W components
+// consume also X/Y components in location 1
 layout(location = 0) flat out dvec3 a_tcs[];
 
-// consumes X component
+// consume Z/W components
 layout(location = 1, component = 2) flat out double b_tcs[];
 
+// consume X/Y components
 layout(location = 2, component = 0) flat out double c_tcs[];
+
+// consume Z/W components
 layout(location = 2, component = 2) flat out double d_tcs[];
 
 void main() {
@@ -82,22 +91,28 @@ void main() {
 
 layout(triangles) in;
 
-// consume Y/Z/W components
+// consume also X/Y components in location 1
 layout(location = 0) flat in dvec3 a_tcs[];
 
-// consumes X component
+// consume Z/W components
 layout(location = 1, component = 2) flat in double b_tcs[];
 
+// consume X/Y components
 layout(location = 2, component = 0) flat in double c_tcs[];
+
+// consume Z/W components
 layout(location = 2, component = 2) flat in double d_tcs[];
 
-// consume Y/Z/W components
+// consume also X/Y components in location 1
 layout(location = 0) flat out dvec3 a_tes;
 
-// consumes X component
+// consume Z/W components
 layout(location = 1, component = 2) flat out double b_tes;
 
+// consume X/Y components
 layout(location = 2, component = 0) flat out double c_tes;
+
+// consume Z/W components
 layout(location = 2, component = 2) flat out double d_tes;
 
 void main() {
@@ -119,13 +134,16 @@ void main() {
 
 out vec4 color;
 
-// consume Y/Z/W components
+// consume also X/Y components in location 1
 layout(location = 0) flat in dvec3 a_tes;
 
-// consumes X component
+// consume Z/W components
 layout(location = 1, component = 2) flat in double b_tes;
 
+// consume X/Y components
 layout(location = 2, component = 0) flat in double c_tes;
+
+// consume Z/W components
 layout(location = 2, component = 2) flat in double d_tes;
 
 void main()
