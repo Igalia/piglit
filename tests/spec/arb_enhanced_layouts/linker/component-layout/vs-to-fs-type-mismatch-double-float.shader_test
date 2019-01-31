@@ -27,7 +27,7 @@ GL_ARB_gpu_shader_fp64
 // consume X/Y components
 layout(location = 7, component = 0) flat out double a;
 
-// consumes Y component
+// consumes Z component
 layout(location = 7, component = 2) out float b;
 
 void main()
@@ -47,7 +47,7 @@ out vec4 color;
 // consume X/Y components
 layout(location = 7, component = 0) flat in double a;
 
-// consumes Y component
+// consumes Z component
 layout(location = 7, component = 2) in float b;
 
 void main()
