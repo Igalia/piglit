@@ -13,7 +13,7 @@
 #extension GL_ARB_gpu_shader_fp64: require
 #extension GL_ARB_separate_shader_objects: require
 
-layout(location = 0, component = 1) out dvec4 b;
+layout(location = 0, component = 0) out dvec4 b;
 
 void main()
 {
