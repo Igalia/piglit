@@ -1,6 +1,6 @@
 // [config]
 // expect_result: fail
-// glsl_version: 1.40
+// glsl_version: 1.50
 // require_extensions: GL_ARB_enhanced_layouts GL_ARB_gpu_shader_fp64 GL_ARB_separate_shader_objects
 // [end config]
 //
@@ -12,7 +12,7 @@
 //   will consume two of these components, and a dvec2 will consume all four
 //   components available within a location."
 
-#version 140
+#version 150
 #extension GL_ARB_enhanced_layouts: require
 #extension GL_ARB_gpu_shader_fp64: require
 #extension GL_ARB_separate_shader_objects: require
