@@ -1,16 +1,17 @@
-// From Section 4.4.1 (Input Layout Qualifiers) of the GLSL 4.50 spec:
+// From Section 4.4.1 (Input Layout Qualifiers) of the GLSL 4.60 spec:
 //
-//   "Location aliasing is causing two variables or block members to have the
-//   same location number. Component aliasing is assigning the same (or
-//   overlapping) component numbers for two location aliases. (Recall if
-//   component is not used, components are assigned starting with 0.) With one
-//   exception, location aliasing is allowed only if it does not cause
-//   component aliasing; it is a compile-time or link-time error to cause
-//   component aliasing."
-//
-//   "Further, when location aliasing, the aliases sharing the location must
-//   have the same underlying numerical type (floating-point or integer) and
-//   the same auxiliary storage and interpolation qualification"
+//   "Location aliasing is causing two variables or block members to
+//    have the same location number. Component aliasing is assigning
+//    the same (or overlapping) component numbers for two location
+//    aliases. (Recall if component is not used, components are
+//    assigned starting with 0.) With one exception, location aliasing
+//    is allowed only if it does not cause component aliasing; it is a
+//    compile-time or link-time error to cause component
+//    aliasing. Further, when location aliasing, the aliases sharing
+//    the location must have the same underlying numerical type and
+//    bit width (floating-point or integer, 32-bit versus 64-bit,
+//    etc.) and the same auxiliary storage and interpolation
+//    qualification."
 
 [require]
 GLSL >= 1.50
