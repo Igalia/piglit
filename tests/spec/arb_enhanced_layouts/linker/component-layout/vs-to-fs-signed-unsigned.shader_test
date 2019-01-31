@@ -23,10 +23,10 @@ GL_ARB_separate_shader_objects
 #extension GL_ARB_separate_shader_objects: require
 
 // consume X/Y/Z components
-layout(location = 0) out ivec3 a;
+layout(location = 0) flat out ivec3 a;
 
 // consumes W component
-layout(location = 0, component = 3) out uint b;
+layout(location = 0, component = 3) flat out uint b;
 
 void main()
 {
@@ -53,4 +53,4 @@ void main()
 }
 
 [test]
-link error
+link success
