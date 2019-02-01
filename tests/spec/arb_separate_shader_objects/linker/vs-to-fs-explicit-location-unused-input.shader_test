@@ -1,0 +1,38 @@
+// From the ARB_separate_shader_objects spec v.25:
+//
+//   "   * An output variable is considered to match an input variable
+//         in the subequent shader if:
+//
+//         * the two variables match in name, type, and qualification;
+//           or
+//
+//         * the two variables are declared with the same location
+//           layout qualifier and match in type and qualification."
+//
+//   ...
+//
+//   " For program objects containing multiple shaders, LinkProgram
+//     will check for mismatches on interfaces between shader stages
+//     in the program being linked and generate a link error if a
+//     mismatch is detected.  A link error will be generated if any
+//     statically referenced input variable or block does not have a
+//     matching output."
+
+[require]
+GLSL >= 1.40
+GL_ARB_separate_shader_objects
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 140
+#extension GL_ARB_separate_shader_objects : require
+
+layout(location = 0) in vec4 in1;
+
+void main()
+{
+}
+
+[test]
+link success
