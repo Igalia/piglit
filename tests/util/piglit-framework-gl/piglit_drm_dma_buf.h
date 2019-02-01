@@ -40,6 +40,10 @@
 #define DRM_FORMAT_GR88 fourcc_code('G', 'R', '8', '8')
 #endif
 
+#ifndef DRM_FORMAT_P010
+#define DRM_FORMAT_P010 fourcc_code('P', '0', '1', '0') /* 2x2 subsampled Cb:Cr plane 10 bits per channel */
+#endif
+
 /* added in libdrm 2.4.95 */
 #ifndef DRM_FORMAT_INVALID
 #define DRM_FORMAT_INVALID 0

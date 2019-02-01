@@ -45,6 +45,17 @@ static int fourcc = -1;
 enum piglit_result
 piglit_display(void)
 {
+	static const uint16_t p010[] = {
+		/* Y */
+		201,  281,  361, 441,
+		201,  281,  361, 441,
+		201,  281,  361, 441,
+		201,  281,  361, 441,
+		/* UV */
+		481, 522, 562, 522,
+		481, 642, 562, 642,
+	};
+
 	static const unsigned char nv12[] = {
 		/* Y */
 		 50,  70,  90, 110,
@@ -127,6 +138,9 @@ piglit_display(void)
 
 	enum piglit_result res;
 	switch (fourcc) {
+	case DRM_FORMAT_P010:
+		t = (unsigned char *) p010;
+		break;
 	case DRM_FORMAT_NV12:
 		t = nv12;
 		break;

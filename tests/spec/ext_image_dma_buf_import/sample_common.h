@@ -25,6 +25,7 @@
 
 #include "piglit-util-egl.h"
 #include "piglit-util-gl.h"
+#include "piglit-framework-gl/piglit_drm_dma_buf.h"
 
 /**
  * Create a dma buffer with format 'fourcc' setting the given pixels as its

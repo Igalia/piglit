@@ -153,6 +153,7 @@ egl_image_for_dma_buf_fd(struct piglit_dma_buf *buf, int fd, int fourcc, EGLImag
 	EGLint *attr;
 	switch (fourcc) {
 	case DRM_FORMAT_NV12:
+	case DRM_FORMAT_P010:
 		attr = attr_nv12;
 		break;
 	case DRM_FORMAT_YUV420:
