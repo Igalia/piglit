@@ -1,0 +1,62 @@
+// From Section 4.4.1 (Input Layout Qualifiers) of the GLSL 4.60 spec:
+//
+//   " Location aliasing is causing two variables or block members to
+//     have the same location number. Component aliasing is assigning
+//     the same (or overlapping) component numbers for two location
+//     aliases. (Recall if component is not used, components are
+//     assigned starting with 0.) With one exception, location
+//     aliasing is allowed only if it does not cause component
+//     aliasing; it is a compile-time or link-time error to cause
+//     component aliasing."
+//
+// From Section 7.4.1 (Shader Interface Matching) of the OpenGL 4.60 spec:
+//
+//   "   * An output variable is considered to match an input variable
+//         in the subsequent shader if:
+//
+//         – the two variables match in name, type, and qualification,
+//           and neither has a location qualifier, or
+//
+//         – the two variables are declared with the same location and
+//           component layout qualifiers and match in type and
+//           qualification."
+
+[require]
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+GL_ARB_gpu_shader_fp64
+GL_ARB_separate_shader_objects
+
+[vertex shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_gpu_shader_fp64: require
+#extension GL_ARB_separate_shader_objects: require
+
+// consumes Z/W components
+layout(location = 0, component = 2) flat out double a;
+
+void main()
+{
+  a = 1.0;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_gpu_shader_fp64: require
+#extension GL_ARB_separate_shader_objects: require
+
+out vec4 color;
+
+// consumes Z/W components
+layout(location = 0, component = 2) flat in double b;
+layout(location = 0, component = 2) flat in double c;
+
+void main()
+{
+  color = vec4(c, b, 0.0, 1.0);
+}
+
+[test]
+link error
