@@ -1247,7 +1247,7 @@ process_requirement(const char *line)
 		   parse_word_copy(line, buffer, sizeof(buffer), &line)) {
 		if (shader_runner_is_extension_supported(buffer))
 			return PIGLIT_SKIP;
-	} else if (parse_str(line, "GLSL", &line)) {
+	} else if (parse_str(line, "GLSL", &line) && !spirv_replaces_glsl) {
 		enum comparison cmp;
 
 		parse_version_comparison(line, &cmp, &glsl_req_version,
