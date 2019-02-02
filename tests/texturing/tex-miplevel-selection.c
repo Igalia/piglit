@@ -326,7 +326,7 @@ piglit_init(int argc, char **argv)
 	if (target == TEX_2D_ARRAY_SHADOW &&
 	    test == GL3_TEXTURE_OFFSET) {
 		piglit_require_GLSL_version(430);
-		version = "430";
+		version = "430 compatibility";
 	}
 
 	switch (target) {
