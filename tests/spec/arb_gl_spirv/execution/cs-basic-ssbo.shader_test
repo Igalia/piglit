@@ -1,0 +1,184 @@
+# This is copied from arb_compute_shader/execution/basic-ssbo.shader_test
+#
+# The difference is that we explicitly assign a binding to the SSBO.
+# Without a binding number specified, glslang implicitly assigns a
+# binding number of 1 to the SSBO, while Mesa assigns a binding number
+# of 0. To ensure the test runs consistently in both cases, assign the
+# binding explicitly.
+
+[require]
+SPIRV YES
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_shader_storage_buffer_object
+GL_ARB_shader_atomic_counters
+
+[compute shader spirv]
+; Automatically generated from the GLSL by gen_gl_spirv_tests.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 60
+; Schema: 0
+               OpCapability Shader
+               OpCapability AtomicStorage
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_LocalInvocationIndex
+               OpExecutionMode %main LocalSize 256 1 1
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_compute_shader"
+               OpSourceExtension "GL_ARB_shader_atomic_counters"
+               OpName %_ ""
+               OpDecorate %gl_LocalInvocationIndex BuiltIn LocalInvocationIndex
+               OpDecorate %mode Location 0
+               OpDecorate %mode DescriptorSet 0
+               OpDecorate %mode Binding 1
+               OpDecorate %_arr_uint_uint_256 ArrayStride 4
+               OpMemberDecorate %SSBO 0 Offset 0
+               OpDecorate %SSBO BufferBlock
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 0
+               OpDecorate %counter Offset 0
+               OpDecorate %counter DescriptorSet 0
+               OpDecorate %counter Binding 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+%_ptr_Function_uint = OpTypePointer Function %uint
+%_ptr_Input_uint = OpTypePointer Input %uint
+%gl_LocalInvocationIndex = OpVariable %_ptr_Input_uint Input
+%_ptr_UniformConstant_uint = OpTypePointer UniformConstant %uint
+       %mode = OpVariable %_ptr_UniformConstant_uint UniformConstant
+   %uint_256 = OpConstant %uint 256
+%_arr_uint_uint_256 = OpTypeArray %uint %uint_256
+       %SSBO = OpTypeStruct %_arr_uint_uint_256
+%_ptr_Uniform_SSBO = OpTypePointer Uniform %SSBO
+          %_ = OpVariable %_ptr_Uniform_SSBO Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_uint = OpTypePointer Uniform %uint
+       %bool = OpTypeBool
+%_ptr_AtomicCounter_uint = OpTypePointer AtomicCounter %uint
+    %counter = OpVariable %_ptr_AtomicCounter_uint AtomicCounter
+     %uint_1 = OpConstant %uint 1
+     %uint_0 = OpConstant %uint 0
+     %v3uint = OpTypeVector %uint 3
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_256 %uint_1 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %index = OpVariable %_ptr_Function_uint Function
+         %11 = OpLoad %uint %gl_LocalInvocationIndex
+               OpStore %index %11
+         %14 = OpLoad %uint %mode
+               OpSelectionMerge %19 None
+               OpSwitch %14 %19 0 %15 1 %16 2 %17 3 %18
+         %15 = OpLabel
+         %27 = OpLoad %uint %index
+         %29 = OpAccessChain %_ptr_Uniform_uint %_ %int_0 %27
+               OpStore %29 %uint_256
+               OpBranch %19
+         %16 = OpLabel
+         %31 = OpLoad %uint %index
+         %32 = OpLoad %uint %index
+         %33 = OpAccessChain %_ptr_Uniform_uint %_ %int_0 %31
+               OpStore %33 %32
+               OpBranch %19
+         %17 = OpLabel
+         %35 = OpLoad %uint %index
+         %36 = OpAccessChain %_ptr_Uniform_uint %_ %int_0 %35
+         %37 = OpLoad %uint %36
+         %39 = OpIEqual %bool %37 %uint_256
+               OpSelectionMerge %41 None
+               OpBranchConditional %39 %40 %41
+         %40 = OpLabel
+         %46 = OpAtomicIIncrement %uint %counter %uint_1 %uint_0
+               OpBranch %41
+         %41 = OpLabel
+               OpBranch %19
+         %18 = OpLabel
+         %48 = OpLoad %uint %index
+         %49 = OpAccessChain %_ptr_Uniform_uint %_ %int_0 %48
+         %50 = OpLoad %uint %49
+         %51 = OpLoad %uint %index
+         %52 = OpIEqual %bool %50 %51
+               OpSelectionMerge %54 None
+               OpBranchConditional %52 %53 %54
+         %53 = OpLabel
+         %55 = OpAtomicIIncrement %uint %counter %uint_1 %uint_0
+               OpBranch %54
+         %54 = OpLabel
+               OpBranch %19
+         %19 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_storage_buffer_object: require
+#extension GL_ARB_shader_atomic_counters: require
+
+#define SIZE 256u
+
+layout(local_size_x = SIZE) in;
+
+layout(binding = 0) uniform atomic_uint counter;
+
+layout(std430, binding = 0)
+buffer SSBO {
+	uint	u[SIZE];
+};
+
+uniform uint mode;
+
+void main()
+{
+	uint index = gl_LocalInvocationIndex;
+
+	switch (mode) {
+	case 0u:
+		u[index] = SIZE;
+		break;
+	case 1u:
+		u[index] = index;
+		break;
+	case 2u:
+		if (u[index] == SIZE)
+			atomicCounterIncrement(counter);
+		break;
+	case 3u:
+		if (u[index] == index)
+			atomicCounterIncrement(counter);
+		break;
+	}
+}
+
+[test]
+atomic counters 1
+ssbo 0 1024
+
+uniform uint 0 0
+compute 1 1 1
+probe atomic counter 0 == 0
+
+uniform uint 0 3
+compute 1 1 1
+probe atomic counter 0 == 0
+
+uniform uint 0 2
+compute 1 1 1
+probe atomic counter 0 == 256
+
+uniform uint 0 1
+compute 1 1 1
+probe atomic counter 0 == 256
+
+uniform uint 0 2
+compute 1 1 1
+probe atomic counter 0 == 256
+
+uniform uint 0 3
+compute 1 1 1
+probe atomic counter 0 == 512
