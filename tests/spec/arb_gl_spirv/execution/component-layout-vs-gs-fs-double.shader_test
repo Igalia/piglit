@@ -1,0 +1,312 @@
+# Test layout component qualifier on a double between multiple shader stages.
+#
+# Copied from
+# arb_enhanced_layouts/execution/component-layout/vs-gs-fs-double.shader_test,
+# the difference is that we explicitly specify locations for inputs and outputs
+# in component-layout tests.  The current version of glslang doesn't handle a
+# mixture of explicit and implicit locations for inputs and outputs, so we made
+# all locations explicit.
+
+[require]
+SPIRV YES
+GLSL >= 1.50
+GL_ARB_enhanced_layouts
+GL_ARB_separate_shader_objects
+GL_ARB_gpu_shader_fp64
+
+[vertex shader spirv]
+; Automatically generated from the GLSL by gen_gl_spirv_tests.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 28
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %main "main" %a %b %vertex_to_gs %piglit_vertex %gl_VertexID %gl_InstanceID
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_enhanced_layouts"
+               OpSourceExtension "GL_ARB_separate_shader_objects"
+               OpDecorate %a Flat
+               OpDecorate %a Location 0
+               OpDecorate %b Flat
+               OpDecorate %b Component 2
+               OpDecorate %b Location 1
+               OpDecorate %vertex_to_gs Location 2
+               OpDecorate %piglit_vertex Location 0
+               OpDecorate %gl_VertexID BuiltIn VertexId
+               OpDecorate %gl_InstanceID BuiltIn InstanceId
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+     %double = OpTypeFloat 64
+   %v3double = OpTypeVector %double 3
+%_ptr_Output_v3double = OpTypePointer Output %v3double
+          %a = OpVariable %_ptr_Output_v3double Output
+   %double_0 = OpConstant %double 0
+%double_0_75 = OpConstant %double 0.75
+   %double_1 = OpConstant %double 1
+         %13 = OpConstantComposite %v3double %double_0 %double_0_75 %double_1
+%_ptr_Output_double = OpTypePointer Output %double
+          %b = OpVariable %_ptr_Output_double Output
+ %double_0_5 = OpConstant %double 0.5
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+%vertex_to_gs = OpVariable %_ptr_Output_v4float Output
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%piglit_vertex = OpVariable %_ptr_Input_v4float Input
+        %int = OpTypeInt 32 1
+%_ptr_Input_int = OpTypePointer Input %int
+%gl_VertexID = OpVariable %_ptr_Input_int Input
+%gl_InstanceID = OpVariable %_ptr_Input_int Input
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+               OpStore %a %13
+               OpStore %b %double_0_5
+         %23 = OpLoad %v4float %piglit_vertex
+               OpStore %vertex_to_gs %23
+               OpReturn
+               OpFunctionEnd
+
+[vertex shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_gpu_shader_fp64: require
+
+// consume X/Y/Z components
+layout(location = 0) flat out dvec3 a;
+
+// consumes W component
+layout(location = 1, component = 2) flat out double b;
+
+layout(location = 2) out vec4 vertex_to_gs;
+
+in vec4 piglit_vertex;
+
+void main()
+{
+  a = dvec3(0.0, 0.75, 1.0);
+  b = 0.5LF;
+
+  vertex_to_gs = piglit_vertex;
+}
+
+[geometry shader spirv]
+; Automatically generated from the GLSL by gen_gl_spirv_tests.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 60
+; Schema: 0
+               OpCapability Geometry
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Geometry %main "main" %_ %vertex_to_gs %a_to_fs %a %b_to_fs %b
+               OpExecutionMode %main Triangles
+               OpExecutionMode %main Invocations 1
+               OpExecutionMode %main OutputTriangleStrip
+               OpExecutionMode %main OutputVertices 3
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_enhanced_layouts"
+               OpSourceExtension "GL_ARB_separate_shader_objects"
+               OpName %_ ""
+               OpMemberDecorate %gl_PerVertex 0 BuiltIn Position
+               OpMemberDecorate %gl_PerVertex 1 BuiltIn PointSize
+               OpMemberDecorate %gl_PerVertex 2 BuiltIn ClipDistance
+               OpMemberDecorate %gl_PerVertex 3 BuiltIn CullDistance
+               OpDecorate %gl_PerVertex Block
+               OpDecorate %vertex_to_gs Location 2
+               OpDecorate %a_to_fs Flat
+               OpDecorate %a_to_fs Location 0
+               OpDecorate %a Flat
+               OpDecorate %a Location 0
+               OpDecorate %b_to_fs Flat
+               OpDecorate %b_to_fs Component 2
+               OpDecorate %b_to_fs Location 1
+               OpDecorate %b Flat
+               OpDecorate %b Component 2
+               OpDecorate %b Location 1
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %int_0 = OpConstant %int 0
+      %int_3 = OpConstant %int 3
+       %bool = OpTypeBool
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_float_uint_1 = OpTypeArray %float %uint_1
+%gl_PerVertex = OpTypeStruct %v4float %float %_arr_float_uint_1 %_arr_float_uint_1
+%_ptr_Output_gl_PerVertex = OpTypePointer Output %gl_PerVertex
+          %_ = OpVariable %_ptr_Output_gl_PerVertex Output
+     %uint_3 = OpConstant %uint 3
+%_arr_v4float_uint_3 = OpTypeArray %v4float %uint_3
+%_ptr_Input__arr_v4float_uint_3 = OpTypePointer Input %_arr_v4float_uint_3
+%vertex_to_gs = OpVariable %_ptr_Input__arr_v4float_uint_3 Input
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+     %double = OpTypeFloat 64
+   %v3double = OpTypeVector %double 3
+%_ptr_Output_v3double = OpTypePointer Output %v3double
+    %a_to_fs = OpVariable %_ptr_Output_v3double Output
+%_arr_v3double_uint_3 = OpTypeArray %v3double %uint_3
+%_ptr_Input__arr_v3double_uint_3 = OpTypePointer Input %_arr_v3double_uint_3
+          %a = OpVariable %_ptr_Input__arr_v3double_uint_3 Input
+%_ptr_Input_v3double = OpTypePointer Input %v3double
+%_ptr_Output_double = OpTypePointer Output %double
+    %b_to_fs = OpVariable %_ptr_Output_double Output
+%_arr_double_uint_3 = OpTypeArray %double %uint_3
+%_ptr_Input__arr_double_uint_3 = OpTypePointer Input %_arr_double_uint_3
+          %b = OpVariable %_ptr_Input__arr_double_uint_3 Input
+%_ptr_Input_double = OpTypePointer Input %double
+      %int_1 = OpConstant %int 1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+          %i = OpVariable %_ptr_Function_int Function
+               OpStore %i %int_0
+               OpBranch %10
+         %10 = OpLabel
+               OpLoopMerge %12 %13 None
+               OpBranch %14
+         %14 = OpLabel
+         %15 = OpLoad %int %i
+         %18 = OpSLessThan %bool %15 %int_3
+               OpBranchConditional %18 %11 %12
+         %11 = OpLabel
+         %31 = OpLoad %int %i
+         %33 = OpAccessChain %_ptr_Input_v4float %vertex_to_gs %31
+         %34 = OpLoad %v4float %33
+         %36 = OpAccessChain %_ptr_Output_v4float %_ %int_0
+               OpStore %36 %34
+         %44 = OpLoad %int %i
+         %46 = OpAccessChain %_ptr_Input_v3double %a %44
+         %47 = OpLoad %v3double %46
+               OpStore %a_to_fs %47
+         %53 = OpLoad %int %i
+         %55 = OpAccessChain %_ptr_Input_double %b %53
+         %56 = OpLoad %double %55
+               OpStore %b_to_fs %56
+               OpEmitVertex
+               OpBranch %13
+         %13 = OpLabel
+         %57 = OpLoad %int %i
+         %59 = OpIAdd %int %57 %int_1
+               OpStore %i %59
+               OpBranch %10
+         %12 = OpLabel
+               OpReturn
+               OpFunctionEnd
+
+[geometry shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_gpu_shader_fp64: require
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+// consume X/Y/Z components
+layout(location = 0) flat in dvec3 a[3];
+
+// consumes W component
+layout(location = 1, component = 2) flat in double b[3];
+
+layout(location = 2) in vec4 vertex_to_gs[3];
+
+// consume X/Y/Z components
+layout(location = 0) flat out dvec3 a_to_fs;
+
+// consumes W component
+layout(location = 1, component = 2) flat out double b_to_fs;
+
+void main()
+{
+  for (int i = 0; i < 3; i++) {
+    gl_Position = vertex_to_gs[i];
+    a_to_fs = a[i];
+    b_to_fs = b[i];
+    EmitVertex();
+  }
+}
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by gen_gl_spirv_tests.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 25
+; Schema: 0
+               OpCapability Shader
+               OpCapability Float64
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color %b_to_fs %a_to_fs
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_enhanced_layouts"
+               OpSourceExtension "GL_ARB_separate_shader_objects"
+               OpDecorate %color Location 0
+               OpDecorate %b_to_fs Flat
+               OpDecorate %b_to_fs Component 2
+               OpDecorate %b_to_fs Location 1
+               OpDecorate %a_to_fs Flat
+               OpDecorate %a_to_fs Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+     %double = OpTypeFloat 64
+%_ptr_Input_double = OpTypePointer Input %double
+    %b_to_fs = OpVariable %_ptr_Input_double Input
+   %v3double = OpTypeVector %double 3
+%_ptr_Input_v3double = OpTypePointer Input %v3double
+    %a_to_fs = OpVariable %_ptr_Input_v3double Input
+    %v3float = OpTypeVector %float 3
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %13 = OpLoad %double %b_to_fs
+         %14 = OpFConvert %float %13
+         %18 = OpLoad %v3double %a_to_fs
+         %20 = OpFConvert %v3float %18
+         %21 = OpCompositeExtract %float %20 0
+         %22 = OpCompositeExtract %float %20 1
+         %23 = OpCompositeExtract %float %20 2
+         %24 = OpCompositeConstruct %v4float %14 %21 %22 %23
+               OpStore %color %24
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 150
+#extension GL_ARB_enhanced_layouts: require
+#extension GL_ARB_separate_shader_objects: require
+#extension GL_ARB_gpu_shader_fp64: require
+
+out vec4 color;
+
+// consume X/Y/Z components
+layout(location = 0) flat in dvec3 a_to_fs;
+
+// consumes W component
+layout(location = 1, component = 2) flat in double b_to_fs;
+
+void main()
+{
+  color = vec4(b_to_fs, a_to_fs);
+}
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+
+draw rect -1 -1 2 2
+probe all rgb 0.5 0 0.75
