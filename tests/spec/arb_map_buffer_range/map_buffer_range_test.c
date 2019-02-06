@@ -55,6 +55,19 @@ verify_buffer(GLenum target, int offset, int length, void const *compare) {
 	return ret == 0;
 }
 
+static void
+clear_buffer(GLenum target)
+{
+	if (piglit_is_extension_supported("GL_ARB_clear_buffer_object")) {
+		/* Clear the buffer just to make the device busy, so that
+		 * the driver can't optimize MapBufferRange to unsychronized
+		 * without explicit_flush.
+		 */
+		int zero = 0;
+		glClearBufferData(target, GL_R32I, GL_RED_INTEGER, GL_INT, &zero);
+	}
+}
+
 /* This test relies on simple patterns, so using offets which are multiples of
  * 0x100 is bad
  */
@@ -131,6 +144,32 @@ piglit_init(int argc, char *argv[])
 						    GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(ptr, temp_data, 100);
 	glFlushMappedBufferRange(target, 0x0, 100);
+	glUnmapBuffer(target);
+	glCopyBufferSubData(target, verify, 0xa002, 100, 100);
+	ret = verify_buffer(verify, 100, 100, temp_data);
+	if (!ret)
+		piglit_report_result(PIGLIT_FAIL);
+
+        /* 3c: test with flushed range, invalidate range */
+	clear_buffer(target);
+	ptr = glMapBufferRange(target, 0xa002, 100, GL_MAP_WRITE_BIT |
+						    GL_MAP_FLUSH_EXPLICIT_BIT |
+						    GL_MAP_INVALIDATE_RANGE_BIT);
+	memcpy(ptr, temp_data, 100);
+	glFlushMappedBufferRange(target, 0x0, 100);
+	glUnmapBuffer(target);
+	glCopyBufferSubData(target, verify, 0xa002, 100, 100);
+	ret = verify_buffer(verify, 100, 100, temp_data);
+	if (!ret)
+		piglit_report_result(PIGLIT_FAIL);
+
+	/* 3d: test with flushed range, invalidate range, non-zero flush offset */
+	clear_buffer(target);
+	ptr = glMapBufferRange(target, 0xa002 - 4, 104, GL_MAP_WRITE_BIT |
+							GL_MAP_FLUSH_EXPLICIT_BIT |
+							GL_MAP_INVALIDATE_RANGE_BIT);
+	memcpy(ptr + 4, temp_data, 100);
+	glFlushMappedBufferRange(target, 0x4, 100);
 	glUnmapBuffer(target);
 	glCopyBufferSubData(target, verify, 0xa002, 100, 100);
 	ret = verify_buffer(verify, 100, 100, temp_data);
