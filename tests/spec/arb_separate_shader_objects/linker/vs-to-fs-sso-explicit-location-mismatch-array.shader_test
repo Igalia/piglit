@@ -1,0 +1,43 @@
+// From the ARB_separate_shader_objects spec v.25:
+//
+//  " With separable program objects, interfaces between shader stages
+//    may involve the outputs from one program object and the inputs
+//    from a second program object.  For such interfaces, it is not
+//    possible to detect mismatches at link time, because the programs
+//    are linked separately.  When each such program is linked, all
+//    inputs or outputs interfacing with another program stage are
+//    treated as active.  The linker will generate an executable that
+//    assumes the presence of a compatible program on the other side
+//    of the interface.  If a mismatch between programs occurs, no GL
+//    error will be generated, but some or all of the inputs on the
+//    interface will be undefined."
+
+[require]
+GLSL >= 1.40
+GL_ARB_separate_shader_objects
+SSO ENABLED
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 140
+#extension GL_ARB_separate_shader_objects : require
+
+uniform int i;
+
+layout(location = 1) in vec4 out1[2];
+
+out vec4 color;
+
+void main()
+{
+	if (i == 0)
+		color = out1[0];
+	else if (i == 1)
+		color = out1[1];
+	else
+		color = vec4(0.0);
+}
+
+[test]
+link success
