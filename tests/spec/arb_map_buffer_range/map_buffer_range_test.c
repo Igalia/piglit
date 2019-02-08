@@ -63,8 +63,7 @@ clear_buffer(GLenum target)
 		 * the driver can't optimize MapBufferRange to unsychronized
 		 * without explicit_flush.
 		 */
-		int zero = 0;
-		glClearBufferData(target, GL_R32I, GL_RED_INTEGER, GL_INT, &zero);
+		glClearBufferData(target, GL_R32I, GL_RED_INTEGER, GL_INT, NULL);
 	}
 }
 
