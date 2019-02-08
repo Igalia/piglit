@@ -167,7 +167,7 @@ static const struct subtest_index_t index_subtests[] = {
 	{   vs_aofa,              GL_PROGRAM_INPUT,          "vs_input2", false, -1, GL_NO_ERROR },
 	{   vs_aofa,              GL_PROGRAM_INPUT,       "vs_input2[0]",  true, -1, GL_NO_ERROR },
 	{   vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[0][0]",  true, -1, GL_NO_ERROR },
-	{   vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[1][0]", false, -1, GL_NO_ERROR },
+	{   vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[1][0]",  true, -1, GL_NO_ERROR },
 	{   vs_aofa,              GL_PROGRAM_INPUT,    "vs_input2[0][1]", false, -1, GL_NO_ERROR },
 	{    vs_sub,          GL_VERTEX_SUBROUTINE,                "vss",  true, -1, GL_NO_ERROR },
 	{    vs_sub,          GL_VERTEX_SUBROUTINE,               "vss2",  true, -1, GL_NO_ERROR },
