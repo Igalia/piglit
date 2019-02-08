@@ -209,25 +209,25 @@ static const char *st_r_tess_uniform_block[] = {"tcs_uniform_block",
 						"tes_uniform_block", NULL};
 static const char *st_r_cs_uniform_block[] = {"cs_uniform_block", NULL};
 static const char *st_r_in_vs[] = {"vs_input0", "vs_input1", NULL};
-static const char *st_r_in_gs[] = {"gs_input[0]", "gl_PerVertex.gl_Position", NULL};
+static const char *st_r_in_gs[] = {"vs_output1[0]", "gl_PerVertex.gl_Position", NULL};
 static const char *st_r_in_fs[] = {"fs_input1", NULL};
-static const char *st_r_in_tes[] = {"tes_input[0]", "gl_PerVertex.gl_Position", NULL};
-static const char *st_r_in_tcs[] = {"tcs_input[0]",
+static const char *st_r_in_tes[] = {"tes_input1[0]", "gl_PerVertex.gl_Position", NULL};
+static const char *st_r_in_tcs[] = {"vs_output1[0]",
 				    "gl_InvocationID",
 				    "gl_PerVertex.gl_Position",
 				    NULL};
-static const char *st_r_out_vs[] = {"gl_Position", NULL};
-static const char *st_r_out_gs[] = {"gs_output0", "gl_Position", NULL};
+static const char *st_r_out_vs[] = {"vs_output1", "gl_Position", NULL};
+static const char *st_r_out_gs[] = {"fs_input1", "gl_Position", NULL};
 static const char *st_r_out_fs[] = {"fs_output0", "fs_output1", NULL};
-static const char *st_r_out_tes[] = {"tes_output[0]", "gl_Position", NULL};
-static const char *st_r_out_tcs[] = {"tcs_output[0]", "tcs_patch",
+static const char *st_r_out_tes[] = {"vs_output1", "gl_Position", NULL};
+static const char *st_r_out_tcs[] = {"tes_input1[0]", "tcs_patch",
 				     "gl_PerVertex.gl_Position",
 				     NULL};
 static const char *st_r_buffer[] = {"vs_buf_var", "gs_buf_var", "fs_buf_var",
 				    NULL};
 static const char *st_r_stor_block[] = {"vs_buffer_block", "gs_buffer_block",
 					"fs_buffer_block", NULL};
-static const char *st_r_tf_varying[] = {"gl_Position", "gs_output0", NULL};
+static const char *st_r_tf_varying[] = {"gl_Position", "fs_input1", NULL};
 static const char *st_r_vs_sub[] = {"vss", "vss2", NULL};
 static const char *st_r_gs_sub[] = {"gss", NULL};
 static const char *st_r_fs_sub[] = {"fss", NULL};
@@ -353,35 +353,35 @@ struct subtest_t {
 }
 
 static const struct subtest_t subtests[] = {
- ST( 8, 35, -1, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_UNIFORM, "(vs,gs,fs)", st_r_uniform),
- ST( 2,  9, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_UNIFORM, "(tes,tcs)", st_r_tess_uniform),
+ ST( 8, 35, -1, -1,  vs_std,    NULL,    NULL,  gs_std,   fs_in,   NULL, GL_UNIFORM, "(vs,gs,fs)", st_r_uniform),
+ ST( 2,  9, -1, -1,    NULL, tcs_sub,  tes_in,    NULL,    NULL,   NULL, GL_UNIFORM, "(tes,tcs)", st_r_tess_uniform),
  ST( 2,  8, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_UNIFORM, "(cs)", st_r_cs_uniform),
- ST( 7, 26,  2, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_UNIFORM_BLOCK, "(vs,gs,fs)", st_r_uniform_block),
- ST( 2, 18, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_UNIFORM_BLOCK, "(tcs,tes)", st_r_tess_uniform_block),
+ ST( 7, 26,  2, -1,  vs_std,    NULL,    NULL,  gs_std,   fs_in,   NULL, GL_UNIFORM_BLOCK, "(vs,gs,fs)", st_r_uniform_block),
+ ST( 2, 18, -1, -1,    NULL, tcs_sub,  tes_in,    NULL,    NULL,   NULL, GL_UNIFORM_BLOCK, "(tcs,tes)", st_r_tess_uniform_block),
  ST( 1, 17, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_UNIFORM_BLOCK, "(cs)", st_r_cs_uniform_block),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs)", st_r_in_vs),
  ST( 2, 25, -1, -1,    NULL,    NULL,    NULL,  gs_std,    NULL,   NULL, GL_PROGRAM_INPUT, "(gs)", st_r_in_gs),
- ST( 1, 10, -1, -1,    NULL,    NULL,    NULL,    NULL,  fs_std,   NULL, GL_PROGRAM_INPUT, "(fs)", st_r_in_fs),
+ ST( 1, 10, -1, -1,    NULL,    NULL,    NULL,    NULL,   fs_in,   NULL, GL_PROGRAM_INPUT, "(fs)", st_r_in_fs),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,    NULL,  fs_std,   NULL, GL_PROGRAM_INPUT, "(vs,fs)", st_r_in_vs),
  ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,  gs_std,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs,gs)", st_r_in_vs),
- ST( 2, 25, -1, -1,    NULL,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_INPUT, "(gs,fs)", st_r_in_gs),
- ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_INPUT, "(vs,gs,fs)", st_r_in_vs),
- ST( 2, 25, -1, -1,    NULL,    NULL, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tes)", st_r_in_tes),
+ ST( 2, 25, -1, -1,    NULL,    NULL,    NULL,  gs_std,   fs_in,   NULL, GL_PROGRAM_INPUT, "(gs,fs)", st_r_in_gs),
+ ST( 2, 10, -1, -1,  vs_std,    NULL,    NULL,  gs_std,   fs_in,   NULL, GL_PROGRAM_INPUT, "(vs,gs,fs)", st_r_in_vs),
+ ST( 2, 25, -1, -1,    NULL,    NULL,  tes_in,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tes)", st_r_in_tes),
  ST( 3, 25, -1, -1,    NULL, tcs_sub,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tcs)", st_r_in_tcs),
- ST( 3, 25, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tcs,tes)", st_r_in_tcs),
- ST( 2, 10, -1, -1,  vs_std, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs,tcs,tes)", st_r_in_vs),
+ ST( 3, 25, -1, -1,    NULL, tcs_sub,  tes_in,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(tcs,tes)", st_r_in_tcs),
+ ST( 2, 10, -1, -1,  vs_std, tcs_sub,  tes_in,    NULL,    NULL,   NULL, GL_PROGRAM_INPUT, "(vs,tcs,tes)", st_r_in_vs),
  ST( 0,  0, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_PROGRAM_INPUT, "(cs)", NULL),
- ST( 1, 12, -1, -1,  vs_std,    NULL,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(vs)", st_r_out_vs),
+ ST( 2, 12, -1, -1,  vs_std,    NULL,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(vs)", st_r_out_vs),
  ST( 2, 12, -1, -1,    NULL,    NULL,    NULL,  gs_std,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(gs)", st_r_out_gs),
  ST( 2, 11, -1, -1,    NULL,    NULL,    NULL,    NULL,  fs_std,   NULL, GL_PROGRAM_OUTPUT, "(fs)", st_r_out_fs),
  ST( 2, 11, -1, -1,  vs_std,    NULL,    NULL,    NULL,  fs_std,   NULL, GL_PROGRAM_OUTPUT, "(vs,fs)", st_r_out_fs),
  ST( 2, 12, -1, -1,  vs_std,    NULL,    NULL,  gs_std,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(vs,gs)", st_r_out_gs),
- ST( 2, 11, -1, -1,    NULL,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_OUTPUT, "(gs,fs)", st_r_out_fs),
- ST( 2, 11, -1, -1,  vs_std,    NULL,    NULL,  gs_std,  fs_std,   NULL, GL_PROGRAM_OUTPUT, "(vs,gs,fs)", st_r_out_fs),
- ST( 2, 14, -1, -1,    NULL,    NULL, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tes)", st_r_out_tes),
+ ST( 2, 11, -1, -1,    NULL,    NULL,    NULL,  gs_std,   fs_in,   NULL, GL_PROGRAM_OUTPUT, "(gs,fs)", st_r_out_fs),
+ ST( 2, 11, -1, -1,  vs_std,    NULL,    NULL,  gs_std,   fs_in,   NULL, GL_PROGRAM_OUTPUT, "(vs,gs,fs)", st_r_out_fs),
+ ST( 2, 12, -1, -1,    NULL,    NULL,  tes_in,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tes)", st_r_out_tes),
  ST( 3, 25, -1, -1,    NULL, tcs_sub,    NULL,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs)", st_r_out_tcs),
- ST( 2, 14, -1, -1,    NULL, tcs_sub, tes_sub,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs,tes)", st_r_out_tes),
- ST( 2, 12, -1, -1,    NULL, tcs_sub, tes_sub,  gs_std,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs,tes,gs)", st_r_out_gs),
+ ST( 2, 12, -1, -1,    NULL, tcs_sub,  tes_in,    NULL,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs,tes)", st_r_out_tes),
+ ST( 2, 12, -1, -1,    NULL, tcs_sub,  tes_in,  gs_std,    NULL,   NULL, GL_PROGRAM_OUTPUT, "(tcs,tes,gs)", st_r_out_gs),
  ST( 0,  0, -1, -1,    NULL,    NULL,    NULL,    NULL,    NULL, cs_sub, GL_PROGRAM_OUTPUT, "(cs)", st_r_cs_sub),
  ST( 3, 11, -1, -1, vs_stor,    NULL,    NULL, gs_stor, fs_stor,   NULL, GL_BUFFER_VARIABLE, "", st_r_buffer),
  ST( 3, 16,  1, -1, vs_stor,    NULL,    NULL, gs_stor, fs_stor,   NULL, GL_SHADER_STORAGE_BLOCK, "", st_r_stor_block),

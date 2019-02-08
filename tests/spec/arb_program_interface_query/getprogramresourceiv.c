@@ -567,8 +567,8 @@ static const struct subtest_t subtests[] = {
 	{ GL_REFERENCED_BY_COMPUTE_SHADER, 1, { 0 } },
 	{ 0, 0, { 0 } }}
  },
- { &prog_std, GL_TRANSFORM_FEEDBACK_VARYING, "gs_output0", NULL, {
-	{ GL_NAME_LENGTH, 1, { 11 } },
+ { &prog_std, GL_TRANSFORM_FEEDBACK_VARYING, "fs_input1", NULL, {
+	{ GL_NAME_LENGTH, 1, { 10 } },
 	{ GL_ARRAY_SIZE, 1, { 1 } },
 	{ 0, 0, { 0 } }}
  },
@@ -1012,7 +1012,7 @@ report_result:
 void
 piglit_init(int argc, char **argv)
 {
-	static const char *st_r_tf_varying[] = {"gs_output0", NULL};
+	static const char *st_r_tf_varying[] = {"fs_input1", NULL};
 
 	piglit_require_extension("GL_ARB_program_interface_query");
 	piglit_require_extension("GL_ARB_separate_shader_objects");
@@ -1021,7 +1021,7 @@ piglit_init(int argc, char **argv)
 	prog_std = piglit_build_simple_program_unlinked_multiple_shaders(
 					GL_VERTEX_SHADER, vs_std,
 					GL_GEOMETRY_SHADER, gs_std,
-					GL_FRAGMENT_SHADER, fs_std,
+					GL_FRAGMENT_SHADER, fs_in,
 					0);
 	glTransformFeedbackVaryings(prog_std, 1, st_r_tf_varying,
 				    GL_INTERLEAVED_ATTRIBS);
