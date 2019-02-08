@@ -74,9 +74,11 @@ static const char vs_std[] =
 	"uniform vs_struct sa[2];\n"
 	"in vec4 vs_input0;\n"
 	"in vec4 vs_input1;\n"
+	"out vec4 vs_output1;\n"
 	"void main() {\n"
 	"	gl_Position = vs_input0 * vs_test * vs_input1 + sa[0].a[1] +"
 	"	              sa[1].a[1];\n"
+	"	vs_output1 = vs_input0;\n"
 	"}";
 
 const char gs_std[] =
@@ -86,18 +88,38 @@ const char gs_std[] =
 	"uniform gs_uniform_block {\n"
 	"	vec4 gs_test;\n"
 	"};\n"
-	"in vec4 gs_input[3];\n"
-	"out vec4 gs_output0;\n"
+	"in vec4 vs_output1[3];\n"
+	"out vec4 fs_input1;\n"
 	"void main() {\n"
 	"	for (int i = 0; i < 6; i++) {\n"
-	"		gl_Position = gs_input[i % 3] *"
+	"		gl_Position = vs_output1[i % 3] *"
 	"		              gl_in[i % 3].gl_Position * gs_test;\n"
-	"		gs_output0 = gs_input[0];\n"
+	"		fs_input1 = vs_output1[0];\n"
 	"		EmitVertex();\n"
 	"	}\n"
 	"}\n";
 
 static const char fs_std[] =
+	"#version 150\n"
+	"uniform fs_uniform_block {"
+	"	vec4 fs_color;\n"
+	"	float fs_array[4];\n"
+	"};\n"
+	"uniform fs_array_uniform_block {\n"
+	"	vec4 fs_color;\n"
+	"	float fs_array[4];\n"
+	"} faub[4];\n"
+	"in vec4 vs_output1;\n"
+	"out vec4 fs_output0;\n"
+	"out vec4 fs_output1;\n"
+	"void main() {\n"
+		"fs_output0 = fs_color * vs_output1 * fs_array[2] * \n"
+		"	      faub[0].fs_array[2] * faub[2].fs_array[2];\n"
+		"fs_output1 = fs_color * vs_output1 * fs_array[3] * \n"
+		"             faub[1].fs_array[3] * faub[3].fs_array[3];\n"
+	"}";
+
+static const char fs_in[] =
 	"#version 150\n"
 	"uniform fs_uniform_block {"
 	"	vec4 fs_color;\n"
@@ -296,8 +318,8 @@ static const char tcs_sub[] =
 	"uniform tcs_uniform_block {\n"
 	"	vec4 tcs_test;\n"
 	"};\n"
-	"out vec4 tcs_output[3];\n"
-	"in vec4 tcs_input[gl_MaxPatchVertices];\n"
+	"out vec4 tes_input1[3];\n"
+	"in vec4 vs_output1[gl_MaxPatchVertices];\n"
 	"patch out vec4 tcs_patch;\n"
 	"subroutine vec4 tcs_offset();\n"
 	"subroutine uniform tcs_offset TESS_CONTROL;\n"
@@ -306,7 +328,7 @@ static const char tcs_sub[] =
 	"	gl_out[gl_InvocationID].gl_Position = tcs_test +"
 	"	                                      gl_in[0].gl_Position *"
 	"	                                      TESS_CONTROL();\n"
-	"	tcs_output[gl_InvocationID] = tcs_input[0] + TESS_CONTROL();\n"
+	"	tes_input1[gl_InvocationID] = vs_output1[0] + TESS_CONTROL();\n"
 	"}";
 
 static const char tes_sub[] =
@@ -317,15 +339,34 @@ static const char tes_sub[] =
 	"uniform tes_uniform_block {\n"
 	"	vec4 tes_test;\n"
 	"};\n"
-	"out vec4 tes_output[1];\n"
-	"in vec4 tes_input[gl_MaxPatchVertices];\n"
+	"out vec4 tes_output1;\n"
+	"in vec4 vs_output1[gl_MaxPatchVertices];\n"
 	"subroutine vec4 tes_offset();\n"
 	"subroutine uniform tes_offset TESS_EVALUATION;\n"
 	"subroutine (tes_offset) vec4 tess() { return vec4(1, 0, 0, 0); }\n"
 	"void main() {\n"
 	"	gl_Position = tes_test + gl_in[0].gl_Position +"
 	"	              TESS_EVALUATION();\n"
-	"	tes_output[0] = tes_input[0] + TESS_EVALUATION();\n"
+	"	tes_output1 = vs_output1[0] + TESS_EVALUATION();\n"
+	"}";
+
+static const char tes_in[] =
+	"#version 150\n"
+	"#extension GL_ARB_shader_subroutine : require\n"
+	"#extension GL_ARB_tessellation_shader : require\n"
+	"layout(triangles) in;\n"
+	"uniform tes_uniform_block {\n"
+	"	vec4 tes_test;\n"
+	"};\n"
+	"out vec4 vs_output1;\n"
+	"in vec4 tes_input1[gl_MaxPatchVertices];\n"
+	"subroutine vec4 tes_offset();\n"
+	"subroutine uniform tes_offset TESS_EVALUATION;\n"
+	"subroutine (tes_offset) vec4 tess() { return vec4(1, 0, 0, 0); }\n"
+	"void main() {\n"
+	"	gl_Position = tes_test + gl_in[0].gl_Position +"
+	"	              TESS_EVALUATION();\n"
+	"	vs_output1 = tes_input1[0] + TESS_EVALUATION();\n"
 	"}";
 
 static const char cs_sub[] =
