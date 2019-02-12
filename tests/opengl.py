@@ -1579,6 +1579,7 @@ with profile.test_list.group_manager(
     for sample_count in MSAA_SAMPLE_COUNTS:
         g(['arb_texture_multisample-texelfetch', sample_count])
     g(['arb_texture_multisample-sample-mask'])
+    g(['arb_texture_multisample-dsa-texelfetch'])
     g(['arb_texture_multisample-sample-mask-value'])
     g(['arb_texture_multisample-sample-mask-execution'])
     g(['arb_texture_multisample-sample-mask-execution', '-tex'])
