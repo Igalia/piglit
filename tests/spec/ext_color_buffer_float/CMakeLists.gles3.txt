@@ -1,0 +1,3 @@
+link_libraries(piglitutil_${piglit_target_api})
+
+piglit_add_executable (ext_color_buffer_float-draw_gles3 draw.c)

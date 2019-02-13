@@ -4967,5 +4967,10 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'NV_image_formats')) as g:
     g(['nv_image_formats-gles3'])
 
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'EXT_color_buffer_float')) as g:
+    g(['ext_color_buffer_float-draw_gles3'])
+
 if platform.system() is 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))
