@@ -44,6 +44,14 @@
 #define DRM_FORMAT_P010 fourcc_code('P', '0', '1', '0') /* 2x2 subsampled Cb:Cr plane 10 bits per channel */
 #endif
 
+#ifndef DRM_FORMAT_P012
+#define DRM_FORMAT_P012 fourcc_code('P', '0', '1', '2') /* 2x2 subsampled Cb:Cr plane 12 bits per channel */
+#endif
+
+#ifndef DRM_FORMAT_P016
+#define DRM_FORMAT_P016 fourcc_code('P', '0', '1', '6') /* 2x2 subsampled Cb:Cr plane 16 bits per channel */
+#endif
+
 /* added in libdrm 2.4.95 */
 #ifndef DRM_FORMAT_INVALID
 #define DRM_FORMAT_INVALID 0

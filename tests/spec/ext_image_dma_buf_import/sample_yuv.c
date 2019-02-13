@@ -56,6 +56,28 @@ piglit_display(void)
 		481, 642, 562, 642,
 	};
 
+	static const uint16_t p012[] = {
+		/* Y */
+		803,  1124,  1445, 1766,
+		803,  1124,  1445, 1766,
+		803,  1124,  1445, 1766,
+		803,  1124,  1445, 1766,
+		/* UV */
+		1927, 2088, 2248, 2088,
+		1927, 2569, 2248, 2569,
+	};
+
+	static const uint16_t p016[] = {
+		/* Y */
+		12850, 17990, 23130, 28270,
+		12850, 17990, 23130, 28270,
+		12850, 17990, 23130, 28270,
+		12850, 17990, 23130, 28270,
+		/* UV */
+		30840, 33410, 35980, 33410,
+		30840, 41120, 35980, 41120,
+	};
+
 	static const unsigned char nv12[] = {
 		/* Y */
 		 50,  70,  90, 110,
@@ -140,6 +162,12 @@ piglit_display(void)
 	switch (fourcc) {
 	case DRM_FORMAT_P010:
 		t = (unsigned char *) p010;
+		break;
+	case DRM_FORMAT_P012:
+		t = (unsigned char *) p012;
+		break;
+	case DRM_FORMAT_P016:
+		t = (unsigned char *) p016;
 		break;
 	case DRM_FORMAT_NV12:
 		t = nv12;

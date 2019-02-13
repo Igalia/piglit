@@ -164,6 +164,8 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		buf_h = h * 3 / 2;
 		break;
 	case DRM_FORMAT_P010:
+	case DRM_FORMAT_P012:
+	case DRM_FORMAT_P016:
 		cpp = 2;
 		buf_h = h * 3 / 2;
 		break;
@@ -197,6 +199,8 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
 	switch (fourcc) {
 	case DRM_FORMAT_NV12:
 	case DRM_FORMAT_P010:
+	case DRM_FORMAT_P012:
+	case DRM_FORMAT_P016:
 		buf->offset[1] = stride * h;
 		buf->stride[1] = stride;
 		break;
