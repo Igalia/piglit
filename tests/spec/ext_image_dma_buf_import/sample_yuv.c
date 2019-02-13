@@ -42,6 +42,17 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static int fourcc = -1;
 
+static bool
+format_has_alpha(int fourcc)
+{
+	switch (fourcc) {
+	case DRM_FORMAT_AYUV:
+		return true;
+	default:
+		return false;
+	}
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -112,29 +123,29 @@ piglit_display(void)
 		120, 140,
 		120, 140,
 	}, ayuv[] = {
-		/* AYUV (TODO: find a way to test alpha channel) */
-		130, 120,  50, 255,
-		130, 127,  70, 255,
-		130, 133,  90, 255,
-		130, 140, 110, 255,
+		/* Increasing alpha ramp. */
+		130, 120,  50, 0,
+		130, 127,  70, 64,
+		130, 133,  90, 128,
+		130, 140, 110, 192,
 
-		140, 120,  50, 255,
-		140, 127,  70, 255,
-		140, 133,  90, 255,
-		140, 140, 110, 255,
+		140, 120,  50, 0,
+		140, 127,  70, 64,
+		140, 133,  90, 128,
+		140, 140, 110, 192,
 
-		150, 120,  50, 255,
-		150, 127,  70, 255,
-		150, 133,  90, 255,
-		150, 140, 110, 255,
+		150, 120,  50, 0,
+		150, 127,  70, 64,
+		150, 133,  90, 128,
+		150, 140, 110, 192,
 
-		160, 120,  50, 255,
-		160, 127,  70, 255,
-		160, 133,  90, 255,
-		160, 140, 110, 255,
+		160, 120,  50, 0,
+		160, 127,  70, 64,
+		160, 133,  90, 128,
+		160, 140, 110, 192,
 	};
 
-	static const unsigned char expected[4 * 4 * 4] = {
+	static unsigned char expected[4 * 4 * 4] = {
 		 44,  41,  25, 255,
 		 67,  64,  48, 255,
 		 90,  79, 111, 255,
@@ -183,6 +194,13 @@ piglit_display(void)
 		break;
 	default:
 		return PIGLIT_SKIP;
+	}
+
+	/* Modify alpha values of the expected result. */
+	if (format_has_alpha(fourcc)) {
+		unsigned char *p = expected;
+		for (uint32_t i = 0; i < 4 * 4; i++, p += 4)
+			p[3] = i * (256 / 4);
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
