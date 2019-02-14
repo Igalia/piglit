@@ -1,0 +1,28 @@
+[require]
+GL >= 3.0
+GLSL >= 3.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 330
+#extension GL_ARB_shader_storage_buffer_object: require
+
+uniform int v1;
+uniform float v2;
+
+void main()
+{
+	float a = -(v1 >> 16);
+	gl_FragColor = vec4(a * v2,0.0f,0.0f,1.0f);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int v1 0x10000
+uniform float v2 -1
+
+draw rect -1 -1 2 2
+probe all rgba 1.0 0.0 0.0 1.0
