@@ -6,7 +6,6 @@ GLSL >= 3.30
 
 [fragment shader]
 #version 330
-#extension GL_ARB_shader_storage_buffer_object: require
 
 uniform int v1;
 uniform float v2;
