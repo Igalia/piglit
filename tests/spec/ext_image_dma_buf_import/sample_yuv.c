@@ -190,6 +190,7 @@ piglit_display(void)
 		t = yvu420;
 		break;
 	case DRM_FORMAT_AYUV:
+	case DRM_FORMAT_XYUV8888:
 		t = ayuv;
 		break;
 	default:

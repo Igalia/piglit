@@ -3035,6 +3035,8 @@ with profile.test_list.group_manager(
       'ext_image_dma_buf_import-sample_yvu420', run_concurrent=False)
     g(['ext_image_dma_buf_import-sample_yuv', '-fmt=AYUV'],
       'ext_image_dma_buf_import-sample_ayuv', run_concurrent=False)
+    g(['ext_image_dma_buf_import-sample_yuv', '-fmt=XYUV'],
+      'ext_image_dma_buf_import-sample_xyuv', run_concurrent=False)
     g(['ext_image_dma_buf_import-sample_yuv', '-fmt=P010'],
       'ext_image_dma_buf_import-sample_p010', run_concurrent=False)
     g(['ext_image_dma_buf_import-sample_yuv', '-fmt=P012'],
