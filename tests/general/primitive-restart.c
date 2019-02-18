@@ -75,6 +75,11 @@ static bool Have_31;
 static bool TestGL31;
 
 
+static void
+enable_restart(GLuint restart_index);
+static void
+disable_restart(void);
+
 static bool
 check_rendering(void)
 {
@@ -181,6 +186,72 @@ test_begin_end(GLenum primMode)
 
    piglit_present_results();
 
+   return pass;
+}
+
+static void
+write_vec2_value(GLfloat * verts, GLuint vidx, GLfloat x, GLfloat y)
+{
+   verts[(vidx * 2) + 0] = x;
+   verts[(vidx * 2) + 1] = y;
+}
+/* This test should draw green rectangle if everything is ok.
+ * But in case of bug which makes us unable to disable
+ * the primitive restart option it should draw just one triangle.
+ * Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=109451
+ */
+static bool
+test_shared_ib_restart()
+{
+   bool pass = true;
+   GLfloat verts[256 * 2];
+   memset(&verts, 0, sizeof(verts));
+   //left-bottom
+   write_vec2_value(verts, 0, 0.0f, 0.0f);
+   //right-bottom
+   write_vec2_value(verts, 1, piglit_width, 0.0f);
+   //left-top
+   write_vec2_value(verts, 2, 0.0f, piglit_height);
+   //right-top
+   write_vec2_value(verts, 255, piglit_width, piglit_height);
+
+   const GLubyte indices[] = { 0, 1, 2, 255, 0 };
+   const GLfloat expected[3] = { 0.0f, 1.0f, 0.0f };
+   GLuint vbo1, vbo2;
+
+   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+   glClear(GL_COLOR_BUFFER_BIT);
+
+   glColor4fv(green);
+
+   glGenBuffers(1, &vbo1);
+   glBindBuffer(GL_ARRAY_BUFFER, vbo1);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_DYNAMIC_DRAW);
+   glVertexPointer(2, GL_FLOAT, 0, (void *)0);
+
+   glGenBuffers(1, &vbo2);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo2);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+   glEnableClientState(GL_VERTEX_ARRAY);
+
+   //We should draw something with an enabled restart option to check that
+   //it could be correctly disabled
+   enable_restart(0xff);
+   glDrawElements(GL_LINE_STRIP, ARRAY_SIZE(indices), GL_UNSIGNED_BYTE, (void*)0);
+   disable_restart();
+
+   //Draw full screen rectangle
+   glDrawElements(GL_TRIANGLE_STRIP, ARRAY_SIZE(indices) - 1, GL_UNSIGNED_BYTE, (void*)0);
+
+   glDisableClientState(GL_VERTEX_ARRAY);
+   glBindBuffer(GL_ARRAY_BUFFER, 0);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+   glDeleteBuffers(1, &vbo1);
+   glDeleteBuffers(1, &vbo2);
+   glFinish();
+   pass = (piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, expected) != 0) && pass;
+   piglit_present_results();
    return pass;
 }
 
@@ -503,6 +574,7 @@ primitive_restart_test(VBO_CFG vbo_cfg)
 
    if (Have_NV) {
       TestGL31 = false;
+      pass = test_shared_ib_restart() && pass;
       pass = test_begin_end(GL_TRIANGLE_STRIP) && pass;
       pass = test_begin_end(GL_LINE_STRIP) && pass;
       pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE) && pass;
@@ -521,6 +593,7 @@ primitive_restart_test(VBO_CFG vbo_cfg)
 
    if (Have_31) {
       TestGL31 = true;
+      pass = test_shared_ib_restart() && pass;
       pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE) && pass;
       pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT) && pass;
       pass = test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT) && pass;
