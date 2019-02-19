@@ -37,11 +37,11 @@ void main()
 clear color 1.0 0.0 0.0 1.0
 clear
 
-uniform ubo 5 uint 0 19
+ubo 5 subdata uint 0 19
 draw rect -1 -1 2 2
 probe all rgba 0.0 0.0 0.0 1.0
 
 clear
-uniform ubo 5 uint 0 20
+ubo 5 subdata uint 0 20
 draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
