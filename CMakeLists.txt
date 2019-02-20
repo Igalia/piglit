@@ -52,6 +52,23 @@ option(PIGLIT_BUILD_CL_TESTS "Build tests for OpenCL" OFF)
 option(PIGLIT_GENERATE_GL_SPIRV_TESTS
 	"Generate ARB_gl_spirv tests by converting GLSL shader_tests to SPIR-V" OFF)
 
+if (PIGLIT_GENERATE_GL_SPIRV_TESTS)
+	find_program(GLSLANG_VALIDATOR_FOUND glslangValidator)
+	find_program(SPIRV_DIS_FOUND spirv-dis)
+
+	if(NOT GLSLANG_VALIDATOR_FOUND)
+		message(FATAL_ERROR "Failed fo find glslangValidator, needed to "
+			"generate the ARB_gl_spirv generated tests."
+			)
+	endif()
+
+	if(NOT SPIRV_DIS_FOUND)
+		message(FATAL_ERROR "Failed to find spirv-dis, needed "
+			"to generate the ARB_gl_spirv generated tests."
+			)
+		endif()
+endif()
+
 if(PIGLIT_BUILD_GL_TESTS)
 	find_package(OpenGL REQUIRED)
 endif()
