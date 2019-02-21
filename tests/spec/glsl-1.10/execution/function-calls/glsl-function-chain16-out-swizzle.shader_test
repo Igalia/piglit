@@ -13,50 +13,50 @@ void main()
 }
 
 [fragment shader]
-void f01(inout vec4 f);
-void f02(inout vec4 f);
-void f06(inout vec4 f);
-void f10(inout vec4 f);
-void f14(inout vec4 f);
+void f01(out vec4 f);
+void f02(out vec4 f);
+void f06(out vec4 f);
+void f10(out vec4 f);
+void f14(out vec4 f);
 void main()
 {
-	vec4 g = vec4(0.0, 0.3, 0, 1.0);
+	vec4 g = vec4(0.0, 0.3, 0.0, 1.0);
 	f01(g);
 	gl_FragColor = g;
 }
-void f01(inout vec4 f) {f02(f);}
-void f05(inout vec4 f) {f06(f);}
-void f09(inout vec4 f) {f10(f);}
-void f13(inout vec4 f) {f14(f);}
+void f01(out vec4 f) {f02(f);}
+void f05(out vec4 f) {f06(f);}
+void f09(out vec4 f) {f10(f);}
+void f13(out vec4 f) {f14(f);}
 
 [fragment shader]
-void f03(inout vec4 f);
-void f07(inout vec4 f);
-void f11(inout vec4 f);
-void f15(inout vec4 f);
-void f02(inout vec4 f) {f03(f);}
-void f06(inout vec4 f) {f07(f);}
-void f10(inout vec4 f) {f11(f);}
-void f14(inout vec4 f) {f15(f);}
+void f03(out vec4 f);
+void f07(out vec4 f);
+void f11(out vec4 f);
+void f15(out vec4 f);
+void f02(out vec4 f) {f03(f);}
+void f06(out vec4 f) {f07(f);}
+void f10(out vec4 f) {f11(f);}
+void f14(out vec4 f) {f15(f);}
 
 [fragment shader]
-void f04(inout vec4 f);
-void f08(inout vec4 f);
-void f12(inout vec4 f);
-void f16(inout float f);
-void f03(inout vec4 f) {f04(f);}
-void f07(inout vec4 f) {f08(f);}
-void f11(inout vec4 f) {f12(f);}
-void f15(inout vec4 f) {f16(f.y);}
+void f04(out vec4 f);
+void f08(out vec4 f);
+void f12(out vec4 f);
+void f16(out float f);
+void f03(out vec4 f) {f04(f);}
+void f07(out vec4 f) {f08(f);}
+void f11(out vec4 f) {f12(f);}
+void f15(out vec4 f) {f = vec4(0.0, 0.3, 0.0, 1.0); f16(f.y);}
 
 [fragment shader]
-void f05(inout vec4 f);
-void f09(inout vec4 f);
-void f13(inout vec4 f);
-void f04(inout vec4 f) {f05(f);}
-void f08(inout vec4 f) {f09(f);}
-void f12(inout vec4 f) {f13(f);}
-void f16(inout float f) {f=0.2;}
+void f05(out vec4 f);
+void f09(out vec4 f);
+void f13(out vec4 f);
+void f04(out vec4 f) {f05(f);}
+void f08(out vec4 f) {f09(f);}
+void f12(out vec4 f) {f13(f);}
+void f16(out float f) {f=0.2;}
 
 
 [test]
