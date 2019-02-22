@@ -144,6 +144,7 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		break;
 	case DRM_FORMAT_GR88:
 	case DRM_FORMAT_RG88:
+	case DRM_FORMAT_YUYV:
 		cpp = 2;
 		break;
 	case DRM_FORMAT_XRGB8888:
@@ -279,6 +280,7 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		break;
 	case DRM_FORMAT_GR88:
 	case DRM_FORMAT_RG88:
+	case DRM_FORMAT_YUYV:
 		format = GBM_FORMAT_GR88;
 		cpp = 2;
 		src_stride = cpp * w;
