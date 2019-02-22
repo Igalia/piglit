@@ -4,15 +4,19 @@ root = true
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
+max_line_length = 79
 
 [*.{c,cpp,h,hpp}]
 indent_style = tab
 tab_width = 8
+max_line_length = 78
 
 [*.{cmake,txt}]
 indent_style = tab
 tab_width = 8
+max_line_length = 78
 
 [{README,HACKING}]
 indent_style = tab
 tab_width = 8
+max_line_length = 78
