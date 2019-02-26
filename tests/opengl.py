@@ -932,6 +932,7 @@ with profile.test_list.group_manager(
     g(['generatemipmap-base-change', 'size'])
     g(['generatemipmap-base-change', 'format'])
     g(['generatemipmap-cubemap'])
+    g(['viewport-clamp'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
