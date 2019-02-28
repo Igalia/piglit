@@ -186,7 +186,7 @@ main()
 clear color 0.8 0.0 0.0 0.0
 clear
 
-draw arrays GL_TRIANGLE_STRIP 4 4 1
+draw arrays GL_TRIANGLE_STRIP 4 4
 draw elements GL_TRIANGLE_STRIP 4 2
 
 probe all rgba 0.0 1.0 0.0 1.0
