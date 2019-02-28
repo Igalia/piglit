@@ -99,9 +99,10 @@ tests/spec/glsl-1.50/linker/instance-matching-uniform-blocks-packaging-qualifier
 # The SPIR-V generation fails because the type overflows the available 4 components
 tests/spec/arb_enhanced_layouts/execution/component-layout/vs-fs-array-dvec3.shader_test
 #
-# We do not have to translate the ARB_gl_spirv tests as they already contain the
-# SPIR-V
+# We do not have to translate the ARB_gl_spirv or ARB_spirv_extensions tests as
+# they already contain the SPIR-V
 tests/spec/arb_gl_spirv/
+tests/spec/arb_spirv_extensions/
 #
 # Interstage linking errors:
 #
