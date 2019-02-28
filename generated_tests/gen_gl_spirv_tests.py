@@ -484,6 +484,9 @@ def fixup_glsl_shaders(shaders, skip_reasons):
         'gl_SubGroupInvocationARB', 'gl_SubGroupSizeARB',
         'gl_SubGroupLtMaskARB', 'gl_SubGroupGtMaskARB', 'gl_SubGroupEqMaskARB',
         'gl_SubGroupLeMaskARB', 'gl_SubGroupGeMaskARB',
+
+        # ARB_shader_draw_parameters
+        'gl_BaseVertexARB', 'gl_BaseInstanceARB', 'gl_DrawIDARB'
     ])
 
     # glslang does not support these extensions, but does support the
