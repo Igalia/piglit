@@ -1,0 +1,55 @@
+[require]
+GL >= 4.0
+GLSL >= 4.00
+GL_ARB_gpu_shader_int64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 400
+#extension GL_ARB_gpu_shader_int64 : require
+
+uniform int64_t ival[] = int64_t[](0xBADDC0DEDEADBEEFl,
+				   0xDEADBEA7BA5EBA11l,
+				   0xF0F1F2F3F4F5F6F7l,
+				   0x0F1F2F3F4F5F6F7Fl,
+				   0x7071727374757677l,
+				   0x0717273747576777l,
+				   0x1F2E3D4C5B6A7988l,
+				   0xBADB100DDEADC0DEl);
+
+const int64_t expected[] = int64_t[](0x00000000000000EFl,
+				     0x00000000000000BAl,
+				     0x00000000000000F5l,
+				     0x000000000000004Fl,
+				     0x0000000000000073l,
+				     0x0000000000000027l,
+				     0x000000000000002El,
+				     0x00000000000000BAl);
+
+out vec4 piglit_fragcolor;
+
+void main()
+{
+	uint fail_mask = 0;
+
+	for (uint i = 0; i < uint(ival.length()); i++) {
+		uint64_t result = (ival[i] >> (i * 8u)) & 0x0FFl;
+		fail_mask |= result != expected[i] ? 1u << i : 0u;
+	}
+
+	/* Construct a clever color so that just looking at the "Observed:"
+	 * output from shader_runner will tell you exactly which values did
+	 * not match.
+	 */
+	piglit_fragcolor = fail_mask == 0
+		? vec4(0.0, 1.0, 0.0, 1.0)
+		: vec4(float(fail_mask) / 255.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
