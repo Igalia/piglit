@@ -5087,6 +5087,36 @@ piglit_display(void)
 				glDrawElements(mode, count,
 					       GL_UNSIGNED_SHORT, NULL);
 			}
+		} else if (parse_str(line, "multidraw arrays ", &rest)) {
+			GLenum mode;
+			int drawcount, *first, *count;
+
+			REQUIRE(parse_word_copy(rest, s, sizeof(s), &rest),
+				"Invalid arguments for the multidraw arrays command");
+			mode = decode_drawing_mode(s);
+
+			REQUIRE(parse_int(rest, &drawcount, &rest), "Bad drawcount");
+			if (drawcount <= 0) {
+				printf("multidraw arrays 'drawcount' must be > 0\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			first = malloc(sizeof(int) * drawcount);
+			count = malloc(sizeof(int) * drawcount);
+
+			if ((parse_ints(rest, first, drawcount, &rest) != drawcount) ||
+			    (parse_ints(rest, count, drawcount, &rest) != drawcount)) {
+				printf("Bad argument count in the multidraw command\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			for (int i = 0; i < drawcount; i++)
+				result = draw_arrays_common(first[i], count[i]);
+
+			glMultiDrawArrays(mode, first, count, drawcount);
+
+			free(first);
+			free(count);
 		} else if (parse_str(line, "disable ", &rest)) {
 			do_enable_disable(rest, false);
 		} else if (parse_str(line, "enable ", &rest)) {
