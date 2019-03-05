@@ -11,3 +11,4 @@ link_libraries (
 
 piglit_add_executable (arb_indirect_parameters-tf-count-elements tf-count-elements.c)
 piglit_add_executable (arb_indirect_parameters-tf-count-arrays tf-count-arrays.c)
+piglit_add_executable (arb_indirect_parameters-conditional-render conditional-render.c)

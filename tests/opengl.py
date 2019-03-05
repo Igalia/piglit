@@ -4873,6 +4873,7 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'ARB_indirect_parameters')) as g:
     g(['arb_indirect_parameters-tf-count-arrays'], 'tf-count-arrays')
     g(['arb_indirect_parameters-tf-count-elements'], 'tf-count-elements')
+    g(['arb_indirect_parameters-conditional-render'], 'conditional-render')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
