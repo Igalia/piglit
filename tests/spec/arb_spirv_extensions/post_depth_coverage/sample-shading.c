@@ -1,0 +1,248 @@
+/*
+ * Copyright (c) 2015 Intel Corporation.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+/*
+ * A test to check whether the right values are written to gl_SampleMaskIn
+ * when ARB_post_depth_coverage, sample shading and multisampling are enabled.
+ * Tests at 2, 4, 8, 16 sample rates.
+ *
+ * Same test than tests/spec/arb_post_depth_coverage/sample-shading.c but
+ * loading SPIR-V shaders instead. Requires SPV_KHR_post_depth_coverage.
+ */
+
+#include "common.h"
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+	config.supports_gl_core_version = 33;
+	config.window_width = 160;
+	config.window_height = 160;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH |
+		PIGLIT_GL_VISUAL_DOUBLE;
+PIGLIT_GL_TEST_CONFIG_END
+
+static GLuint prog1, prog2, vao, ssbo, tex_color, tex_depth, fbo;
+static GLint *sample_mask;
+
+#define VS_FILENAME "vs.shader_source"
+#define FS_1_FILENAME "fs.shader_source"
+#define FS_2_FILENAME "sample-shading-fs.shader_source"
+
+static GLuint
+make_ssbo(void)
+{
+	GLuint ssbo;
+	glGenBuffers(1, &ssbo);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	return ssbo;
+}
+
+static GLuint
+make_fbo(void)
+{
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo );
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex_color);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+		GL_TEXTURE_2D_MULTISAMPLE, tex_color, 0);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex_depth);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+		GL_TEXTURE_2D_MULTISAMPLE, tex_depth, 0);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+	return fbo;
+}
+
+static GLuint
+make_texture_color(void)
+{
+	GLuint tex;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 2,
+		GL_RGBA32F, piglit_width, piglit_height, false);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+	return tex;
+}
+
+static GLuint
+make_texture_depth(void)
+{
+	GLuint tex;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 2,
+		GL_DEPTH24_STENCIL8, piglit_width, piglit_height, false);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+	return tex;
+}
+
+static GLuint
+make_vao(void)
+{
+	static const float pos_tc[12][2] = {
+		{ -1.0, -1.0 },
+		{  0.0, -1.0 },
+		{  0.0,  1.0 },
+		{  0.0,  1.0 },
+		{ -1.0,  1.0 },
+		{ -1.0, -1.0 },
+		{ -1.0, -1.0 },
+		{  1.0, -1.0 },
+		{  1.0,  1.0 },
+		{  1.0,  1.0 },
+		{ -1.0,  1.0 },
+		{ -1.0, -1.0 }
+	};
+	const int stride = sizeof(pos_tc[0]);
+	GLuint vbo, vao;
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(pos_tc), pos_tc, GL_STATIC_DRAW);
+	piglit_check_gl_error(GL_NO_ERROR);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void *) 0);
+
+	glEnableVertexAttribArray(0);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	return vbo;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	check_required_extensions();
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_SAMPLE_SHADING);
+	glMinSampleShading(1);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	prog1 = build_spirv_program(VS_FILENAME, FS_1_FILENAME);
+	prog2 = build_spirv_program(VS_FILENAME, FS_2_FILENAME);
+	vao = make_vao();
+	ssbo = make_ssbo();
+	tex_color = make_texture_color();
+	tex_depth = make_texture_depth();
+	fbo = make_fbo();
+}
+
+
+enum piglit_result
+piglit_display(void)
+{
+	int samples[4] = { 2, 4, 8, 16 };
+	int max_samples;
+	bool pass = true;
+	int i, j, k;
+
+	glViewport(0, 0, piglit_width, piglit_height);
+	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+
+	for (j = 0; j < 4 && samples[j] <= max_samples; j++) {
+		sample_mask = (GLint*) calloc (piglit_width * piglit_height,
+			sizeof(GLint));
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(GLint) * piglit_width *
+			piglit_height, &sample_mask[0], GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex_color);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples[j],
+			GL_RGBA8, piglit_width, piglit_height, false);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex_depth);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples[j],
+			GL_DEPTH24_STENCIL8, piglit_width, piglit_height, false);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+			GL_STENCIL_BUFFER_BIT);
+
+		glUseProgram(prog1);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		glUseProgram(prog2);
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+		glUniform1i(1, piglit_width);
+		glUniform1i(2, samples[j]);
+		glDrawArrays(GL_TRIANGLES, 6, 6);
+
+		glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLint) *
+			piglit_width * piglit_height, sample_mask);
+
+		for (i = 0; i < piglit_width; i++) {
+			for (k = 0; k < piglit_height; k++) {
+				if (i >= piglit_width / 2) {
+					if (sample_mask[piglit_width * k + i] != 1) {
+						pass = false;
+						break;
+					}
+				} else {
+					if (sample_mask[piglit_width * k + i] != 0) {
+						pass = false;
+						break;
+					}
+				}
+			}
+
+			if (!pass)
+				break;
+		}
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+		glDrawBuffer(GL_BACK);
+		glBlitFramebuffer(0, 0, piglit_width, piglit_height, 0, 0, piglit_width,
+			piglit_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+		piglit_present_results();
+		free(sample_mask);
+		if (!pass)
+			break;
+	}
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
