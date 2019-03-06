@@ -1,0 +1,112 @@
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by gen_gl_spirv_tests.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 47
+; Schema: 0
+               OpCapability Shader
+               OpCapability SampleMaskPostDepthCoverage
+               OpExtension "SPV_KHR_post_depth_coverage"
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %gl_FragCoord %gl_SampleMaskIn %color
+               OpExecutionMode %main OriginLowerLeft
+               OpExecutionMode %main EarlyFragmentTests
+               OpExecutionMode %main PostDepthCoverage
+               OpSource GLSL 450
+               OpSourceExtension "GL_ARB_post_depth_coverage"
+               OpName %main "main"
+               OpName %index "index"
+               OpName %gl_FragCoord "gl_FragCoord"
+               OpName %width "width"
+               OpName %MaskOutput "MaskOutput"
+               OpMemberName %MaskOutput 0 "data"
+               OpName %mask_output "mask_output"
+               OpName %gl_SampleMaskIn "gl_SampleMaskIn"
+               OpName %color "color"
+               OpDecorate %gl_FragCoord BuiltIn FragCoord
+               OpDecorate %width Location 2
+               OpDecorate %width DescriptorSet 0
+               OpDecorate %width Binding 0
+               OpDecorate %_runtimearr_int ArrayStride 4
+               OpMemberDecorate %MaskOutput 0 Offset 0
+               OpDecorate %MaskOutput BufferBlock
+               OpDecorate %mask_output DescriptorSet 0
+               OpDecorate %mask_output Binding 3
+               OpDecorate %gl_SampleMaskIn Flat
+               OpDecorate %gl_SampleMaskIn BuiltIn SampleMask
+               OpDecorate %color Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+%_ptr_Function_int = OpTypePointer Function %int
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+%gl_FragCoord = OpVariable %_ptr_Input_v4float Input
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_ptr_Input_float = OpTypePointer Input %float
+%_ptr_UniformConstant_int = OpTypePointer UniformConstant %int
+      %width = OpVariable %_ptr_UniformConstant_int UniformConstant
+     %uint_0 = OpConstant %uint 0
+%_runtimearr_int = OpTypeRuntimeArray %int
+ %MaskOutput = OpTypeStruct %_runtimearr_int
+%_ptr_Uniform_MaskOutput = OpTypePointer Uniform %MaskOutput
+%mask_output = OpVariable %_ptr_Uniform_MaskOutput Uniform
+      %int_0 = OpConstant %int 0
+%_arr_int_uint_1 = OpTypeArray %int %uint_1
+%_ptr_Input__arr_int_uint_1 = OpTypePointer Input %_arr_int_uint_1
+%gl_SampleMaskIn = OpVariable %_ptr_Input__arr_int_uint_1 Input
+%_ptr_Input_int = OpTypePointer Input %int
+%_ptr_Uniform_int = OpTypePointer Uniform %int
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %46 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+      %index = OpVariable %_ptr_Function_int Function
+         %16 = OpAccessChain %_ptr_Input_float %gl_FragCoord %uint_1
+         %17 = OpLoad %float %16
+         %18 = OpConvertFToS %int %17
+         %21 = OpLoad %int %width
+         %22 = OpIMul %int %18 %21
+         %24 = OpAccessChain %_ptr_Input_float %gl_FragCoord %uint_0
+         %25 = OpLoad %float %24
+         %26 = OpConvertFToS %int %25
+         %27 = OpIAdd %int %22 %26
+               OpStore %index %27
+         %33 = OpLoad %int %index
+         %38 = OpAccessChain %_ptr_Input_int %gl_SampleMaskIn %int_0
+         %39 = OpLoad %int %38
+         %41 = OpAccessChain %_ptr_Uniform_int %mask_output %int_0 %33
+               OpStore %41 %39
+               OpStore %color %46
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 430
+#extension GL_ARB_post_depth_coverage: enable
+
+out vec4 color;
+layout(early_fragment_tests) in;
+layout(post_depth_coverage) in;
+layout(location = 2) uniform int width;
+layout(std430, binding = 3) buffer MaskOutput {
+	int data[];
+} mask_output;
+
+void main()
+{
+	int index = int(gl_FragCoord.y) * width + int(gl_FragCoord.x);
+	mask_output.data[index] = int(gl_SampleMaskIn[0]);
+	color = vec4(1.0, 0.0, 0.0, 1.0);
+}
