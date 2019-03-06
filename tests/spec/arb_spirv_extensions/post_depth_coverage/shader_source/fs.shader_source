@@ -1,0 +1,52 @@
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by gen_gl_spirv_tests.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 16
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %gl_FragDepth %color
+               OpExecutionMode %main OriginLowerLeft
+               OpExecutionMode %main DepthReplacing
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %gl_FragDepth "gl_FragDepth"
+               OpName %color "color"
+               OpDecorate %gl_FragDepth BuiltIn FragDepth
+               OpDecorate %color Location 0
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+%_ptr_Output_float = OpTypePointer Output %float
+%gl_FragDepth = OpVariable %_ptr_Output_float Output
+  %float_0_5 = OpConstant %float 0.5
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_0 = OpConstant %float 0
+    %float_1 = OpConstant %float 1
+         %15 = OpConstantComposite %v4float %float_0 %float_1 %float_0 %float_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+               OpStore %gl_FragDepth %float_0_5
+               OpStore %color %15
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 430
+out vec4 color;
+
+void main()
+{
+  gl_FragDepth = 0.5f;
+  color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
