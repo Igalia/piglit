@@ -1,0 +1,57 @@
+[require]
+SPIRV YES
+GLSL >= 4.50
+
+[fragment shader spirv]
+; Automatically generated from the GLSL by gen_gl_spirv_tests.py. DO NOT EDIT
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 7
+; Bound: 23
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Fragment %main "main" %color %gl_SampleMask
+               OpExecutionMode %main OriginLowerLeft
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %color "color"
+               OpName %gl_SampleMask "gl_SampleMask"
+               OpDecorate %color Location 0
+               OpDecorate %gl_SampleMask BuiltIn SampleMask
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+      %color = OpVariable %_ptr_Output_v4float Output
+    %float_1 = OpConstant %float 1
+    %float_0 = OpConstant %float 0
+         %12 = OpConstantComposite %v4float %float_1 %float_0 %float_0 %float_1
+        %int = OpTypeInt 32 1
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+%_arr_int_uint_1 = OpTypeArray %int %uint_1
+%_ptr_Output__arr_int_uint_1 = OpTypePointer Output %_arr_int_uint_1
+%gl_SampleMask = OpVariable %_ptr_Output__arr_int_uint_1 Output
+      %int_0 = OpConstant %int 0
+      %int_1 = OpConstant %int 1
+%_ptr_Output_int = OpTypePointer Output %int
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+               OpStore %color %12
+         %22 = OpAccessChain %_ptr_Output_int %gl_SampleMask %int_0
+               OpStore %22 %int_1
+               OpReturn
+               OpFunctionEnd
+
+[fragment shader]
+#version 430
+out vec4 color;
+
+void main() {
+	color = vec4(1.0, 0.0, 0.0, 1.0);
+	gl_SampleMask[0] = 1;
+}
+
