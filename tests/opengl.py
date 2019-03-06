@@ -4986,5 +4986,14 @@ with profile.test_list.group_manager(
     g(['arb_gl_spirv-sample-position', 'OriginLowerLeft'],
       'sample-position-lower-left')
 
+# Group ARB_spirv_extensions
+with profile.test_list.group_manager(
+    PiglitGLTest,
+    grouptools.join('spec', 'ARB_spirv_extensions')) as g:
+    g(['arb_spirv_extensions-post_depth_coverage-basic'])
+    g(['arb_spirv_extensions-post_depth_coverage-multisampling'])
+    g(['arb_spirv_extensions-post_depth_coverage-sample-shading'])
+
+
 if platform.system() is 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))
