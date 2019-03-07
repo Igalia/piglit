@@ -3040,15 +3040,18 @@ query_check_error_name(const char *query_str, const char *old_query_str,
 }
 
 static int
-resource_info_get_block_or_atomic_buffer_index(struct resource_info *resource)
+resource_info_get_block_or_buffer_index(struct resource_info *resource)
 {
 	/* Gets the block index from the buffer binding */
 	assert(resource->interface == GL_UNIFORM ||
-	       resource->interface == GL_BUFFER_VARIABLE);
+	       resource->interface == GL_BUFFER_VARIABLE ||
+	       resource->interface == GL_TRANSFORM_FEEDBACK_VARYING);
 
 	GLenum block_interface_type;
 	if (resource->interface == GL_BUFFER_VARIABLE)
 		block_interface_type = GL_SHADER_STORAGE_BLOCK;
+	else if (resource->interface == GL_TRANSFORM_FEEDBACK_VARYING)
+		block_interface_type = GL_TRANSFORM_FEEDBACK_BUFFER;
 	else if (resource->is_atomic)
 		block_interface_type = GL_ATOMIC_COUNTER_BUFFER;
 	else
@@ -3108,19 +3111,27 @@ resource_info_get_index(struct resource_info *resource)
 		}
 			break;
 		case GL_BUFFER_VARIABLE:
+		case GL_TRANSFORM_FEEDBACK_VARYING:
 		case GL_UNIFORM: {
-			/* Atomic counter, or var inside an ubo or ssbo */
+			/* Atomic counter, transform feedback varying or var
+			 * inside an ubo or ssbo.
+			 */
 			if (resource->binding != -1) {
 				int block_index =
-					resource_info_get_block_or_atomic_buffer_index(resource);
+					resource_info_get_block_or_buffer_index(resource);
 
 				if (block_index == -1)
 					return -1;
 
-				GLenum props[] = {resource->is_atomic ?
-						  GL_ATOMIC_COUNTER_BUFFER_INDEX :
-						  GL_BLOCK_INDEX,
-						  GL_OFFSET};
+				GLenum block_index_prop;
+				if (resource->is_atomic)
+					block_index_prop = GL_ATOMIC_COUNTER_BUFFER_INDEX;
+				else if (resource->interface == GL_TRANSFORM_FEEDBACK_VARYING)
+					block_index_prop = GL_TRANSFORM_FEEDBACK_BUFFER_INDEX;
+				else
+					block_index_prop = GL_BLOCK_INDEX;
+
+				GLenum props[] = {block_index_prop, GL_OFFSET};
 				GLint got[2];
 				glGetProgramResourceiv(prog, resource->interface,
 						       index, 2, props, 2, NULL, got);
@@ -3152,6 +3163,7 @@ resource_info_get_index(struct resource_info *resource)
 			break;
 		case GL_ATOMIC_COUNTER_BUFFER:
 		case GL_SHADER_STORAGE_BLOCK:
+		case GL_TRANSFORM_FEEDBACK_BUFFER:
 		case GL_UNIFORM_BLOCK: {
 			GLint got;
 			GLenum prop = GL_BUFFER_BINDING;
@@ -3176,7 +3188,6 @@ resource_info_get_index(struct resource_info *resource)
 		case GL_TESS_CONTROL_SUBROUTINE_UNIFORM:
 		case GL_TESS_EVALUATION_SUBROUTINE:
 		case GL_TESS_EVALUATION_SUBROUTINE_UNIFORM:
-		case GL_TRANSFORM_FEEDBACK_VARYING:
 		case GL_VERTEX_SUBROUTINE:
 		case GL_VERTEX_SUBROUTINE_UNIFORM:
 			fprintf(stderr, "Subroutines and XFB not implemented "
@@ -3214,7 +3225,8 @@ query_resource(unsigned interface_type, GLuint index, unsigned prop,
 	 */
 	if (prop == GL_NAME_LENGTH &&
 	    (interface_type == GL_UNIFORM ||
-	     interface_type == GL_UNIFORM_BLOCK)) {
+	     interface_type == GL_UNIFORM_BLOCK ||
+	     interface_type == GL_TRANSFORM_FEEDBACK_VARYING)) {
 		GLint old_got;
 		const char *old_query_str = NULL;
 
@@ -3229,6 +3241,15 @@ query_resource(unsigned interface_type, GLuint index, unsigned prop,
 			glGetActiveUniformBlockiv(prog, index,
 						  GL_UNIFORM_BLOCK_NAME_LENGTH,
 						  &old_got);
+			break;
+		case GL_TRANSFORM_FEEDBACK_VARYING:
+			old_query_str = "glGetTransformFeedbackVarying";
+			char name[100];
+			glGetTransformFeedbackVarying(prog, index,
+						      sizeof(name), &old_got,
+						      NULL, NULL, name);
+			/* Count the NULL terminator */
+			old_got++;
 			break;
 		default:
 			break;
@@ -3306,7 +3327,8 @@ query_resource_name(unsigned interface_type, GLuint index,
 	 */
 	if (interface_type == GL_UNIFORM ||
 	    interface_type == GL_UNIFORM_BLOCK ||
-	    interface_type == GL_PROGRAM_INPUT) {
+	    interface_type == GL_PROGRAM_INPUT ||
+	    interface_type == GL_TRANSFORM_FEEDBACK_VARYING) {
 		GLsizei old_length;
 		char old_name[512];
 		const char *old_query_str = NULL;
@@ -3338,6 +3360,13 @@ query_resource_name(unsigned interface_type, GLuint index,
 			glGetActiveAttrib(prog, index, sizeof(old_name),
 				  &old_length, NULL, NULL, old_name);
 
+			break;
+		case GL_TRANSFORM_FEEDBACK_VARYING:
+			old_query_str = "glGetTransformFeedbackVarying";
+			glGetTransformFeedbackVarying(prog, index,
+						      sizeof(old_name),
+						      &old_length,
+						      NULL, NULL, old_name);
 			break;
 		default:
 			break;
@@ -3479,6 +3508,7 @@ parse_resource_info(const char **line, unsigned interface_type,
 		}
 		/* No break */
 	case GL_BUFFER_VARIABLE:
+	case GL_TRANSFORM_FEEDBACK_VARYING:
 		REQUIRE(parse_int(*line, &(resource->binding), line),
 			"Bad binding for resource at: %s\n", *line);
 		REQUIRE(parse_int(*line, &(resource->offset), line),
@@ -3487,6 +3517,7 @@ parse_resource_info(const char **line, unsigned interface_type,
 		break;
 	case GL_ATOMIC_COUNTER_BUFFER:
 	case GL_SHADER_STORAGE_BLOCK:
+	case GL_TRANSFORM_FEEDBACK_BUFFER:
 	case GL_UNIFORM_BLOCK:
 		REQUIRE(parse_int(*line, &(resource->binding), line),
 			"Bad binding for resource at: %s\n", *line);
@@ -3501,10 +3532,9 @@ parse_resource_info(const char **line, unsigned interface_type,
 	case GL_TESS_CONTROL_SUBROUTINE_UNIFORM:
 	case GL_TESS_EVALUATION_SUBROUTINE:
 	case GL_TESS_EVALUATION_SUBROUTINE_UNIFORM:
-	case GL_TRANSFORM_FEEDBACK_VARYING:
 	case GL_VERTEX_SUBROUTINE:
 	case GL_VERTEX_SUBROUTINE_UNIFORM:
-		fprintf(stderr, "Subroutines and XFB not implemented for this "
+		fprintf(stderr, "Subroutines are not implemented for this "
 			"query");
 		piglit_report_result(PIGLIT_FAIL);
 		break;
@@ -3713,10 +3743,11 @@ verify_query_object_result(const char *line)
  *
  * - <location> <component> for GL_PROGRAM_INPUT and GL_PROGRAM_OUTPUT.
  *    - int int
- * - <binding> for GL_UNIFORM_BLOCK, GL_SHADER_STORAGE_BLOCK and
- *   GL_ATOMIC_COUNTER_BUFFER.
+ * - <binding> for GL_UNIFORM_BLOCK, GL_SHADER_STORAGE_BLOCK,
+ *   GL_ATOMIC_COUNTER_BUFFER and GL_TRANSFORM_FEEDBACK_BUFFER.
  *    - int
- * - <binding> <offset> for GL_UNIFORM inside an UBO and GL_BUFFER_VARIABLE.
+ * - <binding> <offset> for GL_UNIFORM inside an UBO, GL_BUFFER_VARIABLE and
+ *   GL_TRANSFORM_FEEDBACK_VARYING.
  *    - int int
  * - "atomic" <binding> <offset> for GL_UNIFORM atomic counters.
  *    - atomic int int
@@ -3744,6 +3775,8 @@ verify_program_interface_query(const char *line,
 		ENUM_STRING(GL_TESS_CONTROL_SUBROUTINE_UNIFORM),
 		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE),
 		ENUM_STRING(GL_TESS_EVALUATION_SUBROUTINE_UNIFORM),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_BUFFER),
+		ENUM_STRING(GL_TRANSFORM_FEEDBACK_VARYING),
 		ENUM_STRING(GL_UNIFORM),
 		ENUM_STRING(GL_UNIFORM_BLOCK),
 		ENUM_STRING(GL_VERTEX_SUBROUTINE),
@@ -3840,6 +3873,8 @@ verify_program_interface_query(const char *line,
 			ENUM_STRING(GL_REFERENCED_BY_TESS_CONTROL_SHADER),
 			ENUM_STRING(GL_REFERENCED_BY_TESS_EVALUATION_SHADER),
 			ENUM_STRING(GL_REFERENCED_BY_VERTEX_SHADER),
+			ENUM_STRING(GL_TRANSFORM_FEEDBACK_BUFFER_INDEX),
+			ENUM_STRING(GL_TRANSFORM_FEEDBACK_BUFFER_STRIDE),
 			ENUM_STRING(GL_TOP_LEVEL_ARRAY_SIZE),
 			ENUM_STRING(GL_TOP_LEVEL_ARRAY_STRIDE),
 			ENUM_STRING(GL_TYPE),
