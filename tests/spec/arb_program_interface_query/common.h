@@ -347,6 +347,7 @@ static const char tcs_sub[] =
 	"	                                      gl_in[0].gl_Position *"
 	"	                                      TESS_CONTROL();\n"
 	"	tes_input1[gl_InvocationID] = vs_output1[0] + TESS_CONTROL();\n"
+	"	tcs_patch = TESS_CONTROL();\n"
 	"}";
 
 static const char tes_sub[] =
