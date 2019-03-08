@@ -1084,6 +1084,11 @@ with profile.test_list.group_manager(
        os.path.join('spec', 'glsl-es-1.00', 'minimum-maximums.txt')],
       'built-in constants')
 
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'glsl-es-1.00', 'linker')) as g:
+    g(['glsl-es-1.00-fface-invariant'], 'glsl-fface-invariant')
+
 # Group spec/glsl-1.10
 with profile.test_list.group_manager(
         PiglitGLTest,
