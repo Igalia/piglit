@@ -4,6 +4,7 @@
 GLSL >= 1.40
 GL_ARB_separate_shader_objects
 GL_ARB_arrays_of_arrays
+COMPILE FAILURE ALLOWED
 
 [vertex shader]
 #version 140

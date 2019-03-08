@@ -3,6 +3,7 @@
 [require]
 GLSL >= 1.50
 GL_ARB_separate_shader_objects
+COMPILE FAILURE ALLOWED
 
 [vertex shader]
 #version 150

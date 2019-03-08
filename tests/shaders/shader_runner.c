@@ -149,6 +149,9 @@ static GLuint sso_compute_prog;
 static GLuint pipeline = 0;
 static size_t num_vbo_rows = 0;
 static bool vbo_present = false;
+/* < 0, 0, > 0: failed, none, succeeded amount */
+static int num_compiled = 0;
+static bool compile_failure_allowed = false;
 static bool link_ok = false;
 static bool prog_in_use = false;
 static bool sso_in_use = false;
@@ -547,10 +550,13 @@ compile_glsl(GLenum target)
 
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
 
-	if (!ok) {
+	if (ok) {
+		num_compiled = 0 > num_compiled ? num_compiled : num_compiled + 1;
+	} else {
 		GLchar *info;
 		GLint size;
 
+		num_compiled = -1;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
@@ -764,10 +770,13 @@ specialize_spirv(GLenum target,
 	GLint ok;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
 
-	if (!ok) {
+	if (ok) {
+ 		num_compiled = 0 > num_compiled ? num_compiled : num_compiled + 1;
+	} else {
 		GLchar *info;
 		GLint size;
 
+ 		num_compiled = -1;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
@@ -1186,6 +1195,14 @@ process_requirement(const char *line)
 
 		sso_in_use = true;
 		glGenProgramPipelines(1, &pipeline);
+	} else if (parse_str(line, "COMPILE FAILURE", &line) &&
+		   parse_str(line, "ALLOWED", NULL)) {
+		/* Intended to be used in combination with the
+		 * "link error" test directive whenever the expected
+		 * error not necessarily has to happen during linking
+		 * but also during the compilation stage.
+		 */
+		compile_failure_allowed = true;
 	} else if (parse_str(line, "SPIRV", &line)) {
 		spirv_replaces_glsl = !force_glsl;
 
@@ -4691,6 +4708,8 @@ piglit_init(int argc, char **argv)
 			sso_compute_prog = 0;
 			num_vbo_rows = 0;
 			vbo_present = false;
+			num_compiled = 0;
+			compile_failure_allowed = false;
 			link_ok = false;
 			prog_in_use = false;
 			sso_in_use = false;
@@ -4810,6 +4829,9 @@ piglit_init(int argc, char **argv)
 			if (report_subtests) {
 				piglit_report_subtest_result(
 					result, "%s", testname);
+			} else if (compile_failure_allowed &&
+				   0 > num_compiled) {
+				piglit_report_result(PIGLIT_PASS);
 			} else {
 				piglit_report_result(result);
 			}
@@ -4823,6 +4845,8 @@ piglit_init(int argc, char **argv)
 	}
 
 	result = init_test(argv[1]);
-	if (result != PIGLIT_PASS)
+	if (result != PIGLIT_PASS &&
+	    !compile_failure_allowed &&
+	    0 > num_compiled)
 		piglit_report_result(result);
 }
