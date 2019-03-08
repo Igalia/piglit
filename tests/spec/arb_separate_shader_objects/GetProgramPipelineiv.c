@@ -125,6 +125,8 @@ piglit_init(int argc, char **argv)
 		"    color = vec4(0.0, 1.0, 0.0, 0.0);\n"
 		"}\n";
 	static const char gs_source[] =
+		"#extension GL_ARB_geometry_shader4: require\n"
+		"#if __VERSION__ > 140\n"
 		"in gl_PerVertex {\n"
 		"    vec4 gl_Position;\n"
 		"} gl_in[];\n"
@@ -133,6 +135,7 @@ piglit_init(int argc, char **argv)
 		"    vec4 gl_Position;\n"
 		"};\n"
 		"\n"
+		"#endif\n"
 		"layout(triangles) in;\n"
 		"layout(triangle_strip, max_vertices = 3) out;\n"
 		"void main() {\n"
@@ -184,7 +187,8 @@ piglit_init(int argc, char **argv)
 		"\n"
 		"    gl_Position = p0*p.x + p1*p.y + p2*p.z;\n"
 		"}\n";
-	const bool has_gs = piglit_get_gl_version() >= 32;
+	const bool has_gs = piglit_get_gl_version() >= 32
+		|| piglit_is_extension_supported("GL_ARB_geometry_shader4");
 	const bool has_tess = piglit_get_gl_version() >= 40
 		|| piglit_is_extension_supported("GL_ARB_tessellation_shader");
 
