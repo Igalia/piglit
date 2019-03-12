@@ -274,6 +274,7 @@ enum piglit_result
 piglit_display(void)
 {
 	enum piglit_result result = PIGLIT_PASS;
+	int vertex_counters;
 	unsigned qnum_count = num_query_types();
 
 	for (unsigned cnum = 0; cnum < ARRAY_SIZE(consumer_modes); cnum++) {
@@ -289,6 +290,13 @@ piglit_display(void)
 				supported = false;
 				break;
 			}
+		}
+
+		if (!strcmp(cm->name, "indirect-draw-count")) {
+			glGetIntegerv(GL_MAX_VERTEX_ATOMIC_COUNTERS, &vertex_counters);
+
+			if(vertex_counters < 1)
+				supported = false;
 		}
 
 		for (unsigned qnum = 0; qnum < qnum_count; qnum++) {

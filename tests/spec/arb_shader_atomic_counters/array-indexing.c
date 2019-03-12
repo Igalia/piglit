@@ -140,9 +140,19 @@ void
 piglit_init(int argc, char **argv)
 {
         GLuint fb, rb, buffer;
+        int vertex_counters;
 
         piglit_require_gl_version(31);
         piglit_require_extension("GL_ARB_shader_atomic_counters");
+
+        glGetIntegerv(GL_MAX_VERTEX_ATOMIC_COUNTERS,
+                      &vertex_counters);
+
+        if(vertex_counters < 3) {
+                fprintf(stderr, "Insufficient number of supported atomic "
+                        "counter buffers.\n");
+                piglit_report_result(PIGLIT_SKIP);
+        }
 
         glGenFramebuffers(1, &fb);
         glGenRenderbuffers(1, &rb);
