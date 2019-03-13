@@ -78,7 +78,7 @@ install:
 - appveyor DownloadFile https://www.khronos.org/registry/OpenGL/api/GL/glext.h -FileName glext\GL\glext.h
 
 build_script:
-- cmake -H. -Bbuild -G "Ninja" -DGLUT_INCLUDE_DIR=%CD%\freeglut\include -DGLUT_glut_LIBRARY=%CD%\freeglut\%FREEGLUT_LIB% -DGLEXT_INCLUDE_DIR=%CD%\glext
+- cmake -H. -Bbuild -G "Ninja" -DGLUT_INCLUDE_DIR=%CD%\freeglut\include -DGLUT_glut_LIBRARY_RELEASE=%CD%\freeglut\%FREEGLUT_LIB% -DGLEXT_INCLUDE_DIR=%CD%\glext
 - ninja -C build
 
 
