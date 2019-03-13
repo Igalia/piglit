@@ -1,0 +1,60 @@
+// From the ARB_separate_shader_objects spec v.25:
+//
+//    "To use any built-in input or output in the gl_PerVertex and
+//     gl_PerFragment blocks in separable program objects, shader code
+//     must redeclare those blocks prior to use.  A separable program
+//     will fail to link if:
+//
+//      * it contains multiple shaders of a single type with different
+//        redeclarations of these built-in input and output blocks; or
+//
+//      * any shader uses a built-in block member not found in the
+//        redeclaration of that block."
+
+[require]
+GLSL >= 1.50
+GL_ARB_separate_shader_objects
+GL_ARB_cull_distance
+SEPARABLE PROGRAM ENABLED
+
+
+[vertex shader]
+#version 150
+#extension GL_ARB_cull_distance: enable
+
+void main()
+{
+  gl_CullDistance[0] = float(1.0);
+}
+
+
+[geometry shader]
+#version 150
+#extension GL_ARB_cull_distance: enable
+
+layout (points) in;
+layout (points, max_vertices = 1) out;
+
+out vec4 g_color;
+
+void main()
+{
+  g_color = vec4(gl_in[0].gl_CullDistance[0]);
+  EmitVertex();
+}
+
+
+[fragment shader]
+#version 150
+
+in vec4 g_color;
+out vec4 color;
+
+void main()
+{
+  color = g_color;
+}
+
+
+[test]
+link error
