@@ -152,6 +152,7 @@ static bool vbo_present = false;
 static bool link_ok = false;
 static bool prog_in_use = false;
 static bool sso_in_use = false;
+static bool separable_program = false;
 static bool glsl_in_use = false;
 static bool force_glsl = false;
 static bool spirv_in_use = false;
@@ -1175,6 +1176,11 @@ process_requirement(const char *line)
 		piglit_set_rlimit(lim);
 	}  else if (parse_str(line, "SSO", &line) &&
 		    parse_str(line, "ENABLED", NULL)) {
+		if (separable_program) {
+			printf("SSO and SEPARABLE PROGRAM directives are incompatible.\n");
+			return PIGLIT_FAIL;
+		}
+
 		const char *const ext_name = gl_version.es
 			? "GL_EXT_separate_shader_objects"
 			: "GL_ARB_separate_shader_objects";
@@ -1186,6 +1192,23 @@ process_requirement(const char *line)
 
 		sso_in_use = true;
 		glGenProgramPipelines(1, &pipeline);
+	}  else if (parse_str(line, "SEPARABLE PROGRAM", &line) &&
+		    parse_str(line, "ENABLED", NULL)) {
+		if (sso_in_use) {
+			printf("SSO and SEPARABLE PROGRAM directives are incompatible.\n");
+			return PIGLIT_FAIL;
+		}
+
+		const char *const ext_name = gl_version.es
+			? "GL_EXT_separate_shader_objects"
+			: "GL_ARB_separate_shader_objects";
+		const unsigned min_version = gl_version.es
+			? 31 : 41;
+
+		if (gl_version.num < min_version)
+			piglit_require_extension(ext_name);
+
+		separable_program = true;
 	} else if (parse_str(line, "SPIRV", &line)) {
 		spirv_replaces_glsl = !force_glsl;
 
@@ -1454,8 +1477,12 @@ link_and_use_shaders(void)
 	if (result != PIGLIT_PASS)
 		goto cleanup;
 
-	if (!sso_in_use)
+	if (!sso_in_use) {
+		if (separable_program)
+			glProgramParameteri(prog, GL_PROGRAM_SEPARABLE, GL_TRUE);
+
 		glLinkProgram(prog);
+	}
 
 	if (!sso_in_use) {
 		if (!program_binary_save_restore(false))
@@ -4694,6 +4721,7 @@ piglit_init(int argc, char **argv)
 			link_ok = false;
 			prog_in_use = false;
 			sso_in_use = false;
+			separable_program = false;
 			prog_err_info = NULL;
 			vao = 0;
 
