@@ -1,22 +1,16 @@
-# http://www.appveyor.com/docs/appveyor-yml
+# https://www.appveyor.com/docs/appveyor-yml
 #
 # To setup AppVeyor for your own personal repositories do the following:
-# - Sign up
+# - Go to https://gitlab.freedesktop.org/profile/personal_access_tokens and
+#   create a new token with 'api' and 'read_repository' access.
+# - Sign up to AppVeyor
 # - Add a new project
-# - Select Git and fill in the Git clone URL
-# - Setup a Git hook as explained in
-#   https://github.com/appveyor/webhooks#installing-git-hook
-# - Check 'Settings > General > Skip branches without appveyor.yml'
-# - Check 'Settings > General > Rolling builds'
-# - Setup the global or project notifications to your liking
-#
-# Note that kicking (or restarting) a build via the web UI will not work, as it
-# will fail to find appveyor.yml .  The Git hook is the most practical way to
-# kick a build.
+# - Select GitLab EE
+# - Fill GitLab URL as https://gitlab.freedesktop.org/ and paste the token above.
+# - Enable for your personal repository.
 #
 # See also:
-# - http://help.appveyor.com/discussions/problems/2209-node-grunt-build-specify-a-project-or-solution-file-the-directory-does-not-contain-a-project-or-solution-file
-# - http://help.appveyor.com/discussions/questions/1184-build-config-vs-appveyoryaml
+# - https://help.appveyor.com/discussions/questions/1184-build-config-vs-appveyoryaml
 
 version: '{build}'
 
