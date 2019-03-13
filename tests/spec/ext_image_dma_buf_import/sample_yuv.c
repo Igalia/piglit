@@ -56,29 +56,7 @@ format_has_alpha(int fourcc)
 enum piglit_result
 piglit_display(void)
 {
-	static const uint16_t p010[] = {
-		/* Y */
-		201,  281,  361, 441,
-		201,  281,  361, 441,
-		201,  281,  361, 441,
-		201,  281,  361, 441,
-		/* UV */
-		481, 522, 562, 522,
-		481, 642, 562, 642,
-	};
-
-	static const uint16_t p012[] = {
-		/* Y */
-		803,  1124,  1445, 1766,
-		803,  1124,  1445, 1766,
-		803,  1124,  1445, 1766,
-		803,  1124,  1445, 1766,
-		/* UV */
-		1927, 2088, 2248, 2088,
-		1927, 2569, 2248, 2569,
-	};
-
-	static const uint16_t p016[] = {
+	uint16_t p0xx[] = {
 		/* Y */
 		12850, 17990, 23130, 28270,
 		12850, 17990, 23130, 28270,
@@ -172,13 +150,17 @@ piglit_display(void)
 	enum piglit_result res;
 	switch (fourcc) {
 	case DRM_FORMAT_P010:
-		t = (unsigned char *) p010;
+		for (uint32_t i = 0; i < ARRAY_SIZE(p0xx); i++)
+			p0xx[i] &= (1023 << 6);
+		t = (unsigned char *) p0xx;
 		break;
 	case DRM_FORMAT_P012:
-		t = (unsigned char *) p012;
+		for (uint32_t i = 0; i < ARRAY_SIZE(p0xx); i++)
+			p0xx[i] &= (4095 << 4);
+		t = (unsigned char *) p0xx;
 		break;
 	case DRM_FORMAT_P016:
-		t = (unsigned char *) p016;
+		t = (unsigned char *) p0xx;
 		break;
 	case DRM_FORMAT_NV12:
 		t = nv12;
