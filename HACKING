@@ -150,7 +150,7 @@ For this reason, developers of OpenGL drivers and related software, and even
 testers are encouraged to follow the git repository on freedesktop.org at all
 times. A web interface to this repository can be found here:
 
-       http://cgit.freedesktop.org/piglit
+       https://gitlab.freedesktop.org/mesa/piglit
 
 Nevertheless, for purposes of marking a specific point in time for packaging
 in an environment where non-developers do tests on a wide range of hardware,

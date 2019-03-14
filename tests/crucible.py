@@ -21,7 +21,7 @@
 
 """Piglit integrations for Crucible Test Suite.
 
-upstream: https://cgit.freedesktop.org/mesa/crucible/
+upstream: https://gitlab.freedesktop.org/mesa/crucible/
 
 """
 
