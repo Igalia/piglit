@@ -46,6 +46,13 @@ void main() {
 
 layout(triangles) in;
 
+out gl_PerVertex {
+//  vec4 gl_Position;
+//  float gl_PointSize;
+//  float gl_ClipDistance[];
+  float gl_CullDistance[];
+};
+
 void main()
 {
   gl_CullDistance[0] = float(1.0);
@@ -58,6 +65,13 @@ void main()
 
 layout (points) in;
 layout (points, max_vertices = 1) out;
+
+in gl_PerVertex {
+//  vec4 gl_Position;
+//  float gl_PointSize;
+//  float gl_ClipDistance[];
+  float gl_CullDistance[];
+} gl_in[];
 
 out vec4 g_color;
 

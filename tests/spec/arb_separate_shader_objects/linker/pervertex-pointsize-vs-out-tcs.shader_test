@@ -21,6 +21,13 @@ SEPARABLE PROGRAM ENABLED
 [vertex shader]
 #version 150
 
+out gl_PerVertex {
+//  vec4 gl_Position;
+  float gl_PointSize;
+//  float gl_ClipDistance[];
+//  float gl_CullDistance[];
+};
+
 void main()
 {
   gl_PointSize = float(1.0);
@@ -32,6 +39,13 @@ void main()
 #extension GL_ARB_tessellation_shader: require
 
 layout(vertices = 3) out;
+
+in gl_PerVertex {
+//  vec4 gl_Position;
+  float gl_PointSize;
+//  float gl_ClipDistance[];
+//  float gl_CullDistance[];
+} gl_in[gl_MaxPatchVertices];
 
 void main() {
   if (gl_in[0].gl_PointSize == 1.0) {

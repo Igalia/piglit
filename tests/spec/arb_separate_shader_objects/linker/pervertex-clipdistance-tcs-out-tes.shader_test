@@ -32,6 +32,13 @@ void main()
 
 layout(vertices = 3) out;
 
+out gl_PerVertex {
+//  vec4 gl_Position;
+//  float gl_PointSize;
+  float gl_ClipDistance[];
+//  float gl_CullDistance[];
+} gl_out[];
+
 void main() {
   gl_out[gl_InvocationID].gl_ClipDistance[0] = float(1.0);
   gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
@@ -44,6 +51,13 @@ void main() {
 #extension GL_ARB_tessellation_shader: require
 
 layout(triangles) in;
+
+in gl_PerVertex {
+//  vec4 gl_Position;
+//  float gl_PointSize;
+  float gl_ClipDistance[];
+//  float gl_CullDistance[];
+} gl_in[];
 
 out vec4 tes_color;
 
