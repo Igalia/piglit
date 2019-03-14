@@ -1,4 +1,93 @@
+# This is the tag of the docker image used for the build jobs. If the
+# image doesn't exist yet, the containers stage generates it.
+#
+# In order to generate a new image, one should generally change the tag.
+# While removing the image from the registry would also work, that's not
+# recommended except for ephemeral images during development: Replacing
+# an image after a significant amount of time might pull in newer
+# versions of gcc/clang or other packages, which might break the build
+# with older commits using the same tag.
+#
+# After merging a change resulting in generating a new image to the
+# main repository, it's recommended to remove the image from the source
+# repository's container registry, so that the image from the main
+# repository's registry will be used there as well.
+variables:
+  UPSTREAM_REPO: mesa/piglit
+  DEBIAN_TAG: "2019-10-20"
+  DEBIAN_VERSION: buster-slim
+  DEBIAN_IMAGE: "$CI_REGISTRY_IMAGE/debian/$DEBIAN_VERSION:$DEBIAN_TAG"
+
+include:
+  - project: 'wayland/ci-templates'
+    ref: 1f7f57c64ff4ebbf7292e3b7a13600518b8cb24c
+    file: '/templates/debian.yml'
+
+stages:
+  - container
+  - build
+  - deploy
+
+
+# When & how to run the CI
+.ci-run-policy:
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+
+# CONTAINERS
+
+debian:
+  stage: container
+  extends:
+    - .ci-run-policy
+    - .debian@container-ifnot-exists
+  variables:
+    GIT_STRATEGY: none # no need to pull the whole tree for rebuilding the image
+    DEBIAN_EXEC: 'bash .gitlab-ci/debian-install.sh'
+.use-debian:
+  extends:
+    - .ci-run-policy
+  needs: [debian]
+  image: $DEBIAN_IMAGE
+
+
+# BUILD
+
+build:
+  stage: build
+  extends:
+    - .use-debian
+  script:
+    - cmake .
+      -D CMAKE_BUILD_TYPE=Debug
+      -D PIGLIT_BUILD_CL_TESTS=on
+      -D PIGLIT_BUILD_DMA_BUF_TESTS=on
+      -D PIGLIT_BUILD_GLES1_TESTS=on
+      -D PIGLIT_BUILD_GLES2_TESTS=on
+      -D PIGLIT_BUILD_GLX_TESTS=on
+      -D PIGLIT_BUILD_GL_TESTS=on
+      -D PIGLIT_BUILD_WGL_TESTS=off
+      -GNinja
+    - ninja
+
+py.test:
+  stage: build
+  extends:
+    - .use-debian
+  script:
+    - pytest-3 unittests/framework
+
+tox:
+  stage: build
+  extends:
+    - .use-debian
+  script:
+    - tox -e "py37-{generator,noaccel,accel-nix,streams}"
+
 pages:
+  stage: deploy
   image: alpine
   script:
   - apk --no-cache add py2-pip python-dev
