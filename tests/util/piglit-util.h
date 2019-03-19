@@ -467,6 +467,26 @@ piglit_alloc_aligned(size_t alignment, size_t size);
 void
 piglit_free_aligned(void *p);
 
+union uif {
+	float f;
+	unsigned int ui;
+};
+
+static inline unsigned int
+fui(float f)
+{
+	union uif bits;
+	bits.f = f;
+	return bits.ui;
+}
+
+static inline float
+uif(unsigned int ui)
+{
+	union uif bits;
+	bits.ui = ui;
+	return bits.f;
+}
 
 #ifdef __cplusplus
 } /* end extern "C" */
