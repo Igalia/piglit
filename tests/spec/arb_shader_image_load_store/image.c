@@ -330,10 +330,9 @@ encode(const struct image_format_info *format, double x)
         case GL_INT:
                 return (int32_t)x;
 
-        case GL_FLOAT: {
-                float y = x;
-                return *(uint32_t *)&y;
-        }
+        case GL_FLOAT:
+                return fui(x);
+
         default:
                 abort();
         }
@@ -350,7 +349,7 @@ decode(const struct image_format_info *format, uint32_t x)
                 return (int32_t)x;
 
         case GL_FLOAT:
-                return *(float *)&x;
+                return uif(x);
 
         default:
                 abort();
