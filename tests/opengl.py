@@ -2166,6 +2166,7 @@ with profile.test_list.group_manager(
           'samplemask {} all'.format(num_samples))
 
     g(['arb_sample_shading-builtin-gl-sample-mask-mrt-alpha'])
+    g(['arb_sample_shading-builtin-gl-sample-mask-mrt-alpha-to-coverage-combinations'])
 
 # Group ARB_debug_output
 with profile.test_list.group_manager(
