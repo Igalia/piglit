@@ -54,11 +54,6 @@ PIGLIT_GL_TEST_CONFIG_END
 static char shader_source[64 * 1024];
 static GLfloat colors[TEST_COLS][4];
 
-union uif {
-	float f;
-	unsigned int ui;
-};
-
 static const GLenum types[4] = {
 	GL_BYTE,
 	GL_UNSIGNED_BYTE,
@@ -144,49 +139,6 @@ generate_shader(GLenum type)
 		       "END\n");
 }
 
-
-/* Largest magnitued positive half-precision float value.
- */
-#define HALF_MAX 65504.0
-
-static GLushort
-float_to_half(float f)
-{
-	union uif bits;
-	unsigned sign;
-	unsigned exponent;
-	unsigned mantissa;
-
-
-	/* Clamp the value to the range of values representable by a
-	 * half precision float.
-	 */
-	bits.f = CLAMP(f, -HALF_MAX, HALF_MAX);
-
-	sign = bits.ui & (1U << 31);
-	sign >>= 16;
-
-	/* Round denorms to zero, but keep the sign.
-	 */
-	exponent = bits.ui & (0x0ff << 23);
-	if (exponent == 0) {
-		return sign;
-	}
-
-	exponent >>= 23;
-	exponent += -(127 - 15);
-	exponent <<= 10;
-
-	/* Instead of just truncating bits of the mantissa, round the value.
-	 */
-	mantissa = bits.ui & ((1U << 23) - 1);
-	mantissa += (1U << (23 - 10)) >> 1;
-	mantissa >>= (23 - 10);
-
-	return (sign | exponent | mantissa);
-}
-
-
 void
 pack(float *packed, const float *color, GLenum type)
 {
@@ -203,7 +155,7 @@ pack(float *packed, const float *color, GLenum type)
 	switch (type) {
 	case GL_HALF_FLOAT:
 		for (i = 0; i < 4; i++)
-			us[i] = float_to_half(color[i]);
+			us[i] = piglit_half_from_float(color[i]);
 
 		p[0] = (us[0]) | (us[1] << 16);
 		p[1] = (us[2]) | (us[3] << 16);
