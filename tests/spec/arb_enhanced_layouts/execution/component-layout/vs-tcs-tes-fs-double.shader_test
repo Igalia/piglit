@@ -15,7 +15,8 @@ GL_ARB_gpu_shader_fp64
 
 in vec4 vertex;
 
-// consume also X/Y components in location 1
+// consume X/Y/Z/W components in location 0
+// consume X/Y components in location 1
 layout(location = 0) flat out dvec3 a;
 
 // consume Z/W components
@@ -47,7 +48,8 @@ void main()
 
 layout(vertices = 3) out;
 
-// consume also X/Y components in location 1
+// consume X/Y/Z/W components in location 0
+// consume X/Y components in location 1
 layout(location = 0) flat in dvec3 a[];
 
 // consume Z/W components
@@ -59,7 +61,8 @@ layout(location = 2, component = 0) flat in double c[];
 // consume Z/W components
 layout(location = 2, component = 2) flat in double d[];
 
-// consume also X/Y components in location 1
+// consume X/Y/Z/W components in location 0
+// consume X/Y components in location 1
 layout(location = 0) flat out dvec3 a_tcs[];
 
 // consume Z/W components
@@ -91,7 +94,8 @@ void main() {
 
 layout(triangles) in;
 
-// consume also X/Y components in location 1
+// consume X/Y/Z/W components in location 0
+// consume X/Y components in location 1
 layout(location = 0) flat in dvec3 a_tcs[];
 
 // consume Z/W components
@@ -103,7 +107,8 @@ layout(location = 2, component = 0) flat in double c_tcs[];
 // consume Z/W components
 layout(location = 2, component = 2) flat in double d_tcs[];
 
-// consume also X/Y components in location 1
+// consume X/Y/Z/W components in location 0
+// consume X/Y components in location 1
 layout(location = 0) flat out dvec3 a_tes;
 
 // consume Z/W components
@@ -134,7 +139,8 @@ void main() {
 
 out vec4 color;
 
-// consume also X/Y components in location 1
+// consume X/Y/Z/W components in location 0
+// consume X/Y components in location 1
 layout(location = 0) flat in dvec3 a_tes;
 
 // consume Z/W components
