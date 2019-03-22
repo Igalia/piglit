@@ -60,6 +60,9 @@ test_get_unsigned_byte_i_v_value_errors(void * unused)
 
 	glGetIntegerv(GL_NUM_DEVICE_UUIDS_EXT, &numDevices);
 
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+
 	glGetUnsignedBytei_vEXT(GL_DEVICE_UUID_EXT, numDevices + 1, data);
 
 	return RESULT(GL_INVALID_VALUE);
