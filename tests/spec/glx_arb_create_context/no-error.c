@@ -26,6 +26,10 @@
 
 #define BOOLSTR(x) ((x) ? "yes" : "no")
 
+#ifndef GLX_CONTEXT_OPENGL_NO_ERROR_ARB
+#define GLX_CONTEXT_OPENGL_NO_ERROR_ARB 0x31B3
+#endif
+
 static enum piglit_result check_no_error(bool debug, bool robust)
 {
 	int ctx_flags = 0;
