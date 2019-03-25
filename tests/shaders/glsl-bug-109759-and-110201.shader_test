@@ -1,0 +1,98 @@
+/*
+ * Copyright © 2019 Intel Corporation
+ *
+ * Test based on Mesa-commit 6e184147ddce11e90c269a47af7d7395f5ed9c12
+ * Test generates NIR (vec4-backend):
+ *
+ * vec1 32 ssa_0 = load_const (0x00000000 /* 0.000000 */)
+ * vec1 32 ssa_1 = load_const (0x3f800000 /* 1.000000 */)
+ * vec2 32 ssa_2 = load_const (0x00000000 /* 0.000000 */, 0x00000001 /* 0.000000 */)
+ * vec4 32 ssa_3 = intrinsic load_input (ssa_0) (0, 0) /* base=0 */ /* component=0 */
+ * vec1 32 ssa_4 = intrinsic load_uniform (ssa_0) (64, 16) /* base=64 */ /* range=16 */	/* dx */
+ * vec1 32 ssa_5 = intrinsic load_uniform (ssa_0) (80, 16) /* base=80 */ /* range=16 */	/* dy */
+ * vec1 32 ssa_6 = intrinsic load_uniform (ssa_0) (96, 16) /* base=96 */ /* range=16 */	/* xnum */
+ * vec1 32 ssa_7 = load_const (0x00000004 /* 0.000000 */)
+ * vec1 32 ssa_8 = ishl ssa_6, ssa_7
+ * vec2 32 ssa_9 = intrinsic load_uniform (ssa_8) (0, 64) /* base=0 */ /* range=64 */
+ * vec2 32 ssa_9 = intrinsic load_uniform (ssa_8) (0, 64) /* base=0 */ /* range=64 */
+ * vec2 32 ssa_10 = ieq32 ssa_9.xx, ssa_2
+ * r0.x = b32csel ssa_10.y, ssa_4, ssa_0
+ * vec2 32 ssa_12 = ieq32 ssa_9.yy, ssa_2
+ * r0.y = b32csel ssa_12.y, ssa_5.x, ssa_0.x
+ * r0.z = b32csel ssa_10.y, ssa_5.x, ssa_0.x
+ * r0.w = imov ssa_1.x
+ *
+ * After optimizations, for NIR:
+ * r0.x = b32csel ssa_10.y, ssa_4, ssa_0
+ * vec2 32 ssa_12 = ieq32 ssa_9.yy, ssa_2
+ *
+ * will be generated invalid assembler-code:
+ * cmp.z.f0.0(8)   g14<1>.yD       g13<4>.xD       1D              { align16 1Q };
+ * (+f0.0.x) sel(8) g3<1>.xUD      g1<0>.xUD       0x00000000UD    { align16 1Q };
+ *
+ * \author Sergii Romantsov <sergii.romantsov@globallogic.com>
+ * Checks: https://bugs.freedesktop.org/show_bug.cgi?id=109759
+ * Checks: https://bugs.freedesktop.org/show_bug.cgi?id=110201
+ */
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+uniform float dx;
+uniform float dy;
+uniform uint xnum;
+
+const uvec2 cell_color_map[] = uvec2[4](
+    uvec2(0, 0),  // black 	-> black rgb(0, 0, 0, 1)
+    uvec2(0, 1),  // green 	-> green rgb(0, 1, 0, 1)
+    uvec2(1, 0),  // red 	-> magenta rgb(1, 0, 1, 1)
+    uvec2(1, 1)   // yellow	-> white rgb(1, 1, 1, 1)
+);
+
+out vec4 color;
+in vec4 piglit_vertex;
+void main()
+{
+    gl_Position = piglit_vertex;
+    vec2 xpos = vec2(0, dx);
+    vec2 ypos = vec2(0, dy);
+    uvec2 pos = cell_color_map[xnum];
+    color = vec4(xpos[pos.x], ypos[pos.y], ypos[pos.x], 1.0);
+}
+
+[fragment shader]
+in vec4 color;
+void main()
+{
+    gl_FragColor = vec4(color.x, color.y, color.z, 1.0);
+}
+
+[test]
+link success
+
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform float dx 1.0
+uniform float dy 1.0
+
+uniform uint xnum 0
+draw rect -1 -1 1 1
+
+uniform uint xnum 1
+draw rect 0 -1 1 1
+
+uniform uint xnum 2
+draw rect -1 0 1 1
+
+uniform uint xnum 3
+draw rect 0 0 1 1
+
+relative probe rgba (0.25, 0.25) (0.0, 0.0, 0.0, 1.0)
+relative probe rgba (0.75, 0.25) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.25, 0.75) (1.0, 0.0, 1.0, 1.0)
+relative probe rgba (0.75, 0.75) (1.0, 1.0, 1.0, 1.0)
+
