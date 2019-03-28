@@ -1,0 +1,83 @@
+# When the extension is used but no arrangement is declared, all the
+# derivatives will return 0.
+
+[require]
+GL >= 4.5
+GLSL >= 4.50
+GL_NV_compute_shader_derivatives
+
+[compute shader]
+#version 450
+#extension GL_NV_compute_shader_derivatives: require
+
+layout(local_size_x = 6, local_size_y = 4) in;
+
+layout(binding = 0) uniform atomic_uint fail;
+
+layout(binding = 0) buffer SSBO {
+	uint value[24];
+};
+
+void main() {
+	uint index = gl_LocalInvocationIndex;
+
+	if (dFdxFine(value[index]) != 0.0)
+		atomicCounterIncrement(fail);
+	if (dFdxCoarse(value[index]) != 0.0)
+		atomicCounterIncrement(fail);
+	if (dFdx(value[index]) != 0.0)
+		atomicCounterIncrement(fail);
+
+	if (dFdyFine(value[index]) != 0.0)
+		atomicCounterIncrement(fail);
+	if (dFdyCoarse(value[index]) != 0.0)
+		atomicCounterIncrement(fail);
+	if (dFdy(value[index]) != 0.0)
+		atomicCounterIncrement(fail);
+
+	// Check mapping between gl_LocalInvocationIndex and
+	// gl_LocalInvocationID is preserved.
+	uvec3 size = gl_WorkGroupSize;
+	uvec3 id = gl_LocalInvocationID;
+	if (id.x != (index % size.x) ||
+	    id.y != ((index / size.x) % size.y) ||
+	    id.z != ((index / (size.x * size.y)) % size.z)) {
+		atomicCounterIncrement(fail);
+	}
+}
+
+[test]
+
+atomic counters 1
+
+ssbo 0 96
+
+# value[8]
+ssbo 0 subdata int  0 110
+ssbo 0 subdata int  4 120
+ssbo 0 subdata int  8 130
+ssbo 0 subdata int 12 140
+ssbo 0 subdata int 16 150
+ssbo 0 subdata int 20 160
+ssbo 0 subdata int 24 170
+ssbo 0 subdata int 28 180
+ssbo 0 subdata int 32 210
+ssbo 0 subdata int 36 220
+ssbo 0 subdata int 40 230
+ssbo 0 subdata int 44 240
+ssbo 0 subdata int 48 250
+ssbo 0 subdata int 52 260
+ssbo 0 subdata int 56 270
+ssbo 0 subdata int 60 280
+ssbo 0 subdata int 64 310
+ssbo 0 subdata int 68 320
+ssbo 0 subdata int 72 330
+ssbo 0 subdata int 76 340
+ssbo 0 subdata int 80 350
+ssbo 0 subdata int 84 360
+ssbo 0 subdata int 88 370
+ssbo 0 subdata int 92 380
+
+compute 1 1 1
+
+probe atomic counter 0 == 0

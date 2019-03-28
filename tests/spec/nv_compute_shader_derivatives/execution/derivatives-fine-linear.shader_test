@@ -1,0 +1,79 @@
+# Use dFdxFine and dFdyFine in linearNV.  The local size is 4x2, which
+# contains two quads side by side.  The derivatives_y will verify
+# quadsNV are working.
+
+[require]
+GL >= 4.5
+GLSL >= 4.50
+GL_NV_compute_shader_derivatives
+
+[compute shader]
+#version 450
+#extension GL_NV_compute_shader_derivatives: require
+
+layout(local_size_x = 4, local_size_y = 2) in;
+layout(derivative_group_linearNV) in;
+
+layout(binding = 0) uniform atomic_uint fail;
+
+layout(binding = 0) buffer SSBO {
+	uint value[8];
+	uint derivatives_x[8];
+	uint derivatives_y[8];
+};
+
+void main() {
+	uint index = gl_LocalInvocationIndex;
+	derivatives_x[index] = uint(dFdxFine(value[index]));
+	derivatives_y[index] = uint(dFdyFine(value[index]));
+
+	// Check mapping between gl_LocalInvocationIndex and
+	// gl_LocalInvocationID is preserved.
+	uvec3 size = gl_WorkGroupSize;
+	uvec3 id = gl_LocalInvocationID;
+	if (id.x != (index % size.x) ||
+	    id.y != ((index / size.x) % size.y) ||
+	    id.z != ((index / (size.x * size.y)) % size.z)) {
+		atomicCounterIncrement(fail);
+	}
+}
+
+[test]
+
+atomic counters 1
+
+ssbo 0 96
+
+# value[8]
+ssbo 0 subdata int  0  2
+ssbo 0 subdata int  4  3
+ssbo 0 subdata int  8  5
+ssbo 0 subdata int 12  8
+ssbo 0 subdata int 16 13
+ssbo 0 subdata int 20 21
+ssbo 0 subdata int 24 34
+ssbo 0 subdata int 28 55
+
+compute 1 1 1
+
+probe atomic counter 0 == 0
+
+# derivatives_x[8]
+probe ssbo uint 0 32 ==  1
+probe ssbo uint 0 36 ==  1
+probe ssbo uint 0 40 ==  3
+probe ssbo uint 0 44 ==  3
+probe ssbo uint 0 48 ==  8
+probe ssbo uint 0 52 ==  8
+probe ssbo uint 0 56 == 21
+probe ssbo uint 0 60 == 21
+
+# derivatives_y[8]
+probe ssbo uint 0 64 ==  3
+probe ssbo uint 0 68 ==  5
+probe ssbo uint 0 72 ==  3
+probe ssbo uint 0 76 ==  5
+probe ssbo uint 0 80 == 21
+probe ssbo uint 0 84 == 34
+probe ssbo uint 0 88 == 21
+probe ssbo uint 0 92 == 34

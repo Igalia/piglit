@@ -1,0 +1,75 @@
+# Use dFdxCoarse and dFdxCoarse in linearNV.  The local size is 4x2,
+# which contains two sequences of four values (the two rows).  The
+# derivatives_y will verify the linearNV is working.
+
+[require]
+GL >= 4.5
+GLSL >= 4.50
+GL_NV_compute_shader_derivatives
+
+[compute shader]
+#version 450
+#extension GL_NV_compute_shader_derivatives: require
+
+layout(local_size_x = 4, local_size_y = 2) in;
+layout(derivative_group_linearNV) in;
+
+layout(binding = 0) buffer SSBO {
+	uint value[8];
+	uint derivatives_x[8];
+	uint derivatives_y[8];
+};
+
+void main() {
+	uint index = gl_LocalInvocationIndex;
+	derivatives_x[index] = uint(dFdxCoarse(value[index]));
+	derivatives_y[index] = uint(dFdyCoarse(value[index]));
+
+	// Check mapping between gl_LocalInvocationIndex and
+	// gl_LocalInvocationID is preserved.
+	uvec3 size = gl_WorkGroupSize;
+	uvec3 id = gl_LocalInvocationID;
+	if (id.x != (index % size.x) ||
+	    id.y != ((index / size.x) % size.y) ||
+	    id.z != ((index / (size.x * size.y)) % size.z)) {
+		// Force failure since no derivative will be that large.
+		derivatives_x[index] = (size.x * size.y * size.z) + 1;
+		derivatives_y[index] = (size.x * size.y * size.z) + 1;
+	}
+}
+
+[test]
+
+ssbo 0 96
+
+# value[8]
+ssbo 0 subdata int  0 10
+ssbo 0 subdata int  4 20
+ssbo 0 subdata int  8 30
+ssbo 0 subdata int 12 40
+ssbo 0 subdata int 16 50
+ssbo 0 subdata int 20 60
+ssbo 0 subdata int 24 70
+ssbo 0 subdata int 28 80
+
+compute 1 1 1
+
+# derivatives_x[8]
+probe ssbo uint 0 32 == 10
+probe ssbo uint 0 36 == 10
+probe ssbo uint 0 40 == 10
+probe ssbo uint 0 44 == 10
+probe ssbo uint 0 48 == 10
+probe ssbo uint 0 52 == 10
+probe ssbo uint 0 56 == 10
+probe ssbo uint 0 60 == 10
+
+# derivatives_y[8]
+probe ssbo uint 0 64 == 20
+probe ssbo uint 0 68 == 20
+probe ssbo uint 0 72 == 20
+probe ssbo uint 0 76 == 20
+probe ssbo uint 0 80 == 20
+probe ssbo uint 0 84 == 20
+probe ssbo uint 0 88 == 20
+probe ssbo uint 0 92 == 20
