@@ -1,0 +1,257 @@
+// [config]
+// expect_result: pass
+// glsl_version: 4.50
+// require_extensions: GL_NV_compute_shader_derivatives
+// [end config]
+//
+// Verify new functions that should be available in a compute shader when
+// the extension is enabled.  Overview from the spec:
+//
+//    This extension, when enabled, allows applications to use derivatives in
+//    compute shaders.  It adds compute shader support for built-in derivative
+//    functions like dFdx(), automatic level of detail computation in texture
+//    lookup functions like texture(), use of the optional LOD bias parameter
+//    to adjust the computed level of detail values in texture lookup
+//    functions, and the texture level of detail query function
+//    textureQueryLod().
+
+#version 450
+#extension GL_NV_compute_shader_derivatives: require
+
+uniform isampler1D             is1D;
+uniform isampler2D             is2D;
+uniform isampler3D             is3D;
+uniform isamplerCube           isCube;
+uniform isampler1DArray        is1DArray;
+uniform isampler2DArray        is2DArray;
+uniform isamplerCubeArray      isCubeArray;
+
+uniform usampler1D             us1D;
+uniform usampler2D             us2D;
+uniform usampler3D             us3D;
+uniform usamplerCube           usCube;
+uniform usampler1DArray        us1DArray;
+uniform usampler2DArray        us2DArray;
+uniform usamplerCubeArray      usCubeArray;
+
+uniform sampler1D              s1D;
+uniform sampler2D              s2D;
+uniform sampler3D              s3D;
+uniform samplerCube            sCube;
+uniform sampler1DArray         s1DArray;
+uniform sampler2DArray         s2DArray;
+uniform samplerCubeArray       sCubeArray;
+
+uniform sampler1DShadow        s1DShadow;
+uniform sampler2DShadow        s2DShadow;
+uniform samplerCubeShadow      sCubeShadow;
+uniform sampler1DArrayShadow   s1DArrayShadow;
+uniform sampler2DArrayShadow   s2DArrayShadow;
+uniform samplerCubeArrayShadow sCubeArrayShadow;
+
+shared vec4 a;
+
+void main()
+{
+    float bias = 1.0;
+    const int offset1 = 1;
+    const ivec2 offset2 = ivec2(1, 2);
+    const ivec3 offset3 = ivec3(1, 2, 3);
+
+    int iv1 = 1;
+    ivec2 iv2 = ivec2(1, 2);
+    ivec3 iv3 = ivec3(1, 2, 3);
+    ivec4 iv4 = ivec4(1, 2, 3, 4);
+
+    uint uv1 = 1;
+    uvec2 uv2 = uvec2(1, 2);
+    uvec3 uv3 = uvec3(1, 2, 3);
+    uvec4 uv4 = uvec4(1, 2, 3, 4);
+
+    float v1 = 1;
+    vec2 v2 = vec2(1, 2);
+    vec3 v3 = vec3(1, 2, 3);
+    vec4 v4 = vec4(1, 2, 3, 4);
+
+    //
+    // Derivative functions.
+    //
+
+    v1 = dFdx(a.x);
+    v1 = dFdxFine(a.x);
+    v1 = dFdxCoarse(a.x);
+
+    v1 = dFdy(a.y);
+    v1 = dFdyFine(a.y);
+    v1 = dFdyCoarse(a.y);
+
+    v1 = fwidth(a.z);
+    v1 = fwidthFine(a.z);
+    v1 = fwidthCoarse(a.z);
+
+    //
+    // Variants of textureQueryLod().
+    //
+
+    v2 = textureQueryLod(is1D,             v1);
+    v2 = textureQueryLod(is2D,             v2);
+    v2 = textureQueryLod(is3D,             v3);
+    v2 = textureQueryLod(isCube,           v3);
+    v2 = textureQueryLod(is1DArray,        v1);
+    v2 = textureQueryLod(is2DArray,        v2);
+    v2 = textureQueryLod(isCubeArray,      v3);
+
+    v2 = textureQueryLod(us1D,             v1);
+    v2 = textureQueryLod(us2D,             v2);
+    v2 = textureQueryLod(us3D,             v3);
+    v2 = textureQueryLod(usCube,           v3);
+    v2 = textureQueryLod(us1DArray,        v1);
+    v2 = textureQueryLod(us2DArray,        v2);
+    v2 = textureQueryLod(usCubeArray,      v3);
+
+    v2 = textureQueryLod(s1D,              v1);
+    v2 = textureQueryLod(s2D,              v2);
+    v2 = textureQueryLod(s3D,              v3);
+    v2 = textureQueryLod(sCube,            v3);
+    v2 = textureQueryLod(s1DArray,         v1);
+    v2 = textureQueryLod(s2DArray,         v2);
+    v2 = textureQueryLod(sCubeArray,       v3);
+
+    v2 = textureQueryLod(s1DShadow,        v1);
+    v2 = textureQueryLod(s2DShadow,        v2);
+    v2 = textureQueryLod(sCubeShadow,      v3);
+    v2 = textureQueryLod(s1DArrayShadow,   v1);
+    v2 = textureQueryLod(s2DArrayShadow,   v2);
+    v2 = textureQueryLod(sCubeArrayShadow, v3);
+
+    //
+    // Variants of texture() with 'float bias' extra parameter.
+    //
+
+    iv4 = texture(is1D,           v1, bias);
+    iv4 = texture(is2D,           v2, bias);
+    iv4 = texture(is3D,           v3, bias);
+    iv4 = texture(isCube,         v3, bias);
+    iv4 = texture(is1DArray,      v2, bias);
+    iv4 = texture(is2DArray,      v3, bias);
+    iv4 = texture(isCubeArray,    v4, bias);
+
+    uv4 = texture(us1D,           v1, bias);
+    uv4 = texture(us2D,           v2, bias);
+    uv4 = texture(us3D,           v3, bias);
+    uv4 = texture(usCube,         v3, bias);
+    uv4 = texture(us1DArray,      v2, bias);
+    uv4 = texture(us2DArray,      v3, bias);
+    uv4 = texture(usCubeArray,    v4, bias);
+
+    v4  = texture(s1D,            v1, bias);
+    v4  = texture(s2D,            v2, bias);
+    v4  = texture(s3D,            v3, bias);
+    v4  = texture(sCube,          v3, bias);
+    v4  = texture(s1DArray,       v2, bias);
+    v4  = texture(s2DArray,       v3, bias);
+    v4  = texture(sCubeArray,     v4, bias);
+
+    v1  = texture(s1DShadow,      v3, bias);
+    v1  = texture(s2DShadow,      v3, bias);
+    v1  = texture(sCubeShadow,    v4, bias);
+    v1  = texture(s1DArrayShadow, v3, bias);
+
+    //
+    // Variants of textureProj() with 'float bias' extra parameter.
+    //
+
+    iv4 = textureProj(is1D, v2, bias);
+    iv4 = textureProj(is1D, v4, bias);
+    iv4 = textureProj(is2D, v3, bias);
+    iv4 = textureProj(is2D, v4, bias);
+    iv4 = textureProj(is3D, v4, bias);
+
+    uv4 = textureProj(is1D, v2, bias);
+    uv4 = textureProj(is1D, v4, bias);
+    uv4 = textureProj(is2D, v3, bias);
+    uv4 = textureProj(is2D, v4, bias);
+    uv4 = textureProj(is3D, v4, bias);
+
+    v4  = textureProj(s1D,  v2, bias);
+    v4  = textureProj(s1D,  v4, bias);
+    v4  = textureProj(s2D,  v3, bias);
+    v4  = textureProj(s2D,  v4, bias);
+    v4  = textureProj(s3D,  v4, bias);
+
+    v1 = textureProj(s1DShadow, v4, bias);
+    v1 = textureProj(s2DShadow, v4, bias);
+
+    //
+    // Variants of textureOffset() with 'float bias' extra parameter.
+    //
+
+    iv4 = textureOffset(is1D,      v1, offset1, bias);
+    iv4 = textureOffset(is2D,      v2, offset2, bias);
+    iv4 = textureOffset(is3D,      v3, offset3, bias);
+    iv4 = textureOffset(is1DArray, v2, offset1, bias);
+    iv4 = textureOffset(is2DArray, v3, offset2, bias);
+
+    uv4 = textureOffset(us1D,      v1, offset1, bias);
+    uv4 = textureOffset(us2D,      v2, offset2, bias);
+    uv4 = textureOffset(us3D,      v3, offset3, bias);
+    uv4 = textureOffset(us1DArray, v2, offset1, bias);
+    uv4 = textureOffset(us2DArray, v3, offset2, bias);
+
+    v4  = textureOffset(s1D,       v1, offset1, bias);
+    v4  = textureOffset(s2D,       v2, offset2, bias);
+    v4  = textureOffset(s3D,       v3, offset3, bias);
+    v4  = textureOffset(s1DArray,  v2, offset1, bias);
+    v4  = textureOffset(s2DArray,  v3, offset2, bias);
+
+    v1 = textureOffset(s1DShadow,      v3, offset1, bias);
+    v1 = textureOffset(s2DShadow,      v3, offset2, bias);
+    v1 = textureOffset(s1DArrayShadow, v3, offset1, bias);
+
+    //
+    // Variants of textureProjOffset with 'float bias' extra parameter.
+    //
+
+    iv4 = textureProjOffset(is1D, v2, offset1, bias);
+    iv4 = textureProjOffset(is1D, v4, offset1, bias);
+    iv4 = textureProjOffset(is2D, v3, offset2, bias);
+    iv4 = textureProjOffset(is2D, v4, offset2, bias);
+    iv4 = textureProjOffset(is3D, v4, offset3, bias);
+
+    uv4 = textureProjOffset(us1D, v2, offset1, bias);
+    uv4 = textureProjOffset(us1D, v4, offset1, bias);
+    uv4 = textureProjOffset(us2D, v3, offset2, bias);
+    uv4 = textureProjOffset(us2D, v4, offset2, bias);
+    uv4 = textureProjOffset(us3D, v4, offset3, bias);
+
+    v4  = textureProjOffset(s1D,  v2, offset1, bias);
+    v4  = textureProjOffset(s1D,  v4, offset1, bias);
+    v4  = textureProjOffset(s2D,  v3, offset2, bias);
+    v4  = textureProjOffset(s2D,  v4, offset2, bias);
+    v4  = textureProjOffset(s3D,  v4, offset3, bias);
+
+    v1 = textureProjOffset(s1DShadow, v4, offset1, bias);
+    v1 = textureProjOffset(s2DShadow, v4, offset2, bias);
+
+    //
+    // Compatibility profile functions with 'float bias' extra parameter.
+    //
+
+    v4 = texture1D(s1D, v1, bias);
+    v4 = texture1DProj(s1D, v2, bias);
+    v4 = texture1DProj(s1D, v4, bias);
+
+    v4 = texture2D(s2D, v2, bias);
+    v4 = texture2DProj(s2D, v3, bias);
+    v4 = texture2DProj(s2D, v4, bias);
+
+    v4 = texture3D(s3D, v3, bias);
+    v4 = texture3DProj(s3D, v4, bias);
+
+    v4 = textureCube(sCube, v3, bias);
+
+    v4 = shadow1D(s1DShadow, v3, bias);
+    v4 = shadow2D(s2DShadow, v3, bias);
+    v4 = shadow1DProj(s1DShadow, v4, bias);
+    v4 = shadow2DProj(s2DShadow, v4, bias);
+}
