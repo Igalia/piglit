@@ -1,0 +1,20 @@
+[require]
+GL >= 4.5
+GLSL >= 4.50
+GL_NV_compute_shader_derivatives
+
+[compute shader]
+#version 450
+
+layout(local_size_x = 5, local_size_y = 7) in;
+
+[compute shader]
+#version 450
+#extension GL_NV_compute_shader_derivatives: enable
+
+layout(derivative_group_linearNV) in;
+
+void main() {}
+
+[test]
+link error
