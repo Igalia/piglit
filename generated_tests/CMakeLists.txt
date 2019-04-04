@@ -98,6 +98,18 @@ piglit_make_generated_tests(
 	templates/gen_texture_lod_tests/frag_lod.glsl_parser_test.mako
 	)
 piglit_make_generated_tests(
+	gpu_shader4_tests.list
+	gen_gpu_shader4_tests.py
+	templates/gen_gpu_shader4_tests/binary.frag.mako       templates/gen_gpu_shader4_tests/texel_fetch.vert.mako   templates/gen_gpu_shader4_tests/tex.vert.mako
+	templates/gen_gpu_shader4_tests/binary_op.frag.mako    templates/gen_gpu_shader4_tests/tex.frag.mako           templates/gen_gpu_shader4_tests/unary.frag.mako
+	templates/gen_gpu_shader4_tests/binary_op.vert.mako    templates/gen_gpu_shader4_tests/tex_grad.frag.mako      templates/gen_gpu_shader4_tests/unary_op.frag.mako
+	templates/gen_gpu_shader4_tests/binary.vert.mako       templates/gen_gpu_shader4_tests/tex_grad.vert.mako      templates/gen_gpu_shader4_tests/unary_op.vert.mako
+	templates/gen_gpu_shader4_tests/ternary.frag.mako      templates/gen_gpu_shader4_tests/tex_lod.frag.mako       templates/gen_gpu_shader4_tests/unary.vert.mako
+	templates/gen_gpu_shader4_tests/ternary.vert.mako      templates/gen_gpu_shader4_tests/tex_lod.vert.mako       templates/gen_gpu_shader4_tests/vec_compare.frag.mako
+	templates/gen_gpu_shader4_tests/tex_bias.frag.mako     templates/gen_gpu_shader4_tests/texture_size.frag.mako  templates/gen_gpu_shader4_tests/vec_compare.vert.mako
+	templates/gen_gpu_shader4_tests/texel_fetch.frag.mako  templates/gen_gpu_shader4_tests/texture_size.vert.mako
+	)
+piglit_make_generated_tests(
 	outerproduct_invalid_params.list
 	gen_outerproduct_invalid_params.py
 	templates/gen_outerproduct_invalid_params/template.vert.mako
@@ -268,6 +280,7 @@ add_custom_target(gen-gl-tests
 			vp-tex.list
 			variable_index_write_tests.list
 			vs_in_fp64.list
+			gpu_shader4_tests.list
 )
 
 # Create a custom target for generating OpenCL tests
