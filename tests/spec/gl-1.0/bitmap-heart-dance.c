@@ -170,6 +170,8 @@ piglit_display(void)
 	int y = 30;
 	int spacing = 10;
 
+	glUseProgram(0);
+
 	glPixelStorei(GL_UNPACK_LSB_FIRST, GL_TRUE);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -184,6 +186,7 @@ piglit_display(void)
 	draw_row(ltorange, length, x, y + 1*spacing, spacing);
 	draw_row(  yellow, length, x, y + 0*spacing, spacing);
 
+	glUseProgram(program);
 
 	/*
 	 * Upload heart pattern. glBitmap is a bit mysterious in its bit
@@ -234,5 +237,4 @@ piglit_init(int argc, char **argv)
 	fragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
 						fragShaderText);
 	program = piglit_link_simple_program(0, fragShader);
-	glUseProgram(program);
 }
