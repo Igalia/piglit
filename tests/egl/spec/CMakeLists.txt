@@ -1,5 +1,6 @@
 add_subdirectory (egl-1.4)
 add_subdirectory (egl_ext_client_extensions)
+add_subdirectory (egl_ext_device_base)
 add_subdirectory (egl_ext_device_query)
 add_subdirectory (egl_ext_device_enumeration)
 add_subdirectory (egl_ext_device_drm)

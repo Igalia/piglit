@@ -1,0 +1,4 @@
+
+piglit_add_executable(egl_ext_device_base egl_ext_device_base.c)
+
+# vim: ft=cmake:
