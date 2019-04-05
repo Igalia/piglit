@@ -190,6 +190,7 @@ piglit_display(void)
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 
+	free(ref_image);
 	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
