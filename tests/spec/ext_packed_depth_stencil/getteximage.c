@@ -87,7 +87,7 @@ test_z24_s8(void)
 
 
 static bool
-test_z32_s8(void)
+test_z32_s8(bool *warn)
 {
 	const double epsilon = 2.0 / (float) 0xffffff;  /* 2-bit error */
 	GLuint tex[2 * WIDTH * HEIGHT];
@@ -96,6 +96,7 @@ test_z32_s8(void)
 	GLfloat *ftex = (GLfloat *) tex;
 	GLfloat *fbuf = (GLfloat *) buf;
 
+	*warn = false;
 	/* init tex data */
 	for (i = 0; i < WIDTH * HEIGHT; i++) {
 		GLuint s = 255 - (i & 255);
@@ -122,17 +123,31 @@ test_z32_s8(void)
 
 	/* compare */
 	for (i = 0; i < WIDTH * HEIGHT; i++) {
+		GLuint s = buf[i*2+1] & 0xffu;
+		GLuint unused = (buf[i*2+1] >> 8);
 		if (fbuf[i*2+0] != ftex[i*2+0]) {
 			printf("Wrong depth data at position %d: "
 			       "Expected %g, found %g\n",
 			       i, ftex[i*2+0], fbuf[i*2+0]);
 			return false;
 		}
-		if (buf[i*2+1] != tex[i*2+1]) {
+		if (s != tex[i*2+1]) {
 			printf("Wrong stencil data at position %d: "
 			       "Expected 0x%08x, found 0x%08x\n",
-			       i, tex[i*2+1], buf[i*2+1]);
+			       i, tex[i*2+1], s);
 			return false;
+		}
+		if (unused != 0) {
+			/* OpenGl spec "8.4.4.2 Special Interpretations" is saying:
+			 *  the second word contains a packed 24-bit unused field,
+			 *  followed by an 8-bit index
+			 *  So we don't have any strict clarifications about this field
+			 *  behavior but it is safer to have a zero in this field
+			 */
+			printf("Warning: Unused 24-bit field at position %d: "
+			       "Expected 0x0, found 0x%08x\n",
+			       i, unused);
+			*warn = true;
 		}
 	}
 
@@ -168,7 +183,7 @@ test_z32_s8(void)
 void
 piglit_init(int argc, char **argv)
 {
-	bool pass;
+	bool pass, warn;
 
         /* We can create depth/stencil textures if either:
          * 1. We have GL 3.0 or later
@@ -186,10 +201,12 @@ piglit_init(int argc, char **argv)
 
 	if (piglit_get_gl_version() >= 30 ||
 	    piglit_is_extension_supported("GL_ARB_depth_buffer_float")) {
-		pass = test_z32_s8() && pass;
+		pass = test_z32_s8(&warn) && pass;
+	} else {
+		warn = false;
 	}
 
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+	piglit_report_result(pass ? (warn ? PIGLIT_WARN : PIGLIT_PASS) : PIGLIT_FAIL);
 }
 
 
