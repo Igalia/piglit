@@ -3078,6 +3078,7 @@ with profile.test_list.group_manager(
     g(['ext_image_dma_buf_import-transcode-nv12-as-r8-gr88'],
       'ext_image_dma_buf_import-transcode-nv12-as-r8-gr88',
       run_concurrent=False)
+    g(['ext_image_dma_buf_import-export'], run_concurrent=False)
 
 with profile.test_list.group_manager(
         PiglitGLTest,
