@@ -1,0 +1,22 @@
+// [config]
+// expect_result: fail
+// glsl_version: 4.50
+// require_extensions: GL_NV_compute_shader_derivatives
+// [end config]
+//
+// NV_compute_shader_derivatives says
+//
+//    The "derivative_group_quadsNV" and "derivative_group_linearNV" qualifiers
+//    are used to specify how compute shader invocations are grouped for the
+//    purposes of evaluating derivatives for derivative functions and automatic
+//    texture level of detail computation.  It is a compile-time error if both
+//    qualifiers are specified.  If neither qualifier is specified, derivatives
+//    evaluated for compute shaders will return zero.
+
+#version 450
+#extension GL_NV_compute_shader_derivatives: require
+
+layout(derivative_group_quadsNV) in;
+layout(derivative_group_linearNV) in;
+
+void main() {}

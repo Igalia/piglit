@@ -1,0 +1,21 @@
+// [config]
+// expect_result: fail
+// glsl_version: 4.50
+// require_extensions: GL_NV_compute_shader_derivatives
+// [end config]
+//
+// NV_compute_shader_derivatives says
+//
+//    The layout qualifier "derivative_group_quadsNV" specifies that derivatives
+//    in compute shaders are evaluated over 2x2 groups of invocations whose
+//    gl_LocalInvocationID values are of the form (2x+{0,1}, 2y+{0,1}, z).  It
+//    is a compile-time error if this qualifier is used with a local group size
+//    whose first or second dimension is not a multiple of two.
+
+#version 450
+#extension GL_NV_compute_shader_derivatives: require
+
+layout(local_size_x = 3, local_size_y = 2) in;
+layout(derivative_group_quadsNV) in;
+
+void main() {}
