@@ -1,3 +1,4 @@
+add_subdirectory (amd_compressed_atc_texture)
 add_subdirectory (amd_framebuffer_multisample_advanced)
 add_subdirectory (amd_depth_clamp_separate)
 add_subdirectory (amd_performance_monitor)
