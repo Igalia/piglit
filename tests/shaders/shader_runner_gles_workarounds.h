@@ -79,7 +79,7 @@ glMapBuffer(GLenum target, GLbitfield access)
 	GLsizeiptr length = 0;
 
 	glGetBufferParameteri64v(target, GL_BUFFER_SIZE, (GLint64*) &length);
-	if (piglit_check_gl_error(GL_NO_ERROR))
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
 	return glMapBufferRange(target, 0, length, access);
