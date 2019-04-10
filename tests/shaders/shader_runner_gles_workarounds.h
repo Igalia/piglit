@@ -72,17 +72,32 @@ unsupported_function(const char *name, ...)
 #undef glMapBuffer
 
 static GLvoid*
-glMapBuffer(GLenum target, GLbitfield access)
+glMapBuffer(GLenum target, GLbitfield map_buffer_access)
 {
 	/* Emulate with glMapBufferRange. */
 
 	GLsizeiptr length = 0;
+	GLbitfield map_buffer_range_access;
 
 	glGetBufferParameteri64v(target, GL_BUFFER_SIZE, (GLint64*) &length);
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	return glMapBufferRange(target, 0, length, access);
+	switch (map_buffer_access) {
+	case GL_READ_ONLY:
+		map_buffer_range_access = GL_MAP_READ_BIT;
+		break;
+	case GL_WRITE_ONLY:
+		map_buffer_range_access = GL_MAP_WRITE_BIT;
+		break;
+	case GL_READ_WRITE:
+		map_buffer_range_access = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
+		break;
+	default:
+		map_buffer_range_access = 0;
+		break;
+	}
+	return glMapBufferRange(target, 0, length, map_buffer_range_access);
 }
 #endif /* PIGLIT_USE_OPENGL_ES3 */
 
