@@ -91,22 +91,29 @@ float data[] = {
 	0, 0,		0.5, 0,
 };
 
+int aligned_size = 0;
+int chunk_size = 24 * sizeof(float);
+int num_chunks = 4;
+
 enum piglit_result
 piglit_display(void) {
 	int i;
-	int chunk_size = 24 * sizeof(float);
 	bool pass = true;
 
 	glClearColor(0.2, 0.2, 0.2, 0.2);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (i = 0; i < sizeof(data) / chunk_size; i++) {
+	/* verify unaligned offsets produce an error */
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, tbo, aligned_size - 1, 1);
+	pass &= glGetError() == GL_INVALID_VALUE;
+
+	for (i = 0; i < num_chunks; i++) {
 		glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F,
-				 tbo, i * chunk_size, chunk_size);
+				 tbo, i * aligned_size, chunk_size);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 
-	for (i = 0; i < sizeof(data) / chunk_size; i++) {
+	for (i = 0; i < num_chunks; i++) {
 		float c[4] = {
 			data[i * 24 + 2],
 			data[i * 24 + 3],
@@ -114,7 +121,7 @@ piglit_display(void) {
 			1
 		};
 
-		pass = piglit_probe_rect_rgba(
+		pass &= piglit_probe_rect_rgba(
 			piglit_width * 0.5 * (1 + data[i * 24 + 0]),
 			piglit_height * 0.5 * (1 + data[i * 24 + 1]),
 			piglit_width/2,
@@ -128,7 +135,13 @@ piglit_display(void) {
 
 void
 piglit_init(int argc, char **argv) {
+	GLint align, i;
+	uint8_t *chunk;
+
 	piglit_require_extension("GL_ARB_texture_buffer_range");
+
+	glGetIntegerv(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &align);
+	aligned_size = chunk_size % align == 0 ? chunk_size : align;
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
@@ -138,7 +151,12 @@ piglit_init(int argc, char **argv) {
 
 	glGenBuffers(1, &tbo);
 	glBindBuffer(GL_ARRAY_BUFFER, tbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, aligned_size * num_chunks, NULL, GL_STATIC_DRAW);
+
+	for (i = 0, chunk = (uint8_t *)data; i < num_chunks; i++) {
+		glBufferSubData(GL_ARRAY_BUFFER, aligned_size * i, chunk_size, chunk);
+		chunk += chunk_size;
+	}
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_BUFFER, tex);
