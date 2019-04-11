@@ -1,0 +1,45 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 texcoords;
+
+/* Make the first uniform in the linked program take up a bunch of storage */
+uniform mat4 identity;
+
+void main()
+{
+    gl_Position = identity * gl_Vertex;
+    texcoords = (gl_Vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+struct tex_struct {
+    vec4 mix;
+    sampler2D sampler;
+};
+
+varying vec4 texcoords;
+
+/* If the implementation splits the struct badly and accidentally assigns
+ * location 0 to the sampler, an implementation may confuse it with the
+ * earlier matrix which takes up storage (unlike a sampler).
+ */
+uniform tex_struct tex;
+
+void main()
+{
+    gl_FragColor = texture2D(tex.sampler, texcoords.xy) * tex.mix;
+}
+
+[test]
+uniform mat4 identity 1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 1
+uniform int tex.sampler 0
+uniform vec4 tex.mix 0.5 0.5 0.5 0.5
+texture rgbw 0 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.25, 0.25) (0.5, 0.0, 0.0)
+relative probe rgb (0.75, 0.25) (0.0, 0.5, 0.0)
+relative probe rgb (0.25, 0.75) (0.0, 0.0, 0.5)
+relative probe rgb (0.75, 0.75) (0.5, 0.5, 0.5)
+
