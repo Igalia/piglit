@@ -4804,6 +4804,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ext_direct_state_access')) as g:
+    g(['ext_direct_state_access-matrix-commands'],
+      'matrix-commands')
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'arb_shader_image_load_store')) as g:
     g(['arb_shader_image_load_store-atomicity'], 'atomicity')
     g(['arb_shader_image_load_store-bitcast'], 'bitcast')
