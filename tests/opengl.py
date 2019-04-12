@@ -4815,6 +4815,9 @@ with profile.test_list.group_manager(
       'named-buffers 15')
     g(['ext_direct_state_access-named-buffers', '30'],
       'named-buffers 30')
+    g(['ext_direct_state_access-compressedtextureimage',
+       'GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT'],
+      'compressedtextureimage GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
