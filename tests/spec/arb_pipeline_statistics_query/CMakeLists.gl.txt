@@ -16,6 +16,8 @@ link_libraries (
 # use piglit helpers).
 add_library (pipestat_help STATIC pipestat_help.c)
 
+piglit_add_executable (arb_pipeline_statistics_query-extra_prims pipeline_stats_extra_prims.c)
+target_link_libraries (arb_pipeline_statistics_query-extra_prims pipestat_help)
 piglit_add_executable (arb_pipeline_statistics_query-vert pipeline_stats_vert.c)
 target_link_libraries (arb_pipeline_statistics_query-vert pipestat_help)
 piglit_add_executable (arb_pipeline_statistics_query-vert_adj pipeline_stats_vert_adj.c)

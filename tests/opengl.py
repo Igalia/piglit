@@ -4370,6 +4370,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_pipeline_statistics_query')) as g:
+    g(['arb_pipeline_statistics_query-extra_prims'])
     g(['arb_pipeline_statistics_query-vert'])
     g(['arb_pipeline_statistics_query-vert_adj'])
     g(['arb_pipeline_statistics_query-clip'])
