@@ -4811,6 +4811,10 @@ with profile.test_list.group_manager(
       'textures')
     g(['ext_direct_state_access-multi-texture'],
       'multi-texture')
+    g(['ext_direct_state_access-named-buffers', '15'],
+      'named-buffers 15')
+    g(['ext_direct_state_access-named-buffers', '30'],
+      'named-buffers 30')
 
 with profile.test_list.group_manager(
         PiglitGLTest,

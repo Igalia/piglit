@@ -11,4 +11,5 @@ link_libraries (
 piglit_add_executable (ext_direct_state_access-matrix-commands matrix-commands.c)
 piglit_add_executable (ext_direct_state_access-textures textures.c)
 piglit_add_executable (ext_direct_state_access-multi-texture multi-texture.c)
+piglit_add_executable (ext_direct_state_access-named-buffers named-buffers.c)
 # vim: ft=cmake:
