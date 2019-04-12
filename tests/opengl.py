@@ -4807,6 +4807,8 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'ext_direct_state_access')) as g:
     g(['ext_direct_state_access-matrix-commands'],
       'matrix-commands')
+    g(['ext_direct_state_access-textures'],
+      'textures')
 
 with profile.test_list.group_manager(
         PiglitGLTest,

@@ -9,4 +9,5 @@ link_libraries (
 )
 
 piglit_add_executable (ext_direct_state_access-matrix-commands matrix-commands.c)
+piglit_add_executable (ext_direct_state_access-textures textures.c)
 # vim: ft=cmake:
