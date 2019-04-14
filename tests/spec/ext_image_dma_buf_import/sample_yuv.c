@@ -131,6 +131,16 @@ piglit_display(void)
 		90, 140, 110, 160,
 		50, 121,  70, 161,
 		90, 140, 110, 160,
+	}, uyvy[] = {
+		/* UYVY */
+		120, 50, 130, 70,
+		140, 89, 130, 110,
+		120, 50, 130, 70,
+		140, 89, 130, 110,
+		121, 50, 161, 70,
+		140, 90, 160, 110,
+		121, 50, 161, 70,
+		140, 90, 160, 110,
 	};
 
 	static unsigned char expected[4 * 4 * 4] = {
@@ -187,6 +197,9 @@ piglit_display(void)
 		break;
 	case DRM_FORMAT_YUYV:
 		t = yuyv;
+		break;
+	case DRM_FORMAT_UYVY:
+		t = uyvy;
 		break;
 	default:
 		return PIGLIT_SKIP;
