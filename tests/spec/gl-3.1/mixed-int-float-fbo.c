@@ -33,8 +33,22 @@
 
 #include "piglit-util-gl.h"
 
+static bool ext_gpu_shader4 = false;
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_core_version = 31;
+	for (int i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "ext_gpu_shader4")) {
+			ext_gpu_shader4 = true;
+			puts("Testing GL_EXT_gpu_shader4.");
+			break;
+		}
+	}
+
+	if (ext_gpu_shader4)
+		config.supports_gl_compat_version = 10;
+	else
+		config.supports_gl_core_version = 31;
+
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
 	config.khr_no_error_support = PIGLIT_NO_ERRORS;
 PIGLIT_GL_TEST_CONFIG_END
@@ -57,6 +71,25 @@ static const char *fs_text =
 	"   outputFloat = vec4(0.25, 0.5, 0.75, 1.0); \n"
 	"} \n";
 
+static const char *vs_text_gpu_shader4 =
+	"#version 110\n"
+	"attribute vec4 vertex;\n"
+	"void main() \n"
+	"{ \n"
+	"   gl_Position = vertex; \n"
+	"} \n";
+
+static const char *fs_text_gpu_shader4 =
+	"#version 110\n"
+	"#extension GL_EXT_gpu_shader4 : enable\n"
+	"varying out ivec4 outputInt;\n"
+	"varying out vec4 outputFloat;\n"
+	"void main() \n"
+	"{ \n"
+	"   outputInt = ivec4(1, 2, 3, 4); \n"
+	"   outputFloat = vec4(0.25, 0.5, 0.75, 1.0); \n"
+	"} \n";
+
 const int width = 128, height = 128;
 bool int_output_first = true;
 
@@ -64,14 +97,31 @@ bool int_output_first = true;
 static GLuint
 create_program(void)
 {
-	GLuint program = piglit_build_simple_program(vs_text, fs_text);
-	if (int_output_first) {
-		glBindFragDataLocation(program, 0, "outputInt");
-		glBindFragDataLocation(program, 1, "outputFloat");
-	}
-	else {
-		glBindFragDataLocation(program, 0, "outputFloat");
-		glBindFragDataLocation(program, 1, "outputInt");
+	GLuint program;
+
+	if (ext_gpu_shader4) {
+		program = piglit_build_simple_program(vs_text_gpu_shader4,
+						      fs_text_gpu_shader4);
+
+		if (int_output_first) {
+			glBindFragDataLocationEXT(program, 0, "outputInt");
+			glBindFragDataLocationEXT(program, 1, "outputFloat");
+		}
+		else {
+			glBindFragDataLocationEXT(program, 0, "outputFloat");
+			glBindFragDataLocationEXT(program, 1, "outputInt");
+		}
+	} else {
+		program = piglit_build_simple_program(vs_text, fs_text);
+
+		if (int_output_first) {
+			glBindFragDataLocation(program, 0, "outputInt");
+			glBindFragDataLocation(program, 1, "outputFloat");
+		}
+		else {
+			glBindFragDataLocation(program, 0, "outputFloat");
+			glBindFragDataLocation(program, 1, "outputInt");
+		}
 	}
 
 	glLinkProgram(program);
@@ -146,16 +196,21 @@ create_fbo(void)
 enum piglit_result
 piglit_display(void)
 {
-	const int int_clear[4] = { 99, 99, 99, 99 };
-	const float float_clear[4] = { 0.33, 0.33, 0.33, 0.33 };
+	if (ext_gpu_shader4) {
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT);
+	} else {
+		const int int_clear[4] = { 99, 99, 99, 99 };
+		const float float_clear[4] = { 0.33, 0.33, 0.33, 0.33 };
 
-	if (int_output_first) {
-		glClearBufferiv(GL_COLOR, 0, int_clear);
-		glClearBufferfv(GL_COLOR, 1, float_clear);
-	}
-	else {
-		glClearBufferfv(GL_COLOR, 0, float_clear);
-		glClearBufferiv(GL_COLOR, 1, int_clear);
+		if (int_output_first) {
+			glClearBufferiv(GL_COLOR, 0, int_clear);
+			glClearBufferfv(GL_COLOR, 1, float_clear);
+		}
+		else {
+			glClearBufferfv(GL_COLOR, 0, float_clear);
+			glClearBufferiv(GL_COLOR, 1, int_clear);
+		}
 	}
 
 	piglit_draw_rect(-1, -1, 2, 2);
@@ -212,6 +267,13 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	if (ext_gpu_shader4) {
+		piglit_require_gl_version(20);
+		piglit_require_extension("GL_ARB_framebuffer_object");
+		piglit_require_extension("GL_EXT_gpu_shader4");
+		piglit_require_extension("GL_EXT_texture_integer");
+	}
+
 	if (argc > 1 && strcmp(argv[1], "int_second") == 0) {
 		int_output_first = false;
 	}

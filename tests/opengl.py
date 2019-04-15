@@ -3033,6 +3033,13 @@ with profile.test_list.group_manager(
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX8')
     add_fbo_stencil_tests(g, 'GL_STENCIL_INDEX16')
 
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ext_gpu_shader4')) as g:
+    g(['gl-3.1-mixed-int-float-fbo', 'ext_gpu_shader4'], 'bindfragdatalocation mixed-int-float-fbo')
+    g(['gl-3.1-mixed-int-float-fbo', 'ext_gpu_shader4', 'int_second'], 'bindfragdatalocation mixed-int-float-fbo int_second')
+
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'ext_image_dma_buf_import')) as \
         g:
