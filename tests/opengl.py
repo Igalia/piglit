@@ -4822,6 +4822,10 @@ with profile.test_list.group_manager(
       'client-state-indexed 12')
     g(['ext_direct_state_access-client-state-indexed', '30'],
       'client-state-indexed 30')
+    g(['ext_direct_state_access-indexed-state-queries', '12'],
+      'indexed-state-queries 12')
+    g(['ext_direct_state_access-indexed-state-queries', '30'],
+      'indexed-state-queries 30')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
