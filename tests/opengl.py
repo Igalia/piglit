@@ -4818,6 +4818,10 @@ with profile.test_list.group_manager(
     g(['ext_direct_state_access-compressedtextureimage',
        'GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT'],
       'compressedtextureimage GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT')
+    g(['ext_direct_state_access-client-state-indexed', '12'],
+      'client-state-indexed 12')
+    g(['ext_direct_state_access-client-state-indexed', '30'],
+      'client-state-indexed 30')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
