@@ -4826,6 +4826,8 @@ with profile.test_list.group_manager(
       'indexed-state-queries 12')
     g(['ext_direct_state_access-indexed-state-queries', '30'],
       'indexed-state-queries 30')
+    g(['ext_direct_state_access-program-uniform'],
+      'program-uniform')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
