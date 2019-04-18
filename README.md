@@ -10,8 +10,7 @@ Piglit
 6. Todo
 
 
-1. About
---------
+## 1. About
 
 Piglit is a collection of automated tests for OpenGL and OpenCL
 implementations.
@@ -25,8 +24,7 @@ The original tests have been taken from
 - Mesa ( http://www.mesa3d.org/ )
 
 
-2. Setup
---------
+## 2. Setup
 
 First of all, you need to make sure that the following are installed:
 
@@ -188,8 +186,7 @@ CD to piglit directory.
     cmake -H. -Bbuild -G "Ninja" -DGLEXT_INCLUDE_DIR=\path\to\glext -DPIGLIT_USE_WAFFLE=TRUE -DWAFFLE_INCLUDE_DIRS=\path\to\waffle\include\waffle WAFFLE_LDFLAGS=\path\to\waffle\lib\libwaffle-1.a
 
 
-3. How to run tests
--------------------
+## 3. How to run tests
 
 Make sure that everything is set up correctly:
 
@@ -314,8 +311,7 @@ source the file on startup. If piglit is installed and bash-completions are
 available, then this completion file will be installed system-wide.
 
 
-4. Available test sets
-----------------------
+## 4. Available test sets
 
 Test sets are specified as Python scripts in the tests directory.
 The following test sets are currently available:
@@ -377,8 +373,7 @@ The following test sets are currently available:
     suite with piglit.
 
 
-5. How to write tests
----------------------
+## 5. How to write tests
 
 Every test is run as a separate process. This minimizes the impact that
 severe bugs like memory corruption have on the testing process.
@@ -432,8 +427,7 @@ python framework:
     function to search directories for tests.
 
 
-6. Integration
---------------
+## 6. Integration
 
 Piglit provides integration for other test suites as well. The rational for
 this is that it provides piglit's one process per test protections (one test
