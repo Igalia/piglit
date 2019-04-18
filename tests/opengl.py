@@ -4828,6 +4828,8 @@ with profile.test_list.group_manager(
       'indexed-state-queries 30')
     g(['ext_direct_state_access-program-uniform'],
       'program-uniform')
+    g(['ext_direct_state_access-renderbuffer'],
+      'renderbuffer')
 
 with profile.test_list.group_manager(
         PiglitGLTest,

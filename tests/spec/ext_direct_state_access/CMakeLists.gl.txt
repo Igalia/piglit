@@ -16,4 +16,5 @@ piglit_add_executable (ext_direct_state_access-compressedtextureimage compressed
 piglit_add_executable (ext_direct_state_access-client-state-indexed client-state-indexed.c)
 piglit_add_executable (ext_direct_state_access-indexed-state-queries indexed-state-queries.c)
 piglit_add_executable (ext_direct_state_access-program-uniform program-uniform.c)
+piglit_add_executable (ext_direct_state_access-renderbuffer renderbuffer.c)
 # vim: ft=cmake:
