@@ -2,12 +2,12 @@
 Piglit
 ======
 
-1. About
-2. Setup
-3. How to run tests
-4. Available test sets
-5. How to write tests
-6. Integration
+1. [About](#1-about)
+2. [Setup](#2-setup)
+3. [How to run tests](#3-how-to-run-tests)
+4. [Available test sets](#4-available-test-sets)
+5. [How to write tests](#5-how-to-write-tests)
+6. [Integration](#6-integration)
 
 
 ## 1. About
