@@ -7,7 +7,7 @@ Piglit
 3. How to run tests
 4. Available test sets
 5. How to write tests
-6. Todo
+6. Integration
 
 
 ## 1. About
