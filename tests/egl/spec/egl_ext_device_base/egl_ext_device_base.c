@@ -196,6 +196,7 @@ pbuffer_test(EGLDisplay dpy)
 		return PIGLIT_FAIL;
 	}
 
+	piglit_gl_invalidate_extensions();
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	/* Do the actual test */
@@ -260,6 +261,7 @@ surfaceless_test(EGLDisplay dpy)
 		return PIGLIT_FAIL;
 	}
 
+	piglit_gl_invalidate_extensions();
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	/* Do the actual test */
@@ -306,6 +308,7 @@ configless_test(EGLDisplay dpy)
 		return PIGLIT_FAIL;
 	}
 
+	piglit_gl_invalidate_extensions();
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	/* Do the actual test */
