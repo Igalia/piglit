@@ -65,36 +65,6 @@ test_NamedRenderbufferStorageEXT(void* data)
 }
 
 static enum piglit_result
-test_NamedFramebufferTexture2DEXT(void* data)
-{
-	GLuint color_texture;
-	GLuint framebuffer;
-
-	glGenTextures(1, &color_texture);
-	glBindTexture(GL_TEXTURE_2D, color_texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, piglit_width, piglit_height,
-		     0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenFramebuffers(1, &framebuffer);
-	glNamedFramebufferTexture2DEXT(framebuffer, GL_COLOR_ATTACHMENT0,
-				       GL_TEXTURE_2D, color_texture, 0);
-
-	if (!piglit_check_gl_error(GL_NO_ERROR)) {
-		return PIGLIT_FAIL;
-	}
-	if (glCheckNamedFramebufferStatusEXT(framebuffer, GL_FRAMEBUFFER)
-	    != GL_FRAMEBUFFER_COMPLETE) {
-		return PIGLIT_FAIL;
-	}
-	return PIGLIT_PASS;
-}
-
-static enum piglit_result
 test_GetNamedRenderbufferParameterivEXT(void* data)
 {
 	GLuint renderbuffer;
@@ -167,11 +137,6 @@ piglit_init(int argc, char **argv)
 			"NamedRenderbufferStorageEXT",
 			NULL,
 			test_NamedRenderbufferStorageEXT
-		},
-		{
-			"NamedFramebufferTexture2DEXT",
-			NULL,
-			test_NamedFramebufferTexture2DEXT
 		},
 		{
 			"GetNamedRenderbufferParameterivEXT",
