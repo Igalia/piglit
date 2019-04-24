@@ -4830,6 +4830,9 @@ with profile.test_list.group_manager(
       'program-uniform')
     g(['ext_direct_state_access-renderbuffer'], 'renderbuffer')
     g(['ext_direct_state_access-framebuffer'], 'framebuffer')
+    g(['ext_direct_state_access-compressedmultiteximage',
+       'GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT'],
+      'compressedmultiteximage GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
