@@ -50,6 +50,12 @@ enum piglit_log_opt {
 	PIGLIT_LOG_OPT_MAX = 0,
 };
 
+#if (__GNUC__ >= 3)
+#define PRINTFLIKE(f, a) __attribute__ ((format(__printf__, f, a)))
+#else
+#define PRINTFLIKE(f, a)
+#endif
+
 intptr_t
 piglit_log_get_opt(enum piglit_log_opt);
 
@@ -58,17 +64,17 @@ piglit_log_set_opt(enum piglit_log_opt opt, intptr_t value);
 
 /** Log an error.message. */
 void
-piglit_loge(const char *fmt, ...);
+piglit_loge(const char *fmt, ...) PRINTFLIKE(1, 2);
 
 /** Log an info message. */
 void
-piglit_logi(const char *fmt, ...);
+piglit_logi(const char *fmt, ...) PRINTFLIKE(1, 2);
 
 /**
  * Log a debug message if environment variable PIGLIT_DEBUG is "1" or "true".
  */
 void
-piglit_logd(const char *fmt, ...);
+piglit_logd(const char *fmt, ...) PRINTFLIKE(1, 2);
 
 #ifdef __cplusplus
 } /* end extern "C" */

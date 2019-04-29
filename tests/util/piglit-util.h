@@ -61,12 +61,6 @@ extern "C" {
 #define __has_attribute(x) 0
 #endif
 
-#if (__GNUC__ >= 3)
-#define PRINTFLIKE(f, a) __attribute__ ((format(__printf__, f, a)))
-#else
-#define PRINTFLIKE(f, a)
-#endif
-
 #if defined(__GNUC__) || __has_attribute(noreturn)
 #define NORETURN __attribute__((noreturn))
 #else
