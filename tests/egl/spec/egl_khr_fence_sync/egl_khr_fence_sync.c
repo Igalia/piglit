@@ -806,7 +806,7 @@ test_eglGetSyncAttribKHR_sync_status(void *test_data)
 	if (sync_status != EGL_SIGNALED_KHR &&
 	    sync_status != EGL_UNSIGNALED_KHR) {
 		piglit_loge("before glFinish, eglGetSyncAttribKHR(EGL_SYNC_STATUS_KHR):\n"
-			  "  Expected status: EGL_SIGNALED_KHR or EGL_UNSIGNALED_KHR\n",
+			  "  Expected status: EGL_SIGNALED_KHR or EGL_UNSIGNALED_KHR\n"
 			  "  Actual status: 0x%x",
 			  sync_status);
 		result = PIGLIT_FAIL;
@@ -827,7 +827,7 @@ test_eglGetSyncAttribKHR_sync_status(void *test_data)
 	}
 	if (sync_status != EGL_SIGNALED_KHR) {
 		piglit_loge("after glFinish, eglGetSyncAttribKHR(EGL_SYNC_STATUS_KHR):\n"
-			  "  Expected status: EGL_SIGNALED_KHR\n",
+			  "  Expected status: EGL_SIGNALED_KHR\n"
 			  "  Actual status: 0x%x",
 			  sync_status);
 		result = PIGLIT_FAIL;
