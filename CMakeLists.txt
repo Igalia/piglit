@@ -141,7 +141,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		add_definitions(-DPIGLIT_HAS_GLX)
 	endif()
 
-	pkg_check_modules(GBM QUIET gbm>=17.1)
+        pkg_check_modules(GBM REQUIRED gbm>=17.1)
 	if(GBM_FOUND)
 		set(PIGLIT_HAS_GBM True)
 		add_definitions(-DPIGLIT_HAS_GBM)
