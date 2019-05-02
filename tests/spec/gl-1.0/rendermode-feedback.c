@@ -101,14 +101,13 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	piglit_config = &config;
 
-	struct piglit_subtest tests[ARRAY_SIZE(types) + 1];
+	struct piglit_subtest tests[ARRAY_SIZE(types) + 1] = {};
 	for (unsigned i = 0; i < ARRAY_SIZE(types); ++i) {
 		tests[i].name = piglit_get_gl_enum_name(types[i].type);
 		tests[i].option = tests[i].name;
 		tests[i].subtest_func = run_subtest;
 		tests[i].data = (void *)&types[i];
 	}
-	tests[ARRAY_SIZE(types)] = (struct piglit_subtest){ 0 };
 	config.subtests = tests;
 
 	config.supports_gl_compat_version = 10;
