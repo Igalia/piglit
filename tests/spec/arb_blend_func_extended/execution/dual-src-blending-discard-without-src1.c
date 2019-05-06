@@ -84,7 +84,11 @@ piglit_display(void)
     const float green[] = {0.0, 1.0, 0.0};
 
     glClearColor(1.0, 0.0, 0.0, 1.0);
+#ifdef PIGLIT_USE_OPENGL
     glClearDepth(1.0);
+#else
+    glClearDepthf(1.0);
+#endif
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
