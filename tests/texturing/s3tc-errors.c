@@ -147,6 +147,7 @@ check_rendering_(int width, int height, int line)
 #define check_rendering(w, h) check_rendering_(w, h, __LINE__)
 
 
+#ifdef PIGLIT_USE_OPENGL
 /**
  * Check for either of two expected GL errors.
  * XXX this could be a piglit util function
@@ -164,6 +165,7 @@ check_gl_error2_(GLenum err1, GLenum err2, int line)
 }
 
 #define check_gl_error2(err1, err2)  check_gl_error2_(err1, err2, __LINE__)
+#endif
 
 
 static bool
