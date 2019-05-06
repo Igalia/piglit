@@ -145,6 +145,22 @@ create_window(struct egl_state *state)
 				   0, vinfo->depth, InputOutput,
 				   vinfo->visual, mask, &window_attr);
 
+	/* Some tests expect the window size to be what they set. It is really
+	 * up to the window manager to decide the size, but we can at least
+	 * try to ask it to do what we want.
+	 */
+	XSetWMNormalHints(state->dpy, state->win, &(XSizeHints){
+		.flags = PSize | PMinSize | PMaxSize | PBaseSize,
+		.width = state->width,
+		.height = state->height,
+		.min_width = state->width,
+		.min_height = state->height,
+		.max_width = state->width,
+		.max_height = state->height,
+		.base_width = state->width,
+		.base_height = state->height,
+	});
+
 	XMapWindow(state->dpy, state->win);
 
 	XFree(vinfo);
