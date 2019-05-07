@@ -193,17 +193,17 @@ piglit_display(void)
 		/* Draw the outline of a quad. */
 		v = sv + v_from_end(count, 4, 2);
 		set_colors(color, v, 4 * 2, green);
-		set_point(vert, v++, quad_x1, quad_y1 + 0.5);
-		set_point(vert, v++, quad_x2, quad_y1 + 0.5);
+		set_point(vert, v++, quad_x1 + 0.5, quad_y1 + 0.5);
+		set_point(vert, v++, quad_x2 + 0.5, quad_y1 + 0.5);
 
-		set_point(vert, v++, quad_x1, quad_y2 + 0.5);
-		set_point(vert, v++, quad_x2, quad_y2 + 0.5);
+		set_point(vert, v++, quad_x1 + 0.5, quad_y2 + 0.5);
+		set_point(vert, v++, quad_x2 + 0.5, quad_y2 + 0.5);
 
-		set_point(vert, v++, quad_x1 + 0.5, quad_y1);
-		set_point(vert, v++, quad_x1 + 0.5, quad_y2);
+		set_point(vert, v++, quad_x1 + 0.5, quad_y1 + 0.5);
+		set_point(vert, v++, quad_x1 + 0.5, quad_y2 + 0.5);
 
-		set_point(vert, v++, quad_x2 + 0.5, quad_y1);
-		set_point(vert, v++, quad_x2 + 0.5, quad_y2);
+		set_point(vert, v++, quad_x2 + 0.5, quad_y1 + 0.5);
+		set_point(vert, v++, quad_x2 + 0.5, quad_y2 + 0.5);
 		break;
 
 	case GL_LINE_STRIP:
