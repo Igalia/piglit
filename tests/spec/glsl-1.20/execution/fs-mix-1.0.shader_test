@@ -1,0 +1,40 @@
+# In commit 5b908db604b ("nir/flrp: Lower flrp(±1, b, c) and flrp(a,
+# ±1, c) differently"), Mesa added an optimization for the lowering of
+# mix() on platforms that lack a native LRP instruction.  There was a
+# bug in this lowering, and this test exercises it.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+uniform vec4 p[] = vec4[](
+	vec4(1.0, 0.5, 1.0, 0.0),
+	vec4(-1.0, 0.5, 0.0, -1.0),
+	vec4(2.0, 1.0, 2.0, 2.0),
+	vec4(2.0, 0.5, 1.5, 0.5)
+);
+
+void
+main()
+{
+	bool pass = true;
+
+	for (int i = 0; i < p.length(); i++) {
+		if (mix(1.0, p[i].x, p[i].y) != p[i].z)
+			pass = false;
+
+		if (mix(-1.0, p[i].x, p[i].y) != p[i].w)
+			pass = false;
+	}
+
+	gl_FragColor = pass ? vec4(0.0, 1.0, 0.0, 1.0)
+			    : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
