@@ -74,7 +74,7 @@ query_width(struct egl_state *state)
 	if (width != state->width) {
 		fprintf(stderr,
 			"error: width=%d but eglQuerySurface(EGL_WIDTH) "
-			"returned %d\n", state->height, width);
+			"returned %d\n", state->width, width);
 		return PIGLIT_FAIL;
 	}
 	return PIGLIT_PASS;
