@@ -413,7 +413,7 @@ static const struct piglit_drm_driver *
 piglit_drm_get_driver(void)
 {
 	static struct piglit_drm_driver drv = { /* fd */ -1 };
-	drmVersionPtr version;
+	drmVersionPtr version = NULL;
 
 	if (drv.fd != -1)
 		return &drv;
@@ -441,6 +441,7 @@ piglit_drm_get_driver(void)
 
 	drv.name = strdup(version->name);
 	if (!drv.name) {
+		drmFreeVersion(version);
 		fprintf(stderr, "out of memory\n");
 		abort();
 	}
@@ -468,6 +469,7 @@ piglit_drm_get_driver(void)
 		goto fail;
 	}
 
+	drmFreeVersion(version);
 	return &drv;
 
   fail:
@@ -481,6 +483,7 @@ piglit_drm_get_driver(void)
 		drv.name = NULL;
 	}
 
+	drmFreeVersion(version);
 	return NULL;
 }
 
