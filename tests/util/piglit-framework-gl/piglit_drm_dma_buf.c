@@ -330,7 +330,8 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		return false;
 	}
 
-	bo = gbm_bo_create(gbm, buf_w, buf_h, format, GBM_BO_USE_RENDERING);
+	bo = gbm_bo_create(gbm, buf_w, buf_h, format,
+			   GBM_BO_USE_RENDERING | GBM_BO_USE_LINEAR);
 	if (!bo)
 		return false;
 
@@ -361,24 +362,24 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 			memcpy(((char *)dst_data + dst_stride * h) + i * dst_stride,
 				(src_data + (w*h)) + i * src_stride, w);
 		}
-		buf->offset[1] = gbm_bo_get_offset(bo, 1);
-		buf->stride[1] = gbm_bo_get_stride_for_plane(bo, 1);
+		buf->offset[1] = buf->stride[0] * h;
+		buf->stride[1] = buf->stride[0];
 		break;
 	case DRM_FORMAT_YUV420:
 	case DRM_FORMAT_YVU420:
 		for (i = 0; i < h/2; ++i) {
-			memcpy(((char *)dst_data + dst_stride * h) + i * dst_stride / 2,
+			memcpy(((char *)dst_data + dst_stride * h) + i * dst_stride,
 				(src_data + (w*h)) + i * src_stride / 2, w / 2);
 		}
-		unsigned cpu_offset2 = dst_stride * h + (dst_stride * h / 2 / 2);
+		unsigned cpu_offset2 = dst_stride * h + dst_stride * h / 2;
 		for (i = 0; i < h/2; ++i) {
-			memcpy(((char *)dst_data + cpu_offset2) + i * dst_stride / 2,
+			memcpy(((char *)dst_data + cpu_offset2) + i * dst_stride,
 				(src_data + (w*h) + (w*h/4)) + i * src_stride / 2, w / 2);
 		}
-		buf->offset[1] = gbm_bo_get_offset(bo, 1);
-		buf->stride[1] = gbm_bo_get_stride_for_plane(bo, 1);
-		buf->offset[2] = gbm_bo_get_offset(bo, 2);
-		buf->stride[2] = gbm_bo_get_stride_for_plane(bo, 2);
+		buf->offset[1] = buf->stride[0] * h;
+		buf->stride[1] = buf->stride[0];
+		buf->offset[2] = buf->stride[0] * h + buf->stride[0] * h / 2;
+		buf->stride[2] = buf->stride[1];
 		break;
 	default:
 		break;
