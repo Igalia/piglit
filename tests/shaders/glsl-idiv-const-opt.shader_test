@@ -1,0 +1,178 @@
+/* This test was originally created to catch a bug in the logic of
+ * optimizing integer division by a constant that is a power of two.
+ */
+
+[require]
+GL >= 4.5
+GLSL >= 4.50
+
+[compute shader]
+#version 450
+
+layout(local_size_x = 1) in;
+
+layout(binding = 0) buffer SSBO0 {
+	int in_val[25];
+};
+
+layout(binding = 1) buffer SSBO1 {
+	int expected_pos[25];
+};
+
+layout(binding = 2) buffer SSBO2 {
+	int expected_neg[25];
+};
+
+layout(binding = 3) buffer SSBO3 {
+	int fail[25];
+};
+
+void main() {
+	uint index = gl_GlobalInvocationID.x;
+	fail[index] = 0;
+
+	if (in_val[index] / 16 != expected_pos[index])
+		fail[index] += 1;
+
+	if (in_val[index] / -16 != expected_neg[index])
+		fail[index] += 2;
+}
+
+[test]
+
+atomic counters 25
+
+ssbo 0 100
+ssbo 1 100
+ssbo 2 100
+ssbo 3 100
+
+
+ssbo 0 subdata int   0   128
+ssbo 1 subdata int   0     8
+ssbo 2 subdata int   0    -8
+
+ssbo 0 subdata int   4    65
+ssbo 1 subdata int   4     4
+ssbo 2 subdata int   4    -4
+
+ssbo 0 subdata int   8    64
+ssbo 1 subdata int   8     4
+ssbo 2 subdata int   8    -4
+
+ssbo 0 subdata int  12    63
+ssbo 1 subdata int  12     3
+ssbo 2 subdata int  12    -3
+
+ssbo 0 subdata int  16    32
+ssbo 1 subdata int  16     2
+ssbo 2 subdata int  16    -2
+
+ssbo 0 subdata int  20    17
+ssbo 1 subdata int  20     1
+ssbo 2 subdata int  20    -1
+
+ssbo 0 subdata int  24    16
+ssbo 1 subdata int  24     1
+ssbo 2 subdata int  24    -1
+
+ssbo 0 subdata int  28    15
+ssbo 1 subdata int  28     0
+ssbo 2 subdata int  28     0
+
+ssbo 0 subdata int  32    14
+ssbo 1 subdata int  32     0
+ssbo 2 subdata int  32     0
+
+ssbo 0 subdata int  36     8
+ssbo 1 subdata int  36     0
+ssbo 2 subdata int  36     0
+
+ssbo 0 subdata int  40     1
+ssbo 1 subdata int  40     0
+ssbo 2 subdata int  40     0
+
+
+ssbo 0 subdata int  44    -1
+ssbo 1 subdata int  44     0
+ssbo 2 subdata int  44     0
+
+ssbo 0 subdata int  48    -8
+ssbo 1 subdata int  48     0
+ssbo 2 subdata int  48     0
+
+ssbo 0 subdata int  52   -14
+ssbo 1 subdata int  52     0
+ssbo 2 subdata int  52     0
+
+ssbo 0 subdata int  56   -15
+ssbo 1 subdata int  56     0
+ssbo 2 subdata int  56     0
+
+ssbo 0 subdata int  60   -16
+ssbo 1 subdata int  60    -1
+ssbo 2 subdata int  60     1
+
+ssbo 0 subdata int  64   -17
+ssbo 1 subdata int  64    -1
+ssbo 2 subdata int  64     1
+
+ssbo 0 subdata int  68   -32
+ssbo 1 subdata int  68    -2
+ssbo 2 subdata int  68     2
+
+ssbo 0 subdata int  72   -63
+ssbo 1 subdata int  72    -3
+ssbo 2 subdata int  72     3
+
+ssbo 0 subdata int  76   -64
+ssbo 1 subdata int  76    -4
+ssbo 2 subdata int  76     4
+
+ssbo 0 subdata int  80   -65
+ssbo 1 subdata int  80    -4
+ssbo 2 subdata int  80     4
+
+ssbo 0 subdata int  84  -128
+ssbo 1 subdata int  84    -8
+ssbo 2 subdata int  84     8
+
+ssbo 0 subdata int  88             0
+ssbo 1 subdata int  88             0
+ssbo 2 subdata int  88             0
+
+ssbo 0 subdata int  92    2147483647
+ssbo 1 subdata int  92     134217727
+ssbo 2 subdata int  92    -134217727
+
+ssbo 0 subdata int  96   -2147483648
+ssbo 1 subdata int  96    -134217728
+ssbo 2 subdata int  96     134217728
+
+compute 25 1 1
+
+probe ssbo int 3   0 == 0
+probe ssbo int 3   4 == 0
+probe ssbo int 3   8 == 0
+probe ssbo int 3  12 == 0
+probe ssbo int 3  16 == 0
+probe ssbo int 3  20 == 0
+probe ssbo int 3  24 == 0
+probe ssbo int 3  28 == 0
+probe ssbo int 3  32 == 0
+probe ssbo int 3  36 == 0
+probe ssbo int 3  40 == 0
+probe ssbo int 3  44 == 0
+probe ssbo int 3  48 == 0
+probe ssbo int 3  52 == 0
+probe ssbo int 3  56 == 0
+probe ssbo int 3  60 == 0
+probe ssbo int 3  64 == 0
+probe ssbo int 3  68 == 0
+probe ssbo int 3  72 == 0
+probe ssbo int 3  76 == 0
+probe ssbo int 3  80 == 0
+probe ssbo int 3  84 == 0
+probe ssbo int 3  88 == 0
+probe ssbo int 3  92 == 0
+probe ssbo int 3  96 == 0
