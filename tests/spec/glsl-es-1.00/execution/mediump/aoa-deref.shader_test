@@ -1,0 +1,54 @@
+[require]
+GL ES >= 3.1
+GLSL ES >= 3.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 310 es
+
+precision mediump float;
+
+uniform float thing[2][2];
+layout(location = 0) out vec4 out_colour;
+
+void
+main()
+{
+	out_colour.x = thing[0][0] * thing[0][1];
+	out_colour.y = thing[1][0] * thing[1][1];
+	out_colour.z = 0.0;
+	out_colour.w = 0.0;
+}
+
+[test]
+clear
+
+uniform float thing[0][0] 0.25
+uniform float thing[0][1] 0.25
+uniform float thing[1][0] 0.25
+uniform float thing[1][1] 0.25
+draw rect -1 -1 1 1
+
+uniform float thing[0][0] 0.75
+uniform float thing[0][1] 0.25
+uniform float thing[1][0] 0.45
+uniform float thing[1][1] 0.25
+draw rect 0 -1 1 1
+
+uniform float thing[0][0] 0.25
+uniform float thing[0][1] 0.75
+uniform float thing[1][0] 0.25
+uniform float thing[1][1] 0.45
+draw rect -1 0 1 1
+
+uniform float thing[0][0] 0.75
+uniform float thing[0][1] 0.75
+uniform float thing[1][0] 0.45
+uniform float thing[1][1] 0.45
+draw rect 0 0 1 1
+
+relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (0.0625, 0.0625, 0.0)
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.1875, 0.1125, 0.0)
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.1875, 0.1125, 0.0)
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (0.5625, 0.2025, 0.0)
