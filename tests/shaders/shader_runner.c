@@ -384,6 +384,9 @@ compare(float ref, float value, enum comparison cmp);
 static bool
 compare_uint(GLuint ref, GLuint value, enum comparison cmp);
 
+static bool
+compare_int(GLint ref, GLint value, enum comparison cmp);
+
 static void
 version_init(struct component_version *v, enum version_tag tag, bool core, bool compat, bool es, unsigned num)
 {
@@ -928,6 +931,22 @@ compare(float ref, float value, enum comparison cmp)
 
 static bool
 compare_uint(GLuint ref, GLuint value, enum comparison cmp)
+{
+	switch (cmp) {
+	case equal:         return value == ref;
+	case not_equal:     return value != ref;
+	case less:          return value <  ref;
+	case greater_equal: return value >= ref;
+	case greater:       return value >  ref;
+	case less_equal:    return value <= ref;
+	}
+
+	assert(!"Should not get here.");
+	return false;
+}
+
+static bool
+compare_int(GLint ref, GLint value, enum comparison cmp)
 {
 	switch (cmp) {
 	case equal:         return value == ref;
@@ -3491,6 +3510,42 @@ probe_ssbo_uint(GLint ssbo_index, GLint ssbo_offset, const char *op, uint32_t va
 	return true;
 }
 
+static bool
+probe_ssbo_int(GLint ssbo_index, GLint ssbo_offset, const char *op, int32_t value)
+{
+	int32_t *p;
+	int32_t observed;
+	enum comparison cmp;
+	bool result;
+
+	REQUIRE(parse_comparison_op(op, &cmp, NULL),
+		"Invalid comparison operation at: %s\n", op);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo[ssbo_index]);
+	p = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_offset,
+			     sizeof(uint32_t), GL_MAP_READ_BIT);
+
+	if (!p) {
+		printf("Couldn't map ssbo to verify expected value.\n");
+		return false;
+	}
+
+	observed = *p;
+	result = compare_int(value, observed, cmp);
+
+	if (!result) {
+		printf("SSBO %d test failed: Reference %s Observed\n",
+		       ssbo_offset, comparison_string(cmp));
+		printf("  Reference: %d\n", value);
+		printf("  Observed:  %d\n", observed);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		return false;
+	}
+
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	return true;
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -3980,6 +4035,10 @@ piglit_display(void)
 		} else if (sscanf(line, "probe ssbo uint %d %d %s %d",
 				  &x, &y, s, &z) == 4) {
 			if (!probe_ssbo_uint(x, y, s, z))
+				result = PIGLIT_FAIL;
+		} else if (sscanf(line, "probe ssbo int %d %d %s %d",
+				  &x, &y, s, &z) == 4) {
+			if (!probe_ssbo_int(x, y, s, z))
 				result = PIGLIT_FAIL;
 		} else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
