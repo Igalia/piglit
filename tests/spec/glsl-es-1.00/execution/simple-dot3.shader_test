@@ -1,0 +1,25 @@
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+uniform vec3 arg0;
+uniform vec3 arg1;
+
+void main()
+{
+  gl_FragColor.x = dot(arg0, arg1);
+  gl_FragColor.yzw = vec3(0.0, 0.0, 1.0);
+}
+
+[test]
+clear
+uniform vec3 arg0 0.25 0.75 0.5
+uniform vec3 arg1 1.2 0.4 0.6
+draw rect -1 -1 2 2
+probe all rgba 0.9 0.0 0.0 1.0
