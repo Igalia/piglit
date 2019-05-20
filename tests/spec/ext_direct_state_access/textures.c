@@ -696,6 +696,69 @@ test_EnableDisableEXT(void* data)
 }
 
 
+static enum piglit_result
+test_TextureProxyTarget(void* data)
+{
+	bool pass = true;
+	GLint width;
+	GLfloat height;
+	const int n = (int)(intptr_t) data;
+	const GLenum target = dimension_to_target(n);
+
+	GLenum proxy_target = (target == GL_TEXTURE_1D) ? GL_PROXY_TEXTURE_1D :
+		(target == GL_TEXTURE_2D ? GL_PROXY_TEXTURE_2D : GL_PROXY_TEXTURE_3D);
+
+	GLuint tex;
+	glGenTextures(1, &tex);
+
+	/*   The GL_EXT_direct_state_access says:
+	 *
+	 *    Proxy targets work with the glTex* (glTexImage*)
+         *    and glGetTex* (glGetTexLevelParameter*) commands that support
+         *    proxy textures BUT the texture name must be 0 to avoid a
+         *    GL_INVALID_OPERATION error.
+	 */
+	if (n == 1) {
+		glTextureImage1DEXT(tex, proxy_target, 0, GL_RGBA,
+				    piglit_width, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	} else if (n == 2) {
+		glTextureImage2DEXT(tex, proxy_target, 0, GL_RGBA,
+				    piglit_width, piglit_height, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	} else if (n == 3) {
+		glTextureImage3DEXT(tex, proxy_target, 0, GL_RGBA,
+				    piglit_width, piglit_height, 1, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	}
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
+	if (n == 1) {
+		glTextureImage1DEXT(0, proxy_target, 0, GL_RGBA,
+				    piglit_width, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	} else if (n == 2) {
+		glTextureImage2DEXT(0, proxy_target, 0, GL_RGBA,
+				    piglit_width, piglit_height, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	} else if (n == 3) {
+		glTextureImage3DEXT(0, proxy_target, 0, GL_RGBA,
+				    piglit_width, piglit_height, 1, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	}
+        glGetTextureLevelParameterivEXT(0, proxy_target, 0,
+                                        GL_TEXTURE_WIDTH, &width);
+        glGetTextureLevelParameterfvEXT(0, proxy_target, 0,
+                                        GL_TEXTURE_HEIGHT, &height);
+        pass = width == piglit_width && pass;
+        pass = (int)height == (n > 1 ? piglit_height : 1) && pass;
+
+	glDeleteTextures(1, &tex);
+
+	return pass && piglit_check_gl_error(GL_NO_ERROR) ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
@@ -783,6 +846,24 @@ piglit_display(void)
 			"EnableDisableEXT",
 			NULL,
 			test_EnableDisableEXT
+		},
+		{
+			"GL_PROXY_TEXTURE_1D + glTex*",
+			NULL,
+			test_TextureProxyTarget,
+			(void*) 1
+		},
+		{
+			"GL_PROXY_TEXTURE_2D + glTex*",
+			NULL,
+			test_TextureProxyTarget,
+			(void*) 2
+		},
+		{
+			"GL_PROXY_TEXTURE_3D + glTex*",
+			NULL,
+			test_TextureProxyTarget,
+			(void*) 3
 		},
 		{
 			NULL

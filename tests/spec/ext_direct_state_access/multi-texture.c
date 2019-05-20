@@ -1074,6 +1074,47 @@ test_MultiTexParameterfEXT(void* data)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+static enum piglit_result
+test_TextureProxyTarget(void* data)
+{
+	bool pass = true;
+	GLint width;
+	GLfloat height;
+	const int n = (int)(intptr_t) data;
+	const GLenum target = dimension_to_target(n);
+	const GLenum* texunits = n_texunits(2);
+
+	GLenum proxy_target = (target == GL_TEXTURE_1D) ? GL_PROXY_TEXTURE_1D :
+		(target == GL_TEXTURE_2D ? GL_PROXY_TEXTURE_2D : GL_PROXY_TEXTURE_3D);
+
+	glActiveTexture(texunits[1]);
+
+	if (target == GL_TEXTURE_1D) {
+		glMultiTexImage1DEXT(texunits[0], proxy_target, 0, GL_RGBA,
+				    piglit_width, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	} else if (target == GL_TEXTURE_2D) {
+		glMultiTexImage2DEXT(texunits[0], proxy_target, 0, GL_RGBA,
+				    piglit_width, piglit_height, 0,
+				    GL_RGBA, GL_FLOAT, NULL);
+	} else {
+		glMultiTexImage3DEXT(texunits[0], proxy_target, 0, GL_RGBA,
+		    piglit_width, piglit_height, 1, 0,
+		    GL_RGBA, GL_FLOAT, NULL);
+	}
+
+	piglit_check_gl_error(GL_NO_ERROR);
+
+        glGetMultiTexLevelParameterivEXT(texunits[0], proxy_target, 0,
+                                        GL_TEXTURE_WIDTH, &width);
+        glGetMultiTexLevelParameterfvEXT(texunits[0], proxy_target, 0,
+                                        GL_TEXTURE_HEIGHT, &height);
+        pass = width == piglit_width && pass;
+        pass = (int)height == (n > 1 ? piglit_height : 1) && pass;
+
+	return pass && piglit_check_gl_error(GL_NO_ERROR) ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -1176,6 +1217,24 @@ piglit_display(void)
 			"MultiTexParameteriEXT",
 			NULL,
 			test_MultiTexParameteriEXT
+		},
+		{
+			"GL_PROXY_TEXTURE_1D + glTex*",
+			NULL,
+			test_TextureProxyTarget,
+			(void*) 1
+		},
+		{
+			"GL_PROXY_TEXTURE_2D + glTex*",
+			NULL,
+			test_TextureProxyTarget,
+			(void*) 2
+		},
+		{
+			"GL_PROXY_TEXTURE_3D + glTex*",
+			NULL,
+			test_TextureProxyTarget,
+			(void*) 3
 		},
 		{
 			NULL
