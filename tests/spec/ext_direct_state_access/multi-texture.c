@@ -199,6 +199,7 @@ test_MultiTexEnviEXT(void* data)
 		texture_filter_control_test,
 		point_sprite_test
 	};
+	bool pass = true;
 
 	/* This test applies different values to the same pname to 4 texunit:
 	 *   - texunit#0 will use glTexEnvi(...)
@@ -220,12 +221,17 @@ test_MultiTexEnviEXT(void* data)
 			const int value_count = tested[i][j].value_count;
 			/* Iterate on possible values */
 			for (k = 0; k < tested[i][j].value_count; k++) {
+				int original_values[4];
 				const int values[] = {
 					tested[i][j].values[k],
 					tested[i][j].values[(k + 1) % value_count],
 					tested[i][j].values[(k + 2) % value_count],
 					tested[i][j].values[(k + 3) % value_count]
 				};
+				for (l = 0; l < 4; l++) {
+					glGetMultiTexEnvivEXT(texunits[l], target,
+							      pname, &original_values[l]);
+				}
 
 				if (use_display_list != GL_NONE)
 					glNewList(list, use_display_list);
@@ -253,8 +259,15 @@ test_MultiTexEnviEXT(void* data)
 				if (use_display_list != GL_NONE)
 					glEndList(list);
 
-				if (use_display_list == GL_COMPILE)
+				if (use_display_list == GL_COMPILE) {
+					for (l = 0; l < 4; l++) {
+						int v;
+						glGetMultiTexEnvivEXT(texunits[l], target,
+								      pname, &v);
+						pass = v == original_values[l] && pass;
+					}
 					glCallList(list);
+				}
 
 				if (!piglit_check_gl_error(GL_NO_ERROR)) {
 					return PIGLIT_FAIL;
@@ -280,17 +293,23 @@ test_MultiTexEnviEXT(void* data)
 		}
 	}
 
-	return piglit_check_gl_error(GL_NO_ERROR) ? PIGLIT_PASS : PIGLIT_FAIL;
+	return piglit_check_gl_error(GL_NO_ERROR) && pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static enum piglit_result
 test_MultiTexEnvfvEXT(void* data)
 {
 	static const float color[] = { 0.3, 0.7, 0.1, 0.0 };
+	float original_color[4];
 	float got[4];
 	const GLenum* texunits = n_texunits(2);
 
 	glActiveTexture(texunits[0]);
+
+	glGetMultiTexEnvfvEXT(texunits[1],
+			GL_TEXTURE_ENV,
+			GL_TEXTURE_ENV_COLOR,
+			original_color);
 
 	if (use_display_list != GL_NONE)
 		glNewList(list, use_display_list);
@@ -303,13 +322,21 @@ test_MultiTexEnvfvEXT(void* data)
 	if (use_display_list != GL_NONE)
 		glEndList(list);
 
-	if (use_display_list == GL_COMPILE)
-		glCallList(list);
-
 	glGetMultiTexEnvfvEXT(texunits[1],
 			GL_TEXTURE_ENV,
 			GL_TEXTURE_ENV_COLOR,
 			got);
+
+	if (use_display_list == GL_COMPILE) {
+		if (memcmp(original_color, got, sizeof(got)) != 0) {
+			return PIGLIT_FAIL;
+		}
+		glCallList(list);
+		glGetMultiTexEnvfvEXT(texunits[1],
+			GL_TEXTURE_ENV,
+			GL_TEXTURE_ENV_COLOR,
+			got);
+	}
 
 	if (!piglit_check_gl_error(GL_NO_ERROR) || memcmp(color, got, sizeof(got)) != 0) {
 		return PIGLIT_FAIL;
@@ -558,7 +585,7 @@ test_CopyMultiTexImageNDEXT(void* data)
 		glGetMultiTexImageEXT(texunit, target, 0, GL_RGBA, GL_FLOAT, got_pixels);
 	}
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels) && pass;
 
 	free(got_pixels);
 	free(original_pixels);
@@ -614,7 +641,7 @@ test_CopyMultiTexSubImageNDEXT(void* data)
 		glGetMultiTexImageEXT(texunit, target, 0, GL_RGBA, GL_FLOAT, got_pixels);
 	}
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels) && pass;
 
 	free(got_pixels);
 
@@ -762,7 +789,9 @@ test_MultiTexCoordPointerEXT(void* data)
 	texunit = GL_TEXTURE0 + rand() % max_texture_coords;
 
 	glMultiTexCoordPointerEXT(texunit, 2, GL_INT, 4, array);
-	piglit_check_gl_error(GL_NO_ERROR);
+
+	pass = piglit_check_gl_error(GL_NO_ERROR);
+
 	glClientActiveTexture(texunit);
 
 	glGetIntegerv(GL_TEXTURE_COORD_ARRAY_SIZE, &value);
@@ -775,7 +804,7 @@ test_MultiTexCoordPointerEXT(void* data)
 	pass = value == 4 && pass;
 
 	glGetPointerv(GL_TEXTURE_COORD_ARRAY_POINTER, &ptr);
-	pass = ptr == array;
+	pass = ptr == array && pass;
 
 	return piglit_check_gl_error(GL_NO_ERROR) && pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -788,6 +817,7 @@ test_MultiTexParameteriEXT(void* data)
 		GL_TEXTURE_CUBE_MAP,
 	};
 	int i, j, k, l, value;
+	bool pass = true;
 
 	const struct pname_value {
 		GLenum pname;
@@ -880,6 +910,16 @@ test_MultiTexParameteriEXT(void* data)
 			const GLenum* texunits = n_texunits(3);
 			glActiveTexture(texunits[0]);
 			for (k = 0; k < tested[j].value_count; k++) {
+				int original_values[2];
+
+				if (use_display_list != GL_NONE)
+					glNewList(list, use_display_list);
+
+				for (l = 0; l < 2; l++) {
+					glGetMultiTexParameterivEXT(texunits[1 + l], target,
+						tested[j].pname, &original_values[l]);
+				}
+
 				glMultiTexParameteriEXT(
 					texunits[1], target,
 					tested[j].pname,
@@ -889,6 +929,19 @@ test_MultiTexParameteriEXT(void* data)
 					texunits[2], target,
 					tested[j].pname,
 					&tested[j].values[k]);
+
+				if (use_display_list != GL_NONE)
+					glEndList(list);
+
+				if (use_display_list == GL_COMPILE) {
+					for (l = 0; l < 2; l++) {
+						int v;
+						glGetMultiTexParameterivEXT(texunits[1 + l], target,
+							tested[j].pname, &v);
+						pass = v == original_values[l] && pass;
+					}
+					glCallList(list);
+				}
 
 				for (l = 0; l < 2; l++) {
 					glGetMultiTexParameterivEXT(texunits[1 + l], target, tested[j].pname, &value);
@@ -915,7 +968,7 @@ test_MultiTexParameteriEXT(void* data)
 			}
 		}
 	}
-	return PIGLIT_PASS;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static enum piglit_result
@@ -927,6 +980,7 @@ test_MultiTexParameterfEXT(void* data)
 		GL_TEXTURE_CUBE_MAP,
 	};
 	int i, j, k, l;
+	bool pass = true;
 	float value;
 
 	const struct pname_value {
@@ -959,6 +1013,16 @@ test_MultiTexParameterfEXT(void* data)
 			const GLenum* texunits = n_texunits(3);
 			glActiveTexture(texunits[0]);
 			for (k = 0; k < tested[j].value_count; k++) {
+				float original_values[2];
+
+				if (use_display_list != GL_NONE)
+					glNewList(list, use_display_list);
+
+				for (l = 0; l < 2; l++) {
+					glGetMultiTexParameterfvEXT(texunits[1 + l], target,
+						tested[j].pname, &original_values[l]);
+				}
+
 				glMultiTexParameterfEXT(
 					texunits[1], target,
 					tested[j].pname,
@@ -968,6 +1032,19 @@ test_MultiTexParameterfEXT(void* data)
 					texunits[2], target,
 					tested[j].pname,
 					&tested[j].values[k]);
+
+				if (use_display_list != GL_NONE)
+					glEndList(list);
+
+				if (use_display_list == GL_COMPILE) {
+					for (l = 0; l < 2; l++) {
+						float v;
+						glGetMultiTexParameterfvEXT(texunits[1 + l], target,
+							tested[j].pname, &v);
+						pass = v == original_values[l] && pass;
+					}
+					glCallList(list);
+				}
 
 				for (l = 0; l < 2; l++) {
 					glGetMultiTexParameterfvEXT(texunits[1 + l], target, tested[j].pname, &value);
@@ -994,7 +1071,7 @@ test_MultiTexParameterfEXT(void* data)
 			}
 		}
 	}
-	return PIGLIT_PASS;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result

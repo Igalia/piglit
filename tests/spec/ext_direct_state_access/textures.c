@@ -278,7 +278,7 @@ test_CopyTextureImageNDEXT(void* data)
 		glGetTextureImageEXT(tex, target, 0, GL_RGBA, GL_FLOAT, got_pixels);
 	}
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels) && pass;
 
 	free(got_pixels);
 	free(original_pixels);
@@ -333,7 +333,7 @@ test_CopyTextureSubImageNDEXT(void* data)
 		glGetTextureImageEXT(tex, target, 0, GL_RGBA, GL_FLOAT, got_pixels);
 	}
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, height, got_pixels) && pass;
 
 	free(got_pixels);
 	free(original_pixels);
@@ -352,6 +352,7 @@ test_TextureParameteriEXT(void* data)
 		GL_TEXTURE_CUBE_MAP,
 	};
 	int i, j, k, l, value;
+	bool pass = true;
 
 	const struct pname_value {
 		GLenum pname;
@@ -445,8 +446,14 @@ test_TextureParameteriEXT(void* data)
 
 		for (j = 0; j < ARRAY_SIZE(tested); j++) {
 			for (k = 0; k < tested[j].value_count; k++) {
+				int original_values[2];
 				if (use_display_list != GL_NONE)
 					glNewList(list, use_display_list);
+
+				for (l = 0; l < 2; l++) {
+					glGetTextureParameterivEXT(tex[l], target,
+						tested[j].pname, &original_values[l]);
+				}
 
 				glTextureParameteriEXT(
 					tex[0], target,
@@ -461,8 +468,15 @@ test_TextureParameteriEXT(void* data)
 				if (use_display_list != GL_NONE)
 					glEndList(list);
 
-				if (use_display_list == GL_COMPILE)
+				if (use_display_list == GL_COMPILE) {
+					for (l = 0; l < 2; l++) {
+						int v;
+						glGetTextureParameterivEXT(tex[l], target,
+							tested[j].pname, &v);
+						pass = v == original_values[l] && pass;
+					}
 					glCallList(list);
+				}
 
 				for (l = 0; l < 2; l++) {
 					glGetTextureParameterivEXT(tex[l], target, tested[j].pname, &value);
@@ -488,7 +502,7 @@ test_TextureParameteriEXT(void* data)
 		}
 		glDeleteTextures(ARRAY_SIZE(tex), tex);
 	}
-	return PIGLIT_PASS;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static enum piglit_result
@@ -501,6 +515,7 @@ test_TextureParameterfEXT(void* data)
 		GL_TEXTURE_CUBE_MAP,
 	};
 	int i, j, k, l;
+	bool pass = true;
 	float value;
 
 	const struct pname_value {
@@ -533,8 +548,15 @@ test_TextureParameterfEXT(void* data)
 
 		for (j = 0; j < ARRAY_SIZE(tested); j++) {
 			for (k = 0; k < tested[j].value_count; k++) {
+				float original_values[2];
+
 				if (use_display_list != GL_NONE)
 					glNewList(list, use_display_list);
+
+				for (l = 0; l < 2; l++) {
+					glGetTextureParameterfvEXT(tex[l], target,
+						tested[j].pname, &original_values[l]);
+				}
 
 				glTextureParameterfEXT(
 					tex[0], target,
@@ -549,8 +571,15 @@ test_TextureParameterfEXT(void* data)
 				if (use_display_list != GL_NONE)
 					glEndList(list);
 
-				if (use_display_list == GL_COMPILE)
+				if (use_display_list == GL_COMPILE) {
+					for (l = 0; l < 2; l++) {
+						float v;
+						glGetTextureParameterfvEXT(tex[l], target,
+							tested[j].pname, &v);
+						pass = v == original_values[l] && pass;
+					}
 					glCallList(list);
+				}
 
 				for (l = 0; l < 2; l++) {
 					glGetTextureParameterfvEXT(tex[l], target, tested[j].pname, &value);
@@ -576,7 +605,7 @@ test_TextureParameterfEXT(void* data)
 		}
 		glDeleteTextures(ARRAY_SIZE(tex), tex);
 	}
-	return PIGLIT_PASS;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result

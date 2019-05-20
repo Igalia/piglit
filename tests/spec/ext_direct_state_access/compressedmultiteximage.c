@@ -305,15 +305,18 @@ test_MultiCompressedTexImageNDEXT(void* data)
 	if (use_display_list != GL_NONE)
 		glEndList(list);
 
+	if (use_display_list == GL_COMPILE) {
+		int width;
+	        glGetTextureLevelParameterivEXT(tex, target, 0,
+                                		GL_TEXTURE_WIDTH, &width);
+		pass = width == 0 && pass;
+		glCallList(list);
+	}
+
 	/* Test GetCompressedMultiTexImageEXT */
 	compressed = (float*) malloc(compressed_size);
 	glGetCompressedMultiTexImageEXT(texunits[0], target, 0, compressed);
 
-	if (use_display_list == GL_COMPILE) {
-		piglit_check_gl_error(GL_INVALID_OPERATION);
-		glCallList(list);
-		glGetCompressedMultiTexImageEXT(texunits[0], target, 0, compressed);
-	}
 
 	pass = memcmp(compressed, expected_compressed, compressed_size) == 0 && pass;
 	free(compressed);
