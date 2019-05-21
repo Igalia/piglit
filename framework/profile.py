@@ -52,6 +52,7 @@ from framework.test.piglit_test import (
 )
 from framework.test.shader_test import ShaderTest, MultiShaderTest
 from framework.test.glsl_parser_test import GLSLParserTest
+from framework.test.xorg import XTSTest, RendercheckTest
 from framework.options import OPTIONS
 
 __all__ = [
@@ -337,6 +338,10 @@ def make_test(element):
             process(e, skips)
             options['skips'].append(skips)
         return MultiShaderTest(**options)
+    if type_ == 'xts':
+        return XTSTest(**options)
+    if type_ == 'rendercheck':
+        return RendercheckTest(**options)
     raise Exception('Unreachable')
 
 
