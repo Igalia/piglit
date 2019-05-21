@@ -32,22 +32,22 @@ clear
 uniform vec3 arg0 -0.029999999 -0.85000002 -0.94
 uniform vec3 arg1 -0.029999999 -0.85000002 -0.94
 uniform float expected 1.607
-uniform float tolerance 1.607e-05
+uniform float tolerance 1e-3
 draw rect ortho 0 0 4 4
 uniform vec3 arg0 -0.029999999 -0.85000002 -0.94
 uniform vec3 arg1 1.67 0.66000003 1.87
 uniform float expected -2.3689001
-uniform float tolerance 2.3689001e-05
+uniform float tolerance 1e-3
 draw rect ortho 4 0 4 4
 uniform vec3 arg0 1.67 0.66000003 1.87
 uniform vec3 arg1 -0.029999999 -0.85000002 -0.94
 uniform float expected -2.3689001
-uniform float tolerance 2.3689001e-05
+uniform float tolerance 1e-3
 draw rect ortho 8 0 4 4
 uniform vec3 arg0 1.67 0.66000003 1.87
 uniform vec3 arg1 1.67 0.66000003 1.87
 uniform float expected 6.7213998
-uniform float tolerance 6.7214001e-05
+uniform float tolerance 1e-3
 draw rect ortho 12 0 4 4
 probe rect rgba (0, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
 probe rect rgba (4, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
