@@ -53,7 +53,10 @@ static void set_npot(bool new_npot)
 {
 	npot = new_npot;
 	if (npot) {
-		tex_width = 293;
+		/* Mipmapped compressed textures with a level 0 width of 257px
+		 * demonstrated a surface layout bug in the i965 driver.
+		 */
+		tex_width = 257;
 		tex_height = 277;
 	} else {
 		tex_width = 256;
