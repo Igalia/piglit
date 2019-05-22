@@ -410,6 +410,17 @@ piglit_gbm_buf_destroy(struct piglit_dma_buf *buf)
 }
 #endif /* PIGLIT_HAS_GBM_BO_MAP */
 
+static int
+piglit_drm_get_user_fd(void)
+{
+	int fd_res = -1;
+	char *nodename = getenv("WAFFLE_GBM_DEVICE");
+	if (nodename && strlen(nodename))
+		fd_res = open(nodename, O_RDWR);
+
+	return fd_res;
+}
+
 static const struct piglit_drm_driver *
 piglit_drm_get_driver(void)
 {
@@ -419,25 +430,33 @@ piglit_drm_get_driver(void)
 	if (drv.fd != -1)
 		return &drv;
 
-	drv.fd = open("/dev/dri/renderD128", O_RDWR);
-
+	drv.fd = piglit_drm_get_user_fd();
 	if (drv.fd == -1) {
-		drv.fd = open("/dev/dri/card0", O_RDWR);
+		drv.fd = open("/dev/dri/renderD128", O_RDWR);
+
 		if (drv.fd == -1) {
-			fprintf(stderr, "error: failed to open /dev/dri/renderD128 and "
-			        "/dev/dri/card0\n");
-			goto fail;
+			drv.fd = open("/dev/dri/card0", O_RDWR);
+			if (drv.fd == -1) {
+				fprintf(stderr, "error: failed to open /dev/dri/renderD128 and "
+					"/dev/dri/card0\n");
+				goto fail;
 
+			}
+
+			if (!piglit_drm_x11_authenticate(drv.fd))
+				goto fail;
 		}
-
-		if (!piglit_drm_x11_authenticate(drv.fd))
-			goto fail;
 	}
-
 	version = drmGetVersion(drv.fd);
+
 	if (!version || !version->name) {
 		fprintf(stderr, "error: drmGetVersion() failed\n");
 		goto fail;
+	} else {
+#if 0
+		fprintf(stderr, "version: %s %d:%d\n",
+			version->name, version->version_major, version->version_minor);
+#endif
 	}
 
 	drv.name = strdup(version->name);
