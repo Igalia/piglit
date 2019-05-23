@@ -388,7 +388,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_direct_state_access");
 
 	prog = setup_shaders(vs_code, fs_code);
-	progNonLinked = setup_shaders(vs_code, "");
+	progNonLinked = setup_shaders(vs_code, "void main() {}");
 
 	struct piglit_subtest tests[] = {
 		{
