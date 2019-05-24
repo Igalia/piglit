@@ -426,7 +426,7 @@ do_shader_setup(void)
 {
 	GLint prog;
 	GLint sampler_loc, offset_loc;
-	char *vs_code, *fs_code;
+	char *vs_code = NULL, *fs_code = NULL;
 	char *offset_coords;
 	char *prefix[] = { "" /* unorm */, "" /* float */, "i" /* int */, "u" /* uint */, "" /* shadow */ };
 	char *scale[] = {
@@ -550,6 +550,8 @@ do_shader_setup(void)
 		offset_loc = glGetUniformLocation(prog, "o2");
 		glUniform2i(offset_loc, 0, max_offset);
 	}
+	free(vs_code);
+	free(fs_code);
 }
 
 static void
