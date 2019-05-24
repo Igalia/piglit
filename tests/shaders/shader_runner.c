@@ -4020,13 +4020,13 @@ piglit_display(void)
 				  "probe atomic counter buffer %u %u %s %u",
 				  &ux, &uy, s, &uz) == 4) {
 			if (!probe_atomic_counter(ux, uy, s, uz, true)) {
-				piglit_report_result(PIGLIT_FAIL);
+				result = PIGLIT_FAIL;
 			}
 		} else if (sscanf(line,
 				  "probe atomic counter %u %s %u",
 				  &ux, s, &uy) == 3) {
 			if (!probe_atomic_counter(0, ux, s, uy, false)) {
-				piglit_report_result(PIGLIT_FAIL);
+				result = PIGLIT_FAIL;
 			}
 		} else if (sscanf(line, "probe ssbo uint %d %d %s 0x%x",
 				  &x, &y, s, &z) == 4) {
