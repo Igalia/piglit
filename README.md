@@ -33,7 +33,7 @@ First of all, you need to make sure that the following are installed:
   - numpy (http://www.numpy.org)
   - six (https://pypi.python.org/pypi/six)
   - cmake (http://www.cmake.org)
-  - GL, gbm, glu and glut libraries and development packages (i.e. headers)
+  - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
   - waffle (http://www.waffle-gl.org)
   - mako
@@ -97,7 +97,7 @@ flags), then you must invoke cmake with options
 
 Install development packages.
 
-    $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy python-mako freeglut3-dev x11proto-gl-dev libxrender-dev libwaffle-dev libgbm-dev
+    $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy python-mako freeglut3-dev x11proto-gl-dev libxrender-dev libwaffle-dev
 
 Configure and build.
 
