@@ -2545,6 +2545,8 @@ piglit_quads_texture(GLuint tex, unsigned level,
 	glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, width, height, 0, GL_RGBA,
 		     piglit_is_gles() ? GL_UNSIGNED_BYTE : GL_FLOAT, tex_data);
 
+	free(tex_data);
+
 	return tex;
 }
 
