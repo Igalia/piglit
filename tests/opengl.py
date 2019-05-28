@@ -3618,7 +3618,7 @@ with profile.test_list.group_manager(
     g(['arb_transform_feedback2-pause-counting'], 'counting with pause')
 
 with profile.test_list.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'ext_transform_instanced')) as g:
+        PiglitGLTest, grouptools.join('spec', 'arb_transform_feedback_instanced')) as g:
     g(['arb_transform_feedback2-draw-auto', 'instanced'],
       'draw-auto instanced', run_concurrent=False)
 
