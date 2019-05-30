@@ -237,6 +237,7 @@ main(int argc, char **argv)
 					result = PIGLIT_FAIL;
 				}
 			}
+			XFree(vinfo);
 		}
 
 		if (sample_buffers == 0) {
@@ -328,6 +329,7 @@ main(int argc, char **argv)
 		}
 	}
 
+	XCloseDisplay(dpy);
 	piglit_report_result(result);
 	return 0;
 }
