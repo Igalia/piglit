@@ -202,6 +202,8 @@ piglit_display(void)
 
 	piglit_present_results();
 
+	free(screen);
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
