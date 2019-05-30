@@ -122,6 +122,8 @@ compile_shader(void)
 	}
 	glLinkProgram(prog);
 
+	free(vert);
+
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 
