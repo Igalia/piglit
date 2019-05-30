@@ -325,6 +325,7 @@ make_window( Display *dpy, const char *name,
     }
     visinfo = glXGetVisualFromFBConfig(dpy, fbc[0]);
     if (!visinfo) {
+        XFree(fbc);
         printf("Error: couldn't get an RGB, Double-buffered visual\n");
         piglit_report_result(PIGLIT_SKIP);
     }
@@ -353,6 +354,7 @@ make_window( Display *dpy, const char *name,
 
     
     XFree(visinfo);
+    XFree(fbc);
     
     *winRet = win;
     *ctxRet = ctx;

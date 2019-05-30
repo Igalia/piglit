@@ -71,6 +71,8 @@ isDirectRendering(void)
 	result = glXIsDirect(dpy, ctx);
 	glXDestroyContext(dpy, ctx);
 
+	XFree(configs);
+
 	/* This call will cause *_dri.so to be dlclosed and unloaded. */
 	XCloseDisplay(dpy);
 

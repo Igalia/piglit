@@ -337,6 +337,8 @@ piglit_glx_iterate_pixmap_fbconfigs(enum piglit_result (*draw)(Display *dpy,
 		glXDestroyContext(dpy, ctx);
 	}
 
+	XFree(configs);
+
 	if (any_fail)
 		return PIGLIT_FAIL;
 	else if (any_pass)
@@ -394,6 +396,8 @@ piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
 		XDestroyWindow(dpy, d);
 		glXDestroyContext(dpy, ctx);
 	}
+
+	XFree(configs);
 
 	if (any_fail)
 		return PIGLIT_FAIL;

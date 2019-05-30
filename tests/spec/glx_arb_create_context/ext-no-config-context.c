@@ -66,12 +66,15 @@ int main(int argc, char **argv)
 
 		if (!glXMakeCurrent(dpy, window, ctx)) {
 			fprintf(stderr, "Failed to make current\n");
+			XFree(configs);
 			piglit_report_result(PIGLIT_FAIL);
 			return 0;
 		}
 	}
 
 	GLX_ARB_create_context_teardown();
+
+	XFree(configs);
 
 	piglit_report_result(PIGLIT_PASS);
 	return 0;

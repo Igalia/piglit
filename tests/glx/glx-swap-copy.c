@@ -126,6 +126,7 @@ main(int argc, char **argv)
 	config = piglit_get_swap_copy_config(dpy);
 	visinfo = glXGetVisualFromFBConfig(dpy, config[0]);
 	if (!visinfo) {
+		XFree(config);
 		printf("Error: couldn't create a visual from fbconfig.\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
@@ -138,6 +139,8 @@ main(int argc, char **argv)
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	piglit_glx_event_loop(dpy, draw);
+
+	XFree(config);
 
 	return 0;
 }
