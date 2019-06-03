@@ -110,6 +110,8 @@ static enum piglit_result test(unsigned int alu_depth)
 //	printf(program_text);
 
 	program_object = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, program_text);
+	free(program_text);
+	program_text = NULL;
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_object);
