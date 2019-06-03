@@ -129,6 +129,8 @@ piglit_test_int_v(GLenum token, GLuint index, GLint limit, bool max)
 	piglit_report_int(name, limit, val,
 			  (max && val <= limit) ||
 			  (!max && val >= limit));
+
+	free(name);
 }
 
 static void
