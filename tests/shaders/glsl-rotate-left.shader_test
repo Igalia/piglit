@@ -1,0 +1,66 @@
+/* Test to verify that compiler generate ROL instruction on specific
+ * intel platforms.
+ */
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform uint arg0;
+uniform uint arg1;
+uniform uint expected;
+
+void main()
+{
+	uint result = (arg0 << arg1) | (arg0 >> (32u - arg1));
+	gl_FragColor = result == expected ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+uniform uint arg0 0x0
+uniform uint arg1 3
+uniform uint expected 0x0
+draw rect ortho 0 0 4 4
+uniform uint arg0 0xCAFED00D
+uniform uint arg1 0
+uniform uint expected 0xCAFED00D
+draw rect ortho 4 0 4 4
+uniform uint arg0 0xDEADBABE
+uniform uint arg1 32
+uniform uint expected 0xDEADBABE
+draw rect ortho 8 0 4 4
+uniform uint arg0 0xC001500
+uniform uint arg1 20
+uniform uint expected 0x5000C001
+draw rect ortho 12 0 4 4
+uniform uint arg0 0x7FFFFFFF
+uniform uint arg1 23
+uniform uint expected 0xFFBFFFFF
+draw rect ortho 16 0 4 4
+uniform uint arg0 0xDEADBEEF
+uniform uint arg1 16
+uniform uint expected 0xBEEFDEAD
+draw rect ortho 20 0 4 4
+uniform uint arg0 0xBADBEEF8
+uniform uint arg1 28
+uniform uint expected 0x8BADBEEF
+draw rect ortho 24 0 4 4
+uniform uint arg0 0xAAEB6FAF
+uniform uint arg1 34
+uniform uint expected 0xABADBEBE
+draw rect ortho 28 0 4 4
+probe rect rgba (0, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (4, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (8, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (12, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (16, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (20, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (24, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (28, 0, 4, 4) (0.0, 1.0, 0.0, 1.0)
