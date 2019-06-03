@@ -187,6 +187,8 @@ static enum piglit_result test(unsigned int dim, unsigned int samples)
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
 	glDeleteProgramsARB(1, &program_object);
 
+	free(program_text);
+
 	for(y = 0; y < draw_height; ++y) {
 		for(x = 0; x < TEXTURE_SIZE; ++x) {
 			float expected[3];
