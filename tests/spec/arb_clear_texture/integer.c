@@ -147,6 +147,7 @@ check_texture(GLuint tex,
 	GLubyte *tex_data, *p;
 	int texel_size;
 	int i, j;
+	bool pass = true;
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -156,18 +157,24 @@ check_texture(GLuint tex,
 	glGetTexImage(GL_TEXTURE_2D, 0, format->format, format->type, tex_data);
 
 	for (i = 0; i < ARRAY_SIZE(clear_values); i++) {
-		if (memcmp(p, clear_values[i], texel_size))
-			return false;
+		if (memcmp(p, clear_values[i], texel_size)) {
+			pass = false;
+			break;
+		}
 		p += texel_size;
 	}
 
 	/* The rest of the values should be zeroes */
 	for (i = ARRAY_SIZE(clear_values); i < TEX_WIDTH * TEX_HEIGHT; i++)
 		for (j = 0; j < texel_size; j++)
-			if (*(p++) != 0)
-				return false;
+			if (*(p++) != 0) {
+				pass = false;
+				break;
+			}
 
-	return true;
+	free(tex_data);
+
+	return pass;
 }
 
 void
