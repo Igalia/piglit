@@ -379,6 +379,8 @@ piglit_display(void)
 		piglit_report_subtest_result(PIGLIT_SKIP, "%s", tests[5]);
 	}
 
+	free(vs_source);
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
