@@ -182,6 +182,8 @@ image_fill(struct image *img, const float *bg_color, const float *fg_color,
 	default:
 		assert(!"Invalid target");
 	}
+
+	free(img_data);
 }
 
 static void

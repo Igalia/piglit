@@ -580,6 +580,8 @@ load_compare_program(const struct texture_format *format)
 		glLinkProgram(compare->prog);
 		piglit_link_check_status(compare->prog);
 
+		free(fs_src);
+
 		compare->tex1 = glGetUniformLocation(compare->prog, "tex1");
 		compare->tex2 = glGetUniformLocation(compare->prog, "tex2");
 		compare->tex_size = glGetUniformLocation(compare->prog, "tex_size");
