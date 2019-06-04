@@ -311,6 +311,8 @@ def make_test(element):
     options = {}
     for e in element.findall('./option'):
         process(e, options)
+    options['env'] = {e.attrib['name']: e.attrib['value']
+                      for e in element.findall('./environment/env')}
 
     if type_ == 'gl':
         return PiglitGLTest(**options)
