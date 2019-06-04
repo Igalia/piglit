@@ -135,14 +135,14 @@ class Test(metaclass=abc.ABCMeta):
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command']
     timeout = None
 
-    def __init__(self, command, run_concurrent=False):
+    def __init__(self, command, run_concurrent=False, env=None, cwd=None):
         assert isinstance(command, list), command
 
         self.run_concurrent = run_concurrent
         self._command = copy.copy(command)
-        self.env = {}
+        self.env = env or {}
         self.result = TestResult()
-        self.cwd = None
+        self.cwd = cwd
 
     def execute(self, path, log, options):
         """ Run a test
