@@ -569,9 +569,16 @@ def load_test_profile(filename, python=None):
                 # regular version in that case.
                 pass
 
+        if os.path.isabs(filename):
+            if '.meta' in filename:
+                return MetaProfile(filename)
+            if '.xml' in filename:
+                return XMLProfile(filename)
+
         meta = os.path.join(ROOT_DIR, 'tests', name + '.meta.xml')
         if os.path.exists(meta):
             return MetaProfile(meta)
+
 
         xml = os.path.join(ROOT_DIR, 'tests', name + '.xml.gz')
         if os.path.exists(xml):
