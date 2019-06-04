@@ -410,7 +410,7 @@ piglit_display(void)
 		return PIGLIT_PASS;
 	}
 
-	static const unsigned num_quads_per_dim[] = {
+	const unsigned num_quads_per_dim[] = {
 		/* The second number is the approx. number of primitives. */
 		ceil(sqrt(0.5 * 1000)),
 		ceil(sqrt(0.5 * 2000)),
