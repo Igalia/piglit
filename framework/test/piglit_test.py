@@ -215,6 +215,7 @@ class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
 
     """
     def __init__(self, command, run_concurrent=CL_CONCURRENT, **kwargs):
+        self.timeout = 60
         super(PiglitCLTest, self).__init__(command, run_concurrent, **kwargs)
 
 
