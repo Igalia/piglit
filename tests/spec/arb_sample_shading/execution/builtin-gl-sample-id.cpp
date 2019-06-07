@@ -127,6 +127,7 @@ compile_shader(void)
 		(void)!asprintf(&frag_1, frag_template, "", "isampler2DRect", "");
 
 	prog_1 = piglit_build_simple_program(vert, frag_1);
+	free(frag_1);
 	if (!piglit_link_check_status(prog_1)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
