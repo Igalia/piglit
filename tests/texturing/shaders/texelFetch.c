@@ -942,6 +942,8 @@ piglit_display()
 				glDeleteTextures(1, &tex);
 				glDeleteBuffers(1, &pos_vbo);
 				glDeleteBuffers(1, &tc_vbo);
+
+				free_miplevel_info();
 			}
 		}
 	}

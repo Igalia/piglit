@@ -170,6 +170,15 @@ compute_miplevel_info()
 	}
 }
 
+void
+free_miplevel_info() {
+	free(level_size[0]);
+	for (int i = 1; i < miplevels; i++) {
+		free(level_size[i]);
+	}
+	free(level_size);
+}
+
 bool
 has_height()
 {

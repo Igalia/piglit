@@ -159,6 +159,8 @@ piglit_display()
 		pass &= piglit_probe_rect_rgba(x, 10, 10, 10, expected_color);
 	}
 
+	free_miplevel_info();
+
 	glDisableVertexAttribArray(vertex_location);
 	piglit_present_results();
 

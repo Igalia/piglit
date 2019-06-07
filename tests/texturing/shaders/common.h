@@ -108,6 +108,7 @@ void swizzle(float vec4[]);
 
 void upload_miplevel_data(GLenum target, int level, void *level_image);
 void compute_miplevel_info();
+void free_miplevel_info();
 void require_GL_features(enum shader_target test_stage);
 bool select_sampler(const char *name);
 bool parse_swizzle(const char *swiz);
