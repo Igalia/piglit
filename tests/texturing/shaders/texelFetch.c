@@ -373,6 +373,7 @@ upload_multisample_data(GLuint tex, int width, int height,
             sampler.return_type,
             sampler.data_type == GL_UNSIGNED_INT ? "" : "-");
     fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
+    free(fs_code);
     if (!fs) {
         printf("Failed to compile staging program.\n");
         piglit_report_result(PIGLIT_FAIL);
