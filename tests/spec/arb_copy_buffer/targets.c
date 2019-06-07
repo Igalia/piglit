@@ -118,7 +118,7 @@ test_copy(GLenum from, GLenum to)
 
 	glCopyBufferSubData(from, to, 0, 0, sizeof(data));
 	ptr = glMapBuffer(to, GL_READ_ONLY);
-	if (memcmp(ptr, data, sizeof(data))) {
+	if (ptr == NULL || memcmp(ptr, data, sizeof(data))) {
 		fprintf(stderr, "data not copied\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
