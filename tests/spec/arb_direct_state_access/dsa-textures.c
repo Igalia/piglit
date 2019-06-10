@@ -95,6 +95,8 @@ piglit_display(void)
 	pass = piglit_probe_image_rgba(0, 0, piglit_width, piglit_height, data)
 		&& pass;
 
+	free(data);
+
 	if (!piglit_automatic)
 		piglit_present_results();
 
