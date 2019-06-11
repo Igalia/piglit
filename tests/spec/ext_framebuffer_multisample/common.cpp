@@ -268,6 +268,11 @@ Test::Test(TestPattern *pattern, ManifestProgram *manifest_program,
 {
 }
 
+Test::~Test() {
+	delete pattern;
+	delete manifest_program;
+}
+
 void
 Test::init(int num_samples, bool small, bool combine_depth_stencil,
 	   int pattern_width, int pattern_height, int supersample_factor,

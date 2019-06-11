@@ -40,6 +40,8 @@ namespace piglit_util_test_pattern
 	class ManifestProgram
 	{
 	public:
+		virtual ~ManifestProgram() {};
+
 		virtual void compile() = 0;
 		virtual void run() = 0;
 	};
@@ -98,6 +100,8 @@ namespace piglit_util_test_pattern
 	class TestPattern
 	{
 	public:
+		virtual ~TestPattern() {};
+
 		virtual void compile() = 0;
 
 		/**

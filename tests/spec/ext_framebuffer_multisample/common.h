@@ -99,6 +99,7 @@ public:
 	Test(piglit_util_test_pattern::TestPattern *pattern,
 	     piglit_util_test_pattern::ManifestProgram *manifest_program,
 	     bool test_resolve, GLbitfield blit_type, bool srgb);
+	~Test();
 	void init(int num_samples, bool small, bool combine_depth_stencil,
 		  int pattern_width, int pattern_height,
 		  int supersample_factor, GLenum filter_mode);

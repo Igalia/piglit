@@ -161,6 +161,7 @@ piglit_display()
 		pass = test_create_and_execute() && pass;
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 		piglit_present_results();
+		delete test;
 		return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 	}
 
@@ -173,6 +174,7 @@ piglit_display()
 		/* Test only power of 2 samples */
 		num_samples = num_samples ? num_samples << 1: num_samples + 2;
 		piglit_present_results();
+		delete test;
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
