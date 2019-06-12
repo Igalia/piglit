@@ -3632,9 +3632,10 @@ piglit_display(void)
 				     atomics_buf, GL_STATIC_DRAW);
 			free(atomics_buf);
 		} else if (sscanf(line, "atomic counter %u %u %u", &x, &y, &z) == 3) {
-			glNamedBufferSubData(atomics_bos[x],
-					     sizeof(GLuint) * y, sizeof(GLuint),
-					     &z);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, x, atomics_bos[x]);
+			glBufferSubData(GL_ATOMIC_COUNTER_BUFFER,
+					sizeof(GLuint) * y, sizeof(GLuint),
+					&z);
 		} else if (parse_str(line, "clear color ", &rest)) {
 			parse_floats(rest, c, 4, NULL);
 			glClearColor(c[0], c[1], c[2], c[3]);
