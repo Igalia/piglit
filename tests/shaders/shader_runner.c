@@ -1143,13 +1143,17 @@ process_requirement(const char *line)
 
 	if (parse_str(line, "GL_", NULL) &&
 	    parse_word_copy(line, buffer, sizeof(buffer), &line)) {
-		if (!piglit_is_extension_supported(buffer))
+		if (!piglit_is_extension_supported(buffer)) {
+			printf("Test requires unsupported extension %s\n", buffer);
 			return PIGLIT_SKIP;
+		}
 	} else if (parse_str(line, "!", &line) &&
 		   parse_str(line, "GL_", NULL) &&
 		   parse_word_copy(line, buffer, sizeof(buffer), &line)) {
-		if (piglit_is_extension_supported(buffer))
+		if (piglit_is_extension_supported(buffer)) {
+			printf("Test requires unsupported extension %s\n", buffer);
 			return PIGLIT_SKIP;
+		}
 	} else if (parse_str(line, "GLSL", &line)) {
 		enum comparison cmp;
 
@@ -4727,8 +4731,11 @@ piglit_init(int argc, char **argv)
 #endif
 
 	if (use_get_program_binary) {
-		if (gl_num_program_binary_formats == 0)
+		if (gl_num_program_binary_formats == 0) {
+			printf("Trying to use get_program_binary, but "
+			       "GL_NUM_PROGRAM_BINARY == 0\n");
 			piglit_report_result(PIGLIT_SKIP);
+		}
 	}
 
 	/* Automatic mode can run multiple tests per session. */
