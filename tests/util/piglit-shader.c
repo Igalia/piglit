@@ -472,6 +472,7 @@ piglit_assemble_spirv(GLenum target,
 {
 	char *arguments[] = {
 		getenv("PIGLIT_SPIRV_AS_BINARY"),
+		"--target-env", "opengl4.5",
 		"-o", "-",
 		NULL
 	};
