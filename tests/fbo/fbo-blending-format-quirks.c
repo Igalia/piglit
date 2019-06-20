@@ -81,15 +81,22 @@ test_formats(const char *name, const GLenum formats[2],
 
 	printf("Testing %s\n", name);
 
-	glClearColor(0.0, 0.0, 0.0, 0.5);
-	glClear(GL_COLOR_BUFFER_BIT);
+	/* Tets 1 and 2 use glBlendFunc(GL_DST_ALPHA, ...) so make sure alpha
+	 * is initialized to the expected value.
+	 */
+	for (i = 0; i < 2; i++) {
+		glDrawBuffers(1, &draw_bufs[0]);
+		glClearColor(0.0, 0.0, 0.0, expect[0][3]);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	glDrawBuffers(2, draw_bufs);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(factors[0], factors[1]);
 	glBlendColor(1.0, 0.5, 0.25, 0.125);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 
-	glDrawBuffers(2, draw_bufs);
 	piglit_draw_rect(-1.0, -1.0, 2.0, 2.0);
 
 	glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -105,6 +112,9 @@ test_formats(const char *name, const GLenum formats[2],
 		printf("  when testing GL_COLOR_ATTACHMENT1.\n");
 		pass = GL_FALSE;
 	}
+
+	glDeleteTextures(2, tex);
+	glDeleteFramebuffersEXT(1, &fb);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
