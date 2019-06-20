@@ -493,6 +493,30 @@ piglit_assemble_spirv(GLenum target,
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	if (getenv("PIGLIT_SPIRV_VALIDATE")) {
+		char *arguments[] = {
+			getenv("PIGLIT_SPIRV_VAL_BINARY"),
+			"--target-env", "opengl4.5",
+			NULL,
+		};
+
+		if (arguments[0] == NULL)
+			arguments[0] = "spirv-val";
+
+		uint8_t *validate_result;
+		size_t validate_result_length;
+		bool res = piglit_subprocess(arguments,
+					     binary_source_length,
+					     (const uint8_t *) binary_source,
+					     &validate_result_length,
+					     &validate_result);
+
+		if (!res) {
+			fprintf(stderr, "spirv-val failed\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+
 	GLuint shader = glCreateShader(target);
 	glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB,
 		       binary_source, binary_source_length);
