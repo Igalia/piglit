@@ -449,6 +449,7 @@ with profile.test_list.group_manager(
     g(['glx-query-drawable', '--bad-drawable'],
       'glx-query-drawable-GLXBadDrawable', run_concurrent=False)
     g(['glx-string-sanity'], 'extension string sanity')
+    g(['glx-egl-switch-context'], run_concurrent=False)
     add_msaa_visual_plain_tests(g, ['glx-copy-sub-buffer'],
                                 run_concurrent=False)
 profile.test_list[grouptools.join('glx', 'glx-buffer-age vblank_mode=0')] = \
