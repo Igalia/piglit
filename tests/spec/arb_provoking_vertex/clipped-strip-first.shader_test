@@ -1,0 +1,45 @@
+# Check that the correct provoking vertex is used when part of the geometry is
+# clipped and the flat interpolation qualifier is used with triangle strips.
+
+[require]
+GLSL >= 1.30
+GL_EXT_provoking_vertex
+
+[vertex shader]
+#version 130
+
+in vec4 piglit_vertex;
+in vec3 piglit_color;
+flat out vec4 fscolor;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	fscolor = vec4(piglit_color, 1.0);
+}
+
+[fragment shader]
+#version 130
+
+flat in vec4 fscolor;
+
+void main()
+{
+	gl_FragColor = fscolor;
+}
+
+[vertex data]
+piglit_vertex/float/2 	piglit_color/float/3
+-2.0 -1.0		0.0 1.0 0.0
+ 2.0 -1.0		0.0 1.0 0.0
+-2.0  0.0		0.0 1.0 0.0
+ 2.0  0.0		0.0 1.0 0.0
+-2.0  1.0		1.0 0.0 0.0
+ 2.0  1.0		1.0 0.0 0.0
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+provoking vertex first
+draw arrays GL_TRIANGLE_STRIP 0 6
+probe all rgba 0.0 1.0 0.0 1.0
