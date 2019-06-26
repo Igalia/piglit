@@ -13,7 +13,7 @@ GL_INTEL_shader_atomic_float_minmax
 #extension GL_ARB_shader_atomic_counters: require
 #extension GL_INTEL_shader_atomic_float_minmax: require
 
-layout(binding = 0) buffer bufblock {
+layout(binding = 0, std430) buffer bufblock {
 	float array[64];
 	float value;
 };

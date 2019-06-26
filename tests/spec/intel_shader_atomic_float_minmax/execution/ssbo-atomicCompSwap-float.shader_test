@@ -16,7 +16,7 @@ GL_INTEL_shader_atomic_float_minmax
 #extension GL_ARB_gpu_shader5: require
 #extension GL_INTEL_shader_atomic_float_minmax: require
 
-layout(binding = 0) buffer bufblock {
+layout(binding = 0, std430) buffer bufblock {
 	float value;
 };
 
