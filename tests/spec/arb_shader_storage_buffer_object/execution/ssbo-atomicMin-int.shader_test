@@ -12,7 +12,7 @@ GL_ARB_shader_atomic_counters
 #extension GL_ARB_shader_atomic_counters: require
 
 #line 100
-layout(binding = 0) buffer bufblock {
+layout(binding = 0, std430) buffer bufblock {
 	int array[64];
 	int value;
 };
