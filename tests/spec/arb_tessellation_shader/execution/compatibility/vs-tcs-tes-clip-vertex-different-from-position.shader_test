@@ -1,0 +1,107 @@
+# [description]
+# Use all 6 clip planes to clip a rectangle to a hexagon shape.
+#
+# In this test, gl_Position and gl_ClipVertex are different to verify
+# that gl_Position determines screen position and gl_ClipVertex
+# determines clipping.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader]
+#version 150 compatibility
+
+in vec4 piglit_vertex;
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * piglit_vertex;
+
+	// Transform gl_ClipVertex in an arbitrary way so that
+	// we can verify it is being used for clipping instead of
+	// gl_Position.
+	gl_ClipVertex = piglit_vertex * vec4(10.0, 10.0, 1.0, 1.0);
+}
+
+[tessellation control shader]
+#version 150 compatibility
+#extension GL_ARB_tessellation_shader: require
+
+layout(vertices = 3) out;
+
+void main() {
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	gl_out[gl_InvocationID].gl_ClipVertex = gl_in[gl_InvocationID].gl_ClipVertex;
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+}
+
+[tessellation evaluation shader]
+#version 150 compatibility
+#extension GL_ARB_tessellation_shader: require
+
+layout(triangles) in;
+
+void main() {
+	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
+	            + gl_in[1].gl_Position * gl_TessCoord[1]
+	            + gl_in[2].gl_Position * gl_TessCoord[2];
+
+	gl_ClipVertex = gl_in[0].gl_ClipVertex * gl_TessCoord[0]
+	            + gl_in[1].gl_ClipVertex * gl_TessCoord[1]
+	            + gl_in[2].gl_ClipVertex * gl_TessCoord[2];
+}
+
+[fragment shader]
+#version 120
+void main(void)
+{
+	gl_FragColor = vec4(1, 1, 1, 1);
+}
+
+[vertex data]
+piglit_vertex/float/2
+ 0.1  0.1
+ 0.9  0.1
+ 0.1  0.9
+ 0.1  0.9
+ 0.9  0.1
+ 0.9  0.9
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho 0 1 0 1
+clip plane 0 0 1 0 -2.5
+clip plane 1 -1 1 0 4
+clip plane 2 -1 -1 0 14
+clip plane 3 0 -1 0 7.5
+clip plane 4 1 -1 0 4
+clip plane 5 1 1 0 -6
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.2, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.2) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.7) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.8) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.2, 0.7) (0.0, 0.0, 0.0, 0.0)
