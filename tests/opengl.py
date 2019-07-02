@@ -4365,6 +4365,7 @@ with profile.test_list.group_manager(
     g(['arb_shader_storage_buffer_object-maxblocks'], 'maxblocks')
     g(['arb_shader_storage_buffer_object-ssbo-binding'], 'ssbo-binding')
     g(['arb_shader_storage_buffer_object-array-ssbo-binding'], 'array-ssbo-binding')
+    g(['arb_shader_storage_buffer_object-array-ssbo-auto-binding'], 'array-ssbo-auto-binding')
     g(['arb_shader_storage_buffer_object-layout-std430-write-shader'], 'layout-std430-write-shader')
     g(['arb_shader_storage_buffer_object-layout-std140-write-shader'], 'layout-std140-write-shader')
     g(['arb_shader_storage_buffer_object-program_interface_query'], 'program-interface-query')
