@@ -5056,6 +5056,12 @@ with profile.test_list.group_manager(
     g(['arb_bindless_texture-uint64_attribs'], 'uint64_attribs')
     g(['arb_bindless_texture-uniform'], 'uniform')
 
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ext_shader_image_load_store')) as g:
+    g(['ext_shader_image_load_store-image_functions'], 'image_functions')
+    g(['ext_shader_image_load_store-bind_image_error'], 'bind_image_error')
+
 # Group ARB_sample_locations
 with profile.test_list.group_manager(
         PiglitGLTest,
