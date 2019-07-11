@@ -1716,6 +1716,8 @@ with profile.test_list.group_manager(
       'xfb-varyings')
     g(['arb_get_program_binary-restore-implicit-use-program'],
       'restore-implicit-use-program')
+    g(['arb_get_program_binary-restore-sso-program'],
+      'restore-sso-program')
     g(['arb_get_program_binary-reset-uniform'],
       'reset-uniform')
 

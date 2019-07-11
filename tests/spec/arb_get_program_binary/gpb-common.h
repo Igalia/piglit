@@ -34,4 +34,7 @@ gpb_restore_program(GLuint prog, void *binary, GLsizei length, GLenum format);
 bool
 gpb_save_restore(GLuint *prog);
 
+bool
+gpb_save_restore_sso(GLuint *prog, GLuint pipeline, GLbitfield stage);
+
 #endif

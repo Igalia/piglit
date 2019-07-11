@@ -127,3 +127,42 @@ gpb_save_restore(GLuint *prog)
 
 	return true;
 }
+
+bool
+gpb_save_restore_sso(GLuint *prog, GLuint pipeline, GLbitfield stage)
+{
+	GLsizei bin_length;
+	void *binary;
+	GLenum bin_format;
+	GLuint new_prog;
+
+	if (!gpb_save_program(*prog, &binary, &bin_length, &bin_format)) {
+		fprintf(stderr,
+			"failed to save program with GetProgramBinary\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	new_prog = glCreateProgram();
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		free(binary);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (!gpb_restore_program(new_prog, binary, bin_length, bin_format)) {
+		free(binary);
+		fprintf(stderr, "failed to restore binary program\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	free(binary);
+
+	glUseProgramStages(pipeline, stage, new_prog);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
+
+	glDeleteProgram(*prog);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
+	*prog = new_prog;
+
+	return true;
+}
