@@ -164,6 +164,8 @@ static GLint read_width, read_height;
 
 static bool use_get_program_binary = false;
 
+static bool ignore_missing_uniforms = false;
+
 static bool report_subtests = false;
 
 struct specialization_list {
@@ -2292,6 +2294,8 @@ set_uniform(const char *line, int ubo_array_index)
 		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
 		loc = glGetUniformLocation(prog, name);
 		if (loc < 0) {
+			if (ignore_missing_uniforms)
+				return;
 			printf("cannot get location of uniform \"%s\"\n",
 			       name);
 			piglit_report_result(PIGLIT_FAIL);
@@ -2553,6 +2557,8 @@ set_vertex_attrib(const char *line)
 		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
 		loc = glGetAttribLocation(prog, name);
 		if (loc < 0) {
+			if (ignore_missing_uniforms)
+				return;
 			printf("cannot get location of vertex attrib \"%s\"\n",
 			       name);
 			piglit_report_result(PIGLIT_FAIL);
@@ -2693,6 +2699,8 @@ set_subroutine_uniform(const char *line)
 
 	loc = glGetSubroutineUniformLocation(prog, ptype, name);
 	if (loc < 0) {
+		if (ignore_missing_uniforms)
+			return;
 		printf("cannot get location of subroutine uniform \"%s\"\n",
 		       name);
 		piglit_report_result(PIGLIT_FAIL);
@@ -4661,6 +4669,7 @@ piglit_init(int argc, char **argv)
 
 	report_subtests = piglit_strip_arg(&argc, argv, "-report-subtests");
 	force_glsl =  piglit_strip_arg(&argc, argv, "-glsl");
+	ignore_missing_uniforms = piglit_strip_arg(&argc, argv, "-ignore-missing-uniforms");
 	if (argc < 2) {
 		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
