@@ -48,37 +48,62 @@ static struct piglit_gl_test_config *piglit_config;
 
 static enum piglit_result test_logicop(void * data);
 
-#define TEST_ELEMENT(mode)              \
-	{                               \
-		#mode,                  \
-		#mode,                  \
-		test_logicop,           \
-		(void *)(intptr_t)mode  \
-	}
-static struct piglit_subtest tests[] = {
-	TEST_ELEMENT(GL_CLEAR),
-	TEST_ELEMENT(GL_SET),
-	TEST_ELEMENT(GL_COPY),
-	TEST_ELEMENT(GL_COPY_INVERTED),
-	TEST_ELEMENT(GL_NOOP),
-	TEST_ELEMENT(GL_INVERT),
-	TEST_ELEMENT(GL_AND),
-	TEST_ELEMENT(GL_NAND),
-	TEST_ELEMENT(GL_OR),
-	TEST_ELEMENT(GL_NOR),
-	TEST_ELEMENT(GL_XOR),
-	TEST_ELEMENT(GL_EQUIV),
-	TEST_ELEMENT(GL_AND_REVERSE),
-	TEST_ELEMENT(GL_AND_INVERTED),
-	TEST_ELEMENT(GL_OR_REVERSE),
-	TEST_ELEMENT(GL_OR_INVERTED),
-	{ 0 }
+struct test_data {
+	GLenum mode;
+	bool msaa;
 };
-#undef TEST_ELEMENT
+
+static struct test_data datas[] = {
+	{ GL_CLEAR, false },
+	{ GL_SET, false },
+	{ GL_COPY, false },
+	{ GL_COPY_INVERTED, false },
+	{ GL_NOOP, false },
+	{ GL_INVERT, false },
+	{ GL_AND, false },
+	{ GL_NAND, false },
+	{ GL_OR, false },
+	{ GL_NOR, false },
+	{ GL_XOR, false },
+	{ GL_EQUIV, false },
+	{ GL_AND_REVERSE, false },
+	{ GL_AND_INVERTED, false },
+	{ GL_OR_REVERSE, false },
+	{ GL_OR_INVERTED, false },
+	{ GL_CLEAR, true },
+	{ GL_SET, true },
+	{ GL_COPY, true },
+	{ GL_COPY_INVERTED, true },
+	{ GL_NOOP, true },
+	{ GL_INVERT, true },
+	{ GL_AND, true },
+	{ GL_NAND, true },
+	{ GL_OR, true },
+	{ GL_NOR, true },
+	{ GL_XOR, true },
+	{ GL_EQUIV, true },
+	{ GL_AND_REVERSE, true },
+	{ GL_AND_INVERTED, true },
+	{ GL_OR_REVERSE, true },
+	{ GL_OR_INVERTED, true },
+};
+
+static struct piglit_subtest tests[ARRAY_SIZE(datas) + 1];
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	piglit_config = &config;
+
+	for (int i = 0; i < ARRAY_SIZE(datas); i++) {
+		char *name;
+		asprintf(&name, "%s%s", piglit_get_gl_enum_name(datas[i].mode),
+			datas[i].msaa ? "_MSAA" : "");
+		tests[i].name = name;
+		tests[i].option = name;
+		tests[i].subtest_func = test_logicop;
+		tests[i].data = &datas[i];
+	}
+
 	config.subtests = tests;
 	config.supports_gl_compat_version = 11;
 
@@ -224,7 +249,10 @@ make_image(GLuint *name, GLubyte *data)
 static enum piglit_result
 test_logicop(void * data)
 {
-	GLenum logicop = (GLenum)(intptr_t)data;
+	struct test_data *data_ptr = (struct test_data *)data;
+	GLenum logicop = data_ptr->mode;
+	bool is_msaa = data_ptr->msaa;
+
 	bool pass = true;
 	int x, y;
 	GLuint dst_name;
@@ -232,6 +260,28 @@ test_logicop(void * data)
 	GLuint src_name;
 	GLubyte* src_data = random_image_data();
 	GLubyte* exp_data = color_fill_data(0, 0, 0, 0);
+	GLenum fbo;
+	GLuint fbo_tex_name;
+
+	if (is_msaa) {
+		piglit_require_extension("GL_ARB_texture_storage_multisample");
+
+		GLint max_samples;
+		glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+
+		glGenTextures(1, &fbo_tex_name);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, fbo_tex_name);
+		glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+					  max_samples, GL_RGBA8, img_width,
+					  img_height, true);
+
+		glGenFramebuffers(1, &fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				       GL_TEXTURE_2D_MULTISAMPLE, fbo_tex_name, 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			return PIGLIT_FAIL;
+	}
 
 	glDisable(GL_DITHER);
 	glClearColor(0.5, 0.5, 0.5, 0.5);  /* transparent gray */
@@ -253,8 +303,10 @@ test_logicop(void * data)
 	 * whether errors occurred when writing or when reading back,
 	 * but at least we can report anything unusual.
 	 */
-	pass &= piglit_probe_image_ubyte(0, 0, img_width, img_height, GL_RGBA,
-					 dst_data);
+	if (!is_msaa) {
+		pass &= piglit_probe_image_ubyte(0, 0, img_width, img_height, GL_RGBA,
+						 dst_data);
+	}
 
 	/*
 	 * Now generate random source pixels and apply the logicop
@@ -272,6 +324,16 @@ test_logicop(void * data)
 	glBindTexture(GL_TEXTURE_2D, src_name);
 	piglit_draw_rect_tex(0, 0, img_width, img_height, 0, 0, 1, 1);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
+
+	/* Resolve MSAA FBO */
+	if (is_msaa) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+		glBlitFramebuffer(0, 0, img_width, img_height,
+				  0, 0, img_width, img_height,
+				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
+	}
 
 	/* Make exp */
 	for (y = 0; y < drawing_size; ++y) {
