@@ -3,7 +3,7 @@
 [require]
 GLSL >= 1.40
 GL_ARB_shader_atomic_counters
-INT GL_MAX_VERTEX_ATOMIC_COUNTER_BUFFERS >= 2
+INT GL_MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS >= 2
 
 [vertex shader passthrough]
 
