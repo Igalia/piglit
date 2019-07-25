@@ -133,7 +133,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	static const char intel_id[] = "Intel Open Source Technology Center";
+	static const char intel_id[] = "Intel";
 	const char *vendor_str;
 	EGLDisplay egl_dpy = eglGetCurrentDisplay();
 
@@ -143,7 +143,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_OES_framebuffer_object");
 
 	vendor_str = (const char *)glGetString(GL_VENDOR);
-	if (strncmp(vendor_str, intel_id, sizeof(intel_id) - 1) != 0) {
+	if (strncmp(vendor_str, intel_id, sizeof(intel_id) - 1)) {
 		printf("Test requires intel gpu\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
