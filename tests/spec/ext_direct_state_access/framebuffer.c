@@ -32,9 +32,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static GLenum use_display_list = GL_NONE;
-static GLuint list;
-
 static enum piglit_result
 test_FramebufferDrawBufferEXT(void* d)
 {
@@ -61,28 +58,12 @@ test_FramebufferDrawBufferEXT(void* d)
 	for (i = 0; i < max_color_attachments; i++) {
 		const int buffer_count = MIN2(max_draw_buffers, max_color_attachments - i);
 
-		if (use_display_list != GL_NONE)
-			glNewList(list, use_display_list);
-
 		glFramebufferDrawBufferEXT(fbs[1], attachments[i]);
 		glFramebufferDrawBuffersEXT(fbs[2],
 					    buffer_count,
 					    &attachments[i]);
-
-		if (use_display_list != GL_NONE)
-			glEndList(list);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, fbs[1]);
 		glGetIntegerv(GL_DRAW_BUFFER, &got);
-
-		if (use_display_list == GL_COMPILE) {
-			if (got == attachments[i]) {
-				piglit_loge("Draw buffer modified before glCallList()");
-				return PIGLIT_FAIL;
-			}
-			glCallList(list);
-			glGetIntegerv(GL_DRAW_BUFFER, &got);
-		}
 
 		if (got != attachments[i]) {
 			piglit_loge("glFramebufferDrawBufferEXT(..., %s) failed. Got %s\n",
@@ -128,26 +109,10 @@ test_FramebufferReadDrawBufferEXTDefault(void* d)
 
 	for (i = 0; i < ARRAY_SIZE(attachments); i++) {
 		glBindFramebuffer(GL_FRAMEBUFFER, fb);
-
-		if (use_display_list != GL_NONE)
-			glNewList(list, use_display_list);
-
 		glFramebufferDrawBufferEXT(0, attachments[i]);
-
-		if (use_display_list != GL_NONE)
-			glEndList(list);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glGetIntegerv(GL_DRAW_BUFFER, &got);
 
-		if (use_display_list == GL_COMPILE) {
-			if (got == attachments[i]) {
-				piglit_loge("Draw buffer modified before glCallList()");
-				return PIGLIT_FAIL;
-			}
-			glCallList(list);
-			glGetIntegerv(GL_DRAW_BUFFER, &got);
-		}
 		if (!piglit_check_gl_error(GL_NO_ERROR) || got != attachments[i]) {
 			piglit_loge("glFramebufferDrawBufferEXT(0, %s) failed. Got %s\n",
 				    piglit_get_gl_enum_name(attachments[i]),
@@ -159,26 +124,9 @@ test_FramebufferReadDrawBufferEXTDefault(void* d)
 
 	for (i = 0; i < ARRAY_SIZE(attachments); i++) {
 		glBindFramebuffer(GL_FRAMEBUFFER, fb);
-
-		if (use_display_list != GL_NONE)
-			glNewList(list, use_display_list);
-
 		glFramebufferReadBufferEXT(0, attachments[i]);
-
-		if (use_display_list != GL_NONE)
-			glEndList(list);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glGetIntegerv(GL_READ_BUFFER, &got);
-
-		if (use_display_list == GL_COMPILE) {
-			if (got == attachments[i]) {
-				piglit_loge("Read buffer modified before glCallList()");
-				return PIGLIT_FAIL;
-			}
-			glCallList(list);
-			glGetIntegerv(GL_READ_BUFFER, &got);
-		}
 
 		if (!piglit_check_gl_error(GL_NO_ERROR) || got != attachments[i]) {
 			piglit_loge("glFramebufferReadBufferEXT(0, %s) failed. Got %s\n",
@@ -215,25 +163,9 @@ test_FramebufferReadBufferEXT(void* d)
 	glFramebufferReadBufferEXT(fb, attachments[1]);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	for (i = 0; i < max_color_attachments; i++) {
-		if (use_display_list != GL_NONE)
-			glNewList(list, use_display_list);
-
 		glFramebufferReadBufferEXT(fb, attachments[i]);
-
-		if (use_display_list != GL_NONE)
-			glEndList(list);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, fb);
 		glGetIntegerv(GL_READ_BUFFER, &got);
-
-		if (use_display_list == GL_COMPILE) {
-			if (got == attachments[i]) {
-				piglit_loge("Read buffer modified before glCallList()");
-				return PIGLIT_FAIL;
-			}
-			glCallList(list);
-			glGetIntegerv(GL_READ_BUFFER, &got);
-		}
 
 		if (got != attachments[i]) {
 			piglit_loge("glFramebufferReadBufferEXT(..., %s) failed. Got %s\n",
@@ -381,8 +313,6 @@ test_NamedFramebufferTextureNDEXT(void* data)
 void
 piglit_init(int argc, char **argv)
 {
-	int i;
-	enum piglit_result result;
 	piglit_require_extension("GL_EXT_direct_state_access");
 	struct piglit_subtest tests[] = {
 		{
@@ -428,30 +358,7 @@ piglit_init(int argc, char **argv)
 		}
 	};
 
-	result = piglit_run_selected_subtests(tests, NULL, 0, PIGLIT_PASS);
-	list = glGenLists(1);
-
-	/* Re-run the same test but using display list GL_COMPILE */
-	for (i = 0; tests[i].name; i++) {
-		char* test_name_display_list;
-		asprintf(&test_name_display_list, "%s + display list GL_COMPILE", tests[i].name);
-		tests[i].name = test_name_display_list;
-	}
-	use_display_list = GL_COMPILE;
-	result = piglit_run_selected_subtests(tests, NULL, 0, result);
-
-	/* Re-run the same test but using display list GL_COMPILE_AND_EXECUTE */
-	for (i = 0; tests[i].name; i++) {
-		char* test_name_display_list;
-		asprintf(&test_name_display_list, "%s_AND_EXECUTE", tests[i].name);
-		tests[i].name = test_name_display_list;
-	}
-	use_display_list = GL_COMPILE_AND_EXECUTE;
-	result = piglit_run_selected_subtests(tests, NULL, 0, result);
-
-	glDeleteLists(list, 1);
-
-	piglit_report_result(result);
+	piglit_report_result(piglit_run_selected_subtests(tests, NULL, 0, PIGLIT_PASS));
 }
 
 enum piglit_result
