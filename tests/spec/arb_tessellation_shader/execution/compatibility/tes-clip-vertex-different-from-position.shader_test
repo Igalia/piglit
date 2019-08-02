@@ -27,12 +27,12 @@ void main(void)
 layout(quads) in;
 
 void main() {
-	gl_Position = vec4(gl_TessCoord.xy * 2 - 1, 0, 1);;
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_TessCoord.xy * 2 - 1, 0, 1);
 
 	// Transform gl_ClipVertex in an arbitrary way so that
 	// we can verify it is being used for clipping instead of
 	// gl_Position.
-	gl_ClipVertex = gl_Position * vec4(10.0, 10.0, 1.0, 1.0);
+	gl_ClipVertex = vec4(gl_TessCoord.xy * 2 - 1, 0, 1) * vec4(10.0, 10.0, 1.0, 1.0);
 }
 
 [fragment shader]
@@ -70,7 +70,6 @@ enable GL_CLIP_PLANE5
 
 patch parameter vertices 1
 draw arrays GL_PATCHES 0 1
-#draw rect 0.1 0.1 0.8 0.8
 
 # Test points inside each hexagon edge
 relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
