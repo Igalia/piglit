@@ -1071,7 +1071,7 @@ test_MultiTexParameterfEXT(void* data)
 			}
 		}
 	}
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return piglit_check_gl_error(GL_NO_ERROR) && pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static enum piglit_result
@@ -1112,7 +1112,7 @@ test_TextureProxyTarget(void* data)
         pass = width == piglit_width && pass;
         pass = (int)height == (n > 1 ? piglit_height : 1) && pass;
 
-	return pass && piglit_check_gl_error(GL_NO_ERROR) ? PIGLIT_PASS : PIGLIT_FAIL;
+	return piglit_check_gl_error(GL_NO_ERROR) && pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result
