@@ -3101,6 +3101,7 @@ static const struct string_to_enum enable_table[] = {
 	{ "GL_VERTEX_PROGRAM_TWO_SIDE", GL_VERTEX_PROGRAM_TWO_SIDE },
 	{ "GL_PROGRAM_POINT_SIZE", GL_PROGRAM_POINT_SIZE },
 	{ "GL_DEPTH_TEST", GL_DEPTH_TEST },
+	{ "GL_DEPTH_CLAMP", GL_DEPTH_CLAMP },
 	{ NULL, 0 }
 };
 
