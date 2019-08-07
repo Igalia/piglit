@@ -1,0 +1,41 @@
+# Test proper behavior of (a << b) << c where b+c >= 32
+
+[require]
+GL_EXT_gpu_shader4
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 120
+#extension GL_EXT_gpu_shader4: require
+
+uniform int a = 0xffffffff;
+
+void main()
+{
+   /* The GL_EXT_gpu_shader4 spec says:
+    *
+    *    The result is undefined if the right operand is negative, or greater
+    *    than or equal to the number of bits in the left expression's type.
+    *
+    * Both 7 and 25 are less than the number of bits in the left expression's
+    * base type, but (7+25) is not.  Check for compilers that try to do a
+    * clever optimization here.
+    *
+    * Compilers that use the SM5 rules of (x << y) == (x << (y & 31)) will
+    * treat this as a shift by zero.  Produce purple for those, and red for
+    * any other kind of failure.
+    */
+   int x = (a << 7) << 25;
+
+   if (x == a) {
+      gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+   } else {
+     gl_FragColor = x == 0
+	 ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+   }
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
