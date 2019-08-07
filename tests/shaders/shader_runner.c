@@ -291,6 +291,7 @@ enum states {
 	compute_shader_spirv,
 	compute_shader_specializations,
 	vertex_data,
+	shader_include,
 	test,
 };
 
@@ -1410,6 +1411,29 @@ leave_state(enum states state, const char *line, const char *script_name)
 		vertex_data_end = line;
 		break;
 
+	case shader_include: {
+		const char *path_end = strchrnul(shader_string, '\n');
+
+		if (shader_string == path_end) {
+			fprintf(stderr, "No shader include path provided\n");
+			return PIGLIT_FAIL;
+		}
+
+		if (!piglit_is_extension_supported("GL_ARB_shading_language_include"))
+			return PIGLIT_SKIP;
+
+		int path_name_len = path_end - shader_string;
+		glNamedStringARB(GL_SHADER_INCLUDE_ARB, path_name_len, shader_string,
+				 line - shader_string - path_name_len, shader_string + path_name_len);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glNamedStringARB error\n");
+			return PIGLIT_FAIL;
+		}
+
+		break;
+	}
+
 	case test:
 		break;
 
@@ -1757,6 +1781,9 @@ process_test_script(const char *script_name)
 			} else if (parse_str(line, "[vertex data]", NULL)) {
 				state = vertex_data;
 				vertex_data_start = NULL;
+			} else if (parse_str(line, "[shader include]", NULL)) {
+				state = shader_include;
+				shader_string = NULL;
 			} else if (parse_str(line, "[test]", NULL)) {
 				test_start = strchrnul(line, '\n');
 				test_start_line_num = line_num + 1;
@@ -1799,6 +1826,7 @@ process_test_script(const char *script_name)
 			case geometry_shader_spirv:
 			case fragment_shader_spirv:
 			case compute_shader_spirv:
+			case shader_include:
 				if (shader_string == NULL)
 					shader_string = (char *) line;
 				break;
