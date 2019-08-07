@@ -236,6 +236,10 @@ run_compile_test(void * data)
 				if (atomicOp && floatImageType)
 					continue;
 
+				/* skip atomic + not-1x32 */
+				if (atomicOp && i != 2)
+					continue;
+
 				/* Build the fragment template */
 				sprintf(fs, fs_template,
 					v_value_type[k % 3],
