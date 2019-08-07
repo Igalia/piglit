@@ -64,7 +64,7 @@ static const char* vs =
 static GLuint
 create_texture()
 {
-	static int data[4 * TEX_WIDTH];
+	static int data[TEX_WIDTH];
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_1D, texture);
@@ -75,7 +75,7 @@ create_texture()
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	memset(data, 0, sizeof(data));
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA32I, TEX_WIDTH, 0, GL_RGBA_INTEGER, GL_INT, data);
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_R32I, TEX_WIDTH, 0, GL_RED_INTEGER, GL_INT, data);
 
 	return texture;
 }
@@ -84,7 +84,7 @@ static void
 read_texture(void* data, size_t s)
 {
 	glGetTexImage(GL_TEXTURE_1D, 0,
-		      GL_RGBA_INTEGER,
+		      GL_RED_INTEGER,
 		      GL_INT,
 		      data);
 }
@@ -92,7 +92,7 @@ read_texture(void* data, size_t s)
 static GLuint
 create_buffer_texture()
 {
-	static int data[4 * TEX_WIDTH];
+	static int data[TEX_WIDTH];
 	GLuint texture, buffer;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_BUFFER, texture);
@@ -103,7 +103,7 @@ create_buffer_texture()
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferStorage(GL_ARRAY_BUFFER, sizeof(data), data, GL_MAP_READ_BIT);
 
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32I, buffer);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, buffer);
 
 	return texture;
 }
@@ -139,9 +139,9 @@ run_test(void * _data)
 	GLint image_location = glGetUniformLocation(program, "image");
 	GLint wrap_location = glGetUniformLocation(program, "wrap_value");
 	GLuint texture = test->create_texture();
-	GLint read_back[4 * TEX_WIDTH];
+	GLint read_back[TEX_WIDTH];
 
-	glBindImageTextureEXT(0, texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32I);
+	glBindImageTextureEXT(0, texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32I);
 
 	glUseProgram(program);
 	glUniform1i(image_location, 0);
@@ -159,7 +159,7 @@ run_test(void * _data)
 	/* The first component of the first pixel has been written to by all invocations */
 	pass = pass && read_back[0] == test->expected_value;
 	/* All other pixels/components should be untouched */
-	for (int i = 1; i < 4 * TEX_WIDTH; i++) {
+	for (int i = 1; i < TEX_WIDTH; i++) {
 		pass = pass && read_back[i] == 0;
 	}
 
