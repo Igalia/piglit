@@ -1,0 +1,45 @@
+# Some compilers may try to optimize comparisons based on the expected
+# range of the sources.  Check that pessimal cases are handled correctly.
+#
+# See also https://bugs.freedesktop.org/show_bug.cgi?id=111308
+
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 120
+
+uniform float power;
+uniform bool expect_non_zero;
+
+void main(void)
+{
+    float result = exp2(power);
+
+    gl_FragColor = expect_non_zero == (0 < result)
+	? vec4(0.0, 1.0, 0.0, 1.0)
+	: vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform float power 0
+uniform int expect_non_zero 1
+draw rect -1 -1 1 1
+
+uniform float power -6
+uniform int expect_non_zero 1
+draw rect 0 -1 1 1
+
+# Smallest possible subnormal number is 2**-149.  If someone has a
+# representation that has more exponent, this case may incorrectly fail.
+uniform float power -150
+uniform int expect_non_zero 0
+draw rect -1 0 1 1
+
+uniform float power -1000000
+uniform int expect_non_zero 0
+draw rect 0 0 1 1
+
+probe all rgba 0.0 1.0 0.0 1.0

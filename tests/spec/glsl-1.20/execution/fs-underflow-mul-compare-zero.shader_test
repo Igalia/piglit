@@ -1,0 +1,59 @@
+# Some compilers may try to optimize comparisons based on the expected
+# range of the sources.  Check that pessimal cases are handled correctly.
+#
+# See also https://bugs.freedesktop.org/show_bug.cgi?id=111308
+
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 120
+
+uniform float a;
+uniform float b;
+uniform float c;
+uniform bool expect_non_zero;
+
+const float epsilon = 0.000000000000000000433681;
+
+void main(void)
+{
+    /* The worrysome optimization only occurs if the compiler believes that
+     * the mathematical result of the multiply is > 0.
+     */
+    float result = (abs(a) + epsilon) *
+                   (abs(b) + epsilon) *
+                   epsilon;
+    gl_FragColor = expect_non_zero == (0 < result)
+        ? vec4(0.0, 1.0, 0.0, 1.0)
+        : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+# 2**(-61) * 2**(61) * 2**(-61) = 2**(-61)
+uniform float a 0.000000000000000000433681
+uniform float b 2305843009213693952
+uniform int expect_non_zero 1
+draw rect -1 -1 1 1
+
+# 2**(-61) * 2**(-28) * 2**(-61) = 2**(-150)
+uniform float a 0.000000000000000000433681
+uniform float b 0.0000000037252902984619140625
+uniform int expect_non_zero 0
+draw rect 0 -1 1 1
+
+# 2**(-45) * 2**(-44) * 2**(-61) = 2**(-150)
+uniform float a 0.000000000000028421709430404007434844970703125
+uniform float b 0.00000000000005684341886080801486968994140625
+uniform int expect_non_zero 0
+draw rect -1 0 1 1
+
+# 2**(-61) * 2**(-61) * 2**(-61) = 2**(-183)
+uniform float a 0.000000000000000000433681
+uniform float b 0.000000000000000000433681
+uniform int expect_non_zero 0
+draw rect 0 0 1 1
+
+probe all rgba 0.0 1.0 0.0 1.0
