@@ -1,0 +1,32 @@
+# Basic test to make sure a named string is replaced
+# if a second call to glNamedStringARB() uses the same
+# path.
+[require]
+GLSL >= 1.10
+GL_ARB_shading_language_include
+
+[shader include]
+/test path/to/test_include.shader
+
+void main()
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[shader include]
+/test path/to/test_include.shader
+
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#extension GL_ARB_shading_language_include: enable
+
+#include "/test path/to/test_include.shader"
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.0, 1.0, 0.0, 1.0)

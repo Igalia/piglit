@@ -1,0 +1,34 @@
+# Basic test to make sure the path of the shader include
+# is processed correctly. Specifically here we are testing
+# '.' and '..' act as expected. Here the second shader
+# include should replace the first as they should end up
+# with the same path.
+[require]
+GLSL >= 1.10
+GL_ARB_shading_language_include
+
+[shader include]
+/test path/./to/../test_include.shader
+
+void main()
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[shader include]
+/test path/to3/../test_include.shader
+
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#extension GL_ARB_shading_language_include: enable
+
+#include "/test path/./to/../test_include.shader"
+
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.0, 1.0, 0.0, 1.0)
