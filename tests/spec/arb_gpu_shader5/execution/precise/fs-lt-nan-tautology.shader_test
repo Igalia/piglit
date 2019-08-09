@@ -1,0 +1,61 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader5: require
+
+uniform float a;
+uniform float b;
+uniform float c;
+uniform float d;
+uniform bool expect_true;
+
+out vec4 piglit_fragcolor;
+
+void main()
+{
+    precise float x = -abs(a / b);
+    precise float y =  abs(c / d);
+
+    /* This is a tautology unless one of the values is NaN. */
+    piglit_fragcolor = expect_true == (x < y)
+        ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform float a 1.0
+uniform float b 2.0
+uniform float c 1.0
+uniform float d 2.0
+uniform int expect_true 1
+draw rect -1 -1 1 1
+
+# Both are NaN.
+uniform float a 0.0
+uniform float b 0.0
+uniform float c 0.0
+uniform float d 0.0
+uniform int expect_true 0
+draw rect 0 -1 1 1
+
+# First is NaN.
+uniform float a 0.0
+uniform float b 0.0
+uniform float c 1.0
+uniform float d 2.0
+uniform int expect_true 0
+draw rect -1 0 1 1
+
+# Second is NaN.
+uniform float a 1.0
+uniform float b 2.0
+uniform float c 0.0
+uniform float d 0.0
+uniform int expect_true 0
+draw rect 0 0 1 1
+
+probe all rgba 0.0 1.0 0.0 1.0
