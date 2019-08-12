@@ -1,0 +1,75 @@
+# From the ARB_shading_language_include spec:
+#
+#    "If <path> does not start with a forward slash, it is a path relative
+#    to one of the ordered list of initial search points. If this path is
+#    quoted with angled brackets, the tree is searched relative to the
+#    first search point in the ordered list, and then relative to each
+#    subsequent search point, in order, until a matching path is found in
+#    the tree. This is also the behavior if it is quoted with double
+#    quotes in an initial (non-included) shader string. If it is quoted
+#    with double quotes in a previously included string, then the first
+#    search point will be the tree location where the previously included
+#    string had been found. If not found there, the search continues at
+#    the beginning of the list of search points, as just described."
+#
+[require]
+GLSL >= 1.10
+GL_ARB_shading_language_include
+
+[shader include paths]
+/test path/colour/
+/test path/to a/
+/test path/
+/test path/color/
+/test path/to/
+
+[shader include]
+/test path/color/test_colour.shader
+
+void colour()
+{
+	gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+}
+
+[shader include]
+/test path/colour/test_colour.shader
+
+void colour()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[shader include]
+/test path/to/test_include.shader
+
+void main()
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[shader include]
+/test path/./to/../test_include.shader
+
+#include "test_colour.shader"
+
+void main()
+{
+	colour();
+}
+
+[shader include]
+/test path/to a/test_include
+
+void main()
+{
+	gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+}
+
+[fragment shader]
+#extension GL_ARB_shading_language_include: enable
+
+#include "test_include.shader"
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (0.0, 1.0, 0.0, 1.0)
