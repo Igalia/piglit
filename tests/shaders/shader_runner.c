@@ -131,6 +131,8 @@ static GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
 static GLint geometry_layout_vertices_out = 0;
 static GLuint atomics_bos[8];
 static GLuint ssbo[32];
+static unsigned num_shader_include_paths = 0;
+static char **shader_include_path;
 
 #define SHADER_TYPES 6
 static GLuint *subuniform_locations[SHADER_TYPES];
@@ -292,6 +294,7 @@ enum states {
 	compute_shader_specializations,
 	vertex_data,
 	shader_include,
+	shader_include_paths,
 	test,
 };
 
@@ -550,7 +553,11 @@ compile_glsl(GLenum target)
 				    &shader_string_size);
 	}
 
-	glCompileShader(shader);
+	if (num_shader_include_paths) {
+		glCompileShaderIncludeARB(shader, num_shader_include_paths,
+					  (const char **) shader_include_path, NULL);
+	} else
+		glCompileShader(shader);
 
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
 
@@ -1434,6 +1441,39 @@ leave_state(enum states state, const char *line, const char *script_name)
 		break;
 	}
 
+	case shader_include_paths: {
+		num_shader_include_paths = 0;
+		const char *cursor = shader_string;
+		do {
+			const char *line_start = cursor;
+			cursor = strchr(cursor, '\n');
+
+			if (cursor == line_start) {
+				cursor++;
+				continue;
+			}
+
+			cursor++;
+			num_shader_include_paths++;
+		} while (cursor && cursor < line);
+
+		shader_include_path = calloc(num_shader_include_paths, sizeof(char *));
+
+		cursor = shader_string;
+		for (unsigned i = 0; i < num_shader_include_paths; i++) {
+			char *line_end = strchr(cursor, '\n');
+			unsigned path_len = line_end - cursor - 1;
+			char *path = malloc(path_len + 1);
+			path[path_len] = '\0';
+
+			memcpy(path, cursor, path_len);
+			shader_include_path[i] = path;
+			cursor = line_end + 1;
+		}
+
+		break;
+	}
+
 	case test:
 		break;
 
@@ -1784,6 +1824,9 @@ process_test_script(const char *script_name)
 			} else if (parse_str(line, "[shader include]", NULL)) {
 				state = shader_include;
 				shader_string = NULL;
+			} else if (parse_str(line, "[shader include paths]", NULL)) {
+				state = shader_include_paths;
+				shader_string = NULL;
 			} else if (parse_str(line, "[test]", NULL)) {
 				test_start = strchrnul(line, '\n');
 				test_start_line_num = line_num + 1;
@@ -1827,6 +1870,7 @@ process_test_script(const char *script_name)
 			case fragment_shader_spirv:
 			case compute_shader_spirv:
 			case shader_include:
+			case shader_include_paths:
 				if (shader_string == NULL)
 					shader_string = (char *) line;
 				break;
@@ -3424,6 +3468,16 @@ teardown_atomics(void)
 	}
 }
 
+static void
+teardown_shader_include_paths(void)
+{
+	for (unsigned i = 0; i < num_shader_include_paths; i++)
+		free(shader_include_path[i]);
+
+	num_shader_include_paths = 0;
+	free(shader_include_path);
+}
+
 static enum piglit_result
 program_must_be_in_use(void)
 {
@@ -4951,6 +5005,7 @@ piglit_init(int argc, char **argv)
 			teardown_ubos();
 			teardown_atomics();
 			teardown_fbos();
+			teardown_shader_include_paths();
 		}
 		exit(0);
 	}
