@@ -99,6 +99,7 @@ static int gl_version_times_10 = 0;
 static int check_link = 0;
 static unsigned requested_version = 110;
 static bool test_requires_geometry_shader4 = false;
+static bool dummy_shader_include = false;
 
 static GLint
 get_shader_compile_status(GLuint shader)
@@ -302,6 +303,11 @@ test(void)
 		exit(1);
 	}
 
+	if (dummy_shader_include) {
+		glNamedStringARB(GL_SHADER_INCLUDE_ARB, -1, "/dummy/path_to/shader_include",
+				 -1, "");
+	}
+
 	prog = glCreateShader(type);
 	glShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
 	glCompileShader(prog);
@@ -412,6 +418,8 @@ process_options(int argc, char **argv)
 		if (argv[i][0] == '-' && strcmp(argv[i], "-compat") != 0) {
 			if (strcmp(argv[i], "--check-link") == 0)
 				check_link = 1;
+			else if (strcmp(argv[i], "--dummy-shader-include") == 0)
+				dummy_shader_include = true;
 			else
 				usage(argv[0]);
 			/* do not retain the option; we've processed it */

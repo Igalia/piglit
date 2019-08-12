@@ -91,7 +91,8 @@ class Parser(object):
     to sort in the profile.
     """
     _CONFIG_KEYS = frozenset(['expect_result', 'glsl_version',
-                              'require_extensions', 'check_link'])
+                              'require_extensions', 'check_link',
+                              'dummy_shader_include'])
 
     def __init__(self, filepath, installpath=None):
         # a set that stores a list of keys that have been found already
@@ -195,6 +196,8 @@ class Parser(object):
 
         if self.config['check_link'].lower() == 'true':
             command.append('--check-link')
+        if self.config['dummy_shader_include'].lower() == 'true':
+            command.append('--dummy-shader-include')
         command.extend(self.config['require_extensions'].split())
 
         return command
@@ -209,7 +212,7 @@ class Parser(object):
         fails.
 
         """
-        keys = {'require_extensions': '', 'check_link': 'false'}
+        keys = {'require_extensions': '', 'check_link': 'false', 'dummy_shader_include': 'false'}
 
         # Text of config section.
         # Create a generator that iterates over the lines in the test file.
