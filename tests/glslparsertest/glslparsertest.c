@@ -100,6 +100,7 @@ static int check_link = 0;
 static unsigned requested_version = 110;
 static bool test_requires_geometry_shader4 = false;
 static bool dummy_shader_include = false;
+static char *shader_include_path = NULL;
 
 static GLint
 get_shader_compile_status(GLuint shader)
@@ -310,7 +311,12 @@ test(void)
 
 	prog = glCreateShader(type);
 	glShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
-	glCompileShader(prog);
+
+	if (shader_include_path)
+		glCompileShaderIncludeARB(prog, 1, (const char * const *) &shader_include_path, NULL);
+	else
+		glCompileShader(prog);
+
 	ok = get_shader_compile_status(prog);
 
 	size = get_shader_info_log_length(prog);
@@ -420,6 +426,8 @@ process_options(int argc, char **argv)
 				check_link = 1;
 			else if (strcmp(argv[i], "--dummy-shader-include") == 0)
 				dummy_shader_include = true;
+			else if (strncmp(argv[i], "--shader-include-path=", 22) == 0)
+				shader_include_path = argv[i] + 22;
 			else
 				usage(argv[0]);
 			/* do not retain the option; we've processed it */

@@ -92,7 +92,7 @@ class Parser(object):
     """
     _CONFIG_KEYS = frozenset(['expect_result', 'glsl_version',
                               'require_extensions', 'check_link',
-                              'dummy_shader_include'])
+                              'dummy_shader_include', 'shader_include_path'])
 
     def __init__(self, filepath, installpath=None):
         # a set that stores a list of keys that have been found already
@@ -198,6 +198,8 @@ class Parser(object):
             command.append('--check-link')
         if self.config['dummy_shader_include'].lower() == 'true':
             command.append('--dummy-shader-include')
+        if self.config['shader_include_path']:
+            command.append('--shader-include-path=' + self.config['shader_include_path'])
         command.extend(self.config['require_extensions'].split())
 
         return command
@@ -212,7 +214,8 @@ class Parser(object):
         fails.
 
         """
-        keys = {'require_extensions': '', 'check_link': 'false', 'dummy_shader_include': 'false'}
+        keys = {'require_extensions': '', 'check_link': 'false', 'dummy_shader_include': 'false',
+                'shader_include_path': ''}
 
         # Text of config section.
         # Create a generator that iterates over the lines in the test file.
@@ -231,7 +234,7 @@ class Parser(object):
         is_header = re.compile(r'(//|/\*|\*)\s*\[end config\]')
         is_metadata = re.compile(
             r'(//|/\*|\*)\s*(?P<key>[a-z_]*)\:\s(?P<value>.*)')
-        bad_values = re.compile(r'(?![\w\.\! ]).*')
+        bad_values = re.compile(r'(?![\w\.\! /]).*')
 
         for line in lines:
             # If strip renendered '' that means we had a blank newline,
@@ -262,7 +265,7 @@ class Parser(object):
                     if bad.group():
                         raise GLSLParserInternalError(
                             'Bad character "{}" at line: "{}". '
-                            'Only alphanumerics, _, and space '
+                            'Only alphanumerics, _, /, and space '
                             'are allowed'.format(
                                 bad.group()[0], line))
 
