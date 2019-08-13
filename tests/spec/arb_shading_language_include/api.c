@@ -286,6 +286,115 @@ test_api_errors(void)
 	return pass;
 }
 
+static bool
+test_api_functionality(void)
+{
+	char *test_name;
+	bool pass = true;
+
+	/*  From the ARB_shading_language_include spec:
+	 *
+	 *     "The command
+	 *
+	 *     boolean IsNamedStringARB(int namelen, const char *name)
+	 *
+	 *     returns TRUE if the tree location corresponding to <name> has a
+	 *     string associated with it, and FALSE if the tree location has
+	 *     no string associated with it.
+	 *
+	 *     ...
+	 *
+	 *     If <name> or <namelen> do not describe a valid name, or if
+	 *     <name> is NULL, IsNamedStringARB succeeds and returns FALSE."
+	 */
+	const char *include_string = "not_valid_glsl_code";
+	glNamedStringARB(GL_SHADER_INCLUDE_ARB, -1, "/path/shader_include", -1,
+			 include_string);
+	test_name = "Test glIsNamedStringARB() corresponding string";
+	bool is_named = glIsNamedStringARB(20, "/path/shader_include");
+	piglit_report_subtest_result(is_named ? PIGLIT_PASS : PIGLIT_FAIL, "%s", test_name);
+	pass &= is_named;
+
+	test_name = "Test glIsNamedStringARB() no corresponding string";
+	is_named = glIsNamedStringARB(-1, "/path");
+	piglit_report_subtest_result(is_named ? PIGLIT_FAIL : PIGLIT_PASS, "%s", test_name);
+	pass &= !is_named;
+
+	test_name = "Test glIsNamedStringARB() truncated path";
+	is_named = glIsNamedStringARB(19, "/path/shader_include");
+	piglit_report_subtest_result(is_named ? PIGLIT_FAIL : PIGLIT_PASS, "%s", test_name);
+	pass &= !is_named;
+
+	test_name = "Test glIsNamedStringARB() NULL name";
+	is_named = glIsNamedStringARB(-1, NULL);
+	piglit_report_subtest_result(is_named ? PIGLIT_FAIL : PIGLIT_PASS, "%s", test_name);
+	pass &= !is_named;
+
+	/* From the ARB_shading_language_include spec:
+	 *
+	 *   "If <pname> is NAMED_STRING_LENGTH_ARB, the length of the named
+	 *   string, including a null terminator, is returned."
+	 */
+	test_name = "Test glGetNamedStringivARB() GL_NAMED_STRING_LENGTH_ARB";
+	int string_len;
+	glGetNamedStringivARB(-1, "/path/shader_include", GL_NAMED_STRING_LENGTH_ARB, &string_len);
+	bool is_len_correct = string_len == (strlen(include_string) + 1);
+	piglit_report_subtest_result(is_len_correct ? PIGLIT_PASS : PIGLIT_FAIL, "%s", test_name);
+	pass &= is_len_correct;
+
+	/* From the ARB_shading_language_include spec:
+	 *
+	 *   "If <pname> is NAMED_STRING_TYPE_ARB, the <type> argument passed to
+	 *   NamedStringARB is returned."
+	 */
+	test_name = "Test glGetNamedStringivARB() GL_NAMED_STRING_TYPE_ARB";
+	GLint named_string_type;
+	glGetNamedStringivARB(-1, "/path/shader_include", GL_NAMED_STRING_TYPE_ARB, &named_string_type);
+	bool is_type_correct = named_string_type == GL_SHADER_INCLUDE_ARB;
+	piglit_report_subtest_result(is_type_correct ? PIGLIT_PASS : PIGLIT_FAIL, "%s", test_name);
+	pass &= is_type_correct;
+
+	/* From the ARB_shading_language_include spec:
+	 *
+	 *   "The command
+	 *
+	 *   void GetNamedStringARB(int namelen, const char *name,
+	 *                          sizei bufSize, int *stringlen,
+	 *                          char *string)
+	 *
+	 *   returns in <string> the string corresponding to the specified
+	 *   <name>. <name> and <namelen> have the same meanings as the
+	 *   corresponding parameters of NamedStringARB.
+	 *
+	 *   The returned string will be null-terminated. The actual number of
+	 *   characters written into <string>, excluding the null terminator, is
+	 *   returned in <stringlen>. If <stringlen> is NULL, no length is
+	 *   returned. The maximum number of characters that may be written into
+	 *   <string>, including the null terminator, is specified by <bufSize>."
+	 */
+	test_name = "Test glGetNamedStringARB() large buffer";
+	int buffser_size = 1028;
+	char large_string[1028];
+	glGetNamedStringARB(-1, "/path/shader_include", buffser_size, &string_len, large_string);
+	bool is_string_correct =
+		string_len == strlen(include_string) &&
+		strcmp(large_string, include_string) == 0;
+	piglit_report_subtest_result(is_string_correct ? PIGLIT_PASS : PIGLIT_FAIL, "%s", test_name);
+	pass &= is_string_correct;
+
+	test_name = "Test glGetNamedStringARB() small buffer";
+	buffser_size = 10;
+	char truncated_string[10];
+	glGetNamedStringARB(-1, "/path/shader_include", buffser_size, &string_len, truncated_string);
+	is_string_correct =
+		string_len == buffser_size - 1 &&
+		strncmp(large_string, include_string, buffser_size - 1) == 0;
+	piglit_report_subtest_result(is_string_correct ? PIGLIT_PASS : PIGLIT_FAIL, "%s", test_name);
+	pass &= is_string_correct;
+
+	return pass;
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -301,6 +410,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_shading_language_include");
 
 	pass = test_api_errors();
+	pass &= test_api_functionality();
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
