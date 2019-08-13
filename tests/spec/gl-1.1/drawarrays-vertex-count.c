@@ -86,7 +86,7 @@ probe_line_rect(int x1, int y1, int x2, int y2)
 		piglit_probe_rect_rgba(0, y1,
 				       x1, y2 - y1, black) &&
 		piglit_probe_rect_rgba(x2 + 1, y1,
-				       piglit_width - x2, y2 - y1, black) &&
+				       piglit_width - x2 - 1, y2 - y1, black) &&
 		piglit_probe_rect_rgba(0, y2 + 1,
 				       piglit_width, piglit_height - (y2 + 1),
 				       black));
