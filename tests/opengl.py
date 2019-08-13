@@ -2337,6 +2337,11 @@ with profile.test_list.group_manager(
     g(['arb_shading_language_420pack-active-sampler-conflict'], 'active sampler conflict')
     g(['arb_shading_language_420pack-binding-layout'], 'binding layout')
 
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'ARB_shading_language_include')) as g:
+    g(['arb_shading_language_include-api'], 'API tests')
+
 # Group ARB_enhanced_layouts
 with profile.test_list.group_manager(
         PiglitGLTest,
