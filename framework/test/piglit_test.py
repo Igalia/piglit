@@ -74,9 +74,16 @@ class PiglitBaseTest(ValgrindMixin, Test):
 
     @Test.command.getter
     def command(self):
-        # Prepend TEST_BIN_DIR to the path.
-        cmd = os.path.join(TEST_BIN_DIR, super(PiglitBaseTest, self).command[0])
-        return [cmd] + self._command[1:]
+        command = super(PiglitBaseTest, self).command
+
+        def fixup_bin_path(c):
+            # Prepend TEST_BIN_DIR to the path.
+            if c == self._command[0]:
+                return os.path.join(TEST_BIN_DIR, c)
+            else:
+                return c
+
+        return [fixup_bin_path(c) for c in command]
 
     def interpret_result(self):
         out = []
@@ -231,8 +238,7 @@ class CLProgramTester(PiglitCLTest):
     @PiglitCLTest.command.getter
     def command(self):
         command = super(CLProgramTester, self).command
-        command.insert(1, os.path.join(ROOT_DIR, self.filename))
-        return command
+        return command + [os.path.join(ROOT_DIR, self.filename)]
 
 
 class VkRunnerTest(PiglitBaseTest):
