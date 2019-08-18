@@ -17,6 +17,7 @@ env:
 
 matrix:
   include:
+    - env: BUILD=cmake
     - python: 2.7
       env: TOX_ENV="py27-{generator,noaccel,accel-nix,streams}"
     - python: 3.4
@@ -27,7 +28,6 @@ matrix:
       env: TOX_ENV="py36-{generator,noaccel,accel-nix,streams}"
     - python: 3.7
       env: TOX_ENV="py37-{generator,noaccel,accel-nix,streams}"
-    - env: BUILD=cmake
 
 install:
   - |
