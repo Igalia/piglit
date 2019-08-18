@@ -20,8 +20,6 @@ matrix:
     - env: BUILD=cmake
     - python: 2.7
       env: TOX_ENV="py27-{generator,noaccel,accel-nix,streams}"
-    - python: 3.4
-      env: TOX_ENV="py34-{generator,noaccel,accel-nix,streams}"
     - python: 3.5
       env: TOX_ENV="py35-{generator,noaccel,accel-nix,streams}"
     - python: 3.6
