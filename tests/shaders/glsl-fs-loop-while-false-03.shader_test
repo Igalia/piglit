@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+uniform vec2 u;
+
+void main()
+{
+	int x = 0;
+
+	if (u.x > u.y)
+	{
+	   return;
+	}
+
+	do
+	{
+		x++;
+	}
+	while (u.x > u.y);
+
+	if (x == 1) {
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+		return;
+	}
+
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+
+uniform vec2 u 0.0 1.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

@@ -1,0 +1,32 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+void main()
+{
+	int t = 32;
+	int x = 0;
+
+	do
+	{
+		x++;
+	}
+	while (x > t);
+
+	if (x == 1) {
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+		return;
+	}
+
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
