@@ -48,30 +48,12 @@ draw(Display *dpy)
 	float green[] = {0.0, 1.0, 0.0, 0.0};
 	GLboolean pass = GL_TRUE;
 	GLXWindow glxwin_one, glxwin_two;
-	GLXFBConfig *configs;
-	int nconfigs;
-	static const int attributes[] = {
-	  GLX_DRAWABLE_TYPE,    GLX_WINDOW_BIT,
-	  GLX_DOUBLEBUFFER,     GL_TRUE,
-	  GLX_RED_SIZE,         1,
-	  GLX_GREEN_SIZE,       1,
-	  GLX_BLUE_SIZE,        1,
-	  GLX_ALPHA_SIZE,       1,
-	  None
-	};
+	GLXFBConfig *config;
 
-	configs = glXChooseFBConfig(dpy, DefaultScreen(dpy), attributes,
-				    &nconfigs);
+	config = piglit_glx_get_fbconfig_for_visinfo(dpy, visinfo);
 
-	if (nconfigs == 0 || !configs) {
-		fprintf(stderr,
-			"Couldn't get an RGBA, double-buffered FBConfig\n");
-		piglit_report_result(PIGLIT_FAIL);
-		return PIGLIT_FAIL;
-	}
-
-	glxwin_one = glXCreateWindow(dpy, configs[0], win_one, NULL);
-	glxwin_two = glXCreateWindow(dpy, configs[0], win_two, NULL);
+	glxwin_one = glXCreateWindow(dpy, config, win_one, NULL);
+	glxwin_two = glXCreateWindow(dpy, config, win_two, NULL);
 
 	ctx = piglit_get_glx_context(dpy, visinfo);
 
@@ -85,7 +67,6 @@ draw(Display *dpy)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-
 	glXMakeCurrent(dpy, glxwin_one, ctx);
 	pass &= piglit_probe_pixel_rgb(1, 1, green);
 
@@ -95,8 +76,6 @@ draw(Display *dpy)
 	/* Free our resources when we're done. */
 	glXDestroyWindow(dpy, glxwin_one);
 	glXDestroyWindow(dpy, glxwin_two);
-
-	free(configs);
 
 	glXMakeCurrent(dpy, None, NULL);
 	glXDestroyContext(dpy, ctx);
