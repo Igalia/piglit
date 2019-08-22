@@ -4526,6 +4526,7 @@ with profile.test_list.group_manager(
     g(['egl-context-priority'])
     g(['egl-blob-cache'])
     g(['egl-copy-buffers'])
+    g(['egl-gl_oes_egl_image'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
