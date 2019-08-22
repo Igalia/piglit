@@ -103,6 +103,17 @@ piglit_init(int argc, char **argv)
 	peglSetBlobCacheFuncs(dpy, set_blob, get_blob);
 	EXPECT(EGL_BAD_PARAMETER);
 
+	/* Terminate and re-initialize a display and set cache funcs. */
+	eglTerminate(dpy);
+	EXPECT(EGL_SUCCESS);
+
+	if (!eglInitialize(dpy, &major, &minor))
+		piglit_report_result(PIGLIT_FAIL);
+
+	/* Successful call. */
+	peglSetBlobCacheFuncs(dpy, set_blob, get_blob);
+	EXPECT(EGL_SUCCESS);
+
 #undef EXPECT
 
 	piglit_report_result(PIGLIT_PASS);
