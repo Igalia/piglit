@@ -24,8 +24,26 @@
 #include "piglit-glx-util.h"
 #include "common.h"
 
+static int
+expect_badvalue(Display *dpy, XErrorEvent *error)
+{
+	if (error->error_code != BadValue) {
+		fprintf(stderr, "Unexpected X error %d\n", error->error_code);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
+	int badattribs1[] = {
+		None
+	};
+	int badattribs2[] = {
+		GLX_SCREEN, 0,
+		GLX_RENDER_TYPE, GLX_RGBA,
+		None
+	};
 	int ctxattribs[] = {
 		GLX_SCREEN, 0,
 		None
@@ -41,9 +59,25 @@ int main(int argc, char **argv)
 	GLX_ARB_create_context_setup();
 	piglit_require_glx_extension(dpy, "GLX_EXT_no_config_context");
 
-	ctxattribs[1] = screen = DefaultScreen(dpy);
-	ctx = glXCreateContextAttribsARB(dpy, NULL, NULL, True, ctxattribs);
+	ctxattribs[1] = badattribs2[1] = screen = DefaultScreen(dpy);
 
+	XSetErrorHandler(expect_badvalue);
+	ctx = glXCreateContextAttribsARB(dpy, NULL, NULL, True, badattribs1);
+	if (ctx) {
+		fprintf(stderr, "Unexpected success without GLX_SCREEN\n");
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+
+	ctx = glXCreateContextAttribsARB(dpy, NULL, NULL, True, badattribs2);
+	if (ctx) {
+		fprintf(stderr, "Unexpected success with GLX_RENDER_TYPE\n");
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+	XSetErrorHandler(NULL);
+
+	ctx = glXCreateContextAttribsARB(dpy, NULL, NULL, True, ctxattribs);
 	if (!ctx) {
 		fprintf(stderr, "Failed to create a no-config context\n");
 		piglit_report_result(PIGLIT_FAIL);
