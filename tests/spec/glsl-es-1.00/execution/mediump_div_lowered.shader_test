@@ -1,0 +1,32 @@
+# Tests that a division operation in mediump is performed using
+# lowered precision. Note that doing the operation in a higher
+# precision is valid according to the spec so this test can’t be used
+# in production. It is only for development.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+uniform float a, b;
+
+void main()
+{
+    float result = a / b;
+    gl_FragColor.r = result;
+    gl_FragColor.g = fract(result * 1024.0);
+    gl_FragColor.ba = vec2(0.0, 1.0);
+}
+
+[test]
+
+uniform float a 1.0
+uniform float b 3.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.333 0.25 0.0 1.0
