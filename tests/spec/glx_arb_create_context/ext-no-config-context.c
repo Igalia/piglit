@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 		None
 	};
 	GLXContext ctx;
-	int i, n_configs, screen;
+	int i, n_configs, screen, attrib;
 	GLXFBConfig *configs;
 
 	GLX_ARB_create_context_setup();
@@ -46,6 +46,39 @@ int main(int argc, char **argv)
 
 	if (!ctx) {
 		fprintf(stderr, "Failed to create a no-config context\n");
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+
+	if (glXQueryContext(dpy, ctx, GLX_RENDER_TYPE, &attrib) != Success) {
+		fprintf(stderr, "Failed to query GLX_RENDER_TYPE\n");
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+	if (attrib != GLX_DONT_CARE) {
+		fprintf(stderr, "Bad GLX_RENDER_TYPE %d\n", attrib);
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+
+	if (glXQueryContext(dpy, ctx, GLX_FBCONFIG_ID, &attrib) != Success) {
+		fprintf(stderr, "Failed to query GLX_FBCONFIG_ID\n");
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+	if (attrib != None) {
+		fprintf(stderr, "Bad GLX_FBCONFIG_ID %d\n", attrib);
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+
+	if (glXQueryContext(dpy, ctx, GLX_VISUAL_ID_EXT, &attrib) != Success) {
+		fprintf(stderr, "Failed to query GLX_VISUAL_ID_EXT\n");
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+	if (attrib != None) {
+		fprintf(stderr, "Bad GLX_VISUAL_ID_EXT %d\n", attrib);
 		piglit_report_result(PIGLIT_FAIL);
 		return 0;
 	}
