@@ -1,0 +1,40 @@
+# Tests that an operation involving array derefs in mediump is
+# performed using lowered precision. Note that doing the operation in
+# a higher precision is valid according to the spec so this test can’t
+# be used in production. It is only for development.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+uniform float in_simple[2];
+uniform int i0;
+uniform int i1;
+
+void main()
+{
+    /* In r component, simple array deref */
+    gl_FragColor.r = fract(in_simple[0] / in_simple[1] * 1024.0);
+    /* In g component, array deref with non-const index */
+    gl_FragColor.g = fract(in_simple[i0] / in_simple[i1] * 1024.0);
+    /* In b component, embedded deref with array */
+    gl_FragColor.b = 0.0;
+    gl_FragColor.a = 1.0;
+}
+
+[test]
+
+uniform float in_simple[0] 1.0
+uniform float in_simple[1] 3.0
+
+uniform int i0 0
+uniform int i1 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.25 0.0 1.0
