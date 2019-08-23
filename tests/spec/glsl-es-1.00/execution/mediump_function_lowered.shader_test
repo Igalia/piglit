@@ -1,0 +1,42 @@
+# Tests that an operation containing function calls and mediump is
+# performed using lowered precision. Note that doing the operation in
+# a higher precision is valid according to the spec so this test can’t
+# be used in production. It is only for development.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+uniform float a, b;
+
+mediump float
+get_a()
+{
+        return a;
+}
+
+float
+get_b()
+{
+        return b;
+}
+
+void main()
+{
+        gl_FragColor.r = fract(get_a() / get_b() * 1024.0);
+        gl_FragColor.gba = vec3(0.0, 0.0, 1.0);
+}
+
+[test]
+
+uniform float a 1.0
+uniform float b 3.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.0 0.0 1.0
