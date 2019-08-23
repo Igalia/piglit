@@ -1,0 +1,55 @@
+# Tests that an operation involving struct derefs in mediump is
+# performed using lowered precision. Note that doing the operation in
+# a higher precision is valid according to the spec so this test can’t
+# be used in production. It is only for development.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+struct simple {
+  float a, b;
+};
+
+struct embedded {
+ simple a, b;
+};
+
+struct arrayed {
+ simple a[2];
+};
+
+uniform simple in_simple;
+uniform embedded in_embedded;
+uniform arrayed in_arrayed;
+
+void main()
+{
+    /* In r component, simple struct deref */
+    gl_FragColor.r = fract(in_simple.a / in_simple.b * 1024.0);
+    /* In g component, embedded deref */
+    gl_FragColor.g = fract(in_embedded.a.a / in_embedded.b.b * 1024.0);
+    /* In b component, embedded deref with array */
+    gl_FragColor.b = fract(in_arrayed.a[0].a / in_arrayed.a[1].b * 1024.0);
+    gl_FragColor.a = 1.0;
+}
+
+[test]
+
+uniform float in_simple.a 1.0
+uniform float in_simple.b 3.0
+
+uniform float in_embedded.a.a 1.0
+uniform float in_embedded.b.b 3.0
+
+uniform float in_arrayed.a[0].a 1.0
+uniform float in_arrayed.a[1].b 3.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.25 0.25 1.0
