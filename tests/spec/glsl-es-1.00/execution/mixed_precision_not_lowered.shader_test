@@ -1,0 +1,30 @@
+# Tests that a division operation with mixed precision is performed
+# using high precision.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+
+uniform mediump float a;
+uniform highp float b;
+
+void main()
+{
+    highp float result = a / b;
+    gl_FragColor.r = result;
+    gl_FragColor.g = fract(result * 1024.0);
+    gl_FragColor.ba = vec2(0.0, 1.0);
+}
+
+[test]
+
+uniform float a 1.0
+uniform float b 3.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.333 0.333 0.0 1.0
