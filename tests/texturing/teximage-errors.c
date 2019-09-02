@@ -230,6 +230,58 @@ test_depth_formats(const struct format_desc *test, GLenum expected_error,
    }
    return result;
 }
+
+/* Test the combinations of depth formats in glTexSubImage{123}D() */
+static bool
+test_depth_formats_storage(const struct format_desc *test, GLenum expected_error,
+			   GLint n_tests)
+{
+   int i;
+   bool result = true;
+   char buffer[16 * 16 * 16 * 8] = {0};
+   GLuint tex[3];
+
+   /* Not strictly required, but makes the test simpler */
+   if (!piglit_is_extension_supported("GL_ARB_texture_storage"))
+      return true;
+
+   for (i = 0; i < n_tests; i++, glDeleteTextures(3, tex)) {
+      glGenTextures(3, tex);
+
+      if ((test[i].internalformat == GL_DEPTH_COMPONENT32F ||
+           test[i].internalformat == GL_DEPTH32F_STENCIL8) &&
+           !piglit_is_extension_supported("GL_ARB_depth_buffer_float"))
+         continue;
+
+      glBindTexture(GL_TEXTURE_1D, tex[0]);
+      glBindTexture(GL_TEXTURE_2D, tex[1]);
+      glBindTexture(GL_TEXTURE_2D_ARRAY, tex[2]);
+
+      glTexStorage1D(GL_TEXTURE_1D, 1, test[i].internalformat, 16);
+      result = piglit_check_gl_error(GL_NO_ERROR) && result;
+      glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 16,
+		      test[i].format, test[i].type, buffer);
+      result = piglit_check_gl_error(expected_error) && result;
+
+      glTexStorage2D(GL_TEXTURE_2D, 1, test[i].internalformat, 16, 16);
+      result = piglit_check_gl_error(GL_NO_ERROR) && result;
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 16, 16,
+		      test[i].format, test[i].type, buffer);
+      result = piglit_check_gl_error(expected_error) && result;
+
+      if (!piglit_is_extension_supported("GL_EXT_texture_array"))
+         continue;
+
+      glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, test[i].internalformat,
+		     16, 16, 16);
+      result = piglit_check_gl_error(GL_NO_ERROR) && result;
+      glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, 16, 16, 16,
+		      test[i].format, test[i].type, buffer);
+      result = piglit_check_gl_error(expected_error) && result;
+   }
+   return result;
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -255,6 +307,13 @@ piglit_display(void)
 		   && pass;
 	   pass = test_depth_formats(formats_not_allowed, GL_INVALID_OPERATION,
 				     ARRAY_SIZE(formats_not_allowed))
+		   && pass;
+
+	   pass = test_depth_formats_storage(formats_allowed, GL_NO_ERROR,
+					     ARRAY_SIZE(formats_allowed))
+		   && pass;
+	   pass = test_depth_formats_storage(formats_not_allowed, GL_INVALID_OPERATION,
+					     ARRAY_SIZE(formats_not_allowed))
 		   && pass;
    }
 
