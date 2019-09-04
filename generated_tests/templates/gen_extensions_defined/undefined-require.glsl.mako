@@ -34,4 +34,8 @@
 % endfor
 #extension ${extension} : require
 
+% if version.is_es:
+precision mediump float;
+% endif
+
 float foo() { return 0.0; }

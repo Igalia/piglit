@@ -34,6 +34,10 @@
   #extension ${ext} : require
 % endfor
 
+% if version.is_es:
+precision mediump float;
+% endif
+
 #if !defined ${extension}
 #    error ${extension} is not defined
 #elif ${extension} != 1
