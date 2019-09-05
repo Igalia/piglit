@@ -1,0 +1,36 @@
+# The combination of 64-bit datatypes and large group sizes has led to
+# regressions in the i965 compiler.
+
+[require]
+GLSL >= 4.30
+
+[compute shader]
+writeonly uniform image2D tex;
+layout(local_size_x = 1024) in;
+uniform dvec4 arg0;
+uniform double arg1;
+uniform double tolerance;
+uniform dvec4 expected;
+
+void main()
+{
+  dvec4 result = min(arg0, arg1);
+  vec4 tmp_color = distance(result, expected) <= tolerance ?
+                   vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+  ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+  imageStore(tex, coord, tmp_color);
+}
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+uniform int tex 0
+texture rgbw 0 (4, 1) GL_RGBA8
+image texture 0 GL_RGBA8
+fb tex 2d 0
+uniform dvec4 arg0 1.0 2.0 3.0 4.0
+uniform double arg1 -2.0
+uniform dvec4 expected -2.0 -2.0 -2.0 -2.0
+uniform double tolerance 4e-05
+compute 1 1 1
+probe rgb 0 0 0.0 1.0 0.0 1.0
