@@ -77,9 +77,9 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_egl_extension(dpy, "EGL_MESA_configless_context");
 
-	EGLint attr[] = { EGL_NONE };
+	EGLint ctx_attr[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
 	EGLContext ctx =
-		eglCreateContext(dpy, EGL_NO_CONFIG_MESA, EGL_NO_CONTEXT, attr);
+		eglCreateContext(dpy, EGL_NO_CONFIG_MESA, EGL_NO_CONTEXT, ctx_attr);
 	if (ctx == EGL_NO_CONTEXT) {
 		fprintf(stderr, "could not create EGL context\n");
 		piglit_report_result(PIGLIT_FAIL);
@@ -91,11 +91,19 @@ piglit_init(int argc, char **argv)
 	GLuint texture_a;
 	glGenTextures(1, &texture_a);
 	glBindTexture(GL_TEXTURE_2D, texture_a);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA,
+
+	/* Setup 2 miplevels, and max level. */
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA,
 		     GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA, 128, 128, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Create EGLImage from texture.  */
-	EGLint attribs[] = { EGL_NONE };
+	EGLint attribs[] = { EGL_GL_TEXTURE_LEVEL_KHR, 1, EGL_NONE };
 	EGLImageKHR egl_image;
 	egl_image = peglCreateImageKHR(dpy, ctx, EGL_GL_TEXTURE_2D,
 				       (EGLClientBuffer) (intptr_t) texture_a,
@@ -113,9 +121,19 @@ piglit_init(int argc, char **argv)
 	/* Specify texture from EGLImage but use wrong target.  */
 	glEGLImageTargetTexture2DOES(GL_TEXTURE_CUBE_MAP_ARRAY, egl_image);
 
-	if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+	if (!piglit_check_gl_error(GL_INVALID_ENUM))
 		piglit_report_result(PIGLIT_FAIL);
-	}
+
+	/* Specify texture from EGLImage properly.  */
+	glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, egl_image);
+
+	GLint w, h;
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
+
+	/* Verify that we got the miplevel 1 dimensions. */
+	if (w != 128 || h != 128)
+		piglit_report_result(PIGLIT_FAIL);
 
 	glDeleteTextures(1, &texture_a);
 	glDeleteTextures(1, &texture_b);
