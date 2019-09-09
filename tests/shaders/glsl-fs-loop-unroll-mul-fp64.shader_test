@@ -1,0 +1,40 @@
+[require]
+GLSL >= 4.00
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64: require
+
+void main()
+{
+   double lk = 1.0LF;
+   while (lk < 62748517.0LF) /* 13^7 */
+      lk *= 13.0LF;
+   /* lk should be 815730721 */
+
+   while (lk <= 815730721.0LF)
+      lk *= 13.0LF;
+   /* lk should be 10604499373 */
+
+   while (lk != 4826809.0LF)
+      lk /= 13.0LF;
+   /* lk should be 4826809 */
+
+   while (lk == 4826809.0LF)
+      lk /= 13.0LF;
+   /* lk should be 371293 */
+
+   if (lk == 371293.0LF)
+      gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+   else
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

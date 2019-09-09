@@ -1,0 +1,44 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+void main()
+{
+   int i = 3;
+   while (i < 48)               /* nir_op_ige */
+      i <<= 2;
+   /* i should be 48 */
+
+   while (i <= 192)             /* nir_op_ilt */
+      i <<= 2;
+   /* i should be 768 */
+
+   while (i != 3072)            /* nir_op_ieq */
+      i <<= 1;
+   /* i should be 3072 */
+
+   uint j = 3u;
+   while (j < 48u)              /* nir_op_uge */
+      j <<= 2;
+   /* j should be 48 */
+
+   while (j <= 192u)            /* nir_op_ult */
+      j <<= 1;
+   /* j should be 384 */
+
+   if (i == 3072 &&
+       j == 384u)
+      gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+   else
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

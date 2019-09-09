@@ -1,0 +1,54 @@
+[require]
+GLSL >= 4.00
+GL_ARB_gpu_shader_int64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_int64: require
+
+void main()
+{
+   int64_t li = 17L;
+   while (li < 1431211525754907897L) { // (17^15 + 1) / 2
+      li *= 17L;
+   }
+   /* li should be 17^15 (2862423051509815793)*/
+
+   while (li < 8587269154529447379L)
+      li *= 3L;
+   /* li should be 3 * 17^15 (8587269154529447379) */
+
+   int64_t li_2 = 17L;
+   while (li_2 != 27103491L)
+      li_2 *= 1594323L;
+   /* li_2 should be 27103491 */
+
+   while (li_2 == 27103491L)
+      li_2 *= 1594323L;
+   /* li_2 should be 43211719081593 */
+   float z = 1.0;
+   uint64_t uli = 1L;
+   while (uli < 8650415919381337933L) { /* 13^17 */
+      uli *= 13L;
+      z -= 0.01;
+   }
+   /* uli should be 8650415919381337933 */
+
+   while (z < 1.0)
+      z += 1.0;
+
+   if (li == 8587269154529447379L &&
+       li_2 == 43211719081593L &&
+       uli == 8650415919381337933L)
+      gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+   else
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
