@@ -374,6 +374,7 @@ with profile.test_list.group_manager(
         require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-destroycontext-1'], run_concurrent=False)
     g(['glx-destroycontext-2'], run_concurrent=False)
+    g(['glx-destroycontext-3'], run_concurrent=False)
     g(['glx-dont-care-mask'], run_concurrent=False)
     g(['glx-close-display'], run_concurrent=False)
     g(['glx-fbconfig-sanity'], run_concurrent=False)
