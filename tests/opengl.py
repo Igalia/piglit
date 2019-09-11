@@ -1153,6 +1153,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'glsl-1.20')) as g:
     g(['glsl-1.20-getactiveuniform-constant'])
+    g(['glsl-1.20-negative-mult-matNxN-matNxN'])
     g(['built-in-constants',
        os.path.join('spec', 'glsl-1.20', 'minimum-maximums.txt')],
       'built-in constants',

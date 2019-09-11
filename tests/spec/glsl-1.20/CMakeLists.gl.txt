@@ -9,3 +9,4 @@ link_libraries (
 )
 
 piglit_add_executable (glsl-1.20-getactiveuniform-constant getactiveuniform-constant.c)
+piglit_add_executable (glsl-1.20-negative-mult-matNxN-matNxN negative-mult-matNxN-matNxN.c)
