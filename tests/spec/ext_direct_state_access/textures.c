@@ -344,17 +344,19 @@ test_CopyTextureSubImageNDEXT(void* data)
 }
 
 static enum piglit_result
-test_TextureParameteriEXT(void* data)
+test_TextureParameterEXT(void* data)
 {
 	GLuint tex[2];
 	static const GLenum targets[] = {
 		GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D,
 		GL_TEXTURE_CUBE_MAP,
 	};
-	int i, j, k, l, value;
+	int i, j, k, value;
 	bool pass = true;
 
-	const struct pname_value {
+	void (*textureParameteri_variant) (GLuint, GLenum, GLenum, GLint*) = data;
+
+	struct pname_value {
 		GLenum pname;
 		int value_count;
 		int values[8];
@@ -438,6 +440,9 @@ test_TextureParameteriEXT(void* data)
 		},
 	};
 
+	if (!textureParameteri_variant) {
+		return PIGLIT_SKIP;
+	}
 
 	for (i = 0; i < ARRAY_SIZE(targets); i++) {
 		GLenum target = targets[i];
@@ -446,21 +451,14 @@ test_TextureParameteriEXT(void* data)
 
 		for (j = 0; j < ARRAY_SIZE(tested); j++) {
 			for (k = 0; k < tested[j].value_count; k++) {
-				int original_values[2];
+				int original_value;
 				if (use_display_list != GL_NONE)
 					glNewList(list, use_display_list);
 
-				for (l = 0; l < 2; l++) {
-					glGetTextureParameterivEXT(tex[l], target,
-						tested[j].pname, &original_values[l]);
-				}
+				glGetTextureParameterivEXT(tex[1], target,
+					tested[j].pname, &original_value);
 
-				glTextureParameteriEXT(
-					tex[0], target,
-					tested[j].pname,
-					tested[j].values[k]);
-
-				glTextureParameterivEXT(
+				(*textureParameteri_variant)(
 					tex[1], target,
 					tested[j].pname,
 					&tested[j].values[k]);
@@ -469,34 +467,28 @@ test_TextureParameteriEXT(void* data)
 					glEndList(list);
 
 				if (use_display_list == GL_COMPILE) {
-					for (l = 0; l < 2; l++) {
-						int v;
-						glGetTextureParameterivEXT(tex[l], target,
-							tested[j].pname, &v);
-						pass = v == original_values[l] && pass;
-					}
+					int v;
+					glGetTextureParameterivEXT(tex[1], target,
+						tested[j].pname, &v);
+					pass = (v == original_value) && pass;
 					glCallList(list);
 				}
 
-				for (l = 0; l < 2; l++) {
-					glGetTextureParameterivEXT(tex[l], target, tested[j].pname, &value);
+				glGetTextureParameterivEXT(tex[1], target, tested[j].pname, &value);
 
-					if (value != tested[j].values[k]) {
-						piglit_loge("%s(%s, %s, ...) failed. Expected %d but got %d\n",
-							l == 0 ? "glTextureParameteriEXT" : "glTextureParameterivEXT",
-							piglit_get_gl_enum_name(target),
-							piglit_get_gl_enum_name(tested[j].pname),
-							tested[j].values[k],
-							value);
-						return PIGLIT_FAIL;
-					}
-					 if (!piglit_check_gl_error(GL_NO_ERROR)) {
-						piglit_loge("%s(%s, %s, ...) failed.\n",
-							l == 0 ? "glTextureParameteriEXT" : "glTextureParameterivEXT",
-							piglit_get_gl_enum_name(target),
-							piglit_get_gl_enum_name(tested[j].pname));
-						return PIGLIT_FAIL;
-					}
+				if (value != tested[j].values[k]) {
+					piglit_loge("TextureParameter*EXT(%s, %s, ...) failed. Expected %d but got %d\n",
+						piglit_get_gl_enum_name(target),
+						piglit_get_gl_enum_name(tested[j].pname),
+						tested[j].values[k],
+						value);
+					return PIGLIT_FAIL;
+				}
+				 if (!piglit_check_gl_error(GL_NO_ERROR)) {
+					piglit_loge("TextureParameter*EXT(%s, %s, ...) failed.\n",
+						piglit_get_gl_enum_name(target),
+						piglit_get_gl_enum_name(tested[j].pname));
+					return PIGLIT_FAIL;
 				}
 			}
 		}
@@ -758,17 +750,43 @@ test_TextureProxyTarget(void* data)
 	return pass && piglit_check_gl_error(GL_NO_ERROR) ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+void TextureParameteriEXT_wrapper(GLuint texture, GLenum target, GLenum pname, GLint* value) {
+	glTextureParameteriEXT(texture, target, pname, *value);
+}
+
+void TextureParameterIuivEXT_wrapper(GLuint texture, GLenum target, GLenum pname, GLint* value) {
+	glTextureParameterIuivEXT(texture, target, pname, (GLuint*) value);
+}
 
 enum piglit_result
 piglit_display(void)
 {
 	int i;
+	const bool have_ext_tex_int = piglit_is_extension_supported("GL_EXT_texture_integer");
 	struct piglit_subtest tests[] = {
 		{
 			"TextureParameteriEXT",
 			NULL,
-			test_TextureParameteriEXT,
-			NULL
+			test_TextureParameterEXT,
+			TextureParameteriEXT_wrapper
+		},
+		{
+			"TextureParameterivEXT",
+			NULL,
+			test_TextureParameterEXT,
+			glTextureParameterivEXT
+		},
+		{
+			"TextureParameterIivEXT",
+			NULL,
+			test_TextureParameterEXT,
+			have_ext_tex_int ? glTextureParameterIivEXT : NULL
+		},
+		{
+			"TextureParameterIuivEXT",
+			NULL,
+			test_TextureParameterEXT,
+			have_ext_tex_int ? TextureParameterIuivEXT_wrapper : NULL
 		},
 		{
 			"TextureParameterfEXT",
