@@ -295,6 +295,55 @@ test_FlushMappedNamedBufferRangeEXT(void* d)
 	pass = buf[2] == 5 && pass;
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
+	glDeleteBuffers(1, &buffer);
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+static enum piglit_result
+test_NamedCopyBufferSubDataEXT(void* d)
+{
+	bool pass = true;
+	GLuint buffers[2];
+	static const char data[] = {
+		1, 2, 3, 4
+	};
+	char* buf;
+
+	if (gl_compat_version < 30) {
+		return PIGLIT_SKIP;
+	}
+
+	glGenBuffers(ARRAY_SIZE(buffers), buffers);
+
+	glNamedBufferDataEXT(buffers[0], 4, data, GL_STATIC_DRAW);
+	glNamedBufferDataEXT(buffers[1], 4, NULL, GL_STATIC_DRAW);
+
+	/* copy buffers[0] in buffers[1] backward */
+	for (int i = 0; i < ARRAY_SIZE(data); i++) {
+		glNamedCopyBufferSubDataEXT(
+			buffers[0], buffers[1],
+			i, ARRAY_SIZE(data) - i - 1,
+			1);
+	}
+
+	buf = (char*) glMapNamedBufferRangeEXT(buffers[1],
+						0,
+						ARRAY_SIZE(data),
+						GL_MAP_READ_BIT);
+	if (!buf) {
+		return PIGLIT_FAIL;
+	}
+
+	for (int i = 0; i < ARRAY_SIZE(data); i++) {
+		pass = buf[i] == data[ARRAY_SIZE(data) - i - 1] && pass;
+	}
+
+	glUnmapNamedBufferEXT(buffers[1]);
+	glDeleteBuffers(ARRAY_SIZE(buffers), buffers);
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
@@ -327,6 +376,11 @@ piglit_init(int argc, char **argv)
 			"FlushMappedNamedBufferRangeEXT",
 			NULL,
 			test_FlushMappedNamedBufferRangeEXT,
+		},
+		{
+			"NamedCopyBufferSubDataEXT",
+			NULL,
+			test_NamedCopyBufferSubDataEXT,
 		},
 		{
 			NULL
