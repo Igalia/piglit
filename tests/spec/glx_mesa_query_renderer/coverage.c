@@ -113,7 +113,7 @@ verify_integer_values(const char *name, Bool success,
 
 	/* value sanity check */
 	switch (test->attribute) {
-	case GLX_RENDERER_PREFERRED_PROFILE_MESA:
+	case GLX_RENDERER_PREFERRED_PROFILE_MESA: {
 	    unsigned legal = GLX_CONTEXT_CORE_PROFILE_BIT_ARB |
 			     GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB |
 			     GLX_CONTEXT_ES_PROFILE_BIT_EXT |
@@ -131,6 +131,7 @@ verify_integer_values(const char *name, Bool success,
                 pass = false;
             }
 	    break;
+	    }
 	default:
 	    break;
 	}
