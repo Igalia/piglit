@@ -1,0 +1,37 @@
+# Tests that an array index using mediump operations is lowered. Note
+# that doing the operation in a higher precision is valid according to
+# the spec so this test can’t be used in production. It is only for
+# development.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+uniform float values[2];
+uniform float a;
+
+void main()
+{
+	/* Do a calculation at mediump within the arrax index. If it
+	 * is not lowered then the index will be different.
+	 */
+	gl_FragColor.r = values[int(a * 10e7)];
+
+	gl_FragColor.gba = vec3(0.0, 0.0, 1.0);
+}
+
+[test]
+
+uniform float values[0] 0.5
+uniform float values[1] 0.9
+
+uniform float a 0.00000001
+
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.0 0.0 1.0
