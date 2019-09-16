@@ -1,0 +1,41 @@
+# Tests emitting more vertices than specified with max_vertices.
+# Reproduces a hang with RADV and the (disabled by default) NGG path for
+# geometry shaders.
+
+[vertex shader]
+#version 450 core
+
+void main() {
+  gl_Position = vec4(0.0);
+}
+
+[geometry shader]
+#version 450 core
+
+layout (points) in;
+layout (triangle_strip, max_vertices = 3) out;
+
+void main() {
+    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+    EmitVertex();
+
+    gl_Position = vec4(1.0, 0.0, 0.0, 1.0);
+    EmitVertex();
+
+    gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
+    EmitVertex();
+    EndPrimitive();
+
+    gl_Position = vec4(0.0, 1.0, 0.0, 1.0);
+    EmitVertex();
+
+    gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
+    EmitVertex();
+
+    gl_Position = vec4(1.0, 0.0, 0.0, 1.0);
+    EmitVertex();
+    EndPrimitive();
+}
+
+[test]
+draw arrays GL_POINTS 0 1
