@@ -1,0 +1,43 @@
+# Tests passing double values through a geometry shader.
+
+[require]
+geometryShader
+shaderFloat64
+
+[vertex shader]
+#version 450 core
+
+layout(location = 0) out double OutDouble;
+
+void main() { OutDouble = 1.234; }
+
+[geometry shader]
+#version 450 core
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+layout(location = 0) in double InDouble[3];
+layout(location = 0) out double OutDouble;
+
+void main() {
+  gl_Position = vec4(0);
+
+  for(int i = 0; i < 3; i++) {
+    OutDouble = InDouble[i];
+    EmitVertex();
+  }
+
+  EndPrimitive();
+}
+
+[fragment shader]
+#version 450 core
+
+layout(location = 0) flat in double InDouble;
+layout(location = 0, index = 0) out vec4 Color;
+
+void main() { Color = float(InDouble).xxxx; }
+
+[test]
+draw arrays POINT_LIST 0 1
