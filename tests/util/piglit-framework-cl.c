@@ -298,6 +298,14 @@ int piglit_cl_framework_run(int argc, char** argv)
 					num_devices = piglit_cl_get_device_ids(platform_id,
 					                                       CL_DEVICE_TYPE_ALL,
 					                                       &device_ids);
+					/* Check that we have at least 1 device. */
+					if (!num_devices) {
+						char* platform_name =
+							piglit_cl_get_platform_info(platform_id, CL_PLATFORM_NAME);
+						printf("\n# skipping platform %s because it has 0 devices\n\n",
+						       platform_name);
+						free(platform_name);
+					}
 				}
 
 				/* run tests per each device */
