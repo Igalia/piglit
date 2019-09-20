@@ -1,0 +1,87 @@
+[require]
+GLSL >= 4.50
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 450
+
+#extension GL_EXT_demote_to_helper_invocation : require
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_shader_atomic_counter_ops: require
+
+layout(binding = 0) uniform atomic_uint written_by_demoted;
+layout(binding = 0) uniform atomic_uint written_by_non_demoted;
+
+layout (location = 0) out vec4 out_color;
+
+void main()
+{
+	ivec2 f = ivec2(gl_FragCoord.xy);
+	int lsb = (f.x | f.y) & 1;
+
+	/* If any LSB of the fragment coordinate is 1, we demoted it,
+	 * so for example, in the quad below we'll have 3 new helper
+	 * invocations.
+	 *
+	 *       +-----+-----+
+	 *       | 0,0 | 1,0 |
+	 *       +-----+-----+
+	 *       | 0,1 | 1,1 |
+	 *       +-----+-----+
+	 */
+	if (lsb != 0) {
+		demote;
+		/* Because every invocation here is demoted, we don't
+		 * expect this to take effect.
+		 */
+		atomicCounterExchangeARB(written_by_demoted, 1);
+	}
+
+	/* Non demoted will have effect here, verify that we have some. */
+	atomicCounterExchangeARB(written_by_non_demoted, 1);
+
+	/* If we used discard instead of demote, these would be undefined. */
+	vec2 dx = dFdxFine(gl_FragCoord.xy);
+	vec2 dy = dFdyFine(gl_FragCoord.xy);
+
+	bool isHelper = helperInvocationEXT();
+	float dh = dFdxFine(float(isHelper));
+
+	/* For a non-helper invocation, we check that
+	 *
+	 * - Derivatives were calculated correctly;
+	 * - There is a neighbour fragment that is a helper invocation;
+	 * - We are not a helper invocation.
+	 *
+	 * Note that for helper invocations the result is irrelevant.
+	 */
+	bool valid = distance(abs(dx.x), 1.0) < 0.01 && dx.y == 0.0 &&
+		     distance(abs(dy.y), 1.0) < 0.01 && dy.x == 0.0 &&
+		     abs(dh) > 0 && !isHelper;
+
+	if (valid)
+		demote;
+
+	/* If some invocation had invalid results, we'll fail. */
+	out_color = vec4(1, 0, 0, 0);
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+atomic counters 2
+
+clear color 0.0 1.0 0.0 0.0
+clear
+
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 0.0
+
+probe atomic counter 0 == 0
+probe atomic counter 1 == 1
