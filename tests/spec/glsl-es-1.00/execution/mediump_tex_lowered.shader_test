@@ -1,0 +1,36 @@
+# Tests that a sample using mediump operations is lowered. Note that
+# doing the operation in a higher precision is valid according to the
+# spec so this test can’t be used in production. It is only for
+# development.
+
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 100
+precision mediump float;
+
+uniform sampler2D tex;
+uniform vec2 coord;
+uniform float divisor;
+
+void main()
+{
+        gl_FragColor.r = fract(texture2D(tex, coord).x / divisor * 1024.0);
+        gl_FragColor.gba = vec3(0.0, 0.0, 1.0);
+}
+
+[test]
+
+uniform int tex 1
+texture rgbw 1 (8, 8)
+
+uniform vec2 coord 0.0 0.0
+
+uniform float divisor 3.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.0 0.0 1.0
