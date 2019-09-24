@@ -102,7 +102,7 @@ piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	/* Create EGLImage from texture.  */
+	/* Create EGLImage from texture_a miplevel 1. */
 	EGLint attribs[] = { EGL_GL_TEXTURE_LEVEL_KHR, 1, EGL_NONE };
 	EGLImageKHR egl_image;
 	egl_image = peglCreateImageKHR(dpy, ctx, EGL_GL_TEXTURE_2D,
@@ -118,22 +118,24 @@ piglit_init(int argc, char **argv)
 	glGenTextures(1, &texture_b);
 	glBindTexture(GL_TEXTURE_2D, texture_b);
 
-	/* Specify texture from EGLImage but use wrong target.  */
+	/* Specify texture from EGLImage but use wrong target. */
 	glEGLImageTargetTexture2DOES(GL_TEXTURE_CUBE_MAP_ARRAY, egl_image);
-
 	if (!piglit_check_gl_error(GL_INVALID_ENUM))
 		piglit_report_result(PIGLIT_FAIL);
 
-	/* Specify texture from EGLImage properly.  */
+	/* Specify texture from EGLImage properly. */
 	glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, egl_image);
 
 	GLint w, h;
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
 
-	/* Verify that we got the miplevel 1 dimensions. */
-	if (w != 128 || h != 128)
+	/* Verify that we got the texture_a miplevel 1 dimensions. */
+	if (w != 128 || h != 128) {
+		fprintf(stderr, "expected 128x128 (miplevel 1), got %dx%d\n",
+                        w, h);
 		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	glDeleteTextures(1, &texture_a);
 	glDeleteTextures(1, &texture_b);
