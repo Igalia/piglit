@@ -2487,6 +2487,7 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_texture_view')) as g:
+    g(['arb_texture_view-bug-layers-image'], 'bug-layers-image')
     g(['arb_texture_view-cubemap-view'], 'cubemap-view')
     g(['arb_texture_view-texture-immutable-levels'], 'immutable_levels')
     g(['arb_texture_view-max-level'], 'max-level')

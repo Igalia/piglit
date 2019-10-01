@@ -33,5 +33,6 @@ piglit_add_executable(arb_texture_view-targets targets.c common.c)
 piglit_add_executable(arb_texture_view-texsubimage-layers texsubimage-layers.c common.c)
 piglit_add_executable(arb_texture_view-texsubimage-levels texsubimage-levels.c common.c)
 piglit_add_executable(arb_texture_view-texture-immutable-levels texture-immutable-levels.c)
+piglit_add_executable(arb_texture_view-bug-layers-image bug-layers-image.c common.c)
 
 # vim: ft=cmake:
