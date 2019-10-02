@@ -1,14 +1,19 @@
 [require]
-GLSL >= 4.50
+GLSL >= 3.30
+GL_EXT_demote_to_helper_invocation
+GL_ARB_shader_atomic_counters
+GL_ARB_shader_atomic_counter_ops
+GL_ARB_derivative_control
 
 [vertex shader passthrough]
 
 [fragment shader]
-#version 450
+#version 330
 
 #extension GL_EXT_demote_to_helper_invocation : require
 #extension GL_ARB_shader_atomic_counters: require
 #extension GL_ARB_shader_atomic_counter_ops: require
+#extension GL_ARB_derivative_control: require
 
 layout(binding = 0) uniform atomic_uint written_by_demoted;
 layout(binding = 0) uniform atomic_uint written_by_non_demoted;
@@ -35,11 +40,11 @@ void main()
 		/* Because every invocation here is demoted, we don't
 		 * expect this to take effect.
 		 */
-		atomicCounterExchangeARB(written_by_demoted, 1);
+		atomicCounterExchangeARB(written_by_demoted, 1u);
 	}
 
 	/* Non demoted will have effect here, verify that we have some. */
-	atomicCounterExchangeARB(written_by_non_demoted, 1);
+	atomicCounterExchangeARB(written_by_non_demoted, 1u);
 
 	/* If we used discard instead of demote, these would be undefined. */
 	vec2 dx = dFdxFine(gl_FragCoord.xy);
