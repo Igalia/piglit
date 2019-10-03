@@ -1,10 +1,11 @@
 [require]
-GLSL >= 1.30
+GLSL >= 1.40
+GL_EXT_demote_to_helper_invocation
 
 [vertex shader passthrough]
 
 [fragment shader]
-#version 130
+#version 140
 #extension GL_EXT_demote_to_helper_invocation : enable
 
 void main()
