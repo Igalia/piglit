@@ -2245,6 +2245,7 @@ with profile.test_list.group_manager(
     g(['cubemap', 'npot', 'pbo'])
     g(['fbo-pbo-readpixels-small'], run_concurrent=False)
     g(['pbo-drawpixels'], run_concurrent=False)
+    g(['pbo-getteximage'], run_concurrent=False)
     g(['pbo-read-argb8888'], run_concurrent=False)
     g(['pbo-readpixels-small'], run_concurrent=False)
     g(['pbo-teximage'], run_concurrent=False)
