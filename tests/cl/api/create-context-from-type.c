@@ -252,7 +252,7 @@ piglit_cl_test(const int argc,
 		test(multiple_platform_context_properties, CL_DEVICE_TYPE_ALL,
 		     NULL, NULL,
 		     CL_INVALID_PROPERTY, &result,
-		     "Trigger CL_INVALID_PROPERTY if the same property name is pecified more than once");
+		     "Trigger CL_INVALID_PROPERTY if the same property name is specified more than once");
 	}
 #endif
 
