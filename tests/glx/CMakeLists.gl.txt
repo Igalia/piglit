@@ -83,7 +83,10 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	piglit_add_executable (glx-buffer-age glx-buffer-age.c)
 
 	piglit_add_executable (glx-string-sanity glx-string-sanity.c)
-	piglit_add_executable (glx-egl-switch-context glx-egl-switch-context.c)
+	if(${PIGLIT_BUILD_GLES1_TESTS} OR ${PIGLIT_BUILD_GLES2_TESTS} OR ${PIGLIT_BUILD_GLES3_TESTS})
+		piglit_add_executable (glx-egl-switch-context glx-egl-switch-context.c)
+	endif()
+
 ENDIF(PIGLIT_BUILD_GLX_TESTS)
 
 # vim: ft=cmake:
