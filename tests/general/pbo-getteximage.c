@@ -306,7 +306,8 @@ piglit_init(int argc, char **argv)
 	pass &= test_getteximage(GL_TEXTURE_2D_ARRAY, 2, 2, 2, pixels);
 	pass &= test_getteximage(GL_TEXTURE_3D, 2, 2, 2, pixels);
 	pass &= test_getteximage(GL_TEXTURE_CUBE_MAP, 2, 2, 0, pixels);
-	pass &= test_getteximage(GL_TEXTURE_CUBE_MAP_ARRAY, 2, 2, 12, pixels);
+	if (piglit_is_extension_supported("GL_ARB_texture_cube_map_array"))
+		pass &= test_getteximage(GL_TEXTURE_CUBE_MAP_ARRAY, 2, 2, 12, pixels);
 
 	pass &= test_gettexturesubimage(GL_TEXTURE_1D, 2, 0, 0, pixels);
 	pass &= test_gettexturesubimage(GL_TEXTURE_1D_ARRAY, 2, 2, 0, pixels);
