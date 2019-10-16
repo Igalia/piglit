@@ -5103,5 +5103,10 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'AMD_compressed_atc_texture')) as g:
     g(['amd_compressed_atc_texture-miptree'], 'miptree')
 
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'OES_EGL_image_external_essl3')) as g:
+    g(['oes_egl_image_external_essl3'])
+
 if platform.system() == 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))
