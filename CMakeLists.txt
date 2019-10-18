@@ -431,7 +431,7 @@ endif(HAVE_LIBCACA)
 endif(GBM_FOUND)
 
 if(PIGLIT_USE_WAFFLE AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	pkg_check_modules(EGL egl>=11.0)
+	pkg_check_modules(EGL egl)
 endif()
 
 if(EGL_FOUND)
