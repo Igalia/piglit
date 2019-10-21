@@ -48,7 +48,7 @@ draw(Display *dpy)
 	float green[] = {0.0, 1.0, 0.0, 0.0};
 	GLboolean pass = GL_TRUE;
 	GLXWindow glxwin_one, glxwin_two;
-	GLXFBConfig *config;
+	GLXFBConfig config;
 
 	config = piglit_glx_get_fbconfig_for_visinfo(dpy, visinfo);
 
