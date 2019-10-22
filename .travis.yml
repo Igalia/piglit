@@ -26,6 +26,8 @@ matrix:
       env: TOX_ENV="py36-{generator,noaccel,accel-nix,streams}"
     - python: 3.7
       env: TOX_ENV="py37-{generator,noaccel,accel-nix,streams}"
+    - python: 3.8
+      env: TOX_ENV="py38-{generator,noaccel,accel-nix,streams}"
 
 install:
   - |
