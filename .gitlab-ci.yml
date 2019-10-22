@@ -17,6 +17,7 @@ variables:
   DEBIAN_TAG: "2019-10-20"
   DEBIAN_VERSION: buster-slim
   DEBIAN_IMAGE: "$CI_REGISTRY_IMAGE/debian/$DEBIAN_VERSION:$DEBIAN_TAG"
+  GIT_DEPTH: 100
 
 include:
   - project: 'wayland/ci-templates'
