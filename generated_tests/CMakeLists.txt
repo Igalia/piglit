@@ -221,8 +221,10 @@ piglit_make_generated_tests(
 	templates/gen_intel_shader_integer_functions2_tests/addSaturate.shader_test.mako
 	templates/gen_intel_shader_integer_functions2_tests/countLeadingZeros.shader_test.mako
 	templates/gen_intel_shader_integer_functions2_tests/multiply32x16.shader_test.mako
-	templates/gen_intel_shader_integer_functions2_tests/subtractSaturate.shader_test.mako
-	)
+	templates/gen_intel_shader_integer_functions2_tests/subtractSaturate.shader_test.mako)
+piglit_make_generated_tests(
+	inout_64bit.list
+	gen_inout_64bit_tests.py)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -291,6 +293,7 @@ add_custom_target(gen-gl-tests
 			variable_index_write_tests.list
 			vs_in_fp64.list
 			gpu_shader4_tests.list
+			inout_64bit.list
 )
 
 # Create a custom target for generating OpenCL tests
