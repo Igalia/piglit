@@ -21,6 +21,7 @@ apt-get dist-upgrade -y
 
 apt-get install -y \
   bison \
+  ccache \
   cmake \
   flex \
   freeglut3-dev \

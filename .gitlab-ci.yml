@@ -14,7 +14,7 @@
 # repository's registry will be used there as well.
 variables:
   UPSTREAM_REPO: mesa/piglit
-  DEBIAN_TAG: "2019-10-20"
+  DEBIAN_TAG: "2019-10-22"
   DEBIAN_VERSION: buster-slim
   DEBIAN_IMAGE: "$CI_REGISTRY_IMAGE/debian/$DEBIAN_VERSION:$DEBIAN_TAG"
   GIT_DEPTH: 100
@@ -58,10 +58,24 @@ debian:
 
 # BUILD
 
+# Use ccache transparently, and print stats before/after
+.use-ccache:
+  variables:
+    CC: /usr/lib/ccache/gcc
+    CXX: /usr/lib/ccache/g++
+    CCACHE_COMPILERCHECK: content
+    CCACHE_DIR: /cache/piglit/ccache
+  before_script:
+    - export CCACHE_BASEDIR="$PWD"
+    - ccache --show-stats
+  after_script:
+    - ccache --show-stats
+
 build:
   stage: build
   extends:
     - .use-debian
+    - .use-ccache
   script:
     - cmake .
       -D CMAKE_BUILD_TYPE=Debug
