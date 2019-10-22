@@ -54,11 +54,17 @@ DOUBLE_TYPES = [
     "dmat4x2", "dmat4x3", "dmat4"
 ]
 
+INT64_TYPES = [
+    "int64_t", "uint64_t",
+    "i64vec2", "i64vec3", "i64vec4",
+    "u64vec2", "u64vec3", "u64vec4"
+]
+
 ALL400_TYPES = ALL130_TYPES + DOUBLE_TYPES
 
 # All known types, including the redundant NxN matrix types.
 ALL_TYPES = [ "mat2x2",  "mat3x3",  "mat4x4",
-             "dmat2x2", "dmat3x3", "dmat4x4"] + ALL400_TYPES
+              "dmat2x2", "dmat3x3", "dmat4x4"] + ALL400_TYPES + INT64_TYPES
 
 def align(offset, alignment):
     return ((offset + alignment - 1) / alignment) * alignment
@@ -66,7 +72,8 @@ def align(offset, alignment):
 
 def isscalar(type):
     """Return true if the type is a known scalar type from any GLSL version."""
-    return type in ["float", "bool", "int", "uint", "double"]
+    return type in ["float", "bool", "int", "uint", "double", "int64_t",
+                    "uint64_t"]
 
 
 def isvector(type):
@@ -75,7 +82,9 @@ def isvector(type):
                     "ivec2", "ivec3", "ivec4",
                     "uvec2", "uvec3", "uvec4",
                     "bvec2", "bvec3", "bvec4",
-                    "dvec2", "dvec3", "dvec4"]
+                    "dvec2", "dvec3", "dvec4",
+                    "i64vec2", "i64vec3", "i64vec4",
+                    "u64vec2", "u64vec3", "u64vec4"]
 
 
 def ismatrix(type):
@@ -148,7 +157,7 @@ def basic_machine_units(type):
     if type in ["float", "bool", "int", "uint"]:
         return 4
 
-    if type == "double":
+    if type in ["double", "int64_t", "uint64_t"]:
         return 8
 
     raise Exception("Non-scalar type {}".format(type))
@@ -186,7 +195,11 @@ def vector_base_type(type):
     if not isvector(type):
         raise Exception("Non-vector type {}".format(type))
 
-    if type[0] == 'v':
+    if type[0:1] == "i6":
+        return "int64_t"
+    elif type[0:1] == "u6":
+        return "uint64_t"
+    elif type[0] == 'v':
         return "float"
     elif type[0] == 'i':
         return "int"
@@ -714,9 +727,9 @@ def random_data(type, name, offset):
     if isscalar(type):
         h = hash_string("{}@{}".format(offset, name))
 
-        if type == "int":
+        if type == "int" or type == "int64_t":
             return str(h - 0x7fffffff)
-        elif type == "uint":
+        elif type == "uint" or type == "uint64_t":
             return str(h)
         elif type == "bool":
             return str(int((h & 8) == 0))
@@ -804,6 +817,10 @@ def scalar_derp(type, name, data):
         return "{} != {}u".format(name, data)
     elif type == "int":
         return "{} != {}".format(name, data)
+    elif type == "uint64_t":
+        return "{} != {}ul".format(name, data)
+    elif type == "int64_t":
+        return "{} != {}l".format(name, data)
     elif type == "float":
         # Not all implementations support the bit-cast operators that are used
         # to do bit-exact comparisons.  For this reason float_match needs the
@@ -1395,25 +1412,25 @@ class packing_rules(object):
         if type in ["float", "bool", "int", "uint"]:
             return 4
 
-        if type == "double":
+        if type in ["double", "int64_t", "uint64_t"]:
             return 8
 
         if type in ["vec2", "bvec2", "ivec2", "uvec2"]:
             return 2 * 4
 
-        if type == "dvec2":
+        if type in ["dvec2", "i64vec2", "u64vec2"]:
             return 2 * 8
 
         if type in ["vec3", "bvec3", "ivec3", "uvec3"]:
             return 3 * 4
 
-        if type == "dvec3":
+        if type in ["dvec3", "i64vec3", "u64vec3"]:
             return 3 * 8
 
         if type in ["vec4", "bvec4", "ivec4", "uvec4"]:
             return 4 * 4
 
-        if type == "dvec4":
+        if type in ["dvec4", "i64vec4", "u64vec4"]:
             return 4 * 8
 
         if "mat" in type:
@@ -1684,10 +1701,20 @@ class block_member(object):
         'ivec3': "GL_INT_VEC3",
         'ivec4': "GL_INT_VEC4",
 
-        'uint':  "GL_UNSIGNED_INT",
-        'uvec2': "GL_UNSIGNED_INT_VEC2",
-        'uvec3': "GL_UNSIGNED_INT_VEC3",
-        'uvec4': "GL_UNSIGNED_INT_VEC4",
+        'int64_t': "GL_INT64_ARB",
+        'i64vec2': "GL_INT64_VEC2_ARB",
+        'i64vec3': "GL_INT64_VEC3_ARB",
+        'i64vec4': "GL_INT64_VEC4_ARB",
+
+        'uint':  "GL_UNSIGNED_INT64_ARB",
+        'uvec2': "GL_UNSIGNED_INT64_VEC2_ARB",
+        'uvec3': "GL_UNSIGNED_INT64_VEC3_ARB",
+        'uvec4': "GL_UNSIGNED_INT64_VEC4_ARB",
+
+        'uint64_t': "GL_UNSIGNED_INT64_ARB",
+        'u64vec2': "GL_UNSIGNED_INT64_VEC2_ARB",
+        'u64vec3': "GL_UNSIGNED_INT64_VEC3_ARB",
+        'u64vec4': "GL_UNSIGNED_INT64_VEC4_ARB",
 
         'bool':  "GL_BOOL",
         'bvec2': "GL_BOOL_VEC2",
