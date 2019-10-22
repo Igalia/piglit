@@ -73,7 +73,7 @@ int main(int argc, char **argv)
         piglit_report_result(PIGLIT_SKIP);
 
     ctx_glx = glXCreateContext(dpy, visinfo, NULL, True);
-    ctx_egl = eglCreateContext(dpy_egl, EGL_NO_CONFIG_MESA, EGL_NO_CONTEXT, NULL);
+    ctx_egl = eglCreateContext(dpy_egl, EGL_NO_CONFIG_KHR, EGL_NO_CONTEXT, NULL);
 
     glXMakeContextCurrent(dpy, glxWin, glxWin, ctx_glx);
     eglMakeCurrent(dpy_egl, EGL_NO_SURFACE, EGL_NO_SURFACE, ctx_egl);

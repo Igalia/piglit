@@ -37,11 +37,6 @@
 #include "piglit-util-gl.h"
 #include "piglit-util-egl.h"
 
-#ifndef EGL_MESA_configless_context
-#define EGL_MESA_configless_context 1
-#define EGL_NO_CONFIG_MESA			((EGLConfig)0)
-#endif
-
 struct state {
 	Display *dpy;
 	EGLDisplay egl_dpy;
@@ -365,7 +360,7 @@ main(int argc, char **argv)
 	}
 
 	state.ctx = eglCreateContext(state.egl_dpy,
-				     EGL_NO_CONFIG_MESA,
+				     EGL_NO_CONFIG_KHR,
 				     EGL_NO_CONTEXT,
 				     config_attribs);
 	if (state.ctx == EGL_NO_CONTEXT) {
