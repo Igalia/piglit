@@ -1,0 +1,55 @@
+# Test proper behavior of the isnan(vec2) function.
+#
+# Note: testing behavior if isnan() is challenging because the GLSL
+# 1.30 spec does not explicitly define any circumstances under which
+# NaN values are required to be generated.  This test assumes that the
+# expression 0.0/0.0 produces a NaN value when evaluated in the
+# shader.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+uniform float numerator = 0.0;
+uniform float denominator = 0.0;
+uniform float a = -99999.0;
+uniform float c =  99999.0;
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+void main()
+{
+   gl_Position = piglit_vertex;
+
+   float b = numerator / denominator;
+
+   /* We're attempting to trick the optimizer.  We're assuming that
+    * isnan is implemented as x != x.  It's possible that an optimizer
+    * might replace x == x && x < 0 with just x < 0 because the result
+    * is the same.  Since nothing here is marked precise, it's also
+    * possible that the optimizer might replace x < 0 && 0 < y with 0
+    * < min(y, -x).  It is likely that min(y, -x) will produce y when x
+    * is NaN, and that final result is incorrect.
+    */
+   if (!isnan(b) && b < 0 && 0 < a)
+      color = vec4(1., 0., 0., 1.);
+   else
+      color = vec4(0., 1., 0., 1.);
+}
+
+[fragment shader]
+#version 130
+
+in vec4 color;
+out vec4 piglit_fragcolor;
+
+void main()
+{
+   piglit_fragcolor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 1.0 0.0 1.0
