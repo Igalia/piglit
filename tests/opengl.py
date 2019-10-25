@@ -4856,6 +4856,7 @@ with profile.test_list.group_manager(
     g(['ext_direct_state_access-compressedmultiteximage',
        'GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT'],
       'compressedmultiteximage GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT')
+    g(['ext_direct_state_access-vao'], 'vao')
 
 with profile.test_list.group_manager(
         PiglitGLTest,

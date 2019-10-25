@@ -21,4 +21,5 @@ piglit_add_executable (ext_direct_state_access-framebuffer framebuffer.c)
 piglit_add_executable (ext_direct_state_access-compressedmultiteximage compressedmultiteximage.c)
 piglit_add_executable (ext_direct_state_access-named-program named-program.c)
 piglit_add_executable (ext_direct_state_access-generatetexturemipmap generatetexturemipmap.c)
+piglit_add_executable (ext_direct_state_access-vao vao.c)
 # vim: ft=cmake:
