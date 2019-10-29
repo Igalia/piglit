@@ -33,6 +33,8 @@ import shutil
 import sys
 import tempfile
 import traceback
+import os
+import zlib
 
 import mako
 from mako.lookup import TemplateLookup
@@ -50,9 +52,16 @@ __all__ = [
     'feat'
 ]
 
+# Use the source file location to compute _TEMP_DIR,
+# because we don't want to share _TEMP_DIR between multiple
+# source code location of piglit.
+# See https://gitlab.freedesktop.org/mesa/piglit/issues/26
+p = abs(zlib.crc32(os.path.dirname(__file__).encode()))
+
 _TEMP_DIR = os.path.join(
     tempfile.gettempdir(),
     getpass.getuser(),
+    str(p),
     'python-{}'.format(sys.version.split()[0]),
     'mako-{}'.format(mako.__version__),
     'summary',
