@@ -26,6 +26,8 @@ import abc
 import collections
 import struct
 import sys
+
+from six.moves import range
 from textwrap import dedent
 from mako.template import Template
 
@@ -236,7 +238,7 @@ def select_basic_type(types, names):
 def generate_struct_of_basic_types(types, names):
     """Return a sequence of random types with unique field names."""
     return [select_basic_type(types, names)
-            for i in xrange(0, random.randint(1,12))]
+            for i in range(0, random.randint(1,12))]
 
 
 def generate_member_from_description(description, builtin_types, names):
@@ -438,7 +440,7 @@ def iterate_struct_array_recursive(field_type,
 
     element_t = array_base_type(field_type)
 
-    for i in xrange(array_elements(field_type)):
+    for i in range(array_elements(field_type)):
         name_from_API_with_index = "{}[{}]".format(name_from_API, i)
         name_from_shader_with_index = "{}[{}]".format(name_from_shader, i)
 
@@ -727,14 +729,14 @@ def random_data(type, name, offset):
         scalar = vector_base_type(type)
 
         x = [random_data(scalar, name, offset + (i * 3))
-             for i in xrange(vector_size(type))]
+             for i in range(vector_size(type))]
         return " ".join(x)
 
     if ismatrix(type):
         r, c = matrix_dimensions(type)
 
         x = [random_data("float", name, offset + (i * 7))
-             for i in xrange(r * c)]
+             for i in range(r * c)]
         return " ".join(x)
 
 
@@ -833,7 +835,7 @@ def vector_derp(type, name, data):
     return [scalar_derp(scalar,
                  "{}.{}".format(name, "xyzw"[i]),
                  data[i])
-            for i in xrange(vector_size(type))]
+            for i in range(vector_size(type))]
 
 
 def matrix_derp(type, name, data):
@@ -849,7 +851,7 @@ def matrix_derp(type, name, data):
 
     data_pairs = []
 
-    for i in xrange(c):
+    for i in range(c):
         data_pairs.extend(vector_derp(
                 column_type,
                 "{}[{}]".format(name, i),
@@ -917,7 +919,7 @@ def generate_array_data_pairs(name, api_name, element_type, row_major, offset, p
 
     astride = packing.array_stride(element_type, row_major)
 
-    for i in xrange(array_elements(element_type)):
+    for i in range(array_elements(element_type)):
 
         name_with_index = "{}[{}]".format(name, i)
         api_name_with_index = "{}[{}]".format(api_name, i)
@@ -1207,7 +1209,7 @@ def emit_shader_test(blocks, packing, glsl_version, extensions):
 
     t = Template(dedent("""\
     [require]
-    GLSL >= ${glsl_version / 100}.${glsl_version % 100}
+    GLSL >= ${glsl_version // 100}.${glsl_version % 100}
     % for ext in extensions:
     ${ext}
     % endfor
@@ -1279,7 +1281,7 @@ def emit_shader_test(blocks, packing, glsl_version, extensions):
          */
         bool pass = true;
 
-    % for i in xrange(len(checkers)):
+    % for i in range(len(checkers)):
         % if i % 5 == 0:
         if (${checkers[i]})
             pass = false;
