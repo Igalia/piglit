@@ -21,7 +21,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-"""Generate in/out fp64 tests."""
+"""Generate in/out fp64 compilation tests."""
 
 import argparse
 import os
@@ -72,28 +72,6 @@ def generate_compilation_tests(type_name, shader, ver, names_only):
                     extra_params=',0.0' if type_name in ['dvec2', 'dvec3'] else ''))
 
 
-def generate_execution_tests(type_name, ver, names_only):
-    """Generate in/out shader runner tests."""
-
-    assert isinstance(type_name, str)
-    assert isinstance(ver, str)
-    assert isinstance(names_only, bool)
-
-    filename = os.path.join(
-        get_dir_name(ver, 'execution'),
-        'vs-out-fs-in-{0}.shader_test'.format(type_name))
-
-    print(filename)
-
-    if not names_only:
-        with open(filename, 'w') as test_file:
-            test_file.write(TEMPLATES.get_template(
-                'template.shader_test.mako').render_unicode(
-                    glsl_version='{}.{}'.format(ver[0], ver[1:]),
-                    glsl_version_int=ver,
-                    type_name=type_name))
-
-
 def all_compilation_tests(names_only):
     """Creates all the combinations for in/out compilation tests."""
 
@@ -112,25 +90,11 @@ def all_compilation_tests(names_only):
         yield t_name, shader, ver, names_only
 
 
-def all_execution_tests(names_only):
-    """Creates all the combinations for in/out shader runner tests."""
-
-    assert isinstance(names_only, bool)
-    type_names = ['double', 'dvec2', 'dvec3', 'dvec4']
-    glsl_ver = ['150', '400']
-    if not names_only:
-        for ver in glsl_ver:
-            utils.safe_makedirs(get_dir_name(ver, 'execution'))
-
-    for t_name, ver in itertools.product(type_names, glsl_ver):
-        yield t_name, ver, names_only
-
-
 def main():
     """Main function."""
 
     parser = argparse.ArgumentParser(
-        description="Generate in/out tests for fp64")
+        description="Generate in/out compilation tests for fp64")
     parser.add_argument(
         '--names-only',
         dest='names_only',
@@ -141,9 +105,6 @@ def main():
 
     for test_args in all_compilation_tests(args.names_only):
         generate_compilation_tests(*test_args)
-
-    for test_args in all_execution_tests(args.names_only):
-        generate_execution_tests(*test_args)
 
 
 if __name__ == '__main__':
