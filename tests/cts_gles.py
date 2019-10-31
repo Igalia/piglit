@@ -72,13 +72,13 @@ class DEQPCTSTest(deqp.DEQPBaseTest):
 profile = deqp.make_profile(  # pylint: disable=invalid-name
     itertools.chain(
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'ES2-CTS-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GLES2-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'ES3-CTS-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GLES3-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'ES31-CTS-cases.txt', _EXTRA_ARGS)),
+            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GLES31-cases.txt', _EXTRA_ARGS)),
         deqp.iter_deqp_test_cases(
-            deqp.gen_caselist_txt(_CTS_BIN, 'ESEXT-CTS-cases.txt',
+            deqp.gen_caselist_txt(_CTS_BIN, 'KHR-GLESEXT-cases.txt',
                                   _EXTRA_ARGS)),
     ),
     DEQPCTSTest)
