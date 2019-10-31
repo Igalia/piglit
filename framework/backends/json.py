@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016-2017 Intel Corporation
+# Copyright (c) 2014, 2016-2017, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 
 """ Module providing json backend for piglit """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import collections
 import functools
 import os
@@ -36,14 +33,13 @@ try:
 except ImportError:
     import json
 
-import six
 try:
     import jsonstreams
     _STREAMS = True
 except ImportError:
     _STREAMS = False
 
-from framework import status, results, exceptions, compat
+from framework import status, results, exceptions
 from .abstract import FileBackend, write_compressed
 from .register import Registry
 from . import compression
@@ -70,7 +66,7 @@ def piglit_encoder(obj):
 
     """
     if isinstance(obj, status.Status):
-        return six.text_type(obj)
+        return str(obj)
     elif isinstance(obj, set):
         return list(obj)
     elif hasattr(obj, 'to_json'):
@@ -182,10 +178,10 @@ class JSONBackend(FileBackend):
                     s.write('__type__', 'TestrunResult')
                     with open(os.path.join(self._dest, 'metadata.json'),
                               'r') as n:
-                        s.iterwrite(six.iteritems(json.load(n, object_pairs_hook=collections.OrderedDict)))
+                        s.iterwrite(json.load(n, object_pairs_hook=collections.OrderedDict).items())
 
                     if metadata:
-                        s.iterwrite(six.iteritems(metadata))
+                        s.iterwrite(metadata.items())
 
                     with s.subobject('tests') as t:
                         for test in file_list:
@@ -197,7 +193,7 @@ class JSONBackend(FileBackend):
                                 except ValueError:
                                     continue
 
-                                t.iterwrite(six.iteritems(a))
+                                t.iterwrite(a.items())
 
 
         # Delete the temporary files
@@ -267,7 +263,7 @@ def _load(results_file):
         raise exceptions.PiglitFatalError(
             'While loading json results file: "{}",\n'
             'the following error occurred:\n{}'.format(results_file.name,
-                                                       six.text_type(e)))
+                                                       str(e)))
 
     return result
 
@@ -371,7 +367,7 @@ def _update_seven_to_eight(result):
     This value is used for both TestResult.time and TestrunResult.time_elapsed.
 
     """
-    for test in compat.viewvalues(result['tests']):
+    for test in result['tests'].values():
         test['time'] = {'start': 0.0, 'end': float(test['time']),
                         '__type__': 'TimeAttribute'}
 
@@ -391,7 +387,7 @@ def _update_eight_to_nine(result):
     null rather than a single integer or null.
 
     """
-    for test in compat.viewvalues(result['tests']):
+    for test in result['tests'].values():
         if 'pid' in test:
             test['pid'] = [test['pid']]
         else:

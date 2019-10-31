@@ -21,12 +21,7 @@
 
 """ Tests for the backend package """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 import pytest
-import six
 
 from framework import backends
 
@@ -104,15 +99,15 @@ class TestLoad(object):
 
         p = tmpdir.join('foo.test_backend')
         p.write('foo')
-        test = backends.load(six.text_type(p))
-        assert [six.text_type(p)] == test
+        test = backends.load(str(p))
+        assert [str(p)] == test
 
     def test_unknown(self, tmpdir):
         p = tmpdir.join('foo.test_extension')
         p.write('foo')
 
         with pytest.raises(backends.BackendError):
-            backends.load(six.text_type(p))
+            backends.load(str(p))
 
     def test_interupted(self, tmpdir, mock_backend):  # pylint: disable=unused-argument,redefined-outer-name
         """backends.load: works for resuming (no extension known)."""
@@ -120,7 +115,7 @@ class TestLoad(object):
         with tmpdir.join('tests', '0.test_backend').open('w') as f:
             f.write('foo')
 
-        backends.load(six.text_type(tmpdir))
+        backends.load(str(tmpdir))
 
     def test_notimplemented(self, tmpdir, mocker):
         """backends.load(): An error is raised if a loader isn't properly
@@ -138,7 +133,7 @@ class TestLoad(object):
         p.write('foo')
 
         with pytest.raises(backends.BackendNotImplementedError):
-            backends.load(six.text_type(p))
+            backends.load(str(p))
 
     def test_trailing_dot(self, mocker):
         """framework.backends.load: handles the result name ending in '.'.
@@ -170,7 +165,7 @@ class TestLoad(object):
             f.write('foo')
 
         with pytest.raises(backends.BackendError):
-            backends.load(six.text_type(p))
+            backends.load(str(p))
 
 
 class TestSetMeta(object):

@@ -21,10 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 from framework.profile import TestProfile
 from framework.test import add_opencv_tests, add_oclconform_tests
 

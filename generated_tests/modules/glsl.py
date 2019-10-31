@@ -21,14 +21,7 @@
 
 """Provides helper classes for representing glsl data."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import functools
-
-import six
-
-import compat
 
 __all__ = [
     'GLSLESVersion',
@@ -74,7 +67,7 @@ class _Version(object):
 
     def __call__(self, ver):
         """Make a Version object, or provide one from the cache."""
-        assert isinstance(ver, six.text_type)
+        assert isinstance(ver, str)
 
         # Try to get an object from the cache, if that fails create a new one
         # and add it to the cache before returning it.
@@ -95,7 +88,6 @@ class _Version(object):
 Version = _Version()  # pylint: disable=invalid-name
 
 
-@compat.python_2_unicode_compatible  # pylint: disable=no-member
 @functools.total_ordering
 class GLSLVersion(object):
     """A Representation of an OpenGL Shading Language version.
@@ -152,7 +144,6 @@ class GLSLVersion(object):
         return '{:.2f}'.format(float(self))
 
 
-@compat.python_2_unicode_compatible  # pylint: disable=no-member
 @functools.total_ordering
 class GLSLESVersion(object):
     """Represents a GLSL ES version.

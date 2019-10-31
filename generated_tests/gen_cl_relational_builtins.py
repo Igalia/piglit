@@ -24,7 +24,6 @@
 #          Aaron Watry  <awatry@gmail.com>
 #
 
-from __future__ import print_function, division, absolute_import
 import os
 
 from genclbuiltins import gen, TRUE, NEGNAN

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,13 @@
 
 """Tests for the oglconform integration."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
+import io
 try:
     import mock
 except ImportError:
     from unittest import mock
 
 import pytest
-from six.moves import cStringIO as StringIO
 
 from framework import grouptools
 from framework import status
@@ -48,7 +45,7 @@ class TestMakeProfile(object):
 
     def test_basic(self, mocker):
         """tests.oglconform._make_profile: Adds test names"""
-        io_ = mocker.Mock(wraps=StringIO(u'group test.name\n'))
+        io_ = mocker.Mock(wraps=io.StringIO(u'group test.name\n'))
         io_.name = mocker.Mock()
 
         mock_file = mocker.MagicMock()
@@ -66,7 +63,7 @@ class TestMakeProfile(object):
 
     def test_missing(self, mocker):
         """tests.oglconform._make_profile: handles missing groups"""
-        io_ = mocker.Mock(wraps=StringIO(u'test.name\n'))
+        io_ = mocker.Mock(wraps=io.StringIO(u'test.name\n'))
         io_.name = mocker.Mock()
 
         mock_file = mocker.MagicMock()

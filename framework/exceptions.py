@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015 Intel Corporation
+# Copyright (c) 2015, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,8 @@
 
 """Exception and error classes for piglit, and exception handlers."""
 
-from __future__ import print_function, absolute_import, division
 import sys
 import functools
-
-from framework import compat
 
 __all__ = [
     'PiglitInternalError',
@@ -64,7 +61,6 @@ def handler(func):
     return _inner
 
 
-@compat.python_2_unicode_compatible
 class PiglitException(Exception):
     """Class for non-error exceptions.
 
@@ -73,11 +69,10 @@ class PiglitException(Exception):
 
     """
     def __str__(self):
-        return (u'An internal exception that should have been handled was not:'
+        return ('An internal exception that should have been handled was not:'
                 '\n{}'.format(super(PiglitException, self).__str__()))
 
 
-@compat.python_2_unicode_compatible
 class PiglitInternalError(Exception):
     """Class for errors in piglit.
 
@@ -85,7 +80,7 @@ class PiglitInternalError(Exception):
 
     """
     def __str__(self):
-        return u'An internal error occurred:\n{}'.format(
+        return 'An internal error occurred:\n{}'.format(
             super(PiglitInternalError, self).__str__())
 
 

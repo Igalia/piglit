@@ -29,7 +29,6 @@ import os
 import sys
 import re
 import io
-import six
 
 from framework import exceptions
 from .base import TestIsSkip
@@ -56,10 +55,10 @@ _FORCE_DESKTOP_VERSION = os.environ.get('PIGLIT_FORCE_GLSLPARSER_DESKTOP', False
 
 def _is_gles_version(version):
     """Return True if version is es, otherwsie false."""
-    assert not isinstance(version, six.binary_type), \
+    assert not isinstance(version, bytes), \
         '{}({})'.format(version, type(version))
 
-    if isinstance(version, six.text_type):
+    if isinstance(version, str):
         # GLES 3+ versions should have "es" appended, even though
         # glslparsertest doesn't require them. If the version ends in "es" then
         # it is a GLES test for sure.
@@ -109,7 +108,7 @@ class Parser(object):
             self.command = self.get_command(filepath, installpath)
         except GLSLParserInternalError as e:
             raise exceptions.PiglitFatalError(
-                'In file "{}":\n{}'.format(filepath, six.text_type(e)))
+                'In file "{}":\n{}'.format(filepath, str(e)))
 
         self.set_skip_conditions()
 

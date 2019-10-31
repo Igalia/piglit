@@ -27,8 +27,6 @@ import os
 import numpy as np
 import random
 
-import six
-
 from templates import template_file
 from modules import utils
 
@@ -759,7 +757,7 @@ def main():
                            'execution', 'built-in-functions')
     utils.safe_makedirs(dirname)
 
-    for func, attrib in six.iteritems(FUNCS):
+    for func, attrib in FUNCS.items():
 
         TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
                                  attrib['template'])

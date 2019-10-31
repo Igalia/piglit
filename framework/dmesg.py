@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2013-2016 Intel Corporation
+# Copyright (c) 2013-2016, 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -36,17 +36,12 @@ dmesg implementation for their OS.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import abc
 import gzip
 import re
 import subprocess
 import sys
 import warnings
-
-import six
 
 from framework import exceptions
 
@@ -58,8 +53,7 @@ __all__ = [
 ]
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BaseDmesg(object):
+class BaseDmesg(metaclass=abc.ABCMeta):
     """ Abstract base class for Dmesg derived objects
 
     This provides the bases of the constructor, and most subclasses should call
@@ -144,7 +138,7 @@ class BaseDmesg(object):
             result.result = replace(result.result)
 
             # Replace the results of any subtests
-            for key, value in six.iteritems(result.subtests):
+            for key, value in result.subtests.items():
                 result.subtests[key] = replace(value)
 
             # Add the dmesg values to the result

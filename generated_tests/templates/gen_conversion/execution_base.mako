@@ -3,7 +3,6 @@
 <%
     (glsl_version, glsl_version_int) = self.versioning()
 %>\
-<%! from six.moves import range %>\
 [require]
 GLSL >= ${glsl_version}
 % for extension in extensions:

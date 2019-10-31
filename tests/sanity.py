@@ -30,9 +30,6 @@ hardware or software stacks the "gpu" or "quick" profiles are probably more
 appropriate.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
 
 from framework import grouptools

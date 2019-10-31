@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,6 @@ Tests that take more than ~10 seconds should be marked as "slow" and tests that
 take more than ~30 seconds should be marked as "very_slow".
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import importlib
 try:
     import mock
@@ -82,7 +79,7 @@ import pytest
 ])
 def test_generators(name, tmpdir):
     """Teat each generator."""
-    mod = importlib.import_module(name)
+    mod = importlib.import_module('generated_tests.' + name)
     tmpdir.chdir()
 
     # Some tests do checks for sys.argv, so mock that out. Also mock out

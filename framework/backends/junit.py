@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014-2016 Intel Corporation
+# Copyright (c) 2014-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 
 """ Module implementing a JUnitBackend for piglit """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os.path
 import shutil
 try:
@@ -34,8 +31,6 @@ try:
     import simplejson as json
 except ImportError:
     import json
-
-import six
 
 from framework import grouptools, results, exceptions
 from framework.core import PIGLIT_CONFIG
@@ -146,7 +141,7 @@ class JUnitWriter(object):
 
         # Add the piglit type to the failure result
         if res is not None:
-            res.attrib['type'] = six.text_type(result)
+            res.attrib['type'] = str(result)
 
     def _make_root(self, testname, classname, data):
         """Creates and returns the root element."""
@@ -202,7 +197,7 @@ class JUnitWriter(object):
 
         self._make_result(element, data.result, expected_result)
 
-        f.write(six.text_type(etree.tostring(element).decode('utf-8')))
+        f.write(str(etree.tostring(element).decode('utf-8')))
 
 
 class JUnitSubtestWriter(JUnitWriter):
@@ -220,13 +215,13 @@ class JUnitSubtestWriter(JUnitWriter):
             element = etree.Element('testsuite',
                                     name=testname,
                                     time=str(data.time.total),
-                                    tests=six.text_type(len(data.subtests)))
-            for test, result in six.iteritems(data.subtests):
+                                    tests=str(len(data.subtests)))
+            for test, result in data.subtests.items():
                 etree.SubElement(element,
                                  'testcase',
                                  name=self._make_full_test_name(test),
                                  classname=testname,
-                                 status=six.text_type(result))
+                                 status=str(result))
 
         else:
             element = super(JUnitSubtestWriter, self)._make_root(
@@ -249,7 +244,7 @@ class JUnitSubtestWriter(JUnitWriter):
             out.text = data.command + '\n' + out.text
 
             if data.subtests:
-                for subname, result in six.iteritems(data.subtests):
+                for subname, result in data.subtests.items():
                     # replace special characters and make case insensitive
                     elem = element.find('.//testcase[@name="{}"]'.format(
                         self._make_full_test_name(subname)))
@@ -267,7 +262,7 @@ class JUnitSubtestWriter(JUnitWriter):
                               self._expected_result('{}.{}'.format(
                                   classname, testname).lower()))
 
-        f.write(six.text_type(etree.tostring(element).decode('utf-8')))
+        f.write(str(etree.tostring(element).decode('utf-8')))
 
 
 class JUnitBackend(FileBackend):

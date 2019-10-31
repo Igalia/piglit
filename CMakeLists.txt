@@ -227,20 +227,12 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 ENDIF()
 
 if (NOT Python_ADDITIONAL_VERSIONS)
-	set(Python_ADDITIONAL_VERSIONS 3.8 3.7 3.6 3.5 2.7)
+	set(Python_ADDITIONAL_VERSIONS 3.8 3.7 3.6)
 endif()
 find_package(PythonInterp REQUIRED)
 find_package(PythonSix 1.5.2 REQUIRED)
 find_package(PythonNumpy 1.7.0 REQUIRED)
-
-# CMake doesn't have a VERSION_GREATER_EQUAL function, at least as of 3.0,
-# And mako 1.0.2 contains bug fixes required for python 3.5 to work, so
-# the only solution (short of having a series of "OR" statements, is this)
-if (PYTHON_VERSION_STRING VERSION_GREATER 3.4.999999)
-	find_package(PythonMako 1.0.2 REQUIRED)
-else ()
-	find_package(PythonMako 0.8.0 REQUIRED)
-endif (PYTHON_VERSION_STRING VERSION_GREATER 3.4.999999)
+find_package(PythonMako 1.0.2 REQUIRED)
 
 find_package(bash-completion NO_MODULE)
 

@@ -28,9 +28,6 @@ that you have a group of tests you want to run, here are the names of those
 tests, and the Test instance.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import ast
 import collections
 import contextlib
@@ -43,8 +40,6 @@ import multiprocessing.dummy
 import os
 import re
 import xml.etree.cElementTree as et
-
-import six
 
 from framework import grouptools, exceptions, status
 from framework.dmesg import get_dmesg
@@ -134,7 +129,7 @@ class TestDict(collections.MutableMapping):
         file-systems.
         """
         # keys should be strings
-        if not isinstance(key, six.text_type):
+        if not isinstance(key, str):
             raise exceptions.PiglitFatalError(
                 "TestDict keys must be strings, but was {}".format(type(key)))
 
@@ -214,7 +209,7 @@ class TestDict(collections.MutableMapping):
         ...     g(['test'])
         ...     g(['power', 'test'], 'powertest')
         """
-        assert isinstance(group, six.string_types), type(group)
+        assert isinstance(group, str), type(group)
 
         def adder(args, name=None, override_class=None, **kwargs):
             """Helper function that actually adds the tests.
@@ -236,15 +231,14 @@ class TestDict(collections.MutableMapping):
                 assert isinstance(args, list) # //
                 name = ' '.join(args)
 
-            assert isinstance(name, six.string_types)
+            assert isinstance(name, str)
             lgroup = grouptools.join(group, name)
 
             class_ = override_class or test_class
 
             self[lgroup] = class_(
                 args,
-                **dict(itertools.chain(six.iteritems(default_args),
-                                       six.iteritems(kwargs))))
+                **dict(itertools.chain(default_args.items(), kwargs.items())))
 
         yield adder
 
@@ -397,7 +391,7 @@ class XMLProfile(object):
                     opts[n] = DummyTest(n, status.NOTRUN)
                 else:
                     opts[n] = alltests[n]
-            return six.iteritems(opts)
+            return opt.items()
         else:
             return iter(self._itertests())
 
@@ -456,7 +450,7 @@ class MetaProfile(object):
                     opts[n] = DummyTest(n, status.NOTRUN)
                 else:
                     opts[n] = alltests[n]
-            return six.iteritems(opts)
+            return opts.items()
         else:
             return iter(self._itertests())
 
@@ -529,7 +523,7 @@ class TestProfile(object):
         else:
             opts = self.test_list  # pylint: disable=redefined-variable-type
 
-        for k, v in self.filters.run(six.iteritems(opts)):
+        for k, v in self.filters.run(opts.items()):
             yield k, v
 
 

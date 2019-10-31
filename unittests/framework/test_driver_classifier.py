@@ -1,5 +1,6 @@
 # coding=utf-8
 # Copyright (c) 2016 Broadcom
+# Copyright © 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,17 +23,12 @@
 
 """Tests for the driver_classifier module."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 try:
     import mock
 except ImportError:
     from unittest import mock
 
 import pytest
-import six
 
 from framework import driver_classifier
 
@@ -65,7 +61,7 @@ class TestDriverClassifier(object):
             # Modern VC4 string
             ('Gallium 0.4 on VC4 V3D 2.1', ['vc4-2.1', 'vc4', 'mesa']),
         ],
-        ids=six.text_type)
+        ids=str)
     def test_renderer_categorization(self, renderer, categories):
         """Test that when given a certain renderer string, the correct
 
@@ -82,5 +78,5 @@ class TestDriverClassifier(object):
                                                b'sentinal\nand some other '
                                                b'stuff')):
             test.collect_glxinfo()
-        assert isinstance(test.renderer, six.text_type)
+        assert isinstance(test.renderer, str)
         assert test.renderer == 'sentinal'

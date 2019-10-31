@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2014-2016,2018 Intel Corporation
+# Copyright 2014-2016, 2018-2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,15 +19,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import abc
 import os
 import subprocess
-
-import six
-from six.moves import range
 
 from framework import core, grouptools, exceptions
 from framework import options
@@ -142,8 +136,7 @@ def iter_deqp_test_cases(case_file):
                     'deqp: {}:{}: ill-formed line'.format(case_file, i))
 
 
-@six.add_metaclass(abc.ABCMeta)
-class DEQPBaseTest(Test):
+class DEQPBaseTest(Test, metaclass=abc.ABCMeta):
     __RESULT_MAP = {
         "Pass": "pass",
         "Fail": "fail",
@@ -190,7 +183,7 @@ class DEQPBaseTest(Test):
         # otherwise this requires some break/else/continue madness
         for line in self.result.out.split('\n'):
             line = line.lstrip()
-            for k, v in six.iteritems(self.__RESULT_MAP):
+            for k, v in self.__RESULT_MAP.items():
                 if line.startswith(k):
                     self.result.result = v
                     return

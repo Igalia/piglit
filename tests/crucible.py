@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2014-2016 Intel Corporation
+# Copyright 2014-2016, 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,7 @@ upstream: https://gitlab.freedesktop.org/mesa/crucible/
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
-import six
 import subprocess
 import tempfile
 
@@ -66,7 +62,7 @@ class CrucibleTest(Test):
     def interpret_result(self):
         try:
             test = backends.junit.REGISTRY.load(self.__out_xml, 'none')
-            result = test.get_result(next(six.iterkeys(test.tests)))
+            result = test.get_result(next(test.tests.keys()))
             self.result.result = result.name
             super(CrucibleTest, self).interpret_result()
         except etree.ParseError:

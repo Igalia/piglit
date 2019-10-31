@@ -21,9 +21,6 @@
 
 """Tests for the Junit backend package."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
 import textwrap
 try:
@@ -36,7 +33,6 @@ except ImportError:
     from unittest import mock
 
 import pytest
-import six
 
 from framework import backends
 from framework import grouptools
@@ -91,7 +87,7 @@ class TestProtectedLoad(object):
         """
         p = tmpdir.join('foobar.xml')
         p.write(_XML)
-        test = backends.junit.REGISTRY.load(six.text_type(p), 'none')
+        test = backends.junit.REGISTRY.load(str(p), 'none')
         assert test.name == 'foobar'
 
     def test_folder_name(self, tmpdir):
@@ -101,7 +97,7 @@ class TestProtectedLoad(object):
         tmpdir.mkdir('foo')
         p = tmpdir.join('foo', 'results.xml')
         p.write(_XML)
-        test = backends.junit.REGISTRY.load(six.text_type(p), 'none')
+        test = backends.junit.REGISTRY.load(str(p), 'none')
 
         assert test.name == 'foo'
 
@@ -114,7 +110,7 @@ class TestProtectedLoad(object):
         def result(self, tmpdir):
             p = tmpdir.join('test.xml')
             p.write(_XML)
-            return backends.junit._load(six.text_type(p))
+            return backends.junit._load(str(p))
 
         def test_testrunresult(self, result):
             """backends.junit._load: returns a TestrunResult instance."""
@@ -182,7 +178,7 @@ class TestJUnitBackend(object):
             result.err = 'this is stderr'
             result.command = 'foo'
 
-            test = backends.junit.JUnitBackend(six.text_type(tmpdir))
+            test = backends.junit.JUnitBackend(str(tmpdir))
             test.initialize(shared.INITIAL_METADATA)
             with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
                 t(result)
@@ -205,13 +201,13 @@ class TestJUnitWriter(object):
         result.err = 'this is stderr'
         result.command = 'foo'
 
-        test = backends.junit.JUnitBackend(six.text_type(tmpdir))
+        test = backends.junit.JUnitBackend(str(tmpdir))
         test.initialize(shared.INITIAL_METADATA)
         with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
             t(result)
         test.finalize()
 
-        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = etree.parse(str(tmpdir.join('results.xml')))
         test_value = test_value.getroot()
 
         assert test_value.find('.//testcase').attrib['classname'] == \
@@ -231,7 +227,7 @@ class TestJUnitWriter(object):
             result.command = 'foo'
             result.pid = 1034
 
-            test = backends.junit.JUnitBackend(six.text_type(p))
+            test = backends.junit.JUnitBackend(str(p))
             test.initialize(shared.INITIAL_METADATA)
             with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
                 t(result)
@@ -241,7 +237,7 @@ class TestJUnitWriter(object):
                 t(result)
             test.finalize()
 
-            return six.text_type(p.join('results.xml'))
+            return str(p.join('results.xml'))
 
         def test_xml_well_formed(self, test_file):
             """backends.junit.JUnitBackend.write_test: produces well formed xml."""
@@ -272,14 +268,14 @@ class TestJUnitSubtestWriter(object):
         result.subtests['foo'] = 'pass'
         result.subtests['bar'] = 'fail'
 
-        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+        test = backends.junit.JUnitBackend(str(tmpdir),
                                            junit_subtests=True)
         test.initialize(shared.INITIAL_METADATA)
         with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
             t(result)
         test.finalize()
 
-        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = etree.parse(str(tmpdir.join('results.xml')))
         test_value = test_value.getroot()
 
         assert test_value.find('.//testsuite/testsuite').attrib['name'] == \
@@ -297,7 +293,7 @@ class TestJUnitSubtestWriter(object):
         result.subtests['foo'] = 'pass'
         result.subtests['bar'] = 'fail'
 
-        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+        test = backends.junit.JUnitBackend(str(tmpdir),
                                            junit_subtests=True,
                                            junit_suffix='.foo')
         test.initialize(shared.INITIAL_METADATA)
@@ -305,7 +301,7 @@ class TestJUnitSubtestWriter(object):
             t(result)
         test.finalize()
 
-        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = etree.parse(str(tmpdir.join('results.xml')))
         test_value = test_value.getroot()
 
         suite = test_value.find('.//testsuite/testsuite')
@@ -321,14 +317,14 @@ class TestJUnitSubtestWriter(object):
         result.subtests['foo'] = 'pass'
         result.subtests['bar'] = 'skip'
 
-        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+        test = backends.junit.JUnitBackend(str(tmpdir),
                                            junit_subtests=True)
         test.initialize(shared.INITIAL_METADATA)
         with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
             t(result)
         test.finalize()
 
-        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = etree.parse(str(tmpdir.join('results.xml')))
         test_value = test_value.getroot()
 
         suite = test_value.find('.//testsuite/testsuite')
@@ -344,14 +340,14 @@ class TestJUnitSubtestWriter(object):
         result.command = 'foo'
         result.result = 'skip'
 
-        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+        test = backends.junit.JUnitBackend(str(tmpdir),
                                            junit_subtests=True)
         test.initialize(shared.INITIAL_METADATA)
         with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
             t(result)
         test.finalize()
 
-        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = etree.parse(str(tmpdir.join('results.xml')))
         test_value = test_value.getroot()
 
         elem = test_value.find('.//testsuite/testcase[@name="test1"]/skipped')
@@ -366,14 +362,14 @@ class TestJUnitSubtestWriter(object):
         result.subtests['foo'] = 'pass'
         result.subtests['bar'] = 'skip'
 
-        test = backends.junit.JUnitBackend(six.text_type(tmpdir),
+        test = backends.junit.JUnitBackend(str(tmpdir),
                                            junit_subtests=True)
         test.initialize(shared.INITIAL_METADATA)
         with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
             t(result)
         test.finalize()
 
-        test_value = etree.parse(six.text_type(tmpdir.join('results.xml')))
+        test_value = etree.parse(str(tmpdir.join('results.xml')))
         test_value = test_value.getroot()
 
         suite = test_value.find('.//testsuite/testsuite')
@@ -395,7 +391,7 @@ class TestJUnitSubtestWriter(object):
             result.subtests['foo'] = 'pass'
             result.subtests['bar'] = 'fail'
 
-            test = backends.junit.JUnitBackend(six.text_type(p),
+            test = backends.junit.JUnitBackend(str(p),
                                                junit_subtests=True)
             test.initialize(shared.INITIAL_METADATA)
             with test.write_test(grouptools.join('a', 'group', 'test1')) as t:
@@ -406,7 +402,7 @@ class TestJUnitSubtestWriter(object):
                 t(result)
             test.finalize()
 
-            return six.text_type(p.join('results.xml'))
+            return str(p.join('results.xml'))
 
         def test_xml_well_formed(self, test_file):
             """backends.junit.JUnitBackend.write_test: produces well formed xml."""

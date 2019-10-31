@@ -1,6 +1,3 @@
-<%!
-  from six.moves import range
-%>\
 [require]
 GLSL >= 4.00
 GL_ARB_shader_precision

@@ -23,7 +23,6 @@
 
 """Generate non-flat interpolation qualifier tests."""
 
-from __future__ import print_function, division, absolute_import
 import argparse
 import os
 import itertools

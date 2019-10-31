@@ -1,5 +1,4 @@
 <%!
-import six
 import numpy as np
 %>
 [require]

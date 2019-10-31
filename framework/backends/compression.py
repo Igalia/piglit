@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,21 +38,17 @@ the best way to get a compressor.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import bz2
+import contextlib
 import errno
 import functools
 import gzip
+import io
+import lzma
 import os
 import subprocess
-import contextlib
 
-import six
-from six.moves import cStringIO as StringIO
-
-from framework import exceptions, compat
+from framework import exceptions
 from framework.core import PIGLIT_CONFIG
 
 __all__ = [
@@ -63,139 +59,33 @@ __all__ = [
 ]
 
 
-@compat.python_2_unicode_compatible
 class UnsupportedCompressor(exceptions.PiglitInternalError):
     def __init__(self, method, *args, **kwargs):
         super(UnsupportedCompressor, self).__init__(*args, **kwargs)
         self.__method = method
 
     def __str__(self):
-        return u'unsupported compression method {}'.format(self.__method)
+        return 'unsupported compression method {}'.format(self.__method)
 
 
 
 DEFAULT = 'bz2'
 
-if six.PY2:
-    COMPRESSION_SUFFIXES = ['.gz', '.bz2']
-    COMPRESSORS = {
-        'bz2': functools.partial(bz2.BZ2File, mode='w'),
-        'gz': functools.partial(gzip.open, mode='w'),
-        'none': functools.partial(open, mode='w'),
-    }
+COMPRESSION_SUFFIXES = ['.gz', '.bz2', '.xz']
 
-    DECOMPRESSORS = {
-        'bz2': functools.partial(bz2.BZ2File, mode='r'),
-        'gz': functools.partial(gzip.open, mode='r'),
-        'none': functools.partial(open, mode='r'),
-    }
+COMPRESSORS = {
+    'bz2': functools.partial(bz2.open, mode='wt'),
+    'gz': functools.partial(gzip.open, mode='wt'),
+    'none': functools.partial(open, mode='w'),
+    'xz': functools.partial(lzma.open, mode='wt'),
+}
 
-    # First try to use backports.lzma, that's the easiest solution. If that
-    # fails then go to trying the shell. If that fails then piglit won't have
-    # xz support, and will raise an error if xz is used
-    try:
-        import backports.lzma  # pylint: disable=wrong-import-position
-
-        COMPRESSORS['xz'] = functools.partial(backports.lzma.open, mode='w')
-        DECOMPRESSORS['xz'] = functools.partial(backports.lzma.open, mode='r')
-        COMPRESSION_SUFFIXES += ['.xz']
-    except ImportError:
-        try:
-            with open(os.devnull, 'w') as d:
-                subprocess.check_call(['xz', '--help'], stdout=d, stderr=d)
-        except OSError:
-            pass
-        else:
-
-            @contextlib.contextmanager
-            def _compress_xz(filename):
-                """Emulates an open function in write mode for xz.
-
-                Python 2.x doesn't support xz, but it's dang useful. This
-                function calls out to the shell and tries to use xz from the
-                environment to get xz compression.
-
-                This obviously won't work without a working xz binary.
-
-                This function tries to emulate the default values of the lzma
-                module in python3 as much as possible
-
-                """
-                if filename.endswith('.xz'):
-                    filename = filename[:-3]
-
-                with open(filename, 'w') as f:
-                    yield f
-
-                try:
-                    with open(os.devnull, 'w') as null:
-                        subprocess.check_call(
-                            ['xz', '--compress', '-9', '--force', filename],
-                            stderr=null)
-                except OSError as e:
-                    if e.errno == errno.ENOENT:
-                        raise exceptions.PiglitFatalError(
-                            'No xz binary available')
-                    raise
-
-            @contextlib.contextmanager
-            def _decompress_xz(filename):
-                """Eumlates an option function in read mode for xz.
-
-                See the comment in _compress_xz for more information.
-
-                This function tries to emulate the lzma module as much as
-                possible
-
-                """
-                if not filename.endswith('.xz'):
-                    filename = '{}.xz'.format(filename)
-
-                try:
-                    with open(os.devnull, 'w') as null:
-                        string = subprocess.check_output(
-                            ['xz', '--decompress', '--stdout', filename],
-                            stderr=null)
-                except OSError as e:
-                    if e.errno == errno.ENOENT:
-                        raise exceptions.PiglitFatalError(
-                            'No xz binary available')
-                    raise
-
-                # We need a file-like object, so the contents must be placed in
-                # a StringIO object.
-                io = StringIO()
-                io.write(string)
-                io.seek(0)
-
-                yield io
-
-                io.close()
-
-            COMPRESSORS['xz'] = _compress_xz
-            DECOMPRESSORS['xz'] = _decompress_xz
-            COMPRESSION_SUFFIXES += ['.xz']
-else:
-    # In the case of python 3 this all just works, no monkeying around with
-    # imports and fallbacks. just import the right modules and go
-
-    import lzma  # pylint: disable=wrong-import-position,wrong-import-order
-
-    COMPRESSION_SUFFIXES = ['.gz', '.bz2', '.xz']
-
-    COMPRESSORS = {
-        'bz2': functools.partial(bz2.open, mode='wt'),
-        'gz': functools.partial(gzip.open, mode='wt'),
-        'none': functools.partial(open, mode='w'),
-        'xz': functools.partial(lzma.open, mode='wt'),
-    }
-
-    DECOMPRESSORS = {
-        'bz2': functools.partial(bz2.open, mode='rt'),
-        'gz': functools.partial(gzip.open, mode='rt'),
-        'none': functools.partial(open, mode='r'),
-        'xz': functools.partial(lzma.open, mode='rt'),
-    }
+DECOMPRESSORS = {
+    'bz2': functools.partial(bz2.open, mode='rt'),
+    'gz': functools.partial(gzip.open, mode='rt'),
+    'none': functools.partial(open, mode='r'),
+    'xz': functools.partial(lzma.open, mode='rt'),
+}
 
 
 def get_mode():

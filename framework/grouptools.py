@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014-2016 Intel Corporation
+# Copyright (c) 2014-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +29,6 @@ element representing a group, and the final element being the test name. Unlike
 posix paths they may not start with a leading '/'.
 
 """
-
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
-import six
-from six.moves import zip
 
 __all__ = [
     'SEPARATOR',
@@ -162,7 +155,7 @@ def from_path(path):
     This safely handles both Windows and Unix style paths.
 
     """
-    assert isinstance(path, six.string_types), 'Type must be string or unicode'
+    assert isinstance(path, str), 'Type must be str'
 
     if '\\' in path:
         path = path.replace('\\', SEPARATOR)
@@ -184,5 +177,5 @@ def format(name):
     want to see.
 
     """
-    assert isinstance(name, six.string_types)
+    assert isinstance(name, str)
     return name.replace(SEPARATOR, '/')

@@ -1,5 +1,4 @@
 # coding=utf-8
-from __future__ import print_function, division, absolute_import
 import os
 from genclbuiltins import gen, DATA_SIZES, MAX_VALUES, MAX, MIN, BMIN, BMAX, \
                           SMIN, SMAX, UMIN, UMAX, TYPE, SIZE, T, U, B

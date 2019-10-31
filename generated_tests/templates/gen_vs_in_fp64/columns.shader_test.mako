@@ -20,8 +20,6 @@
 ## SOFTWARE.
 
 <%!
-  from six.moves import range
-
   def _version(ver):
       if ver == 'GL_ARB_vertex_attrib_64bit':
           glsl_version_int = '150'

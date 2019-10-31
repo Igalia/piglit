@@ -21,12 +21,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-from __future__ import print_function, division, absolute_import
 import struct
 import os
 from operator import neg
-
-import six
 
 from templates import template_file
 from modules import utils
@@ -136,7 +133,7 @@ REQUIREMENTS = {
 def main():
     """main function."""
     # pylint: disable=line-too-long
-    for api, requirement in six.iteritems(REQUIREMENTS):
+    for api, requirement in REQUIREMENTS.items():
         version = requirement['version']
         extensions = [requirement['extension']] if requirement['extension'] else []
 
@@ -144,9 +141,9 @@ def main():
                                'built-in-functions')
         utils.safe_makedirs(dirname)
 
-        for func, attrib in six.iteritems(FUNCS):
+        for func, attrib in FUNCS.items():
             for execution_stage in ('vs', 'fs'):
-                for in_modifier_func, modifier_func in six.iteritems(MODIFIER_FUNCS):
+                for in_modifier_func, modifier_func in MODIFIER_FUNCS.items():
                     # Modifying the sign of an unsigned number doesn't make sense.
                     if func == 'uintBitsToFloat' and in_modifier_func != '':
                         continue

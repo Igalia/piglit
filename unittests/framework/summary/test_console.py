@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,7 @@ Some of these tests are fickle, since we're testing the output of a summary
 generator.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 import pytest
-import six
 
 from framework import results
 from framework import grouptools
@@ -60,7 +55,7 @@ _ENUMS = {
 class TestPrintSummary(object):
     """Tests for the console output."""
 
-    @pytest.mark.parametrize("index", six.iterkeys(_ENUMS), ids=lambda i: _ENUMS[i])
+    @pytest.mark.parametrize("index", _ENUMS.keys(), ids=lambda i: _ENUMS[i])
     def test_values(self, index, capsys):
         """Create both an expected value and an actual value.
 

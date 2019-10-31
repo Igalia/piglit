@@ -20,9 +20,6 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import argparse
 import ctypes
 import os
@@ -31,8 +28,6 @@ import re
 import shutil
 import sys
 import time
-
-import six
 
 from framework import core, backends, options
 from framework import dmesg
@@ -455,7 +450,7 @@ def resume(input_):
     # Don't re-run tests that have already completed, incomplete status tests
     # have obviously not completed.
     exclude_tests = set()
-    for name, result in six.iteritems(results.tests):
+    for name, result in results.tests.items():
         if args.no_retry or result.result != 'incomplete':
             exclude_tests.add(name)
 

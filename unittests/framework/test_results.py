@@ -1,5 +1,5 @@
 # encoding=utf-8
-# Copyright (c) 2014-2016 Intel Corporation
+# Copyright (c) 2014-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,7 @@
 
 """Tests for the results module."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 import pytest
-import six
 
 from framework import exceptions
 from framework import grouptools
@@ -449,7 +444,7 @@ class TestTotals(object):
     # The tuple is required because of the timeout status, which conflicts with
     # the timeout pylint plugin
     @pytest.mark.parametrize(
-        "key", ((x, ) for x in six.iterkeys(results.Totals())))
+        "key", ((x, ) for x in results.Totals().keys()))
     def test_totals_true(self, key):
         """bool() returns True when any value is not 0."""
         test = results.Totals()
@@ -541,7 +536,7 @@ class TestTestrunResult(object):
         def test_totals(self, inst):
             """totals is restored correctly."""
             baseline = shared.JSON['totals'].copy()
-            for s in six.itervalues(baseline):
+            for s in baseline.values():
                 del s['__type__']
             assert baseline == dict(inst.totals)
 

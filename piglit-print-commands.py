@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 # Copyright (c) 2014, 2016 Intel Corporation
@@ -27,17 +27,9 @@ Deprecated compatibility wrapper
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import sys
-
-import six
 
 from framework.programs.print_commands import main
 
 if __name__ == '__main__':
-    if six.PY2:
-        main([i.decode('utf-8') for i in sys.argv[1:]])
-    elif six.PY3:
-        main(sys.argv[1:])
+    main(sys.argv[1:])

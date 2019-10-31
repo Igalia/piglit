@@ -1,13 +1,10 @@
 # coding=utf-8
-from __future__ import print_function, division, absolute_import
 import os
-
-import six
 
 __all__ = ['gen', 'DATA_SIZES', 'MAX_VALUES', 'MAX', 'MIN', 'BMIN', 'BMAX',
            'SMIN', 'SMAX', 'UMIN', 'UMAX', 'TYPE', 'T', 'U', 'B']
 
-_NUMERIC_TYPES = tuple(list(six.integer_types) + [float])
+_NUMERIC_TYPES = tuple([int, float])
 
 
 DATA_SIZES = {

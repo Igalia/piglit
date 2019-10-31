@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 
 """ Provides tests for the shader_test module """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
 import textwrap
 try:
@@ -32,7 +29,6 @@ except ImportError:
     from unittest import mock
 
 import pytest
-import six
 
 from framework import status
 from framework.test import shader_test
@@ -95,7 +91,7 @@ class TestConfigParsing(object):
 
             [next section]
             """.format(operator, gles)))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert os.path.basename(test.command[0]) == expected
 
@@ -107,7 +103,7 @@ class TestConfigParsing(object):
             GL ES >= 3.0
             GLSL ES >= 3.00 es
             """))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert os.path.basename(test.command[0]) == "shader_runner_gles3"
 
@@ -119,7 +115,7 @@ class TestConfigParsing(object):
             GL >= 3.0
             GL_ARB_ham_sandwhich
             """))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert test.require_extensions == {'GL_ARB_ham_sandwhich'}
 
@@ -131,7 +127,7 @@ class TestConfigParsing(object):
             GL >= 2.0
             GL_ARB_ham_sandwhich
             """))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert test.require_version == 2.0
 
@@ -143,7 +139,7 @@ class TestConfigParsing(object):
             GL ES >= 2.0
             GL_ARB_ham_sandwhich
             """))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert test.require_version == 2.0
 
@@ -155,7 +151,7 @@ class TestConfigParsing(object):
             GL >= 2.1
             GLSL >= 1.20
             """))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert test.require_shader == 1.2
 
@@ -167,7 +163,7 @@ class TestConfigParsing(object):
             GL ES >= 2.0
             GLSL ES >= 1.00
             """))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert test.require_shader == 1.0
 
@@ -187,7 +183,7 @@ class TestConfigParsing(object):
             GL_MAX_VARYING_COMPONENTS
             GL_ARB_foobar
             """))
-        test = shader_test.ShaderTest.new(six.text_type(p))
+        test = shader_test.ShaderTest.new(str(p))
 
         assert test.require_version == 3.3
         assert test.require_shader == 1.50
@@ -205,7 +201,7 @@ class TestCommand(object):
             GL ES >= 3.0
             GLSL ES >= 3.00 es
             """))
-        return six.text_type(p)
+        return str(p)
 
     def test_getter_adds_auto_and_fbo(self, test_file):
         """test.shader_test.ShaderTest: -auto and -fbo is added to the command.
@@ -245,7 +241,7 @@ class TestMultiShaderTest(object):
                 [vertex shader]"""))
 
             return shader_test.MultiShaderTest.new(
-                [six.text_type(one), six.text_type(two)])
+                [str(one), str(two)])
 
         def test_prog(self, inst):
             assert os.path.basename(inst.command[0]) == 'shader_runner'
@@ -275,7 +271,7 @@ class TestMultiShaderTest(object):
             [vertex shader]"""))
 
         return shader_test.MultiShaderTest.new(
-            [six.text_type(one), six.text_type(two)])
+            [str(one), str(two)])
 
     def test_resume(self, inst):
         actual = inst._resume(1)  # pylint: disable=protected-access

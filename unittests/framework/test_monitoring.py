@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2016 Intel Corporation
+# Copyright (c) 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,7 @@
 This provides tests for the framework.monitoring modules.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 import pytest
-import six
 
 from framework import exceptions
 from framework import monitoring
@@ -60,7 +55,7 @@ class TestMonitoring(object):
         p.write(self.init_contents)
         self.monitoring.add_rule('error_file',
                                  'file',
-                                 six.text_type(p),
+                                 str(p),
                                  self.regex)
         self.monitoring.update_monitoring()
 
@@ -77,7 +72,7 @@ class TestMonitoring(object):
         with pytest.raises(exceptions.PiglitFatalError):
             self.monitoring.add_rule('error_file_bad_type',
                                      'bad_type',
-                                     six.text_type(p),
+                                     str(p),
                                      self.regex)
 
     @skip.linux
@@ -87,7 +82,7 @@ class TestMonitoring(object):
         p.write(self.init_contents)
         self.monitoring.add_rule('error_file',
                                  'file',
-                                 six.text_type(p),
+                                 str(p),
                                  self.regex)
         self.monitoring.update_monitoring()
 
@@ -103,7 +98,7 @@ class TestMonitoring(object):
         p.write(self.init_contents)
         self.monitoring.add_rule('no_error_file',
                                  'file',
-                                 six.text_type(p),
+                                 str(p),
                                  self.regex)
         self.monitoring.update_monitoring()
 
@@ -119,7 +114,7 @@ class TestMonitoring(object):
         p.write(self.init_contents)
         self.monitoring.add_rule('error_locked_file',
                                  'locked_file',
-                                 six.text_type(p),
+                                 str(p),
                                  self.regex)
         self.monitoring.update_monitoring()
 
@@ -135,7 +130,7 @@ class TestMonitoring(object):
         p.write(self.init_contents)
         self.monitoring.add_rule('no_error_file',
                                  'locked_file',
-                                 six.text_type(p),
+                                 str(p),
                                  self.regex)
         self.monitoring.update_monitoring()
 

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2013-2016 Intel Corporation
+# Copyright 2013-2016, 2019 Intel Corporation
 # Copyright 2013, 2014 Advanced Micro Devices
 # Copyright 2014 VMWare
 
@@ -23,12 +23,8 @@
 
 """Generate text summaries to be printed to the console."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import textwrap
 import time
-import six
 
 from framework import grouptools, backends
 from .common import Results
@@ -92,7 +88,7 @@ def _print_summary(results):
         regressions=print_template.format(
             *[str(s) for s in results.counts.regressions]),
         total=print_template.format(*[
-            str(sum(six.itervalues(x.totals['root'])))
+            str(sum(x.totals['root'].values()))
             for x in results.results]),
         time=print_template.format(
             *[elapsed_time(r.time_elapsed) for r in results.results]),

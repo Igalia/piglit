@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015 Intel Corporation
+# Copyright (c) 2015, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,7 @@
 
 # pylint: disable=protected-access
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
-
-import six
 
 from framework.summary import html_
 
@@ -36,6 +31,6 @@ from framework.summary import html_
 def test_copy_static(tmpdir):
     """summary.html_._copy_static: puts status content in correct locations"""
     tmpdir.chdir()
-    html_._copy_static_files(six.text_type(tmpdir))
+    html_._copy_static_files(str(tmpdir))
     assert os.path.exists('index.css'), 'index.css not created correctly'
     assert os.path.exists('result.css'), 'result.css not created correctly'

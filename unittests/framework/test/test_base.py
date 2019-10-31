@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 
 """ Tests for the exectest module """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
 import textwrap
 try:
@@ -32,9 +29,6 @@ except ImportError:
     import subprocess
 
 import pytest
-import six
-
-from six.moves import range
 
 from framework import dmesg
 from framework import log
@@ -72,8 +66,6 @@ class TestTest(object):
 
             t.run()
 
-    @pytest.mark.skipif(six.PY2 and subprocess.__name__ != 'subprocess32',
-                        reason='Python 2.7 requires subprocess32 to run this test')
     @skip.posix
     class TestRunCommand(object):
         """Tests for Test._run_command."""
@@ -146,8 +138,7 @@ class TestTest(object):
                 # store it so we can access it later
                 proxy = PopenProxy()
 
-                test = _Test(['python' + ('2' if six.PY2 else '3'),
-                              six.text_type(f)])
+                test = _Test(['python3', str(f)])
                 test.timeout = 1
 
                 # mock out subprocess.Popen with our proxy object
@@ -210,7 +201,7 @@ class TestTest(object):
             test = _Test(['foo'])
             test.run = mocker.Mock(side_effect=self.Sentinal)
 
-            test.execute(mocker.Mock(spec=six.text_type),
+            test.execute(mocker.Mock(spec=str),
                          mocker.Mock(spec=log.BaseLog),
                          {'dmesg': mocker.Mock(spec=dmesg.BaseDmesg),
                           'monitor': mocker.Mock(spec=monitoring.Monitoring)})
@@ -229,7 +220,7 @@ class TestTest(object):
             there is a value.
             """
             assert shared_test.traceback != ''
-            assert isinstance(shared_test.traceback, six.string_types)
+            assert isinstance(shared_test.traceback, str)
 
         def test_exception(self, shared_test):
             """Test.execute (exception): Sets the exception.
@@ -238,7 +229,7 @@ class TestTest(object):
             value, so just make sure it's being set.
             """
             assert shared_test.exception != ''
-            assert isinstance(shared_test.exception, six.string_types)
+            assert isinstance(shared_test.exception, str)
 
     class TestCommand(object):
         """Tests for Test.command."""
@@ -386,10 +377,10 @@ class TestValgrindMixin(object):
 
         # The ids function here is a bit of a hack to work around the
         # pytest-timeout plugin, which is broken. when 'timeout' is passed as a
-        # string using six.text_type it tries to grab that value and a flaming
-        # pile ensues
+        # string using str it tries to grab that value and a flaming pile
+        # ensues
         @pytest.mark.parametrize("starting", PROBLEMS,
-                                 ids=lambda x: six.text_type(x).upper())
+                                 ids=lambda x: str(x).upper())
         def test_problem_status_changes_valgrind_enabled(self, starting, mocker):
             """When running with valgrind mode we're actually testing the test
             binary itself, so any status other than pass is irrelavent, and
@@ -405,7 +396,7 @@ class TestValgrindMixin(object):
             assert test.result.result is status.SKIP
 
         @pytest.mark.parametrize("starting", PROBLEMS,
-                                 ids=lambda x: six.text_type(x).upper())
+                                 ids=lambda x: str(x).upper())
         def test_problems_with_valgrind_disabled(self, starting, mocker):
             """When valgrind is disabled nothign shoud change
             """

@@ -35,12 +35,6 @@ checking.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
-import six
-
 from .utils import lazy_property
 
 
@@ -65,7 +59,7 @@ class Container(object):
         assert [is_scalar, is_vector, is_matrix].count(True) == 1, \
             'A type must be exactly one of: scalar, vector, matrix'
         assert isinstance(contains, Type), 'contains must be a type instance'
-        assert isinstance(name, six.text_type), 'name must be string'
+        assert isinstance(name, str), 'name must be string'
         assert columns is None or isinstance(columns, int), \
             'columns must be an int if provided'
         assert rows is None or isinstance(rows, int), \

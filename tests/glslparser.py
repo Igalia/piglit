@@ -1,9 +1,6 @@
 # coding=utf-8
 """A profile that runs only GLSLParserTest instances."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
 
 from framework import grouptools

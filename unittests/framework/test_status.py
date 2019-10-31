@@ -1,5 +1,5 @@
 # encoding=utf-8
-# Copyright © 2014, 2016 Intel Corporation
+# Copyright © 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,13 +27,9 @@ just asserts that the regressions, fixes, etc lists are as expected.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import itertools
 
 import pytest
-import six
 
 from framework import status
 
@@ -127,8 +123,8 @@ def test_no_change(new, old):
 
 
 @pytest.mark.parametrize("stat,op,expected", [
-    (status.Status('Test', 0, (0, 0)), six.text_type, 'Test'),
-    (status.Status('Test', 0, (0, 0)), six.binary_type, b'Test'),
+    (status.Status('Test', 0, (0, 0)), str, 'Test'),
+    (status.Status('Test', 0, (0, 0)), bytes, b'Test'),
     (status.Status('Test', 0, (0, 0)), int, 0),
     (status.Status('Test', 0, (0, 0)), repr, 'Status("Test", 0, (0, 0))'),
     (status.Status('Test', 0, (0, 0)), hash, hash('Test')),

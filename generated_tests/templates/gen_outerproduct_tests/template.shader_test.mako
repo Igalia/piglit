@@ -18,10 +18,6 @@
 ## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ## SOFTWARE.
 
-<%!
-  from six.moves import range
-%>
-
 <%def name="spec()">
 /* From page 43 (page 49 of the PDF) of the GLSL 1.20 spec:
  *

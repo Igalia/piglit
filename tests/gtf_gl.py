@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2018 Intel Corporation
+# Copyright (c) 2018, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -43,9 +43,6 @@ PIGLIT_GTF_GL_EXTRA_ARGS -- environment equivalent of [gtf_gl]:extra_args
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import itertools
 
 from framework.test import deqp

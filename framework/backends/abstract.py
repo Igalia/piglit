@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,11 @@ This module provides mixins and base classes for backend modules.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import abc
 import contextlib
 import itertools
 import os
 import shutil
-
-import six
 
 from framework import options
 from . import compression
@@ -66,8 +61,7 @@ def write_compressed(filename):
         yield f
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Backend(object):
+class Backend(metaclass=abc.ABCMeta):
     """ Abstract base class for summary backends
 
     This class provides an abstract ancestor for classes implementing backends,

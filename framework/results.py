@@ -22,16 +22,11 @@
 
 """ Module for results generation """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import collections
 import copy
 import datetime
 
-import six
-
-from framework import status, exceptions, grouptools, compat
+from framework import status, exceptions, grouptools
 
 __all__ = [
     'TestrunResult',
@@ -87,8 +82,8 @@ class StringDescriptor(object):  # pylint: disable=too-few-public-methods
     returns a unicode object.
 
     """
-    def __init__(self, name, default=six.text_type()):
-        assert isinstance(default, six.text_type)
+    def __init__(self, name, default=''):
+        assert isinstance(default, str)
         self.__name = name
         self.__default = default
 
@@ -96,9 +91,9 @@ class StringDescriptor(object):  # pylint: disable=too-few-public-methods
         return getattr(instance, self.__name, self.__default)
 
     def __set__(self, instance, value):
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             setattr(instance, self.__name, value.decode('utf-8', 'replace'))
-        elif isinstance(value, six.text_type):
+        elif isinstance(value, str):
             setattr(instance, self.__name, value)
         else:
             raise TypeError('{} attribute must be a unicode or bytes instance, '
@@ -181,7 +176,7 @@ class TestResult(object):
 
         """
         if self.subtests and self.__result != status.CRASH:
-            return max(six.itervalues(self.subtests))
+            return max(self.subtests.values())
         return self.__result
 
     @property
@@ -263,12 +258,11 @@ class TestResult(object):
             self.subtests.update(dict_['subtest'])
 
 
-@compat.python_2_bool_compatible
 class Totals(dict):
     def __init__(self, *args, **kwargs):
         super(Totals, self).__init__(*args, **kwargs)
         for each in status.ALL:
-            each = six.text_type(each)
+            each = str(each)
             if each not in self:
                 self[each] = 0
 
@@ -276,7 +270,7 @@ class Totals(dict):
         # Since totals are prepopulated, calling 'if not <Totals instance>'
         # will always result in True, this will cause it to return True only if
         # one of the values is not zero
-        for each in six.itervalues(self):
+        for each in self.values():
             if each != 0:
                 return True
         return False
@@ -327,11 +321,11 @@ class TestrunResult(object):
 
     def calculate_group_totals(self):
         """Calculate the number of passes, fails, etc at each level."""
-        for name, result in six.iteritems(self.tests):
+        for name, result in self.tests.items():
             # If there are subtests treat the test as if it is a group instead
             # of a test.
             if result.subtests:
-                for res in six.itervalues(result.subtests):
+                for res in result.subtests.values():
                     res = str(res)
                     temp = name
 
@@ -352,7 +346,7 @@ class TestrunResult(object):
             self.calculate_group_totals()
         rep = copy.copy(self.__dict__)
         rep['tests'] = collections.OrderedDict((k, t.to_json())
-                       for k, t in six.iteritems(self.tests))
+                       for k, t in self.tests.items())
         rep['__type__'] = 'TestrunResult'
         return rep
 
@@ -380,12 +374,12 @@ class TestrunResult(object):
             setattr(res, 'time_elapsed',
                     TimeAttribute.from_dict(dict_['time_elapsed']))
         res.tests = collections.OrderedDict((n, TestResult.from_dict(t))
-                    for n, t in six.iteritems(dict_['tests']))
+                    for n, t in dict_['tests'].items())
 
         if not 'totals' in dict_ and not _no_totals:
             res.calculate_group_totals()
         else:
             res.totals = {n: Totals.from_dict(t) for n, t in
-                          six.iteritems(dict_['totals'])}
+                          dict_['totals'].items()}
 
         return res

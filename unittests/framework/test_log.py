@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,12 @@
 
 """Tests for log.py module."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import collections
+import io
 import sys
 import threading
 
 import pytest
-import six
 
 import framework.log as log
 
@@ -75,7 +72,7 @@ class TestQuietLog(object):
 
         @pytest.fixture(autouse=True, scope='function')
         def mock_stdout(self, mocker):
-            mocker.patch.object(sys, 'stdout', six.StringIO())
+            mocker.patch.object(sys, 'stdout', io.StringIO())
 
         def test_log(self, log_state):  # pylint: disable=redefined-outer-name
             """Test the output of the log method."""
@@ -124,7 +121,7 @@ class TestVerboseLog(object):
 
         @pytest.fixture(autouse=True, scope='function')
         def mock_stdout(self, mocker):
-            mocker.patch.object(sys, 'stdout', six.StringIO())
+            mocker.patch.object(sys, 'stdout', io.StringIO())
 
         def test_log(self, log_state):  # pylint: disable=redefined-outer-name
             """Test the output of the log method."""
@@ -169,7 +166,7 @@ class TestDummyLog(object):
 
         @pytest.fixture(autouse=True, scope='function')
         def mock_stdout(self, mocker):
-            mocker.patch.object(sys, 'stdout', six.StringIO())
+            mocker.patch.object(sys, 'stdout', io.StringIO())
 
         def test_log(self, log_state):  # pylint: disable=redefined-outer-name
             """Test the output of the log method."""

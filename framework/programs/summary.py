@@ -20,17 +20,12 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import argparse
 import shutil
 import os
 import os.path as path
 import sys
 import errno
-
-import six
 
 from framework import summary, status, core, backends, exceptions
 from . import parsers
@@ -221,7 +216,7 @@ def formatted(input_, default_format_string=DEFAULT_FMT_STR):
     testrun = backends.load(args.test_results)
 
     def write_results(output):
-        for name, result in six.iteritems(testrun.tests):
+        for name, result in testrun.tests.items():
             if result.result in args.exclude_details:
                 continue
             output.write((args.format_string + "\n").format(

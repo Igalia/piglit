@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,7 @@
 
 """ Provides test for the framework.profile modules """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 import pytest
-import six
 
 from framework import exceptions
 from framework import grouptools
@@ -50,7 +45,7 @@ class TestLoadTestProfile(object):
         p = tmpdir.join('foo.profile')
 
         with pytest.raises(exceptions.PiglitFatalError):
-            profile.load_test_profile(six.text_type(p))
+            profile.load_test_profile(str(p))
 
     def test_no_such_module(self, tmpdir):
         """profile.load_test_profile: Trying to load a non-existent module
@@ -124,7 +119,7 @@ class TestTestDict(object):
     @pytest.mark.parametrize(
         "arg",
         [None, utils.Test(['foo']), ['a'], {'a': 1}],
-        ids=six.text_type)
+        ids=str)
     def test_key_not_string(self, arg):
         """profile.TestDict: If key value isn't a string an exception is raised.
 

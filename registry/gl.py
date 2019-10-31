@@ -24,17 +24,11 @@
 Parse gl.xml into Python objects.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 import os.path
 import re
 import sys
 import functools
 from copy import copy, deepcopy
-
-import six
 
 # Export 'debug' so other Piglit modules can easily enable it.
 debug = False
@@ -174,7 +168,7 @@ class OrderedKeyedSet(object):
         # pair has form {key: [prev, next, key, value])}.
         self.__map = dict()
 
-        if isinstance(key, six.text_type):
+        if isinstance(key, str):
             self.__key_func = lambda elem: getattr(elem, key)
         else:
             self.__key_func = key
@@ -255,13 +249,13 @@ class OrderedKeyedSet(object):
         return node[3]
 
     def sort_by_key(self):
-        sorted_items = sorted(six.iteritems(self.__map))
+        sorted_items = sorted(self.__map.items())
         self.clear()
         for item in sorted_items:
             self.add(item[1])
 
     def sort_by_value(self):
-        sorted_values = sorted(six.itervalues(self.__map))
+        sorted_values = sorted(self.__map.values())
         self.clear()
         for value in sorted_values:
             self.add(value)
@@ -932,7 +926,7 @@ class CommandAliasMap(object):
         """A sorted iterator over the map's unique CommandAliasSet values."""
         if self.__sorted_unique_values is None:
             self.__sorted_unique_values = \
-                sorted(set(six.itervalues(self.__map)))
+                sorted(set(self.__map.values()))
 
         return iter(self.__sorted_unique_values)
 
@@ -1138,13 +1132,7 @@ class Enum(object):
         else:
             base = 10
 
-        if six.PY2:
-            # long is undefined in python3, and we are aware of that
-            # pylint: disable=undefined-variable
-            self.num_value = long(self.str_value, base)
-        else:
-            assert six.PY3
-            self.num_value = int(self.str_value, base)
+        self.num_value = int(self.str_value, base)
 
         _log_debug('parsed {0}'.format(self))
 

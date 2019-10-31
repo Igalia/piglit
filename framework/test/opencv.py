@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2016 Intel Corporation
+# Copyright 2016, 2019 Intel Corporation
 # Copyright 2014 Advanced Micro Devices, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -24,9 +24,6 @@
 # Authors: Tom Stellard <thomas.stellard@amd.com>
 #
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import re
 import subprocess
 from os import path

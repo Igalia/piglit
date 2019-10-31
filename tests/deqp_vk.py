@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2014-2016 Intel Corporation
+# Copyright 2014-2016, 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,6 @@ upstream: https://github.com/KhronosGroup/Vulkan-CTS
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import re
 
 from framework.test import deqp

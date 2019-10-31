@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2013-2016 Intel Corporation
+# Copyright (c) 2013-2016, 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -27,21 +27,17 @@ returning BaseLog derived instances to individual tests.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import sys
 import abc
 import itertools
 import threading
 import collections
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
 try:
     import simplejson as json
 except ImportError:
     import json
-
-import six
-from six.moves.BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 from framework.core import PIGLIT_CONFIG
 from framework import grouptools
@@ -49,8 +45,7 @@ from framework import grouptools
 __all__ = ['LogManager']
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BaseLog(object):
+class BaseLog(metaclass=abc.ABCMeta):
     """ Abstract base class for Log objects
 
     It provides a lock, which should be used to lock whever the shared state is
@@ -170,7 +165,7 @@ class QuietLog(BaseLog):
             done=str(self._state['complete']).zfill(self._pad),
             total=str(self._state['total']).zfill(self._pad),
             status=', '.join('{0}: {1}'.format(k, v) for k, v in
-                             sorted(six.iteritems(self._state['summary']))),
+                             sorted(self._state['summary'].items())),
             running=''.join('|/-\\'[x % 4] for x in self._state['running'])
         )
 

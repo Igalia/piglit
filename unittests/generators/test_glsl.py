@@ -1,5 +1,5 @@
 # encoding=utf-8
-# Copyright © 2016 Intel Corporation
+# Copyright © 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,13 @@
 
 """Tests for generated_tests/modules/glsl.py."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import itertools
 import operator
 
 import pytest
-import six
 
 # pylint can't figure out the sys.path manipulation.
-from modules import glsl  # pylint: disable=import-error
+from generated_tests.modules import glsl  # pylint: disable=import-error
 
 # pylint: disable=no-self-use,invalid-name
 
@@ -151,12 +147,12 @@ def test_compare_glsles_to_float(op, first, second):
 
 def test_GLSLVersion_str():
     """generated_tests.modules.glsl.GLSLVersion: str()"""
-    assert six.text_type(glsl.Version('110')) == '110'
+    assert str(glsl.Version('110')) == '110'
 
 
 def test_GLSLESVersion_str():
     """generated_tests.modules.glsl.GLSLESVersion: str()"""
-    assert six.text_type(glsl.Version('100')) == '100'
+    assert str(glsl.Version('100')) == '100'
 
 
 def test_GLSLVersion_int():

@@ -23,14 +23,11 @@
 
 """Generate fp64 vertex shader input tests."""
 
-from __future__ import print_function, division, absolute_import
 import abc
 import argparse
 import itertools
 import os
 import types
-
-from six.moves import range
 
 from templates import template_dir
 from modules import utils

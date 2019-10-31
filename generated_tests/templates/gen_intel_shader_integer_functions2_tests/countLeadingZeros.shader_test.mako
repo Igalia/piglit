@@ -1,4 +1,3 @@
-<%! import six %>
 [require]
 GL >= 3.0
 GLSL >= 1.30

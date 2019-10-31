@@ -24,11 +24,8 @@
 #
 #
 
-from __future__ import print_function, division, absolute_import
 import os
 import textwrap
-
-from six.moves import range
 
 from modules import utils
 

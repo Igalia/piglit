@@ -28,15 +28,13 @@ The original tests have been taken from
 
 First of all, you need to make sure that the following are installed:
 
-  - Python 2.7.x or >=3.5
+  - Python >=3.6
   - Python Mako module
   - numpy (http://www.numpy.org)
-  - six (https://pypi.python.org/pypi/six)
   - cmake (http://www.cmake.org)
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
   - waffle (http://www.waffle-gl.org)
-  - mako
 
 Optionally, you can install the following:
 
@@ -47,14 +45,6 @@ Optionally, you can install the following:
     (https://jsonstreams.readthedocs.io/en/stable/)
   - VkRunner. A shader script testing tool for Vulkan.
     (https://github.com/igalia/vkrunner)
-
-For Python 2.x you can install the following to add features, these are
-unnecessary for python3:
-  - backports.lzma. A backport of python3's lzma module to python2,
-    this enables fast native xz (de)compression in piglit for results files
-    (https://github.com/peterjc/backports.lzma)
-  - subprocess32. A backport of the subprocess from python3.2, which includes
-    timeout support. This only works for Linux
 
 For testing the python framework using `py.test unittests/framework`
   - py.test. A python test framework, used for running the python framework

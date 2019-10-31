@@ -1,14 +1,8 @@
 # coding=utf-8
 """A profile that runs only ShaderTest instances."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import collections
 import os
-
-from six.moves import zip
-import six
 
 from framework.options import OPTIONS
 from framework import grouptools
@@ -55,7 +49,7 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
 
 # Because we need to handle duplicate group names in TESTS and GENERATED_TESTS
 # this dictionary is constructed, then added to the actual test dictionary.
-for group, files in six.iteritems(shader_tests):
+for group, files in shader_tests.items():
     assert group not in profile.test_list, 'duplicate group: {}'.format(group)
 
     # We'll end up with a list of tuples, split that into two lists

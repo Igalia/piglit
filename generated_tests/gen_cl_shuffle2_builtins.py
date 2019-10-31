@@ -18,11 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from __future__ import print_function, division, absolute_import
 import itertools
 import os
 import random
-import six
 import textwrap
 
 from modules import utils
@@ -49,7 +47,7 @@ DIR_NAME = os.path.join("cl", "builtin", "misc")
 
 
 def gen_array(size, m):
-    return [random.randint(0, m) for i in six.moves.range(size)]
+    return [random.randint(0, m) for i in range(size)]
 
 
 def permute(data1, data2, mask, ssize, dsize):
@@ -90,7 +88,7 @@ def main():
     random.seed(0)
     utils.safe_makedirs(DIR_NAME)
 
-    for t, ut in six.iteritems(TYPES):
+    for t, ut in TYPES.items():
         f = begin_test(t, ut)
         for ss, ds in itertools.product(VEC_SIZES, VEC_SIZES):
             ssize = int(ss) * ELEMENTS

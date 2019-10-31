@@ -22,7 +22,6 @@
 
 """ Generate spec/EXT_gpu_shader4 tests """
 
-from __future__ import print_function, division, absolute_import
 import os
 import collections
 

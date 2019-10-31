@@ -40,13 +40,10 @@ This script outputs, to stdout, the name of each file it generates.
 
 """
 
-from __future__ import print_function, absolute_import, division
 import os
 import sys
 import random
 import textwrap
-
-from six.moves import range
 
 
 class Test(object):

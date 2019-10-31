@@ -23,85 +23,45 @@
 
 """ Module provides a base class for Tests """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-import errno
-import os
-import time
-import sys
-import traceback
-import itertools
 import abc
 import copy
+import errno
+import itertools
+import os
 import signal
+import subprocess
+import sys
+import time
+import traceback
 import warnings
-
-import six
-from six.moves import range
 
 from framework import exceptions
 from framework import status
 from framework.options import OPTIONS
 from framework.results import TestResult
 
-# We're doing some special crazy here to make timeouts work on python 2. pylint
-# is going to complain a lot
-# pylint: disable=wrong-import-position,wrong-import-order
-if six.PY2:
-    try:
-        # subprocess32 only supports *nix systems, this is important because
-        # "start_new_session" is not a valid argument on windows
+_EXTRA_POPEN_ARGS = {}
 
-        import subprocess32 as subprocess
-        _EXTRA_POPEN_ARGS = {'start_new_session': True}
-    except ImportError:
-        # If there is no timeout support, fake it. Add a TimeoutExpired
-        # exception and a Popen that accepts a timeout parameter (and ignores
-        # it), then shadow the actual Popen with this wrapper.
+if sys.platform == 'win32':
+    # There is no implementation in piglit to make timeouts work in
+    # windows, this uses the same Popen snippet as python 2 without
+    # subprocess32 to mask it. Patches are welcome.
+    # XXX: Should this also include cygwin?
+    warnings.warn('Timeouts are not implemented on Windows.')
 
-        import subprocess
+    class Popen(subprocess.Popen):
+        """Sublcass of Popen that accepts and ignores a timeout argument."""
+        def communicate(self, *args, **kwargs):
+            if 'timeout' in kwargs:
+                del kwargs['timeout']
+            return super(Popen, self).communicate(*args, **kwargs)
 
-        class TimeoutExpired(Exception):
-            pass
-
-        class Popen(subprocess.Popen):
-            """Sublcass of Popen that accepts and ignores a timeout argument."""
-            def communicate(self, *args, **kwargs):
-                if 'timeout' in kwargs:
-                    del kwargs['timeout']
-                return super(Popen, self).communicate(*args, **kwargs)
-
-        subprocess.TimeoutExpired = TimeoutExpired
-        subprocess.Popen = Popen
-        _EXTRA_POPEN_ARGS = {}
-
-        warnings.warn('Timeouts are not available')
-elif six.PY3:
-    # In python3.2+ this all just works, no need for the madness above.
-    import subprocess
-    _EXTRA_POPEN_ARGS = {}
-
-    if sys.platform == 'win32':
-        # There is no implementation in piglit to make timeouts work in
-        # windows, this uses the same Popen snippet as python 2 without
-        # subprocess32 to mask it. Patches are welcome.
-        # XXX: Should this also include cygwin?
-        warnings.warn('Timeouts are not implemented on Windows.')
-
-        class Popen(subprocess.Popen):
-            """Sublcass of Popen that accepts and ignores a timeout argument."""
-            def communicate(self, *args, **kwargs):
-                if 'timeout' in kwargs:
-                    del kwargs['timeout']
-                return super(Popen, self).communicate(*args, **kwargs)
-
-        subprocess.Popen = Popen
-    elif os.name == 'posix':
-        # This should work for all *nix systems, Linux, the BSDs, and OSX.
-        # This speicifically creates a session group for each test, so that
-        # it's children can be killed if it times out.
-        _EXTRA_POPEN_ARGS = {'start_new_session': True}
+    subprocess.Popen = Popen
+elif os.name == 'posix':
+    # This should work for all *nix systems, Linux, the BSDs, and OSX.
+    # This speicifically creates a session group for each test, so that
+    # it's children can be killed if it times out.
+    _EXTRA_POPEN_ARGS = {'start_new_session': True}
 
 # pylint: enable=wrong-import-position,wrong-import-order
 
@@ -153,8 +113,7 @@ def is_crash_returncode(returncode):
         return returncode < 0
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Test(object):
+class Test(metaclass=abc.ABCMeta):
     """ Abstract base class for Test classes
 
     This class provides the framework for running tests, with several methods
@@ -241,7 +200,7 @@ class Test(object):
                 # We know because subtests are ordered that the first test with
                 # a status of NOTRUN is the subtest that crashed, mark that
                 # test and move on.
-                for k, v in six.iteritems(self.result.subtests):
+                for k, v in self.result.subtests.items():
                     if v == status.NOTRUN:
                         self.result.subtests[k] = status.CRASH
                         break
@@ -264,13 +223,13 @@ class Test(object):
         self.result.command = ' '.join(self.command)
         self.result.environment = " ".join(
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
-                six.iteritems(OPTIONS.env), six.iteritems(self.env)))
+                OPTIONS.env.items(), self.env.items()))
 
         try:
             self.is_skip()
         except TestIsSkip as e:
             self.result.result = status.SKIP
-            for each in six.iterkeys(self.result.subtests):
+            for each in self.result.subtests.keys():
                 self.result.subtests[each] = status.SKIP
             self.result.out = e.reason
             self.result.returncode = None
@@ -279,10 +238,10 @@ class Test(object):
         try:
             self._run_command()
         except TestRunError as e:
-            self.result.result = six.text_type(e.status)
-            for each in six.iterkeys(self.result.subtests):
-                self.result.subtests[each] = six.text_type(e.status)
-            self.result.out = six.text_type(e)
+            self.result.result = str(e.status)
+            for each in self.result.subtests.keys():
+                self.result.subtests[each] = str(e.status)
+            self.result.out = str(e)
             self.result.returncode = None
             return
 
@@ -321,17 +280,10 @@ class Test(object):
         # command line options (2) override environment variables (1); and
         # Piglit considers environment variables set in all.py (3) to be test
         # requirements.
-        #
-        # passing this as unicode is basically broken in python2 on windows, it
-        # must be passed a bytes.
-        if six.PY2 and sys.platform.startswith('win32'):
-            f = six.binary_type
-        else:
-            f = six.text_type
-        _base = itertools.chain(six.iteritems(os.environ),
-                                six.iteritems(OPTIONS.env),
-                                six.iteritems(self.env))
-        fullenv = {f(k): f(v) for k, v in _base}
+        _base = itertools.chain(os.environ.items(),
+                                OPTIONS.env.items(),
+                                self.env.items())
+        fullenv = {str(k): str(v) for k, v in _base}
 
         try:
             proc = subprocess.Popen(command,
@@ -476,8 +428,7 @@ class ValgrindMixin(object):
                 self.result.result = 'fail'
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ReducedProcessMixin(object):
+class ReducedProcessMixin(metaclass=abc.ABCMeta):
     """This Mixin simplifies writing Test classes that run more than one test
     in a single process.
 

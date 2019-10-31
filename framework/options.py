@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,12 +26,7 @@ is that while you can mutate
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
-
-import six
 
 __all__ = ['OPTIONS']
 
@@ -78,7 +73,7 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.__init__()
 
     def __iter__(self):
-        for key, values in six.iteritems(self.__dict__):
+        for key, values in self.__dict__.items():
             if not key.startswith('_'):
                 yield key, values
 

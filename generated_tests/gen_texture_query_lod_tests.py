@@ -21,11 +21,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-from __future__ import print_function, division, absolute_import
 import os
 import os.path
-
-import six
 
 from templates import template_file
 from modules import utils
@@ -84,13 +81,13 @@ REQUIREMENTS = {
 
 def main():
     """Main function."""
-    for api, requirement in six.iteritems(REQUIREMENTS):
+    for api, requirement in REQUIREMENTS.items():
         lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
         dirname = os.path.join("spec", api.lower(), "compiler",
                                "built-in-functions")
         utils.safe_makedirs(dirname)
 
-        for sampler_type, coord_type in six.iteritems(SAMPLER_TYPE_TO_COORD_TYPE):
+        for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.items():
             requirements = [requirement['extensions']] if requirement['extensions'] else []
 
             # samplerCubeArray types are part GLSL 4.00

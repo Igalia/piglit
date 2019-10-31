@@ -57,13 +57,7 @@ The formula for determining fixes is:
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
-import six
-
-from framework import exceptions, compat
+from framework import exceptions
 
 __all__ = ['NOTRUN',
            'PASS',
@@ -98,7 +92,6 @@ def status_lookup(status):
         raise StatusException(status)
 
 
-@compat.python_2_unicode_compatible
 class StatusException(exceptions.PiglitInternalError):
     """ Raise this exception when a string is passed to status_lookup that
     doesn't exists
@@ -117,7 +110,6 @@ class StatusException(exceptions.PiglitInternalError):
         return u'Unknown status "{}"'.format(self.__status)
 
 
-@compat.python_2_unicode_compatible
 class Status(object):
     """ A simple class for representing the output values of tests.
 
@@ -146,7 +138,7 @@ class Status(object):
         assert isinstance(value, int), type(value)
         # The object is immutable, so calling self.foo = foo will raise a
         # TypeError. Using setattr from the parrent object works around this.
-        self.__name = six.text_type(name)
+        self.__name = str(name)
         self.__value = value
         self.__fraction = fraction
 
@@ -170,10 +162,7 @@ class Status(object):
             self.name, self.value, self.fraction)
 
     def __bytes__(self):
-        if six.PY2:
-            return str(self.name)
-        elif six.PY3:
-            return bytes(self.name, 'utf-8')
+        return bytes(self.name, 'utf-8')
 
     def __str__(self):
         return self.name
@@ -189,10 +178,10 @@ class Status(object):
         # the __int__ magic method
         if isinstance(other, (int, Status)):
             return int(self) == int(other)
-        elif isinstance(other, six.text_type):
-            return six.text_type(self) == other
-        elif isinstance(other, six.binary_type):
-            return six.binary_type(self) == other
+        elif isinstance(other, str):
+            return str(self) == other
+        elif isinstance(other, bytes):
+            return bytes(self) == other
         raise TypeError("Cannot compare type: {}".format(type(other)))
 
     def __ne__(self, other):
@@ -223,13 +212,13 @@ class NoChangeStatus(Status):
         super(NoChangeStatus, self).__init__(name, value, fraction)
 
     def __eq__(self, other):
-        if isinstance(other, (str, six.text_type, Status)):
-            return six.text_type(self) == six.text_type(other)
+        if isinstance(other, (str, Status)):
+            return str(self) == str(other)
         raise TypeError("Cannot compare type: {}".format(type(other)))
 
     def __ne__(self, other):
-        if isinstance(other, (str, six.text_type, Status)):
-            return six.text_type(self) != six.text_type(other)
+        if isinstance(other, (str, Status)):
+            return str(self) != str(other)
         raise TypeError("Cannot compare type: {}".format(type(other)))
 
     def __hash__(self):

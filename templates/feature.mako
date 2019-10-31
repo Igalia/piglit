@@ -2,9 +2,6 @@
   import posixpath  # this must be posixpath, since we want /'s not \'s
   import re
 
-  from six.moves import range
-
-
   def feat_result(result):
       """Percentage result string"""
       return '{}/{}'.format(result[0], result[1])

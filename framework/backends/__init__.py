@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014-2016 Intel Corporation
+# Copyright (c) 2014-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -42,13 +42,8 @@ that a user actually wants.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
 import importlib
-
-import six
 
 from .register import Registry
 from .compression import COMPRESSION_SUFFIXES
@@ -165,7 +160,7 @@ def load(file_path):
 
     extension, compression = get_extension(file_path)
 
-    for backend in six.itervalues(BACKENDS):
+    for backend in BACKENDS.values():
         if extension in backend.extensions:
             loader = backend.load
 

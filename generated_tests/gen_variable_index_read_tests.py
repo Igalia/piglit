@@ -21,11 +21,8 @@
 
 """Generate tests for glsl 1.10 and 1.20 variable index reads."""
 
-from __future__ import print_function, absolute_import, division
 import os
 import itertools
-
-from six.moves import range
 
 from templates import template_dir
 from modules.utils import lazy_property, safe_makedirs

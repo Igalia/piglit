@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,6 @@ except ImportError:
 
 import jsonschema
 import pytest
-import six
 
 from framework import backends
 from framework import exceptions
@@ -65,7 +64,7 @@ class TestJSONBackend(object):
         """Tests for the initialize method."""
 
         def test_metadata_file_created(self, tmpdir):
-            p = six.text_type(tmpdir)
+            p = str(tmpdir)
             test = backends.json.JSONBackend(p)
             test.initialize(shared.INITIAL_METADATA)
             assert os.path.exists(os.path.join(p, 'metadata.json'))
@@ -75,7 +74,7 @@ class TestJSONBackend(object):
 
         def test_write(self, tmpdir):
             """The write method should create a file."""
-            p = six.text_type(tmpdir)
+            p = str(tmpdir)
             test = backends.json.JSONBackend(p)
             test.initialize(shared.INITIAL_METADATA)
 
@@ -91,7 +90,7 @@ class TestJSONBackend(object):
             handled elsewhere), instead it just attempts a touch test of "can
             this be read as JSON".
             """
-            p = six.text_type(tmpdir)
+            p = str(tmpdir)
             test = backends.json.JSONBackend(p)
             test.initialize(shared.INITIAL_METADATA)
 
@@ -110,7 +109,7 @@ class TestJSONBackend(object):
         @pytest.fixture(scope='class')
         def result_dir(self, tmpdir_factory):
             directory = tmpdir_factory.mktemp('main')
-            test = backends.json.JSONBackend(six.text_type(directory))
+            test = backends.json.JSONBackend(str(directory))
             test.initialize(shared.INITIAL_METADATA)
             with test.write_test(self.name) as t:
                 t(self.result)
@@ -148,7 +147,7 @@ class TestJSONBackend(object):
             jsonschema.validate(json_, schema)
 
         def test_ignores_invalid(self, tmpdir):
-            test = backends.json.JSONBackend(six.text_type(tmpdir))
+            test = backends.json.JSONBackend(str(tmpdir))
             test.initialize(shared.INITIAL_METADATA)
             with test.write_test(self.name) as t:
                 t(self.result)
@@ -175,7 +174,7 @@ class TestUpdateResults(object):
 
         with p.open('r') as f:
             base = backends.json._load(f)
-        backends.json._update_results(base, six.text_type(p))
+        backends.json._update_results(base, str(p))
 
 
 class TestResume(object):
@@ -186,11 +185,11 @@ class TestResume(object):
         p.write('')
 
         with pytest.raises(AssertionError):
-            backends.json._resume(six.text_type(p))
+            backends.json._resume(str(p))
 
     def test_load_valid_folder(self, tmpdir):
         """backends.json._resume: loads valid results."""
-        backend = backends.json.JSONBackend(six.text_type(tmpdir))
+        backend = backends.json.JSONBackend(str(tmpdir))
         backend.initialize(shared.INITIAL_METADATA)
         with backend.write_test("group1/test1") as t:
             t(results.TestResult('fail'))
@@ -198,7 +197,7 @@ class TestResume(object):
             t(results.TestResult('pass'))
         with backend.write_test("group2/test3") as t:
             t(results.TestResult('fail'))
-        test = backends.json._resume(six.text_type(tmpdir))
+        test = backends.json._resume(str(tmpdir))
 
         assert set(test.tests.keys()) == \
             {'group1/test1', 'group1/test2', 'group2/test3'}
@@ -208,7 +207,7 @@ class TestResume(object):
 
         This gets triggered by an incomplete atomic write
         """
-        f = six.text_type(tmpdir)
+        f = str(tmpdir)
         backend = backends.json.JSONBackend(f)
         backend.initialize(shared.INITIAL_METADATA)
         with backend.write_test("group1/test1") as t:
@@ -233,7 +232,7 @@ class TestResume(object):
         doing a refactor to split some code out and allow this to be done in
         the resume path.
         """
-        f = six.text_type(tmpdir)
+        f = str(tmpdir)
         backend = backends.json.JSONBackend(f)
         backend.initialize(shared.INITIAL_METADATA)
         with backend.write_test("group1/test1") as t:
@@ -260,20 +259,20 @@ class TestLoadResults(object):
         p = tmpdir.join('results.json')
         with p.open('w') as f:
             f.write(json.dumps(shared.JSON))
-        backends.json.load_results(six.text_type(tmpdir), 'none')
+        backends.json.load_results(str(tmpdir), 'none')
 
     def test_load_file(self, tmpdir):
         """backends.json.load_results: Loads a file passed by name"""
         p = tmpdir.join('my file')
         with p.open('w') as f:
             f.write(json.dumps(shared.JSON))
-        backends.json.load_results(six.text_type(p), 'none')
+        backends.json.load_results(str(p), 'none')
 
     def test_inst(self, tmpdir):
         p = tmpdir.join('my file')
         with p.open('w') as f:
             f.write(json.dumps(shared.JSON))
-        assert isinstance(backends.json.load_results(six.text_type(p), 'none'),
+        assert isinstance(backends.json.load_results(str(p), 'none'),
                           results.TestrunResult)
 
 

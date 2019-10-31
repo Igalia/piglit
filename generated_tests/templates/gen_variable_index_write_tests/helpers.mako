@@ -21,13 +21,11 @@
 <%!
   import textwrap
 
-  from six.moves import range
-
   def clean_block(block):
       """Clean a block of text that is meant to have no indent or newlines.
 
       Removes blank lines and any leading or trailing whitespaces.
-      
+
       """
       ret = []
       for l in block.splitlines():
@@ -50,7 +48,7 @@
           else:
               ret.append(l)
       return '\n'.join(ret)
-              
+
 %>
 
 <%def name="license()" filter="textwrap.dedent">

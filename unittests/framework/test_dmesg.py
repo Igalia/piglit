@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,6 @@ which allows us to test all classes on all platforms, including windows.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import collections
 import re
 try:
@@ -37,7 +34,6 @@ except ImportError:
     from unittest import mock
 
 import pytest
-import six
 
 from framework import dmesg
 from framework import status
@@ -89,7 +85,7 @@ class TestBaseDmesg(object):
             (status.NOTRUN, status.NOTRUN),
             (status.TIMEOUT, status.TIMEOUT),
         ],
-        ids=six.text_type)
+        ids=str)
     def test_update_result_status(self, initial, expected):
         """Test that when update_result is called status change when they
         should, and don't when they shouldn't.
@@ -109,7 +105,7 @@ class TestBaseDmesg(object):
             (status.NOTRUN, status.NOTRUN),
             (status.TIMEOUT, status.TIMEOUT),
         ],
-        ids=six.text_type)
+        ids=str)
     def test_update_result_subtests(self, initial, expected):
         """Test that when update_result is called subtest statuses change when
         they should, and don't when they shouldn't.
@@ -194,28 +190,12 @@ class TestLinuxDmesgTimestamps(object):
         with pytest.warns(RuntimeWarning):
             dmesg.LinuxDmesg()
 
-    @skip.PY3
-    def test_config_oserror(self, mocker):
-        """Test that on python 2.x if an OSError is raised by gzip.open
-        operation doesn't stop.
-        """
-        self._do_test(OSError, mocker)
-
-    @skip.PY3
-    def test_config_ioerror(self, mocker):
-        """Test that on python 2.x if an IOError is raised by gzip.open
-        operation doesn't stop.
-        """
-        self._do_test(IOError, mocker)
-
-    @skip.PY2
     def test_config_filenotfounderror(self, mocker):
         """Test that on python 3.x if an FileNotFound is raised by gzip.open
         operation doesn't stop.
         """
         self._do_test(FileNotFoundError, mocker)
 
-    @skip.PY2
     def test_config_permissionerror(self, mocker):
         """Test that on python 3.x if an PermissionError is raised by gzip.open
         operation doesn't stop.
@@ -340,7 +320,7 @@ def _name_get_dmesg(value):
     """Function that names TestGetDmesg.test_get_dmesg."""
     if isinstance(value, bool):
         return 'real' if not value else 'dummy'
-    elif isinstance(value, six.text_type):
+    elif isinstance(value, str):
         return value
     elif isinstance(value, dmesg.BaseDmesg):
         return repr(value)

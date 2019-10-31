@@ -1,4 +1,3 @@
-<%! from six.moves import range %>
 ## Test execution of pack2x16 functions in the fragment shader.
 [require]
 ${func.requirements}

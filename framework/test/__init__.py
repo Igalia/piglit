@@ -25,9 +25,6 @@
 # create a general use API, but allow it to be controlled by setting the
 # __all__ in each module
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 from .base import *
 from .piglit_test import *
 from .glsl_parser_test import *

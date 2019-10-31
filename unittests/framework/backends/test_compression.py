@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 
 """Tests for compression in file backends."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import itertools
 import os
 import subprocess
@@ -33,7 +30,6 @@ except ImportError:
     from unittest import mock
 
 import pytest
-import six
 
 from framework import core
 from framework.backends import abstract
@@ -68,19 +64,6 @@ def _has_xz_bin():
             raise
         return False
     return True
-
-
-requires_lzma = pytest.mark.skipif(  # pylint: disable=invalid-name
-    six.PY2 and not _has_lzma(),
-    reason="Python 2.x requires backports.lzma to run this test.")
-
-requires_xz_bin = pytest.mark.skipif(  # pylint: disable=invalid-name
-    _has_lzma() or not _has_xz_bin(),
-    reason="Python 2.x requires xz binary to run this test.")
-
-requires_any_lzma = pytest.mark.skipif(  # pylint: disable=invalid-name
-    six.PY2 and not (_has_lzma() or _has_xz_bin()),
-    reason="Python 2.x requires some form of xz compression to run this test.")
 
 
 @pytest.yield_fixture
@@ -135,7 +118,7 @@ def compressor():
 # Tests
 
 
-@pytest.mark.parametrize("mode", ['none', 'bz2', 'gz', requires_lzma('xz')])
+@pytest.mark.parametrize("mode", ['none', 'bz2', 'gz', 'xz'])
 def test_compress(mode, tmpdir):
     """Test that each compressor that we want works.
 
@@ -145,11 +128,11 @@ def test_compress(mode, tmpdir):
     """
     func = compression.COMPRESSORS[mode]
     testfile = tmpdir.join('test')
-    with func(six.text_type(testfile)) as f:
+    with func(str(testfile)) as f:
         f.write('foo')
 
 
-@pytest.mark.parametrize("mode", ['none', 'bz2', 'gz', requires_lzma('xz')])
+@pytest.mark.parametrize("mode", ['none', 'bz2', 'gz', 'xz'])
 def test_decompress(mode, tmpdir):
     """Test that each supported decompressor works.
 
@@ -159,18 +142,16 @@ def test_decompress(mode, tmpdir):
     dec = compression.DECOMPRESSORS[mode]
     testfile = tmpdir.join('test')
 
-    with comp(six.text_type(testfile)) as f:
+    with comp(str(testfile)) as f:
         f.write('foo')
 
-    with dec(six.text_type(testfile)) as f:
+    with dec(str(testfile)) as f:
         actual = f.read()
 
     assert actual == 'foo'
 
 
 @skip.posix
-@skip.PY3
-@requires_xz_bin
 class TestXZBin(object):
     """Tests for the xz bin path on python2.x."""
 
@@ -178,7 +159,7 @@ class TestXZBin(object):
         """Test python2 xz compression using the xz binary."""
         func = compression.COMPRESSORS['xz']
         testfile = tmpdir.join('test')
-        with func(six.text_type(testfile)) as f:
+        with func(str(testfile)) as f:
             f.write('foo')
 
     def test_decompress_xz_bin(self, tmpdir):
@@ -187,10 +168,10 @@ class TestXZBin(object):
         dec = compression.DECOMPRESSORS['xz']
         testfile = tmpdir.join('test')
 
-        with comp(six.text_type(testfile)) as f:
+        with comp(str(testfile)) as f:
             f.write('foo')
 
-        with dec(six.text_type(testfile)) as f:
+        with dec(str(testfile)) as f:
             actual = f.read()
 
         assert actual == 'foo'
@@ -231,7 +212,7 @@ class TestGetMode(object):
         assert compression.get_mode() == 'foobar'
 
 
-@pytest.mark.parametrize("extension", ['bz2', 'gz', requires_any_lzma('xz')])
+@pytest.mark.parametrize("extension", ['bz2', 'gz', 'xz'])
 def test_duplicate_extensions(extension, tmpdir, config):
     """Tests that exersizes a bug that caused the compressed extension to be
     duplicated in some cases.
@@ -252,11 +233,8 @@ def test_changed_extension(orig, new, tmpdir, config):
     """Tests that exersizes a bug that caused two extensions to be present if
     the compression method changed.
     """
-    if 'xz' in [new, orig] and six.PY2 and not (_has_lzma() or _has_xz_bin()):
-        pytest.skip("There is no xz compressor available.")
-
     tmpdir.chdir()
-    config.set('core', 'compression', six.text_type(new))
+    config.set('core', 'compression', str(new))
 
     with abstract.write_compressed('results.txt.' + orig) as f:
         f.write('foo')

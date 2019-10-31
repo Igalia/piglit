@@ -23,9 +23,6 @@
 
 """ Module provides a base class for Tests """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import glob
 import os
 import sys
@@ -33,8 +30,6 @@ try:
     import simplejson as json
 except ImportError:
     import json
-
-import six
 
 from framework import core, options
 from framework import status
@@ -106,7 +101,7 @@ class PiglitBaseTest(ValgrindMixin, Test):
         # missing feature. We should fix these tests to do the right thing, but
         # for the moment this work around will suffice to keep things running.
         if self.result.raw_result is status.SKIP and self.result.subtests:
-            for k, v in six.iteritems(self.result.subtests):
+            for k, v in self.result.subtests.items():
                 if v is status.NOTRUN:
                     self.result.subtests[k] = status.SKIP
 

@@ -27,15 +27,9 @@ The template then formats that information into a shader_test for either the
 fragment shader stage or the vertex shader stage.
 
 """
-
-from __future__ import (
-    print_function, absolute_import, division, unicode_literals
-)
 import copy
 import itertools
 import os
-
-from six.moves import range  # pylint: disable=redefined-builtin
 
 from modules import utils, glsl
 from templates import template_dir

@@ -1,5 +1,5 @@
 # encoding=utf-8
-# Copyright © 2016 Intel Corporation
+# Copyright © 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 
 """Tests for the feature summary module."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 try:
     import simplejson as json
 except ImportError:
@@ -34,7 +31,6 @@ except ImportError:
     from unittest import mock
 
 import pytest
-import six
 
 from framework import grouptools
 from framework import results
@@ -87,14 +83,14 @@ class TestFeatResult(object):
         p.write(json.dumps(DATA))
 
         result = results.TestrunResult()
-        for n, s in six.iteritems(PROFILE.test_list):
+        for n, s in PROFILE.test_list.items():
             result.tests[n] = s.result
         result.options['profile'] = [None]
         result.name = 'foo'
 
         with mock.patch('framework.summary.feature.profile.load_test_profile',
                         mock.Mock(return_value=PROFILE)):
-            return feature.FeatResults([result], six.text_type(p))
+            return feature.FeatResults([result], str(p))
 
     def test_basic(self, feature):
         """The fixture works."""

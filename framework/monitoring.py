@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2016 Intel Corporation
+# Copyright (c) 2016, 2019 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -32,15 +32,10 @@ with code 3.
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import abc
 import errno
 import os
 import re
-
-import six
 
 from framework.core import PIGLIT_CONFIG
 from framework.dmesg import LinuxDmesg
@@ -138,7 +133,7 @@ class Monitoring(object):
     def update_monitoring(self):
         """Update the new messages for each monitoring object"""
         if self._monitoring_rules:
-            for monitoring_rule in six.itervalues(self._monitoring_rules):
+            for monitoring_rule in self._monitoring_rules.values():
                 monitoring_rule.update_monitoring()
 
     def check_monitoring(self):
@@ -153,8 +148,7 @@ class Monitoring(object):
         self.update_monitoring()
 
         if self._monitoring_rules:
-            for rule_key, monitoring_rule in six.iteritems(
-                    self._monitoring_rules):
+            for rule_key, monitoring_rule in self._monitoring_rules.items():
                 # Get error message
                 self._abort_error = monitoring_rule.check_monitoring()
                 # if error message is not empty, abort is requested
@@ -165,8 +159,7 @@ class Monitoring(object):
                     break
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BaseMonitoring(object):
+class BaseMonitoring(metaclass=abc.ABCMeta):
     """Abstract base class for Monitoring derived objects
 
     This provides the bases of the constructor and most subclasses should call

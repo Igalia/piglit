@@ -1,5 +1,5 @@
 # encoding=utf-8
-# Copyright © 2016 Intel Corporation
+# Copyright © 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,12 @@
 
 """Tests from generated_tests/modules/types.py"""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import itertools
 
 import pytest
 
 # pylint can't figure out the sys.path manipulation.
-from modules import types  # pylint: disable=import-error,wrong-import-order
+from generated_tests.modules import types  # pylint: disable=import-error,wrong-import-order
 
 
 def test_container_is_type_assert():

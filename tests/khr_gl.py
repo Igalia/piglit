@@ -44,9 +44,6 @@ PIGLIT_KHR_GL_EXTRA_ARGS -- environment equivalent of [khr_gl]:extra_args
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import itertools
 
 from framework.test import deqp

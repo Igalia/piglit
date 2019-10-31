@@ -49,14 +49,10 @@
  This program outputs, to stdout, the name of each file it generates.
 """
 
-from __future__ import print_function, division, absolute_import
 from builtin_function import *
 import os
 import numpy
 import struct
-
-import six
-from six.moves import range
 
 from templates import template_file
 
@@ -221,7 +217,7 @@ def drop_signbit(xs):
 def main():
     """ Main function """
 
-    for signature, test_vectors in six.iteritems(test_suite):
+    for signature, test_vectors in test_suite.items():
         arg_float_check = all(arg.base_type == glsl_float for arg in signature.argtypes)
         arg_mat_check = any(arg.is_matrix for arg in signature.argtypes)
         # Filter the test vectors down to only those which deal exclusively in

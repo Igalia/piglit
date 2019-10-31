@@ -1,4 +1,3 @@
-<%! from six.moves import range %>
 ## Test execution of unpack2x16 functions in the vertex shader.
 [require]
 ${func.requirements}

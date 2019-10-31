@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2013-2016 Intel Corporation
+# Copyright 2013-2016, 2019 Intel Corporation
 # Copyright 2013, 2014 Advanced Micro Devices
 # Copyright 2014 VMWare
 
@@ -23,9 +23,6 @@
 
 """Genrate html summaries."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import errno
 import getpass
 import os
@@ -38,7 +35,6 @@ import zlib
 
 import mako
 from mako.lookup import TemplateLookup
-import six
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
@@ -113,7 +109,7 @@ def _make_testrun_info(results, destination, exclude=None):
                 info=each.info))
 
         # Then build the individual test results
-        for key, value in six.iteritems(each.tests):
+        for key, value in each.tests.items():
             html_path = os.path.join(destination, name,
                                      escape_filename(key + ".html"))
             temp_path = os.path.dirname(html_path)

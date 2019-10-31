@@ -23,7 +23,6 @@
 
 """Generate in/out fp64 tests."""
 
-from __future__ import print_function, division, absolute_import
 import argparse
 import os
 import itertools

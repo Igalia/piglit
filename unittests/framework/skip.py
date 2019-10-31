@@ -1,5 +1,5 @@
 # encoding=utf-8
-# Copyright © 2016 Intel corporation
+# Copyright © 2016, 2019 Intel corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,19 +25,13 @@ There are a number of repeated conditions for skipping, python version, os name
 or class, etc.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import os
 import sys
 
 import pytest
-import six
 
 # pylint: disable=invalid-name
 
-PY2 = pytest.mark.skipif(six.PY2, reason="Test isn't relavent on python 2.x")
-PY3 = pytest.mark.skipif(six.PY3, reason="Test isn't relavent on python 3.x")
 posix = pytest.mark.skipif(
     os.name != 'posix', reason="Test is only relavent on posix systems.")
 windows = pytest.mark.skipif(

@@ -23,7 +23,6 @@
 
 """Generate fp64 and int64 types conversion tests."""
 
-from __future__ import print_function, division, absolute_import
 import abc
 import argparse
 import itertools

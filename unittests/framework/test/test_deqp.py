@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2015-2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,6 @@ tests
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import textwrap
 try:
     from unittest import mock
@@ -36,7 +33,6 @@ except ImportError:
     import mock
 
 import pytest
-import six
 
 from framework import exceptions
 from framework import grouptools
@@ -128,7 +124,7 @@ class TestIterDeqpTestCases(object):
         """Run the acutal test."""
         p = tmpdir.join('foo')
         p.write(write)
-        gen = deqp.iter_deqp_test_cases(six.text_type(p))
+        gen = deqp.iter_deqp_test_cases(str(p))
         assert next(gen) == expect
 
     def test_test_cases(self, tmpdir):
@@ -310,7 +306,7 @@ dEQP.piglit.nested.group2.test4
     def test_basic(self, tmpdir):
         p = tmpdir.join('foo.txt')
         p.write(self._txt)
-        tests = set(deqp.gen_mustpass_tests(six.text_type(p)))
+        tests = set(deqp.gen_mustpass_tests(str(p)))
         print(tests)
         assert tests == {
             'dEQP.piglit.group1.test1',

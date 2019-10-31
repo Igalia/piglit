@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2013-2016 Intel Corporation
+# Copyright 2013-2016, 2019 Intel Corporation
 # Copyright 2013, 2014 Advanced Micro Devices
 # Copyright 2014 VMWare
 
@@ -23,14 +23,8 @@
 
 """Shared functions for summary generation."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import re
 import operator
-
-import six
-from six.moves import zip
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
@@ -96,11 +90,11 @@ class Names(object):
         """A set of all tests in all runs."""
         all_ = set()
         for res in self.__results:
-            for key, value in six.iteritems(res.tests):
+            for key, value in res.tests.items():
                 if not value.subtests:
                     all_.add(key)
                 else:
-                    for subt in six.iterkeys(value.subtests):
+                    for subt in value.subtests.keys():
                         all_.add(grouptools.join(key, subt))
         return all_
 

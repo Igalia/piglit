@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,6 @@ is mainly just a sanity check to make sure the modules don't contain syntax
 errors and to ensure that the API hasn't changed without fixing these modules
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import importlib
 
 import pytest

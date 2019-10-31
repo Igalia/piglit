@@ -25,10 +25,6 @@
 Generate C source code from Khronos XML.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 import argparse
 import os.path
 import re
@@ -36,7 +32,6 @@ import sys
 import functools
 from collections import namedtuple
 
-import six
 import mako.runtime
 import mako.template
 
@@ -111,14 +106,7 @@ def render_template(filename, out_dir, **context_vars):
         if debug:
             print('fake whitespace: before: {0!r}'.format(proto_text))
 
-        if six.PY2:
-            # the unicode function was removed in python3, this will raise a
-            # pylint error, but not in python2
-            # pylint: disable=undefined-variable
-            text = unicode(proto_text)
-        elif six.PY3:
-            text = proto_text
-
+        text = proto_text
         text = fake_alignment.sub('', text)
         text = fake_tab.sub('\t', text)
         if debug:

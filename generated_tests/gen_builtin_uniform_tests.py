@@ -44,15 +44,12 @@
 # With the optional argument --names-only, it only outputs the names
 # of the files; it doesn't generate them.
 
-from __future__ import print_function, division, absolute_import
 from builtin_function import *
 import abc
 import numpy
 import optparse
 import os
 import os.path
-
-from six.moves import range
 
 from modules import utils
 

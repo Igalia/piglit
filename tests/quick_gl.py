@@ -10,10 +10,6 @@ don't want that level of exhaustiveness, so this filter removes 80% in a random
 (but deterministic) way.
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
-
 from framework import grouptools
 from framework.test import PiglitGLTest
 from tests.opengl import profile as _profile

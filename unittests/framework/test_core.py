@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016 Intel Corporation
+# Copyright (c) 2014, 2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,12 @@
 
 """ Module providing tests for the core module """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import collections
 import errno
 import os
 import textwrap
 
 import pytest
-import six
 
 from framework import core
 from framework import exceptions
@@ -58,7 +54,7 @@ class TestParseListfile(object):
         """
         f = tmpdir.join('test.list')
         f.write("/tmp/foo\n/tmp/bar\n")
-        results = core.parse_listfile(six.text_type(f))
+        results = core.parse_listfile(str(f))
         assert isinstance(results, collections.Container)
 
     def test_parse_listfile_whitespace(self, tmpdir):
@@ -73,7 +69,7 @@ class TestParseListfile(object):
             space
             newline
         """))
-        results = core.parse_listfile(six.text_type(f))
+        results = core.parse_listfile(str(f))
 
         assert results[0] == 'space between'
         assert results[1] == 'tab'
@@ -96,7 +92,7 @@ class TestParseListfile(object):
 
         f = tmpdir.join('test.list')
         f.write("~/foo\n")
-        results = core.parse_listfile(six.text_type(f))
+        results = core.parse_listfile(str(f))
         assert os.path.normpath(results[0]) == expected
 
 
@@ -111,7 +107,7 @@ class TestGetConfig(object):
     def test_config_in_xdg_config_home(self, tmpdir, mocker):
         """core.get_config() finds $XDG_CONFIG_HOME/piglit.conf"""
         env = mocker.patch('framework.core.os.environ', new={})
-        env['XDG_CONFIG_HOME'] = six.text_type(tmpdir)
+        env['XDG_CONFIG_HOME'] = str(tmpdir)
         conf = tmpdir.join('piglit.conf')
         conf.write(self._CONF_FILE)
         core.get_config()
@@ -122,7 +118,7 @@ class TestGetConfig(object):
     def test_config_in_home_dir(self, tmpdir, mocker):
         """core.get_config() finds $HOME/.config/piglit.conf"""
         env = mocker.patch('framework.core.os.environ', new={})
-        env['HOME'] = six.text_type(tmpdir)
+        env['HOME'] = str(tmpdir)
         conf = tmpdir.join('piglit.conf')
         conf.write(self._CONF_FILE)
         core.get_config()
@@ -139,7 +135,7 @@ class TestGetConfig(object):
         try:
             core.get_config()
         finally:
-            os.chdir(six.text_type(ret))
+            os.chdir(str(ret))
 
         assert core.PIGLIT_CONFIG.has_section('nose-test')
 
@@ -148,7 +144,7 @@ class TestGetConfig(object):
         # Mock the __file__ attribute of the core module, since that's how
         # piglit decides where the root of the piglit directory is.
         mocker.patch('framework.core.__file__',
-                     six.text_type(tmpdir.join('framework', 'core.py')))
+                     str(tmpdir.join('framework', 'core.py')))
         mocker.patch('framework.core.os.environ', new={})
         conf = tmpdir.join('piglit.conf')
         conf.write(self._CONF_FILE)
@@ -258,7 +254,6 @@ class TestCheckDir(object):
         with pytest.raises(Sentinel):
             core.check_dir('foo', handler=mocker.Mock(side_effect=Sentinel))
 
-    @skip.PY2
     def test_stat_FileNotFoundError(self, mocker, tmpdir):
         """core.check_dir: FileNotFoundError is raised and failifexsits is
         False continue."""

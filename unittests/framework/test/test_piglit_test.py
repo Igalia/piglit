@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014-2016 Intel Corporation
+# Copyright (c) 2014-2016, 2019 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 
 """Tests for the piglit_test module."""
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import textwrap
 try:
     from unittest import mock
@@ -31,7 +28,6 @@ except ImportError:
     import mock
 
 import pytest
-
 
 from framework import status
 from framework.options import _Options as Options

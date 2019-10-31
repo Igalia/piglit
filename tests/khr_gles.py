@@ -46,9 +46,6 @@ PIGLIT_KHR_GLES_EXTRA_ARGS -- environment equivalent of
 
 """
 
-from __future__ import (
-    absolute_import, division, print_function, unicode_literals
-)
 import itertools
 
 from framework.test import deqp

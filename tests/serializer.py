@@ -27,8 +27,6 @@ import os
 import sys
 import xml.etree.cElementTree as et
 
-import six
-
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 from framework.test.piglit_test import (
@@ -75,7 +73,7 @@ def _serialize_skips(test, elem):
 def serializer(name, profile, outfile):
     """Take each test in the profile and write it out into the xml."""
     # TODO: This is going to take a lot of memory
-    root = et.Element('PiglitTestList', count=six.text_type(len(profile)),
+    root = et.Element('PiglitTestList', count=str(len(profile)),
                       name=name)
     for name, test in profile.itertests():
         if isinstance(test, PiglitGLTest):
@@ -136,7 +134,7 @@ def serializer(name, profile, outfile):
             et.SubElement(elem, 'option', name='cwd', value=test.cwd)
         if test.env:
             env = et.SubElement(elem, 'environment')
-            for k, v in six.iteritems(test.env):
+            for k, v in test.env.items():
                 et.SubElement(env, 'env', name=k, value=v)
 
     tree = et.ElementTree(root)
