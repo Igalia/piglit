@@ -1,0 +1,22 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform float x_f;
+uniform float y_f;
+void main()
+{
+    int x_i = int(x_f);
+    int y_i = int(y_f);
+    int i = x_i < 0 ? -y_i : y_i;
+    float f = float(i) / 255.0;
+	gl_FragColor = vec4(1.0 - f, f, 0.0, 1.0);
+}
+
+[test]
+uniform float x_f -0.5
+uniform float y_f 255.0
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
