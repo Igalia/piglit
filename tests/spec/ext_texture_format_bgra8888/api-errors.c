@@ -55,17 +55,20 @@ run_test(void)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		pass = false;
 
-	/* glTexImage2D, invalid internal format */
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0,
-		     GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-		pass = false;
+	/* OpenGL ES < 3.0 */
+	if (!piglit_is_gles3()) {
+		/* glTexImage2D, invalid internal format */
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0,
+			     GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			pass = false;
 
-	/* glTexImage2D, invalid format */
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA_EXT, 2, 2, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-		pass = false;
+		/* glTexImage2D, invalid format */
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA_EXT, 2, 2, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			pass = false;
+	}
 
 	/* glTexImage2D, invalid type */
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA_EXT, 2, 2, 0,
@@ -79,11 +82,27 @@ run_test(void)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		pass = false;
 
-	/* glTexSubImage2D, invalid format */
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1,
-		        GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-		pass = false;
+	/* Difference between OpenGLES 2.0 and 3.0:
+	 *
+	 * OpenGL ES 2.0:
+	 *
+	 *   "GL_INVALID_OPERATION is generated if the texture array has not been
+	 *   defined by a previous glTexImage2D or glCopyTexImage2D operation whose
+	 *   internalformat matches the format of glTexSubImage2D"
+	 *
+	 * OpenGL ES 3.0:
+	 *
+	 *    "GL_INVALID_OPERATION is generated if the combination of internalFormat
+	 *    of the previously specified texture array, format and type is not valid."
+	 *
+	 */
+	if (!piglit_is_gles3()) {
+		/* glTexSubImage2D, invalid format */
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1,
+			        GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			pass = false;
+	}
 
 	/* glTexSubImage2D, invalid type */
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 1, 1,
