@@ -100,7 +100,7 @@ piglit_init(int argc, char **argv)
 
 	EGLint ctx_attr[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
 	EGLContext ctx =
-		eglCreateContext(dpy, EGL_NO_CONFIG_MESA, EGL_NO_CONTEXT, ctx_attr);
+		eglCreateContext(dpy, EGL_NO_CONFIG_KHR, EGL_NO_CONTEXT, ctx_attr);
 	if (ctx == EGL_NO_CONTEXT) {
 		fprintf(stderr, "could not create EGL context\n");
 		piglit_report_result(PIGLIT_FAIL);
