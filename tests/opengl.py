@@ -4541,6 +4541,7 @@ with profile.test_list.group_manager(
     g(['egl-copy-buffers'])
     g(['egl-gl_oes_egl_image'])
     g(['egl-flush-external'])
+    g(['egl-ext_egl_image_storage'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,
