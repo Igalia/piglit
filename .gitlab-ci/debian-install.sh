@@ -53,7 +53,6 @@ apt-get install -y \
   python3-pytest-mock \
   python3-pytest-timeout \
   python3-setuptools \
-  python3-six \
   python3-wheel \
   tox \
   waffle-utils

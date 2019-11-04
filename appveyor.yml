@@ -51,8 +51,6 @@ install:
 # Setup Python 3
 - set Path=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%Path%
 - pip --version
-# Install Six
-- pip install six
 # Install Mako
 - pip install Mako==1.0.6
 # Install Numpy
