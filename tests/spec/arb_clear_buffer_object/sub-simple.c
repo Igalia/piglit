@@ -38,13 +38,12 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-
 void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	const int buffer_size = 1<<20;
-	unsigned int buffer;
+	unsigned int buffer[2];
 	static const char *const data_7f   = "\x7f\x7f\x7f\x7f";
 	static const char *const data_init = "\xff\xff\xff\xff"
 					     "\xff\xff\xff\xff"
@@ -66,23 +65,39 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_clear_buffer_object");
 
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, buffer_size, NULL, GL_STREAM_READ);
-	fill_array_buffer(64, data_init);
+	glGenBuffers(ARRAY_SIZE(buffer), buffer);
+
+	for (int i = 0; i < 2; i++) {
+		glBindBuffer(GL_ARRAY_BUFFER, buffer[i]);
+		glBufferData(GL_ARRAY_BUFFER, buffer_size, NULL, GL_STREAM_READ);
+		fill_array_buffer(64, data_init);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
 
 	glClearBufferSubData(GL_ARRAY_BUFFER, GL_RGBA8, buffer_size/4,
 			buffer_size/2, GL_RGBA, GL_UNSIGNED_BYTE, data_7f);
 
-	pass = check_array_buffer_sub_data(0, buffer_size/4,
-			64, data_init) && pass;
-	pass = check_array_buffer_sub_data(buffer_size/4, buffer_size/2,
-			4, data_7f) && pass;
-	pass = check_array_buffer_sub_data(3*buffer_size/4, buffer_size/4,
-			64, data_init) && pass;
+	if (piglit_is_extension_supported("GL_EXT_direct_state_access")) {
+		glClearNamedBufferSubDataEXT(buffer[1], GL_RGBA8, buffer_size/4,
+			buffer_size/2, GL_RGBA, GL_UNSIGNED_BYTE, data_7f);
+	}
+
+	for (int i = 0; i < 2; i++) {
+		glBindBuffer(GL_ARRAY_BUFFER, buffer[i]);
+
+		pass = check_array_buffer_sub_data(0, buffer_size/4,
+				64, data_init) && pass;
+		pass = check_array_buffer_sub_data(buffer_size/4, buffer_size/2,
+				4, data_7f) && pass;
+		pass = check_array_buffer_sub_data(3*buffer_size/4, buffer_size/4,
+				64, data_init) && pass;
+
+		if (!piglit_is_extension_supported("GL_EXT_direct_state_access"))
+			break;
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, &buffer);
+	glDeleteBuffers(ARRAY_SIZE(buffer), buffer);
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 

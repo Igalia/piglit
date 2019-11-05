@@ -53,6 +53,20 @@ piglit_init(int argc, char **argv)
 			data_zero);
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
+	if (piglit_is_extension_supported("GL_EXT_direct_state_access")) {
+		/* The GL_ARB_clear_buffer_object spec doesn't specify
+		 * the error if buffer is an invalid name.
+		 * So reusing the logic from the EXT_direct_state_access, the
+		 * framebuffer will be created / initialized but the operation
+		 * will fail.
+		 */
+		glClearNamedBufferDataEXT(42, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE,
+					  data_zero);
+		pass = glGetError() != GL_NO_ERROR && pass;
+		pass = glIsBuffer(42) && pass;
+
+	}
+
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 

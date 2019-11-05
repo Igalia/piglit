@@ -46,7 +46,7 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	const int buffer_size = 1<<20;
-	unsigned int buffer;
+	unsigned int buffer[2];
 	static const char *const data_zero = "\x00\x00\x00\x00";
 	static const char *const data_init = "\xff\xff\xff\xff"
 					     "\xff\xff\xff\xff"
@@ -67,17 +67,28 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_clear_buffer_object");
 
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, buffer_size, NULL, GL_STREAM_READ);
-	fill_array_buffer(64, data_init);
+	/* Init buffers */
+	glGenBuffers(ARRAY_SIZE(buffer), buffer);
+	for (int i = 0; i < ARRAY_SIZE(buffer); i++) {
+		glBindBuffer(GL_ARRAY_BUFFER, buffer[i]);
+		glBufferData(GL_ARRAY_BUFFER, buffer_size, NULL, GL_STREAM_READ);
+		fill_array_buffer(64, data_init);
+	}
 
+	glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
 	glClearBufferData(GL_ARRAY_BUFFER, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE,
-			NULL);
+			  NULL);
 	pass = check_array_buffer_data(4, data_zero) && pass;
 
+	if (piglit_is_extension_supported("GL_EXT_direct_state_access")) {
+		glClearNamedBufferDataEXT(buffer[1], GL_RGBA8, GL_RGBA,
+					  GL_UNSIGNED_BYTE, NULL);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer[1]);
+		pass = check_array_buffer_data(4, data_zero) && pass;
+	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, &buffer);
+	glDeleteBuffers(ARRAY_SIZE(buffer), buffer);
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
