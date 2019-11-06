@@ -39,7 +39,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 GLuint prog;
 GLuint tbo;
-GLuint tex;
+GLuint tex[2];
 
 uint8_t *data;
 
@@ -53,14 +53,19 @@ GLint vertex_location;
 #define WIN_HEIGHT (TBO_WIDTH / WIN_WIDTH)
 
 enum piglit_result
-test_range(GLuint offset, GLuint size)
+test_range(GLuint offset, GLuint size, bool ext_dsa)
 {
 	const float green[4] = { 0, 1, 0, 0 };
 
 	glUseProgram(prog);
 
-	glBindTexture(GL_TEXTURE_BUFFER, tex);
-	glTexBufferRange(GL_TEXTURE_BUFFER, GL_R8UI, tbo, offset, size);
+	glBindTexture(GL_TEXTURE_BUFFER, tex[0]);
+	if (ext_dsa) {
+		glTextureBufferRangeEXT(tex[1], GL_TEXTURE_BUFFER, GL_R8UI, tbo, offset, size);
+		glBindTexture(GL_TEXTURE_BUFFER, tex[1]);
+	} else {
+		glTexBufferRange(GL_TEXTURE_BUFFER, GL_R8UI, tbo, offset, size);
+	}
 
 	glUniform1i(glGetUniformLocation(prog, "buf"), 0);
 	glUniform1ui(glGetUniformLocation(prog, "offset"), offset);
@@ -80,6 +85,8 @@ piglit_display(void)
 	GLint i, j, n;
 	GLuint vao, vbo;
 	GLint incr;
+	bool has_ext_dsa = piglit_is_extension_supported("GL_EXT_direct_state_access");
+
 	const float verts[] =
 		{ -1.0f, -1.0f,  -1.0f, 1.0f,  1.0f, 1.0f,  1.0f, -1.0f };
 
@@ -109,7 +116,10 @@ piglit_display(void)
 			GLint size = (TBO_SIZE - i) / j;
 			if (!size)
 				break;
-			result = test_range(i, (TBO_SIZE - i) / j);
+			result = test_range(i, (TBO_SIZE - i) / j, false);
+
+			if (result == PIGLIT_PASS && has_ext_dsa)
+				result = test_range(i, (TBO_SIZE - i) / j, true);
 		}
 		if (n > 128) { /* takes too long otherwise */
 			n = 0;
@@ -178,7 +188,7 @@ init_tbo()
 	glBindBuffer(GL_TEXTURE_BUFFER, tbo);
 	glBufferData(GL_TEXTURE_BUFFER, TBO_SIZE, data, GL_STATIC_DRAW);
 
-	glGenTextures(1, &tex);
+	glGenTextures(ARRAY_SIZE(tex), tex);
 
 	free(data);
 }
