@@ -192,14 +192,171 @@ verify_uniform(GLuint prog, enum uniform_enum u)
 	return match;
 }
 
+static bool
+test_set_get_uniforms(GLuint prog)
+{
+	GLint loc;
+	enum uniform_enum u;
+	loc = glGetUniformLocation(prog, uniform_values[d1].location);
+	glUniform1d(loc, uniform_values[d1].values[0]);
+
+	loc = glGetUniformLocation(prog, uniform_values[d2].location);
+	glUniform1d(loc, uniform_values[d2].values[0]);
+
+	loc = glGetUniformLocation(prog, uniform_values[sa].location);
+	glUniform1dv(loc, 1, uniform_values[sa].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[sd].location);
+	glUniform1d(loc, uniform_values[sd].values[0]);
+
+	loc = glGetUniformLocation(prog, uniform_values[u1_0].location);
+	glUniform2dv(loc, 1, uniform_values[u1_0].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[u2_0].location);
+	glUniform3dv(loc, 1, uniform_values[u2_0].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[v_1].location);
+	glUniform4dv(loc, 1, uniform_values[v_1].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m1].location);
+	glUniformMatrix2dv(loc, 1, false, uniform_values[m1].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m2].location);
+	glUniformMatrix3dv(loc, 1, false, uniform_values[m2].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m3].location);
+	glUniformMatrix4dv(loc, 1, false, uniform_values[m3].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m4].location);
+	glUniformMatrix2x3dv(loc, 1, false, uniform_values[m4].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m5].location);
+	glUniformMatrix2x4dv(loc, 1, false, uniform_values[m5].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m6].location);
+	glUniformMatrix3x2dv(loc, 1, false, uniform_values[m6].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m7].location);
+	glUniformMatrix3x4dv(loc, 1, false, uniform_values[m7].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m8_0].location);
+	glUniformMatrix4x2dv(loc, 1, false, uniform_values[m8_0].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m9].location);
+	glUniformMatrix4x3dv(loc, 1, false, uniform_values[m9].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[u1_1].location);
+	glUniform2d(loc,
+		    uniform_values[u1_1].values[0],
+		    uniform_values[u1_1].values[1]);
+
+	loc = glGetUniformLocation(prog, uniform_values[u2_2].location);
+	glUniform3d(loc,
+		    uniform_values[u2_2].values[0],
+		    uniform_values[u2_2].values[1],
+		    uniform_values[u2_2].values[2]);
+
+	loc = glGetUniformLocation(prog, uniform_values[v_0].location);
+	glUniform4d(loc,
+		    uniform_values[v_0].values[0],
+		    uniform_values[v_0].values[1],
+		    uniform_values[v_0].values[2],
+		    uniform_values[v_0].values[3]);
+
+	for (u = 0; u < _last; u++) {
+		if (!verify_uniform(prog, u))
+			return false;
+	}
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
+static bool
+test_set_get_uniforms_dsa(GLuint prog)
+{
+	GLint loc;
+	enum uniform_enum u;
+
+	glUseProgram(0);
+
+	loc = glGetUniformLocation(prog, uniform_values[d1].location);
+	glProgramUniform1dEXT(prog, loc, uniform_values[d1].values[0]);
+
+	loc = glGetUniformLocation(prog, uniform_values[d2].location);
+	glProgramUniform1dEXT(prog, loc, uniform_values[d2].values[0]);
+
+	loc = glGetUniformLocation(prog, uniform_values[sa].location);
+	glProgramUniform1dvEXT(prog, loc, 1, uniform_values[sa].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[sd].location);
+	glProgramUniform1dEXT(prog, loc, uniform_values[sd].values[0]);
+
+	loc = glGetUniformLocation(prog, uniform_values[u1_0].location);
+	glProgramUniform2dvEXT(prog, loc, 1, uniform_values[u1_0].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[u2_0].location);
+	glProgramUniform3dvEXT(prog, loc, 1, uniform_values[u2_0].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[v_1].location);
+	glProgramUniform4dvEXT(prog, loc, 1, uniform_values[v_1].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m1].location);
+	glProgramUniformMatrix2dvEXT(prog, loc, 1, false, uniform_values[m1].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m2].location);
+	glProgramUniformMatrix3dvEXT(prog, loc, 1, false, uniform_values[m2].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m3].location);
+	glProgramUniformMatrix4dvEXT(prog, loc, 1, false, uniform_values[m3].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m4].location);
+	glProgramUniformMatrix2x3dvEXT(prog, loc, 1, false, uniform_values[m4].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m5].location);
+	glProgramUniformMatrix2x4dvEXT(prog, loc, 1, false, uniform_values[m5].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m6].location);
+	glProgramUniformMatrix3x2dvEXT(prog, loc, 1, false, uniform_values[m6].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m7].location);
+	glProgramUniformMatrix3x4dvEXT(prog, loc, 1, false, uniform_values[m7].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m8_0].location);
+	glProgramUniformMatrix4x2dvEXT(prog, loc, 1, false, uniform_values[m8_0].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[m9].location);
+	glProgramUniformMatrix4x3dvEXT(prog, loc, 1, false, uniform_values[m9].values);
+
+	loc = glGetUniformLocation(prog, uniform_values[u1_1].location);
+	glProgramUniform2dEXT(prog, loc,
+			   uniform_values[u1_1].values[0],
+			   uniform_values[u1_1].values[1]);
+
+	loc = glGetUniformLocation(prog, uniform_values[u2_2].location);
+	glProgramUniform3dEXT(prog, loc,
+			   uniform_values[u2_2].values[0],
+			   uniform_values[u2_2].values[1],
+			   uniform_values[u2_2].values[2]);
+
+	loc = glGetUniformLocation(prog, uniform_values[v_0].location);
+	glProgramUniform4dEXT(prog, loc,
+			   uniform_values[v_0].values[0],
+			   uniform_values[v_0].values[1],
+			   uniform_values[v_0].values[2],
+			   uniform_values[v_0].values[3]);
+
+	for (u = 0; u < _last; u++) {
+		if (!verify_uniform(prog, u))
+			return false;
+	}
+	return piglit_check_gl_error(GL_NO_ERROR);
+}
+
 void
 piglit_init(int argc, char **argv)
 {
 	bool piglit_pass = true;
 	GLuint vs, fs, prog;
 	GLint numUniforms, i;
-	GLint loc;
-	enum uniform_enum u;
 
 	piglit_require_extension("GL_ARB_gpu_shader_fp64");
 
@@ -276,75 +433,10 @@ piglit_init(int argc, char **argv)
 	}
 
 	/* Check setting/getting values */
+	piglit_pass = test_set_get_uniforms(prog);
 
-	loc = glGetUniformLocation(prog, uniform_values[d1].location);
-	glUniform1d(loc, uniform_values[d1].values[0]);
-
-	loc = glGetUniformLocation(prog, uniform_values[d2].location);
-	glUniform1d(loc, uniform_values[d2].values[0]);
-
-	loc = glGetUniformLocation(prog, uniform_values[sa].location);
-	glUniform1dv(loc, 1, uniform_values[sa].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[sd].location);
-	glUniform1d(loc, uniform_values[sd].values[0]);
-
-	loc = glGetUniformLocation(prog, uniform_values[u1_0].location);
-	glUniform2dv(loc, 1, uniform_values[u1_0].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[u2_0].location);
-	glUniform3dv(loc, 1, uniform_values[u2_0].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[v_1].location);
-	glUniform4dv(loc, 1, uniform_values[v_1].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m1].location);
-	glUniformMatrix2dv(loc, 1, false, uniform_values[m1].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m2].location);
-	glUniformMatrix3dv(loc, 1, false, uniform_values[m2].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m3].location);
-	glUniformMatrix4dv(loc, 1, false, uniform_values[m3].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m4].location);
-	glUniformMatrix2x3dv(loc, 1, false, uniform_values[m4].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m5].location);
-	glUniformMatrix2x4dv(loc, 1, false, uniform_values[m5].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m6].location);
-	glUniformMatrix3x2dv(loc, 1, false, uniform_values[m6].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m7].location);
-	glUniformMatrix3x4dv(loc, 1, false, uniform_values[m7].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m8_0].location);
-	glUniformMatrix4x2dv(loc, 1, false, uniform_values[m8_0].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[m9].location);
-	glUniformMatrix4x3dv(loc, 1, false, uniform_values[m9].values);
-
-	loc = glGetUniformLocation(prog, uniform_values[u1_1].location);
-	glUniform2d(loc,
-		    uniform_values[u1_1].values[0],
-		    uniform_values[u1_1].values[1]);
-
-	loc = glGetUniformLocation(prog, uniform_values[u2_2].location);
-	glUniform3d(loc,
-		    uniform_values[u2_2].values[0],
-		    uniform_values[u2_2].values[1],
-		    uniform_values[u2_2].values[2]);
-
-	loc = glGetUniformLocation(prog, uniform_values[v_0].location);
-	glUniform4d(loc,
-		    uniform_values[v_0].values[0],
-		    uniform_values[v_0].values[1],
-		    uniform_values[v_0].values[2],
-		    uniform_values[v_0].values[3]);
-
-	for (u = 0; u < _last; u++) {
-		piglit_pass = piglit_pass && verify_uniform(prog, u);
+	if (piglit_is_extension_supported("GL_EXT_direct_state_access")) {
+		piglit_pass = test_set_get_uniforms_dsa(prog) && piglit_pass;
 	}
 
 	piglit_report_result(piglit_pass ? PIGLIT_PASS : PIGLIT_FAIL);
