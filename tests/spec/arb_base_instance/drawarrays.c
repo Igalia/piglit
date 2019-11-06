@@ -139,7 +139,7 @@ objpos_to_winpos(const float obj[2], int win[2])
 
 
 static bool
-test_instancing(GLuint divisor, GLuint baseInstance)
+test_instancing(GLuint divisor, GLuint baseInstance, GLuint vao)
 {
 	GLuint verts_bo, colors_bo;
 
@@ -163,7 +163,14 @@ test_instancing(GLuint divisor, GLuint baseInstance)
 	glVertexAttribPointer(ColorAttrib, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(ColorAttrib);
 	/* advance color once every 'n' instances */
-	glVertexAttribDivisorARB(ColorAttrib, divisor);
+
+	if (vao) {
+		glBindVertexArray(0);
+		glVertexArrayVertexAttribDivisorEXT(vao, ColorAttrib, divisor);
+		glBindVertexArray(vao);
+	} else {
+		glVertexAttribDivisorARB(ColorAttrib, divisor);
+	}
 
 	glViewport(0, 0, piglit_width, piglit_height);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -206,10 +213,16 @@ enum piglit_result
 piglit_display(void)
 {
 	GLuint div, baseInst;
+	bool has_ext_dsa = piglit_is_extension_supported("GL_EXT_direct_state_access");
+	GLint vao;
+
+	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vao);
 
 	for (div = 1; div <= PRIMS; div++) {
 		for (baseInst = 0; baseInst < PRIMS -1; baseInst++) {
-			if (!test_instancing(div, baseInst))
+			if (!test_instancing(div, baseInst, 0))
+				return PIGLIT_FAIL;
+			if (has_ext_dsa && !test_instancing(div, baseInst, vao))
 				return PIGLIT_FAIL;
 		}
 	}
