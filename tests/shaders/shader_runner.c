@@ -3660,6 +3660,8 @@ teardown_xfb(void)
 
 	glDeleteQueries(1, &queries[query_index(GL_PRIMITIVES_GENERATED)]);
 	glDeleteQueries(1, &queries[query_index(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN)]);
+	queries[query_index(GL_PRIMITIVES_GENERATED)] = 0;
+	queries[query_index(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN)] = 0;
 }
 
 static enum piglit_result
