@@ -3209,7 +3209,7 @@ query_index(GLenum query)
  *
  *  verify query_object GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN integer
  */
-static void
+static enum piglit_result
 verify_query_object_result(const char *line)
 {
 	static const struct string_to_enum all_targets[] = {
@@ -3241,15 +3241,16 @@ verify_query_object_result(const char *line)
 		fprintf(stderr, "query object for target %s is not initialized. "
 			"Did you forget to call \"xfb draw arrays\"?\n",
 			piglit_get_gl_enum_name(target));
-		piglit_report_result(PIGLIT_FAIL);
+		return PIGLIT_FAIL;
 	}
 
 	if (expected != value) {
 		fprintf(stderr, "glGetQueryObjectuiv(GL_QUERY_RESULT) for a %s "
 			"query object: expected %d, got %d\n",
 			piglit_get_gl_enum_name(target), expected, value);
-		piglit_report_result(PIGLIT_FAIL);
+		return PIGLIT_FAIL;
 	}
+	return PIGLIT_PASS;
 }
 
 static void
@@ -4897,7 +4898,7 @@ piglit_display(void)
 		} else if (parse_str(line, "verify program_interface_query ", &rest)) {
 			active_program_interface(rest);
 		} else if (parse_str(line, "verify query_object", &rest)) {
-			verify_query_object_result(rest);
+			result = verify_query_object_result(rest);
 		} else if (parse_str(line, "vertex attrib ", &rest)) {
 			set_vertex_attrib(rest);
 		} else if (parse_str(line, "newlist ", &rest)) {
