@@ -54,6 +54,7 @@ usage(const char *name)
 	exit(1);
 }
 
+static bool use_ext_dsa_functions = false;
 static int sparse_buffer_page_size;
 
 struct buffer_pair {
@@ -128,9 +129,14 @@ buffer_page_commitment(struct buffer_pair *buf,
 	commit_end = MIN2((start_page + num_pages) * sparse_buffer_page_size,
 			  buf->size);
 
-	glNamedBufferPageCommitmentARB(buf->sparse_buffer,
-				       commit_start, commit_end - commit_start,
-				       commit);
+	if (use_ext_dsa_functions)
+		glNamedBufferPageCommitmentEXT(buf->sparse_buffer,
+					       commit_start, commit_end - commit_start,
+					       commit);
+	else
+		glNamedBufferPageCommitmentARB(buf->sparse_buffer,
+					       commit_start, commit_end - commit_start,
+					       commit);	
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
@@ -587,6 +593,26 @@ piglit_init(int argc, char **argv)
 		pass = run_stress(stress_iterations) && pass;
 	} else {
 		pass = run_simple() && pass;
+	}
+
+	if (piglit_is_extension_supported("GL_EXT_direct_state_access")) {
+		use_ext_dsa_functions = true;
+		pass = run_simple() && pass;
+
+		/* Verify that using buffer = 0 generates an error */
+		glNamedBufferPageCommitmentEXT(0, 0, 1000, true);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
+		/* Verify that using a buffer that has never been bound
+		 * generates an error but initialize the buffer.
+		 */
+		GLuint b;
+		glGenBuffers(1, &b);
+		pass = !glIsBuffer(b) && pass;
+		glNamedBufferPageCommitmentEXT(b, 0, 1000, true);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		pass = glIsBuffer(b) && pass;
+		glDeleteBuffers(1, &b);
 	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
