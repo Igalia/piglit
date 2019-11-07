@@ -789,7 +789,8 @@ specialize_spirv(GLenum target,
 		GLint size;
 
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
-		info = malloc(size);
+		info = malloc(MAX2(size, 1));
+		info[0] = 0;
 
 		glGetShaderInfoLog(shader, size, NULL, info);
 
@@ -882,7 +883,8 @@ link_sso(GLenum target)
 		GLint size;
 
 		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-		prog_err_info = malloc(size);
+		prog_err_info = malloc(MAX2(size, 1));
+		prog_err_info[0] = 0;
 
 		glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 
@@ -1589,7 +1591,8 @@ link_and_use_shaders(void)
 			GLint size;
 
 			glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-			prog_err_info = malloc(size);
+			prog_err_info = malloc(MAX2(size, 1));
+			prog_err_info[0] = 0;
 
 			glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 
@@ -1607,7 +1610,8 @@ link_and_use_shaders(void)
 		GLint size;
 
 		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-		prog_err_info = malloc(size);
+		prog_err_info = malloc(MAX2(size, 1));
+		prog_err_info[0] = 0;
 
 		glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 	}
