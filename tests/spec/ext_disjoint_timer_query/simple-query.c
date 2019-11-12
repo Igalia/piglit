@@ -50,12 +50,48 @@ static const char fs_source[] =
 	"	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
 	"}\n";
 
+static const char *
+target_to_str(GLenum target)
+{
+	switch (target) {
+	case GL_TIME_ELAPSED_EXT:
+		return "GL_TIME_ELAPSED_EXT";
+	case GL_TIMESTAMP_EXT:
+		return "GL_TIMESTAMP_EXT";
+	default:
+		return "";
+	}
+}
+
+static enum piglit_result
+bits_query(GLenum target)
+{
+	GLint bits;
+	glGetQueryivEXT(target, GL_QUERY_COUNTER_BITS_EXT, &bits);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+	/* Spec requires at least 30bits. */
+	if (bits > 0 && bits < 30) {
+		fprintf(stderr, "expected >= 30 bits for %s, got %d\n",
+			target_to_str(target), bits);
+		return PIGLIT_FAIL;
+	}
+	printf("bits query for %s got %d bits\n", target_to_str(target), bits);
+	return PIGLIT_PASS;
+}
+
 enum piglit_result
 piglit_display(void)
 {
 	GLuint query;
 	GLint current, disjoint;
 	GLuint64 time = 0;
+
+	if (bits_query(GL_TIME_ELAPSED_EXT) != PIGLIT_PASS)
+		piglit_report_result(PIGLIT_FAIL);
+
+	if (bits_query(GL_TIMESTAMP_EXT) != PIGLIT_PASS)
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenQueriesEXT(1, &query);
 
