@@ -75,15 +75,6 @@ piglit_display(void)
 	if (current != query)
 		piglit_report_result(PIGLIT_FAIL);
 
-	/* 0x8864 equals to ARB_occlusion_query GL_QUERY_COUNTER_BITS_ARB */
-	glGetQueryivEXT(GL_ANY_SAMPLES_PASSED_EXT, 0x8864, &current);
-
-	/* The error INVALID_ENUM is generated if GetQueryivEXT is called where
-         * <pname> is not CURRENT_QUERY_EXT.
-         */
-	if (!piglit_check_gl_error(GL_INVALID_ENUM))
-		piglit_report_result(PIGLIT_FAIL);
-
 	GLint prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
 
