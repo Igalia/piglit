@@ -1,0 +1,55 @@
+# Image atomic access with predication (if/else), and storing directly
+# the atomic operation value.
+
+[require]
+GL ES >= 3.1
+GLSL ES >= 3.10
+
+
+[compute shader]
+#version 310 es
+#extension GL_OES_shader_image_atomic : require
+
+layout (local_size_x = 1, local_size_y = 1) in;
+
+layout(r32i, binding=1) coherent uniform highp iimage2D in_image;
+
+layout(r32i, binding=2) coherent uniform highp iimage2D in_image_2;
+
+layout(binding=0, std430) buffer Buffer
+{
+	highp int data[];
+} out_ssbo;
+
+void main (void)
+{
+        int groupNdx = int(gl_NumWorkGroups.x * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x);
+	int value;
+
+	if (groupNdx % 2 == 0)
+	{
+	     value = imageAtomicExchange(in_image, ivec2(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y)), 0);
+	}
+	else
+	{
+ 	     value = imageAtomicExchange(in_image_2, ivec2(int(gl_GlobalInvocationID.x), int(gl_GlobalInvocationID.y)), 0);
+	}
+
+	out_ssbo.data[groupNdx] = value;
+}
+
+[test]
+texture integer 1 (2,2) (2,0) GL_R32I
+image texture 1 GL_R32I
+
+texture integer 2 (2,2) (2,10) GL_R32I
+image texture 2 GL_R32I
+
+ssbo 0 64
+
+compute 2 2 1
+
+probe ssbo int 0 0  == 0
+probe ssbo int 0 4  == 11
+probe ssbo int 0 8  == 2
+probe ssbo int 0 12 == 13
