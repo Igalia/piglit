@@ -85,7 +85,13 @@ shader_precision_spec_fns = ('op-add', 'op-assign-add',
                              'sqrt', 'inversesqrt')
 
 def _is_sequence(arg):
-    return isinstance(arg, (collections.Sequence, numpy.ndarray))
+    try:
+        # python 3.3+
+        Sequence = collections.abc.Sequence
+    except AttributeError:
+        # python 2.7+, removed in 3.9
+        Sequence = collections.Sequence
+    return isinstance(arg, (Sequence, numpy.ndarray))
 
 def _floatToBits(f):
     s = struct.pack('>f', f)
