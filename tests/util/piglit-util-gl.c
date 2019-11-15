@@ -2897,23 +2897,83 @@ piglit_rgbw_texture_3d(void)
 	return tex;
 }
 
+/*
+ * Maps a given integer internalformat to a valid format, including
+ * the num_components info.
+ */
+static void
+map_integer_internalformat(GLenum internalformat, GLenum *format, int *num_components)
+{
+	switch(internalformat) {
+	case GL_R32I:
+		*format = GL_RED_INTEGER;
+		*num_components = 1;
+		break;
+	case GL_RG32I:
+		*format = GL_RG_INTEGER;
+		*num_components = 2;
+		break;
+	case GL_RGB32I:
+		*format = GL_RGB_INTEGER;
+		*num_components = 3;
+		break;
+	case GL_RGBA32I:
+		*format = GL_RGBA_INTEGER;
+		*num_components = 4;
+		break;
+	default:
+		printf("piglit_integer_texture only supports 32-bit integer"
+		       " internalformats\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
 /**
  * Generates a texture with the given integer internal format.
- * Pixel data will be filled as R = x, G = y, B = b, A = a.
+ * It tries to use all the 4 data references (x, y, b, a) to fill the data. So:
+ *   * For 4 components: R = x, G = y, B = b, A = a.
+ *   * For 3 components: R = x, G = y, B = b + a
+ *   * For 2 components: R = x + b, G = y + a
+ *   * For 1 components: R = x + y * b + a
+ * Note that it assumes internalformats using 32 bit integer, so we would use GL_INT.
  */
 GLuint piglit_integer_texture(GLenum internalFormat, int w, int h, int b, int a)
 {
-	int *img = malloc(w * h * 4 * sizeof(int));
+	int *img;
 	int *p;
-	int x, y;
 	GLuint tex;
+	GLenum format;
+	int num_components;
+	int x, y;
+
+	map_integer_internalformat(internalFormat, &format, &num_components);
+
+	img = malloc(w * h * num_components * sizeof(int));
 
 	for (y = 0, p = img; y < h; ++y) {
-		for (x = 0; x < w; ++x, p += 4) {
-			p[0] = x;
-			p[1] = y;
-			p[2] = b;
-			p[3] = a;
+		for (x = 0; x < w; ++x) {
+			switch(num_components) {
+			case 4:
+				p[0] = x;
+				p[1] = y;
+				p[2] = b;
+				p[3] = a;
+				break;
+			case 3:
+				p[0] = x;
+				p[1] = y;
+				p[2] = b + a;
+				break;
+			case 2:
+				p[0] = x + b;
+				p[1] = y + a;
+				break;
+			case 1:
+				p[0] = x + y * b + a;
+				break;
+			}
+
+			p += num_components;
 		}
 	}
 
@@ -2926,9 +2986,9 @@ GLuint piglit_integer_texture(GLenum internalFormat, int w, int h, int b, int a)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 			GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0,
-		     GL_RGBA_INTEGER, GL_INT, img);
-
+	glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, w, h);
+	glTexSubImage2D(GL_TEXTURE_2D,
+			0, 0, 0, w, h, format, GL_INT, img);
 	free(img);
 
 	return tex;
