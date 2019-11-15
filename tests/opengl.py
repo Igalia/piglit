@@ -1213,7 +1213,7 @@ for stage in ['vs', 'gs', 'fs']:
     # it is a special case and is actually 1.50 feature.
     # Despite the differences in the commands lines of the two lists (this one
     # does not add '140', the two tests are equivalent.
-    if stage is not 'gs':
+    if stage != 'gs':
         for sampler in textureSize_samplers_130:
             profile.test_list[grouptools.join(
                 'spec', 'glsl-{}'.format(version), 'execution', 'textureSize',
@@ -5097,5 +5097,5 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'AMD_compressed_atc_texture')) as g:
     g(['amd_compressed_atc_texture-miptree'], 'miptree')
 
-if platform.system() is 'Windows':
+if platform.system() == 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))
