@@ -3651,6 +3651,7 @@ teardown_shader_include_paths(void)
 
 	num_shader_include_paths = 0;
 	free(shader_include_path);
+	shader_include_path = NULL;
 }
 
 static void
