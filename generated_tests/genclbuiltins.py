@@ -222,7 +222,7 @@ def generate_kernels(f, dataType, fnName, fnDef):
         gen_kernel_1_arg(f, fnName, argTypes[1], [argTypes[0]])
         return
 
-    if (len(argTypes) == 3 and not fnName is 'upsample'):
+    if (len(argTypes) == 3 and fnName != 'upsample'):
         if (getNumOutArgs(fnDef) == 2):
             gen_kernel_1_arg(f, fnName,
                              argTypes[2], [argTypes[0], argTypes[1]], 'private')
@@ -233,7 +233,7 @@ def generate_kernels(f, dataType, fnName, fnDef):
         else:
             gen_kernel_2_arg_same_size(f, fnName,
                                     [argTypes[1], argTypes[2]], [argTypes[0]])
-        if (fnDef['function_type'] is 'tss'):
+        if (fnDef['function_type'] == 'tss'):
             gen_kernel_2_arg_mixed_size(f, fnName,
                                 [argTypes[1], argTypes[2]], [argTypes[0]])
         return
@@ -249,15 +249,15 @@ def generate_kernels(f, dataType, fnName, fnDef):
         else:
             gen_kernel_3_arg_same_type(f, fnName,
                        [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
-        if (fnDef['function_type'] is 'tss'):
+        if (fnDef['function_type'] == 'tss'):
             gen_kernel_3_arg_mixed_size_tss(f, fnName,
                    [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
-        if (fnDef['function_type'] is 'tts'):
+        if (fnDef['function_type'] == 'tts'):
             gen_kernel_3_arg_mixed_size_tts(f, fnName,
                    [argTypes[1], argTypes[2], argTypes[3]], [argTypes[0]])
         return
 
-    if (fnName is 'upsample'):
+    if (fnName == 'upsample'):
         gen_kernel_2_arg_mixed_sign(f, fnName,
                                     [argTypes[1], argTypes[2]],
                                     [argTypes[0]])
@@ -359,17 +359,17 @@ def isOutArg(functionDef, argIdx):
 def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, fntype):
     # If the test allows mixed vector/scalar arguments, handle the case with
     # only vector arguments through a recursive call.
-    if (fntype is 'tss' or fntype is 'tts'):
+    if (fntype == 'tss' or fntype == 'tts'):
         print_test(f, fnName, argType, functionDef, tests, numTests, vecSize,
                    'ttt')
 
     # The tss && vecSize==1 case is handled in the non-tss case.
-    if ((not fntype is 'ttt') and vecSize == 1):
+    if ((fntype != 'ttt') and vecSize == 1):
         return
 
     # If we're handling mixed vector/scalar input widths, the kernels have
     # different names than when the vector widths match
-    tssStr = fntype + '_' if (not fntype is 'ttt') else ''
+    tssStr = fntype + '_' if (fntype != 'ttt') else ''
 
     argTypes = getArgTypes(argType, functionDef['arg_types'])
     argCount = len(argTypes)
@@ -394,7 +394,7 @@ def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, fntype
         # The output argument and first tss argument are vectors, any that
         # follow are scalar. If !tss, then everything has a matching vector
         # width
-        if (fntype is 'ttt' or (arg < 2 and fntype is 'tss') or (arg < 3 and fntype is 'tts')):
+        if (fntype == 'ttt' or (arg < 2 and fntype == 'tss') or (arg < 3 and fntype == 'tts')):
             f.write(argInOut + str(arg) + ' buffer ' + argTypes[arg] +
                     '[' + str(numTests * vecSize) + '] ' +
                     ''.join(map(lambda x: (x + ' ') * vecSize, argVal.split()))

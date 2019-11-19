@@ -564,8 +564,8 @@ def main():
 
     for dataType in DATA_TYPES:
         for fnName in functions:
-            if (fnName is 'upsample' and
-                    (dataType is 'long' or dataType is 'ulong')):
+            if (fnName == 'upsample' and
+                    (dataType == 'long' or dataType == 'ulong')):
                 continue
             # Merge all of the generic/signed/unsigned/custom test definitions
             testDefs[(dataType, fnName)] = mergedTestDefinition(dataType, fnName)
