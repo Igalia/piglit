@@ -133,6 +133,8 @@ static GLuint atomics_bos[8];
 static GLuint ssbo[32];
 static unsigned num_shader_include_paths = 0;
 static char **shader_include_path;
+static char *shader_include_names[256];
+static unsigned num_shader_includes = 0;
 
 #define MAX_XFB_BUFFERS 4 /* Same value used at nir_xfb_info */
 static GLuint xfb[MAX_XFB_BUFFERS];
@@ -1440,6 +1442,10 @@ leave_state(enum states state, const char *line, const char *script_name)
 		int path_name_len = path_end - shader_string;
 		glNamedStringARB(GL_SHADER_INCLUDE_ARB, path_name_len, shader_string,
 				 line - shader_string - path_name_len, shader_string + path_name_len);
+
+		shader_include_names[num_shader_includes] = strndup(shader_string, path_name_len);
+		num_shader_includes++;
+		assert(num_shader_includes <= 256);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
 			fprintf(stderr, "glNamedStringARB error\n");
@@ -3649,6 +3655,12 @@ teardown_shader_include_paths(void)
 	for (unsigned i = 0; i < num_shader_include_paths; i++)
 		free(shader_include_path[i]);
 
+	for (unsigned i = 0; i < num_shader_includes; i++) {
+		glDeleteNamedStringARB(-1, shader_include_names[i]);
+		free(shader_include_names[i]);
+	}
+
+	num_shader_includes = 0;
 	num_shader_include_paths = 0;
 	free(shader_include_path);
 	shader_include_path = NULL;
