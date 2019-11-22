@@ -4230,6 +4230,7 @@ with profile.test_list.group_manager(
     g(['arb_blend_func_extended-fbo-extended-blend-explicit'])
     g(['arb_blend_func_extended-fbo-extended-blend-pattern'])
     g(['arb_blend_func_extended-dual-src-blending-discard-without-src1'])
+    g(['arb_blend_func_extended-dual-src-blending-issue-1917'])
     g(['arb_blend_func_extended-blend-api_gles2'])
     g(['arb_blend_func_extended-builtins_gles2'])
     g(['arb_blend_func_extended-bindfragdataindexed-invalid-parameters_gles3'])
@@ -4240,6 +4241,7 @@ with profile.test_list.group_manager(
     g(['arb_blend_func_extended-fbo-extended-blend_gles3'])
     g(['arb_blend_func_extended-fbo-extended-blend-explicit_gles3'])
     g(['arb_blend_func_extended-dual-src-blending-discard-without-src1_gles3'])
+    g(['arb_blend_func_extended-dual-src-blending-issue-1917_gles3'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,

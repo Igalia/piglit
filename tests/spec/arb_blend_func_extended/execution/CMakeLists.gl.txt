@@ -13,4 +13,5 @@ piglit_add_executable (arb_blend_func_extended-fbo-extended-blend fbo-extended-b
 piglit_add_executable (arb_blend_func_extended-fbo-extended-blend-explicit fbo-extended-blend-explicit.c)
 piglit_add_executable (arb_blend_func_extended-fbo-extended-blend-pattern fbo-extended-blend-pattern.c)
 piglit_add_executable (arb_blend_func_extended-dual-src-blending-discard-without-src1 dual-src-blending-discard-without-src1.c)
+piglit_add_executable (arb_blend_func_extended-dual-src-blending-issue-1917 dual-src-blending-issue-1917.c)
 # vim: ft=cmake:
