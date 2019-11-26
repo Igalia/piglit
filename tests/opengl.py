@@ -2445,6 +2445,7 @@ with profile.test_list.group_manager(
     g(['arb_texture_buffer_object-unused-name'], 'unused-name')
     g(['arb_texture_buffer_object-render-no-bo'], 'render-no-bo')
     g(['arb_texture_buffer_object-indexed'], 'indexed')
+    g(['arb_texture_buffer_object-re-init'], 're-init')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
