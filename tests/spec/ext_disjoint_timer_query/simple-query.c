@@ -84,7 +84,8 @@ enum piglit_result
 piglit_display(void)
 {
 	GLuint query;
-	GLint current, disjoint;
+	GLint current;
+	GLint64 disjoint;
 	GLuint64 time = 0;
 
 	if (bits_query(GL_TIME_ELAPSED_EXT) != PIGLIT_PASS)
@@ -96,7 +97,9 @@ piglit_display(void)
 	glGenQueriesEXT(1, &query);
 
 	/* Clear disjoint error state. */
-	glGetIntegerv(GL_GPU_DISJOINT_EXT, &disjoint);
+	glGetInteger64vEXT(GL_GPU_DISJOINT_EXT, &disjoint);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glBeginQueryEXT(GL_TIME_ELAPSED_EXT, query);
 
@@ -129,8 +132,10 @@ piglit_display(void)
 
 	glGetQueryObjectui64vEXT(query, GL_QUERY_RESULT_EXT, &time);
 
-	/* Check if if disjoint operation occured. */
-	glGetIntegerv(GL_GPU_DISJOINT_EXT, &disjoint);
+	/* Check if disjoint operation occured. */
+	glGetInteger64vEXT(GL_GPU_DISJOINT_EXT, &disjoint);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* If no disjoint operation, then we should have a
 	 * 'sensible value' in time, expecting more than 0.
