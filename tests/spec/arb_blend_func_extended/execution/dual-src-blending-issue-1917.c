@@ -27,9 +27,9 @@
  * Test exercises a bug on BSW/BDW Intel platforms originally found in
  * skia tests.
  *
- * 1) Draw discarding some pixels
- * 2) Enable dual source blending
- * 3) Draw with shader without discards using dual src blending
+ * 1) Enable dual source blending
+ * 2) Draw with shader without discards using dual src blending
+ * 3) Draw discarding some pixels
  * 4) As a result some pixels in the region of the first draw may be corrupted
  *
  * https://gitlab.freedesktop.org/mesa/mesa/issues/1917
@@ -122,36 +122,51 @@ static const char *fs_blend_text =
 	;
 #endif
 
+static void draw_with_discard()
+{
+	glUseProgram(prog_discard);
+
+	glDisable(GL_BLEND);
+
+	glUniform1f(glGetUniformLocation(prog_discard, "render_width"),
+					render_width);
+
+	piglit_draw_rect(-1, -1, 2, 1);
+}
+
+static void draw_with_dual_src_blend()
+{
+	glUseProgram(prog_blend);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC1_COLOR);
+
+	piglit_draw_rect(-1, 0, 2, 1);
+}
+
 enum piglit_result
 piglit_display(void)
 {
 	static const GLfloat expected_color[4] = { 0.0, 1.0, 0.0, 1.0 };
 	bool pass = true;
 
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	// Viewport is not necessary to reproduce the original issue but
+	// it considerably increases the chances.
+	glViewport(0, 0, render_width / 2, render_height);
+
 	// Reproduction is not deterministic, 100 iteration was enough for it
 	// to never pass on driver/hw which exhibited the issue.
 	for (int i = 0; i < 100; i++) {
-		glDisable(GL_BLEND);
-
-		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Viewport is not necessary to reproduce the original issue but
-		// it considerably increases the chances.
-		glViewport(0, 0, render_width / 2, render_height);
+		draw_with_dual_src_blend();
+		draw_with_discard();
 
-		glUseProgram(prog_discard);
-		glUniform1f(glGetUniformLocation(prog_discard, "render_width"),
-				render_width);
-
-		piglit_draw_rect(-1, -1, 2, 1);
-
-		glUseProgram(prog_blend);
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC1_COLOR);
-
-		piglit_draw_rect(-1, 0, 2, 1);
+		// Inverse order doesn't reproduce the issue on BSW
+		//draw_with_discard();
+		//draw_with_dual_src_blend();
 
 		pass &= piglit_probe_rect_rgba(0, 0,
 									render_width / 4, render_height / 2,
