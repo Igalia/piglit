@@ -145,14 +145,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 			${XCB_INCLUDE_DIRS}
 			${XCB_DRI2_INCLUDE_DIRS}
 		)
-
-		if(LIBDRM_INTEL_FOUND)
-			add_definitions(-DHAVE_LIBDRM_INTEL)
-
-			list(APPEND UTIL_GL_LIBS
-				${LIBDRM_INTEL_LDFLAGS}
-			)
-		endif()
 	endif()
 
 	if(PIGLIT_HAS_X11)

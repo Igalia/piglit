@@ -24,9 +24,6 @@
 #include "piglit-util-gl.h"
 #include "piglit_drm_dma_buf.h"
 #include "drm_fourcc.h"
-#ifdef HAVE_LIBDRM_INTEL
-#include <libdrm/intel_bufmgr.h>
-#endif
 #ifdef PIGLIT_HAS_GBM_BO_MAP
 #include <gbm.h>
 #endif
@@ -105,150 +102,6 @@ piglit_drm_x11_authenticate(int fd)
 
 	return true;
 }
-
-#if defined(HAVE_LIBDRM_INTEL) && !defined(PIGLIT_HAS_GBM_BO_MAP)
-static drm_intel_bufmgr *
-piglit_intel_bufmgr_get(void)
-{
-	static const unsigned batch_sz = 8192 * sizeof(uint32_t);
-	const struct piglit_drm_driver *drv = piglit_drm_get_driver();
-	static drm_intel_bufmgr *mgr = NULL;
-
-	if (mgr)
-		return mgr;
-
-	if (!drv)
-		return NULL;
-
-	mgr = intel_bufmgr_gem_init(drv->fd, batch_sz);
-
-	return mgr;
-}
-
-static bool
-piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
-			const unsigned char *src_data, struct piglit_dma_buf *buf)
-{
-	unsigned i;
-	drm_intel_bo *bo;
-	drm_intel_bufmgr *mgr = piglit_intel_bufmgr_get();
-	unsigned stride, src_stride, cpp;
-	unsigned buf_h = h;
-
-	if (!mgr || h % 2)
-		return false;
-
-	switch (fourcc) {
-	case DRM_FORMAT_R8:
-		cpp = 1;
-		break;
-	case DRM_FORMAT_GR88:
-	case DRM_FORMAT_RG88:
-	case DRM_FORMAT_YUYV:
-	case DRM_FORMAT_UYVY:
-		cpp = 2;
-		break;
-	case DRM_FORMAT_XRGB8888:
-	case DRM_FORMAT_XBGR8888:
-	case DRM_FORMAT_RGBX8888:
-	case DRM_FORMAT_BGRX8888:
-	case DRM_FORMAT_ARGB8888:
-	case DRM_FORMAT_ABGR8888:
-	case DRM_FORMAT_RGBA8888:
-	case DRM_FORMAT_BGRA8888:
-	case DRM_FORMAT_AYUV:
-	case DRM_FORMAT_XYUV8888:
-	case DRM_FORMAT_Y210:
-	case DRM_FORMAT_Y212:
-	case DRM_FORMAT_Y216:
-		cpp = 4;
-		break;
-	case DRM_FORMAT_NV12:
-	case DRM_FORMAT_YUV420:
-	case DRM_FORMAT_YVU420:
-		cpp = 1;
-		buf_h = h * 3 / 2;
-		break;
-	case DRM_FORMAT_P010:
-	case DRM_FORMAT_P012:
-	case DRM_FORMAT_P016:
-		cpp = 2;
-		buf_h = h * 3 / 2;
-		break;
-	case DRM_FORMAT_Y410:
-		cpp = 4;
-		break;
-	case DRM_FORMAT_Y412:
-	case DRM_FORMAT_Y416:
-		cpp = 8;
-		break;
-	default:
-		fprintf(stderr, "invalid fourcc: %.4s\n", (char *)&fourcc);
-		return false;
-	}
-
-	src_stride = cpp * w;
-	stride = ALIGN(w * cpp, 4);
-
-	bo = drm_intel_bo_alloc(mgr, "piglit_dma_buf", buf_h * stride, 4096);
-	if (!bo)
-		return false;
-
-	for (i = 0; i < buf_h; ++i) {
-		if (drm_intel_bo_subdata(bo, i * stride, w * cpp,
-			src_data + i * src_stride)) {
-			drm_intel_bo_unreference(bo);
-			return false;
-		}
-	}
-
-	buf->w = w;
-	buf->h = h;
-	buf->offset[0] = 0;
-	buf->stride[0] = stride;
-	buf->fd = 0;
-	buf->priv = bo;
-
-	switch (fourcc) {
-	case DRM_FORMAT_NV12:
-	case DRM_FORMAT_P010:
-	case DRM_FORMAT_P012:
-	case DRM_FORMAT_P016:
-		buf->offset[1] = stride * h;
-		buf->stride[1] = stride;
-		break;
-	case DRM_FORMAT_YUV420:
-	case DRM_FORMAT_YVU420:
-		buf->offset[1] = stride * h;
-		buf->stride[1] = stride / 2;
-		buf->offset[2] = buf->offset[1] + (stride * h / 2 / 2);
-		buf->stride[2] = stride / 2;
-		break;
-	default:
-		break;
-	}
-
-	return true;
-}
-
-static bool
-piglit_intel_buf_export(struct piglit_dma_buf *buf)
-{
-	if (drm_intel_bo_gem_export_to_prime((drm_intel_bo *)buf->priv,
-					&buf->fd)) {
-		drm_intel_bo_unreference((drm_intel_bo *)buf->priv);
-		return false;
-	}
-
-	return true;
-}
-
-static void
-piglit_intel_buf_destroy(struct piglit_dma_buf *buf)
-{
-	drm_intel_bo_unreference((drm_intel_bo *)buf->priv);
-}
-#endif /* HAVE_LIBDRM_INTEL */
 
 #ifdef PIGLIT_HAS_GBM_BO_MAP
 static struct gbm_device *
@@ -512,13 +365,6 @@ piglit_drm_get_driver(void)
 	if (0) {
 		/* empty */
 	}
-#if defined(HAVE_LIBDRM_INTEL) && !defined(PIGLIT_HAS_GBM_BO_MAP)
-	else if (streq(version->name, "i915")) {
-		drv.create = piglit_intel_buf_create;
-		drv.export = piglit_intel_buf_export;
-		drv.destroy = piglit_intel_buf_destroy;
-	}
-#endif
 #ifdef PIGLIT_HAS_GBM_BO_MAP
 	else if (true) {
 		drv.create = piglit_gbm_buf_create;

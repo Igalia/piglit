@@ -168,7 +168,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	endif()
 
 	pkg_check_modules(LIBDRM QUIET libdrm)
-	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
 	pkg_check_modules(XCB QUIET xcb)
 	pkg_check_modules(XCB_DRI2 QUIET xcb-dri2)
 	pkg_check_modules(GLPROTO QUIET glproto)
@@ -195,18 +194,11 @@ ENDIF()
 
 # Choose to build tests that use dma_buf.
 #
-# Piglit's dma_buf utilities require xcb-dri2 to gain DRM authentication.
+# Piglit's dma_buf utilities require xcb-dri2 to gain DRM authentication, and
+# gbm_bo_map() to be available for generating dma_bufs, and libdrm for fourcc
+# definitions.
 #
-# The presence of libdrm is not sufficient. At least one libdrm_${hardware}
-# library is also needed.
-#
-# When building for Intel, libdrm_intel>=2.4.98 is required.  Support for
-# drm-prime arrived in 2.4.38.  Several defines for fourCC formats were added
-# to drm_fourcc.h in 2.4.68, 2.4.95, and 2.4.98.
-#
-if(LIBDRM_FOUND AND XCB_DRI2_FOUND AND
-   ((LIBDRM_INTEL_VERSION VERSION_GREATER "2.4.97") OR
-     PIGLIT_HAS_GBM_BO_MAP))
+if(LIBDRM_FOUND AND LIBDRM_VERSION VERSION_GREATER "2.4.97" AND XCB_DRI2_FOUND AND PIGLIT_HAS_GBM_BO_MAP)
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID true)
 else()
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID false)
@@ -223,7 +215,7 @@ endif()
 if(PIGLIT_BUILD_DMA_BUF_TESTS AND NOT PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID)
 	message(FATAL_ERROR
 		"PIGLIT_BUILD_DMA_BUF_TESTS require libdrm, "
-		"libdrm_intel>=2.4.98, and xcb-dri2")
+		"gbm_bo_map(), libdrm>=2.4.98 and xcb-dri2")
 endif()
 
 IF(PIGLIT_BUILD_GLX_TESTS)
