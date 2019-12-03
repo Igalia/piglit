@@ -1,0 +1,44 @@
+// From the ARB_separate_shader_objects spec v.25:
+//
+//    "To use any built-in input or output in the gl_PerVertex and
+//     gl_PerFragment blocks in separable program objects, shader code
+//     must redeclare those blocks prior to use.  A separable program
+//     will fail to link if:
+//
+//      * it contains multiple shaders of a single type with different
+//        redeclarations of these built-in input and output blocks; or
+//
+//      * any shader uses a built-in block member not found in the
+//        redeclaration of that block."
+//
+// Issues section (issue #28) states that redeclaration is not
+// required for GLSL shaders using #version 140 or earlier (since
+// interface blocks are not possible with older versions).
+//
+
+[require]
+GLSL >= 1.40
+GL_ARB_separate_shader_objects
+SEPARABLE PROGRAM ENABLED
+
+[vertex shader]
+#version 140
+
+void main()
+{
+  gl_PointSize = float(256.0);
+}
+
+[fragment shader]
+#version 140
+
+out vec4 color;
+
+void main()
+{
+  float len = length((gl_PointCoord.xy / 1.0) - vec2(0.5));
+  color = vec4(len);
+}
+
+[test]
+link success
