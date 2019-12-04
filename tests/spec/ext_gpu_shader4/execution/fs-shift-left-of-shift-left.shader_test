@@ -1,6 +1,7 @@
 # Test proper behavior of (a << b) << c where b+c >= 32
 
 [require]
+GLSL >= 1.20
 GL_EXT_gpu_shader4
 
 [vertex shader passthrough]
