@@ -51,6 +51,10 @@ run(void)
 	float delta = 1.01 / piglit_width;
 	GLuint prog;
 
+	/* This atom should be disabled by default */
+	if (glIsEnabled(GL_BLACKHOLE_RENDER_INTEL))
+		return PIGLIT_FAIL;
+
 	prog = piglit_build_simple_program(
 #if defined(PIGLIT_USE_OPENGL)
 		"#version 330\n"
@@ -98,8 +102,6 @@ run(void)
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), NULL);
 	glEnableVertexAttribArray(0);
 
-	assert(!glIsEnabled(GL_BLACKHOLE_RENDER_INTEL));
-
 	glDisable(GL_BLACKHOLE_RENDER_INTEL);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -120,7 +122,8 @@ run(void)
 
 	glEnable(GL_BLACKHOLE_RENDER_INTEL);
 
-	assert(glIsEnabled(GL_BLACKHOLE_RENDER_INTEL));
+	if (!glIsEnabled(GL_BLACKHOLE_RENDER_INTEL))
+		return PIGLIT_FAIL;
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
