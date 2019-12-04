@@ -45,8 +45,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-enum piglit_result
-piglit_display(void)
+static enum piglit_result
+run(void)
 {
 	float delta = 1.01 / piglit_width;
 	GLuint prog;
@@ -148,9 +148,17 @@ piglit_display(void)
 				     blackhole_clear_expected))
 		return PIGLIT_FAIL;
 
+	return PIGLIT_PASS;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	enum piglit_result result = run();
+
 	glDisable(GL_BLACKHOLE_RENDER_INTEL);
 
-	return PIGLIT_PASS;
+	return result;
 }
 
 void piglit_init(int argc, char **argv)
