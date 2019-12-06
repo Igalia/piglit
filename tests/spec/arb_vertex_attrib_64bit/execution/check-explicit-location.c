@@ -105,7 +105,7 @@ void piglit_init(int argc, char **argv)
 
 		if (loc != 1) {
 			fprintf(stderr,
-				"Expected location of 'vcolor' to be 0, got "
+				"Expected location of 'vcolor' to be 1, got "
 				"%d instead.\n", loc);
 			ok = GL_FALSE;
 		}
