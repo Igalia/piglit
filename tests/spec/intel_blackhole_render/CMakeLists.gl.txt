@@ -8,6 +8,7 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
+piglit_add_executable (intel_blackhole-blit blackhole_blit.c)
 piglit_add_executable (intel_blackhole-dispatch blackhole_dispatch.c)
 piglit_add_executable (intel_blackhole-draw blackhole_draw.c)
 

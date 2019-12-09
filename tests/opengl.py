@@ -5057,9 +5057,12 @@ with profile.test_list.group_manager(
 with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'INTEL_blackhole_render')) as g:
+    g(['intel_blackhole-blit'])
     g(['intel_blackhole-draw'])
     g(['intel_blackhole-dispatch'])
+    g(['intel_blackhole-blit_gles2'])
     g(['intel_blackhole-draw_gles2'])
+    g(['intel_blackhole-blit_gles3'])
     g(['intel_blackhole-draw_gles3'])
 
 # Group INTEL_performance_query

@@ -7,6 +7,7 @@ link_libraries (
 	piglitutil_${piglit_target_api}
 )
 
+piglit_add_executable (intel_blackhole-blit_gles2 blackhole_blit.c)
 piglit_add_executable (intel_blackhole-draw_gles2 blackhole_draw.c)
 
 # vim: ft=cmake:
