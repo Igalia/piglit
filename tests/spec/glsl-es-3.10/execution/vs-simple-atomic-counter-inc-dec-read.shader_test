@@ -55,6 +55,7 @@ void main()
 
 [fragment shader]
 #version 310 es
+precision highp float;
 
 in vec4 vcolor;
 out vec4 fcolor;
