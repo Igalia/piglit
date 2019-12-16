@@ -5062,6 +5062,12 @@ with profile.test_list.group_manager(
     g(['intel_blackhole-draw_gles2'])
     g(['intel_blackhole-draw_gles3'])
 
+# Group INTEL_performance_query
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'INTEL_performance_query')) as g:
+    g(['intel_performance_query-issue_2235'])
+
 # Group ARB_bindless_texture
 with profile.test_list.group_manager(
         PiglitGLTest,
