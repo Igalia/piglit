@@ -1,0 +1,55 @@
+/* This test was originally created to catch a bug in the logic of
+ * multiplying by a constant.
+ */
+
+[require]
+GL >= 4.5
+GLSL >= 4.50
+
+[compute shader]
+#version 450
+
+layout(local_size_x = 1) in;
+
+layout(binding = 0) buffer SSBO0 {
+	int val[5];
+};
+
+layout(binding = 1) buffer SSBO1 {
+	int fail[5];
+};
+
+void main() {
+	/* All vals are the same, but we don't reuse it to avoid
+	 * compiler trying to reuse part of the result.
+	 */
+	if (val[0] *      0 !=       0) fail[0] = 1;
+	if (val[1] *      1 !=      10) fail[1] = 1;
+	if (val[2] *     -1 !=     -10) fail[2] = 1;
+	if (val[3] *  65000 !=  650000) fail[3] = 1;
+	if (val[4] * -65000 != -650000) fail[4] = 1;
+}
+
+[test]
+
+ssbo 0 20
+ssbo 0 subdata int   0   10
+ssbo 0 subdata int   4   10
+ssbo 0 subdata int   8   10
+ssbo 0 subdata int  12   10
+ssbo 0 subdata int  16   10
+
+ssbo 1 20
+ssbo 1 subdata int   0    0
+ssbo 1 subdata int   4    0
+ssbo 1 subdata int   8    0
+ssbo 1 subdata int  12    0
+ssbo 1 subdata int  16    0
+
+compute 1 1 1
+
+probe ssbo int 1   0 == 0
+probe ssbo int 1   4 == 0
+probe ssbo int 1   8 == 0
+probe ssbo int 1  12 == 0
+probe ssbo int 1  16 == 0
