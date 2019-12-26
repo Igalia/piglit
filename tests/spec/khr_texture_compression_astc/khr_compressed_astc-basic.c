@@ -334,13 +334,14 @@ piglit_display(void)
 			"GL_KHR_texture_compression_astc_sliced_3d");
 
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
+		test_tex_img(i, have_gen_mipmap);
+
 		if (have_cube_map_ext)
 			test_non_square_img(i, have_hdr);
 		if (have_tex_stor_ext)
 			test_sub_img(i);
 		test_compressed_teximg_3d(i, have_cube_map_ext,
 					  have_hdr_or_sliced_3d);
-		test_tex_img(i, have_gen_mipmap);
 	}
 
 	piglit_report_result(PIGLIT_PASS);
