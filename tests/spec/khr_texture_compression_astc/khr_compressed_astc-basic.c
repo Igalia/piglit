@@ -80,6 +80,29 @@ have_cube_map_array_support()
 }
 
 bool static inline
+have_3d_texture_support()
+{
+#if defined (PIGLIT_USE_OPENGL)
+	return piglit_get_gl_version() >= 30 ||
+	   piglit_is_extension_supported("GL_EXT_texture3D");
+#else
+	return piglit_get_gl_version() >= 30 ||
+           piglit_is_extension_supported("GL_OES_texture_3D");
+#endif
+}
+
+bool static inline
+have_2d_array_support()
+{
+#if defined (PIGLIT_USE_OPENGL)
+	return piglit_get_gl_version() >= 30 ||
+	   piglit_is_extension_supported("GL_EXT_texture_array");
+#else
+	return piglit_get_gl_version() >= 30;
+#endif
+}
+
+bool static inline
 have_gen_mipmap_support()
 {
 #if defined (PIGLIT_USE_OPENGL)
@@ -112,6 +135,8 @@ have_gen_mipmap_support()
  *
  */
 void test_compressed_teximg_3d(int fi, bool have_cube_map_ext,
+			       bool have_2d_array_ext,
+			       bool have_3d_texture,
 			       bool have_hdr_or_sliced_3d)
 {
 	int j;
@@ -119,11 +144,24 @@ void test_compressed_teximg_3d(int fi, bool have_cube_map_ext,
 	char fake_tex_data[6*16];
 
 	for (j = 0; j < ARRAY_SIZE(good_compressed_tex_3d_targets); ++j) {
-
-		/* Skip the cube_map target if there's no support */
-		if ((good_compressed_tex_3d_targets[j] ==
-                    GL_TEXTURE_CUBE_MAP_ARRAY_EXT) && !have_cube_map_ext)
-			continue;
+		/* Skip the current target if there's no support */
+		switch(good_compressed_tex_3d_targets[j]) {
+		case GL_TEXTURE_2D_ARRAY:
+			if (!have_2d_array_ext)
+				continue;
+			break;
+		case GL_TEXTURE_CUBE_MAP_ARRAY_EXT:
+			if (!have_cube_map_ext)
+				continue;
+			break;
+		case GL_TEXTURE_3D:
+			if (!have_3d_texture)
+				continue;
+			break;
+		default:
+			/* shouldn't be here */
+			piglit_report_result(PIGLIT_FAIL);
+		}
 
 		/* Run the command */
 		glGenTextures(1, &tex3D);
@@ -332,6 +370,8 @@ piglit_display(void)
 	bool have_hdr_or_sliced_3d = have_hdr ||
 			piglit_is_extension_supported(
 			"GL_KHR_texture_compression_astc_sliced_3d");
+	bool have_2d_array = have_2d_array_support();
+	bool have_3d_texture = have_3d_texture_support();
 
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
 		test_tex_img(i, have_gen_mipmap);
@@ -341,6 +381,8 @@ piglit_display(void)
 		if (have_tex_stor_ext)
 			test_sub_img(i);
 		test_compressed_teximg_3d(i, have_cube_map_ext,
+					  have_2d_array,
+					  have_3d_texture,
 					  have_hdr_or_sliced_3d);
 	}
 
