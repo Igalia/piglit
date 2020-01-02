@@ -100,6 +100,7 @@ EXTENSIONS = [
     ("GL_ARB_shader_draw_parameters", "140"),
     ("GL_EXT_separate_shader_objects", "100"),
     ("GL_EXT_draw_buffers", "100"),
+    ("GL_EXT_draw_instanced", "100"),
     ("GL_AMD_shader_stencil_export", "120"),
     ("GL_ARB_shader_stencil_export", "120"),
     ("GL_ARB_geometry_shader4", "110"),

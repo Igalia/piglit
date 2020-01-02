@@ -1749,6 +1749,12 @@ with profile.test_list.group_manager(
       'negative-elements-type')
     g(['arb_draw_instanced-drawarrays'])
 
+# Group EXT_draw_instanced
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'EXT_draw_instanced')) as g:
+    g(['ext_draw_instanced-drawarrays'])
+
 # Group ARB_draw_indirect
 with profile.test_list.group_manager(
         PiglitGLTest,
