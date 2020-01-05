@@ -60,6 +60,7 @@ static const char *gs_template =
 	"{\n"
 	"  for (int i = 0; i < 3; i++) {\n"
 	"    gl_Layer = 2 * i + 1;\n"
+	"    gl_PrimitiveID = gl_PrimitiveIDIn + i;\n"
 	"%s"
 	"    EmitVertex();\n"
 	"  }\n"
@@ -71,16 +72,17 @@ static const char *gs_template =
  * above, the output should be a sequence of integers defined in this
  * array.
  */
-static const int expected[2][3] = {{1, 3, 5}, /* gl_Layer */
+static const int expected[3][3] = {{1, 3, 5}, /* gl_Layer */
+				   {0, 1, 2}, /* gl_PrimitiveID */
 				   {1, 2, 3}}; /* gl_ViewportIndex */
 
-static const char *varyings[] = {"gl_Layer", "gl_ViewportIndex"};
+static const char *varyings[] = {"gl_Layer", "gl_PrimitiveID", "gl_ViewportIndex"};
 
 void
 piglit_init(int argc, char **argv)
 {
 	int i, j, num_xfb_buffers;
-	GLuint prog, vao, xfb_buf[2];
+	GLuint prog, vao, xfb_buf[3];
 	const GLint *readback;
 	char *gstext;
 	bool pass = true;
