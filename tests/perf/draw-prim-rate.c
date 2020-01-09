@@ -513,11 +513,85 @@ run_test(unsigned debug_num_iterations, enum draw_method draw_method,
 	return rate;
 }
 
+static void
+run(enum draw_method draw_method, enum cull_method cull_method,
+    const unsigned *num_quads_per_dim, const unsigned *num_prims,
+    unsigned num_prim_sets)
+{
+	unsigned num_subtests = 1;
+	static unsigned cull_percentages[] = {100, 75, 50, 25};
+	static double quad_sizes_in_pixels[] = {1.0 / 7, 0.25, 0.5};
+
+	if (cull_method == BACK_FACE_CULLING ||
+	    cull_method == VIEW_CULLING ||
+	    cull_method == DEGENERATE_PRIMS) {
+		num_subtests = ARRAY_SIZE(cull_percentages);
+	} else if (cull_method == SUBPIXEL_PRIMS) {
+		num_subtests = ARRAY_SIZE(quad_sizes_in_pixels);
+	}
+
+	for (unsigned subtest = 0; subtest < num_subtests; subtest++) {
+		/* 2 is the maximum prim size when everything fits into the window */
+		double quad_size_in_pixels;
+		unsigned cull_percentage;
+
+		if (cull_method == SUBPIXEL_PRIMS) {
+			quad_size_in_pixels = quad_sizes_in_pixels[subtest];
+			cull_percentage = 0;
+		} else {
+			quad_size_in_pixels = 2;
+			cull_percentage = cull_percentages[subtest];
+		}
+
+		printf("  %-14s, ",
+		       draw_method == INDEXED_TRIANGLES ? "glDrawElements" :
+		       draw_method == TRIANGLES ? "glDrawArraysT" : "glDrawArraysTS");
+
+		if (cull_method == NONE ||
+		    cull_method == RASTERIZER_DISCARD) {
+			printf("%-21s",
+			       cull_method == NONE ? "none" : "rasterizer discard");
+		} else if (cull_method == SUBPIXEL_PRIMS) {
+			printf("%2u small prims/pixel ",
+			       (unsigned)((1.0 / quad_size_in_pixels) *
+					  (1.0 / quad_size_in_pixels) * 2));
+		} else {
+			printf("%3u%% %-16s", cull_percentage,
+			       cull_method == BACK_FACE_CULLING ? "back faces" :
+				cull_method == VIEW_CULLING ?	  "culled by view" :
+				cull_method == DEGENERATE_PRIMS ? "degenerate prims" :
+								  "(error)");
+		}
+		fflush(stdout);
+
+		for (unsigned prog = 0; prog < ARRAY_SIZE(progs); prog++) {
+			glUseProgram(progs[prog]);
+
+			if (prog)
+				printf("   ");
+
+			for (int i = 0; i < num_prim_sets; i++) {
+				double rate = run_test(0, draw_method, cull_method,
+						       num_quads_per_dim[i],
+						       quad_size_in_pixels, cull_percentage);
+				rate *= num_prims[i];
+
+				if (gpu_freq_mhz) {
+					rate /= gpu_freq_mhz * 1000000.0;
+					printf(",%6.2f", rate);
+				} else {
+					printf(",%6.2f", rate / 1000000000);
+				}
+				fflush(stdout);
+			}
+		}
+		printf("\n");
+	}
+}
+
 enum piglit_result
 piglit_display(void)
 {
-	double rate;
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* for debugging */
@@ -562,77 +636,8 @@ piglit_display(void)
 	printf("\n");
 
 	for (int draw_method = 0; draw_method < NUM_DRAW_METHODS; draw_method++) {
-		for (int cull_method = 0; cull_method < NUM_CULL_METHODS; cull_method++) {
-			unsigned num_subtests = 1;
-			static unsigned cull_percentages[] = {100, 75, 50, 25};
-			static double quad_sizes_in_pixels[] = {1.0 / 7, 0.25, 0.5};
-
-			if (cull_method == BACK_FACE_CULLING ||
-			    cull_method == VIEW_CULLING ||
-			    cull_method == DEGENERATE_PRIMS) {
-				num_subtests = ARRAY_SIZE(cull_percentages);
-			} else if (cull_method == SUBPIXEL_PRIMS) {
-				num_subtests = ARRAY_SIZE(quad_sizes_in_pixels);
-			}
-
-			for (unsigned subtest = 0; subtest < num_subtests; subtest++) {
-				/* 2 is the maximum prim size when everything fits into the window */
-				double quad_size_in_pixels;
-				unsigned cull_percentage;
-
-				if (cull_method == SUBPIXEL_PRIMS) {
-					quad_size_in_pixels = quad_sizes_in_pixels[subtest];
-					cull_percentage = 0;
-				} else {
-					quad_size_in_pixels = 2;
-					cull_percentage = cull_percentages[subtest];
-				}
-
-				printf("  %-14s, ",
-				       draw_method == INDEXED_TRIANGLES ? "glDrawElements" :
-				       draw_method == TRIANGLES ? "glDrawArraysT" : "glDrawArraysTS");
-
-				if (cull_method == NONE ||
-				    cull_method == RASTERIZER_DISCARD) {
-					printf("%-21s",
-					       cull_method == NONE ? "none" : "rasterizer discard");
-				} else if (cull_method == SUBPIXEL_PRIMS) {
-					printf("%2u small prims/pixel ",
-					       (unsigned)((1.0 / quad_size_in_pixels) *
-							  (1.0 / quad_size_in_pixels) * 2));
-				} else {
-					printf("%3u%% %-16s", cull_percentage,
-					       cull_method == BACK_FACE_CULLING ? "back faces" :
-						cull_method == VIEW_CULLING ?	  "culled by view" :
-						cull_method == DEGENERATE_PRIMS ? "degenerate prims" :
-										  "(error)");
-				}
-				fflush(stdout);
-
-				for (unsigned prog = 0; prog < ARRAY_SIZE(progs); prog++) {
-					glUseProgram(progs[prog]);
-
-					if (prog)
-						printf("   ");
-
-					for (int i = 0; i < ARRAY_SIZE(num_prims); i++) {
-						rate = run_test(0, draw_method, cull_method,
-								num_quads_per_dim[i],
-								quad_size_in_pixels, cull_percentage);
-						rate *= num_prims[i];
-
-						if (gpu_freq_mhz) {
-							rate /= gpu_freq_mhz * 1000000.0;
-							printf(",%6.2f", rate);
-						} else {
-							printf(",%6.2f", rate / 1000000000);
-						}
-						fflush(stdout);
-					}
-				}
-				printf("\n");
-			}
-		}
+		for (int cull_method = 0; cull_method < NUM_CULL_METHODS; cull_method++)
+			run(draw_method, cull_method, num_quads_per_dim, num_prims, ARRAY_SIZE(num_prims));
 	}
 
 	exit(0);
