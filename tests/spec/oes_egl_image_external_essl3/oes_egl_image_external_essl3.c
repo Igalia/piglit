@@ -63,8 +63,8 @@ PIGLIT_GL_TEST_CONFIG_END
 
 PFNEGLCREATEIMAGEKHRPROC peglCreateImageKHR = NULL;
 
-static const char vs_src[] =
-   "#version 310 es\n"
+static const char vs_template[] =
+   "#version %d es\n"
    "in vec4 piglit_vertex;\n"
    "in vec4 piglit_texcoords;\n"
    "out vec2 texcoords;\n"
@@ -76,7 +76,7 @@ static const char vs_src[] =
    "}\n";
 
 static const char fs_template_sampler[] =
-   "#version 310 es\n"
+   "#version 300 es\n"
    "#extension GL_OES_EGL_image_external_essl3 : require\n"
    "precision mediump float;\n"
    "out vec4 colour;\n"
@@ -200,12 +200,16 @@ GLuint tex_external;
 enum piglit_result
 test_case_image_load(void *data)
 {
+   if (piglit_get_gl_version() < 31)
+      piglit_report_result(PIGLIT_SKIP);
+
    enum piglit_result pass = PIGLIT_PASS;
    const float green[] = {0.0, 1.0, 0.0, 1.0};
 
    glBindImageTexture(1, tex_external, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
 
-   char *fs_src;
+   char *vs_src, *fs_src;
+   asprintf(&vs_src, vs_template, 310);
    asprintf(&fs_src, (const char*) data, fs_imageLoad);
 
    GLuint prog;
@@ -231,12 +235,16 @@ test_case_image_load(void *data)
 enum piglit_result
 test_case_image_store(void *data)
 {
+   if (piglit_get_gl_version() < 31)
+      piglit_report_result(PIGLIT_SKIP);
+
    enum piglit_result pass = PIGLIT_PASS;
    const float green[] = {0.0, 1.0, 0.0, 1.0};
 
    glBindImageTexture(1, tex_external, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
 
-   char *fs_src;
+   char *vs_src, *fs_src;
+   asprintf(&vs_src, vs_template, 310);
    asprintf(&fs_src, (const char*) data, fs_imageStore_store);
 
    GLuint prog;
@@ -280,7 +288,8 @@ test_case_sampler(void *data)
    enum piglit_result pass = PIGLIT_PASS;
    const float green[] = {0.0, 1.0, 0.0, 1.0};
 
-   char *fs_src;
+   char *vs_src, *fs_src;
+   asprintf(&vs_src, vs_template, 300);
    asprintf(&fs_src, fs_template_sampler, (const char*) data);
 
    GLuint prog;
