@@ -281,15 +281,12 @@ static void
 run_draw(unsigned iterations)
 {
 	for (unsigned i = 0; i < iterations; i++) {
-		glVertexPointer(3, GL_FLOAT, 0,
-				(void*)(long)(vb_size * duplicate_index));
-
 		if (is_indexed) {
 			glDrawElements(GL_TRIANGLES, count,
 				       GL_UNSIGNED_INT,
 				       (void*)(long)(ib_size * duplicate_index));
 		} else {
-			glDrawArrays(GL_TRIANGLES, 0, count);
+			glDrawArrays(GL_TRIANGLES, (vb_size / 12) * duplicate_index, count);
 		}
 
 		duplicate_index = (duplicate_index + 1) % num_duplicates;
@@ -371,6 +368,8 @@ run_test(unsigned debug_num_iterations, bool indexed, enum cull_method cull_meth
 		glEnable(GL_RASTERIZER_DISCARD);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+
 	if (indexed)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
 
