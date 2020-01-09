@@ -271,7 +271,115 @@ gen_triangle_tile(unsigned num_quads_per_dim, double prim_size_in_pixels,
 	}
 }
 
-static bool is_indexed;
+static void
+gen_triangle_strip_tile(unsigned num_quads_per_dim, double prim_size_in_pixels,
+			unsigned cull_percentage,
+			bool back_face_culling, bool view_culling, bool degenerate_prims,
+			unsigned max_vertices, unsigned *num_vertices, float *vertices)
+{
+	/* clip space coordinates in both X and Y directions: */
+	const double first = -1;
+	const double max_length = 2;
+	const double d = prim_size_in_pixels * 2.0 / WINDOW_SIZE;
+
+	assert(d * num_quads_per_dim <= max_length);
+	assert(*num_vertices == 0);
+
+	/* the vertex ordering is counter-clockwise */
+	for (unsigned y = 0; y < num_quads_per_dim; y++) {
+		bool cull;
+
+		if (cull_percentage == 0)
+			cull = false;
+		else if (cull_percentage == 25)
+			cull = y % 4 == 0;
+		else if (cull_percentage == 50)
+			cull = y % 2 == 0;
+		else if (cull_percentage == 75)
+			cull = y % 4 != 0;
+		else if (cull_percentage == 100)
+			cull = true;
+		else
+			assert(!"wrong cull_percentage");
+
+		/* view culling in different directions */
+		double xoffset = 0, yoffset = 0, zoffset = 0;
+
+		if (cull && view_culling) {
+			unsigned side = (y / 2) % 4;
+
+			if (side == 0)		xoffset = -2;
+			else if (side == 1)	xoffset =  2;
+			else if (side == 2)	yoffset = -2;
+			else if (side == 3)	yoffset =  2;
+		}
+
+		if (cull && degenerate_prims) {
+			unsigned elem = *num_vertices * 3;
+			*num_vertices += 2 + num_quads_per_dim * 2;
+			assert(*num_vertices <= max_vertices);
+
+			for (unsigned x = 0; x < 2 + num_quads_per_dim * 2; x++) {
+				vertices[elem++] = 0;
+				vertices[elem++] = 0;
+				vertices[elem++] = 0;
+			}
+			continue;
+		}
+
+		unsigned elem = *num_vertices * 3;
+		bool add_degenerates = y > 0;
+		*num_vertices += (add_degenerates ? 4 : 0) + 2 + num_quads_per_dim * 2;
+		assert(*num_vertices <= max_vertices);
+
+		unsigned x = 0;
+		unsigned y0 = y;
+		unsigned y1 = y + 1;
+
+		if (cull && back_face_culling) {
+			y0 = y + 1;
+			y1 = y;
+		}
+
+		/* Add degenerated triangles to connect with the previous triangle strip. */
+		if (add_degenerates) {
+			unsigned base = elem;
+
+			vertices[elem++] = vertices[base - 3];
+			vertices[elem++] = vertices[base - 2];
+			vertices[elem++] = vertices[base - 1];
+		}
+
+		for (unsigned i = 0; i < (add_degenerates ? 4 : 1); i++) {
+			vertices[elem++] = xoffset + first + d * x;
+			vertices[elem++] = yoffset + first + d * y1;
+			vertices[elem++] = zoffset;
+		}
+
+		vertices[elem++] = xoffset + first + d * x;
+		vertices[elem++] = yoffset + first + d * y0;
+		vertices[elem++] = zoffset;
+
+		for (; x < num_quads_per_dim; x++) {
+			vertices[elem++] = xoffset + first + d * (x + 1);
+			vertices[elem++] = yoffset + first + d * y1;
+			vertices[elem++] = zoffset;
+
+			vertices[elem++] = xoffset + first + d * (x + 1);
+			vertices[elem++] = yoffset + first + d * y0;
+			vertices[elem++] = zoffset;
+		}
+	}
+}
+
+enum draw_method {
+	INDEXED_TRIANGLES,
+	TRIANGLES,
+	TRIANGLE_STRIP,
+	NUM_DRAW_METHODS,
+};
+
+static enum draw_method global_draw_method;
 static unsigned count;
 static unsigned num_duplicates;
 static unsigned duplicate_index;
@@ -281,12 +389,14 @@ static void
 run_draw(unsigned iterations)
 {
 	for (unsigned i = 0; i < iterations; i++) {
-		if (is_indexed) {
+		if (global_draw_method == INDEXED_TRIANGLES) {
 			glDrawElements(GL_TRIANGLES, count,
 				       GL_UNSIGNED_INT,
 				       (void*)(long)(ib_size * duplicate_index));
-		} else {
+		} else if (global_draw_method == TRIANGLES) {
 			glDrawArrays(GL_TRIANGLES, (vb_size / 12) * duplicate_index, count);
+		} else if (global_draw_method == TRIANGLE_STRIP) {
+			glDrawArrays(GL_TRIANGLE_STRIP, (vb_size / 12) * duplicate_index, count);
 		}
 
 		duplicate_index = (duplicate_index + 1) % num_duplicates;
@@ -304,9 +414,9 @@ enum cull_method {
 };
 
 static double
-run_test(unsigned debug_num_iterations, bool indexed, enum cull_method cull_method,
-	 unsigned num_quads_per_dim, double quad_size_in_pixels,
-	 unsigned cull_percentage)
+run_test(unsigned debug_num_iterations, enum draw_method draw_method,
+	 enum cull_method cull_method, unsigned num_quads_per_dim,
+	 double quad_size_in_pixels, unsigned cull_percentage)
 {
 	const unsigned max_indices = 8100000 * 3;
 	const unsigned max_vertices = max_indices;
@@ -318,17 +428,26 @@ run_test(unsigned debug_num_iterations, bool indexed, enum cull_method cull_meth
 	float *vertices = (float*)malloc(max_vertices * 12);
 	unsigned *indices = NULL;
 
-	if (indexed)
+	if (draw_method == INDEXED_TRIANGLES)
 		indices = (unsigned*)malloc(max_indices * 4);
 
 	unsigned num_vertices = 0, num_indices = 0;
-	gen_triangle_tile(num_quads_per_dim, quad_size_in_pixels,
-			  cull_percentage,
-			  cull_method == BACK_FACE_CULLING,
-			  cull_method == VIEW_CULLING,
-			  cull_method == DEGENERATE_PRIMS,
-			  max_vertices, &num_vertices, vertices,
-			  max_indices, &num_indices, indices);
+	if (draw_method == TRIANGLE_STRIP) {
+		gen_triangle_strip_tile(num_quads_per_dim, quad_size_in_pixels,
+					cull_percentage,
+					cull_method == BACK_FACE_CULLING,
+					cull_method == VIEW_CULLING,
+					cull_method == DEGENERATE_PRIMS,
+					max_vertices, &num_vertices, vertices);
+	} else {
+		gen_triangle_tile(num_quads_per_dim, quad_size_in_pixels,
+				  cull_percentage,
+				  cull_method == BACK_FACE_CULLING,
+				  cull_method == VIEW_CULLING,
+				  cull_method == DEGENERATE_PRIMS,
+				  max_vertices, &num_vertices, vertices,
+				  max_indices, &num_indices, indices);
+	}
 
 	vb_size = num_vertices * 12;
 	ib_size = num_indices * 4;
@@ -348,7 +467,7 @@ run_test(unsigned debug_num_iterations, bool indexed, enum cull_method cull_meth
 		glBufferSubData(GL_ARRAY_BUFFER, vb_size * i, vb_size, vertices);
 	free(vertices);
 
-	if (indexed) {
+	if (draw_method == INDEXED_TRIANGLES) {
 		glGenBuffers(1, &ib);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -370,11 +489,11 @@ run_test(unsigned debug_num_iterations, bool indexed, enum cull_method cull_meth
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-	if (indexed)
+	if (draw_method == INDEXED_TRIANGLES)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
 
-	is_indexed = indexed;
-	count = indexed ? num_indices : num_vertices;
+	global_draw_method = draw_method;
+	count = draw_method == INDEXED_TRIANGLES ? num_indices : num_vertices;
 	duplicate_index = 0;
 
 	double rate = 0;
@@ -389,7 +508,7 @@ run_test(unsigned debug_num_iterations, bool indexed, enum cull_method cull_meth
 
 	/* Cleanup. */
 	glDeleteBuffers(1, &vb);
-	if (indexed)
+	if (draw_method == INDEXED_TRIANGLES)
 		glDeleteBuffers(1, &ib);
 	return rate;
 }
@@ -404,7 +523,7 @@ piglit_display(void)
 	/* for debugging */
 	if (getenv("ONE")) {
 		glUseProgram(progs[0]);
-		run_test(100, true, BACK_FACE_CULLING, ceil(sqrt(0.5 * 512000)), 2, 50);
+		run_test(1, TRIANGLE_STRIP, BACK_FACE_CULLING, ceil(sqrt(0.5 * 512000)), 2, 50);
 		piglit_swap_buffers();
 		return PIGLIT_PASS;
 	}
@@ -442,7 +561,7 @@ piglit_display(void)
 	}
 	printf("\n");
 
-	for (int indexed = 1; indexed >= 0; indexed--) {
+	for (int draw_method = 0; draw_method < NUM_DRAW_METHODS; draw_method++) {
 		for (int cull_method = 0; cull_method < NUM_CULL_METHODS; cull_method++) {
 			unsigned num_subtests = 1;
 			static unsigned cull_percentages[] = {100, 75, 50, 25};
@@ -469,7 +588,9 @@ piglit_display(void)
 					cull_percentage = cull_percentages[subtest];
 				}
 
-				printf("  %-14s, ", indexed ? "glDrawElements" : "glDrawArrays");
+				printf("  %-14s, ",
+				       draw_method == INDEXED_TRIANGLES ? "glDrawElements" :
+				       draw_method == TRIANGLES ? "glDrawArraysT" : "glDrawArraysTS");
 
 				if (cull_method == NONE ||
 				    cull_method == RASTERIZER_DISCARD) {
@@ -495,7 +616,8 @@ piglit_display(void)
 						printf("   ");
 
 					for (int i = 0; i < ARRAY_SIZE(num_prims); i++) {
-						rate = run_test(false, indexed, cull_method, num_quads_per_dim[i],
+						rate = run_test(0, draw_method, cull_method,
+								num_quads_per_dim[i],
 								quad_size_in_pixels, cull_percentage);
 						rate *= num_prims[i];
 
