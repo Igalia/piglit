@@ -635,8 +635,18 @@ piglit_display(void)
 	}
 	printf("\n");
 
-	for (int draw_method = 0; draw_method < NUM_DRAW_METHODS; draw_method++) {
-		for (int cull_method = 0; cull_method < NUM_CULL_METHODS; cull_method++)
+	for (int cull_method = 0; cull_method < NUM_CULL_METHODS; cull_method++)
+		run(INDEXED_TRIANGLES, cull_method, num_quads_per_dim, num_prims, ARRAY_SIZE(num_prims));
+
+	/* glDrawArrays: Test NONE and BACK_FACE_CULLING first. */
+	for (int draw_method = TRIANGLES; draw_method < NUM_DRAW_METHODS; draw_method++) {
+		for (int cull_method = 0; cull_method < VIEW_CULLING; cull_method++)
+			run(draw_method, cull_method, num_quads_per_dim, num_prims, ARRAY_SIZE(num_prims));
+	}
+
+	/* glDrawArrays: Test the rest. */
+	for (int draw_method = TRIANGLES; draw_method < NUM_DRAW_METHODS; draw_method++) {
+		for (int cull_method = VIEW_CULLING; cull_method < NUM_CULL_METHODS; cull_method++)
 			run(draw_method, cull_method, num_quads_per_dim, num_prims, ARRAY_SIZE(num_prims));
 	}
 
