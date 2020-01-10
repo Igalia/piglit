@@ -8,6 +8,8 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 )
 
-piglit_add_executable (intel_performance_query-issue_2235 issue_2235.c)
+IF(EGL_FOUND)
+	piglit_add_executable (intel_performance_query-issue_2235 issue_2235.c)
+ENDIF(EGL_FOUND)
 
 # vim: ft=cmake:
