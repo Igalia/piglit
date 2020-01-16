@@ -25,8 +25,8 @@ uniform float arg0 2.0
 uniform float expected 4.0
 uniform float tolerance 1e-2
 draw rect ortho 0 0 4 4
-uniform float arg0 16.0
-uniform float expected 65536
+uniform float arg0 14.0
+uniform float expected 16384
 uniform float tolerance 1
 draw rect ortho 4 0 4 4
 uniform float arg0 -4
