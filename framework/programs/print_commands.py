@@ -86,7 +86,8 @@ def main(input_):
     profile_ = profile.load_test_profile(args.testProfile)
 
     if args.exclude_tests:
-        profile_.filters.append(profile.RegexFilter(args.exclude_tests))
+        profile_.filters.append(profile.RegexFilter(args.exclude_tests,
+                                                    inverse=True))
     if args.include_tests:
         profile_.filters.append(profile.RegexFilter(args.include_tests))
 
