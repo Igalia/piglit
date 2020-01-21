@@ -64,7 +64,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	enum piglit_result result = PIGLIT_PASS;
 	GLuint data_bo = 0;
 	GLfloat *data_buf;
 	GLint ok = 1;
@@ -92,7 +91,10 @@ piglit_init(int argc, char **argv)
 	glCompileShader(shader);
 
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
-	assert(ok);
+	if (!ok) {
+		piglit_report_result(PIGLIT_SKIP);
+		return;
+	}
 
 	prog = glCreateProgram();
 
@@ -101,11 +103,17 @@ piglit_init(int argc, char **argv)
 	glLinkProgram(prog);
 
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
-	assert(ok);
+	if (!ok) {
+		piglit_report_result(PIGLIT_SKIP);
+		return;
+	}
 
 	glUseProgram(prog);
 
-	assert(!glIsEnabled(GL_BLACKHOLE_RENDER_INTEL));
+	if (glIsEnabled(GL_BLACKHOLE_RENDER_INTEL)) {
+		piglit_report_result(PIGLIT_FAIL);
+		return;
+	}
 
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	glUniform1f(glGetUniformLocation(prog, "value"), 1.0f);
@@ -113,11 +121,16 @@ piglit_init(int argc, char **argv)
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 	if (!piglit_probe_buffer(data_bo, GL_SHADER_STORAGE_BUFFER, "output_values",
-				 SIZE_X, 1, &one))
-		result = PIGLIT_FAIL;
+				 SIZE_X, 1, &one)) {
+		piglit_report_result(PIGLIT_FAIL);
+		return;
+	}
 
 	glEnable(GL_BLACKHOLE_RENDER_INTEL);
-	assert(glIsEnabled(GL_BLACKHOLE_RENDER_INTEL));
+	if (!glIsEnabled(GL_BLACKHOLE_RENDER_INTEL)) {
+		piglit_report_result(PIGLIT_FAIL);
+		return;
+	}
 
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	glUniform1f(glGetUniformLocation(prog, "value"), 2.0f);
@@ -125,8 +138,10 @@ piglit_init(int argc, char **argv)
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 	if (!piglit_probe_buffer(data_bo, GL_SHADER_STORAGE_BUFFER, "output_values",
-				 SIZE_X, 1, &one))
-		result = PIGLIT_FAIL;
+				 SIZE_X, 1, &one)) {
+		piglit_report_result(PIGLIT_FAIL);
+		return;
+	}
 
-	piglit_report_result(result);
+	piglit_report_result(PIGLIT_PASS);
 }
