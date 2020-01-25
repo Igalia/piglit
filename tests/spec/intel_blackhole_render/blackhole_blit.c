@@ -51,8 +51,14 @@ run(void)
 	float delta = 1.01 / piglit_width;
 	GLuint prog, fb, fb_tex;
 
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
+
+	glClearColor(0.0, 0.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	glGenFramebuffersEXT(1, &fb);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, fb);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER, fb);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &fb_tex);
@@ -62,8 +68,6 @@ run(void)
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glFramebufferTexture2DEXT(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 				  GL_TEXTURE_2D, fb_tex, 0);
-
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, fb);
 
 	/* This atom should be disabled by default */
 	if (glIsEnabled(GL_BLACKHOLE_RENDER_INTEL))
@@ -122,22 +126,24 @@ run(void)
 	if(!piglit_check_gl_error(GL_NO_ERROR))
 		return PIGLIT_FAIL;
 
-	piglit_present_results();
-
-	const float normal_expected[] = { 1.0, 0.0, 0.0, 1.0 };
+	const float shader_expected[] = { 1.0, 0.0, 0.0, 1.0 };
 	if (!piglit_probe_pixel_rgba(piglit_width / 2,
 				     piglit_height / 2,
-				     normal_expected))
+				     shader_expected))
 		return PIGLIT_FAIL;
+
+	piglit_present_results();
 
 	glClearColor(0.0, 1.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	const float blackhole_draw_expected[] = { 0.0, 1.0, 0.0, 1.0 };
+	const float clear_expected[] = { 0.0, 1.0, 0.0, 1.0 };
 	if (!piglit_probe_pixel_rgba(piglit_width / 2,
 				     piglit_height / 2,
-				     blackhole_draw_expected))
+				     clear_expected))
 		return PIGLIT_FAIL;
+
+	piglit_present_results();
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fb);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
@@ -156,11 +162,34 @@ run(void)
 	if(!piglit_check_gl_error(GL_NO_ERROR))
 		return PIGLIT_FAIL;
 
-	piglit_present_results();
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 
+	/* Blitting into piglit_winsys_fbo was dropped because of the
+	 * blackhole state, expect the first clear color.
+	 */
+	const float blackhole_expected[] = { 0.0, 0.0, 1.0, 1.0 };
 	if (!piglit_probe_pixel_rgba(piglit_width / 2,
 				     piglit_height / 2,
-				     blackhole_draw_expected))
+				     blackhole_expected))
+		return PIGLIT_FAIL;
+
+	piglit_present_results();
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fb);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+
+	glBlitFramebuffer(0, 0, piglit_width, piglit_height,
+			  0, 0, piglit_width, piglit_height,
+			  GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
+
+	/* Now the clear color that landed in fb should have been
+	 * copied into piglit_winsys_fbo.
+	 */
+	if (!piglit_probe_pixel_rgba(piglit_width / 2,
+				     piglit_height / 2,
+				     clear_expected))
 		return PIGLIT_FAIL;
 
 	return PIGLIT_PASS;

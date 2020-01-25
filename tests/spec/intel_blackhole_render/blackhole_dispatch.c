@@ -69,7 +69,7 @@ piglit_init(int argc, char **argv)
 	GLint ok = 1;
 	GLint prog = 0;
 	GLuint shader;
-	const float one = 1.0f;
+	const float one = 1.0f, three = 3.0f;
 
 	piglit_require_extension("GL_ARB_compute_shader");
 	piglit_require_extension("GL_INTEL_blackhole_render");
@@ -137,8 +137,21 @@ piglit_init(int argc, char **argv)
 	glDispatchCompute(SIZE_X, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
+	glDisable(GL_BLACKHOLE_RENDER_INTEL);
+
 	if (!piglit_probe_buffer(data_bo, GL_SHADER_STORAGE_BUFFER, "output_values",
 				 SIZE_X, 1, &one)) {
+		piglit_report_result(PIGLIT_FAIL);
+		return;
+	}
+
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	glUniform1f(glGetUniformLocation(prog, "value"), 3.0f);
+	glDispatchCompute(SIZE_X, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+	if (!piglit_probe_buffer(data_bo, GL_SHADER_STORAGE_BUFFER, "output_values",
+				 SIZE_X, 1, &three)) {
 		piglit_report_result(PIGLIT_FAIL);
 		return;
 	}
