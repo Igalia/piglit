@@ -190,7 +190,6 @@ test_attrib_array(void)
       GL_DOUBLE,
    };
    GLint i;
-   GLubyte data[100];
    GLuint index = 1;
    GLint size = 4;
    GLsizei stride = 0;
@@ -209,7 +208,7 @@ test_attrib_array(void)
 
    /* These should not generate a GL error */
    for (i = 0; i < ARRAY_SIZE(goodTypes); i++) {
-      glVertexAttribLPointer(index, size, goodTypes[i], stride, data);
+      glVertexAttribLPointer(index, size, goodTypes[i], stride, NULL);
       err = glGetError();
       if (err != GL_NO_ERROR) {
          fprintf(stderr,
@@ -221,7 +220,7 @@ test_attrib_array(void)
 
    if (!piglit_khr_no_error) {
       for (i = 0; i < ARRAY_SIZE(badTypes); i++) {
-         glVertexAttribLPointer(index, size, badTypes[i], stride, data);
+         glVertexAttribLPointer(index, size, badTypes[i], stride, NULL);
          err = glGetError();
          if (err != GL_INVALID_ENUM) {
             fprintf(stderr,
