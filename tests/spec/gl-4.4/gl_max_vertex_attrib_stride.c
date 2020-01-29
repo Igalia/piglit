@@ -58,9 +58,7 @@ static bool check_stride(char *function, bool check_valid)
 static bool test_stride_vertex_attribl(GLint stride,
 				       bool check_valid)
 {
-	GLdouble vertices[4][4];
-
-	glVertexAttribLPointer(0, 4, GL_DOUBLE, stride, vertices);
+	glVertexAttribLPointer(0, 4, GL_DOUBLE, stride, NULL);
 
 	return check_stride("glVertexAttribLPointer", check_valid);
 }
@@ -68,10 +66,8 @@ static bool test_stride_vertex_attribl(GLint stride,
 static bool test_stride_vertex_attribi(GLint stride,
 				       bool check_valid)
 {
-	GLuint vertices[4][4];
-
 	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT,
-			       stride, vertices);
+			       stride, NULL);
 
 	return check_stride("glVertexAttribIPointer", check_valid);
 }
@@ -79,10 +75,8 @@ static bool test_stride_vertex_attribi(GLint stride,
 static bool test_stride_vertex_attrib(GLint stride,
 				      bool check_valid)
 {
-	GLfloat vertices[4][4];
-
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
-			      stride, vertices);
+			      stride, NULL);
 
 	return check_stride("glVertexAttribPointer", check_valid);
 }
