@@ -28,6 +28,13 @@
  */
 #include "common.h"
 
+int miplevels;
+int base_size[3];
+int **level_size;
+struct sampler_info sampler;
+bool swizzling;
+int minx, miny, minz, maxx, maxy, maxz;
+int sample_count;
 int shader_version = 130;
 
 /**

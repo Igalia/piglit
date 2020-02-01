@@ -35,17 +35,17 @@
  *
  * The total number of miplevels:
  */
-int miplevels;
+extern int miplevels;
 
 /** Size of the base level */
-int base_size[3];
+extern int base_size[3];
 
 /**
  * Multidimensional array containing the dimensions of each miplevel, indexed
  * by miplevel and then x/y/z.  For example, miplevel[0][1] is the height of
  * miplevel 0, while miplevel[5][2] is the number of slices in miplevel 5.
  */
-int **level_size;
+extern int **level_size;
 /** @} */
 
 struct sampler_info
@@ -76,12 +76,13 @@ struct sampler_info
 
 	/** GL_EXT_texture_swizzle setting: GL_RED/GREEN/BLUE/ALPHA/ZERO/ONE */
 	GLenum swizzle[4];
-} sampler;
+};
+extern struct sampler_info sampler;
 
 /** Whether or not we're using GL_EXT_texture_swizzle */
-bool swizzling;
-int minx, miny, minz, maxx, maxy, maxz;
-int sample_count;
+extern bool swizzling;
+extern int minx, miny, minz, maxx, maxy, maxz;
+extern int sample_count;
 extern int shader_version;
 
 /**
