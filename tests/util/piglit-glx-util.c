@@ -28,8 +28,6 @@
 #include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
-int piglit_automatic;
-
 #ifndef _WIN32
 __attribute__((weak)) int piglit_width = 100;
 __attribute__((weak)) int piglit_height = 100;
