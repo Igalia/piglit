@@ -301,8 +301,8 @@ static const GLenum arb_es3_compatibility_valid_internalformats[] = {
         GL_COMPRESSED_SIGNED_RG11_EAC,
 };
 
-GLenum *valid_internalformats;
-unsigned num_valid_internalformats;
+extern GLenum *valid_internalformats;
+extern unsigned num_valid_internalformats;
 
 typedef struct _test_data test_data;
 

@@ -30,6 +30,9 @@ typedef void (APIENTRY *GetInternalformat)(GLenum target, GLenum internalformat,
                                   GLenum pname, GLsizei bufsize,
                                   void *params);
 
+GLenum *valid_internalformats;
+unsigned num_valid_internalformats;
+
 /* This struct is intended to abstract the fact that there are two
  * really similar methods, and two really similar params (just change
  * the type). All the castings and decision about which method should
