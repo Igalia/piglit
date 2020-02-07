@@ -4161,6 +4161,14 @@ with profile.test_list.group_manager(
     g(['arb_copy_image-formats', '--samples=8'])
     g(['arb_copy_image-format-swizzle'])
     g(['arb_copy_image-texview'])
+    g(['nv_copy_image-simple', '--tex-to-tex'])
+    g(['nv_copy_image-simple', '--rb-to-tex'])
+    g(['nv_copy_image-simple', '--rb-to-rb'])
+    g(['nv_copy_image-api_errors'])
+    g(['nv_copy_image-formats'])
+    g(['nv_copy_image-formats', '--samples=2'])
+    g(['nv_copy_image-formats', '--samples=4'])
+    g(['nv_copy_image-formats', '--samples=8'])
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_cull_distance')) as g:

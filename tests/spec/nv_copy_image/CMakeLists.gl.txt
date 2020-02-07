@@ -1,0 +1,15 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+)
+
+piglit_add_executable (nv_copy_image-api_errors api_errors.c)
+piglit_add_executable (nv_copy_image-formats formats.c)
+piglit_add_executable (nv_copy_image-simple simple.c)
+
+# vim: ft=cmake:
