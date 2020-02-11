@@ -98,7 +98,7 @@ uniform ${input_type} src[${i}] ${"{:#010x}".format(np.uint32(s))}
 
 % if input_type == "int":
     % for i, s in enumerate(sources):
-uniform ${input_type} src_as_16bits[${i}] ${"{:#010x}".format(np.uint32((np.int32(s << 16) >> 16)))}
+uniform ${input_type} src_as_16bits[${i}] ${"{:#010x}".format(np.uint32((np.int32(np.uint32(s) << 16) >> 16)))}
     % endfor
 % else:
     % for i, s in enumerate(sources):

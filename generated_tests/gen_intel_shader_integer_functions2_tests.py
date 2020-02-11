@@ -77,8 +77,8 @@ def generate_results_empty(unused1, unused2):
 
 
 def abs_isub32(_a, _b):
-    a = np.int32(_a)
-    b = np.int32(_b)
+    a = np.int32(np.uint32(_a))
+    b = np.int32(np.uint32(_b))
 
     return np.uint32(a - b) if a > b else np.uint32(b - a)
 
@@ -105,8 +105,8 @@ def abs_usub64(_a, _b):
 
 
 def iadd_sat32(_a, _b):
-    a = np.int32(_a)
-    b = np.int32(_b)
+    a = np.int32(np.uint32(_a))
+    b = np.int32(np.uint32(_b))
 
     if a > 0:
         if b > (np.iinfo(np.int32).max - a):
@@ -159,7 +159,7 @@ def isub_sat32(a, b):
         return np.int32(0x7fffffff)
 
     if r < np.int64(-0x080000000):
-        return np.int32(0x80000000)
+        return np.int32(-0x80000000)
 
     return np.int32(r)
 
@@ -200,8 +200,8 @@ def u_hadd32(_a, _b):
 
 
 def s_hadd32(_a, _b):
-    a = np.int32(_a)
-    b = np.int32(_b)
+    a = np.int32(np.uint32(_a))
+    b = np.int32(np.uint32(_b))
 
     return (a >> 1) + (b >> 1) + ((a & b) & 1)
 
@@ -228,8 +228,8 @@ def u_rhadd32(_a, _b):
 
 
 def s_rhadd32(_a, _b):
-    a = np.int32(_a)
-    b = np.int32(_b)
+    a = np.int32(np.uint32(_a))
+    b = np.int32(np.uint32(_b))
 
     return (a >> 1) + (b >> 1) + ((a | b) & 1)
 
@@ -402,7 +402,7 @@ def countTrailingZeros_sources():
 
 
 def multiply32x16_int32_sources():
-    srcs = [0, 1, -1, np.int32(0x80000000), -0x7fffffff, 0x7fffffff ]
+    srcs = [0, 1, -1, np.int32(-0x80000000), -0x7fffffff, 0x7fffffff ]
 
     random.seed(0)
     for i in range(2, 32, 3):
@@ -422,7 +422,7 @@ def multiply32x16_int32_sources():
 
 
 def subtractSaturate_int32_sources():
-    srcs = [0, 1, -1, np.int32(0x80000000), -0x7fffffff, 0x7fffffff ]
+    srcs = [0, 1, -1, np.int32(-0x80000000), -0x7fffffff, 0x7fffffff ]
 
     random.seed(0)
     for i in range(2, 32, 3):
