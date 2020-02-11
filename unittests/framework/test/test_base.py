@@ -89,7 +89,7 @@ class TestTest(object):
             # This function is the only user of psutil, and by putting it in
             # the function itself we avoid needed to try/except it, and then
             # skip if we don't have it.
-            import psutil
+            psutil = pytest.importorskip('psutil')
 
             class PopenProxy(object):
                 """An object that proxies Popen, and saves the Popen instance
