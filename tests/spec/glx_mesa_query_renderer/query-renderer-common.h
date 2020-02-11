@@ -46,11 +46,11 @@ typedef const char *(*PFNGLXQUERYRENDERERSTRINGMESAPROC) (Display *dpy, int scre
 typedef const char *(*PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC) (int attribute);
 #endif /* GLX_MESA_query_renderer */
 
-PFNGLXQUERYRENDERERSTRINGMESAPROC piglit_glXQueryRendererStringMESA;
-PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC piglit_glXQueryCurrentRendererStringMESA;
-PFNGLXQUERYRENDERERINTEGERMESAPROC piglit_glXQueryRendererIntegerMESA;
-PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC piglit_glXQueryCurrentRendererIntegerMESA;
-PFNGLXCREATECONTEXTATTRIBSARBPROC piglit_glXCreateContextAttribsARB;
+extern PFNGLXQUERYRENDERERSTRINGMESAPROC piglit_glXQueryRendererStringMESA;
+extern PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC piglit_glXQueryCurrentRendererStringMESA;
+extern PFNGLXQUERYRENDERERINTEGERMESAPROC piglit_glXQueryRendererIntegerMESA;
+extern PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC piglit_glXQueryCurrentRendererIntegerMESA;
+extern PFNGLXCREATECONTEXTATTRIBSARBPROC piglit_glXCreateContextAttribsARB;
 
 #define glXQueryRendererStringMESA(dpy, screen, renderer, attribute) \
 	(*piglit_glXQueryRendererStringMESA)(dpy, screen, renderer, attribute)
