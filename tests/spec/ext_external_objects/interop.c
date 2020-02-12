@@ -87,5 +87,88 @@ gl_gen_tex_from_mem_obj(const struct vk_image_props *props,
 		return false;
 	}
 
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	return glGetError() == GL_NO_ERROR;
+}
+
+bool
+gl_create_semaphores_from_vk(const struct vk_ctx *ctx,
+			     const struct vk_semaphores *vk_smps,
+			     struct gl_ext_semaphores *gl_smps)
+{
+	VkSemaphoreGetFdInfoKHR sem_fd_info;
+	int fd_gl_ready;
+	int fd_vk_done;
+	PFN_vkGetSemaphoreFdKHR _vkGetSemaphoreFdKHR;
+
+	glGenSemaphoresEXT(1, &gl_smps->vk_frame_done);
+	glGenSemaphoresEXT(1, &gl_smps->gl_frame_ready);
+
+	_vkGetSemaphoreFdKHR =
+		(PFN_vkGetSemaphoreFdKHR)vkGetDeviceProcAddr(ctx->dev,
+							     "vkGetSemaphoreFdKHR");
+	if (!_vkGetSemaphoreFdKHR) {
+		fprintf(stderr, "vkGetSemaphoreFdKHR not found\n");
+		return false;
+	}
+
+	memset(&sem_fd_info, 0, sizeof sem_fd_info);
+	sem_fd_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
+	sem_fd_info.semaphore = vk_smps->vk_frame_ready;
+	sem_fd_info.handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
+
+	if (_vkGetSemaphoreFdKHR(ctx->dev, &sem_fd_info, &fd_vk_done) != VK_SUCCESS) {
+		fprintf(stderr, "Failed to get the Vulkan memory FD");
+		return false;
+	}
+
+	sem_fd_info.semaphore = vk_smps->gl_frame_done;
+	if (_vkGetSemaphoreFdKHR(ctx->dev, &sem_fd_info, &fd_gl_ready) != VK_SUCCESS) {
+		fprintf(stderr, "Failed to get the Vulkan memory FD");
+		return false;
+	}
+
+	glImportSemaphoreFdEXT(gl_smps->vk_frame_done,
+			       GL_HANDLE_TYPE_OPAQUE_FD_EXT,
+			       fd_vk_done);
+
+	glImportSemaphoreFdEXT(gl_smps->gl_frame_ready,
+			       GL_HANDLE_TYPE_OPAQUE_FD_EXT,
+			       fd_gl_ready);
+
+	if (!glIsSemaphoreEXT(gl_smps->vk_frame_done))
+		return false;
+
+	if (!glIsSemaphoreEXT(gl_smps->gl_frame_ready))
+		return false;
+
+	return glGetError() == GL_NO_ERROR;
+}
+
+GLenum
+gl_get_layout_from_vk(const VkImageLayout vk_layout)
+{
+	switch (vk_layout) {
+	case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		return GL_LAYOUT_COLOR_ATTACHMENT_EXT;
+	case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+		return GL_LAYOUT_DEPTH_STENCIL_ATTACHMENT_EXT;
+	case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:
+		return GL_LAYOUT_DEPTH_STENCIL_READ_ONLY_EXT;
+	case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		return GL_LAYOUT_SHADER_READ_ONLY_EXT;
+	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+		return GL_LAYOUT_TRANSFER_SRC_EXT;
+	case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		return GL_LAYOUT_TRANSFER_DST_EXT;
+	case VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL_KHR:
+		return GL_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_EXT;
+	case VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL_KHR:
+		return GL_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_EXT;
+	case VK_IMAGE_LAYOUT_UNDEFINED:
+	default:
+		return GL_NONE;
+	};
 }

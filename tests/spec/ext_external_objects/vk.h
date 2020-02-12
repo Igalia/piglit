@@ -54,6 +54,9 @@ struct vk_image_props
 	VkFormat format;
 	VkImageUsageFlagBits usage;
 	VkImageTiling tiling;
+
+	VkImageLayout in_layout;
+	VkImageLayout end_layout;
 };
 
 struct vk_image_obj
@@ -61,6 +64,39 @@ struct vk_image_obj
 	VkImage img;
 	VkDeviceMemory mem;
 	VkDeviceSize mem_sz;
+};
+
+struct vk_image_att {
+	struct vk_image_obj obj;
+	struct vk_image_props props;
+};
+
+struct vk_renderer
+{
+	VkPipeline pipeline;
+	VkPipelineLayout pipeline_layout;
+	VkRenderPass renderpass;
+	VkShaderModule vs;
+	VkShaderModule fs;
+	VkFramebuffer fb;
+};
+
+struct vk_buf
+{
+	VkBuffer buf;
+	VkDeviceMemory mem;
+};
+
+struct vk_semaphores
+{
+	VkSemaphore vk_frame_ready;
+	VkSemaphore gl_frame_done;
+};
+
+struct vk_dims
+{
+	float w;
+	float h;
 };
 
 bool
@@ -85,8 +121,60 @@ vk_fill_ext_image_props(struct vk_ctx *ctx,
 			uint32_t depth,
 			uint32_t num_samples,
 			uint32_t num_levels,
+			uint32_t num_layers,
 			VkFormat format,
 			VkImageTiling tiling,
 			VkImageUsageFlagBits usage,
+			VkImageLayout in_layout,
+			VkImageLayout end_layout,
 			struct vk_image_props *props);
+
+bool
+vk_create_renderer(struct vk_ctx *ctx,
+		   const char *vs_src,
+		   unsigned int vs_size,
+		   const char *fs_src,
+		   unsigned int fs_size,
+		   struct vk_image_att *color_att,
+		   struct vk_image_att *depth_att,
+		   struct vk_renderer *renderer);
+
+void
+vk_destroy_renderer(struct vk_ctx *ctx,
+		    struct vk_renderer *pipeline);
+
+bool
+vk_create_buffer(struct vk_ctx *ctx,
+		 uint32_t sz,
+		 VkBufferUsageFlagBits usage,
+		 struct vk_buf *bo);
+
+bool
+vk_update_buffer_data(struct vk_ctx *ctx,
+		      void *data,
+		      uint32_t data_sz,
+		      struct vk_buf *bo);
+
+void
+vk_destroy_buffer(struct vk_ctx *ctx,
+		  struct vk_buf *bo);
+
+void
+vk_draw(struct vk_ctx *ctx,
+	struct vk_buf *vbo,
+	struct vk_renderer *renderer,
+	float *vk_fb_color,
+	uint32_t vk_fb_color_count,
+	struct vk_semaphores *semaphores,
+	bool has_wait, bool has_signal,
+	uint32_t w, uint32_t h);
+
+bool
+vk_create_semaphores(struct vk_ctx *ctx,
+		     struct vk_semaphores *semaphores);
+
+void
+vk_destroy_semaphores(struct vk_ctx *ctx,
+		      struct vk_semaphores *semaphores);
+
 #endif /* VK_H */
