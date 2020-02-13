@@ -226,8 +226,9 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()
 
-set(Python_ADDITIONAL_VERSIONS
-    3.8 3.7 3.6 3.5 2.7)
+if (NOT Python_ADDITIONAL_VERSIONS)
+	set(Python_ADDITIONAL_VERSIONS 3.8 3.7 3.6 3.5 2.7)
+endif()
 find_package(PythonInterp REQUIRED)
 find_package(PythonSix 1.5.2 REQUIRED)
 find_package(PythonNumpy 1.7.0 REQUIRED)
