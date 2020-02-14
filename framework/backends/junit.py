@@ -325,9 +325,16 @@ class JUnitBackend(FileBackend):
                 except etree.ParseError:
                     continue
 
+        num_tests = len(piglit)
+        if not num_tests:
+            raise exceptions.PiglitUserError(
+                'No tests were run, not writing a result file',
+                exitcode=2)
+
         # set the test count by counting the number of tests.
         # This must be unicode (py3 str)
-        piglit.attrib['tests'] = str(len(piglit))
+        piglit.attrib['tests'] = str(num_tests)
+
 
         with open(os.path.join(self._dest, 'results.xml'), 'w') as f:
             f.write("<?xml version='1.0' encoding='utf-8'?>\n")

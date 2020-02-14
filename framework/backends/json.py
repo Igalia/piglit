@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright (c) 2014, 2016-2017, 2019 Intel Corporation
+# Copyright (c) 2014, 2016-2017, 2019-2020 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -157,7 +157,11 @@ class JSONBackend(FileBackend):
                             data['tests'].update(json.load(f))
                     except ValueError:
                         pass
-            assert data['tests']
+
+            if not data['tests']:
+                raise exceptions.PiglitUserError(
+                    'No tests were run, not writing a result file',
+                    exitcode=2)
 
             data = results.TestrunResult.from_dict(data)
 
@@ -184,6 +188,7 @@ class JSONBackend(FileBackend):
                         s.iterwrite(metadata.items())
 
                     with s.subobject('tests') as t:
+                        wrote = False
                         for test in file_list:
                             test = os.path.join(tests_dir, test)
                             if os.path.isfile(test):
@@ -194,7 +199,12 @@ class JSONBackend(FileBackend):
                                     continue
 
                                 t.iterwrite(a.items())
+                                wrote = True
 
+                    if not wrote:
+                        raise exceptions.PiglitUserError(
+                            'No tests were run.',
+                            exitcode=2)
 
         # Delete the temporary files
         os.unlink(os.path.join(self._dest, 'metadata.json'))
