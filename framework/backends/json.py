@@ -24,7 +24,6 @@
 import collections
 import functools
 import os
-import posixpath
 import shutil
 import sys
 
