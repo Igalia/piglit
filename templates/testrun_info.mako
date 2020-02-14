@@ -19,10 +19,10 @@
         <td>totals</td>
         <td>
           <table>
-            % for key, value in sorted(six.iteritems(totals), key=lambda i: (i[1], i[0]), reverse=True):
+            % for key, value in sorted(totals.items(), key=lambda i: (i[1], i[0]), reverse=True):
             <tr><td>${key}</td><td>${value}</td></tr>
             % endfor
-            <tr><td>total</td><td>${sum(six.itervalues(totals))}</td></tr>
+            <tr><td>total</td><td>${sum(totals.values())}</td></tr>
           </table>
         </td>
       </tr>
@@ -42,11 +42,11 @@
         <td>info</td>
         <td>
           <table>
-            % for key, sub in sorted(six.iteritems(info)):
+            % for key, sub in sorted(info.items()):
               % if isinstance(sub, str):
                 <tr><td>${str}</td></tr>
               % else:
-                % for subkey, value in sorted(six.iteritems(sub)):
+                % for subkey, value in sorted(sub.items()):
                 <tr><td>${subkey}</td><td><pre>${value}</pre></td></tr>
                 % endfor
               % endif
