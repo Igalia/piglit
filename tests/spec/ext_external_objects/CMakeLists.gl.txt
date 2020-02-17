@@ -13,4 +13,8 @@ piglit_add_executable (ext_external_objects-memory-object-api-errors memory-obje
 
 piglit_add_executable (ext_external_objects-semaphore-api-errors semaphore-api-errors.c)
 
+piglit_add_executable (ext_external_objects-vk-image-override
+		       vk.c interop.c vk_image_override.c)
+
+
 # vim: ft=cmake:
