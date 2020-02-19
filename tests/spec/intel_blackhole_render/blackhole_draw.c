@@ -138,10 +138,14 @@ run(void)
 
 	piglit_present_results();
 
+	glDisable(GL_BLACKHOLE_RENDER_INTEL);
+
 	if (!piglit_probe_pixel_rgba(piglit_width / 2,
 				     piglit_height / 2,
 				     blackhole_draw_expected))
 		return PIGLIT_FAIL;
+
+	glEnable(GL_BLACKHOLE_RENDER_INTEL);
 
 	glClearColor(1.0, 0.0, 0.0, 1.0);
 
@@ -150,13 +154,13 @@ run(void)
 
 	piglit_present_results();
 
+	glDisable(GL_BLACKHOLE_RENDER_INTEL);
+
 	const float blackhole_clear_expected[] = { 0.0, 1.0, 0.0, 1.0 };
 	if (!piglit_probe_pixel_rgba(piglit_width / 2,
 				     piglit_height / 2,
 				     blackhole_clear_expected))
 		return PIGLIT_FAIL;
-
-	glDisable(GL_BLACKHOLE_RENDER_INTEL);
 
 	glClearColor(1.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
