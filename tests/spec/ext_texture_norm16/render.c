@@ -253,8 +253,8 @@ verify_contents(const struct fmt_test *test)
 			continue;
 
 		piglit_report_subtest_result(PIGLIT_FAIL,
-					     "format 0x%x read fail",
-					     test->iformat);
+					     "format %s read fail",
+					     piglit_get_gl_enum_name(test->iformat));
 		result = false;
 		break;
 	}
@@ -295,8 +295,8 @@ test_copy_image(const struct fmt_test *test, GLuint src, GLuint *texture)
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		piglit_report_subtest_result(PIGLIT_FAIL,
-					     "format 0x%x copyimage fail",
-					     test->iformat);
+					     "format %s copyimage fail",
+					     piglit_get_gl_enum_name(test->iformat));
 		result = false;
 	}
 	return result;
@@ -352,8 +352,8 @@ test_format(const struct fmt_test *test)
 	    test->can_texbuf) {
 		bool buf_test = buffer_test(test);
 		piglit_report_subtest_result(PIGLIT_RESULT(buf_test),
-					     "format 0x%x TBO test",
-					     test->iformat);
+					     "format %s TBO test",
+					     piglit_get_gl_enum_name(test->iformat));
 		pass &= buf_test;
 	}
 
@@ -372,8 +372,8 @@ test_format(const struct fmt_test *test)
 		bool render_test = verify_contents_float(test);
 		piglit_present_results();
 		piglit_report_subtest_result(PIGLIT_RESULT(render_test),
-					     "format 0x%x",
-					     test->iformat);
+					     "format %s",
+					     piglit_get_gl_enum_name(test->iformat));
 		glDeleteTextures(1, &texture);
 		pass &= render_test;
 		return pass;
@@ -383,13 +383,13 @@ test_format(const struct fmt_test *test)
 	GLuint rbo = create_rbo(test);
 	if (!rbo || !piglit_check_gl_error(GL_NO_ERROR)) {
 		piglit_report_subtest_result(PIGLIT_FAIL,
-					     "format 0x%x RBO test",
-					     test->iformat);
+					     "format %s RBO test",
+					     piglit_get_gl_enum_name(test->iformat));
 		pass &= false;
 	} else {
 		piglit_report_subtest_result(PIGLIT_PASS,
-					     "format 0x%x RBO test",
-					     test->iformat);
+					     "format %s RBO test",
+					     piglit_get_gl_enum_name(test->iformat));
 	}
 	glDeleteRenderbuffers(1, &rbo);
 
@@ -400,8 +400,8 @@ test_format(const struct fmt_test *test)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
 		GL_FRAMEBUFFER_COMPLETE) {
 		piglit_report_subtest_result(PIGLIT_FAIL,
-					     "format 0x%x fbo fail",
-					     test->iformat);
+					     "format %s fbo fail",
+					     piglit_get_gl_enum_name(test->iformat));
 		pass &= false;
 	}
 
@@ -431,8 +431,8 @@ test_format(const struct fmt_test *test)
 			test_copy_image(test, texture, &texture_copy);
 		pass &= copy_pass;
 		piglit_report_subtest_result(PIGLIT_RESULT(copy_pass),
-					     "copy image format 0x%x",
-					     test->iformat);
+					     "copy image format %s",
+					     piglit_get_gl_enum_name(test->iformat));
 		render_texture(texture_copy, GL_TEXTURE_2D, fbo);
 	}
 
@@ -486,8 +486,8 @@ piglit_display(void)
 	for (unsigned i = 0; i < ARRAY_SIZE(tests); i++, test++) {
 		bool fmt_pass = test_format(test);
 		piglit_report_subtest_result(PIGLIT_RESULT(fmt_pass),
-					     "format 0x%x",
-					     test->iformat);
+					     "format %s",
+					     piglit_get_gl_enum_name(test->iformat));
 		pass &= fmt_pass;
 	}
 
