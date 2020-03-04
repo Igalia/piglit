@@ -44,18 +44,14 @@ __all__ = [
 PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl", "wgl"]
 
 
-class PiglitConfig(configparser.SafeConfigParser):
+class PiglitConfig(configparser.ConfigParser):
     """Custom Config parser that provides a few extra helpers."""
     def __init__(self, *args, **kwargs):
-        # In Python2 the ConfigParser classes are old style, you can't use
-        # super() on them. sigh
-        configparser.SafeConfigParser.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.filename = None
 
     def readfp(self, fp, filename=None):
-        # In Python2 the ConfigParser classes are old style, you can't use
-        # super() on them. sigh
-        configparser.SafeConfigParser.readfp(self, fp, filename)
+        super().readfp(fp, filename)
         self.filename = os.path.abspath(filename or fp.name)
 
     def safe_get(self, section, option, fallback=None, **kwargs):
