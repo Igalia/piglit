@@ -326,6 +326,7 @@ with profile.test_list.group_manager(PiglitGLTest, 'shaders') as g:
     g(['useprogram-flushverts-2'])
     g(['useprogram-inside-begin'])
     g(['useprogram-refcount-1'])
+    g(['useprogram-refcount-1', 'delete_dup'])
     g(['useshaderprogram-bad-type'])
     g(['useshaderprogram-bad-program'])
     g(['useshaderprogram-flushverts-1'])
