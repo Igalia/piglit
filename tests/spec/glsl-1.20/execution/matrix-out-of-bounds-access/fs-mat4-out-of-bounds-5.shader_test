@@ -1,0 +1,31 @@
+/* From section 5.6 "Matrix Components" of the GLSL 1.20 spec:
+ *
+ *  "Behavior is undefined when accessing a component outside the bounds
+ *   of a matrix with a non-constant expression."
+ *
+ * The behaviour becomes defined only in robustness extensions, however even
+ * if driver is technically allowed to crash or hang, it most likely
+ * doesn't want to.
+ */
+
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 120
+
+void main()
+{
+	mat4 mat = mat4(-1.0);
+	int index = int(mat[0][0]);
+	if (mat[index][0] >= 1.0) {
+		mat[index] = vec4(-1.0);
+	}
+
+	gl_FragColor = mat[index];
+}
+
+[test]
+draw rect -1 -1 2 2

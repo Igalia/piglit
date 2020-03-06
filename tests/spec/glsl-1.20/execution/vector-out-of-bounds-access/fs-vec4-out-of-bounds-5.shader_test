@@ -1,0 +1,31 @@
+/* From section 5.5 "Vector Components" of the GLSL 1.20 spec:
+ *
+ *  "When indexing with non-constant expressions, behavior is undefined if the
+ *   index is negative, or greater than or equal to the size of the vector."
+ *
+ * The behaviour becomes defined only in robustness extensions, however even
+ * if driver is technically allowed to crash or hang, it most likely
+ * doesn't want to.
+ */
+
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 120
+
+void main()
+{
+	vec4 vec = vec4(1.0, 2.0, 3.0, -1);
+	int index = int(vec.w);
+	if (vec[index] >= 1.0) {
+		vec[index] = -1.0;
+	}
+
+	gl_FragColor = vec4(vec[index], 0.0, 0.0, 0.0);
+}
+
+[test]
+draw rect -1 -1 2 2
