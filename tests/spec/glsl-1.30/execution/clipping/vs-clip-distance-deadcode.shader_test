@@ -1,0 +1,47 @@
+# Test gl_ClipDistance as dead code.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+void unused(void)
+{
+	gl_ClipDistance[0] = 0.0;
+	gl_ClipDistance[1] = 0.0;
+	gl_ClipDistance[2] = 0.0;
+	gl_ClipDistance[3] = 0.0;
+	gl_ClipDistance[4] = 0.0;
+	gl_ClipDistance[5] = 0.0;
+	gl_ClipDistance[6] = 0.0;
+	gl_ClipDistance[7] = 0.0;
+}
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+void main(void)
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho 0 1 0 1
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+enable GL_CLIP_PLANE6
+enable GL_CLIP_PLANE7
+draw rect 0.0 0.0 1.0 1.0
+
+probe all rgba 0.0 1.0 0.0 1.0
