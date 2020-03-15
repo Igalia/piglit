@@ -59,18 +59,16 @@ verify_rgbw_texture()
 	float *b = expect + 2 * box;
 	float *w = b + color_stride;
 
+	bool pass = true;
+
 	/* Verify texture contents by probing each color box. */
-	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, 0, 0, hf, hf, r))
-		return false;
-	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, hf, 0, hf, hf, g))
-		return false;
-	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, 0, hf, hf, hf, b))
-		return false;
-	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, hf, hf, hf, hf, w))
-		return false;
+	pass = piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, 0, 0, hf, hf, r) && pass;
+	pass = piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, hf, 0, hf, hf, g) && pass;
+	pass = piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, 0, hf, hf, hf, b) && pass;
+	pass = piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, hf, hf, hf, hf, w) && pass;
 
 	free(expect);
-	return true;
+	return pass;
 }
 
 void
