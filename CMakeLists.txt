@@ -21,6 +21,8 @@ endif()
 
 project (piglit)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Require MinGW
 if (MSVC)
 	message (FATAL_ERROR "Windows builds require MinGW")
