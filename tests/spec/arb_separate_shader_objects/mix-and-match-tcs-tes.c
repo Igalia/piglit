@@ -155,42 +155,43 @@ void piglit_init(int argc, char **argv)
 		 1.0, -1.0,
 		 1.0,  1.0
 	};
+	bool pass = true;
 
 	piglit_require_extension("GL_ARB_separate_shader_objects");
 	piglit_require_extension("GL_ARB_tessellation_shader");
 
 	vs_prog = glCreateShaderProgramv(GL_VERTEX_SHADER, 1,
 					 (const GLchar *const*)&vs_code);
-	piglit_link_check_status(vs_prog);
+	pass = piglit_link_check_status(vs_prog) && pass;
 
 	tcs0_prog = glCreateShaderProgramv(GL_TESS_CONTROL_SHADER, 1,
 					   (const GLchar *const *)&tcs0_code);
-	piglit_link_check_status(tcs0_prog);
+	pass = piglit_link_check_status(tcs0_prog) && pass;
 
 	tcs1_prog = glCreateShaderProgramv(GL_TESS_CONTROL_SHADER, 1,
 					   (const GLchar *const *)&tcs1_code);
-	piglit_link_check_status(tcs1_prog);
+	pass = piglit_link_check_status(tcs1_prog) && pass;
 
 	tes_prog = glCreateShaderProgramv(GL_TESS_EVALUATION_SHADER, 1,
 					  (const GLchar *const *)&tes_code);
-	piglit_link_check_status(tes_prog);
+	pass = piglit_link_check_status(tes_prog) && pass;
 
 	fs_prog = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
 					 (const GLchar *const *)&fs_code);
-	piglit_link_check_status(fs_prog);
+	pass = piglit_link_check_status(fs_prog) && pass;
 
 	glGenProgramPipelines(2, pipeline);
 	glUseProgramStages(pipeline[0], GL_VERTEX_SHADER_BIT, vs_prog);
 	glUseProgramStages(pipeline[0], GL_TESS_CONTROL_SHADER_BIT, tcs0_prog);
 	glUseProgramStages(pipeline[0], GL_TESS_EVALUATION_SHADER_BIT, tes_prog);
 	glUseProgramStages(pipeline[0], GL_FRAGMENT_SHADER_BIT, fs_prog);
-	piglit_program_pipeline_check_status(pipeline[0]);
+	pass = piglit_program_pipeline_check_status(pipeline[0]) && pass;
 
 	glUseProgramStages(pipeline[1], GL_VERTEX_SHADER_BIT, vs_prog);
 	glUseProgramStages(pipeline[1], GL_TESS_CONTROL_SHADER_BIT, tcs1_prog);
 	glUseProgramStages(pipeline[1], GL_TESS_EVALUATION_SHADER_BIT, tes_prog);
 	glUseProgramStages(pipeline[1], GL_FRAGMENT_SHADER_BIT, fs_prog);
-	piglit_program_pipeline_check_status(pipeline[1]);
+	pass = piglit_program_pipeline_check_status(pipeline[1]) && pass;
 
 	/* Set up the VAOs/VBOs for drawing rectangles using the approach
 	 * from spec/arb_tessellation_shader/execution/sanity.shader_test.
@@ -204,6 +205,8 @@ void piglit_init(int argc, char **argv)
 	glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
-	if (!piglit_check_gl_error(0))
+	pass = piglit_check_gl_error(0) && pass;
+
+	if (!pass)
 		piglit_report_result(PIGLIT_FAIL);
 }
