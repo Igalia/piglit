@@ -1,0 +1,30 @@
+# Test case reproduces mesa#2610. On Intel GPUs, the ordering of .sat
+# destination modifier and flag generation were handled backwards.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 110
+
+uniform float uni_val;
+
+void main()
+{
+   float val = 0.0;
+   val = 1.0;
+
+   if (uni_val <= 10.0)
+      val = clamp(uni_val - 10.0, 0.0, 1.0);
+
+   gl_FragColor = vec4(val, 1.0 - val, 0.0, 1.0);
+}
+
+[test]
+uniform float uni_val 5.0
+clear color 0.5 0.5 0.5 0.5
+clear
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
