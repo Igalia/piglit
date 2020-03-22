@@ -212,6 +212,8 @@ piglit_init(int argc, char **argv)
 		float b;
 	} *vert;
 
+	bool pass = true;
+
 	piglit_require_extension("GL_ARB_separate_shader_objects");
 	piglit_require_extension("GL_ARB_explicit_attrib_location");
 
@@ -247,7 +249,7 @@ piglit_init(int argc, char **argv)
 		vs_programs[i] =
 			glCreateShaderProgramv(GL_VERTEX_SHADER, 1,
 					       (const GLchar *const *) &source);
-		piglit_link_check_status(vs_programs[i]);
+		pass = piglit_link_check_status(vs_programs[i]) && pass;
 
 		if (i == 0)
 			puts(source);
@@ -269,7 +271,7 @@ piglit_init(int argc, char **argv)
 		fs_programs[i] =
 			glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1,
 					       (const GLchar *const *) &source);
-		piglit_link_check_status(fs_programs[i]);
+		pass = piglit_link_check_status(fs_programs[i]) && pass;
 
 		if (i == 3)
 			puts(source);
@@ -359,4 +361,7 @@ piglit_init(int argc, char **argv)
 			combinations[i - 1] = temp;
 		}
 	}
+
+	if (!pass)
+		piglit_report_result(PIGLIT_FAIL);
 }
