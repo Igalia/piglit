@@ -4369,6 +4369,7 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'arb_shader_storage_buffer_object')) as g:
     g(['arb_shader_storage_buffer_object-minmax'], 'minmax')
     g(['arb_shader_storage_buffer_object-rendering'], 'rendering')
+    g(['arb_shader_storage_buffer_object-issue1258'], 'issue1258')
     g(['arb_shader_storage_buffer_object-getintegeri_v'], 'getintegeri_v')
     g(['arb_shader_storage_buffer_object-deletebuffers'], 'deletebuffers')
     g(['arb_shader_storage_buffer_object-maxblocks'], 'maxblocks')
