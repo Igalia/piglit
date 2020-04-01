@@ -60,12 +60,13 @@ static const char fs_text[] =
 	"}\n"
 	;
 
-void
+GLboolean
 draw(const float *color, float x_offset, bool release)
 {
 	GLuint prog;
 	GLint color_location;
 	GLint offset_location;
+	GLboolean pass;
 
 	prog = piglit_build_simple_program(vs_text, fs_text);
 	if (release)
@@ -73,7 +74,7 @@ draw(const float *color, float x_offset, bool release)
 
 	glBindAttribLocation(prog, 0, "vertex");
 	glLinkProgram(prog);
-	piglit_link_check_status(prog);
+	pass = piglit_link_check_status(prog);
 
 	glUseProgram(prog);
 	color_location = glGetUniformLocation(prog, "color");
@@ -83,6 +84,8 @@ draw(const float *color, float x_offset, bool release)
 	glUniform4f(offset_location, x_offset, 0.0f, 0.0f, 0.0f);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDeleteProgram(prog);
+
+	return pass;
 }
 
 enum piglit_result
@@ -92,9 +95,9 @@ piglit_display(void)
 	float green[] = {0.0, 1.0, 0.0, 0.0};
 	float blue[] = {0.0, 0.0, 1.0, 0.0};
 
-	draw(green, 0.0f, false);
+	pass &= draw(green, 0.0f, false);
 	glReleaseShaderCompiler();
-	draw(blue, 1.0f, true);
+	pass &= draw(blue, 1.0f, true);
 	glReleaseShaderCompiler();
 
 	pass &= piglit_probe_pixel_rgba(piglit_width / 4, piglit_height / 2,
