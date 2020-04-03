@@ -151,7 +151,7 @@ piglit_display(void)
 	t2 = get_gpu_time_via_get(q);
 	validate_times(t1, t2, tolerance);
 
-	usleep(10000);
+	piglit_delay_ns(10000000);
 
 	puts("Test: first glGet, then glQuery");
 	t1 = get_gpu_time_via_get(q);
