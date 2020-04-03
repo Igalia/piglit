@@ -35,7 +35,9 @@
  */
 
 #include "piglit-util-gl.h"
+#ifdef HAVE_UNISTD_H
 #include "unistd.h"
+#endif
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
