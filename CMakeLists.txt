@@ -341,6 +341,9 @@ if (WIN32)
 	# Don't define min/max macros
 	add_definitions (-DNOMINMAX)
 
+	# Even more no min/max macros
+	add_definitions (-D_CRT_DECLARE_NONSTDC_NAMES=0)
+
 	# Define M_PI and others
 	add_definitions (-D_USE_MATH_DEFINES)
 endif (WIN32)
