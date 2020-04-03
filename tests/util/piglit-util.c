@@ -624,6 +624,8 @@ piglit_delay_ns(int64_t time_ns)
 
 	while (nanosleep(&ts, &ts) == -1 && errno == EINTR)
 		;
+#elif defined(_MSC_VER)
+	Sleep(time_ns / 1000000);
 #else
 	usleep(time_ns / 1000);
 #endif
