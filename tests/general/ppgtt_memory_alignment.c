@@ -91,7 +91,13 @@ piglit_init(int argc, char **argv)
 	/* Maximal value of cache-size supported by driver */
 	const GLsizei cache_max_size = 64 * 1024 * 1024;
 	const GLsizei cache_extra_size = cache_max_size * 16;
+#ifdef _MSC_VER
+	SYSTEM_INFO sysInfo;
+	GetSystemInfo(&sysInfo);
+	const unsigned int page_size = sysInfo.dwPageSize;
+#else
 	const unsigned int page_size = getpagesize();
+#endif
 	const GLsizei size_inconsistency = page_size / 4 + 1;
 	GLsizei size = 0;
 	GLuint buf;
