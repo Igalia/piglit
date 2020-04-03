@@ -26,6 +26,7 @@ import os
 import sys
 import getpass
 import tempfile
+import platform
 
 import mako
 from mako.template import Template
@@ -33,12 +34,15 @@ from mako.lookup import TemplateLookup
 
 
 # Based on a similar setup in framework/summary
-MAKO_TEMP_DIR = os.path.join(tempfile.gettempdir(),
-                             getpass.getuser(),
-                             'piglit',
-                             'python-{}'.format(sys.version.split()[0]),
-                             'mako-{}'.format(mako.__version__),
-                             'generators')
+if platform.system() == "Windows":
+    MAKO_TEMP_DIR = tempfile.gettempdir()
+else:
+    MAKO_TEMP_DIR = os.path.join(tempfile.gettempdir(),
+                                 getpass.getuser(),
+                                 'piglit',
+                                 'python-{}'.format(sys.version.split()[0]),
+                                 'mako-{}'.format(mako.__version__),
+                                 'generators')
 
 TEMPLATE_DIR = os.path.abspath(os.path.dirname(__file__))
 
