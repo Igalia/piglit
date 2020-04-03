@@ -342,6 +342,29 @@ strndup(const char *s, size_t n)
 }
 #endif
 
+#ifdef _MSC_VER
+static inline int
+vasprintf(char **strp, const char *fmt, va_list ap)
+{
+	int len = _vscprintf(fmt, ap);
+	if (len < 0)
+		return -1;
+
+	char *str = (char *)malloc(len + 1);
+	if (!str)
+		return -1;
+
+	int r = vsprintf_s(str, len + 1, fmt, ap);
+	if (r < 0) {
+		free(str);
+		return -1;
+	}
+
+	*strp = str;
+	return r;
+}
+#endif
+
 /**
  * Determine if an extension is listed in an extension string
  *
