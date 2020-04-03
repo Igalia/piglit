@@ -30,7 +30,7 @@ extern GLboolean pass;
 extern GLboolean
 compare_texture(const GLfloat *orig, const GLfloat *copy,
 		GLenum orig_fmt, GLenum copy_fmt, unsigned num_pix,
-		GLboolean has_green);
+		GLboolean has_green, GLboolean is_signed);
 
 extern void
-generate_rainbow_texture_data(unsigned width, unsigned height, float *img);
+generate_rainbow_texture_data(unsigned width, unsigned height, bool is_signed, float *img);

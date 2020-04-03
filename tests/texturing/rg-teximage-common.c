@@ -42,6 +42,7 @@
 	(((float) x / (float) maximum) * 2.0 * M_PI)
 
 #define EPSILON (1.0 / 255.0)
+#define EPSILON_SIGNED (2.0 / 255.0)
 /* give a large value for compression */
 #define EPSILON_COMP (20.0 / 255.0)
 
@@ -66,7 +67,7 @@ piglit_display(void)
 GLboolean
 compare_texture(const GLfloat *orig, const GLfloat *copy,
 		GLenum orig_fmt, GLenum copy_fmt, unsigned num_pix,
-		GLboolean has_green)
+		GLboolean has_green, GLboolean is_signed)
 {
 	GLboolean logged = GL_FALSE;
 	GLboolean pass = GL_TRUE;
@@ -77,7 +78,7 @@ compare_texture(const GLfloat *orig, const GLfloat *copy,
 	    orig_fmt == GL_COMPRESSED_SIGNED_RED_RGTC1 || orig_fmt == GL_COMPRESSED_SIGNED_RG_RGTC2)
 		e = EPSILON_COMP;
 	else
-		e = EPSILON;
+		e = is_signed ? EPSILON_SIGNED : EPSILON;
 
 	for (i = 0; i < num_pix; i++) {
 		if (fabs(orig[0] - copy[0]) > e) {
@@ -128,7 +129,7 @@ compare_texture(const GLfloat *orig, const GLfloat *copy,
 
 
 void
-generate_rainbow_texture_data(unsigned width, unsigned height, float *img)
+generate_rainbow_texture_data(unsigned width, unsigned height, bool is_signed, float *img)
 {
 	unsigned i;
 	unsigned j;
@@ -139,10 +140,17 @@ generate_rainbow_texture_data(unsigned width, unsigned height, float *img)
 		for (j = 0; j < width; j++) {
 			const float angle = NORMALIZE_TO_RADIANS(j, width);
 
-			img[0] = (cos(angle + bias) + 1.0) * 0.5;
-			img[1] = (sin(angle - bias) + 1.0) * 0.5;
-			img[2] = (cos(bias) + 1.0) * 0.5;
-			img[3] = (sin(bias) + 1.0) * 0.5;
+			if (is_signed) {
+				img[0] = (cos(angle + bias));
+				img[1] = (sin(angle - bias));
+				img[2] = (cos(bias));
+				img[3] = (sin(bias));
+			} else {
+				img[0] = (cos(angle + bias) + 1.0) * 0.5;
+				img[1] = (sin(angle - bias) + 1.0) * 0.5;
+				img[2] = (cos(bias) + 1.0) * 0.5;
+				img[3] = (sin(bias) + 1.0) * 0.5;
+			}
 			img += 4;
 		}
 	}

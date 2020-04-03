@@ -39,12 +39,15 @@
 #define WIDTH  256
 #define HEIGHT 256
 static float rgba_image[4 * WIDTH * HEIGHT];
+static float rgba_snorm_image[4 * WIDTH * HEIGHT];
 
 static const GLenum internal_formats[] = {
 	GL_COMPRESSED_RG_RGTC2,
 	GL_COMPRESSED_SIGNED_RG_RGTC2,
 	GL_RG,
+	GL_RG_SNORM,
 	GL_RGBA,
+	GL_RGBA_SNORM,
 };
 
 GLuint tex[Elements(internal_formats)];
@@ -71,18 +74,21 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_texture_compression_rgtc");
 
 	result = (GLfloat *) malloc(4 * WIDTH * HEIGHT * sizeof(GLfloat));
-	generate_rainbow_texture_data(WIDTH, HEIGHT, rgba_image);
+	generate_rainbow_texture_data(WIDTH, HEIGHT, false, rgba_image);
+	generate_rainbow_texture_data(WIDTH, HEIGHT, true, rgba_snorm_image);
 
 	glEnable(GL_TEXTURE_2D);
 	glGenTextures(Elements(tex), tex);
 
 	for (i = 0; i < Elements(internal_formats); i++) {
 		GLenum err;
-
+		bool is_snorm = (internal_formats[i] == GL_COMPRESSED_SIGNED_RG_RGTC2 ||
+				 internal_formats[i] == GL_RGBA_SNORM ||
+				 internal_formats[i] == GL_RG_SNORM);
 		glBindTexture(GL_TEXTURE_2D, tex[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, internal_formats[i],
 			     WIDTH, HEIGHT, 0, GL_RGBA,
-			     GL_FLOAT, rgba_image);
+			     GL_FLOAT, is_snorm ? rgba_snorm_image : rgba_image);
 		err = glGetError();
 		if (err) {
 			fprintf(stderr, "glTexImage2D(internalFormat = 0x%04x) "
@@ -96,12 +102,12 @@ piglit_init(int argc, char **argv)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 				GL_NEAREST);
 
-		if (internal_formats[i] != GL_RGBA) {
+		if (internal_formats[i] != GL_RGBA && internal_formats[i] != GL_RGBA_SNORM) {
 			glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT,
 				      result);
-			pass = compare_texture(rgba_image, result,
+			pass = compare_texture(is_snorm ? rgba_snorm_image : rgba_image, result,
 					       internal_formats[i], GL_RGBA,
-					       (WIDTH * HEIGHT), GL_TRUE)
+					       (WIDTH * HEIGHT), GL_TRUE, is_snorm)
 				&& pass;
 		}
 	}

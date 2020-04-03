@@ -70,7 +70,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_texture_rg");
 
 	result = (GLfloat *) malloc(4 * WIDTH * HEIGHT * sizeof(GLfloat));
-	generate_rainbow_texture_data(WIDTH, HEIGHT, rgba_image);
+	generate_rainbow_texture_data(WIDTH, HEIGHT, false, rgba_image);
 
 	glEnable(GL_TEXTURE_2D);
 	glGenTextures(Elements(tex), tex);
@@ -100,7 +100,7 @@ piglit_init(int argc, char **argv)
 				      result);
 			pass = compare_texture(rgba_image, result,
 					       internal_formats[i], GL_RGBA,
-					       (WIDTH * HEIGHT), GL_TRUE)
+					       (WIDTH * HEIGHT), GL_TRUE, GL_FALSE)
 				&& pass;
 		}
 	}
