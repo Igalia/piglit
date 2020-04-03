@@ -67,6 +67,10 @@
 #include <unistd.h>  // for usleep
 #endif
 
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#endif
+
 #include "piglit-util.h"
 
 
