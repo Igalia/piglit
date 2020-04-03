@@ -53,6 +53,22 @@ extern "C" {
 
 #if defined(__APPLE__) || defined(__MINGW32__)
 #  include "libgen.h" // for basename
+#elif defined(_MSC_VER)
+
+static inline char *
+basename(const char *path)
+{
+	static char path_buffer[_MAX_PATH];
+	char drive[_MAX_DRIVE];
+	char dir[_MAX_DIR];
+	char fname[_MAX_FNAME];
+	char ext[_MAX_EXT];
+
+	_splitpath(path, drive, dir, fname, ext);
+	_makepath(path_buffer, NULL , NULL, fname, ext);
+	return path_buffer;
+}
+
 #endif
 
 #include "piglit-log.h"
