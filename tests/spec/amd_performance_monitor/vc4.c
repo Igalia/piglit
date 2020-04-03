@@ -183,7 +183,7 @@ do_perfmon_test(const struct perfmon_info *info,
 {
 	struct perfcounter_id counterid;
 	unsigned perfmon, counter;
-	struct counter_res res = { };
+	struct counter_res res = { 0 };
 	unsigned avail = 0;
 	int written = 0;
 

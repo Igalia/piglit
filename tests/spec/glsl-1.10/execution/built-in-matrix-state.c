@@ -251,7 +251,7 @@ piglit_display(void)
 
 
 	/* Test normal matrix. */
-	float norm[9] = {};
+	float norm[9] = { 0 };
 	load_matrix(mview, GL_MODELVIEW);
 	compute_normal_matrix(norm, mview);
 	pass = check_shader_builtin(GL_FLOAT_MAT3, norm, "gl_NormalMatrix")
