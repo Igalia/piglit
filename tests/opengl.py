@@ -4151,6 +4151,10 @@ with profile.test_list.group_manager(
     g(['arb_copy_image-formats', '--samples=8'])
     g(['arb_copy_image-format-swizzle'])
     g(['arb_copy_image-texview'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'nv_copy_image')) as g:
     g(['nv_copy_image-simple', '--tex-to-tex'])
     g(['nv_copy_image-simple', '--rb-to-tex'])
     g(['nv_copy_image-simple', '--rb-to-rb'])
@@ -4159,6 +4163,26 @@ with profile.test_list.group_manager(
     g(['nv_copy_image-formats', '--samples=2'])
     g(['nv_copy_image-formats', '--samples=4'])
     g(['nv_copy_image-formats', '--samples=8'])
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'nv_alpha_to_coverage_dither_control')) as g:
+    g(['nv_alpha_to_coverage_dither_control-error'])
+    g(['nv_alpha_to_coverage_dither_control','-1'])
+    g(['nv_alpha_to_coverage_dither_control','0'])
+    g(['nv_alpha_to_coverage_dither_control','1'])
+    g(['nv_alpha_to_coverage_dither_control','2'])
+    g(['nv_alpha_to_coverage_dither_control','3'])
+    g(['nv_alpha_to_coverage_dither_control','4'])
+    g(['nv_alpha_to_coverage_dither_control','5'])
+    g(['nv_alpha_to_coverage_dither_control','6'])
+    g(['nv_alpha_to_coverage_dither_control','7'])
+    g(['nv_alpha_to_coverage_dither_control','8'])
+    g(['nv_alpha_to_coverage_dither_control','9'])
+    g(['nv_alpha_to_coverage_dither_control','8', '0', '0'])
+    g(['nv_alpha_to_coverage_dither_control','8', '0', '1'])
+    g(['nv_alpha_to_coverage_dither_control','8', '1', '0'])
+    g(['nv_alpha_to_coverage_dither_control','8', '1', '1'])
 
 with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_cull_distance')) as g:
