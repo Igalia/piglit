@@ -156,6 +156,42 @@ test_buffer_storage_errors(bool dsa)
 	return piglit_check_gl_error(GL_INVALID_VALUE);
 }
 
+static bool
+test_get_unsigned_byte_v_enum_errors()
+{
+	GLubyte data[GL_UUID_SIZE_EXT];
+
+	glGetUnsignedBytevEXT(UINT32_MAX, data);
+
+	return piglit_check_gl_error(GL_INVALID_ENUM);
+}
+
+static bool
+test_get_unsigned_byte_i_v_enum_errors()
+{
+	GLubyte data[GL_UUID_SIZE_EXT];
+
+	glGetUnsignedBytei_vEXT(UINT32_MAX, 0, data);
+
+	return piglit_check_gl_error(GL_INVALID_ENUM);
+}
+
+static bool
+test_get_unsigned_byte_i_v_value_errors()
+{
+	GLubyte data[GL_UUID_SIZE_EXT];
+	GLint numDevices;
+
+	glGetIntegerv(GL_NUM_DEVICE_UUIDS_EXT, &numDevices);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+
+	glGetUnsignedBytei_vEXT(GL_DEVICE_UUID_EXT, numDevices + 1, data);
+
+	return piglit_check_gl_error(GL_INVALID_VALUE);
+}
+
 #define X(f, desc)					     	\
 	do {							\
 		const bool subtest_pass = (f);			\
@@ -202,6 +238,10 @@ piglit_display(void)
 			X(test_buffer_storage_errors(true), "buffer storage direct state access");
 		}
 	}
+
+	X(test_get_unsigned_byte_v_enum_errors(), "unsigned-byte-v-bad-enum");
+	X(test_get_unsigned_byte_i_v_enum_errors(), "unsigned-byte-i-v-bad-enum");
+	X(test_get_unsigned_byte_i_v_value_errors(), "unsigned-byte-i-v-bad-value");
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

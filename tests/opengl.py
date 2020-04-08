@@ -2194,29 +2194,19 @@ with profile.test_list.group_manager(
     g(['arb_occlusion_query2-api'], 'api')
     g(['arb_occlusion_query2-render'], 'render')
 
-# Group EXT_memory_object tests
+# Group EXT_external_objects tests
 with profile.test_list.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'EXT_memory_object')) as g:
-    g(['ext_memory_object-api-errors'], 'api-errors')
+        grouptools.join('spec', 'EXT_external_objects')) as g:
+    g(['ext_external_objects-memory-object-api-errors'], 'memory-object-api-errors')
+    g(['ext_external_objects-semaphore-api-errors'], 'semaphore-api-errors')
 
-# Group EXT_memory_object_fd tests
+# Group EXT_external_objects_fd tests
 with profile.test_list.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'EXT_memory_object_fd')) as g:
-    g(['ext_memory_object_fd-api-errors'], 'api-errors')
-
-# Group EXT_semaphore tests
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'EXT_semaphore')) as g:
-    g(['ext_semaphore-api-errors'], 'api-errors')
-
-# Group EXT_semaphore_fd tests
-with profile.test_list.group_manager(
-        PiglitGLTest,
-        grouptools.join('spec', 'EXT_semaphore_fd')) as g:
-    g(['ext_semaphore_fd-api-errors'], 'api-errors')
+        grouptools.join('spec', 'EXT_external_objects_fd')) as g:
+    g(['ext_external_objects_fd-memory-object-api-errors'], 'memory-object-api-errors')
+    g(['ext_external_objects_fd-semaphore-api-errors'], 'semaphore-api-errors')
 
 # Group EXT_texture_format_BGRA8888 tests
 with profile.test_list.group_manager(

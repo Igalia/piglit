@@ -179,6 +179,8 @@ ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	endif()
 ENDIF()
 
+pkg_check_modules(LIBVULKAN QUIET vulkan)
+
 IF(PIGLIT_HAS_GLX)
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" ON)
 ELSE()
