@@ -35,7 +35,19 @@ uint32_t d = 1;
 uint32_t num_samples = 1;
 uint32_t num_levels = 1;
 uint32_t num_layers = 1;
+VkFormat color_format = VK_FORMAT_R32G32B32A32_SFLOAT;
+VkFormat depth_format = VK_FORMAT_D32_SFLOAT;
+VkImageUsageFlagBits color_usage = VK_IMAGE_USAGE_SAMPLED_BIT |
+				   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+VkImageUsageFlagBits depth_usage = VK_IMAGE_USAGE_SAMPLED_BIT |
+				   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 VkImageTiling color_tiling = VK_IMAGE_TILING_LINEAR;
+VkImageTiling depth_tiling = VK_IMAGE_TILING_OPTIMAL;
+VkImageLayout color_in_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+VkImageLayout color_end_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+VkImageLayout depth_in_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+VkImageLayout depth_end_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
 const struct format_mapping vk_gl_format[] =
 {
 	{ "RGBA 4 UNORM linear", GL_RGBA4, VK_FORMAT_R4G4B4A4_UNORM_PACK16, FLOAT_FS, 4, 4, 4, 4,

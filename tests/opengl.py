@@ -2201,6 +2201,7 @@ with profile.test_list.group_manager(
     g(['ext_external_objects-memory-object-api-errors'], 'memory-object-api-errors')
     g(['ext_external_objects-semaphore-api-errors'], 'semaphore-api-errors')
     g(['ext_external_objects-vk-image-override'], 'vk-image-override')
+    g(['ext_external_objects-vk-image-display'], 'vk-image-display')
 
 # Group EXT_external_objects_fd tests
 with profile.test_list.group_manager(
