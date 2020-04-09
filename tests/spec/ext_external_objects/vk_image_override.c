@@ -46,7 +46,10 @@ static GLuint gl_mem_obj;
 static GLuint gl_tex;
 static GLuint gl_fbo;
 static GLuint gl_rbo;
-static int gl_prog;
+
+static int gl_prog_flt;
+static int gl_prog_int;
+static int gl_prog_uint;
 
 static const char vs[] =
 	"#version 130\n"
@@ -58,23 +61,40 @@ static const char vs[] =
 	"    gl_Position = piglit_vertex;\n"
 	"    tex_coords = piglit_texcoord;\n" "}\n";
 
-#define MAKE_FS(SAMPLER, MAX_VALUE)					\
+/* we want this shader to work with most color formats
+ * so we subtract the expected and the sampled color
+ * if the colors match, all the components will be 0
+ * and their sum (res.x) will be 0. We pass the negative
+ * of the subtraction result to step that is going to
+ * return 0 or non 0 depending on the result (edge = 0)
+ * and we use mix to select between red if there's no match
+ * and green if there's match for the output color */
+
+#define MAKE_FS(SAMPLER, VEC4)				                \
 	"#version 130\n"						\
 	"in vec2 tex_coords;\n"						\
 	"uniform " #SAMPLER " tex; \n"					\
+	"uniform " #VEC4 " expected_color;\n"                           \
 	"out vec4 color;\n"						\
-	"void main() \n"						\
-	"{\n"								\
-	"    color = vec4(texture(tex, tex_coords))/vec4(" #MAX_VALUE ");\n" \
+	"void main() \n"                                                \
+	"{\n"                                                           \
+	"    " #VEC4 " sampled_color = texture(tex, tex_coords);\n"     \
+	"    " #VEC4 " res = " #VEC4 " (abs(expected_color - sampled_color));\n"    \
+	"    res.x += res.y + res.z + res.w;\n"                         \
+	"    color = mix(vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 1.0, 0.0, 1.0), step(0, -float(res.x)));\n" \
 	"}\n"
 
 static const char *fs[] = {
-	MAKE_FS(sampler2D,  1.0),
-	MAKE_FS(isampler2D, 127.0),
-	MAKE_FS(usampler2D, 255.0),
+	MAKE_FS(sampler2D, vec4),
+	MAKE_FS(isampler2D, ivec4),
+	MAKE_FS(usampler2D, uvec4),
 };
 
 #undef MAKE_FS
+
+static float exp_color_flt[4];
+static int exp_color_int[4];
+static unsigned int exp_color_uint[4];
 
 static enum piglit_result
 run_subtest(int case_num);
@@ -83,19 +103,23 @@ static bool
 vk_init(void);
 
 static bool
+gl_init(void);
+
+static bool
 vk_set_image_props(uint32_t w, uint32_t h,
 		   uint32_t depth,
 		   uint32_t num_samples,
-		   uint32_t num_levels, VkFormat format, VkImageTiling tiling);
-
-static void
-vk_cleanup(void);
+		   uint32_t num_levels, VkFormat format,
+		   VkImageTiling tiling, VkImageUsageFlagBits usage);
 
 static bool
 gl_draw_texture(enum fragment_type fs_type, uint32_t w, uint32_t h);
 
 static void
 gl_cleanup(void);
+
+static void
+cleanup(void);
 
 void
 piglit_init(int argc, char **argv)
@@ -109,9 +133,12 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_memory_object");
 	piglit_require_extension("GL_EXT_memory_object_fd");
 
-	atexit(vk_cleanup);
+	atexit(cleanup);
 
 	if (!vk_init())
+		piglit_report_result(PIGLIT_SKIP);
+
+	if (!gl_init())
 		piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -137,10 +164,15 @@ run_subtest(int case_num)
 {
 	bool result = false;
 	enum piglit_result subtest_result;
-	const float color_prb[] = { 1.0, 1.0, 0.0, 1.0 };
+	const float color_prb[] = { 0.0, 1.0, 0.0, 1.0 };
+	GLint loc = -1;
 
-	if (!vk_set_image_props(piglit_width, piglit_height, d, num_samples, num_levels,
-				vk_gl_format[case_num].vkformat, color_tiling)) {
+	/* We don't set the usage flags as the purpose of this test is to test different formats
+	 * We will check different combinations of usage/tiling mode in another test */
+	if (!vk_set_image_props(piglit_width, piglit_height, d,
+				num_samples, num_levels,
+			        vk_gl_format[case_num].vkformat,
+				vk_gl_format[case_num].tiling, 0)) {
 		piglit_report_subtest_result(PIGLIT_SKIP,
 					     "%s: Unsupported image format.",
 					     vk_gl_format[case_num].name);
@@ -184,6 +216,66 @@ run_subtest(int case_num)
 		return PIGLIT_FAIL;
 	}
 
+	switch(vk_gl_format[case_num].fs_type) {
+	case INT_FS:
+	{
+		glUseProgram(gl_prog_int);
+
+		if ((loc = glGetUniformLocation(gl_prog_int, "expected_color")) == -1) {
+			fprintf(stderr, "Failed to get int expected color location.\n");
+			vk_destroy_ext_image(&vk_core, &vk_img_obj);
+			return PIGLIT_FAIL;
+		}
+
+		exp_color_int[0] = pow(2, vk_gl_format[case_num].rbits) / 2 - 1;
+		exp_color_int[1] = pow(2, vk_gl_format[case_num].gbits) / 2 - 1;
+		exp_color_int[2] = 0;
+		exp_color_int[3] = pow(2, vk_gl_format[case_num].abits) / 2 - 1;
+
+		glUniform4iv(loc, 1, exp_color_int);
+	} break;
+	case UINT_FS:
+	{
+		glUseProgram(gl_prog_uint);
+
+		if ((loc = glGetUniformLocation(gl_prog_uint, "expected_color")) == -1) {
+			fprintf(stderr, "Failed to get uint expected color location.\n");
+			vk_destroy_ext_image(&vk_core, &vk_img_obj);
+			return PIGLIT_FAIL;
+		}
+
+		exp_color_uint[0] = pow(2, vk_gl_format[case_num].rbits) - 1;
+		exp_color_uint[1] = pow(2, vk_gl_format[case_num].gbits) - 1;
+		exp_color_uint[2] = 0;
+		exp_color_uint[3] = pow(2, vk_gl_format[case_num].abits) - 1;
+
+		glUniform4uiv(loc, 1, exp_color_uint);
+	} break;
+	case FLOAT_FS:
+	{
+		glUseProgram(gl_prog_flt);
+
+		if ((loc = glGetUniformLocation(gl_prog_flt, "expected_color")) == -1) {
+			fprintf(stderr, "Failed to get float expected color location.\n");
+			vk_destroy_ext_image(&vk_core, &vk_img_obj);
+			return PIGLIT_FAIL;
+		}
+
+		exp_color_flt[0] = 1.0;
+		exp_color_flt[1] = 1.0;
+		exp_color_flt[2] = 0.0;
+		exp_color_flt[3] = 1.0;
+
+		glUniform4fv(loc, 1, exp_color_flt);
+	} break;
+	default:
+		fprintf(stderr, "Invalid format. Shouldn't reach.\n");
+		vk_destroy_ext_image(&vk_core, &vk_img_obj);
+		gl_cleanup();
+		return PIGLIT_FAIL;
+	};
+
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindTexture(gl_target, gl_tex);
 
@@ -192,12 +284,12 @@ run_subtest(int case_num)
 			     2.0 * vk_img_props.h / piglit_height,
 			     0, 0, 1, 1);
 
-	result = piglit_probe_rect_rgba(0, 0,
-					MIN2(vk_img_props.w, piglit_width),
-					MIN2(vk_img_props.h, piglit_height),
-					color_prb);
+	result = piglit_probe_pixel_rgba((float)piglit_width / 2.0,
+					 (float)piglit_height / 2.0,
+					 color_prb);
 
 	subtest_result = result ? PIGLIT_PASS : PIGLIT_FAIL;
+
 	piglit_report_subtest_result(subtest_result, "%s", vk_gl_format[case_num].name);
 
 	piglit_present_results();
@@ -227,15 +319,9 @@ vk_init(void)
 static bool
 vk_set_image_props(uint32_t w, uint32_t h, uint32_t d,
 		   uint32_t num_samples, uint32_t num_levels,
-		   VkFormat format, VkImageTiling tiling)
+		   VkFormat format, VkImageTiling tiling,
+		   VkImageUsageFlagBits usage)
 {
-	VkImageUsageFlagBits usage =
-		VK_IMAGE_USAGE_STORAGE_BIT |
-		VK_IMAGE_USAGE_SAMPLED_BIT |
-		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
-		VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-		VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-
 	VkImageLayout in_layout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VkImageLayout end_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 	uint32_t num_layers = 1;
@@ -279,15 +365,12 @@ gl_draw_texture(enum fragment_type fs_type, uint32_t w, uint32_t h)
 {
 	glBindTexture(gl_target, gl_tex);
 
-	glGenFramebuffers(1, &gl_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, gl_fbo);
-
-	glGenRenderbuffers(1, &gl_rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, gl_rbo);
+
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
 			      w, h);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
 				  GL_DEPTH_STENCIL_ATTACHMENT,
 				  GL_RENDERBUFFER, gl_rbo);
@@ -299,18 +382,10 @@ gl_draw_texture(enum fragment_type fs_type, uint32_t w, uint32_t h)
 	if (!check_bound_fbo_status())
 		return false;
 
-	gl_prog = piglit_build_simple_program(vs, fs[fs_type]);
-	glUseProgram(gl_prog);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, gl_fbo);
 	glClearColor(1.0, 1.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
-	piglit_draw_rect_tex(0, 0,
-			     vk_img_props.w,
-			     vk_img_props.h,
-			     0, 0, 1, 1);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glDisable(GL_DEPTH_TEST);
@@ -321,12 +396,6 @@ gl_draw_texture(enum fragment_type fs_type, uint32_t w, uint32_t h)
 }
 
 static void
-vk_cleanup(void)
-{
-	vk_cleanup_ctx(&vk_core);
-}
-
-static void
 gl_cleanup(void)
 {
 	glBindTexture(gl_get_target(&vk_img_props), 0);
@@ -334,9 +403,34 @@ gl_cleanup(void)
 	glUseProgram(0);
 
 	glDeleteTextures(1, &gl_tex);
+	glDeleteMemoryObjectsEXT(1, &gl_mem_obj);
+}
+
+static void
+cleanup(void)
+{
+	vk_cleanup_ctx(&vk_core);
+	gl_cleanup();
+
 	glDeleteRenderbuffers(1, &gl_rbo);
 	glDeleteFramebuffers(1, &gl_fbo);
-	glDeleteProgram(gl_prog);
 
-	glDeleteMemoryObjectsEXT(1, &gl_mem_obj);
+	glDeleteProgram(gl_prog_flt);
+	glDeleteProgram(gl_prog_int);
+	glDeleteProgram(gl_prog_uint);
+}
+
+static bool
+gl_init(void)
+{
+	gl_prog_flt = piglit_build_simple_program(vs, fs[0]);
+	gl_prog_int = piglit_build_simple_program(vs, fs[1]);
+	gl_prog_uint = piglit_build_simple_program(vs, fs[2]);
+
+	glGenFramebuffers(1, &gl_fbo);
+	glGenRenderbuffers(1, &gl_rbo);
+
+	glUseProgram(0);
+
+	return glGetError() == GL_NO_ERROR;
 }
