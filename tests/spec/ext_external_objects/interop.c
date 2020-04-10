@@ -172,3 +172,45 @@ gl_get_layout_from_vk(const VkImageLayout vk_layout)
 		return GL_NONE;
 	};
 }
+
+bool
+gl_check_vk_compatibility(const struct vk_ctx *ctx)
+{
+	GLubyte deviceUUID[GL_UUID_SIZE_EXT];
+	GLubyte driverUUID[GL_UUID_SIZE_EXT];
+
+	/* FIXME: we select the first device so make sure you've
+	 * exported VK_ICD_FILENAMES */
+	glGetUnsignedBytei_vEXT(GL_DEVICE_UUID_EXT, 0, deviceUUID);
+	glGetUnsignedBytevEXT(GL_DRIVER_UUID_EXT, driverUUID);
+
+	if ((strncmp((const char *)deviceUUID,
+		     (const char *)ctx->deviceUUID, GL_UUID_SIZE_EXT) != 0) ||
+	    (strncmp((const char* )driverUUID,
+		     (const char* )ctx->driverUUID, GL_UUID_SIZE_EXT) != 0)) {
+		fprintf(stderr, "Mismatch in device/driver UUID\n");
+		return false;
+	}
+
+	return glGetError() == GL_NO_ERROR;
+}
+
+bool
+vk_check_gl_compatibility(struct vk_ctx *ctx)
+{
+	GLubyte deviceUUID[GL_UUID_SIZE_EXT];
+	GLubyte driverUUID[GL_UUID_SIZE_EXT];
+
+	/* FIXME: we select the first device so make sure you've
+	 * exported VK_ICD_FILENAMES */
+	glGetUnsignedBytei_vEXT(GL_DEVICE_UUID_EXT, 0, deviceUUID);
+	glGetUnsignedBytevEXT(GL_DRIVER_UUID_EXT, driverUUID);
+
+	if ((strncmp((const char *)deviceUUID,
+		     (const char *)ctx->deviceUUID, GL_UUID_SIZE_EXT) != 0) ||
+	    (strncmp((const char *)driverUUID,
+		     (const char *)ctx->driverUUID, GL_UUID_SIZE_EXT) != 0))
+		return false;
+
+	return glGetError() == GL_NO_ERROR;
+}

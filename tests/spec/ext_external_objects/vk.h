@@ -39,6 +39,9 @@ struct vk_ctx
 	VkCommandPool cmd_pool;
 	VkCommandBuffer cmd_buf;
 	VkQueue queue;
+
+	uint8_t deviceUUID[VK_UUID_SIZE];
+	uint8_t driverUUID[VK_UUID_SIZE];
 };
 
 struct vk_image_props
@@ -107,6 +110,9 @@ vk_init_ctx_for_rendering(struct vk_ctx *ctx);
 
 void
 vk_cleanup_ctx(struct vk_ctx *ctx);
+
+bool
+vk_check_gl_compatibility(struct vk_ctx *ctx);
 
 bool
 vk_create_ext_image(struct vk_ctx *ctx,

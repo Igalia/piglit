@@ -110,6 +110,24 @@ create_device(VkPhysicalDevice pdev)
 	return dev;
 }
 
+static void
+fill_uuid(VkPhysicalDevice pdev, uint8_t *deviceUUID, uint8_t *driverUUID)
+{
+	VkPhysicalDeviceIDProperties devProp;
+	VkPhysicalDeviceProperties2 prop2;
+
+	memset(&devProp, 0, sizeof devProp);
+	devProp.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES;
+
+	memset(&prop2, 0, sizeof prop2);
+	prop2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+	prop2.pNext = &devProp;
+
+	vkGetPhysicalDeviceProperties2(pdev, &prop2);
+	memcpy(deviceUUID, devProp.deviceUUID, VK_UUID_SIZE);
+	memcpy(driverUUID, devProp.driverUUID, VK_UUID_SIZE);
+}
+
 static VkPipelineCache
 create_pipeline_cache(VkDevice dev)
 {
@@ -780,6 +798,8 @@ vk_init_ctx(struct vk_ctx *ctx)
 		fprintf(stderr, "Failed to create Vulkan device.\n");
 		goto fail;
 	}
+
+	fill_uuid(ctx->pdev, ctx->deviceUUID, ctx->driverUUID);
 	return true;
 
 fail:

@@ -31,4 +31,7 @@ gl_create_semaphores_from_vk(const struct vk_ctx *ctx,
 GLenum
 gl_get_layout_from_vk(const VkImageLayout vk_layout);
 
+bool
+gl_check_vk_compatibility(const struct vk_ctx *ctx);
+
 #endif /* INTEROPERABILITY_H */
