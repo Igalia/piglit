@@ -1,0 +1,87 @@
+# GL_NV_viewport_swizzle allows flipping the viewport. The simplest
+# thing to test is to just flip the x/y coordinates and make sure that
+# rendering proceeds as expected. Testing every single combination is
+# tedious, so we test a few that are easy to do.
+
+[require]
+GLSL >= 1.10
+GL_NV_viewport_swizzle
+
+[vertex shader]
+#version 110
+
+attribute vec4 vertex;
+attribute vec4 color;
+
+varying vec4 color_out;
+
+void main() {
+  gl_Position = vertex;
+  color_out = color;
+}
+
+[fragment shader]
+#version 110
+
+varying vec4 color_out;
+
+void main () {
+  gl_FragColor = color_out;
+}
+
+[vertex data]
+vertex/float/4 color/float/4
+-1 -1  0  1    1 0 0 1
+ 1 -1  0  1    0 1 0 1
+-1  1  0  1    0 0 1 1
+ 1  1  0  1    1 1 1 1
+
+[test]
+
+clear color 0.1 0.1 0.1 0.1
+clear
+
+# Regular rendering
+viewport swizzle 0 POSITIVE_X POSITIVE_Y POSITIVE_Z POSITIVE_W
+draw rect -1 -1 2 2
+
+relative probe rgba (0, 0) (1, 0, 0, 1)
+relative probe rgba (1, 0) (0, 1, 0, 1)
+relative probe rgba (0, 1) (0, 0, 1, 1)
+relative probe rgba (1, 1) (1, 1, 1, 1)
+
+# Invert X-axis
+viewport swizzle 0 NEGATIVE_X POSITIVE_Y POSITIVE_Z POSITIVE_W
+draw rect -1 -1 2 2
+
+relative probe rgba (1, 0) (1, 0, 0, 1)
+relative probe rgba (0, 0) (0, 1, 0, 1)
+relative probe rgba (1, 1) (0, 0, 1, 1)
+relative probe rgba (0, 1) (1, 1, 1, 1)
+
+# Invert Y-axis
+viewport swizzle 0 POSITIVE_X NEGATIVE_Y POSITIVE_Z POSITIVE_W
+draw rect -1 -1 2 2
+
+relative probe rgba (0, 1) (1, 0, 0, 1)
+relative probe rgba (1, 1) (0, 1, 0, 1)
+relative probe rgba (0, 0) (0, 0, 1, 1)
+relative probe rgba (1, 0) (1, 1, 1, 1)
+
+# Invert both X and Y
+viewport swizzle 0 NEGATIVE_X NEGATIVE_Y POSITIVE_Z POSITIVE_W
+draw rect -1 -1 2 2
+
+relative probe rgba (1, 1) (1, 0, 0, 1)
+relative probe rgba (0, 1) (0, 1, 0, 1)
+relative probe rgba (1, 0) (0, 0, 1, 1)
+relative probe rgba (0, 0) (1, 1, 1, 1)
+
+# Flip X and Y
+viewport swizzle 0 POSITIVE_Y POSITIVE_X POSITIVE_Z POSITIVE_W
+draw rect -1 -1 2 2
+
+relative probe rgba (0, 0) (1, 0, 0, 1)
+relative probe rgba (0, 1) (0, 1, 0, 1)
+relative probe rgba (1, 0) (0, 0, 1, 1)
+relative probe rgba (1, 1) (1, 1, 1, 1)
