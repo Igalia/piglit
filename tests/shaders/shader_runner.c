@@ -3742,6 +3742,37 @@ handle_texparameter(const char *line)
 	glTexParameteri(target, parameter, value);
 }
 
+static const struct string_to_enum viewport_swizzle_table[] = {
+	{ "POSITIVE_X", GL_VIEWPORT_SWIZZLE_POSITIVE_X_NV },
+	{ "NEGATIVE_X", GL_VIEWPORT_SWIZZLE_NEGATIVE_X_NV },
+	{ "POSITIVE_Y", GL_VIEWPORT_SWIZZLE_POSITIVE_Y_NV },
+	{ "NEGATIVE_Y", GL_VIEWPORT_SWIZZLE_NEGATIVE_Y_NV },
+	{ "POSITIVE_Z", GL_VIEWPORT_SWIZZLE_POSITIVE_Z_NV },
+	{ "NEGATIVE_Z", GL_VIEWPORT_SWIZZLE_NEGATIVE_Z_NV },
+	{ "POSITIVE_W", GL_VIEWPORT_SWIZZLE_POSITIVE_W_NV },
+	{ "NEGATIVE_W", GL_VIEWPORT_SWIZZLE_NEGATIVE_W_NV },
+	{ NULL, 0 }
+};
+
+static void
+handle_viewport_swizzle(const char *line)
+{
+	unsigned viewport;
+	GLenum x, y, z, w;
+
+	viewport = strtol(line, (char **)&line, 0);
+	REQUIRE(parse_enum_tab(viewport_swizzle_table, line, &x, &line),
+		"Bad ViewportSwizzle swizzle at: %s\n", line);
+	REQUIRE(parse_enum_tab(viewport_swizzle_table, line, &y, &line),
+		"Bad ViewportSwizzle swizzle at: %s\n", line);
+	REQUIRE(parse_enum_tab(viewport_swizzle_table, line, &z, &line),
+		"Bad ViewportSwizzle swizzle at: %s\n", line);
+	REQUIRE(parse_enum_tab(viewport_swizzle_table, line, &w, &line),
+		"Bad ViewportSwizzle swizzle at: %s\n", line);
+
+	glViewportSwizzleNV(viewport, x, y, z, w);
+}
+
 static void
 setup_ubos(void)
 {
@@ -5127,6 +5158,8 @@ piglit_display(void)
 			glCallList(list);
 		} else if (parse_str(line, "deletelist", NULL)) {
 			glDeleteLists(list, 1);
+		} else if (parse_str(line, "viewport swizzle ", &rest)) {
+			handle_viewport_swizzle(rest);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
