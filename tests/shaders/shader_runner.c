@@ -4617,6 +4617,9 @@ piglit_display(void)
 		} else if (parse_str(line, "ortho", NULL)) {
 			piglit_ortho_projection(render_width, render_height,
 						GL_FALSE);
+		} else if (sscanf(line, "viewport indexed %u %f %f %f %f",
+				  &x, c + 0, c + 1, c + 2, c + 3) == 5) {
+			glViewportIndexedfv(x, c);
 		} else if (parse_str(line, "probe rgba ", &rest)) {
 			parse_floats(rest, c, 6, NULL);
 			if (!piglit_probe_pixel_rgba((int) c[0], (int) c[1],
