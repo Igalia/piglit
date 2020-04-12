@@ -5123,5 +5123,12 @@ with profile.test_list.group_manager(
         grouptools.join('spec', 'OES_EGL_image_external_essl3')) as g:
     g(['oes_egl_image_external_essl3'])
 
+with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'NV_viewport_swizzle')) as g:
+    g(['nv_viewport_swizzle-errors'])
+    g(['nv_viewport_swizzle-errors_gles3'])
+
+
 if platform.system() == 'Windows':
     profile.filters.append(lambda p, _: not p.startswith('glx'))
