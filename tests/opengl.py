@@ -633,6 +633,7 @@ with profile.test_list.group_manager(
     g(['copyteximage', '1D'])
     g(['copyteximage', '2D'])
     g(['gl-1.1-color-material-array'])
+    g(['gl-1.1-color-material-unused-normal-array'])
     g(['gl-1.1-draw-arrays-start'])
     g(['gl-1.1-read-pixels-after-display-list'])
     g(['gl-1.1-set-vertex-color-after-draw'])
