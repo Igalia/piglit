@@ -1,0 +1,49 @@
+[require]
+GL >= 3.2
+GLSL >= 1.50
+GL_NV_viewport_array2
+GL_ARB_fragment_layer_viewport
+
+[vertex shader]
+#version 140
+#extension GL_NV_viewport_array2: require
+
+in vec4 piglit_vertex;
+
+void main()
+{
+  gl_Position = piglit_vertex;
+  gl_ViewportMask[0] = 0xf;
+  gl_Layer = 1;
+}
+
+[fragment shader]
+#version 140
+#extension GL_ARB_fragment_layer_viewport: require
+out vec4 color;
+
+void main()
+{
+  color = vec4(0, 0, 0, 1);
+  if (gl_ViewportIndex < 3)
+    color[gl_ViewportIndex] = 1.0;
+  else
+    color = vec4(1);
+}
+
+[test]
+texture junk 2DArray 0 (64, 64, 4)
+viewport indexed 0 0 0 32 32
+viewport indexed 1 32 0 32 32
+viewport indexed 2 0 32 32 32
+viewport indexed 3 32 32 32 32
+
+fb tex layered 0
+
+draw rect -1 -1 2 2
+
+fb tex slice 2DArray 0 0 1
+probe rect rgba (0, 0, 32, 32) (1.0, 0.0, 0.0, 1.0)
+probe rect rgba (32, 0, 32, 32) (0.0, 1.0, 0.0, 1.0)
+probe rect rgba (0, 32, 32, 32) (0.0, 0.0, 1.0, 1.0)
+probe rect rgba (32, 32, 32, 32) (1.0, 1.0, 1.0, 1.0)
