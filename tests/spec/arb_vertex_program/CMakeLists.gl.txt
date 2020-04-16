@@ -16,5 +16,6 @@ piglit_add_executable (arb_vertex_program-getlocal4-errors getlocal4-errors.c)
 piglit_add_executable (arb_vertex_program-matrix-property-bindings matrix-property-bindings.c)
 piglit_add_executable (arb_vertex_program-minmax minmax.c)
 piglit_add_executable (arb_vertex_program-property-bindings property-bindings.c)
+piglit_add_executable (arb_vertex_program-unused-attributes unused-attributes.c)
 
 # vim: ft=cmake:

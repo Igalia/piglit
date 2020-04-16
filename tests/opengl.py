@@ -2765,6 +2765,7 @@ with profile.test_list.group_manager(
     g(['arb_vertex_program-matrix-property-bindings'])
     g(['arb_vertex_program-minmax'], 'minmax')
     g(['arb_vertex_program-property-bindings'])
+    g(['arb_vertex_program-unused-attributes'])
     g(['arb_vertex_program-get-limits-without-fp'], run_concurrent=False)
     g(['vp-address-01'], run_concurrent=False)
     g(['vp-address-02'], run_concurrent=False)
