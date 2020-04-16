@@ -226,8 +226,8 @@ class CLProgramTester(PiglitCLTest):
 
     """Class for cl-program-tester tests."""
 
-    def __init__(self, filename):
-        super(CLProgramTester, self).__init__(['cl-program-tester'])
+    def __init__(self, filename, **kwargs):
+        super(CLProgramTester, self).__init__(['cl-program-tester'], **kwargs)
         self.filename = filename
 
     @PiglitCLTest.command.getter
