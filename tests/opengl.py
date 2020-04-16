@@ -8,7 +8,6 @@ import platform
 from framework import grouptools
 from framework import options
 from framework.profile import TestProfile
-from framework.driver_classifier import DriverClassifier
 from framework.test.piglit_test import (
     PiglitGLTest, PiglitBaseTest, BuiltInConstantsTest
 )
@@ -198,24 +197,6 @@ def power_set(s):
 ######
 # Collecting all tests
 profile = TestProfile()  # pylint: disable=invalid-name
-
-# Find and add all apitrace tests.
-classifier = DriverClassifier()
-for basedir in [os.path.join(TESTS_DIR, 'apitrace', 'traces')]:
-    for dirpath, _, filenames in os.walk(basedir):
-        base_group = grouptools.from_path(os.path.join(
-            'apitrace', os.path.relpath(dirpath, basedir)))
-
-        for filename in filenames:
-            if not os.path.splitext(filename)[1] == '.trace':
-                continue
-            group = grouptools.join(base_group, filename)
-
-            profile.test_list[group] = PiglitBaseTest(
-                [os.path.join(TESTS_DIR, 'apitrace', 'test-trace.py'),
-                 os.path.join(dirpath, filename),
-                 ','.join(classifier.categories)],
-                run_concurrent=True)
 
 # List of all of the MSAA sample counts we wish to test
 MSAA_SAMPLE_COUNTS = ['2', '4', '6', '8', '16', '32']
