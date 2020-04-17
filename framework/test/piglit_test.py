@@ -189,8 +189,8 @@ class ASMParserTest(PiglitBaseTest):
 
     """Test class for ASM parser tests."""
 
-    def __init__(self, type_, filename):
-        super(ASMParserTest, self).__init__(['asmparsertest', type_])
+    def __init__(self, type_, filename, env=None):
+        super(ASMParserTest, self).__init__(['asmparsertest', type_], env=env)
         self.filename = filename
 
     @PiglitBaseTest.command.getter
@@ -239,7 +239,7 @@ class CLProgramTester(PiglitCLTest):
 class VkRunnerTest(PiglitBaseTest):
     """ Make a PiglitTest instance for a VkRunner shader test file """
 
-    def __init__(self, filename):
+    def __init__(self, filename, env=None):
         vkrunner_bin = os.environ.get('PIGLIT_VKRUNNER_BINARY')
 
         if vkrunner_bin is None:
@@ -248,7 +248,8 @@ class VkRunnerTest(PiglitBaseTest):
 
         super(VkRunnerTest, self).__init__(
             [vkrunner_bin],
-            run_concurrent=True)
+            run_concurrent=True,
+            env=env)
 
         self.filename = filename
 

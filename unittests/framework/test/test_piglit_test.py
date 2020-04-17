@@ -103,6 +103,9 @@ class TestPiglitBaseTest(object):
 class TestPiglitGLTest(object):
     """tests for the PiglitGLTest class."""
 
+    def test_signature(self):
+        test = PiglitGLTest(['foo'], env=None)
+
     class TestCommand(object):
         """Tests for the command getter and setter."""
 

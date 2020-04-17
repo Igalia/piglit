@@ -153,14 +153,15 @@ class ShaderTest(FastSkipMixin, PiglitBaseTest):
     """
 
     def __init__(self, command, api=None, extensions=set(),
-                  shader_version=None, api_version=None, **kwargs):
+                  shader_version=None, api_version=None, env=None, **kwargs):
         super(ShaderTest, self).__init__(
             command,
             run_concurrent=True,
             api=api,
             extensions=extensions,
             shader_version=shader_version,
-            api_version=api_version)
+            api_version=api_version,
+            env=env)
 
     @classmethod
     def new(cls, filename, installed_name=None):
@@ -209,11 +210,12 @@ class MultiShaderTest(ReducedProcessMixin, PiglitBaseTest):
     filenames -- a list of absolute paths to shader test files
     """
 
-    def __init__(self, prog, files, subtests, skips):
+    def __init__(self, prog, files, subtests, skips, env=None):
         super(MultiShaderTest, self).__init__(
             [prog] + files,
             subtests=subtests,
-            run_concurrent=True)
+            run_concurrent=True,
+            env=env)
 
         self.prog = prog
         self.files = files

@@ -27,7 +27,7 @@ from framework import status
 
 def test_crash():
     """test.gtest.GTest.interpret_result: Crashes are set to crash."""
-    test = GTest(['foo'])
+    test = GTest(['foo'], env=None)
     test.result.returncode = -5
     test.interpret_result()
 

@@ -291,12 +291,13 @@ class GLSLParserTest(FastSkipMixin, PiglitBaseTest):
     """
 
     def __init__(self, command, api=None, extensions=set(),
-                 shader_version=None, **kwargs):
+                 shader_version=None, env=None, **kwargs):
         super(GLSLParserTest, self).__init__(
             command, run_concurrent=True,
             api=api,
             extensions=extensions,
-            shader_version=shader_version)
+            shader_version=shader_version,
+            env=env)
 
     @PiglitBaseTest.command.getter
     def command(self):
