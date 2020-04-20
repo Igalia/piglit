@@ -52,7 +52,7 @@ GL_ARB_texture_query_lod
 uniform sampler2D tex;
 uniform float lod;
 
-#define tolerance (1.0/255.0)
+#define tolerance (2.0/255.0)
 #define equal(x,y) (abs((x) - (y)) <= tolerance)
 
 void main()

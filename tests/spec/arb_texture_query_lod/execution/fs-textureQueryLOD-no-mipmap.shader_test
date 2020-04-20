@@ -52,7 +52,7 @@ GL_ARB_texture_query_lod
 uniform sampler2D tex;
 uniform float lambda_prime;
 
-#define tolerance (1.0/255.0)
+#define tolerance (2.0/255.0)
 #define equal_v2(x,y) all(lessThanEqual(abs((x) - (y)), vec2(tolerance)))
 
 void main()
