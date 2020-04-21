@@ -34,6 +34,7 @@ apt-get install -y \
   libdrm2 \
   libegl1-mesa-dev \
   libglvnd-dev \
+  libvulkan-dev \
   libwaffle-dev \
   libwayland-dev \
   libxkbcommon-dev \
