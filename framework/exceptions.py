@@ -49,42 +49,53 @@ def handler(func):
             func(*args, **kwargs)
         except PiglitFatalError as e:
             print('Fatal Error: {}'.format(str(e)), file=sys.stderr)
-            sys.exit(1)
+            sys.exit(e.exitcode)
         except PiglitAbort as e:
             print('Aborting Piglit execution: {}'.format(str(e)),
                   file=sys.stderr)
-            sys.exit(3)
+            sys.exit(e.exitcode)
         except PiglitUserError as e:
             print('User error: {}'.format(str(e)), file=sys.stderr)
-            sys.exit(1)
+            sys.exit(e.exitcode)
 
     return _inner
 
 
-class PiglitException(Exception):
+class PiglitBaseException(Exception):
+
+    """Base class for all piglit exceptions."""
+
+    def __init__(self, *args, exitcode=1, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.exitcode = exitcode
+
+
+class PiglitException(PiglitBaseException):
     """Class for non-error exceptions.
 
     These should *always* be caught. If this class (or any subclass) is
     uncaught that is a bug in piglit.
 
     """
+
     def __str__(self):
         return ('An internal exception that should have been handled was not:'
                 '\n{}'.format(super(PiglitException, self).__str__()))
 
 
-class PiglitInternalError(Exception):
+class PiglitInternalError(PiglitBaseException):
     """Class for errors in piglit.
 
     These should always be handled.
 
     """
+
     def __str__(self):
         return 'An internal error occurred:\n{}'.format(
             super(PiglitInternalError, self).__str__())
 
 
-class PiglitFatalError(Exception):
+class PiglitFatalError(PiglitBaseException):
     """Class for errors in piglit that cannot be recovered from.
 
     When this class (or a subclass) is raised it should be raised all the way
@@ -93,7 +104,7 @@ class PiglitFatalError(Exception):
     """
 
 
-class PiglitUserError(Exception):
+class PiglitUserError(PiglitBaseException):
     """Class for user configuration errors.
 
     When this class (or a subclass) is raised it should be raised all the way
@@ -101,10 +112,12 @@ class PiglitUserError(Exception):
     """
 
 
-class PiglitAbort(Exception):
+class PiglitAbort(PiglitBaseException):
     """Class for non-errors that require piglit aborting.
 
     When this class (or a subclass) is raised it should be raised all the way
     to the top of the program where it exits.
 
     """
+    def __init__(self, *args, exitcode=3, **kwargs):
+        super().__init__(*args, exitcode=exitcode, **kwargs)
