@@ -82,12 +82,13 @@ piglit_cl_test(const int argc,
 	}
 
 	ref_count_ptr = piglit_cl_get_event_info(event, CL_EVENT_REFERENCE_COUNT);
-	if(*ref_count_ptr != 1) {
+	if(*ref_count_ptr < 1) {
 		free(ref_count_ptr);
 		fprintf(stderr,
-		        "CL_EVENT_REFERENCE_COUNT should be 1 after creating event.\n");
+		        "CL_EVENT_REFERENCE_COUNT should be >= 1 after creating event.\n");
 		return PIGLIT_FAIL;
 	}
+
 	free(ref_count_ptr);
 
 	/* increase by two and decrease by one on each iteration */
@@ -117,14 +118,17 @@ piglit_cl_test(const int argc,
 		/* check internal value of reference count */
 		ref_count_ptr =
 			piglit_cl_get_event_info(event, CL_EVENT_REFERENCE_COUNT);
-		if(*ref_count_ptr != (ref_count+1)) {
-			free(ref_count_ptr);
+
+		if(*ref_count_ptr < (ref_count+1)) {
 			fprintf(stderr,
-			        "CL_EVENT_REFERENCE_COUNT is not changing accordingly.\n");
+			        "Increase #%d: CL_EVENT_REFERENCE_COUNT is not changing accordingly.\n" \
+			        "Expects >=%d got %d\n", ref_count, (ref_count+1), *ref_count_ptr);
+			free(ref_count_ptr);
 			return PIGLIT_FAIL;
 		}
 		free(ref_count_ptr);
 	}
+
 	/* Decrease reference count to 0 */
 	for(ref_count = max_ref_count; ref_count > 0; ref_count--) {
 		errNo = clReleaseEvent(event);
@@ -139,10 +143,12 @@ piglit_cl_test(const int argc,
 		if(ref_count > 1) {
 			ref_count_ptr =
 				piglit_cl_get_event_info(event, CL_EVENT_REFERENCE_COUNT);
-			if(*ref_count_ptr != (ref_count-1)) {
-				free(ref_count_ptr);
+
+			if(*ref_count_ptr < (ref_count-1)) {
 				fprintf(stderr,
-				        "CL_EVENT_REFERENCE_COUNT is not changing accordingly.\n");
+				        "Decrease #%d: CL_EVENT_REFERENCE_COUNT is not changing accordingly.\n" \
+				        "Expects >=%d got %d\n", ref_count, (ref_count-1), *ref_count_ptr);
+				free(ref_count_ptr);
 				return PIGLIT_FAIL;
 			}
 			free(ref_count_ptr);
