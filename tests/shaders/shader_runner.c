@@ -5476,6 +5476,10 @@ piglit_init(int argc, char **argv)
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			for (int k = 0; k < gl_max_clip_planes; k++) {
+				static const GLdouble zero[4];
+
+				if (!piglit_is_core_profile && !es)
+					glClipPlane(GL_CLIP_PLANE0 + k, zero);
 				glDisable(GL_CLIP_PLANE0 + k);
 			}
 
