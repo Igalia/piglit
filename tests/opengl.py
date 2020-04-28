@@ -4451,6 +4451,7 @@ with profile.test_list.group_manager(PiglitGLTest, 'hiz') as g:
 
 with profile.test_list.group_manager(PiglitGLTest, 'fast_color_clear') as g:
     g(['fcc-blit-between-clears'])
+    g(['fcc-write-after-clear'])
     g(['fcc-read-to-pbo-after-clear'], run_concurrent=False)
     g(['fcc-front-buffer-distraction'], run_concurrent=False)
 
