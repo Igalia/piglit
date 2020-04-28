@@ -2,6 +2,8 @@
 [config]
 name: 2D image reading
 
+need_image_support: true
+
 dimensions:  1
 global_size: 1 0 0
 local_size:  1 0 0

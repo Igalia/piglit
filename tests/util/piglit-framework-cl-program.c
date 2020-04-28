@@ -29,6 +29,7 @@ const struct piglit_cl_program_test_config
              PIGLIT_CL_DEFAULT_PROGRAM_TEST_CONFIG = {
 	.clc_version_min = 0,
 	.clc_version_max = 0,
+	.need_image_support = false,
 
 	.program_source = NULL,
 	.program_source_file = NULL,
@@ -204,6 +205,20 @@ piglit_cl_program_test_run(const int argc,
 		                                       num_devices);
 	} else { // config->run_per_device
 		env.context = piglit_cl_create_context(platform_id, &device_id, 1);
+	}
+
+	if(config->need_image_support) {
+		bool image_support = false;
+		if(config->run_per_platform) {
+			image_support = piglit_cl_get_context_image_support(env.context);
+		} else { // config->run_per_device
+			image_support = piglit_cl_get_device_image_support(env.device_id);
+		}
+
+		if(!image_support) {
+			printf("Test need image support and none was found\n");
+			return PIGLIT_SKIP;
+		}
 	}
 
 	if(env.context == NULL) {

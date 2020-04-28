@@ -67,6 +67,7 @@ PIGLIT_CL_DEFINE_TEST_CONFIG_BEGIN(struct piglit_cl_program_test_config)
 
 	int clc_version_min; /**< Minimum OpenCL C version required. (optional) */
 	int clc_version_max; /**< Maximum OpenCL C version supported. (optional) */
+	bool need_image_support; /**< Does the test need image support. (default: false) */
 
 	char* program_source; /**< Source to create and build a program on each run.
 	                           Conflicts with other \c program_*. (optional) */

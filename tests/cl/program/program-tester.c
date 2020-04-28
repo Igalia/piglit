@@ -1726,6 +1726,8 @@ parse_config(const char* config_str,
 					config->expect_build_fail = get_bool(value);
 				} else if(regex_match(key, "^expect_test_fail$")) {
 					expect_test_fail = get_bool(value);
+				} else if(regex_match(key, "^need_image_support$")) {
+					config->need_image_support = get_bool(value);
 				} else if(regex_match(key, "^dimensions$")) {
 					work_dimensions = get_uint(value);
 				} else if(regex_match(key, "^global_size$")) {

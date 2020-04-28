@@ -2,6 +2,8 @@
 [config]
 name: 2D image writing
 
+need_image_support: true
+
 dimensions:  2
 global_size: 2 3 0
 local_size:  1 1 0
