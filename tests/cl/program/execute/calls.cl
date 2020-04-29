@@ -248,6 +248,12 @@ arg_in: 9 buffer int4[10] \
 // calls.
 #ifdef __AMDGCN__
 #define USE_ASM 1
+#define USE_ASM_LS 1
+#endif
+
+// kabini don't have this one
+#ifdef __gfx703__
+#define USE_ASM_LS 0
 #endif
 
 #define NOINLINE __attribute__((noinline))
@@ -288,7 +294,7 @@ NOINLINE
 long i64_func_void(void)
 {
     long ret;
-#if USE_ASM
+#if USE_ASM_LS
     __asm("v_lshlrev_b64 %0, 44, 1" : "=v"(ret));
 #else
     ret = 1ul << 44;
