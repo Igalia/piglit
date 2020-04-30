@@ -2051,7 +2051,8 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
 		return;
 
 	/* Possibly promote the GL version. */
-	if (gl_version->num < required_gl_version_from_glsl_version(
+	if (parse_results->found_glsl
+		&& gl_version->num < required_gl_version_from_glsl_version(
 			parse_results->glsl_version.num)) {
 		gl_version->num = required_gl_version_from_glsl_version(
 			parse_results->glsl_version.num);
