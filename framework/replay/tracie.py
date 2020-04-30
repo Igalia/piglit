@@ -25,25 +25,19 @@
 # SPDX-License-Identifier: MIT
 
 import argparse
-import base64
-import datetime
 import glob
 import hashlib
-import hmac
-import json
 import os
-import requests
 import sys
-import time
 import yaml
 import shutil
 
-from email.utils import formatdate
 from pathlib import Path
 from PIL import Image
-from urllib import parse
 
 import dump_trace_images
+from download_utils import ensure_file
+from upload_utils import upload_file
 
 TRACES_DB_PATH = "./traces-db/"
 RESULTS_PATH = "./results/"
@@ -65,59 +59,8 @@ def replay(trace_path, device_name):
         log_file = files[0]
         return hashlib.md5(Image.open(image_file).tobytes()).hexdigest(), image_file, log_file
 
-def gitlab_ensure_trace(project_url, trace):
-    trace_path = TRACES_DB_PATH + trace['path']
-    if project_url is None:
-        if not os.path.exists(trace_path):
-            print("{} missing".format(trace_path))
-            sys.exit(1)
-        return
-
-    os.makedirs(os.path.dirname(trace_path), exist_ok=True)
-
-    if os.path.exists(trace_path):
-        return
-
-    print("[check_image] Downloading trace %s" % (trace['path']), end=" ", flush=True)
-    download_time = time.time()
-    r = requests.get(project_url + trace['path'])
-    open(trace_path, "wb").write(r.content)
-    print("took %ds." % (time.time() - download_time), flush=True)
-
-def sign_with_hmac(key, message):
-    key = key.encode("UTF-8")
-    message = message.encode("UTF-8")
-
-    signature = hmac.new(key, message, hashlib.sha1).digest()
-
-    return base64.encodebytes(signature).strip().decode()
-
-def upload_artifact(file_name, content_type, device_name):
-    with open('.minio_credentials', 'r') as f:
-        credentials = json.load(f)["minio-packet.freedesktop.org"]
-        minio_key = credentials["AccessKeyId"]
-        minio_secret = credentials["SecretAccessKey"]
-        minio_token = credentials["SessionToken"]
-
-    resource = '/artifacts/%s/%s/%s/%s' % (os.environ['CI_PROJECT_PATH'], os.environ['CI_PIPELINE_ID'], device_name, os.path.basename(file_name))
-    date = formatdate(timeval=None, localtime=False, usegmt=True)
-    url = 'https://minio-packet.freedesktop.org%s' % (resource)
-    to_sign = "PUT\n\n%s\n%s\nx-amz-security-token:%s\n%s" % (content_type, date, minio_token, resource)
-    signature = sign_with_hmac(minio_secret, to_sign)
-
-    with open(file_name, 'rb') as data:
-        headers = {'Host': 'minio-packet.freedesktop.org',
-                   'Date': date,
-                   'Content-Type': content_type,
-                   'Authorization': 'AWS %s:%s' % (minio_key, signature),
-                   'x-amz-security-token': minio_token}
-        print("Uploading artifact to %s" % url);
-        r = requests.put(url, headers=headers, data=data)
-        #print(r.text)
-        r.raise_for_status()
-
 def gitlab_check_trace(project_url, device_name, trace, expectation):
-    gitlab_ensure_trace(project_url, trace)
+    ensure_file(project_url, trace['path'], TRACES_DB_PATH)
 
     result = {}
     result[trace['path']] = {}
@@ -144,7 +87,7 @@ def gitlab_check_trace(project_url, device_name, trace, expectation):
     os.makedirs(results_path, exist_ok=True)
     shutil.move(log_file, os.path.join(results_path, os.path.split(log_file)[1]))
     if not ok and os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') == '1':
-        upload_artifact(image_file, 'image/png', device_name)
+        upload_file(image_file, 'image/png', device_name)
     if not ok or os.environ.get('TRACIE_STORE_IMAGES', '0') == '1':
         image_name = os.path.split(image_file)[1]
         shutil.move(image_file, os.path.join(results_path, image_name))
