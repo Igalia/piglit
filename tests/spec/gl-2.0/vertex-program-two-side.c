@@ -143,7 +143,6 @@ test_prog(unsigned prog, const char *test_name, bool use_patches)
 {
 	glUseProgram(prog);
 	draw_secondary_loc = glGetUniformLocation(prog, "draw_secondary");
-	assert(draw_secondary_loc != -1);
 
 	if (enabled)
 		glEnable(GL_VERTEX_PROGRAM_TWO_SIDE);
