@@ -104,6 +104,16 @@ class TestParams(object):
             return ''
 
     @utils.lazy_property
+    def idx2(self):
+        if self.array_dim != 0:
+            if self.index_value == 'index':
+                return '[{}2]'.format(self.index_value)
+            else:
+                return '[{}]'.format(self.index_value)
+        else:
+            return ''
+
+    @utils.lazy_property
     def test_vec(self):
         if self.matrix_dim == 2:
             return ["0.803161418975390", "0.852987140792140"]

@@ -52,7 +52,7 @@ void main()
   ${helpers.emit_transform(params)}
 
   % if params.mode != 'varying':
-    gl_FrontColor = (distanceSqr(dst_matrix${params.idx} * v, expect) < 4e-9)
+    gl_FrontColor = (distanceSqr(dst_matrix${params.idx2} * v, expect) < 4e-9)
       ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
   % endif
 }

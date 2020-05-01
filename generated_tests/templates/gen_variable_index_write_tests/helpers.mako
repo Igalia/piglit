@@ -78,6 +78,7 @@
 
   % if params.array_dim != 0:
     uniform int index;
+    uniform int index2;
   % endif
 
   % if params.value_type == 'float':
@@ -148,7 +149,7 @@ void main()
   ${emit_transform(params)}
 % endif
 
-  gl_FragColor = (distanceSqr(dst_matrix${params.idx} * v, expect) < 4e-9)
+  gl_FragColor = (distanceSqr(dst_matrix${params.idx2} * v, expect) < 4e-9)
     ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 </%def>
@@ -157,6 +158,7 @@ void main()
 % for i in params.test_sizes:
   % if params.array_dim != 0 and params.index_value == 'index':
     uniform int index ${i - 1}
+    uniform int index2 ${i - 1}
   % endif
 
   <% x_base = (i - 1) * (15 * params.matrix_dim + 10) %>
