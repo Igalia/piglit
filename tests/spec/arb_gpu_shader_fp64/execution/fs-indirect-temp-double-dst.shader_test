@@ -22,6 +22,7 @@ uniform double arg1;
 uniform double tolerance;
 uniform double expected;
 uniform int pick;
+uniform int pick2;
 
 out vec4 color;
 
@@ -30,7 +31,7 @@ void main()
 	double result[5];
 
 	result[pick] = (arg0 + arg1);
-	color = distance(result[pick], expected) <= tolerance
+	color = distance(result[pick2], expected) <= tolerance
 		? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
@@ -49,4 +50,5 @@ uniform double arg1 0.25
 uniform double expected 0.75
 uniform double tolerance 0.0
 uniform int pick 3
+uniform int pick2 3
 draw arrays GL_TRIANGLE_FAN 0 4
