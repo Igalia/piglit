@@ -152,7 +152,7 @@ piglit_cl_test(const int argc,
 					     CL_INVALID_CONTEXT, &result,
 					     "CL_INVALID_CONTEXT if the context associated with command_queue and buffer are not the same");
 
-					test(context->command_queues[0], device_buffer,
+					test(queue, device_buffer,
 					     &pattern, sizeof(pattern),
 					     sizeof(pattern) * 1, sizeof(pattern) * 2,
 					     1, &event, NULL,
