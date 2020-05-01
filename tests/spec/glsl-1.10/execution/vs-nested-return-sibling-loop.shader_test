@@ -16,8 +16,10 @@ void main()
   vec4 colour = vec4(1.0, 0.0, 0.0, 1.0);
 
   if (a == 1) {
+    int i = 0;
     do {
-       colour = vec4(0.0, 1.0, 0.0, 1.0);
+       colour = vec4(i, 1.0, 0.0, 1.0);
+       i++;
     } while (b == 2);
 
     while (c == 1) {
