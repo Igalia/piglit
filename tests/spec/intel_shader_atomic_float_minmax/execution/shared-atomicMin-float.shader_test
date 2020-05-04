@@ -135,9 +135,5 @@ ssbo 0 subdata float 248 248
 ssbo 0 subdata float 252 252
 ssbo 0 subdata float 256 5
 
-clear color 0.5 0.5 0.5 0.5
-clear
-
-draw rect -1 -1 2 2
-
+compute 2 3 4
 probe atomic counter 0 == 0
