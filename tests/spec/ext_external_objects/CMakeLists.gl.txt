@@ -1,61 +1,67 @@
-find_program(GLSLANG_VALIDATOR NAMES glslangValidator)
-
-set(VK_BANDS_VERT ${CMAKE_CURRENT_BINARY_DIR}/vk_bands.vert.spv)
-set(VK_BANDS_FRAG ${CMAKE_CURRENT_BINARY_DIR}/vk_bands.frag.spv)
-
-add_definitions(-DVK_BANDS_VERT="${VK_BANDS_VERT}")
-add_definitions(-DVK_BANDS_FRAG="${VK_BANDS_FRAG}")
-
-IF(GLSLANG_VALIDATOR)
-	add_custom_command(
-		OUTPUT ${VK_BANDS_VERT}
-		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert -o ${VK_BANDS_VERT}
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
-	)
-
-	add_custom_command(
-		OUTPUT ${VK_BANDS_FRAG}
-		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag -o ${VK_BANDS_FRAG}
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
-	)
-ELSE()
-	add_custom_command(
-		OUTPUT ${VK_BANDS_VERT}
-		COMMAND ${CMAKE_COMMAND} -E copy
-		${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert.spv
-		${VK_BANDS_VERT}
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
-	)
-
-	add_custom_command(
-		OUTPUT ${VK_BANDS_FRAG}
-		COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag.spv
-			${VK_BANDS_FRAG}
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
-	)
-ENDIF()
-
-include_directories(
-	${GLEXT_INCLUDE_DIR}
-	${OPENGL_INCLUDE_PATH}
-)
-
 link_libraries (
 	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
-	${LIBVULKAN_LDFLAGS}
 )
 
-piglit_add_executable (ext_external_objects-memory-object-api-errors memory-object-api-errors.c)
+piglit_add_executable (ext_external_objects-memory-object-api-errors
+		       memory-object-api-errors.c)
+piglit_add_executable (ext_external_objects-semaphore-api-errors
+		       semaphore-api-errors.c)
 
-piglit_add_executable (ext_external_objects-semaphore-api-errors semaphore-api-errors.c)
+IF(LIBVULKAN_FOUND)
+	set(VK_BANDS_VERT ${CMAKE_CURRENT_BINARY_DIR}/vk_bands.vert.spv)
+	set(VK_BANDS_FRAG ${CMAKE_CURRENT_BINARY_DIR}/vk_bands.frag.spv)
 
-piglit_add_executable (ext_external_objects-vk-image-override
-		       vk.c interop.c vk_image_override.c)
+	add_definitions(-DVK_BANDS_VERT="${VK_BANDS_VERT}")
+	add_definitions(-DVK_BANDS_FRAG="${VK_BANDS_FRAG}")
 
-piglit_add_executable (ext_external_objects-vk-image-display
-		       vk.c interop.c vk_image_display.c
-		       ${VK_BANDS_VERT} ${VK_BANDS_FRAG})
+	find_program(GLSLANG_VALIDATOR NAMES glslangValidator)
+
+	IF(GLSLANG_VALIDATOR)
+		add_custom_command(
+			OUTPUT ${VK_BANDS_VERT}
+			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert -o ${VK_BANDS_VERT}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
+		)
+
+		add_custom_command(
+			OUTPUT ${VK_BANDS_FRAG}
+			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag -o ${VK_BANDS_FRAG}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
+		)
+	ELSE()
+		add_custom_command(
+			OUTPUT ${VK_BANDS_VERT}
+			COMMAND ${CMAKE_COMMAND} -E copy
+			${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert.spv
+			${VK_BANDS_VERT}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
+		)
+
+		add_custom_command(
+			OUTPUT ${VK_BANDS_FRAG}
+			COMMAND ${CMAKE_COMMAND} -E copy
+				${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag.spv
+				${VK_BANDS_FRAG}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
+		)
+	ENDIF()
+
+	include_directories(
+		${GLEXT_INCLUDE_DIR}
+		${OPENGL_INCLUDE_PATH}
+	)
+
+	link_libraries (
+		piglitutil_${piglit_target_api}
+		${OPENGL_gl_LIBRARY}
+		${LIBVULKAN_LDFLAGS}
+	)
+
+	piglit_add_executable (ext_external_objects-vk-image-override
+		vk.c interop.c vk_image_override.c)
+	piglit_add_executable (ext_external_objects-vk-image-display
+		vk.c interop.c vk_image_display.c ${VK_BANDS_VERT} ${VK_BANDS_FRAG})
+ENDIF()
 
 # vim: ft=cmake:
