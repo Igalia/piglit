@@ -27,7 +27,6 @@
 import argparse
 import base64
 import datetime
-import enum
 import glob
 import hashlib
 import hmac
@@ -35,7 +34,6 @@ import json
 import os
 import requests
 import sys
-import tempfile
 import time
 import yaml
 import shutil
