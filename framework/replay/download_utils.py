@@ -40,9 +40,9 @@ def ensure_file(project_url, file_path, destination):
     if os.path.exists(destination_file_path):
         return
 
-    print("[check_image] Downloading trace %s" % (trace['path']), end=" ", flush=True)
+    print("[check_image] Downloading trace %s"
+          % (trace['path']), end=" ", flush=True)
     download_time = time.time()
     r = requests.get(project_url + trace['path'])
     open(trace_path, "wb").write(r.content)
     print("took %ds." % (time.time() - download_time), flush=True)
-

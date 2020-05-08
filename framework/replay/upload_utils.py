@@ -50,10 +50,13 @@ def upload_file(file_path, content_type, device_name):
         minio_secret = credentials["SecretAccessKey"]
         minio_token = credentials["SessionToken"]
 
-    resource = '/artifacts/%s/%s/%s/%s' % (os.environ['CI_PROJECT_PATH'], os.environ['CI_PIPELINE_ID'], device_name, os.path.basename(file_name))
+    resource = ('/artifacts/%s/%s/%s/%s'
+                % (os.environ['CI_PROJECT_PATH'], os.environ['CI_PIPELINE_ID'],
+                   device_name, os.path.basename(file_path)))
     date = formatdate(timeval=None, localtime=False, usegmt=True)
     url = 'https://minio-packet.freedesktop.org%s' % (resource)
-    to_sign = "PUT\n\n%s\n%s\nx-amz-security-token:%s\n%s" % (content_type, date, minio_token, resource)
+    to_sign = ("PUT\n\n%s\n%s\nx-amz-security-token:%s\n%s"
+               % (content_type, date, minio_token, resource))
     signature = sign_with_hmac(minio_secret, to_sign)
 
     with open(file_path, 'rb') as data:

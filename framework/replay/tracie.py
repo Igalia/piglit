@@ -42,22 +42,30 @@ from upload_utils import upload_file
 TRACES_DB_PATH = "./traces-db/"
 RESULTS_PATH = "./results/"
 
+
 def replay(trace_path, device_name):
     success = dump_trace_images.dump_from_trace(trace_path, [], device_name)
 
     if not success:
-        print("[check_image] Trace %s couldn't be replayed. See above logs for more information." % (str(trace_path)))
+        print("[check_image] Trace %s couldn't be replayed. "
+              "See above logs for more information." % (str(trace_path)))
         return None, None, None
     else:
         base_path = trace_path.parent
         file_name = trace_path.name
-        files = glob.glob(str(base_path / "test" / device_name / (file_name + "-*" + ".png")))
+        files = glob.glob(
+            str(base_path / "test" / device_name / (file_name + "-*" + ".png"))
+        )
         assert(files)
         image_file = files[0]
-        files = glob.glob(str(base_path / "test" / device_name / (file_name + ".log")))
+        files = glob.glob(
+            str(base_path / "test" / device_name / (file_name + ".log"))
+        )
         assert(files)
         log_file = files[0]
-        return hashlib.md5(Image.open(image_file).tobytes()).hexdigest(), image_file, log_file
+        return (hashlib.md5(Image.open(image_file).tobytes()).hexdigest(),
+                image_file, log_file)
+
 
 def gitlab_check_trace(project_url, device_name, trace, expectation):
     ensure_file(project_url, trace['path'], TRACES_DB_PATH)
@@ -76,9 +84,10 @@ def gitlab_check_trace(project_url, device_name, trace, expectation):
         ok = True
     else:
         print("[check_image] Images differ for %s (expected: %s, actual: %s)" %
-                (trace['path'], expectation['checksum'], checksum))
+              (trace['path'], expectation['checksum'], checksum))
         print("[check_image] For more information see "
-                "https://gitlab.freedesktop.org/mesa/mesa/blob/master/.gitlab-ci/tracie/README.md")
+              "https://gitlab.freedesktop.org/"
+              "mesa/mesa/blob/master/.gitlab-ci/tracie/README.md")
         ok = False
 
     trace_dir = os.path.split(trace['path'])[0]
@@ -123,16 +132,19 @@ def run(filename, device_name):
     with open(os.path.join(RESULTS_PATH, 'results.yml'), 'w') as f:
         yaml.safe_dump(results, f, default_flow_style=False)
     if os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') == '1':
-        upload_artifact(os.path.join(RESULTS_PATH, 'results.yml'), 'text/yaml', device_name)
+        upload_artifact(os.path.join(RESULTS_PATH, 'results.yml'),
+                        'text/yaml', device_name)
 
     return all_ok
 
 def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', required=True,
-                        help='the name of the traces.yml file listing traces and their checksums for each device')
+                        help=('the name of the traces.yml file listing traces '
+                              'and their checksums for each device'))
     parser.add_argument('--device-name', required=True,
-                        help="the name of the graphics device used to replay traces")
+                        help=('the name of the graphics device '
+                              'used to replay traces'))
 
     args = parser.parse_args(args)
     return run(args.file, args.device_name)
