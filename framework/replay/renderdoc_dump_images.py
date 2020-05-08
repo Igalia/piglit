@@ -31,27 +31,30 @@ import tempfile
 from pathlib import Path
 
 def cleanup(dirpath):
-        shutil.rmtree(dirpath)
+    shutil.rmtree(dirpath)
 
-dirpath = tempfile.mkdtemp()
-atexit.register(cleanup, dirpath)
-RENDERDOC_DEBUG_FILE = dirpath + "/renderdoc.log"
+TMP_DIR = tempfile.mkdtemp()
+atexit.register(cleanup, TMP_DIR)
+RENDERDOC_DEBUG_FILE = TMP_DIR + "/renderdoc.log"
 
 # Needs to be in the environment before importing the module
 os.environ['RENDERDOC_DEBUG_LOG_FILE'] = RENDERDOC_DEBUG_FILE
 import renderdoc as rd
 
-def findDrawWithEventId(controller, eventId):
-   for d in controller.GetDrawcalls():
-      if d.eventId == eventId:
-         return d
 
-   return None
+def find_draw_with_event_id(controller, event_id):
+    for d in controller.GetDrawcalls():
+        if d.eventId == event_id:
+            return d
 
-def dumpImage(controller, eventId, outputDir, tracefile):
-    draw = findDrawWithEventId(controller, eventId)
+    return None
+
+
+def dump_image(controller, event_id, output_dir, tracefile):
+    draw = find_draw_with_event_id(controller, event_id)
     if draw is None:
-        raise RuntimeError("Couldn't find draw call with eventId " + str(eventId))
+        raise RuntimeError("Couldn't find draw call with event ID " +
+                           str(event_id))
 
     controller.SetFrameEvent(draw.eventId, True)
 
@@ -63,11 +66,12 @@ def dumpImage(controller, eventId, outputDir, tracefile):
     if texsave.resourceId == rd.ResourceId.Null():
         return
 
-    filepath = Path(outputDir)
+    filepath = Path(output_dir)
     filepath.mkdir(parents = True, exist_ok = True)
     filepath = filepath / (tracefile + "-" + str(int(draw.eventId)) + ".png")
 
-    print("Saving image at eventId %d: %s to %s" % (draw.eventId, draw.name, filepath))
+    print("Saving image at event ID %d: %s to %s" % (draw.eventId,
+                                                     draw.name, filepath))
 
     # Most formats can only display a single image per file, so we select the
     # first mip and first slice
@@ -79,7 +83,8 @@ def dumpImage(controller, eventId, outputDir, tracefile):
     texsave.destType = rd.FileType.PNG
     controller.SaveTexture(texsave, str(filepath))
 
-def loadCapture(filename):
+
+def load_capture(filename):
     cap = rd.OpenCaptureFile()
 
     status = cap.OpenFile(filename, '', None)
@@ -101,26 +106,28 @@ def loadCapture(filename):
 
     return (cap, controller)
 
-def renderdoc_dump_images(filename, eventIds, outputDir):
-   rd.InitialiseReplay(rd.GlobalEnvironment(), [])
-   cap, controller = loadCapture(filename);
 
-   tracefile = Path(filename).name
+def renderdoc_dump_images(filename, event_ids, output_dir):
+    rd.InitialiseReplay(rd.GlobalEnvironment(), [])
+    cap, controller = load_capture(filename);
 
-   if len(eventIds) == 0:
-      eventIds.append(controller.GetDrawcalls()[-1].eventId)
+    tracefile = Path(filename).name
 
-   for eventId in eventIds:
-      dumpImage(controller, eventId, outputDir, tracefile)
+    if len(event_ids) == 0:
+        event_ids.append(controller.GetDrawcalls()[-1].eventId)
 
-   cap.Shutdown()
+    for event_id in event_ids:
+        dump_image(controller, event_id, output_dir, tracefile)
 
-   rd.ShutdownReplay()
+    cap.Shutdown()
+
+    rd.ShutdownReplay()
+
 
 if __name__ == "__main__":
    if len(sys.argv) < 3:
       raise RuntimeError("Usage: renderdoc_dump_images.py <trace> <outputdir> [<draw-id>...]")
 
-   eventIds = [int(e) for e in sys.argv[3:]]
+   event_ids = [int(e) for e in sys.argv[3:]]
 
-   renderdoc_dump_images(sys.argv[1], eventIds, sys.argv[2])
+   renderdoc_dump_images(sys.argv[1], event_ids, sys.argv[2])
