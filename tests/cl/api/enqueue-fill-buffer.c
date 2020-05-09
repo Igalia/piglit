@@ -85,10 +85,12 @@ piglit_cl_test(const int argc,
 {
 #if defined(CL_VERSION_1_2)
 	enum piglit_result result = PIGLIT_PASS;
-	cl_int src_buf[4] = {4, 5, 6, 7};
-	cl_int dst_buf[4] = {0, 0, 0, 0};
-	cl_int exp_buf[4] = {4, 9, 9, 7};
-	cl_int pattern = 9;
+	cl_int err;
+
+	cl_int src_buf[15] = {2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2};
+	cl_int dst_buf[15] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	cl_int exp_buf[15] = {2, 3, 4, 5, 21, 21, 21, 21, 21, 21, 21, 21, 4, 3, 2};
+	cl_int pattern[ 4] = {21, 21, 21, 21};
 	cl_event event;
 	cl_mem device_buffer;
 	cl_command_queue queue = env->context->command_queues[0];
@@ -101,12 +103,27 @@ piglit_cl_test(const int argc,
 		return PIGLIT_FAIL;
 	}
 
+	// Create an event to prevent be able to change the memory
+	// value before it's filled and ensure that a copy have been made
+	event = clCreateUserEvent(env->context->cl_ctx, &err);
+	if (err != CL_SUCCESS) {
+		fprintf(stderr, "Could not create user event.\n");
+		return PIGLIT_FAIL;
+	}
+
 	if (!test(queue, device_buffer, &pattern, sizeof(pattern),
 	          sizeof(pattern) * 1, sizeof(pattern) * 2,
-	          0, NULL, NULL,
+	          1, &event, NULL,
 	          CL_SUCCESS, &result, "Enqueuing the buffer to fill.")) {
 		return PIGLIT_FAIL;
 	}
+
+	// The memory associated with pattern can be reused or freed after the function returns.
+	memset(pattern, 42, sizeof(cl_int) * 4);
+
+	// Let's the lib fill the buffer
+	clSetUserEventStatus(event, CL_COMPLETE);
+	clReleaseEvent(event);
 
 	if (!piglit_cl_read_whole_buffer(queue, device_buffer, dst_buf)) {
 		return PIGLIT_FAIL;
@@ -136,16 +153,15 @@ piglit_cl_test(const int argc,
 	 * and events in event_wait_list are not the same.
 	 */
 	{
-		piglit_cl_context context;
-		cl_int err;
-		context = piglit_cl_create_context(env->platform_id,
+		piglit_cl_context new_context;
+		new_context = piglit_cl_create_context(env->platform_id,
 		                                   env->context->device_ids, 1);
-		if (context) {
-			event = clCreateUserEvent(context->cl_ctx, &err);
+		if (new_context) {
+			event = clCreateUserEvent(new_context->cl_ctx, &err);
 			if (err == CL_SUCCESS) {
 				err = clSetUserEventStatus(event, CL_COMPLETE);
 				if (err == CL_SUCCESS) {
-					test(context->command_queues[0], device_buffer,
+					test(new_context->command_queues[0], device_buffer,
 					     &pattern, sizeof(pattern),
 					     sizeof(pattern) * 1, sizeof(pattern) * 2,
 					     0, NULL, NULL,
@@ -168,7 +184,7 @@ piglit_cl_test(const int argc,
 				piglit_merge_result(&result, PIGLIT_WARN);
 			}
 
-			piglit_cl_release_context(context);
+			piglit_cl_release_context(new_context);
 		} else {
 			fprintf(stderr, "Could not test triggering CL_INVALID_CONTEXT.\n");
 			piglit_merge_result(&result, PIGLIT_WARN);
