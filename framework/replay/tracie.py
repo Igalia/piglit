@@ -28,9 +28,9 @@ import argparse
 import glob
 import hashlib
 import os
+import shutil
 import sys
 import yaml
-import shutil
 
 from pathlib import Path
 from PIL import Image
@@ -67,42 +67,44 @@ def replay(trace_path, device_name):
                 image_file, log_file)
 
 
-def gitlab_check_trace(project_url, device_name, trace, expectation):
-    ensure_file(project_url, trace['path'], TRACES_DB_PATH)
+def gitlab_check_trace(project_url,
+                       device_name, trace_path, expected_checksum):
+    ensure_file(project_url, trace_path, TRACES_DB_PATH)
 
     result = {}
-    result[trace['path']] = {}
-    result[trace['path']]['expected'] = expectation['checksum']
+    result[trace_path] = {}
+    result[trace_path]['expected'] = expected_checksum
 
-    trace_path = Path(TRACES_DB_PATH + trace['path'])
-    checksum, image_file, log_file = replay(trace_path, device_name)
+    dest_trace_path = Path(TRACES_DB_PATH + trace_path)
+    checksum, image_file, log_file = replay(dest_trace_path, device_name)
     if checksum is None:
-        result[trace['path']]['actual'] = 'error'
+        result[trace_path]['actual'] = 'error'
         return False, result
-    elif checksum == expectation['checksum']:
-        print("[check_image] Images match for %s" % (trace['path']))
+    elif checksum == expected_checksum:
+        print("[check_image] Images match for %s" % (trace_path))
         ok = True
     else:
         print("[check_image] Images differ for %s (expected: %s, actual: %s)" %
-              (trace['path'], expectation['checksum'], checksum))
+              (trace_path, expected_checksum, checksum))
         print("[check_image] For more information see "
               "https://gitlab.freedesktop.org/"
               "mesa/mesa/blob/master/.gitlab-ci/tracie/README.md")
         ok = False
 
-    trace_dir = os.path.split(trace['path'])[0]
+    trace_dir = os.path.dirname(trace_path)
     dir_in_results = os.path.join(trace_dir, "test", device_name)
     results_path = os.path.join(RESULTS_PATH, dir_in_results)
     os.makedirs(results_path, exist_ok=True)
-    shutil.move(log_file, os.path.join(results_path, os.path.split(log_file)[1]))
+    shutil.move(log_file, os.path.join(results_path,
+                                       os.path.basename(log_file)))
     if not ok and os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') == '1':
         upload_file(image_file, 'image/png', device_name)
     if not ok or os.environ.get('TRACIE_STORE_IMAGES', '0') == '1':
-        image_name = os.path.split(image_file)[1]
+        image_name = os.path.basename(image_file)
         shutil.move(image_file, os.path.join(results_path, image_name))
-        result[trace['path']]['image'] = os.path.join(dir_in_results, image_name)
+        result[trace_path]['image'] = os.path.join(dir_in_results, image_name)
 
-    result[trace['path']]['actual'] = checksum
+    result[trace_path]['actual'] = checksum
 
     return ok, result
 
@@ -123,8 +125,9 @@ def run(filename, device_name):
         for expectation in trace['expectations']:
             if expectation['device'] == device_name:
                 ok, result = gitlab_check_trace(project_url,
-                                                device_name, trace,
-                                                expectation)
+                                                device_name,
+                                                trace['path'],
+                                                expectation['checksum'])
                 all_ok = all_ok and ok
                 results.update(result)
 
