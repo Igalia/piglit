@@ -26,7 +26,6 @@
 
 import argparse
 import glob
-import hashlib
 import os
 import shutil
 import sys
@@ -36,6 +35,7 @@ from pathlib import Path
 from PIL import Image
 
 import dump_trace_images
+import parsers
 from download_utils import ensure_file
 from image_checksum import hexdigest_from_image
 from upload_utils import upload_file
@@ -65,9 +65,9 @@ def replay(trace_path, device_name):
         return (hexdigest_from_image(image_file), image_file, log_file)
 
 
-def gitlab_check_trace(project_url,
+def gitlab_check_trace(download_url,
                        device_name, trace_path, expected_checksum):
-    ensure_file(project_url, trace_path, TRACES_DB_PATH)
+    ensure_file(download_url, trace_path, TRACES_DB_PATH)
 
     result = {}
     result[trace_path] = {}
@@ -106,24 +106,32 @@ def gitlab_check_trace(project_url,
 
     return ok, result
 
-def run(filename, device_name):
 
-    with open(filename, 'r') as f:
-        y = yaml.safe_load(f)
+def write_results(results):
+    os.makedirs(RESULTS_PATH, exist_ok=True)
+    with open(os.path.join(RESULTS_PATH, 'results.yml'), 'w') as f:
+        yaml.safe_dump(results, f, default_flow_style=False)
+    if os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') == '1':
+        upload_file(os.path.join(RESULTS_PATH, 'results.yml'), 'text/yaml',
+                    device_name)
+
+
+def from_yaml(args):
+    y = yaml.safe_load(args.file)
 
     if "traces-db" in y:
-        project_url = y["traces-db"]["download-url"]
+        download_url = y["traces-db"]["download-url"]
     else:
-        project_url = None
+        download_url = None
 
     traces = y['traces'] or []
     all_ok = True
     results = {}
     for trace in traces:
         for expectation in trace['expectations']:
-            if expectation['device'] == device_name:
-                ok, result = gitlab_check_trace(project_url,
-                                                device_name,
+            if expectation['device'] == args.device_name:
+                ok, result = gitlab_check_trace(download_url,
+                                                args.device_name,
                                                 trace['path'],
                                                 expectation['checksum'])
                 all_ok = all_ok and ok
@@ -138,6 +146,7 @@ def run(filename, device_name):
 
     return all_ok
 
+
 def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', required=True,
@@ -149,6 +158,7 @@ def main(args):
 
     args = parser.parse_args(args)
     return run(args.file, args.device_name)
+
 
 if __name__ == "__main__":
     all_ok = main(sys.argv[1:])

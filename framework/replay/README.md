@@ -100,12 +100,23 @@ Mesa traces CI uses a set of scripts to replay traces and check the output
 against reference checksums.
 
 The high level script [tracie.py](.gitlab-ci/tracie/tracie.py) accepts
-a traces definition file and the name of the device to be tested:
+commands to use a `yaml` traces definition file or the description of
+an individual `trace`:
 
 Examples:
 
    ```sh
-   $ tracie.py --file .gitlab-ci/traces.yml --device-name gl-vmware-llvmpipe
+   $ tracie.py yaml \
+               --device-name gl-vmware-llvmpipe \
+               --file .gitlab-ci/traces.yml
+   ```
+
+   ```sh
+   $ tracie.py trace \
+               --device-name gl-vmware-llvmpipe \
+               --download-url https://minio-packet.freedesktop.org/mesa-tracie-public/ \
+               --path glmark2/jellyfish.rdc \
+               --expected-checksum d82267c25a0decdad7b563c56bb81106
    ```
 
 tracie.py copies the produced artifacts to the `$CI_PROJECT_DIR/result`

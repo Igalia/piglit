@@ -36,11 +36,13 @@ def run_tracie():
     Run tests for the .testtrace types, using the "gl-test-device" and
     "vk-test-device" device names.
     '''
-    result = tracie.main(["--device-name", "gl-test-device",
+    result = tracie.main(["yaml",
+                          "--device-name", "gl-test-device",
                           "--file", "./tests/traces.yml"])
     if not result:
         return False
-    result = tracie.main(["--device-name", "vk-test-device",
+    result = tracie.main(["yaml",
+                          "--device-name", "vk-test-device",
                           "--file", "./tests/traces.yml"])
     return result
 

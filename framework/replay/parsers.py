@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright (c) 2020 Collabora Ltd
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 # Copyright © 2020 Valve Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,26 +23,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
-import requests
-import time
+import argparse
 
 
-def ensure_file(download_url, file_path, destination):
-    destination_file_path = destination + file_path
-    if download_url is None:
-        assert os.path.exists(destination_file_path), (
-            "{} missing".format(destination_file_path))
-        return
-
-    os.makedirs(os.path.dirname(destination_file_path), exist_ok=True)
-
-    if os.path.exists(destination_file_path):
-        return
-
-    print("[check_image] Downloading trace %s"
-          % (trace['path']), end=" ", flush=True)
-    download_time = time.time()
-    r = requests.get(download_url + trace['path'])
-    open(trace_path, "wb").write(r.content)
-    print("took %ds." % (time.time() - download_time), flush=True)
+DEVICE = argparse.ArgumentParser(add_help=False)
+DEVICE.add_argument(
+    '-d', '--device-name',
+    dest="device_name",
+    required=True,
+    help='the name of the graphics device used to replay traces')
