@@ -45,23 +45,21 @@ RESULTS_PATH = "./results/"
 
 
 def replay(trace_path, device_name):
-    success = dump_trace_images.dump_from_trace(trace_path, [], device_name)
+    success = dump_trace_images.dump_from_trace(Path(trace_path),
+                                                [], device_name)
 
     if not success:
         print("[check_image] Trace %s couldn't be replayed. "
-              "See above logs for more information." % (str(trace_path)))
+              "See above logs for more information." % trace_path)
         return None, None, None
     else:
-        base_path = trace_path.parent
-        file_name = trace_path.name
-        files = glob.glob(
-            str(base_path / "test" / device_name / (file_name + "-*" + ".png"))
-        )
+        test_path = os.path.join(os.path.dirname(trace_path), "test",
+                                 device_name)
+        file_name = os.path.basename(trace_path)
+        files = glob.glob(os.path.join(test_path, file_name + "-*" + ".png"))
         assert(files)
         image_file = files[0]
-        files = glob.glob(
-            str(base_path / "test" / device_name / (file_name + ".log"))
-        )
+        files = glob.glob(os.path.join(test_path, file_name + ".log"))
         assert(files)
         log_file = files[0]
         return (hexdigest_from_image(image_file), image_file, log_file)
@@ -75,8 +73,8 @@ def gitlab_check_trace(project_url,
     result[trace_path] = {}
     result[trace_path]['expected'] = expected_checksum
 
-    dest_trace_path = Path(TRACES_DB_PATH + trace_path)
-    checksum, image_file, log_file = replay(dest_trace_path, device_name)
+    checksum, image_file, log_file = replay(TRACES_DB_PATH + trace_path,
+                                            device_name)
     if checksum is None:
         result[trace_path]['actual'] = 'error'
         return False, result
