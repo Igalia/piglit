@@ -238,7 +238,7 @@ piglit_cl_test(const int argc,
 	 * CL_INVALID_SAMPLER for an argument declared to be of type sampler_t when
 	 * the specified arg_value is not a valid sampler object.
 	 */
-	test_str = "Trigger CL_INVALID_SAMPLER for an argument declared to be a memory object when the specified arg_value is not a valid memory object.";
+	test_str = "Trigger CL_INVALID_SAMPLER for an argument declared to be of type sampler_t when the specified arg_value is not a valid sampler object.";
 	errNo = clSetKernelArg(kernel, 3, sizeof(cl_sampler), NULL);
 	if(   errNo != CL_INVALID_SAMPLER
 	   && errNo != CL_INVALID_ARG_VALUE) { // two possible values
