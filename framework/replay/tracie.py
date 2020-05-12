@@ -37,6 +37,7 @@ from PIL import Image
 
 import dump_trace_images
 from download_utils import ensure_file
+from image_checksum import hexdigest_from_image
 from upload_utils import upload_file
 
 TRACES_DB_PATH = "./traces-db/"
@@ -63,8 +64,7 @@ def replay(trace_path, device_name):
         )
         assert(files)
         log_file = files[0]
-        return (hashlib.md5(Image.open(image_file).tobytes()).hexdigest(),
-                image_file, log_file)
+        return (hexdigest_from_image(image_file), image_file, log_file)
 
 
 def gitlab_check_trace(project_url,

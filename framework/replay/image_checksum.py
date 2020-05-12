@@ -2,6 +2,7 @@
 # coding=utf-8
 #
 # Copyright (c) 2019 Collabora Ltd
+# Copyright © 2020 Valve Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,18 +24,26 @@
 #
 # SPDX-License-Identifier: MIT
 
-import argparse
-import hashlib
+from argparse import ArgumentParser
+from hashlib import md5
 from PIL import Image
 
+
+def hexdigest_from_image(image_file_path):
+    image_md5 = md5(Image.open(image_file_path).tobytes())
+
+    return image_md5.hexdigest()
+
+
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('imagefile', help='image file to calculate checksum for')
+    parser = ArgumentParser()
+    parser.add_argument('imagefile',
+                        help='image file to calculate checksum from')
 
     args = parser.parse_args()
 
-    md5 = hashlib.md5(Image.open(args.imagefile).tobytes())
-    print(md5.hexdigest())
+    print(hexdigest_from_image(args.imagefile))
+
 
 if __name__ == "__main__":
     main()
