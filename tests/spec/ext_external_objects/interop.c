@@ -86,9 +86,13 @@ gl_gen_tex_from_mem_obj(const struct vk_image_props *props,
 	GLint filter;
 	GLuint target = gl_get_target(props);
 	const struct sized_internalformat *format = get_sized_internalformat(tex_storage_format);
+	GLint tiling = props->tiling == VK_IMAGE_TILING_LINEAR ? GL_LINEAR_TILING_EXT :
+					GL_OPTIMAL_TILING_EXT;
 
 	glGenTextures(1, tex);
 	glBindTexture(target, *tex);
+
+	glTexParameteri(target, GL_TEXTURE_TILING_EXT, tiling);
 
 	switch (target) {
 	case GL_TEXTURE_1D:
