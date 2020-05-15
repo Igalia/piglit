@@ -25,6 +25,14 @@ IF(LIBVULKAN_FOUND)
 	add_definitions(-DVK_BLUE_VERT="${VK_BLUE_VERT}")
 	add_definitions(-DVK_BLUE_FRAG="${VK_BLUE_FRAG}")
 
+	set(VK_ZQUAD_VERT vk_zquad.vert.spv)
+	set(VK_ZQUAD_FRAG vk_zquad.frag.spv)
+	set(VK_ZQUAD_VERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${VK_ZQUAD_VERT})
+	set(VK_ZQUAD_FRAG_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${VK_ZQUAD_FRAG})
+
+	add_definitions(-DVK_ZQUAD_VERT="${VK_ZQUAD_VERT}")
+	add_definitions(-DVK_ZQUAD_FRAG="${VK_ZQUAD_FRAG}")
+
 	find_program(GLSLANG_VALIDATOR NAMES glslangValidator)
 
 	IF(GLSLANG_VALIDATOR)
@@ -50,6 +58,18 @@ IF(LIBVULKAN_FOUND)
 			OUTPUT ${VK_BLUE_FRAG_PATH}
 			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag -o ${VK_BLUE_FRAG_PATH}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag
+		)
+
+		add_custom_command(
+			OUTPUT ${VK_ZQUAD_VERT_PATH}
+			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert -o ${VK_ZQUAD_VERT_PATH}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert
+		)
+
+		add_custom_command(
+			OUTPUT ${VK_ZQUAD_FRAG_PATH}
+			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag -o ${VK_ZQUAD_FRAG_PATH}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag
 		)
 	ELSE()
 		add_custom_command(
@@ -83,6 +103,22 @@ IF(LIBVULKAN_FOUND)
 				${VK_BLUE_FRAG_PATH}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag
 		)
+
+		add_custom_command(
+			OUTPUT ${VK_ZQUAD_VERT_PATH}
+			COMMAND ${CMAKE_COMMAND} -E copy
+				${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert.spv
+				${VK_ZQUAD_VERT_PATH}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert
+		)
+
+		add_custom_command(
+			OUTPUT ${VK_ZQUAD_FRAG_PATH}
+			COMMAND ${CMAKE_COMMAND} -E copy
+				${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag.spv
+				${VK_ZQUAD_FRAG_PATH}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag
+		)
 	ENDIF()
 
 	include_directories(
@@ -110,6 +146,8 @@ IF(LIBVULKAN_FOUND)
 		vk.c interop.c helpers.c vk_vert_buf_update_errors.c)
 	piglit_add_executable (ext_external_objects-vk-vert-buf-reuse
 		vk.c interop.c helpers.c vk_vert_buf_reuse.c ${VK_BLUE_VERT_PATH} ${VK_BLUE_FRAG_PATH})
+	piglit_add_executable (ext_external_objects-vk-depth-display
+		vk.c interop.c helpers.c vk_depth_display.c ${VK_ZQUAD_VERT_PATH} ${VK_ZQUAD_FRAG_PATH})
 ENDIF()
 
 # vim: ft=cmake:

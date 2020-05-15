@@ -42,6 +42,12 @@ enum fragment_type {
 	UINT_FS,
 };
 
+struct ds_format {
+	char *name;
+	GLenum gl_ds_fmt;
+	VkFormat vk_ds_fmt;
+};
+
 struct format_mapping {
 	char *name;
 	GLenum glformat;
