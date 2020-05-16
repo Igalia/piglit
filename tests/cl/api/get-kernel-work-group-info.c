@@ -45,10 +45,77 @@ PIGLIT_CL_API_TEST_CONFIG_BEGIN
 	config.run_per_device = true;
 	config.create_context = true;
 
-	config.program_source =  "kernel void dummy_kernel() {}";
+	config.program_source =  "kernel __attribute__((reqd_work_group_size(1, 1, 1))) void dummy_kernel() {}\n";
 
 PIGLIT_CL_API_TEST_CONFIG_END
 
+static bool
+check_size(size_t expected_size, size_t actual_size, enum piglit_result *result) {
+	if (expected_size != actual_size) {
+		printf(": failed, expected and actual size differ. Expect %lu, got %lu",
+		       expected_size, actual_size);
+		piglit_merge_result(result, PIGLIT_FAIL);
+		return false;
+	}
+
+	return true;
+}
+
+static void
+print_u(size_t i) {
+	printf(": %zu", i);
+}
+
+static void
+check_info(cl_bool is_custom_device,
+           cl_kernel_work_group_info kind,
+           void* param_value, size_t param_value_size,
+           enum piglit_result *result) {
+
+	switch (kind) {
+		case CL_KERNEL_WORK_GROUP_SIZE:
+			if (check_size(sizeof(size_t), param_value_size, result)) {
+				print_u(*(size_t*)param_value);
+			}
+			break;
+		case CL_KERNEL_COMPILE_WORK_GROUP_SIZE:
+			if (check_size(sizeof(size_t) * 3, param_value_size, result)) {
+				printf(": ");
+				size_t* v = (size_t*)param_value;
+				if (v[0] != 1 && v[1] != 1 && v[2] != 1) {
+					printf("failed, expected and actual value differ. Expect (1,1,1), got ");
+					piglit_merge_result(result, PIGLIT_FAIL);
+				}
+				printf("(%zu,%zu,%zu)", v[0], v[1], v[2]);
+			}
+			break;
+		case CL_KERNEL_LOCAL_MEM_SIZE:
+			if (check_size(sizeof(cl_ulong), param_value_size, result)) {
+				print_u(*(cl_ulong*)param_value);
+			}
+			break;
+		case CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE:
+			if (check_size(sizeof(size_t), param_value_size, result)) {
+				print_u(*(size_t*)param_value);
+			}
+			break;
+		case CL_KERNEL_PRIVATE_MEM_SIZE:
+			if (check_size(sizeof(cl_ulong), param_value_size, result)) {
+				print_u(*(cl_ulong*)param_value);
+			}
+			break;
+		case CL_KERNEL_GLOBAL_WORK_SIZE:
+			if (is_custom_device &&
+			    check_size(sizeof(size_t) * 3, param_value_size, result)) {
+				size_t* v = (size_t*)param_value;
+				printf(": (%zu,%zu,%zu)", v[0], v[1], v[2]);
+			}
+			break;
+		default:
+			printf(": WARN unchecked value");
+			piglit_merge_result(result, PIGLIT_WARN);
+	}
+}
 
 enum piglit_result
 piglit_cl_test(const int argc,
@@ -62,6 +129,8 @@ piglit_cl_test(const int argc,
 	cl_int errNo;
 	cl_kernel kernel;
 	cl_uint* dev_count_ptr;
+
+	cl_bool is_custom_device = false;
 
 	size_t param_value_size;
 	void* param_value;
@@ -84,6 +153,7 @@ piglit_cl_test(const int argc,
 	/*** Normal usage ***/
 	for(i = 0; i < num_kernel_work_group_infos; i++) {
 		cl_int success_code = CL_SUCCESS;
+		param_value_size = 0;
 
 #if defined(CL_VERSION_1_2)
 		/* CL_KERNEL_GLOBAL_WORK_SIZE query
@@ -92,13 +162,14 @@ piglit_cl_test(const int argc,
 		if (kernel_work_group_infos[i] == CL_KERNEL_GLOBAL_WORK_SIZE) {
 			cl_device_type* dev_type_ptr =
 			   piglit_cl_get_device_info(env->device_id, CL_DEVICE_TYPE);
-			if (*dev_type_ptr != CL_DEVICE_TYPE_CUSTOM)
+			is_custom_device = *dev_type_ptr == CL_DEVICE_TYPE_CUSTOM;
+			if (!is_custom_device)
 				success_code = CL_INVALID_VALUE;
 			free(dev_type_ptr);
 		}
 #endif
 
-		printf("%s ", piglit_cl_get_enum_name(kernel_work_group_infos[i]));
+		printf("%s", piglit_cl_get_enum_name(kernel_work_group_infos[i]));
 
 		errNo = clGetKernelWorkGroupInfo(kernel,
 		                                 env->device_id,
@@ -108,7 +179,7 @@ piglit_cl_test(const int argc,
 		                                 &param_value_size);
 		if(!piglit_cl_check_error(errNo, success_code)) {
 			fprintf(stderr,
-			        "Failed (error code: %s): Get size of %s.\n",
+			        ": Failed (error code: %s): Get size of %s.\n",
 			        piglit_cl_get_error_name(errNo),
 			        piglit_cl_get_enum_name(kernel_work_group_infos[i]));
 			piglit_merge_result(&result, PIGLIT_FAIL);
@@ -124,13 +195,14 @@ piglit_cl_test(const int argc,
 		                                 NULL);
 		if(!piglit_cl_check_error(errNo, success_code)) {
 			fprintf(stderr,
-			        "Failed (error code: %s): Get value of %s.\n",
+			        ": Failed (error code: %s): Get value of %s.\n",
 			        piglit_cl_get_error_name(errNo),
 			        piglit_cl_get_enum_name(kernel_work_group_infos[i]));
 			piglit_merge_result(&result, PIGLIT_FAIL);
 		}
 
-		//TODO: output returned values
+		check_info(is_custom_device, kernel_work_group_infos[i], param_value, param_value_size, &result);
+
 		printf("\n");
 		free(param_value);
 	}
