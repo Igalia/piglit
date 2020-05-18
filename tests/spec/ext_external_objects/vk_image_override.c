@@ -187,7 +187,7 @@ run_subtest(int case_num)
 	}
 
 	/* call function that generates a texture in image props */
-	if (!gl_create_mem_obj_from_vk_mem(&vk_core, &vk_img_obj,
+	if (!gl_create_mem_obj_from_vk_mem(&vk_core, &vk_img_obj.mobj,
 					   &gl_mem_obj)) {
 		piglit_report_subtest_result(PIGLIT_FAIL,
 					     "%s: Failed to create GL memory object from Vulkan memory.",

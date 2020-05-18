@@ -126,7 +126,7 @@ void piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 	/* create memory object and gl texture */
-	if (!gl_create_mem_obj_from_vk_mem(&vk_core, &vk_color_att.obj,
+	if (!gl_create_mem_obj_from_vk_mem(&vk_core, &vk_color_att.obj.mobj,
 				&gl_mem_obj)) {
 		fprintf(stderr, "Failed to create GL memory object from Vulkan memory.\n");
 		piglit_report_result(PIGLIT_FAIL);
@@ -306,6 +306,7 @@ vk_init(uint32_t w,
 
 	/* create Vulkan renderer */
 	if (!vk_create_renderer(&vk_core, vs_src, vs_sz, fs_src, fs_sz,
+				false, false,
 				&vk_color_att, &vk_depth_att, &vk_rnd)) {
 		fprintf(stderr, "Failed to create Vulkan renderer.\n");
 		goto fail;

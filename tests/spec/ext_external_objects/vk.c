@@ -37,8 +37,36 @@ static VkSampleCountFlagBits
 get_num_samples(uint32_t num_samples);
 
 /* Vulkan create functions */
+
+static void
+enable_validation_layers(VkInstanceCreateInfo *info)
+{
+	int i;
+	uint32_t num_layers;
+	VkLayerProperties *layers;
+	static const char *layer_names[] = {
+		"VK_LAYER_KHRONOS_validation",
+	};
+
+	vkEnumerateInstanceLayerProperties(&num_layers, 0);
+	layers = alloca(num_layers * sizeof *layers);
+	vkEnumerateInstanceLayerProperties(&num_layers, layers);
+
+	if (num_layers) {
+		printf("Available validation layers:\n");
+		for(i = 0; i < (int)num_layers; i++) {
+			printf(" %s\n", layers[i].layerName);
+		}
+
+		info->ppEnabledLayerNames = layer_names;
+		info->enabledLayerCount = sizeof layer_names / sizeof *layer_names;
+	} else {
+		fprintf(stderr, "Vulkan validation layers not found.\n");
+	}
+}
+
 static VkInstance
-create_instance(void)
+create_instance(bool enable_layers)
 {
 	VkApplicationInfo app_info;
 	VkInstanceCreateInfo inst_info;
@@ -47,11 +75,14 @@ create_instance(void)
 	memset(&app_info, 0, sizeof app_info);
 	app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	app_info.pApplicationName = "vktest";
-	app_info.apiVersion = VK_MAKE_VERSION(1, 1, 0);
+	app_info.apiVersion = VK_API_VERSION_1_1;
 
 	memset(&inst_info, 0, sizeof inst_info);
 	inst_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	inst_info.pApplicationInfo = &app_info;
+
+	if (enable_layers)
+		enable_validation_layers(&inst_info);
 
 	if (vkCreateInstance(&inst_info, 0, &inst) != VK_SUCCESS)
 		return VK_NULL_HANDLE;
@@ -86,14 +117,19 @@ static VkDevice
 create_device(VkPhysicalDevice pdev)
 {
 	const char *deviceExtensions[] = { "VK_KHR_external_memory_fd",
-					   "VK_KHR_external_semaphore_fd"};
+					   "VK_KHR_external_semaphore_fd" };
 	VkDeviceQueueCreateInfo dev_queue_info;
 	VkDeviceCreateInfo dev_info;
 	VkDevice dev;
+	uint32_t prop_count;
+	VkQueueFamilyProperties fam_props;
+
+	vkGetPhysicalDeviceQueueFamilyProperties(pdev, &prop_count, 0);
+	vkGetPhysicalDeviceQueueFamilyProperties(pdev, &prop_count, &fam_props);
 
 	memset(&dev_queue_info, 0, sizeof dev_queue_info);
 	dev_queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	dev_queue_info.queueFamilyIndex = 0;
+	dev_queue_info.queueFamilyIndex = prop_count > 0 ? prop_count - 1 : 0;
 	dev_queue_info.queueCount = 1;
 	dev_queue_info.pQueuePriorities = (float[]) { 1.0f };
 
@@ -152,7 +188,7 @@ create_cmd_pool(VkDevice dev)
 	memset(&cmd_pool_info, 0, sizeof cmd_pool_info);
 	cmd_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cmd_pool_info.queueFamilyIndex = 0;
-	cmd_pool_info.flags = 0;
+	cmd_pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
 	if (vkCreateCommandPool(dev, &cmd_pool_info, 0, &cmd_pool) != VK_SUCCESS)
 		return VK_NULL_HANDLE;
@@ -309,15 +345,14 @@ create_framebuffer(struct vk_ctx *ctx,
 	/* VKImageSubresourceRange */
 	memset(&sr, 0, sizeof sr);
 	sr.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	/* FIXME: if we support mipmaps:
-	 * If an application wants to use all mip levels
+	/* If an application wants to use all mip levels
 	 * or layers in an image after the baseMipLevel
 	 * or baseArrayLayer, it can set levelCount and
 	 * layerCount to the special values
 	 * VK_REMAINING_MIP_LEVELS and
 	 * VK_REMAINING_ARRAY_LAYERS without knowing the
 	 * exact number of mip levels or layers.
-	 * */
+	 */
 	sr.baseMipLevel = 0;
 	sr.levelCount = color_att->props.num_levels;
 	sr.baseArrayLayer = 0;
@@ -349,7 +384,6 @@ create_framebuffer(struct vk_ctx *ctx,
 	memset(&depth_info, 0, sizeof depth_info);
 	depth_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	depth_info.image = depth_att->obj.img;
-	/* FIXME: depth attachment might have other image view types as well */
 	depth_info.viewType = depth_att->props.num_layers > 1 ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_2D;
 	depth_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	depth_info.format = depth_att->props.format;
@@ -407,10 +441,10 @@ create_pipeline(struct vk_ctx *ctx,
 		uint32_t width,
 		uint32_t height,
 		uint32_t num_samples,
+		bool enable_depth,
+		bool enable_stencil,
 		struct vk_renderer *renderer)
 {
-	VkVertexInputBindingDescription vert_bind_dsc[1];
-	VkVertexInputAttributeDescription vert_att_dsc[1];
 	VkPipelineColorBlendAttachmentState cb_att_state[1];
 	VkPipelineVertexInputStateCreateInfo vert_input_info;
 	VkPipelineInputAssemblyStateCreateInfo asm_info;
@@ -426,18 +460,11 @@ create_pipeline(struct vk_ctx *ctx,
 	VkFormatProperties fmt_props;
 	VkPushConstantRange pc_range[1];
 
-	uint32_t stride = 8;
 	VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
 	VkStencilOpState front;
 	VkStencilOpState back;
 	int i;
 	VkPipelineLayout pipeline_layout;
-
-	/* VkVertexInputBindingDescription */
-	memset(&vert_bind_dsc[0], 0, sizeof vert_bind_dsc[0]);
-	vert_bind_dsc[0].binding = 0;
-	vert_bind_dsc[0].stride = stride;
-	vert_bind_dsc[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 	/* format of vertex attributes:
 	 * we have 2D vectors so we need a RG format:
@@ -449,20 +476,9 @@ create_pipeline(struct vk_ctx *ctx,
 	vkGetPhysicalDeviceFormatProperties(ctx->pdev, format, &fmt_props);
 	assert(fmt_props.bufferFeatures & VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
 
-	/* VkVertexInputAttributeDescription */
-	memset(&vert_att_dsc[0], 0, sizeof vert_att_dsc[0]);
-	vert_att_dsc[0].location = 0;
-	vert_att_dsc[0].binding = 0;
-	vert_att_dsc[0].format = format;
-	vert_att_dsc[0].offset = 0;
-
 	/* VkPipelineVertexInputStateCreateInfo */
 	memset(&vert_input_info, 0, sizeof vert_input_info);
 	vert_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vert_input_info.vertexBindingDescriptionCount = 1;
-	vert_input_info.pVertexBindingDescriptions = vert_bind_dsc;
-	vert_input_info.vertexAttributeDescriptionCount = 1;
-	vert_input_info.pVertexAttributeDescriptions = vert_att_dsc;
 
 	/* VkPipelineInputAssemblyStateCreateInfo */
 	memset(&asm_info, 0, sizeof asm_info);
@@ -496,6 +512,7 @@ create_pipeline(struct vk_ctx *ctx,
 	rs_info.polygonMode = VK_POLYGON_MODE_FILL;
 	rs_info.cullMode = VK_CULL_MODE_NONE;
 	rs_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+	rs_info.lineWidth = 1.0;
 
 	/* VkPipelineMultisampleStateCreateInfo */
 	memset(&ms_info, 0, sizeof ms_info);
@@ -523,6 +540,21 @@ create_pipeline(struct vk_ctx *ctx,
 	/* defaults in OpenGL ES 3.1 */
 	ds_info.minDepthBounds = 0;
 	ds_info.maxDepthBounds = 1;
+	/* z buffer, stencil buffer */
+	if (enable_depth) {
+		ds_info.depthTestEnable = VK_TRUE;
+		ds_info.depthWriteEnable = VK_TRUE;
+		ds_info.depthCompareOp = VK_COMPARE_OP_LESS;
+
+		if (enable_stencil)
+			fprintf(stderr, "Depth and stencil tests are enabled at the same time. Ignoring stencil.\n");
+
+	} else if (enable_stencil) {
+		ds_info.stencilTestEnable = VK_TRUE;
+		ds_info.depthTestEnable = VK_FALSE;
+		ds_info.depthWriteEnable = VK_FALSE;
+		ds_info.depthCompareOp = VK_COMPARE_OP_LESS;
+	}
 
 	/* VkPipelineColorBlendAttachmentState */
 	memset(&cb_att_state[0], 0, sizeof cb_att_state[0]);
@@ -710,18 +742,18 @@ alloc_image_memory(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 	mem_reqs2.sType = VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2;
 
 	vkGetImageMemoryRequirements2(ctx->dev, &req_info2, &mem_reqs2);
-	img_obj->mem = alloc_memory(ctx,
-				    &mem_reqs2.memoryRequirements,
-				    mem_reqs2.memoryRequirements.memoryTypeBits &
-				    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	img_obj->mobj.mem = alloc_memory(ctx,
+					 &mem_reqs2.memoryRequirements,
+					 mem_reqs2.memoryRequirements.memoryTypeBits &
+					 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	img_obj->mem_sz = mem_reqs2.memoryRequirements.size;
-	if (img_obj->mem == VK_NULL_HANDLE) {
+	img_obj->mobj.mem_sz = mem_reqs2.memoryRequirements.size;
+	if (img_obj->mobj.mem == VK_NULL_HANDLE) {
 		fprintf(stderr, "Failed to allocate image memory.\n");
 		return false;
 	}
 
-	if (vkBindImageMemory(ctx->dev, img_obj->img, img_obj->mem, 0) != VK_SUCCESS) {
+	if (vkBindImageMemory(ctx->dev, img_obj->img, img_obj->mobj.mem, 0) != VK_SUCCESS) {
 		fprintf(stderr, "Failed to bind image memory.\n");
 		return false;
 	}
@@ -754,7 +786,7 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 	img_fmt_info.format = props->format;
 	img_fmt_info.type = get_image_type(props->h, props->depth);
 	img_fmt_info.tiling = props->tiling;
-	img_fmt_info.usage = props->usage;
+	img_fmt_info.usage = props->usage ? props->usage : VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 	memset(&ext_img_fmt_props, 0, sizeof ext_img_fmt_props);
 	ext_img_fmt_props.sType =
@@ -784,7 +816,7 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 bool
 vk_init_ctx(struct vk_ctx *ctx)
 {
-	if ((ctx->inst = create_instance()) == VK_NULL_HANDLE) {
+	if ((ctx->inst = create_instance(false)) == VK_NULL_HANDLE) {
 		fprintf(stderr, "Failed to create Vulkan instance.\n");
 		goto fail;
 	}
@@ -886,7 +918,7 @@ vk_create_ext_image(struct vk_ctx *ctx,
 	img_info.arrayLayers = props->num_layers ? props->num_layers : VK_SAMPLE_COUNT_1_BIT;
 	img_info.samples = get_num_samples(props->num_samples);
 	img_info.tiling = props->tiling;
-	img_info.usage = props->usage;
+	img_info.usage = props->usage ? props->usage : VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	img_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 	if (vkCreateImage(ctx->dev, &img_info, 0, &img->img) != VK_SUCCESS)
@@ -900,6 +932,8 @@ vk_create_ext_image(struct vk_ctx *ctx,
 fail:
 	fprintf(stderr, "Failed to create external image.\n");
 	vk_destroy_ext_image(ctx, img);
+	img->img = VK_NULL_HANDLE;
+	img->mobj.mem = VK_NULL_HANDLE;
 	return false;
 }
 
@@ -911,9 +945,9 @@ vk_destroy_ext_image(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 		img_obj->img = VK_NULL_HANDLE;
 	}
 
-	if (img_obj->mem != VK_NULL_HANDLE) {
-		vkFreeMemory(ctx->dev, img_obj->mem, 0);
-		img_obj->mem = VK_NULL_HANDLE;
+	if (img_obj->mobj.mem != VK_NULL_HANDLE) {
+		vkFreeMemory(ctx->dev, img_obj->mobj.mem, 0);
+		img_obj->mobj.mem = VK_NULL_HANDLE;
 	}
 }
 
@@ -959,6 +993,8 @@ vk_create_renderer(struct vk_ctx *ctx,
 		   unsigned int vs_size,
 		   const char *fs_src,
 		   unsigned int fs_size,
+		   bool enable_depth,
+		   bool enable_stencil,
 		   struct vk_image_att *color_att,
 		   struct vk_image_att *depth_att,
 		   struct vk_renderer *renderer)
@@ -980,7 +1016,8 @@ vk_create_renderer(struct vk_ctx *ctx,
 		goto fail;
 
 	create_pipeline(ctx, color_att->props.w, color_att->props.h,
-			color_att->props.num_samples, renderer);
+			color_att->props.num_samples, enable_depth, enable_stencil, renderer);
+
 	if (renderer->pipeline == VK_NULL_HANDLE)
 		goto fail;
 
@@ -1038,8 +1075,7 @@ vk_create_buffer(struct vk_ctx *ctx,
 
 	/* allocate buffer */
 	vkGetBufferMemoryRequirements(ctx->dev, bo->buf, &mem_reqs);
-	/* FIXME:
-	 * VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bit specifies that the
+	/* VK_MEMORY_PROPERTY_HOST_COHERENT_BIT bit specifies that the
 	 * host cache management commands vkFlushMappedMemoryRanges and
 	 * vkInvalidateMappedMemoryRanges are not needed to flush host
 	 * writes to the device or make device writes visible to the

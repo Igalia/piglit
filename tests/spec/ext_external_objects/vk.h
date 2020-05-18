@@ -62,11 +62,14 @@ struct vk_image_props
 	VkImageLayout end_layout;
 };
 
-struct vk_image_obj
-{
-	VkImage img;
+struct vk_mem_obj {
 	VkDeviceMemory mem;
 	VkDeviceSize mem_sz;
+};
+
+struct vk_image_obj {
+	VkImage img;
+	struct vk_mem_obj mobj;
 };
 
 struct vk_image_att {
@@ -141,6 +144,8 @@ vk_create_renderer(struct vk_ctx *ctx,
 		   unsigned int vs_size,
 		   const char *fs_src,
 		   unsigned int fs_size,
+		   bool enable_depth,
+		   bool enable_stencil,
 		   struct vk_image_att *color_att,
 		   struct vk_image_att *depth_att,
 		   struct vk_renderer *renderer);
