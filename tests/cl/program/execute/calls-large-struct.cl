@@ -40,7 +40,16 @@ arg_in: 1 buffer int[16] \
 
 [test]
 name: byval struct align 8
-kernel_name: kernel_call_byval_struct_align8
+kernel_name: call_byval_struct_align8
+dimensions: 1
+global_size: 1 0 0
+
+arg_out: 0 buffer int[1]  1
+
+
+[test]
+name: byval struct align 8 with realignment
+kernel_name: call_byval_struct_align8_with_realignment
 dimensions: 1
 global_size: 1 0 0
 
@@ -168,8 +177,8 @@ typedef struct ByVal_Struct_Align8 {
     long xs[9];
 } ByVal_Struct_Align8;
 
-__attribute__((noinline))
-int func(ByVal_Struct_Align8 val)
+NOINLINE
+int byval_struct_align8(ByVal_Struct_Align8 val)
 {
     for (int i = 0; i < 9; ++i)
     {
@@ -180,7 +189,7 @@ int func(ByVal_Struct_Align8 val)
     return 1;
 }
 
-__kernel void kernel_call_byval_struct_align8(__global uint* result)
+__kernel void call_byval_struct_align8(__global uint* result)
 {
     struct ByVal_Struct_Align8 val = { { 0x1337 } };
     for (int i = 0; i < 9; ++i)
@@ -188,5 +197,29 @@ __kernel void kernel_call_byval_struct_align8(__global uint* result)
         val.xs[i] = i;
     }
 
-    *result = func(val);
+    *result = byval_struct_align8(val);
+}
+
+NOINLINE
+int byval_struct_align8_with_realignment(ByVal_Struct_Align8 val)
+{
+    volatile long16 force_realignment = 0;
+    for (int i = 0; i < 9; ++i)
+    {
+        long ld = val.xs[i];
+        if (ld != i)
+            return 0;
+    }
+    return 1;
+}
+
+__kernel void call_byval_struct_align8_with_realignment(__global uint* result)
+{
+    struct ByVal_Struct_Align8 val = { { 0x1337 } };
+    for (int i = 0; i < 9; ++i)
+    {
+        val.xs[i] = i;
+    }
+
+    *result = byval_struct_align8_with_realignment(val);
 }
