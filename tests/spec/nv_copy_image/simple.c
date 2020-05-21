@@ -42,7 +42,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 static const float green[3] = {0.0, 1.0, 0.0};
-static const float red[3] = {1.0, 0.0, 0.0};
+static const float reddish[3] = {0.5, 0.0, 0.0};
 static const float blue[3] = {0.0, 0.0, 1.0};
 
 int renderbuffers = 0;
@@ -158,7 +158,7 @@ piglit_display(void)
 	image_init(&images[1], images[1].target, GL_RGB);
 
 	image_fill(&images[0], green);
-	image_fill(&images[1], red);
+	image_fill(&images[1], reddish);
 
 	glCopyImageSubDataNV(images[0].name, images[0].target, 0, 0, 0, 0,
 			   images[1].name, images[1].target, 0, 17, 11, 0,
@@ -168,10 +168,10 @@ piglit_display(void)
 	/* We should now have a green square on red */
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, images[1].fbo);
 	pass &= piglit_probe_rect_rgb(17, 11, 32, 32, green);
-	pass &= piglit_probe_rect_rgb(0, 0, 64, 11, red);
-	pass &= piglit_probe_rect_rgb(0, 11, 17, 32, red);
-	pass &= piglit_probe_rect_rgb(49, 11, 15, 32, red);
-	pass &= piglit_probe_rect_rgb(0, 43, 64, 21, red);
+	pass &= piglit_probe_rect_rgb(0, 0, 64, 11, reddish);
+	pass &= piglit_probe_rect_rgb(0, 11, 17, 32, reddish);
+	pass &= piglit_probe_rect_rgb(49, 11, 15, 32, reddish);
+	pass &= piglit_probe_rect_rgb(0, 43, 64, 21, reddish);
 
 	image_fill(&images[0], blue);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, images[0].fbo);
