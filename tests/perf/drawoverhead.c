@@ -26,6 +26,7 @@
 #include "piglit-util-gl.h"
 
 static bool is_compat;
+static int selected_test_index = -1;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -36,7 +37,30 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_core_version = 0;
 			is_compat = true;
-			break;
+		}
+		if (!strcmp(argv[i], "-test")) {
+			if (i == argc - 1) {
+				fprintf(stderr, "-test requires an argument\n");
+				exit(1);
+			}
+
+			const char *testnum = argv[i + 1];
+			char *endptr;
+			selected_test_index = strtol(testnum, &endptr, 10);
+
+			if (endptr != argv[i + 1] + strlen(testnum)) {
+				fprintf(stderr,
+					"Failed to parse test number '%s'\n", testnum);
+				exit(1);
+			}
+
+			printf("Running only test %d\n", selected_test_index);
+			i++;
+		}
+
+		if (!strcmp(argv[i], "-help")) {
+			fprintf(stderr, "drawoverhead [-compat] [-test TESTNUM]\n");
+			exit(1);
 		}
 	}
 	puts(config.supports_gl_core_version ? "Using Core profile." :
@@ -640,6 +664,9 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 {
 	static unsigned test_index;
 	test_index++;
+
+	if (selected_test_index != -1 && test_index != selected_test_index)
+		return 0;
 
 	double rate = perf_measure_rate(f, 0.5);
 	double ratio = base_rate ? rate / base_rate : 1;
