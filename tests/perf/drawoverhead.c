@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include "piglit-util-gl.h"
 
+static bool color = true;
 static bool is_compat;
 static int selected_test_index = -1;
 
@@ -37,6 +38,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_core_version = 0;
 			is_compat = true;
+		}
+		if (!strcmp(argv[i], "-nocolor")) {
+			color = false;
 		}
 		if (!strcmp(argv[i], "-test")) {
 			if (i == argc - 1) {
@@ -59,7 +63,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		}
 
 		if (!strcmp(argv[i], "-help")) {
-			fprintf(stderr, "drawoverhead [-compat] [-test TESTNUM]\n");
+			fprintf(stderr, "drawoverhead [-compat] [-test TESTNUM] [-nocolor]\n");
 			exit(1);
 		}
 	}
@@ -671,8 +675,12 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	double rate = perf_measure_rate(f, 0.5);
 	double ratio = base_rate ? rate / base_rate : 1;
 
+	const char *ratio_color = base_rate == 0 ? COLOR_RESET :
+		ratio > 0.7 ? COLOR_GREEN :
+		ratio > 0.4 ? COLOR_YELLOW : COLOR_RED;
+
 	printf(" %3u, %s (%2u VBO| %u UBO| %2u %s) w/ %s change,%*s"
-	       COLOR_CYAN "%5u" COLOR_RESET ", %s%.1f%%" COLOR_RESET "\n",
+	       "%s%5u%s, %s%.1f%%%s\n",
 	       test_index, call, num_vbos, num_ubos,
 	       num_textures ? num_textures :
 	         num_tbos ? num_tbos :
@@ -683,11 +691,12 @@ perf_run(const char *call, unsigned num_vbos, unsigned num_ubos,
 	         num_imgbos ? "ImB" : "   ",
 	       change,
 	       MAX2(36 - (int)strlen(change) - (int)strlen(call), 0), "",
+	       color ? COLOR_CYAN : "",
 	       (unsigned)(rate / 1000),
-	       base_rate == 0 ? COLOR_RESET :
-				ratio > 0.7 ? COLOR_GREEN :
-				ratio > 0.4 ? COLOR_YELLOW : COLOR_RED,
-	       100 * ratio);
+	       color ? COLOR_RESET : "",
+	       color ? ratio_color : "",
+	       100 * ratio,
+	       color ? COLOR_RESET : "");
 	return rate;
 }
 
