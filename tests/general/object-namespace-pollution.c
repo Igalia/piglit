@@ -994,8 +994,11 @@ validate_vertex_array(unsigned name)
 static bool
 do_Bitmap(void)
 {
+	GLint old_unpack_alignment;
 	uint8_t bitmap[16 * 16 / 8];
 
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &old_unpack_alignment);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	/* Enable depth test to avoid i965 blit path. */
 	glEnable(GL_DEPTH_TEST);
 
@@ -1003,6 +1006,7 @@ do_Bitmap(void)
 	glBitmap(16, 16, 0, 0, 0, 0, bitmap);
 
 	glDisable(GL_DEPTH_TEST);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, old_unpack_alignment);
 
 	return piglit_check_gl_error(GL_NO_ERROR);
 }
