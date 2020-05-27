@@ -48,6 +48,23 @@ static struct piglit_gl_test_config *piglit_config;
 enum piglit_result
 test_miptrees(void* odd);
 
+static bool is_odd[2] = {true, false};
+static const struct piglit_subtest subtests[] = {
+	{
+		"5x5 Block Dim",
+		"odd",
+		test_miptrees,
+		&is_odd[0]
+	},
+	{
+		"12x12 Block Dim",
+		"even",
+		test_miptrees,
+		&is_odd[1]
+	},
+	{NULL},
+};
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	piglit_config = &config;
@@ -57,23 +74,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = 2 * level0_width;
 	config.window_height = level0_height + (level0_height >> 1);
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
-	static bool is_odd[2] = {true, false};
 
-	config.subtests = (struct piglit_subtest[]) {
-		{
-			"5x5 Block Dim",
-			"odd",
-			test_miptrees,
-			&is_odd[0]
-		},
-		{
-			"12x12 Block Dim",
-			"even",
-			test_miptrees,
-			&is_odd[1]
-		},
-		{NULL},
-	};
+	config.subtests = subtests;
 
 PIGLIT_GL_TEST_CONFIG_END
 
