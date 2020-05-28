@@ -189,10 +189,22 @@ piglit_init(int argc, char **argv)
 	 *   bits-per-channel changes.
 	 */
 
-	puts("Testing implicit read of partial block linear -> sRGB");
+	puts("Testing implicit read of partial block "
+	     "(linear storage) linear ->  sRGB");
 	pass &= test_clear_after_clear(GL_RGBA8, 32, 32, flt_half,
 				       GL_SRGB8_ALPHA8, 1, 1, flt_one,
 				       0, 1, flt_half);
+
+	puts("Testing implicit read of partial block "
+	     "(sRGB storage) linear ->  sRGB");
+	{
+		const struct clear_list list[] = {
+		  entry(GL_RGBA8, 32, 32, flt_half),
+		  entry(GL_SRGB8_ALPHA8, 1, 1, flt_half),
+		};
+		pass &= test_clear_list(GL_SRGB8_ALPHA8, 32, 32,
+				        2, list, 0, 1, flt_half);
+	}
 
 	puts("Testing implicit read of partial block sRGB -> linear");
 	pass &= test_clear_after_clear(GL_SRGB8_ALPHA8, 32, 32, flt_half,
