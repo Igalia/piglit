@@ -55,7 +55,7 @@ class TestParseListfile(object):
         f = tmpdir.join('test.list')
         f.write("/tmp/foo\n/tmp/bar\n")
         results = core.parse_listfile(str(f))
-        assert isinstance(results, collections.Container)
+        assert isinstance(results, collections.abc.Container)
 
     def test_parse_listfile_whitespace(self, tmpdir):
         """parse_listfile should remove various kinds of trailing whitespace.

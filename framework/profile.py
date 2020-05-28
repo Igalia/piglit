@@ -100,7 +100,7 @@ class RegexFilter(object):
             return not any(r.search(name) for r in self.filters)
 
 
-class TestDict(collections.MutableMapping):
+class TestDict(collections.abc.MutableMapping):
     """A special kind of dict for tests.
 
     This mapping lowers the names of keys by default, and enforces that keys be
@@ -262,7 +262,7 @@ class TestDict(collections.MutableMapping):
         self.__allow_reassignment -= 1
 
 
-class Filters(collections.MutableSequence):
+class Filters(collections.abc.MutableSequence):
 
     def __init__(self, iterable=None):
         if iterable:
