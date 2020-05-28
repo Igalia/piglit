@@ -93,7 +93,53 @@ tex_sub_clear(GLuint tex, GLuint format, union color_value color,
 	glDeleteFramebuffers(1, &fbo);
 }
 
-/* Clears a texture's data store twice then probes for a specific pixel. */
+struct clear_list {
+	GLuint format;
+	uint32_t w;
+	uint32_t h;
+	union color_value color;
+};
+
+/* Clears a texture's data store according to the list then probes for a
+ * specific pixel.
+ */
+static bool
+test_clear_list(GLuint tex_format, uint32_t tw, uint32_t th,
+		uint32_t num_clears, const struct clear_list *list,
+		uint32_t px, uint32_t py,
+		union color_value probe_pix)
+{
+	/* Create the texture storage. */
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexStorage2D(GL_TEXTURE_2D, 1, tex_format, tw, th);
+
+	/* Clear the views. */
+	for (int i = 0; i < num_clears; i++) {
+		GLuint view;
+		glGenTextures(1, &view);
+		glTextureView(view, GL_TEXTURE_2D, tex, list[i].format,
+			      0, 1, 0, 1);
+		tex_sub_clear(view, list[i].format, list[i].color,
+			      list[i].w, list[i].h);
+		glDeleteTextures(1, &view);
+	}
+
+	/* Inspect the texture. */
+	assert(format_clear_value_type(tex_format) == GL_FLOAT);
+	const bool matched_pixel =
+		piglit_probe_texel_rgba(GL_TEXTURE_2D, 0, px, py,
+					probe_pix.flt);
+
+	/* Delete the texture. */
+	glDeleteTextures(1, &tex);
+	return matched_pixel;
+}
+
+#define entry(fmt, width, height, col) \
+	{ .format = fmt, .w = width, . h = height, .color = col }
+
 static bool
 test_clear_after_clear(GLuint tex_format, uint32_t tw, uint32_t th,
 		       union color_value tex_color,
@@ -102,28 +148,12 @@ test_clear_after_clear(GLuint tex_format, uint32_t tw, uint32_t th,
 		       uint32_t px, uint32_t py,
 		       union color_value probe_pix)
 {
-	/* Create the textures. */
-	GLuint tex, view;
-	glGenTextures(1, &tex);
-	glGenTextures(1, &view);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexStorage2D(GL_TEXTURE_2D, 1, tex_format, tw, th);
-	glTextureView(view, GL_TEXTURE_2D, tex, view_format, 0, 1, 0, 1);
-
-	/* Clear the textures. */
-	tex_sub_clear(tex, tex_format, tex_color, tw, th);
-	tex_sub_clear(view, view_format, view_color, vw, vh);
-
-	/* Inspect the original. */
-	assert(format_clear_value_type(tex_format) == GL_FLOAT);
-	const bool matched_pixel =
-		piglit_probe_texel_rgba(GL_TEXTURE_2D, 0, px, py,
-					probe_pix.flt);
-
-	/* Delete the textures. */
-	glDeleteTextures(1, &tex);
-	glDeleteTextures(1, &view);
-	return matched_pixel;
+	const struct clear_list list[] = {
+	  entry(tex_format, tw, th, tex_color),
+	  entry(view_format, vw, vh, view_color)
+	};
+	return test_clear_list(tex_format, tw, th,
+			       2, list, px, py, probe_pix);
 }
 
 static void
