@@ -114,7 +114,7 @@ select_physical_device(VkInstance inst)
 }
 
 static VkDevice
-create_device(VkPhysicalDevice pdev)
+create_device(struct vk_ctx *ctx, VkPhysicalDevice pdev)
 {
 	const char *deviceExtensions[] = { "VK_KHR_external_memory_fd",
 					   "VK_KHR_external_semaphore_fd" };
@@ -122,16 +122,33 @@ create_device(VkPhysicalDevice pdev)
 	VkDeviceCreateInfo dev_info;
 	VkDevice dev;
 	uint32_t prop_count;
-	VkQueueFamilyProperties fam_props;
+	VkQueueFamilyProperties *fam_props;
+	uint32_t i;
+	float qprio = 0;
 
+	ctx->qfam_idx = -1;
 	vkGetPhysicalDeviceQueueFamilyProperties(pdev, &prop_count, 0);
-	vkGetPhysicalDeviceQueueFamilyProperties(pdev, &prop_count, &fam_props);
+	if (prop_count < 0) {
+		fprintf(stderr, "Invalid queue family properties.\n");
+		return VK_NULL_HANDLE;
+	}
+
+	fam_props = malloc(prop_count * sizeof *fam_props);
+	vkGetPhysicalDeviceQueueFamilyProperties(pdev, &prop_count, fam_props);
+
+	for (i = 0; i < prop_count; i++) {
+		if (fam_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+			ctx->qfam_idx = i;
+			break;
+		}
+	}
+	free(fam_props);
 
 	memset(&dev_queue_info, 0, sizeof dev_queue_info);
 	dev_queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	dev_queue_info.queueFamilyIndex = prop_count > 0 ? prop_count - 1 : 0;
+	dev_queue_info.queueFamilyIndex = ctx->qfam_idx;
 	dev_queue_info.queueCount = 1;
-	dev_queue_info.pQueuePriorities = (float[]) { 1.0f };
+	dev_queue_info.pQueuePriorities = &qprio;
 
 	memset(&dev_info, 0, sizeof dev_info);
 	dev_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -826,7 +843,7 @@ vk_init_ctx(struct vk_ctx *ctx)
 		goto fail;
 	}
 
-	if ((ctx->dev = create_device(ctx->pdev)) == VK_NULL_HANDLE) {
+	if ((ctx->dev = create_device(ctx, ctx->pdev)) == VK_NULL_HANDLE) {
 		fprintf(stderr, "Failed to create Vulkan device.\n");
 		goto fail;
 	}
@@ -863,7 +880,7 @@ vk_init_ctx_for_rendering(struct vk_ctx *ctx)
 		goto fail;
 	}
 
-	vkGetDeviceQueue(ctx->dev, 0, 0, &ctx->queue);
+	vkGetDeviceQueue(ctx->dev, ctx->qfam_idx, 0, &ctx->queue);
 	if (!ctx->queue) {
 		fprintf(stderr, "Failed to get command queue.\n");
 		goto fail;

@@ -39,6 +39,7 @@ struct vk_ctx
 	VkCommandPool cmd_pool;
 	VkCommandBuffer cmd_buf;
 	VkQueue queue;
+	int qfam_idx;
 
 	uint8_t deviceUUID[VK_UUID_SIZE];
 	uint8_t driverUUID[VK_UUID_SIZE];
