@@ -1078,7 +1078,7 @@ vk_create_buffer(struct vk_ctx *ctx,
 	VkBufferCreateInfo buf_info;
 	VkMemoryRequirements mem_reqs;
 
-	bo->mem = VK_NULL_HANDLE;
+	bo->mobj.mem = VK_NULL_HANDLE;
 	bo->buf = VK_NULL_HANDLE;
 
 	/* VkBufferCreateInfo */
@@ -1097,11 +1097,16 @@ vk_create_buffer(struct vk_ctx *ctx,
 	 * vkInvalidateMappedMemoryRanges are not needed to flush host
 	 * writes to the device or make device writes visible to the
 	 * host, respectively. */
-	bo->mem = alloc_memory(ctx, &mem_reqs, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	if (bo->mem == VK_NULL_HANDLE)
+	bo->mobj.mem = alloc_memory(ctx, &mem_reqs,
+				    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+				    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+	if (bo->mobj.mem == VK_NULL_HANDLE)
 		goto fail;
 
-	if (vkBindBufferMemory(ctx->dev, bo->buf, bo->mem, 0) != VK_SUCCESS) {
+	bo->mobj.mem_sz = sz;
+
+	if (vkBindBufferMemory(ctx->dev, bo->buf, bo->mobj.mem, 0) != VK_SUCCESS) {
 		fprintf(stderr, "Failed to bind buffer memory.\n");
 		goto fail;
 	}
@@ -1122,14 +1127,14 @@ vk_update_buffer_data(struct vk_ctx *ctx,
 {
 	void *map;
 
-	if (vkMapMemory(ctx->dev, bo->mem, 0, data_sz, 0, &map) != VK_SUCCESS) {
+	if (vkMapMemory(ctx->dev, bo->mobj.mem, 0, data_sz, 0, &map) != VK_SUCCESS) {
 		fprintf(stderr, "Failed to map buffer memory.\n");
 		goto fail;
 	}
 
 	memcpy(map, data, data_sz);
 
-	vkUnmapMemory(ctx->dev, bo->mem);
+	vkUnmapMemory(ctx->dev, bo->mobj.mem);
 	return true;
 
 fail:
@@ -1143,13 +1148,15 @@ void
 vk_destroy_buffer(struct vk_ctx *ctx,
 		  struct vk_buf *bo)
 {
-	if (bo->mem != VK_NULL_HANDLE)
-		vkFreeMemory(ctx->dev, bo->mem, 0);
 	if (bo->buf != VK_NULL_HANDLE)
 		vkDestroyBuffer(ctx->dev, bo->buf, 0);
 
+	if (bo->mobj.mem != VK_NULL_HANDLE)
+		vkFreeMemory(ctx->dev, bo->mobj.mem, 0);
+
+	bo->mobj.mem_sz = 0;
 	bo->buf = VK_NULL_HANDLE;
-	bo->mem = VK_NULL_HANDLE;
+	bo->mobj.mem = VK_NULL_HANDLE;
 }
 
 void
@@ -1160,7 +1167,8 @@ vk_draw(struct vk_ctx *ctx,
 	uint32_t vk_fb_color_count,
 	struct vk_semaphores *semaphores,
 	bool has_wait, bool has_signal,
-	uint32_t w, uint32_t h)
+	float x, float y,
+	float w, float h)
 {
 	VkCommandBufferBeginInfo cmd_begin_info;
 	VkRenderPassBeginInfo rp_begin_info;
@@ -1180,11 +1188,12 @@ vk_draw(struct vk_ctx *ctx,
 	/* VkCommandBufferBeginInfo */
 	memset(&cmd_begin_info, 0, sizeof cmd_begin_info);
 	cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 
 	/* VkRect2D render area */
 	memset(&rp_area, 0, sizeof rp_area);
-	rp_area.extent.width = w;
-	rp_area.extent.height = h;
+	rp_area.extent.width = (uint32_t)w;
+	rp_area.extent.height = (uint32_t)h;
 
 	/* VkClearValue */
 	memset(&clear_values[0], 0, sizeof clear_values[0]);
@@ -1226,6 +1235,11 @@ vk_draw(struct vk_ctx *ctx,
 	vkBeginCommandBuffer(ctx->cmd_buf, &cmd_begin_info);
 	vkCmdBeginRenderPass(ctx->cmd_buf, &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
+	viewport.x = x;
+	viewport.y = y;
+	viewport.width = w;
+	viewport.height = h;
+
 	vkCmdSetViewport(ctx->cmd_buf, 0, 1, &viewport);
 	vkCmdSetScissor(ctx->cmd_buf, 0, 1, &scissor);
 
@@ -1250,6 +1264,125 @@ vk_draw(struct vk_ctx *ctx,
 	if (vkQueueSubmit(ctx->queue, 1, &submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
 		fprintf(stderr, "Failed to submit queue.\n");
 	}
+}
+
+void
+vk_copy_image_to_buffer(struct vk_ctx *ctx,
+			struct vk_image_att *src_img,
+			struct vk_buf *dst_bo,
+			float w, float h)
+{
+	VkCommandBufferBeginInfo cmd_begin_info;
+	VkSubmitInfo submit_info;
+
+	/* VkCommandBufferBeginInfo */
+	memset(&cmd_begin_info, 0, sizeof cmd_begin_info);
+	cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	memset(&submit_info, 0, sizeof submit_info);
+	submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submit_info.commandBufferCount = 1;
+	submit_info.pCommandBuffers = &ctx->cmd_buf;
+
+	vkBeginCommandBuffer(ctx->cmd_buf, &cmd_begin_info);
+	if (src_img->props.end_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && dst_bo) {
+		VkImageMemoryBarrier render_finish_barrier = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+			.dstAccessMask = (VK_ACCESS_TRANSFER_READ_BIT |
+					  VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+					  VK_ACCESS_COLOR_ATTACHMENT_READ_BIT),
+			.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+			.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = src_img->obj.img,
+			.subresourceRange = {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			}
+		};
+
+		vkCmdPipelineBarrier(
+				ctx->cmd_buf,
+				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+				VK_PIPELINE_STAGE_TRANSFER_BIT |
+				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+				(VkDependencyFlags) 0, 0, NULL, 0, NULL,
+				1, &render_finish_barrier);
+
+		/* copy image to buf */
+		VkBufferImageCopy copy_region = {
+			.bufferOffset = 0,
+			.bufferRowLength = w,
+			.bufferImageHeight = h,
+			.imageSubresource = {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+			.imageOffset = { 0, 0, 0 },
+			.imageExtent = { w, h, 1 }
+                };
+
+		vkCmdCopyImageToBuffer(ctx->cmd_buf,
+				       src_img->obj.img,
+				       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+				       dst_bo->buf, 1, &copy_region);
+
+		VkImageMemoryBarrier copy_finish_barrier = {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.srcAccessMask = 0,
+			.dstAccessMask = 0,
+			.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = src_img->obj.img,
+			.subresourceRange = {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			}
+		};
+
+		vkCmdPipelineBarrier(ctx->cmd_buf,
+				     VK_PIPELINE_STAGE_TRANSFER_BIT,
+				     VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+				     (VkDependencyFlags) 0, 0, NULL, 0, NULL,
+				     1, &copy_finish_barrier);
+
+		VkBufferMemoryBarrier write_finish_buffer_memory_barrier = {
+			.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+			.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+			.dstAccessMask = VK_ACCESS_HOST_READ_BIT,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.buffer = dst_bo->buf,
+			.offset = 0,
+			.size = VK_WHOLE_SIZE
+		};
+
+		vkCmdPipelineBarrier(ctx->cmd_buf,
+				VK_PIPELINE_STAGE_TRANSFER_BIT,
+				VK_PIPELINE_STAGE_HOST_BIT,
+				(VkDependencyFlags) 0, 0, NULL,
+				1, &write_finish_buffer_memory_barrier,
+				0, NULL);
+	}
+	vkEndCommandBuffer(ctx->cmd_buf);
+
+	if (vkQueueSubmit(ctx->queue, 1, &submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
+		fprintf(stderr, "Failed to submit queue.\n");
+	}
+	vkQueueWaitIdle(ctx->queue);
 }
 
 bool

@@ -36,8 +36,10 @@ struct vk_ctx
 	VkPhysicalDevice pdev;
 	VkDevice dev;
 	VkPipelineCache cache;
+
 	VkCommandPool cmd_pool;
 	VkCommandBuffer cmd_buf;
+
 	VkQueue queue;
 	int qfam_idx;
 
@@ -91,7 +93,7 @@ struct vk_renderer
 struct vk_buf
 {
 	VkBuffer buf;
-	VkDeviceMemory mem;
+	struct vk_mem_obj mobj;
 };
 
 struct vk_semaphores
@@ -179,7 +181,13 @@ vk_draw(struct vk_ctx *ctx,
 	uint32_t vk_fb_color_count,
 	struct vk_semaphores *semaphores,
 	bool has_wait, bool has_signal,
-	uint32_t w, uint32_t h);
+	float x, float y, float w, float h);
+
+void
+vk_copy_image_to_buffer(struct vk_ctx *ctx,
+			struct vk_image_att *src_img,
+			struct vk_buf *dst_bo,
+			float w, float h);
 
 bool
 vk_create_semaphores(struct vk_ctx *ctx,

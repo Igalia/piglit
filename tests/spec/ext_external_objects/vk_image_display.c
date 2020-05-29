@@ -27,6 +27,7 @@
 #include <piglit-util-gl.h>
 #include "interop.h"
 #include "params.h"
+#include "helpers.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -172,7 +173,8 @@ piglit_display(void)
 		glFlush();
 	}
 
-	vk_draw(&vk_core, 0, &vk_rnd, vk_fb_color, 4, &vk_sem , vk_sem_has_wait, vk_sem_has_signal, w, h);
+	vk_draw(&vk_core, 0, &vk_rnd, vk_fb_color, 4, &vk_sem,
+		vk_sem_has_wait, vk_sem_has_signal, 0, 0, w, h);
 
 	layout = gl_get_layout_from_vk(color_end_layout);
 	if (vk_sem_has_signal) {
@@ -198,28 +200,6 @@ piglit_display(void)
 
 	piglit_present_results();
 	return PIGLIT_PASS;
-}
-
-static char*
-load_shader(const char *shader_file, unsigned int *size)
-{
-	static char filepath[4096];
-	if (!shader_file)
-		return NULL;
-
-	piglit_join_paths(filepath, sizeof(filepath), 5,
-			  piglit_source_dir(),
-			  "tests",
-			  "spec",
-			  "ext_external_objects",
-			  shader_file);
-	char *result =
-		piglit_load_text_file(filepath, size);
-
-	if (!result)
-		fprintf(stderr, "Failed to load shader source [%s].\n", filepath);
-
-	return result;
 }
 
 static bool

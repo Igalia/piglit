@@ -60,10 +60,10 @@ IF(LIBVULKAN_FOUND)
 		${LIBVULKAN_LDFLAGS}
 	)
 
-	piglit_add_executable (ext_external_objects-vk-image-override
-		vk.c interop.c vk_image_override.c)
+	piglit_add_executable (ext_external_objects-vk-image-overwrite
+		vk.c interop.c helpers.c vk_image_overwrite.c)
 	piglit_add_executable (ext_external_objects-vk-image-display
-		vk.c interop.c vk_image_display.c ${VK_BANDS_VERT_PATH} ${VK_BANDS_FRAG_PATH})
+		vk.c interop.c helpers.c vk_image_display.c ${VK_BANDS_VERT_PATH} ${VK_BANDS_FRAG_PATH})
 ENDIF()
 
 # vim: ft=cmake:

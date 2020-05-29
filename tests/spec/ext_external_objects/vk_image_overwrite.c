@@ -28,6 +28,7 @@
 #include <piglit-util-gl.h>
 #include "interop.h"
 #include "params.h"
+#include "helpers.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -332,32 +333,6 @@ vk_set_image_props(uint32_t w, uint32_t h, uint32_t d,
 				       format, tiling, usage,
 				       in_layout, end_layout,
 				       &vk_img_props);
-}
-
-static bool
-check_bound_fbo_status(void)
-{
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		switch(status) {
-		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-			fprintf(stderr, "GL FBO status: GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-			fprintf(stderr, "GL FBO status: GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS\n");
-			break;
-		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-			fprintf(stderr, "GL FBO status: GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
-			break;
-		case GL_FRAMEBUFFER_UNSUPPORTED:
-			fprintf(stderr, "GL FBO status: GL_FRAMEBUFFER_UNSUPPORTED\n");
-			break;
-		default:
-			fprintf(stderr, "GL FBO status: Unknown\n");
-		}
-		return false;
-	}
-	return true;
 }
 
 static bool
