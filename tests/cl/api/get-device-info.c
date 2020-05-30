@@ -512,7 +512,7 @@ check_info(const struct piglit_cl_api_test_env* env,
 				}
 			}
 			break;
-		case CL_DEVICE_QUEUE_ON_HOST_PROPERTIES:
+		case CL_DEVICE_QUEUE_PROPERTIES:
 			if (check_size(sizeof(cl_command_queue_properties), param_value_size, result)) {
 				cl_command_queue_properties value =
 					*(cl_command_queue_properties*)param_value;
