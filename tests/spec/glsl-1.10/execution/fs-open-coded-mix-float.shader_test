@@ -1,0 +1,29 @@
+# Mesa could detect open-coded mix (lerp) expressions,
+# check that nothing goes wrong.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform float x;
+uniform float y;
+uniform float a;
+
+void main()
+{
+    float result = (-x + y) * a + x;
+    if (abs(result - 11.0) <= 0.001)
+        gl_FragColor = vec4(1.0);
+    else
+        gl_FragColor = vec4(0.0);
+}
+
+[test]
+uniform float x 3.0
+uniform float y 7.0
+uniform float a 2.0
+
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0

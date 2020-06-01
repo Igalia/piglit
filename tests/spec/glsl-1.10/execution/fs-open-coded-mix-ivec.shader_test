@@ -1,0 +1,30 @@
+# Mesa could detect open-coded mix (lerp) expressions, however
+# it also recognized such pattern for integer expressions -
+# which caused incorrect optimizations and crashes.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform ivec2 x;
+uniform ivec2 y;
+uniform ivec2 a;
+
+void main()
+{
+    ivec2 result = (-x + y) * a + x;
+    if (result == ivec2(11, 13))
+        gl_FragColor = vec4(1.0);
+    else
+        gl_FragColor = vec4(0.0);
+}
+
+[test]
+uniform ivec2 x 3 5
+uniform ivec2 y 7 9
+uniform ivec2 a 2 2
+
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0
