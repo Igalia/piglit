@@ -200,6 +200,23 @@ piglit_display(void)
 	return PIGLIT_PASS;
 }
 
+static char*
+load_shader(const char *shader_file, unsigned int *size)
+{
+	static char filepath[4096];
+	if (!shader_file)
+		return NULL;
+
+	piglit_join_paths(filepath, sizeof(filepath), 5,
+			  piglit_source_dir(),
+			  "tests",
+			  "spec",
+			  "ext_external_objects",
+			  shader_file);
+
+	return piglit_load_text_file(filepath, size);
+}
+
 static bool
 vk_init(uint32_t w,
 	uint32_t h,
@@ -276,12 +293,12 @@ vk_init(uint32_t w,
 	}
 
 	/* load shaders */
-	if (!(vs_src = piglit_load_text_file(VK_BANDS_VERT, &vs_sz))) {
+	if (!(vs_src = load_shader(VK_BANDS_VERT, &vs_sz))) {
 		fprintf(stderr, "Failed to load VS source.\n");
 		goto fail;
 	}
 
-	if (!(fs_src = piglit_load_text_file(VK_BANDS_FRAG, &fs_sz))) {
+	if (!(fs_src = load_shader(VK_BANDS_FRAG, &fs_sz))) {
 		fprintf(stderr, "Failed to load FS source.\n");
 		goto fail;
 	}

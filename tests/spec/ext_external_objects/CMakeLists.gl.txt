@@ -9,8 +9,10 @@ piglit_add_executable (ext_external_objects-semaphore-api-errors
 		       semaphore-api-errors.c)
 
 IF(LIBVULKAN_FOUND)
-	set(VK_BANDS_VERT ${CMAKE_CURRENT_BINARY_DIR}/vk_bands.vert.spv)
-	set(VK_BANDS_FRAG ${CMAKE_CURRENT_BINARY_DIR}/vk_bands.frag.spv)
+	set(VK_BANDS_VERT vk_bands.vert.spv)
+	set(VK_BANDS_FRAG vk_bands.frag.spv)
+	set(VK_BANDS_VERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${VK_BANDS_VERT})
+	set(VK_BANDS_FRAG_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${VK_BANDS_FRAG})
 
 	add_definitions(-DVK_BANDS_VERT="${VK_BANDS_VERT}")
 	add_definitions(-DVK_BANDS_FRAG="${VK_BANDS_FRAG}")
@@ -19,30 +21,30 @@ IF(LIBVULKAN_FOUND)
 
 	IF(GLSLANG_VALIDATOR)
 		add_custom_command(
-			OUTPUT ${VK_BANDS_VERT}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert -o ${VK_BANDS_VERT}
+			OUTPUT ${VK_BANDS_VERT_PATH}
+			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert -o ${VK_BANDS_VERT_PATH}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
 		)
 
 		add_custom_command(
-			OUTPUT ${VK_BANDS_FRAG}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag -o ${VK_BANDS_FRAG}
+			OUTPUT ${VK_BANDS_FRAG_PATH}
+			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag -o ${VK_BANDS_FRAG_PATH}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
 		)
 	ELSE()
 		add_custom_command(
-			OUTPUT ${VK_BANDS_VERT}
+			OUTPUT ${VK_BANDS_VERT_PATH}
 			COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert.spv
-			${VK_BANDS_VERT}
+			${VK_BANDS_VERT_PATH}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
 		)
 
 		add_custom_command(
-			OUTPUT ${VK_BANDS_FRAG}
+			OUTPUT ${VK_BANDS_FRAG_PATH}
 			COMMAND ${CMAKE_COMMAND} -E copy
 				${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag.spv
-				${VK_BANDS_FRAG}
+				${VK_BANDS_FRAG_PATH}
 			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
 		)
 	ENDIF()
@@ -61,7 +63,7 @@ IF(LIBVULKAN_FOUND)
 	piglit_add_executable (ext_external_objects-vk-image-override
 		vk.c interop.c vk_image_override.c)
 	piglit_add_executable (ext_external_objects-vk-image-display
-		vk.c interop.c vk_image_display.c ${VK_BANDS_VERT} ${VK_BANDS_FRAG})
+		vk.c interop.c vk_image_display.c ${VK_BANDS_VERT_PATH} ${VK_BANDS_FRAG_PATH})
 ENDIF()
 
 # vim: ft=cmake:
