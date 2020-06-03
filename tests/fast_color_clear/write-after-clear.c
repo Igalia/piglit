@@ -228,5 +228,16 @@ piglit_init(int argc, char **argv)
 				       GL_RGBA8_SNORM, 8, 4, flt_one,
 				       0, 0, flt_half);
 
+	puts("Testing fast-clear tracking across layers 1 -> 0 -> 1");
+	{
+		const struct clear_list list[] = {
+		  entry(GL_RGBA8, 1, 32, 32, flt_one),
+		  entry(GL_RGBA8, 0, 32, 16, flt_one),
+		  entry(GL_RGBA8, 1, 32, 32, flt_half),
+		};
+		pass &= test_clear_list(GL_RGBA8, 32, 32, 2,
+				        3, list, 0, 0, flt_one);
+	}
+
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
