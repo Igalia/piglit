@@ -95,16 +95,17 @@ tex_sub_clear(GLuint tex, GLuint format, union color_value color,
 
 struct clear_list {
 	GLuint format;
+	uint32_t z;
 	uint32_t w;
 	uint32_t h;
 	union color_value color;
 };
 
 /* Clears a texture's data store according to the list then probes for a
- * specific pixel.
+ * specific pixel on layer 0.
  */
 static bool
-test_clear_list(GLuint tex_format, uint32_t tw, uint32_t th,
+test_clear_list(GLuint tex_format, uint32_t tw, uint32_t th, uint32_t td,
 		uint32_t num_clears, const struct clear_list *list,
 		uint32_t px, uint32_t py,
 		union color_value probe_pix)
@@ -112,15 +113,15 @@ test_clear_list(GLuint tex_format, uint32_t tw, uint32_t th,
 	/* Create the texture storage. */
 	GLuint tex;
 	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexStorage2D(GL_TEXTURE_2D, 1, tex_format, tw, th);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, tex_format, tw, th, td);
 
 	/* Clear the views. */
 	for (int i = 0; i < num_clears; i++) {
 		GLuint view;
 		glGenTextures(1, &view);
 		glTextureView(view, GL_TEXTURE_2D, tex, list[i].format,
-			      0, 1, 0, 1);
+			      0, 1, list[i].z, 1);
 		tex_sub_clear(view, list[i].format, list[i].color,
 			      list[i].w, list[i].h);
 		glDeleteTextures(1, &view);
@@ -129,16 +130,17 @@ test_clear_list(GLuint tex_format, uint32_t tw, uint32_t th,
 	/* Inspect the texture. */
 	assert(format_clear_value_type(tex_format) == GL_FLOAT);
 	const bool matched_pixel =
-		piglit_probe_texel_rgba(GL_TEXTURE_2D, 0, px, py,
-					probe_pix.flt);
+		piglit_probe_texel_volume_rgba(GL_TEXTURE_2D_ARRAY, 0,
+					       px, py, 0, 1, 1, 1,
+					       probe_pix.flt);
 
 	/* Delete the texture. */
 	glDeleteTextures(1, &tex);
 	return matched_pixel;
 }
 
-#define entry(fmt, width, height, col) \
-	{ .format = fmt, .w = width, . h = height, .color = col }
+#define entry(fmt, layer, width, height, col) \
+	{ .format = fmt, .z = layer, .w = width, . h = height, .color = col }
 
 static bool
 test_clear_after_clear(GLuint tex_format, uint32_t tw, uint32_t th,
@@ -149,10 +151,10 @@ test_clear_after_clear(GLuint tex_format, uint32_t tw, uint32_t th,
 		       union color_value probe_pix)
 {
 	const struct clear_list list[] = {
-	  entry(tex_format, tw, th, tex_color),
-	  entry(view_format, vw, vh, view_color)
+	  entry(tex_format, 0, tw, th, tex_color),
+	  entry(view_format, 0, vw, vh, view_color)
 	};
-	return test_clear_list(tex_format, tw, th,
+	return test_clear_list(tex_format, tw, th, 1,
 			       2, list, px, py, probe_pix);
 }
 
@@ -199,10 +201,10 @@ piglit_init(int argc, char **argv)
 	     "(sRGB storage) linear ->  sRGB");
 	{
 		const struct clear_list list[] = {
-		  entry(GL_RGBA8, 32, 32, flt_half),
-		  entry(GL_SRGB8_ALPHA8, 1, 1, flt_half),
+		  entry(GL_RGBA8, 0, 32, 32, flt_half),
+		  entry(GL_SRGB8_ALPHA8, 0, 1, 1, flt_half),
 		};
-		pass &= test_clear_list(GL_SRGB8_ALPHA8, 32, 32,
+		pass &= test_clear_list(GL_SRGB8_ALPHA8, 32, 32, 1,
 				        2, list, 0, 1, flt_half);
 	}
 
