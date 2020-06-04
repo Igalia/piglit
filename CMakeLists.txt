@@ -536,7 +536,7 @@ install (
 install (
 	DIRECTORY tests
 	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
-	FILES_MATCHING REGEX ".*\\.(xml|xml.gz|py|program_test|shader_test|shader_source|frag|vert|geom|tesc|tese|comp|ktx|cl|txt|inc|vk_shader_test)$"
+	FILES_MATCHING REGEX ".*\\.(xml|xml.gz|py|program_test|shader_test|shader_source|frag|vert|geom|tesc|tese|comp|spv|ktx|cl|txt|inc|vk_shader_test)$"
 	REGEX "CMakeFiles|CMakeLists|serializer.py|opengl.py|cl.py|quick_gl.py|glslparser.py|shader.py|quick_shader.py|no_error.py|llvmpipe_gl.py|sanity.py" EXCLUDE
 )
 
