@@ -213,8 +213,13 @@ load_shader(const char *shader_file, unsigned int *size)
 			  "spec",
 			  "ext_external_objects",
 			  shader_file);
+	char *result =
+		piglit_load_text_file(filepath, size);
 
-	return piglit_load_text_file(filepath, size);
+	if (!result)
+		fprintf(stderr, "Failed to load shader source [%s].\n", filepath);
+
+	return result;
 }
 
 static bool
@@ -293,15 +298,11 @@ vk_init(uint32_t w,
 	}
 
 	/* load shaders */
-	if (!(vs_src = load_shader(VK_BANDS_VERT, &vs_sz))) {
-		fprintf(stderr, "Failed to load VS source.\n");
+	if (!(vs_src = load_shader(VK_BANDS_VERT, &vs_sz)))
 		goto fail;
-	}
 
-	if (!(fs_src = load_shader(VK_BANDS_FRAG, &fs_sz))) {
-		fprintf(stderr, "Failed to load FS source.\n");
+	if (!(fs_src = load_shader(VK_BANDS_FRAG, &fs_sz)))
 		goto fail;
-	}
 
 	/* create Vulkan renderer */
 	if (!vk_create_renderer(&vk_core, vs_src, vs_sz, fs_src, fs_sz,
