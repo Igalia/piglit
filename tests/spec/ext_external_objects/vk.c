@@ -900,19 +900,21 @@ vk_create_ext_image(struct vk_ctx *ctx,
 fail:
 	fprintf(stderr, "Failed to create external image.\n");
 	vk_destroy_ext_image(ctx, img);
-	img->img = VK_NULL_HANDLE;
-	img->mem = VK_NULL_HANDLE;
 	return false;
 }
 
 void
 vk_destroy_ext_image(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 {
-	if (img_obj->img != VK_NULL_HANDLE)
+	if (img_obj->img != VK_NULL_HANDLE) {
 		vkDestroyImage(ctx->dev, img_obj->img, 0);
+		img_obj->img = VK_NULL_HANDLE;
+	}
 
-	if (img_obj->mem != VK_NULL_HANDLE)
+	if (img_obj->mem != VK_NULL_HANDLE) {
 		vkFreeMemory(ctx->dev, img_obj->mem, 0);
+		img_obj->mem = VK_NULL_HANDLE;
+	}
 }
 
 bool
