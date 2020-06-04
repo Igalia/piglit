@@ -324,10 +324,6 @@ vk_init(uint32_t w,
 fail:
 	free(vs_src);
 	free(fs_src);
-	vk_destroy_ext_image(&vk_core, &vk_color_att.obj);
-	vk_destroy_ext_image(&vk_core, &vk_depth_att.obj);
-	vk_destroy_renderer(&vk_core, &vk_rnd);
-	vk_destroy_semaphores(&vk_core, &vk_sem);
 
 	return false;
 }
