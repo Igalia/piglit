@@ -346,6 +346,15 @@ with profile.test_list.group_manager(PiglitGLTest, 'shaders') as g:
                     'textureGather'):
         g(['zero-tex-coord', subtest])
 
+with profile.test_list.group_manager(PiglitGLTest, grouptools.join('shaders', 'glsl-uniform-interstage-limits')) as g:
+    g(['glsl-uniform-interstage-limits', '--subdivide', '5'], 'subdivide 5')
+    g(['glsl-uniform-interstage-limits', '--subdivide', '5', '--statechanges'], 'subdivide 5, statechanges')
+    g(['glsl-uniform-interstage-limits', '-v', '300', '-f', '300'], '300 VS, 300 FS')
+    g(['glsl-uniform-interstage-limits', '-v', '350', '-f', '350'], '350 VS, 350 FS')
+    g(['glsl-uniform-interstage-limits', '-v', '400', '-f', '400'], '400 VS, 400 FS')
+    g(['glsl-uniform-interstage-limits', '-v', '520', '-f', '1'], '520 VS, 1 FS')
+    g(['glsl-uniform-interstage-limits', '-v', '1', '-f', '520'], '1 VS, 520 FS')
+
 with profile.test_list.group_manager(
         PiglitGLTest, 'glx',
         require_platforms=['glx', 'mixed_glx_egl']) as g:
