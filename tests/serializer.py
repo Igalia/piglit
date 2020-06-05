@@ -25,7 +25,7 @@ import argparse
 import gzip
 import os
 import sys
-import xml.etree.cElementTree as et
+import xml.etree.ElementTree as et
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 

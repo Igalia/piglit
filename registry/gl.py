@@ -45,8 +45,8 @@ try:
     import lxml.etree as etree
     _log_debug('etree is lxml.etree')
 except ImportError:
-    import xml.etree.cElementTree as etree
-    _log_debug('etree is xml.etree.cElementTree')
+    import xml.etree.ElementTree as etree
+    _log_debug('etree is xml.etree.ElementTree')
 
 
 def parse():

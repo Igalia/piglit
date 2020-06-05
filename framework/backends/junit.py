@@ -26,7 +26,7 @@ import shutil
 try:
     from lxml import etree
 except ImportError:
-    import xml.etree.cElementTree as etree
+    import xml.etree.ElementTree as etree
 try:
     import simplejson as json
 except ImportError:

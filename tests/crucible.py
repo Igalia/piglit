@@ -32,7 +32,7 @@ import tempfile
 try:
     from lxml import etree
 except ImportError:
-    import xml.etree.cElementTree as etree
+    import xml.etree.ElementTree as etree
 
 from framework import grouptools, backends, exceptions
 from framework import status
@@ -66,7 +66,7 @@ class CrucibleTest(Test):
             self.result.result = result.name
             super(CrucibleTest, self).interpret_result()
         except etree.ParseError:
-            # This error is what cElementTree will generate, and is the parent
+            # This error is what ElementTree will generate, and is the parent
             # of what lxml will generate.
             self.result.result = status.CRASH
         finally:

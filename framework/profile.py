@@ -39,7 +39,7 @@ import multiprocessing
 import multiprocessing.dummy
 import os
 import re
-import xml.etree.cElementTree as et
+import xml.etree.ElementTree as et
 
 from framework import grouptools, exceptions, status
 from framework.dmesg import get_dmesg
