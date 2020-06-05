@@ -104,7 +104,6 @@ piglit_display(void)
 		"	gl_FragColor = v[i];\n"
 		"}\n";
 
-	char *vs_source, *fs_source;
 	GLint max_size, vec4s, i_location;
 	GLuint vs, fs, prog, bo;
 	GLenum target;
@@ -152,21 +151,22 @@ piglit_display(void)
 
 	switch (target) {
 	case GL_VERTEX_SHADER:
-		(void)!asprintf(&vs_source, vs_ubo_template, vec4s);
-		(void)!asprintf(&fs_source, "%s", fs_template);
 		printf("Testing VS with uniform block vec4 v[%d]\n", vec4s);
+		vs = piglit_compile_shader_formatted(GL_VERTEX_SHADER,
+						     vs_ubo_template, vec4s);
+		fs = piglit_compile_shader_formatted(GL_FRAGMENT_SHADER,
+						     "%s", fs_template);
 		break;
 	case GL_FRAGMENT_SHADER:
-		(void)!asprintf(&vs_source, "%s", vs_template);
-		(void)!asprintf(&fs_source, fs_ubo_template, vec4s);
 		printf("Testing FS with uniform block vec4 v[%d]\n", vec4s);
+		vs = piglit_compile_shader_formatted(GL_VERTEX_SHADER,
+						     "%s", vs_template);
+		fs = piglit_compile_shader_formatted(GL_FRAGMENT_SHADER,
+						     fs_ubo_template, vec4s);
 		break;
 	default:
 		piglit_report_result(PIGLIT_FAIL);
 	}
-
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
 
 	prog = glCreateProgram();
 	glAttachShader(prog, vs);

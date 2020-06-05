@@ -89,7 +89,6 @@ piglit_init(int argc, char **argv)
 	char name[10];
 	bool use_gs = piglit_get_gl_version() >= 32;
 	const char *header;
-	char *temp_source;
 	int num_uniforms_used = 0;
 
 	if (use_gs) {
@@ -101,22 +100,18 @@ piglit_init(int argc, char **argv)
 
 	prog = glCreateProgram();
 
-	(void)!asprintf(&temp_source, vs_source, header);
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, temp_source);
+	vs = piglit_compile_shader_formatted(GL_VERTEX_SHADER, vs_source, header);
 	glAttachShader(prog, vs);
-	free(temp_source);
 
 	if (use_gs) {
-		(void)!asprintf(&temp_source, gs_source, header);
-		gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, temp_source);
+		gs = piglit_compile_shader_formatted(GL_GEOMETRY_SHADER,
+						     gs_source, header);
 		glAttachShader(prog, gs);
-		free(temp_source);
 	}
 
-	(void)!asprintf(&temp_source, fs_source, header);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, temp_source);
+	fs = piglit_compile_shader_formatted(GL_FRAGMENT_SHADER,
+					     fs_source, header);
 	glAttachShader(prog, fs);
-	free(temp_source);
 
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {

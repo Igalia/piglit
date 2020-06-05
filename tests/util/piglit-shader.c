@@ -182,6 +182,29 @@ piglit_compile_shader_text(GLenum target, const char *text)
         return shader;
 }
 
+/**
+ * Convenience function to compile a GLSL shader with printf formatting.
+ * Throws PIGLIT_FAIL on error, terminating the program.
+ */
+GLuint
+piglit_compile_shader_formatted(GLenum target, const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	char *source;
+	int ret = vasprintf(&source, fmt, ap);
+	va_end(ap);
+
+	if (ret == -1) {
+		fprintf(stderr, "vaspritnf failed\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	GLuint shader = piglit_compile_shader_text(target, source);
+	free(source);
+	return shader;
+}
+
 static GLboolean
 link_check_status(GLint prog, FILE *output)
 {
