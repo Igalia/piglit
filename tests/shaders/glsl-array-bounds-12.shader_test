@@ -10,7 +10,7 @@ GLSL >= 1.20
 #version 120
 
 float array[5];
-uniform int idx;
+uniform int idx = -2;
 
 void main()
 {
@@ -25,7 +25,6 @@ void main()
 }
 
 [test]
-uniform int idx -2
 clear color 0.0 0.0 0.0 0.0
 clear
 draw rect -1 -1 2 2
