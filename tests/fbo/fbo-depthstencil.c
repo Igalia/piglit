@@ -364,8 +364,11 @@ static enum piglit_result test_copy(void)
 		glBlitFramebufferEXT(BUF_SIZE/2+1, BUF_SIZE/2+1, BUF_SIZE, BUF_SIZE,
 				     0, 0, BUF_SIZE/2, BUF_SIZE/2,
 				     GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
-	else
+	else {
+	        glDisable(GL_STENCIL_TEST);
 		glCopyPixels(BUF_SIZE/2+1, BUF_SIZE/2+1, BUF_SIZE/2, BUF_SIZE/2, GL_DEPTH_STENCIL);
+	        glEnable(GL_STENCIL_TEST);
+        }
 
 	/* Initialize the other corners. */
 	glStencilFunc(GL_ALWAYS, 0x6666 & stencilmask, ~0);
