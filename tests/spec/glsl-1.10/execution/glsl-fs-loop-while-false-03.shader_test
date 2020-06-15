@@ -5,8 +5,8 @@ GLSL >= 1.10
 
 [fragment shader]
 
-# we're relying on this being initialized to (0.0, 0.0) since it's going to be
-# eliminated by nir later, and we can't initialize uniforms in GLSL 1.10
+// we're relying on this being initialized to (0.0, 0.0) since it's going to be
+// eliminated by nir later, and we can't initialize uniforms in GLSL 1.10
 uniform vec2 u;
 
 void main()
