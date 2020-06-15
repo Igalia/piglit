@@ -9,7 +9,7 @@ GLSL >= 1.20
  */
 #version 120
 
-float array[5];
+float array[5] = float[5](1.0, 0.0, 1.0, 0.0, 1.0);
 uniform int idx = -2;
 
 void main()
