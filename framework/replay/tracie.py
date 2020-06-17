@@ -38,6 +38,7 @@ import dump_trace_images
 import parsers
 from download_utils import ensure_file
 from image_checksum import hexdigest_from_image
+from query_traces_yaml import query as query_traces_yaml
 from upload_utils import upload_file
 
 TRACES_DB_PATH = "./traces-db/"
@@ -117,7 +118,7 @@ def write_results(results):
 
 
 def from_yaml(args):
-    y = yaml.safe_load(args.file)
+    y = yaml.safe_load(args.yaml_file)
 
     if "traces-db" in y:
         download_url = y["traces-db"]["download-url"]
@@ -149,15 +150,46 @@ def from_yaml(args):
 
 def main(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', required=True,
-                        help=('the name of the traces.yml file listing traces '
-                              'and their checksums for each device'))
-    parser.add_argument('--device-name', required=True,
-                        help=('the name of the graphics device '
-                              'used to replay traces'))
 
-    args = parser.parse_args(args)
-    return run(args.file, args.device_name)
+    # Add a destination due to
+    # https://github.com/python/cpython/pull/3027#issuecomment-330910633
+    subparsers = parser.add_subparsers(dest='command', required=True)
+
+    parser_yaml = subparsers.add_parser('yaml', parents=[parsers.DEVICE,
+                                                         parsers.YAML])
+    parser_yaml.set_defaults(func=from_yaml)
+
+    parser_trace = subparsers.add_parser('trace', parents=[parsers.DEVICE])
+    parser_trace.add_argument(
+        '-u', '--download-url', default=None,
+        help=('the URL from which to download the traces'))
+    parser_trace.add_argument(
+        '-p', '--path', required=True,
+        help='the path to the trace file in the traces-db repository')
+    parser_trace.add_argument(
+        '-e', '--expected-checksum', required=True,
+        help=('the expected checksum value to obtain '
+              'when replaying a trace in a specific device'))
+    parser_trace.set_defaults(func=trace)
+
+    parser_query = subparsers.add_parser(
+        'query',
+        add_help=False,
+        help=('Queries for specific information '
+              'from a traces description file listing traces '
+              'and their checksums for each device.'))
+    parser_query.set_defaults(func=query_traces_yaml)
+
+    # Parse the known arguments (tracie.py yaml or tracie.py query for
+    # example), and then pass the arguments that this parser doesn't
+    # know about to that executable
+    parsed, args = parser.parse_known_args(input_)
+    try:
+        runner = parsed.func
+    except AttributeError:
+        parser.print_help()
+        return False
+    return runner(args or parsed)
 
 
 if __name__ == "__main__":
