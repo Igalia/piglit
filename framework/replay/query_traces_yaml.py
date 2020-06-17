@@ -37,6 +37,16 @@ def trace_devices(trace):
     return [e['device'] for e in trace['expectations']]
 
 
+def trace_checksum(trace, device_name):
+    try:
+        expectation = next(e for e in trace['expectations']
+                           if e['device'] == device_name)
+    except StopIteration:
+        return ""
+
+    return expectation['checksum']
+
+
 def cmd_traces_db_download_url(args):
     y = yaml.safe_load(args.yaml_file)
     print(y['traces-db']['download-url'])
@@ -58,18 +68,24 @@ def cmd_traces(args):
     if len(traces) == 0:
         return
 
-    print('\n'.join((t['path'] for t in traces)))
+    if args.checksum:
+        print('\n'.join(((t['path'] + '\n' + trace_checksum(t, args.device_name))
+                         for t in traces)))
+    else:
+        print('\n'.join((t['path'] for t in traces)))
 
 
 def cmd_checksum(args):
     y = yaml.safe_load(args.yaml_file)
 
     traces = y['traces']
-    trace = next(t for t in traces if t['path'] == args.trace_path)
-    expectation = next(e for e in trace['expectations']
-                       if e['device'] == args.device_name)
+    try:
+        trace = next(t for t in traces if t['path'] == args.trace_path)
+    except StopIteration:
+        print("")
+        return
 
-    print(expectation['checksum'])
+    print(trace_checksum(trace, args.device_name))
 
 
 def query(input_):
@@ -92,6 +108,11 @@ def query(input_):
         default=",".join(all_trace_type_names()),
         help=('the types of traces to look for in recursive dir walks '
               '(by default all types)'))
+    parser_traces.add_argument(
+        '-c', '--checksum',
+        required=False,
+        action='store_true',
+        help='whether to print the checksum below every trace')
     parser_traces.set_defaults(func=cmd_traces)
 
     parser_checksum = subparsers.add_parser('checksum',
