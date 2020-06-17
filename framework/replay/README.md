@@ -100,8 +100,8 @@ Mesa traces CI uses a set of scripts to replay traces and check the output
 against reference checksums.
 
 The high level script [tracie.py](.gitlab-ci/tracie/tracie.py) accepts
-commands to use a `yaml` traces definition file or the description of
-an individual `trace`:
+commands to use a `yaml` traces definition file, `query` for data from
+a traces definition file, or the description of an individual `trace`:
 
 Examples:
 
@@ -109,6 +109,15 @@ Examples:
    $ tracie.py yaml \
                --device-name gl-vmware-llvmpipe \
                --file .gitlab-ci/traces.yml
+   ```
+
+   ```sh
+   $ tracie.py query \
+               --file .gitlab-ci/traces.yml \
+               traces \
+               --device-name gl-vmware-llvmpipe \
+               --trace-types apitrace,renderdoc \
+               --checksum
    ```
 
    ```sh

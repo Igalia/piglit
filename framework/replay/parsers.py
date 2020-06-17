@@ -30,5 +30,15 @@ DEVICE = argparse.ArgumentParser(add_help=False)
 DEVICE.add_argument(
     '-d', '--device-name',
     dest="device_name",
-    required=True,
+    required=False,
+    default="",
     help='the name of the graphics device used to replay traces')
+
+YAML = argparse.ArgumentParser(add_help=False)
+YAML.add_argument(
+    '-f', '--file',
+    dest="yaml_file",
+    required=True,
+    type=argparse.FileType("r"),
+    help=('the name of the traces.yml file listing traces '
+          'and their checksums for each device'))

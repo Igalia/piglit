@@ -25,8 +25,10 @@
 # SPDX-License-Identifier: MIT
 
 import argparse
+import sys
 import yaml
 
+import parsers
 from traceutil import all_trace_type_names, trace_type_from_name
 from traceutil import trace_type_from_filename
 
@@ -35,25 +37,19 @@ def trace_devices(trace):
     return [e['device'] for e in trace['expectations']]
 
 
-def cmd_traces_db_gitlab_project_url(args):
-    with open(args.file, 'r') as f:
-        y = yaml.safe_load(f)
-    print(y['traces-db']['gitlab-project-url'])
-
-
-def cmd_traces_db_commit(args):
-    with open(args.file, 'r') as f:
-        y = yaml.safe_load(f)
-    print(y['traces-db']['commit'])
+def cmd_traces_db_download_url(args):
+    y = yaml.safe_load(args.yaml_file)
+    print(y['traces-db']['download-url'])
 
 
 def cmd_traces(args):
-    with open(args.file, 'r') as f:
-        y = yaml.safe_load(f)
+    y = yaml.safe_load(args.yaml_file)
 
     traces = y['traces']
+    split_trace_types = [trace_type_from_name(t) for t
+                         in args.trace_types.split(",")]
     traces = filter(lambda t: trace_type_from_filename(t['path'])
-                    in args.trace_types, traces)
+                    in split_trace_types, traces)
     if args.device_name:
         traces = filter(lambda t: args.device_name in trace_devices(t), traces)
 
@@ -66,8 +62,7 @@ def cmd_traces(args):
 
 
 def cmd_checksum(args):
-    with open(args.file, 'r') as f:
-        y = yaml.safe_load(f)
+    y = yaml.safe_load(args.yaml_file)
 
     traces = y['traces']
     trace = next(t for t in traces if t['path'] == args.trace_path)
@@ -77,45 +72,42 @@ def cmd_checksum(args):
     print(expectation['checksum'])
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--file', required=True,
-                        help='the name of the yaml file')
+def query(input_):
+    """ Parser for tracie query command """
+    parser = argparse.ArgumentParser(parents=[parsers.YAML])
 
-    subparsers = parser.add_subparsers(help='sub-command help')
+    # Add a destination due to
+    # https://github.com/python/cpython/pull/3027#issuecomment-330910633
+    subparsers = parser.add_subparsers(dest='command', required=True)
 
-    parser_traces_db_gitlab_project_url = subparsers.add_parser(
-        'traces_db_gitlab_project_url')
-    parser_traces_db_gitlab_project_url.set_defaults(
-        func=cmd_traces_db_gitlab_project_url)
+    parser_traces_db_download_url = subparsers.add_parser(
+        'traces_db_download_url')
+    parser_traces_db_download_url.set_defaults(
+        func=cmd_traces_db_download_url)
 
-    parser_traces_db_commit = subparsers.add_parser('traces_db_commit')
-    parser_traces_db_commit.set_defaults(func=cmd_traces_db_commit)
-
-    parser_traces = subparsers.add_parser('traces')
-    parser_traces.add_argument('--device-name', required=False,
-                               help="the name of the graphics device used to "
-                                     "produce images")
+    parser_traces = subparsers.add_parser('traces', parents=[parsers.DEVICE])
     parser_traces.add_argument(
-        '--trace-types', required=False,
+        '-t', '--trace-types',
+        required=False,
         default=",".join(all_trace_type_names()),
         help=('the types of traces to look for in recursive dir walks '
               '(by default all types)'))
     parser_traces.set_defaults(func=cmd_traces)
 
-    parser_checksum = subparsers.add_parser('checksum')
-    parser_checksum.add_argument('--device-name', required=True,
-                               help="the name of the graphics device used to "
-                                     "produce images")
+    parser_checksum = subparsers.add_parser('checksum',
+                                            parents=[parsers.DEVICE])
     parser_checksum.add_argument('trace_path')
     parser_checksum.set_defaults(func=cmd_checksum)
 
-    args = parser.parse_args()
-    if hasattr(args, 'trace_types'):
-        args.trace_types = [trace_type_from_name(t) for t
-                            in args.trace_types.split(",")]
+    args = parser.parse_args(input_)
 
     args.func(args)
+
+
+def main():
+    input_ = sys.argv[1:]
+
+    query(input_)
 
 
 if __name__ == "__main__":
