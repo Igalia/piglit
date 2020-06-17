@@ -26,29 +26,34 @@
 
 import argparse
 import yaml
+
 from traceutil import all_trace_type_names, trace_type_from_name
 from traceutil import trace_type_from_filename
 
+
 def trace_devices(trace):
     return [e['device'] for e in trace['expectations']]
+
 
 def cmd_traces_db_gitlab_project_url(args):
     with open(args.file, 'r') as f:
         y = yaml.safe_load(f)
     print(y['traces-db']['gitlab-project-url'])
 
+
 def cmd_traces_db_commit(args):
     with open(args.file, 'r') as f:
         y = yaml.safe_load(f)
     print(y['traces-db']['commit'])
+
 
 def cmd_traces(args):
     with open(args.file, 'r') as f:
         y = yaml.safe_load(f)
 
     traces = y['traces']
-    traces = filter(lambda t: trace_type_from_filename(t['path']) in args.trace_types,
-                    traces)
+    traces = filter(lambda t: trace_type_from_filename(t['path'])
+                    in args.trace_types, traces)
     if args.device_name:
         traces = filter(lambda t: args.device_name in trace_devices(t), traces)
 
@@ -59,15 +64,18 @@ def cmd_traces(args):
 
     print('\n'.join((t['path'] for t in traces)))
 
+
 def cmd_checksum(args):
     with open(args.file, 'r') as f:
         y = yaml.safe_load(f)
 
     traces = y['traces']
     trace = next(t for t in traces if t['path'] == args.trace_path)
-    expectation = next(e for e in trace['expectations'] if e['device'] == args.device_name)
+    expectation = next(e for e in trace['expectations']
+                       if e['device'] == args.device_name)
 
     print(expectation['checksum'])
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -76,8 +84,10 @@ def main():
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
-    parser_traces_db_gitlab_project_url = subparsers.add_parser('traces_db_gitlab_project_url')
-    parser_traces_db_gitlab_project_url.set_defaults(func=cmd_traces_db_gitlab_project_url)
+    parser_traces_db_gitlab_project_url = subparsers.add_parser(
+        'traces_db_gitlab_project_url')
+    parser_traces_db_gitlab_project_url.set_defaults(
+        func=cmd_traces_db_gitlab_project_url)
 
     parser_traces_db_commit = subparsers.add_parser('traces_db_commit')
     parser_traces_db_commit.set_defaults(func=cmd_traces_db_commit)
@@ -86,10 +96,11 @@ def main():
     parser_traces.add_argument('--device-name', required=False,
                                help="the name of the graphics device used to "
                                      "produce images")
-    parser_traces.add_argument('--trace-types', required=False,
-                               default=",".join(all_trace_type_names()),
-                               help="the types of traces to look for in recursive "
-                                    "dir walks " "(by default all types)")
+    parser_traces.add_argument(
+        '--trace-types', required=False,
+        default=",".join(all_trace_type_names()),
+        help=('the types of traces to look for in recursive dir walks '
+              '(by default all types)'))
     parser_traces.set_defaults(func=cmd_traces)
 
     parser_checksum = subparsers.add_parser('checksum')
@@ -101,9 +112,11 @@ def main():
 
     args = parser.parse_args()
     if hasattr(args, 'trace_types'):
-        args.trace_types = [trace_type_from_name(t) for t in args.trace_types.split(",")]
+        args.trace_types = [trace_type_from_name(t) for t
+                            in args.trace_types.split(",")]
 
     args.func(args)
+
 
 if __name__ == "__main__":
     main()
