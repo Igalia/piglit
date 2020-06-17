@@ -102,7 +102,11 @@ against reference checksums.
 The high level script [tracie.py](.gitlab-ci/tracie/tracie.py) accepts
 a traces definition file and the name of the device to be tested:
 
-    tracie.py --file .gitlab-ci/traces.yml --device-name gl-vmware-llvmpipe
+Examples:
+
+   ```sh
+   $ tracie.py --file .gitlab-ci/traces.yml --device-name gl-vmware-llvmpipe
+   ```
 
 tracie.py copies the produced artifacts to the `$CI_PROJECT_DIR/result`
 directory. By default, created images from traces are only stored in case of a
@@ -123,8 +127,13 @@ appended.
 
 Examples:
 
-    python3 dump_traces_images.py --device-name=gl-vmware-llvmpipe mytrace.trace
-    python3 dump_traces_images.py --device-name=gl-vmware-llvmpipe --calls=2075,3300 mytrace.trace
+   ```sh
+   $ python3 dump_traces_images.py --device-name=gl-vmware-llvmpipe mytrace.trace
+   ```
+
+   ```sh
+   $ python3 dump_traces_images.py --device-name=gl-vmware-llvmpipe --calls=2075,3300 mytrace.trace
+   ```
 
 ### Running the replay scripts locally
 
