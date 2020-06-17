@@ -42,7 +42,7 @@ VkImageUsageFlagBits color_usage = VK_IMAGE_USAGE_SAMPLED_BIT |
 				   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 VkImageUsageFlagBits depth_usage = VK_IMAGE_USAGE_SAMPLED_BIT |
 				   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-VkImageTiling color_tiling = VK_IMAGE_TILING_LINEAR;
+VkImageTiling color_tiling = VK_IMAGE_TILING_OPTIMAL;
 VkImageTiling depth_tiling = VK_IMAGE_TILING_OPTIMAL;
 VkImageLayout color_in_layout = VK_IMAGE_LAYOUT_UNDEFINED;
 VkImageLayout color_end_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
