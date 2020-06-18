@@ -36,9 +36,9 @@ from PIL import Image
 
 import dump_trace_images
 import parsers
+import query_traces_yaml as qty
 from download_utils import ensure_file
 from image_checksum import hexdigest_from_image
-from query_traces_yaml import query as query_traces_yaml
 from upload_utils import upload_file
 
 TRACES_DB_PATH = "./traces-db/"
@@ -118,25 +118,20 @@ def write_results(results):
 
 
 def from_yaml(args):
-    y = yaml.safe_load(args.yaml_file)
+    y = qty.load_yaml(args.yaml_file)
 
-    if "traces-db" in y:
-        download_url = y["traces-db"]["download-url"]
-    else:
-        download_url = None
+    download_url = qty.download_url(y)
 
-    traces = y['traces'] or []
     all_ok = True
     results = {}
-    for trace in traces:
-        for expectation in trace['expectations']:
-            if expectation['device'] == args.device_name:
-                ok, result = gitlab_check_trace(download_url,
-                                                args.device_name,
-                                                trace['path'],
-                                                expectation['checksum'])
-                all_ok = all_ok and ok
-                results.update(result)
+    t_list = qty.traces(y, '', args.device_name, True)
+    for t in t_list:
+        ok, result = gitlab_check_trace(download_url,
+                                        args.device_name,
+                                        t['path'],
+                                        t['checksum'])
+        all_ok = all_ok and ok
+        results.update(result)
 
     os.makedirs(RESULTS_PATH, exist_ok=True)
     with open(os.path.join(RESULTS_PATH, 'results.yml'), 'w') as f:
@@ -178,7 +173,7 @@ def main(args):
         help=('Queries for specific information '
               'from a traces description file listing traces '
               'and their checksums for each device.'))
-    parser_query.set_defaults(func=query_traces_yaml)
+    parser_query.set_defaults(func=qty.query)
 
     # Parse the known arguments (tracie.py yaml or tracie.py query for
     # example), and then pass the arguments that this parser doesn't
