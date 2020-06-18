@@ -29,8 +29,11 @@ import sys
 import yaml
 
 import parsers
-from traceutil import all_trace_type_names, trace_type_from_name
-from traceutil import trace_type_from_filename
+from traceutil import trace_type_from_filename, trace_type_from_name
+
+
+def load_yaml(y):
+    return yaml.safe_load(y) or {}
 
 
 def trace_devices(trace):
@@ -47,36 +50,57 @@ def trace_checksum(trace, device_name):
     return expectation['checksum']
 
 
-def cmd_traces_db_download_url(args):
-    y = yaml.safe_load(args.yaml_file)
-    print(y['traces-db']['download-url'])
+def download_url(y):
+    return y["traces-db"]["download-url"] if "traces-db" in y else None
 
 
-def cmd_traces(args):
-    y = yaml.safe_load(args.yaml_file)
+def traces(y, trace_types, device_name, checksum):
+    traces = y['traces'] or []
 
-    traces = y['traces']
-    split_trace_types = [trace_type_from_name(t) for t
-                         in args.trace_types.split(",")]
-    traces = filter(lambda t: trace_type_from_filename(t['path'])
-                    in split_trace_types, traces)
-    if args.device_name:
-        traces = filter(lambda t: args.device_name in trace_devices(t), traces)
+    if trace_types != '':
+        split_trace_types = [trace_type_from_name(t) for t
+                             in trace_types.split(",")]
+        traces = filter(lambda t: trace_type_from_filename(t['path'])
+                        in split_trace_types, traces)
+    if device_name:
+        traces = filter(lambda t: device_name in trace_devices(t), traces)
 
     traces = list(traces)
 
-    if len(traces) == 0:
-        return
+    result = list()
+    if checksum:
+        for t in traces:
+            result.append({'path': t['path'],
+                           'checksum': trace_checksum(t, device_name)})
+    else:
+        for t in traces:
+            result.append({'path': t['path']})
+
+    return result
+
+
+def cmd_traces_db_download_url(args):
+    y = load_yaml(args.yaml_file)
+
+    url = download_url(y) or ""
+
+    print(url)
+
+
+def cmd_traces(args):
+    y = load_yaml(args.yaml_file)
+
+    t_list = traces(y, args.trace_types, args.device_name, args.checksum)
 
     if args.checksum:
-        print('\n'.join(((t['path'] + '\n' + trace_checksum(t, args.device_name))
-                         for t in traces)))
+        print('\n'.join(((t['path'] + '\n' + t['checksum'])
+                         for t in t_list)))
     else:
-        print('\n'.join((t['path'] for t in traces)))
+        print('\n'.join((t['path'] for t in t_list)))
 
 
 def cmd_checksum(args):
-    y = yaml.safe_load(args.yaml_file)
+    y = load_yaml(args.yaml_file)
 
     traces = y['traces']
     try:
@@ -105,9 +129,10 @@ def query(input_):
     parser_traces.add_argument(
         '-t', '--trace-types',
         required=False,
-        default=",".join(all_trace_type_names()),
-        help=('the types of traces to look for in recursive dir walks '
-              '(by default all types)'))
+        default='',
+        help=('a comma separated list of trace types to look for '
+              'in recursive dir walks. '
+              'If none are provide, all types are used by default'))
     parser_traces.add_argument(
         '-c', '--checksum',
         required=False,
