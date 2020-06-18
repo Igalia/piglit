@@ -36,4 +36,9 @@ load_shader(const char *shader_file,
 bool
 check_bound_fbo_status(void);
 
+bool
+dump_image_rgba(const char *fname,
+		int w, int h,
+		unsigned char *data);
+
 #endif /* HELPERS_H */

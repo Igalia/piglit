@@ -125,7 +125,19 @@ vk_create_ext_image(struct vk_ctx *ctx,
 		    struct vk_image_props *props,
 		    struct vk_image_obj *img_obj);
 
-void vk_destroy_ext_image(struct vk_ctx *ctx, struct vk_image_obj *img_obj);
+bool
+vk_create_ext_buffer(struct vk_ctx *ctx,
+		     uint32_t sz,
+		     VkBufferUsageFlagBits usage,
+		     struct vk_buf *bo);
+
+void
+vk_destroy_ext_image(struct vk_ctx *ctx,
+		     struct vk_image_obj *img_obj);
+
+void
+vk_destroy_ext_bo(struct vk_ctx *ctx,
+		  struct vk_buf *bo);
 
 bool
 vk_fill_ext_image_props(struct vk_ctx *ctx,
@@ -161,6 +173,7 @@ bool
 vk_create_buffer(struct vk_ctx *ctx,
 		 uint32_t sz,
 		 VkBufferUsageFlagBits usage,
+		 void *pnext,
 		 struct vk_buf *bo);
 
 bool
@@ -197,4 +210,12 @@ void
 vk_destroy_semaphores(struct vk_ctx *ctx,
 		      struct vk_semaphores *semaphores);
 
+
+void
+vk_transition_image_layout(struct vk_image_att *img_att,
+			   VkCommandBuffer cmd_buf,
+			   VkImageLayout old_layout,
+			   VkImageLayout new_layout,
+			   uint32_t src_queue_family_index,
+			   uint32_t dst_queue_family_index);
 #endif /* VK_H */

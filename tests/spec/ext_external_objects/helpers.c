@@ -75,3 +75,25 @@ check_bound_fbo_status(void)
 	}
 	return true;
 }
+
+bool
+dump_image_rgba(const char *fname,
+		int w, int h,
+		unsigned char *data)
+{
+	FILE *fp;
+	int i;
+
+	if (!(fp = fopen(fname, "wb"))) {
+		fprintf(stderr, "Failed to open file: %s.\n", fname);
+		return false;
+	}
+
+	fprintf(fp, "P3\n%d %d\n255\n", w, h);
+	for (i = 0; i < w * h; i++) {
+		fprintf(fp, "%d %d %d\n", data[0], data[1], data[2]);
+		data += 4;
+	}
+	fclose(fp);
+	return true;
+}

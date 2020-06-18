@@ -358,7 +358,7 @@ vk_init(uint32_t w,
 		goto fail;
 	}
 
-	if (!vk_create_buffer(&vk_core, w * h * 4 * sizeof(float), VK_BUFFER_USAGE_TRANSFER_DST_BIT, &vk_bo)) {
+	if (!vk_create_buffer(&vk_core, w * h * 4 * sizeof(float), VK_BUFFER_USAGE_TRANSFER_DST_BIT, 0, &vk_bo)) {
 		fprintf(stderr, "Failed to create buffer.\n");
 		goto fail;
 	}

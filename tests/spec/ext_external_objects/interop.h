@@ -72,6 +72,13 @@ gl_gen_tex_from_mem_obj(const struct vk_image_props *props,
 			GLuint *tex);
 
 bool
+gl_gen_buf_from_mem_obj(GLuint mem_obj,
+			GLenum gl_target,
+			size_t sz,
+			uint32_t offset,
+			GLuint *bo);
+
+bool
 gl_create_semaphores_from_vk(const struct vk_ctx *ctx,
 			     const struct vk_semaphores *vk_smps,
 			     struct gl_ext_semaphores *gl_smps);

@@ -197,14 +197,15 @@ create_pipeline_cache(VkDevice dev)
 }
 
 static VkCommandPool
-create_cmd_pool(VkDevice dev)
+create_cmd_pool(struct vk_ctx *ctx)
 {
 	VkCommandPoolCreateInfo cmd_pool_info;
 	VkCommandPool cmd_pool;
+	VkDevice dev = ctx->dev;
 
 	memset(&cmd_pool_info, 0, sizeof cmd_pool_info);
 	cmd_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	cmd_pool_info.queueFamilyIndex = 0;
+	cmd_pool_info.queueFamilyIndex = ctx->qfam_idx;
 	cmd_pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
 	if (vkCreateCommandPool(dev, &cmd_pool_info, 0, &cmd_pool) != VK_SUCCESS)
@@ -335,8 +336,33 @@ get_aspect_from_depth_format(VkFormat depth_format)
 	default:
 		break;
 	}
-	fprintf(stderr, "Cannot select a depth or stencil aspect mask for the selected depth format. Default used.\n");
-	return VK_IMAGE_ASPECT_DEPTH_BIT;
+	return VK_NULL_HANDLE;
+}
+
+static VkPipelineStageFlags
+get_pipeline_stage_flags(const VkImageLayout layout)
+{
+	switch (layout) {
+	case VK_IMAGE_LAYOUT_UNDEFINED:
+		return VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+	case VK_IMAGE_LAYOUT_GENERAL:
+		return VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+	case VK_IMAGE_LAYOUT_PREINITIALIZED:
+		return VK_PIPELINE_STAGE_HOST_BIT;
+	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+	case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		return VK_PIPELINE_STAGE_TRANSFER_BIT;
+	case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		return VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
+		       VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
+	case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+		return VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	default:
+		return 0;
+	}
+	return 0;
 }
 
 static void
@@ -856,6 +882,41 @@ fail:
 	return false;
 }
 
+static VkAccessFlagBits
+get_access_mask(const VkImageLayout layout)
+{
+	switch (layout) {
+	case VK_IMAGE_LAYOUT_UNDEFINED:
+		return 0;
+	case VK_IMAGE_LAYOUT_GENERAL:
+		return VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+		       VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT |
+		       VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_TRANSFER_READ_BIT |
+		       VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_HOST_WRITE_BIT |
+		       VK_ACCESS_HOST_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_PREINITIALIZED:
+		return VK_ACCESS_HOST_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		return VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		return VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
+	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+		return VK_ACCESS_TRANSFER_READ_BIT;
+	case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		return VK_ACCESS_TRANSFER_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+		return 0;
+	default:
+		return 0;
+	};
+
+	return 0;
+}
+
 bool
 vk_init_ctx_for_rendering(struct vk_ctx *ctx)
 {
@@ -869,7 +930,7 @@ vk_init_ctx_for_rendering(struct vk_ctx *ctx)
 		goto fail;
 	}
 
-	if ((ctx->cmd_pool = create_cmd_pool(ctx->dev)) == VK_NULL_HANDLE) {
+	if ((ctx->cmd_pool = create_cmd_pool(ctx)) == VK_NULL_HANDLE) {
 		fprintf(stderr, "Failed to create command pool.\n");
 		goto fail;
 	}
@@ -954,6 +1015,26 @@ fail:
 	return false;
 }
 
+bool
+vk_create_ext_buffer(struct vk_ctx *ctx,
+		     uint32_t sz,
+		     VkBufferUsageFlagBits usage,
+		     struct vk_buf *bo)
+{
+	VkExternalMemoryBufferCreateInfo ext_bo_info;
+
+	memset(&ext_bo_info, 0, sizeof ext_bo_info);
+	ext_bo_info.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO;
+	ext_bo_info.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
+
+	if (!vk_create_buffer(ctx, sz, usage, &ext_bo_info, bo)) {
+		fprintf(stderr, "Failed to allocate external buffer.\n");
+		return false;
+	}
+
+	return true;
+}
+
 void
 vk_destroy_ext_image(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 {
@@ -965,6 +1046,21 @@ vk_destroy_ext_image(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 	if (img_obj->mobj.mem != VK_NULL_HANDLE) {
 		vkFreeMemory(ctx->dev, img_obj->mobj.mem, 0);
 		img_obj->mobj.mem = VK_NULL_HANDLE;
+	}
+}
+
+void
+vk_destroy_ext_bo(struct vk_ctx *ctx,
+		  struct vk_buf *bo)
+{
+	if (bo->buf != VK_NULL_HANDLE) {
+		vkDestroyBuffer(ctx->dev, bo->buf, 0);
+		bo->buf = VK_NULL_HANDLE;
+	}
+
+	if (bo->mobj.mem != VK_NULL_HANDLE) {
+		vkFreeMemory(ctx->dev, bo->mobj.mem, 0);
+		bo->mobj.mem = VK_NULL_HANDLE;
 	}
 }
 
@@ -1073,6 +1169,7 @@ bool
 vk_create_buffer(struct vk_ctx *ctx,
 		 uint32_t sz,
 		 VkBufferUsageFlagBits usage,
+		 void *pnext,
 		 struct vk_buf *bo)
 {
 	VkBufferCreateInfo buf_info;
@@ -1086,6 +1183,8 @@ vk_create_buffer(struct vk_ctx *ctx,
 	buf_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	buf_info.size = sz;
 	buf_info.usage = usage;
+	buf_info.pNext = pnext;
+	buf_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateBuffer(ctx->dev, &buf_info, 0, &bo->buf) != VK_SUCCESS)
 		goto fail;
@@ -1264,6 +1363,10 @@ vk_draw(struct vk_ctx *ctx,
 	if (vkQueueSubmit(ctx->queue, 1, &submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
 		fprintf(stderr, "Failed to submit queue.\n");
 	}
+
+	/* FIXME */
+	if (!semaphores && !has_wait && !has_signal)
+		vkQueueWaitIdle(ctx->queue);
 }
 
 void
@@ -1274,6 +1377,7 @@ vk_copy_image_to_buffer(struct vk_ctx *ctx,
 {
 	VkCommandBufferBeginInfo cmd_begin_info;
 	VkSubmitInfo submit_info;
+	VkImageAspectFlagBits aspect_mask = get_aspect_from_depth_format(src_img->props.format);
 
 	/* VkCommandBufferBeginInfo */
 	memset(&cmd_begin_info, 0, sizeof cmd_begin_info);
@@ -1287,33 +1391,12 @@ vk_copy_image_to_buffer(struct vk_ctx *ctx,
 
 	vkBeginCommandBuffer(ctx->cmd_buf, &cmd_begin_info);
 	if (src_img->props.end_layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && dst_bo) {
-		VkImageMemoryBarrier render_finish_barrier = {
-			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-			.dstAccessMask = (VK_ACCESS_TRANSFER_READ_BIT |
-					  VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
-					  VK_ACCESS_COLOR_ATTACHMENT_READ_BIT),
-			.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-			.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = src_img->obj.img,
-			.subresourceRange = {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-				.baseMipLevel = 0,
-				.levelCount = 1,
-				.baseArrayLayer = 0,
-				.layerCount = 1
-			}
-		};
-
-		vkCmdPipelineBarrier(
-				ctx->cmd_buf,
-				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				VK_PIPELINE_STAGE_TRANSFER_BIT |
-				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				(VkDependencyFlags) 0, 0, NULL, 0, NULL,
-				1, &render_finish_barrier);
+		vk_transition_image_layout(src_img,
+					   ctx->cmd_buf,
+					   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+					   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+					   VK_QUEUE_FAMILY_EXTERNAL,
+					   VK_QUEUE_FAMILY_IGNORED);
 
 		/* copy image to buf */
 		VkBufferImageCopy copy_region = {
@@ -1321,10 +1404,10 @@ vk_copy_image_to_buffer(struct vk_ctx *ctx,
 			.bufferRowLength = w,
 			.bufferImageHeight = h,
 			.imageSubresource = {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.aspectMask = aspect_mask ? aspect_mask : VK_IMAGE_ASPECT_COLOR_BIT,
 				.mipLevel = 0,
 				.baseArrayLayer = 0,
-				.layerCount = 1
+				.layerCount = 1,
 			},
 			.imageOffset = { 0, 0, 0 },
 			.imageExtent = { w, h, 1 }
@@ -1335,29 +1418,12 @@ vk_copy_image_to_buffer(struct vk_ctx *ctx,
 				       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 				       dst_bo->buf, 1, &copy_region);
 
-		VkImageMemoryBarrier copy_finish_barrier = {
-			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.srcAccessMask = 0,
-			.dstAccessMask = 0,
-			.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-			.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = src_img->obj.img,
-			.subresourceRange = {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-				.baseMipLevel = 0,
-				.levelCount = 1,
-				.baseArrayLayer = 0,
-				.layerCount = 1
-			}
-		};
-
-		vkCmdPipelineBarrier(ctx->cmd_buf,
-				     VK_PIPELINE_STAGE_TRANSFER_BIT,
-				     VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-				     (VkDependencyFlags) 0, 0, NULL, 0, NULL,
-				     1, &copy_finish_barrier);
+		vk_transition_image_layout(src_img,
+					   ctx->cmd_buf,
+					   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+					   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+					   VK_QUEUE_FAMILY_EXTERNAL,
+					   VK_QUEUE_FAMILY_IGNORED);
 
 		VkBufferMemoryBarrier write_finish_buffer_memory_barrier = {
 			.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
@@ -1423,4 +1489,35 @@ vk_destroy_semaphores(struct vk_ctx *ctx,
 		vkDestroySemaphore(ctx->dev, semaphores->vk_frame_ready, 0);
 	if (semaphores->gl_frame_done)
 		vkDestroySemaphore(ctx->dev, semaphores->gl_frame_done, 0);
+}
+
+void
+vk_transition_image_layout(struct vk_image_att *img_att,
+			   VkCommandBuffer cmd_buf,
+			   VkImageLayout old_layout,
+			   VkImageLayout new_layout,
+			   uint32_t src_queue_fam_idx,
+			   uint32_t dst_queue_fam_idx)
+{
+	VkImageMemoryBarrier barrier;
+	struct vk_image_props props = img_att->props;
+	VkImageAspectFlagBits aspect_mask = get_aspect_from_depth_format(props.format);
+
+	memset(&barrier, 0, sizeof barrier);
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.srcAccessMask = get_access_mask(old_layout);
+	barrier.dstAccessMask = get_access_mask(new_layout);
+	barrier.oldLayout = old_layout;
+	barrier.newLayout = new_layout;
+	barrier.srcQueueFamilyIndex = src_queue_fam_idx;
+	barrier.dstQueueFamilyIndex = dst_queue_fam_idx;
+	barrier.image = img_att->obj.img;
+	barrier.subresourceRange.aspectMask = aspect_mask ? aspect_mask : VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.layerCount = 1;
+
+	vkCmdPipelineBarrier(cmd_buf,
+			     get_pipeline_stage_flags(old_layout),
+			     get_pipeline_stage_flags(new_layout),
+			     0, 0, VK_NULL_HANDLE, 0, VK_NULL_HANDLE, 1, &barrier);
 }
