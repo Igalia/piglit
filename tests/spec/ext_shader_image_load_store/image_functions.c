@@ -30,13 +30,11 @@
  *     EXT_shader_image_load_store, we simply build a program to verify that
  *     they're available.
  *   - for the 2 functions that only exist in EXT (atomicIncWrap and atomicDecWrap),
- *     we verify their behavior.
+ *     we verify their behavior. Note: on nvidia this test needs to be used with
+ *     "-fbo" argument.
  */
 
 #include "piglit-util-gl.h"
-
-#define WRAP_VALUE 13
-#define TEX_WIDTH 50
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -46,24 +44,16 @@ PIGLIT_GL_TEST_CONFIG_END
 
 struct test_data {
 	const char* function_name;
-	int expected_value;
+	unsigned (*compute_ref_value) (int num_exec, unsigned wrap);
 	const char* type;
-	GLuint (*create_texture) (void);
+	GLuint (*create_texture) (unsigned tex_width);
 	void (*read_texture) (void* data, size_t s);
 };
 
-static const char* vs =
-	"#version 150\n"
-	"#extension GL_EXT_shader_image_load_store : enable\n"
-	"in vec4 position;\n"
-	"void main() {\n"
-	"gl_Position = position;\n"
-	"}\n";
-
 static GLuint
-create_texture()
+create_texture(unsigned tex_width)
 {
-	static int data[TEX_WIDTH];
+	int* data;
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_1D, texture);
@@ -73,8 +63,10 @@ create_texture()
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	memset(data, 0, sizeof(data));
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_R32I, TEX_WIDTH, 0, GL_RED_INTEGER, GL_INT, data);
+	data = (int*) malloc(tex_width * sizeof(int));
+	memset(data, 0, tex_width * sizeof(int));
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_R32I, tex_width, 0, GL_RED_INTEGER, GL_INT, data);
+	free(data);
 
 	return texture;
 }
@@ -89,20 +81,22 @@ read_texture(void* data, size_t s)
 }
 
 static GLuint
-create_buffer_texture()
+create_buffer_texture(unsigned tex_width)
 {
-	static int data[TEX_WIDTH];
+	int* data;
 	GLuint texture, buffer;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_BUFFER, texture);
 
-	memset(data, 0, sizeof(data));
+	data = (int*) malloc(tex_width * sizeof(int));
+	memset(data, 0, tex_width * sizeof(int));
 
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferStorage(GL_ARRAY_BUFFER, sizeof(data), data, GL_MAP_READ_BIT);
+	glBufferStorage(GL_ARRAY_BUFFER, tex_width * sizeof(int), data, GL_MAP_READ_BIT);
 
 	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32I, buffer);
+	free(data);
 
 	return texture;
 }
@@ -119,13 +113,23 @@ read_buffer_texture(void* data, size_t s)
 static enum piglit_result
 run_test(void * _data)
 {
+	const char* vs =
+		"attribute vec4 piglit_vertex;\n"
+		"void main()\n"
+		"{\n"
+			"gl_Position = piglit_vertex;\n"
+		"}\n";
+
 	static const char* fs_template =
 		"#version 150\n"
 		"#extension GL_EXT_shader_image_load_store : enable\n"
-		"uniform int wrap_value;\n"
+		"uniform int index;\n"
+		"uniform uint wrap_value;\n"
 		"layout(size1x32) uniform %s image;\n"
 		"void main() {\n"
-		"   %s(image, 0, wrap_value); \n"
+		"   uint res = %s(image, index, wrap_value);\n"
+		"   gl_FragColor.rgb = vec3(float(res) / float(wrap_value));\n"
+		"   gl_FragColor.a = 1.0;\n"
 		"}\n";
 
 	char fs[1024];
@@ -137,32 +141,44 @@ run_test(void * _data)
 	GLint program = piglit_build_simple_program(vs, fs);
 	GLint image_location = glGetUniformLocation(program, "image");
 	GLint wrap_location = glGetUniformLocation(program, "wrap_value");
-	GLuint texture = test->create_texture();
-	GLint read_back[TEX_WIDTH];
+	GLint index_location = glGetUniformLocation(program, "index");
 
-	glBindImageTextureEXT(0, texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32I);
+	int texture_size[] = {32, 50, 60, 128};
+	int wrap_value[] = {12, 29, 17, 41};
+	GLint read_back[128];
+	for (int i = 0; i < ARRAY_SIZE(texture_size); i++) {
+		GLuint texture = test->create_texture(texture_size[i]);
+		int index = rand() % texture_size[i];
+		glBindImageTextureEXT(0, texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32I);
 
-	glUseProgram(program);
-	glUniform1i(image_location, 0);
-	glUniform1i(wrap_location, WRAP_VALUE);
+		glUseProgram(program);
+		glUniform1i(image_location, 0);
+		glUniform1ui(wrap_location, wrap_value[i]);
+		glUniform1i(index_location, index);
 
-	piglit_draw_rect(-1, -1, 2.0, 2.0);
+		piglit_draw_rect(-1, -1, 2.0, 2.0);
 
-	glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT |
-			GL_BUFFER_UPDATE_BARRIER_BIT |
-			GL_PIXEL_BUFFER_BARRIER_BIT |
-			GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT |
+				GL_BUFFER_UPDATE_BARRIER_BIT |
+				GL_PIXEL_BUFFER_BARRIER_BIT |
+				GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
-	test->read_texture(read_back, sizeof(read_back));
+		test->read_texture(read_back, texture_size[i] * sizeof(int));
 
-	/* The first component of the first pixel has been written to by all invocations */
-	pass = pass && read_back[0] == test->expected_value;
-	/* All other pixels/components should be untouched */
-	for (int i = 1; i < TEX_WIDTH; i++) {
-		pass = pass && read_back[i] == 0;
+		GLuint ref_value = test->compute_ref_value(piglit_width * piglit_height, wrap_value[i]);
+
+		/* The first component of the pixel at index has been written to by all invocations */
+		pass = pass && read_back[index] == ref_value;
+
+		/* All other pixels/components should be untouched */
+		for (int j = 0; j < texture_size[i]; j++) {
+			pass = pass && (j == index || read_back[j] == 0);
+		}
+		glDeleteTextures(1, &texture);
+
+		piglit_present_results();
 	}
 
-	glDeleteTextures(1, &texture);
 	glDeleteProgram(program);
 	return pass && piglit_check_gl_error(GL_NO_ERROR) ?
 		PIGLIT_PASS : PIGLIT_FAIL;
@@ -298,6 +314,26 @@ run_compile_test(void * data)
 	return res;
 }
 
+static unsigned compute_imageAtomicIncWrap(int num_exec, unsigned wrap)
+{
+       unsigned value = 0;
+       /* The EXT_shader_image_load_store spec says:
+        *
+        *    imageAtomicIncWrap() computes a new value by adding one to the contents of
+        *    the selected texel, and then forcing the result to zero if and only if the
+        *    incremented value is greater than or equal to <wrap>.  These functions
+        *    support only 32-bit unsigned integer operands.
+        */
+       for (int i = 0; i < num_exec; i++) {
+               value += 1;
+               /* nvidia and amdgpu-pro drivers interprets the spec as > instead of >= */
+               if (value > wrap) {
+                       value = 0;
+               }
+       }
+       return value;
+}
+
 static unsigned compute_imageAtomicDecWrap(int num_exec, unsigned wrap)
 {
 	unsigned value = 0;
@@ -311,6 +347,7 @@ static unsigned compute_imageAtomicDecWrap(int num_exec, unsigned wrap)
 	 */
 	for (int i = 0; i < num_exec; i++) {
 		if (value == 0 || value > wrap) {
+			/* nvidia and amdgpu-pro drivers wraps to "wrap" and not "wrap - 1" */
 			value = wrap;
 		} else {
 			value -= 1;
@@ -325,37 +362,29 @@ piglit_init(int argc, char **argv)
 	struct test_data test_data[] = {
 		{
 			"imageAtomicIncWrap",
-			/* The EXT_shader_image_load_store spec says:
-			 *
-			 *     imageAtomicIncWrap() computes a new value by adding one to the contents of
-			 *     the selected texel, and then forcing the result to zero if and only if the
-			 *     incremented value is greater than or equal to <wrap>.
-			 *
-			 * So it's equivalent to a modulo.
-			 */
-			(piglit_width * piglit_height) % WRAP_VALUE,
-			"iimage1D",
+			compute_imageAtomicIncWrap,
+			"uimage1D",
 			create_texture,
 			read_texture
 		},
 		{
 			"imageAtomicIncWrap",
-			(piglit_width * piglit_height) % WRAP_VALUE,
-			"iimageBuffer",
+			compute_imageAtomicIncWrap,
+			"uimageBuffer",
 			create_buffer_texture,
 			read_buffer_texture
 		},
 		{
 			"imageAtomicDecWrap",
-			compute_imageAtomicDecWrap(piglit_width * piglit_height, WRAP_VALUE),
-			"iimage1D",
+			compute_imageAtomicDecWrap,
+			"uimage1D",
 			create_texture,
 			read_texture
 		},
 		{
 			"imageAtomicDecWrap",
-			compute_imageAtomicDecWrap(piglit_width * piglit_height, WRAP_VALUE),
-			"iimageBuffer",
+			compute_imageAtomicDecWrap,
+			"uimageBuffer",
 			create_buffer_texture,
 			read_buffer_texture
 		},
@@ -363,25 +392,25 @@ piglit_init(int argc, char **argv)
 	const struct piglit_subtest tests[] =
 	{
 		{
-			"imageAtomicIncWrap iimage1D",
+			"imageAtomicIncWrap uimage1D",
 			NULL,
 			run_test,
 			&test_data[0],
 		},
 		{
-			"imageAtomicIncWrap iimageBuffer",
+			"imageAtomicIncWrap uimageBuffer",
 			NULL,
 			run_test,
 			&test_data[1],
 		},
 		{
-			"imageAtomicDecWrap iimage1D",
+			"imageAtomicDecWrap uimage1D",
 			NULL,
 			run_test,
 			&test_data[2],
 		},
 		{
-			"imageAtomicDecWrap iimageBuffer",
+			"imageAtomicDecWrap uimageBuffer",
 			NULL,
 			run_test,
 			&test_data[3],
