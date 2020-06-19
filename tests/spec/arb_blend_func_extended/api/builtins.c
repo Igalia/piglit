@@ -40,8 +40,8 @@ bool compile_simple_program(const char* vs_text, const char* fs_text)
 
 	prog = glCreateProgram();
 
-	vs = piglit_compile_shader_text_nothrow(GL_VERTEX_SHADER, vs_text);
-	fs = piglit_compile_shader_text_nothrow(GL_FRAGMENT_SHADER, fs_text);
+	vs = piglit_compile_shader_text_nothrow(GL_VERTEX_SHADER, vs_text, true);
+	fs = piglit_compile_shader_text_nothrow(GL_FRAGMENT_SHADER, fs_text, true);
 
 	if (!vs || !fs)
 		return false;

@@ -31,7 +31,7 @@
 void piglit_get_glsl_version(bool *es, int* major, int* minor);
 
 GLuint piglit_compile_shader(GLenum target, const char *filename);
-GLuint piglit_compile_shader_text_nothrow(GLenum target, const char *text);
+GLuint piglit_compile_shader_text_nothrow(GLenum target, const char *text, bool err_to_stderr);
 GLuint piglit_compile_shader_text(GLenum target, const char *text);
 GLuint piglit_compile_shader_formatted(GLenum target, const char *fmt, ...) PRINTFLIKE(2, 3);
 GLboolean piglit_link_check_status(GLint prog);

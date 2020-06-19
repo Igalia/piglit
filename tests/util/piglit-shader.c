@@ -124,7 +124,7 @@ shader_name(GLenum target)
  * Convenience function to compile a GLSL shader.
  */
 GLuint
-piglit_compile_shader_text_nothrow(GLenum target, const char *text)
+piglit_compile_shader_text_nothrow(GLenum target, const char *text, bool err_to_stderr)
 {
 	GLuint prog;
 	GLint ok;
@@ -146,11 +146,13 @@ piglit_compile_shader_text_nothrow(GLenum target, const char *text)
 
 		glGetShaderInfoLog(prog, size, NULL, info);
 		if (!ok) {
-			fprintf(stderr, "Failed to compile %s shader: %s\n",
-				shader_name(target),
-				info);
+			if (err_to_stderr) {
+				fprintf(stderr, "Failed to compile %s shader: %s\n",
+					shader_name(target),
+					info);
 
-			fprintf(stderr, "source:\n%s", text);
+				fprintf(stderr, "source:\n%s", text);
+			}
 			glDeleteShader(prog);
 			prog = 0;
 		}
@@ -174,7 +176,7 @@ piglit_compile_shader_text_nothrow(GLenum target, const char *text)
 GLuint
 piglit_compile_shader_text(GLenum target, const char *text)
 {
-        GLuint shader = piglit_compile_shader_text_nothrow(target, text);
+        GLuint shader = piglit_compile_shader_text_nothrow(target, text, true);
 
         if (!shader)
                 piglit_report_result(PIGLIT_FAIL);

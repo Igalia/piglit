@@ -78,7 +78,7 @@ generate_cs_prog(uint32_t x, uint32_t y, uint32_t z, char *src)
 	GLuint prog = glCreateProgram();
 
 	GLuint shader =
-		piglit_compile_shader_text_nothrow(GL_COMPUTE_SHADER, source);
+		piglit_compile_shader_text_nothrow(GL_COMPUTE_SHADER, source, true);
 
 	if (!shader) {
 		glDeleteProgram(prog);

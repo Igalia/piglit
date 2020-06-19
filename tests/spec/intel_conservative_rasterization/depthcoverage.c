@@ -67,7 +67,7 @@ void piglit_init(int argc, char **argv)
 		"void main()\n"
 		"{\n"
 		"  color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-		"}\n");
+		"}\n", true);
 	if (invalid_prog)
 		piglit_report_result(PIGLIT_FAIL);
 

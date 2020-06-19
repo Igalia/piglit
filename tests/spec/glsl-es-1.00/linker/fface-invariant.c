@@ -60,7 +60,7 @@ piglit_init(int argc, char **argv)
 
 	vs_shader = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 	fs_shader = piglit_compile_shader_text_nothrow(GL_FRAGMENT_SHADER,
-						       fs_source);
+						       fs_source, true);
 
 	/* A compile error is allowed. */
 	if (!fs_shader)

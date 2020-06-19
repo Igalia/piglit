@@ -276,7 +276,7 @@ generate_program_v(const struct grid_info grid, const char **sources)
                                 grid, stage->stage,
                                 sources[get_stage_idx(stage)]);
                         GLuint shader = piglit_compile_shader_text_nothrow(
-                                stage->stage, source);
+                                stage->stage, source, true);
 
                         free(source);
 

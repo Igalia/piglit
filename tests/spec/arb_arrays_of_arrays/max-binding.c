@@ -49,7 +49,7 @@ generate_and_compile_shader(GLuint stage, const char *src_template,
 	ret = asprintf(&src, src_template, binding);
 	assert(ret);
 
-	ret = piglit_compile_shader_text_nothrow(stage, src);
+	ret = piglit_compile_shader_text_nothrow(stage, src, true);
 
 	free(src);
 	return ret;

@@ -74,7 +74,7 @@ generate_cs_prog(unsigned x, unsigned y, unsigned z, char *ext,
 	GLuint prog = glCreateProgram();
 
 	GLuint shader =
-		piglit_compile_shader_text_nothrow(GL_COMPUTE_SHADER, source);
+		piglit_compile_shader_text_nothrow(GL_COMPUTE_SHADER, source, true);
 
 	free(source);
 

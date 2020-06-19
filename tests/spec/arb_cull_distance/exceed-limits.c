@@ -97,7 +97,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL_version(130);
 	piglit_require_extension("GL_ARB_cull_distance");
 
-	vs = piglit_compile_shader_text_nothrow(GL_VERTEX_SHADER, vert);
+	vs = piglit_compile_shader_text_nothrow(GL_VERTEX_SHADER, vert, true);
 	if (vs == 0)
 		piglit_report_result(PIGLIT_PASS);
 
