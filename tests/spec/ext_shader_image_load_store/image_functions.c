@@ -41,7 +41,6 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 config.supports_gl_core_version = 32;
-config.khr_no_error_support = PIGLIT_NO_ERRORS;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -175,7 +174,7 @@ run_compile_test(void * data)
 	/* Type of the uniform variable used in imageStore */
 	static const char* v_value_type[] = { "vec4", "ivec4", "uvec4" };
 	/* Type of the uniform variable used in the atomic operations */
-	static const char* i_value_type[] = { "int", "int", "uint" };
+	static const char* i_value_type[] = { "float", "int", "uint" };
 	/* Layout qualifier for the image */
 	static const char* qualifiers[] = {
 		"size1x8", "size1x16", "size1x32", "size2x32", "size4x32"
@@ -208,8 +207,9 @@ run_compile_test(void * data)
 	/* Fragment shader template */
 	static const char* fs_template =
 		"#version 150\n"
+		"#extension GL_ARB_ES3_1_compatibility: %s\n"
 		"#extension GL_EXT_shader_image_load_store : enable\n"
-		"uniform int wrap_value;\n"
+		"uniform uint wrap_value;\n"
 		"uniform %s v_value;\n"
 		"uniform %s i_value;\n"
 		"layout(%s) uniform %s image;\n"
@@ -219,29 +219,64 @@ run_compile_test(void * data)
 		"}\n";
 
 	char fs[2048];
-	bool pass = true;
+	enum piglit_result res = PIGLIT_PASS;
 
 	static const char** types[] = {
 		types_int, types_ivec2, types_ivec3
 	};
 
 	const bool atomicOp = strstr(data, "Atomic") != NULL;
+	const bool atomicOpWrap = atomicOp && strstr(data, "Wrap") != NULL;
+	const bool atomicOpExchange = atomicOp && strstr(data, "Exchange") != NULL;
+	bool enable_arb_es31_compat = false;
 
 	for (int i = 0; i < ARRAY_SIZE(qualifiers); i++) {
 		for (int j = 0; j < ARRAY_SIZE(types); j++) {
 			for (int k = 0; types[j][k]; k++) {
+				bool is_valid = true;
 				bool floatImageType = strncmp(types[j][k], "image", 5) == 0;
+				bool signedImageType = strncmp(types[j][k], "iimage", 6) == 0;
 
-				/* skip atomic + float */
-				if (atomicOp && floatImageType)
-					continue;
+				/* The EXT_shader_image_load_store spec says:
+				 *    These functions [atomic functions] support 32-bit unsigned integer
+				 *    operands and 32-bit signed integer operands.
+				 */
+				if (atomicOp && floatImageType) {
+					is_valid = false;
+					/* The GL_ARB_ES3_1_compatibility says:
+					 *    a new GLSL built-in function, imageAtomicExchange, which performs atomic
+					 *    exchanges on r32f floating point images.
+					 */
+					if (atomicOpExchange && piglit_is_extension_supported("GL_ARB_ES3_1_compatibility")) {
+						enable_arb_es31_compat = true;
+						is_valid = true;
+					}
+				}
 
-				/* skip atomic + not-1x32 */
+				/* The EXT_shader_image_load_store spec says:
+				 *    These functions [imageAtomicIncWrap and imageAtomicDecWrap] support
+				 *    only 32-bit unsigned integer operands.
+				 */
+				if (atomicOpWrap && signedImageType)
+					is_valid = false;
+
+				/* The EXT_shader_image_load_store spec says:
+				 *     A layout of "size1x8" is illegal for image variables associated
+				 *     with floating-point data types.
+				 */
+				if (floatImageType && i == 0)
+					is_valid = false;
+
+				/* The says:
+				 *     The format of the image unit must be in the "1x32" equivalence
+				 *     class [...] otherwise the atomic operation is invalid.
+				 */
 				if (atomicOp && i != 2)
-					continue;
+					is_valid = false;
 
 				/* Build the fragment template */
 				sprintf(fs, fs_template,
+					enable_arb_es31_compat ? "enable" : "disable",
 					v_value_type[k % 3],
 					i_value_type[k % 3],
 					qualifiers[i],
@@ -249,15 +284,18 @@ run_compile_test(void * data)
 					coords[j],
 					(char*) data);
 
-				/* And verify we can build the program */
-				GLint program = piglit_build_simple_program(vs, fs);
-				pass = pass && piglit_check_gl_error(GL_NO_ERROR);
-				glDeleteProgram(program);
+				/* And verify we can build the fragment shader */
+				GLint program = piglit_compile_shader_text_nothrow(GL_FRAGMENT_SHADER, fs, is_valid);
+				if (is_valid != (bool) program) {
+					res = PIGLIT_FAIL;
+				}
+				if (program)
+					glDeleteShader(program);
 			}
 		}
 	}
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return res;
 }
 
 static unsigned compute_imageAtomicDecWrap(int num_exec, unsigned wrap)
@@ -413,13 +451,13 @@ piglit_init(int argc, char **argv)
 			"imageAtomicIncWrap",
 			NULL,
 			run_compile_test,
-			"imageAtomicIncWrap(image, coord, i_value)",
+			"imageAtomicIncWrap(image, coord, wrap_value)",
 		},
 		{
 			"imageAtomicDecWrap",
 			NULL,
 			run_compile_test,
-			"imageAtomicDecWrap(image, coord, i_value)",
+			"imageAtomicDecWrap(image, coord, wrap_value)",
 		},
 		{0},
 	};
