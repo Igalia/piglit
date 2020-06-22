@@ -1,0 +1,27 @@
+# Test built from glsl-fs-statevar-call.shader_test
+# to reproduce issue https://gitlab.freedesktop.org/mesa/mesa/-/issues/3140
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform int index;
+vec4 mix_lighting(gl_LightSourceParameters l)
+{
+	return l.constantAttenuation / 2.0 + l.ambient.xwxx;
+}
+
+void main()
+{
+	gl_FragColor = mix_lighting(gl_LightSource[index]);
+}
+
+[test]
+uniform int index 0
+draw rect -1 -1 2 2
+probe all rgba 0.5 1.0 0.5 0.5
