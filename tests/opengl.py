@@ -2212,6 +2212,7 @@ with profile.test_list.group_manager(
     g(['ext_external_objects-vk-image-overwrite'], 'vk-image-overwrite')
     g(['ext_external_objects-vk-image-display'], 'vk-image-display')
     g(['ext_external_objects-vk-image-display-overwrite'], 'vk-image-display-overwrite')
+    g(['ext_external_objects-vk-buf-exchange'], 'vk-buf-exchange')
 
 # Group EXT_external_objects_fd tests
 with profile.test_list.group_manager(
