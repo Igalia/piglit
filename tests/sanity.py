@@ -75,7 +75,7 @@ shader_tests = (
     'shaders/arb_texture_gather-miplevels.shader_test',
     'spec/glsl-1.10/execution/algebraic/glsl-algebraic-add-zero.shader_test',
     'spec/glsl-1.10/execution/derivatives/glsl-derivs-varyings.shader_test',
-    'shaders/glsl-fs-max-3.shader_test',
+    'spec/glsl-1.10/execution/builtins/glsl-fs-max-3.shader_test',
     'shaders/glsl-fs-texture2d-branching.shader_test',
     'shaders/glsl-vs-mat-mul-1.shader_test',
     'spec/amd_shader_trinary_minmax/execution/built-in-functions/cs-max3-uvec4-uvec4-uvec4.shader_test',
