@@ -74,7 +74,7 @@ shader_tests = (
     'fast_color_clear/all-colors.shader_test',
     'shaders/arb_texture_gather-miplevels.shader_test',
     'spec/glsl-1.10/execution/algebraic/glsl-algebraic-add-zero.shader_test',
-    'shaders/glsl-derivs-varyings.shader_test',
+    'spec/glsl-1.10/execution/derivatives/glsl-derivs-varyings.shader_test',
     'shaders/glsl-fs-max-3.shader_test',
     'shaders/glsl-fs-texture2d-branching.shader_test',
     'shaders/glsl-vs-mat-mul-1.shader_test',
