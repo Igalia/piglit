@@ -478,7 +478,7 @@ test_draw_by_index(VBO_CFG vbo_cfg, bool one_by_one, GLenum primMode, GLenum ind
       glGenBuffers(1, &vbo2);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo2);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, vbo_data_size, NULL, GL_STATIC_DRAW);
-   } else {
+   } else if (create_vbo1) {
       vbo2 = vbo1;
    }
 
