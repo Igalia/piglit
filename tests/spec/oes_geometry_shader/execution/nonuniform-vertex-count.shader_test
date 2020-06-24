@@ -1,0 +1,103 @@
+# Reproduces the bug in Mesa issue 3150.
+#
+# The geometry shader takes in points and outputs three squares as
+# triangle strip primitives. The middle square is conditionally
+# emitted depending on a vertex attribute. On V3D, this makes the
+# offset for the vertex data of the final square non-uniform across
+# the lanes and needs special handling.
+[require]
+GL ES >= 3.1
+GLSL ES >= 3.1
+GL_OES_geometry_shader
+
+[vertex shader]
+#version 310 es
+
+layout(location = 0) in vec2 pos;
+layout(location = 1) in float middle;
+
+out float middle_g;
+
+void
+main()
+{
+	gl_Position = vec4(pos, 0.0, 1.0);
+	middle_g = middle;
+}
+
+[geometry shader]
+#version 310 es
+#extension GL_OES_geometry_shader : require
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 12) out;
+
+in float middle_g[];
+
+void
+emit_square(vec2 pos)
+{
+	/* Emit a square centered at pos whose width is ¼ of the
+	 * framebuffer and whose height is ⅓.
+	 */
+	for (float y = -1.0; y <= 1.0; y += 2.0) {
+		for (float x = -1.0; x <= 1.0; x += 2.0) {
+			gl_Position = vec4(pos.x + x * 2.0 / 8.0,
+					   pos.y + y * 2.0 / 6.0,
+					   0.0,
+					   1.0);
+			EmitVertex();
+		}
+	}
+
+	EndPrimitive();
+}
+
+void
+main()
+{
+	/* Top square */
+	emit_square(vec2(gl_in[0].gl_Position.x, 1.0 - 2.0 / 6.0));
+
+	/* Optionally emit the middle square */
+	if (middle_g[0] > 0.5)
+		emit_square(vec2(gl_in[0].gl_Position.x, 0.0));
+
+	/* Bottom square */
+	emit_square(vec2(gl_in[0].gl_Position.x, 2.0 / 6.0 - 1.0));
+}
+
+[fragment shader]
+#version 310 es
+
+layout(location = 0) mediump out vec4 color_out;
+
+void
+main()
+{
+	color_out = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[vertex data]
+pos/float/2  middle/float/1
+-0.75 0.0    1.0
+-0.25 0.0    1.0
+# Don’t draw the middle section for the points on the right-hand side
+0.25 0.0     0.0
+0.75 0.0     0.0
+
+[test]
+clear color 0.0 0.0 1.0 1.0
+clear
+
+draw arrays GL_POINTS 0 4
+
+# Top third should all be green
+relative probe rect rgb (0.0, 0.0, 1.0, 0.32) (0.0, 1.0, 0.0)
+
+# Middle section should be half green half blue
+relative probe rect rgb (0.0, 0.34, 0.5, 0.31) (0.0, 1.0, 0.0)
+relative probe rect rgb (0.5, 0.34, 0.5, 0.31) (0.0, 0.0, 1.0)
+
+# Bottom third should be all green
+relative probe rect rgb (0.0, 0.67, 1.0, 0.31) (0.0, 1.0, 0.0)
