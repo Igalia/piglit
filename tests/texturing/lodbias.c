@@ -77,19 +77,28 @@ static GLfloat TextureData[2][3][3] = {
 static GLboolean
 probe_cell(const char* testname, int cellx, int celly, const float* expected)
 {
-	int x, y;
+	const int step = SquareSize/5;
+	const int extent = 4*step;
+	const int x = SquareSize*cellx+step;
+	const int y = SquareSize*celly+step;
+	float *cell = malloc(extent*extent*3*sizeof(float));
 
-	for(y = 0; y < 4; ++y) {
-		for(x = 0; x < 4; ++x) {
-			int pixx = (5*cellx+x+1)*SquareSize/5;
-			int pixy = (5*celly+y+1)*SquareSize/5;
-			if (!piglit_probe_pixel_rgb(pixx, pixy, expected)) {
+	glReadPixels(x, y, extent, extent, GL_RGB, GL_FLOAT, cell);
+
+	for(int yoffset = 0; yoffset < extent; yoffset += step) {
+		for(int xoffset = 0; xoffset < extent; xoffset += step) {
+			const float *probe = cell+3*(extent*yoffset+xoffset);
+			if (!piglit_compare_pixels(x + xoffset, y + yoffset,
+						   expected, probe,
+						   piglit_tolerance, 3)) {
 				fprintf(stderr, "%s: %i,%i failed\n", testname, cellx, celly);
+				free(cell);
 				return GL_FALSE;
 			}
 		}
 	}
 
+	free(cell);
 	return GL_TRUE;
 }
 
