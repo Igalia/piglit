@@ -37,7 +37,6 @@ static VkSampleCountFlagBits
 get_num_samples(uint32_t num_samples);
 
 /* Vulkan create functions */
-
 static void
 enable_validation_layers(VkInstanceCreateInfo *info)
 {
@@ -236,7 +235,11 @@ create_renderpass(struct vk_ctx *ctx,
 	att_dsc[0].format = color_img_props->format;
 
 	att_dsc[1].samples = get_num_samples(depth_img_props->num_samples);
-	att_dsc[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	/* We might want to reuse a depth buffer */
+	if (depth_img_props->in_layout != VK_IMAGE_LAYOUT_UNDEFINED)
+		att_dsc[1].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+	else
+		att_dsc[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	att_dsc[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 	att_dsc[1].initialLayout = depth_img_props->in_layout;
 	att_dsc[1].finalLayout = depth_img_props->end_layout;
@@ -610,16 +613,22 @@ create_pipeline(struct vk_ctx *ctx,
 		ds_info.depthTestEnable = VK_TRUE;
 		ds_info.depthWriteEnable = VK_TRUE;
 		ds_info.depthCompareOp = VK_COMPARE_OP_LESS;
-
-		if (enable_stencil)
-			fprintf(stderr, "Depth and stencil tests are enabled at the same time. Ignoring stencil.\n");
-
-	} else if (enable_stencil) {
+	}
+	if (enable_stencil) {
 		ds_info.stencilTestEnable = VK_TRUE;
 		ds_info.depthTestEnable = VK_FALSE;
-		ds_info.depthWriteEnable = VK_FALSE;
-		ds_info.depthCompareOp = VK_COMPARE_OP_LESS;
+		ds_info.depthWriteEnable = VK_TRUE;
 	}
+
+	/* we only care about the passOp here */
+	ds_info.back.compareOp = VK_COMPARE_OP_ALWAYS;
+	ds_info.back.failOp = VK_STENCIL_OP_REPLACE;
+	ds_info.back.depthFailOp = VK_STENCIL_OP_REPLACE;
+	ds_info.back.passOp = VK_STENCIL_OP_REPLACE;
+	ds_info.back.compareMask = 0xffffffff;
+	ds_info.back.writeMask = 0xffffffff;
+	ds_info.back.reference = 1;
+	ds_info.front = ds_info.back;
 
 	/* VkPipelineColorBlendAttachmentState */
 	memset(&cb_att_state[0], 0, sizeof cb_att_state[0]);
@@ -1343,6 +1352,8 @@ vk_draw(struct vk_ctx *ctx,
 	memset(&rp_area, 0, sizeof rp_area);
 	rp_area.extent.width = (uint32_t)w;
 	rp_area.extent.height = (uint32_t)h;
+	rp_area.offset.x = x;
+	rp_area.offset.y = y;
 
 	/* VkClearValue */
 	memset(&clear_values[0], 0, sizeof clear_values[0]);
@@ -1353,6 +1364,7 @@ vk_draw(struct vk_ctx *ctx,
 
 	memset(&clear_values[1], 0, sizeof clear_values[1]);
 	clear_values[1].depthStencil.depth = 1.0;
+	clear_values[1].depthStencil.stencil = 0;
 
 	/* VkRenderPassBeginInfo */
 	memset(&rp_begin_info, 0, sizeof rp_begin_info);
@@ -1388,6 +1400,11 @@ vk_draw(struct vk_ctx *ctx,
 	viewport.y = y;
 	viewport.width = w;
 	viewport.height = h;
+
+	scissor.offset.x = x;
+	scissor.offset.y = y;
+	scissor.extent.width = w;
+	scissor.extent.height = h;
 
 	vkCmdSetViewport(ctx->cmd_buf, 0, 1, &viewport);
 	vkCmdSetScissor(ctx->cmd_buf, 0, 1, &scissor);
