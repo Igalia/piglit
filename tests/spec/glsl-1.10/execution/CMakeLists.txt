@@ -1,4 +1,5 @@
 piglit_include_target_api()
 add_subdirectory (clipping)
 add_subdirectory (derivatives)
+add_subdirectory (discard)
 add_subdirectory (varying-packing)
