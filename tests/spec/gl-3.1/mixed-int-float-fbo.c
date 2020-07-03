@@ -54,7 +54,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vs_text =
-	"#version 150\n"
+	"#version 140\n"
 	"in vec4 vertex;\n"
 	"void main() \n"
 	"{ \n"
@@ -62,7 +62,7 @@ static const char *vs_text =
 	"} \n";
 
 static const char *fs_text =
-	"#version 150\n"
+	"#version 140\n"
 	"out ivec4 outputInt;\n"
 	"out vec4 outputFloat;\n"
 	"void main() \n"
