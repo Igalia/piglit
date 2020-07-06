@@ -509,8 +509,10 @@ piglit_init(int argc, char **argv)
 	if (sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY)
 		extension = "#extension GL_ARB_texture_cube_map_array : enable\n";
 	if (sampler.target == GL_TEXTURE_2D_MULTISAMPLE
-		|| sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY)
+		|| sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
 		extension = "#extension GL_ARB_texture_multisample : enable\n";
+		sample_count = 4;
+	}
 
 	prog = generate_GLSL(test_stage);
 	if (!prog)
