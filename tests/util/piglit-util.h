@@ -80,6 +80,8 @@ basename(const char *path)
 
 #if defined(__GNUC__) || __has_attribute(noreturn)
 #define NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#define NORETURN __declspec(noreturn)
 #else
 #define NORETURN
 #endif
