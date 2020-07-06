@@ -38,6 +38,7 @@ extern "C" {
 /* Another two macros provided by windows.h which conflict with piglit */
 #undef near
 #undef far
+#define strdup _strdup
 
 #endif
 
