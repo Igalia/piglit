@@ -42,22 +42,7 @@ from framework.results import TestResult
 
 _EXTRA_POPEN_ARGS = {}
 
-if sys.platform == 'win32':
-    # There is no implementation in piglit to make timeouts work in
-    # windows, this uses the same Popen snippet as python 2 without
-    # subprocess32 to mask it. Patches are welcome.
-    # XXX: Should this also include cygwin?
-    warnings.warn('Timeouts are not implemented on Windows.')
-
-    class Popen(subprocess.Popen):
-        """Sublcass of Popen that accepts and ignores a timeout argument."""
-        def communicate(self, *args, **kwargs):
-            if 'timeout' in kwargs:
-                del kwargs['timeout']
-            return super(Popen, self).communicate(*args, **kwargs)
-
-    subprocess.Popen = Popen
-elif os.name == 'posix':
+if os.name == 'posix':
     # This should work for all *nix systems, Linux, the BSDs, and OSX.
     # This speicifically creates a session group for each test, so that
     # it's children can be killed if it times out.
