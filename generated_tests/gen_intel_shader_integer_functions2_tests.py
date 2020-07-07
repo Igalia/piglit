@@ -78,14 +78,24 @@ def abs_isub32(_a, _b):
     a = np.int32(np.uint32(_a))
     b = np.int32(np.uint32(_b))
 
-    return np.uint32(a - b) if a > b else np.uint32(b - a)
+    err = np.geterr()
+    np.seterr(over='ignore')
+    ret = np.uint32(a - b) if a > b else np.uint32(b - a)
+    np.seterr(over=err['over'])
+
+    return ret
 
 
 def abs_isub64(_a, _b):
     a = np.int64(_a)
     b = _b.astype(np.int64)
 
-    return np.uint64(a - b) if a > b else np.uint64(b - a)
+    err = np.geterr()
+    np.seterr(over='ignore')
+    ret = np.uint64(a - b) if a > b else np.uint64(b - a)
+    np.seterr(over=err['over'])
+
+    return ret
 
 
 def abs_usub32(_a, _b):
