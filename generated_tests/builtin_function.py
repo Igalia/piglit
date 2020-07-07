@@ -1598,11 +1598,13 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 
     f('determinant', 1, 150, np.linalg.det, None, [squaremats])
 
-    f('op-add', 2, 150, lambda x, y: x + y, match_simple_binop,
-      [int64s+int64vecs+uint64s+uint64vecs,
-       int64s+int64vecs+uint64s+uint64vecs],
-      template='({0} + {1})',
-      extension="ARB_gpu_shader_int64")
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning)
+        f('op-add', 2, 150, lambda x, y: x + y, match_simple_binop,
+          [int64s+int64vecs+uint64s+uint64vecs,
+           int64s+int64vecs+uint64s+uint64vecs],
+          template='({0} + {1})',
+          extension="ARB_gpu_shader_int64")
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', RuntimeWarning)
         f('op-sub', 2, 150, lambda x, y: x - y, match_simple_binop,
