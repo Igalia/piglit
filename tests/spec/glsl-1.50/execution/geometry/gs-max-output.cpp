@@ -361,6 +361,7 @@ piglit_init(int argc, char **argv)
 	unsigned scan_count = 0;
 	struct testcase explicit_testcase;
 
+	piglit_require_extension("GL_ARB_gpu_shader5");
 	memcpy(&explicit_testcase, &default_testcase, sizeof(explicit_testcase));
 
 	int i;
