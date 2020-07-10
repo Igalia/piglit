@@ -267,8 +267,8 @@ piglit_init(int argc, char **argv)
 			       tex, 0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 
-	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
-	       GL_FRAMEBUFFER_COMPLETE);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* create sample readback shader */
 	readback_prog = piglit_build_simple_program(vs_src_readback,

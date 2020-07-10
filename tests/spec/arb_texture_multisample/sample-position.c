@@ -247,8 +247,8 @@ piglit_init(int argc, char **argv)
 	glUseProgram(prog_rd);
 	glUniform1i(glGetUniformLocation(prog_rd, "tex"), 0);
 
-	assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) ==
-	       GL_FRAMEBUFFER_COMPLETE);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		piglit_report_result(PIGLIT_FAIL);
 
 	glViewport(0, 0, 1, 1);
 
