@@ -264,9 +264,9 @@ piglit_display(void)
     {
       float color[3];
 
-      color[0] = (float)gimp_image.pixel_data[(y*256+x)*3 +0] / 256.0F;
-      color[1] = (float)gimp_image.pixel_data[(y*256+x)*3 +1] / 256.0F;
-      color[2] = (float)gimp_image.pixel_data[(y*256+x)*3 +2] / 256.0F;
+      color[0] = (float)pixel_data[(y*256+x)*3 +0] / 256.0F;
+      color[1] = (float)pixel_data[(y*256+x)*3 +1] / 256.0F;
+      color[2] = (float)pixel_data[(y*256+x)*3 +2] / 256.0F;
 
       if(piglit_probe_pixel_rgb(x, 255-y, color))
         passed_cnt++;

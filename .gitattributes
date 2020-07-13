@@ -1,1 +1,2 @@
 *.mako -crlf
+*.bin binary
