@@ -95,11 +95,7 @@ static std::map<fragmentshaderkey, GLuint> fragmentshaders;
 static std::map<geometryshaderkey, GLuint> testprograms;
 
 static const struct testcase default_testcase = {
-	.num_instances = 1,
-	.num_points = 1,
-	.num_invocations = 1,
-	.num_outputs = 1,
-	.num_components = 0,
+	1, 1, 1, 1, 0,
 };
 
 static GLuint vs_shader;

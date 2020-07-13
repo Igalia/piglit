@@ -135,13 +135,7 @@ static std::map<fragmentshaderkey, GLuint> fragmentshaders;
 static std::map<geometryshaderkey, GLuint> testprograms;
 
 static const struct testcase default_testcase = {
-	.num_instances = 1,
-	.num_patches = 1,
-	.tessfactor_u = 1,
-	.tessfactor_v = 1,
-	.num_invocations = 1,
-	.num_outputs = 1,
-	.num_extra_components = 0,
+	1, 1, 1, 1, 1, 1, 0,
 };
 
 static int32_t *buffer_copy;
