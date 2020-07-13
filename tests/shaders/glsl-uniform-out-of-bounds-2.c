@@ -108,7 +108,7 @@ piglit_init(int argc, char **argv)
 		/* for each index in array, plus some before and after */
 		for (i = -2; i < 6; ++i) {
 			bool is_active = 0 <= i && i < num_active_elements;
-			GLchar element[9];
+			GLchar element[112];
 			GLint loc;
 			sprintf(element, "%s[%d]", name, i);
 			loc = glGetUniformLocation(prog, element);
