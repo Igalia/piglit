@@ -90,16 +90,16 @@ test_pos_and_sizes(void)
 
 	/* To test 1D and 3D entry points, let's try using the wrong functions. */
 	glTextureSubImage1D(name, 0, 0, 4, GL_RGBA, GL_FLOAT, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureSubImage3D(name, 0, 0, 0, 0, 4, 4, 4, GL_RGBA, GL_FLOAT, NULL);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glCopyTextureSubImage1D(name, 0, 0, 0, 0, 4);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glCopyTextureSubImage3D(name, 0, 0, 0, 0, 0, 0, 4, 4);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	return pass;
 }
