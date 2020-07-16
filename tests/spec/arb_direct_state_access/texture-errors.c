@@ -258,7 +258,7 @@ test_scalar_vector(void)
 	return pass;
 }
 
-/* GL_INVALID_ENUM is generated if the effective target is either
+/* GL_INVALID_OPERATION (GL 4.6) is generated if the effective target is either
  * GL_TEXTURE_2D_MULTISAMPLE or GL_TEXTURE_2D_MULTISAMPLE_ARRAY, and pname is
  * any of the sampler states.
  */
@@ -279,22 +279,22 @@ test_multisample(void)
 	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
 
 	glTextureParameteri(name, GL_TEXTURE_WRAP_R, i);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterf(name, GL_TEXTURE_WRAP_R, f);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterfv(name, GL_TEXTURE_WRAP_R, fvec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameteriv(name, GL_TEXTURE_WRAP_R, ivec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterIiv(name, GL_TEXTURE_WRAP_R, ivec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterIuiv(name, GL_TEXTURE_WRAP_R, uvec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	/* GL_TEXTURE_2D_MULTISAMPLE */
 	glDeleteTextures(1, &name);
@@ -302,25 +302,25 @@ test_multisample(void)
 	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
 
 	glTextureParameteri(name, GL_TEXTURE_WRAP_R, i);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterf(name, GL_TEXTURE_WRAP_R, f);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterfv(name, GL_TEXTURE_WRAP_R, fvec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameteriv(name, GL_TEXTURE_WRAP_R, ivec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterIiv(name, GL_TEXTURE_WRAP_R, ivec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	glTextureParameterIuiv(name, GL_TEXTURE_WRAP_R, uvec);
-	pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "glTextureParameter: GL_INVALID_ENUM if "
+				     "glTextureParameter: GL_INVALID_OPERATION if "
 				     "multisample+sampler state");
 	return pass;
 }
