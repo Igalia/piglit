@@ -72,7 +72,7 @@ profile = TestProfile()
 
 shader_tests = (
     'fast_color_clear/all-colors.shader_test',
-    'shaders/arb_texture_gather-miplevels.shader_test',
+    'spec/arb_texture_gather/execution/miplevels.shader_test',
     'spec/glsl-1.10/execution/algebraic/glsl-algebraic-add-zero.shader_test',
     'spec/glsl-1.10/execution/derivatives/glsl-derivs-varyings.shader_test',
     'spec/glsl-1.10/execution/builtins/glsl-fs-max-3.shader_test',
