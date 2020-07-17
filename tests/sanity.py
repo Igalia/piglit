@@ -77,7 +77,7 @@ shader_tests = (
     'spec/glsl-1.10/execution/derivatives/glsl-derivs-varyings.shader_test',
     'spec/glsl-1.10/execution/builtins/glsl-fs-max-3.shader_test',
     'spec/glsl-1.10/execution/samplers/glsl-fs-texture2d-branching.shader_test',
-    'shaders/glsl-vs-mat-mul-1.shader_test',
+    'spec/glsl-1.10/execution/glsl-vs-mat-mul-1.shader_test',
     'spec/amd_shader_trinary_minmax/execution/built-in-functions/cs-max3-uvec4-uvec4-uvec4.shader_test',
     'spec/amd_shader_trinary_minmax/execution/built-in-functions/tcs-max3-vec4-vec4-vec4.shader_test',
     'spec/arb_arrays_of_arrays/execution/image_store/basic-imageStore-mixed-const-non-const-uniform-index.shader_test',
