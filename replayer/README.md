@@ -61,6 +61,13 @@ appending a _v2 suffix to the file).
 
 ### Replaying traces
 
+If running from the source tree, replayer needs the
+`PIGLIT_SOURCE_DIR` env variable:
+
+   ```sh
+   $ PIGLIT_SOURCE_DIR="../" ./replayer.py ...
+   ```
+
 replayer features a series of commands to deal with traces:
  * `checksum`: will calculate the checksum for a given image file.
  * `compare`: will download a trace or all the traces in a traces
