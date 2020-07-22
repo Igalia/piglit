@@ -1,9 +1,4 @@
-((nil . ((indent-tabs-mode . t)
-	 (tab-width . 8)
-	 (show-trailing-whitespace . t)
-	 (whitespace-style face indentation)
-	 (whitespace-line-column . 79)))
- (prog-mode .
+((prog-mode .
 	    ((c-file-style . "linux")
 	     (eval ignore-errors
 		   (require 'whitespace)
@@ -17,4 +12,9 @@
 	      ((indent-tabs-mode . nil)
 	       (tab-width . 4)
 	       (whitespace-line-column . 80)))
+ (nil . ((indent-tabs-mode . t)
+	 (tab-width . 8)
+	 (show-trailing-whitespace . t)
+	 (whitespace-style face indentation)
+	 (whitespace-line-column . 79)))
  )
