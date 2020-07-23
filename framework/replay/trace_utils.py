@@ -23,8 +23,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
-from pathlib import Path
+
 from enum import Enum, auto
 
 class TraceType(Enum):
@@ -43,6 +42,7 @@ _trace_type_info_map = {
     TraceType.TESTTRACE : ("testtrace", ".testtrace")
 }
 
+
 def all_trace_type_names():
     s = []
     for t,(name, ext) in _trace_type_info_map.items():
@@ -50,12 +50,14 @@ def all_trace_type_names():
             s.append(name)
     return s
 
+
 def trace_type_from_name(tt_name):
     for t,(name, ext) in _trace_type_info_map.items():
         if tt_name == name:
             return t
 
     return TraceType.UNKNOWN
+
 
 def trace_type_from_filename(trace_file):
     for t,(name, ext) in _trace_type_info_map.items():
