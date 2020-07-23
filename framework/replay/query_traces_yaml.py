@@ -28,8 +28,8 @@ import argparse
 import sys
 import yaml
 
-import parsers
-from traceutil import trace_type_from_filename, trace_type_from_name
+import framework.replay.parsers
+from framework.replay.traceutil import trace_type_from_filename, trace_type_from_name
 
 
 def load_yaml(y):

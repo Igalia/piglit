@@ -34,12 +34,12 @@ import yaml
 from pathlib import Path
 from PIL import Image
 
-import dump_trace_images
-import parsers
-import query_traces_yaml as qty
-from download_utils import ensure_file
-from image_checksum import hexdigest_from_image
-from upload_utils import upload_file
+import framework.replay.dump_trace_images
+import framework.replay.parsers
+import framework.replay.query_traces_yaml as qty
+from framework.replay.download_utils import ensure_file
+from framework.replay.image_checksum import hexdigest_from_image
+from framework.replay.upload_utils import upload_file
 
 TRACES_DB_PATH = "./traces-db/"
 RESULTS_PATH = "./results/"
