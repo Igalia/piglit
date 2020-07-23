@@ -24,48 +24,59 @@
 # SPDX-License-Identifier: MIT
 
 import base64
-import datetime
-import hashlib
 import hmac
-import json
 import os
 import requests
 
 from email.utils import formatdate
+from hashlib import sha1
+from os import path
+from urllib.parse import urljoin, urlparse
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+
+__all__ = ['upload_file']
 
 
 def sign_with_hmac(key, message):
-    key = key.encode("UTF-8")
-    message = message.encode("UTF-8")
+    key = key.encode('UTF-8')
+    message = message.encode('UTF-8')
 
-    signature = hmac.new(key, message, hashlib.sha1).digest()
+    signature = hmac.new(key, message, sha1).digest()
 
     return base64.encodebytes(signature).strip().decode()
 
 
 def upload_file(file_path, content_type, device_name):
-    with open('.minio_credentials', 'r') as f:
-        credentials = json.load(f)["minio-packet.freedesktop.org"]
-        minio_key = credentials["AccessKeyId"]
-        minio_secret = credentials["SecretAccessKey"]
-        minio_token = credentials["SessionToken"]
+    if os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') != '1':
+        return
 
     resource = ('/artifacts/%s/%s/%s/%s'
                 % (os.environ['CI_PROJECT_PATH'], os.environ['CI_PIPELINE_ID'],
-                   device_name, os.path.basename(file_path)))
+                   device_name, path.basename(file_path)))
     date = formatdate(timeval=None, localtime=False, usegmt=True)
     url = 'https://minio-packet.freedesktop.org%s' % (resource)
-    to_sign = ("PUT\n\n%s\n%s\nx-amz-security-token:%s\n%s"
-               % (content_type, date, minio_token, resource))
-    signature = sign_with_hmac(minio_secret, to_sign)
+    headers = {'Host': 'minio-packet.freedesktop.org',
+               'Date': date,
+               'Content-Type': content_type}
+
+    with open('.minio_credentials', 'r') as f:
+        credentials = json.load(f)["minio-packet.freedesktop.org"]
+        minio_key = credentials['AccessKeyId']
+        minio_secret = credentials['SecretAccessKey']
+        minio_token = credentials['SessionToken']
+        to_sign = 'PUT\n\n{}\n{}\nx-amz-security-token:{}\n{}'.format(
+            content_type, date, minio_token, url.path)
+        signature = sign_with_hmac(minio_secret, to_sign)
+        headers.update(
+            {'Authorization': 'AWS {}:{}'.format(minio_key, signature),
+             'x-amz-security-token': minio_token})
 
     with open(file_path, 'rb') as data:
-        headers = {'Host': 'minio-packet.freedesktop.org',
-                   'Date': date,
-                   'Content-Type': content_type,
-                   'Authorization': 'AWS %s:%s' % (minio_key, signature),
-                   'x-amz-security-token': minio_token}
-        print("Uploading file to %s" % url);
-        r = requests.put(url, headers=headers, data=data)
+        print('Uploading file to {}'.format(url.geturl()))
+        r = requests.put(url.geturl(), headers=headers, data=data)
         #print(r.text)
         r.raise_for_status()

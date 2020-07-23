@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # coding=utf-8
 #
 # Copyright (c) 2019 Collabora Ltd
@@ -24,20 +23,32 @@
 #
 # SPDX-License-Identifier: MIT
 
-import argparse
-import sys
 import yaml
 
-import framework.replay.parsers
+from framework import exceptions
 from framework.replay.trace_utils import trace_type_from_filename, trace_type_from_name
 
 
+__all__ = ['download_url',
+           'load_yaml',
+           'trace_checksum',
+           'trace_devices',
+           'traces']
+
+
 def load_yaml(y):
-    return yaml.safe_load(y) or {}
+    try:
+        return yaml.safe_load(y) or {}
+    except yaml.YAMLError:
+        raise exceptions.PiglitFatalError(
+            'Cannot use the provided stream. Is it YAML?')
 
 
 def trace_devices(trace):
-    return [e['device'] for e in trace['expectations']]
+    try:
+        return [e['device'] for e in trace['expectations']]
+    except KeyError:
+        return []
 
 
 def trace_checksum(trace, device_name):
@@ -47,24 +58,27 @@ def trace_checksum(trace, device_name):
 
         return expectation['checksum']
     except StopIteration:
-        return ""
+        return ''
     except KeyError:
-        return ""
+        return ''
 
 
 def download_url(y):
-    return y["traces-db"]["download-url"] if "traces-db" in y else None
+    try:
+        return y['traces-db']['download-url'] if 'traces-db' in y else None
+    except KeyError:
+        return None
 
 
-def traces(y, trace_types, device_name, checksum):
+def traces(y, trace_types=None, device_name=None, checksum=False):
     traces = y.get('traces', []) or []
 
-    if trace_types != '':
+    if trace_types is not None:
         split_trace_types = [trace_type_from_name(t) for t
-                             in trace_types.split(",")]
+                             in trace_types.split(',')]
         traces = filter(lambda t: trace_type_from_filename(t['path'])
                         in split_trace_types, traces)
-    if device_name:
+    if device_name is not None:
         traces = [t for t in traces if device_name in trace_devices(t)]
 
     traces = list(traces)
@@ -72,91 +86,14 @@ def traces(y, trace_types, device_name, checksum):
     result = list()
     if checksum:
         for t in traces:
-            result.append({'path': t['path'],
-                           'checksum': trace_checksum(t, device_name)})
+            try:
+                yield {'path': t['path'],
+                       'checksum': trace_checksum(t, device_name)}
+            except KeyError:
+                yield {}
     else:
         for t in traces:
-            result.append({'path': t['path']})
-
-    return result
-
-
-def cmd_traces_db_download_url(args):
-    y = load_yaml(args.yaml_file)
-
-    url = download_url(y) or ""
-
-    print(url)
-
-
-def cmd_traces(args):
-    y = load_yaml(args.yaml_file)
-
-    t_list = traces(y, args.trace_types, args.device_name, args.checksum)
-
-    if args.checksum:
-        print('\n'.join(((t['path'] + '\n' + t['checksum'])
-                         for t in t_list)))
-    else:
-        print('\n'.join((t['path'] for t in t_list)))
-
-
-def cmd_checksum(args):
-    y = load_yaml(args.yaml_file)
-
-    traces = y['traces']
-    try:
-        trace = next(t for t in traces if t['path'] == args.trace_path)
-    except StopIteration:
-        print("")
-        return
-
-    print(trace_checksum(trace, args.device_name))
-
-
-def query(input_):
-    """ Parser for tracie query command """
-    parser = argparse.ArgumentParser(parents=[parsers.YAML])
-
-    # Add a destination due to
-    # https://github.com/python/cpython/pull/3027#issuecomment-330910633
-    subparsers = parser.add_subparsers(dest='command', required=True)
-
-    parser_traces_db_download_url = subparsers.add_parser(
-        'traces_db_download_url')
-    parser_traces_db_download_url.set_defaults(
-        func=cmd_traces_db_download_url)
-
-    parser_traces = subparsers.add_parser('traces', parents=[parsers.DEVICE])
-    parser_traces.add_argument(
-        '-t', '--trace-types',
-        required=False,
-        default='',
-        help=('a comma separated list of trace types to look for '
-              'in recursive dir walks. '
-              'If none are provide, all types are used by default'))
-    parser_traces.add_argument(
-        '-c', '--checksum',
-        required=False,
-        action='store_true',
-        help='whether to print the checksum below every trace')
-    parser_traces.set_defaults(func=cmd_traces)
-
-    parser_checksum = subparsers.add_parser('checksum',
-                                            parents=[parsers.DEVICE])
-    parser_checksum.add_argument('trace_path')
-    parser_checksum.set_defaults(func=cmd_checksum)
-
-    args = parser.parse_args(input_)
-
-    args.func(args)
-
-
-def main():
-    input_ = sys.argv[1:]
-
-    query(input_)
-
-
-if __name__ == "__main__":
-    main()
+            try:
+                yield {'path': t['path']}
+            except KeyError:
+                yield {}

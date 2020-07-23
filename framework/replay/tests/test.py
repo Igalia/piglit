@@ -1,10 +1,10 @@
 import logging
+import os
 import pytest
 import re
 import shutil
 
-from os import environ, chdir
-from os.path import dirname, exists, realpath
+from os import path
 
 import tracie
 
@@ -14,7 +14,7 @@ TRACE_LOG_TEST1 = "results/trace1/test/gl-test-device/magenta.testtrace.log"
 TRACE_LOG_TEST2 = "results/trace2/test/vk-test-device/olive.testtrace.log"
 TRACE_PNG_TEST1 = "results/trace1/test/gl-test-device/magenta.testtrace-0.png"
 TRACE_PNG_TEST2 = "results/trace2/test/vk-test-device/olive.testtrace-0.png"
-TRACIE_DIR = dirname(realpath(__file__)) + "/.."
+TRACIE_DIR = path.dirname(path.realpath(__file__)) + "/.."
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
@@ -55,18 +55,18 @@ def prepare_for_run(tmp_path):
     test_dir = str(tmp_path) + "/run"
     shutil.copytree(TRACIE_DIR, test_dir)
     # Change the working dir to the test_dir
-    chdir(test_dir)
+    os.chdir(test_dir)
     # Set the traces-db
     shutil.move("./tests/test-data", "./traces-db")
     # Disable trace storing
-    environ["TRACIE_STORE_IMAGES"] = "0"
+    os.environ["TRACIE_STORE_IMAGES"] = "0"
 
 
 def cleanup(tmp_path):
     '''
     Performs the clean up of the test dir.
     '''
-    if exists(tmp_path):
+    if path.exists(tmp_path):
         shutil.rmtree(tmp_path)
 
 
@@ -192,10 +192,10 @@ def test_tracie_fails_on_dump_image_error():
 
 def test_tracie_stores_only_logs_on_checksum_match():
     assert run_tracie()
-    assert exists(TRACE_LOG_TEST1)
-    assert exists(TRACE_LOG_TEST2)
-    assert not exists(TRACE_PNG_TEST1)
-    assert not exists(TRACE_PNG_TEST2)
+    assert path.exists(TRACE_LOG_TEST1)
+    assert path.exists(TRACE_LOG_TEST2)
+    assert not path.exists(TRACE_PNG_TEST1)
+    assert not path.exists(TRACE_PNG_TEST2)
 
 
 def test_tracie_stores_images_on_checksum_mismatch():
@@ -205,12 +205,12 @@ def test_tracie_stores_images_on_checksum_mismatch():
                               "8e0a801367e1714463475a824dab363b")
     write_to(content, filename)
     assert not run_tracie()
-    assert not exists(TRACE_PNG_TEST1)
-    assert exists(TRACE_PNG_TEST2)
+    assert not path.exists(TRACE_PNG_TEST1)
+    assert path.exists(TRACE_PNG_TEST2)
 
 
 def test_tracie_stores_images_on_request():
-    environ["TRACIE_STORE_IMAGES"] = "1"
+    os.environ["TRACIE_STORE_IMAGES"] = "1"
     assert run_tracie()
-    assert exists(TRACE_PNG_TEST1)
-    assert exists(TRACE_PNG_TEST2)
+    assert path.exists(TRACE_PNG_TEST1)
+    assert path.exists(TRACE_PNG_TEST2)
