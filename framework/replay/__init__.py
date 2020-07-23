@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright (c) 2019 Collabora Ltd
+# Copyright (c) 2014,2016 Intel Corporation
 # Copyright © 2020 Valve Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,14 +23,16 @@
 #
 # SPDX-License-Identifier: MIT
 
-from hashlib import md5
-from PIL import Image
+""" Module that provides test classes and helpers """
 
+# By importing every exported function from each module in the package we
+# create a general use API, but allow it to be controlled by setting the
+# __all__ in each module
 
-__all__ = ['hexdigest_from_image']
-
-
-def hexdigest_from_image(file_path):
-    image_md5 = md5(Image.open(file_path).tobytes())
-
-    return image_md5.hexdigest()
+from .compare_replay import *
+from .download_utils import *
+from .dump_trace_images import *
+from .image_checksum import *
+from .query_traces_yaml import *
+from .trace_utils import *
+from .upload_utils import *

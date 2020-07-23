@@ -26,6 +26,13 @@
 
 from enum import Enum, auto
 
+
+__all__ = ['TraceType',
+           'all_trace_type_names',
+           'trace_type_from_name',
+           'trace_type_from_filename']
+
+
 class TraceType(Enum):
     UNKNOWN = auto()
     APITRACE = auto()
@@ -35,11 +42,11 @@ class TraceType(Enum):
     TESTTRACE = auto()
 
 _trace_type_info_map = {
-    TraceType.APITRACE : ("apitrace", ".trace"),
-    TraceType.APITRACE_DXGI : ("apitrace-dxgi", ".trace-dxgi"),
-    TraceType.RENDERDOC : ("renderdoc", ".rdc"),
-    TraceType.GFXRECONSTRUCT : ("gfxreconstruct", ".gfxr"),
-    TraceType.TESTTRACE : ("testtrace", ".testtrace")
+    TraceType.APITRACE : ('apitrace', '.trace'),
+    TraceType.APITRACE_DXGI : ('apitrace-dxgi', '.trace-dxgi'),
+    TraceType.RENDERDOC : ('renderdoc', '.rdc'),
+    TraceType.GFXRECONSTRUCT : ('gfxreconstruct', '.gfxr'),
+    TraceType.TESTTRACE : ('testtrace', '.testtrace')
 }
 
 

@@ -25,24 +25,29 @@
 
 import os
 import requests
-import time
+
+from os import path
+from time import time
+
+
+__all__ = ['ensure_file']
 
 
 def ensure_file(download_url, file_path, destination):
-    destination_file_path = destination + file_path
+    destination_file_path = path.join(destination, file_path)
     if download_url is None:
-        assert os.path.exists(destination_file_path), (
-            "{} missing".format(destination_file_path))
+        assert path.exists(destination_file_path), (
+            '{} missing'.format(destination_file_path))
         return
 
-    os.makedirs(os.path.dirname(destination_file_path), exist_ok=True)
+    os.makedirs(path.dirname(destination_file_path), exist_ok=True)
 
-    if os.path.exists(destination_file_path):
+    if path.exists(destination_file_path):
         return
 
-    print("[check_image] Downloading trace %s"
-          % (trace['path']), end=" ", flush=True)
-    download_time = time.time()
-    r = requests.get(download_url + trace['path'])
-    open(trace_path, "wb").write(r.content)
-    print("took %ds." % (time.time() - download_time), flush=True)
+    print('[check_image] Downloading file {}'.format(
+        file_path), end=' ', flush=True)
+    download_time = time()
+    r = requests.get(download_url + file_path)
+    open(destination_file_path, 'wb').write(r.content)
+    print('took %ds.' % (time() - download_time), flush=True)

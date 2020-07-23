@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # coding=utf-8
 #
 # Copyright (c) 2020 Collabora Ltd
@@ -24,84 +23,84 @@
 #
 # SPDX-License-Identifier: MIT
 
-import argparse
-import glob
 import os
 import shutil
-import sys
 import yaml
 
-from pathlib import Path
-from PIL import Image
+from glob import glob
+from os import path
 
-import framework.replay.dump_trace_images
-import framework.replay.parsers
-import framework.replay.query_traces_yaml as qty
+from framework import status
+from framework.replay import query_traces_yaml as qty
 from framework.replay.download_utils import ensure_file
+from framework.replay.dump_trace_images import dump_from_trace
 from framework.replay.image_checksum import hexdigest_from_image
 from framework.replay.upload_utils import upload_file
 
-TRACES_DB_PATH = "./traces-db/"
-RESULTS_PATH = "./results/"
 
+__all__ = ['from_yaml',
+           'trace']
+
+TRACES_DB_PATH = './traces-db/'
+RESULTS_PATH = './results/'
 
 def replay(trace_path, device_name):
-    success = dump_trace_images.dump_from_trace(Path(trace_path),
-                                                [], device_name)
+    success = dump_from_trace(trace_path, [], device_name)
 
     if not success:
-        print("[check_image] Trace %s couldn't be replayed. "
-              "See above logs for more information." % trace_path)
+        print("[check_image] Trace {} couldn't be replayed. "
+              "See above logs for more information.".format(trace_path))
         return None, None, None
     else:
-        test_path = os.path.join(os.path.dirname(trace_path), "test",
-                                 device_name)
-        file_name = os.path.basename(trace_path)
-        files = glob.glob(os.path.join(test_path, file_name + "-*" + ".png"))
+        test_path = path.join(path.dirname(trace_path), 'test', device_name)
+        file_name = path.basename(trace_path)
+        files = glob(path.join(test_path, file_name + '-*' + '.png'))
         assert(files)
         image_file = files[0]
-        files = glob.glob(os.path.join(test_path, file_name + ".log"))
+        files = glob(path.join(test_path, file_name + '.log'))
         assert(files)
         log_file = files[0]
         return (hexdigest_from_image(image_file), image_file, log_file)
 
 
-def gitlab_check_trace(download_url,
-                       device_name, trace_path, expected_checksum):
+def check_trace(download_url, device_name, trace_path, expected_checksum):
     ensure_file(download_url, trace_path, TRACES_DB_PATH)
 
     result = {}
     result[trace_path] = {}
     result[trace_path]['expected'] = expected_checksum
 
-    checksum, image_file, log_file = replay(TRACES_DB_PATH + trace_path,
+    trace_dir = path.dirname(trace_path)
+    dir_in_results = path.join(trace_dir, 'test', device_name)
+    results_path = path.join(RESULTS_PATH, dir_in_results)
+    os.makedirs(results_path, exist_ok=True)
+
+    checksum, image_file, log_file = replay(path.join(TRACES_DB_PATH,
+                                                      trace_path),
                                             device_name)
+
+    result[trace_path]['actual'] = checksum or 'error'
+
+    shutil.move(log_file, path.join(results_path, path.basename(log_file)))
     if checksum is None:
-        result[trace_path]['actual'] = 'error'
         return False, result
-    elif checksum == expected_checksum:
-        print("[check_image] Images match for %s" % (trace_path))
+    if checksum == expected_checksum:
+        if os.environ.get('TRACIE_STORE_IMAGES', '0') == '1':
+            shutil.move(image_file, path.join(results_path, image_name))
+        print('[check_image] Images match for:\n  {}'.format(trace_path))
         ok = True
     else:
-        print("[check_image] Images differ for %s (expected: %s, actual: %s)" %
-              (trace_path, expected_checksum, checksum))
-        print("[check_image] For more information see "
-              "https://gitlab.freedesktop.org/"
-              "mesa/mesa/blob/master/.gitlab-ci/tracie/README.md")
+        upload_file(image_file, 'image/png', device_name)
+        print('[check_image] Images differ for '
+              '%s (expected: %s, actual: %s)'.format(
+              trace_path, expected_checksum, checksum))
+        print('[check_image] For more information see '
+              'https://gitlab.freedesktop.org/'
+              'mesa/mesa/blob/master/.gitlab-ci/tracie/README.md')
         ok = False
 
-    trace_dir = os.path.dirname(trace_path)
-    dir_in_results = os.path.join(trace_dir, "test", device_name)
-    results_path = os.path.join(RESULTS_PATH, dir_in_results)
-    os.makedirs(results_path, exist_ok=True)
-    shutil.move(log_file, os.path.join(results_path,
-                                       os.path.basename(log_file)))
-    if not ok and os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') == '1':
-        upload_file(image_file, 'image/png', device_name)
     if not ok or os.environ.get('TRACIE_STORE_IMAGES', '0') == '1':
-        image_name = os.path.basename(image_file)
-        shutil.move(image_file, os.path.join(results_path, image_name))
-        result[trace_path]['image'] = os.path.join(dir_in_results, image_name)
+        result[trace_path]['image'] = image_file
 
     result[trace_path]['actual'] = checksum
 
@@ -110,26 +109,24 @@ def gitlab_check_trace(download_url,
 
 def write_results(results):
     os.makedirs(RESULTS_PATH, exist_ok=True)
-    with open(os.path.join(RESULTS_PATH, 'results.yml'), 'w') as f:
+    results_file_path = path.join(RESULTS_PATH, 'results.yml')
+    with open(results_file_path, 'w') as f:
         yaml.safe_dump(results, f, default_flow_style=False)
-    if os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') == '1':
-        upload_file(os.path.join(RESULTS_PATH, 'results.yml'), 'text/yaml',
-                    device_name)
+    upload_file(results_file_path, 'text/yaml', device_name)
 
 
-def from_yaml(args):
-    y = qty.load_yaml(args.yaml_file)
+def from_yaml(yaml_file, device_name):
+    y = qty.load_yaml(yaml_file)
 
     download_url = qty.download_url(y)
 
     all_ok = True
     results = {}
-    t_list = qty.traces(y, '', args.device_name, True)
+    t_list = qty.traces(y, device_name=device_name, checksum=True)
     for t in t_list:
-        ok, result = gitlab_check_trace(download_url,
-                                        args.device_name,
-                                        t['path'],
-                                        t['checksum'])
+        ok, result = check_trace(download_url,
+                                 device_name,
+                                 t['path'], t['checksum'])
         all_ok = all_ok and ok
         results.update(result)
 
@@ -143,50 +140,10 @@ def from_yaml(args):
     return all_ok
 
 
-def main(args):
-    parser = argparse.ArgumentParser()
+def trace(download_url, device_name, trace_path, expected_checksum):
+    ok, result = check_trace(download_url, device_name, trace_path,
+                             expected_checksum)
 
-    # Add a destination due to
-    # https://github.com/python/cpython/pull/3027#issuecomment-330910633
-    subparsers = parser.add_subparsers(dest='command', required=True)
+    write_results(result)
 
-    parser_yaml = subparsers.add_parser('yaml', parents=[parsers.DEVICE,
-                                                         parsers.YAML])
-    parser_yaml.set_defaults(func=from_yaml)
-
-    parser_trace = subparsers.add_parser('trace', parents=[parsers.DEVICE])
-    parser_trace.add_argument(
-        '-u', '--download-url', default=None,
-        help=('the URL from which to download the traces'))
-    parser_trace.add_argument(
-        '-p', '--path', required=True,
-        help='the path to the trace file in the traces-db repository')
-    parser_trace.add_argument(
-        '-e', '--expected-checksum', required=True,
-        help=('the expected checksum value to obtain '
-              'when replaying a trace in a specific device'))
-    parser_trace.set_defaults(func=trace)
-
-    parser_query = subparsers.add_parser(
-        'query',
-        add_help=False,
-        help=('Queries for specific information '
-              'from a traces description file listing traces '
-              'and their checksums for each device.'))
-    parser_query.set_defaults(func=qty.query)
-
-    # Parse the known arguments (tracie.py yaml or tracie.py query for
-    # example), and then pass the arguments that this parser doesn't
-    # know about to that executable
-    parsed, args = parser.parse_known_args(input_)
-    try:
-        runner = parsed.func
-    except AttributeError:
-        parser.print_help()
-        return False
-    return runner(args or parsed)
-
-
-if __name__ == "__main__":
-    all_ok = main(sys.argv[1:])
-    sys.exit(0 if all_ok else 1)
+    return ok
