@@ -29,7 +29,7 @@ import sys
 import yaml
 
 import framework.replay.parsers
-from framework.replay.traceutil import trace_type_from_filename, trace_type_from_name
+from framework.replay.trace_utils import trace_type_from_filename, trace_type_from_name
 
 
 def load_yaml(y):

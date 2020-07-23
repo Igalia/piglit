@@ -30,7 +30,7 @@ import sys
 import subprocess
 from pathlib import Path
 
-from framework.replay.traceutil import trace_type_from_filename, TraceType
+from framework.replay.trace_utils import trace_type_from_filename, TraceType
 
 def log(severity, msg, end='\n'):
     print("[dump_trace_images] %s: %s" % (severity, msg), flush=True, end=end)
