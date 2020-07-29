@@ -119,7 +119,11 @@ def _dump_with_gfxreconstruct(trace_path, output_dir, calls):
         'PIGLIT_REPLAY_GFXRECON_REPLAY_BINARY',
         ('replay', 'gfxrecon-replay_bin'),
         default='gfxrecon-replay')
-    cmd = [gfxrecon_replay_bin, trace_path]
+    gfxrecon_replay_extra_args = core.get_option(
+        'PIGLIT_REPLAY_GFXRECON_REPLAY_EXTRA_ARGS',
+        ('replay', 'gfxrecon-replay_extra_args'),
+        default='').split()
+    cmd = [gfxrecon_replay_bin] + gfxrecon_replay_extra_args + [trace_path]
     env = os.environ.copy()
     env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
     env['VK_SCREENSHOT_FRAMES'] = ','.join(calls)
