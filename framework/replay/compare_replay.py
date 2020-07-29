@@ -73,6 +73,10 @@ def _check_trace(trace_path, expected_checksum):
                                    results_path)
 
     result[trace_path]['actual'] = checksum or 'error'
+    print('[check_image]\n'
+          '    actual: {}\n'
+          '  expected: {}'.format(result[trace_path]['actual'],
+                                  expected_checksum))
 
     if checksum is None:
         return False, result
@@ -82,9 +86,7 @@ def _check_trace(trace_path, expected_checksum):
         print('[check_image] Images match for:\n  {}'.format(trace_path))
         ok = True
     else:
-        print('[check_image] Images differ for '
-              '%s (expected: %s, actual: %s)'.format(
-              trace_path, expected_checksum, checksum))
+        print('[check_image] Images differ for:\n  {}'.format(trace_path))
         print('[check_image] For more information see '
               'https://gitlab.freedesktop.org/'
               'mesa/mesa/blob/master/.gitlab-ci/tracie/README.md')
