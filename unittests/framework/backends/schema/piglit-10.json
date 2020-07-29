@@ -90,6 +90,17 @@
                     "traceback": { "type": ["string", "null"] },
                     "out": { "type": "string" },
                     "dmesg": { "type": "string" },
+                    "images": {
+                        "type": ["array", "null"],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "image_desc": { "type": "string" },
+                                "image_ref": { "type": "string" },
+                                "image_render": { "type": "string" }
+                            }
+                        }
+                    },
                     "pid": {
                         "type": "array",
                         "items": { "type": "number" }

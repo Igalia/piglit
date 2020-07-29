@@ -206,6 +206,7 @@ class TestResult(object):
             'exception': self.exception,
             'traceback': self.traceback,
             'dmesg': self.dmesg,
+            'images': self.images,
             'pid': self.pid,
         }
         return obj
@@ -226,7 +227,7 @@ class TestResult(object):
         inst = cls()
 
         for each in ['returncode', 'command', 'exception', 'environment',
-                     'traceback', 'dmesg', 'pid', 'result']:
+                     'traceback', 'dmesg', 'images', 'pid', 'result']:
             if each in dict_:
                 setattr(inst, each, dict_[each])
 
@@ -254,6 +255,8 @@ class TestResult(object):
         """
         if 'result' in dict_:
             self.result = dict_['result']
+            if 'images' in dict_:
+                self.images = dict_['images']
         elif 'subtest' in dict_:
             self.subtests.update(dict_['subtest'])
 
