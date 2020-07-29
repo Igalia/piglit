@@ -193,6 +193,47 @@ run_test=./%(test_name)s
 ; If both are missing, it will look for "vkrunner" in the search PATH.
 ;bin=/home/neil/local/bin/vkrunner
 
+[replay]
+; Path to the apitrace executable. The option is not required.
+; Can be overwritten by PIGLIT_REPLAY_APITRACE_BINARY environment
+; variable.
+;apitrace_bin=/apitrace/build/apitrace
+
+; Path to the eglretrace (apitrace) executable. The option is not
+; required.
+; Can be overwritten by PIGLIT_REPLAY_EGLRETRACE_BINARY environment
+; variable.
+;eglretrace_bin=/apitrace/build/eglretrace
+
+; Path to the Wine executable. The option is not required.
+; Can be overwritten by PIGLIT_REPLAY_WINE_BINARY environment
+; variable.
+;wine_bin=/usr/bin/wine
+
+; Path to the Windows' d3dretrace (apitrace) executable to be run
+; under Wine. The option is not required.
+; Can be overwritten by PIGLIT_REPLAY_WINE_APITRACE_BINARY environment
+; variable.
+;wine_apitrace_bin=/apitrace-msvc-win64/bin/apitrace.exe
+
+; Path to the Windows' apitrace executable to be run under Wine. The
+; option is not required.
+; Can be overwritten by PIGLIT_REPLAY_WINE_D3DRETRACE_BINARY
+; environment variable.
+;wine_d3dretrace_bin=/apitrace-msvc-win64/bin/d3dretrace.exe
+
+; Path to the gfxrecon-info (GFXReconstruct) executable. The option is
+; not required.
+; Can be overwritten by PIGLIT_REPLAY_GFXRECON_INFO_BINARY environment
+; variable.
+;gfxrecon-info_bin=/gfxreconstruct/build/bin/gfxrecon-info
+
+; Path to the gfxrecon-replay (GFXReconstruct) executable. The option
+; is not required.
+; Can be overwritten by PIGLIT_REPLAY_GFXRECON_REPLAY_BINARY
+; environment variable.
+;gfxrecon-replay_bin=/gfxreconstruct/build/bin/gfxrecon-replay
+
 [expected-failures]
 ; Provide a list of test names that are expected to fail.  These tests
 ; will be listed as passing in JUnit output when they fail.  Any

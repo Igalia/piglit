@@ -57,7 +57,15 @@ def _run_logged_command(cmd, env, log_path):
                 ret.returncode))
 
 def _get_last_apitrace_frame_call(cmd_wrapper, trace_path):
-    cmd = cmd_wrapper + ['apitrace', 'dump', '--calls=frame', trace_path]
+    if len(cmd_wrapper) > 0:
+        apitrace_bin = core.get_option('PIGLIT_REPLAY_WINE_APITRACE_BINARY',
+                                       ('replay', 'wine_apitrace_bin'),
+                                       default='apitrace')
+    else:
+        apitrace_bin = core.get_option('PIGLIT_REPLAY_APITRACE_BINARY',
+                                       ('replay', 'apitrace_bin'),
+                                       default='apitrace')
+    cmd = cmd_wrapper + [apitrace_bin, 'dump', '--calls=frame', trace_path]
     ret = subprocess.run(cmd, stdout=subprocess.PIPE)
     for l in reversed(ret.stdout.decode(errors='replace').splitlines()):
         s = l.split(None, 1)
@@ -66,7 +74,10 @@ def _get_last_apitrace_frame_call(cmd_wrapper, trace_path):
     return -1
 
 def _get_last_gfxreconstruct_frame_call(trace_path):
-    cmd = ['gfxrecon-info', trace_path]
+    gfxrecon_info_bin = core.get_option('PIGLIT_REPLAY_GFXRECON_INFO_BINARY',
+                                        ('replay', 'gfxrecon-info_bin'),
+                                        default='gfxrecon-info')
+    cmd = [gfxrecon_info_bin, trace_path]
     ret = subprocess.run(cmd, stdout=subprocess.PIPE)
     lines = ret.stdout.decode(errors='replace').splitlines()
     if len(lines) >= 1:
@@ -104,7 +115,11 @@ def _dump_with_gfxreconstruct(trace_path, output_dir, calls):
         # 1 to total-num-calls:
         # https://github.com/LunarG/gfxreconstruct/issues/284
         calls = [str(_get_last_gfxreconstruct_frame_call(trace_path) - 1)]
-    cmd = ['gfxrecon-replay', trace_path]
+    gfxrecon_replay_bin = core.get_option(
+        'PIGLIT_REPLAY_GFXRECON_REPLAY_BINARY',
+        ('replay', 'gfxrecon-replay_bin'),
+        default='gfxrecon-replay')
+    cmd = [gfxrecon_replay_bin, trace_path]
     env = os.environ.copy()
     env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
     env['VK_SCREENSHOT_FRAMES'] = ','.join(calls)
@@ -144,10 +159,21 @@ def dump_from_trace(trace_path, output_dir=None, calls=[]):
     trace_type = trace_type_from_filename(path.basename(trace_path))
     try:
         if trace_type == TraceType.APITRACE:
-            _dump_with_apitrace(['eglretrace'], trace_path, output_dir, calls)
+            eglretrace_bin = core.get_option('PIGLIT_REPLAY_EGLRETRACE_BINARY',
+                                             ('replay', 'eglretrace_bin'),
+                                             default='eglretrace')
+            _dump_with_apitrace([eglretrace_bin],
+                                trace_path, output_dir, calls)
         elif trace_type == TraceType.APITRACE_DXGI:
-            _dump_with_apitrace(['wine', 'd3dretrace'], trace_path, output_dir,
-                                calls)
+            wine_bin = core.get_option('PIGLIT_REPLAY_WINE_BINARY',
+                                       ('replay', 'wine_bin'),
+                                       default='wine')
+            wine_d3dretrace_bin = core.get_option(
+                'PIGLIT_REPLAY_WINE_D3DRETRACE_BINARY',
+                ('replay', 'wine_d3dretrace_bin'),
+                default='d3dretrace')
+            _dump_with_apitrace([wine_bin, wine_d3dretrace_bin],
+                                trace_path, output_dir, calls)
         elif trace_type == TraceType.RENDERDOC:
             _dump_with_renderdoc(trace_path, output_dir, calls)
         elif trace_type == TraceType.GFXRECONSTRUCT:
