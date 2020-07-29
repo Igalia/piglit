@@ -25,6 +25,10 @@
 
 import os
 import yaml
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 from glob import glob
 from os import path
@@ -79,25 +83,43 @@ def _check_trace(trace_path, expected_checksum):
                                   expected_checksum))
 
     if checksum is None:
-        return False, result
+        return -1, result
     if checksum == expected_checksum:
         if not OPTIONS.keep_image:
             os.remove(image_file)
         print('[check_image] Images match for:\n  {}'.format(trace_path))
-        ok = True
+        ok = 0
     else:
         print('[check_image] Images differ for:\n  {}'.format(trace_path))
         print('[check_image] For more information see '
               'https://gitlab.freedesktop.org/'
               'mesa/mesa/blob/master/.gitlab-ci/tracie/README.md')
-        ok = False
+        ok = 1
 
-    if not ok or OPTIONS.keep_image:
+    if ok != 0 or OPTIONS.keep_image:
         result[trace_path]['image'] = image_file
 
     result[trace_path]['actual'] = checksum
 
     return ok, result
+
+
+def _print_result(ok, trace_path, result):
+    output = 'PIGLIT: '
+    json_result = {}
+    if ok < 0:
+        json_result['result'] = str(status.CRASH)
+    elif ok > 0:
+        json_result['result'] = str(status.FAIL)
+        json_result['images'] = [
+            {'image_desc': trace_path,
+             'image_ref': result[trace_path]['expected'] + '.png',
+             'image_render': result[trace_path]['image']}]
+    else:
+        json_result['result'] = str(status.PASS)
+
+    output += json.dumps(json_result)
+    print(output)
 
 
 def _write_results(results):
@@ -117,8 +139,9 @@ def from_yaml(yaml_file):
     t_list = qty.traces(y, device_name=OPTIONS.device_name, checksum=True)
     for t in t_list:
         ok, result = _check_trace(t['path'], t['checksum'])
-        all_ok = all_ok and ok
+        all_ok = all_ok and 0 == ok
         results.update(result)
+        # _print_result(ok, t['path'], result)
 
     _write_results(results)
 
@@ -127,7 +150,8 @@ def from_yaml(yaml_file):
 
 def trace(trace_path, expected_checksum):
     ok, result = _check_trace(trace_path, expected_checksum)
+    _print_result(ok, trace_path, result)
 
     _write_results(result)
 
-    return ok
+    return 0 == ok
