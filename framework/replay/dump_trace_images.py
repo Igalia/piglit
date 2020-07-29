@@ -44,15 +44,15 @@ def _log_result(msg):
     print(msg, flush=True)
 
 def _run_logged_command(cmd, env, log_path):
-    ret = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    ret = subprocess.run(cmd, stdout=subprocess.PIPE, env=env)
     logoutput = '[dump_trace_images] Running: {}\n'.format(
         ' '.join(cmd)).encode() + ret.stdout
     core.check_dir(path.dirname(log_path))
     with open(log_path, 'wb') as log:
         log.write(logoutput)
+    print(logoutput.decode(errors='replace'))
     if ret.returncode:
         raise RuntimeError(
-            logoutput.decode(errors='replace') +
             '[dump_traces_images] Process failed with error code: {}'.format(
                 ret.returncode))
 
@@ -67,6 +67,9 @@ def _get_last_apitrace_frame_call(cmd_wrapper, trace_path):
                                        default='apitrace')
     cmd = cmd_wrapper + [apitrace_bin, 'dump', '--calls=frame', trace_path]
     ret = subprocess.run(cmd, stdout=subprocess.PIPE)
+    logoutput = '[dump_trace_images] Running: {}\n'.format(
+        ' '.join(cmd)) + ret.stdout.decode(errors='replace')
+    print(logoutput)
     for l in reversed(ret.stdout.decode(errors='replace').splitlines()):
         s = l.split(None, 1)
         if len(s) >= 1 and s[0].isnumeric():
@@ -80,6 +83,7 @@ def _get_last_gfxreconstruct_frame_call(trace_path):
     cmd = [gfxrecon_info_bin, trace_path]
     ret = subprocess.run(cmd, stdout=subprocess.PIPE)
     lines = ret.stdout.decode(errors='replace').splitlines()
+    print(ret.stdout.decode(errors='replace'))
     if len(lines) >= 1:
         c = lines[0].split(': ', 1)
         if len(c) >= 2 and c[1].isnumeric():
