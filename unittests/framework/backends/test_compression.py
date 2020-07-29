@@ -73,7 +73,7 @@ def env():
 
 @pytest.yield_fixture
 def config():
-    with mock.patch('framework.backends.compression.PIGLIT_CONFIG',
+    with mock.patch('framework.core.PIGLIT_CONFIG',
                     new_callable=core.PiglitConfig) as conf:
         conf.add_section('core')
         yield conf

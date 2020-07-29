@@ -48,8 +48,8 @@ import lzma
 import os
 import subprocess
 
+from framework import core
 from framework import exceptions
-from framework.core import PIGLIT_CONFIG
 
 __all__ = [
     'UnsupportedCompressor',
@@ -103,9 +103,9 @@ def get_mode():
     # function it can honor changes to the PIGLIT_CONFIG instance, or the
     # PIGLIT_COMPRESSION environment variable.
 
-    method = (os.environ.get('PIGLIT_COMPRESSION') or
-              PIGLIT_CONFIG.safe_get('core', 'compression') or
-              DEFAULT)
+    method = core.get_option('PIGLIT_COMPRESSION',
+                             ('core', 'compression'),
+                             default=DEFAULT)
 
     if method not in COMPRESSORS:
         raise UnsupportedCompressor(method)
