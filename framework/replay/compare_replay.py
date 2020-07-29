@@ -34,16 +34,15 @@ from framework.replay import query_traces_yaml as qty
 from framework.replay.download_utils import ensure_file
 from framework.replay.dump_trace_images import dump_from_trace
 from framework.replay.image_checksum import hexdigest_from_image
+from framework.replay.options import OPTIONS
 
 
 __all__ = ['from_yaml',
            'trace']
 
-TRACES_DB_PATH = './traces-db/'
-RESULTS_PATH = './results/'
 
-def _replay(trace_path, results_path, device_name):
-    success = dump_from_trace(trace_path, results_path, [], device_name)
+def _replay(trace_path, results_path):
+    success = dump_from_trace(trace_path, results_path, [])
 
     if not success:
         print("[check_image] Trace {} couldn't be replayed. "
@@ -57,28 +56,27 @@ def _replay(trace_path, results_path, device_name):
         return hexdigest_from_image(image_file), image_file
 
 
-def _check_trace(download_url, device_name, trace_path, expected_checksum):
-    ensure_file(download_url, trace_path, TRACES_DB_PATH)
+def _check_trace(trace_path, expected_checksum):
+    ensure_file(trace_path)
 
     result = {}
     result[trace_path] = {}
     result[trace_path]['expected'] = expected_checksum
 
     trace_dir = path.dirname(trace_path)
-    dir_in_results = path.join('trace', device_name, trace_dir)
-    results_path = path.join(RESULTS_PATH, dir_in_results)
+    dir_in_results = path.join('trace', OPTIONS.device_name, trace_dir)
+    results_path = path.join(OPTIONS.results_path, dir_in_results)
     os.makedirs(results_path, exist_ok=True)
 
-    checksum, image_file = _replay(path.join(TRACES_DB_PATH, trace_path),
-                                   results_path,
-                                   device_name))
+    checksum, image_file = _replay(path.join(OPTIONS.db_path, trace_path),
+                                   results_path)
 
     result[trace_path]['actual'] = checksum or 'error'
 
     if checksum is None:
         return False, result
     if checksum == expected_checksum:
-        if os.environ.get('TRACIE_STORE_IMAGES', '0') != '1':
+        if not OPTIONS.keep_image:
             os.remove(image_file)
         print('[check_image] Images match for:\n  {}\n'.format(trace_path))
         ok = True
@@ -91,7 +89,7 @@ def _check_trace(download_url, device_name, trace_path, expected_checksum):
               'mesa/mesa/blob/master/.gitlab-ci/tracie/README.md')
         ok = False
 
-    if not ok or os.environ.get('TRACIE_STORE_IMAGES', '0') == '1':
+    if not ok or OPTIONS.keep_image:
         result[trace_path]['image'] = image_file
 
     result[trace_path]['actual'] = checksum
@@ -100,24 +98,22 @@ def _check_trace(download_url, device_name, trace_path, expected_checksum):
 
 
 def _write_results(results):
-    os.makedirs(RESULTS_PATH, exist_ok=True)
-    results_file_path = path.join(RESULTS_PATH, 'results.yml')
+    os.makedirs(OPTIONS.results_path, exist_ok=True)
+    results_file_path = path.join(OPTIONS.results_path, 'results.yml')
     with open(results_file_path, 'w') as f:
         yaml.safe_dump(results, f, default_flow_style=False)
 
 
-def from_yaml(yaml_file, device_name):
+def from_yaml(yaml_file):
     y = qty.load_yaml(yaml_file)
 
-    download_url = qty.download_url(y)
+    OPTIONS.set_download_url(qty.download_url(y))
 
     all_ok = True
     results = {}
-    t_list = qty.traces(y, device_name=device_name, checksum=True)
+    t_list = qty.traces(y, device_name=OPTIONS.device_name, checksum=True)
     for t in t_list:
-        ok, result = _check_trace(download_url,
-                                  device_name,
-                                  t['path'], t['checksum'])
+        ok, result = _check_trace(t['path'], t['checksum'])
         all_ok = all_ok and ok
         results.update(result)
 
@@ -126,9 +122,8 @@ def from_yaml(yaml_file, device_name):
     return all_ok
 
 
-def trace(download_url, device_name, trace_path, expected_checksum):
-    ok, result = _check_trace(download_url, device_name, trace_path,
-                              expected_checksum)
+def trace(trace_path, expected_checksum):
+    ok, result = _check_trace(trace_path, expected_checksum)
 
     _write_results(result)
 

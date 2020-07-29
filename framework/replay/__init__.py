@@ -33,5 +33,6 @@ from .compare_replay import *
 from .download_utils import *
 from .dump_trace_images import *
 from .image_checksum import *
+from .options import *
 from .query_traces_yaml import *
 from .trace_utils import *
