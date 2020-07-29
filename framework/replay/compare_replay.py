@@ -25,7 +25,12 @@
 
 import os
 import yaml
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
+from enum import Enum, unique
 from glob import glob
 from os import path
 
@@ -38,8 +43,16 @@ from framework.replay.image_checksum import hexdigest_from_image
 from framework.replay.options import OPTIONS
 
 
-__all__ = ['from_yaml',
+__all__ = ['Result',
+           'from_yaml',
            'trace']
+
+
+@unique
+class Result(Enum):
+    FAILURE = -1
+    MATCH = 0
+    DIFFER = 1
 
 
 def _replay(trace_path, results_path):
@@ -60,9 +73,9 @@ def _replay(trace_path, results_path):
 def _check_trace(trace_path, expected_checksum):
     ensure_file(trace_path)
 
-    result = {}
-    result[trace_path] = {}
-    result[trace_path]['expected'] = expected_checksum
+    yaml_result = {}
+    yaml_result[trace_path] = {}
+    yaml_result[trace_path]['expected'] = expected_checksum
 
     trace_dir = path.dirname(trace_path)
     dir_in_results = path.join('trace', OPTIONS.device_name, trace_dir)
@@ -72,39 +85,57 @@ def _check_trace(trace_path, expected_checksum):
     checksum, image_file = _replay(path.join(OPTIONS.db_path, trace_path),
                                    results_path)
 
-    result[trace_path]['actual'] = checksum or 'error'
+    yaml_result[trace_path]['actual'] = checksum or 'error'
     print('[check_image]\n'
           '    actual: {}\n'
-          '  expected: {}'.format(result[trace_path]['actual'],
+          '  expected: {}'.format(yaml_result[trace_path]['actual'],
                                   expected_checksum))
 
     if checksum is None:
-        return False, result
+        return Result.FAILURE, yaml_result
     if checksum == expected_checksum:
         if not OPTIONS.keep_image:
             os.remove(image_file)
         print('[check_image] Images match for:\n  {}\n'.format(trace_path))
-        ok = True
+        result = Result.MATCH
     else:
         print('[check_image] Images differ for:\n  {}'.format(trace_path))
         print('[check_image] For more information see '
               'https://gitlab.freedesktop.org/'
               'mesa/mesa/blob/master/.gitlab-ci/tracie/README.md')
-        ok = False
+        result = Result.DIFFER
 
-    if not ok or OPTIONS.keep_image:
-        result[trace_path]['image'] = image_file
+    if result is not Result.MATCH or OPTIONS.keep_image:
+        yaml_result[trace_path]['image'] = image_file
 
-    result[trace_path]['actual'] = checksum
+    yaml_result[trace_path]['actual'] = checksum
 
-    return ok, result
+    return result, yaml_result
 
 
-def _write_results(results):
+def _print_result(result, trace_path, yaml_result):
+    output = 'PIGLIT: '
+    json_result = {}
+    if result is Result.FAILURE:
+        json_result['result'] = str(status.CRASH)
+    elif result is Result.DIFFER:
+        json_result['result'] = str(status.FAIL)
+        json_result['images'] = [
+            {'image_desc': trace_path,
+             'image_ref': yaml_result[trace_path]['expected'] + '.png',
+             'image_render': yaml_result[trace_path]['image']}]
+    else:
+        json_result['result'] = str(status.PASS)
+
+    output += json.dumps(json_result)
+    print(output)
+
+
+def _write_results(yaml_results):
     core.check_dir(OPTIONS.results_path)
     results_file_path = path.join(OPTIONS.results_path, 'results.yml')
     with open(results_file_path, 'w') as f:
-        yaml.safe_dump(results, f, default_flow_style=False)
+        yaml.safe_dump(yaml_results, f, default_flow_style=False)
 
 
 def from_yaml(yaml_file):
@@ -112,22 +143,26 @@ def from_yaml(yaml_file):
 
     OPTIONS.set_download_url(qty.download_url(y))
 
-    all_ok = True
-    results = {}
+    global_result = Result.MATCH
+    yaml_results = {}
     t_list = qty.traces(y, device_name=OPTIONS.device_name, checksum=True)
     for t in t_list:
-        ok, result = _check_trace(t['path'], t['checksum'])
-        all_ok = all_ok and ok
-        results.update(result)
+        result, yaml_result = _check_trace(t['path'], t['checksum'])
+        if result is not Result.MATCH and global_result is not Result.FAILURE:
+            global_result = result
+        yaml_results.update(yaml_result)
+        # TODO: print in subtest format
+        # _print_result(result, t['path'], yaml_result)
 
-    _write_results(results)
+    _write_results(yaml_results)
 
-    return all_ok
+    return global_result
 
 
 def trace(trace_path, expected_checksum):
-    ok, result = _check_trace(trace_path, expected_checksum)
+    result, yaml_result = _check_trace(trace_path, expected_checksum)
+    _print_result(result, trace_path, yaml_result)
 
-    _write_results(result)
+    _write_results(yaml_result)
 
-    return ok
+    return result
