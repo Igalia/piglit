@@ -61,7 +61,7 @@ class DEQPVKTest(deqp.DEQPBaseTest):
         elif _DEQP_ASSERT.search(self.result.err):
             self.result.result = 'skip'
             self.result.out += \
-                '\n\nMarked as skip because of a internal dEQP assertion'
+                '\n\nMarked as skip because of an internal dEQP assertion'
         else:
             super(DEQPVKTest, self).interpret_result()
 

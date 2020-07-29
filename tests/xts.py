@@ -43,7 +43,7 @@ class XTSProfile(TestProfile):  # pylint: disable=too-few-public-methods
     def setup(self):
         """This hook sets the XTSTest.results_path variable.
 
-        Setting this variable allows images created by XTS to moved into the
+        Setting this variable allows images created by XTS to be moved into the
         results directory.
         """
         XTSTest.RESULTS_PATH = self.results_dir
@@ -85,7 +85,7 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
             {"XT_RESET_DELAY": '0',
              "XT_FONTPATH_GOOD": '/usr/share/fonts/X11/misc',
              "XT_FONTPATH": os.path.join(X_TEST_SUITE, 'xts5', 'fonts'),
-             # XXX: Are the next 3 necissary?
+             # XXX: Are the next 3 necessary?
              "XT_LOCAL": 'Yes',
              "XT_TCP": 'No',
              "XT_DISPLAYHOST": ''})

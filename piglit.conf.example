@@ -183,7 +183,7 @@ run_test=./%(test_name)s
 ; Set this value to change whether piglit defaults to using process isolation
 ; or not. Care should be taken when using this option since it provides a
 ; performance improvement, but with a cost in stability and reproducibility.
-; 
+;
 ; Default: True
 ;process isolation=True
 

@@ -141,7 +141,7 @@ class TimeAttribute(object):
 
 
 class TestResult(object):
-    """An object represting the result of a single test."""
+    """An object representing the result of a single test."""
     __slots__ = ['returncode', '_err', '_out', 'time', 'command', 'traceback',
                  'environment', 'subtests', 'dmesg', '__result', 'images',
                  'exception', 'pid']

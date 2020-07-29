@@ -10,7 +10,7 @@
         "time_elapsed": { "$ref": "#/definitions/timeAttribute" },
         "info": {
             "type": "object",
-            "description": "Relavent information about the system running tests.",
+            "description": "Relevant information about the system running tests.",
             "additionalProperties": { 
                 "type": "object",
                 "additionalProperties": { "type": "string" }

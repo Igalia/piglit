@@ -392,8 +392,8 @@ def _update_seven_to_eight(result):
 def _update_eight_to_nine(result):
     """Update json results from version 8 to 9.
 
-    This changes the PID feild of the TestResult object to alist of Integers or
-    null rather than a single integer or null.
+    This changes the PID field of the TestResult object to a list of Integers
+    or null rather than a single integer or null.
 
     """
     for test in result['tests'].values():

@@ -29,7 +29,7 @@ __all__ = ['profile']
 profile = _profile.copy()
 
 
-# There are too many of theset, it's simply exhaustive to run them all.
+# There are too many of these, it's simply exhaustive to run them all.
 class FilterVsIn(object):
     """Filter out 80% of the Vertex Attrib 64 vs_in tests."""
 
