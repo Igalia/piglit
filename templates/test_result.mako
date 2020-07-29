@@ -36,7 +36,7 @@
               <td>reference</td>
               <td>rendered</td>
             </tr>
-          % for image in images:
+          % for image in value.images:
             <tr>
               <td>${image['image_desc']}</td>
               <td><img src="file://${image['image_ref']}"></td>
