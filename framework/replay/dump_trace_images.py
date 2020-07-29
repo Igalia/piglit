@@ -34,14 +34,14 @@ from framework.replay.trace_utils import trace_type_from_filename, TraceType
 __all__ = ['dump_from_trace']
 
 
-def log(severity, msg, end='\n'):
+def _log(severity, msg, end='\n'):
     print('[dump_trace_images] {}: {}'.format(severity, msg), flush=True,
           end=end)
 
-def log_result(msg):
+def _log_result(msg):
     print(msg, flush=True)
 
-def run_logged_command(cmd, env, log_path):
+def _run_logged_command(cmd, env, log_path):
     ret = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
     logoutput = '[dump_trace_images] Running: {}\n'.format(
         ' '.join(cmd)).encode() + ret.stdout
@@ -54,7 +54,7 @@ def run_logged_command(cmd, env, log_path):
             '[dump_traces_images] Process failed with error code: {}'.format(
                 ret.returncode))
 
-def get_last_apitrace_frame_call(cmd_wrapper, trace_path):
+def _get_last_apitrace_frame_call(cmd_wrapper, trace_path):
     cmd = cmd_wrapper + ['apitrace', 'dump', '--calls=frame', trace_path]
     ret = subprocess.run(cmd, stdout=subprocess.PIPE)
     for l in reversed(ret.stdout.decode(errors='replace').splitlines()):
@@ -63,7 +63,7 @@ def get_last_apitrace_frame_call(cmd_wrapper, trace_path):
             return int(s[0])
     return -1
 
-def get_last_gfxreconstruct_frame_call(trace_path):
+def _get_last_gfxreconstruct_frame_call(trace_path):
     cmd = ['gfxrecon-info', trace_path]
     ret = subprocess.run(cmd, stdout=subprocess.PIPE)
     lines = ret.stdout.decode(errors='replace').splitlines()
@@ -73,21 +73,21 @@ def get_last_gfxreconstruct_frame_call(trace_path):
             return int(c[1])
     return -1
 
-def dump_with_apitrace(retrace_cmd, trace_path, calls, device_name):
+def _dump_with_apitrace(retrace_cmd, trace_path, calls, device_name):
     output_dir = path.join(path.dirname(trace_path), 'test', device_name)
     os.makedirs(output_dir, exist_ok=True)
     outputprefix = path.join(output_dir, path.basename(trace_path)) + '-'
     if len(calls) == 0:
-        calls = [str(get_last_apitrace_frame_call(retrace_cmd[:-1],
+        calls = [str(_get_last_apitrace_frame_call(retrace_cmd[:-1],
                                                    trace_path))]
     cmd = retrace_cmd + ['--headless',
                          '--snapshot=' + ','.join(calls),
                          '--snapshot-prefix=' + outputprefix,
                          trace_path]
     log_path = path.join(output_dir, path.basename(trace_path)) + '.log'
-    run_logged_command(cmd, None, log_path)
+    _run_logged_command(cmd, None, log_path)
 
-def dump_with_renderdoc(trace_path, calls, device_name):
+def _dump_with_renderdoc(trace_path, calls, device_name):
     output_dir = path.join(path.dirname(trace_path), 'test', device_name)
     os.makedirs(output_dir, exist_ok=True)
     script_path = path.dirname(path.abspath(__file__))
@@ -95,9 +95,9 @@ def dump_with_renderdoc(trace_path, calls, device_name):
            trace_path, output_dir]
     cmd.extend(calls)
     log_path = path.join(output_dir, path.basename(trace_path)) + '.log'
-    run_logged_command(cmd, None, log_path)
+    _run_logged_command(cmd, None, log_path)
 
-def dump_with_gfxreconstruct(trace_path, calls, device_name):
+def _dump_with_gfxreconstruct(trace_path, calls, device_name):
     from PIL import Image
     output_dir = path.join(path.dirname(trace_path), 'test', device_name)
     os.makedirs(output_dir, exist_ok=True)
@@ -107,14 +107,14 @@ def dump_with_gfxreconstruct(trace_path, calls, device_name):
         # 0 to (total-num-calls - 1) while gfxreconstruct does it from
         # 1 to total-num-calls:
         # https://github.com/LunarG/gfxreconstruct/issues/284
-        calls = [str(get_last_gfxreconstruct_frame_call(trace_path) - 1)]
+        calls = [str(_get_last_gfxreconstruct_frame_call(trace_path) - 1)]
     cmd = ['gfxrecon-replay', trace_path]
     env = os.environ.copy()
     env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
     env['VK_SCREENSHOT_FRAMES'] = ','.join(calls)
     env['VK_SCREENSHOT_DIR'] = output_dir
     log_path = outputprefix + '.log'
-    run_logged_command(cmd, env, log_path)
+    _run_logged_command(cmd, env, log_path)
     for c in calls:
         ppm = path.join(output_dir, c) + '.ppm'
         outputfile = outputprefix + '-' + c + '.png'
@@ -123,7 +123,7 @@ def dump_with_gfxreconstruct(trace_path, calls, device_name):
         Image.open(ppm).save(outputfile)
         os.remove(ppm)
 
-def dump_with_testtrace(trace_path, calls, device_name):
+def _dump_with_testtrace(trace_path, calls, device_name):
     from PIL import Image
     output_dir = path.join(path.dirname(trace_path), 'test', device_name)
     os.makedirs(output_dir, exist_ok=True)
@@ -142,27 +142,27 @@ def dump_with_testtrace(trace_path, calls, device_name):
                         bytes(color * 32 * 32)).save(outputfile)
 
 def dump_from_trace(trace_path, calls, device_name):
-    log('Info', 'Dumping trace {}'.format(trace_path, end='...\n')
+    _log('Info', 'Dumping trace {}'.format(trace_path), end='...\n')
     trace_type = trace_type_from_filename(path.basename(trace_path))
     try:
         if trace_type == TraceType.APITRACE:
-            dump_with_apitrace(['eglretrace'], trace_path, calls, device_name)
+            _dump_with_apitrace(['eglretrace'], trace_path, calls, device_name)
         elif trace_type == TraceType.APITRACE_DXGI:
-            dump_with_apitrace(['wine', 'd3dretrace'], trace_path, calls,
+            _dump_with_apitrace(['wine', 'd3dretrace'], trace_path, calls,
                                 device_name)
         elif trace_type == TraceType.RENDERDOC:
-            dump_with_renderdoc(trace_path, calls, device_name)
+            _dump_with_renderdoc(trace_path, calls, device_name)
         elif trace_type == TraceType.GFXRECONSTRUCT:
-            dump_with_gfxreconstruct(trace_path, calls, device_name)
+            _dump_with_gfxreconstruct(trace_path, calls, device_name)
         elif trace_type == TraceType.TESTTRACE:
-            dump_with_testtrace(trace_path, calls, device_name)
+            _dump_with_testtrace(trace_path, calls, device_name)
         else:
             raise RuntimeError('Unknown tracefile extension')
-        log_result('OK')
+        _log_result('OK')
         return True
     except Exception as e:
-        log_result('ERROR')
-        log('Debug', '=== Failure log start ===')
+        _log_result('ERROR')
+        _log('Debug', '=== Failure log start ===')
         print(e)
-        log('Debug', '=== Failure log end ===')
+        _log('Debug', '=== Failure log end ===')
         return False
