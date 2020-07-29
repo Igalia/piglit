@@ -188,8 +188,10 @@ run_test=./%(test_name)s
 ;process isolation=True
 
 [vkrunner]
-; Path to the VkRunner executable
-; bin=/home/neil/local/bin/vkrunner
+; Path to the VkRunner executable. The option is not required.
+; Can be overwritten by PIGLIT_VKRUNNER_BINARY environment variable.
+; If both are missing, it will look for "vkrunner" in the search PATH.
+;bin=/home/neil/local/bin/vkrunner
 
 [expected-failures]
 ; Provide a list of test names that are expected to fail.  These tests
