@@ -161,8 +161,8 @@ It's often useful, especially during development, to be able to run the scripts
 locally.
 
 Depending on the target 3D API, the scripts require a recent version
-of apitrace being in the path, and also the renderdoc python module
-being available, for GL traces.
+of apitrace (and eglretrace) being in the path, and also the renderdoc
+python module being available, for GL traces.
 
 To ensure python3 can find the renderdoc python module you need to set
 `PYTHONPATH` to point to the location of `renderdoc.so` (binary python modules)
@@ -171,7 +171,7 @@ renderdoc build tree, both of these are in `renderdoc/<builddir>/lib`. Note
 that renderdoc doesn't install the `renderdoc.so` python module.
 
 In the case of Vulkan traces, the scripts need a recent version of
-gfxrecon-replay being in the path, and also the
+gfxrecon-info and gfxrecon-replay being in the path, and also the
 `VK_LAYER_LUNARG_screenshot` Vulkan layer from LunarG's VulkanTools.
 
 To ensure that this layer can be found when running the trace you need
@@ -181,5 +181,9 @@ location of `libVkLayer_screenshot.so`.
 
 In the case of DXGI traces, the scripts require Wine, a recent version
 of DXVK installed in the default `WINEPREFIX`, and a recent binary
-version of apitrace for Windows which should be reachable through
-Windows' `PATH` environment variable.
+version of apitrace (and d3dretrace) for Windows which should be
+reachable through Windows' `PATH` environment variable.
+
+Alternatively, all of the paths for specific binaries can be set via
+piglit's configuration file or env variables. Check the documenation
+at [piglit.conf.example](piglit.conf.example) for further details.
