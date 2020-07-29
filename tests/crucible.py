@@ -34,20 +34,15 @@ try:
 except ImportError:
     import xml.etree.ElementTree as etree
 
-from framework import grouptools, backends, exceptions
+from framework import grouptools, backends, core, exceptions
 from framework import status
-from framework.core import PIGLIT_CONFIG
 from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
 
-crucible_bin = os.environ.get('PIGLIT_CRUCIBLE_BIN', None)
-if crucible_bin is None:
-    crucible_bin = PIGLIT_CONFIG.safe_get('crucible', 'bin')
-
-if crucible_bin is None:
-    raise exceptions.PiglitFatalError(
-        'Cannot get "PIGLIT_CRUCIBLE_BIN" or conf value "crucible:bin"')
+crucible_bin = core.get_option('PIGLIT_CRUCIBLE_BIN',
+                               ('crucible', 'bin'),
+                               required=True)
 
 
 class CrucibleTest(Test):

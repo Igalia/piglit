@@ -240,11 +240,9 @@ class VkRunnerTest(PiglitBaseTest):
     """ Make a PiglitTest instance for a VkRunner shader test file """
 
     def __init__(self, filename, env=None):
-        vkrunner_bin = os.environ.get('PIGLIT_VKRUNNER_BINARY')
-
-        if vkrunner_bin is None:
-            vkrunner_bin = core.PIGLIT_CONFIG.safe_get(
-                'vkrunner', 'bin', fallback='vkrunner')
+        vkrunner_bin = core.get_option('PIGLIT_VKRUNNER_BINARY',
+                                       ('vkrunner', 'bin'),
+                                       default='vkrunner')
 
         super(VkRunnerTest, self).__init__(
             [vkrunner_bin],
