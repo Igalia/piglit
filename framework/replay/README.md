@@ -1,7 +1,5 @@
-Tracie - Mesa Traces Continuous Integration System
-==================================================
-
-Home of the Mesa trace testing effort.
+Replayer
+========
 
 ### Traces definition file
 
@@ -27,140 +25,142 @@ traces:
 ```
 
 The `traces-db` entry can be absent, in which case it is assumed that
-the traces can be found in the `CWD/traces-db` directory.
+the traces can be found in the `CWD/replayer-db` directory.
 
 Traces that don't have an expectation for the current device are skipped
 during trace replay.
 
-Adding a new trace to the list involves commiting the trace to the git repo and
-adding an entry to the `traces` list. The reference checksums can be calculated
-with the [image_checksum.py](.gitlab-ci/tracie/image_checksum.py) script.
-Alternatively, an arbitrary checksum can be used, and during replay (see below)
-the scripts will report the mismatch and expected checksum.
+Adding a new trace to the list involves uploading the trace to the
+remote `traces-db` and adding an entry to the `traces` list. The
+reference checksums can be calculated with the `checksum` command.
+Alternatively, an arbitrary checksum can be used, and during replay
+(see below) the scripts will report the mismatch and expected
+checksum.
 
 ### Trace-db download urls
 
 The trace-db:download-url property contains an HTTPS url from which traces can
 be downloaded, by appending traces:path properties to it.
 
-### Enabling trace testing on a new device
-
-To enable trace testing on a new device:
-
-1. Create a new job in .gitlab-ci.yml. The job will need to be tagged
-   to run on runners with the appropriate hardware.
-
-   1. If you mean to test GL traces, use the `.traces-test-gl`
-      template jobs as a base, and make sure you set a unique value for the
-     `DEVICE_NAME` variable:
-
-   ```yaml
-   my-hardware-gl-traces:
-     extends: .traces-test-gl
-     variables:
-       DEVICE_NAME: "gl-myhardware"
-   ```
-
-   2. If you mean to test Vulkan traces, use the `.traces-test-vk`
-      template jobs as a base, set the `VK_DRIVER` variable, and make
-      sure you set a unique value for the `DEVICE_NAME` variable:
-
-   ```yaml
-   my-hardware-vk-traces:
-     extends: .traces-test-vk
-     variables:
-       VK_DRIVER: "radeon"
-       DEVICE_NAME: "vk-myhardware"
-   ```
-
-2. Update the .gitlab-ci/traces.yml file with expectations for the new device.
-   Ensure that the device name used in the expectations matches the one
-   set in the job. For more information, and tips about how to calculate
-   the checksums, see the section describing the trace definition files.
-
 ### Trace files
 
-Tracie supports renderdoc (.rdc), apitrace (.trace) and gfxreconstruct
-(.gfxr) files. Trace files need to have the correct extension so that
-tracie can detect them properly.
+replayer supports renderdoc (.rdc), apitrace (.trace, .trace-dxgi) and
+gfxreconstruct (.gfxr) files. Trace files need to have the correct
+extension so that replayer can detect them properly.
 
-The trace files that are contained in public traces-db repositories must be
-legally redistributable. This is typically true for FOSS games and
-applications. Traces for proprietary games and application are typically not
-redistributable, unless specific redistribution rights have been granted by the
-publisher.
+The trace files that are contained in public `traces-db` stores must
+be legally redistributable. This is typically true for FOSS games and
+applications. Traces for proprietary games and application are
+typically not redistributable, unless specific redistribution rights
+have been granted by the publisher.
 
-Trace files in a given repository are expected to be immutable once committed
-for the first time, so any changes need to be accompanied by a change in the
-file name (eg. by appending a _v2 suffix to the file).
+In order to have reliable comparisons, trace files in a given store
+are expected to be immutable. Any change to a trace file means that it
+needs to be renamed and updated in the traces definition file (eg. by
+appending a _v2 suffix to the file).
 
 ### Replaying traces
 
-Mesa traces CI uses a set of scripts to replay traces and check the output
-against reference checksums.
+replayer features a series of commands to deal with traces:
+ * `checksum`: will calculate the checksum for a given image file.
+ * `compare`: will download a trace or all the traces in a traces
+   definition file for a given device, replay them and compare their
+   checksum against the expected ones.
+ * `download`: will download a file, given a relative path, from a
+   remote url.
+ * `dump`: will dump as images the last call or specified calls from a
+   trace file, given a specific device.
+ * `query`: will return the queried information from a given traces
+   definition file.
 
-The high level script [tracie.py](.gitlab-ci/tracie/tracie.py) accepts
-commands to use a `yaml` traces definition file, `query` for data from
-a traces definition file, or the description of an individual `trace`:
+You can get a more complete help running:
+
+   ```sh
+   $ replayer.py <command> --help
+   ```
 
 Examples:
 
    ```sh
-   $ tracie.py yaml \
-               --device-name gl-vmware-llvmpipe \
-               --file .gitlab-ci/traces.yml
+   $ replayer.py checksum ./vkcube.gfxr-9.png
    ```
 
    ```sh
-   $ tracie.py query \
-               --file .gitlab-ci/traces.yml \
-               traces \
-               --device-name gl-vmware-llvmpipe \
-               --trace-types apitrace,renderdoc \
-               --checksum
+   $ replayer.py compare trace \
+                 --output ./results \
+		 --device-name gl-vmware-llvmpipe \
+		 --download-url https://minio-packet.freedesktop.org/mesa-tracie-public/ \
+		 glmark2/desktop-blur-radius=5:effect=blur:passes=1:separable=true:windows=4.rdc \
+		 8867f3a41f180626d0d4b7661ff5c0f4
    ```
 
    ```sh
-   $ tracie.py trace \
-               --device-name gl-vmware-llvmpipe \
-               --download-url https://minio-packet.freedesktop.org/mesa-tracie-public/ \
-               --path glmark2/jellyfish.rdc \
-               --expected-checksum d82267c25a0decdad7b563c56bb81106
-   ```
-
-tracie.py copies the produced artifacts to the `$CI_PROJECT_DIR/result`
-directory. By default, created images from traces are only stored in case of a
-checksum mismatch. The `TRACIE_STORE_IMAGES` CI/environment variable can be set
-to `1` to force storing images, e.g., to get a complete set of reference
-images.
-
-At a lower level the
-[dump_trace_images.py](.gitlab-ci/tracie/dump_trace_images.py) script is
-called, which replays a trace, dumping a set of images in the process. By
-default only the image corresponding to the last frame of the trace is dumped,
-but this can be changed with the `--calls` parameter. The dumped images are
-stored in a subdirectory `test/<device-name>` next to the trace file itself,
-with names of the form `tracefilename-callnum.png`.  The full log of any
-commands used while dumping the images is also saved in a file in the
-'test/<device-name>' subdirectory, named after the trace name with '.log'
-appended.
-
-Examples:
-
-   ```sh
-   $ python3 dump_traces_images.py --device-name=gl-vmware-llvmpipe mytrace.trace
+   $ replayer.py compare yaml \
+		 --yaml-file ./traces.yml \
+		 --device-name gl-vmware-llvmpipe \
+		 --keep-image
    ```
 
    ```sh
-   $ python3 dump_traces_images.py --device-name=gl-vmware-llvmpipe --calls=2075,3300 mytrace.trace
+   $ replayer.py download \
+		 --download-url https://minio-packet.freedesktop.org/mesa-tracie-public/ \
+		 --db-path ./traces-db \
+		 --force-download \
+		 glmark2/desktop-blur-radius=5:effect=blur:passes=1:separable=true:windows=4.rdc
    ```
 
-### Running the replay scripts locally
+   ```sh
+   $ replayer.py dump \
+                 --config ./piglit.conf \
+                 --output ./results \
+		 --device-name gl-vmware-llvmpipe \
+		 --calls "3,8,9" \
+		 glmark2/desktop-blur-radius=5:effect=blur:passes=1:separable=true:windows=4.rdc
+   ```
 
-It's often useful, especially during development, to be able to run the scripts
-locally.
+   ```sh
+   $ replayer.py query \
+		 --yaml-file ./traces.yml \
+                 checksum \
+                 --device-name gl-vmware-llvmpipe \
+		 glmark2/desktop-blur-radius=5:effect=blur:passes=1:separable=true:windows=4.rdc
+   ```
 
-Depending on the target 3D API, the scripts require a recent version
+   ```sh
+   $ replayer.py query \
+		 --yaml-file ./traces.yml \
+                 traces \
+                 --device-name gl-vmware-llvmpipe \
+                 --trace-types "apitrace,renderdoc"
+                 --checksum
+   ```
+
+   ```sh
+   $ replayer.py query \
+		 --yaml-file ./traces.yml \
+                 traces_db_download_url
+   ```
+
+Unless specified when comparing or dumping, replayer places the
+produced artifacts at the `CWD/results` directory. By default, created
+images from traces are only stored in case of a checksum
+mismatch. This can be overriden with the `--keep-image` parameter to
+force storing images, e.g., to get a complete set of reference images.
+
+By default when dumping, only the image corresponding to the last frame
+of the trace is created.  This can be changed with the `--calls`
+parameter.
+
+Unless specified with the `--output` parameter, the dumped images are
+stored in the subdirectory `./test/<device-name>/<trace_file_path/` ,
+with names of the form `trace_file_name-call_num.png`.  The full log
+of any commands used while dumping the images is also saved in a file
+in the 'test/<device-name>' subdirectory, named after the trace name
+with '.log' appended.
+
+### Specific dependencies for dumping depending of the trace type
+
+Depending on the target 3D API, replayer requires a recent version
 of apitrace (and eglretrace) being in the path, and also the renderdoc
 python module being available, for GL traces.
 
@@ -170,7 +170,7 @@ and `LD_LIBRARY_PATH` to point to the location of `librenderdoc.so`. In the
 renderdoc build tree, both of these are in `renderdoc/<builddir>/lib`. Note
 that renderdoc doesn't install the `renderdoc.so` python module.
 
-In the case of Vulkan traces, the scripts need a recent version of
+In the case of Vulkan traces, replayer needs a recent version of
 gfxrecon-info and gfxrecon-replay being in the path, and also the
 `VK_LAYER_LUNARG_screenshot` Vulkan layer from LunarG's VulkanTools.
 
@@ -179,7 +179,7 @@ to set `VK_LAYER_PATH` to point to the location of
 `VkLayer_screenshot.json` and `LD_LIBRARY_PATH` to point to the
 location of `libVkLayer_screenshot.so`.
 
-In the case of DXGI traces, the scripts require Wine, a recent version
+In the case of DXGI traces, replayer requires Wine, a recent version
 of DXVK installed in the default `WINEPREFIX`, and a recent binary
 version of apitrace (and d3dretrace) for Windows which should be
 reachable through Windows' `PATH` environment variable.

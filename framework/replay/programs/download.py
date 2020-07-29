@@ -1,6 +1,5 @@
 # coding=utf-8
 #
-# Copyright (c) 2015-2016, 2019 Intel Corporation
 # Copyright © 2020 Valve Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -25,20 +24,35 @@
 
 import argparse
 
+from framework import exceptions
+from framework.replay import download_utils
+from framework.replay import options
+from . import parsers
 
-DEVICE = argparse.ArgumentParser(add_help=False)
-DEVICE.add_argument(
-    '-d', '--device-name',
-    dest="device_name",
-    required=False,
-    default="",
-    help='the name of the graphics device used to replay traces')
 
-YAML = argparse.ArgumentParser(add_help=False)
-YAML.add_argument(
-    '-f', '--file',
-    dest="yaml_file",
-    required=True,
-    type=argparse.FileType("r"),
-    help=('the name of the traces.yml file listing traces '
-          'and their checksums for each device'))
+__all__ = ['download']
+
+
+def _ensure_file(args):
+    options.OPTIONS.set_download_url(args.download_url)
+    options.OPTIONS.download['force'] = args.force_download
+    options.OPTIONS.db_path = args.db_path
+
+    return download_utils.ensure_file(args.file_path)
+
+
+@exceptions.handler
+def download(input_):
+    """ Parser for replayer download command """
+    parser = argparse.ArgumentParser(parents=[parsers.DOWNLOAD_URL,
+                                              parsers.DOWNLOAD_FORCE,
+                                              parsers.DB_PATH])
+    parser.add_argument(
+        'file_path',
+        help=('the path to the file '
+              'at the provided URL from which to download'))
+    parser.set_defaults(func=_ensure_file)
+
+    args = parser.parse_args(input_)
+
+    args.func(args)
