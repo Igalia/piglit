@@ -28,6 +28,7 @@ import subprocess
 
 from os import path
 
+from framework.replay.options import OPTIONS
 from framework.replay.trace_utils import trace_type_from_filename, TraceType
 
 
@@ -133,10 +134,11 @@ def _dump_with_testtrace(trace_path, output_dir, calls):
         Image.frombytes('RGBA', (32, 32),
                         bytes(color * 32 * 32)).save(outputfile)
 
-def dump_from_trace(trace_path, output_dir, calls, device_name):
+def dump_from_trace(trace_path, output_dir=None, calls=[]):
     _log('Info', 'Dumping trace {}'.format(trace_path), end='...\n')
     if output_dir is None:
-        output_dir = path.join('trace', device_name, path.dirname(trace_path))
+        output_dir = path.join('trace', OPTIONS.device_name,
+                               path.dirname(trace_path))
     os.makedirs(output_dir, exist_ok=True)
     trace_type = trace_type_from_filename(path.basename(trace_path))
     try:

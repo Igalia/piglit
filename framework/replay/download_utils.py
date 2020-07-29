@@ -29,27 +29,29 @@ import requests
 from os import path
 from time import time
 
+from framework.replay.options import OPTIONS
+
 
 __all__ = ['ensure_file']
 
 
-def ensure_file(download_url, file_path, destination):
-    destination_file_path = path.join(destination, file_path)
-    if download_url is None:
+def ensure_file(file_path):
+    destination_file_path = path.join(OPTIONS.db_path, file_path)
+    if OPTIONS.download['url'] is None:
         assert path.exists(destination_file_path), (
             '{} missing'.format(destination_file_path))
         return
 
     os.makedirs(path.dirname(destination_file_path), exist_ok=True)
 
-    if path.exists(destination_file_path):
+    if not OPTIONS.download['force'] and path.exists(destination_file_path):
         return
 
     print('[check_image] Downloading file {}'.format(
         file_path), end=' ', flush=True)
     download_time = time()
     with open(destination_file_path, 'wb') as file:
-        with requests.get(download_url + file_path,
+        with requests.get(OPTIONS.download['url'].geturl() + file_path,
                           allow_redirects=True, stream=True) as r:
             r.raise_for_status()
             for chunk in r.iter_content(chunk_size=8194):
