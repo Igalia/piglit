@@ -194,6 +194,21 @@ run_test=./%(test_name)s
 ;bin=/home/neil/local/bin/vkrunner
 
 [replay]
+; Path to the replay description file.
+; Can be overwritten by PIGLIT_REPLAY_DESCRIPTION_FILE environment
+; variable.
+;description_file=./traces.yml
+
+; Name of the device selected for the replay.
+; Can be overwritten by PIGLIT_REPLAY_DEVICE_NAME environment
+; variable.
+;device_name=vk-amd-raven
+
+; Space-separated list of extra command line arguments for
+; replayer. The option is not required. The environment variable
+; PIGLIT_REPLAY_EXTRA_ARGS overrides the value set here.
+;extra_args=--keep-image
+
 ; Path to the apitrace executable. The option is not required.
 ; Can be overwritten by PIGLIT_REPLAY_APITRACE_BINARY environment
 ; variable.
