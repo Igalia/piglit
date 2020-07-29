@@ -29,6 +29,7 @@ import yaml
 from glob import glob
 from os import path
 
+from framework import core
 from framework import status
 from framework.replay import query_traces_yaml as qty
 from framework.replay.download_utils import ensure_file
@@ -66,7 +67,7 @@ def _check_trace(trace_path, expected_checksum):
     trace_dir = path.dirname(trace_path)
     dir_in_results = path.join('trace', OPTIONS.device_name, trace_dir)
     results_path = path.join(OPTIONS.results_path, dir_in_results)
-    os.makedirs(results_path, exist_ok=True)
+    core.check_dir(results_path)
 
     checksum, image_file = _replay(path.join(OPTIONS.db_path, trace_path),
                                    results_path)
@@ -98,7 +99,7 @@ def _check_trace(trace_path, expected_checksum):
 
 
 def _write_results(results):
-    os.makedirs(OPTIONS.results_path, exist_ok=True)
+    core.check_dir(OPTIONS.results_path)
     results_file_path = path.join(OPTIONS.results_path, 'results.yml')
     with open(results_file_path, 'w') as f:
         yaml.safe_dump(results, f, default_flow_style=False)

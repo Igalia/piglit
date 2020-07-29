@@ -28,6 +28,7 @@ import subprocess
 
 from os import path
 
+from framework import core
 from framework.replay.options import OPTIONS
 from framework.replay.trace_utils import trace_type_from_filename, TraceType
 
@@ -46,7 +47,7 @@ def _run_logged_command(cmd, env, log_path):
     ret = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
     logoutput = '[dump_trace_images] Running: {}\n'.format(
         ' '.join(cmd)).encode() + ret.stdout
-    os.makedirs(path.dirname(log_path), exist_ok=True)
+    core.check_dir(path.dirname(log_path))
     with open(log_path, 'wb') as log:
         log.write(logoutput)
     if ret.returncode:
@@ -139,7 +140,7 @@ def dump_from_trace(trace_path, output_dir=None, calls=[]):
     if output_dir is None:
         output_dir = path.join('trace', OPTIONS.device_name,
                                path.dirname(trace_path))
-    os.makedirs(output_dir, exist_ok=True)
+    core.check_dir(output_dir)
     trace_type = trace_type_from_filename(path.basename(trace_path))
     try:
         if trace_type == TraceType.APITRACE:

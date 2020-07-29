@@ -23,12 +23,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
 import requests
 
 from os import path
 from time import time
 
+from framework import core
 from framework.replay.options import OPTIONS
 
 
@@ -42,7 +42,7 @@ def ensure_file(file_path):
             '{} missing'.format(destination_file_path))
         return
 
-    os.makedirs(path.dirname(destination_file_path), exist_ok=True)
+    core.check_dir(path.dirname(destination_file_path))
 
     if not OPTIONS.download['force'] and path.exists(destination_file_path):
         return
