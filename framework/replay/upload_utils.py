@@ -41,7 +41,7 @@ except ImportError:
 __all__ = ['upload_file']
 
 
-def sign_with_hmac(key, message):
+def _sign_with_hmac(key, message):
     key = key.encode('UTF-8')
     message = message.encode('UTF-8')
 
@@ -70,7 +70,7 @@ def upload_file(file_path, content_type, device_name):
         minio_token = credentials['SessionToken']
         to_sign = 'PUT\n\n{}\n{}\nx-amz-security-token:{}\n{}'.format(
             content_type, date, minio_token, url.path)
-        signature = sign_with_hmac(minio_secret, to_sign)
+        signature = _sign_with_hmac(minio_secret, to_sign)
         headers.update(
             {'Authorization': 'AWS {}:{}'.format(minio_key, signature),
              'x-amz-security-token': minio_token})

@@ -44,7 +44,7 @@ __all__ = ['from_yaml',
 TRACES_DB_PATH = './traces-db/'
 RESULTS_PATH = './results/'
 
-def replay(trace_path, device_name):
+def _replay(trace_path, device_name):
     success = dump_from_trace(trace_path, [], device_name)
 
     if not success:
@@ -63,7 +63,7 @@ def replay(trace_path, device_name):
         return (hexdigest_from_image(image_file), image_file, log_file)
 
 
-def check_trace(download_url, device_name, trace_path, expected_checksum):
+def _check_trace(download_url, device_name, trace_path, expected_checksum):
     ensure_file(download_url, trace_path, TRACES_DB_PATH)
 
     result = {}
@@ -75,9 +75,9 @@ def check_trace(download_url, device_name, trace_path, expected_checksum):
     results_path = path.join(RESULTS_PATH, dir_in_results)
     os.makedirs(results_path, exist_ok=True)
 
-    checksum, image_file, log_file = replay(path.join(TRACES_DB_PATH,
-                                                      trace_path),
-                                            device_name)
+    checksum, image_file, log_file = _replay(path.join(TRACES_DB_PATH,
+                                                       trace_path),
+                                             device_name)
 
     result[trace_path]['actual'] = checksum or 'error'
 
@@ -107,7 +107,7 @@ def check_trace(download_url, device_name, trace_path, expected_checksum):
     return ok, result
 
 
-def write_results(results):
+def _write_results(results):
     os.makedirs(RESULTS_PATH, exist_ok=True)
     results_file_path = path.join(RESULTS_PATH, 'results.yml')
     with open(results_file_path, 'w') as f:
@@ -124,26 +124,21 @@ def from_yaml(yaml_file, device_name):
     results = {}
     t_list = qty.traces(y, device_name=device_name, checksum=True)
     for t in t_list:
-        ok, result = check_trace(download_url,
-                                 device_name,
-                                 t['path'], t['checksum'])
+        ok, result = _check_trace(download_url,
+                                  device_name,
+                                  t['path'], t['checksum'])
         all_ok = all_ok and ok
         results.update(result)
 
-    os.makedirs(RESULTS_PATH, exist_ok=True)
-    with open(os.path.join(RESULTS_PATH, 'results.yml'), 'w') as f:
-        yaml.safe_dump(results, f, default_flow_style=False)
-    if os.environ.get('TRACIE_UPLOAD_TO_MINIO', '0') == '1':
-        upload_artifact(os.path.join(RESULTS_PATH, 'results.yml'),
-                        'text/yaml', device_name)
+    _write_results(results)
 
     return all_ok
 
 
 def trace(download_url, device_name, trace_path, expected_checksum):
-    ok, result = check_trace(download_url, device_name, trace_path,
-                             expected_checksum)
+    ok, result = _check_trace(download_url, device_name, trace_path,
+                              expected_checksum)
 
-    write_results(result)
+    _write_results(result)
 
     return ok
