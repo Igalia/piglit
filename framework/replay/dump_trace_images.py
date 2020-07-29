@@ -73,9 +73,7 @@ def _get_last_gfxreconstruct_frame_call(trace_path):
             return int(c[1])
     return -1
 
-def _dump_with_apitrace(retrace_cmd, trace_path, calls, device_name):
-    output_dir = path.join(path.dirname(trace_path), 'test', device_name)
-    os.makedirs(output_dir, exist_ok=True)
+def _dump_with_apitrace(retrace_cmd, trace_path, output_dir, calls):
     outputprefix = path.join(output_dir, path.basename(trace_path)) + '-'
     if len(calls) == 0:
         calls = [str(_get_last_apitrace_frame_call(retrace_cmd[:-1],
@@ -87,9 +85,7 @@ def _dump_with_apitrace(retrace_cmd, trace_path, calls, device_name):
     log_path = path.join(output_dir, path.basename(trace_path)) + '.log'
     _run_logged_command(cmd, None, log_path)
 
-def _dump_with_renderdoc(trace_path, calls, device_name):
-    output_dir = path.join(path.dirname(trace_path), 'test', device_name)
-    os.makedirs(output_dir, exist_ok=True)
+def _dump_with_renderdoc(trace_path, output_dir, calls):
     script_path = path.dirname(path.abspath(__file__))
     cmd = [path.join(script_path, 'renderdoc_dump_images.py'),
            trace_path, output_dir]
@@ -97,10 +93,8 @@ def _dump_with_renderdoc(trace_path, calls, device_name):
     log_path = path.join(output_dir, path.basename(trace_path)) + '.log'
     _run_logged_command(cmd, None, log_path)
 
-def _dump_with_gfxreconstruct(trace_path, calls, device_name):
+def _dump_with_gfxreconstruct(trace_path, output_dir, calls):
     from PIL import Image
-    output_dir = path.join(path.dirname(trace_path), 'test', device_name)
-    os.makedirs(output_dir, exist_ok=True)
     outputprefix = path.join(output_dir, path.basename(trace_path))
     if len(calls) == 0:
         # FIXME: The VK_LAYER_LUNARG_screenshot numbers the calls from
@@ -123,10 +117,8 @@ def _dump_with_gfxreconstruct(trace_path, calls, device_name):
         Image.open(ppm).save(outputfile)
         os.remove(ppm)
 
-def _dump_with_testtrace(trace_path, calls, device_name):
+def _dump_with_testtrace(trace_path, output_dir, calls):
     from PIL import Image
-    output_dir = path.join(path.dirname(trace_path), 'test', device_name)
-    os.makedirs(output_dir, exist_ok=True)
     outputprefix = path.join(output_dir, path.basename(trace_path))
     with open(trace_path) as f:
         rgba = f.read()
@@ -141,21 +133,24 @@ def _dump_with_testtrace(trace_path, calls, device_name):
         Image.frombytes('RGBA', (32, 32),
                         bytes(color * 32 * 32)).save(outputfile)
 
-def dump_from_trace(trace_path, calls, device_name):
+def dump_from_trace(trace_path, output_dir, calls, device_name):
     _log('Info', 'Dumping trace {}'.format(trace_path), end='...\n')
+    if output_dir is None:
+        output_dir = path.join(path.dirname(trace_path), 'test', device_name)
+    os.makedirs(output_dir, exist_ok=True)
     trace_type = trace_type_from_filename(path.basename(trace_path))
     try:
         if trace_type == TraceType.APITRACE:
-            _dump_with_apitrace(['eglretrace'], trace_path, calls, device_name)
+            _dump_with_apitrace(['eglretrace'], trace_path, output_dir, calls)
         elif trace_type == TraceType.APITRACE_DXGI:
-            _dump_with_apitrace(['wine', 'd3dretrace'], trace_path, calls,
-                                device_name)
+            _dump_with_apitrace(['wine', 'd3dretrace'], trace_path, output_dir,
+                                calls)
         elif trace_type == TraceType.RENDERDOC:
-            _dump_with_renderdoc(trace_path, calls, device_name)
+            _dump_with_renderdoc(trace_path, output_dir, calls)
         elif trace_type == TraceType.GFXRECONSTRUCT:
-            _dump_with_gfxreconstruct(trace_path, calls, device_name)
+            _dump_with_gfxreconstruct(trace_path, output_dir, calls)
         elif trace_type == TraceType.TESTTRACE:
-            _dump_with_testtrace(trace_path, calls, device_name)
+            _dump_with_testtrace(trace_path, output_dir, calls)
         else:
             raise RuntimeError('Unknown tracefile extension')
         _log_result('OK')

@@ -24,7 +24,6 @@
 # SPDX-License-Identifier: MIT
 
 import os
-import shutil
 import yaml
 
 from glob import glob
@@ -43,23 +42,19 @@ __all__ = ['from_yaml',
 TRACES_DB_PATH = './traces-db/'
 RESULTS_PATH = './results/'
 
-def _replay(trace_path, device_name):
-    success = dump_from_trace(trace_path, [], device_name)
+def _replay(trace_path, results_path, device_name):
+    success = dump_from_trace(trace_path, results_path, [], device_name)
 
     if not success:
         print("[check_image] Trace {} couldn't be replayed. "
               "See above logs for more information.".format(trace_path))
-        return None, None, None
+        return None, None
     else:
-        test_path = path.join(path.dirname(trace_path), 'test', device_name)
         file_name = path.basename(trace_path)
-        files = glob(path.join(test_path, file_name + '-*' + '.png'))
+        files = glob(path.join(results_path, file_name + '-*' + '.png'))
         assert(files)
         image_file = files[0]
-        files = glob(path.join(test_path, file_name + '.log'))
-        assert(files)
-        log_file = files[0]
-        return (hexdigest_from_image(image_file), image_file, log_file)
+        return hexdigest_from_image(image_file), image_file
 
 
 def _check_trace(download_url, device_name, trace_path, expected_checksum):
@@ -74,18 +69,17 @@ def _check_trace(download_url, device_name, trace_path, expected_checksum):
     results_path = path.join(RESULTS_PATH, dir_in_results)
     os.makedirs(results_path, exist_ok=True)
 
-    checksum, image_file, log_file = _replay(path.join(TRACES_DB_PATH,
-                                                       trace_path),
-                                             device_name)
+    checksum, image_file = _replay(path.join(TRACES_DB_PATH, trace_path),
+                                   results_path,
+                                   device_name))
 
     result[trace_path]['actual'] = checksum or 'error'
 
-    shutil.move(log_file, path.join(results_path, path.basename(log_file)))
     if checksum is None:
         return False, result
     if checksum == expected_checksum:
-        if os.environ.get('TRACIE_STORE_IMAGES', '0') == '1':
-            shutil.move(image_file, path.join(results_path, image_name))
+        if os.environ.get('TRACIE_STORE_IMAGES', '0') != '1':
+            os.remove(image_file)
         print('[check_image] Images match for:\n  {}\n'.format(trace_path))
         ok = True
     else:
