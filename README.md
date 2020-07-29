@@ -339,7 +339,16 @@ The following test sets are currently available:
     currently all of the Vulkan tests require VkRunner. If it is not
     installed then all of the tests will be skipped.
 
-### 4.4 External Integration
+
+### 4.4 Replay tests
+
+  - **replay.py** This profile allows running
+    [replayer.py](replayer/replayer.py) tests from a traces
+    description file. Check its [README](replayer/README.md) for
+    further information about the format of the description files and
+    running dependencies.
+
+### 4.5 External Integration
 
   - **xts.py** Support for running the X Test Suite using piglit.
   - **igt.py** Support for running Intel-gpu-tools test suite using piglit.
