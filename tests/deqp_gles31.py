@@ -21,21 +21,22 @@
 
 """Piglit integrations for dEQP GLES31 tests."""
 
+from framework import core
 from framework.test import deqp
 from framework.options import OPTIONS
 
 __all__ = ['profile']
 
 # Path to the deqp-gles3 executable.
-_DEQP_GLES31_BIN = deqp.get_option('PIGLIT_DEQP_GLES31_BIN',
+_DEQP_GLES31_BIN = core.get_option('PIGLIT_DEQP_GLES31_BIN',
                                    ('deqp-gles31', 'bin'),
                                    required=True)
 
-_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP31_MUSTPASS',
+_DEQP_MUSTPASS = core.get_option('PIGLIT_DEQP31_MUSTPASS',
                                  ('deqp-gles31', 'mustpasslist'),
                                  required=OPTIONS.deqp_mustpass)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES31_EXTRA_ARGS',
+_EXTRA_ARGS = core.get_option('PIGLIT_DEQP_GLES31_EXTRA_ARGS',
                               ('deqp-gles31', 'extra_args'),
                               default='').split()
 

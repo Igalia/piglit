@@ -24,7 +24,7 @@
 import os
 import warnings
 
-from framework.core import PIGLIT_CONFIG
+from framework import core
 from framework.test import deqp
 from framework.options import OPTIONS
 
@@ -43,7 +43,7 @@ def _deprecated_get(env_, conf_, dep_env=None, dep_conf=('', ''), **kwargs):
     """
     val = None
     if dep_env is not None and dep_conf is not None:
-        val = deqp.get_option(dep_env, dep_conf)
+        val = core.get_option(dep_env, dep_conf)
 
         if dep_env is not None and os.environ.get(dep_env) is not None:
             # see if the old environment variable was set, if it is uses it,
@@ -52,13 +52,13 @@ def _deprecated_get(env_, conf_, dep_env=None, dep_conf=('', ''), **kwargs):
                 '{} has been replaced by {} and will be removed. You should '
                 'update any scripts using the old environment variable'.format(
                     dep_env, env_))
-        elif dep_conf != ('', '') and PIGLIT_CONFIG.has_option(*dep_conf):
+        elif dep_conf != ('', '') and core.PIGLIT_CONFIG.has_option(*dep_conf):
             warnings.warn(
                 '{} has been replaced by {} and will be removed. You should '
                 'update any scripts using the old conf variable'.format(
                     ':'.join(dep_conf), ':'.join(conf_)))
 
-    return val if val is not None else deqp.get_option(env_, conf_, **kwargs)
+    return val if val is not None else core.get_option(env_, conf_, **kwargs)
 
 
 _DEQP_GLES3_BIN = _deprecated_get('PIGLIT_DEQP_GLES3_BIN',
@@ -72,7 +72,7 @@ _DEQP_MUSTPASS = _deprecated_get('PIGLIT_DEQP3_MUSTPASS',
                                  dep_env='PIGLIT_DEQP_MUSTPASS',
                                  required=OPTIONS.deqp_mustpass)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
+_EXTRA_ARGS = core.get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                               ('deqp-gles3', 'extra_args'),
                               default='').split()
 

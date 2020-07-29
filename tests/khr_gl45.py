@@ -40,19 +40,20 @@ PIGLIT_KHR_GL_EXTRA_ARGS -- environment equivalent of [khr_gl45]:extra_args
 
 import itertools
 
+from framework import core
 from framework.test import deqp
 from framework.options import OPTIONS
 
 __all__ = ['profile']
 
-_KHR_BIN = deqp.get_option('PIGLIT_KHR_GL_BIN', ('khr_gl45', 'bin'),
+_KHR_BIN = core.get_option('PIGLIT_KHR_GL_BIN', ('khr_gl45', 'bin'),
                            required=True)
 
-_KHR_MUSTPASS = deqp.get_option('PIGLIT_KHRGL45_MUSTPASS',
+_KHR_MUSTPASS = core.get_option('PIGLIT_KHRGL45_MUSTPASS',
                                  ('khr_gl45', 'mustpasslist'),
                                  required=OPTIONS.deqp_mustpass)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_KHR_GL_EXTRA_ARGS', ('khr_gl45', 'extra_args'),
+_EXTRA_ARGS = core.get_option('PIGLIT_KHR_GL_EXTRA_ARGS', ('khr_gl45', 'extra_args'),
                               default='').split()
 
 

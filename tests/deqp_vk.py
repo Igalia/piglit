@@ -27,16 +27,17 @@ upstream: https://github.com/KhronosGroup/Vulkan-CTS
 
 import re
 
+from framework import core
 from framework.test import deqp
 
 __all__ = ['profile']
 
 # Path to the deqp-gles3 executable.
-_DEQP_VK_BIN = deqp.get_option('PIGLIT_DEQP_VK_BIN',
+_DEQP_VK_BIN = core.get_option('PIGLIT_DEQP_VK_BIN',
                                ('deqp-vk', 'bin'),
                                required=True)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_VK_EXTRA_ARGS',
+_EXTRA_ARGS = core.get_option('PIGLIT_DEQP_VK_EXTRA_ARGS',
                               ('deqp-vk', 'extra_args'),
                               default='').split()
 

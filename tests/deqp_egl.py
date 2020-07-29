@@ -21,20 +21,21 @@
 
 """Piglit integrations for dEQP EGL tests."""
 
+from framework import core
 from framework.test import deqp
 from framework.options import OPTIONS
 
 __all__ = ['profile']
 
-_EGL_BIN = deqp.get_option('PIGLIT_DEQP_EGL_BIN',
+_EGL_BIN = core.get_option('PIGLIT_DEQP_EGL_BIN',
                            ('deqp-egl', 'bin'),
                            required=True)
 
-_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP_EGL_MUSTPASS',
+_DEQP_MUSTPASS = core.get_option('PIGLIT_DEQP_EGL_MUSTPASS',
                                  ('deqp-egl', 'mustpasslist'),
                                  required=OPTIONS.deqp_mustpass)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_EGL_EXTRA_ARGS',
+_EXTRA_ARGS = core.get_option('PIGLIT_DEQP_EGL_EXTRA_ARGS',
                               ('deqp-egl', 'extra_args'),
                               default='').split()
 
