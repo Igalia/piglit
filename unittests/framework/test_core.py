@@ -25,6 +25,10 @@ import collections
 import errno
 import os
 import textwrap
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 import pytest
 
@@ -196,6 +200,58 @@ class TestPiglitConfig(object):
         """core.PiglitConfig: safe_get returns the value of fallback when the
         section or option is missing."""
         assert self.conf.safe_get('invalid', 'invalid', fallback='foo') == 'foo'
+
+
+class TestGetOptions(object):
+    """Tests for the get_option function."""
+
+    @pytest.fixture
+    def env(self, mocker):
+        """Create a mocked os.environ."""
+        return mocker.patch('framework.core.os.environ', {})
+
+    @pytest.fixture
+    def conf(self, mocker):
+        """Create a mocked piglit.conf."""
+        return mocker.patch('framework.core.PIGLIT_CONFIG.safe_get',
+                            mocker.Mock(return_value=None))
+
+    def test_from_default(self):
+        """core.get_option: if env is set it overrides piglit.conf."""
+        # The mock means that only the first value matters
+        actual = core.get_option('foo', ('foo', 'foo'),
+                                 default=mock.sentinel.good)
+
+        assert actual is mock.sentinel.good
+
+    def test_from_conf(self, conf):
+        """core.get_option: if env is not set a value is taken from
+        piglit.conf.
+        """
+        conf.return_value = mock.sentinel
+
+        # The mock means that these values don't actually matter
+        actual = core.get_option('foo', ('foo', 'foo'))
+
+        assert actual is mock.sentinel
+
+    def test_from_env(self, env, conf):
+        """core.get_option: if env is set it overrides piglit.conf."""
+        conf.return_value = mock.sentinel.bad
+        env['TEST'] = mock.sentinel.good
+
+        # The mock means that only the first value matters
+        actual = core.get_option('TEST', ('foo', 'foo'))
+
+        assert actual is mock.sentinel.good
+
+    def test_get_option_required(self, mocker):
+        """core.get_option: dies if a required option cannot be retrieved."""
+        mocker.patch('framework.core.os.environ', {}, True)
+
+        with pytest.raises(exceptions.PiglitFatalError):
+            core.get_option('NOT_REAL', ('fake', 'fake'), default='',
+                            required=True)
 
 
 class TestCheckDir(object):

@@ -45,14 +45,15 @@ PIGLIT_GTF_GL_EXTRA_ARGS -- environment equivalent of [gtf_gl]:extra_args
 
 import itertools
 
+from framework import core
 from framework.test import deqp
 
 __all__ = ['profile']
 
-_GTF_BIN = deqp.get_option('PIGLIT_GTF_GL_BIN', ('gtf_gl', 'bin'),
+_GTF_BIN = core.get_option('PIGLIT_GTF_GL_BIN', ('gtf_gl', 'bin'),
                            required=True)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_GTF_GL_EXTRA_ARGS', ('gtf_gl', 'extra_args'),
+_EXTRA_ARGS = core.get_option('PIGLIT_GTF_GL_EXTRA_ARGS', ('gtf_gl', 'extra_args'),
                               default='').split()
 
 

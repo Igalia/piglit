@@ -31,34 +31,14 @@ from framework.test.base import Test, is_crash_returncode, TestRunError
 __all__ = [
     'DEQPBaseTest',
     'gen_caselist_txt',
-    'get_option',
     'iter_deqp_test_cases',
     'make_profile',
 ]
 
 
-def get_option(env_varname, config_option, default=None, required=False):
-    """Query the given environment variable and then piglit.conf for the option.
-
-    Return the value of the default argument if opt is None.
-
-    """
-    opt = os.environ.get(env_varname, None)
-    if opt is not None:
-        return opt
-
-    opt = core.PIGLIT_CONFIG.safe_get(config_option[0], config_option[1])
-
-    if required and not opt:
-        raise exceptions.PiglitFatalError(
-            'Cannot get env "{}" or conf value "{}:{}"'.format(
-                env_varname, config_option[0], config_option[1]))
-    return opt or default
-
-
-_EXTRA_ARGS = get_option('PIGLIT_DEQP_EXTRA_ARGS',
-                         ('deqp', 'extra_args'),
-                         default='').split()
+_EXTRA_ARGS = core.get_option('PIGLIT_DEQP_EXTRA_ARGS',
+                              ('deqp', 'extra_args'),
+                              default='').split()
 
 
 def select_source(bin_, filename, mustpass, extra_args):

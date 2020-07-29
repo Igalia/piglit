@@ -21,21 +21,22 @@
 
 """Piglit integrations for dEQP GLES2 tests."""
 
+from framework import core
 from framework.test import deqp
 from framework.options import OPTIONS
 
 __all__ = ['profile']
 
 # Path to the deqp-gles2 executable.
-_DEQP_GLES2_BIN = deqp.get_option('PIGLIT_DEQP_GLES2_BIN',
+_DEQP_GLES2_BIN = core.get_option('PIGLIT_DEQP_GLES2_BIN',
                                   ('deqp-gles2', 'bin'),
                                   required=True)
 
-_DEQP_MUSTPASS = deqp.get_option('PIGLIT_DEQP2_MUSTPASS',
+_DEQP_MUSTPASS = core.get_option('PIGLIT_DEQP2_MUSTPASS',
                                  ('deqp-gles2', 'mustpasslist'),
                                  required=OPTIONS.deqp_mustpass)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_DEQP_GLES2_EXTRA_ARGS',
+_EXTRA_ARGS = core.get_option('PIGLIT_DEQP_GLES2_EXTRA_ARGS',
                               ('deqp-gles2', 'extra_args'),
                               default='').split()
 

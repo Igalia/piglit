@@ -38,6 +38,7 @@ __all__ = [
     'PLATFORMS',
     'PiglitConfig',
     'collect_system_info',
+    'get_option',
     'parse_listfile',
 ]
 
@@ -108,6 +109,25 @@ def get_config(arg=None):
                 break
             except IOError:
                 pass
+
+
+def get_option(env_varname, config_option, default=None, required=False):
+    """Query the given environment variable and then piglit.conf for the option.
+
+    Return the value of the default argument if opt is None.
+
+    """
+    opt = os.environ.get(env_varname, None)
+    if opt is not None:
+        return opt
+
+    opt = PIGLIT_CONFIG.safe_get(config_option[0], config_option[1])
+
+    if required and not opt:
+        raise exceptions.PiglitFatalError(
+            'Cannot get env "{}" or conf value "{}:{}"'.format(
+                env_varname, config_option[0], config_option[1]))
+    return opt or default
 
 
 def check_dir(dirname, failifexists=False, handler=None):

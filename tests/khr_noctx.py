@@ -47,14 +47,15 @@ PIGLIT_KHR_NOCTX_EXTRA_ARGS -- environment equivalent of
 
 import itertools
 
+from framework import core
 from framework.test import deqp
 
 __all__ = ['profile']
 
-_KHR_BIN = deqp.get_option('PIGLIT_KHR_NOCTX_BIN', ('khr_noctx', 'bin'),
+_KHR_BIN = core.get_option('PIGLIT_KHR_NOCTX_BIN', ('khr_noctx', 'bin'),
                            required=True)
 
-_EXTRA_ARGS = deqp.get_option('PIGLIT_KHR_NOCTX_EXTRA_ARGS', ('khr_noctx', 'extra_args'),
+_EXTRA_ARGS = core.get_option('PIGLIT_KHR_NOCTX_EXTRA_ARGS', ('khr_noctx', 'extra_args'),
                               default='').split()
 
 

@@ -27,10 +27,6 @@ tests
 """
 
 import textwrap
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 import pytest
 
@@ -46,58 +42,6 @@ from framework.test import deqp
 class _DEQPTestTest(deqp.DEQPBaseTest):
     deqp_bin = 'deqp.bin'
     extra_args = ['extra']
-
-
-class TestGetOptions(object):
-    """Tests for the get_option function."""
-
-    @pytest.fixture
-    def env(self, mocker):
-        """Create a mocked os.environ."""
-        return mocker.patch('framework.test.deqp.os.environ', {})
-
-    @pytest.fixture
-    def conf(self, mocker):
-        """Create a mocked piglit.conf."""
-        return mocker.patch('framework.core.PIGLIT_CONFIG.safe_get',
-                            mocker.Mock(return_value=None))
-
-    def test_from_default(self):
-        """deqp.get_option: if env is set it overrides piglit.conf."""
-        # The mock means that only the first value matters
-        actual = deqp.get_option('foo', ('foo', 'foo'),
-                                 default=mock.sentinel.good)
-
-        assert actual is mock.sentinel.good
-
-    def test_from_conf(self, conf):
-        """deqp.get_option: if env is not set a value is taken from
-        piglit.conf.
-        """
-        conf.return_value = mock.sentinel
-
-        # The mock means that these values don't actually matter
-        actual = deqp.get_option('foo', ('foo', 'foo'))
-
-        assert actual is mock.sentinel
-
-    def test_from_env(self, env, conf):
-        """deqp.get_option: if env is set it overrides piglit.conf."""
-        conf.return_value = mock.sentinel.bad
-        env['TEST'] = mock.sentinel.good
-
-        # The mock means that only the first value matters
-        actual = deqp.get_option('TEST', ('foo', 'foo'))
-
-        assert actual is mock.sentinel.good
-
-    def test_get_option_required(self, mocker):
-        """deqp.get_option: dies if a required option cannot be retrieved."""
-        mocker.patch('framework.test.deqp.os.environ', {}, True)
-
-        with pytest.raises(exceptions.PiglitFatalError):
-            deqp.get_option('NOT_REAL', ('fake', 'fake'), default='',
-                            required=True)
 
 
 class TestMakeProfile(object):
