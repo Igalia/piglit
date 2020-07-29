@@ -60,6 +60,13 @@ JSON = {
                 "__type__": "TimeAttribute",
                 "end": 1469638791.2439244
             },
+            "images": [
+                {
+                    "image_desc": "gl-1.0-readpixsanity images",
+                    "image_ref": "/home/user/source/gl-1.0-readpixsanity-results/ref.png",
+                    "image_render": "/home/user/source/gl-1.0-readpixsanity-results/render.png"
+                }
+            ],
             "pid": [11768],
             "__type__": "TestResult",
             "returncode": 1,
