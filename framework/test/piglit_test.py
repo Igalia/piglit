@@ -40,6 +40,7 @@ __all__ = [
     'PiglitCLTest',
     'PiglitGLTest',
     'PiglitBaseTest',
+    'PiglitReplayerTest',
     'VkRunnerTest',
     'CL_CONCURRENT',
     'ROOT_DIR',
@@ -257,3 +258,28 @@ class VkRunnerTest(PiglitBaseTest):
         # to prepend TEST_BIN_DIR so that it will look for vkrunner in
         # the search path.
         return self._command + [os.path.join(ROOT_DIR, self.filename)]
+
+
+class PiglitReplayerTest(PiglitBaseTest):
+    """ Make a PiglitTest instance for a Replayer test
+
+    Runs a single replayer test.
+
+    Arguments:
+    extra_args -- to pass to replayer
+
+    """
+
+    RESULTS_PATH = None
+
+    def __init__(self, extra_args, **kwargs):
+        super(PiglitReplayerTest, self).__init__(
+            ['replayer.py', 'compare', 'trace'], **kwargs)
+        self.extra_args = extra_args
+
+    @PiglitBaseTest.command.getter
+    def command(self):
+        command = super(PiglitReplayerTest, self).command
+        if self.RESULTS_PATH is not None:
+            command += ['--output', self.RESULTS_PATH]
+        return command + self.extra_args
