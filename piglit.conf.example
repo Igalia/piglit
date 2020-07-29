@@ -234,6 +234,12 @@ run_test=./%(test_name)s
 ; environment variable.
 ;gfxrecon-replay_bin=/gfxreconstruct/build/bin/gfxrecon-replay
 
+; Space-separated list of extra command line arguments for
+; gfxrecon-replay. The option is not required. The environment
+; variable PIGLIT_REPLAY_GFXRECON_REPLAY_EXTRA_ARGS overrides the
+; value set here.
+;gfxrecon-replay_extra_args=-m rebind
+
 [expected-failures]
 ; Provide a list of test names that are expected to fail.  These tests
 ; will be listed as passing in JUnit output when they fail.  Any
