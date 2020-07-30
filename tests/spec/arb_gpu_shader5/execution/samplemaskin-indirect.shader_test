@@ -19,6 +19,9 @@ void main()
 	if (gl_SampleMaskIn[zero] == 1) {
 		color.rg = vec2(0.0, 1.0);
 	}
+        /* this prevents 'zero' from being optimized out */
+	if (zero == 1)
+		color = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 [test]
