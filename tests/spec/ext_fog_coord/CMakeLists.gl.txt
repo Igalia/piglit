@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (ext_fog_coord-modes modes.c)
+piglit_add_executable (ext_fog_coord-modes-half-float modes-half-float.c)
 IF (UNIX)
 	target_link_libraries (ext_fog_coord-modes m)
 ENDIF (UNIX)

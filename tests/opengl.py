@@ -3849,6 +3849,12 @@ with profile.test_list.group_manager(
 
 with profile.test_list.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'nv_half_float')) as g:
+    g(['attribs-half-float'])
+    g(['ext_fog_coord-modes-half-float'], run_concurrent=False)
+
+with profile.test_list.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'nv_texture_barrier')) as g:
     g(['blending-in-shader'], run_concurrent=False)
     g(['arb_texture_barrier-texture-halves-ping-pong-operation-chain'])
