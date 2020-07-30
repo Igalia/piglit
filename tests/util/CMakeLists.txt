@@ -165,4 +165,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+if(MSVC)
+	list(APPEND UTIL_SOURCES msvc/getopt.c)
+endif()
+
 piglit_include_target_api()

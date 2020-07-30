@@ -3,6 +3,11 @@ include_directories(
 	${piglit_SOURCE_DIR}/tests/util
 )
 
+if(MSVC)
+	include_directories(${piglit_SOURCE_DIR}/tests/util/msvc)
+	add_definitions(-DSTATIC_GETOPT)
+endif()
+
 add_subdirectory (util)
 add_subdirectory (fbo)
 add_subdirectory (general)
