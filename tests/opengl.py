@@ -4195,6 +4195,15 @@ with profile.test_list.group_manager(
     g(['nv_alpha_to_coverage_dither_control','8', '1', '1'])
 
 with profile.test_list.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'nv_copy_depth_to_color')) as g:
+    g(['nv_copy_depth_to_color'])
+    g(['nv_copy_depth_to_color','1', '0x223344ff'])
+    g(['nv_copy_depth_to_color','0', '0x223344ff'])
+    g(['nv_copy_depth_to_color','1', '0x76356278'])
+    g(['nv_copy_depth_to_color','0', '0x76356278'])
+
+with profile.test_list.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_cull_distance')) as g:
     g(['arb_cull_distance-max-distances'])
     g(['arb_cull_distance-exceed-limits', 'cull'])
