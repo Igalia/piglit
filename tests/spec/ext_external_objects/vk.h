@@ -194,6 +194,8 @@ vk_draw(struct vk_ctx *ctx,
 	uint32_t vk_fb_color_count,
 	struct vk_semaphores *semaphores,
 	bool has_wait, bool has_signal,
+	struct vk_image_att *attachments,
+	uint32_t n_attachments,
 	float x, float y, float w, float h);
 
 void

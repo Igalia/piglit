@@ -1266,6 +1266,8 @@ vk_draw(struct vk_ctx *ctx,
 	uint32_t vk_fb_color_count,
 	struct vk_semaphores *semaphores,
 	bool has_wait, bool has_signal,
+	struct vk_image_att *attachments,
+	uint32_t n_attachments,
 	float x, float y,
 	float w, float h)
 {
@@ -1356,6 +1358,47 @@ vk_draw(struct vk_ctx *ctx,
 	vkCmdBindPipeline(ctx->cmd_buf, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->pipeline);
 
 	vkCmdDraw(ctx->cmd_buf, 4, 1, 0, 0);
+
+	if (attachments) {
+		VkImageMemoryBarrier *barriers =
+			malloc(n_attachments * sizeof(VkImageMemoryBarrier));
+		VkImageMemoryBarrier *barrier = barriers;
+		for (uint32_t n = 0; n < n_attachments; n++, barrier++) {
+			struct vk_image_att *att = &attachments[n];
+
+			/* Insert barrier to mark ownership transfer. */
+			barrier->sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+
+			bool is_depth =
+				get_aspect_from_depth_format(att->props.format) != VK_NULL_HANDLE;
+
+			barrier->oldLayout = is_depth ?
+				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			barrier->newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			barrier->srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			barrier->dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
+			barrier->image = att->obj.img;
+			barrier->subresourceRange.aspectMask = is_depth ?
+				VK_IMAGE_ASPECT_DEPTH_BIT :
+				VK_IMAGE_ASPECT_COLOR_BIT;
+			barrier->subresourceRange.baseMipLevel = 0;
+			barrier->subresourceRange.levelCount = 1;
+			barrier->subresourceRange.baseArrayLayer = 0;
+			barrier->subresourceRange.layerCount = 1;
+			barrier->srcAccessMask = 0;
+			barrier->dstAccessMask = 0;
+		}
+
+		vkCmdPipelineBarrier(ctx->cmd_buf,
+				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+				     0,
+				     0, NULL,
+				     0, NULL,
+				     n_attachments, barriers);
+		free(barriers);
+	}
 
 	vkCmdEndRenderPass(ctx->cmd_buf);
 	vkEndCommandBuffer(ctx->cmd_buf);

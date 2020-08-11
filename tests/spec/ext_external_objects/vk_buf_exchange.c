@@ -138,7 +138,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	vk_draw(&vk_core, 0, &vk_rnd, vk_fb_color, 4, 0,
-		false, false, 0, 0, w, h);
+		false, false, NULL, 0, 0, 0, w, h);
 
 	vk_copy_image_to_buffer(&vk_core, &vk_color_att, &vk_bo, w, h);
 

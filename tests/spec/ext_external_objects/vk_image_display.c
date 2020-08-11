@@ -173,8 +173,10 @@ piglit_display(void)
 		glFlush();
 	}
 
+	struct vk_image_att images[] = { vk_color_att, vk_depth_att };
+
 	vk_draw(&vk_core, 0, &vk_rnd, vk_fb_color, 4, &vk_sem,
-		vk_sem_has_wait, vk_sem_has_signal, 0, 0, w, h);
+		vk_sem_has_wait, vk_sem_has_signal, images, ARRAY_SIZE(images), 0, 0, w, h);
 
 	layout = gl_get_layout_from_vk(color_end_layout);
 	if (vk_sem_has_signal) {
