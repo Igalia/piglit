@@ -48,6 +48,11 @@ def ensure_file(download_url, file_path, destination):
     print('[check_image] Downloading file {}'.format(
         file_path), end=' ', flush=True)
     download_time = time()
-    r = requests.get(download_url + file_path)
-    open(destination_file_path, 'wb').write(r.content)
+    with open(destination_file_path, 'wb') as file:
+        with requests.get(download_url + file_path,
+                          allow_redirects=True, stream=True) as r:
+            r.raise_for_status()
+            for chunk in r.iter_content(chunk_size=8194):
+                if chunk:
+                    file.write(chunk)
     print('took %ds.' % (time() - download_time), flush=True)
