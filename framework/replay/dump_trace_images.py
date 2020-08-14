@@ -118,7 +118,7 @@ def _dump_with_gfxreconstruct(trace_path, calls, device_name):
     for c in calls:
         ppm = path.join(output_dir, c) + '.ppm'
         outputfile = outputprefix + '-' + c + '.png'
-        with open(log_path, 'w') as log:
+        with open(log_path, 'a') as log:
             log.write('Writing: {} to {}'.format(ppm, outputfile))
         Image.open(ppm).save(outputfile)
         os.remove(ppm)
