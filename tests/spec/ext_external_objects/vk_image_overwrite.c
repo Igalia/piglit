@@ -285,10 +285,7 @@ run_subtest(int case_num)
 			     2.0 * vk_img_props.h / piglit_height,
 			     0, 0, 1, 1);
 
-	result = piglit_probe_pixel_rgba((float)piglit_width / 2.0,
-					 (float)piglit_height / 2.0,
-					 color_prb);
-
+	result = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, color_prb);
 	subtest_result = result ? PIGLIT_PASS : PIGLIT_FAIL;
 
 	piglit_report_subtest_result(subtest_result, "%s", vk_gl_format[case_num].name);
