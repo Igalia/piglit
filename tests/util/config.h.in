@@ -4,6 +4,7 @@
 #cmakedefine HAVE_FOPEN_S 1
 #cmakedefine HAVE_SETRLIMIT 1
 #cmakedefine HAVE_STRNDUP 1
+#cmakedefine HAVE_HTOBE32 1
 
 #cmakedefine HAVE_FCNTL_H 1
 #cmakedefine HAVE_SYS_STAT_H 1

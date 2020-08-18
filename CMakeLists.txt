@@ -7,6 +7,7 @@ INCLUDE (CheckCCompilerFlag)
 INCLUDE (CheckCSourceCompiles)
 INCLUDE (CheckCXXCompilerFlag)
 INCLUDE (CheckFunctionExists)
+INCLUDE (CheckSymbolExists)
 INCLUDE (CheckIncludeFile)
 INCLUDE (FindPkgConfig)
 
@@ -467,6 +468,8 @@ if(NOT MINGW)
 check_function_exists(fopen_s   HAVE_FOPEN_S)
 endif()
 check_function_exists(setrlimit HAVE_SETRLIMIT)
+
+check_symbol_exists(htobe32 "endian.h" HAVE_HTOBE32)
 
 check_include_file(sys/time.h  HAVE_SYS_TIME_H)
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)

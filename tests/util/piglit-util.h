@@ -117,6 +117,21 @@ ffs(int i)
 #endif /* !__MINGW32__ */
 #endif /* !HAVE_FFS*/
 
+#ifndef HAVE_HTOBE32
+static inline uint32_t
+htobe32(uint32_t host_32bits)
+{
+#ifdef __BIG_ENDIAN__
+	return host_32bits;
+#else
+	return ((host_32bits >> 24) & 0x000000FF) |
+	       ((host_32bits >> 16) & 0x0000FF00) |
+	       ((host_32bits >>  8) & 0x00FF0000) |
+	       (host_32bits         & 0xFF000000);
+#endif
+}
+#endif /* HAVE_ASPRINTF */
+
 #ifdef _WIN32
 #  define PIGLIT_PATH_SEP '\\'
 #else
