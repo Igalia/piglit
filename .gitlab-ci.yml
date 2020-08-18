@@ -71,7 +71,7 @@ debian:
   after_script:
     - ccache --show-stats
 
-build:
+build-debian:
   stage: build
   extends:
     - .use-debian
