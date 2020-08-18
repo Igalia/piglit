@@ -68,6 +68,7 @@ struct vk_image_props
 struct vk_mem_obj {
 	VkDeviceMemory mem;
 	VkDeviceSize mem_sz;
+	bool dedicated;
 };
 
 struct vk_image_obj {

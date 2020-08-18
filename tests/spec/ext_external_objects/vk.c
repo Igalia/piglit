@@ -739,11 +739,14 @@ get_num_samples(uint32_t num_samples)
 static VkDeviceMemory
 alloc_memory(struct vk_ctx *ctx,
 	     const VkMemoryRequirements *mem_reqs,
+	     VkImage image,
+	     VkBuffer buffer,
 	     VkMemoryPropertyFlagBits prop_flags)
 {
 	VkExportMemoryAllocateInfo exp_mem_info;
 	VkMemoryAllocateInfo mem_alloc_info;
 	VkDeviceMemory mem;
+	VkMemoryDedicatedAllocateInfoKHR ded_info;
 
 	memset(&exp_mem_info, 0, sizeof exp_mem_info);
 	exp_mem_info.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
@@ -762,6 +765,15 @@ alloc_memory(struct vk_ctx *ctx,
 		return VK_NULL_HANDLE;
 	}
 
+	if (image || buffer) {
+		memset(&ded_info, 0, sizeof ded_info);
+		ded_info.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO;
+		ded_info.image = image;
+		ded_info.buffer = buffer;
+
+		exp_mem_info.pNext = &ded_info;
+	}
+
 	if (vkAllocateMemory(ctx->dev, &mem_alloc_info, 0, &mem) !=
 	    VK_SUCCESS)
 		return VK_NULL_HANDLE;
@@ -772,8 +784,12 @@ alloc_memory(struct vk_ctx *ctx,
 static bool
 alloc_image_memory(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 {
+	VkMemoryDedicatedRequirements ded_reqs;
 	VkImageMemoryRequirementsInfo2 req_info2;
 	VkMemoryRequirements2 mem_reqs2;
+
+	memset(&ded_reqs, 0, sizeof ded_reqs);
+	ded_reqs.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS;
 
 	/* VkImageMemoryRequirementsInfo2 */
 	memset(&req_info2, 0, sizeof req_info2);
@@ -783,14 +799,18 @@ alloc_image_memory(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 	/* VkMemoryRequirements2 */
 	memset(&mem_reqs2, 0, sizeof mem_reqs2);
 	mem_reqs2.sType = VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2;
+	mem_reqs2.pNext = &ded_reqs;
 
 	vkGetImageMemoryRequirements2(ctx->dev, &req_info2, &mem_reqs2);
 	img_obj->mobj.mem = alloc_memory(ctx,
 					 &mem_reqs2.memoryRequirements,
+					 ded_reqs.requiresDedicatedAllocation? img_obj->img : VK_NULL_HANDLE,
+					 VK_NULL_HANDLE,
 					 mem_reqs2.memoryRequirements.memoryTypeBits &
 					 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	img_obj->mobj.mem_sz = mem_reqs2.memoryRequirements.size;
+	img_obj->mobj.dedicated = ded_reqs.requiresDedicatedAllocation;
 	if (img_obj->mobj.mem == VK_NULL_HANDLE) {
 		fprintf(stderr, "Failed to allocate image memory.\n");
 		return false;
@@ -1196,7 +1216,7 @@ vk_create_buffer(struct vk_ctx *ctx,
 	 * vkInvalidateMappedMemoryRanges are not needed to flush host
 	 * writes to the device or make device writes visible to the
 	 * host, respectively. */
-	bo->mobj.mem = alloc_memory(ctx, &mem_reqs,
+	bo->mobj.mem = alloc_memory(ctx, &mem_reqs, VK_NULL_HANDLE, VK_NULL_HANDLE,
 				    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
 				    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 

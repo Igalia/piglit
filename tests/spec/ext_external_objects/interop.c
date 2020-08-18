@@ -48,6 +48,7 @@ gl_create_mem_obj_from_vk_mem(struct vk_ctx *ctx,
 {
 	VkMemoryGetFdInfoKHR fd_info;
 	int fd;
+	GLint dedicated = vk_mem_obj->dedicated ? GL_TRUE : GL_FALSE;
 
 	PFN_vkGetMemoryFdKHR _vkGetMemoryFdKHR =
 		(PFN_vkGetMemoryFdKHR)vkGetDeviceProcAddr(ctx->dev,
@@ -69,6 +70,7 @@ gl_create_mem_obj_from_vk_mem(struct vk_ctx *ctx,
 	}
 
 	glCreateMemoryObjectsEXT(1, gl_mem_obj);
+	glMemoryObjectParameterivEXT(*gl_mem_obj, GL_DEDICATED_MEMORY_OBJECT_EXT, &dedicated);
 	glImportMemoryFdEXT(*gl_mem_obj, vk_mem_obj->mem_sz, GL_HANDLE_TYPE_OPAQUE_FD_EXT, fd);
 
 	if (!glIsMemoryObjectEXT(*gl_mem_obj))
