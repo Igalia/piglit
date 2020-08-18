@@ -54,7 +54,7 @@ test_depthstencil_to_color_copypix(int x, int y)
 {
 	int i;
 	bool pass = true;
-	uint *depth_stencil_buf = malloc(IMAGE_WIDTH * IMAGE_HEIGHT * sizeof(uint));
+	uint32_t *depth_stencil_buf = malloc(IMAGE_WIDTH * IMAGE_HEIGHT * sizeof(uint32_t));
 
 	GLuint big_depth_stencil_val = htobe32(depth_stencil_val);
 	GLubyte *data_ptr = (GLubyte*)&big_depth_stencil_val;
