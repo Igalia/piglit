@@ -65,7 +65,7 @@ def _check_trace(download_url, device_name, trace_path, expected_checksum):
     result[trace_path]['expected'] = expected_checksum
 
     trace_dir = path.dirname(trace_path)
-    dir_in_results = path.join(trace_dir, 'test', device_name)
+    dir_in_results = path.join('trace', device_name, trace_dir)
     results_path = path.join(RESULTS_PATH, dir_in_results)
     os.makedirs(results_path, exist_ok=True)
 
