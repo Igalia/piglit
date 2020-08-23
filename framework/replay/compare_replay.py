@@ -35,7 +35,6 @@ from framework.replay import query_traces_yaml as qty
 from framework.replay.download_utils import ensure_file
 from framework.replay.dump_trace_images import dump_from_trace
 from framework.replay.image_checksum import hexdigest_from_image
-from framework.replay.upload_utils import upload_file
 
 
 __all__ = ['from_yaml',
@@ -90,7 +89,6 @@ def _check_trace(download_url, device_name, trace_path, expected_checksum):
         print('[check_image] Images match for:\n  {}\n'.format(trace_path))
         ok = True
     else:
-        upload_file(image_file, 'image/png', device_name)
         print('[check_image] Images differ for '
               '%s (expected: %s, actual: %s)'.format(
               trace_path, expected_checksum, checksum))
@@ -112,7 +110,6 @@ def _write_results(results):
     results_file_path = path.join(RESULTS_PATH, 'results.yml')
     with open(results_file_path, 'w') as f:
         yaml.safe_dump(results, f, default_flow_style=False)
-    upload_file(results_file_path, 'text/yaml', device_name)
 
 
 def from_yaml(yaml_file, device_name):

@@ -35,4 +35,3 @@ from .dump_trace_images import *
 from .image_checksum import *
 from .query_traces_yaml import *
 from .trace_utils import *
-from .upload_utils import *
