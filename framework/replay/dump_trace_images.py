@@ -136,7 +136,7 @@ def _dump_with_testtrace(trace_path, output_dir, calls):
 def dump_from_trace(trace_path, output_dir, calls, device_name):
     _log('Info', 'Dumping trace {}'.format(trace_path), end='...\n')
     if output_dir is None:
-        output_dir = path.join(path.dirname(trace_path), 'test', device_name)
+        output_dir = path.join('trace', device_name, path.dirname(trace_path))
     os.makedirs(output_dir, exist_ok=True)
     trace_type = trace_type_from_filename(path.basename(trace_path))
     try:
