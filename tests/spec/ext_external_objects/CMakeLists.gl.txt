@@ -70,6 +70,8 @@ IF(LIBVULKAN_FOUND)
 		vk.c interop.c helpers.c vk_buf_exchange.c ${VK_BANDS_VERT_PATH} ${VK_BANDS_FRAG_PATH})
 	piglit_add_executable (ext_external_objects-vk-pix-buf-update-errors
 		vk.c interop.c helpers.c vk_pix_buf_update_errors.c ${VK_BANDS_VERT_PATH} ${VK_BANDS_FRAG_PATH})
+	piglit_add_executable (ext_external_objects-vk-vert-buf-update-errors
+		vk.c interop.c helpers.c vk_vert_buf_update_errors.c)
 ENDIF()
 
 # vim: ft=cmake:
