@@ -5420,6 +5420,12 @@ piglit_init(int argc, char **argv)
 			memcpy(piglit_tolerance, default_piglit_tolerance,
 			       sizeof(piglit_tolerance));
 
+			for (unsigned i = 0; i < ARRAY_SIZE(specializations); i++) {
+				free(specializations[i].indices);
+				free(specializations[i].values);
+			}
+			memset(specializations, 0, sizeof(specializations));
+
 			/* Re-initialize the GL context if a different GL config is required. */
 			if (!validate_current_gl_context(filename))
 				recreate_gl_context(argv[0], argc - i, argv + i);
