@@ -1,0 +1,38 @@
+# Check that the driver doesn't mess up derivatives for flat input.
+# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/6564
+
+[require]
+GLSL >= 1.50
+GL_ARB_derivative_control
+
+[vertex shader]
+in vec4 piglit_vertex;
+flat out vec4 test;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	test = piglit_vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_derivative_control: require
+
+flat in vec4 test;
+
+void main()
+{
+	float dxc = dFdxCoarse(test.x);
+	float dyc = dFdyCoarse(test.x);
+	float dxf = dFdxFine(test.x);
+	float dyf = dFdyFine(test.x);
+
+	if (dxc == 0 && dyc == 0 && dxf == 0 && dyf == 0)
+		gl_FragColor = vec4(0, 1, 0, 1);
+	else
+		gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
