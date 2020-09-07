@@ -58,7 +58,7 @@ debian:
   needs: [debian]
   image: $DEBIAN_IMAGE
 
-windows:
+.windows:
   stage: container
   extends:
     - .ci-run-policy
@@ -113,7 +113,7 @@ build-debian:
       -GNinja
     - ninja -j4
 
-build-windows:
+.build-windows:
   stage: build
   extends:
     - .use-windows
