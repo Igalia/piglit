@@ -1018,6 +1018,7 @@ vk_create_ext_image(struct vk_ctx *ctx,
 	img_info.tiling = props->tiling;
 	img_info.usage = props->usage ? props->usage : VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	img_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	img_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateImage(ctx->dev, &img_info, 0, &img->img) != VK_SUCCESS)
 		goto fail;
@@ -1396,7 +1397,7 @@ vk_draw(struct vk_ctx *ctx,
 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			barrier->newLayout = VK_IMAGE_LAYOUT_GENERAL;
-			barrier->srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			barrier->srcQueueFamilyIndex = ctx->qfam_idx;
 			barrier->dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
 			barrier->image = att->obj.img;
 			barrier->subresourceRange.aspectMask = is_depth ?
@@ -1459,7 +1460,7 @@ vk_copy_image_to_buffer(struct vk_ctx *ctx,
 					   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 					   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 					   VK_QUEUE_FAMILY_EXTERNAL,
-					   VK_QUEUE_FAMILY_IGNORED);
+					   ctx->qfam_idx);
 
 		/* copy image to buf */
 		VkBufferImageCopy copy_region = {
@@ -1486,14 +1487,14 @@ vk_copy_image_to_buffer(struct vk_ctx *ctx,
 					   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 					   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 					   VK_QUEUE_FAMILY_EXTERNAL,
-					   VK_QUEUE_FAMILY_IGNORED);
+					   ctx->qfam_idx);
 
 		VkBufferMemoryBarrier write_finish_buffer_memory_barrier = {
 			.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
 			.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
 			.dstAccessMask = VK_ACCESS_HOST_READ_BIT,
 			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = ctx->qfam_idx,
 			.buffer = dst_bo->buf,
 			.offset = 0,
 			.size = VK_WHOLE_SIZE
