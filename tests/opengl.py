@@ -2215,6 +2215,7 @@ with profile.test_list.group_manager(
     g(['ext_external_objects-vk-buf-exchange'], 'vk-buf-exchange')
     g(['ext_external_objects-vk-pix-buf-update-errors'], 'vk-pix-buf-update-errors')
     g(['ext_external_objects-vk-vert-buf-update-errors'], 'vk-vert-buf-update-errors')
+    g(['ext_external_objects-vk-vert-buf-reuse'], 'vk-vert-buf-reuse')
 
 # Group EXT_external_objects_fd tests
 with profile.test_list.group_manager(

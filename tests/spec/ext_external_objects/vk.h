@@ -81,6 +81,14 @@ struct vk_image_att {
 	struct vk_image_props props;
 };
 
+struct vk_vertex_info
+{
+	int num_verts;
+	int num_components;
+
+	VkPrimitiveTopology topology;
+};
+
 struct vk_renderer
 {
 	VkPipeline pipeline;
@@ -89,6 +97,8 @@ struct vk_renderer
 	VkShaderModule vs;
 	VkShaderModule fs;
 	VkFramebuffer fb;
+
+	struct vk_vertex_info vertex_info;
 };
 
 struct vk_buf
@@ -164,6 +174,7 @@ vk_create_renderer(struct vk_ctx *ctx,
 		   bool enable_stencil,
 		   struct vk_image_att *color_att,
 		   struct vk_image_att *depth_att,
+		   struct vk_vertex_info *vert_info,
 		   struct vk_renderer *renderer);
 
 void

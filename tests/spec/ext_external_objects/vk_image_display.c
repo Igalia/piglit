@@ -289,7 +289,7 @@ vk_init(uint32_t w,
 	/* create Vulkan renderer */
 	if (!vk_create_renderer(&vk_core, vs_src, vs_sz, fs_src, fs_sz,
 				false, false,
-				&vk_color_att, &vk_depth_att, &vk_rnd)) {
+				&vk_color_att, &vk_depth_att, 0, &vk_rnd)) {
 		fprintf(stderr, "Failed to create Vulkan renderer.\n");
 		goto fail;
 	}

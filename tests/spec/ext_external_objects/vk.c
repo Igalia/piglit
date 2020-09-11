@@ -488,6 +488,9 @@ create_pipeline(struct vk_ctx *ctx,
 		bool enable_stencil,
 		struct vk_renderer *renderer)
 {
+	VkVertexInputBindingDescription vert_bind_dsc[1];
+	VkVertexInputAttributeDescription vert_att_dsc[1];
+
 	VkPipelineColorBlendAttachmentState cb_att_state[1];
 	VkPipelineVertexInputStateCreateInfo vert_input_info;
 	VkPipelineInputAssemblyStateCreateInfo asm_info;
@@ -503,11 +506,11 @@ create_pipeline(struct vk_ctx *ctx,
 	VkFormatProperties fmt_props;
 	VkPushConstantRange pc_range[1];
 
-	VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
 	VkStencilOpState front;
 	VkStencilOpState back;
 	int i;
 	VkPipelineLayout pipeline_layout;
+	uint32_t stride;
 
 	/* format of vertex attributes:
 	 * we have 2D vectors so we need a RG format:
@@ -518,15 +521,34 @@ create_pipeline(struct vk_ctx *ctx,
 	format = VK_FORMAT_R32G32_SFLOAT;
 	vkGetPhysicalDeviceFormatProperties(ctx->pdev, format, &fmt_props);
 	assert(fmt_props.bufferFeatures & VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT);
+	stride = 8;
+
+	/* VkVertexInputAttributeDescription */
+	memset(&vert_att_dsc, 0, sizeof vert_att_dsc);
+	vert_att_dsc[0].location = 0;
+	vert_att_dsc[0].binding = 0;
+	vert_att_dsc[0].format = format; /* see comment */
+	vert_att_dsc[0].offset = 0;
+
+	/* VkVertexInputBindingDescription */
+	memset(&vert_bind_dsc, 0, sizeof vert_bind_dsc);
+	vert_bind_dsc[0].binding = 0;
+	vert_bind_dsc[0].stride = stride;
+	vert_bind_dsc[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 	/* VkPipelineVertexInputStateCreateInfo */
 	memset(&vert_input_info, 0, sizeof vert_input_info);
 	vert_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vert_input_info.vertexBindingDescriptionCount = 1;
+	vert_input_info.pVertexBindingDescriptions = vert_bind_dsc;
+	vert_input_info.vertexAttributeDescriptionCount = 1;
+	vert_input_info.pVertexAttributeDescriptions = vert_att_dsc;
 
 	/* VkPipelineInputAssemblyStateCreateInfo */
 	memset(&asm_info, 0, sizeof asm_info);
 	asm_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	asm_info.topology = topology;
+	asm_info.topology = renderer->vertex_info.topology ?
+			    renderer->vertex_info.topology : VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
 	asm_info.primitiveRestartEnable = false;
 
 	/* VkViewport */
@@ -1131,8 +1153,13 @@ vk_create_renderer(struct vk_ctx *ctx,
 		   bool enable_stencil,
 		   struct vk_image_att *color_att,
 		   struct vk_image_att *depth_att,
+		   struct vk_vertex_info *vert_info,
 		   struct vk_renderer *renderer)
 {
+	memset(&renderer->vertex_info, 0, sizeof renderer->vertex_info);
+	if (vert_info)
+		renderer->vertex_info = *vert_info;
+
 	renderer->renderpass = create_renderpass(ctx, &color_att->props, &depth_att->props);
 	if (renderer->renderpass == VK_NULL_HANDLE)
 		goto fail;
@@ -1297,7 +1324,7 @@ vk_draw(struct vk_ctx *ctx,
 	VkRect2D rp_area;
 	VkClearValue clear_values[2];
 	VkSubmitInfo submit_info;
-	VkDeviceSize dev_sz = 0;
+	VkDeviceSize offsets[] = {0};
 	VkPipelineStageFlagBits stage_flags;
 	struct vk_dims img_size;
 
@@ -1374,11 +1401,12 @@ vk_draw(struct vk_ctx *ctx,
 			   &img_size);
 
 	if (vbo) {
-		vkCmdBindVertexBuffers(ctx->cmd_buf, 1, 1, &vbo->buf, &dev_sz);
+		vkCmdBindVertexBuffers(ctx->cmd_buf, 0, 1, &vbo->buf, offsets);
 	}
 	vkCmdBindPipeline(ctx->cmd_buf, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->pipeline);
 
-	vkCmdDraw(ctx->cmd_buf, 4, 1, 0, 0);
+	int num_vertices = vbo ? renderer->vertex_info.num_verts : 4;
+	vkCmdDraw(ctx->cmd_buf, num_vertices, 1, 0, 0);
 
 	if (attachments) {
 		VkImageMemoryBarrier *barriers =
