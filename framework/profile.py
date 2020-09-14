@@ -398,7 +398,7 @@ class XMLProfile(object):
                     opts[n] = DummyTest(n, status.NOTRUN)
                 else:
                     opts[n] = alltests[n]
-            return opt.items()
+            return opts.items()
         else:
             return iter(self._itertests())
 
