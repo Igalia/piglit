@@ -1,0 +1,33 @@
+# Reproducer for https://gitlab.freedesktop.org/mesa/mesa/-/issues/3271: verify
+# that glUniform* works as expected when using a struct containing a bindless sampler
+[require]
+GLSL >= 4.50
+GL_ARB_bindless_texture
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 450
+#extension GL_ARB_bindless_texture: enable
+
+layout (bindless_sampler) uniform;
+struct S {
+	sampler2D tex;
+	vec4 v;
+};
+
+uniform S unif;
+out vec4 outcolor;
+
+void main()
+{
+	outcolor = unif.v;
+}
+
+[test]
+# Texture 0 is the imageStore output.
+uniform vec4 unif.v 0.25 0.5 0.75 1.0
+
+draw rect -1 -1 2 2
+
+probe all rgba 0.25 0.5 0.75 1.0
