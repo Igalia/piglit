@@ -1410,7 +1410,7 @@ vk_draw(struct vk_ctx *ctx,
 
 	if (attachments) {
 		VkImageMemoryBarrier *barriers =
-			malloc(n_attachments * sizeof(VkImageMemoryBarrier));
+			calloc(n_attachments, sizeof(VkImageMemoryBarrier));
 		VkImageMemoryBarrier *barrier = barriers;
 		for (uint32_t n = 0; n < n_attachments; n++, barrier++) {
 			struct vk_image_att *att = &attachments[n];
@@ -1435,8 +1435,6 @@ vk_draw(struct vk_ctx *ctx,
 			barrier->subresourceRange.levelCount = 1;
 			barrier->subresourceRange.baseArrayLayer = 0;
 			barrier->subresourceRange.layerCount = 1;
-			barrier->srcAccessMask = 0;
-			barrier->dstAccessMask = 0;
 		}
 
 		vkCmdPipelineBarrier(ctx->cmd_buf,
