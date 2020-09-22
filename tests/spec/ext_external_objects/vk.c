@@ -964,7 +964,7 @@ vk_init_ctx_for_rendering(struct vk_ctx *ctx)
 {
 	if (!vk_init_ctx(ctx)) {
 		fprintf(stderr, "Failed to initialize Vulkan.\n");
-		goto fail;
+		return false;
 	}
 
 	if ((ctx->cache = create_pipeline_cache(ctx->dev)) == VK_NULL_HANDLE) {
