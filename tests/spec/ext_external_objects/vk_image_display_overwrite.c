@@ -255,9 +255,9 @@ piglit_display(void)
 			     2,
 			     0, 0, 1, 1);
 
+	const float y = (float)piglit_height / 2.0;
 	for (i = 0; i < 6; i++) {
 		float x = i * (float)piglit_width / 6.0 + (float)piglit_width / 12.0;
-		float y = (float)piglit_height / 2.0;
 
 		if (!piglit_probe_pixel_rgba(x, y, colors[i]))
 			return PIGLIT_FAIL;
