@@ -1,0 +1,73 @@
+[require]
+GL >= 4.0
+GLSL >= 4.4
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+GL_ARB_gpu_shader_int64
+GL_NV_shader_atomic_int64
+
+[compute shader]
+#version 440
+#extension GL_ARB_compute_shader: require
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_gpu_shader_int64 : require
+#extension GL_NV_shader_atomic_int64 : require
+
+layout(local_size_x = 64) in;
+
+layout(binding = 0) buffer bufblock {
+	shared int64_t array[64];
+	shared int64_t value;
+};
+
+layout(binding = 0) uniform atomic_uint fail;
+
+void main()
+{
+	if (gl_LocalInvocationIndex == 0u) {
+		int i;
+		for (i=0;i<64;i++)
+			array[i] = i * 4;
+		value = 5L;
+	}
+
+	barrier();
+
+	int64_t local_index = int64_t(gl_LocalInvocationIndex);
+	int64_t v;
+
+	/* For value, every instance should get 5. */
+	v = atomicMin(value, 7 + local_index);
+	if (v != 5L)
+		atomicCounterIncrement(fail);
+
+	if (value != 5L)
+		atomicCounterIncrement(fail);
+
+	int64_t first_expected = local_index * 4;
+	int64_t second_expected = -first_expected;
+
+	/* The per-instance value should give the old value on the first step.
+	 * This is expected to be the byte offset of the current array
+	 * element.
+	 */
+	v = atomicMin(array[int(local_index)], second_expected);
+	if (v != first_expected)
+		atomicCounterIncrement(fail);
+
+	/* The per-instance value should give the new value on the second
+	 * step.  This is expected to be the negative byte offset of the
+	 * current array element.
+	 */
+	v = atomicExchange(array[int(local_index)], first_expected);
+	if (v != second_expected)
+		atomicCounterIncrement(fail);
+}
+
+[test]
+atomic counters 1
+ssbo 0 4160
+
+compute 1 1 1
+
+probe atomic counter 0 == 0

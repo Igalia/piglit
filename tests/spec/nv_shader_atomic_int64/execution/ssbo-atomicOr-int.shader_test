@@ -1,0 +1,55 @@
+[require]
+GL >= 4.0
+GLSL >= 4.4
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+GL_ARB_gpu_shader_int64
+GL_NV_shader_atomic_int64
+
+[compute shader]
+#version 440
+#extension GL_ARB_compute_shader: require
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_gpu_shader_int64 : require
+#extension GL_NV_shader_atomic_int64 : require
+
+layout(local_size_x = 64) in;
+
+layout(binding = 0) buffer bufblock {
+       int64_t cumulative;
+};
+
+layout(binding = 0) uniform atomic_uint pass;
+layout(binding = 0) uniform atomic_uint fail;
+
+void main()
+{
+	/* Each shader invocation sets one unique bit.
+	 * Hence when all shaders have finished execution
+	 * the cumulative value should be 0xffffffffffffffff.
+	 */
+
+	int64_t m = int64_t(1L << gl_LocalInvocationIndex);
+
+        atomicOr(cumulative, m);
+
+	barrier();
+
+	if (gl_LocalInvocationIndex == 0u) {
+		/* If all 64 bits are set, the test passes. */
+		if (cumulative == 0xffffffffffffffffL)
+			atomicCounterIncrement(pass);
+		else
+			atomicCounterIncrement(fail);
+	}
+}
+
+[test]
+atomic counters 2
+ssbo 0 64
+ssbo 0 subdata int64 0 0
+
+compute 1 1 1
+
+probe atomic counter 0 == 1
+probe atomic counter 1 == 0
