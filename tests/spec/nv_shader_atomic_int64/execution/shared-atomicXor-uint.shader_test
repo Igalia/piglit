@@ -1,0 +1,58 @@
+[require]
+GL >= 4.0
+GLSL >= 4.4
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+GL_ARB_gpu_shader_int64
+GL_NV_shader_atomic_int64
+
+[compute shader]
+#version 440
+#extension GL_ARB_compute_shader: require
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_gpu_shader_int64 : require
+#extension GL_NV_shader_atomic_int64 : require
+
+layout(local_size_x = 64) in;
+
+shared uint64_t cumulative;
+shared uint64_t reference;
+
+layout(binding = 0) uniform atomic_uint pass;
+layout(binding = 0) uniform atomic_uint fail;
+
+void main()
+{
+        if (gl_LocalInvocationIndex == 0u) {
+                cumulative = 0xff77224488990011L;
+                reference = cumulative;
+	}
+
+	barrier();
+
+	/* Each shader invocation sets flip unique bit.
+	 * Hence when all shaders have finished execution
+	 * the cumulative value should be the negation of
+	 * the original value.
+	 */
+
+	uint64_t m = uint64_t(1L << gl_LocalInvocationIndex);
+
+        atomicXor(cumulative, m);
+
+	barrier();
+
+	if (gl_LocalInvocationIndex == 0u) {
+		/* If all 64 bits are flipped, the test passes. */
+		if ((cumulative & reference) == 0x0ul)
+			atomicCounterIncrement(pass);
+		else
+			atomicCounterIncrement(fail);
+	}
+}
+
+[test]
+atomic counters 2
+compute 12 2 1
+probe atomic counter 0 == 24
+probe atomic counter 1 == 0

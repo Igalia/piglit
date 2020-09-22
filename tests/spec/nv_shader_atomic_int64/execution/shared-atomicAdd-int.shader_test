@@ -1,0 +1,83 @@
+[require]
+GL >= 4.0
+GLSL >= 4.4
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+GL_ARB_gpu_shader_int64
+GL_NV_shader_atomic_int64
+
+
+[compute shader]
+#version 440
+#extension GL_ARB_compute_shader: require
+#extension GL_ARB_shader_atomic_counters: require
+#extension GL_ARB_gpu_shader_int64 : require
+#extension GL_NV_shader_atomic_int64 : require
+
+layout(local_size_x = 64) in;
+
+shared int64_t value1;
+shared int64_t value2;
+shared uint64_t mask;
+
+layout(binding = 0) uniform atomic_uint pass;
+layout(binding = 0) uniform atomic_uint fail;
+
+void main()
+{
+	/* This test validates two aspects of the 64 bit atomicAdd operation.
+	 * One part of the test gets each shader invocation to set one unique bit
+	 * of a 64-bit variable and add them up. Hence when all shaders have
+	 * finished execution the cumulative value should be 0xffffffffffffffff.
+	 * The other part of the test takes the return value of the operation
+	 * and uses it to set one unique bit in a 64-bit variable per shader
+	 * execution. Hence when all the shaders have finished execution
+	 * the cumulative value is expected to be 0xffffffffffffffff.
+	 */
+
+	int64_t data1 = 1L<<gl_LocalInvocationIndex;
+	int64_t data2 = 4L;
+
+        if (gl_LocalInvocationIndex == 0u) {
+                value1 = 0L;
+                value2 = 0L;
+                mask = 0ul;
+	}
+
+	barrier();
+
+        atomicAdd(value1, data1);
+        int64_t f = atomicAdd(value2, data2);
+	uint i = uint(f) / 4u;
+	uint bit = i % 64u;
+	uint64_t m = 1ul << bit;
+
+	if (i < 64u) {
+		/* If the bit was already set, the test fails. */
+		uint64_t r = atomicOr(mask, m);
+		if ((r & m) != 0ul)
+			atomicCounterIncrement(fail);
+
+		/* Once all 64 bits are set, the test passes. */
+		if ((r | m) == 0xfffffffffffffffful)
+			atomicCounterIncrement(pass);
+	} else {
+		atomicCounterIncrement(fail);
+	}
+
+
+	barrier();
+
+        if (gl_LocalInvocationIndex == 0u) {
+		if (value1 == 0xffffffffffffffffL)
+			atomicCounterIncrement(pass);
+		else
+			atomicCounterIncrement(fail);
+	}
+}
+
+[test]
+atomic counters 2
+compute 2 3 4
+probe atomic counter 0 == 48
+probe atomic counter 1 == 0
