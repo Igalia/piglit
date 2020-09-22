@@ -70,7 +70,7 @@ static const char vs_overwrite[] =
 	"}\n";
 
 static const char fs_overwrite[] =
-	"#version 450\n"
+	"#version 130\n"
 	"in vec2 tex_coords;\n"
 	"uniform sampler2D tex; \n"
 	"out vec4 color;\n"
