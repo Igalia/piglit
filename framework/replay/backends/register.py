@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright (c) 2014,2016 Intel Corporation
+# Copyright (c) 2015-2016, 2019 Intel Corporation
 # Copyright © 2020 Valve Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,14 +23,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-""" Module that provides test classes and helpers """
+"""An object for registering dump backends."""
 
-# By importing every exported function from each module in the package we
-# create a general use API, but allow it to be controlled by setting the
-# __all__ in each module
+import collections
 
-from .compare_replay import *
-from .download_utils import *
-from .image_checksum import *
-from .options import *
-from .query_traces_yaml import *
+Registry = collections.namedtuple(
+    'Registry',
+    ['extensions', 'backend']
+)

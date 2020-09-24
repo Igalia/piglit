@@ -45,7 +45,7 @@ def _traces(args):
     y = qty.load_yaml(args.yaml_file)
 
     t_list = qty.traces(y,
-                        trace_types=args.trace_types,
+                        trace_extensions=args.trace_extensions,
                         device_name=args.device_name,
                         checksum=args.checksum)
 
@@ -97,12 +97,13 @@ def query(input_):
         parents=[parsers.DEVICE],
         help=('Outputs the trace files filtered by the optional arguments.'))
     parser_traces.add_argument(
-        '-t', '--trace-types',
+        '-t', '--trace-extensions',
         required=False,
         default=None,
-        help=('a comma separated list of trace types to look for '
-              'in recursive dir walks. '
-              'If none are provide, all types are used by default'))
+        help=('a comma separated list of trace extensions to look for '
+              'in recursive dir walks (e.g. ".trace,.rdc"). '
+              'If none are provide, all supported extensions '
+              'are used by default'))
     parser_traces.add_argument(
         '-c', '--checksum',
         action='store_true',

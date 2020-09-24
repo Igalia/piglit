@@ -36,9 +36,9 @@ from os import path
 
 from framework import core
 from framework import status
+from framework.replay import backends
 from framework.replay import query_traces_yaml as qty
 from framework.replay.download_utils import ensure_file
-from framework.replay.dump_trace_images import dump_from_trace
 from framework.replay.image_checksum import hexdigest_from_image
 from framework.replay.options import OPTIONS
 
@@ -56,7 +56,12 @@ class Result(Enum):
 
 
 def _replay(trace_path, results_path):
-    success = dump_from_trace(trace_path, results_path, [])
+    try:
+        success = backends.dump(trace_path, results_path, [])
+    except (backends.DumpBackendNotImplementedError,
+            backends.DumpBackendError) as e:
+        print(e)
+        success = False
 
     if not success:
         print("[check_image] Trace {} couldn't be replayed. "
