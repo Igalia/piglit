@@ -112,7 +112,7 @@ class TestLoad(object):
         with pytest.raises(backends.BackendError):
             backends.load(str(p))
 
-    def test_interupted(self, tmpdir, mock_backend):  # pylint: disable=unused-argument,redefined-outer-name
+    def test_interrupted(self, tmpdir, mock_backend):  # pylint: disable=unused-argument,redefined-outer-name
         """backends.load: works for resuming (no extension known)."""
         tmpdir.mkdir('tests')
         with tmpdir.join('tests', '0.test_backend').open('w') as f:
@@ -122,7 +122,7 @@ class TestLoad(object):
 
     def test_notimplemented(self, tmpdir, mocker):
         """backends.load(): An error is raised if a loader isn't properly
-        implmented.
+        implemented.
         """
         mocker.patch.dict(
             backends.BACKENDS,

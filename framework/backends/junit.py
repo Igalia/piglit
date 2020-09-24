@@ -346,7 +346,7 @@ class JUnitBackend(FileBackend):
         os.mkdir(tests)
 
     def finalize(self, metadata=None):
-        """ Scoop up all of the individual peices and put them together """
+        """ Scoop up all of the individual pieces and put them together """
         root = etree.Element('testsuites')
         piglit = etree.Element('testsuite', name='piglit')
         root.append(piglit)
@@ -390,7 +390,7 @@ def _load(results_file):
     It's worth noting that junit is not as descriptive as piglit's own json
     format, so some data structures will be empty compared to json.
 
-    This tries to not make too many assumptions about the strucuter of the
+    This tries to not make too many assumptions about the structure of the
     JUnit document.
 
     """

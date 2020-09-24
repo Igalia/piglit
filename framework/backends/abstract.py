@@ -80,7 +80,7 @@ class Backend(metaclass=abc.ABCMeta):
         """ Generic constructor
 
         This method should setup the container and open any files or conections
-        as necissary. It should not however, write anything into the backend
+        as necessary. It should not however, write anything into the backend
         store, that job is for the iniitalize method.
 
         In addition it takes keyword arguments that define options for the
