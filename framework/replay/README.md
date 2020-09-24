@@ -131,7 +131,7 @@ Examples:
 		 --yaml-file ./traces.yml \
                  traces \
                  --device-name gl-vmware-llvmpipe \
-                 --trace-types "apitrace,renderdoc"
+                 --trace-extensions ".trace,.rdc"
                  --checksum
    ```
 

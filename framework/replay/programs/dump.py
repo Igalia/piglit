@@ -25,7 +25,7 @@
 import argparse
 
 from framework import exceptions
-from framework.replay import dump_trace_images
+from framework.replay import backends
 from framework.replay import options
 from framework.programs import parsers as piglit_parsers
 from . import parsers
@@ -43,8 +43,7 @@ def _dump_from_trace(args):
     else:
         calls = []
 
-    return dump_trace_images.dump_from_trace(args.file_path, args.output,
-                                             calls)
+    return backends.dump(args.file_path, args.output, calls)
 
 
 @exceptions.handler

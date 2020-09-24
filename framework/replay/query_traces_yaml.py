@@ -25,8 +25,9 @@
 
 import yaml
 
+from os import path
+
 from framework import exceptions
-from framework.replay.trace_utils import trace_type_from_filename, trace_type_from_name
 
 
 __all__ = ['download_url',
@@ -62,14 +63,18 @@ def download_url(y):
     return y['traces-db']['download-url'] if 'traces-db' in y else None
 
 
-def traces(y, trace_types=None, device_name=None, checksum=False):
+def traces(y, trace_extensions=None, device_name=None, checksum=False):
+
+    def _trace_extension(trace):
+        name, extension = path.splitext(trace)
+
+        return extension
+
     traces = y['traces'] or []
 
-    if trace_types is not None:
-        split_trace_types = [trace_type_from_name(t) for t
-                             in trace_types.split(',')]
-        traces = filter(lambda t: trace_type_from_filename(t['path'])
-                        in split_trace_types, traces)
+    if trace_extensions is not None:
+        traces = filter(lambda t: _trace_extension(t['path'])
+                        in trace_extensions.split(','), traces)
     if device_name is not None:
         traces = filter(lambda t: device_name in trace_devices(t), traces)
 
