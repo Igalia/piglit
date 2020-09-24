@@ -43,13 +43,10 @@ def _log(severity, msg, end='\n'):
 def _log_result(msg):
     print(msg, flush=True)
 
-def _run_logged_command(cmd, env, log_path):
+def _run_logged_command(cmd, env):
     ret = subprocess.run(cmd, stdout=subprocess.PIPE, env=env)
     logoutput = '[dump_trace_images] Running: {}\n'.format(
         ' '.join(cmd)).encode() + ret.stdout
-    core.check_dir(path.dirname(log_path))
-    with open(log_path, 'wb') as log:
-        log.write(logoutput)
     print(logoutput.decode(errors='replace'))
     if ret.returncode:
         raise RuntimeError(
@@ -99,16 +96,14 @@ def _dump_with_apitrace(retrace_cmd, trace_path, output_dir, calls):
                          '--snapshot=' + ','.join(calls),
                          '--snapshot-prefix=' + outputprefix,
                          trace_path]
-    log_path = path.join(output_dir, path.basename(trace_path)) + '.log'
-    _run_logged_command(cmd, None, log_path)
+    _run_logged_command(cmd, None)
 
 def _dump_with_renderdoc(trace_path, output_dir, calls):
     script_path = path.dirname(path.abspath(__file__))
     cmd = [path.join(script_path, 'renderdoc_dump_images.py'),
            trace_path, output_dir]
     cmd.extend(calls)
-    log_path = path.join(output_dir, path.basename(trace_path)) + '.log'
-    _run_logged_command(cmd, None, log_path)
+    _run_logged_command(cmd, None)
 
 def _dump_with_gfxreconstruct(trace_path, output_dir, calls):
     from PIL import Image
@@ -132,13 +127,11 @@ def _dump_with_gfxreconstruct(trace_path, output_dir, calls):
     env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
     env['VK_SCREENSHOT_FRAMES'] = ','.join(calls)
     env['VK_SCREENSHOT_DIR'] = output_dir
-    log_path = outputprefix + '.log'
-    _run_logged_command(cmd, env, log_path)
+    _run_logged_command(cmd, env)
     for c in calls:
         ppm = path.join(output_dir, c) + '.ppm'
         outputfile = outputprefix + '-' + c + '.png'
-        with open(log_path, 'a') as log:
-            log.write('Writing: {} to {}'.format(ppm, outputfile))
+        print('Writing: {} to {}'.format(ppm, outputfile))
         Image.open(ppm).save(outputfile)
         os.remove(ppm)
 
@@ -150,11 +143,9 @@ def _dump_with_testtrace(trace_path, output_dir, calls):
     color = [int(rgba[0:2], 16), int(rgba[2:4], 16),
              int(rgba[4:6], 16), int(rgba[6:8], 16)]
     if len(calls) == 0: calls = ['0']
-    log_path = outputprefix + '.log'
     for c in calls:
         outputfile = outputprefix + '-' + c + '.png'
-        with open(log_path, 'w') as log:
-            log.write('Writing RGBA: {} to {}'.format(rgba, outputfile))
+        print('Writing RGBA: {} to {}'.format(rgba, outputfile))
         Image.frombytes('RGBA', (32, 32),
                         bytes(color * 32 * 32)).save(outputfile)
 
