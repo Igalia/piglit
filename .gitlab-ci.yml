@@ -155,21 +155,21 @@ py36-tox:
   extends:
     - .tox
   variables:
-    TOX_ENV: "py36-{generator,noaccel,accel-nix,streams}"
+    TOX_ENV: "py36-{generator,noaccel,accel-nix,streams,functional}"
 
 py37-tox:
   image: python:3.7
   extends:
     - .tox
   variables:
-    TOX_ENV: "py37-{generator,noaccel,accel-nix,streams}"
+    TOX_ENV: "py37-{generator,noaccel,accel-nix,streams,functional}"
 
 py38-tox:
   image: python:3.8
   extends:
     - .tox
   variables:
-    TOX_ENV: "py38-{generator,noaccel,accel-nix,streams}"
+    TOX_ENV: "py38-{generator,noaccel,accel-nix,streams,functional}"
 
 pages:
   stage: deploy
