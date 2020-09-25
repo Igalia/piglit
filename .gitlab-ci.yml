@@ -145,7 +145,7 @@ tox:
   extends:
     - .use-debian
   script:
-    - tox -e "py37-{generator,noaccel,accel-nix,streams}"
+    - tox -e "py37-{generator,noaccel,accel-nix,streams,functional}"
 
 pages:
   stage: deploy
