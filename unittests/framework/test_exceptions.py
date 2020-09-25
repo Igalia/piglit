@@ -48,3 +48,33 @@ def test_handle_PiglitAbort():
 def test_handle_PiglitUserError():
     """exceptions.handler: Handles PiglitUserError"""
     raise exceptions.PiglitUserError
+
+
+@exceptions.handler
+def f1():
+    pass
+
+
+@exceptions.handler
+def f2(param):
+    return param + 1
+
+
+@exceptions.handler
+def f3(param, unused):
+    return param, len(param)
+
+
+@pytest.mark.parametrize("function, param, expected", [
+    (f1, (), None),
+    (f2, 2, 3),
+    (f2, 5, 6),
+    (f3, ("testing", 1), ("testing", 7)),
+    (f3, ("more testing", 2), ("more testing", 12)),
+])
+def test_handle_return(function, param, expected):
+    if type(param) is tuple:
+        value = function(*param)
+    else:
+        value = function(param)
+    assert value == expected

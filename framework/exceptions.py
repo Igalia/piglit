@@ -46,7 +46,7 @@ def handler(func):
     @functools.wraps(func)
     def _inner(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except PiglitFatalError as e:
             print('Fatal Error: {}'.format(str(e)), file=sys.stderr)
             sys.exit(e.exitcode)
