@@ -32,9 +32,9 @@ import subprocess
 
 from os import path
 
-from framework import core
-from .abstract import DumpBackend, dump_handler
-from .register import Registry
+from framework import core, exceptions
+from framework.replay.backends.abstract import DumpBackend, dump_handler
+from framework.replay.backends.register import Registry
 
 
 __all__ = [
@@ -52,10 +52,18 @@ class TestTraceBackend(DumpBackend):
     """
     _get_last_frame_call = None  # this silences the abstract-not-subclassed warning
 
-    def __init__(self, trace_path, output_dir=None, calls=[], **kwargs):
+    def __init__(self, trace_path, output_dir=None, calls=None, **kwargs):
         super(TestTraceBackend, self).__init__(trace_path, output_dir, calls,
                                                **kwargs)
-        if len(self._calls) == 0: self._calls = ['0']
+        extension = path.splitext(self._trace_path)[1]
+
+        if extension != '.testtrace':
+            raise exceptions.PiglitFatalError(
+                'Invalid trace_path: "{}" tried to be dumped '
+                'by the TestTraceBackend.\n'.format(self._trace_path))
+
+        if not self._calls:
+            self._calls = ['0']
 
     @dump_handler
     def dump(self):
