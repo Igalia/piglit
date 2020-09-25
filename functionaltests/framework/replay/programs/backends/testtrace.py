@@ -31,8 +31,8 @@ import subprocess
 from os import path
 
 from framework import core
-from .abstract import DumpBackend, dump_handler
-from .register import Registry
+from framework.replay.backends.abstract import DumpBackend, dump_handler
+from framework.replay.backends.register import Registry
 
 
 __all__ = [
