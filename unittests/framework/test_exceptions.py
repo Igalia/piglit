@@ -34,3 +34,17 @@ from framework import exceptions
 def test_handle_PiglitFatalError():
     """exceptions.handler: Handles PiglitFatalError"""
     raise exceptions.PiglitFatalError
+
+
+@pytest.mark.raises(exception=SystemExit)
+@exceptions.handler
+def test_handle_PiglitAbort():
+    """exceptions.handler: Handles PiglitAbort"""
+    raise exceptions.PiglitAbort
+
+
+@pytest.mark.raises(exception=SystemExit)
+@exceptions.handler
+def test_handle_PiglitUserError():
+    """exceptions.handler: Handles PiglitUserError"""
+    raise exceptions.PiglitUserError
