@@ -140,36 +140,20 @@ py.test:
   script:
     - pytest-3 unittests/framework
 
-.tox:
+tox:
+  image: python:${PY_MAJVER}.${PY_MINVER}
   stage: build
   extends:
     - .ci-run-policy
   before_script:
     - pip install tox
   script:
-    - tox -e $TOX_ENV
+    - tox -e "py${PY_MAJVER}${PY_MINVER}-{generator,noaccel,accel-nix,streams,functional}"
+  parallel:
+    matrix:
+      - PY_MAJVER: 3
+        PY_MINVER: [6, 7, 8]
   needs: []
-
-py36-tox:
-  image: python:3.6
-  extends:
-    - .tox
-  variables:
-    TOX_ENV: "py36-{generator,noaccel,accel-nix,streams,functional}"
-
-py37-tox:
-  image: python:3.7
-  extends:
-    - .tox
-  variables:
-    TOX_ENV: "py37-{generator,noaccel,accel-nix,streams,functional}"
-
-py38-tox:
-  image: python:3.8
-  extends:
-    - .tox
-  variables:
-    TOX_ENV: "py38-{generator,noaccel,accel-nix,streams,functional}"
 
 pages:
   stage: deploy
