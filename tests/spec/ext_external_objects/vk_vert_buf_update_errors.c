@@ -89,8 +89,8 @@ piglit_init(int argc, char **argv)
 	atexit(cleanup);
 
 	if (!vk_init()) {
-		fprintf(stderr, "Failed to initialize Vulkan.\n");
-		piglit_report_result(PIGLIT_FAIL);
+		fprintf(stderr, "Failed to initialize Vulkan, skipping the test.\n");
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	if (!gl_create_mem_obj_from_vk_mem(&vk_core, &vk_vb.mobj, &gl_memobj)) {
