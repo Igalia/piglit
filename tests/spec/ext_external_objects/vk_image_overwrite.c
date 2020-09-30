@@ -332,7 +332,7 @@ vk_set_image_props(uint32_t w, uint32_t h, uint32_t d,
 				       num_layers,
 				       format, tiling, usage,
 				       in_layout, end_layout,
-				       &vk_img_props);
+				       true, &vk_img_props);
 }
 
 static bool

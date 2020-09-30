@@ -863,7 +863,7 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 	VkExternalImageFormatProperties ext_img_fmt_props;
 	VkImageFormatProperties2 img_fmt_props;
 
-	VkExternalMemoryFeatureFlagBits feature_flags =
+	VkExternalMemoryFeatureFlagBits export_feature_flags =
 		VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT;
 	VkExternalMemoryHandleTypeFlagBits handle_type =
 		VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
@@ -897,7 +897,8 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 		return false;
 	}
 
-	if (!(ext_img_fmt_props.externalMemoryProperties.externalMemoryFeatures & feature_flags)) {
+	if (props->need_export &&
+	    !(ext_img_fmt_props.externalMemoryProperties.externalMemoryFeatures & export_feature_flags)) {
 		fprintf(stderr, "Unsupported Vulkan external memory features.\n");
 		return false;
 	}
@@ -1129,6 +1130,7 @@ vk_fill_ext_image_props(struct vk_ctx *ctx,
 			VkImageUsageFlagBits usage,
 			VkImageLayout in_layout,
 			VkImageLayout end_layout,
+			bool need_export,
 			struct vk_image_props *props)
 {
 	props->w = w;
@@ -1145,6 +1147,8 @@ vk_fill_ext_image_props(struct vk_ctx *ctx,
 
 	props->in_layout = in_layout;
 	props->end_layout = end_layout;
+
+	props->need_export = need_export;
 
 	if (!are_props_supported(ctx, props))
 		return false;

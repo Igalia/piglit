@@ -63,6 +63,8 @@ struct vk_image_props
 
 	VkImageLayout in_layout;
 	VkImageLayout end_layout;
+
+	bool need_export;
 };
 
 struct vk_mem_obj {
@@ -162,6 +164,7 @@ vk_fill_ext_image_props(struct vk_ctx *ctx,
 			VkImageUsageFlagBits usage,
 			VkImageLayout in_layout,
 			VkImageLayout end_layout,
+			bool need_export,
 			struct vk_image_props *props);
 
 bool

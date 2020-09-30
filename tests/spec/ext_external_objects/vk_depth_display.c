@@ -289,6 +289,7 @@ vk_subtest_init(int case_num)
 				     color_usage,
 				     color_in_layout,
 				     color_end_layout,
+				     true,
 				     &vk_color_att.props)) {
 		fprintf(stderr, "Unsupported color image properties.\n");
 		return false;
@@ -308,6 +309,7 @@ vk_subtest_init(int case_num)
 				     depth_usage,
 				     depth_in_layout,
 				     depth_end_layout,
+				     true,
 				     &vk_depth_att.props)) {
 		fprintf(stderr, "Unsupported depth image properties.\n");
 		vk_destroy_ext_image(&vk_core, &vk_color_att.obj);

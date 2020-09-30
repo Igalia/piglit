@@ -224,6 +224,7 @@ vk_init(uint32_t w,
 				     color_usage,
 				     color_in_layout,
 				     color_end_layout,
+				     false,
 				     &vk_color_att.props)) {
 		fprintf(stderr, "Unsupported color image properties.\n");
 		return false;
@@ -243,6 +244,7 @@ vk_init(uint32_t w,
 				     depth_usage,
 				     depth_in_layout,
 				     depth_end_layout,
+				     false,
 				     &vk_depth_att.props)) {
 		fprintf(stderr, "Unsupported depth image properties.\n");
 		return false;
