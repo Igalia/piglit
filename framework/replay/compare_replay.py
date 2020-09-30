@@ -24,6 +24,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import shutil
 import yaml
 try:
     import simplejson as json
@@ -107,10 +108,13 @@ def _check_trace(trace_path, expected_checksum):
         print('[check_image] Images differ for:\n  {}'.format(trace_path))
         print('[check_image] For more information see '
               'https://gitlab.freedesktop.org/'
-              'mesa/mesa/blob/master/.gitlab-ci/tracie/README.md')
+              'mesa/piglit/blob/master/replayer/README.md\n')
         result = Result.DIFFER
 
     if result is not Result.MATCH or OPTIONS.keep_image:
+        image_file_dest = path.join(path.dirname(image_file),
+                                    '{}.png'.format(checksum))
+        shutil.move(image_file, image_file_dest)
         yaml_result[trace_path]['image'] = image_file
 
     yaml_result[trace_path]['actual'] = checksum

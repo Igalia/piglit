@@ -41,8 +41,8 @@ from .backends import testtrace
 
 
 TESTS_OUTPUT = "results/output.txt"
-TRACE_PNG_TEST1 = "results/trace/gl-test-device/trace1/magenta.testtrace-0.png"
-TRACE_PNG_TEST2 = "results/trace/vk-test-device/trace2/olive.testtrace-0.png"
+TRACE_PNG_TEST1 = "results/trace/gl-test-device/trace1/8e0a801367e1714463475a824dab363b.png"
+TRACE_PNG_TEST2 = "results/trace/vk-test-device/trace2/5efda83854befe0155ff8517a58d5b51.png"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
