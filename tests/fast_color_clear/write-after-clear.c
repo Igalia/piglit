@@ -102,12 +102,12 @@ struct clear_list {
 };
 
 /* Clears a texture's data store according to the list then probes for a
- * specific pixel on layer 0.
+ * specific pixel.
  */
 static bool
 test_clear_list(GLuint tex_format, uint32_t tw, uint32_t th, uint32_t td,
 		uint32_t num_clears, const struct clear_list *list,
-		uint32_t px, uint32_t py,
+		uint32_t px, uint32_t py, uint32_t pz,
 		union color_value probe_pix)
 {
 	/* Create the texture storage. */
@@ -131,7 +131,7 @@ test_clear_list(GLuint tex_format, uint32_t tw, uint32_t th, uint32_t td,
 	assert(format_clear_value_type(tex_format) == GL_FLOAT);
 	const bool matched_pixel =
 		piglit_probe_texel_volume_rgba(GL_TEXTURE_2D_ARRAY, 0,
-					       px, py, 0, 1, 1, 1,
+					       px, py, pz, 1, 1, 1,
 					       probe_pix.flt);
 
 	/* Delete the texture. */
@@ -156,7 +156,7 @@ test_clear_after_clear(GLuint tex_format, uint32_t tw, uint32_t th,
 	  entry(view_format, 0, vw, vh, 1, view_color)
 	};
 	return test_clear_list(tex_format, tw, th, 1,
-			       2, list, px, py, probe_pix);
+			       2, list, px, py, 0, probe_pix);
 }
 
 static void
@@ -206,7 +206,7 @@ piglit_init(int argc, char **argv)
 		  entry(GL_SRGB8_ALPHA8, 0, 1, 1, 1, flt_half),
 		};
 		pass &= test_clear_list(GL_SRGB8_ALPHA8, 32, 32, 1,
-				        2, list, 0, 1, flt_half);
+				        2, list, 0, 1, 0, flt_half);
 	}
 
 	puts("Testing implicit read of partial block sRGB -> linear");
@@ -237,7 +237,7 @@ piglit_init(int argc, char **argv)
 		  entry(GL_RGBA8, 1, 32, 32, 1, flt_half),
 		};
 		pass &= test_clear_list(GL_RGBA8, 32, 32, 2,
-				        3, list, 0, 0, flt_one);
+				        3, list, 0, 0, 0, flt_one);
 	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
