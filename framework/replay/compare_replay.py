@@ -25,7 +25,6 @@
 
 import os
 import shutil
-import yaml
 try:
     import simplejson as json
 except ImportError:
@@ -79,9 +78,7 @@ def _replay(trace_path, results_path):
 def _check_trace(trace_path, expected_checksum):
     ensure_file(trace_path)
 
-    yaml_result = {}
-    yaml_result[trace_path] = {}
-    yaml_result[trace_path]['expected'] = expected_checksum
+    json_result = {}
 
     trace_dir = path.dirname(trace_path)
     dir_in_results = path.join('trace', OPTIONS.device_name, trace_dir)
@@ -91,14 +88,13 @@ def _check_trace(trace_path, expected_checksum):
     checksum, image_file = _replay(path.join(OPTIONS.db_path, trace_path),
                                    results_path)
 
-    yaml_result[trace_path]['actual'] = checksum or 'error'
     print('[check_image]\n'
           '    actual: {}\n'
-          '  expected: {}'.format(yaml_result[trace_path]['actual'],
-                                  expected_checksum))
+          '  expected: {}'.format(checksum or 'error', expected_checksum))
 
     if checksum is None:
-        return Result.FAILURE, yaml_result
+        return Result.FAILURE, json_result
+
     if checksum == expected_checksum:
         if not OPTIONS.keep_image:
             os.remove(image_file)
@@ -109,42 +105,32 @@ def _check_trace(trace_path, expected_checksum):
         print('[check_image] For more information see '
               'https://gitlab.freedesktop.org/'
               'mesa/piglit/blob/master/replayer/README.md\n')
+        json_result['images'] = [
+            {'image_desc': trace_path,
+             'image_ref': expected_checksum + '.png'}]
         result = Result.DIFFER
 
     if result is not Result.MATCH or OPTIONS.keep_image:
         image_file_dest = path.join(path.dirname(image_file),
                                     '{}.png'.format(checksum))
         shutil.move(image_file, image_file_dest)
-        yaml_result[trace_path]['image'] = image_file
+        if 'images' in json_result:
+            json_result['images'][0]['image_render'] = image_file_dest
 
-    yaml_result[trace_path]['actual'] = checksum
-
-    return result, yaml_result
+    return result, json_result
 
 
-def _print_result(result, trace_path, yaml_result):
+def _print_result(result, trace_path, json_result):
     output = 'PIGLIT: '
-    json_result = {}
     if result is Result.FAILURE:
         json_result['result'] = str(status.CRASH)
     elif result is Result.DIFFER:
         json_result['result'] = str(status.FAIL)
-        json_result['images'] = [
-            {'image_desc': trace_path,
-             'image_ref': yaml_result[trace_path]['expected'] + '.png',
-             'image_render': yaml_result[trace_path]['image']}]
     else:
         json_result['result'] = str(status.PASS)
 
     output += json.dumps(json_result)
     print(output)
-
-
-def _write_results(yaml_results):
-    core.check_dir(OPTIONS.results_path)
-    results_file_path = path.join(OPTIONS.results_path, 'results.yml')
-    with open(results_file_path, 'w') as f:
-        yaml.safe_dump(yaml_results, f, default_flow_style=False)
 
 
 def from_yaml(yaml_file):
@@ -153,25 +139,21 @@ def from_yaml(yaml_file):
     OPTIONS.set_download_url(qty.download_url(y))
 
     global_result = Result.MATCH
-    yaml_results = {}
+    # TODO: print in subtest format
+    # json_results = {}
     t_list = qty.traces(y, device_name=OPTIONS.device_name, checksum=True)
     for t in t_list:
-        result, yaml_result = _check_trace(t['path'], t['checksum'])
+        result, json_result = _check_trace(t['path'], t['checksum'])
         if result is not Result.MATCH and global_result is not Result.FAILURE:
             global_result = result
-        yaml_results.update(yaml_result)
-        # TODO: print in subtest format
-        # _print_result(result, t['path'], yaml_result)
-
-    _write_results(yaml_results)
+        # json_results.update(json_result)
+        # _print_result(result, t['path'], json_result)
 
     return global_result
 
 
 def trace(trace_path, expected_checksum):
-    result, yaml_result = _check_trace(trace_path, expected_checksum)
-    _print_result(result, trace_path, yaml_result)
-
-    _write_results(yaml_result)
+    result, json_result = _check_trace(trace_path, expected_checksum)
+    _print_result(result, trace_path, json_result)
 
     return result
