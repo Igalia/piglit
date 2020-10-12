@@ -35,6 +35,7 @@ from glob import glob
 from os import path
 
 from framework import core
+from framework import exceptions
 from framework import status
 from framework.replay import backends
 from framework.replay import query_traces_yaml as qty
@@ -70,7 +71,10 @@ def _replay(trace_path, results_path):
     else:
         file_name = path.basename(trace_path)
         files = glob(path.join(results_path, file_name + '-*' + '.png'))
-        assert(files)
+        if not files:
+            raise exceptions.PiglitFatalError(
+                'No dumped files found '
+                'in the results path "{}".'.format(results_path))
         image_file = files[0]
         return hexdigest_from_image(image_file), image_file
 

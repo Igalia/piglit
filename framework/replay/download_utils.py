@@ -28,7 +28,7 @@ import requests
 from os import path
 from time import time
 
-from framework import core
+from framework import core, exceptions
 from framework.replay.options import OPTIONS
 
 
@@ -38,8 +38,9 @@ __all__ = ['ensure_file']
 def ensure_file(file_path):
     destination_file_path = path.join(OPTIONS.db_path, file_path)
     if OPTIONS.download['url'] is None:
-        assert path.exists(destination_file_path), (
-            '{} missing'.format(destination_file_path))
+        if not path.exists(destination_file_path):
+            raise exceptions.PiglitFatalError(
+                '{} missing'.format(destination_file_path))
         return
 
     core.check_dir(path.dirname(destination_file_path))
