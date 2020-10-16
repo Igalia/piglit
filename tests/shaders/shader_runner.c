@@ -960,6 +960,22 @@ compare(float ref, float value, enum comparison cmp)
 }
 
 static bool
+compare_double(double ref, double value, enum comparison cmp)
+{
+	switch (cmp) {
+	case equal:         return fabs(value - ref) < DBL_EPSILON;
+	case not_equal:     return fabs(value - ref) >= DBL_EPSILON;
+	case less:          return value <  ref;
+	case greater_equal: return value >= ref;
+	case greater:       return value >  ref;
+	case less_equal:    return value <= ref;
+	}
+
+	assert(!"Should not get here.");
+	return false;
+}
+
+static bool
 compare_uint(GLuint ref, GLuint value, enum comparison cmp)
 {
 	switch (cmp) {
@@ -4159,6 +4175,42 @@ probe_ssbo_int64(GLint ssbo_index, GLint ssbo_offset, const char *op, int64_t va
 	return true;
 }
 
+static bool
+probe_ssbo_double(GLint ssbo_index, GLint ssbo_offset, const char *op, double value)
+{
+	double *p;
+	double observed;
+	enum comparison cmp;
+	bool result;
+
+	REQUIRE(parse_comparison_op(op, &cmp, NULL),
+		"Invalid comparison operation at: %s\n", op);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo[ssbo_index]);
+	p = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_offset,
+			     sizeof(double), GL_MAP_READ_BIT);
+
+	if (!p) {
+		printf("Couldn't map ssbo to verify expected value.\n");
+		return false;
+	}
+
+	observed = *p;
+	result = compare_double(value, observed, cmp);
+
+	if (!result) {
+		printf("SSBO %d test failed: Reference %s Observed\n",
+		       ssbo_offset, comparison_string(cmp));
+		printf("  Reference: %g\n", value);
+		printf("  Observed:  %g\n", observed);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		return false;
+	}
+
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	return true;
+}
+
 GLenum piglit_xfb_primitive_mode(GLenum draw_arrays_mode)
 {
 	switch (draw_arrays_mode) {
@@ -4771,6 +4823,10 @@ piglit_display(void)
 				  &x, &y, s, &lz) == 4) {
 			if (!probe_ssbo_int64(x, y, s, lz))
 				result = PIGLIT_FAIL;
+		} else if (sscanf(line, "probe ssbo double %d %d %s %lf",
+				  &x, &y, s, &d[0]) == 4) {
+			if (!probe_ssbo_double(x, y, s, d[0]))
+				result = PIGLIT_FAIL;
 		} else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
 				  "( %f , %f , %f , %f )",
@@ -4928,6 +4984,10 @@ piglit_display(void)
 		} else if (sscanf(line, "ssbo %d subdata float %d %f", &x, &y, &c[0]) == 3) {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, 4, &c[0]);
+		} else if (sscanf(line, "ssbo %d subdata double %d %s", &x, &y, s) == 3) {
+			parse_doubles(s, &d[0], 1, NULL);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, sizeof(double), &d[0]);
 		} else if (sscanf(line, "ssbo %d subdata int64 %ld %s", &x, &ly, s) == 3) {
 			parse_int64s(s, &lz, 1, NULL);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
