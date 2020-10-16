@@ -14,7 +14,7 @@
 # repository's registry will be used there as well.
 variables:
   UPSTREAM_REPO: mesa/piglit
-  DEBIAN_TAG: "2020-04-21"
+  DEBIAN_TAG: "2020-10-16"
   DEBIAN_VERSION: buster-slim
   DEBIAN_IMAGE: "$CI_REGISTRY_IMAGE/debian/$DEBIAN_VERSION:$DEBIAN_TAG"
   WINDOWS_TAG: "2020-08-18"

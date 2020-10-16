@@ -48,13 +48,17 @@ apt-get install -y \
   python3-mako \
   python3-mock \
   python3-numpy \
+  python3-pil \
   python3-pip \
   python3-psutil \
   python3-pytest \
   python3-pytest-mock \
   python3-pytest-timeout \
+  python3-requests \
+  python3-requests-mock \
   python3-setuptools \
   python3-wheel \
+  python3-yaml \
   tox \
   waffle-utils
 
