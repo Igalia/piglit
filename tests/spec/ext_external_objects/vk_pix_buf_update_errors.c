@@ -178,12 +178,9 @@ piglit_display(void)
 		{1.0, 0.0, 1.0, 1.0},
 		{0.0, 1.0, 1.0, 1.0}
 	};
-	unsigned char *data;
 	enum piglit_result res = PIGLIT_PASS;
+	unsigned char *data = calloc(w * h, 1);
 
-	data = malloc(w * h);
-	for (i = 0; i < w * h; i++)
-		data[i] = 127;
 
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, gl_bo);
 	glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, vk_bo.mobj.mem_sz, data);
@@ -192,11 +189,13 @@ piglit_display(void)
 		fprintf(stderr, "glBufferSubData should return GL_INVALID_OPERATION error!\n");
 		res = PIGLIT_FAIL;
 	}
+
+	glBindTexture(GL_TEXTURE_2D, gl_tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, 0);
+
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 	glUseProgram(gl_prog);
-	glBindTexture(GL_TEXTURE_2D, gl_tex);
-
 	piglit_draw_rect_tex(-1, -1, 2, 2, 0, 0, 1, 1);
 
 	/* We make sure that the gl_bo buffer data are the initial ones */
@@ -332,10 +331,6 @@ gl_init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, gl_bo);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, 0);
-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return glGetError() == GL_NO_ERROR;
