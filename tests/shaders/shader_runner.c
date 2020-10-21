@@ -4284,8 +4284,8 @@ piglit_display(void)
 		double d[4];
 		int x, y, z, w, h, l, tex, level;
 		unsigned ux, uy, uz;
-		int64_t lz;
-		uint64_t luz;
+		int64_t ly, lz;
+		uint64_t luy, luz;
 		char s[300]; // 300 for safety
 		enum piglit_result result = PIGLIT_PASS;
 
@@ -4928,14 +4928,14 @@ piglit_display(void)
 		} else if (sscanf(line, "ssbo %d subdata float %d %f", &x, &y, &c[0]) == 3) {
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, 4, &c[0]);
-		} else if (sscanf(line, "ssbo %d subdata int64 %ld %s", &x, &y, s) == 3) {
+		} else if (sscanf(line, "ssbo %d subdata int64 %ld %s", &x, &ly, s) == 3) {
 			parse_int64s(s, &lz, 1, NULL);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, sizeof(int64_t), &lz);
-		} else if (sscanf(line, "ssbo %d subdata uint64 %lu %s", &x, &y, s) == 3) {
-			parse_int64s(s, &luz, 1, NULL);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, ly, sizeof(int64_t), &lz);
+		} else if (sscanf(line, "ssbo %d subdata uint64 %lu %s", &x, &luy, s) == 3) {
+			parse_uint64s(s, &luz, 1, NULL);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
-			glBufferSubData(GL_SHADER_STORAGE_BUFFER, y, sizeof(uint64_t), &luz);
+			glBufferSubData(GL_SHADER_STORAGE_BUFFER, luy, sizeof(uint64_t), &luz);
 		} else if (sscanf(line, "ssbo %d subdata int %d %s", &x, &y, s) == 3) {
 			parse_ints(s, &z, 1, NULL);
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo[x]);
