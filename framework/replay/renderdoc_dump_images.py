@@ -2,6 +2,7 @@
 # coding=utf-8
 #
 # Copyright (c) 2019 Collabora Ltd
+# Copyright © 2020 Valve Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,6 +24,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import argparse
 import atexit
 import os
 import shutil
@@ -113,7 +115,7 @@ def renderdoc_dump_images(filename, event_ids, output_dir):
 
     tracefile = Path(filename).name
 
-    if len(event_ids) == 0:
+    if not event_ids:
         event_ids.append(controller.GetDrawcalls()[-1].eventId)
 
     for event_id in event_ids:
@@ -124,10 +126,24 @@ def renderdoc_dump_images(filename, event_ids, output_dir):
     rd.ShutdownReplay()
 
 
-if __name__ == "__main__":
-   if len(sys.argv) < 3:
-      raise RuntimeError("Usage: renderdoc_dump_images.py <trace> <outputdir> [<draw-id>...]")
+def main():
+    parser = argparse.ArgumentParser()
 
-   event_ids = [int(e) for e in sys.argv[3:]]
+    parser.add_argument('file_path',
+                        help='the path to a trace file.')
+    parser.add_argument('output_dir',
+                        help='the path in which to place the results')
+    parser.add_argument('draw_id',
+                        type=int,
+                        nargs=argparse.REMAINDER,
+                        help=('a draw-id number from the trace to dump. '
+                              'If none are provided, by default, '
+                              'the last frame will be used.'))
 
-   renderdoc_dump_images(sys.argv[1], event_ids, sys.argv[2])
+    args = parser.parse_args()
+
+    renderdoc_dump_images(args.file_path, args.draw_id, args.output_dir)
+
+
+if __name__ == '__main__':
+    main()
