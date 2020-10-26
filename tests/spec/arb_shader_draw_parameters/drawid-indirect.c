@@ -104,6 +104,20 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_shader_draw_parameters");
 	piglit_require_extension("GL_ARB_base_instance");
 
+	/* GL_ARB_multidraw_indirect says:
+	 *
+	 *    OpenGL 4.0 or ARB_draw_indirect is required.
+	 *
+	 *  GL_ARB_draw_indirect says:
+	 *
+	 *    OpenGL 3.1 is required.
+	 *
+	 * Leave the top-level requirement at OpenGL 3.1, but require
+	 * the correct set of extensions.
+	 */
+	piglit_require_extension("GL_ARB_draw_indirect");
+	piglit_require_extension("GL_ARB_multi_draw_indirect");
+
 	prog = piglit_build_simple_program(vs_text, fs_text);
 
 	glUseProgram(prog);
