@@ -56,16 +56,16 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char vs_template[] =
-	"#version 330\n"
+	"#version 140\n"
 	"#extension GL_ARB_shader_draw_parameters: require\n"
 	"\n"
-	"layout(location = 0) in vec2 pos;\n"
-	"layout(location = 1) in ivec4 ref;\n"
+	"in vec4 piglit_vertex;\n"
+	"in ivec4 ref;\n"
 	"out vec4 color;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
-	"  gl_Position = vec4(pos, 0.0, 1.0);\n"
+	"  gl_Position = piglit_vertex;\n"
 	"  if (%s)\n"
 	"    color = vec4(0, 1, 0, 1);\n"
 	"  else\n"
@@ -116,8 +116,6 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	piglit_require_GLSL_version(330);
-
 	piglit_require_extension("GL_ARB_shader_draw_parameters");
 	piglit_require_extension("GL_ARB_base_instance");
 	if (opt_draw_indirect)
@@ -125,6 +123,8 @@ piglit_init(int argc, char **argv)
 
 	prog = piglit_build_simple_program(vs_text, fs_text);
 
+	glBindAttribLocation(prog, 1, (const GLchar *) "ref");
+	glLinkProgram(prog);
 	glUseProgram(prog);
 }
 
