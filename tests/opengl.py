@@ -5020,6 +5020,8 @@ with profile.test_list.group_manager(
     g(['arb_shader_draw_parameters-drawid-indirect', 'basevertex'], 'drawid-indirect-basevertex')
     g(['arb_shader_draw_parameters-drawid-indirect', 'baseinstance'], 'drawid-indirect-baseinstance')
     g(['arb_shader_draw_parameters-drawid-indirect', 'vertexid'], 'drawid-indirect-vertexid')
+    g(['arb_shader_draw_parameters-drawid-single-draw'], 'drawid-single-draw')
+    g(['arb_shader_draw_parameters-drawid-single-draw', 'dlist'], 'drawid-single-draw-display-list')
 
     variables = ('basevertex', 'baseinstance', 'basevertex-baseinstance', 'vertexid-zerobased')
     for v in variables:
