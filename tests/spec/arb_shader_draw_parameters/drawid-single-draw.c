@@ -28,17 +28,25 @@
  *
  *    In non-MultiDraw* commands, the value of <gl_DrawIDARB> is always zero.
  *
- * This test contains two variations.  The first variation attempts a bunch of
+ * This test contains three variations.  The first variation attempts a bunch of
  * non-MultiDraw* commands and verifies that gl_DrawIDARB is always zero.  The
  * second variation does the same thing using compatibility profile display
  * lists.  The display lists are constructed in a way that an implementation
  * may coalesce the draws into a single operation that resembles a MultDraw*
  * command.
+ *
+ * The third variation uses primitive restart to draw multiple primitives
+ * using a single non-MultiDraw* command.
+ *
+ * A fourth variation that combines primitive restart and display lists is
+ * possible.  It is not clear what this should do.  See
+ * https://github.com/KhronosGroup/OpenGL-API/issues/74.
  */
 
 #include "piglit-util-gl.h"
 
 static bool use_dlist = false;
+static bool use_primitive_restart = false;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -46,6 +54,11 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		if (strcmp(argv[i], "dlist") == 0) {
 			printf("Using display lists.\n");
 			use_dlist = true;
+		}
+
+		if (strcmp(argv[i], "restart") == 0) {
+			printf("Using primitive restart.\n");
+			use_primitive_restart = true;
 		}
 	}
 
@@ -119,9 +132,11 @@ piglit_display()
 		},
 	};
 
-	const int indices[12] = {
+	const int indices[13] = {
 		0, 1, 2,
 		0, 2, 3,
+
+		0x12345678,
 
 		4, 5, 6,
 		4, 6, 7,
@@ -155,15 +170,37 @@ piglit_display()
 		if (dlist != 0)
 			glNewList(dlist, GL_COMPILE);
 
-		glDrawElements(GL_TRIANGLES,
-			       6,
-			       GL_UNSIGNED_INT,
-			       &indices[0]);
+		if (use_primitive_restart) {
+			/* Section G.1 ("New Features") of the OpenGL 3.3 spec
+			 * says:
+			 *
+			 *    Primitive restart (GL_NV_primitive_restart).
+			 *    Because client enable/disable no longer exists
+			 *    in OpenGL 3.1, the PRIMITIVE_RESTART state has
+			 *    become server state, unlike the NV extension
+			 *    where it is client state. As a result, the
+			 *    numeric values assigned to PRIMITIVE_RESTART and
+			 *    PRIMITIVE_RESTART_INDEX differ from the NV
+			 *    versions of those tokens.
+			 */
+			glEnable(GL_PRIMITIVE_RESTART);
+			glPrimitiveRestartIndex(0x12345678);
+			glDrawElements(GL_TRIANGLES,
+				       13,
+				       GL_UNSIGNED_INT,
+				       &indices[0]);
+			glDisable(GL_PRIMITIVE_RESTART);
+		} else {
+			glDrawElements(GL_TRIANGLES,
+				       6,
+				       GL_UNSIGNED_INT,
+				       &indices[0]);
 
-		glDrawElements(GL_TRIANGLES,
-			       6,
-			       GL_UNSIGNED_INT,
-			       &indices[6]);
+			glDrawElements(GL_TRIANGLES,
+				       6,
+				       GL_UNSIGNED_INT,
+				       &indices[7]);
+		}
 
 		if (dlist != 0)
 			glEndList();
