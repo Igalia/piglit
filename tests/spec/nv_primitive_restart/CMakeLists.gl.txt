@@ -10,4 +10,5 @@ link_libraries (
 
 piglit_add_executable (primitive-restart primitive-restart.c)
 piglit_add_executable (primitive-restart-draw-mode primitive-restart-draw-mode.c)
+piglit_add_executable (nv_primitive_restart-errors errors.c)
 piglit_add_executable (nv_primitive_restart-no-core-profile no-core-profile.c)
