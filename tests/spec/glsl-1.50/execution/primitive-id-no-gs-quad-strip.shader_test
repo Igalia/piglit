@@ -1,0 +1,51 @@
+# Check proper functioning of the gl_PrimitiveID fragment shader input, in the
+# case where there is no geometry shader, and a quad strip is being drawn.
+
+[require]
+GL COMPAT >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec3 piglit_vertex;
+flat out int expected_primitive_id;
+
+void main()
+{
+    gl_Position = vec4(piglit_vertex.xy, 0.0, 1.0);
+    expected_primitive_id = int(piglit_vertex.z);
+}
+
+[fragment shader]
+#version 150
+
+flat in int expected_primitive_id;
+out vec4 piglit_fragcolor;
+
+void main()
+{
+    if (expected_primitive_id == gl_PrimitiveID)
+        piglit_fragcolor = vec4(0.0, 1.0, 0.0, 1.0);
+    else
+        piglit_fragcolor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+piglit_vertex/float/3
+-1.0  1.0 0.0
+-1.0 -1.0 0.0
+-0.5  1.0 0.0
+-0.5 -1.0 0.0
+ 0.0  1.0 1.0
+ 0.0 -1.0 1.0
+ 0.5  1.0 2.0
+ 0.5 -1.0 2.0
+ 1.0  1.0 3.0
+ 1.0 -1.0 3.0
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_QUAD_STRIP 0 10
+probe all rgba 0.0 1.0 0.0 1.0
