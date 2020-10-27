@@ -4344,6 +4344,7 @@ with profile.test_list.group_manager(
         'points', 'lines', 'line_loop', 'line_strip', 'triangles',
         'triangle_strip', 'triangle_fan', 'quads', 'quad_strip', 'polygon')
 
+    g(['nv_primitive_restart-dlist'], 'dlist')
     g(['nv_primitive_restart-errors'], 'errors')
     g(['nv_primitive_restart-no-core-profile'], 'no-core-profile')
 
