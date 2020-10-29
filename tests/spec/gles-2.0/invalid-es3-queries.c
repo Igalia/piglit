@@ -126,7 +126,10 @@ piglit_init(int argc, char **argv)
 	CHECK_QUERIES(GL_ARB_transform_feedback2);
 	CHECK_QUERIES(GL_ARB_uniform_buffer_object);
 	CHECK_QUERIES(GL_ARB_vertex_shader);
-	CHECK_QUERIES(GL_EXT_framebuffer_blit);
+	if (!piglit_is_extension_supported("GL_ANGLE_framebuffer_blit") &&
+	    !piglit_is_extension_supported("GL_NV_framebuffer_blit")) {
+	    CHECK_QUERIES(GL_EXT_framebuffer_blit);
+	}
 	CHECK_QUERIES(GL_EXT_pixel_buffer_object);
 	CHECK_QUERIES(GL_EXT_texture_lod_bias);
 	CHECK_QUERIES(GL_EXT_transform_feedback);
