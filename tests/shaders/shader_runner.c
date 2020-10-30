@@ -4211,6 +4211,42 @@ probe_ssbo_double(GLint ssbo_index, GLint ssbo_offset, const char *op, double va
 	return true;
 }
 
+static bool
+probe_ssbo_float(GLint ssbo_index, GLint ssbo_offset, const char *op, float value)
+{
+	float *p;
+	float observed;
+	enum comparison cmp;
+	bool result;
+
+	REQUIRE(parse_comparison_op(op, &cmp, NULL),
+		"Invalid comparison operation at: %s\n", op);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo[ssbo_index]);
+	p = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_offset,
+			     sizeof(float), GL_MAP_READ_BIT);
+
+	if (!p) {
+		printf("Couldn't map ssbo to verify expected value.\n");
+		return false;
+	}
+
+	observed = *p;
+	result = compare_double(value, observed, cmp);
+
+	if (!result) {
+		printf("SSBO %d test failed: Reference %s Observed\n",
+		       ssbo_offset, comparison_string(cmp));
+		printf("  Reference: %g\n", value);
+		printf("  Observed:  %g\n", observed);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+		return false;
+	}
+
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	return true;
+}
+
 GLenum piglit_xfb_primitive_mode(GLenum draw_arrays_mode)
 {
 	switch (draw_arrays_mode) {
@@ -4826,6 +4862,10 @@ piglit_display(void)
 		} else if (sscanf(line, "probe ssbo double %d %d %s %lf",
 				  &x, &y, s, &d[0]) == 4) {
 			if (!probe_ssbo_double(x, y, s, d[0]))
+				result = PIGLIT_FAIL;
+		} else if (sscanf(line, "probe ssbo float %d %d %s %f",
+				  &x, &y, s, &c[0]) == 4) {
+			if (!probe_ssbo_float(x, y, s, c[0]))
 				result = PIGLIT_FAIL;
 		} else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
