@@ -41,7 +41,7 @@
  *     - An FBO with a packed depth/stencil attachment.  The stencil data
  *       should not be modified.
  *
- * In each case, \c glClearBufferfv is called twice.  Each call uses a
+ * In each case, \c glClearBufferfv is called more than once. Each call uses a
  * different clear value.  This ensures that the test doesn't erroneously pass
  * because the depth buffer was already filled with the clear color.
  *
@@ -69,6 +69,8 @@ void piglit_init(int argc, char **argv)
 
 	static const float first[4]  = { 0.5, 1.0, 1.0, 1.0 };
 	static const float second[4] = { 0.8, 0.0, 0.0, 0.0 };
+	static const float third[4] = { -5.0, 0.0, 0.0, 0.0 };
+	static const float third_clamped[4] = { 0.0, 0.0, 0.0, 0.0 };
 
 	unsigned i;
 	bool pass = true;
@@ -148,6 +150,36 @@ void piglit_init(int argc, char **argv)
 				    default_stencil,
 				    test_vectors[i].depth,
 				    second[0])
+			&& pass;
+
+		/* From the OpenGL 3.0 spec,
+		 * Section 4.2.3 "Clearing the Buffers":
+		 *
+		 *    If buffer is DEPTH, drawbuffer must be zero, and value
+		 *    points to the single depth value to clear the depth
+		 *    buffer to. Clamping and type conversion for fixed-point
+		 *    depth buffers are performed in the same fashion as for
+		 *    ClearDepth.
+		 *
+		 * generate_simple_fbo generates a fixed-point depth buffer,
+		 * so the clamping applies.
+		 */
+		glClearBufferfv(GL_DEPTH, 0, third);
+		err = glGetError();
+		if (err != GL_NO_ERROR) {
+			fprintf(stderr,
+				"Third call to glClearBufferfv erroneously "
+				"generated a GL error (%s, 0x%04x)\n",
+				piglit_get_gl_error_name(err), err);
+			pass = false;
+		}
+
+		pass = simple_probe(test_vectors[i].color,
+				    default_color,
+				    test_vectors[i].stencil,
+				    default_stencil,
+				    test_vectors[i].depth,
+				    third_clamped[0])
 			&& pass;
 
 		glDeleteFramebuffers(1, &fb);
