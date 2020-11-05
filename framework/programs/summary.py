@@ -148,6 +148,11 @@ def console(input_):
                            const="problems",
                            dest='mode',
                            help="Only display tests that had problems.")
+    excGroup1.add_argument("-r", "--regressions",
+                           action="store_const",
+                           const="regressions",
+                           dest='mode',
+                           help="Only display tests that regressed.")
     parser.add_argument("-l", "--list",
                         action="store",
                         help="Use test results from a list file")
