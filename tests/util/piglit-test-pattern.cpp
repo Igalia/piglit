@@ -846,7 +846,7 @@ ManifestStencil::run()
 	for (int i = 0; i < 8; ++i) {
 		glStencilFunc(GL_EQUAL, i, 0xff);
 		glUniform4fv(color_loc, 1, colors[i]);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 
 	glDisable(GL_STENCIL_TEST);
@@ -940,7 +940,7 @@ ManifestDepth::run()
 	for (int i = 0; i < 8; ++i) {
 		glUniform4fv(color_loc, 1, colors[i]);
 		glUniform1f(depth_loc, float(7 - 2*i)/8);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 
 	glDisable(GL_STENCIL_TEST);
