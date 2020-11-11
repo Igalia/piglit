@@ -1539,7 +1539,8 @@ create_test_clear_program(const struct format_info *base,
 				expected[i++] = 0xb8000100;
 				expected[i] = 0x3f800000;
 			} else if (base->internalformat == GL_RGBA16F ||
-				   base->internalformat == GL_RG16F) {
+				   base->internalformat == GL_RG16F ||
+				   base->internalformat == GL_RGB32F) {
 				test_nan = true;
 				expected[i] = true;
 			} else if (base->internalformat == GL_RGBA8UI) {
@@ -1656,7 +1657,6 @@ create_test_clear_program(const struct format_info *base,
 		case GL_R8:
 		case GL_RGB10_A2:
 			if (base->internalformat == GL_RGBA32F ||
-			    base->internalformat == GL_RGB32F ||
 			    base->internalformat == GL_RGBA32UI ||
 			    base->internalformat == GL_RGB32UI ||
 			    base->internalformat == GL_RGBA32I ||
@@ -1694,7 +1694,8 @@ create_test_clear_program(const struct format_info *base,
 			else if (base->internalformat == GL_RGBA16F ||
 				 base->internalformat == GL_RGB16F ||
 				 base->internalformat == GL_RG16F ||
-				 base->internalformat == GL_R16F) {
+				 base->internalformat == GL_R16F ||
+				 base->internalformat == GL_RGB32F) {
 				test_nan = true;
 				expected[i] = true;
 			} else if (base->internalformat == GL_RGBA8UI ||
