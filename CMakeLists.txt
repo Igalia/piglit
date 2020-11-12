@@ -1,16 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
-
-INCLUDE (GNUInstallDirs)
-INCLUDE (CheckCCompilerFlag)
-INCLUDE (CheckCSourceCompiles)
-INCLUDE (CheckCXXCompilerFlag)
-INCLUDE (CheckFunctionExists)
-INCLUDE (CheckSymbolExists)
-INCLUDE (CheckIncludeFile)
-INCLUDE (FindPkgConfig)
-
 # http://www.cmake.org/cmake/help/v3.0/policy/CMP0042.html
 if (POLICY CMP0042)
 	cmake_policy (SET CMP0042 NEW)
@@ -21,6 +10,17 @@ if (POLICY CMP0072)
 endif()
 
 project (piglit)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
+
+INCLUDE (GNUInstallDirs)
+INCLUDE (CheckCCompilerFlag)
+INCLUDE (CheckCSourceCompiles)
+INCLUDE (CheckCXXCompilerFlag)
+INCLUDE (CheckFunctionExists)
+INCLUDE (CheckSymbolExists)
+INCLUDE (CheckIncludeFile)
+INCLUDE (FindPkgConfig)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
