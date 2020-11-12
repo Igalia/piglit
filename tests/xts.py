@@ -121,7 +121,9 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
                 try:
                     out = subprocess.check_output(command, cwd=self.cwd)
                 except OSError:
-                    images.append({'image_desc': 'image processing failed'})
+                    images.append({'image_desc': 'image processing failed',
+                                   'image_ref': None,
+                                   'image_render': None})
                     continue
 
                 # Each Err*.err log contains a rendered image, and a reference

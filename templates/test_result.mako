@@ -39,8 +39,8 @@
           % for image in value.images:
             <tr>
               <td>${image['image_desc']}</td>
-              <td><img src="file://${image['image_ref']}"></td>
-              <td><img src="file://${image['image_render']}"></td>
+              <td><img src="file://${image['image_ref'] if 'image_ref' in image else None}"></td>
+              <td><img src="file://${image['image_render'] if 'image_render' in image else None}"></td>
             </tr>
           % endfor
           </table>
