@@ -167,7 +167,7 @@ piglit_subprocess(char * const *arguments,
 			close(i);
 		execvp(arguments[0], arguments);
 		fprintf(stderr, "%s: %s\n", arguments[0], strerror(errno));
-		exit(EXIT_FAILURE);
+		_exit(EXIT_FAILURE);
 	} else {
 		close(stdin_pipe[0]);
 		close(stdout_pipe[1]);
