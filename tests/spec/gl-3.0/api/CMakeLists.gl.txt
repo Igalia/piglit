@@ -22,5 +22,6 @@ piglit_add_executable (genmipmap-errors genmipmap-errors.c)
 piglit_add_executable (getfragdatalocation getfragdatalocation.c)
 piglit_add_executable (gl-3.0-forward-compatible-bit forward-compatible-bit.c)
 piglit_add_executable (integer-errors integer-errors.c)
+piglit_add_executable (clearbuffer-bug clearbuffer-bug.c)
 
 # vim: ft=cmake:

@@ -912,6 +912,7 @@ with profile.test_list.group_manager(
     g(['clearbuffer-invalid-buffer'])
     g(['clearbuffer-mixed-format'])
     g(['clearbuffer-stencil'])
+    g(['clearbuffer-bug'])
     g(['gl-3.0-dlist-uint-uniforms'],
       'dlist-uint-uniforms')
     g(['genmipmap-errors'])
