@@ -41,26 +41,31 @@ void main()
 	 * were observed.
 	 */
 	int f;
+	uint i;
+	int c;
 
 	/* This is an open-coded atomicAdd. */
 	do {
 		f = value;
+
+		i = uint(f) / 4u;
+		c = int(i / 32u);
+
+		/* Stop when values won't fit in the mask array. */
+		if (c >= mask.length()) {
+			color = vec4(0.0, 0.0, 1.0, 1.0);
+			return;
+		}
 	} while (f != atomicCompSwap(value, f, f + 4));
 
-	uint i = uint(f) / 4u;
 	uint bit = i % 32u;
-	int c = int(i / 32u);
 	uint m = 1u << bit;
 
-	if (c < mask.length()) {
-		/* If the bit was already set, the test fails. */
-		if ((atomicCounterOrARB(mask[c], m) & m) != 0u)
-			atomicCounterIncrement(fail);
+	/* If the bit was already set, the test fails. */
+	if ((atomicCounterOrARB(mask[c], m) & m) != 0u)
+		atomicCounterIncrement(fail);
 
-		color = vec4(0.0, 1.0, 0.0, 1.0);
-	} else {
-		color = vec4(0.0, 0.0, 1.0, 1.0);
-	}
+	color = vec4(0.0, 1.0, 0.0, 1.0);
 }
 
 [test]
