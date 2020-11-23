@@ -261,16 +261,21 @@ piglit_init(int argc, char **argv)
 		primitives_generated = MAX_TOTAL_PRIMS;
 	}
 
-	/* Check transform feedback outputs. */
-	readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
-	for (i = 0; i < primitives_generated; i++) {
-		if (readback[i] != i) {
-			printf("Expected primitive %d to have gl_PrimitiveIDIn"
-			       " = %d, got %d instead\n", i, i, readback[i]);
-			pass = false;
-		}
-	}
-	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
+        if (primitives_generated) {
+                /* Check transform feedback outputs. */
+                readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
+                for (i = 0; i < primitives_generated; i++) {
+                        if (readback[i] != i) {
+                                printf("Expected primitive %d to have gl_PrimitiveIDIn"
+                                       " = %d, got %d instead\n", i, i, readback[i]);
+                                pass = false;
+                        }
+                }
+                glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
+        } else {
+                printf("Expected at least 1 primitive, got 0\n");
+                pass = false;
+        }
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
