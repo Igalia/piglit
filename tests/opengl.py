@@ -3879,6 +3879,7 @@ with profile.test_list.group_manager(
     g(['nv_conditional_render-bitmap'], 'bitmap')
     g(['nv_conditional_render-blitframebuffer'], 'blitframebuffer')
     g(['nv_conditional_render-clear'], 'clear')
+    g(['nv_conditional_render-clear-bug'], 'clear-bug')
     g(['nv_conditional_render-copypixels'], 'copypixels')
     g(['nv_conditional_render-copyteximage'], 'copyteximage')
     g(['nv_conditional_render-copytexsubimage'], 'copytexsubimage')
