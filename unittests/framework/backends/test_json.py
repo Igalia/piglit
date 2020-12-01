@@ -276,6 +276,69 @@ class TestLoadResults(object):
                           results.TestrunResult)
 
 
+class TestWriteResults(object):
+    """Tests for the write_results function."""
+
+    @classmethod
+    def setup_class(cls):
+        """Setup values used by all tests."""
+        test = results.TestrunResult()
+        test.info = {
+            'system': {
+                'uname': 'this is uname',
+                'glxinfo': 'glxinfo',
+                'clinfo': 'clinfo',
+                'wglinfo': 'wglinfo',
+                'lspci': 'this is lspci',
+            }
+        }
+        test.name = 'name'
+        test.options = {'some': 'option'}
+        test.time_elapsed.end = 1.23
+        another_test = results.TestResult()
+        another_test.subtests['foo'] = 'pass'
+        another_test.subtests['bar'] = 'skip'
+        test.tests = {'a test': results.TestResult('pass'),
+                      'another test': another_test}
+
+        cls.test = test
+
+    @pytest.mark.parametrize('filepath', [
+        ('foo.json'),
+        ('bar.json'),
+    ])
+    def test_write(self, filepath, tmpdir):
+        """backends.json.write_results: writes a TestrunResult into a filepath.
+        """
+        p = tmpdir.join(filepath)
+        assert backends.json.write_results(self.test, str(p))
+        assert p.check()
+
+    def test_load(self, tmpdir):
+        """backends.json.write_results: test that the written JSON can be loaded.
+
+        This doesn't attempt to validate the schema of the code. It just
+        attempts a touch test of "can this be read as JSON".
+
+        """
+        p = tmpdir.join('foo.json')
+        assert backends.json.write_results(self.test, str(p))
+
+        with p.open('r') as f:
+            json.load(f)
+
+    @pytest.mark.parametrize('filepath, exception', [
+        ('', FileNotFoundError),
+        (None, TypeError),
+    ])
+    def test_bogus_filepath(self, filepath, exception):
+        """backends.json.write_results: raise with bogus filepaths
+        for the output.
+        """
+        with pytest.raises(exception):
+            assert backends.json.write_results(self.test, filepath)
+
+
 class TestLoad(object):
     """Tests for the _load function."""
 

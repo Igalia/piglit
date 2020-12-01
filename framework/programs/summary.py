@@ -268,18 +268,16 @@ def aggregate(input_):
             'a results directory (not results/tests)?'.format(args.results_folder))
 
     try:
-        # FIXME: This works, it fixes the problem, but it only works because
-        # only the json backend has the ability to aggregate results at the
-        # moment.
-        backends.json._write(results, outfile)
+        use_compression = backends.write(results, outfile)
     except IOError as e:
         if e.errno == errno.EPERM:
             raise exceptions.PiglitFatalError(
                 "Unable to write aggregated file, permission denied.")
         raise
 
-    print("Aggregated file written to: {}.{}".format(
-        outfile, backends.compression.get_mode()))
+    mode = backends.compression.get_mode() if use_compression else 'none'
+    comp_ext = '.{}'.format(mode) if mode != 'none' else ''
+    print("Aggregated file written to: {}{}".format(outfile, comp_ext))
 
 
 @exceptions.handler

@@ -352,7 +352,7 @@ def _update_results(results, filepath):
     # Move the old results, and write the current results
     try:
         os.rename(filepath, filepath + '.old')
-        _write(results, filepath)
+        write_results(results, filepath)
     except OSError:
         print("WARNING: Could not write updated results {}".format(filepath),
               file=sys.stderr)
@@ -360,10 +360,12 @@ def _update_results(results, filepath):
     return results
 
 
-def _write(results, file_):
+def write_results(results, file_):
     """Write the values of the results out to a file."""
     with write_compressed(file_) as f:
         json.dump(results, f, default=piglit_encoder, indent=INDENT)
+
+    return True
 
 
 def _update_seven_to_eight(result):
@@ -425,4 +427,5 @@ REGISTRY = Registry(
     backend=JSONBackend,
     load=load_results,
     meta=set_meta,
+    write=write_results,
 )

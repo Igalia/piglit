@@ -24,6 +24,7 @@
 import pytest
 
 from framework import backends
+from framework import results
 
 # pylint: disable=no-self-use
 
@@ -42,6 +43,7 @@ def mock_backend(mocker):
             backend=None,
             load=lambda x, _: x,
             meta=None,
+            write=None,
         )})
     yield
 
@@ -95,6 +97,7 @@ class TestLoad(object):
                 backend=None,
                 load=lambda x, _: [x],
                 meta=None,
+                write=None,
             )})
 
         p = tmpdir.join('foo.test_backend')
@@ -128,6 +131,7 @@ class TestLoad(object):
                 backend=None,
                 load=None,
                 meta=None,
+                write=None,
             )})
         p = tmpdir.join('foo.test_backend')
         p.write('foo')
@@ -149,6 +153,7 @@ class TestLoad(object):
                 backend=None,
                 load=None,
                 meta=None,
+                write=None,
             )})
         with pytest.raises(backends.BackendNotImplementedError):
             backends.load('foo.test_backend..gz')
@@ -168,6 +173,105 @@ class TestLoad(object):
             backends.load(str(p))
 
 
+class TestWrite(object):
+    """Tests for the write function."""
+
+    @classmethod
+    def setup_class(cls):
+        """class fixture."""
+        res = results.TestrunResult()
+        res.tests['foo'] = results.TestResult('pass')
+        res.tests['bar'] = results.TestResult('fail')
+        res.tests['oink'] = results.TestResult('crash')
+        res.tests['bonk'] = results.TestResult('warn')
+        res.tests['bor'] = results.TestResult('crash')
+        res.tests['bor'].subtests['1'] = 'pass'
+        res.tests['bor'].subtests['2'] = 'skip'
+        res.tests['bor'].subtests['3'] = 'fail'
+        res.tests['bor'].subtests['4'] = 'pass'
+
+        cls.results = res
+
+    @pytest.mark.parametrize('expected', [
+        (True),
+        (False),
+    ])
+    def test_basic(self, expected, mocker):
+        """backends.write: works as expected.
+
+        This is an interesting function to test, because it is just a wrapper
+        that returns True or False. So most of the testing should be
+        happening in the tests for each backend.
+
+        However, we can test this by injecting a fake backend, and ensuring
+        that we get back what we expect. What we do is inject list(), which
+        means that we should get back [file_path], instead of just file_path,
+        like the legitimate backends return.
+        """
+        mocker.patch.dict(
+            backends.BACKENDS,
+            {'test_backend': backends.register.Registry(
+                extensions=['.test_backend'],
+                backend=None,
+                load=None,
+                meta=None,
+                write=lambda x, _: expected,
+            )})
+
+        test = backends.write(self.results, 'foo.test_backend')
+        assert expected == test
+
+    @pytest.mark.raises(exception=backends.BackendError)
+    def test_unknown(self, tmpdir):  # pylint: disable=unused-argument
+        backends.write(self.results, 'foo.test_extension')
+
+    @pytest.mark.raises(exception=backends.BackendNotImplementedError)
+    def test_notimplemented(self, mocker):
+        """backends.write(): An error is raised if a writer isn't properly
+        implemented.
+        """
+        mocker.patch.dict(
+            backends.BACKENDS,
+            {'test_backend': backends.register.Registry(
+                extensions=['.test_backend'],
+                backend=None,
+                load=None,
+                meta=None,
+                write=None,
+            )})
+
+        backends.write(self.results, 'foo.test_backend')
+
+    @pytest.mark.raises(exception=backends.BackendNotImplementedError)
+    def test_trailing_dot(self, mocker):
+        """framework.backends.write: handles the result name ending in '.'.
+
+        Basically if this reaches a BackendNotImplementedError, then the '.'
+        was handled correctly, otherwise if it's '.' then we should reach the
+        BackendError, which is incorrect.
+        """
+        mocker.patch.dict(
+            backends.BACKENDS,
+            {'test_backend': backends.register.Registry(
+                extensions=['.test_backend'],
+                backend=None,
+                load=None,
+                meta=None,
+                write=None,
+            )})
+
+        backends.write(self.results, 'foo.test_backend..gz')
+
+    @pytest.mark.raises(exception=backends.BackendError)
+    def test_old(self, mock_backend):
+        """backends.write: Ignores files ending in '.old'.
+
+        If this raises a BackendError it means it didn't find a backend to use,
+        thus it skipped the file ending in '.old'.
+        """
+        backends.write(self.results, 'results.test_backend.old')
+
+
 class TestSetMeta(object):
     """Tests for the set_meta function."""
 
@@ -180,6 +284,7 @@ class TestSetMeta(object):
                 backend=None,
                 load=None,
                 meta=lambda x: x.append('bar'),
+                write=None,
             )})
 
         test = []

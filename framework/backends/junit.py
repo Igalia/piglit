@@ -470,4 +470,5 @@ REGISTRY = Registry(
     backend=JUnitBackend,
     load=load,
     meta=lambda x: x,  # The venerable no-op function
+    write=None,
 )

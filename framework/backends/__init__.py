@@ -55,6 +55,7 @@ __all__ = [
     'get_backend',
     'load',
     'set_meta',
+    'write',
 ]
 
 
@@ -111,6 +112,46 @@ def get_backend(backend):
     return inst
 
 
+def get_extension(file_path):
+    """Get the extension name to use when searching for a loader.
+
+    This function correctly handles compression suffixes, as long as they are
+    valid.
+
+    """
+    def _extension(file_path):
+        """Helper function to get the extension string."""
+        compression = 'none'
+        name, extension = os.path.splitext(file_path)
+
+        # If we hit a compressed suffix, get an additional suffix to test
+        # with.
+        # i.e: Use .json.gz rather that .gz
+        if extension in COMPRESSION_SUFFIXES:
+            compression = extension[1:]  # Drop the leading '.'
+            # Remove any trailing '.', this fixes a bug where the filename
+            # is 'foo.json..xz, or similar
+            extension = os.path.splitext(name.rstrip('.'))[1]
+
+        return extension, compression
+
+    if not os.path.isdir(file_path):
+        return _extension(file_path)
+    else:
+        for file_ in os.listdir(file_path):
+            if file_.startswith('result') and not file_.endswith('.old'):
+                return _extension(file_)
+
+    tests = os.path.join(file_path, 'tests')
+    if os.path.exists(tests):
+        return _extension(os.listdir(tests)[0])
+    else:
+        # At this point we have failed to find any sort of backend, just
+        # except and die
+        raise BackendError("No backend found for any file in {}".format(
+            file_path))
+
+
 def load(file_path):
     """Wrapper for loading runs.
 
@@ -119,44 +160,6 @@ def load(file_path):
     then return the TestrunResult instance.
 
     """
-    def get_extension(file_path):
-        """Get the extension name to use when searching for a loader.
-
-        This function correctly handles compression suffixes, as long as they
-        are valid.
-
-        """
-        def _extension(file_path):
-            """Helper function to get the extension string."""
-            compression = 'none'
-            name, extension = os.path.splitext(file_path)
-
-            # If we hit a compressed suffix, get an additional suffix to test
-            # with.
-            # i.e: Use .json.gz rather that .gz
-            if extension in COMPRESSION_SUFFIXES:
-                compression = extension[1:]  # Drop the leading '.'
-                # Remove any trailing '.', this fixes a bug where the filename
-                # is 'foo.json..xz, or similar
-                extension = os.path.splitext(name.rstrip('.'))[1]
-
-            return extension, compression
-
-        if not os.path.isdir(file_path):
-            return _extension(file_path)
-        else:
-            for file_ in os.listdir(file_path):
-                if file_.startswith('result') and not file_.endswith('.old'):
-                    return _extension(file_)
-
-        tests = os.path.join(file_path, 'tests')
-        if os.path.exists(tests):
-            return _extension(os.listdir(tests)[0])
-        else:
-            # At this point we have failed to find any sort of backend, just
-            # except and die
-            raise BackendError("No backend found for any file in {}".format(
-                file_path))
 
     extension, compression = get_extension(file_path)
 
@@ -171,7 +174,34 @@ def load(file_path):
             return loader(file_path, compression)
 
     raise BackendError(
-        'No module supports file extensions "{}"'.format(extension))
+        'No module supports file extension "{}"'.format(extension))
+
+
+def write(results, file_path):
+    """Wrapper for writing runs.
+
+    This function will attempt to determine how to write a TestrunResult
+    instance into the file (based on file extension), passing the TestrunResult
+    instance into the appropriate writer.
+
+    Returns whether the backend will attempt to use compression when writing
+    the results file or not.
+    """
+
+    extension, _ = get_extension(file_path)
+
+    for backend in BACKENDS.values():
+        if extension in backend.extensions:
+            writer = backend.write
+
+            if writer is None:
+                raise BackendNotImplementedError(
+                    'Writer for {} is not implemented'.format(extension))
+
+            return writer(results, file_path)
+
+    raise BackendError(
+        'No module supports file extension "{}"'.format(extension))
 
 
 def set_meta(backend, result):
