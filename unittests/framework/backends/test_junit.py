@@ -54,8 +54,8 @@ _XML = """\
         <system-err>this is stderr
 
 pid: [1934]
-time start: 1.0
-time end: 4.5
+start time: 1.0
+end time: 4.5
         </system-err>
       </testcase>
     </testsuite>
@@ -150,8 +150,8 @@ class TestProtectedLoad(object):
                 this is stderr
 
                 pid: [1934]
-                time start: 1.0
-                time end: 4.5""")
+                start time: 1.0
+                end time: 4.5""")
             assert result.tests[self.testname].err.strip() == expected
 
         def test_totals(self, result):

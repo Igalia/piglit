@@ -45,6 +45,9 @@ __all__ = [
 
 _JUNIT_SPECIAL_NAMES = ('api', 'search')
 
+_PID_STR = "pid: "
+_START_TIME_STR = "start time: "
+_END_TIME_STR = "end time: "
 
 def junit_escape(name):
     name = name.replace('.', '_')
@@ -85,8 +88,10 @@ class JUnitWriter(object):
         """Adds the 'system-err' element."""
         err = etree.SubElement(element, 'system-err')
         err.text = data.err
-        err.text += '\n\npid: {}\nstart time: {}\nend time: {}\n'.format(
-            data.pid, data.time.start, data.time.end)
+        err.text += '\n\n{}{}\n{}{}\n{}{}\n'.format(
+            _PID_STR, data.pid,
+            _START_TIME_STR, data.time.start,
+            _END_TIME_STR, data.time.end)
 
         if data.result in ['fail', 'dmesg-warn', 'dmesg-fail']:
             if expected_result == "failure":
@@ -410,14 +415,14 @@ def _load(results_file):
 
         # Try to get the values in stderr for time and pid
         for line in result.err.split('\n'):
-            if line.startswith('time start:'):
-                result.time.start = float(line[len('time start: '):])
+            if line.startswith(_START_TIME_STR):
+                result.time.start = float(line[len(_START_TIME_STR):])
                 continue
-            elif line.startswith('time end:'):
-                result.time.end = float(line[len('time end: '):])
+            elif line.startswith(_END_TIME_STR):
+                result.time.end = float(line[len(_END_TIME_STR):])
                 continue
-            elif line.startswith('pid:'):
-                result.pid = json.loads(line[len('pid: '):])
+            elif line.startswith(_PID_STR):
+                result.pid = json.loads(line[len(_PID_STR):])
                 continue
 
 
