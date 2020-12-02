@@ -465,10 +465,29 @@ def load(results_dir, compression):  # pylint: disable=unused-argument
         raise exceptions.PiglitFatalError("No results found")
 
 
+def write_results(results, file_, junit_subtests=False):
+    """Write the values of the results out to a file."""
+
+    if not junit_subtests:
+        writer = JUnitWriter('', {}, {})
+    else:
+        writer = JUnitSubtestWriter('', {}, {})
+
+    with open(file_, 'w') as f:
+        f.write("<?xml version='1.0' encoding='utf-8'?>\n")
+        f.write('<testsuites><testsuite name="piglit" tests="{}">'.format(
+            len(results.tests)))
+        for k, v in results.tests.items():
+            writer(f, k, v)
+        f.write("</testsuite></testsuites>")
+
+    return False
+
+
 REGISTRY = Registry(
     extensions=['.xml'],
     backend=JUnitBackend,
     load=load,
     meta=lambda x: x,  # The venerable no-op function
-    write=None,
+    write=write_results,
 )

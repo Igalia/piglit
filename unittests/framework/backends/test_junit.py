@@ -411,3 +411,105 @@ class TestJUnitSubtestWriter(object):
             schema = etree.XMLSchema(file=JUNIT_SCHEMA)  # pylint: disable=no-member
             with open(test_file, 'r') as f:
                 assert schema.validate(etree.parse(f))
+
+
+class TestWriteResults(object):
+    """Tests for the write_results function."""
+
+    @classmethod
+    def setup_class(cls):
+        """Setup values used by all tests."""
+        test = results.TestrunResult()
+        test.info = {
+            'system': {
+                'uname': 'this is uname',
+                'glxinfo': 'glxinfo',
+                'clinfo': 'clinfo',
+                'wglinfo': 'wglinfo',
+                'lspci': 'this is lspci',
+            }
+        }
+        test.name = 'name'
+        test.options = {'some': 'option'}
+        test.time_elapsed.end = 1.23
+        another_test = results.TestResult()
+        another_test.subtests['foo'] = 'pass'
+        another_test.subtests['bar'] = 'skip'
+        test.tests = {'a test': results.TestResult('pass'),
+                      'another test': another_test}
+
+        cls.test = test
+
+    @pytest.mark.parametrize('filepath', [
+        ('foo.xml'),
+        ('bar.xml'),
+    ])
+    def test_write(self, filepath, tmpdir):
+        """backends.json.write_results: writes a TestrunResult into a filepath.
+        """
+        p = tmpdir.join(filepath)
+        assert not backends.junit.write_results(self.test, str(p))
+        assert p.check()
+        p.remove()
+        assert not backends.junit.write_results(self.test, str(p),
+                                                junit_subtests=True)
+        assert p.check()
+
+    def test_xml_well_formed(self, tmpdir):
+        """backends.json.write_results: writes a TestrunResult into a well
+        formed xml.
+        """
+        p = tmpdir.join('foo.xml')
+        assert not backends.junit.write_results(self.test, str(p))
+        etree.parse(str(p))
+        p.remove()
+        assert not backends.junit.write_results(self.test, str(p),
+                                                junit_subtests=True)
+        etree.parse(str(p))
+
+    @pytest.mark.skipif(etree.__name__ != 'lxml.etree',
+                        reason="This test requires lxml")
+    def test_xml_valid(self, tmpdir):
+        """backends.json.write_results: writes a TestrunResult into a well
+        formed JUnit.
+        """
+        # This XMLSchema class is unique to lxml
+        schema = etree.XMLSchema(file=JUNIT_SCHEMA)  # pylint: disable=no-member
+        p = tmpdir.join('foo.xml')
+        assert not backends.junit.write_results(self.test, str(p))
+        with p.open('r') as f:
+            assert schema.validate(etree.parse(f))
+        p.remove()
+        assert not backends.junit.write_results(self.test, str(p),
+                                                junit_subtests=True)
+        with p.open('r') as f:
+            assert schema.validate(etree.parse(f))
+
+    def test_inst(self, tmpdir):
+        """backends.junit.write_results: test that the written JUnit loads
+        as a proper TestrunResult.
+        """
+        p = tmpdir.join('foo.xml')
+        assert not backends.junit.write_results(self.test, str(p))
+        assert isinstance(backends.junit.load(str(p), 'none'),
+                          results.TestrunResult)
+        p.remove()
+        assert not backends.junit.write_results(self.test, str(p),
+                                                junit_subtests=True)
+        assert isinstance(backends.junit.load(str(p), 'none'),
+                          results.TestrunResult)
+
+    @pytest.mark.parametrize('filepath, exception', [
+        ('', FileNotFoundError),
+        (None, TypeError),
+    ])
+    def test_bogus_filepath(self, filepath, exception):
+        """backends.junit.write_results: raise with bogus filepaths
+        for the output.
+        """
+        with pytest.raises(exception):
+            assert not backends.junit.write_results(self.test, filepath)
+
+        with pytest.raises(exception):
+            assert not backends.junit.write_results(self.test, filepath,
+                                                    junit_subtests=True)
