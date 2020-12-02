@@ -400,7 +400,10 @@ def _load(results_file):
             result.time = results.TimeAttribute(end=float(test.attrib['time']))
         syserr = test.find('system-err')
         if syserr is not None:
-            result.err = syserr.text
+            reversed_err = syserr.text.split('\n')
+            reversed_err.reverse()
+        else:
+            reversed_err = []
 
         # The command is prepended to system-out, so we need to separate those
         # into two separate elements
@@ -413,8 +416,16 @@ def _load(results_file):
             else:
                 result.out = out_tag.text
 
+        err_list = []
+        skip = 0
         # Try to get the values in stderr for time and pid
-        for line in result.err.split('\n'):
+        for line in reversed_err:
+            if skip > 0:
+                if line == '':
+                    skip -= 1
+                    continue
+                else:
+                    skip = 0
             if line.startswith(_START_TIME_STR):
                 result.time.start = float(line[len(_START_TIME_STR):])
                 continue
@@ -423,7 +434,12 @@ def _load(results_file):
                 continue
             elif line.startswith(_PID_STR):
                 result.pid = json.loads(line[len(_PID_STR):])
+                skip = 2
                 continue
+            err_list.append(line)
+
+        err_list.reverse()
+        result.err = "\n".join(err_list)
 
 
         run_result.tests[name] = result
