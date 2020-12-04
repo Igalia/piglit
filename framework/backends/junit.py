@@ -1,5 +1,6 @@
 # coding=utf-8
 # Copyright (c) 2014-2016, 2019 Intel Corporation
+# Copyright © 2020 Valve Corporation.
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +23,7 @@
 """ Module implementing a JUnitBackend for piglit """
 
 import os.path
+import re
 import shutil
 try:
     from lxml import etree
@@ -48,6 +50,29 @@ _JUNIT_SPECIAL_NAMES = ('api', 'search')
 _PID_STR = "pid: "
 _START_TIME_STR = "start time: "
 _END_TIME_STR = "end time: "
+
+# XML cannot include certain characters. This regex matches the "invalid XML
+# text character range".
+_FORBIDDEN_XML_TEXT_CHARS_RE = re.compile(
+    u'[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]+'
+)
+
+
+def escape_forbidden_xml_text_chars(val, replacement=''):
+    """
+    Strip invalid XML text characters.
+    """
+    # See: https://github.com/html5lib/html5lib-python/issues/96
+    #
+    # The XML 1.0 spec defines the valid character range as:
+    # Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+    #
+    # Sources:
+    # https://www.w3.org/TR/REC-xml/#charsets,
+    # https://lsimons.wordpress.com/2011/03/17/stripping-illegal-characters-out-of-xml-in-python/
+
+    return _FORBIDDEN_XML_TEXT_CHARS_RE.sub(replacement, val)
+
 
 def junit_escape(name):
     name = name.replace('.', '_')
@@ -87,7 +112,9 @@ class JUnitWriter(object):
     def _set_xml_err(element, data, expected_result):
         """Adds the 'system-err' element."""
         err = etree.SubElement(element, 'system-err')
-        err.text = data.err
+        # We cannot control what is in the error output. Let's escape the
+        # forbidden XML characters.
+        err.text = escape_forbidden_xml_text_chars(data.err)
         err.text += '\n\n{}{}\n{}{}\n{}{}\n'.format(
             _PID_STR, data.pid,
             _START_TIME_STR, data.time.start,
@@ -195,7 +222,9 @@ class JUnitWriter(object):
 
             # Add stdout
             out = etree.SubElement(element, 'system-out')
-            out.text = data.out
+            # We cannot control what is in the output. Let's escape the
+            # forbidden XML characters.
+            out.text = escape_forbidden_xml_text_chars(data.out)
 
             # Prepend command line to stdout
             out.text = data.command + '\n' + out.text
@@ -244,7 +273,9 @@ class JUnitSubtestWriter(JUnitWriter):
 
             # Add stdout
             out = etree.SubElement(element, 'system-out')
-            out.text = data.out
+            # We cannot control what is in the output. Let's escape the
+            # forbidden XML characters.
+            out.text = escape_forbidden_xml_text_chars(data.out)
             # Prepend command line to stdout
             out.text = data.command + '\n' + out.text
 
