@@ -115,8 +115,8 @@ def _check_trace(trace_path, expected_checksum):
         result = Result.DIFFER
 
     if result is not Result.MATCH or OPTIONS.keep_image:
-        image_file_dest = path.join(path.dirname(image_file),
-                                    '{}.png'.format(checksum))
+        root, ext = path.splitext(image_file)
+        image_file_dest = '{}-{}{}'.format(root, checksum, ext)
         shutil.move(image_file, image_file_dest)
         if 'images' in json_result:
             json_result['images'][0]['image_render'] = image_file_dest

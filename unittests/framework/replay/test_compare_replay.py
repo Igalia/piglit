@@ -171,11 +171,13 @@ class TestCompareReplay(object):
         self.m_ensure_file.assert_called_once()
         self.m_backends_dump.assert_called_once()
         self.m_hexdigest_from_image.assert_called_once()
+        dumped_image_path = '{}-99.png'.format(self.trace_path)
+        root, ext = path.splitext(dumped_image_path)
         assert not self.tmpdir.join(self.results_partial_path,
-                                    self.trace_path + '-99.png').check()
+                                    dumped_image_path).check()
         assert not self.tmpdir.join(self.results_partial_path,
-                                    path.dirname(self.trace_path),
-                                    self.exp_checksum + '.png').check()
+                                    '{}-{}{}'.format(
+                                        root, self.exp_checksum, ext)).check()
         s = f.getvalue()
         assert s == ('[check_image]\n'
                      '    actual: ' + self.exp_checksum + '\n'
@@ -197,16 +199,20 @@ class TestCompareReplay(object):
         assert self.m_ensure_file.call_count == 2
         assert self.m_backends_dump.call_count == 2
         assert self.m_hexdigest_from_image.call_count == 2
+        dumped_image_path = '{}-78.png'.format(second_trace_path)
+        root, ext = path.splitext(dumped_image_path)
         assert not self.tmpdir.join(self.results_partial_path,
-                                    second_trace_path + '-78.png').check()
+                                    dumped_image_path).check()
+        assert not self.tmpdir.join(
+            self.results_partial_path,
+            '{}-{}{}'.format(root, second_exp_checksum, ext)).check()
+        dumped_image_path = '{}-99.png'.format(self.trace_path)
+        root, ext = path.splitext(dumped_image_path)
         assert not self.tmpdir.join(self.results_partial_path,
-                                    path.dirname(second_trace_path),
-                                    second_exp_checksum + '.png').check()
+                                    dumped_image_path).check()
         assert not self.tmpdir.join(self.results_partial_path,
-                                    self.trace_path + '-99.png').check()
-        assert not self.tmpdir.join(self.results_partial_path,
-                                    path.dirname(self.trace_path),
-                                    self.exp_checksum + '.png').check()
+                                    '{}-{}{}'.format(
+                                        root, self.exp_checksum, ext)).check()
         s = f.getvalue()
         assert s == ('[check_image]\n'
                      '    actual: ' + second_exp_checksum + '\n'
@@ -232,11 +238,14 @@ class TestCompareReplay(object):
         self.m_ensure_file.assert_called_once()
         self.m_backends_dump.assert_called_once()
         self.m_hexdigest_from_image.assert_called_once()
+        dumped_image_path = '{}-99.png'.format(self.trace_path)
+        root, ext = path.splitext(dumped_image_path)
         assert not self.tmpdir.join(self.results_partial_path,
-                                    self.trace_path + '-99.png').check()
-        assert not self.tmpdir.join(self.results_partial_path,
-                                    path.dirname(self.trace_path),
-                                    self.exp_checksum + '.png').check()
+                                    dumped_image_path).check()
+        final_image_pathlib = self.tmpdir.join(
+            self.results_partial_path, '{}-{}{}'.format(
+                root, self.exp_checksum, ext))
+        assert not final_image_pathlib.check()
         s = f.getvalue()
         assert s.endswith('PIGLIT: {"result": "pass"}\n')
 
@@ -252,11 +261,14 @@ class TestCompareReplay(object):
         self.m_ensure_file.assert_called_once()
         self.m_backends_dump.assert_called_once()
         self.m_hexdigest_from_image.assert_called_once()
+        dumped_image_path = '{}-99.png'.format(self.trace_path)
+        root, ext = path.splitext(dumped_image_path)
         assert not self.tmpdir.join(self.results_partial_path,
-                                    self.trace_path + '-99.png').check()
-        assert self.tmpdir.join(self.results_partial_path,
-                                path.dirname(self.trace_path),
-                                self.exp_checksum + '.png').check()
+                                    dumped_image_path).check()
+        final_image_pathlib = self.tmpdir.join(
+            self.results_partial_path, '{}-{}{}'.format(
+                root, self.exp_checksum, ext))
+        assert final_image_pathlib.check()
         s = f.getvalue()
         assert s.endswith('PIGLIT: {"result": "pass"}\n')
 
@@ -272,21 +284,20 @@ class TestCompareReplay(object):
         self.m_ensure_file.assert_called_once()
         self.m_backends_dump.assert_called_once()
         self.m_hexdigest_from_image.assert_called_once()
+        dumped_image_path = '{}-99.png'.format(self.trace_path)
+        root, ext = path.splitext(dumped_image_path)
         assert not self.tmpdir.join(self.results_partial_path,
-                                    self.trace_path + '-99.png').check()
-        assert self.tmpdir.join(self.results_partial_path,
-                                path.dirname(self.trace_path),
-                                self.exp_checksum + '.png').check()
+                                    dumped_image_path).check()
+        final_image_pathlib = self.tmpdir.join(
+            self.results_partial_path, '{}-{}{}'.format(
+                root, self.exp_checksum, ext))
+        assert final_image_pathlib.check()
         s = f.getvalue()
         assert s.endswith('PIGLIT: '
                           '{"images": [{'
                           '"image_desc": "' + self.trace_path + '", '
                           '"image_ref": "' + wrong_checksum + '.png", '
-                          '"image_render": "' +
-                          self.tmpdir.join(self.results_partial_path,
-                                           path.dirname(self.trace_path),
-                                           self.exp_checksum +
-                                           '.png').strpath +
+                          '"image_render": "' + final_image_pathlib.strpath +
                           '"}], "result": "fail"}\n')
 
     @pytest.mark.parametrize('trace_path', [
@@ -306,8 +317,10 @@ class TestCompareReplay(object):
         self.m_ensure_file.assert_called_once()
         self.m_backends_dump.assert_called_once()
         self.m_hexdigest_from_image.assert_not_called()
-        assert not self.tmpdir.join(self.results_partial_path,
-                                    path.dirname(trace_path),
-                                    third_exp_checksum + '.png').check()
+        root, ext = path.splitext('{}-99.png'.format(self.trace_path))
+        final_image_pathlib = self.tmpdir.join(
+            self.results_partial_path, '{}-{}{}'.format(
+                root, third_exp_checksum, ext))
+        assert not final_image_pathlib.check()
         s = f.getvalue()
         assert s.endswith('PIGLIT: {"result": "crash"}\n')
