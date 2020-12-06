@@ -96,7 +96,13 @@ def _check_trace(trace_path, expected_checksum):
           '    actual: {}\n'
           '  expected: {}'.format(checksum or 'error', expected_checksum))
 
+    json_result['images'] = [
+        {'image_desc': trace_path,
+         'image_ref': expected_checksum + '.png',
+         'image_render': expected_checksum + '.png'}]
+
     if checksum is None:
+        json_result['images'][0]['image_render'] = None
         return Result.FAILURE, json_result
 
     if checksum == expected_checksum:
@@ -109,17 +115,13 @@ def _check_trace(trace_path, expected_checksum):
         print('[check_image] For more information see '
               'https://gitlab.freedesktop.org/'
               'mesa/piglit/blob/master/replayer/README.md\n')
-        json_result['images'] = [
-            {'image_desc': trace_path,
-             'image_ref': expected_checksum + '.png'}]
         result = Result.DIFFER
 
     if result is not Result.MATCH or OPTIONS.keep_image:
         root, ext = path.splitext(image_file)
         image_file_dest = '{}-{}{}'.format(root, checksum, ext)
         shutil.move(image_file, image_file_dest)
-        if 'images' in json_result:
-            json_result['images'][0]['image_render'] = image_file_dest
+        json_result['images'][0]['image_render'] = image_file_dest
 
     return result, json_result
 

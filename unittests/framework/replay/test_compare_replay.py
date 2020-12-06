@@ -247,7 +247,12 @@ class TestCompareReplay(object):
                 root, self.exp_checksum, ext))
         assert not final_image_pathlib.check()
         s = f.getvalue()
-        assert s.endswith('PIGLIT: {"result": "pass"}\n')
+        assert s.endswith('PIGLIT: '
+                          '{"images": [{'
+                          '"image_desc": "' + self.trace_path + '", '
+                          '"image_ref": "' + self.exp_checksum + '.png", '
+                          '"image_render": "' + self.exp_checksum + '.png"'
+                          '}], "result": "pass"}\n')
 
     def test_trace_success_keep_image(self):
         """compare_replay.trace: compare a trace successfully and set the option to keep the dumped image"""
@@ -270,7 +275,12 @@ class TestCompareReplay(object):
                 root, self.exp_checksum, ext))
         assert final_image_pathlib.check()
         s = f.getvalue()
-        assert s.endswith('PIGLIT: {"result": "pass"}\n')
+        assert s.endswith('PIGLIT: '
+                          '{"images": [{'
+                          '"image_desc": "' + self.trace_path + '", '
+                          '"image_ref": "' + self.exp_checksum + '.png", '
+                          '"image_render": "' + final_image_pathlib.strpath +
+                          '"}], "result": "pass"}\n')
 
     def test_trace_fail(self):
         """compare_replay.trace: fail comparing a trace"""
@@ -323,4 +333,8 @@ class TestCompareReplay(object):
                 root, third_exp_checksum, ext))
         assert not final_image_pathlib.check()
         s = f.getvalue()
-        assert s.endswith('PIGLIT: {"result": "crash"}\n')
+        assert s.endswith('PIGLIT: '
+                          '{"images": [{'
+                          '"image_desc": "' + trace_path + '", '
+                          '"image_ref": "' + third_exp_checksum + '.png", '
+                          '"image_render": null}], "result": "crash"}\n')
