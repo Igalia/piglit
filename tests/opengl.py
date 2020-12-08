@@ -1914,6 +1914,7 @@ with profile.test_list.group_manager(
     g(['fbo-generatemipmap-1d', 'RGB9_E5'])
     g(['fbo-generatemipmap-3d'])
     g(['fbo-generatemipmap-3d', 'RGB9_E5'])
+    g(['framebuffer-blit-mipmap'])
     for format in ('rgba', 'depth', 'stencil'):
         for test_mode in ('draw', 'read'):
             g(['framebuffer-blit-levels', test_mode, format],
