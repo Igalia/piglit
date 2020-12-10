@@ -5703,6 +5703,8 @@ piglit_init(int argc, char **argv)
 			glUseProgram(0);
 			glDisable(GL_DEPTH_TEST);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			if (!es)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			for (int k = 0; k < gl_max_clip_planes; k++) {
 				static const GLdouble zero[4];
