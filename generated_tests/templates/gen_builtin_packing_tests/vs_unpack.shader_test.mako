@@ -1,6 +1,7 @@
 ## Test execution of unpack2x16 functions in the vertex shader.
 [require]
 ${func.requirements}
+SIZE 10 10
 
 [vertex shader]
 #ifndef GL_ES

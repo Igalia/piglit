@@ -1,6 +1,7 @@
 ## Test execution of pack2x16 functions in the fragment shader.
 [require]
 ${func.requirements}
+SIZE 10 10
 
 [vertex shader]
 in vec4 vertex;
