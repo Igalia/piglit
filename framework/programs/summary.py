@@ -138,6 +138,11 @@ def console(input_):
                            dest='mode',
                            help="Only display the summary, not the individual "
                                 "test results")
+    excGroup1.add_argument("-g", "--fixes",
+                           action="store_const",
+                           const="fixes",
+                           dest='mode',
+                           help="Only display tests that have been fixed.")
     excGroup1.add_argument("-i", "--incomplete",
                            action="store_const",
                            const="incomplete",
