@@ -32,6 +32,7 @@ piglit_add_executable (ati_fragment_shader-render-notexture   render-notexture.c
 piglit_add_executable (ati_fragment_shader-render-constants   render-constants.c)
 piglit_add_executable (ati_fragment_shader-render-precedence  render-precedence.c)
 piglit_add_executable (ati_fragment_shader-render-fog         render-fog.c)
+piglit_add_executable (ati_fragment_shader-render-ops         render-ops.c)
 piglit_add_executable (ati_fragment_shader-render-textargets  render-textargets.c)
 
 # vim: ft=cmake:

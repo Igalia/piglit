@@ -1847,6 +1847,7 @@ with profile.test_list.group_manager(
     g(['ati_fragment_shader-render-default'])
     g(['ati_fragment_shader-render-fog'])
     g(['ati_fragment_shader-render-notexture'])
+    g(['ati_fragment_shader-render-ops'])
     g(['ati_fragment_shader-render-precedence'])
     g(['ati_fragment_shader-render-sources'])
     g(['ati_fragment_shader-render-textargets'])
