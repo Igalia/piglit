@@ -54,7 +54,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define ONE_SECOND 1000000
+#define ONE_SECOND 1000000000
 
 enum piglit_result
 piglit_display(void)
