@@ -904,6 +904,7 @@ with profile.test_list.group_manager(
     g(['gl-3.0-bound-resource-limits'],
       'bound-resource-limits')
     g(['clearbuffer-depth'])
+    g(['clearbuffer-depth-cs-probe'])
     g(['clearbuffer-depth-stencil'])
     g(['clearbuffer-display-lists'])
     g(['clearbuffer-invalid-drawbuffer'])

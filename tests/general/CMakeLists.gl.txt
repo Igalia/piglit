@@ -135,5 +135,6 @@ piglit_add_executable (vs-point_size-zero vs-point_size-zero.c)
 piglit_add_executable (triangle-guardband-viewport triangle-guardband-viewport.c)
 piglit_add_executable (teximage-scale-bias teximage-scale-bias.c)
 piglit_add_executable (viewport-clamp viewport-clamp.c)
+piglit_add_executable (clearbuffer-depth-cs-probe clearbuffer-depth-cs-probe.c)
 
 # vim: ft=cmake:
