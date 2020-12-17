@@ -1,0 +1,102 @@
+# Runtime array length.
+
+[require]
+SPIRV YES
+GL >= 3.3
+GLSL >= 4.50
+
+[compute shader spirv]
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 10
+; Bound: 26
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main"
+               OpExecutionMode %main LocalSize 1 1 1
+               OpSource GLSL 450
+               OpName %main "main"
+               OpName %Result "Result"
+               OpMemberName %Result 0 "result"
+               OpName %_ ""
+               OpName %Input "Input"
+               OpMemberName %Input 0 "some_vec"
+               OpMemberName %Input 1 "the_array"
+               OpName %__0 ""
+               OpMemberDecorate %Result 0 Offset 0
+               OpDecorate %Result BufferBlock
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 1
+               OpDecorate %_runtimearr_v4float ArrayStride 16
+               OpMemberDecorate %Input 0 Offset 0
+               OpMemberDecorate %Input 1 Offset 16
+               OpDecorate %Input BufferBlock
+               OpDecorate %__0 DescriptorSet 0
+               OpDecorate %__0 Binding 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+     %Result = OpTypeStruct %uint
+%_ptr_Uniform_Result = OpTypePointer Uniform %Result
+          %_ = OpVariable %_ptr_Uniform_Result Uniform
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+      %float = OpTypeFloat 32
+    %v4float = OpTypeVector %float 4
+%_runtimearr_v4float = OpTypeRuntimeArray %v4float
+      %Input = OpTypeStruct %v4float %_runtimearr_v4float
+%_ptr_Uniform_Input = OpTypePointer Uniform %Input
+        %__0 = OpVariable %_ptr_Uniform_Input Uniform
+%_ptr_Uniform_uint = OpTypePointer Uniform %uint
+     %v3uint = OpTypeVector %uint 3
+     %uint_1 = OpConstant %uint 1
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_1 %uint_1 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %18 = OpArrayLength %uint %__0 1
+         %19 = OpBitcast %int %18
+         %20 = OpBitcast %uint %19
+         %22 = OpAccessChain %_ptr_Uniform_uint %_ %int_0
+               OpStore %22 %20
+               OpReturn
+               OpFunctionEnd
+
+[compute shader]
+#version 450
+
+layout (local_size_x = 1) in;
+
+layout(std430, binding = 0) buffer Input {
+	vec4 some_vec;
+	vec4 the_array[];
+};
+
+layout(std430, binding = 1) buffer Result {
+	uint result;
+};
+
+void main() {
+	result = the_array.length();
+}
+
+[test]
+ssbo 0 128 # size, 8 vec4s
+ssbo 0 subdata float 0 -8
+ssbo 0 subdata float 4 6
+ssbo 0 subdata float 8 3
+ssbo 0 subdata float 12 1
+ssbo 0 subdata float 32 8
+ssbo 0 subdata float 36 -5.2
+ssbo 0 subdata float 40 -3
+ssbo 0 subdata float 44 0
+
+ssbo 1 4
+ssbo 1 subdata int 0 0
+
+compute 1 1 1
+
+probe ssbo int 1  0 == 7
+
