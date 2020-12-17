@@ -75,6 +75,7 @@ egl_init_test(struct egl_test *test)
 {
 	static const char *no_extensions[] = { NULL };
 
+	test->context_attribs = NULL;
 	test->config_attribs = egl_default_attribs;
 	test->surface_attribs = NULL;
 	test->draw = NULL;
@@ -213,11 +214,8 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	enum piglit_result result = PIGLIT_PASS;
 	int i, dispatch_api, api_bit = EGL_OPENGL_BIT;
 
-	EGLint ctxAttribsES[] = {
-		EGL_CONTEXT_CLIENT_VERSION, 0,
-		EGL_NONE
-	};
-	EGLint *ctxAttribs = NULL;
+	EGLint nCtxAttribs = 0;
+	EGLint ctxAttribs[40];
 
 	for (i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "-auto"))
@@ -243,11 +241,13 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	switch (api_bit) {
 	case EGL_OPENGL_ES_BIT:
 		dispatch_api = PIGLIT_DISPATCH_ES1;
-		ctxAttribsES[1] = 1;
+		ctxAttribs[nCtxAttribs++] = EGL_CONTEXT_CLIENT_VERSION;
+		ctxAttribs[nCtxAttribs++] = 1;
 		break;
 	case EGL_OPENGL_ES2_BIT:
 		dispatch_api = PIGLIT_DISPATCH_ES2;
-		ctxAttribsES[1] = 2;
+		ctxAttribs[nCtxAttribs++] = EGL_CONTEXT_CLIENT_VERSION;
+		ctxAttribs[nCtxAttribs++] = 2;
 		break;
 	default:
 		fprintf(stderr, "Note: No EGL_RENDERABLE_TYPE defined in test attributes, defaulted to gl\n");
@@ -271,10 +271,8 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	/* bind chosen API and set ctxattribs if using ES */
 	if (api_bit == EGL_OPENGL_BIT)
 		eglBindAPI(EGL_OPENGL_API);
-	else {
+	else
 		eglBindAPI(EGL_OPENGL_ES_API);
-		ctxAttribs = ctxAttribsES;
-	}
 
 	check_extensions(&state, test);
 
@@ -284,6 +282,12 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		result = PIGLIT_FAIL;
 		goto fail;
 	}
+
+	for (int i = 0; test->context_attribs && test->context_attribs[i] != EGL_NONE; i++)
+		ctxAttribs[nCtxAttribs++] = test->context_attribs[i];
+
+	ctxAttribs[nCtxAttribs++] = EGL_NONE;
+	assert(nCtxAttribs < ARRAY_SIZE(ctxAttribs));
 
 	state.ctx = eglCreateContext(state.egl_dpy, state.cfg,
 				     EGL_NO_CONTEXT, ctxAttribs);

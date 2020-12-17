@@ -36,6 +36,7 @@ struct egl_state {
 };
 
 struct egl_test {
+	const EGLint *context_attribs;
 	const EGLint *config_attribs;
 	const EGLint *surface_attribs;
 	const char **extensions;

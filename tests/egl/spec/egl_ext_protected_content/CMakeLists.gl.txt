@@ -1,0 +1,7 @@
+link_libraries(
+	piglitutil_${piglit_target_api}
+)
+
+piglit_add_executable(egl_ext_protected_content ../../egl-util.c egl_ext_protected_content.c)
+
+# vim: ft=cmake:
