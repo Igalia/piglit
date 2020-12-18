@@ -34,12 +34,12 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const float color1[] = {0.2, 0.3, 0.8};
-static const float color2[] = {0.9, 0.8, 0.3};
+static const float color1[] = {0.2, 0.3, 0.8, 0.8};
+static const float color2[] = {0.9, 0.8, 0.3, 0.3};
 
-static float resultLin[] = {0.0, 0.0, 0.0};
-static float resultExp[] = {0.0, 0.0, 0.0};
-static float resultEx2[] = {0.0, 0.0, 0.0};
+static float resultLin[] = {0.0, 0.0, 0.0, 0.0};
+static float resultExp[] = {0.0, 0.0, 0.0, 0.0};
+static float resultEx2[] = {0.0, 0.0, 0.0, 0.0};
 
 static const float z = 0.8;
 static const float dens = 0.4;
@@ -54,7 +54,7 @@ piglit_display(void)
 	glClearColor(1.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glColor3fv(color2);
+	glColor4fv(color2);
 
 	glFogfv(GL_FOG_COLOR, color1);
 	glFogf(GL_FOG_DENSITY, dens);
@@ -78,18 +78,18 @@ piglit_display(void)
 			   piglit_width / 4, piglit_height);
 	glDisable(GL_FRAGMENT_SHADER_ATI);
 
-	pass = pass && piglit_probe_rect_rgb(0, 0,
-					     piglit_width / 4,
-					     piglit_height, resultLin);
-	pass = pass && piglit_probe_rect_rgb(piglit_width / 4, 0,
-					     piglit_width / 4,
-					     piglit_height, resultExp);
-	pass = pass && piglit_probe_rect_rgb(2 * piglit_width / 4, 0,
-					     piglit_width / 4,
-					     piglit_height, resultEx2);
-	pass = pass && piglit_probe_rect_rgb(3 * piglit_width / 4, 0,
-					     piglit_width / 4,
-					     piglit_height, color2);
+	pass = pass && piglit_probe_rect_rgba(0, 0,
+					      piglit_width / 4,
+					      piglit_height, resultLin);
+	pass = pass && piglit_probe_rect_rgba(piglit_width / 4, 0,
+					      piglit_width / 4,
+					      piglit_height, resultExp);
+	pass = pass && piglit_probe_rect_rgba(2 * piglit_width / 4, 0,
+					      piglit_width / 4,
+					      piglit_height, resultEx2);
+	pass = pass && piglit_probe_rect_rgba(3 * piglit_width / 4, 0,
+					      piglit_width / 4,
+					      piglit_height, color2);
 
 	piglit_present_results();
 
@@ -109,6 +109,8 @@ piglit_init(int argc, char **argv)
 	glBeginFragmentShaderATI();
 	glColorFragmentOp1ATI(GL_MOV_ATI, GL_REG_0_ATI, GL_NONE, GL_NONE,
 			GL_PRIMARY_COLOR_ARB, GL_NONE, GL_NONE);
+	glAlphaFragmentOp1ATI(GL_MOV_ATI, GL_REG_0_ATI, GL_NONE,
+			GL_PRIMARY_COLOR_ARB, GL_NONE, GL_NONE);
 	glEndFragmentShaderATI();
 
 	/* compute the expected results */
@@ -121,6 +123,9 @@ piglit_init(int argc, char **argv)
 		f = exp(-pow(dens*z,2.0));
 		resultEx2[u] = f*color2[u] + (1.0-f)*color1[u];
 	}
+	resultLin[3] = color2[3];
+	resultExp[3] = color2[3];
+	resultEx2[3] = color2[3];
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
