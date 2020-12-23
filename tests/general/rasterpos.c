@@ -289,7 +289,8 @@ set_raster_pos_glsl(const struct raster_pos *r, GLenum next_shader, bool sso)
 		if (next_source) {
 			prog = piglit_build_simple_program_multiple_shaders(
 				       GL_VERTEX_SHADER, vs_source,
-				       next_shader, next_source);
+				       next_shader, next_source,
+				       0);
 		} else {
 			prog = piglit_build_simple_program(vs_source, NULL);
 		}
