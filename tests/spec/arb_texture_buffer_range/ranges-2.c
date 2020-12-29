@@ -141,7 +141,7 @@ piglit_init(int argc, char **argv) {
 	piglit_require_extension("GL_ARB_texture_buffer_range");
 
 	glGetIntegerv(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &align);
-	aligned_size = chunk_size % align == 0 ? chunk_size : align;
+	aligned_size = ALIGN(chunk_size, align);
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
