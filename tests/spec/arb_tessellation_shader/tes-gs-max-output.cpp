@@ -584,6 +584,8 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_tessellation_shader");
 	piglit_require_extension("GL_ARB_shader_storage_buffer_object");
+	/* For GL_MAX_GEOMETRY_SHADER_INVOCATIONS */
+	piglit_require_extension("GL_ARB_gpu_shader5");
 
 	memcpy(&explicit_testcase, &default_testcase, sizeof(explicit_testcase));
 
