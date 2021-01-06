@@ -4,6 +4,7 @@
 GL >= 3.3
 GLSL >= 3.30
 GL_ARB_shader_storage_buffer_object
+GL_ARB_gpu_shader5
 
 [vertex shader]
 #version 330
