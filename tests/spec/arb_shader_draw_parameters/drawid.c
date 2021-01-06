@@ -117,10 +117,10 @@ piglit_display()
 			0, 2,
 			0, 3,
 
-			1, 4,
-			1, 5,
-			1, 6,
-			1, 7,
+			2, 4,
+			2, 5,
+			2, 6,
+			2, 7,
 		}
 	};
 
@@ -154,14 +154,14 @@ piglit_display()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	GLsizei counts[2] = { 6, 6 };
-	const int *indices_array[2] = { &indices[0], &indices[6] };
+	static const GLsizei counts[4] = { 6, 0, 6, 0 };
+	const int *indices_array[4] = { &indices[0], &indices[0], &indices[6], &indices[6] };
 
 	glMultiDrawElements(GL_TRIANGLES,
 			    counts,
 			    GL_UNSIGNED_INT,
 			    (const void **) indices_array,
-			    2);
+			    ARRAY_SIZE(counts));
 
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
 				      green);
