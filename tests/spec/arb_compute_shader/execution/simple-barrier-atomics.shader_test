@@ -20,6 +20,7 @@ void main()
 {
         atomicCounterIncrement(a0);
 
+	memoryBarrierAtomicCounter();
 	barrier();
 
         if (atomicCounter(a0) == 1024u) {
