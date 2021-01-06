@@ -104,14 +104,16 @@ static void test_ubyte_indices(float x1, float y1, float x2, float y2, int test)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indx), indx, GL_STATIC_DRAW);
 		if (use_multi) {
-			GLsizei count[] = {3, 3};
+			static const GLsizei count[] = {3, 3, 0};
 			/* We need 2 draws in order to get non-zero in
 			 * pipe_draw_info::start, so make the second draw
 			 * a zero-area triangle. */
 			const void *offset[] = {(void*)(intptr_t)(index*9),
+						(void*)(intptr_t)1,
 						(void*)(intptr_t)1};
 			glMultiDrawElements(GL_TRIANGLES, count,
-					    GL_UNSIGNED_BYTE, offset, 2);
+					    GL_UNSIGNED_BYTE, offset,
+					    ARRAY_SIZE(count));
 		} else {
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE,
 				       (void*)(intptr_t)(index*9));
@@ -120,11 +122,12 @@ static void test_ubyte_indices(float x1, float y1, float x2, float y2, int test)
 		glDeleteBuffers(1, &buf);
 	} else {
 		if (use_multi) {
-			GLsizei count[] = {3, 3};
+			static const GLsizei count[] = {3, 3, 0};
 			/* The second draw is a zero-area triangle. */
-			const void *indices[] = {indx + index*9, indx + 1};
+			const void *indices[] = {indx + index*9, indx + 1, indx + 1};
 			glMultiDrawElements(GL_TRIANGLES, count,
-					    GL_UNSIGNED_BYTE, indices, 2);
+					    GL_UNSIGNED_BYTE, indices,
+					    ARRAY_SIZE(count));
 		} else {
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE,
 				       indx + index*9);
