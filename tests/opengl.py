@@ -2518,6 +2518,8 @@ with profile.test_list.group_manager(
       'sampling-2d-array-as-cubemap-array')
     g(['arb_texture_view-sampling-2d-array-as-2d-layer'],
       'sampling-2d-array-as-2d-layer')
+    g(['arb_texture_view-fbo-blit'],
+      'fbo-blit')
 
 with profile.test_list.group_manager(
         PiglitGLTest,
