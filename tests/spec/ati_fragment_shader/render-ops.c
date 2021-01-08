@@ -393,7 +393,7 @@ piglit_display(void)
 		bool ok = piglit_probe_rect_halves_equal_rgba(get_test_x(i), get_test_y(i),
 							      w * 2, h);
 		enum piglit_result sub_result = ok ? PIGLIT_PASS : PIGLIT_FAIL;
-		piglit_report_subtest_result(sub_result, test->name);
+		piglit_report_subtest_result(sub_result, "%s", test->name);
 		piglit_merge_result(&result, sub_result);
 	}
 
