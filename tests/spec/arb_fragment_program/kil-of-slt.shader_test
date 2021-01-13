@@ -1,0 +1,46 @@
+[require]
+# Reproduces a bug caused by a bad optimization that would cause part of the
+# condition for the KIL instruction to be omitted.
+#
+# See also https://gitlab.freedesktop.org/mesa/mesa/-/issues/1346
+GL_ARB_fragment_program
+GL_ARB_vertex_program
+
+[vertex program]
+!!ARBvp1.0
+MOV	result.position, vertex.attrib[0];
+MOV	result.texcoord[0], vertex.attrib[0];
+END
+
+[fragment program]
+!!ARBfp1.0
+OPTION ARB_precision_hint_fastest;
+TEMP	R0;
+SLT	R0.xy, fragment.texcoord[0], -program.local[0];
+MOV	result.color, program.local[1];
+KIL	-R0.xyxx;
+END
+
+[test]
+clear color 0.5 0.5 0.5 0.0
+clear
+
+parameter local_fp 0 (2.0, 2.0, 0.0, 0.0)
+parameter local_fp 1 (0.0, 1.0, 0.0, 1.0)
+draw rect -1 -1 2 2
+
+parameter local_fp 0 (-2.0, -2.0, 0.0, 0.0)
+parameter local_fp 1 (1.0, 0.0, 0.0, 1.0)
+draw rect -1 -1 1 1
+
+# Properly discarding the region requires that both the .x and .y value be
+# included in the condition calculation.
+parameter local_fp 0 (2.0, -2.0, 0.0, 0.0)
+parameter local_fp 1 (1.0, 0.0, 0.0, 1.0)
+draw rect 0 -1 1 1
+
+parameter local_fp 0 (-2.0, 2.0, 0.0, 0.0)
+parameter local_fp 1 (1.0, 0.0, 0.0, 1.0)
+draw rect -1 0 1 1
+
+probe all rgba 0.0 1.0 0.0 1.0
