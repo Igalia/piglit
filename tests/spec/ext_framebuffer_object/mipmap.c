@@ -65,6 +65,8 @@ piglit_display(void)
 	glDisable(GL_TEXTURE_2D);
 
 	for (int i = TEXSIZE, level = 0; i > 0; i /= 2, level++) {
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level);
 		glTexImage2D(GL_TEXTURE_2D, level, GL_RGB, i, i, 0, GL_RGB,
 			     GL_INT, NULL);
 
