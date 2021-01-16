@@ -1,0 +1,27 @@
+[require]
+GL >= 4.0
+GLSL >= 4.00
+GL_ARB_gpu_shader_int64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 400
+#extension GL_ARB_gpu_shader_int64 : require
+
+out vec4 color;
+
+uniform uint val = 1;
+
+void main()
+{
+  uint64_t t = val;
+  color = t == 1L ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
