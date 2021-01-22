@@ -10,6 +10,7 @@ endif()
 
 add_subdirectory (util)
 add_subdirectory (fbo)
+add_subdirectory (gbm)
 add_subdirectory (general)
 add_subdirectory (glx)
 add_subdirectory (glslparsertest)

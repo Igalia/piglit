@@ -1,0 +1,10 @@
+link_libraries (
+   ${GBM_LDFLAGS}
+	piglitutil
+)
+
+if(PIGLIT_HAS_GBM_BO_GET_FD_FOR_PLANE)
+   piglit_add_executable(gbm-multi-plane gbm-multi-plane.c)
+endif()
+
+# vim: ft=cmake:
