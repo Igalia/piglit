@@ -28,6 +28,7 @@
 #include "interop.h"
 #include "params.h"
 #include "helpers.h"
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 config.supports_gl_compat_version = 30;
@@ -55,6 +56,35 @@ static const char fs[] =
 	"void main() \n"
 	"{\n"
 	"    color = texture(tex, tex_coords);\n"
+	"}\n";
+
+static const char vs_overwrite[] =
+	"#version 130\n"
+	"in vec4 piglit_vertex;\n"
+	"in vec2 piglit_texcoord;\n"
+	"out vec2 tex_coords;\n"
+	"void main()\n"
+	"{\n"
+	"    gl_Position = piglit_vertex;\n"
+	"    tex_coords = piglit_texcoord;\n"
+	"}\n";
+
+static const char fs_overwrite[] =
+	"#version 130\n"
+	"in vec2 tex_coords;\n"
+	"uniform sampler2D tex; \n"
+	"out vec4 color;\n"
+	"const vec4 colors[] = vec4[] (\n"
+	"	vec4(1.0, 0.0, 0.0, 1.0),\n"
+	"	vec4(0.0, 1.0, 0.0, 1.0),\n"
+	"	vec4(0.0, 0.0, 1.0, 1.0),\n"
+	"	vec4(0.5, 0.5, 0.5, 1.0),\n"
+	"	vec4(1.0, 0.0, 1.0, 1.0),\n"
+	"	vec4(0.0, 1.0, 1.0, 1.0));\n"
+	"void main()\n"
+	"{\n"
+	"	int band = int(gl_FragCoord.x * 6.0 / 160.0);\n"
+	"	color =  colors[band];\n"
 	"}\n";
 
 static bool
@@ -94,14 +124,16 @@ static GLenum gl_target = GL_TEXTURE_2D;
 static GLenum gl_tex_storage_format = GL_RGBA32F;
 static GLuint gl_tex;
 static GLint gl_prog;
+static GLint gl_prog_overwrite;
 static GLuint gl_mem_obj;
+
+static GLuint gl_fbo;
+static GLuint gl_rbo;
 
 static struct gl_ext_semaphores gl_sem;
 static struct vk_semaphores vk_sem;
-static bool vk_sem_has_wait = true;
-static bool vk_sem_has_signal = true;
 
-static float vk_fb_color[4] = { 1.0, 0.0, 0.0, 1.0 };
+static float vk_fb_color[4] = { 1.0, 1.0, 1.0, 1.0 };
 
 void piglit_init(int argc, char **argv)
 {
@@ -124,7 +156,7 @@ void piglit_init(int argc, char **argv)
 		fprintf(stderr, "Failed to initialize Vulkan, skipping the test.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
-	/* create memory object and gl texture */
+
 	if (!gl_create_mem_obj_from_vk_mem(&vk_core, &vk_color_att.obj.mobj,
 				&gl_mem_obj)) {
 		fprintf(stderr, "Failed to create GL memory object from Vulkan memory.\n");
@@ -147,27 +179,6 @@ void piglit_init(int argc, char **argv)
 		fprintf(stderr, "Failed to initialize structs for GL rendering.\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
-
-	/* one initial vk rendering to fill the texture */
-	GLuint layout = gl_get_layout_from_vk(color_in_layout);
-	if (vk_sem_has_wait) {
-		glSignalSemaphoreEXT(gl_sem.gl_frame_ready, 0, 0, 1,
-				     &gl_tex, &layout);
-		glFlush();
-	}
-
-	struct vk_image_att images[] = { vk_color_att, vk_depth_att };
-	vk_draw(&vk_core, 0, &vk_rnd, vk_fb_color, 4, &vk_sem,
-		vk_sem_has_wait, vk_sem_has_signal, images, ARRAY_SIZE(images), 0, 0, w, h);
-
-	layout = gl_get_layout_from_vk(color_end_layout);
-	if (vk_sem_has_signal) {
-		glWaitSemaphoreEXT(gl_sem.vk_frame_done, 0, 0, 1,
-				   &gl_tex, &layout);
-		glFlush();
-	}
-
-	/* no gl rendering takes place before display */
 }
 
 enum piglit_result
@@ -175,6 +186,8 @@ piglit_display(void)
 {
 	enum piglit_result res = PIGLIT_PASS;
 	int i;
+	bool vk_sem_has_wait = true;
+	bool vk_sem_has_signal = true;
 	float colors[6][4] = {
 		{1.0, 0.0, 0.0, 1.0},
 		{0.0, 1.0, 0.0, 1.0},
@@ -183,6 +196,15 @@ piglit_display(void)
 		{1.0, 0.0, 1.0, 1.0},
 		{0.0, 1.0, 1.0, 1.0}
 	};
+
+	glBindTexture(gl_target, gl_tex);
+	glBindFramebuffer(GL_FRAMEBUFFER, gl_fbo);
+	glUseProgram(gl_prog_overwrite);
+	piglit_draw_rect(-1, -1, 2, 2);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFinish();
+
 	GLuint layout = gl_get_layout_from_vk(color_in_layout);
 
 	if (vk_sem_has_wait) {
@@ -192,31 +214,31 @@ piglit_display(void)
 	}
 
 	struct vk_image_att images[] = { vk_color_att, vk_depth_att };
-	vk_clear_color(&vk_core, 0, &vk_rnd, vk_fb_color, 4, &vk_sem,
-		       vk_sem_has_wait, vk_sem_has_signal, images,
-		       ARRAY_SIZE(images), 0, 0, w, h);
+	vk_draw(&vk_core, 0, &vk_rnd, vk_fb_color, 4, &vk_sem,
+		vk_sem_has_wait, vk_sem_has_signal, images, ARRAY_SIZE(images),
+		0, 0, w, h);
+
 	layout = gl_get_layout_from_vk(color_end_layout);
 	if (vk_sem_has_signal) {
 		glWaitSemaphoreEXT(gl_sem.vk_frame_done, 0, 0, 1,
 				   &gl_tex, &layout);
-		glFlush();
 	}
 
-	/* OpenGL rendering */
+	glUseProgram(gl_prog);
 	glBindTexture(gl_target, gl_tex);
 	piglit_draw_rect_tex(-1, -1,
 			     2,
 			     2,
 			     0, 0, 1, 1);
 
+
+	const float y = (float)piglit_height / 2.0;
 	for (i = 0; i < 6; i++) {
 		float x = i * (float)piglit_width / 6.0 + (float)piglit_width / 12.0;
-		float y = (float)piglit_height / 2.0;
 
-		if (!piglit_probe_pixel_rgba(x, y, colors[0]))
+		if (!piglit_probe_pixel_rgba(x, y, colors[i]))
 			res = PIGLIT_FAIL;
 	}
-
 	piglit_present_results();
 	return res;
 }
@@ -294,14 +316,12 @@ vk_init(uint32_t w,
 		goto fail;
 	}
 
-	/* load shaders */
 	if (!(vs_src = load_shader(VK_BANDS_VERT, &vs_sz)))
 		goto fail;
 
 	if (!(fs_src = load_shader(VK_BANDS_FRAG, &fs_sz)))
 		goto fail;
 
-	/* create Vulkan renderer */
 	if (!vk_create_renderer(&vk_core, vs_src, vs_sz, fs_src, fs_sz,
 				false, false,
 				&vk_color_att, &vk_depth_att, 0, &vk_rnd)) {
@@ -349,8 +369,39 @@ static bool
 gl_init()
 {
 	gl_prog = piglit_build_simple_program(vs, fs);
-	glUseProgram(gl_prog);
+	gl_prog_overwrite = piglit_build_simple_program(vs_overwrite,
+						       fs_overwrite);
 
+	glGenFramebuffers(1, &gl_fbo);
+	glGenRenderbuffers(1, &gl_rbo);
+
+	glBindTexture(gl_target, gl_tex);
+	glBindFramebuffer(GL_FRAMEBUFFER, gl_fbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, gl_rbo);
+
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+			      w, h);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+				  GL_DEPTH_STENCIL_ATTACHMENT,
+				  GL_RENDERBUFFER, gl_rbo);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER,
+			       GL_COLOR_ATTACHMENT0,
+			       gl_target, gl_tex, 0);
+
+	if (!check_bound_fbo_status())
+		return false;
+
+	glClearColor(1.0, 1.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(gl_target, 0);
+
+	glClearColor(0.1, 0.1, 0.1, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	return glGetError() == GL_NO_ERROR;
 }
@@ -365,6 +416,9 @@ gl_cleanup(void)
 
 	glDeleteSemaphoresEXT(1, &gl_sem.gl_frame_ready);
 	glDeleteSemaphoresEXT(1, &gl_sem.vk_frame_done);
+
+	glDeleteFramebuffers(1, &gl_fbo);
+	glDeleteRenderbuffers(1, &gl_rbo);
 
 	glDeleteMemoryObjectsEXT(1, &gl_mem_obj);
 }
