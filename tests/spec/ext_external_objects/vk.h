@@ -214,6 +214,18 @@ vk_draw(struct vk_ctx *ctx,
 	float x, float y, float w, float h);
 
 void
+vk_clear_color(struct vk_ctx *ctx,
+	       struct vk_buf *vbo,
+	       struct vk_renderer *renderer,
+	       float *vk_fb_color,
+	       uint32_t vk_fb_color_count,
+	       struct vk_semaphores *semaphores,
+	       bool has_wait, bool has_signal,
+	       struct vk_image_att *attachments,
+	       uint32_t n_attachments,
+	       float x, float y, float w, float h);
+
+void
 vk_copy_image_to_buffer(struct vk_ctx *ctx,
 			struct vk_image_att *src_img,
 			struct vk_buf *dst_bo,

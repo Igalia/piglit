@@ -1526,6 +1526,165 @@ vk_draw(struct vk_ctx *ctx,
 }
 
 void
+vk_clear_color(struct vk_ctx *ctx,
+	       struct vk_buf *vbo,
+	       struct vk_renderer *renderer,
+	       float *vk_fb_color,
+	       uint32_t vk_fb_color_count,
+	       struct vk_semaphores *semaphores,
+	       bool has_wait, bool has_signal,
+	       struct vk_image_att *attachments,
+	       uint32_t n_attachments,
+	       float x, float y,
+	       float w, float h)
+{
+	VkCommandBufferBeginInfo cmd_begin_info;
+	VkRenderPassBeginInfo rp_begin_info;
+	VkRect2D rp_area;
+	VkClearValue clear_values[2];
+	VkSubmitInfo submit_info;
+	VkPipelineStageFlagBits stage_flags;
+	VkImageSubresourceRange img_range;
+
+	assert(vk_fb_color_count == 4);
+
+	if (has_wait)
+		assert(semaphores->gl_frame_done);
+	if (has_signal)
+		assert(semaphores->vk_frame_ready);
+
+	/* VkCommandBufferBeginInfo */
+	memset(&cmd_begin_info, 0, sizeof cmd_begin_info);
+	cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+
+	/* VkRect2D render area */
+	memset(&rp_area, 0, sizeof rp_area);
+	rp_area.extent.width = (uint32_t)w;
+	rp_area.extent.height = (uint32_t)h;
+	rp_area.offset.x = x;
+	rp_area.offset.y = y;
+
+	/* VkClearValue */
+	memset(&clear_values[0], 0, sizeof clear_values[0]);
+	clear_values[0].color.float32[0] = vk_fb_color[0]; /* red */
+	clear_values[0].color.float32[1] = vk_fb_color[1]; /* green */
+	clear_values[0].color.float32[2] = vk_fb_color[2]; /* blue */
+	clear_values[0].color.float32[3] = vk_fb_color[3]; /* alpha */
+
+	memset(&clear_values[1], 0, sizeof clear_values[1]);
+	clear_values[1].depthStencil.depth = 1.0;
+	clear_values[1].depthStencil.stencil = 0;
+
+	/* VkRenderPassBeginInfo */
+	memset(&rp_begin_info, 0, sizeof rp_begin_info);
+	rp_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	rp_begin_info.renderPass = renderer->renderpass;
+	rp_begin_info.framebuffer = renderer->fb;
+	rp_begin_info.renderArea = rp_area;
+	rp_begin_info.clearValueCount = 2;
+	rp_begin_info.pClearValues = clear_values;
+
+	/* VkSubmitInfo */
+	stage_flags = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
+
+	memset(&submit_info, 0, sizeof submit_info);
+	submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submit_info.commandBufferCount = 1;
+	submit_info.pCommandBuffers = &ctx->cmd_buf;
+	if (has_wait) {
+		submit_info.pWaitDstStageMask = &stage_flags;
+		submit_info.waitSemaphoreCount = 1;
+		submit_info.pWaitSemaphores = &semaphores->gl_frame_done;
+	}
+
+	if (has_signal) {
+		submit_info.signalSemaphoreCount = 1;
+		submit_info.pSignalSemaphores = &semaphores->vk_frame_ready;
+	}
+
+	img_range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	img_range.baseMipLevel = 0;
+	img_range.levelCount = 1;
+	img_range.baseArrayLayer = 0;
+	img_range.layerCount = 1;
+
+	vkBeginCommandBuffer(ctx->cmd_buf, &cmd_begin_info);
+	vkCmdBeginRenderPass(ctx->cmd_buf, &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+
+	viewport.x = x;
+	viewport.y = y;
+	viewport.width = w;
+	viewport.height = h;
+
+	scissor.offset.x = x;
+	scissor.offset.y = y;
+	scissor.extent.width = w;
+	scissor.extent.height = h;
+
+	vkCmdSetViewport(ctx->cmd_buf, 0, 1, &viewport);
+	vkCmdSetScissor(ctx->cmd_buf, 0, 1, &scissor);
+
+	vkCmdBindPipeline(ctx->cmd_buf, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->pipeline);
+
+	vkCmdClearColorImage(ctx->cmd_buf,
+			     attachments[0].obj.img,
+			     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			     &clear_values[0].color,
+			     1,
+			     &img_range);
+
+	if (attachments) {
+		VkImageMemoryBarrier *barriers =
+			calloc(n_attachments, sizeof(VkImageMemoryBarrier));
+		VkImageMemoryBarrier *barrier = barriers;
+		for (uint32_t n = 0; n < n_attachments; n++, barrier++) {
+			struct vk_image_att *att = &attachments[n];
+
+			/* Insert barrier to mark ownership transfer. */
+			barrier->sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+
+			bool is_depth =
+				get_aspect_from_depth_format(att->props.format) != VK_NULL_HANDLE;
+
+			barrier->oldLayout = is_depth ?
+				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			barrier->newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			barrier->srcQueueFamilyIndex = ctx->qfam_idx;
+			barrier->dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
+			barrier->image = att->obj.img;
+			barrier->subresourceRange.aspectMask = is_depth ?
+				VK_IMAGE_ASPECT_DEPTH_BIT :
+				VK_IMAGE_ASPECT_COLOR_BIT;
+			barrier->subresourceRange.baseMipLevel = 0;
+			barrier->subresourceRange.levelCount = 1;
+			barrier->subresourceRange.baseArrayLayer = 0;
+			barrier->subresourceRange.layerCount = 1;
+		}
+
+		vkCmdPipelineBarrier(ctx->cmd_buf,
+				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+				     0,
+				     0, NULL,
+				     0, NULL,
+				     n_attachments, barriers);
+		free(barriers);
+	}
+
+	vkCmdEndRenderPass(ctx->cmd_buf);
+	vkEndCommandBuffer(ctx->cmd_buf);
+
+	if (vkQueueSubmit(ctx->queue, 1, &submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
+		fprintf(stderr, "Failed to submit queue.\n");
+	}
+
+	if (!semaphores && !has_wait && !has_signal)
+		vkQueueWaitIdle(ctx->queue);
+}
+
+void
 vk_copy_image_to_buffer(struct vk_ctx *ctx,
 			struct vk_image_att *src_img,
 			struct vk_buf *dst_bo,
