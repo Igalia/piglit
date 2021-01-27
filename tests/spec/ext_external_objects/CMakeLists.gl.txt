@@ -148,6 +148,8 @@ IF(LIBVULKAN_FOUND)
 		vk.c interop.c helpers.c vk_vert_buf_reuse.c ${VK_BLUE_VERT_PATH} ${VK_BLUE_FRAG_PATH})
 	piglit_add_executable (ext_external_objects-vk-depth-display
 		vk.c interop.c helpers.c vk_depth_display.c ${VK_ZQUAD_VERT_PATH} ${VK_ZQUAD_FRAG_PATH})
+	piglit_add_executable (ext_external_objects-vk-semaphores
+		vk.c interop.c helpers.c vk_semaphores.c ${VK_BANDS_VERT_PATH} ${VK_BANDS_FRAG_PATH})
 ENDIF()
 
 # vim: ft=cmake:
