@@ -1,0 +1,30 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float zero = 0.0;
+uniform float also_zero = 0.0;
+uniform float a_number = 42.0;
+
+out vec4 piglit_fragcolor;
+
+void main()
+{
+    float not_a_number = zero / also_zero;
+
+    /* Result of the min() should be 42, but range analysis might incorrectly
+     * think that it's some value <= 0.
+     */
+    if (32.0 < min(-abs(not_a_number), abs(a_number))) {
+        piglit_fragcolor = vec4(0.0, 1.0, 0.0, 1.0);
+    } else {
+        piglit_fragcolor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
