@@ -539,12 +539,15 @@ create_pipeline(struct vk_ctx *ctx,
 	vert_bind_dsc[0].stride = stride;
 	vert_bind_dsc[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
+	/* If using vbo, we have setup vertex_info in the renderer. */
+	bool use_vbo = renderer->vertex_info.num_verts > 0;
+
 	/* VkPipelineVertexInputStateCreateInfo */
 	memset(&vert_input_info, 0, sizeof vert_input_info);
 	vert_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vert_input_info.vertexBindingDescriptionCount = 1;
+	vert_input_info.vertexBindingDescriptionCount = use_vbo ? 1 : 0;
 	vert_input_info.pVertexBindingDescriptions = vert_bind_dsc;
-	vert_input_info.vertexAttributeDescriptionCount = 1;
+	vert_input_info.vertexAttributeDescriptionCount = use_vbo ? 1 : 0;
 	vert_input_info.pVertexAttributeDescriptions = vert_att_dsc;
 
 	/* VkPipelineInputAssemblyStateCreateInfo */
