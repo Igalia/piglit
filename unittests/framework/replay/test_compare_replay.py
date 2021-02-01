@@ -60,6 +60,8 @@ class TestCompareReplay(object):
             TestCompareReplay._create_dump(trace_path, results_path, 78)
 
             return True
+        elif trace_path.endswith('glmark2/jellyfish.rdc'):
+            return True
         elif trace_path.endswith('Wicked-Engine/Tests:Cloth_Physics_Test.trace-dxgi'):
             return False
         elif trace_path.endswith('unimplemented/backend.vktrace'):
@@ -311,12 +313,41 @@ class TestCompareReplay(object):
                           '"}], "result": "fail"}\n')
 
     @pytest.mark.parametrize('trace_path', [
+        ('glmark2/jellyfish.rdc'),
+        ('unimplemented/backend.vktrace'),
+        ('unexisting/back.end'),
+    ])
+    def test_trace_no_dumped_images(self, trace_path):
+        """compare_replay.trace: dump succeeds but no images are generated"""
+
+        third_exp_checksum = 'ebaa1e2d04d7dfe5a91499510722c46e'
+        f = io.StringIO()
+        with contextlib.redirect_stdout(f):
+            assert (compare_replay.trace(trace_path, third_exp_checksum)
+                    is compare_replay.Result.FAILURE)
+        self.m_qty_load_yaml.assert_not_called()
+        self.m_ensure_file.assert_called_once()
+        self.m_backends_dump.assert_called_once()
+        self.m_hexdigest_from_image.assert_not_called()
+        root, ext = path.splitext('{}-99.png'.format(self.trace_path))
+        final_image_pathlib = self.tmpdir.join(
+            self.results_partial_path, '{}-{}{}'.format(
+                root, third_exp_checksum, ext))
+        assert not final_image_pathlib.check()
+        s = f.getvalue()
+        assert s.endswith('PIGLIT: '
+                          '{"images": [{'
+                          '"image_desc": "' + trace_path + '", '
+                          '"image_ref": "' + third_exp_checksum + '.png", '
+                          '"image_render": null}], "result": "crash"}\n')
+
+    @pytest.mark.parametrize('trace_path', [
         ('Wicked-Engine/Tests:Cloth_Physics_Test.trace-dxgi'),
         ('unimplemented/backend.vktrace'),
         ('unexisting/back.end'),
     ])
     def test_trace_dump_crash(self, trace_path):
-        """compare_replay.trace: dump crashes or fails comparing a trace"""
+        """compare_replay.trace: dump crashes"""
 
         third_exp_checksum = '6b6d27df609b8d086cc3335e6d103581'
         f = io.StringIO()

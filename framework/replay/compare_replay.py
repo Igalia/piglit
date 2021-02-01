@@ -72,9 +72,10 @@ def _replay(trace_path, results_path):
         file_name = path.basename(trace_path)
         files = glob(path.join(results_path, file_name + '-*' + '.png'))
         if not files:
-            raise exceptions.PiglitFatalError(
-                'No dumped files found '
-                'in the results path "{}".'.format(results_path))
+            print('[check_image] No dumped files found '
+                  'in the results path "{}". '
+                  'See above logs for more information.'.format(results_path))
+            return None, None
         image_file = files[0]
         return hexdigest_from_image(image_file), image_file
 
