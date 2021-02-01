@@ -1,0 +1,80 @@
+# Reproducer for issue 3712
+# https://gitlab.freedesktop.org/mesa/mesa/-/issues/3712
+[require]
+GLSL >= 1.50
+GL_ARB_compute_shader
+GL_ARB_shader_storage_buffer_object
+
+[compute shader]
+#version 150
+#extension GL_ARB_compute_shader: require
+#extension GL_ARB_shader_storage_buffer_object: require
+// #define SKIP_NOOP
+
+layout(local_size_x = 1) in;
+layout(binding = 0) writeonly buffer Result {
+   ivec4 result[];
+};
+
+layout(binding = 1) writeonly buffer Noop {
+   ivec4 noop[];
+};
+
+ivec4 choose(ivec4 a, ivec4 b) {
+   ivec4 c = b;
+   if (b.x == b.y) {            // True in trivial case
+      c = a;
+   } else if (a.x > a.y) {      // Never true
+      c = min(a, b);
+   }
+   return c;
+}
+
+ivec4 transform(uint ref) {
+   return ivec4(ref, float(ref)+1.0, float(ref)+2.0, float(ref)+3.0);
+}
+
+shared ivec4 sh_value;
+
+void main() {
+   ivec4 value = ivec4(0, 0, 0, 0);
+   uint loop_breaker = 0u;
+   uint i = 0u;
+
+   if (gl_LocalInvocationID.x == 0u) {
+      while (true) {
+         ivec4 ix = transform(i);
+         i++;
+         if (i == 1u) {
+            value = choose(ix, value);
+            if (loop_breaker == 0u) {
+               break;
+            }
+            loop_breaker--;
+         }
+      }
+      ivec4 a_0 = transform(gl_GlobalInvocationID.x);
+      ivec4 a_1 = choose(value, a_0);
+#ifndef SKIP_NOOP
+      noop[gl_GlobalInvocationID.x] = a_1;
+#endif
+      sh_value = value;
+   }
+   value = sh_value;
+   result[gl_GlobalInvocationID.x] = value;
+}
+
+[test]
+ssbo 0 64
+ssbo 1 64
+
+compute 2 1 1
+
+probe ssbo int 0 0  == 0
+probe ssbo int 0 4  == 1
+probe ssbo int 0 8  == 2
+probe ssbo int 0 12 == 3
+probe ssbo int 0 16 == 0
+probe ssbo int 0 20 == 1
+probe ssbo int 0 24 == 2
+probe ssbo int 0 28 == 3
