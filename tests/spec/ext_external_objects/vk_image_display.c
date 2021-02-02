@@ -154,6 +154,7 @@ void piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display(void)
 {
+	enum piglit_result res = PIGLIT_PASS;
 	int i;
 	bool vk_sem_has_wait = true;
 	bool vk_sem_has_signal = true;
@@ -196,12 +197,14 @@ piglit_display(void)
 		float x = i * (float)piglit_width / 6.0 + (float)piglit_width / 12.0;
 		float y = (float)piglit_height / 2.0;
 
-		if (!piglit_probe_pixel_rgba(x, y, colors[i]))
-			return PIGLIT_FAIL;
+		if (!piglit_probe_pixel_rgba(x, y, colors[i])) {
+			res = PIGLIT_FAIL;
+			break;
+		}
 	}
 
 	piglit_present_results();
-	return PIGLIT_PASS;
+	return res;
 }
 
 static bool
