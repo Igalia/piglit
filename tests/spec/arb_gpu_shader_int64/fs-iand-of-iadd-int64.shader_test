@@ -1,0 +1,36 @@
+[require]
+GLSL >= 4.00
+GL_ARB_gpu_shader_int64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_int64: require
+
+out vec4 piglit_fragcolor;
+
+void main()
+{
+    /* The scale factor and the bias values ensure that every fragment will
+     * generate a value larger than (1 << 32).
+     */
+    uint64_t a = uint64_t(int(gl_FragCoord.x) + 8179) *
+		 uint64_t(int(gl_FragCoord.y) + 9931) * 1693ul;
+
+    /* Reassociating the addition and the masking will not have the
+     * same result.
+     */
+    uint64_t b = (a + 0x0ffffffffffffff0ul) & 0x00000000fffffff0ul;
+
+    if (b >= (1ul << 32))
+	piglit_fragcolor = vec4(1.0, 0.0, 0.0, 1.0);
+    else
+	piglit_fragcolor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
