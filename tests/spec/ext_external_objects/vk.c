@@ -1054,6 +1054,12 @@ vk_create_ext_image(struct vk_ctx *ctx,
 	img_info.usage = props->usage ? props->usage : VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	img_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	img_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	/* issue 17 of EXT_external_objects
+	 * Required in OpenGL implementations that support
+	 * ARB_texture_view, OES_texture_view, EXT_texture_view,
+	 * or OpenGL 4.3 and above.
+	 */
+	img_info.flags = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
 
 	if (vkCreateImage(ctx->dev, &img_info, 0, &img->img) != VK_SUCCESS)
 		goto fail;
