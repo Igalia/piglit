@@ -36,24 +36,24 @@ In piglit.conf one should set the following:
 Alternatively (or in addition, since environment variables have precedence),
 one could set:
 PIGLIT_REPLAY_DESCRIPTION_FILE -- environment equivalent of [replay]:description_file
-PIGLIT_REPLAY_DEVICE_NAME -- environment equivalent of [replay]:description_file
+PIGLIT_REPLAY_DEVICE_NAME -- environment equivalent of [replay]:device_name
 
 Optionally, in piglit.conf one could set also the following:
 [replay]:extra_args -- Space-separated list of extra command line arguments for replayer.
 [replay]:apitrace_bin -- Path to the apitrace executable.
-[replay]:eglretrace-d_bin -- Path to the eglretrace (apitrace) executable.
+[replay]:eglretrace_bin -- Path to the eglretrace (apitrace) executable.
 [replay]:wine_bin -- Path to the Wine executable.
-[replay]:wine_apitrace_bin -- Path to the Windows' d3dretrace (apitrace) executable to be run under Wine.
-[replay]:wine_d3dretrace_bin -- Path to the Windows' apitrace executable to be run under Wine.
+[replay]:wine_apitrace_bin -- Path to the Windows' apitrace executable to be run under Wine.
+[replay]:wine_d3dretrace_bin -- Path to the Windows' d3dretrace (apitrace) executable to be run under Wine.
 [replay]:gfxrecon-info_bin -- Path to the gfxrecon-info (GFXReconstruct) executable.
 [replay]:gfxrecon-replay_bin -- Path to the gfxrecon-replay (GFXReconstruct) executable.
 [replay]:gfxrecon-replay_extra_args -- Space-separated list of extra command line arguments for gfxrecon-replay.
 
 Alternatively (or in addition, since environment variables have precedence),
 one could set:
-PIGLIT_REPLAY_EXTRA_ARGS -- environment equivalent of [replay]:description_file
+PIGLIT_REPLAY_EXTRA_ARGS -- environment equivalent of [replay]:extra_args
 PIGLIT_REPLAY_APITRACE_BINARY -- environment equivalent of [replay]:apitrace_bin
-PIGLIT_REPLAY_EGLRETRACE_BINARY -- environment equivalent of [replay]:eglretrace-d_bin
+PIGLIT_REPLAY_EGLRETRACE_BINARY -- environment equivalent of [replay]:eglretrace_bin
 PIGLIT_REPLAY_WINE_BINARY -- environment equivalent of [replay]:wine_bin
 PIGLIT_REPLAY_WINE_APITRACE_BINARY -- environment equivalent of [replay]:wine_apitrace_bin
 PIGLIT_REPLAY_WINE_D3DRETRACE_BINARY -- environment equivalent of [replay]:wine_d3dretrace_bin
