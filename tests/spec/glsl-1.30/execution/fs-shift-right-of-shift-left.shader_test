@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+out vec4 piglit_fragcolor;
+
+void main()
+{
+    /* The scale factor and the bias values ensure that every fragment will
+     * generate a value larger than (1 << 26).  This is crafted fairly
+     * carefully to avoid other algebraic optimizations getting in the way.
+     */
+    uint a = (uint(gl_FragCoord.x) + 9011u) *
+	     (uint(gl_FragCoord.y) + 9013u);
+
+    /* This should effectively mask off the high six bits, but leave
+     * the remaining bits intact.
+     */
+    uint b = (a << 6u) >> 6u;
+
+    if (b > (1u << 26))
+	piglit_fragcolor = vec4(1.0, 0.0, 0.0, 1.0);
+    else {
+	/* (a ^ b) should result in the high 6-bits from a. */
+	uint c = (a ^ b) % (1u << 26);
+	if (c != 0u)
+	    piglit_fragcolor = vec4(0.0, 0.0, 1.0, 1.0);
+	else
+	    piglit_fragcolor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
