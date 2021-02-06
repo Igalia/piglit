@@ -106,7 +106,7 @@ piglit_drm_x11_authenticate(int fd)
 	return true;
 }
 
-#ifdef HAVE_LIBDRM_INTEL
+#if defined(HAVE_LIBDRM_INTEL) && !defined(PIGLIT_HAS_GBM_BO_MAP)
 static drm_intel_bufmgr *
 piglit_intel_bufmgr_get(void)
 {
@@ -510,7 +510,7 @@ piglit_drm_get_driver(void)
 	if (0) {
 		/* empty */
 	}
-#ifdef HAVE_LIBDRM_INTEL
+#if defined(HAVE_LIBDRM_INTEL) && !defined(PIGLIT_HAS_GBM_BO_MAP)
 	else if (streq(version->name, "i915")) {
 		drv.create = piglit_intel_buf_create;
 		drv.export = piglit_intel_buf_export;
