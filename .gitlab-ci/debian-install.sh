@@ -48,6 +48,7 @@ apt-get install -y \
   python3-mako \
   python3-mock \
   python3-numpy \
+  python3-packaging \
   python3-pil \
   python3-pip \
   python3-psutil \

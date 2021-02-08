@@ -95,7 +95,7 @@ class DumpBackend(metaclass=abc.ABCMeta):
         print(logoutput.decode(errors='replace'))
         if ret.returncode:
             raise RuntimeError(
-                '[dump_traces_images] Process failed with error code: {}'.format(
+                '[dump_trace_images] Process failed with error code: {}'.format(
                     ret.returncode))
 
 

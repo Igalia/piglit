@@ -56,56 +56,73 @@ class TestGFXReconstructBackend(object):
             if cmd[-1] == self.vk_last_frame_fails_trace_path:
                 ret.stdout = b''
             else:
-                ret.stdout = bytearray('Total frames: ' +
-                                       str(int(self.vk_trace_last_call) + 1) +
-                                       textwrap.dedent('''
-                                       Application info:
-                                               Application name: vkcube
-                                               Application version: 0
-                                               Engine name: vkcube
-                                               Engine version: 0
-                                               Target API version: 4194304 (1.0.0)
+                info_output = '''\
+                File info:
+                        Compression format: Zstandard
+                        Total frames: {}
 
-                                       Physical device info:
-                                               Device name: TESTING DEVICE
-                                               Device ID: 0xabcd
-                                               Vendor ID: 0xefgh
-                                               Driver version: 83890275 (0x5001063)
-                                               API version: 4202627 (1.2.131)
+                Application info:
+                        Application name: vkcube
+                        Application version: 0
+                        Engine name: vkcube
+                        Engine version: 0
+                        Target API version: 4194304 (1.0.0)
 
-                                       Device memory allocation info:
-                                               Total allocations: 5
-                                               Min allocation size: 1216
-                                               Max allocation size: 540680
+                Physical device info:
+                        Device name: TESTING DEVICE
+                        Device ID: 0xabcd
+                        Vendor ID: 0xefgh
+                        Driver version: 83890275 (0x5001063)
+                        API version: 4202627 (1.2.131)
 
-                                       Pipeline info:
-                                               Total graphics pipelines: 1
-                                               Total compute pipelines: 0
-                                       '''),
-                                       'utf-8')
+                Device memory allocation info:
+                        Total allocations: 5
+                        Min allocation size: 1216
+                        Max allocation size: 540680
+
+                Pipeline info:
+                        Total graphics pipelines: 1
+                        Total compute pipelines: 0
+                '''.format(int(self.vk_trace_last_call))
+                ret.stdout = bytearray(textwrap.dedent(info_output), 'utf-8')
+
+            return ret
+        elif cmd[-1] == '--version':
+            # VK replay --version
+            ret = subprocess.CompletedProcess(cmd, 0)
+            if cmd[0] == self.gfxrecon_replay_bogus:
+                ret.stdout = b''
+            else:
+                if cmd[0] == self.gfxrecon_replay_old:
+                    version = '0.9.3'
+                else:
+                    version = '0.9.4'
+                version_output = '''\
+                gfxrecon-replay version info:
+                  GFXReconstruct Version {} (v{}:3738dec)
+                  Vulkan Header Version 1.2.162
+                '''.format(version, version)
+                ret.stdout = bytearray(textwrap.dedent(version_output), 'utf-8')
 
             return ret
         elif cmd[0].endswith(self.gfxrecon_replay):
             # VK replay
             ret = subprocess.CompletedProcess(cmd, 0)
             if cmd[-1] != self.vk_replay_crashes_trace_path:
-                calls = env['VK_SCREENSHOT_FRAMES']
-                prefix = env['VK_SCREENSHOT_DIR']
+                calls = cmd[-4]
+                prefix = cmd[-2]
                 ret.stdout = b''
-                if env['VK_INSTANCE_LAYERS'] == 'VK_LAYER_LUNARG_screenshot':
-                    for call in calls.split(','):
-                        if (call != self.vk_trace_wrong_call and
-                            call != '-1'):
-                            from PIL import Image
-                            dump = path.join(prefix, call + '.ppm')
-                            rgba = 'ff00ffff'
-                            color = [int(rgba[0:2], 16), int(rgba[2:4], 16),
-                                     int(rgba[4:6], 16), int(rgba[6:8], 16)]
-                            Image.frombytes('RGBA', (32, 32),
-                                            bytes(color * 32 * 32)).save(dump)
-                            ret.stdout += bytearray('Screen Capture file '
-                                                    'is: ' + dump + '\n',
-                                                    'utf-8')
+                for call in calls.split(','):
+                    if (call != self.vk_trace_wrong_call and
+                        call != '-1'):
+                        from PIL import Image
+                        dump = path.join(
+                            prefix, 'screenshot_frame_{}.bmp'.format(call))
+                        rgba = 'ff00ffff'
+                        color = [int(rgba[0:2], 16), int(rgba[2:4], 16),
+                                 int(rgba[4:6], 16), int(rgba[6:8], 16)]
+                        Image.frombytes('RGBA', (32, 32),
+                                        bytes(color * 32 * 32)).save(dump)
                 ret.stdout += bytearray('35.650065 fps, 0.280504 seconds, '
                                         '10 frames, 1 loop, framerange 1-10\n',
                                         'utf-8')
@@ -128,6 +145,8 @@ class TestGFXReconstructBackend(object):
         OPTIONS.device_name = 'test-device'
         self.gfxrecon_info = 'gfxrecon-info'
         self.gfxrecon_replay = 'gfxrecon-replay'
+        self.gfxrecon_replay_old = '/old/gfxrecon-replay'
+        self.gfxrecon_replay_bogus = '/bogus/gfxrecon-replay'
         self.gfxrecon_replay_extra = ''
         self.vk_trace_path = tmpdir.mkdir(
             'db-path').join('KhronosGroup-Vulkan-Tools/vkcube.gfxr').strpath
@@ -137,9 +156,9 @@ class TestGFXReconstructBackend(object):
         self.vk_replay_crashes_trace_path = tmpdir.join(
             'db-path',
             'replay/fails.gfxr').strpath
-        self.vk_trace_calls = '2,5'
-        self.vk_trace_last_call = '9'
-        self.vk_trace_wrong_call = '10'
+        self.vk_trace_calls = '3,6'
+        self.vk_trace_last_call = '10'
+        self.vk_trace_wrong_call = '11'
         self.output_dir = tmpdir.mkdir('results').strpath
         self.results_partial_path = path.join('trace', OPTIONS.device_name)
         self.m_gfxreconstruct_subprocess_run = mocker.patch(
@@ -190,17 +209,19 @@ class TestGFXReconstructBackend(object):
         test = backends.gfxreconstruct.GFXReconstructBackend(trace_path)
         assert test.dump()
         snapshot_prefix = trace_path + '-'
-        env = os.environ.copy()
-        env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
-        env['VK_SCREENSHOT_FRAMES'] = calls
-        env['VK_SCREENSHOT_DIR'] = path.dirname(trace_path)
         m_calls = [self.mocker.call(
-            [self.gfxrecon_info, trace_path],
+            [self.gfxrecon_replay, '--version'],
             stdout=subprocess.PIPE),
                    self.mocker.call(
-                       [self.gfxrecon_replay, trace_path],
-                       env=env, stdout=subprocess.PIPE)]
-        assert self.m_gfxreconstruct_subprocess_run.call_count == 2
+                       [self.gfxrecon_info, trace_path],
+                       stdout=subprocess.PIPE),
+                   self.mocker.call(
+                       [self.gfxrecon_replay,
+                        '--screenshots', calls,
+                        '--screenshot-dir', path.dirname(trace_path),
+                        trace_path],
+                       env=None, stdout=subprocess.PIPE)]
+        assert self.m_gfxreconstruct_subprocess_run.call_count == 3
         self.m_gfxreconstruct_subprocess_run.assert_has_calls(m_calls)
         for call in calls.split(','):
             assert path.exists(snapshot_prefix + call + '.png')
@@ -230,18 +251,20 @@ class TestGFXReconstructBackend(object):
         test = backends.gfxreconstruct.GFXReconstructBackend(trace_path)
         assert test.dump()
         snapshot_prefix = trace_path + '-'
-        env = os.environ.copy()
-        env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
-        env['VK_SCREENSHOT_FRAMES'] = calls
-        env['VK_SCREENSHOT_DIR'] = path.dirname(trace_path)
         m_calls = [self.mocker.call(
-            [self.gfxrecon_info, trace_path],
+            [self.gfxrecon_replay, '--version'],
             stdout=subprocess.PIPE),
                    self.mocker.call(
+                       [self.gfxrecon_info, trace_path],
+                       stdout=subprocess.PIPE),
+                   self.mocker.call(
                        [self.gfxrecon_replay] +
-                       gfxrecon_replay_extra.split() + [trace_path],
-                       env=env, stdout=subprocess.PIPE)]
-        assert self.m_gfxreconstruct_subprocess_run.call_count == 2
+                       gfxrecon_replay_extra.split() +
+                       ['--screenshots', calls,
+                        '--screenshot-dir', path.dirname(trace_path),
+                        trace_path],
+                       env=None, stdout=subprocess.PIPE)]
+        assert self.m_gfxreconstruct_subprocess_run.call_count == 3
         self.m_gfxreconstruct_subprocess_run.assert_has_calls(m_calls)
         for call in calls.split(','):
             assert path.exists(snapshot_prefix + call + '.png')
@@ -260,17 +283,19 @@ class TestGFXReconstructBackend(object):
         assert test.dump()
         snapshot_prefix = path.join(self.output_dir,
                                     path.basename(trace_path) + '-')
-        env = os.environ.copy()
-        env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
-        env['VK_SCREENSHOT_FRAMES'] = calls
-        env['VK_SCREENSHOT_DIR'] = self.output_dir
         m_calls = [self.mocker.call(
-            [self.gfxrecon_info, trace_path],
+            [self.gfxrecon_replay, '--version'],
             stdout=subprocess.PIPE),
                    self.mocker.call(
-                       [self.gfxrecon_replay, trace_path],
-                       env=env, stdout=subprocess.PIPE)]
-        assert self.m_gfxreconstruct_subprocess_run.call_count == 2
+                       [self.gfxrecon_info, trace_path],
+                       stdout=subprocess.PIPE),
+                   self.mocker.call(
+                       [self.gfxrecon_replay,
+                        '--screenshots', calls,
+                        '--screenshot-dir', self.output_dir,
+                        trace_path],
+                       env=None, stdout=subprocess.PIPE)]
+        assert self.m_gfxreconstruct_subprocess_run.call_count == 3
         self.m_gfxreconstruct_subprocess_run.assert_has_calls(m_calls)
         for call in calls.split(','):
             assert path.exists(snapshot_prefix + call + '.png')
@@ -288,13 +313,17 @@ class TestGFXReconstructBackend(object):
             trace_path, calls=calls.split(','))
         assert test.dump()
         snapshot_prefix = trace_path + '-'
-        env = os.environ.copy()
-        env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
-        env['VK_SCREENSHOT_FRAMES'] = calls
-        env['VK_SCREENSHOT_DIR'] = path.dirname(trace_path)
-        self.m_gfxreconstruct_subprocess_run.assert_called_once_with(
-            [self.gfxrecon_replay, trace_path],
-            env=env, stdout=subprocess.PIPE)
+        m_calls = [self.mocker.call(
+            [self.gfxrecon_replay, '--version'],
+            stdout=subprocess.PIPE),
+                   self.mocker.call(
+                       [self.gfxrecon_replay,
+                        '--screenshots', calls,
+                        '--screenshot-dir', path.dirname(trace_path),
+                        trace_path],
+                       env=None, stdout=subprocess.PIPE)]
+        assert self.m_gfxreconstruct_subprocess_run.call_count == 2
+        self.m_gfxreconstruct_subprocess_run.assert_has_calls(m_calls)
         for call in calls.split(','):
             assert path.exists(snapshot_prefix + call + '.png')
 
@@ -311,13 +340,17 @@ class TestGFXReconstructBackend(object):
             trace_path, calls=calls.split(','))
         assert not test.dump()
         snapshot_prefix = trace_path + '-'
-        env = os.environ.copy()
-        env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
-        env['VK_SCREENSHOT_FRAMES'] = calls
-        env['VK_SCREENSHOT_DIR'] = path.dirname(trace_path)
-        self.m_gfxreconstruct_subprocess_run.assert_called_once_with(
-            [self.gfxrecon_replay, trace_path],
-            env=env, stdout=subprocess.PIPE)
+        m_calls = [self.mocker.call(
+            [self.gfxrecon_replay, '--version'],
+            stdout=subprocess.PIPE),
+                   self.mocker.call(
+                       [self.gfxrecon_replay,
+                        '--screenshots', calls,
+                        '--screenshot-dir', path.dirname(trace_path),
+                        trace_path],
+                       env=None, stdout=subprocess.PIPE)]
+        assert self.m_gfxreconstruct_subprocess_run.call_count == 2
+        self.m_gfxreconstruct_subprocess_run.assert_has_calls(m_calls)
         for call in calls.split(','):
             assert not path.exists(snapshot_prefix + call + '.png')
 
@@ -332,17 +365,19 @@ class TestGFXReconstructBackend(object):
         test = backends.gfxreconstruct.GFXReconstructBackend(trace_path)
         assert not test.dump()
         snapshot_prefix = trace_path + '-'
-        env = os.environ.copy()
-        env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
-        env['VK_SCREENSHOT_FRAMES'] = calls
-        env['VK_SCREENSHOT_DIR'] = path.dirname(trace_path)
         m_calls = [self.mocker.call(
-            [self.gfxrecon_info, trace_path],
+            [self.gfxrecon_replay, '--version'],
             stdout=subprocess.PIPE),
                    self.mocker.call(
-                       [self.gfxrecon_replay, trace_path],
-                       env=env, stdout=subprocess.PIPE)]
-        assert self.m_gfxreconstruct_subprocess_run.call_count == 2
+                       [self.gfxrecon_info, trace_path],
+                       stdout=subprocess.PIPE),
+                   self.mocker.call(
+                       [self.gfxrecon_replay,
+                        '--screenshots', calls,
+                        '--screenshot-dir', path.dirname(trace_path),
+                        trace_path],
+                       env=None, stdout=subprocess.PIPE)]
+        assert self.m_gfxreconstruct_subprocess_run.call_count == 3
         self.m_gfxreconstruct_subprocess_run.assert_has_calls(m_calls)
         for call in calls.split(','):
             assert not path.exists(snapshot_prefix + call + '.png')
@@ -358,17 +393,45 @@ class TestGFXReconstructBackend(object):
         test = backends.gfxreconstruct.GFXReconstructBackend(trace_path)
         assert not test.dump()
         snapshot_prefix = trace_path + '-'
-        env = os.environ.copy()
-        env['VK_INSTANCE_LAYERS'] = 'VK_LAYER_LUNARG_screenshot'
-        env['VK_SCREENSHOT_FRAMES'] = calls
-        env['VK_SCREENSHOT_DIR'] = path.dirname(trace_path)
         m_calls = [self.mocker.call(
-            [self.gfxrecon_info, trace_path],
+            [self.gfxrecon_replay, '--version'],
             stdout=subprocess.PIPE),
                    self.mocker.call(
-                       [self.gfxrecon_replay, trace_path],
-                       env=env, stdout=subprocess.PIPE)]
-        assert self.m_gfxreconstruct_subprocess_run.call_count == 2
+                       [self.gfxrecon_info, trace_path],
+                       stdout=subprocess.PIPE),
+                   self.mocker.call(
+                       [self.gfxrecon_replay,
+                        '--screenshots', calls,
+                        '--screenshot-dir', path.dirname(trace_path),
+                        trace_path],
+                       env=None, stdout=subprocess.PIPE)]
+        assert self.m_gfxreconstruct_subprocess_run.call_count == 3
         self.m_gfxreconstruct_subprocess_run.assert_has_calls(m_calls)
+        for call in calls.split(','):
+            assert not path.exists(snapshot_prefix + call + '.png')
+
+    @pytest.mark.parametrize('option', [
+        (0),
+        (1),
+    ])
+    def test_dump_vk_replay_invalid(self, option, config):
+        """Tests for the dump method: replay's version is invalid.
+
+        Check a basic VK dump. Checking replay's version tells us it's invalid.
+
+        """
+        if option == 0:
+            self.gfxrecon_replay = self.gfxrecon_replay_old
+        elif option == 1:
+            self.gfxrecon_replay = self.gfxrecon_replay_bogus
+        config.set('replay', 'gfxrecon-replay_bin', self.gfxrecon_replay)
+        calls = self.vk_trace_last_call
+        trace_path = self.vk_trace_path
+        test = backends.gfxreconstruct.GFXReconstructBackend(trace_path)
+        assert not test.dump()
+        snapshot_prefix = trace_path + '-'
+        self.m_gfxreconstruct_subprocess_run.assert_called_once_with(
+            [self.gfxrecon_replay, '--version'],
+            stdout=subprocess.PIPE)
         for call in calls.split(','):
             assert not path.exists(snapshot_prefix + call + '.png')
