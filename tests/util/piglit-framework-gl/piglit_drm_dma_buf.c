@@ -317,6 +317,14 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		src_stride = w;
 		cpp = 1;
 		break;
+	case DRM_FORMAT_P010:
+	case DRM_FORMAT_P012:
+	case DRM_FORMAT_P016:
+		format = GBM_FORMAT_GR88;
+		buf_h = h * 3 / 2;
+		cpp = 2;
+		src_stride = cpp * w;
+		break;
 	case DRM_FORMAT_YUV420:
 	case DRM_FORMAT_YVU420:
 		format = GBM_FORMAT_GR88;
@@ -358,9 +366,12 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 
 	switch (fourcc) {
 	case DRM_FORMAT_NV12:
+	case DRM_FORMAT_P010:
+	case DRM_FORMAT_P012:
+	case DRM_FORMAT_P016:
 		for (i = 0; i < h/2; ++i) {
 			memcpy(((char *)dst_data + dst_stride * h) + i * dst_stride,
-				(src_data + (w*h)) + i * src_stride, w);
+				(src_data + (w * h * cpp)) + i * src_stride, w * cpp);
 		}
 		buf->offset[1] = buf->stride[0] * h;
 		buf->stride[1] = buf->stride[0];
