@@ -1,0 +1,89 @@
+# Verify that max(x, NaN) always returns x.  This is *not* required by the
+# GLSL spec, but many applications depend on it.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+varying vec4 color;
+
+#define FLT_MAX 3.40282347E+38
+
+/* Values are packed into an array that is accessed in clever ways to avoid
+ * compiler optimizations that try to "constant propagate" uniforms at draw
+ * time.
+ */
+uniform float data[14] = float[](
+    -3.0, -3.0, -3.0, -3.0,
+    0.0, 0.0, 0.0, 0.0, 0.0,
+    FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX
+);
+
+void main()
+{
+    gl_Position = gl_Vertex;
+
+    /* Produce a value on the ragne [0, 3]. */
+    vec2 idx = abs(gl_Vertex.xy) + 2.0;
+
+    /* Pick an element from data that must be a number.  This is crafted so
+     * that number_a and number_b are the same value, but hopefully the
+     * compiler won't be able to detect that.
+     */
+    float number_a = data[int(idx.x)];
+    float number_b = data[int(idx.y)];
+
+    /* Try to generate NaN in two different ways.  Especially in GLSL 1.20,
+     * there is no guarantee that Inf or NaN are possible, so the test is
+     * trying to be very crafty here.
+     *
+     * idx is in [-1, 1], so idx + 3 is in [2, 4], etc.
+     * Fill the data in those ranges with the values that we want.
+     */
+    float zero_a = data[int(idx.x + 4.0)];
+    float zero_b = data[int(idx.y + 5.0)];
+    vec4 flt_max = vec4(data[int(idx.x + 9.0)],
+			data[int(idx.y + 10.0)],
+			data[int(idx.y + 9.0)],
+			data[int(idx.x + 10.0)]);
+    float inf_a = flt_max.x * flt_max.y;
+    float inf_b = flt_max.x + flt_max.y + flt_max.z + flt_max.w;
+
+    float not_a_number_a = zero_a / zero_b; // should be 0/0 = NaN
+    float not_a_number_b = inf_a - inf_b; // should be Inf-Inf = NaN
+
+    /* Min and max are supposed to return the non-NaN value.  Implementations
+     * that don't generate NaN should generate either 0, 1, or some huge
+     * value.  Since number_a should be -3, those implementations will still
+     * pass the test.
+     */
+    float result_a = min(number_a, not_a_number_a);
+    float result_b = min(not_a_number_b, number_b);
+
+    if (result_a == result_b) {
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+    } else {
+	color = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+
+    // Sanity checking...
+    if (number_a != number_b ||
+	flt_max.x != FLT_MAX || flt_max.y != FLT_MAX ||
+	flt_max.z != FLT_MAX || flt_max.w != FLT_MAX ||
+	inf_a != inf_b ||
+	zero_a != 0.0 || zero_b != 0.0) {
+	color = vec4(0.0, 0.0, 1.0, 1.0);
+    }
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+    gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0
