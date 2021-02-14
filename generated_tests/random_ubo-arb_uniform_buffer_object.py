@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # coding=utf-8
 
 # Copyright (c) 2014 Intel Corporation
@@ -40,7 +40,7 @@ def do_test(requirements, packing):
     basename = random_ubo.generate_file_name(requirements, packing)
     fullname = os.path.join(path, basename)
 
-    file = open(fullname, "w", 0)
+    file = open(fullname, "w")
 
     fields, required_layouts = random_ubo.generate_ubo(
         requirements,
@@ -60,7 +60,7 @@ def do_test(requirements, packing):
         fields,
         layouts)
 
-    print basename
+    print(basename)
     file.write(random_ubo.emit_shader_test(
         blocks,
         packing,
