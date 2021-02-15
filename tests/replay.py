@@ -63,10 +63,13 @@ PIGLIT_REPLAY_GFXRECON_REPLAY_EXTRA_ARGS -- environment equivalent of [replay]:g
 
 """
 
+import collections
+
 from os import path
 
-from framework import core, exceptions, grouptools, profile
+from framework import core, exceptions, grouptools, profile, status
 from framework.replay import query_traces_yaml as qty
+from framework.test.base import DummyTest
 from framework.test.piglit_test import PiglitReplayerTest
 
 __all__ = ['profile']
@@ -142,7 +145,7 @@ class ReplayProfile(object):
                     opts[n] = DummyTest(n, status.NOTRUN)
                 else:
                     opts[n] = alltests[n]
-            return opt.items()
+            return opts.items()
         else:
             return iter(self._itertests())
 
