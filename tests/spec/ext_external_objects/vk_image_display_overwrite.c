@@ -241,7 +241,7 @@ piglit_display(void)
 	 * pixels we've just read from Vulkan memory as texture data
 	 * in a new OpenGL texture */
 	glBindTexture(gl_target, gl_disp_tex);
-	glTexImage2D(gl_target, 0, gl_tex_storage_format, w, h, 0, GL_RGBA, GL_FLOAT, pixels);
+	glTexSubImage2D(gl_target, 0, 0, 0, w, h, GL_RGBA, GL_FLOAT, pixels);
 	glFinish();
 
 	vkUnmapMemory(vk_core.dev, vk_bo.mobj.mem);
@@ -443,6 +443,7 @@ gl_init()
 	glBindTexture(gl_target, gl_disp_tex);
 	glTexParameteri(gl_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(gl_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(gl_target, 0, gl_tex_storage_format, w, h, 0, GL_RGBA, GL_FLOAT, 0);
 	glBindTexture(gl_target, 0);
 
 	glClearColor(0.1, 0.1, 0.1, 1.0);
