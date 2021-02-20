@@ -772,6 +772,7 @@ get_num_samples(uint32_t num_samples)
 
 static VkDeviceMemory
 alloc_memory(struct vk_ctx *ctx,
+	     bool is_external,
 	     const VkMemoryRequirements *mem_reqs,
 	     VkImage image,
 	     VkBuffer buffer,
@@ -782,14 +783,16 @@ alloc_memory(struct vk_ctx *ctx,
 	VkDeviceMemory mem;
 	VkMemoryDedicatedAllocateInfoKHR ded_info;
 
-	memset(&exp_mem_info, 0, sizeof exp_mem_info);
-	exp_mem_info.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
-	exp_mem_info.handleTypes =
-		VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+	if (is_external) {
+		memset(&exp_mem_info, 0, sizeof exp_mem_info);
+		exp_mem_info.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+		exp_mem_info.handleTypes =
+			VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
+	}
 
 	memset(&mem_alloc_info, 0, sizeof mem_alloc_info);
 	mem_alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	mem_alloc_info.pNext = &exp_mem_info;
+	mem_alloc_info.pNext = is_external ? &exp_mem_info : 0;
 	mem_alloc_info.allocationSize = mem_reqs->size;
 	mem_alloc_info.memoryTypeIndex =
 		get_memory_type_idx(ctx->pdev, mem_reqs, prop_flags);
@@ -837,6 +840,7 @@ alloc_image_memory(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 
 	vkGetImageMemoryRequirements2(ctx->dev, &req_info2, &mem_reqs2);
 	img_obj->mobj.mem = alloc_memory(ctx,
+					 true,
 					 &mem_reqs2.memoryRequirements,
 					 ded_reqs.requiresDedicatedAllocation? img_obj->img : VK_NULL_HANDLE,
 					 VK_NULL_HANDLE,
@@ -869,7 +873,7 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 	VkExternalMemoryFeatureFlagBits export_feature_flags =
 		VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT;
 	VkExternalMemoryHandleTypeFlagBits handle_type =
-		VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+		VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
 
 	memset(&ext_img_fmt_info, 0, sizeof ext_img_fmt_info);
 	ext_img_fmt_info.sType =
@@ -1089,7 +1093,7 @@ vk_create_ext_buffer(struct vk_ctx *ctx,
 	ext_bo_info.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO;
 	ext_bo_info.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
 
-	if (!vk_create_buffer(ctx, sz, usage, &ext_bo_info, bo)) {
+	if (!vk_create_buffer(ctx, true, sz, usage, &ext_bo_info, bo)) {
 		fprintf(stderr, "Failed to allocate external buffer.\n");
 		return false;
 	}
@@ -1237,6 +1241,7 @@ vk_destroy_renderer(struct vk_ctx *ctx,
 
 bool
 vk_create_buffer(struct vk_ctx *ctx,
+		 bool is_external,
 		 uint32_t sz,
 		 VkBufferUsageFlagBits usage,
 		 void *pnext,
@@ -1266,7 +1271,7 @@ vk_create_buffer(struct vk_ctx *ctx,
 	 * vkInvalidateMappedMemoryRanges are not needed to flush host
 	 * writes to the device or make device writes visible to the
 	 * host, respectively. */
-	bo->mobj.mem = alloc_memory(ctx, &mem_reqs, VK_NULL_HANDLE, VK_NULL_HANDLE,
+	bo->mobj.mem = alloc_memory(ctx, is_external, &mem_reqs, VK_NULL_HANDLE, VK_NULL_HANDLE,
 				    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
 				    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
@@ -1581,7 +1586,7 @@ vk_create_semaphores(struct vk_ctx *ctx,
 	/* VkExportSemaphoreCreateInfo */
 	memset(&exp_sema_info, 0, sizeof exp_sema_info);
 	exp_sema_info.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
-	exp_sema_info.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
+	exp_sema_info.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
 
 	/* VkSemaphoreCreateInfo */
 	memset(&sema_info, 0, sizeof sema_info);

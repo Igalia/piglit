@@ -186,6 +186,7 @@ vk_destroy_renderer(struct vk_ctx *ctx,
 
 bool
 vk_create_buffer(struct vk_ctx *ctx,
+		 bool is_external,
 		 uint32_t sz,
 		 VkBufferUsageFlagBits usage,
 		 void *pnext,

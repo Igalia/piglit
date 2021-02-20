@@ -404,7 +404,7 @@ vk_init_vulkan_drawing()
 		goto fail;
 	}
 
-	if (!vk_create_buffer(&vk_core, w * h * 4 * sizeof(float), VK_BUFFER_USAGE_TRANSFER_DST_BIT, 0,
+	if (!vk_create_buffer(&vk_core, false, w * h * 4 * sizeof(float), VK_BUFFER_USAGE_TRANSFER_DST_BIT, 0,
 			      &vk_tmp_buf)) {
 		fprintf(stderr, "Failed to create buffer.\n");
 		goto fail;
