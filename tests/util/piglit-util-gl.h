@@ -167,6 +167,10 @@ void piglit_compute_probe_tolerance(GLenum format, float *tolerance);
 int piglit_compare_pixels(int x, int y, const float *expected, const float *probe,
 			 const float *tolerance, int num_components);
 
+
+GLfloat *piglit_read_pixels_float(GLint x, GLint y, GLsizei width, GLsizei height,
+				  GLenum format, GLfloat *pixels);
+
 /**
  * Compare two adjacent in-memory floating-point images.
  * Adjacent means: y1 == y2 && x1 == x2 - w;
@@ -183,6 +187,8 @@ int piglit_compare_images_color(int x, int y, int w, int h, int num_components,
 				const float *tolerance,
 				const float *expected_image,
 				const float *observed_image);
+bool piglit_compare_pixels_float(const float *color1, const float *color2,
+				 const float *tolerance, int components);
 int piglit_probe_image_color(int x, int y, int w, int h, GLenum format, const float *image);
 int piglit_probe_image_rgb(int x, int y, int w, int h, const float *image);
 int piglit_probe_image_rgba(int x, int y, int w, int h, const float *image);
