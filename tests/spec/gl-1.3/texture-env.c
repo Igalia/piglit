@@ -417,6 +417,7 @@ matrix_test(GLenum env_mode, GLenum tex_format, int num_colors,
 	glEnd();
 
 	/* Check results */
+	float *pixels = piglit_read_pixels_float(0, 0, piglit_width, piglit_height, GL_RGBA, NULL);
 	for (int row = 0; row < num_colors; row++) {
 		for (int col = 0; col < num_colors; col++) {
 
@@ -431,7 +432,10 @@ matrix_test(GLenum env_mode, GLenum tex_format, int num_colors,
 			int y = row * 3 + 1;
 
 			/* compare */
-			if (!piglit_probe_pixel_rgba(x, y, expected)) {
+			if (!piglit_compare_pixels_float(
+				&pixels[4 * y * piglit_width + 4 * x],
+				expected,
+				piglit_tolerance, 4)) {
 				/* Report the error */
 				printf("GL_TEXTURE_ENV_MODE = %s\n"
 				       "Texture Format = %s\n"
@@ -450,10 +454,14 @@ matrix_test(GLenum env_mode, GLenum tex_format, int num_colors,
 				       bg_color[0], bg_color[1],
 				       bg_color[2], bg_color[3]);
 #endif
+				free(pixels);
 				return false;
 			}
 		}
 	}
+
+	free(pixels);
+
 	return true;
 }
 
