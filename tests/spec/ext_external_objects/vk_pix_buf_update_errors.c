@@ -66,8 +66,6 @@ vk_init(uint32_t w,
 	uint32_t num_layers,
 	VkFormat color_format,
 	VkFormat depth_format,
-	VkImageUsageFlagBits color_usage,
-	VkImageUsageFlagBits depth_usage,
 	VkImageTiling color_tiling,
 	VkImageTiling depth_tiling,
 	VkImageLayout color_in_layout,
@@ -110,11 +108,6 @@ static uint32_t num_levels = 1;
 static uint32_t num_layers = 1;
 static VkFormat color_format = VK_FORMAT_R32G32B32A32_SFLOAT;
 static VkFormat depth_format = VK_FORMAT_D32_SFLOAT;
-static VkImageUsageFlagBits color_usage = VK_IMAGE_USAGE_SAMPLED_BIT |
-					  VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-					  VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-static VkImageUsageFlagBits depth_usage = VK_IMAGE_USAGE_SAMPLED_BIT |
-					  VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 static VkImageTiling color_tiling = VK_IMAGE_TILING_OPTIMAL;
 static VkImageTiling depth_tiling = VK_IMAGE_TILING_OPTIMAL;
 static VkImageLayout color_in_layout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -137,7 +130,6 @@ piglit_init(int argc, char **argv)
 
 	if (!vk_init(w, h, d, num_samples, num_levels, num_layers,
 		     color_format, depth_format,
-		     color_usage, depth_usage,
 		     color_tiling, depth_tiling,
 		     color_in_layout, depth_in_layout,
 		     color_end_layout, depth_end_layout)) {
@@ -222,8 +214,6 @@ vk_init(uint32_t w,
 	uint32_t num_layers,
 	VkFormat color_format,
 	VkFormat depth_format,
-	VkImageUsageFlagBits color_usage,
-	VkImageUsageFlagBits depth_usage,
 	VkImageTiling color_tiling,
 	VkImageTiling depth_tiling,
 	VkImageLayout color_in_layout,
@@ -253,7 +243,6 @@ vk_init(uint32_t w,
 				     num_layers,
 				     color_format,
 				     color_tiling,
-				     color_usage,
 				     color_in_layout,
 				     color_end_layout,
 				     false,
@@ -273,7 +262,6 @@ vk_init(uint32_t w,
 				     num_layers,
 				     depth_format,
 				     depth_tiling,
-				     depth_usage,
 				     depth_in_layout,
 				     depth_end_layout,
 				     false,

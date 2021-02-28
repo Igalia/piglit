@@ -111,7 +111,7 @@ vk_set_image_props(uint32_t w, uint32_t h,
 		   uint32_t depth,
 		   uint32_t num_samples,
 		   uint32_t num_levels, VkFormat format,
-		   VkImageTiling tiling, VkImageUsageFlagBits usage);
+		   VkImageTiling tiling);
 
 static bool
 gl_draw_texture(enum fragment_type fs_type, uint32_t w, uint32_t h);
@@ -168,12 +168,10 @@ run_subtest(int case_num)
 	const float color_prb[] = { 0.0, 1.0, 0.0, 1.0 };
 	GLint loc = -1;
 
-	/* We don't set the usage flags as the purpose of this test is to test different formats
-	 * We will check different combinations of usage/tiling mode in another test */
 	if (!vk_set_image_props(piglit_width, piglit_height, d,
 				num_samples, num_levels,
 			        vk_gl_format[case_num].vkformat,
-				vk_gl_format[case_num].tiling, 0)) {
+				vk_gl_format[case_num].tiling)) {
 		piglit_report_subtest_result(PIGLIT_SKIP,
 					     "%s: Unsupported image format.",
 					     vk_gl_format[case_num].name);
@@ -317,8 +315,7 @@ vk_init(void)
 static bool
 vk_set_image_props(uint32_t w, uint32_t h, uint32_t d,
 		   uint32_t num_samples, uint32_t num_levels,
-		   VkFormat format, VkImageTiling tiling,
-		   VkImageUsageFlagBits usage)
+		   VkFormat format, VkImageTiling tiling)
 {
 	VkImageLayout in_layout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VkImageLayout end_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -327,7 +324,7 @@ vk_set_image_props(uint32_t w, uint32_t h, uint32_t d,
 	return vk_fill_ext_image_props(&vk_core, w, h, d,
 				       num_samples, num_levels,
 				       num_layers,
-				       format, tiling, usage,
+				       format, tiling,
 				       in_layout, end_layout,
 				       true, &vk_img_props);
 }

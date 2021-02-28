@@ -161,7 +161,6 @@ vk_fill_ext_image_props(struct vk_ctx *ctx,
 			uint32_t num_layers,
 			VkFormat format,
 			VkImageTiling tiling,
-			VkImageUsageFlagBits usage,
 			VkImageLayout in_layout,
 			VkImageLayout end_layout,
 			bool need_export,
@@ -236,4 +235,5 @@ vk_transition_image_layout(struct vk_image_att *img_att,
 			   VkImageLayout new_layout,
 			   uint32_t src_queue_family_index,
 			   uint32_t dst_queue_family_index);
+
 #endif /* VK_H */

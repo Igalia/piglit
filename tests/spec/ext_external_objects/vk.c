@@ -866,9 +866,31 @@ static bool
 are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 {
 	VkPhysicalDeviceExternalImageFormatInfo ext_img_fmt_info;
-	VkPhysicalDeviceImageFormatInfo2 img_fmt_info;
 	VkExternalImageFormatProperties ext_img_fmt_props;
+
+	int i;
+	VkPhysicalDeviceImageFormatInfo2 img_fmt_info;
 	VkImageFormatProperties2 img_fmt_props;
+	VkImageUsageFlagBits all_flags[] = {
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+		VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+		VK_IMAGE_USAGE_SAMPLED_BIT,
+		VK_IMAGE_USAGE_STORAGE_BIT,
+		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+		VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT,
+		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
+		/* Provided by VK_EXT_fragment_density_map */
+		VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
+		/* Comment out when the headers become available in all
+		 * distros:
+		 * Provided by VK_NV_shading_rate_image
+		 * VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV,
+		 * Provided by VK_KHR_fragment_shading_rate
+		 * VK_IMAGE_USAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR,
+		 */
+	};
+	VkImageUsageFlagBits flags = 0;
 
 	VkExternalMemoryFeatureFlagBits export_feature_flags =
 		VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT;
@@ -880,15 +902,6 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 		VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO;
 	ext_img_fmt_info.handleType = handle_type;
 
-	memset(&img_fmt_info, 0, sizeof img_fmt_info);
-	img_fmt_info.sType =
-		VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2;
-	img_fmt_info.pNext = &ext_img_fmt_info;
-	img_fmt_info.format = props->format;
-	img_fmt_info.type = get_image_type(props->h, props->depth);
-	img_fmt_info.tiling = props->tiling;
-	img_fmt_info.usage = props->usage ? props->usage : VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-
 	memset(&ext_img_fmt_props, 0, sizeof ext_img_fmt_props);
 	ext_img_fmt_props.sType =
 		VK_STRUCTURE_TYPE_EXTERNAL_IMAGE_FORMAT_PROPERTIES;
@@ -897,15 +910,35 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 	img_fmt_props.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2;
 	img_fmt_props.pNext = &ext_img_fmt_props;
 
+	memset(&img_fmt_info, 0, sizeof img_fmt_info);
+	img_fmt_info.sType =
+		VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2;
+	img_fmt_info.pNext = &ext_img_fmt_info;
+	img_fmt_info.format = props->format;
+	img_fmt_info.type = get_image_type(props->h, props->depth);
+	img_fmt_info.tiling = props->tiling;
+
+	for (i = 0; i < ARRAY_SIZE(all_flags); i++) {
+		img_fmt_info.usage = all_flags[i];
+		if (vkGetPhysicalDeviceImageFormatProperties2(ctx->pdev,
+					&img_fmt_info,
+					&img_fmt_props) == VK_SUCCESS) {
+			flags |= all_flags[i];
+		}
+	}
+
+	img_fmt_info.usage = flags;
 	if (vkGetPhysicalDeviceImageFormatProperties2
 	    (ctx->pdev, &img_fmt_info, &img_fmt_props) != VK_SUCCESS) {
 		fprintf(stderr,
 			"Unsupported Vulkan format properties.\n");
 		return false;
 	}
+	props->usage = flags;
 
 	if (props->need_export &&
-	    !(ext_img_fmt_props.externalMemoryProperties.externalMemoryFeatures & export_feature_flags)) {
+	    !(ext_img_fmt_props.externalMemoryProperties.externalMemoryFeatures
+		    & export_feature_flags)) {
 		fprintf(stderr, "Unsupported Vulkan external memory features.\n");
 		return false;
 	}
@@ -1140,7 +1173,6 @@ vk_fill_ext_image_props(struct vk_ctx *ctx,
 			uint32_t num_layers,
 			VkFormat format,
 			VkImageTiling tiling,
-			VkImageUsageFlagBits usage,
 			VkImageLayout in_layout,
 			VkImageLayout end_layout,
 			bool need_export,
@@ -1155,7 +1187,6 @@ vk_fill_ext_image_props(struct vk_ctx *ctx,
 	props->num_layers = num_layers;
 
 	props->format = format;
-	props->usage = usage;
 	props->tiling = tiling;
 
 	props->in_layout = in_layout;
