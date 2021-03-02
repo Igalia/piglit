@@ -275,7 +275,8 @@ static void
 gen_triangle_strip_tile(unsigned num_quads_per_dim, double prim_size_in_pixels,
 			unsigned cull_percentage,
 			bool back_face_culling, bool view_culling, bool degenerate_prims,
-			unsigned max_vertices, unsigned *num_vertices, float *vertices)
+			unsigned max_vertices, unsigned *num_vertices, float *vertices,
+			unsigned max_indices, unsigned *num_indices, unsigned *indices)
 {
 	/* clip space coordinates in both X and Y directions: */
 	const double first = -1;
@@ -370,12 +371,20 @@ gen_triangle_strip_tile(unsigned num_quads_per_dim, double prim_size_in_pixels,
 			vertices[elem++] = zoffset;
 		}
 	}
+
+	if (indices) {
+		for (unsigned i = 0; i < *num_vertices; i++)
+			indices[i] = i;
+
+		*num_indices = *num_vertices;
+	}
 }
 
 enum draw_method {
 	INDEXED_TRIANGLES,
 	TRIANGLES,
 	TRIANGLE_STRIP,
+	INDEXED_TRIANGLE_STRIP,
 	NUM_DRAW_METHODS,
 };
 
@@ -397,6 +406,10 @@ run_draw(unsigned iterations)
 			glDrawArrays(GL_TRIANGLES, (vb_size / 12) * duplicate_index, count);
 		} else if (global_draw_method == TRIANGLE_STRIP) {
 			glDrawArrays(GL_TRIANGLE_STRIP, (vb_size / 12) * duplicate_index, count);
+		} else if (global_draw_method == INDEXED_TRIANGLE_STRIP) {
+			glDrawElements(GL_TRIANGLE_STRIP, count,
+				       GL_UNSIGNED_INT,
+				       (void*)(long)(ib_size * duplicate_index));
 		}
 
 		duplicate_index = (duplicate_index + 1) % num_duplicates;
@@ -428,17 +441,20 @@ run_test(unsigned debug_num_iterations, enum draw_method draw_method,
 	float *vertices = (float*)malloc(max_vertices * 12);
 	unsigned *indices = NULL;
 
-	if (draw_method == INDEXED_TRIANGLES)
+	if (draw_method == INDEXED_TRIANGLES ||
+	    draw_method == INDEXED_TRIANGLE_STRIP)
 		indices = (unsigned*)malloc(max_indices * 4);
 
 	unsigned num_vertices = 0, num_indices = 0;
-	if (draw_method == TRIANGLE_STRIP) {
+	if (draw_method == TRIANGLE_STRIP ||
+	    draw_method == INDEXED_TRIANGLE_STRIP) {
 		gen_triangle_strip_tile(num_quads_per_dim, quad_size_in_pixels,
 					cull_percentage,
 					cull_method == BACK_FACE_CULLING,
 					cull_method == VIEW_CULLING,
 					cull_method == DEGENERATE_PRIMS,
-					max_vertices, &num_vertices, vertices);
+					max_vertices, &num_vertices, vertices,
+					max_indices, &num_indices, indices);
 	} else {
 		gen_triangle_tile(num_quads_per_dim, quad_size_in_pixels,
 				  cull_percentage,
@@ -467,7 +483,7 @@ run_test(unsigned debug_num_iterations, enum draw_method draw_method,
 		glBufferSubData(GL_ARRAY_BUFFER, vb_size * i, vb_size, vertices);
 	free(vertices);
 
-	if (draw_method == INDEXED_TRIANGLES) {
+	if (indices) {
 		glGenBuffers(1, &ib);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -489,11 +505,11 @@ run_test(unsigned debug_num_iterations, enum draw_method draw_method,
 	glBindBuffer(GL_ARRAY_BUFFER, vb);
 	glVertexPointer(3, GL_FLOAT, 0, NULL);
 
-	if (draw_method == INDEXED_TRIANGLES)
+	if (indices)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
 
 	global_draw_method = draw_method;
-	count = draw_method == INDEXED_TRIANGLES ? num_indices : num_vertices;
+	count = indices ? num_indices : num_vertices;
 	duplicate_index = 0;
 
 	double rate = 0;
@@ -508,7 +524,7 @@ run_test(unsigned debug_num_iterations, enum draw_method draw_method,
 
 	/* Cleanup. */
 	glDeleteBuffers(1, &vb);
-	if (draw_method == INDEXED_TRIANGLES)
+	if (indices)
 		glDeleteBuffers(1, &ib);
 	return rate;
 }
@@ -545,7 +561,8 @@ run(enum draw_method draw_method, enum cull_method cull_method,
 
 		printf("  %-14s, ",
 		       draw_method == INDEXED_TRIANGLES ? "glDrawElements" :
-		       draw_method == TRIANGLES ? "glDrawArraysT" : "glDrawArraysTS");
+		       draw_method == TRIANGLES ? "glDrawArraysT" :
+		       draw_method == TRIANGLE_STRIP ? "glDrawArraysTS" : "glDrawElemsTS");
 
 		if (cull_method == NONE ||
 		    cull_method == RASTERIZER_DISCARD) {
@@ -597,7 +614,7 @@ piglit_display(void)
 	/* for debugging */
 	if (getenv("ONE")) {
 		glUseProgram(progs[0]);
-		run_test(1, TRIANGLE_STRIP, BACK_FACE_CULLING, ceil(sqrt(0.5 * 512000)), 2, 50);
+		run_test(1, INDEXED_TRIANGLE_STRIP, BACK_FACE_CULLING, ceil(sqrt(0.5 * 512000)), 2, 50);
 		piglit_swap_buffers();
 		return PIGLIT_PASS;
 	}
