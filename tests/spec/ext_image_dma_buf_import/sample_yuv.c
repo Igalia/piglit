@@ -202,6 +202,7 @@ piglit_display(void)
 		t = uyvy;
 		break;
 	default:
+		fprintf(stderr, "invalid fourcc: %.4s\n", (char *)&fourcc);
 		return PIGLIT_SKIP;
 	}
 
@@ -260,12 +261,14 @@ piglit_init(int argc, char **argv)
 		fourcc = parse_format(argv[i] + sizeof(fmt) - 1);
 		if (fourcc == -1) {
 			fprintf(stderr, "invalid format: %s\n", argv[i]);
+			usage(argv[0], "YUV");
 			piglit_report_result(PIGLIT_SKIP);
 		}
         }
 
 	if (fourcc == -1) {
 		fprintf(stderr, "format not specified\n");
+		usage(argv[0], "YUV");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 }

@@ -242,3 +242,14 @@ dma_buf_create_and_sample_32bpp(unsigned w, unsigned h,
 
 	return sample_buffer(buf, fourcc);
 }
+
+void
+usage(const char *name, const char *color_space)
+{
+	fprintf(stderr,
+		"Usage:\n"
+		"    %s -fmt=<format>\n"
+		"\n"
+		"Where <format> is a fourCC code for a %s format.\n",
+		name, color_space);
+}

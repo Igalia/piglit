@@ -45,4 +45,7 @@ texture_for_egl_image(EGLImageKHR img, GLuint *out_tex);
 void
 sample_tex(GLuint tex, unsigned x, unsigned y, unsigned w, unsigned h);
 
+void
+usage(const char *name, const char *color_space);
+
 #endif /* SAMPLE_COMMON_H */

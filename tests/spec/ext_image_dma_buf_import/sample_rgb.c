@@ -105,12 +105,14 @@ piglit_init(int argc, char **argv)
 		fourcc = parse_format(argv[i] + sizeof(fmt) - 1);
 		if (fourcc == -1) {
 			fprintf(stderr, "invalid format: %s\n", argv[i]);
+			usage(argv[0], "RGB");
 			piglit_report_result(PIGLIT_SKIP);
 		}
         }
 
 	if (fourcc == -1) {
 		fprintf(stderr, "format not specified\n");
+		usage(argv[0], "RGB");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 }
