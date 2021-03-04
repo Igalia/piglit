@@ -25,42 +25,6 @@
 
 #include "drm_fourcc.h"
 
-/* These definitions were added in libdrm 2.4.68, since that's still pretty
- * recent defined these to allow older libdrm to continue working.
- */
-#ifndef DRM_FORMAT_R8
-#define DRM_FORMAT_R8 fourcc_code('R', '8', ' ', ' ')
-#endif
-
-#ifndef DRM_FORMAT_RG88
-#define DRM_FORMAT_RG88 fourcc_code('R', 'G', '8', '8')
-#endif
-
-#ifndef DRM_FORMAT_GR88
-#define DRM_FORMAT_GR88 fourcc_code('G', 'R', '8', '8')
-#endif
-
-#ifndef DRM_FORMAT_P010
-#define DRM_FORMAT_P010 fourcc_code('P', '0', '1', '0') /* 2x2 subsampled Cb:Cr plane 10 bits per channel */
-#endif
-
-#ifndef DRM_FORMAT_P012
-#define DRM_FORMAT_P012 fourcc_code('P', '0', '1', '2') /* 2x2 subsampled Cb:Cr plane 12 bits per channel */
-#endif
-
-#ifndef DRM_FORMAT_P016
-#define DRM_FORMAT_P016 fourcc_code('P', '0', '1', '6') /* 2x2 subsampled Cb:Cr plane 16 bits per channel */
-#endif
-
-#ifndef DRM_FORMAT_XYUV8888
-#define DRM_FORMAT_XYUV8888 fourcc_code('X', 'Y', 'U', 'V') /* 8 bits per channel and no subsampling */
-#endif
-
-/* added in libdrm 2.4.95 */
-#ifndef DRM_FORMAT_INVALID
-#define DRM_FORMAT_INVALID 0
-#endif
-
 struct piglit_dma_buf {
 	unsigned w;
 	unsigned h;

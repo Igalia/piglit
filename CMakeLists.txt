@@ -200,11 +200,12 @@ ENDIF()
 # The presence of libdrm is not sufficient. At least one libdrm_${hardware}
 # library is also needed.
 #
-# When building for Intel, libdrm_intel>=2.4.38 is required because support for
-# drm-prime arrived in that version.
+# When building for Intel, libdrm_intel>=2.4.98 is required.  Support for
+# drm-prime arrived in 2.4.38.  Several defines for fourCC formats were added
+# to drm_fourcc.h in 2.4.68, 2.4.95, and 2.4.98.
 #
 if(LIBDRM_FOUND AND XCB_DRI2_FOUND AND
-   ((LIBDRM_INTEL_VERSION VERSION_GREATER "2.4.37") OR
+   ((LIBDRM_INTEL_VERSION VERSION_GREATER "2.4.97") OR
      PIGLIT_HAS_GBM_BO_MAP))
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID true)
 else()
@@ -222,7 +223,7 @@ endif()
 if(PIGLIT_BUILD_DMA_BUF_TESTS AND NOT PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID)
 	message(FATAL_ERROR
 		"PIGLIT_BUILD_DMA_BUF_TESTS require libdrm, "
-		"libdrm_intel>=2.4.38, and xcb-dri2")
+		"libdrm_intel>=2.4.98, and xcb-dri2")
 endif()
 
 IF(PIGLIT_BUILD_GLX_TESTS)
