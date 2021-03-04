@@ -90,16 +90,16 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_OES_EGL_image_external");
 
 	for (i = 1; i < argc; i++) {
-                static const char fmt[] = "-fmt=";
+		static const char fmt[] = "-fmt=";
 
-                if (!strcmp(argv[i], "-alpha-one")) {
+		if (!strcmp(argv[i], "-alpha-one")) {
 			force_alpha_to_one = true;
-                        continue;
-                }
+			continue;
+		}
 
-                if (strncmp(argv[i], fmt, sizeof(fmt) - 1)) {
+		if (strncmp(argv[i], fmt, sizeof(fmt) - 1)) {
 			fprintf(stderr, "unknown argument %s\n", argv[i]);
-                        continue;
+			continue;
 		}
 
 		fourcc = parse_format(argv[i] + sizeof(fmt) - 1);
@@ -108,7 +108,7 @@ piglit_init(int argc, char **argv)
 			usage(argv[0], "RGB");
 			piglit_report_result(PIGLIT_SKIP);
 		}
-        }
+	}
 
 	if (fourcc == -1) {
 		fprintf(stderr, "format not specified\n");

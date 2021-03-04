@@ -92,7 +92,7 @@ sample_tex(GLuint tex, unsigned x, unsigned y, unsigned w, unsigned h)
 	GLuint prog;
 
 	prog = piglit_build_simple_program(vs_src, fs_src);
-	
+
 	glUseProgram(prog);
 
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, tex);
