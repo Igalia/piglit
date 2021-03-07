@@ -298,20 +298,6 @@ endif ()
 if (MINGW)
 	# Match MSVC default stack size
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,1048576")
-
-	# Avoid depending on MinGW runtime DLLs
-	check_cxx_compiler_flag (-static-libgcc HAVE_STATIC_LIBGCC_FLAG)
-	if (HAVE_STATIC_LIBGCC_FLAG)
-		set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
-		set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
-		set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -static-libgcc")
-	endif ()
-	check_cxx_compiler_flag (-static-libstdc++ HAVE_STATIC_LIBSTDCXX_FLAG)
-	if (HAVE_STATIC_LIBSTDCXX_FLAG)
-		set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
-		set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++")
-		set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -static-libstdc++")
-	endif ()
 endif ()
 
 if (${CMAKE_C_COMPILER_ID} STREQUAL "SunPro")
@@ -578,6 +564,33 @@ install (
 	PROGRAMS piglit RENAME piglit${PIGLIT_INSTALL_VERSION_SUFFIX}${PYTHON_SUFFIX}
 	DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# Install MinGW runtime DLLs
+if (MINGW)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set (LIBGCC_DLL_NAME libgcc_s_seh-1.dll)
+	else ()
+		set (LIBGCC_DLL_NAME libgcc_s_sjlj-1.dll)
+	endif ()
+	execute_process (
+		COMMAND ${CMAKE_C_COMPILER} -print-file-name=${LIBGCC_DLL_NAME}
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		OUTPUT_VARIABLE LIBGCC_DLL
+	)
+	execute_process (
+		COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=libstdc++-6.dll
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		OUTPUT_VARIABLE LIBSTDCXX_DLL
+	)
+	if (EXISTS ${LIBGCC_DLL})
+		message (STATUS "Found libgcc DLL: ${LIBGCC_DLL}")
+		install (FILES ${LIBGCC_DLL} DESTINATION ${PIGLIT_INSTALL_LIBDIR}/bin)
+	endif ()
+	if (EXISTS ${LIBSTDCXX_DLL})
+		message (STATUS "Found libstdc++ DLL: ${LIBSTDCXX_DLL}")
+		install (FILES ${LIBSTDCXX_DLL} DESTINATION ${PIGLIT_INSTALL_LIBDIR}/bin)
+	endif ()
+endif ()
 
 
 set (CPACK_PACKAGE_VERSION_MAJOR "1")
