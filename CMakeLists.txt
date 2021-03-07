@@ -598,7 +598,8 @@ endif ()
 
 # See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
 if (WIN32)
-	set (CPACK_GENERATOR "ZIP")
+	set (CPACK_GENERATOR "7Z")
+	set (CPACK_STRIP_FILES ON)
 else ()
 	set (CPACK_GENERATOR "TBZ2")
 endif ()
