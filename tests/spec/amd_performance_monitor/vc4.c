@@ -38,10 +38,13 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static enum piglit_result merged_result = PIGLIT_PASS;
+
 #define verify(x)                                                            \
 	if (!(x)) {                                                          \
 		printf("%s:%i\n", __func__, __LINE__);			     \
 		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test->name); \
+		piglit_merge_result(&merged_result, PIGLIT_FAIL);            \
 		return;                                                      \
 	}
 
@@ -307,5 +310,5 @@ piglit_init(int argc, char **argv)
 	for (i = 0; i < ARRAY_SIZE(tests); i++)
 		do_perfmon_test(&info, &tests[i]);
 
-	exit(0);
+	piglit_report_result(merged_result);
 }

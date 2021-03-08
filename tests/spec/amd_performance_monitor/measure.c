@@ -64,9 +64,12 @@ get_counters(unsigned group, unsigned **counters, int *num_counters,
 				    *num_counters, *counters);
 }
 
+static enum piglit_result merged_result = PIGLIT_PASS;
+
 #define verify(x)                                                           \
 	if (!(x)) {                                                         \
 		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name); \
+		piglit_merge_result(&merged_result, PIGLIT_FAIL);           \
 		return;                                                     \
 	}
 
@@ -379,12 +382,11 @@ piglit_init(int argc, char **argv)
 	/* Basic glGetPerfMonitorGroupsAMD() tests */
 	get_groups(&groups, &num_groups);
 
-	/* If there are no groups, the rest of the tests can't run.  Bail. */
-	if (num_groups == 0)
-		exit(0);
+	/* If there are no groups, the rest of the tests can't run. */
+	if (num_groups > 0) {
+		test_basic_measurement(groups[0]);
+		test_change_counters_while_active(groups[0]);
+	}
 
-	test_basic_measurement(groups[0]);
-	test_change_counters_while_active(groups[0]);
-
-	exit(0);
+	piglit_report_result(merged_result);
 }

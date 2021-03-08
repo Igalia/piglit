@@ -112,9 +112,13 @@ find_invalid_counter(unsigned *counters, int num_counters)
 	return invalid_counter;
 }
 
+static enum piglit_result merged_result = PIGLIT_PASS;
+
 #define report(pass) \
 	do { \
-		piglit_report_subtest_result((pass) ? PIGLIT_PASS : PIGLIT_FAIL, __FUNCTION__); \
+		enum piglit_result r = (pass) ? PIGLIT_PASS : PIGLIT_FAIL; \
+		piglit_report_subtest_result(r, __FUNCTION__); \
+		piglit_merge_result(&merged_result, r); \
 		return; \
 	} while (0)
 
@@ -1002,6 +1006,7 @@ test_select_counters_invalid_num_counters(unsigned group)
 enum piglit_result
 piglit_display(void)
 {
+	/* UNREACHABLE */
 	return PIGLIT_FAIL;
 }
 
@@ -1048,7 +1053,7 @@ piglit_init(int argc, char **argv)
 
 	/* If there are no groups, the rest of the tests can't run.  Bail. */
 	if (num_groups == 0)
-		exit(0);
+		goto end;
 
 	test_get_counters_null_pointers(groups[0]);
 	test_get_counters_null_pointer_non_zero_size(groups[0]);
@@ -1071,12 +1076,14 @@ piglit_init(int argc, char **argv)
 
 	/* If there are no counters, the rest of the tests can't run.  Bail. */
 	if (num_g0_counters == 0)
-		exit(0);
+		goto end;
+
 
 	test_counter_string_null_length(groups[0], g0_counters[0]);
 	test_counter_string_single_character_buffer(groups[0], g0_counters[0]);
 	test_counter_string_small_buffer(groups[0], g0_counters[0]);
 	test_counter_string_normal_buffer(groups[0], g0_counters[0]);
 
-	exit(0);
+end:
+	piglit_report_result(merged_result);
 }
