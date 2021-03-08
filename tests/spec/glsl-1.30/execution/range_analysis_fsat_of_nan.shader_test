@@ -1,0 +1,71 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 130
+uniform float zero = 0.0;
+uniform float also_zero = 0.0;
+
+out vec4 piglit_fragcolor;
+
+void main()
+{
+    /* Create a value that, if it were a number, would have to be > 0.  Due to
+     * possilbe flush-to-zero semantics, pretty much anything involving
+     * multiplication or division can be zero.  However, gt_zero + ge_zero is
+     * gt_zero.
+     */
+    float not_a_number = 1.0 + abs(zero / also_zero);
+
+    /* Result of the max() should be 0.0, but range analysis might incorrectly
+     * think that it's some value > 0.
+     *
+     * A clever optimizer will convert this to
+     *
+     *    piglit_fragcolor = vec4(float(saturate(X) > 0),
+     *                            float(!(saturate(X) > 0)),
+     *                            0, 1);
+     *
+     * Since saturate(X) must be a number, it may further convert it to
+     *
+     *    piglit_fragcolor = vec4(float(saturate(X) > 0),
+     *                            float(saturate(X) <= 0),
+     *                            0, 1);
+     *
+     * At this point, all conversions are safe and exact.
+     *
+     * There are two possible incorrect reductions here.  First, range anaysis
+     * may detect that X must be greater than zero, so saturate(X) must also
+     * be greater than zero.  This first comparison a tautology and the second
+     * comparison a contradiction.  If X is NaN (as we have cleverly
+     * constructed here), saturate(X) should be zero instead.
+     *
+     * Second, since the calculations are not marked precise, an overzealous
+     * optimizer may reduce this to
+     *
+     *    piglit_fragcolor = vec4(float(X > 0),
+     *                            float(X <= 0),
+     *                            0, 1);
+     *
+     * Dropping saturate() from the greater-than comparison is safe because
+     * (0 > 0) is equivalent to (NaN > 0).  If X is NaN, the other condition
+     * will also evaluate false.  The GLSL spec gives quite a bit of leeway
+     * with respect to NaN, but that seems too far.  The shader author asked
+     * for a result of red or green.  A result of black is still "undefined
+     * behavior," but it's also a little mean.
+     *
+     * A result of red likely indicates the first problem, and a result of
+     * black likely indicates the second problem.
+     */
+    if (min(max(not_a_number, 0.0), 1.0) > 0.0) {
+        piglit_fragcolor = vec4(1.0, 0.0, 0.0, 1.0);
+    } else {
+        piglit_fragcolor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
