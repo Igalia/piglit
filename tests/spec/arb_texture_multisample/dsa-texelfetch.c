@@ -178,6 +178,17 @@ read_from_texture(GLenum internal_type, bool is_int)
    glTextureStorage2DMultisample(init_texture, 4, internal_type, piglit_width,
                                  piglit_height, GL_FALSE);
 
+   if (glGetError() == GL_INVALID_OPERATION) {
+      /* The spec says:
+       *    "An INVALID_OPERATION error is generated if samples is greater
+       *     than the maximum  number  of  samples  supported  for  this target
+       *     and internalformat"
+       *
+       * So skip the "internal_type" + 4 samples combination in this case.
+       */
+      return PIGLIT_SKIP;
+   }
+
    glNamedFramebufferTexture(init_fbo, GL_COLOR_ATTACHMENT0, init_texture, 0);
    glNamedFramebufferDrawBuffer(init_fbo, GL_COLOR_ATTACHMENT0);
 
