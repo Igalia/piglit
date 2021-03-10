@@ -48,6 +48,9 @@ format_has_alpha(int fourcc)
 {
 	switch (fourcc) {
 	case DRM_FORMAT_AYUV:
+	case DRM_FORMAT_Y410:
+	case DRM_FORMAT_Y412:
+	case DRM_FORMAT_Y416:
 		return true;
 	default:
 		return false;
@@ -60,7 +63,27 @@ format_has_alpha(int fourcc)
 #    define htole16(x) (uint16_t)(x)
 #    define HAVE_HTOLE16
 #  endif
+#  ifndef HAVE_HTOLE32
+#    define htole32(x) (uint32_t)(x)
+#    define HAVE_HTOLE32
+#  endif
+#  ifndef HAVE_HTOLE64
+#    define htole64(x) (uint64_t)(x)
+#    define HAVE_HTOLE64
+#  endif
 #endif
+
+#define PACK_Y410(a, y, cr, cb)				\
+	htole64(((uint32_t)(a  & 0x003) << 30) |	\
+		((uint32_t)(cr & 0x3ff) << 20) |	\
+		((uint32_t)(y  & 0x3ff) << 10) |	\
+		((uint32_t)(cb & 0x3ff) <<  0))
+
+#define PACK_Y416(a, y, cr, cb)				\
+	htole64((((uint64_t)(uint16_t) a) << 48) |	\
+		(((uint64_t)(uint16_t)cr) << 32) |	\
+		(((uint64_t)(uint16_t) y) << 16) |	\
+		(((uint64_t)(uint16_t)cb) <<  0))
 
 enum piglit_result
 piglit_display(void)
@@ -77,6 +100,50 @@ piglit_display(void)
 		htole16(30840), htole16(41120), htole16(35980), htole16(41120),
 	};
 #endif
+
+	const uint32_t y410[] = {
+		PACK_Y410(0, 200, 520, 480),
+		PACK_Y410(1, 280, 520, 511),
+		PACK_Y410(2, 360, 520, 535),
+		PACK_Y410(3, 440, 520, 560),
+
+		PACK_Y410(0, 200, 560, 480),
+		PACK_Y410(1, 280, 560, 511),
+		PACK_Y410(2, 360, 560, 535),
+		PACK_Y410(3, 440, 560, 560),
+
+		PACK_Y410(0, 200, 600, 480),
+		PACK_Y410(1, 280, 600, 511),
+		PACK_Y410(2, 360, 600, 535),
+		PACK_Y410(3, 440, 600, 560),
+
+		PACK_Y410(0, 200, 640, 480),
+		PACK_Y410(1, 280, 640, 511),
+		PACK_Y410(2, 360, 640, 535),
+		PACK_Y410(3, 440, 640, 560),
+	};
+
+	uint64_t y41x[] = {
+		PACK_Y416(0x0000, 0x3232, 0x8282, 0x7878),
+		PACK_Y416(0x5555, 0x4646, 0x8282, 0x7F7F),
+		PACK_Y416(0xAAAA, 0x5A5A, 0x8282, 0x8585),
+		PACK_Y416(0xFFFF, 0x6E6E, 0x8282, 0x8C8C),
+
+		PACK_Y416(0x0000, 0x3232, 0x8C8C, 0x7878),
+		PACK_Y416(0x5555, 0x4646, 0x8C8C, 0x7F7F),
+		PACK_Y416(0xAAAA, 0x5A5A, 0x8C8C, 0x8585),
+		PACK_Y416(0xFFFF, 0x6E6E, 0x8C8C, 0x8C8C),
+
+		PACK_Y416(0x0000, 0x3232, 0x9696, 0x7878),
+		PACK_Y416(0x5555, 0x4646, 0x9696, 0x7F7F),
+		PACK_Y416(0xAAAA, 0x5A5A, 0x9696, 0x8585),
+		PACK_Y416(0xFFFF, 0x6E6E, 0x9696, 0x8C8C),
+
+		PACK_Y416(0x0000, 0x3232, 0xA0A0, 0x7878),
+		PACK_Y416(0x5555, 0x4646, 0xA0A0, 0x7F7F),
+		PACK_Y416(0xAAAA, 0x5A5A, 0xA0A0, 0x8585),
+		PACK_Y416(0xFFFF, 0x6E6E, 0xA0A0, 0x8C8C),
+	};
 
 	static const unsigned char nv12[] = {
 		/* Y */
@@ -193,6 +260,22 @@ piglit_display(void)
 		break;
 	case DRM_FORMAT_P016:
 		t = (unsigned char *) p0xx;
+		break;
+#endif
+#ifdef HAVE_HTOLE32
+	case DRM_FORMAT_Y410:
+		t = (unsigned char *) y410;
+		break;
+#endif
+#ifdef HAVE_HTOLE64
+	case DRM_FORMAT_Y412:
+		for (unsigned i = 0; i < ARRAY_SIZE(y41x); i++)
+			y41x[i] &= htole64(0xFFF0FFF0FFF0FFF0llu);
+
+		t = (unsigned char *) y41x;
+		break;
+	case DRM_FORMAT_Y416:
+		t = (unsigned char *) y41x;
 		break;
 #endif
 	case DRM_FORMAT_NV12:

@@ -172,6 +172,13 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		cpp = 2;
 		buf_h = h * 3 / 2;
 		break;
+	case DRM_FORMAT_Y410:
+		cpp = 4;
+		break;
+	case DRM_FORMAT_Y412:
+	case DRM_FORMAT_Y416:
+		cpp = 8;
+		break;
 	default:
 		fprintf(stderr, "invalid fourcc: %.4s\n", (char *)&fourcc);
 		return false;
@@ -299,6 +306,19 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		cpp = 4;
 		src_stride = cpp * w;
 		break;
+	case DRM_FORMAT_Y410:
+		format = GBM_FORMAT_ABGR2101010;
+		cpp = 4;
+		src_stride = cpp * w;
+		break;
+	case DRM_FORMAT_Y412:
+	case DRM_FORMAT_Y416:
+		format = GBM_BO_FORMAT_ARGB8888;
+		buf_w = w * 2;
+		cpp = 8;
+		src_stride = cpp * w;
+		break;
+
 	/* For YUV formats, the U/V planes might have a greater relative
 	 * pitch.  For example, if the driver needs pitch aligned to 32
 	 * pixels, for a 4x4 YUV image, the stride of both the Y and U/V
