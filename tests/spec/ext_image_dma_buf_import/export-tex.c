@@ -72,7 +72,8 @@ create_cleared_eglImage(EGLDisplay egl_dpy, int w, int h)
 
 	EGLImageKHR img =
 		eglCreateImageKHR(egl_dpy, eglGetCurrentContext(),
-				  EGL_GL_TEXTURE_2D_KHR, (EGLClientBuffer)tex,
+				  EGL_GL_TEXTURE_2D_KHR,
+				  (EGLClientBuffer)(uintptr_t)tex,
 				  NULL);
 	tex_clear(tex, w, h);
 	glFinish();
