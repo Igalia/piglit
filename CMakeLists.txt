@@ -461,6 +461,7 @@ endif()
 check_function_exists(setrlimit HAVE_SETRLIMIT)
 
 check_symbol_exists(htobe32 "endian.h" HAVE_HTOBE32)
+check_symbol_exists(htole16 "endian.h" HAVE_HTOLE16)
 
 check_include_file(sys/time.h  HAVE_SYS_TIME_H)
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)

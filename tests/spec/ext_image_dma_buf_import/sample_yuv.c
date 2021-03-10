@@ -21,6 +21,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <endian.h>
 #include "sample_common.h"
 #include "image_common.h"
 
@@ -53,19 +54,29 @@ format_has_alpha(int fourcc)
 	}
 }
 
+#ifndef __BIG_ENDIAN__
+/* Assume __LITTLE_ENDIAN__ */
+#  ifndef HAVE_HTOLE16
+#    define htole16(x) (uint16_t)(x)
+#    define HAVE_HTOLE16
+#  endif
+#endif
+
 enum piglit_result
 piglit_display(void)
 {
+#ifdef HAVE_HTOLE16
 	uint16_t p0xx[] = {
 		/* Y */
-		12850, 17990, 23130, 28270,
-		12850, 17990, 23130, 28270,
-		12850, 17990, 23130, 28270,
-		12850, 17990, 23130, 28270,
+		htole16(12850), htole16(17990), htole16(23130), htole16(28270),
+		htole16(12850), htole16(17990), htole16(23130), htole16(28270),
+		htole16(12850), htole16(17990), htole16(23130), htole16(28270),
+		htole16(12850), htole16(17990), htole16(23130), htole16(28270),
 		/* UV */
-		30840, 33410, 35980, 33410,
-		30840, 41120, 35980, 41120,
+		htole16(30840), htole16(33410), htole16(35980), htole16(33410),
+		htole16(30840), htole16(41120), htole16(35980), htole16(41120),
 	};
+#endif
 
 	static const unsigned char nv12[] = {
 		/* Y */
@@ -169,19 +180,21 @@ piglit_display(void)
 
 	enum piglit_result res;
 	switch (fourcc) {
+#ifdef HAVE_HTOLE16
 	case DRM_FORMAT_P010:
 		for (uint32_t i = 0; i < ARRAY_SIZE(p0xx); i++)
-			p0xx[i] &= (1023 << 6);
+			p0xx[i] &= htole16(1023 << 6);
 		t = (unsigned char *) p0xx;
 		break;
 	case DRM_FORMAT_P012:
 		for (uint32_t i = 0; i < ARRAY_SIZE(p0xx); i++)
-			p0xx[i] &= (4095 << 4);
+			p0xx[i] &= htole16(4095 << 4);
 		t = (unsigned char *) p0xx;
 		break;
 	case DRM_FORMAT_P016:
 		t = (unsigned char *) p0xx;
 		break;
+#endif
 	case DRM_FORMAT_NV12:
 		t = nv12;
 		break;
