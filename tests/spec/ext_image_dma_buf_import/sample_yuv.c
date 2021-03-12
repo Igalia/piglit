@@ -99,6 +99,21 @@ piglit_display(void)
 		htole16(30840), htole16(33410), htole16(35980), htole16(33410),
 		htole16(30840), htole16(41120), htole16(35980), htole16(41120),
 	};
+
+	uint16_t y216[] = {
+		/*      Y0               Cb0              Y1               Cr0 */
+		htole16(0x3232), htole16(0x7878), htole16(0x4646), htole16(0x8282),
+		htole16(0x5A5A), htole16(0x8C8C), htole16(0x6E6E), htole16(0x8282),
+
+		htole16(0x3232), htole16(0x7878), htole16(0x4646), htole16(0x8C8C),
+		htole16(0x5A5A), htole16(0x8C8C), htole16(0x6E6E), htole16(0x8C8C),
+
+		htole16(0x3232), htole16(0x7878), htole16(0x4646), htole16(0x9696),
+		htole16(0x5A5A), htole16(0x8C8C), htole16(0x6E6E), htole16(0x9696),
+
+		htole16(0x3232), htole16(0x7878), htole16(0x4646), htole16(0xA0A0),
+		htole16(0x5A5A), htole16(0x8C8C), htole16(0x6E6E), htole16(0xA0A0),
+	};
 #endif
 
 	const uint32_t y410[] = {
@@ -260,6 +275,21 @@ piglit_display(void)
 		break;
 	case DRM_FORMAT_P016:
 		t = (unsigned char *) p0xx;
+		break;
+	case DRM_FORMAT_Y210:
+		/* Smash the low 6 bits of each component to zero. */
+		for (unsigned i = 0; i < ARRAY_SIZE(y216); i++)
+			y216[i] &= htole16(0xffc0);
+		t = (unsigned char *) y216;
+		break;
+	case DRM_FORMAT_Y212:
+		/* Smash the low 4 bits of each component to zero. */
+		for (unsigned i = 0; i < ARRAY_SIZE(y216); i++)
+			y216[i] &= htole16(0xfff0);
+		t = (unsigned char *) y216;
+		break;
+	case DRM_FORMAT_Y216:
+		t = (unsigned char *) y216;
 		break;
 #endif
 #ifdef HAVE_HTOLE32

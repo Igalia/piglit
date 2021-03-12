@@ -158,6 +158,9 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned fourcc,
 	case DRM_FORMAT_BGRA8888:
 	case DRM_FORMAT_AYUV:
 	case DRM_FORMAT_XYUV8888:
+	case DRM_FORMAT_Y210:
+	case DRM_FORMAT_Y212:
+	case DRM_FORMAT_Y216:
 		cpp = 4;
 		break;
 	case DRM_FORMAT_NV12:
@@ -316,6 +319,13 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 		format = GBM_BO_FORMAT_ARGB8888;
 		buf_w = w * 2;
 		cpp = 8;
+		src_stride = cpp * w;
+		break;
+	case DRM_FORMAT_Y210:
+	case DRM_FORMAT_Y212:
+	case DRM_FORMAT_Y216:
+		format = GBM_BO_FORMAT_ARGB8888;
+		cpp = 4;
 		src_stride = cpp * w;
 		break;
 
