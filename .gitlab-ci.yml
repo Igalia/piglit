@@ -14,7 +14,7 @@
 # repository's registry will be used there as well.
 variables:
   UPSTREAM_REPO: mesa/piglit
-  DEBIAN_TAG: "2021-02-09"
+  DEBIAN_TAG: "2021-02-09_4"
   DEBIAN_VERSION: buster-slim
   DEBIAN_IMAGE: "$CI_REGISTRY_IMAGE/debian/$DEBIAN_VERSION:$DEBIAN_TAG"
   WINDOWS_TAG: "2020-08-18"
@@ -114,6 +114,20 @@ build-debian:
       -D PIGLIT_BUILD_WGL_TESTS=off
       -GNinja
     - ninja -j4
+
+build-debian-mingw:
+  stage: build
+  extends:
+    - .use-debian
+    - .use-ccache
+  parallel:
+    matrix:
+      - TARGET: [mingw32, mingw64]
+  script:
+    - .gitlab-ci/build-mingw.sh ${TARGET}
+  artifacts:
+    paths:
+      - build/*/piglit-*.7z
 
 build-windows:
   stage: build

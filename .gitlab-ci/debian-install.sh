@@ -23,6 +23,7 @@ apt-get install -y \
   bison \
   ccache \
   cmake \
+  curl \
   flex \
   freeglut3-dev \
   g++-multilib \
@@ -39,6 +40,7 @@ apt-get install -y \
   libwayland-dev \
   libxkbcommon-dev \
   libxrender-dev \
+  mingw-w64 \
   ninja-build \
   opencl-dev \
   pkg-config \
@@ -61,7 +63,26 @@ apt-get install -y \
   python3-wheel \
   python3-yaml \
   tox \
-  waffle-utils
+  waffle-utils \
+  unzip
+
+rm -rf /var/lib/apt/lists/*
 
 pip3 install pytest-pythonpath
 pip3 install pytest-raises
+
+# Download Waffle artifacts.  See also
+# https://gitlab.freedesktop.org/mesa/waffle/-/merge_requests/89
+# https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html#downloading-the-latest-artifacts
+for target in mingw32 mingw64
+do
+    mkdir -p /opt/waffle/$target
+    curl -s -L "https://gitlab.freedesktop.org/mesa/waffle/-/jobs/artifacts/${WAFFLE_BRANCH:-maint-1.7}/raw/publish/$target/waffle-$target.zip?job=cmake-mingw" -o /tmp/waffle-$target.zip
+    unzip -qo /tmp/waffle-$target.zip -d /opt/waffle/$target
+    test -d /opt/waffle/$target/waffle
+    rm /tmp/waffle-$target.zip
+done
+
+apt-get purge -y \
+  curl \
+  unzip
