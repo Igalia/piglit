@@ -592,6 +592,11 @@ if (MINGW)
 	endif ()
 endif ()
 
+# Install Waffle DLL if specified
+if (WIN32 AND Waffle_DLL)
+	install (FILES ${Waffle_DLL} DESTINATION ${PIGLIT_INSTALL_LIBDIR}/bin)
+endif ()
+
 
 set (CPACK_PACKAGE_VERSION_MAJOR "1")
 set (CPACK_PACKAGE_VERSION_MINOR "0")
