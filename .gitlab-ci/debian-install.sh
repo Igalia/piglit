@@ -21,6 +21,7 @@ apt-get dist-upgrade -y
 
 apt-get install -y \
   bison \
+  bzip2 \
   ccache \
   cmake \
   curl \
@@ -35,11 +36,13 @@ apt-get install -y \
   libdrm2 \
   libegl1-mesa-dev \
   libglvnd-dev \
+  libpciaccess-dev \
   libvulkan-dev \
   libwaffle-dev \
   libwayland-dev \
   libxkbcommon-dev \
   libxrender-dev \
+  meson \
   mingw-w64 \
   ninja-build \
   opencl-dev \
@@ -82,6 +85,8 @@ do
     test -d /opt/waffle/$target/waffle
     rm /tmp/waffle-$target.zip
 done
+
+curl -s -L "https://dri.freedesktop.org/libdrm/libdrm-2.4.98.tar.bz2" -o /tmp/libdrm-2.4.98.tar.bz2
 
 apt-get purge -y \
   curl \
