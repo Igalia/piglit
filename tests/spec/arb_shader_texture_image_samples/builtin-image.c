@@ -196,13 +196,15 @@ test(const struct image_format_info *format,
 		size.x, size.y, size.z,	size.w);
 	if (res == PIGLIT_FAIL)
 		*status = PIGLIT_FAIL;
+	else if (res == PIGLIT_PASS && *status == PIGLIT_SKIP)
+		*status = PIGLIT_PASS;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
 	const bool slow = (argc >= 2 && !strcmp(argv[1], "--slow"));
-	enum piglit_result status = PIGLIT_PASS;
+	enum piglit_result status = PIGLIT_SKIP;
 	const struct image_format_info *format;
 	const struct image_target_info *target;
 	const struct image_stage_info *stage;
