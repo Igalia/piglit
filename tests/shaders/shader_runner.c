@@ -5631,10 +5631,11 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	/* Automatic mode can run multiple tests per session. */
-	if (report_subtests) {
+	/* Run multiple tests per session. */
+	if (argc > 2) {
 		char testname[4096], *ext;
 		int i, j;
+		enum piglit_result all = PIGLIT_PASS;
 
 		for (i = 1; i < argc; i++) {
 			const char *hit, *filename = argv[i];
@@ -5811,7 +5812,7 @@ piglit_init(int argc, char **argv)
 				piglit_report_subtest_result(
 					result, "%s", testname);
 			} else {
-				piglit_report_result(result);
+				piglit_merge_result(&all, result);
 			}
 
 			/* destroy GL objects? */
@@ -5821,6 +5822,8 @@ piglit_init(int argc, char **argv)
 			teardown_shader_include_paths();
 			teardown_xfb();
 		}
+		if (!report_subtests)
+			piglit_report_result(all);
 		exit(0);
 	}
 
