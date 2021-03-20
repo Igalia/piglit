@@ -61,18 +61,13 @@ static const char fs[] =
 static const char vs_overwrite[] =
 	"#version 130\n"
 	"in vec4 piglit_vertex;\n"
-	"in vec2 piglit_texcoord;\n"
-	"out vec2 tex_coords;\n"
 	"void main()\n"
 	"{\n"
 	"    gl_Position = piglit_vertex;\n"
-	"    tex_coords = piglit_texcoord;\n"
 	"}\n";
 
 static const char fs_overwrite[] =
 	"#version 130\n"
-	"in vec2 tex_coords;\n"
-	"uniform sampler2D tex; \n"
 	"out vec4 color;\n"
 	"const vec4 colors[] = vec4[] (\n"
 	"	vec4(1.0, 0.0, 0.0, 1.0),\n"
