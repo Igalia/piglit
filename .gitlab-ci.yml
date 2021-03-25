@@ -186,6 +186,6 @@ pages:
     - public
   only:
     refs:
-      - master
+      - main
     changes:
       - docs/**
