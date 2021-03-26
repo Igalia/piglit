@@ -63,6 +63,9 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     download.url -- The URL from which to download the files.
     download.force -- Forces downloading even if the destination file already
                       exists.
+    download.minio_host -- Name of MinIO server from which to download traces
+    download.role_session_name -- Role session name for authentication with MinIO
+    download.jwt -- JWT token for authentication with MinIO
     """
 
     def __init__(self):
@@ -71,7 +74,11 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.db_path = None
         self.results_path = None
         self.download = {'url': None,
-                         'force': False
+                         'force': False,
+                         'minio': False,
+                         'minio_host': '',
+                         'role_session_name': '',
+                         'jwt': ''
         }
 
     def clear(self):

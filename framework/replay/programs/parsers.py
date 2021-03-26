@@ -67,6 +67,30 @@ DOWNLOAD_FORCE.add_argument(
     help=('forces downloading '
           'even if the destination file already exists'))
 
+DOWNLOAD_MINIO_HOST = argparse.ArgumentParser(add_help=False)
+DOWNLOAD_MINIO_HOST.add_argument(
+    '-m', '--minio_host',
+    dest='download_minio_host',
+    required=False,
+    default=None,
+    help=('name of MinIO server from which to download traces'))
+
+DOWNLOAD_ROLE_SESSION_NAME = argparse.ArgumentParser(add_help=False)
+DOWNLOAD_ROLE_SESSION_NAME.add_argument(
+    '-r', '--role-session-name',
+    dest='download_role_session_name',
+    required=False,
+    default=None,
+    help=('role session name for authentication with MinIO'))
+
+DOWNLOAD_JWT = argparse.ArgumentParser(add_help=False)
+DOWNLOAD_JWT.add_argument(
+    '-j', '--jwt',
+    dest='download_jwt',
+    required=False,
+    default=None,
+    help=('JWT token for authentication with MinIO'))
+
 DB_PATH = argparse.ArgumentParser(add_help=False)
 DB_PATH.add_argument(
     '-p', '--db-path',

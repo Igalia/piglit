@@ -38,6 +38,9 @@ def _from_yaml(args):
     options.OPTIONS.device_name = args.device_name
     options.OPTIONS.keep_image = args.keep_image
     options.OPTIONS.download['force'] = args.force_download
+    options.OPTIONS.download['minio_host'] = args.download_minio_host
+    options.OPTIONS.download['role_session_name'] = args.download_role_session_name
+    options.OPTIONS.download['jwt'] = args.download_jwt
     options.OPTIONS.db_path = args.db_path
     options.OPTIONS.results_path = args.output
 
@@ -49,6 +52,9 @@ def _trace(args):
     options.OPTIONS.keep_image = args.keep_image
     options.OPTIONS.set_download_url(args.download_url)
     options.OPTIONS.download['force'] = args.force_download
+    options.OPTIONS.download['minio_host'] = args.download_minio_host
+    options.OPTIONS.download['role_session_name'] = args.download_role_session_name
+    options.OPTIONS.download['jwt'] = args.download_jwt
     options.OPTIONS.db_path = args.db_path
     options.OPTIONS.results_path = args.output
 
@@ -77,6 +83,9 @@ def compare(input_):
                  parsers.KEEP_IMAGE,
                  parsers.DOWNLOAD_URL,
                  parsers.DOWNLOAD_FORCE,
+                 parsers.DOWNLOAD_MINIO_HOST,
+                 parsers.DOWNLOAD_ROLE_SESSION_NAME,
+                 parsers.DOWNLOAD_JWT,
                  parsers.DB_PATH,
                  parsers.RESULTS_PATH],
         help=('Compares a specific trace given a checksum and a device.'))
@@ -97,6 +106,9 @@ def compare(input_):
                  parsers.KEEP_IMAGE,
                  parsers.YAML,
                  parsers.DOWNLOAD_FORCE,
+                 parsers.DOWNLOAD_MINIO_HOST,
+                 parsers.DOWNLOAD_ROLE_SESSION_NAME,
+                 parsers.DOWNLOAD_JWT,
                  parsers.DB_PATH,
                  parsers.RESULTS_PATH],
         help=('Compares from a traces description file listing traces '

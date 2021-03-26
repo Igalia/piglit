@@ -30,6 +30,7 @@ import pytest
 import os
 import requests
 import requests_mock
+from urllib.parse import urlparse
 
 from os import path
 
@@ -37,6 +38,19 @@ from framework import exceptions
 from framework.replay import download_utils
 from framework.replay.options import OPTIONS
 
+ASSUME_ROLE_RESPONSE = '''<?xml version="1.0" encoding="UTF-8"?>
+    <AssumeRoleWithWebIdentityResponse
+        xmlns="https://sts.amazonaws.com/doc/2011-06-15/">
+        <AssumeRoleWithWebIdentityResult>
+            <Credentials>
+                <AccessKeyId>Key</AccessKeyId>
+                <SecretAccessKey>Secret</SecretAccessKey>
+                <Expiration>2021-03-25T13:59:58Z</Expiration>
+                <SessionToken>token</SessionToken>
+            </Credentials>
+        </AssumeRoleWithWebIdentityResult>
+    </AssumeRoleWithWebIdentityResponse>
+'''
 
 class TestDownloadUtils(object):
     """Tests for download_utils methods."""
@@ -108,3 +122,19 @@ class TestDownloadUtils(object):
         requests_mock.get(self.full_url, exc=requests.exceptions.ConnectTimeout)
         assert not self.trace_file.check()
         download_utils.ensure_file(self.trace_path)
+
+    def test_minio_authorization(self, requests_mock):
+        """download_utils.ensure_file: Check we send the authentication headers to MinIO"""
+        requests_mock.post(self.url, text=ASSUME_ROLE_RESPONSE)
+        OPTIONS.download['minio_host'] = urlparse(self.url).netloc
+
+        assert not self.trace_file.check()
+        download_utils.ensure_file(self.trace_path)
+        TestDownloadUtils.check_same_file(self.trace_file, "remote")
+
+        post_request = requests_mock.request_history[0]
+        assert(post_request.method == 'POST')
+
+        get_request = requests_mock.request_history[1]
+        assert(get_request.method == 'GET')
+        assert(requests_mock.request_history[1].headers['Authorization'].startswith('AWS Key'))
