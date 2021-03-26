@@ -410,6 +410,29 @@ struct test_desc {
 		GL_FLOAT, /* expected_type */
 		8, /* expected_size */
 	},
+	{
+		"gl_ClipDistance-second-half", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[8];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 4; ++i)\n"
+		"    gl_ClipDistance[4 + i] = (float(i) + 4.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		4, /* num_varyings */
+		{"gl_ClipDistance[4]", "gl_ClipDistance[5]",
+		 "gl_ClipDistance[6]", "gl_ClipDistance[7]"},
+
+		4, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		1, /* expected_size */
+	},
 };
 
 const struct test_desc *test_to_run;
