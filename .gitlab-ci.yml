@@ -175,7 +175,7 @@ pages:
   stage: deploy
   image: alpine
   script:
-  - apk --no-cache add py2-pip python-dev
+  - apk --no-cache add py3-pip python3
   - pip install sphinx
   - pip install Flask-Sphinx-Themes
   - cd docs
