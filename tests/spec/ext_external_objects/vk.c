@@ -180,21 +180,6 @@ fill_uuid(VkPhysicalDevice pdev, uint8_t *deviceUUID, uint8_t *driverUUID)
 	memcpy(driverUUID, devProp.driverUUID, VK_UUID_SIZE);
 }
 
-static VkPipelineCache
-create_pipeline_cache(VkDevice dev)
-{
-	VkPipelineCacheCreateInfo pcache_info;
-	VkPipelineCache pcache;
-
-	memset(&pcache_info, 0, sizeof pcache_info);
-	pcache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-
-	if (vkCreatePipelineCache(dev, &pcache_info, 0, &pcache) != VK_SUCCESS)
-		return VK_NULL_HANDLE;
-
-	return pcache;
-}
-
 static VkCommandPool
 create_cmd_pool(struct vk_ctx *ctx)
 {
@@ -378,8 +363,8 @@ create_framebuffer(struct vk_ctx *ctx,
 	VkImageViewCreateInfo color_info;
 	VkImageViewCreateInfo depth_info;
 	VkFramebufferCreateInfo fb_info;
-	VkImageView atts[2];
 	VkImageViewType view_type = get_image_view_type(&color_att->props);
+	VkImageView atts[2];
 
 	if (!color_att->obj.img || !depth_att->obj.img) {
 		fprintf(stderr, "Invalid framebuffer attachment image.\n");
@@ -413,7 +398,7 @@ create_framebuffer(struct vk_ctx *ctx,
 	color_info.format = color_att->props.format;
 	color_info.subresourceRange = sr;
 
-	if (vkCreateImageView(ctx->dev, &color_info, 0, &atts[0]) != VK_SUCCESS) {
+	if (vkCreateImageView(ctx->dev, &color_info, 0, &color_att->obj.img_view) != VK_SUCCESS) {
 		fprintf(stderr, "Failed to create color image view for framebuffer.\n");
 		vk_destroy_ext_image(ctx, &color_att->obj);
 		goto fail;
@@ -435,11 +420,14 @@ create_framebuffer(struct vk_ctx *ctx,
 	depth_info.format = depth_att->props.format;
 	depth_info.subresourceRange = sr;
 
-	if (vkCreateImageView(ctx->dev, &depth_info, 0, &atts[1]) != VK_SUCCESS) {
+	if (vkCreateImageView(ctx->dev, &depth_info, 0, &depth_att->obj.img_view) != VK_SUCCESS) {
 		fprintf(stderr, "Failed to create depth image view for framebuffer.\n");
 		vk_destroy_ext_image(ctx, &depth_att->obj);
 		goto fail;
 	}
+
+	atts[0] = color_att->obj.img_view;
+	atts[1] = depth_att->obj.img_view;
 
 	memset(&fb_info, 0, sizeof fb_info);
 	fb_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -697,7 +685,7 @@ create_pipeline(struct vk_ctx *ctx,
 	pipeline_info.stageCount = 2;
 	pipeline_info.pStages = sdr_stages;
 
-	if (vkCreateGraphicsPipelines(ctx->dev, ctx->cache, 1,
+	if (vkCreateGraphicsPipelines(ctx->dev, 0, 1,
 				      &pipeline_info, 0, &renderer->pipeline) !=
 			VK_SUCCESS) {
 		fprintf(stderr, "Failed to create graphics pipeline.\n");
@@ -878,12 +866,12 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 		VK_IMAGE_USAGE_STORAGE_BIT,
 		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-		VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT,
 		VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT,
-		/* Provided by VK_EXT_fragment_density_map */
-		VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
-		/* Comment out when the headers become available in all
-		 * distros:
+		/* Shouldn't be used together with COLOR, DEPTH_STENCIL
+		 * attachment bits:
+		 * VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT,
+		 * Provided by VK_EXT_fragment_density_map
+		 * VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT,
 		 * Provided by VK_NV_shading_rate_image
 		 * VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV,
 		 * Provided by VK_KHR_fragment_shading_rate
@@ -927,7 +915,15 @@ are_props_supported(struct vk_ctx *ctx, struct vk_image_props *props)
 		}
 	}
 
-	img_fmt_info.usage = flags;
+	/* usage can't be null */
+	if (flags) {
+		img_fmt_info.usage = flags;
+	}
+	else {
+		fprintf(stderr, "Unsupported Vulkan format properties: usage.\n");
+		return false;
+	}
+
 	if (vkGetPhysicalDeviceImageFormatProperties2
 	    (ctx->pdev, &img_fmt_info, &img_fmt_props) != VK_SUCCESS) {
 		fprintf(stderr,
@@ -1017,11 +1013,6 @@ vk_init_ctx_for_rendering(struct vk_ctx *ctx)
 		return false;
 	}
 
-	if ((ctx->cache = create_pipeline_cache(ctx->dev)) == VK_NULL_HANDLE) {
-		fprintf(stderr, "Failed to create pipeline cache.\n");
-		goto fail;
-	}
-
 	if ((ctx->cmd_pool = create_cmd_pool(ctx)) == VK_NULL_HANDLE) {
 		fprintf(stderr, "Failed to create command pool.\n");
 		goto fail;
@@ -1049,20 +1040,27 @@ fail:
 void
 vk_cleanup_ctx(struct vk_ctx *ctx)
 {
-	if (ctx->cmd_buf != VK_NULL_HANDLE)
+	if (ctx->cmd_buf != VK_NULL_HANDLE) {
+		vkResetCommandBuffer(ctx->cmd_buf, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
 		vkFreeCommandBuffers(ctx->dev, ctx->cmd_pool, 1, &ctx->cmd_buf);
+		ctx->cmd_buf = VK_NULL_HANDLE;
+	}
 
-	if (ctx->cmd_pool != VK_NULL_HANDLE)
+	if (ctx->cmd_pool != VK_NULL_HANDLE) {
+		vkResetCommandPool(ctx->dev, ctx->cmd_pool, VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT);
 		vkDestroyCommandPool(ctx->dev, ctx->cmd_pool, 0);
+		ctx->cmd_pool = VK_NULL_HANDLE;
+	}
 
-	if (ctx->cache != VK_NULL_HANDLE)
-		vkDestroyPipelineCache(ctx->dev, ctx->cache, 0);
-
-	if (ctx->dev != VK_NULL_HANDLE)
+	if (ctx->dev != VK_NULL_HANDLE) {
 		vkDestroyDevice(ctx->dev, 0);
+		ctx->dev = VK_NULL_HANDLE;
+	}
 
-	if (ctx->inst != VK_NULL_HANDLE)
+	if (ctx->inst != VK_NULL_HANDLE) {
 		vkDestroyInstance(ctx->inst, 0);
+		ctx->inst = VK_NULL_HANDLE;
+	}
 }
 
 bool
@@ -1088,7 +1086,7 @@ vk_create_ext_image(struct vk_ctx *ctx,
 	img_info.arrayLayers = props->num_layers ? props->num_layers : VK_SAMPLE_COUNT_1_BIT;
 	img_info.samples = get_num_samples(props->num_samples);
 	img_info.tiling = props->tiling;
-	img_info.usage = props->usage ? props->usage : VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	img_info.usage = props->usage;
 	img_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	img_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	/* issue 17 of EXT_external_objects
@@ -1145,6 +1143,11 @@ vk_destroy_ext_image(struct vk_ctx *ctx, struct vk_image_obj *img_obj)
 	if (img_obj->mobj.mem != VK_NULL_HANDLE) {
 		vkFreeMemory(ctx->dev, img_obj->mobj.mem, 0);
 		img_obj->mobj.mem = VK_NULL_HANDLE;
+	}
+
+	if (img_obj->img_view != VK_NULL_HANDLE) {
+		vkDestroyImageView(ctx->dev, img_obj->img_view, 0);
+		img_obj->img_view = VK_NULL_HANDLE;
 	}
 }
 
@@ -1251,23 +1254,35 @@ void
 vk_destroy_renderer(struct vk_ctx *ctx,
 		    struct vk_renderer *renderer)
 {
-	if (renderer->renderpass != VK_NULL_HANDLE)
+	if (renderer->renderpass != VK_NULL_HANDLE) {
 		vkDestroyRenderPass(ctx->dev, renderer->renderpass, 0);
+		renderer->renderpass = VK_NULL_HANDLE;
+	}
 
-	if (renderer->vs != VK_NULL_HANDLE)
+	if (renderer->vs != VK_NULL_HANDLE) {
 		vkDestroyShaderModule(ctx->dev, renderer->vs, 0);
+		renderer->vs = VK_NULL_HANDLE;
+	}
 
-	if (renderer->fs != VK_NULL_HANDLE)
+	if (renderer->fs != VK_NULL_HANDLE) {
 		vkDestroyShaderModule(ctx->dev, renderer->fs, 0);
+		renderer->fs = VK_NULL_HANDLE;
+	}
 
-	if (renderer->pipeline != VK_NULL_HANDLE)
-		vkDestroyPipeline(ctx->dev, renderer->pipeline, 0);
-
-	if (renderer->fb != VK_NULL_HANDLE)
+	if (renderer->fb != VK_NULL_HANDLE) {
 		vkDestroyFramebuffer(ctx->dev, renderer->fb, 0);
+		renderer->fb = VK_NULL_HANDLE;
+	}
 
-	if (renderer->pipeline_layout != VK_NULL_HANDLE)
+	if (renderer->pipeline != VK_NULL_HANDLE) {
+		vkDestroyPipeline(ctx->dev, renderer->pipeline, 0);
+		renderer->pipeline = VK_NULL_HANDLE;
+	}
+
+	if (renderer->pipeline_layout != VK_NULL_HANDLE) {
 		vkDestroyPipelineLayout(ctx->dev, renderer->pipeline_layout, 0);
+		renderer->pipeline_layout = VK_NULL_HANDLE;
+	}
 }
 
 bool
@@ -1395,7 +1410,7 @@ vk_draw(struct vk_ctx *ctx,
 	/* VkCommandBufferBeginInfo */
 	memset(&cmd_begin_info, 0, sizeof cmd_begin_info);
 	cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
 	/* VkRect2D render area */
 	memset(&rp_area, 0, sizeof rp_area);
@@ -1556,7 +1571,7 @@ vk_clear_color(struct vk_ctx *ctx,
 	/* VkCommandBufferBeginInfo */
 	memset(&cmd_begin_info, 0, sizeof cmd_begin_info);
 	cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
 	/* VkRect2D render area */
 	memset(&rp_area, 0, sizeof rp_area);
@@ -1610,6 +1625,13 @@ vk_clear_color(struct vk_ctx *ctx,
 	img_range.layerCount = 1;
 
 	vkBeginCommandBuffer(ctx->cmd_buf, &cmd_begin_info);
+	vkCmdClearColorImage(ctx->cmd_buf,
+			     attachments[0].obj.img,
+			     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			     &clear_values[0].color,
+			     1,
+			     &img_range);
+
 	vkCmdBeginRenderPass(ctx->cmd_buf, &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
 	viewport.x = x;
@@ -1626,13 +1648,6 @@ vk_clear_color(struct vk_ctx *ctx,
 	vkCmdSetScissor(ctx->cmd_buf, 0, 1, &scissor);
 
 	vkCmdBindPipeline(ctx->cmd_buf, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->pipeline);
-
-	vkCmdClearColorImage(ctx->cmd_buf,
-			     attachments[0].obj.img,
-			     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			     &clear_values[0].color,
-			     1,
-			     &img_range);
 
 	if (attachments) {
 		VkImageMemoryBarrier *barriers =

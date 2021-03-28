@@ -35,7 +35,6 @@ struct vk_ctx
 	VkInstance inst;
 	VkPhysicalDevice pdev;
 	VkDevice dev;
-	VkPipelineCache cache;
 
 	VkCommandPool cmd_pool;
 	VkCommandBuffer cmd_buf;
@@ -75,6 +74,7 @@ struct vk_mem_obj {
 
 struct vk_image_obj {
 	VkImage img;
+	VkImageView img_view;
 	struct vk_mem_obj mobj;
 };
 
