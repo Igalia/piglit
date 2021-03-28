@@ -36,7 +36,42 @@ static VkRect2D scissor;
 static VkSampleCountFlagBits
 get_num_samples(uint32_t num_samples);
 
-/* Vulkan create functions */
+/* Vulkan static functions */
+static VkAccessFlagBits
+get_access_mask(const VkImageLayout layout)
+{
+	switch (layout) {
+	case VK_IMAGE_LAYOUT_UNDEFINED:
+		return 0;
+	case VK_IMAGE_LAYOUT_GENERAL:
+		return VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+		       VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT |
+		       VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_TRANSFER_READ_BIT |
+		       VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_HOST_WRITE_BIT |
+		       VK_ACCESS_HOST_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_PREINITIALIZED:
+		return VK_ACCESS_HOST_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		return VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
+		       VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		return VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
+	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+		return VK_ACCESS_TRANSFER_READ_BIT;
+	case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		return VK_ACCESS_TRANSFER_WRITE_BIT;
+	case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+		return 0;
+	default:
+		return 0;
+	};
+
+	return 0;
+}
+
 static void
 enable_validation_layers(VkInstanceCreateInfo *info)
 {
@@ -970,41 +1005,6 @@ fail:
 	return false;
 }
 
-static VkAccessFlagBits
-get_access_mask(const VkImageLayout layout)
-{
-	switch (layout) {
-	case VK_IMAGE_LAYOUT_UNDEFINED:
-		return 0;
-	case VK_IMAGE_LAYOUT_GENERAL:
-		return VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
-		       VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT |
-		       VK_ACCESS_TRANSFER_WRITE_BIT | VK_ACCESS_TRANSFER_READ_BIT |
-		       VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_HOST_WRITE_BIT |
-		       VK_ACCESS_HOST_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT |
-		       VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
-		       VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
-		       VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT;
-	case VK_IMAGE_LAYOUT_PREINITIALIZED:
-		return VK_ACCESS_HOST_WRITE_BIT;
-	case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
-		return VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
-		       VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-		return VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
-	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
-		return VK_ACCESS_TRANSFER_READ_BIT;
-	case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-		return VK_ACCESS_TRANSFER_WRITE_BIT;
-	case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
-		return 0;
-	default:
-		return 0;
-	};
-
-	return 0;
-}
-
 bool
 vk_init_ctx_for_rendering(struct vk_ctx *ctx)
 {
@@ -1489,6 +1489,7 @@ vk_draw(struct vk_ctx *ctx,
 	int num_vertices = vbo ? renderer->vertex_info.num_verts : 4;
 	vkCmdDraw(ctx->cmd_buf, num_vertices, 1, 0, 0);
 
+	vkCmdEndRenderPass(ctx->cmd_buf);
 	if (attachments) {
 		VkImageMemoryBarrier *barriers =
 			calloc(n_attachments, sizeof(VkImageMemoryBarrier));
@@ -1506,6 +1507,8 @@ vk_draw(struct vk_ctx *ctx,
 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			barrier->newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			barrier->srcAccessMask = get_access_mask(barrier->oldLayout);
+			barrier->dstAccessMask = get_access_mask(barrier->newLayout);
 			barrier->srcQueueFamilyIndex = ctx->qfam_idx;
 			barrier->dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
 			barrier->image = att->obj.img;
@@ -1519,7 +1522,7 @@ vk_draw(struct vk_ctx *ctx,
 		}
 
 		vkCmdPipelineBarrier(ctx->cmd_buf,
-				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+				     VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
 				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 				     0,
 				     0, NULL,
@@ -1527,8 +1530,6 @@ vk_draw(struct vk_ctx *ctx,
 				     n_attachments, barriers);
 		free(barriers);
 	}
-
-	vkCmdEndRenderPass(ctx->cmd_buf);
 	vkEndCommandBuffer(ctx->cmd_buf);
 
 	if (vkQueueSubmit(ctx->queue, 1, &submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
@@ -1625,9 +1626,15 @@ vk_clear_color(struct vk_ctx *ctx,
 	img_range.layerCount = 1;
 
 	vkBeginCommandBuffer(ctx->cmd_buf, &cmd_begin_info);
+	vk_transition_image_layout(&attachments[0],
+				   ctx->cmd_buf,
+				   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				   VK_IMAGE_LAYOUT_GENERAL,
+				   VK_QUEUE_FAMILY_EXTERNAL,
+				   ctx->qfam_idx);
 	vkCmdClearColorImage(ctx->cmd_buf,
 			     attachments[0].obj.img,
-			     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			     VK_IMAGE_LAYOUT_GENERAL,
 			     &clear_values[0].color,
 			     1,
 			     &img_range);
@@ -1649,46 +1656,39 @@ vk_clear_color(struct vk_ctx *ctx,
 
 	vkCmdBindPipeline(ctx->cmd_buf, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->pipeline);
 
-	if (attachments) {
-		VkImageMemoryBarrier *barriers =
-			calloc(n_attachments, sizeof(VkImageMemoryBarrier));
-		VkImageMemoryBarrier *barrier = barriers;
-		for (uint32_t n = 0; n < n_attachments; n++, barrier++) {
-			struct vk_image_att *att = &attachments[n];
-
-			/* Insert barrier to mark ownership transfer. */
-			barrier->sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-
-			bool is_depth =
-				get_aspect_from_depth_format(att->props.format) != VK_NULL_HANDLE;
-
-			barrier->oldLayout = is_depth ?
-				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			barrier->newLayout = VK_IMAGE_LAYOUT_GENERAL;
-			barrier->srcQueueFamilyIndex = ctx->qfam_idx;
-			barrier->dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
-			barrier->image = att->obj.img;
-			barrier->subresourceRange.aspectMask = is_depth ?
-				VK_IMAGE_ASPECT_DEPTH_BIT :
-				VK_IMAGE_ASPECT_COLOR_BIT;
-			barrier->subresourceRange.baseMipLevel = 0;
-			barrier->subresourceRange.levelCount = 1;
-			barrier->subresourceRange.baseArrayLayer = 0;
-			barrier->subresourceRange.layerCount = 1;
-		}
-
-		vkCmdPipelineBarrier(ctx->cmd_buf,
-				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-				     0,
-				     0, NULL,
-				     0, NULL,
-				     n_attachments, barriers);
-		free(barriers);
-	}
-
 	vkCmdEndRenderPass(ctx->cmd_buf);
+
+	if (!attachments || n_attachments < 2)
+		return;
+
+	VkImageMemoryBarrier barrier;
+	memset(&barrier, 0, sizeof barrier);
+	/* Insert barrier to mark ownership transfer. */
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	bool is_depth = get_aspect_from_depth_format(attachments[1].props.format) != VK_NULL_HANDLE;
+	if (!is_depth) {
+		fprintf(stderr, "The second attachment of vk_clear_color is not a depth attachment.\n");
+		return;
+	}
+	barrier.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	barrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+	barrier.srcQueueFamilyIndex = ctx->qfam_idx;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
+	barrier.image = attachments[1].obj.img;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+
+	vkCmdPipelineBarrier(ctx->cmd_buf,
+			     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+			     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+			     0,
+			     0, NULL,
+			     0, NULL,
+			     1, &barrier);
+
 	vkEndCommandBuffer(ctx->cmd_buf);
 
 	if (vkQueueSubmit(ctx->queue, 1, &submit_info, VK_NULL_HANDLE) != VK_SUCCESS) {
