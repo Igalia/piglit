@@ -1,6 +1,6 @@
 // [config]
 // expect_result: pass
-// glsl_version: 4.50
+// glsl_version: 4.50compatibility
 // require_extensions: GL_NV_compute_shader_derivatives
 // [end config]
 //
@@ -15,7 +15,7 @@
 //    functions, and the texture level of detail query function
 //    textureQueryLod().
 
-#version 450
+#version 450 compatibility
 #extension GL_NV_compute_shader_derivatives: require
 
 uniform isampler1D             is1D;
