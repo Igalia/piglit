@@ -233,6 +233,8 @@ static void
 vk_cleanup()
 {
 	vk_destroy_buffer(&vk_core, &vk_vb);
+	vk_destroy_ext_image(&vk_core, &vk_color_att.obj);
+	vk_destroy_ext_image(&vk_core, &vk_depth_att.obj);
 	vk_cleanup_ctx(&vk_core);
 }
 
