@@ -18,12 +18,17 @@ EOF
 
 apt-get update
 
+# Ephemeral packages (installed for this script and removed again at the end)
+EPHEMERAL="
+  curl
+  unzip
+  "
+
 apt-get install -y \
   bison \
   bzip2 \
   ccache \
   cmake \
-  curl \
   flex \
   freeglut3-dev \
   g++-multilib \
@@ -66,7 +71,7 @@ apt-get install -y \
   python3-yaml \
   tox \
   waffle-utils \
-  unzip
+  $EPHEMERAL
 
 pip3 install pytest-pythonpath
 pip3 install pytest-raises
@@ -85,6 +90,5 @@ done
 
 curl -s -L "https://dri.freedesktop.org/libdrm/libdrm-2.4.98.tar.bz2" -o /tmp/libdrm-2.4.98.tar.bz2
 
-apt-get purge -y \
-  curl \
-  unzip
+apt-get purge -y $EPHEMERAL
+apt-get autoremove -y --purge
