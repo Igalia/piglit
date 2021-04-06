@@ -7,24 +7,18 @@
 # an image after a significant amount of time might pull in newer
 # versions of gcc/clang or other packages, which might break the build
 # with older commits using the same tag.
-#
-# After merging a change resulting in generating a new image to the
-# main repository, it's recommended to remove the image from the source
-# repository's container registry, so that the image from the main
-# repository's registry will be used there as well.
 variables:
-  UPSTREAM_REPO: mesa/piglit
-  DEBIAN_TAG: "2021-03-29_2"
-  DEBIAN_VERSION: buster-slim
-  DEBIAN_IMAGE: "$CI_REGISTRY_IMAGE/debian/$DEBIAN_VERSION:$DEBIAN_TAG"
+  FDO_UPSTREAM_REPO: mesa/piglit
+  FDO_DISTRIBUTION_TAG: "2021-04-06-templates"
+  FDO_DISTRIBUTION_VERSION: buster-slim
   WINDOWS_TAG: "2020-08-18"
   WINDOWS_IMAGE: "$CI_REGISTRY_IMAGE/windows/x64_build:$WINDOWS_TAG"
   WINDOWS_UPSTREAM_IMAGE: "$CI_REGISTRY/$UPSTREAM_REPO/windows/x64_build:$WINDOWS_TAG"
   GIT_DEPTH: 100
 
 include:
-  - project: 'wayland/ci-templates'
-    ref: b7030c2cd0d6ccc5f6d4f8299bafa4daa9240d71
+  - project: 'freedesktop/ci-templates'
+    ref: 290b79e0e78eab67a83766f4e9691be554fc4afd
     file: '/templates/debian.yml'
 
 stages:
@@ -48,15 +42,16 @@ debian:
   stage: container
   extends:
     - .ci-run-policy
-    - .debian@container-ifnot-exists
+    - .fdo.container-build@debian
   variables:
     GIT_STRATEGY: none # no need to pull the whole tree for rebuilding the image
-    DEBIAN_EXEC: 'bash .gitlab-ci/debian-install.sh'
+    FDO_DISTRIBUTION_EXEC: 'bash .gitlab-ci/debian-install.sh'
+
 .use-debian:
   extends:
     - .ci-run-policy
+    - .fdo.distribution-image@debian
   needs: [debian]
-  image: $DEBIAN_IMAGE
 
 windows:
   stage: container

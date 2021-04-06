@@ -17,7 +17,6 @@ Pin-Priority: 500
 EOF
 
 apt-get update
-apt-get dist-upgrade -y
 
 apt-get install -y \
   bison \
@@ -68,8 +67,6 @@ apt-get install -y \
   tox \
   waffle-utils \
   unzip
-
-rm -rf /var/lib/apt/lists/*
 
 pip3 install pytest-pythonpath
 pip3 install pytest-raises
