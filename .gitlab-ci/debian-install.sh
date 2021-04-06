@@ -20,13 +20,15 @@ apt-get update
 
 # Ephemeral packages (installed for this script and removed again at the end)
 EPHEMERAL="
+  bzip2
   curl
+  libpciaccess-dev
+  meson
   unzip
   "
 
 apt-get install -y \
   bison \
-  bzip2 \
   ccache \
   cmake \
   flex \
@@ -36,17 +38,13 @@ apt-get install -y \
   gettext \
   git \
   jq \
-  libdrm-dev \
-  libdrm2 \
   libegl1-mesa-dev \
   libglvnd-dev \
-  libpciaccess-dev \
   libvulkan-dev \
   libwaffle-dev \
   libwayland-dev \
   libxkbcommon-dev \
   libxrender-dev \
-  meson \
   mingw-w64 \
   ninja-build \
   opencl-dev \
@@ -88,7 +86,18 @@ do
     rm /tmp/waffle-$target.zip
 done
 
-curl -s -L "https://dri.freedesktop.org/libdrm/libdrm-2.4.98.tar.bz2" -o /tmp/libdrm-2.4.98.tar.bz2
+
+# Debian buster has libdrm 2.4.97, which is too old
+export LIBDRM_VERSION=libdrm-2.4.98
+
+curl -s -L "https://dri.freedesktop.org/libdrm/$LIBDRM_VERSION.tar.bz2" -o /tmp/$LIBDRM_VERSION.tar.bz2
+tar -xvf /tmp/$LIBDRM_VERSION.tar.bz2 && rm /tmp/$LIBDRM_VERSION.tar.bz2
+cd $LIBDRM_VERSION
+meson build -D vc4=false -D freedreno=false -D etnaviv=false
+ninja -C build install
+cd ..
+rm -rf $LIBDRM_VERSION
+
 
 apt-get purge -y $EPHEMERAL
 apt-get autoremove -y --purge

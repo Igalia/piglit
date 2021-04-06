@@ -9,7 +9,7 @@
 # with older commits using the same tag.
 variables:
   FDO_UPSTREAM_REPO: mesa/piglit
-  FDO_DISTRIBUTION_TAG: "2021-04-06-ephemeral"
+  FDO_DISTRIBUTION_TAG: "2021-04-07-libdrm"
   FDO_DISTRIBUTION_VERSION: buster-slim
   WINDOWS_TAG: "2020-08-18"
   WINDOWS_IMAGE: "$CI_REGISTRY_IMAGE/windows/x64_build:$WINDOWS_TAG"
