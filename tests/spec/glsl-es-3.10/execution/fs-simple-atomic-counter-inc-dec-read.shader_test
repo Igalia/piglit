@@ -10,7 +10,7 @@ INT GL_MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS >= 2
 
 [fragment shader]
 #version 310 es
-precision highp float;
+precision highp int;
 
 layout(binding = 0) uniform atomic_uint a0;
 layout(binding = 0) uniform atomic_uint a1;
