@@ -57,8 +57,8 @@ do
     -DWaffle_LDFLAGS=$waffleDir/lib/libwaffle-1.dll.a \
     -DWaffle_DLL=$waffleDir/bin/waffle-1.dll
 
-  cmake --build build/$target
+  cmake --build build/$target -j${FDO_CI_CONCURRENT:-4}
 
-  cmake --build build/$target --target $packageTarget
+  cmake --build build/$target --target $packageTarget -j${FDO_CI_CONCURRENT:-4}
 
 done

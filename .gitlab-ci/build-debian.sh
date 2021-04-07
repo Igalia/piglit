@@ -13,4 +13,4 @@ cmake . \
       -D PIGLIT_BUILD_WGL_TESTS=off \
       -GNinja
 
-ninja -j4
+ninja -j${FDO_CI_CONCURRENT:-4}
