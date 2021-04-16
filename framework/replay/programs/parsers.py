@@ -75,6 +75,14 @@ DOWNLOAD_MINIO_HOST.add_argument(
     default=None,
     help=('name of MinIO server from which to download traces'))
 
+DOWNLOAD_MINIO_BUCKET = argparse.ArgumentParser(add_help=False)
+DOWNLOAD_MINIO_BUCKET.add_argument(
+    '-b', '--minio_bucket',
+    dest='download_minio_bucket',
+    required=False,
+    default=None,
+    help=('Name of bucket in MinIO server containing the traces'))
+
 DOWNLOAD_ROLE_SESSION_NAME = argparse.ArgumentParser(add_help=False)
 DOWNLOAD_ROLE_SESSION_NAME.add_argument(
     '-r', '--role-session-name',

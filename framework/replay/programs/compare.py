@@ -39,6 +39,7 @@ def _from_yaml(args):
     options.OPTIONS.keep_image = args.keep_image
     options.OPTIONS.download['force'] = args.force_download
     options.OPTIONS.download['minio_host'] = args.download_minio_host
+    options.OPTIONS.download['minio_bucket'] = args.download_minio_bucket
     options.OPTIONS.download['role_session_name'] = args.download_role_session_name
     options.OPTIONS.download['jwt'] = args.download_jwt
     options.OPTIONS.db_path = args.db_path
@@ -53,6 +54,7 @@ def _trace(args):
     options.OPTIONS.set_download_url(args.download_url)
     options.OPTIONS.download['force'] = args.force_download
     options.OPTIONS.download['minio_host'] = args.download_minio_host
+    options.OPTIONS.download['minio_bucket'] = args.download_minio_bucket
     options.OPTIONS.download['role_session_name'] = args.download_role_session_name
     options.OPTIONS.download['jwt'] = args.download_jwt
     options.OPTIONS.db_path = args.db_path
@@ -84,6 +86,7 @@ def compare(input_):
                  parsers.DOWNLOAD_URL,
                  parsers.DOWNLOAD_FORCE,
                  parsers.DOWNLOAD_MINIO_HOST,
+                 parsers.DOWNLOAD_MINIO_BUCKET,
                  parsers.DOWNLOAD_ROLE_SESSION_NAME,
                  parsers.DOWNLOAD_JWT,
                  parsers.DB_PATH,
@@ -107,6 +110,7 @@ def compare(input_):
                  parsers.YAML,
                  parsers.DOWNLOAD_FORCE,
                  parsers.DOWNLOAD_MINIO_HOST,
+                 parsers.DOWNLOAD_MINIO_BUCKET,
                  parsers.DOWNLOAD_ROLE_SESSION_NAME,
                  parsers.DOWNLOAD_JWT,
                  parsers.DB_PATH,

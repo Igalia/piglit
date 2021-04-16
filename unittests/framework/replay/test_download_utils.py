@@ -127,6 +127,9 @@ class TestDownloadUtils(object):
         """download_utils.ensure_file: Check we send the authentication headers to MinIO"""
         requests_mock.post(self.url, text=ASSUME_ROLE_RESPONSE)
         OPTIONS.download['minio_host'] = urlparse(self.url).netloc
+        OPTIONS.download['minio_bucket'] = 'minio_bucket'
+        OPTIONS.download['role_session_name'] = 'role_session_name'
+        OPTIONS.download['jwt'] = 'jwt'
 
         assert not self.trace_file.check()
         download_utils.ensure_file(self.trace_path)

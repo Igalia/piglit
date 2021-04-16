@@ -64,6 +64,7 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
     download.force -- Forces downloading even if the destination file already
                       exists.
     download.minio_host -- Name of MinIO server from which to download traces
+    download.minio_bucket -- Name of bucket in MinIO server containing the traces
     download.role_session_name -- Role session name for authentication with MinIO
     download.jwt -- JWT token for authentication with MinIO
     """
@@ -75,8 +76,8 @@ class _Options(object):  # pylint: disable=too-many-instance-attributes
         self.results_path = None
         self.download = {'url': None,
                          'force': False,
-                         'minio': False,
                          'minio_host': '',
+                         'minio_bucket': '',
                          'role_session_name': '',
                          'jwt': ''
         }

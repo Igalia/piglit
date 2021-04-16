@@ -84,19 +84,14 @@ def get_minio_credentials(url):
             minio_credentials['SecretAccessKey'],
             minio_credentials['SessionToken'])
 
-def get_bucket(url):
-    o = urlparse(url)
-    return o.path[1:].split('/')[0]
-
 def get_authorization_headers(url, resource):
     minio_key, minio_secret, minio_token = get_minio_credentials(url)
 
     content_type = 'application/octet-stream'
     date = formatdate(timeval=None, localtime=False, usegmt=True)
-    bucket = get_bucket(url)
     to_sign = "GET\n\n\n%s\nx-amz-security-token:%s\n/%s/%s" % (date,
                                                                 minio_token,
-                                                                bucket,
+                                                                OPTIONS.download['minio_bucket'],
                                                                 resource)
     signature = sign_with_hmac(minio_secret, to_sign)
 
@@ -125,6 +120,9 @@ def ensure_file(file_path):
         file_path), end=' ', flush=True)
 
     if OPTIONS.download['minio_host']:
+        assert OPTIONS.download['minio_bucket']
+        assert OPTIONS.download['role_session_name']
+        assert OPTIONS.download['jwt']
         headers = get_authorization_headers(url, file_path)
     else:
         headers = None
