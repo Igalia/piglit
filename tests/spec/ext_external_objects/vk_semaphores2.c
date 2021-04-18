@@ -128,7 +128,6 @@ static GLint gl_prog_overwrite;
 static GLuint gl_mem_obj;
 
 static GLuint gl_fbo;
-static GLuint gl_rbo;
 
 static struct gl_ext_semaphores gl_sem;
 static struct vk_semaphores vk_sem;
@@ -373,20 +372,9 @@ gl_init()
 						       fs_overwrite);
 
 	glGenFramebuffers(1, &gl_fbo);
-	glGenRenderbuffers(1, &gl_rbo);
 
 	glBindTexture(gl_target, gl_tex);
 	glBindFramebuffer(GL_FRAMEBUFFER, gl_fbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, gl_rbo);
-
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-			      w, h);
-
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-				  GL_DEPTH_STENCIL_ATTACHMENT,
-				  GL_RENDERBUFFER, gl_rbo);
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER,
 			       GL_COLOR_ATTACHMENT0,
 			       gl_target, gl_tex, 0);
@@ -395,14 +383,13 @@ gl_init()
 		return false;
 
 	glClearColor(1.0, 1.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(gl_target, 0);
 
 	glClearColor(0.1, 0.1, 0.1, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	return glGetError() == GL_NO_ERROR;
 }
 
@@ -418,7 +405,6 @@ gl_cleanup(void)
 	glDeleteSemaphoresEXT(1, &gl_sem.vk_frame_done);
 
 	glDeleteFramebuffers(1, &gl_fbo);
-	glDeleteRenderbuffers(1, &gl_rbo);
 
 	glDeleteMemoryObjectsEXT(1, &gl_mem_obj);
 }

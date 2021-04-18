@@ -46,7 +46,6 @@ static struct vk_image_obj vk_img_obj;
 static GLuint gl_mem_obj;
 static GLuint gl_tex;
 static GLuint gl_fbo;
-static GLuint gl_rbo;
 
 static int gl_prog_flt;
 static int gl_prog_int;
@@ -335,15 +334,6 @@ gl_draw_texture(enum fragment_type fs_type, uint32_t w, uint32_t h)
 	glBindTexture(gl_target, gl_tex);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, gl_fbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, gl_rbo);
-
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-			      w, h);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-				  GL_DEPTH_STENCIL_ATTACHMENT,
-				  GL_RENDERBUFFER, gl_rbo);
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER,
 			       GL_COLOR_ATTACHMENT0,
 			       gl_target, gl_tex, 0);
@@ -352,12 +342,10 @@ gl_draw_texture(enum fragment_type fs_type, uint32_t w, uint32_t h)
 		return false;
 
 	glClearColor(1.0, 1.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glDisable(GL_DEPTH_TEST);
 	glClearColor(0.0, 0.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -381,7 +369,6 @@ cleanup(void)
 	vk_cleanup_ctx(&vk_core);
 	gl_cleanup();
 
-	glDeleteRenderbuffers(1, &gl_rbo);
 	glDeleteFramebuffers(1, &gl_fbo);
 
 	glDeleteProgram(gl_prog_flt);
@@ -397,8 +384,6 @@ gl_init(void)
 	gl_prog_uint = piglit_build_simple_program(vs, fs[2]);
 
 	glGenFramebuffers(1, &gl_fbo);
-	glGenRenderbuffers(1, &gl_rbo);
-
 	glUseProgram(0);
 
 	return glGetError() == GL_NO_ERROR;
