@@ -305,6 +305,8 @@ piglit_gbm_buf_create(unsigned w, unsigned h, unsigned fourcc,
 	case DRM_FORMAT_ABGR8888:
 	case DRM_FORMAT_RGBA8888:
 	case DRM_FORMAT_BGRA8888:
+	case DRM_FORMAT_AYUV:
+	case DRM_FORMAT_XYUV8888:
 		format = GBM_BO_FORMAT_ARGB8888;
 		cpp = 4;
 		src_stride = cpp * w;
