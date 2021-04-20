@@ -1662,36 +1662,47 @@ vk_clear_color(struct vk_ctx *ctx,
 
 	vkCmdEndRenderPass(ctx->cmd_buf);
 
-	if (!attachments || n_attachments < 2)
-		return;
+	if (attachments) {
+		VkImageMemoryBarrier *barriers =
+			calloc(n_attachments, sizeof(VkImageMemoryBarrier));
+		VkImageMemoryBarrier *barrier = barriers;
 
-	VkImageMemoryBarrier barrier;
-	memset(&barrier, 0, sizeof barrier);
-	/* Insert barrier to mark ownership transfer. */
-	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-	bool is_depth = get_aspect_from_depth_format(attachments[1].props.format) != VK_NULL_HANDLE;
-	if (!is_depth) {
-		fprintf(stderr, "The second attachment of vk_clear_color is not a depth attachment.\n");
-		return;
+		for (uint32_t n = 0; n < n_attachments; n++, barrier++) {
+			struct vk_image_att *att = &attachments[n];
+
+			/* Insert barrier to mark ownership transfer. */
+			barrier->sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+
+			bool is_depth =
+				get_aspect_from_depth_format(att->props.format) != VK_NULL_HANDLE;
+
+			barrier->oldLayout = is_depth ?
+				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			barrier->newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			barrier->srcAccessMask = get_access_mask(barrier->oldLayout);
+			barrier->dstAccessMask = get_access_mask(barrier->newLayout);
+			barrier->srcQueueFamilyIndex = ctx->qfam_idx;
+			barrier->dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
+			barrier->image = att->obj.img;
+			barrier->subresourceRange.aspectMask = is_depth ?
+				VK_IMAGE_ASPECT_DEPTH_BIT :
+				VK_IMAGE_ASPECT_COLOR_BIT;
+			barrier->subresourceRange.baseMipLevel = 0;
+			barrier->subresourceRange.levelCount = 1;
+			barrier->subresourceRange.baseArrayLayer = 0;
+			barrier->subresourceRange.layerCount = 1;
+		}
+
+		vkCmdPipelineBarrier(ctx->cmd_buf,
+				     VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+				     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+				     0,
+				     0, NULL,
+				     0, NULL,
+				     n_attachments, barriers);
+		free(barriers);
 	}
-	barrier.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-	barrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-	barrier.srcQueueFamilyIndex = ctx->qfam_idx;
-	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL;
-	barrier.image = attachments[1].obj.img;
-	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-	barrier.subresourceRange.baseMipLevel = 0;
-	barrier.subresourceRange.levelCount = 1;
-	barrier.subresourceRange.baseArrayLayer = 0;
-	barrier.subresourceRange.layerCount = 1;
-
-	vkCmdPipelineBarrier(ctx->cmd_buf,
-			     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-			     VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-			     0,
-			     0, NULL,
-			     0, NULL,
-			     1, &barrier);
 
 	vkEndCommandBuffer(ctx->cmd_buf);
 
