@@ -351,7 +351,7 @@ gl_init()
 	gl_prog = piglit_build_simple_program(vs, fs);
 	glUseProgram(gl_prog);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	return glGetError() == GL_NO_ERROR;
 }
 
