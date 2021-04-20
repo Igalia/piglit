@@ -39,6 +39,7 @@ apt-get install -y \
   git \
   jq \
   libegl1-mesa-dev \
+  libgbm-dev \
   libglvnd-dev \
   libvulkan-dev \
   libwaffle-dev \
