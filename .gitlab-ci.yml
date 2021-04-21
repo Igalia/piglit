@@ -99,6 +99,11 @@ build-debian:
     - .use-ccache
   script:
     - .gitlab-ci/build-debian.sh
+  artifacts:
+    when: on_failure
+    paths:
+      - CMakeCache.txt
+      - CMakeFiles/*.log
 
 build-debian-mingw:
   stage: build
