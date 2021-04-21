@@ -28,6 +28,10 @@
 
 #include "vk.h"
 
+#ifndef VK_NULL_HANDLE
+#define VK_NULL_HANDLE 0
+#endif
+
 /* static variables */
 static VkViewport viewport;
 static VkRect2D scissor;
@@ -359,7 +363,7 @@ get_aspect_from_depth_format(VkFormat depth_format)
 	default:
 		break;
 	}
-	return VK_NULL_HANDLE;
+	return 0;
 }
 
 static VkPipelineStageFlags
@@ -1501,7 +1505,7 @@ vk_draw(struct vk_ctx *ctx,
 			barrier->sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 
 			bool is_depth =
-				get_aspect_from_depth_format(att->props.format) != VK_NULL_HANDLE;
+				get_aspect_from_depth_format(att->props.format) != 0;
 
 			barrier->oldLayout = is_depth ?
 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL :
