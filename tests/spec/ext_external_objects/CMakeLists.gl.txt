@@ -8,7 +8,7 @@ piglit_add_executable (ext_external_objects-memory-object-api-errors
 piglit_add_executable (ext_external_objects-semaphore-api-errors
 		       semaphore-api-errors.c)
 
-IF(LIBVULKAN_FOUND)
+IF(PIGLIT_BUILD_VK_TESTS)
 	set(VK_BANDS_VERT vk_bands.vert.spv)
 	set(VK_BANDS_FRAG vk_bands.frag.spv)
 	set(VK_BANDS_VERT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${VK_BANDS_VERT})
@@ -33,93 +33,41 @@ IF(LIBVULKAN_FOUND)
 	add_definitions(-DVK_ZQUAD_VERT="${VK_ZQUAD_VERT}")
 	add_definitions(-DVK_ZQUAD_FRAG="${VK_ZQUAD_FRAG}")
 
-	find_program(GLSLANG_VALIDATOR NAMES glslangValidator)
+	add_custom_command(
+		OUTPUT ${VK_BANDS_VERT_PATH}
+		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert -o ${VK_BANDS_VERT_PATH}
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
+	)
 
-	IF(GLSLANG_VALIDATOR)
-		add_custom_command(
-			OUTPUT ${VK_BANDS_VERT_PATH}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert -o ${VK_BANDS_VERT_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
-		)
+	add_custom_command(
+		OUTPUT ${VK_BANDS_FRAG_PATH}
+		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag -o ${VK_BANDS_FRAG_PATH}
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
+	)
 
-		add_custom_command(
-			OUTPUT ${VK_BANDS_FRAG_PATH}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag -o ${VK_BANDS_FRAG_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
-		)
+	add_custom_command(
+		OUTPUT ${VK_BLUE_VERT_PATH}
+		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.vert -o ${VK_BLUE_VERT_PATH}
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.vert
+	)
 
-		add_custom_command(
-			OUTPUT ${VK_BLUE_VERT_PATH}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.vert -o ${VK_BLUE_VERT_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.vert
-		)
+	add_custom_command(
+		OUTPUT ${VK_BLUE_FRAG_PATH}
+		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag -o ${VK_BLUE_FRAG_PATH}
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag
+	)
 
-		add_custom_command(
-			OUTPUT ${VK_BLUE_FRAG_PATH}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag -o ${VK_BLUE_FRAG_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag
-		)
+	add_custom_command(
+		OUTPUT ${VK_ZQUAD_VERT_PATH}
+		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert -o ${VK_ZQUAD_VERT_PATH}
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert
+	)
 
-		add_custom_command(
-			OUTPUT ${VK_ZQUAD_VERT_PATH}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert -o ${VK_ZQUAD_VERT_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert
-		)
-
-		add_custom_command(
-			OUTPUT ${VK_ZQUAD_FRAG_PATH}
-			COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag -o ${VK_ZQUAD_FRAG_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag
-		)
-	ELSE()
-		add_custom_command(
-			OUTPUT ${VK_BANDS_VERT_PATH}
-			COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert.spv
-			${VK_BANDS_VERT_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.vert
-		)
-
-		add_custom_command(
-			OUTPUT ${VK_BANDS_FRAG_PATH}
-			COMMAND ${CMAKE_COMMAND} -E copy
-				${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag.spv
-				${VK_BANDS_FRAG_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_bands.frag
-		)
-
-		add_custom_command(
-			OUTPUT ${VK_BLUE_VERT_PATH}
-			COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.vert.spv
-			${VK_BLUE_VERT_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.vert
-		)
-
-		add_custom_command(
-			OUTPUT ${VK_BLUE_FRAG_PATH}
-			COMMAND ${CMAKE_COMMAND} -E copy
-				${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag.spv
-				${VK_BLUE_FRAG_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_blue.frag
-		)
-
-		add_custom_command(
-			OUTPUT ${VK_ZQUAD_VERT_PATH}
-			COMMAND ${CMAKE_COMMAND} -E copy
-				${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert.spv
-				${VK_ZQUAD_VERT_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.vert
-		)
-
-		add_custom_command(
-			OUTPUT ${VK_ZQUAD_FRAG_PATH}
-			COMMAND ${CMAKE_COMMAND} -E copy
-				${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag.spv
-				${VK_ZQUAD_FRAG_PATH}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag
-		)
-	ENDIF()
+	add_custom_command(
+		OUTPUT ${VK_ZQUAD_FRAG_PATH}
+		COMMAND ${GLSLANG_VALIDATOR} -V ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag -o ${VK_ZQUAD_FRAG_PATH}
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vk_zquad.frag
+	)
 
 	include_directories(
 		${GLEXT_INCLUDE_DIR}
