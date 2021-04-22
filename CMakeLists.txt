@@ -37,8 +37,10 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(PIGLIT_BUILD_GLES_TESTS_DEFAULT ON)
+	set(PIGLIT_BUILD_VK_TESTS_DEFAULT ON)
 else()
 	set(PIGLIT_BUILD_GLES_TESTS_DEFAULT OFF)
+	set(PIGLIT_BUILD_VK_TESTS_DEFAULT OFF)
 endif()
 
 option(PIGLIT_BUILD_GL_TESTS "Build tests for OpenGL" ON)
@@ -46,6 +48,7 @@ option(PIGLIT_BUILD_GLES1_TESTS "Build tests for OpenGL ES1" ${PIGLIT_BUILD_GLES
 option(PIGLIT_BUILD_GLES2_TESTS "Build tests for OpenGL ES2" ${PIGLIT_BUILD_GLES_TESTS_DEFAULT})
 option(PIGLIT_BUILD_GLES3_TESTS "Build tests for OpenGL ES3" ${PIGLIT_BUILD_GLES_TESTS_DEFAULT})
 option(PIGLIT_BUILD_CL_TESTS "Build tests for OpenCL" OFF)
+option(PIGLIT_BUILD_VK_TESTS "Build tests for Vulkan" ${PIGLIT_BUILD_VK_TESTS_DEFAULT})
 
 if(PIGLIT_BUILD_GL_TESTS)
 	find_package(OpenGL REQUIRED)
@@ -178,6 +181,20 @@ ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		add_definitions(-DPIGLIT_HAS_WGL)
 	endif()
 ENDIF()
+
+if(PIGLIT_BUILD_VK_TESTS)
+
+if (NOT LIBVULKAN_FOUND)
+	message(FATAL_ERROR "libvulkan required by vulkan tests not found")
+endif()
+
+find_program(GLSLANG_VALIDATOR NAMES glslangValidator)
+
+if (NOT GLSLANG_VALIDATOR)
+	message(FATAL_ERROR "glslangValidator required by vulkan tests not found")
+endif()
+
+endif(PIGLIT_BUILD_VK_TESTS)
 
 IF(PIGLIT_HAS_GLX)
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" ON)
