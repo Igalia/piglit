@@ -37,6 +37,7 @@ apt-get install -y \
   gcc-multilib \
   gettext \
   git \
+  glslang-tools \
   jq \
   libegl1-mesa-dev \
   libgbm-dev \
