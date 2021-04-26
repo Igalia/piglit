@@ -32,7 +32,7 @@ import xml.etree.ElementTree as ET
 from os import path
 from time import time
 from email.utils import formatdate
-from urllib.parse import urlparse
+from requests.utils import requote_uri
 
 from framework import core, exceptions
 from framework.replay.options import OPTIONS
@@ -92,7 +92,7 @@ def get_authorization_headers(url, resource):
     to_sign = "GET\n\n\n%s\nx-amz-security-token:%s\n/%s/%s" % (date,
                                                                 minio_token,
                                                                 OPTIONS.download['minio_bucket'],
-                                                                resource)
+                                                                requote_uri(resource))
     signature = sign_with_hmac(minio_secret, to_sign)
 
     headers = {'Host': OPTIONS.download['minio_host'],
