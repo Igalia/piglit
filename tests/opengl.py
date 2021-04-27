@@ -886,6 +886,7 @@ with profile.test_list.group_manager(
     g(['incomplete-cubemap', 'format'], 'incomplete-cubemap-format')
     g(['gl-2.0-texture-units'])
     g(['gl-2.0-uniform-neg-location'])
+    g(['shadersource-errors'])
 
 with profile.test_list.group_manager(
         PiglitGLTest,

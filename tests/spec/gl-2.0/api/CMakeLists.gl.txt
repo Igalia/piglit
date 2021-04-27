@@ -14,5 +14,6 @@ piglit_add_executable (getattriblocation-conventional getattriblocation-conventi
 piglit_add_executable (clip-flag-behavior clip-flag-behavior.c)
 piglit_add_executable (gl-2.0-texture-units texture-units.c)
 piglit_add_executable (gl-2.0-uniform-neg-location uniform-neg-location.c)
+piglit_add_executable (shadersource-errors shadersource-errors.c)
 
 # vim: ft=cmake:
